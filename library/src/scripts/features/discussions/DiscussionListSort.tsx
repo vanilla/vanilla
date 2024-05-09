@@ -5,7 +5,7 @@
  */
 
 import React, { useMemo } from "react";
-import startCase from "lodash-es/startCase";
+import startCase from "lodash/startCase";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
 import { ButtonTypes } from "@library/forms/buttonTypes";

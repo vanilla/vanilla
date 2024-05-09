@@ -1,9 +1,9 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-import React, { ComponentProps, useState } from "react";
+import React, { ComponentProps, useEffect, useState } from "react";
 import classNames from "classnames";
 import { t } from "@vanilla/i18n";
 import { useUniqueID } from "@library/utility/idUtils";
@@ -21,9 +21,7 @@ import { widgetSettingsClasses } from "@dashboard/layout/editor/widgetSettings/W
 import { WidgetSettings } from "@dashboard/layout/editor/widgetSettings/WidgetSettings";
 import { IFieldError, JsonSchema, PartialSchemaDefinition } from "@vanilla/json-schema-forms";
 import { ILayoutCatalog, IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { useFormik } from "formik";
-import ModalConfirm from "@library/modal/ModalConfirm";
-import { useIsMounted } from "@vanilla/react-utils";
+import isEmpty from "lodash/isEmpty";
 
 export interface IWidgetConfigurationComponentProps {
     schema: JsonSchema;
@@ -37,151 +35,125 @@ interface IProps {
     isVisible: ComponentProps<typeof Modal>["isVisible"];
     exitHandler: ComponentProps<typeof Modal>["exitHandler"];
     widgetID: string;
-    initialValues: any;
+    initialValue?: any;
     widgetCatalog: IWidgetCatalog;
     middlewaresCatalog: ILayoutCatalog["middlewares"];
     assetCatalog?: IWidgetCatalog;
-    schema: JsonSchema;
-    name: string;
 }
 
 export function WidgetSettingsModal(props: IProps) {
-    const {
-        schema,
-        name,
-        widgetID,
-        onSave,
-        isVisible,
-        exitHandler,
-        initialValues,
-        widgetCatalog,
-        middlewaresCatalog,
-        assetCatalog,
-    } = props;
+    const { widgetID, onSave, isVisible, exitHandler, initialValue, widgetCatalog, middlewaresCatalog, assetCatalog } =
+        props;
 
     const classes = widgetSettingsClasses();
     const classFrameFooter = frameFooterClasses();
     const classesFrameBody = frameBodyClasses();
     const titleID = useUniqueID("widgetSettings_Modal");
-
-    const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
-    const isMounted = useIsMounted();
-
+    const [value, setValue] = useState<any>(initialValue ?? {});
     const [fieldErrors, setFieldErrors] = useState<Record<string, IFieldError[]>>({});
 
-    // we will need to use our schema validator here at some point, ticket for that created here https://higherlogic.atlassian.net/browse/VNLA-5028
-    const checkFields = (tmpValue: any, tmpSchema: JsonSchema | PartialSchemaDefinition, path?: string[]) => {
-        const errors: Record<string, IFieldError[]> = {};
-        const requiredProps = tmpSchema.required ?? [];
-        requiredProps.forEach((fieldName) => {
-            const fieldPath = path ? [...path] : [];
-            fieldPath.push(fieldName);
-            const fieldSchema = tmpSchema.properties ? tmpSchema.properties[fieldName] : tmpSchema;
+    useEffect(() => {
+        setValue(initialValue ?? {});
+    }, [initialValue]);
 
-            if (tmpValue && fieldSchema?.properties) {
-                checkFields(tmpValue[fieldName], fieldSchema, fieldPath);
-            } else if (!tmpValue) {
-                errors[fieldPath.join("/")] = [
+    const widgetOrAssetCatalog = assetCatalog && assetCatalog[widgetID] ? assetCatalog : widgetCatalog;
+
+    // we will need to use our schema validator here at some point, ticket for that created here https://higherlogic.atlassian.net/browse/VNLA-5028
+    const validateAndSaveForm = (evt: React.FormEvent<HTMLFormElement>) => {
+        evt.preventDefault();
+
+        const schema: JsonSchema = widgetOrAssetCatalog[widgetID]?.schema ?? {};
+        const errors: Record<string, IFieldError[]> = {};
+
+        const checkFields = (tmpValue: any, tmpSchema: JsonSchema | PartialSchemaDefinition, path?: string[]) => {
+            const requiredProps = tmpSchema.required ?? [];
+            requiredProps.forEach((fieldName) => {
+                const fieldPath = path ? [...path] : [];
+                fieldPath.push(fieldName);
+                const fieldSchema = tmpSchema.properties ? tmpSchema.properties[fieldName] : tmpSchema;
+
+                if (tmpValue && fieldSchema?.properties) {
+                    checkFields(tmpValue[fieldName], fieldSchema, fieldPath);
+                } else if (!tmpValue) {
+                    errors[fieldPath.join("/")] = [
+                        {
+                            field: fieldName,
+                            message: t("Invalid entry."),
+                            path: path?.join("/"),
+                        },
+                    ];
+                }
+            });
+
+            const limitSchema = tmpSchema.properties.limit ?? tmpSchema.properties.apiParams?.properties?.limit;
+            const limitToCheck = tmpValue.limit ?? tmpValue.apiParams?.limit;
+            const currentLimitExceedsMaximum =
+                limitSchema && limitSchema.maximum && limitToCheck && parseInt(limitToCheck) > limitSchema.maximum;
+            if (currentLimitExceedsMaximum) {
+                errors[tmpSchema.properties.limit ? "limit" : "apiParams/limit"] = [
                     {
-                        field: fieldName,
-                        message: t("Invalid entry."),
-                        path: path?.join("/"),
+                        field: "limit",
+                        message: t("Number input must be between 1 and 100."),
+                        path: tmpSchema.properties.limit ? undefined : "apiParams",
                     },
                 ];
             }
-        });
+        };
 
-        const limitSchema = tmpSchema.properties.limit ?? tmpSchema.properties.apiParams?.properties?.limit;
-        const limitToCheck = tmpValue.limit ?? tmpValue.apiParams?.limit;
-        const currentLimitExceedsMaximum =
-            limitSchema && limitSchema.maximum && limitToCheck && parseInt(limitToCheck) > limitSchema.maximum;
-        if (currentLimitExceedsMaximum) {
-            errors[tmpSchema.properties.limit ? "limit" : "apiParams/limit"] = [
-                {
-                    field: "limit",
-                    message: t("Number input must be between 1 and 100."),
-                    path: tmpSchema.properties.limit ? undefined : "apiParams",
-                },
-            ];
+        checkFields(value, schema);
+
+        const isValid = isEmpty(errors);
+
+        setFieldErrors(errors);
+
+        if (isValid) {
+            onSave(value);
         }
-        return errors;
     };
 
-    function close() {
+    const changeValue = (newValue) => {
+        setValue(newValue);
         setFieldErrors({});
-        setTimeout(() => {
-            if (isMounted()) {
-                exitHandler && exitHandler();
-            }
-        }, 1);
-    }
+    };
 
-    const { values, setValues, submitForm, dirty, resetForm } = useFormik({
-        initialValues,
-        enableReinitialize: true,
-        onSubmit: (values) => {
-            onSave(values);
-            close();
-        },
-        validateOnChange: false,
-        validateOnMount: false,
-        validate: (values) => {
-            const errors = checkFields(values, schema);
-            setFieldErrors(errors);
-            return errors;
-        },
-    });
-
-    function handleClose() {
-        if (dirty) {
-            if (isMounted()) {
-                setConfirmDialogVisible(true);
-            }
-        } else {
-            setConfirmDialogVisible(false);
-            close();
-        }
-    }
+    const onExit = () => {
+        setFieldErrors({});
+        exitHandler && exitHandler();
+    };
 
     return (
         <Modal
             isVisible={isVisible}
             size={ModalSizes.LARGE}
-            exitHandler={handleClose}
+            exitHandler={onExit}
             titleID={titleID}
             className={classes.container}
         >
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    submitForm();
-                }}
-                className={classes.modalForm}
-            >
+            <form onSubmit={validateAndSaveForm} className={classes.modalForm}>
                 <Frame
                     header={
                         <FrameHeader
                             titleID={titleID}
-                            closeFrame={handleClose}
-                            title={`${t("Add/Edit")} ${name ?? ""}`}
+                            closeFrame={onExit}
+                            title={`${t("Add/Edit")} ${widgetOrAssetCatalog[widgetID]?.name ?? ""}`}
                         />
                     }
                     body={
                         <section className={classNames(classesFrameBody.contents, classes.section)}>
                             <WidgetSettingsPreview
                                 widgetID={widgetID}
-                                config={values}
-                                value={values}
+                                config={value}
                                 widgetCatalog={widgetCatalog}
-                                onChange={setValues}
-                                schema={schema}
+                                value={value}
+                                onChange={changeValue}
+                                schema={widgetOrAssetCatalog[widgetID]?.schema ?? {}}
                                 middlewares={middlewaresCatalog}
                                 assetCatalog={assetCatalog}
                             />
                             <WidgetSettings
-                                value={values}
-                                onChange={setValues}
-                                schema={schema}
+                                value={value}
+                                onChange={changeValue}
+                                schema={widgetOrAssetCatalog[widgetID]?.schema ?? {}}
                                 middlewares={middlewaresCatalog}
                                 fieldErrors={fieldErrors}
                             />
@@ -192,7 +164,7 @@ export function WidgetSettingsModal(props: IProps) {
                             <Button
                                 className={classFrameFooter.actionButton}
                                 buttonType={ButtonTypes.TEXT}
-                                onClick={handleClose}
+                                onClick={onExit}
                             >
                                 {t("Cancel")}
                             </Button>
@@ -207,24 +179,6 @@ export function WidgetSettingsModal(props: IProps) {
                     }
                 />
             </form>
-
-            <ModalConfirm
-                title={t("Unsaved Changes")}
-                isVisible={confirmDialogVisible}
-                onCancel={() => {
-                    setConfirmDialogVisible(false);
-                }}
-                onConfirm={() => {
-                    resetForm({ values: initialValues });
-                    setConfirmDialogVisible(false);
-                    close();
-                }}
-                confirmTitle={t("Exit")}
-            >
-                {t(
-                    "You are leaving the widget editor without saving your changes. Make sure your updates are saved before exiting.",
-                )}
-            </ModalConfirm>
         </Modal>
     );
 }

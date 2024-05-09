@@ -11,7 +11,6 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { percent } from "csx";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { css } from "@emotion/css";
-import { shadowHelper } from "@library/styles/shadowHelpers";
 
 export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial<ICallToActionOptions>) => {
     const vars = callToActionVariables(optionsOverrides);
@@ -23,15 +22,11 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-        color: "inherit",
 
         //we are going to use <img> with src-sets in the component directly, so no background-image css
         backgroundImage: "none",
     });
 
-    const containerLink = css({
-        "&:hover": { boxShadow: shadowHelper().makeShadow(0.6) },
-    });
     const isImageLeft = vars.options.imagePlacement === "left";
     const isImageTop = vars.options.imagePlacement === "top";
     const mediaQueries = vars.mediaQueries();
@@ -166,7 +161,6 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
     return {
         root,
         container,
-        containerLink,
         title,
         absoluteTitle,
         description,

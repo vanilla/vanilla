@@ -11,7 +11,7 @@ import {
     IFeaturedCollectionsOptions,
 } from "@library/featuredCollections/FeaturedCollections";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
-import omit from "lodash-es/omit";
+import omit from "lodash/omit";
 
 interface IProps extends IFeaturedCollectionsProps {
     containerOptions?: IHomeWidgetContainerOptions;

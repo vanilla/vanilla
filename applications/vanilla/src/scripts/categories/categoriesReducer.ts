@@ -7,7 +7,7 @@ import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { produce } from "immer";
 import CategorySuggestionActions from "@vanilla/addon-vanilla/categories/CategorySuggestionActions";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import clone from "lodash-es/clone";
+import clone from "lodash/clone";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 
 export interface ICategoriesState {

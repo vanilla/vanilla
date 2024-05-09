@@ -12,7 +12,6 @@ import { RecordID } from "@vanilla/utils";
 import { FormikHelpers } from "formik";
 
 export interface IAttachmentIntegration {
-    name: string;
     attachmentType: string;
     label: string;
     recordTypes: string[];

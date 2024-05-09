@@ -9,7 +9,7 @@ namespace VanillaTests\Library\Vanilla\Web;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Models\SiteMeta;
-use Vanilla\Web\Asset\WebAsset;
+use Vanilla\Web\Asset\ExternalAsset;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\PageHead;
 use Vanilla\Web\PageHeadInterface;
@@ -40,7 +40,7 @@ class PageHeadTest extends SiteTestCase
         /** @var PageHeadInterface $instance */
         foreach ($instances as $instance) {
             $instance
-                ->addScript(new WebAsset("https://test.com/javascript.js"))
+                ->addScript(new ExternalAsset("https://test.com/javascript.js"))
                 ->addInlineScript("console.log('Hello world')")
                 ->addLinkTag(["rel" => "isLink"])
                 ->addMetaTag(["type" => "isMeta"])

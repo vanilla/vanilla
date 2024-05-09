@@ -235,6 +235,14 @@ $dic->setInstance(Container::class, $dic)
     ->rule(\Vanilla\Web\Asset\AssetPreloadModel::class)
     ->setShared(true)
 
+    ->rule(\Vanilla\Web\Asset\WebpackAssetProvider::class)
+    ->addCall("setHotReloadEnabled", [ContainerUtils::config("HotReload.Enabled")])
+    ->addCall("setLocaleKey", [ContainerUtils::currentLocale()])
+    ->addCall("setCacheBusterKey", [ContainerUtils::cacheBuster()])
+    // Explicitly cannot be set as shared.
+    // If instantiated too early, then the request/site sections will not be processed yet.
+    ->setShared(false)
+
     ->rule(\Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel::class)
     ->setShared(true)
     ->addCall("addProvider", [
@@ -246,6 +254,7 @@ $dic->setInstance(Container::class, $dic)
     ->addCall("addProvider", [
         new Reference(\Vanilla\Web\ContentSecurityPolicy\VanillaWhitelistContentSecurityPolicyProvider::class),
     ])
+    ->addCall("addProvider", [new Reference(\Vanilla\Web\Asset\WebpackContentSecurityPolicyProvider::class)])
 
     ->rule(\Vanilla\Web\Asset\LegacyAssetModel::class)
     ->setConstructorArgs([ContainerUtils::cacheBuster()])
@@ -505,11 +514,6 @@ $dic->call(function (
     $dockerDefaultsPath = PATH_CONF . "/docker-defaults.php";
     if (file_exists($dockerDefaultsPath)) {
         $config->load($dockerDefaultsPath);
-    }
-
-    $hotBuildPath = PATH_CONF . "/hot-build.php";
-    if (file_exists($hotBuildPath)) {
-        $config->load($hotBuildPath);
     }
 
     // Load installation-specific configuration so that we know what apps are enabled.

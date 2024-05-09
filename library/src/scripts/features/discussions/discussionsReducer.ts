@@ -11,7 +11,7 @@ import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { RecordID, stableObjectHash } from "@vanilla/utils";
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import difference from "lodash-es/difference";
+import difference from "lodash/difference";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { useDispatch } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
@@ -70,7 +70,7 @@ function setDiscussionReaction(
         (reaction) => ({
             ...reaction,
             //assumes the user can only have one reaction to a discussion
-            hasReacted: reaction.urlcode === params.addReaction?.urlcode,
+            hasReacted: reaction.urlcode === params.addReaction?.urlcode ?? false,
         }),
     );
     return state;

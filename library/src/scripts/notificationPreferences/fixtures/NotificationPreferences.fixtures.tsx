@@ -11,7 +11,6 @@ import {
     NotificationPreferencesSchemaType,
 } from "@library/notificationPreferences";
 import { JSONSchemaType } from "@vanilla/json-schema-forms";
-import { fn } from "@storybook/test";
 
 const preferenceSchema: JSONSchemaType<INotificationPreference> = {
     type: "object",
@@ -114,9 +113,9 @@ export const mockPreferences: INotificationPreferences = {
 
 export function createMockApi(): INotificationPreferencesApi {
     return {
-        getSchema: fn().mockReturnValue(mockSchema),
-        getUserPreferences: fn().mockReturnValue(mockPreferences),
-        patchUserPreferences: fn(async function (params) {
+        getSchema: jest.fn().mockReturnValue(mockSchema),
+        getUserPreferences: jest.fn().mockReturnValue(mockPreferences),
+        patchUserPreferences: jest.fn(async function (params) {
             return {
                 ...params.preferences,
             };

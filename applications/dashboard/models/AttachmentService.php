@@ -64,7 +64,6 @@ class AttachmentService
         foreach ($this->getAllProviders() as $provider) {
             if ($provider->hasPermissions()) {
                 $catalog[$provider->getTypeName()] = [
-                    "name" => $provider->getProviderName(),
                     "attachmentType" => $provider->getTypeName(),
                     "label" => $provider->getCreateLabelCode(),
                     "submitButton" => $provider->getSubmitLabelCode(),
@@ -72,9 +71,6 @@ class AttachmentService
                     "title" => $provider->getTitleLabelCode(),
                     "externalIDLabel" => $provider->getExternalIDLabelCode(),
                     "logoIcon" => $provider->getLogoIconName(),
-                    "canEscalateOwnPost" => $provider->canEscalateOwnPost(),
-                    "escalationDelayUnit" => $provider->getEscalationDelayUnit(),
-                    "escalationDelayLength" => $provider->getEscalationDelayLength(),
                 ];
             }
         }
@@ -159,7 +155,7 @@ class AttachmentService
                 continue;
             }
 
-            if (!$provider->canViewAttachment($attachment)) {
+            if (!$provider->hasPermissions()) {
                 // Current user doesn't have access.
                 continue;
             }

@@ -11,7 +11,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { StackingContextProvider } from "@vanilla/react-utils";
 import { IComment } from "@dashboard/@types/api/comment";
-import ChangeQnaStatusForm from "@QnA/components/ChangeQnaStatusForm.loadable";
+import ChangeQnaStatusForm from "@QnA/components/ChangeQnaStatusForm";
 
 const CommentOptionsChangeStatus: FunctionComponent<{ comment: IComment; onSuccess?: () => Promise<void> }> = ({
     comment,

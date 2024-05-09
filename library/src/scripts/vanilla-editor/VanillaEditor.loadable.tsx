@@ -44,7 +44,6 @@ import { Path } from "slate";
 import { VanillaEditorContainer } from "./VanillaEditorContainer";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
 import { useIsInModal } from "@library/modal/Modal.context";
-import { t } from "@library/utility/appUtils";
 
 /**
  * @todo
@@ -207,7 +206,7 @@ export function VanillaEditorLoadable(props: IProps) {
     };
 
     return (
-        <div id="vanilla-editor-root" ref={scrollRef} data-testid={"vanilla-editor"}>
+        <div id="vanilla-editor-root" ref={scrollRef}>
             <PlateProvider<MyValue>
                 id={editorID}
                 editor={editor}
@@ -236,9 +235,6 @@ export function VanillaEditorLoadable(props: IProps) {
                                     className: cx(
                                         userContentClasses().root,
                                         vanillaEditorClasses().root({ horizontalPadding: true }),
-                                    ),
-                                    "aria-label": t(
-                                        "To access the paragraph format menu, press control, shift, and P. To access the text format menu, press control, shift, and I. Use the arrow keys to navigate in each menu.",
                                     ),
                                 }}
                             >

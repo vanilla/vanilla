@@ -11,11 +11,11 @@
  *      `TZ=NZ yarn test:unit` (New Zealand Standard Time GMT+12:00)
  */
 
-import { vitest } from "vitest";
+import { expect } from "chai";
 import { timeFrameFromDateModifierRange } from "./utils";
 
 function mockDate(value: string | Date) {
-    Date.now = vitest.fn(() => new Date(value).valueOf());
+    Date.now = jest.fn(() => new Date(value).valueOf());
 }
 
 function areDatesEqual(date1: Date, date2: Date) {

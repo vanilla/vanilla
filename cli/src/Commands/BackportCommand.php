@@ -38,6 +38,9 @@ class BackportCommand extends Console\Command\Command
         parent::configure();
         $description = <<<TXT
 Backport a pull request to a target branch and open a pull request targeting that branch.
+
+Used to apply a PR targeting 1 branch to another branch target.
+Only the commits specific to that branch will be applied.
 TXT;
 
         $this->setName("backport")

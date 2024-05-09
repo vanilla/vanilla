@@ -5,16 +5,16 @@
 
 import { LoadStatus } from "@library/@types/api/core";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { fakeDiscussions } from "@library/features/discussions/DiscussionList.story";
 import { DiscussionListItemMeta } from "@library/features/discussions/DiscussionListItemMeta";
 import { STORY_TAGS } from "@library/storybook/storyData";
 import { render, screen } from "@testing-library/react";
 import TagWidget from "@vanilla/addon-vanilla/tag/TagWidget";
 import { setMeta } from "@library/utility/appUtils";
 import DiscussionTagAsset from "@vanilla/addon-vanilla/thread/DiscussionTagAsset";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 
 describe("Tags", () => {
-    const discussion = { ...DiscussionFixture.fakeDiscussions[2], url: "/mockPath", name: "Mock Discussion" };
+    const discussion = { ...fakeDiscussions[2], url: "/mockPath", name: "Mock Discussion" };
     const tagID = STORY_TAGS[0].tagID;
     describe("Custom Layouts ARE NOT enabled for discussion lists, no tag has a url pointing to new discussion list page.", () => {
         beforeEach(() => {

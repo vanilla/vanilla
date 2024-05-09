@@ -3,9 +3,11 @@
  * @license GPL-2.0-only
  */
 
+import chai, { expect } from "chai";
+import asPromised from "chai-as-promised";
 import { color } from "csx";
 import { flattenObject, spaceshipCompare, unflattenObject } from "./logicUtils";
-import { describe, it, expect } from "vitest";
+chai.use(asPromised);
 
 describe("spaceshipCompare()", () => {
     it("compares two numbers", () => {

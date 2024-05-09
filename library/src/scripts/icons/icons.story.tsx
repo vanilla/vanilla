@@ -5,6 +5,7 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
+import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
@@ -20,15 +21,18 @@ import { StoryTiles } from "@library/storybook/StoryTiles";
 import { color } from "csx";
 import { coreIconsData, Icon, iconRegistry } from "@vanilla/icons";
 import { css } from "@emotion/css";
-import groupBy from "lodash-es/groupBy";
+import groupBy from "lodash/groupBy";
 import { labelize } from "@vanilla/utils";
 import { IconType } from "@vanilla/icons";
+import iconSymbolsHtml from "!raw-loader!../../../../resources/views/svg-symbols.html";
 
-export default {
-    title: "Components",
-};
+const story = storiesOf("Components", module);
 
 const invert = ["NewPostMenuIcon"];
+
+const iconDiv = document.createElement("div");
+iconDiv.innerHTML = iconSymbolsHtml;
+document.body.insertBefore(iconDiv, document.body.firstChild);
 
 function IconSet({ icons }) {
     return (
@@ -90,7 +94,7 @@ function VanillaIconsSet() {
     );
 }
 
-export const Icons = () => {
+story.add("Icons", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Global Icons</StoryHeading>
@@ -117,4 +121,4 @@ export const Icons = () => {
             <IconSet icons={SearchIcons} />
         </StoryContent>
     );
-};
+});

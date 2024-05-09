@@ -9,7 +9,7 @@ import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import { visibility } from "@library/styles/styleHelpers";
 import classNames from "classnames";
-import random from "lodash-es/random";
+import random from "lodash/random";
 import React from "react";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { t } from "@vanilla/i18n/src";

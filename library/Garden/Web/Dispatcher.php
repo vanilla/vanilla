@@ -155,7 +155,6 @@ class Dispatcher implements LoggerAwareInterface
      *
      * @param RequestInterface $request The request to handle.
      * @return Data Returns the response as a data object.
-     * @throws ResponseException
      */
     protected function dispatchInternal(RequestInterface $request)
     {

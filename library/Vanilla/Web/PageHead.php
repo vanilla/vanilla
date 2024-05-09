@@ -11,13 +11,14 @@ use Garden\EventManager;
 use Garden\Web\RequestInterface;
 use Twig\Markup;
 use Vanilla\Contracts\Web\AssetInterface;
+use Vanilla\FileUtils;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteMetaExtra;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Utility\StringUtils;
 use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\NoScriptStylesAsset;
-use Vanilla\Web\Asset\ViteAssetProvider;
+use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Webmozart\PathUtil\Path;
@@ -41,7 +42,7 @@ final class PageHead implements PageHeadInterface
     /** @var SiteMeta */
     private $siteMeta;
 
-    /** @var ViteAssetProvider */
+    /** @var WebpackAssetProvider */
     protected $assetProvider;
 
     /** @var RequestInterface */
@@ -56,7 +57,7 @@ final class PageHead implements PageHeadInterface
      * @param AssetPreloadModel $preloadModel
      * @param EventManager $eventManager
      * @param SiteMeta $siteMeta
-     * @param ViteAssetProvider $assetProvider
+     * @param WebpackAssetProvider $assetProvider
      * @param RequestInterface $request
      * @param SeoMetaModel $seoMetaModel
      * @param NoScriptStylesAsset $noScriptLayoutStylesAsset
@@ -66,7 +67,7 @@ final class PageHead implements PageHeadInterface
         AssetPreloadModel $preloadModel,
         EventManager $eventManager,
         SiteMeta $siteMeta,
-        ViteAssetProvider $assetProvider,
+        WebpackAssetProvider $assetProvider,
         RequestInterface $request,
         SeoMetaModel $seoMetaModel,
         NoScriptStylesAsset $noScriptLayoutStylesAsset
@@ -132,24 +133,10 @@ final class PageHead implements PageHeadInterface
     public function renderHtml(): Markup
     {
         $this->applyMetaTags();
+        $this->inlineScripts[] = $this->assetProvider->getInlinePolyfillContents();
+        $this->scripts = array_merge($this->scripts, $this->assetProvider->getScripts($this->assetSection));
+        $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets($this->assetSection));
 
-        $this->inlineScripts[] = $this->assetProvider->getBootstrapInlineScript();
-        if ($this->assetProvider->isHotBuild()) {
-            $this->inlineScripts[] = $this->assetProvider->getHotBuildInlineScript();
-            $this->scripts = array_merge(
-                $this->scripts,
-                $this->assetProvider->getHotBuildScriptAssets($this->assetSection)
-            );
-        } else {
-            $viteAssets = $this->assetProvider->getEnabledEntryAssets($this->assetSection);
-            foreach ($viteAssets as $viteAsset) {
-                if ($viteAsset->isScript()) {
-                    $this->addScript($viteAsset);
-                } elseif ($viteAsset->isStyleSheet()) {
-                    $this->styles[$viteAsset->getWebPath()] = $viteAsset;
-                }
-            }
-        }
         $this->inlineScripts[] = new PhpAsJsVariable([
             "gdn" => [
                 "meta" => $this->siteMeta->value($this->siteMetaExtras),
@@ -353,7 +340,7 @@ final class PageHead implements PageHeadInterface
      */
     public function addScript(AssetInterface $script)
     {
-        $this->scripts[$script->getWebPath()] = $script;
+        $this->scripts[] = $script;
 
         return $this;
     }

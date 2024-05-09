@@ -5,7 +5,6 @@
 
 import React from "react";
 import { mountPortal, mountReact, mountReactMultiple, IMountable } from "./mounting";
-import { vitest } from "vitest";
 
 function HelloWorld(props: { id: string }) {
     return <div className="helloworld" id={props.id}></div>;
@@ -50,7 +49,7 @@ describe("mountPortal", () => {
 describe("mountReact", () => {
     it("mounts the component to the target element", async () => {
         document.body.innerHTML = "";
-        const callback = vitest.fn();
+        const callback = jest.fn();
         const target = document.createElement("div");
         target.id = "target";
         document.body.appendChild(target);
@@ -62,7 +61,7 @@ describe("mountReact", () => {
 
     it("mounts the component and overwrites the target", async () => {
         document.body.innerHTML = "";
-        const callback = vitest.fn();
+        const callback = jest.fn();
         const target = document.createElement("div");
         target.id = "target";
         document.body.appendChild(target);
@@ -75,7 +74,7 @@ describe("mountReact", () => {
 
 describe("mountReactMultiple", () => {
     it("mounts an array of components to their respective targets", async () => {
-        const callback = vitest.fn();
+        const callback = jest.fn();
         const mountables = createMountables(4);
         await mountReactMultiple(mountables, callback);
         expect.assertions(mountables.length * 2 + 1);
@@ -87,7 +86,7 @@ describe("mountReactMultiple", () => {
     });
 
     it("mounts an array of components and overwites the targets", async () => {
-        const callback = vitest.fn();
+        const callback = jest.fn();
         const mountables = createMountables(6);
         await mountReactMultiple(mountables, callback, { overwrite: true });
         expect.assertions(mountables.length * 2 + 1);

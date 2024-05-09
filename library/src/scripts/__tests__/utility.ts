@@ -15,16 +15,11 @@ export function importAll(r: any) {
     r.keys().forEach(r);
 }
 
-let mock: MockAdapter | null = null;
-
 /**
  * Wrap an API endoint with a mock wrapper.
  */
 export function mockAPI(options?: any) {
-    if (mock !== null) {
-        mock.restore();
-    }
-    mock = new MockAdapter(apiv2, { ...options });
+    const mock = new MockAdapter(apiv2, { ...options });
     return mock;
 }
 

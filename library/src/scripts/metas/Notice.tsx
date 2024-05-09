@@ -13,7 +13,7 @@ interface INoticeProps {
     className?: string;
 }
 
-const Notice: FunctionComponent<React.PropsWithChildren<INoticeProps>> = ({ children, className }) => {
+const Notice: FunctionComponent<INoticeProps> = ({ children, className }) => {
     const classes = noticeClasses();
     return <div className={cx(classes.root, className)}>{children}</div>;
 };

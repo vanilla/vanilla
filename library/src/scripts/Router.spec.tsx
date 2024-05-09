@@ -12,11 +12,9 @@ import { render } from "@testing-library/react";
 import { initPageViewTracking } from "@library/pageViews/pageViewTracking";
 import { Route } from "react-router";
 import { act } from "react-dom/test-utils";
-import { RouterRegistry } from "@library/Router.registry";
-import { vitest } from "vitest";
 
 // Mock so we don't crash when calling it.
-(global as any).scrollTo = vitest.fn();
+global.scrollTo = jest.fn();
 
 describe("<Router />", () => {
     let history: History;
@@ -24,7 +22,7 @@ describe("<Router />", () => {
     beforeAll(() => {
         history = createMemoryHistory();
         initPageViewTracking(history);
-        RouterRegistry.addRoutes([<Route key={"my-route"} path={"/test-path"} component={TestRouteContents} />]);
+        Router.addRoutes([<Route key={"my-route"} path={"/test-path"} component={TestRouteContents} />]);
     });
 
     beforeEach(() => {

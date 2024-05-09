@@ -59,8 +59,6 @@ class VanillaCli extends Console\Application
     public function __construct()
     {
         parent::__construct("vnla", "2.0");
-        // Kludge to prevent printing of the full path.
-        $_SERVER["PHP_SELF"] = "vnla";
         $this->container = $this->createContainer();
         $addonManager = $this->container->get(AddonManager::class);
         $addonManager->startAddonsByKey(["dashboard"], Addon::TYPE_ADDON);
@@ -68,7 +66,6 @@ class VanillaCli extends Console\Application
         foreach ($this->getCommandClasses() as $commandClass) {
             $this->add($this->container->get($commandClass));
         }
-        $this->addPlaceholderCommands();
     }
 
     /**
@@ -77,8 +74,6 @@ class VanillaCli extends Console\Application
     protected function getCommandClasses(): array
     {
         return [
-            Commands\BuildCommand::class,
-            Commands\StorybookCommand::class,
             Commands\VanillaCacheCommand::class,
             Commands\InstallCommand::class,
             Commands\SplitTestsCommand::class,
@@ -92,23 +87,6 @@ class VanillaCli extends Console\Application
             Commands\ConvertToRich::class,
             Commands\ReparseRich2Quotes::class,
         ];
-    }
-
-    /**
-     * @return void
-     */
-    protected function addPlaceholderCommands(): void
-    {
-        $this->add(
-            new Commands\PlaceholderCommand(
-                "composer",
-                "Execute a composer command.",
-                new Console\Input\InputDefinition([])
-            )
-        );
-        $this->add(
-            new Commands\PlaceholderCommand("php", "Execute a php command.", new Console\Input\InputDefinition([]))
-        );
     }
 
     /**

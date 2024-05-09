@@ -10,7 +10,7 @@ import { IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.style
 import { DeepPartial } from "redux";
 import { getMeta } from "@library/utility/appUtils";
 import { STORY_LEADERS } from "@library/storybook/storyData";
-import random from "lodash-es/random";
+import random from "lodash/random";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
 
 interface IProps extends Omit<React.ComponentProps<typeof CategoriesWidget>, "itemData"> {

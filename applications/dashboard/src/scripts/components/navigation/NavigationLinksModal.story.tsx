@@ -6,6 +6,7 @@
 
 import React, { useState } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
+import { storiesOf } from "@storybook/react";
 import { NavigationLinksModal } from "@dashboard/components/navigation/NavigationLinksModal";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
@@ -13,9 +14,7 @@ import Button from "@library/forms/Button";
 import { userContentClasses } from "@library/content/UserContent.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
-export default {
-    title: "Theme UI",
-};
+const story = storiesOf("Theme UI", module);
 
 const INITIAL_DATA: INavigationVariableItem[] = [
     {
@@ -97,6 +96,6 @@ function NavigationLinksModalWrapper() {
     );
 }
 
-export const _NavigationLinksModal = () => {
+story.add("Navigation Links Modal", () => {
     return <NavigationLinksModalWrapper />;
-};
+});

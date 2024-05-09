@@ -10,7 +10,7 @@ import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
 import { searchInFilterClasses } from "@library/search/searchInFilter.styles";
 import { buttonClasses } from "@library/forms/Button.styles";
 import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
-import isEqual from "lodash-es/isEqual";
+import isEqual from "lodash/isEqual";
 import { IDateModifierRange, IDateModifierRangePickerProps } from "@library/forms/rangePicker/types";
 import { dateModifier, DateModifierBuilder } from "@library/forms/rangePicker/utils";
 

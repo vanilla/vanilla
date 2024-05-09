@@ -463,10 +463,6 @@ export const iconClasses = useThemeCache(() => {
         color: ColorsUtils.colorOut(globalVars.messageColors.warning.fg),
     });
 
-    const successFgColor = style("successFgColor", {
-        color: ColorsUtils.colorOut(globalVars.messageColors.success),
-    });
-
     const documentation = style("documentation", {
         display: "block",
         width: styleUnit(vars.documentation.width),
@@ -633,7 +629,6 @@ export const iconClasses = useThemeCache(() => {
         warning,
         errorFgColor,
         warningFgColor,
-        successFgColor,
         fileType,
         attachmentError,
         vanillaLogo,

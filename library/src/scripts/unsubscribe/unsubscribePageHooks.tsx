@@ -9,6 +9,7 @@ import { IError } from "@library/errorPages/CoreErrorMessages";
 import { getCategoryReason, getUnsubscribeReason } from "@library/unsubscribe/getUnsubscribeReason";
 import { t } from "@library/utility/appUtils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Buffer } from "buffer";
 import React from "react";
 import {
     IDecodedToken,
@@ -156,7 +157,7 @@ function decodeToken(token: IUnsubscribeToken): IDecodedToken | null {
     }
 
     try {
-        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        const decodedToken = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
 
         return {
             activityID: decodedToken.ActivityID,

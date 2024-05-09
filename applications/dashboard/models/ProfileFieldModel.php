@@ -951,8 +951,6 @@ class ProfileFieldModel extends FullRecordCacheModel
      */
     public function updateUserProfileFields(int $userID, array $values, bool $dispatchEvent = false)
     {
-        // Get current profile field values for the user
-        $userCurrentProfileFields = $this->getUserProfileFields($userID, true);
         // Retrieve whitelist (A combination of existing profileField records + pre-determined _ghost_ default fields.
         $allowedFields = array_replace(
             array_column($this->getProfileFields(), null, "apiName"),
@@ -974,7 +972,7 @@ class ProfileFieldModel extends FullRecordCacheModel
             }
         }
         $this->userMetaModel->clearUserMetaCache($userID);
-        $this->eventManager->fire("userProfileMetaUpdate", $this, $userID, $updateFields, $userCurrentProfileFields);
+        $this->eventManager->fire("userProfileMetaUpdate", $this, $userID, $updateFields);
         $userModel = Gdn::getContainer()->get(\UserModel::class);
         if ($dispatchEvent) {
             $userEvent = $userModel->eventFromRow(

@@ -22,7 +22,7 @@ import DocumentTitle from "@library/routing/DocumentTitle";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 import { sanitizeUrl } from "@vanilla/utils";
-import { getClassForButtonType } from "@library/forms/Button.getClassForButtonType";
+import { getClassForButtonType } from "@library/forms/Button";
 import { cx } from "@emotion/css";
 
 interface IProps {

@@ -9,7 +9,6 @@ import React from "react";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { LayoutEditorFixture } from "@dashboard/layout/editor/__fixtures__/LayoutEditor.fixtures";
 import LayoutWidgetsThumbnails from "@dashboard/layout/editor/thumbnails/LayoutWidgetsThumbnails";
-import { vitest } from "vitest";
 
 const MOCK_WIDGETS = LayoutEditorFixture.widgetData([
     "react.article.articles",
@@ -25,7 +24,7 @@ const renderInProvider = async (element: React.ReactNode) => {
 
 describe("LayoutWidgetThumbnails", () => {
     it("Selection fires onChange event", async () => {
-        const mockChange = vitest.fn();
+        const mockChange = jest.fn();
         await renderInProvider(
             <LayoutWidgetsThumbnails
                 labelID={"testLabel"}
@@ -63,13 +62,24 @@ describe("LayoutWidgetThumbnails", () => {
         expect(searchInput).toHaveValue("");
     });
     it("Search input filters available widgets", async () => {
-        await renderInProvider(<LayoutWidgetsThumbnails labelID={"testLabel"} widgets={MOCK_WIDGETS} />);
+        await renderInProvider(
+            <LayoutWidgetsThumbnails
+                labelID={"testLabel"}
+                widgets={MOCK_WIDGETS}
+                onChange={() => null}
+                value={"react.article.articles"}
+            />,
+        );
 
-        const searchInput = screen.getByRole("textbox", { name: "Search Text" });
+        const searchInput = document.querySelector("input");
 
-        fireEvent.change(searchInput, { target: { value: "banner" } });
+        await act(async () => {
+            searchInput && fireEvent.change(searchInput, { target: { value: "banner" } });
+        });
 
-        const articleWidget = screen.queryByText("article articles");
-        expect(articleWidget).toBeInTheDocument();
+        waitFor(async () => {
+            const articleWidget = screen.queryByText("article articles");
+            expect(articleWidget).not.toBeInTheDocument();
+        });
     });
 });

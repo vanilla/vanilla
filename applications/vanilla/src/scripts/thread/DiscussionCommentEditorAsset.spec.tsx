@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { fireEvent, render, waitFor, screen, act } from "@testing-library/react";
+import { fireEvent, render, waitFor, screen } from "@testing-library/react";
 import DiscussionCommentEditorAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentEditorAsset";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
@@ -22,7 +22,7 @@ const queryClient = new QueryClient({
     },
 });
 
-const renderInProvider = async (props?: Partial<React.ComponentProps<typeof DiscussionCommentEditorAsset>>) => {
+const renderInProvider = (props?: Partial<React.ComponentProps<typeof DiscussionCommentEditorAsset>>) => {
     render(
         <TestReduxProvider
             state={{
@@ -43,20 +43,21 @@ const renderInProvider = async (props?: Partial<React.ComponentProps<typeof Disc
             </QueryClientProvider>
         </TestReduxProvider>,
     );
-    await vi.dynamicImportSettled();
 };
 
 const mockAdapter = mockAPI();
 
 describe("DiscussionCommentEditorAsset", () => {
     it("Draft button is disabled when the editor is empty", async () => {
-        await renderInProvider();
-        const draftButton = screen.getByRole("button", { name: "Save Draft" });
-        expect(draftButton).toBeInTheDocument();
-        expect(draftButton).toBeDisabled();
+        renderInProvider();
+        waitFor(() => {
+            const draftButton = screen.getByRole("button", { name: "Save draft" });
+            expect(draftButton).toBeInTheDocument();
+            expect(draftButton).toBeDisabled();
+        });
     });
     it("Editor is populated with a draft when an initial draft", async () => {
-        await renderInProvider({
+        renderInProvider({
             draft: {
                 dateUpdated: "1990-08-20T00:00:00Z",
                 draftID: 1,
@@ -64,15 +65,16 @@ describe("DiscussionCommentEditorAsset", () => {
                 format: "rich2",
             },
         });
-        const draftButton = screen.getByRole("button", { name: "Save Draft" });
-        expect(draftButton).toBeInTheDocument();
-        expect(draftButton).toBeEnabled();
-        expect(screen.getByText("Vanilla is awesome!")).toBeInTheDocument();
+        waitFor(() => {
+            const draftButton = screen.getByRole("button", { name: "Save draft" });
+            expect(draftButton).toBeInTheDocument();
+            expect(draftButton).toBeEnabled();
+            expect(screen.getByText("Vanilla is awesome!")).toBeInTheDocument();
+        });
     });
-    // Not working following vite migration
-    it.skip("Save draft button calls the /drafts endpoint", async () => {
+    it("Save draft button calls the /drafts endpoint", async () => {
         mockAdapter.onPatch("/drafts/1").reply(200, {});
-        await renderInProvider({
+        renderInProvider({
             draft: {
                 dateUpdated: "1990-08-20T00:00:00Z",
                 draftID: 1,
@@ -80,15 +82,11 @@ describe("DiscussionCommentEditorAsset", () => {
                 format: "rich2",
             },
         });
-        const draftButton = screen.getByRole("button", { name: "Save Draft" });
-
-        await act(async () => {
+        waitFor(() => {
+            const draftButton = screen.getByRole("button", { name: "Save draft" });
+            expect(draftButton).toBeInTheDocument();
             fireEvent.click(draftButton);
+            expect(mockAdapter.history.patch.length).toBe(1);
         });
-
-        act(() => {
-            fireEvent.click(draftButton);
-        });
-        expect(mockAdapter.history.patch.length).toBe(1);
     });
 });

@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { registerLayoutPage } from "@library/features/Layout/LayoutPage.registry";
+import { registerLayoutPage } from "@library/features/Layout/LayoutPage";
 import { getSiteSection } from "@library/utility/appUtils";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
 import { DiscussionThreadPaginationContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadPaginationContext";

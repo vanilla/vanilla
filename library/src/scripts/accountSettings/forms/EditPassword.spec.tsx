@@ -9,7 +9,6 @@ import { fireEvent, render, waitFor, screen, act } from "@testing-library/react"
 import { EditPassword } from "@library/accountSettings/forms/EditPassword";
 import { LoadStatus } from "@library/@types/api/core";
 import * as AccountSettingsFixtures from "@library/accountSettings/AccountSettings.fixtures";
-import { vitest } from "vitest";
 
 describe("Edit Password", () => {
     it("Render Initial Form", async () => {
@@ -39,7 +38,7 @@ describe("Edit Password", () => {
     });
 
     it("Sets form dirty state after field change", async () => {
-        const mockFunction = vitest.fn();
+        const mockFunction = jest.fn();
 
         await act(async () => {
             render(
@@ -58,7 +57,7 @@ describe("Edit Password", () => {
     });
 
     it("Sets saving state when patchStatusByUserID status is loading", async () => {
-        const mockFunction = vitest.fn();
+        const mockFunction = jest.fn();
         await act(async () => {
             render(
                 <AccountSettingsFixtures.UserEditingSelf
@@ -78,7 +77,7 @@ describe("Edit Password", () => {
     });
 
     it("Sets success state when patchStatusByUserID status is successful", async () => {
-        const mockFunction = vitest.fn();
+        const mockFunction = jest.fn();
         await act(async () => {
             render(
                 <AccountSettingsFixtures.UserEditingSelf

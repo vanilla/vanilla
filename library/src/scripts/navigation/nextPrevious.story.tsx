@@ -5,16 +5,15 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
+import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { t } from "@library/utility/appUtils";
 import NextPrevious from "@library/navigation/NextPrevious";
 
-export default {
-    title: "Navigation",
-};
+const story = storiesOf("Navigation", module);
 
-export const _NextPrevious = () => {
+story.add("Next/Previous", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Next/Previous</StoryHeading>
@@ -48,8 +47,4 @@ export const _NextPrevious = () => {
             />
         </StoryContent>
     );
-};
-
-_NextPrevious.story = {
-    name: "Next/Previous",
-};
+});

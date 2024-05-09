@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -32,14 +32,12 @@ import { MyEditor, useMyPlateEditorState } from "@library/vanilla-editor/typescr
 import { vanillaEditorClasses } from "@library/vanilla-editor/VanillaEditor.classes";
 import { useVanillaEditorBounds } from "@library/vanilla-editor/VanillaEditorBoundsContext";
 import { VanillaEditorFormatter } from "@library/vanilla-editor/VanillaEditorFormatter";
-import { focusEditor, getSelectionText, isRangeAcrossBlocks, useEventPlateId, useHotkeys } from "@udecode/plate-common";
+import { getSelectionText, isRangeAcrossBlocks, useEventPlateId } from "@udecode/plate-common";
 import { EMPTY_RECT } from "@vanilla/react-utils";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
 interface IElementToolbarProps {
     renderAbove?: boolean;
-    isVisible?: boolean;
-    onClose?: () => void;
 }
 
 export function ElementToolbar(props: IElementToolbarProps) {
@@ -62,13 +60,6 @@ export function ElementToolbar(props: IElementToolbarProps) {
             openAsModal={false}
             alwaysRender={true}
             renderAbove={!!props.renderAbove}
-            forceVisible={props.isVisible}
-            onClose={props.onClose}
-            onVisibilityChange={(isVisible) => {
-                if (!isVisible) {
-                    props.onClose?.();
-                }
-            }}
         >
             {(toggleProps) => (
                 <FixedElementToolbar
@@ -78,7 +69,6 @@ export function ElementToolbar(props: IElementToolbarProps) {
                     style={{
                         display: toggleProps.isVisible ? undefined : "none",
                     }}
-                    closeHandler={props.onClose}
                 />
             )}
         </FlyoutToggle>
@@ -115,7 +105,6 @@ interface IFloatingElementToolbarProps extends IElementToolbarProps {
 }
 export function FloatingElementToolbar(props: IFloatingElementToolbarProps) {
     const { fullPage = false, ...restProps } = props;
-    const [open, setOpen] = useState(false);
 
     const editor = useMyPlateEditorState(useEventPlateId());
     const { boundsRef } = useVanillaEditorBounds();
@@ -136,18 +125,6 @@ export function FloatingElementToolbar(props: IFloatingElementToolbarProps) {
         return `translate(calc(-100% + -4px), calc(${yValue}px - 50%))`;
     }, [selectionRect, editorRect, fullPage]);
 
-    useHotkeys(
-        "ctrl+shift+p",
-        (e) => {
-            setOpen(true);
-        },
-        {
-            enabled: !isEdgeCase || editorRect === EMPTY_RECT || selectionRect === EMPTY_RECT,
-            enableOnContentEditable: true,
-        },
-        [],
-    );
-
     // If this is one of the edge cases, don't render the floating toolbar.
     if (isEdgeCase) {
         return <></>;
@@ -161,13 +138,7 @@ export function FloatingElementToolbar(props: IFloatingElementToolbarProps) {
 
     return (
         <span className={classes.elementToolbarPosition} style={{ transform: toolbarPosition }}>
-            <ElementToolbar
-                {...restProps}
-                isVisible={open}
-                onClose={() => {
-                    setOpen(false);
-                }}
-            />
+            <ElementToolbar {...restProps} />
         </span>
     );
 }
@@ -224,20 +195,14 @@ function useTabIcons() {
  * - Many items in this menu are exclusive of each other.
  */
 
-function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement> & { closeHandler?: () => void }) {
-    const { closeHandler, ...restProps } = props;
+function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement>) {
     const editor = useMyPlateEditorState(useEventPlateId());
     const formatter = new VanillaEditorFormatter(editor);
 
     const { headingIcon, listIcon, otherIcon } = useTabIcons();
 
-    const handleOnActivate = (format: keyof VanillaEditorFormatter) => {
-        formatter[format]();
-        closeHandler?.();
-    };
-
     return (
-        <MenuBar {...restProps}>
+        <MenuBar {...props}>
             <MenuBarItem
                 accessibleLabel={t("Toggle Heading Menu")}
                 active={headingIcon !== null}
@@ -245,28 +210,28 @@ function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement> & { clo
             >
                 <MenuBarSubMenuItemGroup>
                     <MenuBarSubMenuItem
-                        onActivate={() => handleOnActivate("h2")}
+                        onActivate={() => formatter.h2()}
                         active={formatter.isH2()}
                         icon={<Heading2Icon />}
                     >
                         {t("Heading 2")}
                     </MenuBarSubMenuItem>
                     <MenuBarSubMenuItem
-                        onActivate={() => handleOnActivate("h3")}
+                        onActivate={() => formatter.h3()}
                         active={formatter.isH3()}
                         icon={<Heading3Icon />}
                     >
                         {t("Heading 3")}
                     </MenuBarSubMenuItem>
                     <MenuBarSubMenuItem
-                        onActivate={() => handleOnActivate("h4")}
+                        onActivate={() => formatter.h4()}
                         active={formatter.isH4()}
                         icon={<Heading4Icon />}
                     >
                         {t("Heading 4")}
                     </MenuBarSubMenuItem>
                     <MenuBarSubMenuItem
-                        onActivate={() => handleOnActivate("h5")}
+                        onActivate={() => formatter.h5()}
                         active={formatter.isH5()}
                         icon={<Heading5Icon />}
                     >
@@ -281,14 +246,14 @@ function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement> & { clo
             >
                 <MenuBarSubMenuItemGroup>
                     <MenuBarSubMenuItem
-                        onActivate={() => handleOnActivate("unorderedList")}
+                        onActivate={() => formatter.unorderedList()}
                         active={formatter.isUnorderedList()}
                         icon={<ListUnorderedIcon />}
                     >
                         {t("Bulleted List")}
                     </MenuBarSubMenuItem>
                     <MenuBarSubMenuItem
-                        onActivate={() => handleOnActivate("orderedList")}
+                        onActivate={() => formatter.orderedList()}
                         active={formatter.isOrderedList()}
                         icon={<ListOrderedIcon />}
                     >
@@ -298,14 +263,14 @@ function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement> & { clo
                 <MenuBarSubMenuItemGroup>
                     <MenuBarSubMenuItem
                         disabled={!formatter.canIndentList()}
-                        onActivate={() => handleOnActivate("indentList")}
+                        onActivate={() => formatter.indentList()}
                         icon={<IndentIcon />}
                     >
                         {t("Indent")}
                     </MenuBarSubMenuItem>
                     <MenuBarSubMenuItem
                         disabled={!formatter.canOutdentList()}
-                        onActivate={() => handleOnActivate("outdentList")}
+                        onActivate={() => formatter.outdentList()}
                         icon={<OutdentIcon />}
                     >
                         {t("Outdent")}
@@ -320,21 +285,21 @@ function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement> & { clo
                 <MenuBarSubMenuItemGroup>
                     <MenuBarSubMenuItem
                         active={formatter.isBlockquote()}
-                        onActivate={() => handleOnActivate("blockquote")}
+                        onActivate={() => formatter.blockquote()}
                         icon={<BlockquoteIcon />}
                     >
                         {t("Quote")}
                     </MenuBarSubMenuItem>
                     <MenuBarSubMenuItem
                         active={formatter.isCodeBlock()}
-                        onActivate={() => handleOnActivate("codeBlock")}
+                        onActivate={() => formatter.codeBlock()}
                         icon={<CodeBlockIcon />}
                     >
                         {t("Code Block")}
                     </MenuBarSubMenuItem>
                     <MenuBarSubMenuItem
                         active={formatter.isSpoiler()}
-                        onActivate={() => handleOnActivate("spoiler")}
+                        onActivate={() => formatter.spoiler()}
                         icon={<SpoilerIcon />}
                     >
                         {t("Spoiler")}
@@ -344,7 +309,9 @@ function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement> & { clo
             <MenuBarItem
                 accessibleLabel={t("Paragraph (Removes paragraph style and sets to plain paragraph)")}
                 icon={<PilcrowIcon />}
-                onActivate={() => handleOnActivate("paragraph")}
+                onActivate={() => {
+                    formatter.paragraph();
+                }}
                 active={formatter.isParagraph()}
             />
         </MenuBar>

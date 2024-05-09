@@ -16,7 +16,8 @@ import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
 import { mockAPI } from "@library/__tests__/utility";
 import { LiveAnnouncer } from "react-aria-live";
-import MockAdapter from "axios-mock-adapter";
+
+jest.setTimeout(100000);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -30,10 +31,7 @@ beforeAll(() => {
     setMeta("featureFlags.Digest.Enabled", true);
 });
 
-let mockApi: MockAdapter;
-beforeEach(() => {
-    mockApi = mockAPI();
-});
+const mockApi = mockAPI();
 
 const dummyData = {
     "emailDigest.enabled": true,
@@ -60,53 +58,55 @@ describe("DigestSettings", () => {
     beforeEach(async () => {
         mockApi.onGet(/users\/by-name/).reply(200, []);
         mockApi.onGet(/digest\/delivery-dates.*/).reply(200, {});
-        result = render(
-            <QueryClientProvider client={queryClient}>
-                <LiveAnnouncer>
-                    <TestReduxProvider
-                        state={{
-                            config: {
-                                configsByLookupKey: {
-                                    [stableObjectHash([
-                                        "emailDigest.enabled",
-                                        "emailDigest.logo",
-                                        "emailDigest.dayOfWeek",
-                                        "emailDigest.postCount",
-                                        "emailDigest.metaOptions",
-                                        "emailDigest.imageEnabled",
-                                        "emailDigest.authorEnabled",
-                                        "emailDigest.viewCountEnabled",
-                                        "emailDigest.commentCountEnabled",
-                                        "emailDigest.scoreCountEnabled",
-                                        "emailDigest.title",
-                                        "emailDigest.includeCommunityName",
-                                        "emailDigest.introduction",
-                                        "emailDigest.footer",
-                                        "emailStyles.format",
-                                        "emailStyles.image",
-                                        "emailStyles.textColor",
-                                        "emailStyles.backgroundColor",
-                                        "emailStyles.containerBackgroundColor",
-                                        "emailStyles.buttonTextColor",
-                                        "emailStyles.buttonBackgroundColor",
-                                        "outgoingEmails.supportName",
-                                        "outgoingEmails.supportAddress",
-                                        "emailNotifications.disabled",
-                                        "emailNotifications.fullPost",
-                                        "outgoingEmails.footer",
-                                    ])]: {
-                                        status: LoadStatus.SUCCESS,
-                                        data: dummyData,
+        await act(async () => {
+            result = render(
+                <QueryClientProvider client={queryClient}>
+                    <LiveAnnouncer>
+                        <TestReduxProvider
+                            state={{
+                                config: {
+                                    configsByLookupKey: {
+                                        [stableObjectHash([
+                                            "emailDigest.enabled",
+                                            "emailDigest.logo",
+                                            "emailDigest.dayOfWeek",
+                                            "emailDigest.postCount",
+                                            "emailDigest.metaOptions",
+                                            "emailDigest.imageEnabled",
+                                            "emailDigest.authorEnabled",
+                                            "emailDigest.viewCountEnabled",
+                                            "emailDigest.commentCountEnabled",
+                                            "emailDigest.scoreCountEnabled",
+                                            "emailDigest.title",
+                                            "emailDigest.includeCommunityName",
+                                            "emailDigest.introduction",
+                                            "emailDigest.footer",
+                                            "emailStyles.format",
+                                            "emailStyles.image",
+                                            "emailStyles.textColor",
+                                            "emailStyles.backgroundColor",
+                                            "emailStyles.containerBackgroundColor",
+                                            "emailStyles.buttonTextColor",
+                                            "emailStyles.buttonBackgroundColor",
+                                            "outgoingEmails.supportName",
+                                            "outgoingEmails.supportAddress",
+                                            "emailNotifications.disabled",
+                                            "emailNotifications.fullPost",
+                                            "outgoingEmails.footer",
+                                        ])]: {
+                                            status: LoadStatus.SUCCESS,
+                                            data: dummyData,
+                                        },
                                     },
                                 },
-                            },
-                        }}
-                    >
-                        <DigestSettings />
-                    </TestReduxProvider>
-                </LiveAnnouncer>
-            </QueryClientProvider>,
-        );
+                            }}
+                        >
+                            <DigestSettings />
+                        </TestReduxProvider>
+                    </LiveAnnouncer>
+                </QueryClientProvider>,
+            );
+        });
     });
 
     describe("Email digest section", () => {

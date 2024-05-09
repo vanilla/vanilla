@@ -14,7 +14,7 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import { resetQuillContent, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import classNames from "classnames";
-import throttle from "lodash-es/throttle";
+import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { useLastValue } from "@vanilla/react-utils";

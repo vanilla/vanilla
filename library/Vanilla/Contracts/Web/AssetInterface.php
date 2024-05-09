@@ -27,19 +27,4 @@ interface AssetInterface
      * @return string
      */
     public function getWebPath(): string;
-
-    /**
-     * @return bool
-     */
-    public function isScript(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isStyleSheet(): bool;
-
-    /**
-     * @return string
-     */
-    public function isScriptModule(): string;
 }

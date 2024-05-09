@@ -4,16 +4,15 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
+import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { AddTheme } from "./AddTheme";
 import { PlusIcon } from "@library/icons/common";
 
-export default {
-    title: "Theme UI",
-};
+const story = storiesOf("Theme UI", module);
 
-export const _AddTheme = () => {
+story.add("Add Theme", () => {
     return (
         <>
             <StoryContent>
@@ -22,4 +21,4 @@ export const _AddTheme = () => {
             </StoryContent>
         </>
     );
-};
+});

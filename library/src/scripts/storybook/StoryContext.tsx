@@ -28,7 +28,7 @@ import { ThemeProvider } from "@library/theming/ThemeProvider";
 import { INITIAL_THEME_STATE } from "@library/theming/themeReducer";
 import { addComponent, _mountComponents } from "@library/utility/componentRegistry";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
-import merge from "lodash-es/merge";
+import merge from "lodash/merge";
 import React, { useCallback, useContext, useEffect, useLayoutEffect, useState } from "react";
 import { LiveAnnouncer } from "react-aria-live";
 import { Provider } from "react-redux";

@@ -1,4 +1,4 @@
-import { globalValueRef, logError, logWarning } from "@vanilla/utils";
+import { logError, logWarning } from "@vanilla/utils";
 
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
@@ -9,7 +9,7 @@ interface ITranslations {
     [key: string]: string;
 }
 
-let translationStoreRef = globalValueRef<ITranslations | null>("translationStore", null);
+let translationStore: ITranslations | null = null;
 
 let internalTranslationDebugValue = false;
 
@@ -31,14 +31,14 @@ export function translationDebug(newValue?: boolean): boolean {
  * Load a set of key value pairs as translation resources.
  */
 export function loadTranslations(translations: ITranslations) {
-    translationStoreRef.set({ ...translations });
+    translationStore = { ...translations };
 }
 
 /**
  * Clear all translation resources.
  */
 export function clearTranslations() {
-    translationStoreRef.set(null);
+    translationStore = null;
 }
 
 /**
@@ -57,7 +57,6 @@ export function translate(str: string, defaultTranslation?: string): string {
 
     const fallback = defaultTranslation !== undefined ? defaultTranslation : str;
 
-    const translationStore = translationStoreRef.current();
     if (!translationStore) {
         // Test environment allows top level static initialization.
         const message = `Attempted to translate a value '${str}' before the translation store was initialized.`;

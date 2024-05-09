@@ -23,7 +23,7 @@ import {
     getMentionOnSelectItem,
     removeMentionInput,
 } from "@udecode/plate-mention";
-import uniqueId from "lodash-es/uniqueId";
+import uniqueId from "lodash/uniqueId";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 

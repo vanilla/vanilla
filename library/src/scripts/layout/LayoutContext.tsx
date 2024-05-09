@@ -5,7 +5,7 @@
  */
 
 import { Optionalize } from "@library/@types/utils";
-import throttle from "lodash-es/throttle";
+import throttle from "lodash/throttle";
 import React, { useContext, useEffect, useState } from "react";
 import { ISectionClasses } from "@library/layout/Section.styles";
 import { SectionTypes } from "@library/layout/types/interface.layoutTypes";

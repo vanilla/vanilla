@@ -5,7 +5,7 @@
 
 import { mockCategoriesDataWithHeadings } from "@library/categoriesWidget/CategoriesWidget.fixtures";
 import { groupCategoryItems, updateCategoryFollowCount } from "@library/categoriesWidget/CategoriesWidget.utils";
-import cloneDeep from "lodash-es/cloneDeep";
+import cloneDeep from "lodash/cloneDeep";
 describe("CategoriesWidget", () => {
     it("Ensure we get separate groups of items for grid display with groupCategoryItems() function", () => {
         const categoryItems = cloneDeep(mockCategoriesDataWithHeadings);

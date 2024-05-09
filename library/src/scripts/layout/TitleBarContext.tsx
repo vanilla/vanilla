@@ -5,7 +5,7 @@
  */
 
 import { Optionalize } from "@library/@types/utils";
-import throttle from "lodash-es/throttle";
+import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 

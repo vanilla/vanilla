@@ -17,7 +17,6 @@ import { LoadStatus } from "@library/@types/api/core";
 import { CategoryPreferencesFixture } from "@dashboard/userPreferences/__fixtures__/CategoryNotificationPreferences.Fixture";
 import { mockAPI } from "@library/__tests__/utility";
 import { DEFAULT_NOTIFICATION_PREFERENCES } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import MockAdapter from "axios-mock-adapter/types";
 
 const queryClient = new QueryClient();
 
@@ -44,10 +43,10 @@ const renderInProvider = (preferences: ILegacyCategoryPreferences[] | ISavedDefa
     );
 };
 
+const mockAdapter = mockAPI();
 describe("DefaultCategoriesModal", () => {
-    let mockAdapter: MockAdapter;
     beforeEach(() => {
-        mockAdapter = mockAPI();
+        mockAdapter.reset();
         mockAdapter.onGet(/categories/).reply(200, CategoryPreferencesFixture.getMockCategoryResponse());
     });
     it("renders empty table state", async () => {

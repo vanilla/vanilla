@@ -20,8 +20,8 @@ import { CloseIcon } from "../shared/CloseIcon";
 import { AutoCompleteOption, IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { AutoCompleteContext, IAutoCompleteContext, IAutoCompleteInputState } from "./AutoCompleteContext";
 import { useComboboxContext } from "@reach/combobox";
-import groupBy from "lodash-es/groupBy";
-import sortBy from "lodash-es/sortBy";
+import groupBy from "lodash/groupBy";
+import sortBy from "lodash/sortBy";
 import { useStackingContext } from "@vanilla/react-utils";
 
 function AutoCompleteArrow() {

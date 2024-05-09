@@ -18,7 +18,8 @@ import { cx } from "@library/styles/styleShim";
 import { Icon } from "@vanilla/icons";
 import { useFocusOnActivate } from "@vanilla/react-utils";
 import React, { useRef, useState } from "react";
-import { extractDataByKeyLookup } from "./utils";
+import { EMPTY_SCHEMA, JsonSchema } from "@vanilla/json-schema-forms";
+import merge from "lodash/merge";
 
 interface IProps {
     path: ILayoutEditorDestinationPath;
@@ -29,12 +30,13 @@ export function LayoutEditorAddWidget(props: IProps) {
     const { editorContents, editorSelection, layoutViewType } = useLayoutEditor();
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const catalog = useLayoutCatalog(layoutViewType);
-    const [widgetSelectionModalOpen, setWidgetSelectionModalOpen] = useState(false);
-    const [widgetSettingsModalOpen, setWidgetSettingsModalOpen] = useState(false);
-    const [selectedWidgetID, setSelectedWidgetID] = useState<string | undefined>(undefined);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const widgetSchema = selectedWidgetID ? catalog?.widgets[selectedWidgetID]?.schema : undefined;
-    const widgetName = selectedWidgetID ? catalog?.widgets[selectedWidgetID]?.name : undefined;
+    //widgetSettingsModal
+    const [isWidgetSettingsModalOpen, setWidgetSettingsModalOpen] = useState(false);
+    const [selectedWidgetID, setSelectedWidgetID] = useState("");
+
+    const widgetSchema = catalog?.widgets[selectedWidgetID]?.schema ?? EMPTY_SCHEMA;
 
     const isSelected =
         LayoutEditorPath.areWidgetPathsEqual(props.path, editorSelection.getPath()) &&
@@ -69,7 +71,7 @@ export function LayoutEditorAddWidget(props: IProps) {
                     e.preventDefault();
                     e.stopPropagation();
                     editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
-                    setWidgetSelectionModalOpen(true);
+                    setIsModalOpen(true);
                 }}
                 className={classes.addWidget}
             >
@@ -80,43 +82,67 @@ export function LayoutEditorAddWidget(props: IProps) {
             <LayoutThumbnailsModal
                 title="Choose your Widget"
                 exitHandler={() => {
-                    if (!widgetSettingsModalOpen) {
-                        setWidgetSelectionModalOpen(false);
-                        editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
-                    }
+                    setIsModalOpen(false);
+                    editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
                 }}
                 sections={allowedWidgets}
                 onAddSection={(widgetID) => {
                     setWidgetSettingsModalOpen(true);
                     setSelectedWidgetID(widgetID);
                 }}
-                isVisible={widgetSelectionModalOpen}
+                isVisible={isModalOpen}
                 itemType="widgets"
             />
-            {!!widgetSchema && (
-                <WidgetSettingsModal
-                    key={selectedWidgetID!}
-                    exitHandler={() => {
-                        setWidgetSettingsModalOpen(false);
-                    }}
-                    onSave={(settings) => {
-                        editorContents.insertWidget(props.path, {
-                            $hydrate: selectedWidgetID,
-                            ...settings,
-                        });
-                        editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
-                        setWidgetSelectionModalOpen(false);
-                        setSelectedWidgetID(undefined);
-                    }}
-                    isVisible={widgetSettingsModalOpen}
-                    schema={widgetSchema}
-                    name={widgetName!}
-                    initialValues={extractDataByKeyLookup(widgetSchema, "default")}
-                    widgetID={selectedWidgetID!}
-                    widgetCatalog={catalog?.widgets ?? {}}
-                    middlewaresCatalog={catalog?.middlewares ?? {}}
-                />
-            )}
+            <WidgetSettingsModal
+                exitHandler={() => {
+                    setWidgetSettingsModalOpen(false);
+                }}
+                onSave={(settings) => {
+                    editorContents.insertWidget(props.path, {
+                        $hydrate: selectedWidgetID,
+                        ...settings,
+                    });
+                    editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
+                    setWidgetSettingsModalOpen(false);
+                    setIsModalOpen(false);
+                }}
+                isVisible={isWidgetSettingsModalOpen}
+                initialValue={extractDataByKeyLookup(widgetSchema, "default")}
+                widgetID={selectedWidgetID}
+                widgetCatalog={catalog?.widgets ?? {}}
+                middlewaresCatalog={catalog?.middlewares ?? {}}
+            />
         </>
     );
+}
+
+//get schema object with default values only as props for a widget in order to set them in widget previews
+export function extractDataByKeyLookup(schema: JsonSchema, keyToLookup: string, path?: string, currentData?: object) {
+    let generatedData = currentData ?? {};
+    if (schema && schema.type === "object") {
+        Object.entries(schema.properties).map(([key, value]: [string, JsonSchema]) => {
+            if (value.type === "object") {
+                extractDataByKeyLookup(value, keyToLookup, path ? `${path}.${key}` : key, generatedData);
+            } else if (value[keyToLookup]) {
+                //we have a path, value is nested somewhere in the object
+                if (path) {
+                    let keys = [...path.split("."), key],
+                        newObjectFromCurrentPath = {};
+
+                    //new object creation logic from path
+                    let node = keys.slice(0, -1).reduce(function (memo, current) {
+                        return (memo[current] = {});
+                    }, newObjectFromCurrentPath);
+
+                    //last key where we'll assign our value
+                    node[key] = value[keyToLookup];
+                    generatedData = merge(generatedData, newObjectFromCurrentPath);
+                } else {
+                    //its first level value, we just assign it to our object
+                    generatedData[key] = value[keyToLookup];
+                }
+            }
+        });
+    }
+    return generatedData;
 }

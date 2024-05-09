@@ -11,7 +11,7 @@ import React from "react";
  * story.addDecorator(legacyCssDecorator)
  */
 export const legacyCssDecorator = (getStory: () => any) => {
-    import("./_legacyStylesNested.scss");
+    require("./_legacyStylesNested.scss");
     const AdminStyles = () => {
         return <div className="storybookLegacyStyles">{getStory()}</div>;
     };

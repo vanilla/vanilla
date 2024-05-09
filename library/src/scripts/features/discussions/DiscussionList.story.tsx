@@ -12,6 +12,7 @@ import { STORY_IMAGE, STORY_IPSUM_MEDIUM, STORY_ME_ADMIN, STORY_TAGS, STORY_USER
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { setMeta } from "@library/utility/appUtils";
 import React, { useState } from "react";
+
 import { IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 import { DiscussionGridView } from "@library/features/discussions/DiscussionGridView";
 import { DiscussionListAssetHeader } from "@library/features/discussions/DiscussionListAssetHeader";
@@ -25,13 +26,106 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import keyBy from "lodash/keyBy";
 import { GlobalPreset } from "@library/styles/globalStyleVars";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 
 export default {
     title: "Components/DiscussionLists",
+    excludeStories: ["fakeDiscussions"],
 };
 
+const dummyUserFragment = STORY_USER;
+const dummyTags = STORY_TAGS;
+
 setMeta("ui.useAdminCheckboxes", true);
+
+const commonFields = {
+    dateInserted: "2021-02-11 17:51:15",
+    dateUpdated: "2021-02-03 17:51:15",
+    type: "discussion",
+    pinned: false,
+    insertUserID: dummyUserFragment.userID,
+    insertUser: dummyUserFragment,
+    lastUser: dummyUserFragment,
+    updateUser: dummyUserFragment,
+    closed: false,
+    score: 0,
+    unread: false,
+    countUnread: 0,
+    bookmarked: false,
+    categoryID: 123,
+};
+
+export const fakeDiscussions = [
+    {
+        ...commonFields,
+        url: "#",
+        canonicalUrl: "#",
+        name: "Unresolved Discussion",
+        excerpt: STORY_IPSUM_MEDIUM,
+        discussionID: 10,
+        countViews: 10,
+        countComments: 0,
+        dateLastComment: "2021-02-17 17:51:15",
+        dateInserted: "2021-02-11 17:51:15",
+        dateUpdated: "2021-02-2 17:51:15",
+        type: "discussion",
+        pinned: true,
+        score: 2,
+        resolved: false,
+    },
+    {
+        ...commonFields,
+        url: "#",
+        canonicalUrl: "#",
+        name: "Resolved Discussion",
+        excerpt: STORY_IPSUM_MEDIUM,
+        discussionID: 2,
+        countViews: 200,
+        countComments: 1299,
+        closed: true,
+        category: {
+            categoryID: 123,
+            name: "Product Ideas",
+            url: "#",
+        },
+        resolved: true,
+    },
+    {
+        ...commonFields,
+        url: "#",
+        canonicalUrl: "#",
+        name: "With everything",
+        excerpt: STORY_IPSUM_MEDIUM,
+        discussionID: 5,
+        tags: dummyTags,
+        countViews: 1029,
+        countComments: 11,
+        dateInserted: "2021-02-11 17:51:15",
+        dateUpdated: "2021-02-11 17:51:15",
+        unread: true,
+        type: "idea",
+        reactions: [
+            { urlcode: ReactionUrlCode.UP, reactionValue: 1, hasReacted: false },
+            { urlcode: ReactionUrlCode.DOWN, reactionValue: -1, hasReacted: true },
+        ],
+        score: 22,
+    },
+    {
+        ...commonFields,
+        url: "#",
+        canonicalUrl: "#",
+        name: "This is an idea",
+        excerpt: STORY_IPSUM_MEDIUM,
+        discussionID: 55,
+        countViews: 1011,
+        countComments: 2,
+        dateInserted: "2021-02-11 17:51:15",
+        dateUpdated: "2021-02-11 17:51:15",
+        unread: true,
+        type: "idea",
+        reactions: [{ urlcode: ReactionUrlCode.UP, reactionValue: 1, hasReacted: false }],
+        score: 333,
+    },
+];
 
 const loggedInStoreState = {
     users: {
@@ -40,7 +134,7 @@ const loggedInStoreState = {
         },
     },
     discussions: {
-        discussionsByID: keyBy(DiscussionFixture.fakeDiscussions, "discussionID"),
+        discussionsByID: keyBy(fakeDiscussions, "discussionID"),
     },
 };
 
@@ -68,7 +162,7 @@ export const Default = storyWithConfig(
             <StoryContent>
                 <QueryClientProvider client={queryClient}>
                     <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={DiscussionFixture.fakeDiscussions}></DiscussionListView>
+                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
                     </PermissionsFixtures.AllPermissions>
                 </QueryClientProvider>
             </StoryContent>
@@ -111,7 +205,7 @@ export const Theme = storyWithConfig(
             <StoryContent>
                 <QueryClientProvider client={queryClient}>
                     <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={DiscussionFixture.fakeDiscussions}></DiscussionListView>
+                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
                     </PermissionsFixtures.AllPermissions>
                 </QueryClientProvider>
             </StoryContent>
@@ -141,7 +235,7 @@ export const CertainMetasHidden = storyWithConfig(
             <StoryContent>
                 <QueryClientProvider client={queryClient}>
                     <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={DiscussionFixture.fakeDiscussions}></DiscussionListView>
+                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
                     </PermissionsFixtures.AllPermissions>
                 </QueryClientProvider>
             </StoryContent>
@@ -167,7 +261,7 @@ export const MetasRenderedAsIcons = storyWithConfig(
             <StoryContent>
                 <QueryClientProvider client={queryClient}>
                     <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={DiscussionFixture.fakeDiscussions}></DiscussionListView>
+                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
                     </PermissionsFixtures.AllPermissions>
                 </QueryClientProvider>
             </StoryContent>
@@ -201,7 +295,7 @@ export const UserIconInMetas = storyWithConfig(
             <StoryContent>
                 <QueryClientProvider client={queryClient}>
                     <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={DiscussionFixture.fakeDiscussions}></DiscussionListView>
+                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
                     </PermissionsFixtures.AllPermissions>
                 </QueryClientProvider>
             </StoryContent>
@@ -237,7 +331,7 @@ export const UserIconInMetasWithBorder = storyWithConfig(
             <StoryContent>
                 <QueryClientProvider client={queryClient}>
                     <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={DiscussionFixture.fakeDiscussions}></DiscussionListView>
+                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
                     </PermissionsFixtures.AllPermissions>
                 </QueryClientProvider>
             </StoryContent>
@@ -271,7 +365,7 @@ export const UserIconInMetasWithoutBorder = storyWithConfig(
             <StoryContent>
                 <QueryClientProvider client={queryClient}>
                     <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={DiscussionFixture.fakeDiscussions}></DiscussionListView>
+                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
                     </PermissionsFixtures.AllPermissions>
                 </QueryClientProvider>
             </StoryContent>
@@ -305,7 +399,7 @@ export const IconHidden = storyWithConfig(
             <StoryContent>
                 <QueryClientProvider client={queryClient}>
                     <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={DiscussionFixture.fakeDiscussions}></DiscussionListView>
+                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
                     </PermissionsFixtures.AllPermissions>
                 </QueryClientProvider>
             </StoryContent>
@@ -322,8 +416,8 @@ export const AsGridVariant = storyWithConfig(
         return (
             <QueryClientProvider client={queryClient}>
                 <DiscussionsWidget
-                    discussions={DiscussionFixture.fakeDiscussions}
-                    apiParams={{ discussionID: DiscussionFixture.fakeDiscussions[0].discussionID }}
+                    discussions={fakeDiscussions}
+                    apiParams={{ discussionID: fakeDiscussions[0].discussionID }}
                     containerOptions={{ displayType: WidgetContainerDisplayType.GRID }}
                 />
             </QueryClientProvider>
@@ -340,8 +434,8 @@ export const AsCarouselVariant = storyWithConfig(
         return (
             <QueryClientProvider client={queryClient}>
                 <DiscussionsWidget
-                    discussions={DiscussionFixture.fakeDiscussions}
-                    apiParams={{ discussionID: DiscussionFixture.fakeDiscussions[0].discussionID }}
+                    discussions={fakeDiscussions}
+                    apiParams={{ discussionID: fakeDiscussions[0].discussionID }}
                     containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
                 />
             </QueryClientProvider>
@@ -359,8 +453,8 @@ export const AsSimpleLinks = storyWithConfig(
             <QueryClientProvider client={queryClient}>
                 <DiscussionsWidget
                     title="My Discussions"
-                    discussions={DiscussionFixture.fakeDiscussions}
-                    apiParams={{ discussionID: DiscussionFixture.fakeDiscussions[0].discussionID }}
+                    discussions={fakeDiscussions}
+                    apiParams={{ discussionID: fakeDiscussions[0].discussionID }}
                     containerOptions={{ displayType: WidgetContainerDisplayType.LINK }}
                 />
             </QueryClientProvider>
@@ -378,9 +472,9 @@ export const FeaturedImage = storyWithConfig(
             <StoryHeading>List View</StoryHeading>
             <QueryClientProvider client={queryClient}>
                 <DiscussionsWidget
-                    discussions={DiscussionFixture.fakeDiscussions}
+                    discussions={fakeDiscussions}
                     apiParams={{
-                        discussionID: DiscussionFixture.fakeDiscussions[0].discussionID,
+                        discussionID: fakeDiscussions[0].discussionID,
                         featuredImage: true,
                         fallbackImage: STORY_IMAGE,
                     }}
@@ -388,9 +482,9 @@ export const FeaturedImage = storyWithConfig(
                 />
                 <StoryHeading>Grid View</StoryHeading>
                 <DiscussionsWidget
-                    discussions={DiscussionFixture.fakeDiscussions}
+                    discussions={fakeDiscussions}
                     apiParams={{
-                        discussionID: DiscussionFixture.fakeDiscussions[0].discussionID,
+                        discussionID: fakeDiscussions[0].discussionID,
                         featuredImage: true,
                         fallbackImage: STORY_IMAGE,
                     }}
@@ -398,9 +492,9 @@ export const FeaturedImage = storyWithConfig(
                 />
                 <StoryHeading>Carousel View</StoryHeading>
                 <DiscussionsWidget
-                    discussions={DiscussionFixture.fakeDiscussions}
+                    discussions={fakeDiscussions}
                     apiParams={{
-                        discussionID: DiscussionFixture.fakeDiscussions[0].discussionID,
+                        discussionID: fakeDiscussions[0].discussionID,
                         featuredImage: true,
                         fallbackImage: STORY_IMAGE,
                     }}
@@ -415,7 +509,7 @@ export const FeaturedImage = storyWithConfig(
 const DiscussionListStory = (props) => {
     const [apiParams, setApiParams] = useState<IGetDiscussionListParams>({
         ...props.apiParams,
-        discussionID: DiscussionFixture.fakeDiscussions[0].discussionID,
+        discussionID: fakeDiscussions[0].discussionID,
     });
 
     const mockProps = {
@@ -444,15 +538,15 @@ const DiscussionListStory = (props) => {
 
     const assetHeader = (
         <DiscussionListAssetHeader
-            discussionIDs={DiscussionFixture.fakeDiscussions.map(({ discussionID }) => discussionID)}
+            discussionIDs={fakeDiscussions.map(({ discussionID }) => discussionID)}
             noCheckboxes={mockProps.noCheckboxes || isLink}
             categoryFollowEnabled
-            paginationProps={{ totalResults: DiscussionFixture.fakeDiscussions.length }}
+            paginationProps={{ totalResults: fakeDiscussions.length }}
             apiParams={apiParams}
             updateApiParams={updateApiParams}
         />
     );
-    const assetFooter = <NumberedPager totalResults={DiscussionFixture.fakeDiscussions.length} />;
+    const assetFooter = <NumberedPager totalResults={fakeDiscussions.length} />;
 
     if (mockProps.isList) {
         return (
@@ -464,10 +558,7 @@ const DiscussionListStory = (props) => {
                     }}
                     extraHeader={assetHeader}
                 >
-                    <DiscussionListView
-                        discussions={DiscussionFixture.fakeDiscussions}
-                        discussionOptions={discussionOptions}
-                    />
+                    <DiscussionListView discussions={fakeDiscussions} discussionOptions={discussionOptions} />
 
                     {assetFooter}
                 </HomeWidgetContainer>
@@ -480,7 +571,7 @@ const DiscussionListStory = (props) => {
             <QueryClientProvider client={queryClient}>
                 <div>
                     <QuickLinks
-                        links={DiscussionFixture.fakeDiscussions.map(({ name, url }, index) => ({
+                        links={fakeDiscussions.map(({ name, url }, index) => ({
                             id: index.toString(),
                             name,
                             url,
@@ -500,7 +591,7 @@ const DiscussionListStory = (props) => {
                 <DiscussionGridView
                     {...mockProps}
                     discussionOptions={discussionOptions}
-                    discussions={DiscussionFixture.fakeDiscussions}
+                    discussions={fakeDiscussions}
                     assetHeader={assetHeader}
                 />
                 {assetFooter}
@@ -586,7 +677,7 @@ export const OnDarkThemeHiddenMeta = storyWithConfig(
             <StoryContent>
                 <QueryClientProvider client={queryClient}>
                     <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={DiscussionFixture.fakeDiscussions}></DiscussionListView>
+                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
                     </PermissionsFixtures.AllPermissions>
                 </QueryClientProvider>
             </StoryContent>

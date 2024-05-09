@@ -8,7 +8,7 @@ import React, { useContext, useCallback } from "react";
 import { formatUrl } from "@library/utility/appUtils";
 import { createPath, LocationDescriptor, LocationDescriptorObject } from "history";
 import { useHistory, useRouteMatch } from "react-router";
-import { isLayoutRoute } from "@library/features/Layout/LayoutPage.paths";
+import { isLayoutRoute } from "@library/features/Layout/LayoutPage";
 
 export interface IWithLinkContext {
     linkContexts: string[];

@@ -7,8 +7,8 @@ import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorato
 import { mockAPI } from "@library/__tests__/utility";
 import React, { useState } from "react";
 import { WidgetFormGenerator } from "./WidgetFormGenerator";
-import keyBy from "lodash-es/keyBy";
-import mapValues from "lodash-es/mapValues";
+import keyBy from "lodash/keyBy";
+import mapValues from "lodash/mapValues";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 
 export default {

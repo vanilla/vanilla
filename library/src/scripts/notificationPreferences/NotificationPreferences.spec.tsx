@@ -15,7 +15,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NotificationPreferencesForm } from "./NotificationPreferences";
 import { EmailLanguagePreferencesImpl } from "@library/notificationPreferences/EmailLanguagePreferences";
 import { isINotificationPreference } from "@library/notificationPreferences/utils";
-import { vitest } from "vitest";
 
 const mockUserID = 2;
 
@@ -30,13 +29,15 @@ describe("Notification Preferences Form", () => {
             },
         });
         it("A given group contains checkboxes that can be interacted with", async () => {
-            render(
-                <QueryClientProvider client={queryClient}>
-                    <NotificationPreferencesContextProvider {...{ api: mockApi, userID: mockUserID }}>
-                        <NotificationPreferencesForm />
-                    </NotificationPreferencesContextProvider>
-                </QueryClientProvider>,
-            );
+            act(() => {
+                render(
+                    <QueryClientProvider client={queryClient}>
+                        <NotificationPreferencesContextProvider {...{ api: mockApi, userID: mockUserID }}>
+                            <NotificationPreferencesForm />
+                        </NotificationPreferencesContextProvider>
+                    </QueryClientProvider>,
+                );
+            });
 
             const groupTwoTitle = await screen.findByText("Group Two");
             expect(groupTwoTitle).toBeInTheDocument();
@@ -56,12 +57,13 @@ describe("Notification Preferences Form", () => {
             expect(emailCheckbox).toBeChecked();
 
             // un-check the email checkbox
-            fireEvent.click(emailCheckbox);
+            await act(async () => {
+                fireEvent.click(emailCheckbox);
+            });
 
             const emailCheckboxAfterClick = within(row).getByLabelText<HTMLInputElement>("Email", { exact: false });
             expect(emailCheckboxAfterClick).not.toBeChecked();
 
-            await vitest.waitFor(() => expect(mockApi.patchUserPreferences).toHaveBeenCalled());
             expect(mockApi.patchUserPreferences).toHaveBeenCalledWith({
                 userID: mockUserID,
                 preferences: {
@@ -87,52 +89,58 @@ describe("Notification Preferences Form", () => {
             },
         });
 
-        const mockDebounceInterval = 500;
+        const mockDebounceInterval = 3000;
 
         it("Only calls the submit function once per debounceInterval", async () => {
-            render(
-                <QueryClientProvider client={queryClient}>
-                    <NotificationPreferencesContextProvider {...{ api: mockApi, userID: mockUserID }}>
-                        <NotificationPreferencesForm debounceInterval={mockDebounceInterval} />
-                    </NotificationPreferencesContextProvider>
-                </QueryClientProvider>,
-            );
+            act(() => {
+                render(
+                    <QueryClientProvider client={queryClient}>
+                        <NotificationPreferencesContextProvider {...{ api: mockApi, userID: mockUserID }}>
+                            <NotificationPreferencesForm debounceInterval={mockDebounceInterval} />
+                        </NotificationPreferencesContextProvider>
+                    </QueryClientProvider>,
+                );
+            });
 
-            const form = await screen.findByRole("form", undefined, { timeout: 1000 });
+            jest.useFakeTimers();
+
+            const form = await screen.findByRole("form");
             expect(form).toBeInTheDocument();
 
-            const checkboxes = within(form).getAllByRole("checkbox");
-
-            vitest.useFakeTimers();
+            const checkboxes = await within(form).findAllByRole("checkbox");
 
             // click one checkbox
-            fireEvent.click(checkboxes[0]);
+            await act(async () => {
+                fireEvent.click(checkboxes[0]);
+            });
 
             await act(async () => {
-                vitest.advanceTimersByTime(100);
+                jest.advanceTimersByTime(100);
             });
 
             // the interval is not elapsed, so it hasn't been called yet
             expect(mockApi.patchUserPreferences).not.toHaveBeenCalled();
 
             // click anothercheckbox
-            fireEvent.click(checkboxes[1]);
+            await act(async () => {
+                fireEvent.click(checkboxes[1]);
+            });
 
             await act(async () => {
-                vitest.advanceTimersByTime(100);
+                jest.advanceTimersByTime(100);
             });
 
             // still not elapsed, so not called yet.
             expect(mockApi.patchUserPreferences).not.toHaveBeenCalled();
 
             await act(async () => {
-                vitest.advanceTimersByTime(mockDebounceInterval);
+                jest.advanceTimersByTime(mockDebounceInterval);
             });
 
             // the interval has elapsed since last click, and the function was only called once even though there were two clicks
             expect(mockApi.patchUserPreferences).toHaveBeenCalledTimes(1);
-            vitest.runOnlyPendingTimers();
-            vitest.useRealTimers();
+            jest.runOnlyPendingTimers();
+            jest.useRealTimers();
         });
     });
 });

@@ -7,15 +7,14 @@ import React from "react";
 import { IMe, IUser } from "@library/@types/api/users";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ITag } from "@library/features/tags/TagsReducer";
-import random from "lodash-es/random";
+import random from "lodash/random";
 import { slugify } from "@vanilla/utils";
 import { ILeader } from "@library/leaderboardWidget/LeaderboardWidget";
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { IPostReaction } from "@library/postReactions/PostReactions.types";
-import STORY_IMAGE from "./storyDataImage.png";
 
-export { STORY_IMAGE };
-export const STORY_ICON = STORY_IMAGE;
+export const STORY_IMAGE = require("./storyDataImage.png");
+export const STORY_ICON = require("./storyDataImage.png");
 
 export const STORY_LOGO_WHITE = "https://us.v-cdn.net/6030677/uploads/1861f935b5982c0bec354466296d241f.png";
 export const STORY_LOGO_BLACK = "https://us.v-cdn.net/5022541/uploads/067/Z28XXGPR2ZCS.png";

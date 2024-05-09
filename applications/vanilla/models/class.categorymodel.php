@@ -833,9 +833,8 @@ class CategoryModel extends Gdn_Model implements
      *
      * @param int $userID The target user's ID.
      * @return int[]
-     * @throws Exception
      */
-    public function getFollowed($userID): array
+    public function getFollowed($userID)
     {
         $key = "Follow_{$userID}";
         $result = Gdn::cache()->get($key);
@@ -843,29 +842,14 @@ class CategoryModel extends Gdn_Model implements
             $sql = clone $this->SQL;
             $sql->reset();
 
-            $userCategoryData = $sql
-                ->select("uc.*")
-                ->from("UserCategory uc")
-                ->join("Category c", "uc.CategoryID = c.CategoryID")
-                ->where([
+            $userData = $sql
+                ->getWhere("UserCategory", [
                     "UserID" => $userID,
                     "Followed" => 1,
                 ])
-                ->get()
                 ->resultArray();
-
-            $result = array_column($userCategoryData, null, "CategoryID");
+            $result = array_column($userData, null, "CategoryID");
             Gdn::cache()->store($key, $result);
-        } elseif (count($result) > 0) {
-            // Check that the followed categories exists
-            $categoryIDs = array_keys($result);
-            $categoriesCount = $this->createSql()->getCount("Category", ["CategoryID" => $categoryIDs]);
-
-            // If the cached count differs from the db count, invalidate cache and recount.
-            if ($categoriesCount != count($categoryIDs)) {
-                Gdn::cache()->remove("Follow_{$userID}");
-                return $this->getFollowed($userID);
-            }
         }
 
         return $result;
@@ -4989,7 +4973,6 @@ SQL;
      * Recalculate all aggregate post count columns for all categories.
      *
      * @return void
-     * @throws Gdn_UserException
      */
     private static function recalculateAggregateCounts()
     {

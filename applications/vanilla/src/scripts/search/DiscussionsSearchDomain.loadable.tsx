@@ -10,7 +10,7 @@ import { TypeDiscussionsIcon } from "@library/icons/searchIcons";
 import { ISearchForm, ISearchRequestQuery } from "@library/search/searchTypes";
 import { IDiscussionSearchTypes } from "@vanilla/addon-vanilla/search/discussionSearchTypes";
 import { t } from "@vanilla/i18n";
-import flatten from "lodash-es/flatten";
+import flatten from "lodash/flatten";
 import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
 import { SearchFilterPanelDiscussions } from "@vanilla/addon-vanilla/search/SearchFilterPanelDiscussions";
 import { SearchFilterPanelComments } from "@vanilla/addon-vanilla/search/SearchFilterPanelComments";

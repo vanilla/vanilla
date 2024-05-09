@@ -14,14 +14,12 @@ import { api } from "@library/notificationPreferences";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 import React, { PropsWithChildren } from "react";
-import { fn } from "@storybook/test";
 import {
     AttachmentIntegrationsApiContextProvider,
     AttachmentIntegrationsContextProvider,
 } from "../Integrations.context";
 
 export const FAKE_INTEGRATION: IAttachmentIntegration = {
-    name: "fakeIntegration",
     label: "Fake Integration for Discussion",
     attachmentType: "fakeIntegration",
     recordTypes: ["discussion", "comment"],
@@ -117,10 +115,10 @@ export const queryClient = new QueryClient({
 });
 
 export const mockApi = {
-    getIntegrationsCatalog: fn(FAKE_API.getIntegrationsCatalog),
-    getAttachmentSchema: fn(FAKE_API.getAttachmentSchema),
-    postAttachment: fn(FAKE_API.postAttachment),
-    refreshAttachments: fn(FAKE_API.refreshAttachments),
+    getIntegrationsCatalog: jest.fn(FAKE_API.getIntegrationsCatalog),
+    getAttachmentSchema: jest.fn(FAKE_API.getAttachmentSchema),
+    postAttachment: jest.fn(FAKE_API.postAttachment),
+    refreshAttachments: jest.fn(FAKE_API.refreshAttachments),
 };
 
 export function IntegrationsTestWrapper({ children }: PropsWithChildren<{}>) {

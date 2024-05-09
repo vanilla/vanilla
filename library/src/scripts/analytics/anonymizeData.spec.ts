@@ -17,14 +17,12 @@ import getStore from "@library/redux/getStore";
 import apiv2 from "@library/apiv2";
 import UserActions from "@library/features/users/UserActions";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import MockAdapter from "axios-mock-adapter/types";
 
+const mockAdapter = mockAPI();
 const API_URL = "/analytics/privacy";
 
 describe("Get and set AnonymizeData preference for user that is not logged in.", () => {
-    let mockAdapter: MockAdapter;
     beforeEach(() => {
-        mockAdapter = mockAPI();
         mockAdapter
             .onGet("/config?select=garden.cookie.name,garden.cookie.path")
             .reply(200, { "garden.cookie.name": "TestCookies", "garden.cookie.path": "/" });
@@ -87,10 +85,8 @@ describe("Get and set AnonymizeData preference for user that is not logged in.",
 describe("Get and set AnonymizeData preference for use that is logged in.", () => {
     const store = getStore();
     const userActions = new UserActions(store.dispatch, apiv2);
-    let mockAdapter: MockAdapter;
 
     beforeEach(() => {
-        mockAdapter = mockAPI();
         mockAdapter.onGet("/users/me").reply(200, UserFixture.createMockUser());
         mockAdapter.onGet("/users/$me/permissions?expand=junctions").reply(200, {
             isAdmin: true,
@@ -113,9 +109,8 @@ describe("Get and set AnonymizeData preference for use that is logged in.", () =
     });
 
     it("Vanilla Analytics is disabled and endpoint is not reachable, return site default when getting value", async () => {
-        mockAdapter.onGet(/config/).reply(200, {});
-        setAnonymizeMeta(false);
         mockAdapter.onGet(API_URL).networkError();
+        setAnonymizeMeta(false);
         const result = await getAnonymizeData();
         expect(result).toBeFalsy();
     });

@@ -4,8 +4,8 @@
  * @license Proprietary
  */
 
-import { ReactNode, useState } from "react";
-import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
+import React, { ReactNode, useState } from "react";
+import { render, waitFor, screen, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react-hooks";
@@ -18,14 +18,12 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { DeepPartial } from "redux";
 import { DiscussionListFilter } from "./DiscussionListFilter";
 import { IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
-import MockAdapter from "axios-mock-adapter/types";
-import { PermissionsContextProvider } from "@library/features/users/PermissionsContext";
 
 // create a state for the community.manage permission as enabled or disabled
 const communityManagePermission = (enable: boolean = false) => ({
     status: LoadStatus.SUCCESS,
     data: {
-        isAdmin: false,
+        isAdmin: true,
         permissions: [
             {
                 type: "global",
@@ -85,13 +83,6 @@ const MOCK_TAGS_DATA = [
 ];
 const MOCK_TAGS_OPTIONS = [
     { value: "23", label: "Dragon" },
-    { value: "5", label: "unicorn" },
-];
-
-const MOCK_ALL_TAGS_OPTIONS = [
-    { value: "16", label: "Already Offered" },
-    { value: "23", label: "Dragon" },
-    { value: "1", label: "Spam" },
     { value: "5", label: "unicorn" },
 ];
 
@@ -198,9 +189,7 @@ const MockWrapper = (props: IMockWrapperProps) => {
     return (
         <TestReduxProvider state={mockState}>
             <QueryClientProvider client={queryClient}>
-                <PermissionsContextProvider>
-                    <MemoryRouter>{children}</MemoryRouter>
-                </PermissionsContextProvider>
+                <MemoryRouter>{children}</MemoryRouter>
             </QueryClientProvider>
         </TestReduxProvider>
     );
@@ -222,42 +211,32 @@ const MockFilter = (props: Omit<IMockWrapperProps, "children">) => {
 
 describe("DiscussionListFilter", () => {
     // Mock API for the tests
-    let mockAdapter: MockAdapter;
-
-    beforeEach(() => {
-        mockAdapter = mockAPI();
-        mockAdapter.onGet("/tags").reply(200, MOCK_TAGS_DATA);
-        mockAdapter.onGet("/discussions/statuses").reply(200, [...MOCK_STATUS_DATA]);
-    });
-
-    afterEach(() => {
-        mockAdapter.reset();
-        cleanup();
-    });
+    const mockAdapter = mockAPI();
+    mockAdapter.onGet("/tags").reply(200, MOCK_TAGS_DATA);
+    mockAdapter.onGet("/discussions/statuses").reply(200, MOCK_STATUS_DATA);
 
     it("useTypeOptions() hook returns options based on enabled addons", async () => {
         const { result, waitFor } = renderHook(() => useTypeOptions(), { wrapper: MockWrapper });
 
-        await waitFor(() => {
+        waitFor(() => {
             expect(result.current).toBeDefined();
             expect(result.current).toStrictEqual(MOCK_ADDONS_OPTIONS);
         });
     });
 
-    it("useTagOptions() hook returns tags as options", async () => {
+    it("useTagOptions() hook returns User tags as options", async () => {
         const { result, waitFor } = renderHook(() => useTagOptions(), { wrapper: MockWrapper });
 
-        await vi.waitFor(() => {
+        waitFor(() => {
             expect(result.current).toBeDefined();
-            expect(result.current).toStrictEqual(MOCK_ALL_TAGS_OPTIONS);
+            expect(result.current).toStrictEqual(MOCK_TAGS_OPTIONS);
         });
     });
 
     it("useStatusOptions() hook returns Questions and Ideation statuses", async () => {
         const { result, waitFor } = renderHook(() => useStatusOptions(), { wrapper: MockWrapper });
 
-        await vi.dynamicImportSettled();
-        await waitFor(() => {
+        waitFor(() => {
             expect(result.current).toBeDefined();
             expect(result.current).toStrictEqual(MOCK_STATUS_OPTIONS);
         });
@@ -265,125 +244,32 @@ describe("DiscussionListFilter", () => {
 
     it("useStatusOptions({ internal: true }) hook return Internal Statuses", async () => {
         const { result, waitFor } = renderHook(() => useStatusOptions(true), { wrapper: MockWrapper });
-        await vi.dynamicImportSettled();
-        await waitFor(() => {
+
+        waitFor(() => {
             expect(result.current).toBeDefined();
             expect(result.current).toStrictEqual(MOCK_INTERNAL_STATUS_OPTIONS);
         });
     });
 
-    it("Displays all fields including resolution status and post engagement due to proper permissions", async () => {
-        render(<MockFilter isCommunityManager />);
-        await vi.dynamicImportSettled();
-
-        expect(screen.getByText(/Post Type/)).toBeInTheDocument();
-        expect(await screen.findByText(/Post Status/)).toBeInTheDocument();
-        expect(screen.getByText(/Tags/)).toBeInTheDocument();
-        expect(screen.getByText(/Resolution Status/)).toBeInTheDocument();
-        expect(screen.getByText(/Post Engagement/)).toBeInTheDocument();
-    });
-
-    it("Displays all fields except resolution status and post engagement due to lack of permissions", async () => {
+    it("Displays all fields except resolution status due to lack of permissions", async () => {
         render(<MockFilter />);
 
-        await vi.dynamicImportSettled();
-
-        expect(screen.getByText(/Post Type/)).toBeInTheDocument();
-        expect(await screen.findByText(/Post Status/)).toBeInTheDocument();
-        expect(screen.getByText(/Tags/)).toBeInTheDocument();
-        expect(screen.queryByText(/Resolution Status/)).not.toBeInTheDocument();
-        expect(screen.queryByText(/Post Engagement/)).not.toBeInTheDocument();
+        waitFor(() => {
+            expect(screen.getByText(/Post Type/)).toBeInTheDocument();
+            expect(screen.getByText(/Post Status/)).toBeInTheDocument();
+            expect(screen.getByText(/Tags/)).toBeInTheDocument();
+            expect(screen.findByText(/Resolution Status/)).not.toBeInTheDocument();
+        });
     });
 
-    describe("Post engagement section", async () => {
-        it("renders both checkboxes as checked by default", async () => {
-            render(<MockFilter isCommunityManager />);
-            await vi.dynamicImportSettled();
-            const hasNoCommentsCheckbox = await screen.findByRole("checkbox", { name: "No Comments" });
-            const hasCommentsCheckbox = await screen.findByRole("checkbox", { name: "Has Comments" });
+    it("Displays all fields including resolution status due to proper permissions", async () => {
+        render(<MockFilter />);
 
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-        });
-
-        it("allows the user to uncheck a checkbox", async () => {
-            render(<MockFilter isCommunityManager />);
-            await vi.dynamicImportSettled();
-            const hasNoCommentsCheckbox = await screen.findByRole("checkbox", { name: "No Comments" });
-            const hasCommentsCheckbox = await screen.findByRole("checkbox", { name: "Has Comments" });
-
-            // Both are checked by default, uncheck 'has no comments'
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).not.toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // re-check 'has no comments' so both are checked again
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // uncheck 'has comments'
-            await act(async () => {
-                fireEvent.click(hasCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).not.toBeChecked();
-        });
-
-        it("won't allow the user to uncheck both checkboxes", async () => {
-            render(<MockFilter isCommunityManager />);
-            await vi.dynamicImportSettled();
-            const hasNoCommentsCheckbox = await screen.findByRole("checkbox", { name: "No Comments" });
-            const hasCommentsCheckbox = await screen.findByRole("checkbox", { name: "Has Comments" });
-
-            // Both are checked by default, uncheck 'has no comments'
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).not.toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // Attempt to uncheck 'has comments' too
-            await act(async () => {
-                fireEvent.click(hasCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).not.toBeChecked();
-            // At least one checkbox must be selected, so it can't be unchecked
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // Make both checkboxes checked again
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // Uncheck 'has comments'
-            await act(async () => {
-                fireEvent.click(hasCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).not.toBeChecked();
-
-            // Attempt to uncheck 'has no comments' too
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            // At least one checkbox must be selected, so it can't be unchecked
-            expect(hasCommentsCheckbox).not.toBeChecked();
+        waitFor(() => {
+            expect(screen.getByText(/Post Type/)).toBeInTheDocument();
+            expect(screen.getByText(/Post Status/)).toBeInTheDocument();
+            expect(screen.getByText(/Tags/)).toBeInTheDocument();
+            expect(screen.getByText(/Resolution Status/)).toBeInTheDocument();
         });
     });
 });

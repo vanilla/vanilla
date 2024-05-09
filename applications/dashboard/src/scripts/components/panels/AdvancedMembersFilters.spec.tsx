@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { render, act, cleanup, fireEvent, within, waitFor } from "@testing-library/react";
+import { render, act, cleanup, fireEvent, within } from "@testing-library/react";
 import { RenderResult } from "@testing-library/react";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import {
@@ -22,13 +22,13 @@ import { mockAPI } from "@library/__tests__/utility";
 import { SearchService } from "@library/search/SearchService";
 import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
 import { MemoryRouter } from "react-router";
-import MockAdapter from "axios-mock-adapter/types";
 
-let mockAdapter: MockAdapter;
+jest.setTimeout(20000);
+
+const mockAdapter = mockAPI();
 
 describe("AdvancedMembersFilters", () => {
     beforeAll(async () => {
-        mockAdapter = mockAPI();
         const FakeInputComponent = function (props: { value: string; onChange: (value: string) => void }) {
             return <input type="textbox" value={props.value} onChange={(e) => props.onChange(e.target.value)}></input>;
         };
@@ -236,10 +236,10 @@ describe("AdvancedMembersFilters", () => {
 
         it("Submitting the form submits the search, and closes the modal", async () => {
             mockAdapter.onGet("/search").reply(200, []);
-            fireEvent.submit(result.getByRole("dialog").querySelector("form")!);
-            await waitFor(() => {
-                expect(result.queryByRole("dialog")).not.toBeInTheDocument();
+            await act(async () => {
+                fireEvent.submit(result.getByRole("dialog").querySelector("form")!);
             });
+            expect(result.queryByRole("dialog")).not.toBeInTheDocument();
             expect(mockAdapter.history.get.length).toEqual(1);
             mockAdapter.reset();
         });

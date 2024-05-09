@@ -11,7 +11,7 @@ import { IReaction } from "@dashboard/@types/api/reaction";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { RecordID } from "@vanilla/utils";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import intersection from "lodash-es/intersection";
+import intersection from "lodash/intersection";
 import { IForumStoreState } from "@vanilla/addon-vanilla/redux/state";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { IDiscussionsStoreState } from "@library/features/discussions/discussionsReducer";

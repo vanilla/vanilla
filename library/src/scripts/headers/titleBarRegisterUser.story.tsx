@@ -4,6 +4,7 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
+import { storiesOf } from "@storybook/react";
 import React, { useState, createRef, useEffect } from "react";
 import { MemoryRouter, Router } from "react-router";
 import TitleBar, { TitleBar as TitleBarStatic } from "@library/headers/TitleBar";
@@ -22,13 +23,12 @@ import { StoryFullPage } from "@library/storybook/StoryFullPage";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import gdn from "@library/gdn";
 import { setMeta } from "@library/utility/appUtils";
-import localLogoUrl from "./titleBarStoryLogo.png";
+
+const localLogoUrl = require("./titleBarStoryLogo.png");
 
 loadTranslations({});
 
-export default {
-    title: "Headers/Title Bar",
-};
+const story = storiesOf("Headers/Title Bar", module);
 
 const makeMockRegisterUser: IMe = {
     name: "Neena",
@@ -133,30 +133,26 @@ function TestTitleBar(props: { hasConversations: boolean }) {
     );
 }
 
-export const TitleBarRegisteredUser = () => {
-    return <TestTitleBar hasConversations={true} />;
-};
-
-TitleBarRegisteredUser.story = {
-    name: "TitleBar Registered User",
-
-    parameters: {
+story.add(
+    "TitleBar Registered User",
+    () => {
+        return <TestTitleBar hasConversations={true} />;
+    },
+    {
         chromatic: {
             viewports: [oneColumnVariables().breakPoints.noBleed, oneColumnVariables().breakPoints.xs],
         },
     },
-};
+);
 
-export const TitleBarRegisteredUserNoConversations = () => {
-    return <TestTitleBar hasConversations={false} />;
-};
-
-TitleBarRegisteredUserNoConversations.story = {
-    name: "TitleBar Registered User (No Conversations)",
-
-    parameters: {
+story.add(
+    "TitleBar Registered User (No Conversations)",
+    () => {
+        return <TestTitleBar hasConversations={false} />;
+    },
+    {
         chromatic: {
             viewports: [oneColumnVariables().breakPoints.noBleed, oneColumnVariables().breakPoints.xs],
         },
     },
-};
+);

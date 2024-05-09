@@ -1,5 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
-import Editor, { loader as monaco, OnChange, OnMount } from "@monaco-editor/react";
+import {
+    ControlledEditor,
+    ControlledEditorOnChange,
+    DiffEditorDidMount,
+    EditorDidMount,
+    monaco,
+} from "@monaco-editor/react";
 import { DarkThemeIcon, LightThemeIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
 import { assetUrl, getMeta, siteUrl } from "@library/utility/appUtils";
@@ -11,7 +17,7 @@ if (process.env.NODE_ENV !== "test") {
     monaco.config({
         paths: {
             // @ts-ignore: DIST_NAME comes from webpack.
-            vs: assetUrl(`/dist/v2/monaco-editor-30-1/min/vs`),
+            vs: assetUrl(`/${__DIST__NAME__}/monaco-editor-30-1/min/vs`),
         },
     });
 }
@@ -21,8 +27,8 @@ export interface ITextEditorProps {
     jsonSchemaUri?: string;
     typescriptDefinitions?: string;
     value?: string;
-    onChange?: OnChange;
-    editorDidMount?: OnMount;
+    onChange?: ControlledEditorOnChange;
+    editorDidMount?: DiffEditorDidMount;
     minimal?: boolean;
     noPadding?: boolean;
     className?: string;
@@ -104,7 +110,7 @@ export default function TextEditor(props: ITextEditorProps) {
     useJsonSchema(props.jsonSchemaUri ?? null);
     useTypeDefinitions(props.typescriptDefinitions);
 
-    const handleEditorDidMount: OnMount = () => {
+    const handleEditorDidMount: EditorDidMount = (_, editor) => {
         setIsEditorReady(true);
     };
 
@@ -130,10 +136,10 @@ export default function TextEditor(props: ITextEditorProps) {
             <button type="button" onClick={toggleTheme} className={classes.themeToggleIcon} disabled={!isEditorReady}>
                 {themeModeButton}
             </button>
-            <Editor
+            <ControlledEditor
                 theme={theme}
                 language={language}
-                onMount={handleEditorDidMount}
+                editorDidMount={handleEditorDidMount}
                 options={props.minimal ? minimalOptions : fullOptions}
                 value={value}
                 onChange={onChange}

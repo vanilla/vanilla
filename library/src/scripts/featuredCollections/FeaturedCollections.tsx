@@ -12,7 +12,7 @@ import {
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { featuredCollectionsVariables, ICollection } from "@library/featuredCollections/Collections.variables";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import omit from "lodash-es/omit";
+import omit from "lodash/omit";
 import { List } from "@library/lists/List";
 import { FeaturedCollectionRecord } from "@library/featuredCollections/FeaturedCollectionRecord";
 import QuickLinks from "@library/navigation/QuickLinks";

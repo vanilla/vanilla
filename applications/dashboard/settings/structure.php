@@ -1190,8 +1190,6 @@ $Construct
     ->column("CountGroup", "int", null)
     ->column("SpoofUserID", "int", true)
     ->column("SpoofUserName", "varchar(" . UserModel::USERNAME_LENGTH . ")", true)
-    ->column("DispatchUUID", "varchar(255)", true, "index")
-    ->column("AutomationRuleRevisionID", "int", true, "index")
     ->engine("InnoDB")
     ->set($Explicit, $Drop);
 

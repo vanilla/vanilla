@@ -5,9 +5,7 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
 use Garden\Web\Data;
-use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
@@ -18,6 +16,7 @@ use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchResultItem;
+use Vanilla\Search\SearchService;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Utility\ModelUtils;
 use Garden\Web\Pagination;
@@ -126,9 +125,6 @@ class CommentsApiController extends AbstractApiController
      * Delete a comment.
      *
      * @param int $id The ID of the comment.
-     * @throws PermissionException
-     * @throws HttpException
-     * @throws \Vanilla\Exception\Database\NoResultsException
      */
     public function delete(int $id)
     {
@@ -173,10 +169,6 @@ class CommentsApiController extends AbstractApiController
      * @param int $id The ID of the comment.
      * @param array $query The request query.
      * @return array
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
-     * @throws HttpException
      */
     public function get(int $id, array $query)
     {
@@ -241,7 +233,7 @@ class CommentsApiController extends AbstractApiController
      * @throws NotFoundException If the record with the given ID can't be found.
      * @throws \Exception Throws an exception if no session is available.
      * @throws \Vanilla\Exception\PermissionException Throws an exception if the user does not have the specified permission(s).
-     * @throws ValidationException If the output schema is configured incorrectly.
+     * @throws \Garden\Schema\ValidationException If the output schema is configured incorrectly.
      */
     public function get_quote($id)
     {
@@ -292,10 +284,6 @@ class CommentsApiController extends AbstractApiController
      *
      * @param int $id The ID of the comment.
      * @return array
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function get_edit($id)
     {
@@ -351,10 +339,6 @@ class CommentsApiController extends AbstractApiController
      *
      * @param array $query The query string.
      * @return Data
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function index(array $query)
     {
@@ -522,10 +506,6 @@ class CommentsApiController extends AbstractApiController
      * @param array $body The request body.
      * @return array
      * @throws ClientException If comment editing is not allowed.
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function patch($id, array $body)
     {
@@ -628,10 +608,6 @@ class CommentsApiController extends AbstractApiController
      *
      * @param array $query
      * @return Data
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function get_search(array $query)
     {
@@ -676,10 +652,6 @@ class CommentsApiController extends AbstractApiController
      * @param int $id The comment ID.
      * @param array $query The request query.
      * @return array
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function get_reactions(int $id, array $query)
     {
@@ -728,11 +700,6 @@ class CommentsApiController extends AbstractApiController
      * @param int $id The comment ID.
      * @param array $body The request query.
      * @return array
-     * @throws Gdn_UserException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function post_reactions(int $id, array $body)
     {
@@ -768,10 +735,6 @@ class CommentsApiController extends AbstractApiController
      * @param int $id The comment ID.
      * @param int|null $userID
      * @return void
-     * @throws Gdn_UserException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
      */
     public function delete_reactions(int $id, int $userID = null): void
     {

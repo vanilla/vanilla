@@ -13,7 +13,7 @@ import Message from "@library/messages/Message";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import React, { ReactNode, useMemo } from "react";
+import React, { useMemo } from "react";
 
 interface IProps {
     errorsByDiscussionID: ILongRunnerResponse["progress"]["exceptionsByID"] | null;
@@ -32,7 +32,7 @@ export function BulkDiscussionErrors(props: IProps) {
         if (failedDiscussions && Object.keys(failedDiscussions).length > 0) {
             let stringMessage = messagePrefix;
             let reactMessage: React.ReactNode = messagePrefix;
-            let reactDescriptionArr: ReactNode[] = [];
+            let reactDescriptionArr: React.ReactNodeArray = [];
 
             const failedNames: string[] = [];
             Object.values(failedDiscussions).forEach((failedDiscussion, i) => {

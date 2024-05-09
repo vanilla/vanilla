@@ -19,7 +19,7 @@ import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { MenuPlacement } from "@library/forms/select/SelectOne";
 import { RecordID } from "@vanilla/utils";
 import apiv2 from "@library/apiv2";
-import debounce from "lodash-es/debounce";
+import debounce from "lodash/debounce";
 import { CategoryDisplayAs } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { useMutation } from "@tanstack/react-query";
 

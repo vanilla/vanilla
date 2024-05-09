@@ -9,10 +9,9 @@ import { render, fireEvent, act } from "@testing-library/react";
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import ProfileFieldDelete from "@dashboard/userProfiles/components/ProfileFieldDelete";
 import { LiveAnnouncer } from "react-aria-live";
-import { vitest } from "vitest";
 
 const mockField = ProfileFieldsFixtures.mockProfileFields()[0];
-const mockClose = vitest.fn();
+const mockClose = jest.fn();
 
 const renderInProvider = () => {
     const MockProfileFieldsProvider = ProfileFieldsFixtures.createMockProfileFieldsProvider();

@@ -125,30 +125,25 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                     {isAsset ? <span>{trashButton}</span> : trashButton}
                 </ConditionalWrap>
             </EmbedMenu>
-            {!!$hydrate && catalog?.widgets[$hydrate] && (
-                <WidgetSettingsModal
-                    key={$hydrate}
-                    exitHandler={() => {
-                        setWidgetSettingsModalOpen(false);
-                    }}
-                    onSave={(settings) => {
-                        editorContents.modifyWidget(props.path, {
-                            $hydrate: $hydrate,
-                            ...settings,
-                        });
-                        editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
-                        setWidgetSettingsModalOpen(false);
-                    }}
-                    isVisible={isWidgetSettingsModalOpen}
-                    schema={catalog.widgets[$hydrate].schema}
-                    name={catalog.widgets[$hydrate].name}
-                    initialValues={widgetProps}
-                    widgetCatalog={catalog.widgets}
-                    middlewaresCatalog={catalog.middlewares ?? {}}
-                    widgetID={$hydrate ?? ""}
-                    assetCatalog={catalog?.assets}
-                />
-            )}
+            <WidgetSettingsModal
+                exitHandler={() => {
+                    setWidgetSettingsModalOpen(false);
+                }}
+                onSave={(settings) => {
+                    editorContents.modifyWidget(props.path, {
+                        $hydrate: $hydrate,
+                        ...settings,
+                    });
+                    editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
+                    setWidgetSettingsModalOpen(false);
+                }}
+                isVisible={isWidgetSettingsModalOpen}
+                initialValue={widgetProps}
+                widgetCatalog={catalog?.widgets ?? {}}
+                middlewaresCatalog={catalog?.middlewares ?? {}}
+                widgetID={$hydrate ?? ""}
+                assetCatalog={catalog?.assets}
+            />
         </>
     );
 }

@@ -7,7 +7,7 @@
 import { ColumnType, INotificationPreference, INotificationPreferences } from "@library/notificationPreferences";
 import { getDeepPropertyListInDotNotation } from "@library/utility/appUtils";
 import { JsonSchema } from "@vanilla/json-schema-forms";
-import get from "lodash-es/get";
+import get from "lodash/get";
 import type { Row } from "react-table";
 
 export function isParentOfNotificationPreferenceSchemas(schema: JsonSchema) {

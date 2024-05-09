@@ -1,5 +1,6 @@
 import React from "react";
 import { addComponent } from "@library/utility/componentRegistry";
+import { fakeDiscussions } from "@library/features/discussions/DiscussionList.story";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
@@ -9,7 +10,6 @@ import {
     LayoutDevice,
 } from "@library/features/Layout/LayoutRenderer.types";
 import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 
 export default {
     title: "Widgets/LayoutRenderer",
@@ -117,7 +117,7 @@ const sampleHomeLayout: IHydratedLayoutWidget[] = [
             children: [
                 {
                     $reactComponent: "DiscussionList",
-                    $reactProps: { discussions: DiscussionFixture.fakeDiscussions },
+                    $reactProps: { discussions: fakeDiscussions },
                 },
             ],
         },

@@ -16,8 +16,6 @@ interface AttachmentProviderInterface
 {
     // const TYPE_NAME {should match the name of the issue type};
 
-    const ESCALATION_DELAY_UNITS = ["minute", "hour", "day", "week", "month", "year"];
-
     /**
      * Create a new issue in the external service and return the saved associated attachment data.
      *
@@ -117,49 +115,4 @@ interface AttachmentProviderInterface
      * @return int
      */
     public function getRefreshTimeSeconds(): int;
-
-    /**
-     * If a user can escalate their own post to this provider.
-     *
-     * @return bool
-     */
-    public function canEscalateOwnPost(): bool;
-
-    /**
-     * Get units used to calculate time span before a user can escalate their own post.
-     * Must be one of `AttachmentProviderInterface::ESCALATION_DELAY_UNITS`.
-     *
-     * @return string|null
-     */
-    public function getEscalationDelayUnit(): ?string;
-
-    /**
-     * Get length of time span before a user can escalate their own post.
-     * Should be used with AttachmentProviderInterface::getEscalationDelayUnit()`.
-     *
-     * @return int
-     */
-    public function getEscalationDelayLength(): int;
-
-    /**
-     * If the current user can view a specific attachment record.
-     *
-     * @param array $attachment
-     * @return bool
-     */
-    public function canViewAttachment(array $attachment): bool;
-
-    /**
-     * If the current user can create an attachment for a specific recordType and recordID.
-     *
-     * @param string $recordType
-     * @param int $recordID
-     * @return bool
-     */
-    public function canCreateAttachmentForRecord(string $recordType, int $recordID): bool;
-
-    /**
-     * Get the provider name.
-     */
-    public function getProviderName(): string;
 }

@@ -1,7 +1,7 @@
 import { siteUrl, t, getMeta, safelyParseJSON } from "@library/utility/appUtils";
 import axios from "axios";
 import qs from "qs";
-import debounce from "lodash-es/debounce";
+import debounce from "lodash/debounce";
 import { logDebug } from "@vanilla/utils";
 
 /** Attach auto save function after vanilla is loaded */

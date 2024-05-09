@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { render, waitFor, screen } from "@testing-library/react";
-import Result, { IResult } from "@library/result/Result";
+import { render, waitFor } from "@testing-library/react";
+import Result from "@library/result/Result";
 import ResultList from "@library/result/ResultList";
 import { SearchFixture } from "@library/search/__fixtures__/Search.fixture";
 import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
@@ -17,7 +17,6 @@ import EVENT_SEARCH_DOMAIN from "@groups/search/EventSearchDomain";
 import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
 import { SearchService } from "@library/search/SearchService";
 import { MemoryRouter } from "react-router";
-import { expect } from "@storybook/test";
 
 beforeAll(() => {
     COMMUNITY_SEARCH_SOURCE.addDomain(DISCUSSIONS_SEARCH_DOMAIN);
@@ -35,7 +34,7 @@ describe("ResultList", () => {
     it("Renders result list without images", async () => {
         const results = SearchFixture.createMockSearchResults(1);
 
-        render(
+        const { findByText, container } = render(
             <MemoryRouter>
                 <SearchFormContextProvider>
                     <ResultList results={results.results} rel={"noindex nofollow"} />
@@ -43,11 +42,12 @@ describe("ResultList", () => {
             </MemoryRouter>,
         );
 
-        await vi.dynamicImportSettled();
-        const testResult = await screen.findByText("test result 0");
-        expect(testResult).toBeInTheDocument();
-        const imageNodes = screen.queryAllByRole("img");
-        expect(imageNodes.length).toBe(0);
+        waitFor(async () => {
+            const testResult = await findByText("test result 1");
+            expect(testResult).toBeInTheDocument();
+            const imageNodes = container.querySelectorAll("img");
+            expect(imageNodes.length).toBe(0);
+        });
     });
     it("Renders result list with image source", async () => {
         const results = SearchFixture.createMockSearchResults(1, {
@@ -59,27 +59,50 @@ describe("ResultList", () => {
             },
         });
 
-        render(
+        const { container } = render(
             <MemoryRouter>
                 <SearchFormContextProvider>
-                    <ResultList
-                        results={results.results.map((result): IResult => {
-                            return {
-                                ...result,
-                                image: result.image?.url,
-                                imageSet: result.image?.urlSrcSet as any,
-                            };
-                        })}
-                        rel={"noindex nofollow"}
-                    />
+                    <ResultList results={results.results} rel={"noindex nofollow"} />
                 </SearchFormContextProvider>
             </MemoryRouter>,
         );
 
-        await vi.dynamicImportSettled();
+        waitFor(async () => {
+            const imageNodes = container.querySelectorAll("img");
+            expect(imageNodes.length).toBe(1);
+            expect(imageNodes[0]).toHaveAttribute("src", "test-image-url");
+        });
+    });
+    it("Renders result list with image source set", async () => {
+        const results = SearchFixture.createMockSearchResults(1, {
+            result: {
+                image: {
+                    url: "test-image-url",
+                    alt: "test-image-alt",
+                    urlSrcSet: {
+                        10: "test-image-10",
+                        800: "test-image-800",
+                        1200: "test-image-1200",
+                    },
+                },
+            },
+        });
 
-        const imageNodes = screen.getAllByRole("img");
-        expect(imageNodes).toHaveLength(1);
-        expect(imageNodes[0]).toHaveAttribute("src", "test-image-url");
+        const { container } = render(
+            <MemoryRouter>
+                <SearchFormContextProvider>
+                    <ResultList results={results.results} rel={"noindex nofollow"} />
+                </SearchFormContextProvider>
+            </MemoryRouter>,
+        );
+
+        waitFor(async () => {
+            const imageNodes = container.querySelectorAll("img");
+            expect(imageNodes.length).toBe(1);
+            expect(imageNodes[0]).toHaveAttribute(
+                "srcset",
+                "test-image-10 10w,test-image-800 800w,test-image-1200 1200w",
+            );
+        });
     });
 });

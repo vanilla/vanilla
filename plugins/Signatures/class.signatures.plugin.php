@@ -639,7 +639,6 @@ class SignaturesPlugin extends Gdn_Plugin
             $style = <<<EOT
 .Signature img, .UserSignature img {
    max-height: {$maxImageHeight}px !important;
-   width: auto;
 }
 EOT;
 

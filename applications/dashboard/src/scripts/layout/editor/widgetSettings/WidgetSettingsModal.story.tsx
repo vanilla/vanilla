@@ -9,7 +9,6 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import "../../../../../scss/admin-new.scss";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { JsonSchema } from "@vanilla/json-schema-forms";
-import { extractDataByKeyLookup } from "@dashboard/layout/editor/utils";
 
 //FIXME FIXME this story is not generating on production build in chromatic
 //https://higherlogic.atlassian.net/browse/VNLA-1459
@@ -181,9 +180,6 @@ export function LayoutEditorWidgetSettingsModal() {
         <StoryContent>
             <StoryHeading>Widget Settings Modal with expandable form groups.</StoryHeading>
             <WidgetSettingsModal
-                initialValues={extractDataByKeyLookup(widgetCatalogMock.widgetID.schema, "default")}
-                schema={widgetCatalogMock.widgetID.schema}
-                name={widgetCatalogMock.widgetID.name}
                 widgetCatalog={widgetCatalogMock}
                 widgetID="widgetID"
                 exitHandler={() => {}}

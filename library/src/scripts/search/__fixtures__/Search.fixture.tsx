@@ -10,7 +10,6 @@ import { ISearchRequestQuery, ISearchSource } from "@library/search/searchTypes"
 import SearchDomain from "@library/search/SearchDomain";
 import { TypeAllIcon } from "@library/icons/searchIcons";
 import { SearchDomainLoadable } from "../SearchDomainLoadable";
-import { fn } from "@storybook/test";
 
 interface IParams {
     pagination?: ISearchResponse["pagination"];
@@ -113,7 +112,7 @@ export class MockSearchSource implements ISearchSource {
         }
     }
 
-    public performSearch = fn(async function (requestParams: ISearchRequestQuery, endpointOverride?: string) {
+    public performSearch = jest.fn(async function (requestParams: ISearchRequestQuery, endpointOverride?: string) {
         return {
             results: [],
             pagination: {},
@@ -142,7 +141,7 @@ export class MockSearchSourceWithAsyncDomains implements ISearchSource {
     }
 
     //mock api response for a custom connected search
-    public performSearch = fn(async (requestParams: ISearchRequestQuery, endpointOverride?: string) => {
+    public performSearch = jest.fn(async (requestParams: ISearchRequestQuery, endpointOverride?: string) => {
         return {
             results: [],
             pagination: {},
@@ -223,7 +222,7 @@ export class MockConnectedSearchSource implements ISearchSource {
     }
 
     //mock api response for a custom connected search
-    public performSearch = fn(async (requestParams: ISearchRequestQuery, endpointOverride?: string) => {
+    public performSearch = jest.fn(async (requestParams: ISearchRequestQuery, endpointOverride?: string) => {
         return {
             results: this.results,
             pagination: {},
@@ -238,7 +237,7 @@ export const MOCK_SEARCH_DOMAIN = new (class MockSearchDomain extends SearchDoma
     public icon = (<TypeAllIcon />);
     public recordTypes = [];
     public isIsolatedType = false;
-    public transformFormToQuery = fn(function (form) {
+    public transformFormToQuery = jest.fn(function (form) {
         return {
             ...form,
         };
@@ -252,7 +251,7 @@ export const MOCK_ASYNC_SEARCH_DOMAIN_LOADABLE = new (class MockAsyncSearchDomai
     public icon = (<TypeAllIcon />);
     public recordTypes = [];
     public isIsolatedType = false;
-    public transformFormToQuery = fn(function (form) {
+    public transformFormToQuery = jest.fn(function (form) {
         return {
             ...form,
         };

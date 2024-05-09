@@ -1,0 +1,3 @@
+{
+    "presets": ["@vanillaforums/babel-preset"]
+}

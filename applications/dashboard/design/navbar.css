@@ -148,7 +148,7 @@
 }
 .nav-heading a.collapsed::before {
   -webkit-transform: rotate(-90deg);
-  transform: rotate(-90deg);
+  tranform: rotate(-90deg);
 }
 
 .nav-inline {

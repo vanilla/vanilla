@@ -5,8 +5,6 @@
  * @license GPL-2.0-only
  */
 
-window.global ||= window;
-
 window.onerror = (error) => {
     console.error(error);
     /**

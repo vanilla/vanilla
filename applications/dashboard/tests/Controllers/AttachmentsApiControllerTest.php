@@ -295,10 +295,6 @@ class AttachmentsApiControllerTest extends SiteTestCase
                 "title" => "Mock - Case",
                 "externalIDLabel" => "Mock #",
                 "logoIcon" => "logo-mock",
-                "name" => "Mock Provider",
-                "canEscalateOwnPost" => false,
-                "escalationDelayUnit" => null,
-                "escalationDelayLength" => 0,
             ],
         ];
         $response = $this->api()->get("/attachments/catalog");

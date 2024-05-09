@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 import InputTextBlock from "@library/forms/InputTextBlock";
-import debounce from "lodash-es/debounce";
+import debounce from "lodash/debounce";
 import { themeInputTextClasses } from "@library/forms/themeEditor/themeInputText.styles";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { t } from "@vanilla/i18n/src";

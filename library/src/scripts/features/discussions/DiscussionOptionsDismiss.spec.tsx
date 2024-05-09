@@ -11,8 +11,6 @@ import DiscussionOptionsDismiss from "@library/features/discussions/DiscussionOp
 import { mockAPI } from "@library/__tests__/utility";
 import { ToastProvider } from "@library/features/toaster/ToastContext";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
-import { vitest } from "vitest";
-import MockAdapter from "axios-mock-adapter/types";
 
 const discussion = {
     ...DiscussionFixture.mockDiscussion,
@@ -20,7 +18,8 @@ const discussion = {
     dismissed: false,
 };
 
-const onMutateSuccess = vitest.fn(async function () {});
+const mockApi = mockAPI();
+const onMutateSuccess = jest.fn(async function () {});
 
 async function renderInProvider() {
     const queryClient = new QueryClient({
@@ -41,16 +40,15 @@ async function renderInProvider() {
     );
 }
 
-let mockAdapter: MockAdapter;
 beforeEach(() => {
-    mockAdapter = mockAPI();
     onMutateSuccess.mockReset();
+    mockApi.reset();
 });
 
 describe("DiscussionOptionsDismiss", () => {
     describe("Success", () => {
         beforeEach(async () => {
-            mockAdapter
+            mockApi
                 .onPut(`/discussions/${discussion.discussionID}/dismiss`)
                 .replyOnce((requestConfig: { data: DiscussionsApi.DismissParams }) => {
                     return [
@@ -73,7 +71,7 @@ describe("DiscussionOptionsDismiss", () => {
         });
 
         it("makes an API call to the dismiss endpoint", async () => {
-            expect(mockAdapter.history.put.length).toBe(1);
+            expect(mockApi.history.put.length).toBe(1);
         });
 
         it("calls the onMutateSuccess callback", async () => {
@@ -90,7 +88,7 @@ describe("DiscussionOptionsDismiss", () => {
         const fakeErrorMessage = "Fake Error";
 
         beforeEach(async () => {
-            mockAdapter
+            mockApi
                 .onPut(`/discussions/${discussion.discussionID}/dismiss`)
                 .replyOnce(500, { message: fakeErrorMessage });
 

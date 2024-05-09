@@ -40,9 +40,8 @@ export interface IInputProps {
     "aria-label"?: string;
     "aria-describedby"?: string;
     // these are for number inputs
-    min?: number;
-    max?: number;
-    step?: number;
+    min?: string;
+    step?: string;
     inputmode?: string;
     pattern?: string;
 }
@@ -110,7 +109,6 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                         placeholder: inputProps.placeholder,
                         maxLength: inputProps.maxLength,
                         min: inputProps.min,
-                        max: inputProps.max,
                         step: inputProps.step,
                         onChange: this.onChange,
                         onFocus: this.onFocus,

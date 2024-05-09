@@ -8,15 +8,8 @@ import { makeStorybookDecorator } from "@library/makeStorybookDecorator";
 import { styleUnit } from "@library/styles/styleUnit";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { _mountComponents, addComponent } from "@library/utility/componentRegistry";
+import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import "../../resources/fonts/Open Sans/font.css";
-import { loadTranslations } from "@vanilla/i18n";
-import iconSymbolsHtml from "../../resources/views/svg-symbols.html?raw";
-import "../../resources/fonts/Open Sans/font.css";
-
-loadTranslations({});
-const iconDiv = document.createElement("div");
-iconDiv.innerHTML = iconSymbolsHtml;
-document.body.insertBefore(iconDiv, document.body.firstChild);
 
 const panelLayoutBreakPoints = oneColumnVariables().breakPoints;
 
@@ -74,7 +67,7 @@ export const parameters = {
     },
     layout: "fullscreen",
     options: {
-        storySort: (a, b) => (a.title === b.title ? 0 : a.id.localeCompare(b.id, { numeric: true })),
+        storySort: (a, b) => (a[1].kind === b[1].kind ? 0 : a[1].id.localeCompare(b[1].id, { numeric: true })),
     },
     showRoots: true,
 };

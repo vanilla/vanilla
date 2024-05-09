@@ -76,7 +76,7 @@
         "vanilla/js-connect-php": "4.0.1",
         "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
-        "vanilla/nbbc": "^2.6",
+        "vanilla/nbbc": "~2.1",
         "vanilla/safecurl": "~0.9",
         "webmozart/assert": "^1.9",
         "webmozart/path-util": "^2.3",

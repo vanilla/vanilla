@@ -5,6 +5,7 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
+import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { t } from "@library/utility/appUtils";
@@ -13,11 +14,9 @@ import Heading from "@library/layout/Heading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { typographyClasses } from "@library/styles/typographyStyles";
 
-export default {
-    title: "Components",
-};
+const story = storiesOf("Components", module);
 
-export const Headings = () => {
+story.add("Headings", () => {
     const classesTypography = typographyClasses();
     return (
         <StoryContent>
@@ -41,4 +40,4 @@ export const Headings = () => {
             <StoryParagraph>Sub headings in components</StoryParagraph>
         </StoryContent>
     );
-};
+});

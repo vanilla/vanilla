@@ -6,7 +6,7 @@
 
 import { LayoutEditorContents, LayoutEditorPath } from "@dashboard/layout/editor/LayoutEditorContents";
 import { ILayoutEditorPath, ILayoutEditorWidgetPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import clamp from "lodash-es/clamp";
+import clamp from "lodash/clamp";
 
 export enum LayoutEditorDirection {
     LEFT,

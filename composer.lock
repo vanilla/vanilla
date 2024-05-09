@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2e77cc167f406076dab1798a8323297c",
+    "content-hash": "148d0c4aa7af9d51ab2d3608f04b87c4",
     "packages": [
         {
             "name": "bopoda/robots-txt-parser",
@@ -5326,16 +5326,16 @@
         },
         {
             "name": "vanilla/nbbc",
-            "version": "v2.6.0",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/nbbc.git",
-                "reference": "66c17388697a27f51ee078399d6d31553bbeffb7"
+                "reference": "f6b875fa1b66060e7a061268667ff8c71e0e63d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/66c17388697a27f51ee078399d6d31553bbeffb7",
-                "reference": "66c17388697a27f51ee078399d6d31553bbeffb7",
+                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/f6b875fa1b66060e7a061268667ff8c71e0e63d4",
+                "reference": "f6b875fa1b66060e7a061268667ff8c71e0e63d4",
                 "shasum": ""
             },
             "require": {
@@ -5362,9 +5362,9 @@
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
             "support": {
-                "source": "https://github.com/vanilla/nbbc/tree/v2.6.0"
+                "source": "https://github.com/vanilla/nbbc/tree/v2.4.0"
             },
-            "time": "2024-04-16T19:34:20+00:00"
+            "time": "2023-01-17T17:43:24+00:00"
         },
         {
             "name": "vanilla/safecurl",

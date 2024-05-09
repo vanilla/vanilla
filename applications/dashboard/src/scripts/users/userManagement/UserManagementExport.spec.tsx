@@ -13,20 +13,18 @@ import { mockAPI } from "@library/__tests__/utility";
 import { render, RenderResult } from "@testing-library/react";
 import { downloadAsFile } from "@vanilla/dom-utils";
 import userEvent from "@testing-library/user-event";
-import { vitest } from "vitest";
-import MockAdapter from "axios-mock-adapter/types";
 
-let mockApi: MockAdapter;
+const mockApi = mockAPI({ onNoMatch: "throwException" });
 // Mock our time.
-Date.now = vitest.fn(() => new Date("2022-12-01T00:05:30Z").valueOf());
+Date.now = jest.fn(() => new Date("2022-12-01T00:05:30Z").valueOf());
 const expectedFileName = "user-export_2022-12-01_00-05-30";
 
 describe("useUsersExport()", () => {
-    let downloader = vitest.fn();
+    let downloader = jest.fn();
     let rendered: RenderResult;
 
     beforeEach(() => {
-        mockApi = mockAPI({ onNoMatch: "throwException" });
+        mockApi.reset();
         downloader.mockReset();
         rendered = render(
             <ToastProvider>

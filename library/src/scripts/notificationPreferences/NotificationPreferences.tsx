@@ -28,7 +28,7 @@ import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { Formik, useFormikContext } from "formik";
 import React, { PropsWithChildren, useMemo, useEffect } from "react";
 import { Column, Row, useTable } from "react-table";
-import debounce from "lodash-es/debounce";
+import debounce from "lodash/debounce";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { PreferencesTable } from "@library/preferencesTable/PreferencesTable";

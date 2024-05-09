@@ -57,12 +57,6 @@ UserCardView.registerContent = function (registeredContent: IExtraUserCardConten
     if (!UserCardView.extraContent.find((content) => content.key === registeredContent.key)) {
         UserCardView.extraContent.push(registeredContent);
     }
-    return () => {
-        UserCardView.unregisterContent(registeredContent);
-    };
-};
-UserCardView.unregisterContent = function (registeredContent: IExtraUserCardContent) {
-    UserCardView.extraContent = UserCardView.extraContent.filter((content) => content.key !== registeredContent.key);
 };
 
 UserCardView.extraButtons = [] as IExtraUserCardContent[];

@@ -16,7 +16,7 @@ import { Icon } from "@vanilla/icons";
 import { useIsMounted } from "@vanilla/react-utils";
 import { CustomRadioGroup, CustomRadioInput } from "@vanilla/ui";
 import { spaceshipCompare } from "@vanilla/utils";
-import debounce from "lodash-es/debounce";
+import debounce from "lodash/debounce";
 import * as React from "react";
 import { useCallback, useRef, useState } from "react";
 

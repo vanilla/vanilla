@@ -7,16 +7,15 @@
 import React from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { AnalyticsData, onPageViewWithContext } from "@library/analytics/AnalyticsData";
-import { vitest } from "vitest";
 
 describe("AnalyticsData", () => {
     it("AnalyticsData component fires a dispatch event", () => {
-        const dispatchEventSpy = vitest.spyOn(document, "dispatchEvent");
+        const dispatchEventSpy = jest.spyOn(document, "dispatchEvent");
         render(<AnalyticsData uniqueKey={"test"} />);
         expect(dispatchEventSpy).toHaveBeenCalled();
     });
     it("onPageViewWithContext fires callback when event is dispatched", () => {
-        const mockCallback = vitest.fn();
+        const mockCallback = jest.fn();
         onPageViewWithContext(mockCallback);
         document.dispatchEvent(new CustomEvent("pageViewWithContext", { detail: "test" }));
         expect(mockCallback).toHaveBeenCalled();

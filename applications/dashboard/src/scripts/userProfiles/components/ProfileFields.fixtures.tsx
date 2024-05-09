@@ -16,7 +16,7 @@ import {
 } from "@reduxjs/toolkit";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
-import capitalize from "lodash-es/capitalize";
+import capitalize from "lodash/capitalize";
 import {
     ProfileField,
     ProfileFieldDataType,

@@ -6,9 +6,10 @@
 
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { mockAPI } from "@library/__tests__/utility";
+import Translate from "@library/content/Translate";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
+import SmartLink from "@library/routing/links/SmartLink";
 import { UnsubscribePageImpl } from "@library/unsubscribe/UnsubscribePage";
-import { UnsubscribeFixture } from "@library/unsubscribe/__fixtures__/Unsubscribe.Fixture";
 import { IUnsubscribeToken } from "@library/unsubscribe/unsubscribePage.types";
 import {
     useGetUnsubscribe,
@@ -21,6 +22,285 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import { renderHook } from "@testing-library/react-hooks";
 import React from "react";
 import { MemoryRouter } from "react-router";
+
+const mockAdapter = mockAPI();
+
+// Base result data to be overwritten per test scenario
+const TOKEN_RESULT_TEMPLATE = {
+    activityID: 1,
+    activityTypes: [],
+    activityData: [],
+    user: {
+        userID: 2,
+        name: "Test User",
+        email: "test@email.com",
+        photoUrl: "https://user-images.githubusercontent.com/1770056/74098133-6f625100-4ae2-11ea-8a9d-908d70030647.png",
+    },
+};
+
+const FETCH_RESULT_TEMPLATE = {
+    preferences: [],
+    followedCategory: undefined,
+    hasMultiple: false,
+    isAllProcessed: false,
+    isEmailDigest: false,
+    isUnfollowCategory: false,
+};
+
+// Notification unsubscribe has already been processed
+const MOCK_PROCESSED_TOKEN =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBY3Rpdml0eUlEIjoxLCJBY3Rpdml0eVR5cGVzIjpbIk1lbnRpb24iXSwiQWN0aXZpdHlEYXRhIjpbXSwiVXNlcklEIjoyLCJOYW1lIjoiVGVzdCBVc2VyIiwiRW1haWwiOiJ0ZXN0QGVtYWlsLmNvbSIsIlBob3RvVXJsIjoiaHR0cHM6Ly91c2VyLWltYWdlcy5naXRodWJ1c2VyY29udGVudC5jb20vMTc3MDA1Ni83NDA5ODEzMy02ZjYyNTEwMC00YWUyLTExZWEtOGE5ZC05MDhkNzAwMzA2NDcucG5nIn0.rAUe47FZ9bEk71w8F399qBMjTREZmcWob9q5bcwoqao" as IUnsubscribeToken;
+
+const MOCK_PROCESSED_API_RESULT = {
+    preferences: [],
+    followCategory: [],
+};
+
+const MOCK_PROCESSED_DATA = {
+    ...TOKEN_RESULT_TEMPLATE,
+    ...FETCH_RESULT_TEMPLATE,
+    activityTypes: ["Mention"],
+    isAllProcessed: true,
+};
+
+mockAdapter.onPost(`/unsubscribe/${MOCK_PROCESSED_TOKEN}`).reply(201, MOCK_PROCESSED_API_RESULT);
+
+// Notification that the user earned a new badge
+const MOCK_BADGE_TOKEN =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBY3Rpdml0eUlEIjoxLCJBY3Rpdml0eVR5cGVzIjpbIkJhZGdlIl0sIkFjdGl2aXR5RGF0YSI6W10sIlVzZXJJRCI6MiwiTmFtZSI6IlRlc3QgVXNlciIsIkVtYWlsIjoidGVzdEBlbWFpbC5jb20iLCJQaG90b1VybCI6Imh0dHBzOi8vdXNlci1pbWFnZXMuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzE3NzAwNTYvNzQwOTgxMzMtNmY2MjUxMDAtNGFlMi0xMWVhLThhOWQtOTA4ZDcwMDMwNjQ3LnBuZyJ9.2Hv5Q-fPoJdXuqV5-kIAte1xRk238ieCnnvxRWUzhCM" as IUnsubscribeToken;
+
+const MOCK_BADGE_API_RESULT = {
+    preferences: [{ preference: "Email.Badge", enabled: "0" }],
+    followCategory: [],
+};
+
+const MOCK_BADGE_RESUBSCRIBE_RESULT = {
+    preferences: [{ preference: "Email.Badge", enabled: "1" }],
+    followCategory: [],
+};
+
+const MOCK_BADGE_DATA = {
+    ...TOKEN_RESULT_TEMPLATE,
+    ...FETCH_RESULT_TEMPLATE,
+    activityTypes: ["Badge"],
+    preferences: [
+        {
+            preferenceRaw: "Email.Badge",
+            preferenceName: "Badge",
+            enabled: false,
+            label: <p key="Email.Badge">New badges</p>,
+            optionID: "Email||Badge",
+        },
+    ],
+};
+
+const MOCK_BADGE_RESUBSCRIBE_DATA = {
+    ...TOKEN_RESULT_TEMPLATE,
+    ...FETCH_RESULT_TEMPLATE,
+    activityTypes: ["Badge"],
+    isAllProcessed: true,
+    preferences: [
+        {
+            ...MOCK_BADGE_DATA.preferences[0],
+            enabled: true,
+        },
+    ],
+};
+
+mockAdapter.onPost(`/unsubscribe/${MOCK_BADGE_TOKEN}`).reply(201, MOCK_BADGE_API_RESULT);
+mockAdapter.onPost(`/unsubscribe/resubscribe/${MOCK_BADGE_TOKEN}`).reply(201, MOCK_BADGE_RESUBSCRIBE_RESULT);
+
+// Notification that someone commented on a post they are participating in and is also in a category they are following
+const MOCK_MULTI_TOKEN =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBY3Rpdml0eUlEIjoxLCJBY3Rpdml0eVR5cGVzIjpbIlBhcnRpY2lwYXRlQ29tbWVudCJdLCJBY3Rpdml0eURhdGEiOnsiY2F0ZWdvcnkiOiJUZXN0IENhdGVnb3J5IiwicmVhc29ucyI6WyJwYXJ0aWNpcGF0ZWQiXX0sIlVzZXJJRCI6MiwiTmFtZSI6IlRlc3QgVXNlciIsIkVtYWlsIjoidGVzdEBlbWFpbC5jb20iLCJQaG90b1VybCI6Imh0dHBzOi8vdXNlci1pbWFnZXMuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzE3NzAwNTYvNzQwOTgxMzMtNmY2MjUxMDAtNGFlMi0xMWVhLThhOWQtOTA4ZDcwMDMwNjQ3LnBuZyJ9.zrOLcYUXWEG9EM2xJBTuR5i4jWknQlKzMge20k1fDE8" as IUnsubscribeToken;
+
+const MOCK_MULTI_API_RESULT = {
+    followCategory: {
+        categoryID: 1,
+        enabled: "1",
+        name: "Test Category",
+        preference: "Preferences.Email.NewComment.1",
+    },
+    preferences: [{ preference: "Email.ParticipateComment", enabled: "1" }],
+};
+
+const MOCK_SAVE_API_RESULT = {
+    ...MOCK_MULTI_API_RESULT,
+    preferences: [{ preference: "Email.ParticipateComment", enabled: "0" }],
+};
+
+const MOCK_MULTI_DATA = {
+    ...TOKEN_RESULT_TEMPLATE,
+    ...FETCH_RESULT_TEMPLATE,
+    hasMultiple: true,
+    activityTypes: ["ParticipateComment"],
+    activityData: {
+        category: "Test Category",
+        reasons: ["participated"],
+    },
+    followedCategory: {
+        categoryID: 1,
+        categoryName: "Test Category",
+        enabled: true,
+        label: (
+            <p key="Preferences.Email.NewComment.1">
+                <SmartLink to="/categories/test-category">Test Category</SmartLink> | New comments on posts
+            </p>
+        ),
+        preferenceName: "NewComment",
+        preferenceRaw: "Preferences.Email.NewComment.1",
+        optionID: "Preferences||Email||NewComment||1",
+    },
+    preferences: [
+        {
+            enabled: true,
+            label: <p key="Email.ParticipateComment">New comments on posts I&apos;ve participated in</p>,
+            preferenceName: "ParticipateComment",
+            preferenceRaw: "Email.ParticipateComment",
+            optionID: "Email||ParticipateComment",
+        },
+    ],
+};
+
+const MOCK_SAVE_DATA = {
+    ...MOCK_MULTI_DATA,
+    preferences: [
+        {
+            ...MOCK_MULTI_DATA.preferences[0],
+            enabled: false,
+        },
+    ],
+};
+
+mockAdapter.onPost(`/unsubscribe/${MOCK_MULTI_TOKEN}`).reply(201, MOCK_MULTI_API_RESULT);
+mockAdapter.onPatch(`/unsubscribe/${MOCK_MULTI_TOKEN}`).reply(204, MOCK_SAVE_API_RESULT);
+
+// Landing page to unfollow a category
+const MOCK_UNFOLLOW_TOKEN =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBY3Rpdml0eUlEIjoxLCJBY3Rpdml0eVR5cGVzIjpbIlVuZm9sbG93Q2F0ZWdvcnkiXSwiQWN0aXZpdHlEYXRhIjp7ImNhdGVnb3J5IjoiVGVzdCBDYXRlZ29yeSJ9LCJVc2VySUQiOjIsIk5hbWUiOiJUZXN0IFVzZXIiLCJFbWFpbCI6InRlc3RAZW1haWwuY29tIiwiUGhvdG9VcmwiOiJodHRwczovL3VzZXItaW1hZ2VzLmdpdGh1YnVzZXJjb250ZW50LmNvbS8xNzcwMDU2Lzc0MDk4MTMzLTZmNjI1MTAwLTRhZTItMTFlYS04YTlkLTkwOGQ3MDAzMDY0Ny5wbmcifQ.HkyTPxvo1kbKaJxWrDE4SEPWtPK6HIuxplD9i5oTmds" as IUnsubscribeToken;
+
+const MOCK_UNFOLLOW_API_RESULT = {
+    preferences: [],
+    followCategory: {
+        categoryID: 1,
+        enabled: "0",
+        name: "Test Category",
+        preference: "Preferences.follow.1",
+    },
+};
+
+const MOCK_UNFOLLOW_DATA = {
+    ...TOKEN_RESULT_TEMPLATE,
+    ...FETCH_RESULT_TEMPLATE,
+    activityTypes: ["UnfollowCategory"],
+    activityData: {
+        category: "Test Category",
+    },
+    isUnfollowCategory: true,
+    followedCategory: {
+        categoryID: 1,
+        categoryName: "Test Category",
+        enabled: false,
+        preferenceName: "follow",
+        preferenceRaw: "Preferences.follow.1",
+        label: (
+            <p>
+                <Translate
+                    source="You are no longer following <0/>"
+                    c0={<SmartLink to="/categories/test-category">Test Category</SmartLink>}
+                />
+            </p>
+        ),
+        optionID: "Preferences||follow||1",
+    },
+};
+
+mockAdapter.onPost(`/unsubscribe/${MOCK_UNFOLLOW_TOKEN}`).reply(201, MOCK_UNFOLLOW_API_RESULT);
+
+// Landing page to unsubscribe from email digest
+const MOCK_DIGEST_TOKEN =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBY3Rpdml0eUlEIjoxLCJBY3Rpdml0eVR5cGVzIjpbIkRpZ2VzdEVuYWJsZWQiXSwiQWN0aXZpdHlEYXRhIjpbXSwiVXNlcklEIjoyLCJOYW1lIjoiVGVzdCBVc2VyIiwiRW1haWwiOiJ0ZXN0QGVtYWlsLmNvbSIsIlBob3RvVXJsIjoiaHR0cHM6Ly91c2VyLWltYWdlcy5naXRodWJ1c2VyY29udGVudC5jb20vMTc3MDA1Ni83NDA5ODEzMy02ZjYyNTEwMC00YWUyLTExZWEtOGE5ZC05MDhkNzAwMzA2NDcucG5nIn0.oLjnqaTHTCs6Zf6LIMFoTQAB6KIDQzeKobzzAg54S7k" as IUnsubscribeToken;
+
+const MOCK_DIGEST_API_RESULT = {
+    preferences: [
+        {
+            preference: "Email.DigestEnabled",
+            enabled: "0",
+        },
+    ],
+    followCategory: [],
+};
+
+const MOCK_DIGEST_DATA = {
+    ...TOKEN_RESULT_TEMPLATE,
+    ...FETCH_RESULT_TEMPLATE,
+    activityTypes: ["DigestEnabled"],
+    isEmailDigest: true,
+    preferences: [
+        {
+            preferenceRaw: "Email.DigestEnabled",
+            preferenceName: "DigestEnabled",
+            enabled: false,
+            label: <></>,
+            optionID: "Email||DigestEnabled",
+        },
+    ],
+};
+
+mockAdapter.onPost(`/unsubscribe/${MOCK_DIGEST_TOKEN}`).reply(202, MOCK_DIGEST_API_RESULT);
+
+const MOCK_DIGEST_HIDE_CATEGORY_TOKEN =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBY3Rpdml0eUlEIjowLCJBY3Rpdml0eVR5cGVzIjpbIkZvbGxvd2VkQ2F0ZWdvcnkiXSwiQWN0aXZpdHlEYXRhIjp7ImNhdGVnb3J5IjoiVGVzdCBDYXRlZ29yeSJ9LCJVc2VySUQiOjIsIk5hbWUiOiJUZXN0IFVzZXIiLCJFbWFpbCI6InRlc3RAZW1haWwuY29tIiwiUGhvdG9VcmwiOiJodHRwczovL3VzZXItaW1hZ2VzLmdpdGh1YnVzZXJjb250ZW50LmNvbS8xNzcwMDU2Lzc0MDk4MTMzLTZmNjI1MTAwLTRhZTItMTFlYS04YTlkLTkwOGQ3MDAzMDY0Ny5wbmcifQ.M3niNjuqgJdaJaqbltyMk6mMXNwyzJtY-HTfprkU0Nc" as IUnsubscribeToken;
+
+const MOCK_DIGEST_HIDE_CATEGORY_API_RESULT = {
+    preferences: [
+        {
+            preference: "Email.Digest",
+            enabled: "1",
+            userID: 2,
+        },
+    ],
+    followCategory: {
+        categoryID: 1,
+        preference: "Preferences.Email.Digest.1",
+        name: "Test Category",
+        enabled: "1",
+        userID: 2,
+    },
+};
+
+const MOCK_DIGEST_HIDE_CATEGORY_DATA = {
+    ...TOKEN_RESULT_TEMPLATE,
+    ...FETCH_RESULT_TEMPLATE,
+    activityTypes: ["FollowedCategory"],
+    activityData: {
+        category: "Test Category",
+    },
+    activityID: 0,
+    isEmailDigest: false,
+    isUnfollowCategory: false,
+    hasMultiple: true,
+    preferences: [
+        {
+            preferenceRaw: "Email.Digest",
+            preferenceName: "Digest",
+            enabled: true,
+            label: <></>,
+            optionID: "Email||Digest",
+        },
+    ],
+    followedCategory: {
+        categoryID: 1,
+        categoryName: "Test Category",
+        enabled: true,
+        label: <SmartLink to="/categories/test-category">Test Category</SmartLink>,
+        preferenceName: "Digest",
+        preferenceRaw: "Preferences.Email.Digest.1",
+        optionID: "Preferences||Email||Digest||1",
+    },
+};
+
+mockAdapter.onPost(`/unsubscribe/${MOCK_DIGEST_HIDE_CATEGORY_TOKEN}`).reply(202, MOCK_DIGEST_HIDE_CATEGORY_API_RESULT);
 
 // Wrapper with QueryClientProvider for testing hooks
 function queryClientWrapper() {
@@ -67,166 +347,132 @@ function renderInProviders(token: IUnsubscribeToken) {
 }
 
 describe("UnsubscribePage Hooks", () => {
-    beforeAll(() => {
-        const mockAdapter = mockAPI();
-
-        mockAdapter
-            .onPost(`/unsubscribe/${UnsubscribeFixture.MOCK_PROCESSED_TOKEN}`)
-            .reply(201, UnsubscribeFixture.MOCK_PROCESSED_API_RESULT);
-
-        mockAdapter
-            .onPost(`/unsubscribe/${UnsubscribeFixture.MOCK_BADGE_TOKEN}`)
-            .reply(201, UnsubscribeFixture.MOCK_BADGE_RESUBSCRIBE_RESULT);
-        mockAdapter
-            .onPost(`/unsubscribe/resubscribe/${UnsubscribeFixture.MOCK_BADGE_TOKEN}`)
-            .reply(201, UnsubscribeFixture.MOCK_BADGE_RESUBSCRIBE_RESULT);
-
-        mockAdapter
-            .onPost(`/unsubscribe/${UnsubscribeFixture.MOCK_MULTI_TOKEN}`)
-            .reply(201, UnsubscribeFixture.MOCK_MULTI_API_RESULT);
-        mockAdapter
-            .onPatch(`/unsubscribe/${UnsubscribeFixture.MOCK_MULTI_TOKEN}`)
-            .reply(204, UnsubscribeFixture.MOCK_SAVE_API_RESULT);
-
-        mockAdapter
-            .onPost(`/unsubscribe/${UnsubscribeFixture.MOCK_UNFOLLOW_TOKEN}`)
-            .reply(201, UnsubscribeFixture.MOCK_UNFOLLOW_API_RESULT);
-
-        mockAdapter
-            .onPost(`/unsubscribe/${UnsubscribeFixture.MOCK_DIGEST_TOKEN}`)
-            .reply(202, UnsubscribeFixture.MOCK_DIGEST_API_RESULT);
-
-        mockAdapter
-            .onPost(`/unsubscribe/${UnsubscribeFixture.MOCK_DIGEST_HIDE_CATEGORY_TOKEN}`)
-            .reply(202, UnsubscribeFixture.MOCK_DIGEST_HIDE_CATEGORY_TOKEN);
-    });
-
     describe("useGetUnsubscribe", () => {
         it("Token returns no notifications as they have been processed", async () => {
-            const { result } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_PROCESSED_TOKEN), {
+            const { result, waitFor } = renderHook(() => useGetUnsubscribe(MOCK_PROCESSED_TOKEN), {
                 wrapper: queryClientWrapper(),
             });
 
-            await act(async () => {
-                await result.current.mutateAsync(UnsubscribeFixture.MOCK_PROCESSED_TOKEN);
+            act(() => {
+                result.current.mutateAsync(MOCK_PROCESSED_TOKEN);
             });
 
-            await vi.waitFor(() => {
-                expect(result.current.isSuccess).toBe(true);
+            await waitFor(() => {
+                return result.current.isSuccess;
             });
 
-            expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_PROCESSED_DATA);
+            expect(result.current.data).toStrictEqual(MOCK_PROCESSED_DATA);
         });
 
         it("Token returns reason for notification is new badge", async () => {
-            const { result } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_BADGE_TOKEN), {
+            const { result, waitFor } = renderHook(() => useGetUnsubscribe(MOCK_BADGE_TOKEN), {
                 wrapper: queryClientWrapper(),
             });
 
-            await act(async () => {
-                await result.current.mutateAsync(UnsubscribeFixture.MOCK_BADGE_TOKEN);
+            act(() => {
+                result.current.mutateAsync(MOCK_BADGE_TOKEN);
             });
 
-            await vi.waitFor(() => {
-                expect(result.current.isSuccess).toBe(true);
+            await waitFor(() => {
+                return result.current.isSuccess;
             });
 
-            expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_BADGE_DATA);
+            expect(result.current.data).toStrictEqual(MOCK_BADGE_DATA);
         });
 
         it("Token returns multiple reasons for notification", async () => {
-            const { result, waitFor } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_MULTI_TOKEN), {
+            const { result, waitFor } = renderHook(() => useGetUnsubscribe(MOCK_MULTI_TOKEN), {
                 wrapper: queryClientWrapper(),
             });
 
             act(() => {
-                result.current.mutateAsync(UnsubscribeFixture.MOCK_MULTI_TOKEN);
+                result.current.mutateAsync(MOCK_MULTI_TOKEN);
             });
 
             await waitFor(() => {
                 return result.current.isSuccess;
             });
 
-            expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_MULTI_DATA);
+            expect(result.current.data).toStrictEqual(MOCK_MULTI_DATA);
         });
 
         it("Token returns unfollow category data", async () => {
-            const { result, waitFor } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_UNFOLLOW_TOKEN), {
+            const { result, waitFor } = renderHook(() => useGetUnsubscribe(MOCK_UNFOLLOW_TOKEN), {
                 wrapper: queryClientWrapper(),
             });
 
             act(() => {
-                result.current.mutateAsync(UnsubscribeFixture.MOCK_UNFOLLOW_TOKEN);
+                result.current.mutateAsync(MOCK_UNFOLLOW_TOKEN);
             });
 
             await waitFor(() => {
                 return result.current.isSuccess;
             });
 
-            expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_UNFOLLOW_DATA);
+            expect(result.current.data).toStrictEqual(MOCK_UNFOLLOW_DATA);
         });
 
         it("Token returns email digest unsubscribe data", async () => {
-            const { result, waitFor } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_DIGEST_TOKEN), {
+            const { result, waitFor } = renderHook(() => useGetUnsubscribe(MOCK_DIGEST_TOKEN), {
                 wrapper: queryClientWrapper(),
             });
 
             act(() => {
-                result.current.mutateAsync(UnsubscribeFixture.MOCK_DIGEST_TOKEN);
+                result.current.mutateAsync(MOCK_DIGEST_TOKEN);
             });
 
             await waitFor(() => {
                 return result.current.isSuccess;
             });
 
-            expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_DIGEST_DATA);
+            expect(result.current.data).toStrictEqual(MOCK_DIGEST_DATA);
         });
 
-        it.skip("Token returns email digest hide category data", async () => {
-            const { result } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_DIGEST_HIDE_CATEGORY_TOKEN), {
+        it("Token returns email digest hide category data", async () => {
+            const { result, waitFor } = renderHook(() => useGetUnsubscribe(MOCK_DIGEST_HIDE_CATEGORY_TOKEN), {
                 wrapper: queryClientWrapper(),
             });
 
-            await act(async () => {
-                await result.current.mutateAsync(UnsubscribeFixture.MOCK_DIGEST_HIDE_CATEGORY_TOKEN);
+            act(() => {
+                result.current.mutateAsync(MOCK_DIGEST_HIDE_CATEGORY_TOKEN);
             });
 
-            await vi.waitFor(() => {
-                expect(result.current.isSuccess).toBe(true);
+            await waitFor(() => {
+                return result.current.isSuccess;
             });
 
-            expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_DIGEST_HIDE_CATEGORY_DATA);
+            expect(result.current.data).toStrictEqual(MOCK_DIGEST_HIDE_CATEGORY_DATA);
         });
     });
 
     it("Undo unsubscribe", async () => {
-        const { result, waitFor } = renderHook(() => useUndoUnsubscribe(UnsubscribeFixture.MOCK_BADGE_TOKEN), {
+        const { result, waitFor } = renderHook(() => useUndoUnsubscribe(MOCK_BADGE_TOKEN), {
             wrapper: queryClientWrapper(),
         });
 
         act(() => {
-            result.current.mutateAsync(UnsubscribeFixture.MOCK_BADGE_TOKEN);
+            result.current.mutateAsync(MOCK_BADGE_TOKEN);
         });
 
         await waitFor(() => {
             return result.current.isSuccess;
         });
 
-        expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_BADGE_RESUBSCRIBE_DATA);
+        expect(result.current.data).toStrictEqual(MOCK_BADGE_RESUBSCRIBE_DATA);
     });
 
     it("Unsubscribe from only one notification in a list of choices", async () => {
         const postData = {
-            ...UnsubscribeFixture.MOCK_MULTI_DATA,
+            ...MOCK_MULTI_DATA,
             preferences: [
                 {
-                    ...UnsubscribeFixture.MOCK_MULTI_DATA.preferences[0],
+                    ...MOCK_MULTI_DATA.preferences[0],
                     enabled: false,
                 },
             ],
         };
 
-        const { result, waitFor } = renderHook(() => useSaveUnsubscribe(UnsubscribeFixture.MOCK_MULTI_TOKEN), {
+        const { result, waitFor } = renderHook(() => useSaveUnsubscribe(MOCK_MULTI_TOKEN), {
             wrapper: queryClientWrapper(),
         });
 
@@ -238,12 +484,12 @@ describe("UnsubscribePage Hooks", () => {
             return result.current.isSuccess;
         });
 
-        expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_SAVE_DATA);
+        expect(result.current.data).toStrictEqual(MOCK_SAVE_DATA);
     });
 
     it("Create link to notification preferences page for current user", async () => {
         const { result, waitFor } = renderHook(() => usePreferenceLink(), { wrapper: queryClientWrapper() });
-        const link = result.current(UnsubscribeFixture.TOKEN_RESULT_TEMPLATE.user);
+        const link = result.current(TOKEN_RESULT_TEMPLATE.user);
         await waitFor(() => {
             expect(link).toBe("/profile/preferences");
         });
@@ -251,7 +497,7 @@ describe("UnsubscribePage Hooks", () => {
 
     it("Create link to followed content page for current user", async () => {
         const { result, waitFor } = renderHook(() => usePreferenceLink(), { wrapper: queryClientWrapper() });
-        const link = result.current(UnsubscribeFixture.TOKEN_RESULT_TEMPLATE.user, true);
+        const link = result.current(TOKEN_RESULT_TEMPLATE.user, true);
         await waitFor(() => {
             expect(link).toBe("/profile/followed-content");
         });
@@ -260,7 +506,7 @@ describe("UnsubscribePage Hooks", () => {
     it("Create link to notification preferences page for another user", async () => {
         const { result, waitFor } = renderHook(() => usePreferenceLink(), { wrapper: queryClientWrapper() });
         const tmpUser = {
-            ...UnsubscribeFixture.TOKEN_RESULT_TEMPLATE.user,
+            ...TOKEN_RESULT_TEMPLATE.user,
             userID: 100,
         };
         const link = result.current(tmpUser);
@@ -272,7 +518,7 @@ describe("UnsubscribePage Hooks", () => {
     it("Create link to followed content page for another user", async () => {
         const { result, waitFor } = renderHook(() => usePreferenceLink(), { wrapper: queryClientWrapper() });
         const tmpUser = {
-            ...UnsubscribeFixture.TOKEN_RESULT_TEMPLATE.user,
+            ...TOKEN_RESULT_TEMPLATE.user,
             userID: 100,
         };
         const link = result.current(tmpUser, true);
@@ -284,7 +530,7 @@ describe("UnsubscribePage Hooks", () => {
 
 describe("UnsubscribePage Rendering", () => {
     it("Renders landing page with notification that unsubscribe has been processed", async () => {
-        renderInProviders(UnsubscribeFixture.MOCK_PROCESSED_TOKEN);
+        renderInProviders(MOCK_PROCESSED_TOKEN);
 
         await waitFor(() => {
             expect(screen.getByText(/Request Processed/)).toBeInTheDocument();
@@ -292,51 +538,47 @@ describe("UnsubscribePage Rendering", () => {
         });
     });
 
-    it.skip("Renders a simple unsubscribe landing page with a single notification reason", async () => {
-        renderInProviders(UnsubscribeFixture.MOCK_BADGE_TOKEN);
+    it("Renders a simple unsubscribe landing page with a single notification reason", async () => {
+        renderInProviders(MOCK_BADGE_TOKEN);
 
-        await vi.waitFor(async () => {
-            expect(await screen.findByText(/Unsubscribe Successful/)).toBeInTheDocument();
-            expect(await screen.findByText(/You will no longer receive email notifications for/)).toBeInTheDocument();
-            expect(await screen.findByText(/New badges/)).toBeInTheDocument();
-            expect(await screen.findByText(/Change your mind?/)).toBeInTheDocument();
-            expect(await screen.findByRole("button", { name: "Undo" })).toBeInTheDocument();
-        }, 5000);
+        await waitFor(() => {
+            expect(screen.getByText(/Unsubscribe Successful/)).toBeInTheDocument();
+            expect(screen.getByText(/You will no longer receive email notifications for/)).toBeInTheDocument();
+            expect(screen.getByText(/New badges/)).toBeInTheDocument();
+            expect(screen.getByText(/Change your mind?/)).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "Undo" })).toBeInTheDocument();
 
-        // Manage button links to notification preference page for currently logged in user
-        const manageButton = await screen.findByRole("button", { name: "Manage All Notifications" });
-        expect(manageButton).toBeInTheDocument();
-        expect(manageButton.attributes.getNamedItem("href")?.value).toBe(
-            `${window.location.origin}/profile/preferences`,
-        );
+            // Manage button links to notification preference page for currently logged in user
+            const manageButton = screen.getByRole("button", { name: "Manage All Notifications" });
+            expect(manageButton).toBeInTheDocument();
+            expect(manageButton.attributes.getNamedItem("href")?.value).toBe(
+                `${window.location.origin}/profile/preferences`,
+            );
 
-        // verify user information being displayed
-        const userLink = await screen.findByRole("link", { name: UnsubscribeFixture.MOCK_BADGE_DATA.user.name });
-        expect(userLink).toBeInTheDocument();
-        expect(userLink.attributes.getNamedItem("href")?.value).toBe(
-            encodeURI(`${window.location.origin}/profile/2/Test User`),
-        );
-        expect(await screen.findByText(UnsubscribeFixture.MOCK_BADGE_DATA.user.email)).toBeInTheDocument();
-        const userImage = await screen.findByRole("img", {
-            name: `User: "${UnsubscribeFixture.MOCK_BADGE_DATA.user.name}"`,
+            // verify user information being displayed
+            const userLink = screen.getByRole("link", { name: MOCK_BADGE_DATA.user.name });
+            expect(userLink).toBeInTheDocument();
+            expect(userLink.attributes.getNamedItem("href")?.value).toBe(
+                encodeURI(`${window.location.origin}/profile/2/Test User`),
+            );
+            expect(screen.getByText(MOCK_BADGE_DATA.user.email)).toBeInTheDocument();
+            const userImage = screen.getByRole("img", { name: `User: "${MOCK_BADGE_DATA.user.name}"` });
+            expect(userImage).toBeInTheDocument();
+            expect(userImage.attributes.getNamedItem("src")?.value).toBe(MOCK_BADGE_DATA.user.photoUrl);
         });
-        expect(userImage).toBeInTheDocument();
-        expect(userImage.attributes.getNamedItem("src")?.value).toBe(UnsubscribeFixture.MOCK_BADGE_DATA.user.photoUrl);
     });
 
     it("Renders landing page to unfollow a category", async () => {
-        renderInProviders(UnsubscribeFixture.MOCK_UNFOLLOW_TOKEN);
+        renderInProviders(MOCK_UNFOLLOW_TOKEN);
 
         await waitFor(() => {
             expect(screen.getByText(/Unfollow Successful/)).toBeInTheDocument();
 
-            const categoryLink = screen.getByRole("link", {
-                name: UnsubscribeFixture.MOCK_UNFOLLOW_DATA.followedCategory.categoryName,
-            });
+            const categoryLink = screen.getByRole("link", { name: MOCK_UNFOLLOW_DATA.followedCategory.categoryName });
             const expectedLink = [
                 window.location.origin,
                 "categories",
-                UnsubscribeFixture.MOCK_UNFOLLOW_DATA.followedCategory.categoryName.replace(/\s/g, "-").toLowerCase(),
+                MOCK_UNFOLLOW_DATA.followedCategory.categoryName.replace(/\s/g, "-").toLowerCase(),
             ].join("/");
             expect(categoryLink).toBeInTheDocument();
             expect(categoryLink.attributes.getNamedItem("href")?.value).toBe(encodeURI(expectedLink));
@@ -356,20 +598,20 @@ describe("UnsubscribePage Rendering", () => {
     });
 
     it("Renders landing page to unsubscribe from email", async () => {
-        renderInProviders(UnsubscribeFixture.MOCK_DIGEST_TOKEN);
+        renderInProviders(MOCK_DIGEST_TOKEN);
 
-        await waitFor(async () => {
-            expect(await screen.findByText(/Unsubscribe Successful/)).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText(/Unsubscribe Successful/)).toBeInTheDocument();
 
-            expect(await screen.findByText(/You will no longer receive the email digest./)).toBeInTheDocument();
+            expect(screen.getByText(/You will no longer receive the email digest./)).toBeInTheDocument();
 
-            expect(await screen.findByText(/Change your mind?/)).toBeInTheDocument();
-            expect(await screen.findByRole("button", { name: "Undo" })).toBeInTheDocument();
+            expect(screen.getByText(/Change your mind?/)).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "Undo" })).toBeInTheDocument();
         });
     });
 
     it("Renders landing page to with multiple reasons for receiving the email", async () => {
-        renderInProviders(UnsubscribeFixture.MOCK_MULTI_TOKEN);
+        renderInProviders(MOCK_MULTI_TOKEN);
 
         await waitFor(() => {
             expect(screen.getByText(/Unsubscribe/)).toBeInTheDocument();
@@ -387,7 +629,7 @@ describe("UnsubscribePage Rendering", () => {
             expect(checkbox1).toBeInTheDocument();
 
             const checkbox2 = screen.getByRole("checkbox", {
-                name: `${UnsubscribeFixture.MOCK_MULTI_DATA.followedCategory.categoryName} | New comments on posts`,
+                name: `${MOCK_MULTI_DATA.followedCategory.categoryName} | New comments on posts`,
                 checked: true,
             });
             expect(checkbox2).toBeInTheDocument();

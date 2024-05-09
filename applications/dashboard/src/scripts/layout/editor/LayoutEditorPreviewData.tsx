@@ -16,10 +16,9 @@ import { ISiteTotalCount, ISiteTotalApiCount } from "@library/siteTotals/SiteTot
 import { uuidv4 } from "@vanilla/utils";
 import { IComment } from "@dashboard/@types/api/comment";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
-import random from "lodash-es/random";
+import random from "lodash/random";
 import { ICategoryItem } from "@library/categoriesWidget/CategoryItem";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import userPhotoUrl from "./icons/userphoto.svg";
 import { IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
@@ -41,7 +40,7 @@ export class LayoutEditorPreviewData {
         return {
             userID: 99999999,
             name: "Liza Malzem",
-            photoUrl: userPhotoUrl,
+            photoUrl: require("!file-loader!./icons/userphoto.svg").default,
             title: "Product Manager",
             dateLastActive: "2016-07-25 17:51:15",
         };

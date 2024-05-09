@@ -6,8 +6,8 @@
 
 import React, { useRef, useState, useEffect, useMemo, ReactNode } from "react";
 import { useMeasure } from "@vanilla/react-utils";
-import _debounce from "lodash-es/debounce";
-import _range from "lodash-es/range";
+import _debounce from "lodash/debounce";
+import _range from "lodash/range";
 import { t } from "@library/utility/appUtils";
 import { RightChevronSmallIcon, LeftChevronSmallIcon } from "@library/icons/common";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
@@ -21,7 +21,7 @@ import { CarouselPaging } from "@library/carousel/CarouselPaging";
 import { CarouselArrowNav } from "@library/carousel/CarouselArrowNav";
 
 import { useCarousel } from "@library/carousel/useCarousel";
-import clamp from "lodash-es/clamp";
+import clamp from "lodash/clamp";
 
 /**
  * Configurable Carousel component.

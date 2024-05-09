@@ -13,7 +13,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { INewPostMenuProps } from "@library/newPostMenu/NewPostMenu";
 import { cx } from "@emotion/css";
 import { Menu, MenuButton, MenuLink, MenuList, useMenuButtonContext } from "@reach/menu-button";
-import { getClassForButtonType } from "@library/forms/Button.getClassForButtonType";
+import { getClassForButtonType } from "@library/forms/Button";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import Container from "@library/layout/components/Container";

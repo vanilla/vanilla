@@ -11,7 +11,7 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedUtils;
 use Vanilla\Web\Asset\AssetPreloader;
 use Vanilla\Web\Asset\AssetPreloadModel;
-use Vanilla\Web\Asset\WebAsset;
+use Vanilla\Web\Asset\ExternalAsset;
 
 /**
  * Embed data object for Twitter.
@@ -33,7 +33,7 @@ class TwitterEmbed extends AbstractEmbed
         // Even a normal preload still hases scroll anchoring issues.
         // See https://github.com/vanilla/vanilla/issues/8884
         EmbedUtils::getPreloadModel()->addScript(
-            new WebAsset(self::JS_SCRIPT),
+            new ExternalAsset(self::JS_SCRIPT),
             AssetPreloader::REL_FULL,
             "twitter-embed-script-asset"
         );

@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import image from "./NewQuickLinksLabItem.svg";
+import image from "!file-loader!./NewQuickLinksLabItem.svg";
 import { LabThemeEditorNote } from "@dashboard/labs/LabThemeEditorNote";
 import { VanillaLabsItem } from "@dashboard/labs/VanillaLabsItem";
 import { t } from "@vanilla/i18n";

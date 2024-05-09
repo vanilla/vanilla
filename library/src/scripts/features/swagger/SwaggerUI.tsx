@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 import SwaggerUI from "swagger-ui";
-import "swagger-ui/dist/swagger-ui.css";
 import "@library/features/swagger/swaggerStyles.scss";
 import { injectGlobal } from "@emotion/css";
 import { inputMixin } from "@library/forms/inputStyles";

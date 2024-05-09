@@ -259,9 +259,9 @@ describe("SiteTotals", () => {
             },
         };
 
+        const mockAdapter = mockAPI();
+        mockAdapter.onGet("/site-totals").reply(200, mockSiteTotalsCount);
         it("useSiteTotalsCount() returns right data structure.", async () => {
-            const mockAdapter = mockAPI();
-            mockAdapter.onGet("/site-totals").reply(200, mockSiteTotalsCount);
             const { result, waitFor } = renderHook(() => useGetSiteTotalsCount([SiteTotalsCountOption.USER]), {
                 wrapper: queryClientWrapper(),
             });

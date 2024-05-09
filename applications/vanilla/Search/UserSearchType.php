@@ -229,7 +229,6 @@ class UserSearchType extends AbstractSearchType
     {
         $schemaFields = array_merge(
             [
-                "userID:s?",
                 "email:s?",
                 "emailDomain:a?" => [
                     "items" => [
@@ -315,7 +314,6 @@ class UserSearchType extends AbstractSearchType
             }
         }
         $this->validateProfileFieldFilters($query);
-        $this->filterByUserID($query);
     }
 
     /**
@@ -506,43 +504,5 @@ class UserSearchType extends AbstractSearchType
     {
         $profileFields = $this->profileFieldModel->getProfileFields(["enabled" => true]);
         return array_column($profileFields, null, "apiName");
-    }
-
-    /**
-     * Ability to filter by user ID
-     *
-     * @param SearchQuery $query
-     * @return void
-     * @throws ValidationException
-     */
-    private function filterByUserID(SearchQuery $query): void
-    {
-        $ipAddresses = $query->getQueryParameter("ipAddresses", null);
-        if (empty($ipAddresses)) {
-            $userIDs = $query->getQueryParameter("userID", null);
-            if (!empty($userIDs)) {
-                $userIDs = RangeExpression::createSchema([":int"])->validate($userIDs);
-                foreach ($userIDs->getValues() as $op => $userID) {
-                    $userID = (int) $userID;
-                    switch ($op) {
-                        case "=":
-                            $query->setFilter("userID.numeric", [$userID]);
-                            break;
-                        case "<":
-                            $query->setFilterRange("userID.numeric", null, $userID, true, false);
-                            break;
-                        case ">":
-                            $query->setFilterRange("userID.numeric", $userID, null, true, false);
-                            break;
-                        case "<=":
-                            $query->setFilterRange("userID.numeric", null, $userID, false, false);
-                            break;
-                        case ">=":
-                            $query->setFilterRange("userID.numeric", $userID, null, false, false);
-                            break;
-                    }
-                }
-            }
-        }
     }
 }

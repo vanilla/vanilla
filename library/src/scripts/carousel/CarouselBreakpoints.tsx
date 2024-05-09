@@ -7,7 +7,7 @@
 import { homeWidgetContainerVariables } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { getPixelNumber } from "@library/styles/styleUtils";
-import clamp from "lodash-es/clamp";
+import clamp from "lodash/clamp";
 
 export function getBreakPoints(sliderWrapperWidth: number, maxSlidesToShow?: number) {
     const itemSpacings = homeWidgetContainerVariables().itemSpacing.horizontal;

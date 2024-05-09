@@ -123,7 +123,6 @@ export interface IIntegrationContextValue {
     title: IAttachmentIntegration["title"];
     externalIDLabel: IAttachmentIntegration["externalIDLabel"];
     logoIcon: IAttachmentIntegration["logoIcon"];
-    name: IAttachmentIntegration["name"];
 
     // context customizations
     transformLayout?: ICustomIntegrationContext["transformLayout"];
@@ -140,7 +139,6 @@ export const IntegrationContext = createContext<IIntegrationContextValue>({
     title: "",
     externalIDLabel: "",
     logoIcon: "meta-external",
-    name: "",
 });
 
 export function useIntegrationContext() {
@@ -209,7 +207,6 @@ export function IntegrationContextProvider(
         <IntegrationContext.Provider
             value={{
                 ...{
-                    name: integration.name,
                     label,
                     submitButton,
                     title,

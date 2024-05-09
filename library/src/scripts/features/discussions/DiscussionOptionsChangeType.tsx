@@ -9,7 +9,7 @@ import { t } from "@library/utility/appUtils";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
-import ChangeTypeDiscussionForm from "@library/features/discussions/forms/ChangeTypeDiscussionForm";
+import LazyChangeTypeDiscussionForm from "@library/features/discussions/forms/LazyChangeTypeDiscussionForm";
 import { StackingContextProvider } from "@vanilla/react-utils";
 
 const DiscussionOptionsChangeType: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
@@ -30,7 +30,7 @@ const DiscussionOptionsChangeType: FunctionComponent<{ discussion: IDiscussion; 
             <DropDownItemButton onClick={open}>{t("Change Type")}</DropDownItemButton>
             <StackingContextProvider>
                 <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={close}>
-                    <ChangeTypeDiscussionForm discussion={discussion} onSuccess={handleSuccess} onCancel={close} />
+                    <LazyChangeTypeDiscussionForm discussion={discussion} onSuccess={handleSuccess} onCancel={close} />
                 </Modal>
             </StackingContextProvider>
         </>

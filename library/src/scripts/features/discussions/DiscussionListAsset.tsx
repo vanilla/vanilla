@@ -9,7 +9,7 @@ import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { DISCUSSIONS_MAX_PAGE_COUNT, useDiscussionList } from "@library/features/discussions/discussionHooks";
 import { LoadStatus } from "@library/@types/api/core";
 import { DiscussionListSortOptions, IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
-import isEqual from "lodash-es/isEqual";
+import isEqual from "lodash/isEqual";
 import { DiscussionListAssetHeader } from "@library/features/discussions/DiscussionListAssetHeader";
 import { DiscussionListView } from "@library/features/discussions/DiscussionList.views";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
@@ -76,12 +76,10 @@ export function DiscussionListAsset(props: IProps) {
 
         // In case a community manager shared a link that had one of these set.
         // Display a permission error and exclude the parameter.
-        if ((finalParams.internalStatusID?.length || finalParams.hasComments !== undefined) && !isCommunityManager) {
+        if (finalParams.internalStatusID?.length && !isCommunityManager) {
             delete finalParams.internalStatusID;
-            delete finalParams.hasComments;
             setPermissionError(true);
         }
-
         return finalParams;
     }, [props.apiParams, apiParams, props.isPreview]);
 
@@ -193,7 +191,6 @@ export function DiscussionListAsset(props: IProps) {
         tagID: actualApiParams.tagID,
         statusID: actualApiParams.statusID,
         internalStatusID: actualApiParams.internalStatusID,
-        hasComments: actualApiParams.hasComments,
         page: actualApiParams.page,
         followed: actualApiParams.followed,
         sort: actualApiParams.sort,

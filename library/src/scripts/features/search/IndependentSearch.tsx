@@ -20,8 +20,8 @@ import {
     SEARCH_SCOPE_LOCAL,
 } from "@library/features/search/SearchScopeContext";
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
-import merge from "lodash-es/merge";
-import clone from "lodash-es/clone";
+import merge from "lodash/merge";
+import clone from "lodash/clone";
 import { cx } from "@emotion/css";
 
 export interface IIndependentSearchProps extends IWithSearchProps, RouteComponentProps<{}> {

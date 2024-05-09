@@ -82,7 +82,7 @@ export function AccountSettingsImpl() {
             setEmail(viewingUser?.email ?? email);
             setEmailConfirmed(viewingUser?.emailConfirmed ?? emailConfirmed);
             setShowEmail(viewingUser?.showEmail ?? showEmail);
-            setShowProfile(viewingUser?.private != null ? !viewingUser.private : showProfile);
+            setShowProfile(!viewingUser?.private ?? showProfile);
             setPassword(
                 <span aria-label={t("masked password")} className="password">
                     ﹡﹡﹡﹡﹡﹡﹡﹡﹡﹡﹡﹡

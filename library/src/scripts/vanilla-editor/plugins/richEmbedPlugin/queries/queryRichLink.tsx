@@ -14,7 +14,7 @@ import {
 import { IVanillaLinkElement, MyEditor } from "@library/vanilla-editor/typescript";
 import { findNode, getNodeString } from "@udecode/plate-common";
 import { ELEMENT_LINK } from "@udecode/plate-link";
-import isEmpty from "lodash-es/isEmpty";
+import isEmpty from "lodash/isEmpty";
 import { Location, Path } from "slate";
 
 export function queryRichLink(

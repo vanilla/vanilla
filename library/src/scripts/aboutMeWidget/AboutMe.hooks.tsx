@@ -11,7 +11,7 @@ import { IDataListNode } from "@library/dataLists/DataList";
 import { ProfileFieldVisibilityIcon } from "@dashboard/userProfiles/components/ProfileFieldVisibilityIcon";
 import { RecordID } from "@vanilla/utils";
 import React, { ReactNode, useMemo } from "react";
-import sortBy from "lodash-es/sortBy";
+import sortBy from "lodash/sortBy";
 import DateTime from "@library/content/DateTime";
 import { formatDateStringIgnoringTimezone } from "@library/editProfileFields/utils";
 

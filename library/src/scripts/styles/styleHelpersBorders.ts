@@ -9,7 +9,7 @@ import { Property } from "csstype";
 import { TLength } from "@library/styles/styleShim";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import merge from "lodash-es/merge";
+import merge from "lodash/merge";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
 import {
     IBorderRadiusOptions,

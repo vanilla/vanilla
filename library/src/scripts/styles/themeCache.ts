@@ -1,6 +1,6 @@
 import getStore from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
-import memoize from "lodash-es/memoize";
+import memoize from "lodash/memoize";
 import { hashString } from "@vanilla/utils";
 import { useEffect, useState } from "react";
 

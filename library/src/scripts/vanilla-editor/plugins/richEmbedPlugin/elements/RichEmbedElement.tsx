@@ -43,10 +43,8 @@ import {
 import { useComponentDebug, useIsMounted } from "@vanilla/react-utils";
 import { matchWithWildcard } from "@vanilla/utils";
 import React, { useEffect, useRef, useState } from "react";
-import { LiveMessage } from "react-aria-live";
 import { Transforms } from "slate";
 import { useSelected } from "slate-react";
-import { sprintf } from "sprintf-js";
 
 type IProps = PlateRenderElementProps<any, IRichEmbedElement> & { isInline: boolean };
 
@@ -107,17 +105,13 @@ export function RichEmbedElement(props: IProps) {
 
     const progressEmitterRef = useRef(new ProgressEventEmitter());
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [liveMessage, setLiveMessage] = useState<string | null>(null);
+    let [isLoading, setIsLoading] = useState(false);
     async function loadEmbedData() {
         setIsLoading(true);
         try {
             switch (element.dataSourceType) {
                 case "file":
                 case "image":
-                    setLiveMessage(
-                        sprintf(t("Your %s %s is uploading."), t(element.dataSourceType), element.uploadFile.name),
-                    );
                     const uploadedFile = await uploadFile(element.uploadFile, {
                         onUploadProgress: progressEmitterRef.current.emit,
                     });
@@ -129,13 +123,7 @@ export function RichEmbedElement(props: IProps) {
                             { uploadFile: null, url: uploadedFile.url, error: undefined },
                         );
                     });
-                    setLiveMessage(
-                        sprintf(
-                            t("Your %s %s finished uploading."),
-                            t(element.dataSourceType),
-                            element.uploadFile.name,
-                        ),
-                    );
+
                     break;
                 case "iframe":
                     // We should check if the user is allowed to embed here
@@ -279,7 +267,6 @@ export function RichEmbedElement(props: IProps) {
                 </EmbedContext.Provider>
             </span>
             {children}
-            {liveMessage && <LiveMessage message={liveMessage} aria-live="polite" clearOnUnmount />}
         </span>
     );
 }

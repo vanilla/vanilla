@@ -13,7 +13,6 @@ import { useUsernameAvailability } from "@library/accountSettings/forms/EditUser
 import { mockAPI } from "@library/__tests__/utility";
 import TestRenderer from "react-test-renderer";
 import * as AccountSettingsFixtures from "@library/accountSettings/AccountSettings.fixtures";
-import { vitest } from "vitest";
 
 describe("Edit Username", () => {
     beforeEach(() => {
@@ -54,7 +53,7 @@ describe("Edit Username", () => {
         expect(screen.queryByText(/Password/)).not.toBeInTheDocument();
     });
     it("Sets form dirty state after username change", async () => {
-        const mockFunction = vitest.fn();
+        const mockFunction = jest.fn();
         await act(async () => {
             render(
                 <AccountSettingsFixtures.UserEditingSelf>
@@ -70,7 +69,7 @@ describe("Edit Username", () => {
     });
 
     it("Sets saving state when patchStatusByPatchID status is loading", async () => {
-        const mockFunction = vitest.fn();
+        const mockFunction = jest.fn();
         await act(async () => {
             render(
                 <AccountSettingsFixtures.UserEditingSelf
@@ -91,7 +90,7 @@ describe("Edit Username", () => {
     });
 
     it("Sets success state when patchStatusByPatchID status is successful", async () => {
-        const mockFunction = vitest.fn();
+        const mockFunction = jest.fn();
 
         await act(async () => {
             render(

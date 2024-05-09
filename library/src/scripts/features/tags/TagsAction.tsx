@@ -7,7 +7,7 @@ import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/R
 import actionCreatorFactory from "typescript-fsa";
 import { IApiError } from "@library/@types/api/core";
 import { ITag } from "@library/features/tags/TagsReducer";
-import debounce from "lodash-es/debounce";
+import debounce from "lodash/debounce";
 
 const createAction = actionCreatorFactory("@@tags");
 

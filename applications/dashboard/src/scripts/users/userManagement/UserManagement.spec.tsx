@@ -29,8 +29,8 @@ import {
 } from "@dashboard/users/userManagement/UserManagementUtils";
 import UserManagementColumnsConfig from "@dashboard/users/userManagement/UserManagementColumnsConfig";
 import { LiveAnnouncer } from "react-aria-live";
-import { vitest } from "vitest";
 
+jest.setTimeout(20000);
 describe("UserManagement", () => {
     const mockUser = {
         ...UserFixture.createMockUser({ userID: 4, name: "test-user" }),
@@ -105,13 +105,11 @@ describe("UserManagement", () => {
         },
     };
 
-    beforeEach(() => {
-        const mockAdapter = mockAPI();
-        mockAdapter.onGet("/users?expand=profileFields").reply(200, [mockUser], { "x-app-page-result-count": 1 });
-        mockAdapter.onPost("/users").reply(201, [mockAddUser]);
-        mockAdapter.onPatch(`/users/${mockUpdateUser.userID}`).reply(200, [mockUpdateUser]);
-        mockAdapter.onGet("/site-totals").reply(200, mockSiteTotalsCount);
-    });
+    const mockAdapter = mockAPI();
+    mockAdapter.onGet("/users?expand=profileFields").reply(200, [mockUser], { "x-app-page-result-count": 1 });
+    mockAdapter.onPost("/users").reply(201, [mockAddUser]);
+    mockAdapter.onPatch(`/users/${mockUpdateUser.userID}`).reply(200, [mockUpdateUser]);
+    mockAdapter.onGet("/site-totals").reply(200, mockSiteTotalsCount);
 
     const mockColumnsConfig: StackableTableColumnsConfig = {
         "first column": {
@@ -364,7 +362,7 @@ describe("UserManagement", () => {
 
     describe("UserManagementConfig", () => {
         it("Config button click event opens the modal. If no columns selected, apply button won't save but show the error instead.", async () => {
-            const mockFunction = vitest.fn();
+            const mockFunction = jest.fn();
             const result = render(
                 <LiveAnnouncer>
                     <UserManagementColumnsConfig

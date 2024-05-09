@@ -10,7 +10,7 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { RecordID } from "@vanilla/utils";
 import { ICollection } from "@library/featuredCollections/Collections.variables";
 import CollectionsActions from "@library/featuredCollections/CollectionsActions";
-import sortBy from "lodash-es/sortBy";
+import sortBy from "lodash/sortBy";
 import { getResourceHash } from "@library/featuredCollections/CollectionsUtils";
 
 export interface ICollectionsStoreState {

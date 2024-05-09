@@ -15,7 +15,6 @@ import {
 import { setMeta } from "@library/utility/appUtils";
 import { RenderResult, act, render } from "@testing-library/react";
 import DiscussionAttachmentsAsset from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
-import { vitest } from "vitest";
 
 const mockDiscussion = LayoutEditorPreviewData.discussion();
 
@@ -24,7 +23,7 @@ beforeAll(() => {
 });
 
 afterEach(() => {
-    vitest.clearAllMocks();
+    jest.clearAllMocks();
     queryClient.clear();
 });
 
@@ -33,7 +32,6 @@ describe("DiscussionAttachmentsAsset", () => {
 
     describe("With attachments", () => {
         beforeEach(async () => {
-            mockApi.refreshAttachments.mockClear();
             await act(async () => {
                 result = render(
                     <IntegrationsTestWrapper>
@@ -49,7 +47,6 @@ describe("DiscussionAttachmentsAsset", () => {
 
     describe("Without attachments", () => {
         beforeEach(async () => {
-            mockApi.refreshAttachments.mockClear();
             await act(async () => {
                 result = render(
                     <IntegrationsTestWrapper>

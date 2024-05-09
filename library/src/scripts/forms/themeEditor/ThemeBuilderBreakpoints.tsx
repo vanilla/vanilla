@@ -9,7 +9,7 @@ import { ThemeBuilderBlock, useThemeBlock } from "@library/forms/themeEditor/The
 import { t } from "@vanilla/i18n";
 import { ThemeToggle } from "@library/forms/themeEditor/ThemeToggle";
 import { logWarning } from "@vanilla/utils";
-import { Spring, animated, config as springConfig } from "react-spring/renderprops.cjs";
+import { Spring, animated, config as springConfig } from "react-spring/renderprops";
 import { ThemeBuilderUpload } from "@library/forms/themeEditor/ThemeBuilderUpload";
 import { css } from "@emotion/css";
 

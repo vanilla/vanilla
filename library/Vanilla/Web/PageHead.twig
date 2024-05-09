@@ -13,13 +13,13 @@
 {% endif %}
 
 {% for script in inlineScripts -%}
-    <script type="module" nonce="{{ nonce }}">
+    <script nonce="{{ nonce }}">
         {{- script|raw -}}
     </script>
 {% endfor %}
 
 {% for script in scripts -%}
-    <script {{ script.isScriptModule() ? "type=\"module\""|raw : "defer" }} crossorigin nonce="{{ nonce }}" src="{{ script.getWebPath() }}"></script>
+    <script crossorigin nonce="{{ nonce }}" defer src="{{ script.getWebPath() }}"></script>
 {% endfor %}
 
 {%- if jsonLD -%}

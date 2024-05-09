@@ -15,7 +15,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { important, percent } from "csx";
-import merge from "lodash-es/merge";
+import merge from "lodash/merge";
 import { css, CSSObject } from "@emotion/css";
 import { IBorderStyles, ISimpleBorderStyle, IMixedBorderStyles } from "@library/styles/cssUtilsTypes";
 

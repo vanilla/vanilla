@@ -95,14 +95,6 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     /**
      * @inheritDoc
      */
-    public function getProviderName(): string
-    {
-        return "Mock Provider";
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getTypeName(): string
     {
         return self::TYPE_NAME;
@@ -208,45 +200,5 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     public function getRefreshTimeSeconds(): int
     {
         return 5 * 60;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function canEscalateOwnPost(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function canViewAttachment(array $attachment): bool
-    {
-        return $this->hasPermissions();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function canCreateAttachmentForRecord(string $recordType, int $recordID): bool
-    {
-        return $this->hasPermissions();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getEscalationDelayUnit(): ?string
-    {
-        return null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getEscalationDelayLength(): int
-    {
-        return 0;
     }
 }

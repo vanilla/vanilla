@@ -16,12 +16,12 @@ import { TextEditorContextProvider } from "@library/textEditor/TextEditor";
 import { themeSettingsReducer } from "@library/theming/themeSettingsReducer";
 import { addPageComponent } from "@library/utility/componentRegistry";
 import { applySharedPortalContext } from "@vanilla/react-utils";
+import React from "react";
 import "../../../design/admin-new.css";
 import { layoutSettingsSlice } from "@dashboard/layout/layoutSettings/LayoutSettings.slice";
 import { t } from "@vanilla/i18n";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { getDeveloperRoutes } from "@dashboard/developer/getDeveloperRoutes";
-import { RouterRegistry } from "@library/Router.registry";
 
 registerContextProvider(TextEditorContextProvider);
 registerReducer(dashboardSectionSlice.name, dashboardSectionSlice.reducer);
@@ -36,8 +36,8 @@ applySharedPortalContext((props) => {
     );
 });
 
-RouterRegistry.addRoutes(getAppearanceRoutes());
-RouterRegistry.addRoutes(getDeveloperRoutes());
+Router.addRoutes(getAppearanceRoutes());
+Router.addRoutes(getDeveloperRoutes());
 supportsFrames(true);
 addPageComponent(AdminApp);
 

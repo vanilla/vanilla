@@ -35,8 +35,8 @@ import { t } from "@library/utility/appUtils";
 import { Icon } from "@vanilla/icons";
 import { useLastValue } from "@vanilla/react-utils";
 import { useFormik } from "formik";
-import sortBy from "lodash-es/sortBy";
-import uniq from "lodash-es/uniq";
+import sortBy from "lodash/sortBy";
+import uniq from "lodash/uniq";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 type FormValues = {

@@ -11,6 +11,7 @@ import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { richEditorClasses } from "@library/editor/richEditorStyles";
 import { insertLinkClasses } from "@library/editor/toolbars/pieces/insertLinkClasses";
+import Keyboard from "quill/modules/keyboard";
 
 interface IProps {
     inputRef: React.RefObject<HTMLInputElement>;
@@ -46,7 +47,7 @@ export default function InlineToolbarLinkInput(props: IProps) {
                     onChange={props.onInputChange}
                     ref={props.inputRef}
                     onKeyDown={(event) => {
-                        if (event.key === "Enter") {
+                        if (Keyboard.match(event.nativeEvent, "enter")) {
                             handleFormSubmit(event);
                         } else {
                             props.onInputKeyDown?.(event);

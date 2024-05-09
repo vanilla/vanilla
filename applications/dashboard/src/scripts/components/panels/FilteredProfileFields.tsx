@@ -3,11 +3,11 @@ import { useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hoo
 import { IDateTimeRange, LoadStatus } from "@library/@types/api/core";
 import { ProfileField } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { notEmpty } from "@vanilla/utils";
-import omit from "lodash-es/omit";
+import omit from "lodash/omit";
 import { GroupedTag, SortedTagCloud } from "@dashboard/components/panels/SortedTagCloud";
 import { t } from "@vanilla/i18n";
 import { filteredProfileFieldsClasses } from "@dashboard/components/panels/FilteredProfileFields.styles";
-import sortBy from "lodash-es/sortBy";
+import sortBy from "lodash/sortBy";
 
 /** This is a record of key API name and value  */
 export type ProfileFieldValue = Record<ProfileField["apiName"], string | string[] | IDateTimeRange>;

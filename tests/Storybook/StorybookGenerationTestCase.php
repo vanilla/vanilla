@@ -8,7 +8,6 @@
 namespace VanillaTests\Storybook;
 
 use Nette\Utils\FileSystem;
-use Symfony\Component\Process\Process;
 use Vanilla\Formatting\Html\HtmlDocument;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
@@ -65,44 +64,24 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test
                 $htmlDocument->getRawHtml()
         );
         $bodyClasses = $bodyNode->getAttribute("class") ?? "";
+        $data = [
+            "cssFiles" => $cssFiles,
+            "bodyClasses" => $bodyClasses,
+        ];
+        $dataJson = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        $writeBase = self::STORYBOOK_BASE_PATH . "/" . $storyName;
+        $htmlPath = $writeBase . ".html";
+        $dataPath = $writeBase . ".json";
 
         $bodyContent = $htmlDocument->getOuterHtml($bodyNode);
-
-        $namePieces = explode(" ", $storyName);
-        $firstPiece = array_shift($namePieces);
-        $storyTitle = json_encode("Foundation/{$firstPiece}", JSON_UNESCAPED_SLASHES);
-        $componentTitle = json_encode(implode(" ", $namePieces), JSON_UNESCAPED_SLASHES);
-        $bodyClasses = json_encode($bodyClasses, JSON_UNESCAPED_SLASHES);
-        $cssFiles = json_encode($cssFiles, JSON_UNESCAPED_SLASHES);
-        $componentName = str_replace(["(", ")", "-", "$", "/", "\\", "&", "+"], "", implode("", $namePieces));
-
-        $jsPath = self::STORYBOOK_BASE_PATH . "/" . $storyName . ".story.jsx";
-        $htmlPath = self::STORYBOOK_BASE_PATH . "/" . $storyName . ".html";
-
-        $jsFile = <<<TS
-import { PhpGeneratedStory } from "@library/storybook/PhpGeneratedStory";
-import React from "react";
-import html from "./{$storyName}.html?raw";
-
-export default {
-    title: {$storyTitle}
-};
-
-export function $componentName() {
-    const bodyClasses = {$bodyClasses};
-    const cssFiles = {$cssFiles};
-    return <PhpGeneratedStory html={html} cssFiles={cssFiles} bodyClasses={bodyClasses} />;
-}
-$componentName.storyName = {$componentTitle};
-
-TS;
-
+        // $bodyContent = $this->minifyHTML($bodyContent);
         FileSystem::write($htmlPath, $bodyContent, 0777);
-        FileSystem::write($jsPath, $jsFile, 0777);
+        FileSystem::write($dataPath, $dataJson, 0777);
 
+        // We should have prettier already from our node installation. Format the resulting file with it if possible.
         if ($this->prettierExists()) {
-            $process = new Process(["yarn", "prettier", "--write", $jsPath, $htmlPath]);
-            $process->mustRun();
+            exec("yarn prettier --write \"$htmlPath\"");
         }
     }
 

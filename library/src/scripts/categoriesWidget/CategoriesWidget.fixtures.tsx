@@ -5,7 +5,7 @@
 
 import { STORY_ICON, STORY_IMAGE, STORY_LEADERS } from "@library/storybook/storyData";
 import { ICategoryItem } from "@library/categoriesWidget/CategoryItem";
-import random from "lodash-es/random";
+import random from "lodash/random";
 
 export const mockCategoriesDataWithHeadings: ICategoryItem[] = [
     {

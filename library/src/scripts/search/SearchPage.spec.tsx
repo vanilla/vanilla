@@ -192,13 +192,15 @@ describe("SearchPage", () => {
             });
 
             it("renders a radio button for each loadable domain", async () => {
-                result = render(
-                    <MockSearchPage
-                        initialFormState={{
-                            domain: PLACES_SEARCH_DOMAIN.key,
-                        }}
-                    />,
-                );
+                await act(async () => {
+                    result = render(
+                        <MockSearchPage
+                            initialFormState={{
+                                domain: PLACES_SEARCH_DOMAIN.key,
+                            }}
+                        />,
+                    );
+                });
                 const radioGroup = await result.findByRole("radiogroup");
                 expect(
                     await within(radioGroup).findByRole("radio", { name: LOADABLE_PLACES_SEARCH_DOMAIN.name }),
@@ -256,7 +258,9 @@ describe("SearchPage", () => {
                     );
 
                     // Change to a domain that doesn't support `types`.
-                    fireEvent.click(asyncDomainRadioBtn);
+                    await act(async () => {
+                        fireEvent.click(asyncDomainRadioBtn);
+                    });
 
                     // The search in the new domain was performed without `types`.
                     expect(MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.performSearch).toHaveBeenLastCalledWith(

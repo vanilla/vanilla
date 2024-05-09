@@ -15,7 +15,6 @@ use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
 use Garden\StaticCacheConfigTrait;
-use Garden\Web\Exception\ForbiddenException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -1527,12 +1526,6 @@ class UserModel extends Gdn_Model implements
         $userID = $this->SQL->insert($this->Name, $userSet);
 
         if ($userID) {
-            // Set default roles for the user
-            if (is_array($roles)) {
-                $this->saveRoles($userID, $roles, [
-                    self::OPT_LOG_ROLE_CHANGES => Gdn::config("ExtraLogging.Enabled", false),
-                ]);
-            }
             // If values need to be saved in the `UserMeta` table.
             if (count($userMetaSet) > 0) {
                 $this->profileFieldModel->updateUserProfileFields($userID, $userMetaSet);
@@ -1542,8 +1535,13 @@ class UserModel extends Gdn_Model implements
             $this->clearCache($userID, [self::CACHE_TYPE_USER]);
 
             $user = $this->getID($userID, DATASET_TYPE_ARRAY);
-            // Give roles based on user email
+
             $this->giveRolesByEmail($user);
+            if (is_array($roles)) {
+                $this->saveRoles($userID, $roles, [
+                    self::OPT_LOG_ROLE_CHANGES => Gdn::config("ExtraLogging.Enabled", false),
+                ]);
+            }
 
             $userEvent = $this->eventFromRow($user, UserEvent::ACTION_INSERT, $this->currentFragment());
             $this->getEventManager()->dispatch($userEvent);
@@ -2830,9 +2828,8 @@ class UserModel extends Gdn_Model implements
      * @param string $source
      * @param int $categoryID
      * @param int|false $timestamp
-     * @throws Gdn_UserException
-     * @see UserModel::givePoints()
      * @since 2.1.0
+     * @see UserModel::givePoints()
      */
     private static function givePointsInternal(
         $userID,
@@ -3081,7 +3078,6 @@ class UserModel extends Gdn_Model implements
                 $this->Validation->addValidationResult("Banned", "You may not ban a user with the Admin flag set.");
             }
         }
-        $existingUserRecord = $user;
 
         $this->EventArguments["ExistingUser"] = $user;
         $this->EventArguments["FormPostValues"] = $formPostValues;
@@ -3440,12 +3436,7 @@ class UserModel extends Gdn_Model implements
         if ($userID && !$insert) {
             // Events for inserts are dispatched in `insertInternal()`
             $user = $this->getID($userID);
-            $userEvent = $this->eventFromRow(
-                (array) $user,
-                UserEvent::ACTION_UPDATE,
-                $this->currentFragment(),
-                $existingUserRecord
-            );
+            $userEvent = $this->eventFromRow((array) $user, UserEvent::ACTION_UPDATE, $this->currentFragment());
             $this->getEventManager()->dispatch($userEvent);
         }
         return $userID;
@@ -3470,25 +3461,19 @@ class UserModel extends Gdn_Model implements
      * @param array $row
      * @param string $action
      * @param array|object|null $sender
-     * @param array|null $existingData
-     * @throws \Garden\Schema\ValidationException
      * @return UserEvent
      */
-    public function eventFromRow(array $row, string $action, $sender = null, ?array $existingData = null): ResourceEvent
+    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent
     {
         $user = $this->normalizeRow($row, false);
         $user = $this->readSchema()->validate($user);
-        if ($existingData) {
-            $existingData = $this->normalizeRow($existingData, false);
-            $existingData = $this->readSchema()->validate($existingData);
-        }
 
         if ($sender) {
             $senderSchema = new UserFragmentSchema();
             $sender = $senderSchema->validate($sender);
         }
 
-        $result = new UserEvent($action, ["user" => $user, "existingData" => $existingData], $sender);
+        $result = new UserEvent($action, ["user" => $user], $sender);
         return $result;
     }
 
@@ -4346,7 +4331,6 @@ class UserModel extends Gdn_Model implements
      *
      * @param array|string $filter
      * @return int
-     * @throws ForbiddenException
      */
     public function searchCount($filter = "")
     {
@@ -4510,7 +4494,6 @@ class UserModel extends Gdn_Model implements
      * @param array $options
      *  - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
      * @return int UserID.
-     * @throws Gdn_UserException
      */
     public function insertForInvite($formPostValues, $options = [])
     {

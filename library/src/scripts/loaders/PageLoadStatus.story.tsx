@@ -1,3 +1,4 @@
+import { storiesOf } from "@storybook/react";
 import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorator";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
@@ -7,10 +8,7 @@ import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
 import { PageLoadStatus } from "@library/loaders/PageLoadStatus";
 import { IAPIErrorFragment } from "@library/errorPages/CoreErrorMessages";
 
-export default {
-    title: "Loaders/LoadingStatus",
-    decorators: [dashboardCssDecorator],
-};
+const formsStory = storiesOf("Loaders/LoadingStatus", module).addDecorator(dashboardCssDecorator);
 
 const data: ILoadable<any, IAPIErrorFragment> = {
     status: LoadStatus.PENDING,
@@ -38,7 +36,7 @@ const story = (status: LoadStatus) =>
         );
     };
 
-export const Pending = story(LoadStatus.PENDING);
-export const Loading = story(LoadStatus.LOADING);
-export const Error = story(LoadStatus.ERROR);
-export const Success = story(LoadStatus.SUCCESS);
+formsStory.add(LoadStatus.PENDING, story(LoadStatus.PENDING));
+formsStory.add(LoadStatus.LOADING, story(LoadStatus.LOADING));
+formsStory.add(LoadStatus.ERROR, story(LoadStatus.ERROR));
+formsStory.add(LoadStatus.SUCCESS, story(LoadStatus.SUCCESS));

@@ -6,7 +6,7 @@
 
 import React, { useMemo } from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { getClassForButtonType } from "@library/forms/Button.getClassForButtonType";
+import { getClassForButtonType } from "@library/forms/Button";
 import SmartLink from "@library/routing/links/SmartLink";
 import { IOptionalComponentID } from "@library/utility/idUtils";
 import { LinkProps } from "react-router-dom";

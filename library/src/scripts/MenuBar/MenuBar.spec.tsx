@@ -11,7 +11,6 @@ import { MenuBarItem } from "@library/MenuBar/MenuBarItem";
 import { MenuBarSubMenuItem } from "@library/MenuBar/MenuBarSubMenuItem";
 import { fireEvent, render, screen, act, waitFor } from "@testing-library/react";
 import React from "react";
-import { vitest } from "vitest";
 
 describe("<MenuBar />", () => {
     // don't forget test for disabled items.
@@ -67,7 +66,7 @@ describe("<MenuBar />", () => {
     });
 
     describe("items can be activated", () => {
-        const spy = vitest.fn();
+        const spy = jest.fn();
         beforeEach(() => {
             spy.mockReset();
             render(

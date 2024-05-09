@@ -8,7 +8,7 @@ import React, { useMemo } from "react";
 import { Tokens } from "@library/forms/select/Tokens";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { useStatusOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
-import flatten from "lodash-es/flatten";
+import flatten from "lodash/flatten";
 import { IGroupOption } from "@library/forms/select/Tokens.loadable";
 import { useIsInModal } from "@library/modal/Modal.context";
 

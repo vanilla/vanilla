@@ -20,6 +20,7 @@ import { DiscussionOptionsSink } from "@library/features/discussions/DiscussionO
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { DiscussionOptionsChangeLog } from "@library/features/discussions/DiscussionOptionsChangeLog";
 import DiscussionChangeType from "@library/features/discussions/DiscussionOptionsChangeType";
+import { NON_CHANGE_TYPE } from "@library/features/discussions/forms/ChangeTypeDiscussionForm";
 import { DiscussionOptionsTag } from "@library/features/discussions/DiscussionOptionsTag";
 import { CollectionsOptionButton } from "@library/featuredCollections/CollectionsOptionButton";
 import { CollectionRecordTypes } from "@library/featuredCollections/Collections.variables";
@@ -32,8 +33,6 @@ import {
     useAttachmentIntegrations,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { IntegrationButtonAndModal } from "@library/features/discussions/integrations/Integrations";
-import { NON_CHANGE_TYPE } from "@library/features/discussions/forms/ChangeTypeDiscussionForm.constants";
-import { Icon } from "@vanilla/icons";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -248,12 +247,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
     }
 
     return (
-        <DropDown
-            buttonContents={<Icon icon="navigation-circle-ellipsis" />}
-            name={t("Discussion Options")}
-            flyoutType={FlyoutType.LIST}
-            asReachPopover
-        >
+        <DropDown name={t("Discussion Options")} flyoutType={FlyoutType.LIST} asReachPopover>
             {items.map((item, i) => {
                 return <React.Fragment key={i}>{item}</React.Fragment>;
             })}

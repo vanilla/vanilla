@@ -56,20 +56,6 @@ class ComposerHelper
     }
 
     /**
-     * Clear the js deps cache.
-     */
-    public static function clearJSDepsCache()
-    {
-        $cacheDir = realpath(__DIR__ . "/../../build/.cache");
-
-        // Clear deps cache if it exists.
-        $depsCache = $cacheDir . "/deps";
-        if (file_exists($depsCache)) {
-            self::deleteRecursively($depsCache);
-        }
-    }
-
-    /**
      * Recursively delete a directory.
      *
      * @param string $root
@@ -112,6 +98,7 @@ class ComposerHelper
         $addonManager->ensureMultiCache();
         printf("\nAddon cache built");
 
+        $vanillaRoot = PATH_ROOT;
         $skipBuild = getenv(self::DISABLE_AUTO_BUILD) === "true";
         if ($skipBuild) {
             printf(
@@ -129,8 +116,25 @@ class ComposerHelper
             printf("Installing core node_modules failed\n");
             exit($installReturn);
         }
+
+        // Build bootstrap can be used to configure this build if env variables are not available.
+        $buildBootstrap = realpath($vanillaRoot . "/conf/build-bootstrap.php");
+        if (file_exists($buildBootstrap)) {
+            include $buildBootstrap;
+        }
+
+        $buildScript = realpath($vanillaRoot . "/build/scripts/build.ts");
+        $buildDocsScript = realpath($vanillaRoot . "/build/scripts/variables/buildVariableDocs.ts");
+        $tsNodeRegister = realpath($vanillaRoot . "/node_modules/ts-node/register");
+        $tsConfig = realpath($vanillaRoot . "/build/tsconfig.json");
+        $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
+        $lowMemoryFlag = getenv(self::DISABLE_VALIDATION_ENV) || getenv(self::LOW_MEMORY_ENV) ? "--low-memory" : "";
+
+        // Stderr gets swalled in some environments.
+        $stdoutRedirect = " 2>&1";
+
         // Run build
-        $buildCommand = "yarn esrun ./build/vite.buildProd.ts 2>&1";
+        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $lowMemoryFlag $stdoutRedirect";
         printf("\nBuilding frontend assets\n");
         printf("\n$buildCommand\n");
         system($buildCommand, $buildResult);
@@ -147,6 +151,20 @@ class ComposerHelper
         }
         printf("\nGererating Vendor Licenses for build\n");
         passthru("yarn licenses generate-disclaimer --production > $licensePath");
+
+        // The disable validation flag was used to enable low memory optimizations.
+        // The build no longer does any validation, however, so a new env variable has been added.
+        // So, we check for both.
+        $docsCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildDocsScript -i $lowMemoryFlag $stdoutRedirect";
+
+        printf("\nBuilding variable documentation\n");
+        printf("\n$docsCommand\n");
+        system($docsCommand, $buildResult);
+
+        if ($buildResult !== 0) {
+            printf("The build failed with code $buildResult");
+            exit($buildResult);
+        }
     }
 
     /**

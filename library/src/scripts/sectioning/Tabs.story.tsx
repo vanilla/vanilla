@@ -3,14 +3,16 @@
  * @license GPL-2.0-only
  */
 
+import { StoryHeading } from "@library/storybook/StoryHeading";
+import { storiesOf } from "@storybook/react";
+import { StoryContent } from "@library/storybook/StoryContent";
+import { Tabs } from "@library/sectioning/Tabs";
+import React from "react";
+import TextEditor from "@library/textEditor/TextEditor";
+import { StoryTextContent } from "@library/storybook/storyData";
+import { TabsTypes } from "@library/sectioning/TabsTypes";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { Tabs } from "@library/sectioning/Tabs";
-import { TabsTypes } from "@library/sectioning/TabsTypes";
-import { StoryContent } from "@library/storybook/StoryContent";
-import { StoryTextContent } from "@library/storybook/storyData";
-import { StoryHeading } from "@library/storybook/StoryHeading";
-import React from "react";
 
 export default {
     title: "Components/Tabs",

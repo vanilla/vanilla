@@ -9,10 +9,7 @@ namespace VanillaTests\Forum\Utils;
 
 use AttachmentModel;
 use Exception;
-use Garden\Container\ContainerException;
-use Garden\Container\NotFoundException;
 use Garden\Http\HttpResponse;
-use Garden\Schema\ValidationException;
 use Gdn_Format;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Http\InternalClient;
@@ -158,9 +155,6 @@ trait CommunityApiTestTrait
      * @param array $extras Extra fields to set directly in the model.
      *
      * @return array
-     * @throws ContainerException
-     * @throws NotFoundException
-     * @throws ValidationException
      */
     public function createDiscussion(array $overrides = [], array $extras = []): array
     {

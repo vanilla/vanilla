@@ -286,9 +286,7 @@ declare module "quill/core/emitter";
 declare module "quill/core/module" {
     import Quill from "quill/core";
     export default class Module {
-        protected quill: Quill;
-        protected options: AnyObject;
-        constructor(quill: Quill, options: AnyObject);
+        constructor(protected quill: Quill, protected options: AnyObject);
         public init();
     }
 }

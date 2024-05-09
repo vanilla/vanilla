@@ -17,7 +17,6 @@ use Vanilla\Utility\HtmlUtils;
 use Vanilla\Utility\StringUtils;
 use Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\Asset\NoScriptStylesAsset;
-use Vanilla\Web\Asset\ViteAssetProvider;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlTrait;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
@@ -2301,7 +2300,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                     }
                 }
 
-                $this->addViteAsseViteAssts();
+                $this->addWebpackAssets();
                 $this->addThemeAssets();
                 $this->registerDashboardReduxActions();
 
@@ -2493,27 +2492,31 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     }
 
     /**
-     * Add the assets from ViteAssetProvider to the page.
+     * Add the assets from WebpackAssetProvider to the page.
      */
-    private function addViteAsseViteAssts()
+    private function addWebpackAssets()
     {
-        $assetProvider = \Gdn::getContainer()->get(ViteAssetProvider::class);
+        // Webpack based scripts
+        /** @var \Vanilla\Web\Asset\WebpackAssetProvider $webpackAssetProvider */
+        $webpackAssetProvider = Gdn::getContainer()->get(\Vanilla\Web\Asset\WebpackAssetProvider::class);
+
+        $polyfillContent = $webpackAssetProvider->getInlinePolyfillContents();
+        $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
+
+        // Add the built webpack javascript files.
         $section = $this->MasterView === "admin" ? "admin" : "forum";
-        $bootstrapInline = $assetProvider->getBootstrapInlineScript();
-        $this->Head->addScript("", "module", false, ["content" => $bootstrapInline]);
-        if ($assetProvider->isHotBuild()) {
-            $hotBuildInline = $assetProvider->getHotBuildInlineScript();
-            $this->Head->addScript("", "module", false, ["content" => $hotBuildInline]);
-            $assets = $assetProvider->getHotBuildScriptAssets($section);
-        } else {
-            $assets = $assetProvider->getEnabledEntryAssets($section);
+        $jsAssets = $webpackAssetProvider->getScripts($section);
+        foreach ($jsAssets as $asset) {
+            $this->Head->addScript($asset->getWebPath(), "text/javascript", false, [
+                "defer" => "defer",
+                "static" => $asset->isStatic(),
+            ]);
         }
-        foreach ($assets as $viteAsset) {
-            if ($viteAsset->isScript()) {
-                $this->Head->addScript($viteAsset->getWebPath(), "module", false);
-            } elseif ($viteAsset->isStyleSheet()) {
-                $this->Head->addCss($viteAsset->getWebPath(), null, false);
-            }
+
+        // The built stylesheets
+        $styleAssets = $webpackAssetProvider->getStylesheets($section);
+        foreach ($styleAssets as $asset) {
+            $this->Head->addCss($asset->getWebPath(), null, false);
         }
 
         // Noscript stylesheet

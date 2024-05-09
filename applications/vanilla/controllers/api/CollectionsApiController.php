@@ -8,13 +8,7 @@
 namespace Vanilla\Controllers\Api;
 
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
-use Garden\Web\Exception\ClientException;
-use Garden\Web\Exception\HttpException;
 use PHPUnit\Exception;
-use Vanilla\DateFilterSchema;
-use Vanilla\Exception\Database\NoResultsException;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\CollectionModel;
 use Vanilla\ApiUtils;
@@ -51,9 +45,6 @@ class CollectionsApiController extends \AbstractApiController
      *
      * @param array $query
      * @return Data
-     * @throws ValidationException
-     * @throws HttpException
-     * @throws PermissionException
      */
     public function index(array $query): Data
     {
@@ -61,13 +52,6 @@ class CollectionsApiController extends \AbstractApiController
         $in = Schema::parse([
             "collectionID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"]),
             "name:s?",
-            "dateUpdated?" => new DateFilterSchema([
-                "description" => "When the collection was updated.",
-                "x-filter" => [
-                    "field" => "DateUpdated",
-                    "processor" => [DateFilterSchema::class, "dateFilterField"],
-                ],
-            ]),
             "page:i?" => [
                 "description" => "Page number. [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
                 "default" => 1,
@@ -82,8 +66,7 @@ class CollectionsApiController extends \AbstractApiController
         $query = $in->validate($query);
         $options = [];
         [$options["offset"], $options["limit"]] = offsetLimit("p{$query["page"]}", $query["limit"]);
-
-        $where = ApiUtils::queryToFilters($in, $query);
+        $where = [];
         if (isset($query["collectionID"])) {
             $where["collectionID"] = $query["collectionID"];
         }
@@ -112,9 +95,6 @@ class CollectionsApiController extends \AbstractApiController
      *
      * @param int $collectionID
      * @return Data
-     * @throws HttpException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function get(int $collectionID): Data
     {
@@ -139,9 +119,6 @@ class CollectionsApiController extends \AbstractApiController
      *
      * @param array $query
      * @return Data
-     * @throws HttpException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function get_byResource(array $query): Data
     {
@@ -160,9 +137,6 @@ class CollectionsApiController extends \AbstractApiController
      *
      * @param array $body
      * @return Data
-     * @throws HttpException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function put_byResource(array $body): Data
     {
@@ -208,10 +182,6 @@ class CollectionsApiController extends \AbstractApiController
      *
      * @param int $collectionID
      * @return void
-     * @throws HttpException
-     * @throws PermissionException
-     * @throws ValidationException
-     * @throws NoResultsException
      */
     public function delete(int $collectionID): void
     {
@@ -225,10 +195,6 @@ class CollectionsApiController extends \AbstractApiController
      *
      * @param array $body
      * @return Data
-     * @throws HttpException
-     * @throws PermissionException
-     * @throws ValidationException
-     * @throws ClientException
      */
     public function post(array $body): Data
     {
@@ -245,9 +211,7 @@ class CollectionsApiController extends \AbstractApiController
      * Get collection records and its extracted contents
      *
      * @param int $collectionID
-     * @param string $locale
      * @return Data
-     * @throws ValidationException
      */
     public function get_content(int $collectionID, string $locale): Data
     {
@@ -276,11 +240,6 @@ class CollectionsApiController extends \AbstractApiController
      * @param int $collectionID
      * @param array $body
      * @return Data
-     * @throws HttpException
-     * @throws NoResultsException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function patch(int $collectionID, array $body): Data
     {

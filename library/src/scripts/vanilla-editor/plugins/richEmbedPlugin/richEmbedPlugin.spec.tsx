@@ -13,10 +13,9 @@ import { createVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loada
 import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { mockAPI } from "@library/__tests__/utility";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import React from "react";
 import { LiveAnnouncer } from "react-aria-live";
-import MockAdapter from "axios-mock-adapter/types";
 
 function insertHtml(editor: MyEditor, html: string) {
     const dataTransfer = new DataTransfer();
@@ -24,13 +23,14 @@ function insertHtml(editor: MyEditor, html: string) {
     editor.insertData(dataTransfer);
 }
 
-// Skipping post vitest migration. The test was never actually written properly
-describe.skip("RichEmbedPlugin", () => {
-    let mockAdapter: MockAdapter;
+// These tests can be a bit slow in CI. Extend their timeout.
+jest.setTimeout(100000);
+
+describe("RichEmbedPlugin", () => {
+    const mockAdapter = mockAPI();
+    mockAdapter.onGet("/users/by-names").reply(200, []);
 
     beforeEach(() => {
-        mockAdapter = mockAPI();
-        mockAdapter.onGet("/users/by-names").reply(200, []);
         setMeta("trustedDomains", "codesandbox.io");
         supportsFrames(true);
     });
@@ -58,18 +58,18 @@ describe.skip("RichEmbedPlugin", () => {
             </TestReduxProvider>,
         );
 
-        act(() => {
-            insertHtml(editor, `<a href="${url}">${url}</a>`);
+        insertHtml(editor, `<a href="${url}">${url}</a>`);
+
+        waitFor(async () => {
+            const link = await screen.findByRole("link", { name: url });
+            expect(link).toHaveAttribute("href", url);
+
+            const embed = await screen.findByTestId(`inline-embed:${url}`);
+            expect(embed).toBeVisible();
+
+            const favicon = embed.querySelector("img");
+            expect(favicon).toHaveAttribute("src", "https://github.com/favicon.ico");
         });
-
-        const link = await screen.findByRole("link", { name: url });
-        expect(link).toHaveAttribute("href", url);
-
-        const embed = await screen.findByTestId(`inline-embed:${url}`);
-        expect(embed).toBeVisible();
-
-        const favicon = embed.querySelector("img");
-        expect(favicon).toHaveAttribute("src", "https://github.com/favicon.ico");
     });
 
     it("non-link embeds are automatically converted into a rich cards when inserted", async () => {
@@ -91,16 +91,15 @@ describe.skip("RichEmbedPlugin", () => {
             </LiveAnnouncer>,
         );
 
-        await vi.dynamicImportSettled();
-        act(() => {
-            insertHtml(editor, `<a href="${url}">${url}</a>`);
+        insertHtml(editor, `<a href="${url}">${url}</a>`);
+
+        waitFor(async () => {
+            const link = await screen.findByRole("link", { name: url });
+            expect(link).toHaveAttribute("href", url);
+
+            const embed = await screen.findByTestId(`card-embed:${url}`);
+            expect(embed).toBeVisible();
         });
-
-        const link = await screen.findByRole("link", { name: url });
-        expect(link).toHaveAttribute("href", url);
-
-        const embed = await screen.findByTestId(`card-embed:${url}`);
-        expect(embed).toBeVisible();
     });
 
     it("Rich embed iframes are rendered inline", async () => {
@@ -117,10 +116,12 @@ describe.skip("RichEmbedPlugin", () => {
         );
 
         insertRichEmbed(editor, url, RichLinkAppearance.CARD, "iframe", { height: "300px", width: "600px" });
-        const embed = await screen.findByTestId(`card-embed:${url}`);
-        expect(embed).toBeVisible();
+        waitFor(async () => {
+            const embed = await screen.findByTestId(`card-embed:${url}`);
+            expect(embed).toBeVisible();
 
-        const iframe = await screen.findByTestId(`iframe-embed`);
-        expect(iframe).toBeVisible();
+            const iframe = await screen.findByTestId(`iframe-embed`);
+            expect(iframe).toBeVisible();
+        });
     });
 });

@@ -8,7 +8,6 @@
 namespace Vanilla\Web\Asset;
 
 use Vanilla\Contracts\Web\AssetInterface;
-use Vanilla\Contracts\Web\AssetTrait;
 use Vanilla\Theme\Asset\JavascriptThemeAsset;
 
 /**
@@ -16,8 +15,6 @@ use Vanilla\Theme\Asset\JavascriptThemeAsset;
  */
 class ThemeScriptAsset implements AssetInterface
 {
-    use AssetTrait;
-
     /** @var JavascriptThemeAsset */
     private $asset;
 

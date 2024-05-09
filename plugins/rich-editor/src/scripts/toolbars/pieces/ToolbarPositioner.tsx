@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import debounce from "lodash-es/debounce";
+import debounce from "lodash/debounce";
 import Quill, { BoundsStatic } from "quill/core";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";

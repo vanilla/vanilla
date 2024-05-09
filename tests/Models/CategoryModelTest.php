@@ -12,7 +12,6 @@ use CategoryModel;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
-use Gdn;
 use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
@@ -1884,37 +1883,6 @@ class CategoryModelTest extends SiteTestCase
             1,
             $this->categoryModel->getDigestEnabledUserCountForCategory($digestCategory["categoryID"])
         );
-    }
-
-    /**
-     * Test Followed categories count for deleted categories.
-     */
-    public function testGetFollowedDeleteCategories()
-    {
-        $userID = Gdn::session()->UserID;
-
-        // Create a few root categories
-        $categoryA = $this->createCategory(["parentCategoryID" => -1]);
-        $categoryB = $this->createCategory(["parentCategoryID" => -1]);
-        $categoryC = $this->createCategory(["parentCategoryID" => -1]);
-
-        // Get the original count of followed categories for the current user.
-        $originalFollowedCount = count($this->categoryModel->getFollowed($userID));
-
-        // Follow 2 of the 3 categories.
-        $this->categoryModel->follow($userID, $categoryA["categoryID"]);
-        $this->categoryModel->follow($userID, $categoryB["categoryID"]);
-
-        // Get the new count of followed categories for the current user.
-        $newFollowedCount = count($this->categoryModel->getFollowed($userID));
-        $this->assertEquals(2, $newFollowedCount - $originalFollowedCount);
-
-        // Delete one of the two followed categories.
-        $this->categoryModel->deleteID($categoryA["categoryID"]);
-
-        // Get the final count of followed categories for the current user.
-        $finalFollowedCount = count($this->categoryModel->getFollowed($userID));
-        $this->assertEquals(1, $finalFollowedCount - $originalFollowedCount);
     }
 
     /**

@@ -8,7 +8,7 @@ import Quill from "quill/core";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import { CodeToken } from "quill/modules/syntax";
 import Module from "quill/core/module";
-import throttle from "lodash-es/throttle";
+import throttle from "lodash/throttle";
 
 /**
  * Module that triggers syntax highlighting in code blocks.

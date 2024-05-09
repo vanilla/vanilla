@@ -5,7 +5,7 @@
     "version": "3.0.1",
     "license": "MIT",
     "peerDependencies": {
-        "lodash-es": "*",
+        "lodash": "^4.17.0",
         "redux": "^4.0.0"
     },
     "devDependencies": {

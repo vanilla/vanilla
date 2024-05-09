@@ -9,9 +9,8 @@ import { RenderResult, act, fireEvent, render } from "@testing-library/react";
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 import ThreadItemPermalink from "@vanilla/addon-vanilla/thread/ThreadItemPermalink";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
-import { vitest } from "vitest";
 
-const mockWriteText = vitest.fn().mockImplementation(async () => {});
+const mockWriteText = jest.fn().mockImplementation(async () => {});
 
 Object.assign(navigator, {
     clipboard: {

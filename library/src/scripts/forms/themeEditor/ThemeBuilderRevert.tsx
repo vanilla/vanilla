@@ -10,7 +10,7 @@ import { t } from "@vanilla/i18n";
 import { ResetIcon } from "@library/icons/common";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
-import isEqual from "lodash-es/isEqual";
+import isEqual from "lodash/isEqual";
 import { ColorHelper } from "csx";
 
 interface IProps extends Omit<React.ComponentProps<typeof Button>, "children" | "onClick"> {

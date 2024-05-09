@@ -9,27 +9,6 @@ import { useState } from "react";
 import { LayoutSectionID } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { LayoutThumbnailsModal } from "@dashboard/layout/editor/thumbnails/LayoutThumbnailsModal";
 import { EMPTY_SCHEMA } from "@vanilla/json-schema-forms";
-import OneColumnIcon from "../../../../../design/images/sectionIcons/1column.svg";
-import TwoColumnIcon from "../../../../../design/images/sectionIcons/2column.svg";
-import ThreeColumnIcon from "../../../../../design/images/sectionIcons/3column.svg";
-import FullWidthIcon from "../../../../../design/images/sectionIcons/fullwidth.svg";
-import ArticlesIcon from "../../../../../design/images/widgetIcons/articles.svg";
-import ContentBannerIcon from "../../../../../design/images/widgetIcons/contentbanner.svg";
-import BannerIcon from "../../../../../design/images/widgetIcons/banner.svg";
-import CategoriesIcon from "../../../../../design/images/widgetIcons/categories.svg";
-import AnnouncementsIcon from "../../../../../design/images/widgetIcons/announcements.svg";
-import DiscussionsIcon from "../../../../../design/images/widgetIcons/discussions.svg";
-import IdeasIcon from "../../../../../design/images/widgetIcons/ideas.svg";
-import QuestionsIcon from "../../../../../design/images/widgetIcons/questions.svg";
-import EventsIcon from "../../../../../design/images/widgetIcons/events.svg";
-import CustomHtmlIcon from "../../../../../design/images/widgetIcons/customhtml.svg";
-import LeaderboardIcon from "../../../../../design/images/widgetIcons/leaderboard.svg";
-import WhosOnlineIcon from "../../../../../design/images/widgetIcons/whosonline.svg";
-import QuickLinksIcon from "../../../../../design/images/widgetIcons/quicklinks.svg";
-import RSSFeedIcon from "../../../../../design/images/widgetIcons/rssfeed.svg";
-import TagCloudIcon from "../../../../../design/images/widgetIcons/tagcloud.svg";
-import UserSpotlightIcon from "../../../../../design/images/widgetIcons/userspotlight.svg";
-import SiteTotalsIcon from "../../../../../design/images/widgetIcons/sitetotals.svg";
 
 export default {
     title: "Dashboard/Appearance",
@@ -40,25 +19,25 @@ const fauxData = {
     "react.section.1-column": {
         schema: EMPTY_SCHEMA,
         $reactComponent: "Component 1",
-        iconUrl: OneColumnIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/sectionIcons/1column.svg").default,
         name: "1 column",
     },
     "react.section.2-columns": {
         schema: EMPTY_SCHEMA,
         $reactComponent: "Component 2",
-        iconUrl: TwoColumnIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/sectionIcons/2column.svg").default,
         name: "2 columns",
     },
     "react.section.3-columns": {
         schema: EMPTY_SCHEMA,
         $reactComponent: "Component 3",
-        iconUrl: ThreeColumnIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/sectionIcons/3column.svg").default,
         name: "3 columns",
     },
     "react.section.full-width": {
         schema: EMPTY_SCHEMA,
         $reactComponent: "Component for full width",
-        iconUrl: FullWidthIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/sectionIcons/fullwidth.svg").default,
         name: "Full Width",
     },
 };
@@ -67,103 +46,103 @@ const fauxData = {
 const widgetsFauxData = {
     "react.article.articles": {
         $reactComponent: "",
-        iconUrl: ArticlesIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/articles.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Articles",
     },
     "react.banner.content": {
         $reactComponent: "",
-        iconUrl: BannerIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/contentbanner.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Content Banner",
     },
     "react.banner.full": {
         $reactComponent: "",
-        iconUrl: BannerIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/banner.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Banner",
     },
     "react.categories": {
         $reactComponent: "",
-        iconUrl: CategoriesIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/categories.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Categories",
     },
     "react.discussion.announcements": {
         $reactComponent: "",
-        iconUrl: AnnouncementsIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/announcements.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Announcements",
     },
     "react.discussion.discussions": {
         $reactComponent: "",
-        iconUrl: DiscussionsIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/discussions.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Discussions",
     },
     "react.discussion.ideas": {
         $reactComponent: "",
-        iconUrl: IdeasIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/ideas.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Ideas",
     },
     "react.discussion.questions": {
         $reactComponent: "",
-        iconUrl: QuestionsIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/questions.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Questions",
     },
     "react.event.events": {
         $reactComponent: "",
-        iconUrl: EventsIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/events.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Events",
     },
     "react.html": {
         $reactComponent: "",
-        iconUrl: CustomHtmlIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/customhtml.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Custom HTML",
     },
     "react.leaderboard": {
         $reactComponent: "",
-        iconUrl: LeaderboardIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/leaderboard.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Leaderboard",
     },
     "react.online": {
         $reactComponent: "",
-        iconUrl: WhosOnlineIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/whosonline.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Who's Online",
     },
     "react.quick-links": {
         $reactComponent: "",
-        iconUrl: QuickLinksIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/quicklinks.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Quick Links",
     },
     "react.rss": {
         $reactComponent: "",
-        iconUrl: RSSFeedIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/rssfeed.svg").default,
         schema: EMPTY_SCHEMA,
         name: "RSS Feed",
     },
     "react.tag": {
         $reactComponent: "",
-        iconUrl: TagCloudIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/tagcloud.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Tag Cloud",
     },
     "react.userspotlight": {
         $reactComponent: "",
-        iconUrl: UserSpotlightIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/userspotlight.svg").default,
         schema: EMPTY_SCHEMA,
         name: "User Spotlight",
     },
     "react.sitetotals": {
         $reactComponent: "",
-        iconUrl: SiteTotalsIcon,
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/sitetotals.svg").default,
         schema: EMPTY_SCHEMA,
         name: "Site Totals",
     },

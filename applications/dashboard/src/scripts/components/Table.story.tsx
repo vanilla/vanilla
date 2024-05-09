@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import shuffle from "lodash-es/shuffle";
+import shuffle from "lodash/shuffle";
 import { Table as TableComponent } from "./Table";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";

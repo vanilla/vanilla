@@ -7,7 +7,7 @@
 import apiv2 from "@library/apiv2";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import debounce from "lodash-es/debounce";
+import debounce from "lodash/debounce";
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { t } from "@vanilla/i18n";

@@ -8,7 +8,6 @@ import React from "react";
 import classNames from "classnames";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 import { CheckIcon } from "@library/icons/common";
-import { stableObjectHash } from "@vanilla/utils";
 
 export interface IMenuRadioOption {
     name: string;
@@ -58,9 +57,9 @@ export default class DropDownItemRadio extends React.Component<IProps, IState> {
         if (!this.hasOptions) {
             return null;
         } else {
-            const radioOptions = this.props.options.map((option, index) => {
+            const radioOptions = this.props.options.forEach((option, index) => {
                 return (
-                    <label className="dropDownRadio-option" key={stableObjectHash(option)}>
+                    <label className="dropDownRadio-option">
                         <input
                             type="radio"
                             className="dropDownRadio-input"

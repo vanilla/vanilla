@@ -31,7 +31,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Message from "@library/messages/Message";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
-import Translate from "@library/content/Translate";
 
 interface IIntegrationModalProps extends Pick<React.ComponentProps<typeof Modal>, "isVisible" | "exitHandler"> {
     onSuccess?: () => Promise<void>;
@@ -46,7 +45,6 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
     const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
 
     const {
-        name,
         label,
         submitButton,
         schema: { status: schemaStatus, data: integrationSchema, error: schemaError },
@@ -54,7 +52,6 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
         postAttachment,
         CustomIntegrationForm,
         beforeSubmit,
-        ...rest
     } = useIntegrationContext();
 
     useEffect(() => {
@@ -72,7 +69,7 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
         await onSuccess?.();
         toast.addToast({
             autoDismiss: true,
-            body: <Translate source="Success! Submitted to <0/>." c0={name} />,
+            body: t("Integration successful"), //FIXME: copy
         });
     }
 

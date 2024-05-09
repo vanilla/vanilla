@@ -37,19 +37,16 @@ export default class Count extends React.Component<IProps> {
         const classes = countClasses();
 
         return (
-            <>
+            <div className={cx(classes.root, this.props.className)}>
                 <span className="sr-only" aria-live="polite">
-                    {this.props.label + ` ${this.props.count}`}
+                    {hasCount ? this.props.label + ` ${this.props.count}` : ""}
                 </span>
-
                 {hasCount && (
-                    <div className={cx(classes.root, this.props.className)}>
-                        <div className={classes.text} aria-hidden={true}>
-                            {visibleCount}
-                        </div>
+                    <div className={classes.text} aria-hidden={true}>
+                        {visibleCount}
                     </div>
                 )}
-            </>
+            </div>
         );
     }
 }

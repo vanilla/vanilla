@@ -31,11 +31,6 @@ export interface ISearchSource<RequestQueryType = ISearchRequestQuery, SearchRes
     loadDomains?: () => Promise<SearchDomain[]>;
 }
 
-export enum SearchQueryOperator {
-    AND = "and",
-    OR = "or",
-}
-
 interface ISearchFormBase {
     domain: string;
     query: RecordID;
@@ -53,8 +48,6 @@ interface ISearchFormBase {
     recordTypes?: string[];
     scope?: string; // moved from ISearchRequestQuery
     collapse?: boolean; // moved from ISearchRequestQuery
-
-    queryOperator?: SearchQueryOperator;
 }
 
 export type ISearchForm<ExtraFormValues extends object = {}> = ISearchFormBase & ExtraFormValues;

@@ -7,10 +7,9 @@
 import { EmbedEvent } from "@library/embed/embedEvents";
 import { initModernEmbed } from "@library/embed/modernEmbed.local";
 import { setMeta } from "@library/utility/appUtils";
-import isEqual from "lodash-es/isEqual";
-import { vitest } from "vitest";
+import isEqual from "lodash/isEqual";
 
-vitest.useFakeTimers();
+jest.useFakeTimers();
 
 describe("modernEmbed.local", () => {
     let _teardown: (() => void) | null = null;
@@ -110,7 +109,7 @@ describe("modernEmbed.local", () => {
 
         window.location.href = "https://forum.vanilla.com/some/path#hash";
         document.title = "My Document Title";
-        vitest.advanceTimersToNextTimer();
+        jest.advanceTimersToNextTimer();
         assertEventWasFired(windowStub, {
             type: "embeddedHrefUpdate",
             href: "https://forum.vanilla.com/some/path#hash",
@@ -134,7 +133,7 @@ function assertEventWasFired(windowStub: WindowStub, expectedEvent: EmbedEvent) 
 }
 
 function makeWindowStub(name: string) {
-    const postMessageSpy = vitest.fn();
+    const postMessageSpy = jest.fn();
     const windowStub = {
         stub: name,
         postMessage: postMessageSpy,

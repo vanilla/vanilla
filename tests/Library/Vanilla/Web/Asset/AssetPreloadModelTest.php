@@ -9,7 +9,7 @@ namespace VanillaTests\Library\Vanilla\Web\Asset;
 
 use Vanilla\Web\Asset\AssetPreloader;
 use Vanilla\Web\Asset\AssetPreloadModel;
-use Vanilla\Web\Asset\WebAsset;
+use Vanilla\Web\Asset\ExternalAsset;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\SharedBootstrapTestCase;
@@ -38,8 +38,8 @@ class AssetPreloadModelTest extends MinimalContainerTestCase
         $first = "https://test.asset.com/1.js";
         $second = "https://test.asset.com/2.js";
         $key = "uniqueKey";
-        $model->addScript(new WebAsset($first), AssetPreloader::REL_PRELOAD, $key);
-        $model->addScript(new WebAsset($second), AssetPreloader::REL_PRELOAD, $key);
+        $model->addScript(new ExternalAsset($first), AssetPreloader::REL_PRELOAD, $key);
+        $model->addScript(new ExternalAsset($second), AssetPreloader::REL_PRELOAD, $key);
         $this->assertCount(1, $model->getPreloads());
         $this->assertEquals(
             $first,
@@ -56,12 +56,12 @@ class AssetPreloadModelTest extends MinimalContainerTestCase
     public function testRendering()
     {
         $model = new AssetPreloadModel();
-        $model->addScript(new WebAsset("test-script"), AssetPreloader::REL_FULL);
-        $model->addScript(new WebAsset("test-script-preload"), AssetPreloader::REL_PRELOAD);
-        $model->addScript(new WebAsset("test-script-prefetch"), AssetPreloader::REL_PREFETCH);
-        $model->addStylesheet(new WebAsset("test-style"), AssetPreloader::REL_FULL);
-        $model->addStylesheet(new WebAsset("test-style-preload"), AssetPreloader::REL_PRELOAD);
-        $model->addStylesheet(new WebAsset("test-style-prefetch"), AssetPreloader::REL_PREFETCH);
+        $model->addScript(new ExternalAsset("test-script"), AssetPreloader::REL_FULL);
+        $model->addScript(new ExternalAsset("test-script-preload"), AssetPreloader::REL_PRELOAD);
+        $model->addScript(new ExternalAsset("test-script-prefetch"), AssetPreloader::REL_PREFETCH);
+        $model->addStylesheet(new ExternalAsset("test-style"), AssetPreloader::REL_FULL);
+        $model->addStylesheet(new ExternalAsset("test-style-preload"), AssetPreloader::REL_PRELOAD);
+        $model->addStylesheet(new ExternalAsset("test-style-prefetch"), AssetPreloader::REL_PREFETCH);
 
         $expected = <<<HTML
 <!-- Preload links, scripts, and stylesheets -->

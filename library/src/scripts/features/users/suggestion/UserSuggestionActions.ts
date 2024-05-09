@@ -12,7 +12,7 @@ import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggest
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
 import { Dispatch } from "redux";
 import apiv2 from "@library/apiv2";
-import debounce from "lodash-es/debounce";
+import debounce from "lodash/debounce";
 
 interface ILookupUserOptions {
     username: string;

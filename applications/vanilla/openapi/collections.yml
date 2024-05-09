@@ -5,30 +5,24 @@ paths:
         get:
             summary: List collections.
             parameters:
-                - name: collectionID
-                  description: Filter by one or more collection IDs.
+                - description: Filter by one or more collection IDs.
                   in: query
+                  name: collectionID
                   required: false
                   schema:
                       $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
-                - name: name
-                  description: Filter by collection name
+                - description: Filter by collection name
                   in: query
+                  name: name
                   required: false
                   schema:
                       type: string
                       minLength: 1
                       maxLength: 255
-                - name: dateUpdated
-                  description: Filter by updated date. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
-                  in: query
-                  schema:
-                      format: date-filter
-                      type: string
                 - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
-                - name: limit
-                  description: Desired number of collections per page.
+                - description: Desired number of collections per page.
                   in: query
+                  name: limit
                   schema:
                       type: integer
                       default: 20

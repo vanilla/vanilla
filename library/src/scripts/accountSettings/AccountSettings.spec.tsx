@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { AccountSettingsImpl } from "@library/accountSettings/AccountSettings";
 import { IUser } from "@library/@types/api/users";
 import { mockAPI } from "@library/__tests__/utility";
@@ -171,14 +171,14 @@ describe("AccountSettings", () => {
         );
     });
 
-    it("Display Privacy section", async () => {
+    it("Display Privacy section", () => {
         render(
             <AccountSettingsFixtures.UserEditingSelf mockUserOverrides={{ showEmail: true }}>
                 <AccountSettingsImpl />
             </AccountSettingsFixtures.UserEditingSelf>,
         );
 
-        const header = await screen.findByRole("heading", { name: "Privacy" });
+        const header = screen.getByRole("heading", { name: "Privacy" });
         expect(header).toBeInTheDocument();
         expect(header.tagName.toLowerCase()).toEqual("h2");
 
@@ -205,7 +205,9 @@ describe("AccountSettings", () => {
         expect(emailDisplayCheckbox).toBeInTheDocument();
         expect(emailDisplayCheckbox).not.toBeChecked();
 
-        fireEvent.click(emailDisplayCheckbox);
+        await act(async () => {
+            fireEvent.click(emailDisplayCheckbox);
+        });
 
         expect(mockAdapter.history.patch.length).toBeGreaterThan(0);
     });
@@ -224,7 +226,9 @@ describe("AccountSettings", () => {
         expect(profileDisplayCheckbox).toBeInTheDocument();
         expect(profileDisplayCheckbox).toBeChecked();
 
-        fireEvent.click(profileDisplayCheckbox);
+        await act(async () => {
+            fireEvent.click(profileDisplayCheckbox);
+        });
 
         expect(mockAdapter.history.patch.length).toBeGreaterThan(0);
     });

@@ -23,7 +23,7 @@ import {
 import { isHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.utils";
 import { ArrayUtils } from "@vanilla/utils";
 import produce from "immer";
-import omit from "lodash-es/omit";
+import omit from "lodash/omit";
 
 /**
  * Class representing the primary data structure of the layout editor

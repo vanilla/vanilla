@@ -220,7 +220,7 @@ export function initializeAtComplete(editorElement, iframe?: any) {
      *
      * Note, in content editable mode (iframe for us), the value is surrounded by span tags.
      */
-    function beforeInsertHandler(value: string, $li: JQuery): string {
+    function beforeInsertHandler(value: string, $li: JQuery<any>): string {
         // It's better to use the value provided, as it may have
         // html tags around it, depending on mode. Using the
         // regular expression avoids the need to check what mode

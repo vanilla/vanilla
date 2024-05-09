@@ -70,7 +70,7 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
                 href={sanitizeUrl(href)}
                 target={isForeign ? "_blank" : undefined}
                 rel={isForeign ? "noopener" : props.rel}
-                {...(passthru as any)}
+                {...passthru}
                 tabIndex={tabIndex}
                 data-link-type="legacy"
             />

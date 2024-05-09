@@ -3,18 +3,17 @@
  * @license GPL-2.0-only
  */
 
-@import "./coreVariables";
+@import "~library-scss/coreVariables";
 @import "~@vanilla/theme-core/scss/mixins/mixins";
 
-@import "./utility/normalize";
-@import "./utility/utilities";
-@import "./utility/icons";
+@import "~library-scss/utility/normalize";
+@import "~library-scss/utility/utilities";
+@import "~library-scss/utility/icons";
 
 // Embeds
-@import "./embeds/embeds";
+@import "~library-scss/embeds/embeds";
 
-@import "./utility/scaffolding";
-@import "./utility/utilities";
+@import "~library-scss/utility/scaffolding";
 
 // Clear reach warning
 // https://reach.tech/styling/

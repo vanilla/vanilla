@@ -8,7 +8,7 @@ import Emitter from "quill/core/emitter";
 import Quill, { RangeStatic, Blot, DeltaOperation } from "quill/core";
 import Delta from "quill-delta";
 import { matchAtMention } from "@vanilla/utils";
-import uniqueId from "lodash-es/uniqueId";
+import uniqueId from "lodash/uniqueId";
 import BlockBlot from "quill/blots/block";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import { logDebug } from "@vanilla/utils";

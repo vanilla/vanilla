@@ -7,16 +7,15 @@ import { TypeAllIcon } from "@library/icons/searchIcons";
 import { FilterPanelAll } from "@library/search/panels/FilterPanelAll";
 import { SearchActions } from "@library/search/SearchActions";
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, searchReducer } from "@library/search/searchReducer";
-import { ISearchForm, ISearchRequestQuery, ISearchSource, SearchQueryOperator } from "@library/search/searchTypes";
+import { ISearchForm, ISearchRequestQuery, ISearchSource } from "@library/search/searchTypes";
 import {
     ALLOWED_GLOBAL_SEARCH_FIELDS,
     MEMBERS_RECORD_TYPE,
     ALL_CONTENT_DOMAIN_KEY,
-    DEFAULT_SEARCH_QUERY_OPERATOR,
 } from "@library/search/searchConstants";
 import { t } from "@vanilla/i18n";
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from "react";
-import merge from "lodash-es/merge";
+import merge from "lodash/merge";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { SEARCH_SCOPE_LOCAL, useSearchScope } from "@library/features/search/SearchScopeContext";
 import { getCurrentLocale } from "@vanilla/i18n";
@@ -225,7 +224,6 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
             recordTypes: queryDomain.recordTypes,
             scope: searchScope.value?.value ?? undefined,
             sort,
-            queryOperator: form.queryOperator ?? undefined,
         };
 
         let query = {
@@ -448,10 +446,6 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
                 value={{
                     ...{
                         ...state.form,
-                        queryOperator:
-                            state.form.queryOperator === DEFAULT_SEARCH_QUERY_OPERATOR
-                                ? undefined
-                                : state.form.queryOperator,
                         initialized: undefined,
                         needsResearch: undefined,
                         pageURL: undefined,

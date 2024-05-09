@@ -13,8 +13,6 @@ use Vanilla\Addon;
  * A simple framework that all plugins should extend. Aside from the implementation of
  * Gdn_IPlugin, this class provides some convenience methods to make plugin development
  * easier and faster.
- *
- * @deprecated do not use this as the base class for new plugins.
  */
 abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin
 {

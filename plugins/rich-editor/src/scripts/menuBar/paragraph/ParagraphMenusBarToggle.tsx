@@ -29,7 +29,7 @@ import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import classNames from "classnames";
 import Quill, { RangeStatic } from "quill/core";
 import React from "react";
-import uniqueId from "lodash-es/uniqueId";
+import uniqueId from "lodash/uniqueId";
 import { IconForButtonWrap } from "@library/editor/pieces/IconForButtonWrap";
 import { richEditorVariables } from "@library/editor/richEditorVariables";
 import { FocusWatcher, TabHandler } from "@vanilla/dom-utils";

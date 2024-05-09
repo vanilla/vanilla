@@ -8,8 +8,7 @@ import React from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
-import Button from "@library/forms/Button";
-import { getClassForButtonType } from "@library/forms/Button.getClassForButtonType";
+import Button, { getClassForButtonType } from "@library/forms/Button";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
 

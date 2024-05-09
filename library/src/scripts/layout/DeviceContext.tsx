@@ -6,7 +6,7 @@
 
 import { Optionalize } from "@library/@types/utils";
 import { oneColumnVariables } from "@library/layout/Section.variables";
-import throttle from "lodash-es/throttle";
+import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 
 export enum Devices {

@@ -10,7 +10,6 @@ import { t } from "@vanilla/i18n";
 import { Tabs } from "@library/sectioning/Tabs";
 import { htmlWidgetEditorClasses } from "@library/htmlWidget/HtmlWidgetEditor.classes";
 import { HtmlWidget } from "@library/htmlWidget/HtmlWidget";
-import tsDefinitions from "./HtmlWidgetEditor.d.ts?raw";
 
 export function HtmlWidgetCodeEditor(props: {
     value: React.ComponentProps<typeof HtmlWidget>;
@@ -27,7 +26,7 @@ export function HtmlWidgetCodeEditor(props: {
                     className={classes.editor}
                     language={"html"}
                     value={props.value.html ?? ""}
-                    onChange={(html) => {
+                    onChange={(event, html) => {
                         props.onChange({
                             ...props.value,
                             html: html ?? "",
@@ -44,7 +43,7 @@ export function HtmlWidgetCodeEditor(props: {
                     className={classes.editor}
                     language={"css"}
                     value={props.value.css ?? ""}
-                    onChange={(css) => {
+                    onChange={(event, css) => {
                         props.onChange({
                             ...props.value,
                             css: css ?? "",
@@ -61,13 +60,13 @@ export function HtmlWidgetCodeEditor(props: {
                     className={classes.editor}
                     language={"javascript"}
                     value={props.value.javascript ?? ""}
-                    onChange={(javascript) => {
+                    onChange={(event, javascript) => {
                         props.onChange({
                             ...props.value,
                             javascript: javascript ?? "",
                         });
                     }}
-                    typescriptDefinitions={tsDefinitions}
+                    typescriptDefinitions={require("!raw-loader!./HtmlWidgetEditor.d.ts").default}
                 />
             ),
         },

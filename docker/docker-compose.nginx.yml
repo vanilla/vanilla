@@ -20,7 +20,6 @@ services:
                     - "elastic.vanilla.localhost"
                     - "kibana.vanilla.localhost"
                     - "search.vanilla.localhost"
-                    - "frontend.vanilla.localhost"
         volumes:
             - "./images/nginx/certs:/usr/local/share/ca-certificates" # Mount self-signed certificates
 

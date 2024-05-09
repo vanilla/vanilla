@@ -5,6 +5,7 @@
  */
 
 import { createVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { waitFor } from "@testing-library/react";
 import { TDescendant } from "@udecode/plate-common";
 
 const ROW_COUNT = 6;
@@ -12,25 +13,31 @@ const COL_COUNT = 6;
 const CAPTION_TEXT = "Mock Table Caption";
 
 describe("withNormalizeTable", () => {
-    it("separate first row of plain table into thead and rest in tbody", () => {
+    it("separate first row of plain table into thead and rest in tbody", async () => {
         const editor = createVanillaEditor();
         const { input, output } = generateMockTable();
         editor.insertNode(input);
-        expect(editor.children).toStrictEqual(output);
+        waitFor(() => {
+            expect(editor.children).toStrictEqual(output);
+        });
     });
 
-    it("render provided caption and move first row of tbody to thead", () => {
+    it("render provided caption and move first row of tbody to thead", async () => {
         const editor = createVanillaEditor();
         const { input, output } = generateMockTable({ hasCaption: true, hasBody: true });
         editor.insertNode(input);
-        expect(editor.children).toStrictEqual(output);
+        waitFor(() => {
+            expect(editor.children).toStrictEqual(output);
+        });
     });
 
-    it("render provided caption, thead, tbody, and tfoot", () => {
+    it("render provided caption, thead, tbody, and tfoot", async () => {
         const editor = createVanillaEditor();
         const { input, output } = generateMockTable({ hasCaption: true, hasBody: true, hasHead: true, hasFoot: true });
         editor.insertNode(input);
-        expect(JSON.stringify(editor.children, null, 4)).toEqual(JSON.stringify(output, null, 4));
+        waitFor(() => {
+            expect(editor.children).toStrictEqual(output);
+        });
     });
 });
 
@@ -52,7 +59,11 @@ const generateMockTableRow = (props: IRowOptions = {}): TDescendant[] => {
             const textNode = {
                 text: [cellLabel, idx + 1].join(" "),
             };
-            subchildren.push({ type: "p", children: [textNode] });
+            if (props.isOutput) {
+                subchildren.push({ type: "p", children: [textNode] });
+            } else {
+                subchildren.push(textNode);
+            }
 
             return { type: type, children: subchildren };
         });

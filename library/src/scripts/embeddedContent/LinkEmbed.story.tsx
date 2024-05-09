@@ -5,20 +5,19 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
+import { storiesOf } from "@storybook/react";
 import React from "react";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
 import { EmbedContext } from "@library/embeddedContent/IEmbedContext";
 import { css } from "@emotion/css";
 
-export default {
-    title: "Embeds",
-};
+const story = storiesOf("Embeds", module);
 
 const ipsum = `
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur elit ligula, fermentum nec felis vel, aliquam interdum justo. Suspendisse et egestas neque. Vivamus volutpat odio eget enim tincidunt, in pretium arcu consectetur. Nulla sodales molestie pharetra.
 `;
 
-export const _LinkEmbed = () => {
+story.add("LinkEmbed", () => {
     return (
         <>
             <StoryHeading depth={1}>COMPONENT: LinkEmbed</StoryHeading>
@@ -82,8 +81,4 @@ export const _LinkEmbed = () => {
             </EmbedContext.Provider>
         </>
     );
-};
-
-_LinkEmbed.story = {
-    name: "LinkEmbed",
-};
+});

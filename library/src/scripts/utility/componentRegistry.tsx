@@ -5,7 +5,7 @@
 
 import { resetThemeCache } from "@library/styles/themeCache";
 import { IComponentMountOptions, IMountable, mountReact, mountReactMultiple } from "@vanilla/react-utils";
-import { globalValueRef, logDebug, logError, logWarning } from "@vanilla/utils";
+import { logDebug, logError, logWarning } from "@vanilla/utils";
 import React from "react";
 
 let useTheme = true;
@@ -39,12 +39,12 @@ export interface IRegisteredComponent {
  * The currently registered Components.
  * @private
  */
-const _componentsRef = globalValueRef<{
+const _components: {
     [key: string]: IRegisteredComponent;
-}>("components", {});
+} = {};
 
-let _pageComponentRef = globalValueRef<React.ComponentType<any> | null>("pageComponent", null);
-let _mountedPageRef = globalValueRef("mountedPage", false);
+let _pageComponent: React.ComponentType<any> | null = null;
+let _mountedPage = false;
 
 /**
  * Register a component in the Components registry.
@@ -53,7 +53,7 @@ let _mountedPageRef = globalValueRef("mountedPage", false);
  * @param component The component to register.
  */
 export function addComponent(name: string, Component: React.ComponentType<any>, mountOptions?: IComponentMountOptions) {
-    _componentsRef.current()[name.toLowerCase()] = {
+    _components[name.toLowerCase()] = {
         Component,
         mountOptions,
     };
@@ -68,17 +68,17 @@ export function registerWidgets(widgets: Record<string, IWidget>) {
     }
 }
 
-const _widgetLoadersRef = globalValueRef<Record<string, ILoadableWidget>>("widgetLoaders", {});
+const _widgetLoaders: Record<string, ILoadableWidget> = {};
 
 export function registerLoadableWidgets(widgets: Record<string, ILoadableWidget>) {
     for (const [widgetName, widget] of Object.entries(widgets)) {
-        _widgetLoadersRef.current()[widgetName] = widget;
+        _widgetLoaders[widgetName] = widget;
         addComponent(widgetName, React.lazy(widget));
     }
 }
 
 export async function preloadWidgets(widgetNames: string[]): Promise<void> {
-    const loaderPromises = Object.entries(_widgetLoadersRef.current())
+    const loaderPromises = Object.entries(_widgetLoaders)
         .filter(([widgetName, widgetLoader]) => {
             return widgetNames.includes(widgetName);
         })
@@ -93,7 +93,7 @@ export async function preloadWidgets(widgetNames: string[]): Promise<void> {
  * @param component The component to register.
  */
 export function addPageComponent(Component: React.ComponentType<any>) {
-    _pageComponentRef.set(Component);
+    _pageComponent = Component;
 }
 
 /**
@@ -103,7 +103,7 @@ export function addPageComponent(Component: React.ComponentType<any>) {
  * @returns Returns **true** if the component has been registered or **false** otherwise.
  */
 export function componentExists(name: string): boolean {
-    return _componentsRef.current()[name.toLowerCase()] !== undefined;
+    return _components[name.toLowerCase()] !== undefined;
 }
 
 /**
@@ -113,7 +113,7 @@ export function componentExists(name: string): boolean {
  * @returns Returns the component or **undefined** if there is no registered component.
  */
 export function getComponent(name: string): IRegisteredComponent | null {
-    return _componentsRef.current()[name.toLowerCase()] ?? null;
+    return _components[name.toLowerCase()] ?? null;
 }
 
 /**
@@ -124,16 +124,16 @@ export function getComponent(name: string): IRegisteredComponent | null {
  * @param parent - The parent element to search. This element is not included in the search.
  */
 export async function _mountComponents(parent: Element) {
+    performance.mark("Mount Components - Start");
     logDebug("Mounting react components");
     const awaiting: Array<Promise<any>> = [];
     const parentPage = parent.querySelector("#app");
     let mountables: IMountable[] = [];
 
-    let PageComponentToMount = _pageComponentRef.current();
-
-    if (parentPage instanceof HTMLElement && PageComponentToMount !== null && !_mountedPageRef.current()) {
-        _mountedPageRef.set(true);
-        logDebug("Found page component to mount", _pageComponentRef.current());
+    if (parentPage instanceof HTMLElement && _pageComponent !== null && !_mountedPage) {
+        _mountedPage = true;
+        let PageComponentToMount = _pageComponent;
+        logDebug("Found page component to mount", _pageComponent);
         mountables.push({
             target: parentPage,
             component: <PageComponentToMount />,
@@ -178,10 +178,12 @@ export async function _mountComponents(parent: Element) {
         if (registeredComponent.mountOptions?.bypassPortalManager) {
             awaiting.push(
                 new Promise<void>((resolve) => {
+                    performance.mark(`Mount Components - ${name} - Start`);
                     mountReact(
                         reactNode,
                         node,
                         () => {
+                            performance.mark(`Mount Components - ${name} - End`);
                             resolve();
                         },
                         registeredComponent.mountOptions,
@@ -208,5 +210,7 @@ export async function _mountComponents(parent: Element) {
         }),
     );
 
-    await Promise.all(awaiting);
+    await Promise.all(awaiting).finally(() => {
+        performance.mark("Mount Components - End");
+    });
 }

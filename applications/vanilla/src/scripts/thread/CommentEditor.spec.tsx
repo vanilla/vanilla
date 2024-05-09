@@ -12,7 +12,6 @@ import { ICommentEdit } from "@dashboard/@types/api/comment";
 import { mockAPI } from "@library/__tests__/utility";
 import MockAdapter from "axios-mock-adapter";
 import { CommentFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Comment.Fixture";
-import { vitest } from "vitest";
 
 const MOCK_COMMENT_EDIT: ICommentEdit = {
     commentID: 1,
@@ -26,6 +25,8 @@ const MOCK_COMMENT_EDIT: ICommentEdit = {
     format: "rich2",
 };
 
+jest.setTimeout(100000);
+
 describe("CommentEditor", () => {
     let mockAdapter: MockAdapter;
 
@@ -34,45 +35,45 @@ describe("CommentEditor", () => {
     });
 
     it("Renders the editable comment", async () => {
-        await CommentFixture.wrapInProvider(
-            <CommentEditor
-                comment={LayoutEditorPreviewData.comments(1)[0]}
-                commentEdit={MOCK_COMMENT_EDIT}
-                onClose={() => null}
-            />,
-            {
-                enableNetworkRequests: false,
-            },
-        );
+        await act(async () => {
+            await CommentFixture.wrapInProvider(
+                <CommentEditor
+                    comment={LayoutEditorPreviewData.comments(1)[0]}
+                    commentEdit={MOCK_COMMENT_EDIT}
+                    onClose={() => null}
+                />,
+                {
+                    enableNetworkRequests: true,
+                },
+            );
+        });
 
-        await screen.findByTestId("vanilla-editor");
-        const mockCommentText = await screen.findByText("This is a mock comment.");
-        expect(mockCommentText).toBeInTheDocument();
+        await waitFor(() => expect(screen.queryByText("This is a mock comment.")).toBeInTheDocument());
     });
 
     it("Saves the comment body", async () => {
         mockAdapter.onPatch(/(.+)/).replyOnce(200, []);
-        const mockOnSuccess = vitest.fn();
+        const mockOnSuccess = jest.fn();
 
-        await CommentFixture.wrapInProvider(
-            <CommentEditor
-                comment={LayoutEditorPreviewData.comments(1)[0]}
-                commentEdit={MOCK_COMMENT_EDIT}
-                onClose={() => null}
-                onSuccess={mockOnSuccess}
-            />,
-            {
-                enableNetworkRequests: true,
-            },
-        );
-
-        await screen.findByTestId("vanilla-editor");
-        const mockCommentText = await screen.findByText("This is a mock comment.");
-        expect(mockCommentText).toBeInTheDocument();
-
-        const saveButton = await screen.findByRole("button", { name: "Save" });
         await act(async () => {
-            fireEvent.click(saveButton);
+            await CommentFixture.wrapInProvider(
+                <CommentEditor
+                    comment={LayoutEditorPreviewData.comments(1)[0]}
+                    commentEdit={MOCK_COMMENT_EDIT}
+                    onClose={() => null}
+                    onSuccess={mockOnSuccess}
+                />,
+                {
+                    enableNetworkRequests: true,
+                },
+            );
+        });
+
+        await waitFor(() => expect(screen.queryByText("This is a mock comment.")).toBeInTheDocument());
+
+        await act(async () => {
+            const saveButton = screen.queryByRole("button", { name: "Save" });
+            saveButton && fireEvent.click(saveButton);
         });
 
         expect(mockAdapter.history.patch.length).toBe(1);

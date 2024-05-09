@@ -51,8 +51,8 @@ export const buttonSizing = (props: {
         minHeight: styleUnit(height),
         minWidth: minWidth ? styleUnit(minWidth) : undefined,
         fontSize: styleUnit(fontSize),
-        padding: `0px ${px(paddingHorizontal + (paddingOffsets.right || 0))} 0px ${px(
-            paddingHorizontal + (paddingOffsets.left || 0),
+        padding: `0px ${px(paddingHorizontal + (paddingOffsets.right || 0) ?? 0)} 0px ${px(
+            paddingHorizontal + (paddingOffsets.left || 0) ?? 0,
         )}`,
         lineHeight: styleUnit(height - borderWidth * 2),
     };

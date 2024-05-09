@@ -246,12 +246,6 @@ export const modalClasses = useThemeCache(() => {
             "&.noTransform": {
                 transform: "none !important",
             },
-            "&.isFixHeight": {
-                height: percent(80),
-                ...mediaQueries.xs({
-                    height: percent(96),
-                }),
-            },
         },
     });
 

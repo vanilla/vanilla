@@ -35,7 +35,6 @@ class CallToActionWidgetTest extends SiteTestCase
                 "title" => "My Button",
                 "type" => "standard",
                 "url" => "https://testurl.com",
-                "shouldUseButton" => true,
             ],
             '$reactTestID' => "cta1",
         ];
@@ -46,7 +45,6 @@ class CallToActionWidgetTest extends SiteTestCase
                 "title" => "My Button",
                 "url" => "https://testurl.com",
                 "type" => "standard",
-                "shouldUseButton" => true,
             ],
             "background" => [
                 "image" => "https://myimage.jpg",
@@ -65,7 +63,6 @@ class CallToActionWidgetTest extends SiteTestCase
                     "title" => "My Button",
                     "type" => "standard",
                     "url" => "https://testurl.com",
-                    "shouldUseButton" => true,
                 ],
             ],
             '$reactTestID' => "cta1",
@@ -156,12 +153,10 @@ HTML
                     "button" => [
                         "title" => "Sign In",
                         "type" => "primary",
-                        "shouldUseButton" => true,
                     ],
                     "secondButton" => [
                         "title" => "Register",
                         "type" => "standard",
-                        "shouldUseButton" => true,
                     ],
                 ],
                 '$reactTestID' => "guestcta",

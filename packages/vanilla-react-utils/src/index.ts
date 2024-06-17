@@ -19,6 +19,7 @@ export * from "./useInterval";
 export * from "./useIsMounted";
 export * from "./useLastValue";
 export * from "./useMeasure";
+export * from "./useIsMounted";
 export * from "./useRouteChangePrompt";
 export * from "./useTabKeyboardHandler";
 export * from "./useThrowError";

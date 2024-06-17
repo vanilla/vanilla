@@ -15,13 +15,9 @@
  * @since 2.0
  */
 
-use Garden\Schema\Schema;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Database\CallbackWhereExpression;
 use Vanilla\Database\Select;
 use Vanilla\Database\SetLiterals\RawExpression;
-use Vanilla\Models\Model;
-use Vanilla\Utility\ArrayUtils;
 
 /**
  * Class Gdn_SQLDriver
@@ -132,84 +128,24 @@ abstract class Gdn_SQLDriver
     }
 
     /**
-     * Apply an option array.
+     * Removes table aliases from an array of JOIN ($this->_Joins) and GROUP BY
+     * ($this->_GroupBys) strings. Returns the $Statements array with prefixes
+     * removed.
      *
-     * @param array $options Keys should be constants from {@link Model::OPT_*}
-     * @param Schema|null $readSchema Required for negative selects to work.
-     *
-     * @return $this
+     * @param array $Statements The string specification of the table. ie.
+     * "tbl_User as u" or "user u".
+     * @return array the array of filtered statements.
      */
-    public function applyModelOptions(array $options, ?Schema $readSchema = null)
-    {
-        $selects = $options[Model::OPT_SELECT] ?? [];
-        $orderFields = $options[Model::OPT_ORDER] ?? ($options["orderFields"] ?? []);
-        $orderDirection = $options[Model::OPT_DIRECTION] ?? "asc";
-        $limit = $options[Model::OPT_LIMIT] ?? false;
-        $offset = $options[Model::OPT_OFFSET] ?? 0;
-
-        $joins = $options[Model::OPT_JOINS] ?? false;
-        if ($joins) {
-            $this->applyJoins($joins);
-        }
-
-        if (!empty($selects)) {
-            if (is_string($selects)) {
-                $selects = ArrayUtils::explodeTrim(",", $selects);
-            }
-            if ($readSchema) {
-                $selects = $this->translateSelects($selects, $readSchema);
-            }
-
-            $this->select($selects);
-        }
-
-        $this->orderBy($orderFields, $orderDirection);
-        $this->limit($limit, $offset);
-
-        return $this;
-    }
-
-    /**
-     * Translate selects with some additional support.
-     *
-     * Notably support for negative selects. If you pass a negative select, all properties from the schema except for the negative select will be applied.
-     *
-     * @param array $selects
-     * @param Schema $readSchema
-     *
-     * @return array
-     */
-    public static function translateSelects(array $selects, Schema $readSchema): array
-    {
-        $negatives = [];
-        foreach ($selects as $select) {
-            if ($select[0] === "-") {
-                $negatives[] = substr($select, 1);
-            }
-        }
-
-        if (!empty($negatives)) {
-            $columns = array_keys($readSchema->getField("properties"));
-            $selects = array_values(array_diff($columns, $negatives));
-        }
-        return $selects;
-    }
-
-    /**
-     * Apply joins to sql query.
-     *
-     * @param array $joins
-     */
-    public function applyJoins(array $joins): void
-    {
-        foreach ($joins as $join) {
-            $tableName = $join["tableName"] ?? "";
-            $on = $join["on"] ?? "";
-            $joinType = $join["joinType"] ?? "";
-
-            $this->join($tableName, $on, $joinType);
-        }
-    }
+    //protected function _FilterTableAliases($Statements) {
+    //   foreach ($Statements as $k => $v) {
+    //      foreach ($this->_AliasMap as $Alias => $Table) {
+    //         $Statement = preg_replace('/(\w+\.\w+)/', $this->escapeIdentifier('$0'), $v); // Makes `table.field`
+    //         $Statement = str_replace(array($this->Database->DatabasePrefix.$Table, '.'), array($Table, $this->escapeSql('.')), $Statement);
+    //      }
+    //      $Statements[$k] = $Statement;
+    //   }
+    //   return $Statements;
+    //}
 
     /**
      * Concat the next where expression with an 'and' operator.
@@ -310,9 +246,6 @@ abstract class Gdn_SQLDriver
         // THIS PART OF THE FUNCTION SHOULD EVENTUALLY BE REMOVED.
         if ($escapeFieldSql === false) {
             $field = "@" . $field;
-        }
-        if ($escapeFieldSql === 0) {
-            $escapeFieldSql = false;
         }
 
         if (is_array($value)) {
@@ -832,30 +765,6 @@ abstract class Gdn_SQLDriver
         $sql = $this->getSelect();
         $result = $this->query($sql);
         return $result;
-    }
-
-    /**
-     * Get a limited pagination count for the current query.
-     *
-     * @param string $primaryKeyField
-     *
-     * @return int
-     */
-    public function getPagingCount(string $primaryKeyField): int
-    {
-        $limit = Gdn::config("Vanilla.APIv2.MaxCount", 10000);
-        $countQuery = $this->resetSelects()
-            ->select($primaryKeyField)
-            ->limit($limit)
-            ->offset(0)
-            ->getSelect();
-        $countQuery = <<<SQL
-SELECT COUNT(*) as count FROM ({$countQuery}) cq
-SQL;
-
-        $result = $this->query($countQuery);
-
-        return $result->firstRow()->count;
     }
 
     /**
@@ -2138,7 +2047,7 @@ SQL;
             if ($value instanceof \DateTimeInterface) {
                 $dt = new DateTime("@" . $value->getTimestamp());
                 $dt->setTimezone($dtZone);
-                $value = $dt->format(CurrentTimeStamp::MYSQL_DATE_FORMAT_PRECISE);
+                $value = $dt->format(MYSQL_DATE_FORMAT);
             } elseif (is_bool($value)) {
                 $value = (int) $value;
             }
@@ -2159,7 +2068,7 @@ SQL;
     public function quote($value, $type = PDO::PARAM_STR): string
     {
         if ($value instanceof \DateTimeInterface) {
-            $value = gmdate(CurrentTimeStamp::MYSQL_DATE_FORMAT_PRECISE, $value->getTimestamp());
+            $value = gmdate(MYSQL_DATE_FORMAT, $value->getTimestamp());
         }
         $r = $this->Database->connection()->quote($value, $type);
 
@@ -2390,7 +2299,7 @@ SQL;
 
         foreach ($field as $f => $v) {
             if ($v instanceof DateTimeImmutable) {
-                $v = $v->format(CurrentTimeStamp::MYSQL_DATE_FORMAT_PRECISE);
+                $v = $v->format(MYSQL_DATE_FORMAT);
             } elseif (is_array($v) || (is_object($v) && !$v instanceof \Vanilla\Database\SetLiterals\SetLiteral)) {
                 throw new Exception("Invalid value type (" . gettype($v) . ") in INSERT/UPDATE statement.", 500);
             }
@@ -2574,16 +2483,6 @@ SQL;
      */
     public function where($field, $value = null, $escapeFieldSql = true, $escapeValueSql = true)
     {
-        if ($value instanceof CallbackWhereExpression) {
-            call_user_func($value->callback, $this);
-            return $this;
-        }
-
-        if ($field instanceof CallbackWhereExpression) {
-            call_user_func($field->callback, $this);
-            return $this;
-        }
-
         if (!is_array($field)) {
             $field = [$field => $value];
         }
@@ -2603,8 +2502,6 @@ SQL;
                 }
             } elseif (is_object($subValue) && $subValue instanceof \Vanilla\Schema\RangeExpression) {
                 $this->whereRangeExpression($subField, $subValue);
-            } elseif ($subValue instanceof CallbackWhereExpression) {
-                $this->where($subValue);
             } else {
                 $whereExpr = $this->conditionExpr($subField, $subValue, $escapeFieldSql, $escapeValueSql);
                 if (strlen($whereExpr) > 0) {

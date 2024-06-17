@@ -6,7 +6,6 @@ import { t } from "@library/utility/appUtils";
 import NumberFormatted from "@library/content/NumberFormatted";
 import Button from "@library/forms/Button";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { cx } from "@emotion/css";
 
 interface IStackedListProps<T extends {}> {
     themingVariables: ReturnType<typeof stackedListVariables>;
@@ -16,7 +15,6 @@ interface IStackedListProps<T extends {}> {
     openModal?(): void;
     tooltipText?: string;
     ItemComponent: ComponentType<T & JSX.IntrinsicAttributes>;
-    className?: string;
 }
 
 export function StackedList<T extends {}>(props: IStackedListProps<T>) {
@@ -25,7 +23,7 @@ export function StackedList<T extends {}>(props: IStackedListProps<T>) {
     const extraCount = Math.max(0, data.length + extra - maxCount);
     const itemsToDisplay = data.slice(0, maxCount);
     return (
-        <ul className={cx(root, props.className)}>
+        <ul className={root}>
             {itemsToDisplay.map((item, i) => {
                 const isLastItem = i === itemsToDisplay.length - 1 || i === maxCount - 1;
                 return (

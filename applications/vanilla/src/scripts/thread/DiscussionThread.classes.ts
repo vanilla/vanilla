@@ -13,12 +13,7 @@ export const discussionThreadClasses = useThemeCache(() => {
         verticalAlign: "middle",
     });
 
-    const resolved = css({
-        marginInlineEnd: 4,
-    });
-
     return {
         closedTag,
-        resolved,
     };
 });

@@ -11,8 +11,6 @@ import { DiscussionCommentsAssetPreview } from "@vanilla/addon-vanilla/thread/Di
 import { DiscussionAttachmentsAssetPreview } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset.preview";
 import { DiscussionOriginalPostAssetPreview } from "@vanilla/addon-vanilla/thread/DiscussionOriginalPostAsset.preview";
 import { DiscussionTagAssetPreview } from "@vanilla/addon-vanilla/thread/DiscussionTagAsset.preview";
-import { RouterRegistry } from "@library/Router.registry";
-import { getCommunityManagementRoutes } from "@dashboard/moderation/CommunityManagementRoutes";
 
 registerWidgetOverviews({
     TagWidget: TagWidgetPreview,
@@ -22,5 +20,3 @@ registerWidgetOverviews({
     DiscussionCommentEditorAsset: DiscussionCommentEditorAsset,
     DiscussionTagAsset: DiscussionTagAssetPreview,
 });
-
-RouterRegistry.addRoutes(getCommunityManagementRoutes());

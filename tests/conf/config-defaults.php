@@ -4,4 +4,3 @@
 
 // Disable Captcha checks for tests.
 $Configuration['Garden']['Registration']['SkipCaptcha'] = true;
-$Configuration["auditLog"]["enabled"] = false;

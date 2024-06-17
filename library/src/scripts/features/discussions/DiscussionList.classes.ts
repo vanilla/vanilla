@@ -224,7 +224,6 @@ export const discussionListClasses = useThemeCache(
         const qnaStatusUnanswered = css(tagMixin(tagsVariables(), vars.qnaStatusUnanswered, false));
         const qnaStatusAnswered = css(tagMixin(tagsVariables(), vars.qnaStatusAnswered, false));
         const qnaStatusAccepted = css(tagMixin(tagsVariables(), vars.qnaStatusAccepted, false));
-        const closedTag = css(tagMixin(tagsVariables(), vars.closedTag, false));
 
         return {
             title,
@@ -250,7 +249,6 @@ export const discussionListClasses = useThemeCache(
             filterAndSortingButton,
             disablePointerEvents,
             announcementTag,
-            closedTag,
             qnaStatusUnanswered,
             qnaStatusAnswered,
             qnaStatusAccepted,

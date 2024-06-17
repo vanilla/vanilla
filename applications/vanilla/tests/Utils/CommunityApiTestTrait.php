@@ -14,9 +14,7 @@ use Garden\Container\NotFoundException;
 use Garden\Http\HttpResponse;
 use Garden\Schema\ValidationException;
 use Gdn_Format;
-use PHPUnit\Framework\TestCase;
 use Vanilla\Formatting\Formats\TextFormat;
-use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Http\InternalClient;
 use Vanilla\Utility\ModelUtils;
 use VanillaTests\Fixtures\TestUploader;
@@ -42,12 +40,6 @@ trait CommunityApiTestTrait
     /** @var int|null */
     protected $lastInsertedCollectionID = null;
 
-    /** @var int|null */
-    protected $lastReportID = null;
-
-    /** @var int|null */
-    protected $lastEscalationID = null;
-
     /** @var HttpResponse|null */
     protected $lastCommunityResponse;
 
@@ -62,90 +54,6 @@ trait CommunityApiTestTrait
         $this->lastInsertedTagID = null;
         $this->lastInsertedCollectionID = null;
         $this->lastResponse = null;
-        $this->lastReportID = null;
-        $this->lastEscalationID = null;
-    }
-
-    /**
-     * Create a report.
-     *
-     * @param array $post The post to report. (Result from {@link self::createDiscussion()} or {@link self::createComment()})
-     * @param array $overrides Fields to override on the insert.
-     *
-     * @return array The report.
-     */
-    public function createReport(array $post, array $overrides = []): array
-    {
-        if (isset($post["commentID"])) {
-            $recordType = "comment";
-            $recordID = $post["commentID"];
-        } elseif (isset($post["discussionID"])) {
-            $recordType = "discussion";
-            $recordID = $post["discussionID"];
-        } else {
-            TestCase::fail("Could not determine recordType and recordID from post data.");
-        }
-
-        $defaults = [
-            "recordType" => $recordType,
-            "recordID" => $recordID,
-            "reportReasonIDs" => [ReportReasonModel::INITIAL_REASON_ABUSE],
-            "noteBody" => "This is a test report.",
-            "noteFormat" => "markdown",
-        ];
-
-        $params = $overrides + $defaults;
-        $response = $this->api()->post("/reports", $params);
-        TestCase::assertEquals(201, $response->getStatusCode());
-        $report = $response->getBody();
-        $this->lastReportID = $report["reportID"];
-        return $report;
-    }
-
-    /**
-     * Create an escalation. Will create a report automatically if one is not provided.
-     *
-     * @param array $post The post to report. (Result from {@link self::createDiscussion()} or {@link self::createComment()})
-     * @param array $overrides Fields to override on the insert.
-     *
-     * @return array
-     */
-    public function createEscalation(array $post, array $overrides = []): array
-    {
-        if (isset($post["commentID"])) {
-            $recordType = "comment";
-            $recordID = $post["commentID"];
-        } elseif (isset($post["discussionID"])) {
-            $recordType = "discussion";
-            $recordID = $post["discussionID"];
-        } else {
-            TestCase::fail("Could not determine recordType and recordID from post data.");
-        }
-
-        $defaults = [
-            "recordType" => $recordType,
-            "recordID" => $recordID,
-            "name" => "This is an escalation",
-        ];
-
-        if (isset($overrides["reportID"])) {
-            // We have a report.
-        } else {
-            // Add in an on the fly report.
-            $dummyReport = [
-                "reportReasonIDs" => [ReportReasonModel::INITIAL_REASON_ABUSE],
-                "noteBody" => "This is a test report for an escalation.",
-                "noteFormat" => "markdown",
-            ];
-            $defaults += $dummyReport;
-        }
-
-        $params = $overrides + $defaults;
-        $response = $this->api()->post("/escalations", $params);
-        TestCase::assertEquals(201, $response->getStatusCode());
-        $escalation = $response->getBody();
-        $this->lastEscalationID = $escalation["escalationID"];
-        return $escalation;
     }
 
     /**
@@ -195,32 +103,23 @@ trait CommunityApiTestTrait
      *
      * @param array $overrides Fields to override on the insert.
      * @param int[] $viewRoleIDs
-     * @param array $permissionRoleIDMapping
      *
      * @return array
      */
-    public function createPermissionedCategory(
-        array $overrides = [],
-        array $viewRoleIDs = [],
-        array $permissionRoleIDMapping = []
-    ): array {
+    public function createPermissionedCategory(array $overrides = [], array $viewRoleIDs = []): array
+    {
         $result = $this->createCategory(["customPermissions" => true] + $overrides);
 
-        $permissionRoleIDMapping["discussions.view"] = $viewRoleIDs;
-
-        $allRoleIDs = array_merge(...array_values($permissionRoleIDMapping));
-        foreach ($allRoleIDs as $roleID) {
-            $permissions = [];
-            foreach ($permissionRoleIDMapping as $permission => $roleIDs) {
-                $permissions[$permission] = in_array($roleID, $roleIDs);
-            }
-
-            $this->api()->patch("/roles/$roleID", [
+        foreach ($viewRoleIDs as $viewRoleID) {
+            // Make the category and it's contents hidden to guests.
+            $this->api()->patch("/roles/$viewRoleID", [
                 "permissions" => [
                     [
                         "id" => $this->lastInsertedCategoryID,
                         "type" => "category",
-                        "permissions" => $permissions,
+                        "permissions" => [
+                            "discussions.view" => true,
+                        ],
                     ],
                 ],
             ]);
@@ -240,7 +139,7 @@ trait CommunityApiTestTrait
     public function createCollection(array $records = [], array $overrides = []): array
     {
         $params = $overrides + [
-            "name" => "Test Collection" . $this->generateCollectionSalt(),
+            "name" => "Test Collection",
             "records" => $records,
         ];
 
@@ -554,15 +453,5 @@ trait CommunityApiTestTrait
             // 410 is a known response to a spam reaction.
             throw $response->asException();
         }
-    }
-
-    /**
-     * Generates and returns a salt
-     *
-     * @return string
-     */
-    private function generateCollectionSalt(): string
-    {
-        return "-" . round(microtime(true) * 1000) . rand(1, 1000);
     }
 }

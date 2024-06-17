@@ -36,7 +36,6 @@ import { createDeserializeCsvPlugin } from "@udecode/plate-serializer-csv";
 import { createDeserializeDocxPlugin } from "@udecode/plate-serializer-docx";
 import { createDeserializeMdPlugin } from "@udecode/plate-serializer-md";
 import { createTrailingBlockPlugin } from "@udecode/plate-trailing-block";
-import { deserializeMentionHtml } from "@library/vanilla-editor/plugins/mentionPlugin/deserializeMentionHtml";
 
 export const VanillaEditorPlugins = createMyPlugins(
     [
@@ -194,8 +193,6 @@ export const VanillaEditorPlugins = createMyPlugins(
         createMentionPlugin<MentionPlugin<IMentionSuggestionData>, MyValue, MyEditor>({
             key: "@",
             component: MentionElement,
-            // pasted HTML from another post will be deserialized into this element
-            deserializeHtml: deserializeMentionHtml,
             props: (oldProps) => {
                 return {
                     prefix: oldProps.element.type, //use "@" as the prefix

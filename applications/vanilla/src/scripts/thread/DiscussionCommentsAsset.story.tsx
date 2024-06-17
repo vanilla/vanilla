@@ -1,12 +1,13 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
+import { LoadStatus } from "@library/@types/api/core";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
-import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { STORY_COMMENTS } from "@library/storybook/storyData";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
@@ -48,9 +49,22 @@ export const GuestView = () => {
 
 export const MemberView = () => {
     return (
-        <CurrentUserContextProvider currentUser={STORY_COMMENTS[0].insertUser}>
+        <TestReduxProvider
+            state={{
+                users: {
+                    current: {
+                        status: LoadStatus.SUCCESS,
+                        data: {
+                            ...STORY_COMMENTS[0].insertUser,
+                            countUnreadNotifications: 0,
+                            countUnreadConversations: 0,
+                        },
+                    },
+                },
+            }}
+        >
             <StoryCommentList />
-        </CurrentUserContextProvider>
+        </TestReduxProvider>
     );
 };
 export const AdminView = () => {

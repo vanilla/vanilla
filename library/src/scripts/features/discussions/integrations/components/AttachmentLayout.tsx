@@ -17,7 +17,6 @@ import { Icon } from "@vanilla/icons";
 import { IUserFragment } from "@library/@types/api/users";
 import { t } from "@vanilla/i18n";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
-import { cx } from "@emotion/css";
 
 export interface IAttachmentLayoutProps {
     icon?: React.ReactNode;
@@ -35,29 +34,21 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
     const { icon, title, notice, url, id, idLabel, dateUpdated, user, metadata } = props;
     const classes = AttachmentLayoutClasses();
 
-    const noticeContent = notice ? (
-        <MetaItem>
-            <Notice className={classes.notice}>{notice}</Notice>
-        </MetaItem>
-    ) : null;
-
-    const renderExternalLink = !!url && !!id && !!idLabel;
-    const renderNoticeByTitle = !!noticeContent && renderExternalLink;
-    const positionNoticeInCorner = !!noticeContent && !renderNoticeByTitle;
-
     return (
         <div className={classes.root}>
             <div className={classes.logoSection}>{!!icon && <div className={classes.logoWrapper}>{icon}</div>}</div>
 
             <div className={classes.textSection}>
                 <div className={classes.header}>
-                    <div
-                        className={cx(classes.titleAndNoticeAndMetasWrapper, {
-                            [classes.positionNoticeInCorner]: positionNoticeInCorner,
-                        })}
-                    >
+                    <div className={classes.titleAndNoticeAndMetasWrapper}>
                         {!!title && <h5 className={classes.title}>{title}</h5>}
-                        {!!noticeContent && <Metas className={classes.inlineMetas}>{noticeContent}</Metas>}
+                        <Metas className={classes.inlineMetas}>
+                            {!!notice && (
+                                <MetaItem>
+                                    <Notice className={classes.notice}>{notice}</Notice>
+                                </MetaItem>
+                            )}
+                        </Metas>
 
                         <Metas className={classes.metasRow}>
                             {!!dateUpdated && !!user && (
@@ -72,15 +63,21 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                         </Metas>
                     </div>
 
-                    {renderExternalLink && (
-                        <div className={classes.externalLinkWrapper}>
-                            <div className={classes.detailItem}>
-                                <div className={classes.detailLabel}>{idLabel}</div>
-                                <div className={classes.detailValue}>
-                                    <SmartLink to={url} className={classes.externalLink}>
-                                        <strong>{id}</strong>
-                                        <Icon className={classes.externalIcon} icon="meta-external" size="default" />
-                                    </SmartLink>
+                    {!!url && !!id && !!idLabel && (
+                        <div>
+                            <div className={classes.externalLinkWrapper}>
+                                <div className={classes.detailItem}>
+                                    <div className={classes.detailLabel}>{idLabel}</div>
+                                    <div className={classes.detailValue}>
+                                        <SmartLink to={url} className={classes.externalLink}>
+                                            <strong>{id}</strong>
+                                            <Icon
+                                                className={classes.externalIcon}
+                                                icon="meta-external"
+                                                size="default"
+                                            />
+                                        </SmartLink>
+                                    </div>
                                 </div>
                             </div>
                         </div>

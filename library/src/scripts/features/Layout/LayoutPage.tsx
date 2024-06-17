@@ -12,7 +12,6 @@ import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
 import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
 import { useEmailConfirmationToast } from "@library/features/Layout/EmailConfirmation.hook";
-import { AnalyticsData } from "@library/analytics/AnalyticsData";
 
 interface IProps {
     layoutQuery: ILayoutQuery;
@@ -43,10 +42,6 @@ export function LayoutPage(props: IProps) {
 
     return (
         <WidgetLayout>
-            <AnalyticsData
-                uniqueKey={`customLayout_${layoutQuery.layoutViewType}_${layoutQuery.recordID}_${layoutQuery.recordType}`}
-                data={layoutQuery}
-            />
             <PageBoxDepthContextProvider depth={0}>
                 <LayoutRenderer layout={layout.data.layout} />
             </PageBoxDepthContextProvider>

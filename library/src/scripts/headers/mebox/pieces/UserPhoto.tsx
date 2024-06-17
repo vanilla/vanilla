@@ -13,7 +13,6 @@ import { accessibleLabel, t } from "@library/utility/appUtils";
 import { LoadingCircle } from "@library/loaders/LoadingRectangle";
 
 export enum UserPhotoSize {
-    XSMALL = "xsmall",
     SMALL = "small",
     MEDIUM = "medium",
     LARGE = "large",
@@ -38,9 +37,6 @@ export function UserPhoto(props: IProps) {
 
     let sizeClass = classes.small;
     switch (size) {
-        case UserPhotoSize.XSMALL:
-            sizeClass = classes.xsmall;
-            break;
         case UserPhotoSize.XLARGE:
             sizeClass = classes.xlarge;
             break;
@@ -94,9 +90,6 @@ export function UserPhotoSkeleton(props: { className?: string; size?: UserPhotoS
             break;
         case UserPhotoSize.MEDIUM:
             sizeClass = classes.medium;
-            break;
-        case UserPhotoSize.XSMALL:
-            sizeClass = classes.xsmall;
             break;
     }
     return (

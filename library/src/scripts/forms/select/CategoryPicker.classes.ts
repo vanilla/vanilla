@@ -7,7 +7,7 @@ import { css } from "@emotion/css";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { useThemeCache } from "@library/styles/styleUtils";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { colorOut } from "@library/styles/styleHelpers";
 
 export const categoryPickerClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -47,8 +47,8 @@ export const categoryPickerClasses = useThemeCache(() => {
                 &:active + .${pickerButton},
                 &.focus-visible + .${pickerButton},
             `]: {
-                borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
-                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                borderColor: colorOut(globalVars.mainColors.primary),
+                color: colorOut(globalVars.mainColors.primary),
             },
         },
     });
@@ -56,7 +56,7 @@ export const categoryPickerClasses = useThemeCache(() => {
     const categoryLabel = css({
         ...Mixins.font({
             weight: globalVars.fonts.weights.bold,
-            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+            color: colorOut(globalVars.mainColors.fg),
         }),
     });
 

@@ -5,9 +5,9 @@
  */
 
 import { mockAPI } from "@library/__tests__/utility";
-import { ViewType, trackEvent, trackExternalNavigation, trackPageView } from "@library/analytics/tracking";
-import { setMeta } from "@library/utility/appUtils";
+import { trackPageView, trackEvent, ViewType } from "@library/analytics/tracking";
 import MockAdapter from "axios-mock-adapter/types";
+import { setMeta } from "@library/utility/appUtils";
 
 describe("Anayltics Tracking", () => {
     let mockAdapter: MockAdapter;
@@ -61,61 +61,5 @@ describe("Anayltics Tracking", () => {
         trackPageView("http://some-url.tld");
         expect(JSON.parse(mockAdapter.history.post[0].data)).toHaveProperty("eventID");
         expect(JSON.parse(mockAdapter.history.post[0].data).eventID).toBe(200);
-    });
-
-    it("trackExternalNavigation does not call tick API if link is same domain", () => {
-        vi.stubGlobal("location", { href: "http://example.com/some-page", origin: "http://example.com" });
-        mockAdapter.onPost(/tick/).replyOnce(201, {});
-        const link = document.createElement("a");
-        link.href = "http://example.com/internal-page";
-        trackExternalNavigation(new Event("click"), link);
-        expect(mockAdapter.history.post.length).toBe(0);
-    });
-
-    it("trackExternalNavigation does not call tick API if link is relative", () => {
-        vi.stubGlobal("location", { href: "http://example.com/some-page", origin: "http://example.com" });
-        mockAdapter.onPost(/tick/).replyOnce(201, {});
-        const link = document.createElement("a");
-        link.href = "/internal-page";
-        trackExternalNavigation(new Event("click"), link);
-        expect(mockAdapter.history.post.length).toBe(0);
-    });
-
-    it("trackExternalNavigation does not call tick API if on the leaving page", () => {
-        vi.stubGlobal("location", {
-            href: `http://example.com/home/leaving?target=${encodeURI("http://external.com")}`,
-            origin: "http://example.com",
-        });
-        mockAdapter.onPost(/tick/).replyOnce(201, {});
-        const link = document.createElement("a");
-        link.href = "http://external.com";
-        trackExternalNavigation(new Event("click"), link);
-        expect(mockAdapter.history.post.length).toBe(0);
-    });
-
-    it("trackExternalNavigation calls tick API if link is not same domain", () => {
-        vi.stubGlobal("location", { href: "http://example.com/some-page", origin: "http://example.com" });
-        mockAdapter.onPost(/tick/).replyOnce(201, {});
-        const link = document.createElement("a");
-        link.href = "http://external.com";
-        trackExternalNavigation(new Event("click"), link);
-        expect(mockAdapter.history.post.length).toBe(1);
-        expect(JSON.parse(mockAdapter.history.post[0].data)).toHaveProperty("type");
-        expect(JSON.parse(mockAdapter.history.post[0].data).type).toBe("externalNavigation");
-        expect(JSON.parse(mockAdapter.history.post[0].data)).toHaveProperty("destinationUrl");
-        expect(JSON.parse(mockAdapter.history.post[0].data).destinationUrl).toBe("http://external.com");
-    });
-
-    it("trackExternalNavigation calls tick API if link is going to leaving page first", () => {
-        vi.stubGlobal("location", { href: "http://example.com/some-page", origin: "http://example.com" });
-        mockAdapter.onPost(/tick/).replyOnce(201, {});
-        const link = document.createElement("a");
-        link.href = `http://example.com/home/leaving?target=${encodeURI("http://external.com")}`;
-        trackExternalNavigation(new Event("click"), link);
-        expect(mockAdapter.history.post.length).toBe(1);
-        expect(JSON.parse(mockAdapter.history.post[0].data)).toHaveProperty("type");
-        expect(JSON.parse(mockAdapter.history.post[0].data).type).toBe("externalNavigation");
-        expect(JSON.parse(mockAdapter.history.post[0].data)).toHaveProperty("destinationUrl");
-        expect(JSON.parse(mockAdapter.history.post[0].data).destinationUrl).toBe("http://external.com");
     });
 });

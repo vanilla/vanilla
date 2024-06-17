@@ -7,18 +7,13 @@
 
 namespace VanillaTests\Library\Core;
 
-use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\BootstrapTestCase;
-use VanillaTests\Forum\Utils\CommunityApiTestTrait;
-use VanillaTests\SiteTestCase;
 
 /**
  * Tests for the `Gdn_Smarty` class.
  */
-class SmartyTest extends SiteTestCase
+class SmartyTest extends BootstrapTestCase
 {
-    use CommunityApiTestTrait;
-
     /**
      * @var \Gdn_Smarty
      */
@@ -34,6 +29,7 @@ class SmartyTest extends SiteTestCase
         $dir = PATH_ROOT . "/tests/cache/smarty";
         touchFolder($dir);
         $this->smarty->smarty()->setCompileDir($dir);
+        $this->smarty->enableSecurity($this->smarty->smarty());
         $this->smarty->smarty()->setTemplateDir(PATH_ROOT . "/tests/fixtures/smarty");
     }
 
@@ -132,7 +128,7 @@ class SmartyTest extends SiteTestCase
      */
     public function testUnsafeTemplates(string $path): void
     {
-        $this->expectException(\Smarty\CompilerException::class);
+        $this->expectException(\SmartyCompilerException::class);
         $lines = file($path);
         $this->expectExceptionMessage(trim($lines[0]));
         $r = $this->fetch($path);
@@ -152,7 +148,7 @@ class SmartyTest extends SiteTestCase
         $exception = null;
         try {
             $rendered = $this->fetch($path);
-        } catch (\Smarty\CompilerException $e) {
+        } catch (\SmartyCompilerException $e) {
             $exception = $e;
         }
 
@@ -230,23 +226,5 @@ class SmartyTest extends SiteTestCase
         foreach ($paths as $path) {
             yield basename($path) => [$path];
         }
-    }
-
-    /**
-     * Test that we can render our a legacy default.master.tpl
-     */
-    public function testRenderKeystoneDiscussions()
-    {
-        \Gdn::config()->saveToConfig("Garden.Theme", "keystone");
-
-        $this->createDiscussion(["name" => "hello world"]);
-        $html = $this->bessy()->getHtml(
-            "/discussions",
-            [],
-            [
-                TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL,
-            ]
-        );
-        $html->assertContainsString("hello world");
     }
 }

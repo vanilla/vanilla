@@ -8,7 +8,6 @@
 
 use Garden\Web\Exception\ResponseException;
 use Garden\Web\Redirect;
-use JetBrains\PhpStorm\NoReturn;
 use Vanilla\Logging\TraceCollector;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Theme\ThemeService;
@@ -1020,10 +1019,6 @@ if (!function_exists("isTrustedDomain")) {
         if (strpos($url, "http:") === 0 || strpos($url, "https:") === 0) {
             //This is a complete url
             $urlParts = parse_url($url);
-            if (!is_array($urlParts)) {
-                return false;
-            }
-
             if (!empty($urlParts["user"])) {
                 //we don't currently allow user:pass in the origin header so this can be a malicious request so don't set headers
                 return false;
@@ -1327,8 +1322,8 @@ if (!function_exists("redirectTo")) {
      * @param int $statusCode HTTP status code. 302 by default.
      * @param bool $trustedOnly Non trusted destinations will be redirected to /home/leaving?Target=$destination
      */
-    #[NoReturn]
-    function redirectTo($destination = null, $statusCode = 302, $trustedOnly = true) {
+    function redirectTo($destination = null, $statusCode = 302, $trustedOnly = true)
+    {
         if ($destination === null) {
             $url = url("");
         } elseif ($trustedOnly) {

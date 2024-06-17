@@ -7,7 +7,7 @@
 
 import React from "react";
 import { t, getMeta, siteUrl } from "@library/utility/appUtils";
-import { indexArrayByKey, notEmpty } from "@vanilla/utils";
+import { indexArrayByKey, logError, notEmpty } from "@vanilla/utils";
 import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from "axios";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
@@ -16,6 +16,7 @@ import { IApiError, IFieldError } from "@library/@types/api/core";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ApiContext } from "@vanilla/ui";
 import { LongRunnerClient } from "@library/LongRunnerClient";
+import { formatUrl } from "./utility/appUtils";
 
 function fieldErrorTransformer(responseData) {
     if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {

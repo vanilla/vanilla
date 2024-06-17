@@ -286,15 +286,4 @@ class LocalesApiController extends Controller
             throw new \Garden\Web\Exception\NotFoundException("Locale");
         }
     }
-
-    /**
-     * Check if a locale is valid.
-     *
-     * @param string $locale
-     * @return bool
-     */
-    public function isValidLocale(string $locale): bool
-    {
-        return $this->localeModel->isEnabled($locale);
-    }
 }

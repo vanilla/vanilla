@@ -9,8 +9,6 @@
  * @since 2.0
  */
 
-use Vanilla\Dashboard\Events\ConfigurationChangeEvent;
-use Vanilla\Logging\AuditLogger;
 use Vanilla\Utility\Deprecation;
 
 /**
@@ -24,7 +22,10 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     const CONFIG_FILE_CACHE_KEY = "garden.config.%s";
 
     /** @var array  configs to omit*/
-    const OMIT_LOGGING = ["SystemAccessToken", "Garden.Update"];
+    const OMIT_LOGGING = ["SystemAccessToken"];
+
+    /** @var array */
+    public $ConfigChangesData = [];
 
     /** @var string  */
     public $NotFound = "NOT_FOUND";
@@ -74,9 +75,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /** @var string use for translationDebug */
     private $fallBackDecorator = "";
 
-    private array $auditConfigsOld = [];
-    private array $auditConfigsNew = [];
-
     /**
      * Initialize a new instance of the {@link Gdn_Configuration} class.
      *
@@ -94,30 +92,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         } else {
             $this->defaultPath = PATH_CONF . "/config.php";
         }
-    }
-
-    private function trackAuditConfig(string $key, mixed $old, mixed $new): void
-    {
-        if (!$this->shouldOmitAuditLogForConfigKey($key)) {
-            $this->auditConfigsOld[$key] = $old;
-            $this->auditConfigsNew[$key] = $new;
-        }
-    }
-
-    /**
-     * Determine if the config should be skipped.
-     *
-     * @param string $key Key of the config
-     * @return bool
-     */
-    private function shouldOmitAuditLogForConfigKey(string $key): bool
-    {
-        foreach (self::OMIT_LOGGING as $omitKey) {
-            if (stripos($key, $omitKey) !== false) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -567,7 +541,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             }
         }
 
-        if ($save && $this->dynamic instanceof Gdn_ConfigurationSource) {
+        if ($save) {
             $this->dynamic->set($name, $value, $overwrite);
         }
     }
@@ -986,23 +960,13 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
-     * @inheritDoc
-     */
-    public function saveWithoutAuditLog(string|array $name, mixed $value = "")
-    {
-        return $this->saveToConfig($name, $value, [
-            "isSecret" => true,
-        ]);
-    }
-
-    /**
      * @inheritdoc
      */
     public function saveToConfig($name, $value = "", $options = [])
     {
         $save = $options === false ? false : val("Save", $options, true);
-        $removeEmpty = $options["RemoveEmpty"] ?? false;
-        $isSecret = $options["isSecret"] ?? false;
+        $bypassLogging = $options === false ? false : val("BypassLogging", $options, false);
+        $removeEmpty = val("RemoveEmpty", $options);
 
         if (!is_array($name)) {
             $name = [$name => $value];
@@ -1011,20 +975,43 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         // Apply changes one by one
         $result = true;
         foreach ($name as $k => $v) {
-            if (!$isSecret && $save) {
-                $oldValue = $this->get($k, null);
-                $newValue = $v;
-                $this->trackAuditConfig($k, $oldValue, $newValue);
-            }
-
             if (!$v && $removeEmpty) {
                 $this->remove($k);
             } else {
+                //If this is a change (different from what has been saved before)
+                // and we are queueing this change for saving, keep track of it.
+                if (!$bypassLogging && $save && $this->get($k) != $v) {
+                    if (!$this->omitConfigLog($k)) {
+                        //Record Old value.
+                        $this->ConfigChangesData[$k] = $this->get($k);
+                        // Record New/changed value.
+                        if (!array_key_exists("_New", $this->ConfigChangesData)) {
+                            $this->ConfigChangesData["_New"] = [];
+                        }
+                        $this->ConfigChangesData["_New"][$k] = $v;
+                    }
+                }
                 $result = $result & $this->set($k, $v, true, $save);
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Determine if the config should be skipped.
+     *
+     * @param string $key Key of the config
+     * @return bool
+     */
+    private function omitConfigLog(string $key): bool
+    {
+        foreach (self::OMIT_LOGGING as $omitKey) {
+            if (stripos($key, $omitKey) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1068,30 +1055,17 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /**
      * Shutdown.
      */
-    public function shutdown(): void
+    public function shutdown()
     {
         foreach ($this->sources as $source) {
+            //If there were changes queued to save, record them in Log table when we save config changes to file.
+            if (count($this->ConfigChangesData) > 0) {
+                // Log root config changes
+                LogModel::insert("Edit", "Configuration", $this->ConfigChangesData);
+                $this->ConfigChangesData = [];
+            }
             $source->shutdown();
         }
-        $this->logAudits();
-    }
-
-    /**
-     * Log configuration changes that need to be audit logged
-     *
-     * @return void
-     */
-    public function logAudits(): void
-    {
-        // If there were changes queued to save, record them in Log table when we save config changes to file.
-        $wasSiteInstallation = isset($this->auditConfigsOld["Garden.Installed"]);
-
-        if (!$wasSiteInstallation && !empty($this->auditConfigsOld) && !empty($this->auditConfigsNew)) {
-            $auditLog = new ConfigurationChangeEvent($this->auditConfigsOld, $this->auditConfigsNew);
-            AuditLogger::log($auditLog);
-        }
-        $this->auditConfigsOld = [];
-        $this->auditConfigsNew = [];
     }
 
     /**

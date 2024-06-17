@@ -124,6 +124,6 @@ class EmailDigestActivity extends Activity
      */
     public static function getNotificationRequiredSettings(): array
     {
-        return ["Garden.Digest.Enabled"];
+        return ["Garden.Digest.Enabled", "Feature.Digest.Enabled"];
     }
 }

@@ -10,7 +10,6 @@ namespace VanillaTests\Models;
 use Garden\EventManager;
 use Gdn;
 use LogModel;
-use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
 use VanillaTests\ExpectedNotification;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\NotificationsApiTestTrait;
@@ -187,87 +186,5 @@ class LogModelTest extends SiteTestCase
             ->get("comments", ["insertUserID" => $user["userID"]])
             ->getBody();
         $this->assertCount(1, $comments);
-    }
-
-    /**
-     * Test log model getAutomationLogsByDispatchID for User type.
-     *
-     * @return void
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws \Garden\Web\Exception\NotFoundException
-     */
-    public function testGetAutomationLogsByDispatchIDForUserType(): void
-    {
-        $automationRuleRevisionModel = $this->container()->get(AutomationRuleRevisionModel::class);
-        $user = $this->createUser(["name" => "testUser"]);
-        LogModel::insert("Automation", "User", [
-            "RecordUserID" => $user["userID"],
-            "DispatchUUID" => "xxx",
-            "AutomationRuleRevisionID" => 1,
-            "Data" => [
-                "currentStatusID" => 1,
-                "newStatusID" => 2,
-            ],
-        ]);
-        $automationRuleRevisionModel->insert([
-            "automationRuleID" => 1,
-            "automationRuleRevisionID" => 1,
-            "triggerType" => "testTrigger",
-            "triggerValue" => ["key" => "value"],
-            "actionType" => "testAction",
-            "actionValue" => ["key" => "value"],
-        ]);
-
-        $logs = $this->logModel->getAutomationLogsByDispatchID("xxx", "User", 1);
-        $this->assertCount(1, $logs);
-        $logs = $logs[0];
-        $this->assertArrayHasKey("RecordName", $logs);
-        $this->assertEquals($user["name"], $logs["RecordName"]);
-        $this->assertArrayHasKey("RecordEmail", $logs);
-        $this->assertEquals($user["email"], $logs["RecordEmail"]);
-        $this->assertEquals("User", $logs["RecordType"]);
-    }
-
-    /**
-     * Test log model getAutomationLogsByDispatchID for Discussion type.
-     *
-     * @return void
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws \Garden\Schema\ValidationException
-     * @throws \Garden\Web\Exception\NotFoundException
-     */
-    public function testGetAutomationLogsByDispatchIDForDiscussionType()
-    {
-        $automationRuleRevisionModel = $this->container()->get(AutomationRuleRevisionModel::class);
-        $automationRuleRevisionModel->insert([
-            "automationRuleID" => 1,
-            "automationRuleRevisionID" => 2,
-            "triggerType" => "testTrigger",
-            "triggerValue" => ["key" => "value"],
-            "actionType" => "testAction",
-            "actionValue" => ["key" => "value"],
-        ]);
-        $discussion = $this->createDiscussion();
-        LogModel::insert("Automation", "Discussion", [
-            "RecordID" => $discussion["discussionID"],
-            "DispatchUUID" => "zyxw",
-            "AutomationRuleRevisionID" => 2,
-            "Data" => [
-                "currentStatusID" => 1,
-                "newStatusID" => 2,
-            ],
-        ]);
-
-        $logs = $this->logModel->getAutomationLogsByDispatchID("zyxw", "Discussion", 1);
-        $this->assertCount(1, $logs);
-        $logs = $logs[0];
-        $this->assertArrayHasKey("RecordName", $logs);
-        $this->assertEquals($discussion["name"], $logs["RecordName"]);
-        $this->assertArrayHasKey("RecordBody", $logs);
-        $this->assertEquals($discussion["body"], $logs["RecordBody"]);
-        $this->assertEquals("Discussion", $logs["RecordType"]);
-        $this->assertArrayHasKey("Format", $logs);
     }
 }

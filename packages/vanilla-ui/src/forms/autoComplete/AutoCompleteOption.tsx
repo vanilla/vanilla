@@ -8,10 +8,8 @@ import React, { useContext, useMemo } from "react";
 import { cx } from "@emotion/css";
 import { ComboboxOption, ComboboxOptionText } from "@reach/combobox";
 import { autoCompleteClasses } from "./AutoComplete.styles";
-import { useAutoCompleteContext } from "./AutoCompleteContext";
+import { AutoCompleteContext } from "./AutoCompleteContext";
 import { Checkmark } from "../shared/Checkmark";
-import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
 
 export interface IAutoCompleteOption {
     value: any;
@@ -34,14 +32,12 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
     ref: React.Ref<HTMLLIElement>,
 ) {
     const { value, label = value, extraLabel, ...otherProps } = props;
-    const { size, value: autoCompleteValue, multiple } = useAutoCompleteContext();
+    const { size, value: autoCompleteValue, multiple } = useContext(AutoCompleteContext);
     const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
     const values = multiple && Array.isArray(autoCompleteValue) ? autoCompleteValue : [autoCompleteValue];
     const selected = values.indexOf(value) > -1;
 
     const extraLabelContent = props.data?.parentLabel ?? extraLabel;
-
-    const icon = props.data?.icon;
 
     return (
         <ComboboxOption
@@ -51,8 +47,7 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
             data-autocomplete-selected={selected || undefined}
             value={label}
         >
-            <div className={cx(classes.optionText, icon && classes.iconLayout)}>
-                {icon && <UserPhoto size={UserPhotoSize.XSMALL} userInfo={icon ?? deletedUserFragment()} />}
+            <div className={classes.optionText}>
                 <ComboboxOptionText />
                 {extraLabelContent && <span className={classes.parentLabel}>{` - ${extraLabelContent}`}</span>}
                 {props.data?.labelSuffix}

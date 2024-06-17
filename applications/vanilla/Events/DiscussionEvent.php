@@ -13,7 +13,6 @@ use Vanilla\Analytics\TrackableCommunityModel;
 use Vanilla\Logging\LogEntry;
 use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggerUtils;
-use Vanilla\Utility\ArrayUtils;
 
 /**
  * Represent a discussion resource event.
@@ -68,16 +67,16 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     public function getLogEntry(): LogEntry
     {
         $context = LoggerUtils::resourceEventLogContext($this);
-        $context["discussion"] = ArrayUtils::pluck($this->payload["discussion"] ?? [], [
-            "discussionID",
-            "categoryID",
-            "type",
-            "dateInserted",
-            "dateUpdated",
-            "updateUserID",
-            "insertUserID",
-            "url",
-            "name",
+        $context["discussion"] = array_intersect_key($this->payload["discussion"] ?? [], [
+            "discussionID" => true,
+            "categoryID" => true,
+            "type" => true,
+            "dateInserted" => true,
+            "dateUpdated" => true,
+            "updateUserID" => true,
+            "insertUserID" => true,
+            "url" => true,
+            "name" => true,
         ]);
 
         $log = new LogEntry(LogLevel::INFO, LoggerUtils::resourceEventLogMessage($this), $context);

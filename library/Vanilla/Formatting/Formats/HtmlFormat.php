@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Formats;
 
 use Exception;
+use UserModel;
 use Vanilla\Contracts\Formatting\FormatParsedInterface;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;

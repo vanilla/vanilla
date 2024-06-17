@@ -18,7 +18,7 @@ export function DashboardFormSubheading(props: IProps) {
             <h2
                 {...restProps}
                 className={cx("subheading", props.className, hasBackground && dashboardClasses().subHeadingBackground)}
-            />
+            ></h2>
         </li>
     );
 }

@@ -20,9 +20,6 @@ class PageViewEvent implements TrackingEventInterface
     const ACTION_PAGE_VIEW = "page_view";
     const ACTION_DISCUSSION_VIEW = "discussion_view";
 
-    const BOUNCE_TYPE_EXTERNAL_NAVIGATION = "externalNavigation";
-    const BOUNCE_TYPE_EXIT_NAVIGATION = "exitNavigation";
-
     /** @var string */
     private $action;
 

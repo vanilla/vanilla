@@ -7,15 +7,12 @@
 
 namespace VanillaTests\APIv2;
 use Garden\Web\Exception\ForbiddenException;
-use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the /api/v2/conversations endpoints.
  */
 class ConversationsTest extends AbstractAPIv2Test
 {
-    use UsersAndRolesApiTestTrait;
-
     protected static $userCounter = 0;
 
     protected static $userIDs = [];
@@ -313,31 +310,6 @@ class ConversationsTest extends AbstractAPIv2Test
         // Make sure the body has been formatted to remove the XSS.
         $this->assertStringContainsString("\"&gt;&lt;", $updatedConversation["body"]);
         $this->assertStringNotContainsString($updatedConversation["body"], $xssVector);
-    }
-
-    /**
-     * Test starting a conversation with an intitial message.
-     */
-    public function testInitialPost()
-    {
-        $recipient1 = $this->createUser(["name" => "Recipient1"]);
-        $recipient2 = $this->createUser(["name" => "Recipient2"]);
-        $result = $this->api()
-            ->post("/conversations", [
-                "participantUserIDs" => [$recipient1["userID"], $recipient2["userID"]],
-                "initialBody" => "Hello **world**",
-                "initialFormat" => "markdown",
-            ])
-            ->getBody();
-
-        $this->assertEquals("Recipient1", $result["participants"][0]["user"]["name"]);
-        $this->assertEquals("Recipient2", $result["participants"][1]["user"]["name"]);
-
-        // Current user was automatically added.
-        $this->assertEquals("circleci", $result["participants"][2]["user"]["name"]);
-
-        $this->assertEquals("Recipient1, Recipient2", $result["name"]);
-        $this->assertEquals(1, $result["countMessages"]);
     }
 
     /**

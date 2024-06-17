@@ -239,9 +239,7 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
             "label:s" => [
                 "x-control" => SchemaForm::textBox(new FormOptions("Label", "Text to display after the count")),
             ],
-            "isHidden:b?" => [
-                "default" => false,
-            ],
+            "isHidden:b?",
         ]);
 
         $siteSectionModel = \Gdn::getContainer()->get(SiteSectionModel::class);
@@ -400,7 +398,7 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
         $availableCounts = $siteTotalService->getCountRecordTypes();
 
         $filteredCounts = array_filter($apiParams["counts"], function ($item) use ($availableCounts) {
-            return !($item["isHidden"] ?? false) && in_array($item["recordType"], $availableCounts);
+            return !$item["isHidden"] && in_array($item["recordType"], $availableCounts);
         });
 
         // re-index the counts array.

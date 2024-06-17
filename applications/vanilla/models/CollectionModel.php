@@ -7,16 +7,12 @@
 
 namespace Vanilla\Models;
 
-use Exception;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
 use Gdn;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\Operation;
-use Vanilla\Exception\Database\NoResultsException;
-use UserModel;
-use Gdn_Session;
 
 /**
  * A model for handling collection
@@ -34,9 +30,16 @@ class CollectionModel extends PipelineModel
     protected static $provider;
 
     /** @var CollectionRecordProviderInterface[] */
-    protected array $providersByType;
+    protected $providersByType;
 
-    protected UserModel $userModel;
+    /** @var ModelCache */
+    private $modelCache;
+
+    /** @var bool $filtered */
+    private $filtered = false;
+
+    /** @var \UserModel */
+    protected $userModel;
 
     /**
      * Collection Model constructor.
@@ -44,7 +47,7 @@ class CollectionModel extends PipelineModel
      * @param \Gdn_Session $session
      * @param \UserModel $userModel
      */
-    public function __construct(Gdn_Session $session, UserModel $userModel)
+    public function __construct(\Gdn_Session $session, \UserModel $userModel)
     {
         parent::__construct(self::TABLE_NAME);
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
@@ -85,61 +88,39 @@ class CollectionModel extends PipelineModel
      * @param array $where
      * @param array $options
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
     public function searchCollectionRecords(array $where = [], array $options = []): array
     {
-        $subqueryWhere = [];
-
-        // Anything that starts with `r.` relates to collectionRecord & is part of the subquery where clauses.
-        foreach ($where as $whereKey => $whereValue) {
-            if (strpos($whereKey, "r.") === 0) {
-                $subqueryWhere[$whereKey] = $whereValue;
-                unset($where[$whereKey]);
-            }
-        }
-
         // Get the `collectionID`s for subsequent query.
         $results = $this->select($where, $options);
-        $subqueryWhere["c.collectionID"] = array_column($results, "collectionID");
+        $where = [];
+        $where["c.collectionID"] = array_column($results, "collectionID");
         $sql = $this->createSql();
         $records = [];
-        $query = $sql
-            ->select(
-                "c.collectionID, c.name, c.insertUserID, c.updateUserID, c.dateInserted, c.dateUpdated, r.recordID, r.recordType, r.sort, r.dateInserted as dateAddedToCollection"
-            )
+        $results = $sql
+            ->select()
             ->from($this->getTable() . " c")
-            ->leftJoin("collectionRecord r", "r.collectionID = c.collectionID")
-            //            ->orderBy(["c.collectionID", "r.sort"], "asc")
-            ->where($subqueryWhere);
-        $results = $query->get()->resultArray();
+            ->join("collectionRecord r", "r.collectionID = c.collectionID")
+            ->orderBy(["r.collectionID", "r.sort"], "asc")
+            ->where($where)
+            ->get()
+            ->resultArray();
         $collectionID = null;
         $key = -1;
         $availableRecordTypes = $this->getAllRecordTypes();
         foreach ($results as $value) {
-            // Filter out records that are not in the available record types.
-            // If the recordType is null, we will include it, it just means we do not have any collectionRecord for it.
-            if (!in_array($value["recordType"], $availableRecordTypes) && !is_null($value["recordType"])) {
+            if (!in_array($value["recordType"], $availableRecordTypes)) {
                 continue;
             }
-
-            $collectionRecords = array_intersect_key($value, [
-                "recordID" => "",
-                "recordType" => "",
-                "sort" => "",
-                "dateAddedToCollection" => "",
-            ]);
+            $collectionRecords = array_intersect_key($value, ["recordID" => "", "recordType" => "", "sort" => ""]);
             unset($value["recordID"], $value["recordType"], $value["sort"]);
             if ($collectionID != $value["collectionID"]) {
                 $key++;
                 $collectionID = $value["collectionID"];
                 $records[$key] = $value;
             }
-            if (!isset($records[$key]["records"]) && empty(implode("", $collectionRecords))) {
-                $records[$key]["records"] = [];
-            } else {
-                $records[$key]["records"][] = $collectionRecords;
-            }
+            $records[$key]["records"][] = $collectionRecords;
         }
         unset($results);
 
@@ -147,21 +128,18 @@ class CollectionModel extends PipelineModel
     }
 
     /**
-     * Get a single collection & its records by collectionID
+     * Get a single collection by its ID
      *
      * @param int $collectionID
      * @return array
-     * @throws NoResultsException
-     * @throws ValidationException
      */
-    public function getCollectionRecordByCollectionID(int $collectionID): array
+    public function getCollectionRecordByID(int $collectionID): array
     {
         $collectionRecord = $this->selectSingle(["collectionID" => $collectionID]);
         $sql = $this->createSql();
         $filteredRecords = [];
         $records = $sql
             ->select()
-            ->select("dateInserted", "", "dateAddedToCollection")
             ->where("collectionID", $collectionID)
             ->orderBy("sort")
             ->get("collectionRecord")
@@ -202,7 +180,7 @@ class CollectionModel extends PipelineModel
      *
      * @param int $collectionID
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function deleteCollection(int $collectionID): void
     {
@@ -219,7 +197,7 @@ class CollectionModel extends PipelineModel
      * @param array $collectionIDs
      * @return bool
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function checkCollectionsExist(array $collectionIDs): bool
     {
@@ -249,19 +227,14 @@ class CollectionModel extends PipelineModel
         unset($collectionRecord["records"]);
         try {
             $this->database->beginTransaction();
-            $existingCollections = $this->select(["name" => $collectionRecord["name"]]);
-            if (count($existingCollections) === 0) {
-                $collectionID = $this->insert($collectionRecord);
-            } else {
-                $collectionID = $existingCollections[0]["collectionID"];
-            }
+            $collectionID = $this->insert($collectionRecord);
             if (empty($collectionID)) {
                 throw new ClientException("Error inserting the collection Record");
             }
             $this->addCollectionRecords($collectionID, $records);
 
             $this->database->commitTransaction();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->database->rollbackTransaction();
             throw $e;
         }
@@ -327,7 +300,7 @@ class CollectionModel extends PipelineModel
      * @param array $collectionRecord
      * @return void
      * @throws \Garden\Schema\ValidationException
-     * @throws NoResultsException
+     * @throws \Vanilla\Exception\Database\NoResultsException
      */
     public function updateCollection(int $collectionID, array $collectionRecord): void
     {
@@ -342,7 +315,7 @@ class CollectionModel extends PipelineModel
             $this->update($collectionRecord, ["collectionID" => $collectionID]);
             $this->addCollectionRecords($collectionID, $records);
             $this->database->commitTransaction();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->database->rollbackTransaction();
             throw $e;
         }
@@ -354,8 +327,6 @@ class CollectionModel extends PipelineModel
      * @param int $collectionID
      * @param string $locale
      * @return array
-     * @throws ValidationException
-     * @throws NoResultsException
      */
     public function getCollectionRecordContentByID(int $collectionID, string $locale = "en"): array
     {
@@ -475,11 +446,11 @@ class CollectionModel extends PipelineModel
      * @param string $locale
      * @return array
      * @throws ValidationException
-     * @throws NoResultsException
+     * @throws \Vanilla\Exception\Database\NoResultsException
      */
     public function generateRecordContent(int $collectionID, string $locale): array
     {
-        $collectionRecord = $this->getCollectionRecordByCollectionID($collectionID);
+        $collectionRecord = $this->getCollectionRecordByID($collectionID);
 
         $filteredRecords = $this->filterCollectionRecords($collectionRecord["records"], $locale, false);
 
@@ -489,23 +460,22 @@ class CollectionModel extends PipelineModel
     }
 
     /**
-     * Filter collection record contents to see if they should be displayed
+     * Filter collection record contents to see if they are good to be displayed
      * @param array $collectionRecords
      * @param ?string $locale
      * @param bool $cached
      * @return array
      */
-    public function filterCollectionRecords(array $collectionRecords, ?string $locale, bool $cached = true): array
+    private function filterCollectionRecords(array $collectionRecords, ?string $locale, bool $cached = true): array
     {
         $recordByTypes = [];
 
-        // Find the current valid records
+        //find the current valid records
         foreach ($this->filterRecordsByType($collectionRecords) as $recordType => $records) {
             $provider = $this->providersByType[$recordType] ?? null;
             if (empty($provider)) {
                 continue;
             }
-            // Check for valid recordIDs
             $validRecordIDs = $provider->filterValidRecordIDs(array_column($records, "recordID")) ?? [];
             if (!$cached) {
                 $recordByTypes[$recordType] = $provider->getRecords($validRecordIDs, $locale);
@@ -533,23 +503,5 @@ class CollectionModel extends PipelineModel
             }
         }
         return array_values($collectionRecords);
-    }
-
-    /**
-     * Get a comma separated list of collection names from their IDs
-     *
-     * @param int[] $collectionIDs
-     * @return string
-     */
-    public function getCollectionNamesFromCollectionIDs(array $collectionIDs): string
-    {
-        $result = "";
-        $collectionData = $this->select(["collectionID" => $collectionIDs]);
-        foreach ($collectionData as $index => $collection) {
-            $isLastOrOnlyItem =
-                count($collectionData) === 1 || (count($collectionData) > 1 && $index === count($collectionData) - 1);
-            $result .= $collection["name"] . ($isLastOrOnlyItem ? " " : ", ");
-        }
-        return $result;
     }
 }

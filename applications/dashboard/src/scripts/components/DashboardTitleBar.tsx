@@ -1,11 +1,12 @@
 /**
  * @author Dominic Lacaille <dominic.lacaille@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 import * as React from "react";
 import { DashboardTitleBarClasses } from "@dashboard/components/DashboardTitleBar.classes";
 import SmartLink from "@library/routing/links/SmartLink";
+import { useUsersState } from "@library/features/users/userModel";
 import DashboardMeBox from "@library/headers/mebox/pieces/DashboardMeBox";
 import { Icon } from "@vanilla/icons";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
@@ -17,7 +18,6 @@ import Container from "@library/layout/components/Container";
 import classNames from "classnames";
 import { IDashboardSection } from "@dashboard/DashboardSectionType";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
-import { useCurrentUser } from "@library/features/users/userHooks";
 
 interface IExtraSectionContent {
     key: string;
@@ -47,7 +47,7 @@ export default function DashboardTitleBar(props: IProps) {
     const { sections, activeSectionID } = props;
     const classes = DashboardTitleBarClasses();
     const dropdownClasses = dropDownClasses();
-    const currentUser = useCurrentUser();
+    const { currentUser } = useUsersState();
     const device = useTitleBarDevice();
 
     const isCompact = props.isCompact || device === TitleBarDevices.COMPACT;

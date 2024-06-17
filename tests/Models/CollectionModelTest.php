@@ -59,7 +59,7 @@ class CollectionModelTest extends SiteTestCase
         $collectionID = $this->collectionModel->saveCollection($collectionRecord);
         $this->assertisInt($collectionID);
 
-        $savedCollection = $this->collectionModel->getCollectionRecordByCollectionID($collectionID);
+        $savedCollection = $this->collectionModel->getCollectionRecordByID($collectionID);
         $savedRecord = $savedCollection["records"][0];
         $this->assertEquals($collectionRecord["name"], $savedCollection["name"]);
         $this->assertEquals($collectionRecord["records"][0]["recordID"], $savedRecord["recordID"]);
@@ -77,6 +77,6 @@ class CollectionModelTest extends SiteTestCase
         $this->collectionModel->deleteCollection($id);
         $this->expectExceptionMessage("No rows matched the provided criteria.");
         $this->expectException(NoResultsException::class);
-        $this->collectionModel->getCollectionRecordByCollectionID($id);
+        $this->collectionModel->getCollectionRecordByID($id);
     }
 }

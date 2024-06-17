@@ -20,6 +20,7 @@ import {
 } from "@library/lists/ListItem.variables";
 import TruncatedText from "@library/content/TruncatedText";
 import Heading from "@library/layout/Heading";
+import Paragraph from "@library/layout/Paragraph";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { pointerEventsClass } from "@library/styles/styleHelpersFeedback";
 import { IFeaturedImage, IImage } from "@library/@types/api/core";
@@ -157,7 +158,7 @@ export function ListItem(props: IListItemProps) {
     ) : undefined;
 
     const descriptionView = props.description ? (
-        <div className={cx(classes.description, descriptionClassName)}>
+        <Paragraph className={cx(classes.description, descriptionClassName)}>
             {truncateDescription ? (
                 <TruncatedText maxCharCount={descriptionMaxCharCount} lines={3}>
                     {props.description}
@@ -165,7 +166,7 @@ export function ListItem(props: IListItemProps) {
             ) : (
                 props.description
             )}
-        </div>
+        </Paragraph>
     ) : null;
 
     let metas = <Metas className={classes.metasContainer}>{props.metas}</Metas>;

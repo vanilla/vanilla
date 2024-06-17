@@ -108,7 +108,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/FullCollectionSchema"
+                                $ref: "#/components/schemas/Collection"
                 "401":
                     $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
@@ -132,73 +132,19 @@ paths:
                     $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
             tags:
                 - Collections
-    /collections/contents/{locale}:
-        get:
-            summary: List collections & contents.
-            parameters:
-                - name: locale
-                  description: Filter the records by their locale.
-                  in: path
-                  required: true
-                  schema:
-                      type: string
-                - name: collectionID
-                  description: Filter by one or more collection IDs.
-                  in: query
-                  required: false
-                  schema:
-                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
-                - name: dateAddedToCollection
-                  description: Filter by date a record has been added to collection. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
-                  in: query
-                  schema:
-                      format: date-filter
-                      type: string
-                - name: expand[]
-                  description: >
-                      Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
-                  in: query
-                  schema:
-                      type: array
-                      items:
-                          type: string
-                          enum:
-                              - all
-                              - collection
-                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
-                - name: limit
-                  description: Desired number of collections per page.
-                  in: query
-                  schema:
-                      type: integer
-                      default: 100
-                      minimum: 1
-            responses:
-                "200":
-                    content:
-                        "application/json":
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/CollectionRecordContentSchema"
-                                type: array
-                    description: Success
-                "401":
-                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
-            tags:
-                - Collections
     /collections/{id}/content/{locale}:
         get:
             summary: List collection with the each record expanded
             parameters:
-                - name: id
-                  description: The collection id
+                - description: The collection id
                   in: path
+                  name: id
                   required: true
                   schema:
                       type: integer
-                - name: locale
-                  description: Filter the records by their locale.
+                - description: Filter the records by their locale.
                   in: path
+                  name: locale
                   required: true
                   schema:
                       type: string
@@ -291,7 +237,7 @@ paths:
                 - Collections
 components:
     schemas:
-        PostCollectionRecord:
+        CollectionRecord:
             properties:
                 recordID:
                     description: The ID of the corresponding record
@@ -314,15 +260,6 @@ components:
                 - recordID
                 - recordType
             type: object
-        CollectionRecord:
-            allOf:
-                - type: object
-                  properties:
-                      dateAddedToCollection:
-                          description: When the record was added to collection.
-                          format: date-time
-                          type: string
-                - $ref: "#/components/schemas/PostCollectionRecord"
         Collection:
             description: A collection of multiple  resources
             type: object
@@ -351,7 +288,7 @@ components:
                 records:
                     description: An array of records that belongs to the collection.
                     items:
-                        $ref: "#/components/schemas/PostCollectionRecord"
+                        $ref: "#/components/schemas/CollectionRecord"
                     type: array
                     maxItems: 30
             required:
@@ -363,7 +300,7 @@ components:
                       records:
                           description: An array of records that belongs to the collection.
                           items:
-                              $ref: "#/components/schemas/PostCollectionRecord"
+                              $ref: "#/components/schemas/CollectionRecord"
                           type: array
                           maxItems: 30
                   required:
@@ -443,33 +380,3 @@ components:
                 - collectionID
                 - name
                 - records
-        CollectionRecordContentSchema:
-            allOf:
-                - $ref: "#/components/schemas/CollectionRecord"
-                - type: object
-                  properties:
-                      collectionID:
-                          description: The Id of the collection.
-                          type: integer
-                          readOnly: true
-                      record:
-                          description: The expanded data of the specific record
-                          type: object
-                          anyOf:
-                              - $ref: "../../../cloud/plugins/knowledge/openapi/articles.yml#/components/schemas/Article"
-                              - $ref: "../../vanilla/openapi/discussions.yml#/components/schemas/Discussion"
-                              - $ref: "../../vanilla/openapi/categories.yml#/components/schemas/CategorySchema"
-                              - $ref: "../../groups/openapi/groups.yml#/components/schemas/Group"
-                              - $ref: "../../groups/openapi/events.yml#/components/schemas/FullEvent"
-                              - $ref: "../../../cloud/plugins/knowledge/openapi/knowledge-bases.yml#/components/schemas/FullKnowledgeBaseSchema"
-                      collection:
-                          description: The collection that the record belongs to
-                          type: object
-                          properties:
-                              collectionID:
-                                  description: The Id of the collection.
-                                  type: integer
-                                  readOnly: true
-                              name:
-                                  description: Name for the collection
-                                  type: string

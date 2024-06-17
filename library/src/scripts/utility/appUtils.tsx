@@ -9,7 +9,6 @@ import gdn from "@library/gdn";
 import { globalValueRef, logError, PromiseOrNormalCallback, RecordID } from "@vanilla/utils";
 import { ensureScript } from "@vanilla/dom-utils";
 import { sprintf } from "sprintf-js";
-import { isLayoutRoute } from "@library/features/Layout/LayoutPage.paths";
 
 // Re-exported for backwards compatibility
 export { t, translate } from "@vanilla/i18n";
@@ -302,11 +301,6 @@ export function _executeReady(before?: () => void | Promise<void>): Promise<any[
                 .finally(() => {
                     const contentEvent = new CustomEvent("X-VanillaReady", { bubbles: true, cancelable: false });
                     document.dispatchEvent(contentEvent);
-
-                    // we'll dispatch this event only on legacy pages, as for layout/knowledge pages we dispatch it from <AnalyticsData/>
-                    if (getMeta("trackLegacyPageViews", false)) {
-                        document.dispatchEvent(new CustomEvent("X-PageView", { bubbles: true, cancelable: false }));
-                    }
                 });
         };
 

@@ -1,10 +1,11 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
 // Imports
+import React from "react";
 import { AppContext } from "@library/AppContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { registerLayoutPage } from "@library/features/Layout/LayoutPage.registry";
@@ -23,12 +24,12 @@ import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import { LayoutError } from "@library/features/Layout/LayoutErrorBoundary";
 import { HamburgerMenuContextProvider } from "@library/contexts/HamburgerMenuContext";
-import { getSiteSection } from "@library/utility/appUtils";
+import { getMeta, getSiteSection } from "@library/utility/appUtils";
 import { logDebug } from "@vanilla/utils";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { CommunitySearchProvider } from "@vanilla/addon-vanilla/search/CommunitySearchProvider";
-import { onPageViewWithContext } from "@library/analytics/AnalyticsData";
-import { trackLink, trackPageView } from "@library/analytics/tracking";
+import { AnalyticsData, onPageViewWithContext } from "@library/analytics/AnalyticsData";
+import { trackPageView } from "@library/analytics/tracking";
 import SectionFullWidth from "@library/layout/SectionFullWidth";
 import SectionOneColumn from "@library/layout/SectionOneColumn";
 import ThreeColumnSection from "@library/layout/ThreeColumnSection";
@@ -53,6 +54,7 @@ function LayoutApp() {
 
                 <Router useLayoutRouting>
                     <TitleBar />
+                    <AnalyticsData uniqueKey={"customLayoutPage"} />
                 </Router>
             </HamburgerMenuContextProvider>
         </>
@@ -145,5 +147,3 @@ SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 onPageViewWithContext((event: CustomEvent) => {
     trackPageView(window.location.href, event.detail);
 });
-
-trackLink();

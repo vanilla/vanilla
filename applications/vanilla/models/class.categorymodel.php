@@ -163,18 +163,6 @@ class CategoryModel extends Gdn_Model implements
     const LAYOUT_NESTED_CATEGORY_LIST = "nestedCategoryList";
     const LAYOUT_DISCUSSION_CATEGORY_PAGE = "discussionCategoryPage";
 
-    public const OUTPUT_PREFERENCE_FOLLOW = "preferences.followed";
-
-    public const OUTPUT_PREFERENCE_DISCUSSION_APP = "preferences.popup.posts";
-
-    public const OUTPUT_PREFERENCE_DISCUSSION_EMAIL = "preferences.email.posts";
-
-    public const OUTPUT_PREFERENCE_COMMENT_APP = "preferences.popup.comments";
-
-    public const OUTPUT_PREFERENCE_COMMENT_EMAIL = "preferences.email.comments";
-
-    public const OUTPUT_PREFERENCE_DIGEST = "preferences.email.digest";
-
     /** @var int The tippy-top of the category tree. */
     public const ROOT_ID = -1;
 
@@ -247,8 +235,6 @@ class CategoryModel extends Gdn_Model implements
     private $imageSrcSetService;
 
     private bool $unfilteredSearchCategories = false;
-
-    private ?array $preferenceMap = null;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -529,7 +515,7 @@ class CategoryModel extends Gdn_Model implements
                     ->select("C.CategoryID")
                     ->distinct()
                     ->from("Category C")
-                    ->join("Permission P", "C.PermissionCategoryID = P.JunctionID AND P.JunctionTable = 'Category'")
+                    ->join("Permission P", "C.PermissionCategoryID = P.JunctionID")
                     ->join("Role R", "R.RoleID = P.RoleID ")
                     ->where([
                         "P.JunctionTable" => "Category",
@@ -913,7 +899,6 @@ class CategoryModel extends Gdn_Model implements
      *
      * @param array $preferences
      * @return array
-     * @deprecated
      * @todo : Remove this function and its references after 2023.014 release
      */
     public function convertOldPreferencesToNew(array $preferences): array
@@ -1128,7 +1113,6 @@ class CategoryModel extends Gdn_Model implements
      *   - filterArchivedCategories (bool): Filter out categories that are archived.
      *   - forceArrayReturn (bool): Force an array return value.
      *   - filterNonDiscussionCategories (bool) : Filter out categories with no discussion in them
-     *   - filterSiteSections (bool) : Filter out categories that are not in the current site section
      * @return array|bool An array of filtered categories or true if no categories were filtered.
      */
     public function getVisibleCategories(array $options = [])
@@ -1140,9 +1124,7 @@ class CategoryModel extends Gdn_Model implements
             $unfiltered = false;
         }
 
-        $filterSiteSections = $options["filterSiteSections"] ?? true;
-
-        if ($filterSiteSections && $this->eventManager->hasHandler("getAlternateVisibleCategories")) {
+        if ($this->eventManager->hasHandler("getAlternateVisibleCategories")) {
             $categories = $this->eventManager->fireFilter("getAlternateVisibleCategories", []);
             $unfiltered = false;
         } else {
@@ -1388,11 +1370,7 @@ class CategoryModel extends Gdn_Model implements
         if (!($category["CssClass"] ?? false)) {
             // Our validation rule is that the CssClass should be no longer than 50 chars, so if we're auto-generating one,
             // make sure we respect the rule.
-            $category["CssClass"] = substr(
-                "Category-" . $category["CategoryID"] . "-" . $category["UrlCode"] ?? "",
-                0,
-                50
-            );
+            $category["CssClass"] = substr("Category-" . $category["CategoryID"] . "-" . $category["UrlCode"], 0, 50);
         }
 
         if (isset($category["AllowedDiscussionTypes"]) && is_string($category["AllowedDiscussionTypes"])) {
@@ -2314,7 +2292,7 @@ class CategoryModel extends Gdn_Model implements
                 }
 
                 $category["LastTitle"] = $discussion["Name"];
-                $category["LastUrl"] = DiscussionModel::discussionUrl($discussion, false, true) . "#latest";
+                $category["LastUrl"] = discussionUrl($discussion, false, true) . "#latest";
                 $category["LastDiscussionUserID"] = $discussion["InsertUserID"];
                 $category["LastUserID"] = $discussion["LastCommentUserID"] ?? $discussion["InsertUserID"];
                 $user = Gdn::userModel()->getID($category["LastUserID"]);
@@ -2819,10 +2797,9 @@ class CategoryModel extends Gdn_Model implements
     /**
      * Get list of categories (disregarding user permission for admins).
      *
-     * @return object SQL results.
-     * @throws Exception
      * @since 2.0.0
-     * @deprecated This function isn't secure and might blow up if there are too many categories.
+     *
+     * @return object SQL results.
      */
     public function getAll()
     {
@@ -3761,14 +3738,8 @@ class CategoryModel extends Gdn_Model implements
             (bool) val("CustomPermissions", $formPostValues) || is_array(val("Permissions", $formPostValues));
         $CustomPoints = val("CustomPoints", $formPostValues, null);
 
-        if (isset($formPostValues["Name"])) {
-            $formPostValues["Name"] = htmlspecialchars($formPostValues["Name"]);
-        }
-
         if (isset($formPostValues["AllowedDiscussionTypes"]) && is_array($formPostValues["AllowedDiscussionTypes"])) {
             $formPostValues["AllowedDiscussionTypes"] = dbencode($formPostValues["AllowedDiscussionTypes"]);
-        } else {
-            $formPostValues["AllowedDiscussionTypes"] = null;
         }
 
         // Is this a new category?
@@ -4391,7 +4362,13 @@ class CategoryModel extends Gdn_Model implements
      */
     private function getUserMeta(int $userID, ?int $categoryID = null): array
     {
-        $names = $this->getCategoryPreferencesWithReference();
+        $names = [
+            self::PREFERENCE_FOLLOW,
+            self::PREFERENCE_DISCUSSION_APP,
+            self::PREFERENCE_DISCUSSION_EMAIL,
+            self::PREFERENCE_COMMENT_APP,
+            self::PREFERENCE_COMMENT_EMAIL,
+        ];
         $userMetaModel = Gdn::userMetaModel();
         $sql = $userMetaModel->createSql()->where("UserID", $userID);
         $sql->beginWhereGroup();
@@ -4504,7 +4481,9 @@ class CategoryModel extends Gdn_Model implements
                 }
                 // set the preferences here and it should be all set
                 $preferencesToSet = self::getGenericCategoryPreferenceKeys();
-                $categoryPreference = $this->normalizePreferencesInput($categoryPreference["preferences"] ?? []);
+                $categoryPreference = CategoriesApiController::normalizePreferencesInput(
+                    $categoryPreference["preferences"] ?? []
+                );
                 $preferences = [];
                 foreach ($preferencesToSet as $pref) {
                     if (isset($categoryPreference[$pref])) {
@@ -4525,68 +4504,6 @@ class CategoryModel extends Gdn_Model implements
                 "trace" => $exception->getTraceAsString(),
             ]);
         }
-    }
-
-    /**
-     * Get a list of the valid Category Preferences.
-     *
-     * @return string[]
-     */
-    public function getCategoryPreferences(): array
-    {
-        $this->preferenceMap = [
-            self::OUTPUT_PREFERENCE_FOLLOW => "Preferences.Follow",
-            self::OUTPUT_PREFERENCE_DISCUSSION_APP => "Preferences.Popup.NewDiscussion",
-            self::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => "Preferences.Email.NewDiscussion",
-            self::OUTPUT_PREFERENCE_COMMENT_APP => "Preferences.Popup.NewComment",
-            self::OUTPUT_PREFERENCE_COMMENT_EMAIL => "Preferences.Email.NewComment",
-        ];
-        if (CategoryModel::isDigestEnabled()) {
-            $this->preferenceMap[self::OUTPUT_PREFERENCE_DIGEST] = "Preferences.Email.Digest";
-        }
-
-        $result = $this->eventManager->fire("categoryModel_getPreferenceMap", $this->preferenceMap);
-
-        if (is_array($result) && !empty($result)) {
-            $this->preferenceMap = $result[0];
-        }
-
-        return $this->preferenceMap;
-    }
-
-    /**
-     * Get a list of the valid Category Preferences with the suffix `.%d`.
-     *
-     * @return string[]
-     */
-    public function getCategoryPreferencesWithReference(): array
-    {
-        $preferences = $this->getCategoryPreferences();
-
-        foreach ($preferences as $key => $value) {
-            $preferences[$key] = $value . ".%d";
-        }
-
-        return $preferences;
-    }
-
-    /**
-     * Convert preference field names and values for db input.
-     *
-     * @param array $preferencesToInput
-     * @return array
-     */
-    public function normalizePreferencesInput(array $preferencesToInput): array
-    {
-        $preferencesMap = $this->getCategoryPreferences();
-        $input = [];
-        foreach ($preferencesToInput as $apiName => $value) {
-            if (isset($preferencesMap[$apiName])) {
-                $input[$preferencesMap[$apiName]] = (bool) $value;
-            }
-        }
-
-        return $input;
     }
 
     /**
@@ -4803,16 +4720,17 @@ class CategoryModel extends Gdn_Model implements
      */
     private function generatePreferences(int $categoryID, array $userMeta, ?array $userCategory): array
     {
-        $preferences = $this->getCategoryPreferencesWithReference();
-
-        foreach ($preferences as $preference) {
-            $categoryPreferences[self::stripCategoryPreferenceKey($preference)] =
-                $userMeta[sprintf($preference, $categoryID)]["Value"] ?? false;
-        }
-
-        $categoryPreferences[self::stripCategoryPreferenceKey(self::PREFERENCE_FOLLOW)] =
-            $userCategory["Followed"] ?? false;
-
+        $categoryPreferences = [
+            self::stripCategoryPreferenceKey(self::PREFERENCE_FOLLOW) => $userCategory["Followed"] ?? false,
+            self::stripCategoryPreferenceKey(self::PREFERENCE_DISCUSSION_APP) =>
+                $userMeta[sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID)]["Value"] ?? false,
+            self::stripCategoryPreferenceKey(self::PREFERENCE_DISCUSSION_EMAIL) =>
+                $userMeta[sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID)]["Value"] ?? false,
+            self::stripCategoryPreferenceKey(self::PREFERENCE_COMMENT_APP) =>
+                $userMeta[sprintf(self::PREFERENCE_COMMENT_APP, $categoryID)]["Value"] ?? false,
+            self::stripCategoryPreferenceKey(self::PREFERENCE_COMMENT_EMAIL) =>
+                $userMeta[sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID)]["Value"] ?? false,
+        ];
         if (self::isDigestEnabled()) {
             $categoryPreferences[self::stripCategoryPreferenceKey(self::PREFERENCE_DIGEST_EMAIL)] =
                 $userCategory["DigestEnabled"] ?? false;
@@ -5612,22 +5530,5 @@ SQL;
             default:
                 return CategoryModel::LAYOUT_CATEGORY_LIST;
         }
-    }
-
-    /**
-     * Convert preference field names and values for api output.
-     *
-     * @param array $preferencesToOutput
-     * @return array
-     */
-    public function normalizePreferencesOutput(array $preferencesToOutput): array
-    {
-        $preferencesMap = array_flip($this->getCategoryPreferences());
-        $output = [];
-        foreach ($preferencesMap as $dbName => $apiName) {
-            $output[$apiName] = $preferencesToOutput[$dbName] ?? false;
-        }
-
-        return $output;
     }
 }

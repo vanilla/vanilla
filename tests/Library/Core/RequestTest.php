@@ -7,7 +7,6 @@
 namespace VanillaTests\Library\Core;
 
 use Vanilla\Utility\UrlUtils;
-use Vanilla\Web\BotDetector;
 use VanillaTests\SharedBootstrapTestCase;
 use Gdn_Request;
 
@@ -911,27 +910,5 @@ class RequestTest extends SharedBootstrapTestCase
             $request->setMethod("PATCH");
             $this->assertSame("PATCH", $request->getMethod());
         });
-    }
-
-    /**
-     * @return void
-     */
-    public function testIsCrawler(): void
-    {
-        $botDetector = new BotDetector();
-        $request = $this->createRequest();
-        $request->setHeader("User-Agent", "Googlebot/2.1 (+http://www.google.com/bot.html)");
-        $this->assertTrue($botDetector->isBot($request));
-
-        // A normal user agent is not a bot
-        $request->setHeader(
-            "User-Agent",
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-        );
-        $this->assertFalse($botDetector->isBot($request));
-
-        // Alternatively our Edge network might identify the bot
-        $request->setHeader("X-Known-Bot", "1");
-        $this->assertTrue($botDetector->isBot($request));
     }
 }

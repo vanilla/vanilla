@@ -1120,10 +1120,6 @@ components:
                 showEmail:
                     description: Is the email address visible to other users?
                     type: boolean
-                suggestAnswers:
-                    description: Should we automatically suggest answers for this user?
-                    type: boolean
-                    x-feature: "Feature.AISuggestions.Enabled"
                 insertIPAddress:
                     description: First IP address of this user. Only visible to site administrators.
                     type: string
@@ -1167,10 +1163,6 @@ components:
                 showEmail:
                     description: Is the email address visible to other users?
                     type: boolean
-                suggestAnswers:
-                    description: Should we automatically suggest answers for this user?
-                    type: boolean
-                    x-feature: "Feature.AISuggestions.Enabled"
                 name:
                     description: Name of the user.
                     minLength: 1

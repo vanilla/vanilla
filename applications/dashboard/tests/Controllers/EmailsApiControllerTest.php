@@ -82,10 +82,24 @@ class EmailsApiControllerTest extends SiteTestCase
     }
 
     /**
+     * Test that the digest endpoint requires a feature flag.
+     */
+    public function testSendTestDigestFails(): void
+    {
+        $this->expectExceptionMessage("This feature is not enabled.");
+        $response = $this->api()->post("/emails/send-test-digest", [
+            "destinationAddress" => "dest@example.com",
+            "destinationUserID" => $this->api()->getUserID(),
+        ]);
+    }
+
+    /**
      * Test sending test digest emails.
      */
     public function testSendTestDigestEmail(): void
     {
+        self::enableFeature("Digest");
+
         $user = $this->createUser([
             "email" => "testuser@example.com",
         ]);
@@ -146,6 +160,7 @@ class EmailsApiControllerTest extends SiteTestCase
      */
     public function testSendTestDigestEmailWithConfigurations(): void
     {
+        self::enableFeature("Digest");
         self::$emails = [];
         $memberUser = $this->createUser();
         $this->resetTable("Discussion");
@@ -207,6 +222,8 @@ class EmailsApiControllerTest extends SiteTestCase
      */
     public function testSendTestDigestEmailCheckCategory(): void
     {
+        self::enableFeature("Digest");
+
         $user = $this->createUser([
             "email" => "testuser1@example.com",
         ]);

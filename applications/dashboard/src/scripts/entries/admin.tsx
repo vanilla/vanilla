@@ -55,6 +55,7 @@ addComponent("ModernEmbedSettings", ModernEmbedSettings);
 
 addComponent("UserManagementSpoof", UserManagementSpoof);
 
+disableComponentTheming();
 onContent(() => initAllUserContent());
 registerReducer("roles", roleReducer);
 registerReducer("themeSettings", themeSettingsReducer);
@@ -126,11 +127,4 @@ addComponent("DashboardAddEditUser", DashboardAddEditUser); //this should be gon
 addComponent("UserManagementPage", () => {
     return <Router sectionRoots={["/dashboard/user"]} />;
 });
-addComponent("AuditLogsPage", () => {
-    return <Router sectionRoots={["/dashboard/settings/audit-logs"]} />;
-});
 addComponent("ExternalSearchSettingsPage", ExternalSearchSettingsPage);
-
-addComponent("automationRules", () => {
-    return <Router sectionRoots={["/settings/automation-rules"]} />;
-});

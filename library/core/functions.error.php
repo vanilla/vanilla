@@ -8,10 +8,8 @@
  * @since 2.0
  */
 
-use Garden\Utils\ContextException;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\DebugUtils;
-use Whoops\Handler\PrettyPageHandler;
 
 /**
  * A custom error handler that displays much more, very useful information when
@@ -115,35 +113,6 @@ function gdnExceptionHandler(Throwable $Exception)
             }
         }
 
-        if ($Debug) {
-            $handler = new PrettyPageHandler();
-            $handler->setApplicationRootPath(PATH_ROOT);
-            if (!$PanicError) {
-                $handler->setApplicationPaths([PATH_APPLICATIONS, PATH_PLUGINS, PATH_THEMES, PATH_LIBRARY]);
-            }
-
-            $exStack = $Exception;
-            while (true) {
-                if ($exStack instanceof ContextException) {
-                    $handler->addDataTable(get_class($exStack) . " Context", $exStack->getContext());
-                }
-                if ($exStack->getPrevious() === null) {
-                    break;
-                } else {
-                    $exStack = $exStack->getPrevious();
-                }
-            }
-
-            $whoops = new \Whoops\Run();
-
-            $whoops->allowQuit(false);
-            $whoops->writeToOutput(false);
-            $whoops->pushHandler($handler);
-            $html = $whoops->handleException($Exception);
-            echo $html;
-            exit();
-        }
-
         if ($PanicError === false) {
             // See if we can get the file that caused the error
             if (is_string($File) && is_numeric($ErrorNumber)) {
@@ -156,6 +125,10 @@ function gdnExceptionHandler(Throwable $Exception)
                 $MasterViewPaths = [];
                 $MasterViewName = "error.master.php";
                 $MasterViewCss = "error.css";
+
+                if ($Debug) {
+                    $MasterViewName = "deverror.master.php";
+                }
 
                 if (class_exists("Gdn", false)) {
                     $CurrentTheme = ""; // The currently selected theme

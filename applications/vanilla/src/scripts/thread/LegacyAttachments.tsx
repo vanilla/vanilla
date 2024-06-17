@@ -7,9 +7,8 @@
 import { IntegrationButtonAndModal } from "@library/features/discussions/integrations/Integrations";
 import {
     AttachmentIntegrationsContextProvider,
-    WriteableIntegrationContextProvider,
-    ReadableIntegrationContextProvider,
-    useWriteableAttachmentIntegrations,
+    IntegrationContextProvider,
+    useAttachmentIntegrations,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
@@ -32,14 +31,7 @@ export function LegacyThreadAttachmentsAsset(props: IProps) {
         <div>
             <AttachmentIntegrationsContextProvider>
                 {props.attachments?.map((attachment, i) => {
-                    return (
-                        <ReadableIntegrationContextProvider
-                            key={attachment.attachmentID}
-                            attachmentType={attachment.attachmentType}
-                        >
-                            <DiscussionAttachment key={i} attachment={attachment} />
-                        </ReadableIntegrationContextProvider>
-                    );
+                    return <DiscussionAttachment key={i} attachment={attachment} />;
                 })}
             </AttachmentIntegrationsContextProvider>
         </div>
@@ -50,7 +42,6 @@ interface IFormProps {
     recordType: string;
     recordID: number;
     redirectTarget: string;
-    isAuthor: boolean;
 }
 
 export function LegacyIntegrationsOptionsMenuItems(props: IFormProps) {
@@ -62,29 +53,28 @@ export function LegacyIntegrationsOptionsMenuItems(props: IFormProps) {
 }
 
 function LegacyIntegrationsOptionsMenuItemsImpl(props: IFormProps) {
-    const { isAuthor } = props;
-    const writeableIntegrations = useWriteableAttachmentIntegrations()
-        .filter((integration) => integration.recordTypes.includes(props.recordType))
-        .filter(({ writeableContentScope }) => (writeableContentScope === "own" ? isAuthor : true));
+    const integrations = useAttachmentIntegrations();
 
-    return writeableIntegrations.length > 0 ? (
+    return (
         <>
-            {writeableIntegrations.map((integration) => {
-                return (
-                    <WriteableIntegrationContextProvider
-                        key={integration.attachmentType}
-                        recordType={props.recordType}
-                        attachmentType={integration.attachmentType}
-                        recordID={props.recordID}
-                    >
-                        <IntegrationButtonAndModal
-                            onSuccess={async () => {
-                                window.location.href = props.redirectTarget;
-                            }}
-                        />
-                    </WriteableIntegrationContextProvider>
-                );
-            })}
+            {integrations
+                .filter((integration) => integration.recordTypes.includes(props.recordType))
+                .map((integration) => {
+                    return (
+                        <IntegrationContextProvider
+                            key={integration.attachmentType}
+                            recordType={props.recordType}
+                            attachmentType={integration.attachmentType}
+                            recordID={props.recordID}
+                        >
+                            <IntegrationButtonAndModal
+                                onSuccess={async () => {
+                                    window.location.href = props.redirectTarget;
+                                }}
+                            />
+                        </IntegrationContextProvider>
+                    );
+                })}
         </>
-    ) : null;
+    );
 }

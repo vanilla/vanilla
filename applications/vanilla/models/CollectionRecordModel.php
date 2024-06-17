@@ -7,8 +7,6 @@
 
 namespace Vanilla\Models;
 
-use Exception;
-use UserModel;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 
 /**
@@ -17,8 +15,6 @@ use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 class CollectionRecordModel extends PipelineModel
 {
     private const TABLE_NAME = "collectionRecord";
-
-    public const LIMIT_DEFAULT = 100;
 
     public function __construct()
     {
@@ -46,7 +42,7 @@ class CollectionRecordModel extends PipelineModel
      * @param string $orderDirection
      * @param int $batchSize
      * @return \Generator
-     * @throws Exception
+     * @throws \Exception
      */
     public function getWhereIterator(
         array $where = [],
@@ -92,36 +88,5 @@ class CollectionRecordModel extends PipelineModel
                 return;
             }
         }
-    }
-
-    /**
-     * Get collection records based on filter.
-     *
-     * @param array $where
-     * @param int $limit
-     * @param int $offset
-     * @return array
-     */
-    public function getCollectionRecords(array $where = [], int $limit = 100, int $offset = 0): array
-    {
-        $sql = $this->createSql();
-        $readSchemaArray = $this->getReadSchema()->getSchemaArray();
-        $columns = array_keys($readSchemaArray["properties"]);
-        foreach ($where as $key => $value) {
-            $column = explode(" ", $key)[0];
-            if (in_array($column, $columns)) {
-                $where["cr." . $key] = $value;
-                unset($where[$key]);
-            }
-        }
-        return $sql
-            ->select()
-            ->select("cr.dateInserted as dateAddedToCollection")
-            ->from($this->getTable() . " cr")
-            ->join("collection c", "c.collectionID = cr.collectionID")
-            ->where($where)
-            ->limit($limit, $offset)
-            ->get()
-            ->resultArray();
     }
 }

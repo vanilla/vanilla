@@ -160,11 +160,6 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
         $column->Unsigned = $unsigned;
         $column->AutoIncrement = false;
 
-        if ($column->Type === "datetime") {
-            $column->Precision = $column->Length;
-            $column->Length = null;
-        }
-
         // Handle enums and sets as types.
         if (is_array($type)) {
             if (count($type) === 2 && is_array(val(1, $type))) {
@@ -182,37 +177,6 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
         }
 
         return $column;
-    }
-
-    /**
-     * Add dateInserted / dateUpdated and insertUserID / updateUserID columns.
-     *
-     * @param bool $includeUpdate Add update columns.
-     * @param bool $includeIPAddress Add insertIPAddress & updateIPAddress columns.
-     *
-     * @return $this
-     */
-    public function insertUpdateColumns(
-        bool $includeUpdate = true,
-        bool $includeIPAddress = false,
-        int $datePrecision = 0
-    ): Gdn_DatabaseStructure {
-        $this->column("dateInserted", $datePrecision > 0 ? "datetime($datePrecision)" : "datetime", false);
-
-        $this->column("insertUserID", "int", false);
-
-        if ($includeUpdate) {
-            $this->column("dateUpdated", "datetime[$datePrecision]", null)->column("updateUserID", "int", null);
-        }
-
-        if ($includeIPAddress) {
-            $this->column("insertIPAddress", "varbinary(16)", false);
-            if ($includeUpdate) {
-                $this->column("updateIPAddress", "varbinary(16)", null);
-            }
-        }
-
-        return $this;
     }
 
     /**
@@ -466,13 +430,12 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
      *
      * @param string $name The name of the column.
      * @param string $type The data type of the column.
-     * @param bool $autoIncrement
      * @return $this
      */
-    public function primaryKey($name, $type = "int", bool $autoIncrement = true)
+    public function primaryKey($name, $type = "int")
     {
         $column = $this->_createColumn($name, $type, false, null, "primary");
-        $column->AutoIncrement = $autoIncrement;
+        $column->AutoIncrement = true;
         $this->_Columns[$name] = $column;
 
         return $this;
@@ -715,7 +678,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
             case "length":
                 return array_merge($char, $text, $length, $decimal);
             case "definelength":
-                return array_merge($char, $length, $decimal, ["datetime"]);
+                return array_merge($char, $length, $decimal);
             default:
                 return [];
         }

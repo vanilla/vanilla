@@ -96,54 +96,6 @@ class SchemaUtilsTest extends TestCase
     }
 
     /**
-     * @return void
-     */
-    public function testOnlyTogetherHappy(): void
-    {
-        $field = new ValidationField(new Validation(), [], "");
-        $fn = SchemaUtils::onlyTogether(["a", "b", "c"]);
-
-        $fn(["a" => 1, "b" => 2, "c" => 3], $field);
-        $this->assertTrue($field->isValid());
-    }
-
-    /**
-     * @return void
-     */
-    public function testOnlyTogetherInvalid(): void
-    {
-        $field = new ValidationField(new Validation(), [], "");
-        $fn = SchemaUtils::onlyTogether(["a", "b", "c"]);
-
-        $fn(["a" => 1, "b" => 2], $field);
-        $this->assertFalse($field->isValid());
-    }
-
-    /**
-     * @return void
-     */
-    public function testFieldRequirementValid(): void
-    {
-        $field = new ValidationField(new Validation(), [], "");
-        $fn = SchemaUtils::fieldRequirement("a", "b");
-
-        $fn(["a" => 1, "b" => 2], $field);
-        $this->assertTrue($field->isValid());
-    }
-
-    /**
-     * @return void
-     */
-    public function testFieldRequirementInvalid(): void
-    {
-        $field = new ValidationField(new Validation(), [], "");
-        $fn = SchemaUtils::fieldRequirement("a", "b");
-
-        $fn(["a" => 1], $field);
-        $this->assertFalse($field->isValid());
-    }
-
-    /**
      * Validating an array should work with valid data.
      */
     public function testValidateArrayValid(): void

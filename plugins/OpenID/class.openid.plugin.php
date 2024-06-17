@@ -217,7 +217,11 @@ class OpenIDPlugin extends Gdn_Plugin
         }
         $this->EventArguments = $Args;
 
-        $OpenID = $this->getOpenID();
+        try {
+            $OpenID = $this->getOpenID();
+        } catch (Gdn_UserException $ex) {
+            $Sender->Form->addError("@" . $ex->getMessage());
+        }
 
         $Mode = $Sender->Request->get("openid_mode");
         switch ($Mode) {
@@ -231,7 +235,7 @@ class OpenIDPlugin extends Gdn_Plugin
 
                 break;
             default:
-                if (!isset($OpenID->identity)) {
+                if (!$OpenID->identity) {
                     $Sender->CssClass = "Dashboard Entry connect";
                     $Sender->setData("Title", t("Sign In with OpenID"));
                     $Sender->render("Url", "", "plugins/OpenID");

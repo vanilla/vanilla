@@ -20,7 +20,6 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ResponseException;
 use Garden\Web\Redirect;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Dashboard\Events\LayoutApplyEvent;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\Asset\LayoutQuery;
@@ -32,7 +31,6 @@ use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\Resolvers\ReactResolver;
 use Vanilla\Layout\Section\AbstractLayoutSection;
-use Vanilla\Logging\AuditLogger;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
@@ -788,8 +786,6 @@ class LayoutsApiController extends \AbstractApiController
 
         $layoutViews = $this->layoutViewModel->select(["layoutViewID" => $layoutViewIDs]);
         $result = $this->layoutViewModel->normalizeRows($layoutViews, ["record"]);
-        $auditEvent = new LayoutApplyEvent($row, $result);
-        AuditLogger::log($auditEvent);
         $out = $this->schema(LayoutViewModel::getSchema());
         SchemaUtils::validateArray($result, $out);
         return new Data($result, 201);

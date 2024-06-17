@@ -18,9 +18,7 @@ use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\AddonStructure;
-use Vanilla\Dashboard\Events\AddonToggledEvent;
 use Vanilla\Logger;
-use Vanilla\Logging\AuditLogger;
 
 /**
  * Handles addon maintenance within the application.
@@ -215,7 +213,12 @@ class AddonModel implements LoggerAwareInterface
         $this->enableInConfig($addon, true, $options);
 
         if (!$wasEnabled) {
-            AuditLogger::log(new AddonToggledEvent($addon, true));
+            $this->logger->info("The {addonKey} {addonType} was enabled.", [
+                "event" => "addon_enabled",
+                "addonKey" => $addon->getKey(),
+                "addonType" => $addon->getType(),
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
+            ]);
         }
     }
 
@@ -347,7 +350,12 @@ class AddonModel implements LoggerAwareInterface
 
         // 4. Log the disable.
         if ($wasEnabled) {
-            AuditLogger::log(new AddonToggledEvent($addon, false));
+            $this->logger->info("The {addonKey} {addonType} was disabled.", [
+                "event" => "addon_disabled",
+                "addonKey" => $addon->getKey(),
+                "addonType" => $addon->getType(),
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
+            ]);
         }
 
         $this->events->dispatch(new AddonDisabledEvent($addon));

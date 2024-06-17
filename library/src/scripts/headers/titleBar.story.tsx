@@ -32,8 +32,6 @@ import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
 import { Icon } from "@vanilla/icons";
 
 import localLogoUrl from "./titleBarStoryLogo.png";
-import { CurrentUserContextProvider, ReduxCurrentUserContextProvider } from "@library/features/users/userHooks";
-import { ReduxThemeContextProvider } from "@library/theming/Theme.context";
 
 loadTranslations({});
 
@@ -67,7 +65,7 @@ export default {
     },
 };
 
-const mockRegisterUser: IMe = {
+const makeMockRegisterUser: IMe = {
     name: "Neena",
     userID: 1,
     isAdmin: true,
@@ -79,6 +77,12 @@ const mockRegisterUser: IMe = {
 };
 
 const initialState = testStoreState({
+    users: {
+        current: {
+            status: LoadStatus.SUCCESS,
+            data: makeMockRegisterUser,
+        },
+    },
     theme: {
         assets: {
             data: {
@@ -92,6 +96,12 @@ const initialState = testStoreState({
 });
 
 const initialStateWithMeboxVars = testStoreState({
+    users: {
+        current: {
+            status: LoadStatus.SUCCESS,
+            data: makeMockRegisterUser,
+        },
+    },
     theme: {
         assets: {
             data: {
@@ -124,7 +134,6 @@ function StoryTitleBar(props: { title: string; openSearch?: boolean; scope?: boo
     return (
         <>
             <MemoryRouter>
-                {/* <CurrentUserContextProvider currentUser={mockRegisterUser}> */}
                 <BannerContextProvider>
                     <TitleBarDeviceProvider>
                         <ScrollOffsetProvider scrollWatchingEnabled={false}>
@@ -144,7 +153,6 @@ function StoryTitleBar(props: { title: string; openSearch?: boolean; scope?: boo
                         </ScrollOffsetProvider>
                     </TitleBarDeviceProvider>
                 </BannerContextProvider>
-                {/* </CurrentUserContextProvider> */}
             </MemoryRouter>
         </>
     );
@@ -320,7 +328,7 @@ export const WithGradientAndImageOnSticky = storyWithConfig(
 
 loadTranslations({});
 
-const mockGuestUser: IMe = {
+const makeMockGuestUser: IMe = {
     name: "test",
     userID: 0,
     isAdmin: true,
@@ -334,6 +342,12 @@ const mockGuestUser: IMe = {
 export const TitleBarGuestUser = storyWithConfig(
     {
         storeState: {
+            users: {
+                current: {
+                    status: LoadStatus.SUCCESS,
+                    data: makeMockGuestUser,
+                },
+            },
             theme: {
                 assets: {
                     data: {
@@ -360,49 +374,45 @@ export const TitleBarGuestUser = storyWithConfig(
         return (
             <MemoryRouter>
                 <Provider store={getStore(initialState, true)}>
-                    <ReduxThemeContextProvider>
-                        <CurrentUserContextProvider currentUser={mockGuestUser}>
-                            <TitleBarDeviceProvider>
-                                <StoryFullPage>
-                                    <StoryHeading>Hamburger menu</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} />
-                                    <StoryHeading>Hamburger menu - open </StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
-                                    <StoryHeading>Hamburger menu - open with scope</StoryHeading>
-                                    <TitleBar
-                                        useMobileBackButton={false}
-                                        isFixed={false}
-                                        forceVisibility={true}
-                                        scope={scope}
-                                    />
+                    <TitleBarDeviceProvider>
+                        <StoryFullPage>
+                            <StoryHeading>Hamburger menu</StoryHeading>
+                            <TitleBar useMobileBackButton={false} isFixed={false} />
+                            <StoryHeading>Hamburger menu - open </StoryHeading>
+                            <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                            <StoryHeading>Hamburger menu - open with scope</StoryHeading>
+                            <TitleBar
+                                useMobileBackButton={false}
+                                isFixed={false}
+                                forceVisibility={true}
+                                scope={scope}
+                            />
 
-                                    <StoryHeading>Big Logo</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} />
+                            <StoryHeading>Big Logo</StoryHeading>
+                            <TitleBar useMobileBackButton={false} isFixed={false} />
 
-                                    <StoryHeading>Big Logo - open</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
-                                    <StoryHeading>Big Logo - open with scope</StoryHeading>
-                                    <TitleBar
-                                        useMobileBackButton={false}
-                                        isFixed={false}
-                                        forceVisibility={true}
-                                        scope={scope}
-                                    />
-                                    <StoryHeading>Extra Navigation links</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} />
-                                    <StoryHeading>Extra Navigation links - open</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
-                                    <StoryHeading>Extra Navigation links - open with scope</StoryHeading>
-                                    <TitleBar
-                                        useMobileBackButton={false}
-                                        isFixed={false}
-                                        forceVisibility={true}
-                                        scope={scope}
-                                    />
-                                </StoryFullPage>
-                            </TitleBarDeviceProvider>
-                        </CurrentUserContextProvider>
-                    </ReduxThemeContextProvider>
+                            <StoryHeading>Big Logo - open</StoryHeading>
+                            <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                            <StoryHeading>Big Logo - open with scope</StoryHeading>
+                            <TitleBar
+                                useMobileBackButton={false}
+                                isFixed={false}
+                                forceVisibility={true}
+                                scope={scope}
+                            />
+                            <StoryHeading>Extra Navigation links</StoryHeading>
+                            <TitleBar useMobileBackButton={false} isFixed={false} />
+                            <StoryHeading>Extra Navigation links - open</StoryHeading>
+                            <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                            <StoryHeading>Extra Navigation links - open with scope</StoryHeading>
+                            <TitleBar
+                                useMobileBackButton={false}
+                                isFixed={false}
+                                forceVisibility={true}
+                                scope={scope}
+                            />
+                        </StoryFullPage>
+                    </TitleBarDeviceProvider>
                 </Provider>
             </MemoryRouter>
         );
@@ -423,16 +433,12 @@ export const TitleBarWithMeboxWithLabelsAndSeparators = storyWithConfig({}, () =
     return (
         <MemoryRouter>
             <Provider store={getStore(initialStateWithMeboxVars, true)}>
-                <ReduxThemeContextProvider>
-                    <CurrentUserContextProvider currentUser={mockRegisterUser}>
-                        <TitleBarDeviceProvider>
-                            <StoryFullPage>
-                                <StoryHeading>Mebox with labels and separators</StoryHeading>
-                                <TitleBar />
-                            </StoryFullPage>
-                        </TitleBarDeviceProvider>
-                    </CurrentUserContextProvider>
-                </ReduxThemeContextProvider>
+                <TitleBarDeviceProvider>
+                    <StoryFullPage>
+                        <StoryHeading>Mebox with labels and separators</StoryHeading>
+                        <TitleBar />
+                    </StoryFullPage>
+                </TitleBarDeviceProvider>
             </Provider>
         </MemoryRouter>
     );

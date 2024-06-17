@@ -37,19 +37,20 @@ class ResourceEventLogger
      * Log resource events that are loggable.
      *
      * @param LoggableEventInterface $event
-     * @return LoggableEventInterface
+     * @return ResourceEvent
      */
-    public function logResourceEvent(LoggableEventInterface $event): LoggableEventInterface
+    public function logResourceEvent(LoggableEventInterface $event): ResourceEvent
     {
         try {
+            $entry = $event->getLogEntry();
+
             if ($event instanceof ResourceEvent && $this->shouldLogEvent($event)) {
-                // All resource events implement AuditLogEventInterface.
-                AuditLogger::log($event);
+                $this->logger->log($entry->getLevel(), $entry->getMessage(), $entry->getContext());
             }
 
             return $event;
         } catch (\Exception $ex) {
-            ErrorLogger::warning($ex, ["resourceEvent"]);
+            trigger_error($ex->getMessage(), E_USER_WARNING);
             return $event;
         }
     }
@@ -100,10 +101,6 @@ class ResourceEventLogger
      */
     private function shouldLogEvent(ResourceEvent $event): bool
     {
-        if ($event->bypassLogFilters()) {
-            return true;
-        }
-
         $class = get_class($event);
         $action = $event->getAction();
 

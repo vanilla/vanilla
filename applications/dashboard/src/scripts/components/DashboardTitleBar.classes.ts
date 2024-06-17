@@ -34,7 +34,6 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
         ...Mixins.padding({ vertical: 2, horizontal: 12 }),
         ...Mixins.border({ radius: 14, width: 1 }),
         marginLeft: 18,
-        whiteSpace: "nowrap",
 
         svg: {
             marginLeft: 3,

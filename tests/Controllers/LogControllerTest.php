@@ -9,7 +9,6 @@ namespace VanillaTests\Controllers;
 
 use Garden\Events\ResourceEvent;
 use Gdn;
-use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\SiteTestCase;
@@ -448,25 +447,5 @@ class LogControllerTest extends SiteTestCase
             $this->assertIsNumeric($userID);
             return $userID;
         });
-    }
-
-    /**
-     * Test /log/automationrules/{dispatchID} trows exception with invalid dispatchID.
-     */
-    public function testAutomationRulesPageThrowsExceptionWhenProvidedInvalidDispatchID(): void
-    {
-        $this->expectException(NoResultsException::class);
-        $this->expectExceptionMessage("Dispatch not found.");
-        $this->bessy()->get("/log/automationrules/abc");
-    }
-
-    /**
-     * Test /log/automationrules/{dispatchID} trows exception when no DispatchId is provided.
-     */
-    public function testAutomationRulesPageThrowsExceptionWhenNoDispatchISProvided(): void
-    {
-        $this->expectException(\Gdn_UserException::class);
-        $this->expectExceptionMessage("Page Not Found");
-        $this->bessy()->get("/log/automationrules/");
     }
 }

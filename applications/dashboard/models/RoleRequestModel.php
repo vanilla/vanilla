@@ -33,10 +33,11 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
     public const STATUS_PENDING = "pending";
     public const STATUS_APPROVED = "approved";
     public const STATUS_DENIED = "denied";
+
     public const OPT_LOG = "log";
+
     public const OPT_FRAGMENT_TYPE = "type";
     public const OPT_FRAGMENT_USERID = "userID";
-    public const DEFAULT_TTL = "5 days";
 
     /**
      * An array mapping statuses and what they are allowed to be updated to.
@@ -359,26 +360,5 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
                 self::OPT_FRAGMENT_USERID => $userID,
             ]);
         };
-    }
-
-    /**
-     * @inheridoc
-     */
-    public function update(array $set, array $where, array $options = []): bool
-    {
-        // Status
-        $status = $set["status"] ?? false;
-        if ($status) {
-            $where["status <>"] = $set["status"];
-        }
-
-        // Set the expiry for closed applications.
-        if ($status && in_array($set["status"], [RoleRequestModel::STATUS_APPROVED, RoleRequestModel::STATUS_DENIED])) {
-            $set["ttl"] = self::DEFAULT_TTL;
-        } elseif ($status) {
-            $set["dateExpires"] = null;
-        }
-
-        return parent::update($set, $where, $options);
     }
 }

@@ -1,14 +1,15 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
+import React from "react";
 import { FeaturedCollections } from "@library/featuredCollections/FeaturedCollections";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 import { CollectionRecordTypes, ICollection } from "@library/featuredCollections/Collections.variables";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 
 export default {
     title: "Widgets/FeaturedCollections",
@@ -18,8 +19,6 @@ export default {
 export const fakeCollection: ICollection = {
     collectionID: 1,
     name: "Storybook Collection",
-    dateInserted: "2020-10-06T15:30:44+00:00",
-    dateUpdated: "2020-10-06T15:30:44+00:00",
     records: DiscussionFixture.fakeDiscussions.map((record) => ({
         recordID: record.discussionID,
         recordType: CollectionRecordTypes.DISCUSSION,

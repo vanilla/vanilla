@@ -93,14 +93,6 @@ export const autoCompleteClasses = ({
     checkmarkContainer: css({
         display: "flex",
         height: "1em",
-        svg: {
-            position: "relative",
-
-            ...{
-                small: { width: 18, height: 18, right: -3, transform: "translateY(calc(0.5em - 50%))" },
-                default: { width: 24, height: 24, right: -4, transform: "translateY(calc(0.5em - 50%))" },
-            }[size],
-        },
     }),
     parentLabel: css({
         color: "#767676",
@@ -125,6 +117,14 @@ export const autoCompleteClasses = ({
         "[data-user-value]": {
             fontWeight: 600,
         },
+        svg: {
+            position: "relative",
+
+            ...{
+                small: { width: 18, height: 18, right: -3, transform: "translateY(calc(0.5em - 50%))" },
+                default: { width: 24, height: 24, right: -4, transform: "translateY(calc(0.5em - 50%))" },
+            }[size],
+        },
         "&:first-of-type&:last-of-type": {
             background: "rgba(3,125,188,0.08)",
         },
@@ -134,11 +134,6 @@ export const autoCompleteClasses = ({
     }),
     optionText: css({
         flex: 1,
-    }),
-    iconLayout: css({
-        display: "grid",
-        gridTemplateColumns: "24px auto",
-        gap: 8,
     }),
     separator: css({
         listStyle: "none",

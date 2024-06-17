@@ -18,16 +18,11 @@ use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutViewModel;
-use Vanilla\Logging\AuditLogger;
-use Vanilla\Logging\AuditLogModel;
 use Vanilla\Models\DeveloperProfileModel;
 use Vanilla\Models\InstallModel;
 use Vanilla\Scheduler\CronModel;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
-use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
-use Vanilla\Dashboard\Models\AutomationRuleModel;
-use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
 
 $LEGACYADDON = [
     "EnabledPlugins.recaptcha",
@@ -1357,10 +1352,6 @@ $Construct
     ->column("dateUpdated", "datetime", false, ["index"])
     ->set($Explicit, $Drop);
 
-// Automation Rules Structure
-AutomationRuleModel::structure($Database, $Explicit, $Drop);
-AutomationRuleRevisionModel::structure($Database, $Explicit, $Drop);
-AutomationRuleDispatchesModel::structure($Database, $Explicit, $Drop);
 RecordStatusModel::structure($Database);
 RecordStatusLogModel::structure($Database, $Explicit, $Drop);
 LayoutModel::structure($Database, $Explicit, $Drop);
@@ -1443,9 +1434,6 @@ $themeService->invalidateCache();
 
 // Ensure we have a secret setup in the site context.
 Gdn::config()->touch("Context.Secret", betterRandomString(32, "Aa0"));
-
-// Audit Logging
-AuditLogModel::structure($Construct);
 
 // User Mentions table.
 UserMentionsModel::structure($Database);

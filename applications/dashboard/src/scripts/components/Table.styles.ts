@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { css, cx } from "@emotion/css";
+import { css } from "@emotion/css";
 import { percent } from "csx";
 import { singleBorder } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
@@ -83,18 +83,11 @@ export const tableClasses = () => {
         width: "100%",
         height: "100%",
         minHeight: 48,
+        maxHeight: 48,
         alignItems: "center",
         justifyContent: "center",
         ...Mixins.padding({ vertical: 4 }),
     });
-
-    const cellContentWrapTruncated = cx(
-        cellContentWrap,
-        css({
-            maxHeight: 48,
-            ...Mixins.padding({ vertical: 4 }),
-        }),
-    );
 
     const cellContentTruncate = css({
         width: "100%",
@@ -183,7 +176,6 @@ export const tableClasses = () => {
         cell,
         cellContentWrap,
         cellContentTruncate,
-        cellContentWrapTruncated,
         cellCompact,
         basicColumn,
         pagination,

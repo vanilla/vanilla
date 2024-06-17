@@ -9,8 +9,7 @@ describe("SearchUtils", () => {
     const mockDateRange = { start: "2024-04-24", end: "2024-04-26" };
     const mockOnlyOneDateInRange = { start: "2024-04-24", end: undefined };
     const mockDateRangeString = "[2024-04-24,2024-04-26]";
-    const mockSmallerThanDateString = "<=2024-04-26";
-    const mockSameDateString = "2024-04-26";
+    const mockOnlyOneDateString = "<=2024-04-26";
 
     it("Test dateRangeToString() convertor.", () => {
         const convertedResult = dateRangeToString(mockDateRange);
@@ -38,17 +37,10 @@ describe("SearchUtils", () => {
         expect(convertedResult["end"]).toBe(mockDateRange.end);
 
         // only end, start was not in the string
-        const convertedResult2 = dateStringInUrlToDateRange(mockSmallerThanDateString);
+        const convertedResult2 = dateStringInUrlToDateRange(mockOnlyOneDateString);
         expect(convertedResult2).toBeDefined();
         expect(typeof convertedResult2).toBe("object");
-        expect(convertedResult2["start"]).toBeUndefined();
+        expect(convertedResult2["start"]).toBeUndefined;
         expect(convertedResult2["end"]).toBe(mockDateRange.end);
-
-        // one date, start and end are the same
-        const convertedResult3 = dateStringInUrlToDateRange(mockSameDateString);
-        expect(convertedResult3).toBeDefined();
-        expect(typeof convertedResult3).toBe("object");
-        expect(convertedResult3["start"]).toBe(mockSameDateString);
-        expect(convertedResult2["end"]).toBe(mockSameDateString);
     });
 });

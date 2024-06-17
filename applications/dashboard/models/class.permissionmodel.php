@@ -275,7 +275,6 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Garden.Profiles.Edit" => 1,
             "Garden.Email.View" => 1,
             "Garden.Uploads.Add" => 1,
-            "Reactions.Flag.Add" => 1,
         ]);
         $this->addDefault(RoleModel::TYPE_ADMINISTRATOR, [
             "Garden.SignIn.Allow" => 1,
@@ -300,7 +299,6 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Garden.Moderation.Manage" => 1,
             "Garden.Reactions.View" => 1,
             "Garden.Uploads.Add" => 1,
-            "Reactions.Flag.Add" => 1,
         ]);
         $this->addDefault(RoleModel::TYPE_MEMBER, [
             "Garden.SignIn.Allow" => 1,
@@ -310,7 +308,6 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Garden.Email.View" => 1,
             "Garden.Uploads.Add" => 1,
             "Garden.Reactions.View" => 1,
-            "Reactions.Flag.Add" => 1,
         ]);
 
         // Allow the ability for other applications and plug-ins to speak up with their own default permissions.

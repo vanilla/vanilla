@@ -225,7 +225,7 @@ class RichEditorPlugin extends Gdn_Plugin
                 "showConversionNotice" => $args["Attributes"]["showConversionNotice"] ?? false,
             ];
 
-            if (!(Gdn::session()->User->Admin ?? false)) {
+            if (!Gdn::session()->User->Admin) {
                 // If a category is set check for AllowFileUploads. (admins bypass this condition)
                 $categoryID = $controller->data("Category.CategoryID", $controller->data("ContextualCategoryID"));
                 // Check the category exists.

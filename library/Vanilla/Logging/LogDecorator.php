@@ -17,7 +17,6 @@ use Vanilla\Logger;
 use Vanilla\Site\OwnSite;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Utility\DebugUtils;
-use Vanilla\Web\BotDetector;
 
 /**
  * A decorator for the log that adds default context attributes based on the current request.
@@ -53,7 +52,6 @@ class LogDecorator implements LoggerInterface
 
     /** @var OwnSite */
     private $ownSite;
-    private BotDetector $botDetector;
 
     /**
      * @var array
@@ -98,19 +96,18 @@ class LogDecorator implements LoggerInterface
      *
      * NOTE: This gets instantiated very early in the request.
      * Do not add any other direct dependencies in here if possible.
+     *
+     * @param LoggerInterface $logger
+     * @param \Gdn_Request $request
+     * @param \Gdn_Session $session
+     * @param OwnSite $ownSite
      */
-    public function __construct(
-        LoggerInterface $logger,
-        \Gdn_Request $request,
-        \Gdn_Session $session,
-        OwnSite $ownSite,
-        BotDetector $botDetector
-    ) {
+    public function __construct(LoggerInterface $logger, \Gdn_Request $request, \Gdn_Session $session, OwnSite $ownSite)
+    {
         $this->session = $session;
         $this->request = $request;
         $this->logger = $logger;
         $this->ownSite = $ownSite;
-        $this->botDetector = $botDetector;
     }
 
     /**
@@ -175,7 +172,6 @@ class LogDecorator implements LoggerInterface
                 "country" =>
                     $this->staticContextDefaults["request"]["country"] ??
                     ($this->staticContextDefaults["requestCountry"] ?? null),
-                "isBot" => $this->botDetector->isBot($this->request),
             ],
         ];
 

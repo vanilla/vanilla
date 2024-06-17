@@ -62,7 +62,7 @@ export default defineConfig(() => {
                 all: true,
                 extension: ["ts", "tsx"],
                 exclude: ["**/node_modules/**", "**/build/**", "**/dist/**", "**/coverage/**", "**/*.js"],
-                reporter: ["json", "lcov"],
+                reporter: "json",
                 reportsDirectory: "coverage/vitest",
             },
         },

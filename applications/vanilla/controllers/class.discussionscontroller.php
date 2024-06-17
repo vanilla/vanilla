@@ -711,7 +711,7 @@ class DiscussionsController extends VanillaController
             $this->setData("ChildTags", $childTags);
         }
 
-        $this->title(htmlspecialchars($tagRow["FullName"] ?? "Unknown"));
+        $this->title(htmlspecialchars($tagRow["FullName"]));
         $urlTag = empty($categoryCode) ? rawurlencode($tag) : rawurlencode($categoryCode) . "/" . rawurlencode($tag);
         if (urlencode($tag) == $tag) {
             $this->canonicalUrl(

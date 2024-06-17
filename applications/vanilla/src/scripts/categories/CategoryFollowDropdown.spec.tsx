@@ -1,11 +1,12 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
 import { render, screen, act, fireEvent, waitFor } from "@testing-library/react";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { mockAPI } from "@library/__tests__/utility";
@@ -22,15 +23,17 @@ const MOCK_CATEGORY_ID = 1;
 async function renderInProvider(props?: Partial<React.ComponentProps<typeof CategoryFollowDropDown>>) {
     return render(
         <QueryClientProvider client={queryClient}>
-            <CategoryFollowDropDown
-                userID={MOCK_USER_ID}
-                categoryID={MOCK_CATEGORY_ID}
-                categoryName="Test Category"
-                emailDigestEnabled
-                emailEnabled
-                isOpen
-                {...props}
-            />
+            <TestReduxProvider>
+                <CategoryFollowDropDown
+                    userID={MOCK_USER_ID}
+                    categoryID={MOCK_CATEGORY_ID}
+                    categoryName="Test Category"
+                    emailDigestEnabled
+                    emailEnabled
+                    isOpen
+                    {...props}
+                />
+            </TestReduxProvider>
         </QueryClientProvider>,
     );
 }

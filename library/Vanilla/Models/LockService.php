@@ -8,8 +8,6 @@
 namespace Vanilla\Models;
 
 use Garden\Container\Container;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\MemcachedStore;
@@ -47,12 +45,7 @@ class LockService extends LockFactory
         if ($this->keyPrefix) {
             $resource = $this->keyPrefix . "." . $resource;
         }
-        $lock = parent::createLock($resource, $ttl, $autoRelease);
-        if ($lock instanceof LoggerAwareInterface) {
-            // Noisy logging that we don't care about.
-            $lock->setLogger(new NullLogger());
-        }
-        return $lock;
+        return parent::createLock($resource, $ttl, $autoRelease);
     }
 
     /**

@@ -19,14 +19,14 @@ class JsonFieldProcessor implements Processor
     /** @var array */
     private $fields = [];
 
-    private int $jsonFlags;
+    private int $jsonFlags = 0;
 
     /**
      * JsonFieldProcessor constructor.
      *
      * @param array $fields
      */
-    public function __construct(array $fields = [], int $jsonFlags = JSON_FORCE_OBJECT)
+    public function __construct(array $fields = [], int $jsonFlags = 0)
     {
         $this->setFields($fields);
         $this->jsonFlags = $jsonFlags;
@@ -77,7 +77,7 @@ class JsonFieldProcessor implements Processor
                 if (is_array($json)) {
                     $json = LoggerUtils::stringifyDates($json);
                 }
-                $json = json_encode($json, $this->jsonFlags);
+                $json = json_encode($json, JSON_FORCE_OBJECT | $this->jsonFlags);
                 if ($json === false) {
                     throw new \InvalidArgumentException("Unable to encode field as JSON.", 400);
                 }

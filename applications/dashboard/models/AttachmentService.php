@@ -7,15 +7,13 @@
 
 namespace Vanilla\Dashboard\Models;
 
-use AttachmentModel;
-use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Utils\ContextException;
-use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Community\Events\EscalationEvent;
-use Vanilla\Community\Events\TicketEscalationEvent;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Formatting\FormatCompatibilityService;
+use Vanilla\Formatting\Formats\Rich2Format;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\DebugUtils;
@@ -27,24 +25,16 @@ class AttachmentService
 {
     private $providers = [];
 
-    private AttachmentModel $attachmentModel;
     private \CommentModel $commentModel;
     private \DiscussionModel $discussionModel;
-    private EventManager $eventManager;
 
     /**
      * DI.
      */
-    public function __construct(
-        AttachmentModel $attachmentModel,
-        \CommentModel $commentModel,
-        \DiscussionModel $discussionModel,
-        EventManager $eventManager
-    ) {
-        $this->attachmentModel = $attachmentModel;
+    public function __construct(\CommentModel $commentModel, \DiscussionModel $discussionModel)
+    {
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
-        $this->eventManager = $eventManager;
     }
 
     /**
@@ -89,24 +79,20 @@ class AttachmentService
     {
         $catalog = [];
         foreach ($this->getAllProviders() as $provider) {
-            if ($provider->hasReadPermissions()) {
-                $catalogEntry = [];
-
-                $catalogEntry = array_merge($catalogEntry, [
-                    "writeableContentScope" => $provider->getWriteableContentScope(),
-                    "attachmentType" => $provider->getTypeName(),
-                    "title" => $provider->getTitleLabelCode(),
-                    "externalIDLabel" => $provider->getExternalIDLabelCode(),
-                    "logoIcon" => $provider->getLogoIconName(),
+            if ($provider->hasPermissions()) {
+                $catalog[$provider->getTypeName()] = [
                     "name" => $provider->getProviderName(),
+                    "attachmentType" => $provider->getTypeName(),
                     "label" => $provider->getCreateLabelCode(),
                     "submitButton" => $provider->getSubmitLabelCode(),
                     "recordTypes" => $provider->getRecordTypes(),
+                    "title" => $provider->getTitleLabelCode(),
+                    "externalIDLabel" => $provider->getExternalIDLabelCode(),
+                    "logoIcon" => $provider->getLogoIconName(),
+                    "canEscalateOwnPost" => $provider->canEscalateOwnPost(),
                     "escalationDelayUnit" => $provider->getEscalationDelayUnit(),
                     "escalationDelayLength" => $provider->getEscalationDelayLength(),
-                ]);
-
-                $catalog[$provider->getTypeName()] = $catalogEntry;
+                ];
             }
         }
         return $catalog;
@@ -152,6 +138,7 @@ class AttachmentService
      */
     public function refreshStale(array $attachmentRows): array
     {
+        $attachmentIDsOrdered = array_column($attachmentRows, "AttachmentID");
         $staleAttachments = array_filter($attachmentRows, function ($attachment) {
             $provider = $this->getProvider($attachment["Type"]);
             if (!$provider) {
@@ -195,7 +182,7 @@ class AttachmentService
                 continue;
             }
 
-            if (!($provider->canViewBasicAttachment($attachment) || $provider->canViewFullAttachment($attachment))) {
+            if (!$provider->canViewAttachment($attachment)) {
                 // Current user doesn't have access.
                 continue;
             }
@@ -269,65 +256,5 @@ class AttachmentService
                 ]);
         }
         return $record;
-    }
-
-    /**
-     * Create an attachment.
-     *
-     * @param array $body
-     * @return array
-     * @throws ForbiddenException
-     * @throws NotFoundException
-     */
-    public function createAttachment(array $body)
-    {
-        $attachmentType = $body["attachmentType"] ?? "";
-        $provider = $this->getProvider($attachmentType);
-        if (!$provider) {
-            throw new NotFoundException("No provider was found for this attachment type.");
-        }
-        $basicBody = $this->attachmentModel->getAttachmentPostSchema()->validate($body);
-        $recordType = $basicBody["recordType"];
-        $recordID = $basicBody["recordID"];
-
-        if (!$provider->canCreateAttachmentForRecord($recordType, $recordID)) {
-            throw new ForbiddenException("You do not have permission to create attachments using this provider.");
-        }
-
-        $fullSchema = $this->attachmentModel
-            ->getAttachmentPostSchema()
-            ->merge($provider->getHydratedFormSchema($recordType, $recordID, $body));
-
-        $body = $fullSchema->validate($body);
-
-        $attachment = $provider->createAttachment($recordType, $recordID, $body);
-        // Dispatch a Discussion event (close)
-        if ($recordType === "discussion") {
-            $discussion = $this->discussionModel->normalizeRow(
-                $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY)
-            );
-            $trackingEventInterface = EscalationEvent::fromDiscussion(
-                EscalationEvent::POST_COLLECTION_NAME,
-                [
-                    "recordType" => $recordType,
-                    "isEscalation" => $provider->getIsEscalation(),
-                    "attachment" => $attachment,
-                ],
-                $discussion
-            );
-        } elseif ($recordType === "comment") {
-            $comment = $this->commentModel->normalizeRow($this->commentModel->getID($recordID, DATASET_TYPE_ARRAY));
-            $trackingEventInterface = EscalationEvent::fromComment(
-                EscalationEvent::POST_COLLECTION_NAME,
-                [
-                    "recordType" => $recordType,
-                    "isEscalation" => $provider->getIsEscalation(),
-                    "attachment" => $attachment,
-                ],
-                $comment
-            );
-        }
-        $this->eventManager->dispatch($trackingEventInterface);
-        return $attachment;
     }
 }

@@ -126,11 +126,7 @@ export function CallToAction(props: IProps) {
                                 {t(props.title)}
                             </Heading>
                             {props.description && (
-                                <div
-                                    className={cx(ctaClasses.description, {
-                                        [ctaClasses.descriptionPadding]: shouldUseButton,
-                                    })}
-                                >
+                                <div className={ctaClasses.description}>
                                     {typeof props.description === "string" ? t(props.description) : props.description}
                                 </div>
                             )}

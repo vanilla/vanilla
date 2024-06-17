@@ -7,4 +7,3 @@
 export * from "./AutoComplete";
 export * from "./AutoCompleteOption";
 export * from "./AutoCompleteLookupOptions";
-export * from "./AutoCompleteContext";

@@ -51,6 +51,7 @@ export const filterPanelClasses = useThemeCache((mediaQueries) => {
     const footer = style("body", {
         ...{
             "&&": {
+                justifyContent: "space-between",
                 border: 0,
                 marginTop: styleUnit(globalVars.gutter.size),
                 ...Mixins.padding({

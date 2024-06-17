@@ -3,9 +3,6 @@ use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Forum\Digest\DigestContentModel;
 use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\Forum\Digest\UserDigestModel;
-use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
-use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
-use Vanilla\Forum\Models\CommunityManagement\ReportModel;
 
 if (!defined("APPLICATION")) {
     exit();
@@ -588,7 +585,6 @@ $PermissionModel->define(
         "Vanilla.Comments.Add" => 1,
         "Vanilla.Comments.Edit" => 0,
         "Vanilla.Comments.Delete" => 0,
-        "Vanilla.Posts.Moderate" => "Vanilla.Discussions.Delete",
     ],
     "tinyint",
     "Category",
@@ -802,6 +798,3 @@ if (!$config->configKeyExists("Garden.Unsubscribe.Salt")) {
 DigestModel::structure($Construct);
 DigestContentModel::structure($Construct);
 UserDigestModel::structure($Construct);
-ReportModel::structure($Construct);
-ReportReasonModel::structure($Construct);
-EscalationModel::structure($Construct);

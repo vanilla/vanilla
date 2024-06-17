@@ -540,14 +540,8 @@ class DiscussionsTest extends AbstractResourceTest
             ->get($this->baseUrl, ["score" => 5])
             ->getBody();
         $this->assertCount(2, $discussionWithScore5);
-        $this->assertContainsEquals($discussions["score5"][0]["discussionID"], [
-            $discussionWithScore5[0]["discussionID"],
-            $discussionWithScore5[1]["discussionID"],
-        ]);
-        $this->assertContainsEquals($discussions["score5"][1]["discussionID"], [
-            $discussionWithScore5[0]["discussionID"],
-            $discussionWithScore5[1]["discussionID"],
-        ]);
+        $this->assertEquals($discussions["score5"][0]["discussionID"], $discussionWithScore5[0]["discussionID"]);
+        $this->assertEquals($discussions["score5"][1]["discussionID"], $discussionWithScore5[1]["discussionID"]);
 
         // Get a list of discussions with score -3.
         $discussionWithScoreMinus3 = $this->api()

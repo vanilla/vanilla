@@ -1447,9 +1447,9 @@ class Gdn_Form extends Gdn_Pluggable
 
         $result = '<div class="table-wrap"><table class="table-data js-checkbox-grid table-checkbox-grid">';
         // Append the header.
-        $result .= "<thead><tr><th>" . htmlspecialchars(t($groupName)) . "</th>";
+        $result .= "<thead><tr><th>" . t($groupName) . "</th>";
         foreach ($columns as $columnName => $x) {
-            $result .= "<td>" . htmlspecialchars(t($columnName)) . "</td>";
+            $result .= "<td>" . t($columnName) . "</td>";
         }
         $result . "</tr></thead>";
 
@@ -1462,9 +1462,9 @@ class Gdn_Form extends Gdn_Pluggable
             // If the row name is still seperated by dots then put those in spans.
             $rowNames = explode(".", $rowName);
             for ($i = 0; $i < count($rowNames) - 1; ++$i) {
-                $result .= '<span class="Parent">' . htmlspecialchars(t($rowNames[$i])) . "</span>";
+                $result .= '<span class="Parent">' . t($rowNames[$i]) . "</span>";
             }
-            $result .= htmlspecialchars(t(self::labelCode($rowNames[count($rowNames) - 1]))) . "</th>";
+            $result .= t(self::labelCode($rowNames[count($rowNames) - 1])) . "</th>";
             // Append the columns within the rows.
             foreach ($columns as $columnName => $y) {
                 $result .= "<td>";
@@ -3718,19 +3718,7 @@ PASSWORDMETER;
     protected function _valueAttribute($fieldName, $attributes)
     {
         // Value from $Attributes overrides the datasource and the postback.
-
-        // Following PHP 8 array -> string values give a deprecation error.
-        // They are always turned into "Array" which was useless so if something is all janked up
-        // and returning an array value we now fallback to an empty string.
-        $default = $this->getValue($fieldName);
-        if (is_array($default)) {
-            $default = "";
-        }
-        $value = arrayValueI("value", $attributes, $default);
-        if (is_array($value)) {
-            $value = "";
-        }
-        return ' value="' . Gdn_Format::form($value) . '"';
+        return ' value="' . Gdn_Format::form(arrayValueI("value", $attributes, $this->getValue($fieldName))) . '"';
     }
 
     /**

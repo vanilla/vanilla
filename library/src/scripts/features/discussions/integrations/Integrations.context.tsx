@@ -9,21 +9,20 @@ import { queryResultToILoadable } from "@library/ReactQueryUtils";
 import { IntegrationsApi } from "@library/features/discussions/integrations/Integrations.api";
 import {
     IAttachment,
+    IAttachmentIntegration,
     IAttachmentIntegrationCatalog,
     ICustomIntegrationContext,
     IIntegrationsApi,
     IPostAttachmentParams,
-    IAttachmentIntegration,
-    isWriteableAttachmentIntegration,
 } from "@library/features/discussions/integrations/Integrations.types";
 import { getMeta } from "@library/utility/appUtils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { JsonSchema } from "@vanilla/json-schema-forms";
-import { RecordID, logDebug } from "@vanilla/utils";
+import { RecordID } from "@vanilla/utils";
 import { PropsWithChildren, createContext, useContext } from "react";
 import { lookupCustomIntegrationsContext } from "@library/features/discussions/integrations/Integrations.registry";
 
-interface IAttachmentIntegrationsApiContextValue {
+export interface IAttachmentIntegrationsApiContextValue {
     api: IIntegrationsApi;
 }
 
@@ -61,22 +60,16 @@ function getIntegrationsFromMeta(): IAttachmentIntegrationCatalog | undefined {
 }
 interface IAttachmentIntegrationsContextValue {
     integrations: IAttachmentIntegration[];
-    writeableIntegrations: IAttachmentIntegration[];
-    refreshStaleAttachments: (attachments: IAttachment[]) => Promise<void>;
+    refreshStaleAttachments: (attachmentIDs: Array<IAttachment["attachmentID"]>) => Promise<void>;
 }
 
 export const AttachmentIntegrationsContext = createContext<IAttachmentIntegrationsContextValue>({
     integrations: [],
-    writeableIntegrations: [],
-    refreshStaleAttachments: async (_attachments) => ({} as any),
+    refreshStaleAttachments: async (_attachmentIDs) => ({} as any),
 });
 
-function useAttachmentIntegrations() {
+export function useAttachmentIntegrations() {
     return useContext(AttachmentIntegrationsContext).integrations;
-}
-
-export function useWriteableAttachmentIntegrations() {
-    return useContext(AttachmentIntegrationsContext).writeableIntegrations;
 }
 
 export function useRefreshStaleAttachments() {
@@ -101,21 +94,9 @@ export function AttachmentIntegrationsContextProvider(
 
     const integrationsValue = integrationsQuery.data ?? initialIntegrations;
 
-    const integrations = Object.values(integrationsValue ?? {});
-    const writeableIntegrations = integrationsValue
-        ? Object.values(integrationsValue).filter((integration) => isWriteableAttachmentIntegration(integration))
-        : [];
-
     const refreshStaleAttachments = useMutation({
-        mutationFn: async (attachments: IAttachment[]) => {
-            const writeableIntegrationsAttachmentTypes = writeableIntegrations.map((i) => i.attachmentType);
-            const attachmentIDs = attachments
-                .filter(({ attachmentType }) => writeableIntegrationsAttachmentTypes.includes(attachmentType))
-                .map(({ attachmentID }) => attachmentID);
-
-            if (attachmentIDs.length > 0) {
-                await api.refreshAttachments({ attachmentIDs, onlyStale: true });
-            }
+        mutationFn: async (attachmentIDs: Array<IAttachment["attachmentID"]>) => {
+            await api.refreshAttachments({ attachmentIDs, onlyStale: true });
         },
     });
 
@@ -123,8 +104,7 @@ export function AttachmentIntegrationsContextProvider(
         <AttachmentIntegrationsContext.Provider
             value={{
                 ...{
-                    integrations,
-                    writeableIntegrations,
+                    integrations: Object.values(integrationsValue ?? {}),
                     refreshStaleAttachments: refreshStaleAttachments.mutateAsync,
                 },
             }}
@@ -134,61 +114,15 @@ export function AttachmentIntegrationsContextProvider(
     );
 }
 
-interface IReadableIntegrationContextValue {
-    title: IAttachmentIntegration["title"];
-    externalIDLabel: IAttachmentIntegration["externalIDLabel"];
-    logoIcon: IAttachmentIntegration["logoIcon"];
-}
-
-const ReadableIntegrationContext = createContext<IReadableIntegrationContextValue>({
-    title: "",
-    externalIDLabel: "",
-    logoIcon: "meta-external",
-});
-
-export function useReadableIntegrationContext() {
-    return useContext(ReadableIntegrationContext);
-}
-
-export function ReadableIntegrationContextProvider(
-    props: PropsWithChildren<{
-        attachmentType: string;
-    }>,
-) {
-    const api = useAttachmentIntegrationsApi();
-    const integrations = useAttachmentIntegrations();
-    const { children, attachmentType } = props;
-
-    const integration = integrations.find((i) => i.attachmentType === attachmentType);
-    if (!integration) {
-        logDebug(
-            `No integration found for attachment type: ${attachmentType}. Are you missing the <AttachmentIntegrationsContextProvider/>?`,
-        );
-        return null;
-    }
-
-    const { title, externalIDLabel, logoIcon = "meta-external" } = integration ?? {};
-
-    return (
-        <ReadableIntegrationContext.Provider
-            value={{
-                title,
-                externalIDLabel,
-                logoIcon,
-            }}
-        >
-            {children}
-        </ReadableIntegrationContext.Provider>
-    );
-}
-
-interface IWriteableIntegrationContextValue {
+export interface IIntegrationContextValue {
     getSchema: () => Promise<JsonSchema>;
     schema: ILoadable<JsonSchema>;
     postAttachment: (values: IPostAttachmentParams) => Promise<IAttachment>;
-
     label: IAttachmentIntegration["label"];
     submitButton: IAttachmentIntegration["submitButton"];
+    title: IAttachmentIntegration["title"];
+    externalIDLabel: IAttachmentIntegration["externalIDLabel"];
+    logoIcon: IAttachmentIntegration["logoIcon"];
     name: IAttachmentIntegration["name"];
 
     // context customizations
@@ -197,20 +131,23 @@ interface IWriteableIntegrationContextValue {
     CustomIntegrationForm?: ICustomIntegrationContext["CustomIntegrationForm"];
 }
 
-const WriteableIntegrationContext = createContext<IWriteableIntegrationContextValue>({
+export const IntegrationContext = createContext<IIntegrationContextValue>({
     getSchema: async () => ({} as any),
     schema: { status: LoadStatus.PENDING },
     postAttachment: async () => ({} as any),
     label: "",
     submitButton: "",
+    title: "",
+    externalIDLabel: "",
+    logoIcon: "meta-external",
     name: "",
 });
 
-export function useWriteableIntegrationContext() {
-    return useContext(WriteableIntegrationContext);
+export function useIntegrationContext() {
+    return useContext(IntegrationContext);
 }
 
-export function WriteableIntegrationContextProvider(
+export function IntegrationContextProvider(
     props: PropsWithChildren<{
         attachmentType: string;
         recordType: string;
@@ -218,10 +155,10 @@ export function WriteableIntegrationContextProvider(
     }>,
 ) {
     const api = useAttachmentIntegrationsApi();
-    const writeableIntegrations = useWriteableAttachmentIntegrations();
+    const integrations = useAttachmentIntegrations();
     const { children, attachmentType, recordType, recordID } = props;
 
-    const integration = writeableIntegrations.find((i) => i.attachmentType === attachmentType);
+    const integration = integrations.find((i) => i.attachmentType === attachmentType);
     const {
         label = "",
         submitButton = "",
@@ -265,14 +202,11 @@ export function WriteableIntegrationContextProvider(
     });
 
     if (!integration) {
-        logDebug(
-            `No integration found for attachment type: ${attachmentType}. Are you missing the <AttachmentIntegrationsContextProvider/>?`,
-        );
         return null;
     }
 
     return (
-        <WriteableIntegrationContext.Provider
+        <IntegrationContext.Provider
             value={{
                 ...{
                     name: integration.name,
@@ -297,6 +231,6 @@ export function WriteableIntegrationContextProvider(
             }}
         >
             {children}
-        </WriteableIntegrationContext.Provider>
+        </IntegrationContext.Provider>
     );
 }

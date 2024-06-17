@@ -11,6 +11,7 @@
             "@knowledge/*": ["./cloud/plugins/knowledge/src/scripts/*"],
             "@vanillaanalytics/*": ["./cloud/plugins/vanillaanalytics/src/scripts/*"],
             "@FederatedSearch/*": ["./cloud/plugins/FederatedSearch/src/scripts/*"],
+            "@AutomationRules/*": ["./cloud/plugins/AutomationRules/src/scripts/*"],
             "@oauth2/*": ["./plugins/oauth2/src/scripts/*"],
             "@webhooks/*": ["./cloud/plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./cloud/plugins/themingapi/src/scripts/*"],

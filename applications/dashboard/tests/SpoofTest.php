@@ -43,6 +43,12 @@ class SpoofTest extends \VanillaTests\SiteTestCase
         $this->assertNotEquals($preSpoofUserID, $postSpoofUserID);
         $this->assertSame($this->memberID, $postSpoofUserID);
 
+        $logModel = $this->container()->get(LogModel::class);
+        //Load last config edit entry.
+        $record = $logModel->getWhere(["recordType" => "Spoof", "operation" => "Spoof"], "RecordDate", "desc", 0, 1)[0];
+        // Spoofed user is recorded in Log table.
+        $this->assertSame($preSpoofUserID, $record["SpoofUserID"]);
+
         // The member userID should also now be associated with the session in the GDN_Session table.
         $memberSessions = $this->api()
             ->get("/sessions", ["userID" => $this->memberID])

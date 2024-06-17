@@ -131,14 +131,4 @@ class UserPointEvent extends UserEvent implements TrackingEventInterface
         }
         return null;
     }
-
-    /**
-     * Return true to bypass {@link ResourceEventLogger} filters.
-     *
-     * @return bool
-     */
-    public function bypassLogFilters(): bool
-    {
-        return false;
-    }
 }

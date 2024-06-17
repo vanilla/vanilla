@@ -6,7 +6,6 @@
 
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IMe, IUser } from "@library/@types/api/users";
-import { hashString } from "@vanilla/utils";
 
 export class UserFixture {
     public static adminAsCurrent = {
@@ -75,16 +74,8 @@ export class UserFixture {
     };
 
     public static createMockUser(overrides?: Partial<IUser>): IUser {
-        const name = overrides?.name ?? "Some User";
-        let nameHash = hashString(name + "1")
-            .toString()
-            .slice(0, 32)
-            .replace("-", "")
-            .toLowerCase();
-        nameHash = nameHash.padEnd(32, "0");
         return {
             userID: 3,
-            name: name,
             email: "test@example.com",
             emailConfirmed: true,
             showEmail: false,
@@ -93,61 +84,10 @@ export class UserFixture {
             dateInserted: new Date("2022-02-22").toUTCString(),
             dateUpdated: new Date("2022-02-22").toUTCString(),
             hidden: false,
-            photoUrl: `https://w${nameHash.slice(0, 1)}.vanillicon.com/v2/${nameHash}.svg`,
             countDiscussions: 10,
             countComments: 100,
             private: false,
-            roles: this.getMockRoles(name),
-            label: overrides?.name ?? this.getMockTitle(name),
             ...overrides,
         } as IUser;
-    }
-
-    public static getMockTitle(name: string): string {
-        const titles = ["Member", "Super User", "Staff", "Admin"];
-        const hash = hashString(name);
-        const offset = hash % titles.length;
-        return titles[offset]!;
-    }
-
-    public static getMockRoles(name: string): IUser["roles"] {
-        const roleSets = [
-            [
-                {
-                    roleID: 1,
-                    name: "Admin",
-                },
-            ],
-            [
-                {
-                    roleID: 2,
-                    name: "Member",
-                },
-            ],
-            [
-                {
-                    roleID: 2,
-                    name: "Member",
-                },
-                {
-                    roleID: 2,
-                    name: "Super User",
-                },
-            ],
-            [
-                {
-                    roleID: 3,
-                    name: "Staff",
-                },
-                {
-                    roleID: 4,
-                    name: "Member",
-                },
-            ],
-        ];
-
-        const hash = hashString(name);
-        const offset = hash % roleSets.length;
-        return roleSets[offset]!;
     }
 }

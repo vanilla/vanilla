@@ -83,12 +83,7 @@ export default class SiteNavNode extends React.Component<IProps> {
             const linkOrButtonContents = (
                 <span className={cx(classes.label, { [`${classes.activeLink}`]: this.props.isLink })}>
                     {this.props.iconPrefix}
-                    <span className={classes.labelText}>
-                        {this.props.name}
-                        {this.props.badge && this.props.badge.text && (
-                            <span className={classes.badge}>{this.props.badge.text}</span>
-                        )}
-                    </span>
+                    <span className={classes.labelText}>{this.props.name}</span>
                     {this.props.iconSuffix}
                     {this.props.withCheckMark && <CheckCompactIcon className={siteNavNodeClasses().checkMark} />}
                 </span>

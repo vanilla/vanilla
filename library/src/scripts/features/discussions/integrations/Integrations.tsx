@@ -1,10 +1,10 @@
 import IntegrationModal from "@library/features/discussions/integrations/IntegrationModal";
-import { useWriteableIntegrationContext } from "@library/features/discussions/integrations/Integrations.context";
+import { useIntegrationContext } from "@library/features/discussions/integrations/Integrations.context";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { useState } from "react";
 
 export function IntegrationButtonAndModal(props: { onSuccess?: () => Promise<void> }) {
-    const { label } = useWriteableIntegrationContext();
+    const { label } = useIntegrationContext();
     const { onSuccess } = props;
     const [isVisible, setIsVisible] = useState(false);
     return (

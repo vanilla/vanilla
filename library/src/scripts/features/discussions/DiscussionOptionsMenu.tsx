@@ -28,16 +28,12 @@ import { DiscussionOptionsChangeAuthor } from "@library/features/discussions/Dis
 import DiscussionOptionsDismiss from "@library/features/discussions/DiscussionOptionsDismiss";
 import DiscussionOptionsBump from "@library/features/discussions/DiscussionOptionsBump";
 import {
-    WriteableIntegrationContextProvider,
-    useWriteableAttachmentIntegrations,
+    IntegrationContextProvider,
+    useAttachmentIntegrations,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { IntegrationButtonAndModal } from "@library/features/discussions/integrations/Integrations";
 import { NON_CHANGE_TYPE } from "@library/features/discussions/forms/ChangeTypeDiscussionForm.constants";
 import { Icon } from "@vanilla/icons";
-import { ToolTip } from "@library/toolTip/ToolTip";
-import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
-import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -71,7 +67,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         mode: PermissionMode.RESOURCE_IF_JUNCTION,
     };
 
-    const writeableIntegrations = useWriteableAttachmentIntegrations();
+    const availableIntegrations = useAttachmentIntegrations();
 
     const currentUserID = useCurrentUserID();
 
@@ -85,8 +81,6 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
     const canManageDiscussion = hasPermission("discussions.manage", permOptions);
 
     const canBump = hasPermission("curation.manage");
-
-    const canReport = hasPermission("flag.add");
 
     const items: React.ReactNode[] = [];
 
@@ -230,18 +224,17 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         items.push(...changeLogItems);
     }
 
-    writeableIntegrations
+    availableIntegrations
         .filter(({ recordTypes }) => recordTypes.includes("discussion"))
-        .filter(({ writeableContentScope }) => (writeableContentScope === "own" ? isAuthor : true))
         .forEach(({ attachmentType }) => {
             permissionCheckedAndIntegrationItems.push(
-                <WriteableIntegrationContextProvider
+                <IntegrationContextProvider
                     recordType="discussion"
                     attachmentType={attachmentType}
                     recordID={discussion.discussionID}
                 >
                     <IntegrationButtonAndModal onSuccess={onMutateSuccess} />
-                </WriteableIntegrationContextProvider>,
+                </IntegrationContextProvider>,
             );
         });
 
@@ -250,53 +243,21 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         items.push(...permissionCheckedAndIntegrationItems);
     }
 
-    if (items.length > 0 && canReport) {
-        items.push(<DropDownItemSeparator />);
-        items.push(
-            <ReportRecordOption
-                discussionName={discussion.name}
-                recordType={"discussion"}
-                recordID={discussion.discussionID}
-                onSuccess={onMutateSuccess}
-            />,
-        );
+    if (items.length === 0) {
+        return <></>;
     }
 
     return (
-        <>
-            {items.length > 0 ? (
-                <DropDown
-                    buttonContents={<Icon icon="navigation-circle-ellipsis" />}
-                    name={t("Discussion Options")}
-                    flyoutType={FlyoutType.LIST}
-                    asReachPopover
-                >
-                    {items.map((item, i) => {
-                        return <React.Fragment key={i}>{item}</React.Fragment>;
-                    })}
-                </DropDown>
-            ) : (
-                <>
-                    {canReport ? (
-                        <ReportRecordOption
-                            discussionName={discussion.name}
-                            recordType={"discussion"}
-                            recordID={discussion.discussionID}
-                            onSuccess={onMutateSuccess}
-                            customTrigger={(props) => {
-                                return (
-                                    <ToolTip label={t("Report content")}>
-                                        <Button buttonType={ButtonTypes.ICON} onClick={props.onClick}>
-                                            <Icon icon="post-flag" />
-                                        </Button>
-                                    </ToolTip>
-                                );
-                            }}
-                        />
-                    ) : null}
-                </>
-            )}
-        </>
+        <DropDown
+            buttonContents={<Icon icon="navigation-circle-ellipsis" />}
+            name={t("Discussion Options")}
+            flyoutType={FlyoutType.LIST}
+            asReachPopover
+        >
+            {items.map((item, i) => {
+                return <React.Fragment key={i}>{item}</React.Fragment>;
+            })}
+        </DropDown>
     );
 };
 

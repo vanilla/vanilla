@@ -11,23 +11,15 @@ import { IFieldError, JsonSchema } from "@vanilla/json-schema-forms";
 import { RecordID } from "@vanilla/utils";
 import { FormikHelpers } from "formik";
 
-type WriteableContentScope = "all" | "own" | "none";
-
 export interface IAttachmentIntegration {
-    attachmentType: string;
-    title: string;
-    externalIDLabel: string;
-    logoIcon: IconType;
-
-    writeableContentScope: WriteableContentScope;
     name: string;
+    attachmentType: string;
     label: string;
     recordTypes: string[];
     submitButton: string;
-}
-
-export function isWriteableAttachmentIntegration(integration: IAttachmentIntegration): boolean {
-    return ["all", "own"].includes(integration.writeableContentScope);
+    title: string;
+    externalIDLabel: string;
+    logoIcon: IconType;
 }
 
 export type IAttachmentIntegrationCatalog = Record<string, IAttachmentIntegration>;

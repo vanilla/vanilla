@@ -16,7 +16,6 @@ interface IProps extends React.HTMLAttributes<HTMLSpanElement> {
     classNames?: string;
     children: ReactNode;
     onRemove?: () => void;
-    compact?: boolean;
 }
 
 export const TokenItem = React.forwardRef(function TokenItemImpl(props: IProps, ref: React.RefObject<HTMLDivElement>) {
@@ -24,9 +23,7 @@ export const TokenItem = React.forwardRef(function TokenItemImpl(props: IProps, 
     const classes = TokenItemClasses();
     return (
         <span {...rest} ref={ref} className={cx(classes.root, props.className, "token")}>
-            <span className={cx(classes.textContent, "tokenText", props.compact && classes.textContentCompact)}>
-                {props.children}
-            </span>
+            <span className={cx(classes.textContent, "tokenText")}>{props.children}</span>
             {onRemove && (
                 <Button buttonType={ButtonTypes.ICON_COMPACT} className={classes.button} onClick={onRemove}>
                     <CloseTinyIcon className={classes.icon} />

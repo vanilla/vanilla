@@ -140,7 +140,7 @@ $border-radius: to-rem(6);
 $border-radius-lg: to-rem(6);
 $border-radius-sm: to-rem(2);
 
-$caret-width: 4px !default;
+$caret-width: 0.375em !default;
 $caret-width-lg: $caret-width !default;
 
 // Buttons
@@ -178,7 +178,7 @@ $btn-border-radius-navbar: to-rem(10);
 
 // Navs
 
-$nav-link-padding: 5px 15px;
+$nav-link-padding: 5px 1em;
 $nav-pills-link-hover-bg: #e8ecf2;
 $nav-pills-panel-border-radius: $border-radius 0 0 $border-radius;
 
@@ -203,7 +203,8 @@ $table-padding-x: ($grid-gutter-width * 0.5);
 $table-padding-y: 8px;
 $meta-margin: 15px;
 $padding-row: $grid-gutter-width * 0.5;
-$border-color: rgb(221, 222, 224);
+$border-color: #e7e8e9;
+
 $font-size-tables: to-rem(13);
 
 // Cards

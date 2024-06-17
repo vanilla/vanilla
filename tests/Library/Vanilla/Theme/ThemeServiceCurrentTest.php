@@ -121,7 +121,6 @@ class ThemeServiceCurrentTest extends MockThemeTestCase
 
         // Theme features from the mobile theme were properly preserved.
         /** @var ThemeFeatures $features */
-        self::container()->setInstance(ThemeFeatures::class, null);
         $features = self::container()->get(ThemeFeatures::class);
         $this->assertEquals(false, $features->useSharedMasterView());
     }

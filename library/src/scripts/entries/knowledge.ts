@@ -5,11 +5,9 @@
  */
 
 import { onPageViewWithContext } from "@library/analytics/AnalyticsData";
-import { trackPageView, trackLink } from "@library/analytics/tracking";
+import { trackPageView } from "@library/analytics/tracking";
 
 // Page view tracking occurs through these custom events with specific types
 onPageViewWithContext((event: CustomEvent) => {
     trackPageView(window.location.href, event.detail);
 });
-
-trackLink();

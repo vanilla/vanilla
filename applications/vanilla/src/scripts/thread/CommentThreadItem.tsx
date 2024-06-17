@@ -13,10 +13,9 @@ import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { ThreadItem } from "@vanilla/addon-vanilla/thread/ThreadItem";
 import React, { useState } from "react";
 import CommentMeta from "@vanilla/addon-vanilla/thread/CommentMeta";
-import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
+import { IntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { DiscussionAttachment } from "./DiscussionAttachmentsAsset";
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
-import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 
 interface IProps {
     comment: IComment;
@@ -24,7 +23,6 @@ interface IProps {
     /** called after a successful PATCH or DELETE.*/
     onMutateSuccess?: () => Promise<void>;
     actions?: React.ComponentProps<typeof ThreadItem>["actions"];
-    boxOptions?: Partial<IBoxOptions>;
 }
 
 export function CommentThreadItem(props: IProps) {
@@ -53,7 +51,7 @@ export function CommentThreadItem(props: IProps) {
             name={comment.name}
         >
             <ThreadItem
-                boxOptions={props.boxOptions ?? {}}
+                boxOptions={{}}
                 content={comment.body}
                 actions={actions}
                 editor={
@@ -82,12 +80,14 @@ export function CommentThreadItem(props: IProps) {
                     (comment.attachments ?? []).length > 0 ? (
                         <>
                             {comment.attachments?.map((attachment) => (
-                                <ReadableIntegrationContextProvider
+                                <IntegrationContextProvider
                                     key={attachment.attachmentID}
+                                    recordType={"comment"}
+                                    recordID={comment.commentID}
                                     attachmentType={attachment.attachmentType}
                                 >
                                     <DiscussionAttachment key={attachment.attachmentID} attachment={attachment} />
-                                </ReadableIntegrationContextProvider>
+                                </IntegrationContextProvider>
                             ))}
                         </>
                     ) : null

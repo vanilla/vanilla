@@ -9,7 +9,6 @@
  */
 
 use Garden\Schema\Schema;
-use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 
 /**
  * Handles /log endpoint.
@@ -548,67 +547,6 @@ class LogController extends DashboardController
         $log = $this->LogModel->getWhere($where, "LogID", "Desc", $offset, $limit);
         $this->setData("Log", $log);
 
-        $this->render();
-    }
-
-    /**
-     * Get list of affected records based on DispatchUUID.
-     *
-     * @param string $dispatchUUID
-     * @param string $page
-     * @return void
-     * @throws Gdn_UserException
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws \Garden\Web\Exception\NotFoundException
-     * @throws \Vanilla\Exception\Database\NoResultsException
-     */
-    public function automationRules(string $dispatchUUID = "", string $page = ""): void
-    {
-        if (empty($dispatchUUID)) {
-            throw notFoundException("Page");
-        }
-        $this->permission("Garden.Moderation.Manage");
-        [$offset, $limit] = offsetLimit($page, 10);
-        $this->setHighlightRoute("dashboard/log/automationRules");
-        $automationDispatchModel = Gdn::getContainer()->get(AutomationRuleDispatchesModel::class);
-        $dispatchRecord = $automationDispatchModel->getAutomationRuleDispatchByUUID($dispatchUUID);
-        if (!$dispatchRecord) {
-            throw notFoundException("Page");
-        }
-
-        $where = [
-            "DispatchUUID" => $dispatchUUID,
-            "Operation" => ["Automation"],
-        ];
-        // Get the total number of records for this dispatch.
-        $recordCount = $this->LogModel->getCountWhere($where);
-        $this->setData("RecordCount", $recordCount);
-        if ($offset >= $recordCount) {
-            $offset = $recordCount - $limit;
-        }
-        $log = $this->LogModel->getAutomationLogsByDispatchID(
-            $dispatchUUID,
-            $dispatchRecord["attributes"]["affectedRecordType"],
-            $limit,
-            $offset,
-            true
-        );
-
-        // Set data for the view
-        $this->setData("LogModel", $this->LogModel);
-        $this->setData("Title", t("Automation Rule Dispatch " . "#$dispatchUUID"));
-        $automationDispatchRecord = [
-            "DispatchID" => $dispatchUUID,
-            "TriggerName" => $dispatchRecord["trigger"]["triggerName"],
-            "ActionName" => $dispatchRecord["action"]["actionName"],
-            "DispatchType" => ucfirst($dispatchRecord["dispatchType"]),
-            "DispatchStatus" => ucfirst($dispatchRecord["status"]),
-            "RecordType" => $dispatchRecord["attributes"]["affectedRecordType"] ?? "",
-        ];
-        $this->setData("AutomationDispatchRecord", $automationDispatchRecord);
-        $this->setData("Log", $log);
-        Gdn_Theme::section("Moderation");
         $this->render();
     }
 }

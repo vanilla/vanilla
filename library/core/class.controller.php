@@ -2479,16 +2479,13 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
      */
     private function addThemeAssets()
     {
-        if (!$this->isRenderingMasterView()) {
+        if (!$this->allowCustomTheming || !$this->isRenderingMasterView() || $this->MasterView === "admin") {
             // We only want to load theme data for full page loads & controllers that require theming data.
             return;
         }
 
         /** @var ThemePreloadProvider $themeProvider */
         $themeProvider = Gdn::getContainer()->get(ThemePreloadProvider::class);
-        if (!$this->allowCustomTheming || $this->MasterView === "admin") {
-            $themeProvider->setForcedThemeKey("theme-dashboard");
-        }
 
         $this->registerReduxActionProvider($themeProvider);
         $themeScript = $themeProvider->getThemeScript();

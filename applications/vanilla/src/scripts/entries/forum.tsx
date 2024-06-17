@@ -41,12 +41,11 @@ import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacy
 import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 import { CommunitySearchProvider } from "@vanilla/addon-vanilla/search/CommunitySearchProvider";
 import { delegateEvent } from "@vanilla/dom-utils";
+import React from "react";
 import {
     LegacyIntegrationsOptionsMenuItems,
     LegacyThreadAttachmentsAsset,
 } from "@vanilla/addon-vanilla/thread/LegacyAttachments";
-import ReportModal from "@vanilla/addon-vanilla/thread/ReportModal";
-import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
 
 registerReducer("forum", forumReducer);
 
@@ -100,27 +99,6 @@ delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElemen
             recordID={id}
             recordType={recordType as CollectionRecordTypes}
             modalOnly
-        />,
-    );
-});
-
-delegateEvent("click", ".js-legacyDiscussionOrCommentReport", (event, triggeringElement) => {
-    event.preventDefault();
-    const recordID = triggeringElement.getAttribute("data-recordID");
-    const recordType = triggeringElement.getAttribute("data-recordType");
-    const discussionName = triggeringElement.getAttribute("data-discussionName");
-    if (!recordID || !recordType || !discussionName) {
-        return;
-    }
-
-    mountModal(
-        <ReportRecordOption
-            discussionName={discussionName}
-            recordID={parseInt(recordID, 10)}
-            recordType={recordType as "discussion" | "comment"}
-            initialVisibility={true}
-            customTrigger={() => null}
-            isLegacyPage
         />,
     );
 });

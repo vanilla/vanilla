@@ -5,13 +5,9 @@
  * @license GPL-2.0-only
  */
 
-use Garden\Web\Data;
-use Vanilla\Dashboard\Events\DashboardAccessEvent;
-use Vanilla\Logging\AuditLogger;
 use Vanilla\Models\DashboardPreloadProvider;
 use Vanilla\Utility\Timers;
 use Vanilla\Web\ThemedPage;
-use VanillaTests\Fixtures\MockSiteMetaExtra;
 
 /**
  * Base page for rendering new admin layouts built in react.
@@ -26,7 +22,6 @@ class DashboardPage extends ThemedPage
     public function initialize(): self
     {
         Timers::instance()->setShouldRecordProfile(false);
-        return $this;
     }
 
     /**
@@ -48,18 +43,5 @@ class DashboardPage extends ThemedPage
         $dashboardProvider = \Gdn::getContainer()->get(DashboardPreloadProvider::class);
         $this->registerReduxActionProvider($dashboardProvider);
         parent::initAssets();
-    }
-
-    /**
-     * Override to log a dashboard access event.
-     *
-     * @return Data
-     */
-    public function render(): Data
-    {
-        $accessEvent = new DashboardAccessEvent();
-        AuditLogger::log($accessEvent);
-        $this->addSiteMetaExtra($accessEvent->asSiteMetaExtra());
-        return parent::render();
     }
 }

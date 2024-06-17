@@ -349,9 +349,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = true) => {
 
     const legacyFrame = style("legacyFrame", {
         margin: "auto",
-        "&&&": {
-            height: "initial",
-        },
+        height: "initial",
         minHeight: styleUnit(vars.sizing.minHeight + vars.menuButton.size),
         position: "relative",
         backgroundColor: ColorsUtils.colorOut(vars.colors.bg),

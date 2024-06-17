@@ -17,7 +17,7 @@ export interface ILookupApi {
     valueKey: string;
     labelKey: string;
     excludeLookups?: string[];
-    processOptions?: (values: any[]) => IComboBoxOption[];
+    processOptions?: (values: IComboBoxOption[]) => IComboBoxOption[];
 }
 
 export interface ISelectLookupProps extends Omit<ISelectOneProps, "options" | "value"> {

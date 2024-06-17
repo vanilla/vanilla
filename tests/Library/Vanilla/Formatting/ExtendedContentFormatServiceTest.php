@@ -74,9 +74,9 @@ class ExtendedContentFormatServiceTest extends TestCase
             '<source src="https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4" type="video/mp4"></source>' .
             "</video>";
 
-        // Stripped out in the normal formatter.
-        $actualNormal = str_replace(["<p>", "</p>"], "", $this->getFormatter()->renderHTML($in, $format));
-        $actualNormal = trim($actualNormal); // There may be an empty newline.
+        // Stripped out in the normal formatter. Iframes aren't allowed.
+        $actualNormal = trim($this->getFormatter()->renderHTML($in, $format));
+        $actualNormal = str_replace(["<p>", "</p>"], "", $actualNormal); // There may be an empty newline.
         $this->assertEquals("", $actualNormal);
 
         // Left alone in the extended formatter.

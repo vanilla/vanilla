@@ -136,15 +136,4 @@ class MockConfig implements Contracts\ConfigurationInterface
     {
         return count(array_filter(array_keys($arr), "is_string")) > 0;
     }
-
-    /**
-     * @param array|string $name
-     * @param mixed $value
-     *
-     * @return void
-     */
-    public function saveWithoutAuditLog(array|string $name, mixed $value = ""): void
-    {
-        return;
-    }
 }

@@ -30,8 +30,6 @@ export function FeaturedCollectionsWidgetPreview(props: IProps) {
                 collection={{
                     collectionID: 1,
                     name: "Preview Collection",
-                    dateInserted: "2020-10-06T15:30:44+00:00",
-                    dateUpdated: "2020-10-06T15:30:44+00:00",
                     records: LayoutEditorPreviewData.discussions(10, true).map((record) => ({
                         recordID: record.discussionID,
                         recordType: CollectionRecordTypes.DISCUSSION,

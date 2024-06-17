@@ -15,6 +15,10 @@ import { setMeta } from "@library/utility/appUtils";
 
 const queryClient = new QueryClient();
 
+beforeAll(() => {
+    setMeta("featureFlags.Digest.Enabled", true);
+});
+
 const dummyData = {
     "emailStyles.format": "html",
     "emailStyles.image": "",

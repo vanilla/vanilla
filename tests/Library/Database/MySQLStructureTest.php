@@ -465,32 +465,4 @@ EOT;
         $this->st->table("renameIndex")->tryRenameIndex("IX_renameIndex_DumbName", "IX_renameIndex_GreatName");
         $this->assertIndexes(["IX_renameIndex_GreatName[col1]", "IX_renameIndex_GreatName[col2]"], "renameIndex");
     }
-
-    /**
-     * @return void
-     */
-    public function testDatePrecision(): void
-    {
-        $this->st
-            ->table("datePrecision")
-            ->column("date", "datetime")
-            ->set();
-
-        $this->st
-            ->table("datePrecision")
-            ->column("date", "datetime(4)")
-            ->set();
-
-        $this->st
-            ->table("datePrecision")
-            ->column("date", "datetime(6)")
-            ->set();
-
-        // This has been updated and shows itself properly in the schema.
-        $schema = $this->db->createSql()->fetchTableSchema("datePrecision");
-        $this->assertEquals(6, $schema["date"]->Precision);
-
-        $gdnSchema = $this->db->simpleSchema("datePrecision");
-        $this->assertEquals("datetime", $gdnSchema->getField("properties.date.type"));
-    }
 }

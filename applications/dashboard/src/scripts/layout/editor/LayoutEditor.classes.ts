@@ -8,7 +8,7 @@ import { css, CSSObject } from "@emotion/css";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
-import { styleUnit } from "@library/styles/styleHelpers";
+import { colorOut, styleUnit } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Property } from "csstype";
 
@@ -98,7 +98,7 @@ export const layoutEditorClasses = useThemeCache(() => {
         minHeight: column.height,
         borderRadius: 4,
         border: "1px solid",
-        borderColor: ColorsUtils.colorOut(column.border.color),
+        borderColor: colorOut(column.border.color),
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -107,21 +107,21 @@ export const layoutEditorClasses = useThemeCache(() => {
         ":hover, :focus, :active": {
             outline: "none",
             cursor: "pointer",
-            backgroundColor: ColorsUtils.colorOut(column.color.bg),
-            borderColor: ColorsUtils.colorOut(column.border.active),
+            backgroundColor: colorOut(column.color.bg),
+            borderColor: colorOut(column.border.active),
         },
         "&:focus-visible, &.focus-visible": {
             boxShadow: focusShadow,
             borderWidth: 0,
         },
         "& .buttonCircle": {
-            color: ColorsUtils.colorOut(column.border.color),
-            borderColor: ColorsUtils.colorOut(column.border.color),
+            color: colorOut(column.border.color),
+            borderColor: colorOut(column.border.color),
         },
         ":hover .buttonCircle, :focus .buttonCircle, :focus-within .buttonCircle, :active .buttonCircle": {
-            color: ColorsUtils.colorOut(button.circle.active.fg),
-            backgroundColor: ColorsUtils.colorOut(button.circle.active.bg),
-            borderColor: ColorsUtils.colorOut(button.circle.active.border),
+            color: colorOut(button.circle.active.fg),
+            backgroundColor: colorOut(button.circle.active.bg),
+            borderColor: colorOut(button.circle.active.border),
         },
     });
 
@@ -164,9 +164,9 @@ export const layoutEditorClasses = useThemeCache(() => {
         height: button.size,
         overflow: "initial",
         "&:focus .buttonCircle, &:focus-within .buttonCircle, &:active .buttonCircle": {
-            color: ColorsUtils.colorOut(button.circle.active.fg),
-            backgroundColor: ColorsUtils.colorOut(button.circle.active.bg),
-            borderColor: ColorsUtils.colorOut(button.circle.active.border),
+            color: colorOut(button.circle.active.fg),
+            backgroundColor: colorOut(button.circle.active.bg),
+            borderColor: colorOut(button.circle.active.border),
         },
         "&:focus": {
             outline: "none",
@@ -189,8 +189,8 @@ export const layoutEditorClasses = useThemeCache(() => {
         height: button.line.size,
         borderRadius: button.line.size,
         border: "2px solid",
-        backgroundColor: ColorsUtils.colorOut(button.line.color),
-        borderColor: ColorsUtils.colorOut(button.line.color),
+        backgroundColor: colorOut(button.line.color),
+        borderColor: colorOut(button.line.color),
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -199,9 +199,9 @@ export const layoutEditorClasses = useThemeCache(() => {
 
     const buttonCircle = css({
         borderRadius: "50%",
-        color: ColorsUtils.colorOut(button.circle.color.fg),
-        backgroundColor: ColorsUtils.colorOut(button.circle.color.bg),
-        borderColor: ColorsUtils.colorOut(button.circle.color.border),
+        color: colorOut(button.circle.color.fg),
+        backgroundColor: colorOut(button.circle.color.bg),
+        borderColor: colorOut(button.circle.color.border),
         border: "1px solid",
         padding: 0,
         width: button.size,

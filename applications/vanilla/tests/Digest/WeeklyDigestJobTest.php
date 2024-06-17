@@ -37,6 +37,7 @@ class WeeklyDigestJobTest extends SiteTestCase
         $this->emailDigestGenerator = \Gdn::getContainer()->get(EmailDigestGenerator::class);
         $config = [
             "Garden.Email.Disabled" => false,
+            "Feature.Digest.Enabled" => true,
             "Garden.Digest.Enabled" => true,
         ];
         \Gdn::config()->saveToConfig($config);
@@ -50,6 +51,7 @@ class WeeklyDigestJobTest extends SiteTestCase
         yield "Email disabled" => [
             [
                 "Garden.Digest.Enabled" => true,
+                "Feature.Digest.Enabled" => true,
                 "Garden.Email.Disabled" => true,
             ],
         ];
@@ -57,6 +59,7 @@ class WeeklyDigestJobTest extends SiteTestCase
         yield "Digest config disabled" => [
             [
                 "Garden.Digest.Enabled" => true,
+                "Feature.Digest.Enabled" => false,
                 "Garden.Email.Disabled" => false,
             ],
         ];
@@ -64,6 +67,7 @@ class WeeklyDigestJobTest extends SiteTestCase
         yield "Feature disabled" => [
             [
                 "Garden.Digest.Enabled" => false,
+                "Feature.Digest.Enabled" => true,
                 "Garden.Email.Disabled" => false,
             ],
         ];

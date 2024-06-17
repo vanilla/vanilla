@@ -24,7 +24,6 @@ import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThre
 import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
 import ThreadItemPermalink from "@vanilla/addon-vanilla/thread/ThreadItemPermalink";
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
-import { Icon } from "@vanilla/icons";
 
 interface IProps {
     discussion: IDiscussion;
@@ -65,9 +64,6 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                 <PageHeadingBox
                     title={
                         <>
-                            <span className={discussionThreadClasses().resolved}>
-                                <Icon icon={discussion.resolved ? "cmd-approve" : "cmd-alert"} />
-                            </span>
                             <span>{discussion.name}</span>
                             {discussion.closed && (
                                 <Tag

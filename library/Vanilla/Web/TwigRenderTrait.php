@@ -74,7 +74,7 @@ trait TwigRenderTrait
     {
         foreach ($links as &$link) {
             // Normalize certain widget items.
-            $link["url"] = $link["url"] ?? ($link["Url"] ?? ($link["to"] ?? ""));
+            $link["url"] = $link["url"] ?? ($link["Url"] ?? $link["to"]);
             $link["name"] = $link["name"] ?? ($link["Name"] ?? ($link["label"] ?? ($link["title"] ?? null)));
             $link["excerpt"] = $link["excerpt"] ?? ($link["description"] ?? null);
         }

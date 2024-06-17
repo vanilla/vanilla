@@ -18,16 +18,6 @@ interface AttachmentProviderInterface
 
     const ESCALATION_DELAY_UNITS = ["minute", "hour", "day", "week", "month", "year"];
 
-    const WRITEABLE_CONTENT_SCOPE_ALL = "all";
-    const WRITEABLE_CONTENT_SCOPE_OWN = "own";
-    const WRITEABLE_CONTENT_SCOPE_NONE = "none";
-
-    const WRITEABLE_CONTENT_SCOPES = [
-        self::WRITEABLE_CONTENT_SCOPE_ALL,
-        self::WRITEABLE_CONTENT_SCOPE_OWN,
-        self::WRITEABLE_CONTENT_SCOPE_NONE,
-    ];
-
     /**
      * Create a new issue in the external service and return the saved associated attachment data.
      *
@@ -47,7 +37,6 @@ interface AttachmentProviderInterface
 
     /**
      * Normalize an attachment of our own type for display.
-     * This method is responsible for limiting what data the session user can see.
      *
      * @param array $attachment
      *
@@ -63,13 +52,6 @@ interface AttachmentProviderInterface
     public function getTypeName(): string;
 
     /**
-     * Get If this is an Escalation provider.
-     *
-     * @return bool
-     */
-    public function getIsEscalation(): bool;
-
-    /**
      * Get the form schema for creating the external issue with fields dynamically populated from the record.
      *
      * @param string $recordType
@@ -81,18 +63,11 @@ interface AttachmentProviderInterface
     public function getHydratedFormSchema(string $recordType, int $recordID, array $args): Schema;
 
     /**
-     * Get the scope of content on which the user can create attachments.
-     * Must be one of `AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPES`.
-     * @return string
-     */
-    public function getWriteableContentScope(): string;
-
-    /**
-     * Verify that the user is authorized to read attachments from this provider.
+     * Verify that the user is authorized to use this provider.
      *
      * @return bool
      */
-    public function hasReadPermissions(): bool;
+    public function hasPermissions(): bool;
 
     /**
      * Get the types of records that can be used with this provider.
@@ -144,6 +119,13 @@ interface AttachmentProviderInterface
     public function getRefreshTimeSeconds(): int;
 
     /**
+     * If a user can escalate their own post to this provider.
+     *
+     * @return bool
+     */
+    public function canEscalateOwnPost(): bool;
+
+    /**
      * Get units used to calculate time span before a user can escalate their own post.
      * Must be one of `AttachmentProviderInterface::ESCALATION_DELAY_UNITS`.
      *
@@ -160,20 +142,12 @@ interface AttachmentProviderInterface
     public function getEscalationDelayLength(): int;
 
     /**
-     * If the current user can view the basic attachment record.
+     * If the current user can view a specific attachment record.
      *
      * @param array $attachment
      * @return bool
      */
-    public function canViewBasicAttachment(array $attachment): bool;
-
-    /**
-     * If the current user can view the full attachment record.
-     *
-     * @param array $attachment
-     * @return bool
-     */
-    public function canViewFullAttachment(array $attachment): bool;
+    public function canViewAttachment(array $attachment): bool;
 
     /**
      * If the current user can create an attachment for a specific recordType and recordID.

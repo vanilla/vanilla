@@ -45,7 +45,7 @@ const backLinkClasses = useThemeCache(() => {
                 left: negative(24),
                 right: globalVars.gutter.half,
             }),
-            transform: translateY("0.5ch"),
+            transform: translateY("-0.1em"),
         },
         mediaQueries.oneColumnDown({
             ...Mixins.margin({

@@ -39,6 +39,13 @@ class DashboardNavModule extends SiteNavModule
      * @var array
      */
     private static $sectionsInfo = [
+        "Appearance" => [
+            "permission" => ["Garden.Settings.Manage"],
+            "section" => "Appearance",
+            "title" => "Appearance",
+            "description" => "Customize your community",
+            "url" => "/appearance",
+        ],
         "Moderation" => [
             "permission" => [
                 "Garden.Moderation.Manage",
@@ -51,18 +58,25 @@ class DashboardNavModule extends SiteNavModule
                 "Garden.Users.Approve",
             ],
             "section" => "Moderation",
-            "title" => "Dashboard",
+            "title" => "Moderation",
             "description" => "Community Management",
             "url" => [
-                "Garden.Moderation.Manage" => "/dashboard/content/reports",
                 "Garden.Users.Add" => "/dashboard/user",
                 "Garden.Users.Edit" => "/dashboard/user",
                 "Garden.Users.Delete" => "/dashboard/user",
+                "Garden.Moderation.Manage" => "/dashboard/log/moderation",
                 "Moderation.ModerationQueue.Manage" => "/dashboard/log/moderation",
                 "Garden.Community.Manage" => "/dashboard/message",
                 "Garden.Settings.Manage" => "/dashboard/settings/bans",
                 "Garden.Users.Approve" => "/dashboard/user/applicants",
             ],
+        ],
+        "Settings" => [
+            "permission" => ["Garden.Settings.Manage", "Garden.Community.Manage"],
+            "section" => "Settings",
+            "title" => "Settings",
+            "description" => "Configuration & Addons",
+            "url" => "/dashboard/role",
         ],
         "Analytics" => [
             "permission" => ["Garden.Settings.View", "Garden.Settings.Manage", "Garden.Community.Manage"],
@@ -71,20 +85,6 @@ class DashboardNavModule extends SiteNavModule
             "description" => "Visualize Your Community",
             "url" => "/dashboard/settings/home",
             "empty" => true,
-        ],
-        "Appearance" => [
-            "permission" => ["Garden.Settings.Manage"],
-            "section" => "Appearance",
-            "title" => "Appearance",
-            "description" => "Customize your community",
-            "url" => "/appearance",
-        ],
-        "Settings" => [
-            "permission" => ["Garden.Settings.Manage", "Garden.Community.Manage"],
-            "section" => "Settings",
-            "title" => "Settings",
-            "description" => "Configuration & Addons",
-            "url" => "/dashboard/role",
         ],
     ];
 

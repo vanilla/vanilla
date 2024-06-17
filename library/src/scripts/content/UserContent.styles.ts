@@ -20,59 +20,6 @@ import { media } from "@library/styles/styleShim";
 import { userContentVariables } from "@library/content/UserContent.variables";
 import { LinkDecorationType } from "@library/styles/cssUtilsTypes";
 
-export function codeMixin(): CSSObject {
-    const vars = userContentVariables();
-
-    const codeStyles: CSSObject = {
-        ".code": {
-            position: "relative",
-            fontSize: vars.code.fontSize,
-            fontFamily: `Menlo, Monaco, Consolas, "Courier New", monospace`,
-            maxWidth: percent(100),
-            overflowX: "auto",
-            margin: 0,
-            color: ColorsUtils.colorOut(vars.blocks.fg),
-            backgroundColor: ColorsUtils.colorOut(vars.blocks.bg),
-            border: "none",
-        },
-        "&& .codeInline": {
-            whiteSpace: "normal",
-            ...Mixins.padding(vars.codeInline.padding),
-            color: ColorsUtils.colorOut(vars.codeInline.fg),
-            backgroundColor: ColorsUtils.colorOut(vars.codeInline.bg),
-            borderRadius: vars.codeInline.borderRadius,
-            // We CAN'T use display: `inline` & position: `relative` together.
-            // This causes the cursor to disappear in a contenteditable.
-            // @see https://bugs.chromium.org/p/chromium/issues/detail?id=724821
-            display: "inline",
-            position: "static",
-        },
-        "&& .codeBlock": {
-            display: "block",
-            wordWrap: "normal",
-            lineHeight: vars.codeBlock.lineHeight,
-            borderRadius: vars.codeBlock.borderRadius,
-            flexShrink: 0, // Needed so code blocks don't collapse in the editor.
-            whiteSpace: "pre",
-            color: ColorsUtils.colorOut(vars.codeBlock.fg),
-            backgroundColor: ColorsUtils.colorOut(vars.codeBlock.bg),
-            ...Mixins.padding(vars.codeBlock.padding),
-            "&&::selection": {
-                background: "#c1def1",
-            },
-        },
-
-        "&& .codeBlockWrapped": {
-            whiteSpace: "normal",
-        },
-
-        "& code": {
-            fontFamily: `Menlo, Monaco, Consolas, "Courier New", monospace`,
-        },
-    };
-    return codeStyles;
-}
-
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -248,6 +195,54 @@ export function userContentMixin(): CSSObject {
         "& a:active": {
             color: ColorsUtils.colorOut(globalVars.links.colors.active),
             textDecoration: "underline",
+        },
+    };
+
+    const codeStyles: CSSObject = {
+        ".code": {
+            position: "relative",
+            fontSize: vars.code.fontSize,
+            fontFamily: `Menlo, Monaco, Consolas, "Courier New", monospace`,
+            maxWidth: percent(100),
+            overflowX: "auto",
+            margin: 0,
+            color: ColorsUtils.colorOut(vars.blocks.fg),
+            backgroundColor: ColorsUtils.colorOut(vars.blocks.bg),
+            border: "none",
+        },
+        "&& .codeInline": {
+            whiteSpace: "normal",
+            ...Mixins.padding(vars.codeInline.padding),
+            color: ColorsUtils.colorOut(vars.codeInline.fg),
+            backgroundColor: ColorsUtils.colorOut(vars.codeInline.bg),
+            borderRadius: vars.codeInline.borderRadius,
+            // We CAN'T use display: `inline` & position: `relative` together.
+            // This causes the cursor to disappear in a contenteditable.
+            // @see https://bugs.chromium.org/p/chromium/issues/detail?id=724821
+            display: "inline",
+            position: "static",
+        },
+        "&& .codeBlock": {
+            display: "block",
+            wordWrap: "normal",
+            lineHeight: vars.codeBlock.lineHeight,
+            borderRadius: vars.codeBlock.borderRadius,
+            flexShrink: 0, // Needed so code blocks don't collapse in the editor.
+            whiteSpace: "pre",
+            color: ColorsUtils.colorOut(vars.codeBlock.fg),
+            backgroundColor: ColorsUtils.colorOut(vars.codeBlock.bg),
+            ...Mixins.padding(vars.codeBlock.padding),
+            "&&::selection": {
+                background: "#c1def1",
+            },
+        },
+
+        "&& .codeBlockWrapped": {
+            whiteSpace: "normal",
+        },
+
+        "& code": {
+            fontFamily: `Menlo, Monaco, Consolas, "Courier New", monospace`,
         },
     };
 
@@ -502,7 +497,7 @@ export function userContentMixin(): CSSObject {
         ...headings,
         ...lists,
         ...paragraphSpacing,
-        ...codeMixin(),
+        ...codeStyles,
         ...spoilersAndQuotes,
         ...embeds,
         ...blockquotes,
@@ -515,47 +510,6 @@ export function userContentMixin(): CSSObject {
         "&.Hidden": {
             // In case some legacy code tries to hide us.
             display: "none !important",
-        },
-
-        "& .moderationImageAndButtonContainer": {
-            position: "relative",
-
-            ".toggleButton": {
-                position: "absolute",
-                display: "block",
-                zIndex: 100,
-                top: "8px",
-                left: "8px",
-
-                border: "1px solid rgb(214, 215, 217)",
-                borderRadius: "6px",
-                fontWeight: 600,
-                padding: "2px 16px",
-                color: "rgb(85, 90, 98)",
-                background: "rgb(255, 255, 255)",
-
-                "&:hover": {
-                    color: "rgb(255, 255, 255)",
-                    borderColor: "rgb(3, 125, 188)",
-                    background: "rgb(3, 125, 188)",
-                },
-            },
-
-            ".moderationContainer.blur": {
-                position: "relative",
-
-                "&::before": {
-                    position: "absolute",
-                    content: "''",
-                    width: "100%",
-                    height: "100%",
-                    zIndex: 50,
-                    background: "rgba(119, 119, 119, 0.45)",
-                    backdropFilter: "blur(25px)",
-                    top: 0,
-                    left: 0,
-                },
-            },
         },
     };
 

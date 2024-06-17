@@ -151,6 +151,8 @@ class AccessTokenModelTest extends SharedBootstrapTestCase
         $this->assertNotEquals($initialConfToken, $secondConfToken);
         $this->assertNotFalse($model->verify($secondConfToken));
         $config = $this->container()->get(ConfigurationInterface::class);
+        // Checking that "APIv2.SystemAccessToken" was not added to the config changes.
+        $this->assertArrayNotHasKey("APIv2.SystemAccessToken", $config->ConfigChangesData);
 
         // Ensure that the old token is now only valid for another 6h. 5 and 7h are used for convenience.
         $initialToken = $model->verify($initialConfToken);

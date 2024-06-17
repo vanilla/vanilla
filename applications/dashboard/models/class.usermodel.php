@@ -12,6 +12,7 @@ use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
+use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
 use Garden\StaticCacheConfigTrait;
 use Garden\Web\Exception\ForbiddenException;
@@ -19,29 +20,21 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Dashboard\Events\PasswordResetEmailSentEvent;
-use Vanilla\Dashboard\Events\PasswordResetUserNotFoundEvent;
 use Vanilla\Dashboard\Events\UserEvent;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Dashboard\Events\UserPointEvent;
-use Vanilla\Dashboard\Events\UserRoleModificationEvent;
-use Vanilla\Dashboard\Events\UserRoleRemoveEvent;
-use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Dashboard\Models\UserFragment;
 use Vanilla\Dashboard\Models\UserVisitUpdater;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\Database\NoResultsException;
-use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Logger;
-use Vanilla\Logging\AuditLogger;
-use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\UserFragmentSchema;
@@ -62,6 +55,7 @@ use Vanilla\Web\SystemCallableInterface;
  */
 class UserModel extends Gdn_Model implements
     UserProviderInterface,
+    EventFromRowInterface,
     CrawlableInterface,
     SystemCallableInterface,
     FragmentFetcherInterface,
@@ -1551,7 +1545,7 @@ class UserModel extends Gdn_Model implements
             // Give roles based on user email
             $this->giveRolesByEmail($user);
 
-            $userEvent = $this->eventFromRow($user, UserEvent::ACTION_INSERT);
+            $userEvent = $this->eventFromRow($user, UserEvent::ACTION_INSERT, $this->currentFragment());
             $this->getEventManager()->dispatch($userEvent);
         }
 
@@ -3053,7 +3047,7 @@ class UserModel extends Gdn_Model implements
             unset($formPostValues["Private"]);
         }
 
-        // Do not allow setting this via general save.
+        // Do not allowing setting this via general save.
         unset($formPostValues["Admin"]);
 
         // This field is deprecated but included on user objects for backwards compatibility.
@@ -3358,7 +3352,6 @@ class UserModel extends Gdn_Model implements
                     }
 
                     if (array_key_exists("ProfileFields", $formPostValues)) {
-                        $originalProfileFields = $this->profileFieldModel->getUserProfileFields($userID, true);
                         $this->profileFieldModel->updateUserProfileFields($userID, $formPostValues["ProfileFields"]);
                     }
                 } else {
@@ -3435,18 +3428,6 @@ class UserModel extends Gdn_Model implements
                     $this->sendEmailConfirmationEmail($user, true);
                 }
 
-                if ($userID) {
-                    if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
-                        if (array_key_exists("SuggestAnswers", $formPostValues)) {
-                            $this->userMetaModel->setUserMeta(
-                                $userID,
-                                "SuggestAnswers",
-                                forceBool($formPostValues["SuggestAnswers"], "1", "1", "0")
-                            );
-                        }
-                    }
-                }
-
                 $this->clearCache($userID, [self::CACHE_TYPE_USER]);
                 $this->EventArguments["UserID"] = $userID;
                 $this->fireEvent("AfterSave");
@@ -3456,15 +3437,15 @@ class UserModel extends Gdn_Model implements
         } else {
             $userID = false;
         }
-
         if ($userID && !$insert) {
             // Events for inserts are dispatched in `insertInternal()`
             $user = $this->getID($userID);
-            $userEvent = $this->eventFromRow((array) $user, UserEvent::ACTION_UPDATE, $existingUserRecord);
-            if (isset($originalProfileFields)) {
-                $currentProfileFields = $this->profileFieldModel->getUserProfileFields($userID, true);
-                $userEvent->auditProfileFieldChange($originalProfileFields, $currentProfileFields);
-            }
+            $userEvent = $this->eventFromRow(
+                (array) $user,
+                UserEvent::ACTION_UPDATE,
+                $this->currentFragment(),
+                $existingUserRecord
+            );
             $this->getEventManager()->dispatch($userEvent);
         }
         return $userID;
@@ -3488,11 +3469,12 @@ class UserModel extends Gdn_Model implements
      *
      * @param array $row
      * @param string $action
+     * @param array|object|null $sender
      * @param array|null $existingData
      * @throws \Garden\Schema\ValidationException
      * @return UserEvent
      */
-    public function eventFromRow(array $row, string $action, ?array $existingData = null): ResourceEvent
+    public function eventFromRow(array $row, string $action, $sender = null, ?array $existingData = null): ResourceEvent
     {
         $user = $this->normalizeRow($row, false);
         $user = $this->readSchema()->validate($user);
@@ -3501,7 +3483,12 @@ class UserModel extends Gdn_Model implements
             $existingData = $this->readSchema()->validate($existingData);
         }
 
-        $result = new UserEvent($action, ["user" => $user, "existingData" => $existingData], $this->currentFragment());
+        if ($sender) {
+            $senderSchema = new UserFragmentSchema();
+            $sender = $senderSchema->validate($sender);
+        }
+
+        $result = new UserEvent($action, ["user" => $user, "existingData" => $existingData], $sender);
         return $result;
     }
 
@@ -3591,17 +3578,6 @@ class UserModel extends Gdn_Model implements
                 $result["sortEmail"] = mb_convert_case(Normalizer::normalize($result["email"]), MB_CASE_LOWER);
             }
         }
-
-        if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
-            $aiConfig = AiSuggestionSourceService::aiSuggestionConfigs();
-            if ($aiConfig["enabled"]) {
-                $result["suggestAnswers"] = $this->userMetaModel->getUserMeta(
-                    $result["userID"],
-                    "SuggestAnswers",
-                    true
-                )["SuggestAnswers"];
-            }
-        }
         return $result;
     }
 
@@ -3687,7 +3663,6 @@ class UserModel extends Gdn_Model implements
             "points",
             "roles?",
             "showEmail",
-            "suggestAnswers?",
             "userID",
             "title?",
             "countDiscussions?",
@@ -3965,8 +3940,25 @@ class UserModel extends Gdn_Model implements
         $removedRoles = array_diff($oldRoles, $newRoles);
         $newRoles = array_diff($newRoles, $oldRoles);
 
-        $auditEvent = new UserRoleModificationEvent($user->Name, $user->UserID, $newRoles, $removedRoles);
-        AuditLogger::log($auditEvent);
+        foreach ($removedRoles as $RoleName) {
+            $this->logger->info("{" . Logger::FIELD_TARGET_USERNAME . "} removed from the {$RoleName} role.", [
+                Logger::FIELD_EVENT => "role_remove",
+                Logger::FIELD_TARGET_USERID => $user->UserID,
+                Logger::FIELD_TARGET_USERNAME => $user->Name,
+                "role" => $RoleName,
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+            ]);
+        }
+
+        foreach ($newRoles as $RoleName) {
+            $this->logger->info("{" . Logger::FIELD_TARGET_USERNAME . "} added to the {$RoleName} role.", [
+                Logger::FIELD_EVENT => "role_add",
+                Logger::FIELD_TARGET_USERID => $user->UserID,
+                Logger::FIELD_TARGET_USERNAME => $user->Name,
+                "role" => $RoleName,
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+            ]);
+        }
     }
 
     /**
@@ -4224,9 +4216,30 @@ class UserModel extends Gdn_Model implements
             return;
         }
 
-        $sql->distinct()
-            ->join("UserIP ip1", "ip1.UserID=u.UserID")
-            ->where("ip1.IPAddress", $ipAddresses);
+        $subquery = $this->createSql();
+        $subquery
+            ->select("1")
+            ->from("UserIP ip1")
+            ->where("ip1.UserID", "u.UserID", true, false)
+            ->where("ip1.IPAddress", $ipAddresses)
+            ->groupBy("ip1.UserID");
+        $sql->whereExists($subquery);
+    }
+
+    /**
+     * Returns a function for use by Schema::addValidator() to validate an array of IP addresses.
+     *
+     * @return Closure
+     */
+    public function createIpAddressesValidator(): Closure
+    {
+        return function (array $ipAddresses, \Garden\Schema\ValidationField $field) {
+            foreach ($ipAddresses as $ipAddress) {
+                if (!filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
+                    $field->addError("$ipAddress is not a valid IP address");
+                }
+            }
+        };
     }
 
     /**
@@ -4427,10 +4440,7 @@ class UserModel extends Gdn_Model implements
         if ($wildcardSearch) {
             $name = $this->escapeField($name);
             $name = rtrim($name, "*");
-            $this->SQL
-                ->where("Name", $name)
-                ->orOp()
-                ->like("Name", $name, "right");
+            $this->SQL->like("Name", $name, "right");
         } else {
             $this->SQL->where("Name", $name);
         }
@@ -5387,7 +5397,7 @@ class UserModel extends Gdn_Model implements
         $this->clearCache($id);
         $this->clearUserNameCache($userData["Name"]);
         if ($userData) {
-            $userEvent = $this->eventFromRow((array) $userData, UserEvent::ACTION_DELETE);
+            $userEvent = $this->eventFromRow((array) $userData, UserEvent::ACTION_DELETE, $this->currentFragment());
             $this->getEventManager()->dispatch($userEvent);
         }
         return true;
@@ -6337,8 +6347,11 @@ SQL;
                 "Couldn't find an account associated with that email/username."
             );
             if ($log) {
-                $failedAudit = new PasswordResetUserNotFoundEvent($input);
-                AuditLogger::log($failedAudit);
+                $this->logger->info("Can't find account associated with email/username {$input}.", [
+                    Logger::FIELD_EVENT => "password_reset_failure",
+                    "input" => $input,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                ]);
             }
             return true;
         }
@@ -6373,8 +6386,14 @@ SQL;
             try {
                 $email->send();
                 if ($log) {
-                    $emailSentAuditEvent = new PasswordResetEmailSentEvent($user->Email, $user->Name, $user->UserID);
-                    AuditLogger::log($emailSentAuditEvent);
+                    $this->logger->info("{$user->Email} has been sent a password reset email.", [
+                        Logger::FIELD_EVENT => "password_reset_request",
+                        "input" => $input,
+                        "email" => $user->Email,
+                        Logger::FIELD_TARGET_USERID => $user->UserID,
+                        Logger::FIELD_TARGET_USERNAME => $user->Name,
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                    ]);
                 }
             } catch (Exception $ex) {
                 if ($log) {
@@ -6386,14 +6405,12 @@ SQL;
                             Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                         ]);
                     } else {
-                        ErrorLogger::error(
-                            $ex,
-                            ["password", "reset", "request"],
-                            [
-                                "input" => $input,
-                                "email" => $user->Email,
-                            ]
-                        );
+                        $this->logger->error("The password reset email to {$user->Email} failed to send.", [
+                            Logger::FIELD_EVENT => "password_reset_request",
+                            "input" => $input,
+                            "email" => $user->Email,
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        ]);
                     }
                 }
                 if (debug()) {
@@ -6407,8 +6424,11 @@ SQL;
         if ($noEmail) {
             $this->Validation->addValidationResult("Name", "There is no email address associated with that account.");
             if ($log) {
-                $notFoundAuditEvent = new PasswordResetUserNotFoundEvent($input);
-                AuditLogger::log($notFoundAuditEvent);
+                $this->logger->info("Can't find account associated with email/username {$input}.", [
+                    Logger::FIELD_EVENT => "password_reset_failure",
+                    "input" => $input,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                ]);
             }
             return false;
         }
@@ -6572,7 +6592,7 @@ SQL;
         }
 
         if (count($userMetaSet) > 0) {
-            $this->profileFieldModel->updateUserProfileFields($rowID, $userMetaSet, true);
+            $this->profileFieldModel->updateUserProfileFields($rowID, $userMetaSet);
         }
 
         if (in_array($property, ["Permissions"])) {
@@ -7169,7 +7189,8 @@ SQL;
     private function createUserPointEvent(array $pointData): UserPointEvent
     {
         $user = $this->getID($pointData["userID"], DATASET_TYPE_ARRAY);
-        $userEvent = $this->eventFromRow($user, UserEvent::ACTION_UPDATE);
+        $fragment = $this->currentFragment();
+        $userEvent = $this->eventFromRow($user, UserEvent::ACTION_UPDATE, $fragment);
 
         $pointReceived["value"] = $pointData["givenPoints"];
         $pointReceived["source"] = $pointData["source"];

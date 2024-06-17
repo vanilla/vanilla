@@ -107,7 +107,7 @@ class AccessTokenModel extends Gdn_Model
 
             $db->commitTransaction();
             // Save the new token into the config for access by orch or for system recovery.
-            $this->config->saveWithoutAuditLog(self::CONFIG_SYSTEM_TOKEN, $newToken);
+            $this->config->saveToConfig(self::CONFIG_SYSTEM_TOKEN, $newToken, ["BypassLogging" => true]);
         } catch (Throwable $e) {
             $db->rollbackTransaction();
             throw $e;

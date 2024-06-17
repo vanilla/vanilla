@@ -589,7 +589,6 @@ class UtilityController extends DashboardController
      */
     public function getFeed($type = "news", $length = 5, $feedFormat = "normal")
     {
-        $this->auditLogEnabled = false;
         $validTypes = ["releases", "help", "news", "cloud"];
         $validFormats = ["extended", "normal"];
 

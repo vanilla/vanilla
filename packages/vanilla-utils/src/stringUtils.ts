@@ -50,10 +50,9 @@ export function labelize(str: string): string {
      * $labelCode = preg_replace('`\s+`', ' ', $labelCode);
      * $labelCode = ucfirst(trim($labelCode));
      */
-    let label = str.replace(/([^A-Z0-9])([A-Z0-9])/g, "$1 $2");
-    label = label.replace(/([A-Z0-9])(?=[a-z])/g, " $1");
+    let label = str.replace(/([^A-Z0-9])([A-Z0-9])/, "$1 $2");
+    label = label.replace(/([A-Z0-9])(?=[a-z])/, " $1");
     label = label.replace(/[_-]/g, " ");
-    label = label.replace(/\./g, " ");
     label = label.replace(/\s+/g, " ");
     let parts = label.split(" ");
     label = parts.map((s) => s.charAt(0).toLocaleUpperCase() + s.slice(1)).join(" ");
@@ -280,7 +279,7 @@ export function mergeAndReplaceArrays(item1: Record<any, any>, item2: Record<any
     return mergeWith({}, item1, item2, mergeCustomizer);
 }
 
-export function isNumeric(value: any): value is number | string {
+export function isNumeric(value: any) {
     if (typeof value === "number") {
         return true;
     }

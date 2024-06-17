@@ -520,8 +520,6 @@ class RecordStatusModel extends FullRecordCacheModel implements LoggerAwareInter
         if ($autoIncVal < 10000) {
             $recordStatusIDQuery = "alter table {$tableName} AUTO_INCREMENT=10000";
             $database->sql()->query($recordStatusIDQuery, "update");
-            // Force table stats to update.
-            $database->query("ANALYZE TABLE `{$tableName}`");
         }
     }
 
@@ -631,11 +629,11 @@ class RecordStatusModel extends FullRecordCacheModel implements LoggerAwareInter
      */
     public function expandStatuses(array &$rows)
     {
-        ModelUtils::leftJoin($rows, ["statusID", "recordStatusID"], [$this, "getActiveStatuses"]);
+        ModelUtils::leftJoin($rows, ["statusID"], [$this, "getActiveStatuses"]);
         if (\Gdn::session()->checkPermission("staff.allow")) {
             ModelUtils::leftJoin(
                 $rows,
-                ["internalStatusID", "recordInternalStatusID"],
+                ["internalStatusID"],
                 function () {
                     $r = $this->getStatuses(true, true);
                     return $r;

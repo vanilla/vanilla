@@ -14,9 +14,7 @@ use Garden\StaticCacheConfigTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Dashboard\Events\UserSignInEvent;
 use Vanilla\Logger;
-use Vanilla\Logging\AuditLogger;
 use Vanilla\Permissions;
 
 /**
@@ -477,13 +475,8 @@ class Gdn_Session implements LoggerAwareInterface
      * @param bool $persist If setting an identity, should we persist it beyond browser restart?
      * @param string|null $sessionID Session ID to use to start the session.
      */
-    public function start(
-        $userID = false,
-        bool $setIdentity = true,
-        bool $persist = false,
-        string $sessionID = null,
-        $attributes = []
-    ) {
+    public function start($userID = false, bool $setIdentity = true, bool $persist = false, string $sessionID = null)
+    {
         if (!c("Garden.Installed", false)) {
             return;
         }
@@ -529,12 +522,14 @@ class Gdn_Session implements LoggerAwareInterface
                     if ($setIdentity) {
                         $this->processAnonymousCookie();
                         $sessionModel = new SessionModel();
-                        $this->Session = $sessionModel->startNewSession($this->UserID, $sessionID, $attributes);
+                        $this->Session = $sessionModel->startNewSession($this->UserID, $sessionID);
                         $userModel->giveRolesByEmail((array) $this->User);
                         Gdn::authenticator()->setIdentity($this->UserID, $persist, $this->Session["SessionID"]);
                         $this->SessionID = $this->Session["SessionID"];
-                        $signInEvent = new UserSignInEvent($this->UserID);
-                        AuditLogger::log($signInEvent);
+                        $this->logger->info("Session started for userID {$this->UserID}.", [
+                            Logger::FIELD_EVENT => "session_start",
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        ]);
                         Gdn::pluginManager()->callEventHandlers($this, "Gdn_Session", "Start");
                     }
 

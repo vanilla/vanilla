@@ -41,7 +41,7 @@ RouterRegistry.addRoutes(getDeveloperRoutes());
 supportsFrames(true);
 addPageComponent(AdminApp);
 
-const SETTINGS_PERMISSIONS = ["settings.manage", "community.moderate", "moderation.manage"];
+const SETTINGS_PERMISSIONS = ["settings.manage", "community.moderate"];
 const ANALYTICS_PERMISSIONS = ["data.view", "dashboards.manage"];
 
 function AdminApp() {
@@ -49,7 +49,7 @@ function AdminApp() {
     if (hasPermission([...SETTINGS_PERMISSIONS, ...ANALYTICS_PERMISSIONS])) {
         return (
             <SiteNavProvider categoryRecordType="panelMenu">
-                <Router sectionRoots={["/appearance", "/analytics/v2", "/settings/developer", "/dashboard/content"]} />
+                <Router sectionRoots={["/appearance", "/analytics/v2", "/settings/developer"]} />
             </SiteNavProvider>
         );
     } else {

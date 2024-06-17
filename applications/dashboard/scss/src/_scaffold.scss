@@ -23,7 +23,6 @@
 .main-container {
     width: 100%;
     height: 100%;
-    background-color: #fbfcff;
 }
 
 .navbar {
@@ -42,13 +41,6 @@
     justify-content: center;
     padding-top: $navbar-height;
     height: 100%;
-    padding-left: 40px;
-    padding-right: 40px;
-
-    @media (max-width: 806px) {
-        padding-left: 0;
-        padding-right: 0;
-    }
 
     @include media-breakpoint-down(md) {
         display: block;
@@ -70,7 +62,7 @@
     padding-top: $navbar-height;
     padding-left: $padding-row;
     padding-right: $padding-row;
-    max-width: 1002px;
+    max-width: 1024px;
     min-width: 0;
     overflow-y: visible;
 
@@ -89,34 +81,33 @@
 // Panels
 
 .panel {
-    padding-top: 48px;
-    padding-bottom: 48px;
+    padding-top: $spacer * 4;
+    padding-bottom: $spacer * 4;
 }
 
 .panel-content,
 .panel-content-wrapper {
-    width: 255px;
+    width: 204px;
     height: 100%;
 }
 
 $panelMaxHeight: calc(100vh - #{$navbar-height * 2});
 
 .panel-left {
+    padding-left: $spacer;
     position: sticky;
     top: 0;
     max-height: $panelMaxHeight;
     padding-bottom: 0;
 
     .panel-content {
-        width: calc(100% + 24px);
-        margin-left: -24px;
-        padding-left: 24px;
         max-height: $panelMaxHeight;
         overflow: auto;
     }
 }
 
 .panel-right {
+    padding-right: $spacer;
     order: 3;
     position: sticky;
     max-height: $panelMaxHeight;

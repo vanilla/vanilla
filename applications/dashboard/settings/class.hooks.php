@@ -18,11 +18,9 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\AddonManager;
 use Vanilla\Contracts;
-use Vanilla\Dashboard\Events\UserSpoofEvent;
 use Vanilla\Dashboard\Modules\CommunityLeadersModule;
 use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
-use Vanilla\Logging\AuditLogger;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Widgets\WidgetService;
 
@@ -99,15 +97,19 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         $dic->rule("HeadModule")
             ->setShared(true)
             ->addAlias("Head")
+
             ->rule("MenuModule")
             ->setShared(true)
             ->addAlias("Menu")
+
             ->rule("Gdn_Dispatcher")
             ->addCall("passProperty", ["Menu", new Reference("MenuModule")])
+
             ->rule(\Vanilla\Menu\CounterModel::class)
             ->addCall("addProvider", [new Reference(ActivityCounterProvider::class)])
             ->addCall("addProvider", [new Reference(LogCounterProvider::class)])
             ->addCall("addProvider", [new Reference(RoleCounterProvider::class)])
+
             ->rule(WidgetService::class)
             ->addCall("registerWidget", [CommunityLeadersModule::class]);
 
@@ -378,70 +380,33 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
 
         $sort = -1; // Ensure these nav items come before any plugin nav items.
 
-        $nav->addGroupToSection("Moderation", t("Content"), "content")
+        $nav->addGroupToSection("Moderation", t("Site"), "site")
             ->addLinkToSectionIf(
-                !Gdn::config("Feature.CommunityManagement.Enabled") &&
-                    $session->checkPermission(["Garden.Moderation.Manage", "Moderation.Spam.Manage"], false),
+                "Garden.Community.Manage",
                 "Moderation",
-                t("Spam Queue"),
-                "/dashboard/log/spam",
-                "content.spam-queue",
+                t("Messages"),
+                "/dashboard/message",
+                "site.messages",
                 "",
                 $sort
             )
             ->addLinkToSectionIf(
-                !Gdn::config("Feature.CommunityManagement.Enabled") &&
-                    $session->checkPermission(["Garden.Moderation.Manage", "Moderation.ModerationQueue.Manage"], false),
+                $session->checkPermission(["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete"], false),
                 "Moderation",
-                t("Moderation Queue"),
-                "/dashboard/log/moderation",
-                "content.moderation-queue",
+                t("Users"),
+                "/dashboard/user",
+                "site.users",
                 "",
-                $sort,
-                ["popinRel" => "/dashboard/log/count/moderate"],
-                false
+                $sort
             )
             ->addLinkToSectionIf(
-                Gdn::config("Feature.CommunityManagement.Enabled") &&
-                    $session->checkPermission(["Garden.Moderation.Manage", "Moderation.ModerationQueue.Manage"], false),
+                "Garden.Settings.Manage",
                 "Moderation",
-                t("Triage"),
-                "/dashboard/content/triage",
-                "content.triage",
+                t("Ban Rules"),
+                "/dashboard/settings/bans",
+                "site.bans",
                 "",
-                $sort,
-                ["badge" => "0"] //TODO: Add count here
-            )
-            ->addLinkToSectionIf(
-                Gdn::config("Feature.CommunityManagement.Enabled") &&
-                    $session->checkPermission(["Garden.Moderation.Manage", "Moderation.ModerationQueue.Manage"], false),
-                "Moderation",
-                t("Reports"),
-                "/dashboard/content/reports",
-                "content.reports",
-                "",
-                $sort,
-                ["badge" => "0"] //TODO: Add count here
-            )
-            ->addLinkToSectionIf(
-                Gdn::config("Feature.CommunityManagement.Enabled") &&
-                    $session->checkPermission(["Garden.Moderation.Manage", "Moderation.ModerationQueue.Manage"], false),
-                "Moderation",
-                t("Escalations"),
-                "/dashboard/content/escalations",
-                "content.escalations",
-                "",
-                $sort,
-                ["badge" => "0"] //TODO: Add count here
-            )
-            ->addLinkToSectionIf(
-                $session->checkPermission(["Garden.Settings.Manage", "Garden.Moderation.Manage"], false),
-                "Moderation",
-                t("Change Log"),
-                "/dashboard/log/edits",
-                "site.change-log",
-                "",
-                1 // Always last
+                $sort
             );
 
         $nav->addGroupToSection("Moderation", t("Requests"), "requests")
@@ -467,36 +432,38 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 $sort
             );
 
-        $nav->addGroupToSection("Moderation", t("Site"), "site")
+        $nav->addGroupToSection("Moderation", t("Content"), "content")
             ->addLinkToSectionIf(
-                $session->checkPermission(["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete"], false),
+                $session->checkPermission(["Garden.Moderation.Manage", "Moderation.Spam.Manage"], false),
                 "Moderation",
-                t("Users"),
-                "/dashboard/user",
-                "site.users",
+                t("Spam Queue"),
+                "/dashboard/log/spam",
+                "content.spam-queue",
                 "",
                 $sort
             )
             ->addLinkToSectionIf(
-                "Garden.Community.Manage",
+                $session->checkPermission(["Garden.Moderation.Manage", "Moderation.ModerationQueue.Manage"], false),
                 "Moderation",
-                t("Messages"),
-                "/dashboard/message",
-                "site.messages",
+                t("Moderation Queue"),
+                "/dashboard/log/moderation",
+                "content.moderation-queue",
+                "",
+                $sort,
+                ["popinRel" => "/dashboard/log/count/moderate"],
+                false
+            )
+            ->addLinkToSectionIf(
+                $session->checkPermission(["Garden.Settings.Manage", "Garden.Moderation.Manage"], false),
+                "Moderation",
+                t("Change Log"),
+                "/dashboard/log/edits",
+                "content.change-log",
                 "",
                 $sort
             )
-            ->addLinkToSectionIf(
-                "Garden.Settings.Manage",
-                "Moderation",
-                t("Ban Rules"),
-                "/dashboard/settings/bans",
-                "site.bans",
-                "",
-                $sort
-            );
 
-        $nav->addGroup(t("Appearance"), "appearance", "", -1)
+            ->addGroup(t("Appearance"), "appearance", "", -1)
             ->addLinkIf(
                 $hasThemeOptions && $session->checkPermission("Garden.Settings.Manage"),
                 t("Theme Options"),
@@ -521,6 +488,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 "",
                 $sort
             )
+
             ->addGroup(t("Membership"), "users", "", ["after" => "appearance"])
             ->addLinkIf(
                 $session->checkPermission(["Garden.Settings.Manage", "Garden.Roles.Manage"], false),
@@ -553,25 +521,9 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 "users.preferences",
                 "",
                 $sort
-            );
-        if (\Gdn::config("Feature.AutomationRules.Enabled")) {
-            $nav->addGroupIf("Garden.Settings.Manage", t("Automation"), "automation", "", [
-                "after" => "appearance",
-            ])
-                ->addLinkIf(
-                    "Garden.Settings.Manage",
-                    t("Automation Rules"),
-                    "/settings/automation-rules",
-                    "automation.automation-rules"
-                )
-                ->addLinkIf(
-                    "Garden.Settings.Manage",
-                    t("Automation Rules History"),
-                    "/settings/automation-rules/history",
-                    "automation.automation-rules-history"
-                );
-        }
-        $nav->addGroup(t("Emails"), "email", "", ["after" => "users"])
+            )
+
+            ->addGroup(t("Emails"), "email", "", ["after" => "users"])
             ->addLinkIf(
                 "Garden.Community.Manage",
                 t("Email Settings"),
@@ -590,9 +542,12 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 "",
                 $sort
             )
+
             ->addGroup(t("Discussions"), "forum", "", ["after" => "email"])
             ->addLinkIf("Garden.Settings.Manage", t("Tagging"), "settings/tagging", "forum.tagging", $sort)
+
             ->addGroup(t("Reputation"), "reputation", "", ["after" => "forum"])
+
             ->addGroup(t("Connections"), "connect", "", ["after" => "reputation"])
             ->addLinkIf(
                 "Garden.Settings.Manage",
@@ -602,6 +557,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 "",
                 $sort
             )
+
             ->addGroup(t("Addons"), "add-ons", "", ["after" => "connect"])
             ->addLinkIf(
                 "Garden.Settings.Manage",
@@ -631,6 +587,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 "",
                 $sort
             )
+
             ->addGroup(t("Technical"), "site-settings", "", ["after" => "reputation"])
             ->addLinkIf(
                 "Garden.Settings.Manage",
@@ -648,17 +605,10 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 "",
                 $sort
             )
-            ->addLinkIf(
-                "Garden.Settings.Manage",
-                t("Audit Log"),
-                "/dashboard/settings/audit-logs",
-                "site-settings.audit-log",
-                "",
-                $sort,
-                ["badge" => "New"]
-            )
             ->addLinkIf("Garden.Settings.Manage", t("Routes"), "/dashboard/routes", "site-settings.routes", "", $sort)
+
             ->addGroup("API Integrations", "api", "", ["after" => "site-settings"])
+
             ->addGroupIf("Garden.Settings.Manage", t("Forum Data"), "forum-data", "", ["after" => "site-settings"])
             ->addLinkIf(
                 \Vanilla\FeatureFlagHelper::featureEnabled("Import") && $session->checkPermission("Garden.Import"),
@@ -1475,7 +1425,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         $spoofUserID = getValue("0", $sender->RequestArgs);
         $user = $sender->userModel->getId(intval($spoofUserID));
         $transientKey = getValue("1", $sender->RequestArgs);
-
         // Validate the transient key && permissions
         if (
             Gdn::session()->validateTransientKey($transientKey) &&
@@ -1485,15 +1434,27 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             $spoofedByUser = Gdn::session()->User;
             $session = Gdn::session()->Session;
             $attributes = $session["Attributes"] ?? [];
-            $context = array_merge(
-                ["spoofedByUserID" => $spoofedByUser->UserID, "spoofedByUserName" => $spoofedByUser->Name],
-                $attributes
+            $context = ["SpoofUserID" => $spoofedByUser->UserID, "SpoofUserName" => $spoofedByUser->Name];
+            if (($attributes["orcUserId"] ?? false) && ($attributes["orcUserEmail"] ?? false)) {
+                $context = array_merge($attributes, $context);
+            }
+            if (($attributes["SpoofUserID"] ?? false) && ($attributes["SpoofUserName"] ?? false)) {
+                $context = $attributes;
+            }
+            //Record Whom the user spoofs in as.
+            $context["userSpoofedId"] = $user->UserID;
+            $context["userSpoofedName"] = $user->Name;
+
+            LogModel::insert("Spoof", "Spoof", $context);
+
+            Gdn::session()->start($spoofUserID);
+            $this->sessionModel->update(["Attributes" => $context], ["SessionID" => Gdn::session()->SessionID]);
+            $context[\Vanilla\Logger::FIELD_TAGS] = ["user", "spoof"];
+            $context[\Vanilla\Logger::FIELD_CHANNEL] = \Vanilla\Logger::CHANNEL_SECURITY;
+            $this->logger->info(
+                "User $spoofedByUser->Name($spoofedByUser->UserID) has spoofed into as $user->Name($user->UserID)",
+                $context
             );
-
-            $spoofEvent = new UserSpoofEvent($user->UserID, $user->Name, $context);
-            AuditLogger::log($spoofEvent);
-
-            Gdn::session()->start($spoofUserID, attributes: $spoofEvent->getAuditContext());
         }
         if (!isset($this->_DeliveryType) || $this->_DeliveryType !== DELIVERY_TYPE_ALL) {
             $sender->setRedirectTo("profile");

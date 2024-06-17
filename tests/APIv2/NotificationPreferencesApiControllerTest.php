@@ -264,7 +264,7 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
     public function testEmailDigestPreference(): void
     {
         // The "Email Digest" preference should be included when the digest is enabled globally.
-        $this->runWithConfig(["Garden.Digest.Enabled" => true], function () {
+        $this->runWithConfig(["Garden.Digest.Enabled" => true, "Feature.Digest.Enabled" => true], function () {
             $schema = $this->api()
                 ->get("/notification-preferences/schema")
                 ->getBody();
@@ -287,7 +287,7 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
      */
     public function testEmailDigestDefaultPreferences(): void
     {
-        $this->runWithConfig(["Garden.Digest.Enabled" => true], function () {
+        $this->runWithConfig(["Garden.Digest.Enabled" => true, "Feature.Digest.Enabled" => true], function () {
             $schema = $this->api()
                 ->get("/notification-preferences/schema", ["schemaType" => "defaults"])
                 ->getBody();
@@ -593,7 +593,7 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
     public function testPatchForbiddenDefaultPreference(): void
     {
         $this->expectExceptionMessage("You cannot set a default preference for the EmailDigest activity.");
-        $this->runWithConfig(["Garden.Digest.Enabled" => true], function () {
+        $this->runWithConfig(["Garden.Digest.Enabled" => true, "Feature.Digest.Enabled" => true], function () {
             $this->api()->patch("notification-preferences/defaults", ["DigestEnabled" => ["email" => true]]);
         });
     }
@@ -622,7 +622,9 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
 
         // Enable user digest for user
         $this->runWithUser(function () use ($user) {
-            $this->runWithConfig(["Garden.Digest.Enabled" => true], function () use ($user) {
+            $this->runWithConfig(["Garden.Digest.Enabled" => true, "Feature.Digest.Enabled" => true], function () use (
+                $user
+            ) {
                 $this->api()->patch("notification-preferences/{$user["userID"]}", [
                     "DigestEnabled" => ["email" => true],
                 ]);

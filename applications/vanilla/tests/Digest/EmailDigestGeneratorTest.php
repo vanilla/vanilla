@@ -44,6 +44,7 @@ class EmailDigestGeneratorTest extends SiteTestCase
         $this->emailDigestGenerator = \Gdn::getContainer()->get(EmailDigestGenerator::class);
         $config = [
             "Garden.Email.Disabled" => false,
+            "Feature.Digest.Enabled" => true,
             "Garden.Digest.Enabled" => true,
         ];
         \Gdn::config()->saveToConfig($config);

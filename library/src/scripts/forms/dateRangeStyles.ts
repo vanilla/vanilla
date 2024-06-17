@@ -12,7 +12,7 @@ export const dateRangeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const input = css({
-        width: "150px",
+        width: "136px",
         maxWidth: "100%",
     });
 

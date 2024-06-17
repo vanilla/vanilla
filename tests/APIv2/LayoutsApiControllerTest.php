@@ -19,8 +19,6 @@ use Vanilla\Forum\Widgets\DiscussionListAsset;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Layout\Providers\FileBasedLayoutProvider;
-use VanillaTests\AuditLogTestTrait;
-use VanillaTests\ExpectedAuditLog;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Layout\LayoutTestTrait;
@@ -35,7 +33,6 @@ class LayoutsApiControllerTest extends AbstractResourceTest
     use CommunityApiTestTrait;
     use ExpectExceptionTrait;
     use LayoutTestTrait;
-    use AuditLogTestTrait;
 
     /* @var LayoutViewModel */
     private $layoutViewModel;
@@ -783,42 +780,17 @@ class LayoutsApiControllerTest extends AbstractResourceTest
     }
 
     /**
-     * Test that we fire resource events on CRUD operations.
-     *
-     * @return void
-     */
-    public function testResourceEvents(): void
-    {
-        $layout = $this->testPost(["name" => "my resource layout"] + $this->record());
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("layout_add")->withMessage("Layout `my resource layout` was created.")
-        );
-
-        // Now modify it.
-        $this->api()->patch("/layouts/{$layout["layoutID"]}", ["name" => "my updated resource layout"]);
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("layout_update")->withMessage("Layout `my updated resource layout` was updated.")
-        );
-
-        // now delete it
-        $this->api()->delete("/layouts/{$layout["layoutID"]}");
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("layout_delete")->withMessage("Layout `my updated resource layout` was deleted.")
-        );
-    }
-
-    /**
      * Test that attempting to create a multiple layout views with one request.
      */
     public function testMultiplePutLayoutView(): void
     {
         $layout = $this->testPost();
         $layoutID = $layout["layoutID"];
-        $newCategory = $this->createCategory();
-        $newCategory2 = $this->createCategory();
+        $newCategoryID = $this->createCategory()["categoryID"];
+        $newCategoryID2 = $this->createCategory()["categoryID"];
         $discussionView = [
-            ["recordID" => $newCategory["categoryID"], "recordType" => "category"],
-            ["recordID" => $newCategory2["categoryID"], "recordType" => "category"],
+            ["recordID" => $newCategoryID, "recordType" => "category"],
+            ["recordID" => $newCategoryID2, "recordType" => "category"],
             ["recordID" => -1, "recordType" => "global"],
         ];
 
@@ -830,14 +802,6 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $this->assertEquals($layoutID, $body[0]["layoutID"]);
         $this->assertRowsEqual($discussionView[1], $body[1]);
         $this->assertEquals($layoutID, $body[2]["layoutID"]);
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("layout_apply")
-                ->withMessage("Layout `{$layout["name"]}` was applied.")
-                ->withContext([
-                    "layoutID" => $layoutID,
-                    "appliedTo.categories" => [$newCategory["name"], $newCategory2["name"]],
-                ])
-        );
     }
 
     /**

@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,7 +8,9 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import qs from "qs";
 import { useHistory, useLocation } from "react-router";
 import debounce from "lodash-es/debounce";
+import History from "history";
 import { useLastValue } from "@vanilla/react-utils";
+import { Uri } from "monaco-editor";
 
 interface IStringMap {
     [key: string]: any;
@@ -56,9 +58,7 @@ export function useQueryStringSync(value: IStringMap, defaults?: IStringMap, syn
         [history],
     );
 
-    const queryFromUrl = qs.parse(location.search, { ignoreQueryPrefix: true });
-
-    const filteredCurrent = qs.stringify(getFilteredValue(value, defaults || {}, queryFromUrl));
+    const filteredCurrent = qs.stringify(getFilteredValue(value, defaults || {}));
     const filteredLast = useLastValue(filteredCurrent);
 
     // Handle continuous updates updates.
@@ -84,13 +84,8 @@ export function useQueryStringSync(value: IStringMap, defaults?: IStringMap, syn
 
 /**
  * Get a version of the query string object with only keys that have values.
- * If there were params in the URL that are not in the value or defaults, they will be preserved.
  */
-export function getFilteredValue(
-    inputValue: IStringMap,
-    defaults: IStringMap,
-    paramsFromUrl: IStringMap,
-): IStringMap | null {
+function getFilteredValue(inputValue: IStringMap, defaults: IStringMap): IStringMap | null {
     let filteredValue: IStringMap | null = null;
 
     for (const [key, value] of Object.entries(inputValue)) {
@@ -107,14 +102,6 @@ export function getFilteredValue(
         }
 
         filteredValue[key] = value;
-    }
-
-    // we might have more query params in url that are not in the value or defaults, we should preserve those
-    const queryParamsNotMatchingValueOrDefaults = Object.fromEntries(
-        Object.entries(paramsFromUrl).filter(([key]) => !(key in inputValue) && !(key in defaults)),
-    );
-    if (Object.keys(queryParamsNotMatchingValueOrDefaults).length > 0) {
-        filteredValue = { ...filteredValue, ...queryParamsNotMatchingValueOrDefaults };
     }
 
     return filteredValue;

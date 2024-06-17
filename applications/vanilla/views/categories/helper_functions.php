@@ -546,10 +546,15 @@ if (!function_exists("followButton")):
             $isEmailDisabled =
                 Gdn::config("Garden.Email.Disabled") || !Gdn::session()->checkPermission("Garden.Email.View");
 
-            $emailDigestEnabled = !Gdn::config("Garden.Email.Disabled") && Gdn::config("Garden.Digest.Enabled");
+            $emailDigestEnabled =
+                !Gdn::config("Garden.Email.Disabled") &&
+                Gdn::config("Garden.Digest.Enabled") &&
+                Gdn::config("Feature.Digest.Enabled");
 
             $notificationPreferences = $categoryModel->getPreferences($userID)[$categoryID]["preferences"] ?? [];
-            $cleanNotificationPreferences = $categoryModel->normalizePreferencesOutput($notificationPreferences);
+            $cleanNotificationPreferences = CategoriesApiController::normalizePreferencesOutput(
+                $notificationPreferences
+            );
 
             $output = TwigStaticRenderer::renderReactModule("CategoryFollowDropDown", [
                 "userID" => $userID,

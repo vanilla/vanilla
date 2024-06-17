@@ -5,7 +5,6 @@
  */
 
 import { css } from "@emotion/css";
-import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleUnit } from "@library/styles/styleUnit";
 import { componentThemeVariables } from "@library/styles/styleUtils";
@@ -35,7 +34,7 @@ export const userDropDownVariables = useThemeCache(() => {
         paddingRight: item.rightPadding,
         paddingLeft: item.leftPadding,
         fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: globalVars.fonts.size.subTitle,
+        fontSize: globalVars.fonts.size.large,
         lineHeight: globalVars.lineHeights.condensed,
         ...themeVars.subComponentStyles("userName"),
     };
@@ -54,14 +53,6 @@ export const userDropDownClasses = useThemeCache(() => {
 
     const userCard = css({
         listStyle: "none",
-        ...Mixins.padding({
-            vertical: 4,
-            horizontal: 14,
-        }),
-        display: "flex",
-        justifyContent: "start",
-        alignItems: "center",
-        gap: 12,
     });
 
     const userCardPhotoLink = css({
@@ -70,38 +61,28 @@ export const userDropDownClasses = useThemeCache(() => {
 
     const userCardPhoto = css({
         border: `solid 1px ${globalVars.mixBgAndFg(0.3)}`,
-        // A little crazy that the difference between Medium(60) and Large(100) photos is 40px
-        "&&": {
-            width: 70,
-            height: "auto",
-            aspectRatio: "1/1",
-        },
+        marginTop: styleUnit(vars.userCard.topMargin),
+        marginLeft: "auto",
+        marginRight: "auto",
     });
 
     const userCardName = css({
+        display: "block",
         color: "inherit",
         fontWeight: vars.userName.fontWeight,
         fontSize: styleUnit(vars.userName.fontSize),
         lineHeight: vars.userName.lineHeight,
-        textWrap: "pretty",
+        textAlign: "center",
+        marginTop: styleUnit(vars.userName.topMargin),
+        marginRight: "auto",
+        marginBottom: styleUnit(vars.userName.bottomMargin),
+        marginLeft: "auto",
+        paddingRight: styleUnit(vars.userName.paddingRight),
+        paddingLeft: styleUnit(vars.userName.paddingLeft),
     });
 
     const contents = css({
         width: styleUnit(vars.contents.width),
-    });
-
-    const userInfo = css({
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "start",
-    });
-
-    const email = css({
-        fontSize: styleUnit(globalVars.fonts.size.small),
-    });
-
-    const accountLinks = css({
-        fontSize: styleUnit(globalVars.fonts.size.medium),
     });
 
     return {
@@ -109,9 +90,6 @@ export const userDropDownClasses = useThemeCache(() => {
         userCardPhoto,
         userCardName,
         contents,
-        userInfo,
-        accountLinks,
-        email,
         userCard,
     };
 });

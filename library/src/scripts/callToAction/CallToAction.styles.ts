@@ -65,10 +65,8 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
     });
     const description = css({
         position: "relative",
-        ...Mixins.font({ ...vars.description.font, color: optionsOverrides?.textColor }),
-    });
-    const descriptionPadding = css({
         ...Mixins.padding(vars.description.spacing),
+        ...Mixins.font({ ...vars.description.font, color: optionsOverrides?.textColor }),
     });
     const link = css({
         ...Mixins.margin(vars.link.spacing),
@@ -172,7 +170,6 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
         title,
         absoluteTitle,
         description,
-        descriptionPadding,
         absoluteDescription,
         content,
         imageContainer,

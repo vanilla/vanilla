@@ -16,15 +16,10 @@ use Gdn_CookieIdentity;
 use Gdn_Session;
 use League\Uri\Http;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Dashboard\Events\PasswordResetEmailSentEvent;
-use Vanilla\Dashboard\Events\PasswordResetUserNotFoundEvent;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
-use VanillaTests\AuditLogTestTrait;
-use VanillaTests\ExpectedAuditLog;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
-use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 use VanillaTests\TestLoggerTrait;
 use VanillaTests\VanillaTestCase;
@@ -34,10 +29,9 @@ use VanillaTests\VanillaTestCase;
  *
  * These tests aren't exhaustive. If more tests are added then we may need to tweak this class to use the `SiteTestTrait`.
  */
-class EntryControllerTest extends SiteTestCase
+class EntryControllerTest extends VanillaTestCase
 {
-    use SetupTraitsTrait, CommunityApiTestTrait, TestLoggerTrait, ExpectExceptionTrait;
-    use AuditLogTestTrait;
+    use SiteTestTrait, SetupTraitsTrait, CommunityApiTestTrait, TestLoggerTrait, ExpectExceptionTrait;
 
     /** @var EntryController */
     private $controller;
@@ -57,6 +51,7 @@ class EntryControllerTest extends SiteTestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->setUpTestTraits();
 
         $this->controller = $this->container()->get(\EntryController::class);
         $this->controller->getImports();
@@ -65,7 +60,6 @@ class EntryControllerTest extends SiteTestCase
         $this->userData = $this->insertDummyUser();
         $this->categoryModel = Gdn::getContainer()->get(\CategoryModel::class);
         $this->tokenModel = $this->container()->get(\AccessTokenModel::class);
-        $this->api()->setUserID(2);
     }
 
     /**
@@ -452,9 +446,8 @@ class EntryControllerTest extends SiteTestCase
     public function testRegisterBasic(): void
     {
         $this->runWithConfig(["Garden.Registration.Method" => "Basic"], function () {
-            $this->api()->setUserID(0);
             $user = self::sprintfCounter([
-                "Name" => "registerBasicUser",
+                "Name" => "test%s",
                 "Email" => "test%s@example.com",
                 "Password" => __FUNCTION__,
                 "PasswordMatch" => __FUNCTION__,
@@ -479,10 +472,6 @@ class EntryControllerTest extends SiteTestCase
                     "vn_source" => "register",
                 ],
                 $query
-            );
-
-            $this->assertAuditLogged(
-                ExpectedAuditLog::create("user_register")->withMessage("User `registerBasicUser` registered.")
             );
 
             $r2 = $this->bessy()->get($welcome->template->getButtonUrl(), [], []);
@@ -548,11 +537,6 @@ class EntryControllerTest extends SiteTestCase
         $this->runWithExpectedExceptionMessage($expectedErrorMessage, function () use ($postBody) {
             $r = $this->bessy()->post("/entry/signin", $postBody);
         });
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("user_signinFailed")
-                ->withMessage("Someone tried to sign in with the email or username `dummyuser@test.com` but failed.")
-                ->withContext(["failureMode" => "User not found."])
-        );
 
         //Test with valid Email and invalid password
         $this->runWithExpectedExceptionMessage($expectedErrorMessage, function () {
@@ -561,13 +545,6 @@ class EntryControllerTest extends SiteTestCase
                 "Password" => "123456",
             ]);
         });
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("user_signinFailed")
-                ->withMessage(
-                    "Someone tried to sign in with the email or username `{$this->userData["Email"]}` but failed."
-                )
-                ->withContext(["failureMode" => "Invalid password.", "emailOrUsername" => $this->userData["Email"]])
-        );
 
         //Test with valid username and invalid password
         $this->runWithExpectedExceptionMessage($expectedErrorMessage, function () {
@@ -576,13 +553,6 @@ class EntryControllerTest extends SiteTestCase
                 "Password" => "123456",
             ]);
         });
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("user_signinFailed")
-                ->withMessage(
-                    "Someone tried to sign in with the email or username `{$this->userData["Name"]}` but failed."
-                )
-                ->withContext(["failureMode" => "Invalid password.", "emailOrUsername" => $this->userData["Name"]])
-        );
 
         //Test sign in for private community
         $this->runWithExpectedExceptionMessage($expectedErrorMessage, function () use ($expectedErrorMessage) {
@@ -598,24 +568,14 @@ class EntryControllerTest extends SiteTestCase
         $this->runWithExpectedExceptionMessage($expectedErrorMessage, function () use ($postBody) {
             $r = $this->bessy()->post("/entry/auth", $postBody);
         });
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("user_signinFailed")
-                ->withMessage("Someone tried to sign in with the email or username `dummyuser@test.com` but failed.")
-                ->withContext(["failureMode" => "Authentication denied."])
-        );
 
         // Test sign in Via Auth with valid username and no password
         $this->runWithExpectedExceptionMessage($expectedErrorMessage, function () {
             $r = $this->bessy()->post("/entry/auth", [
-                "Email" => "user1",
+                "Email" => $this->userData["Name"],
                 "Password" => "",
             ]);
         });
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("user_signinFailed")
-                ->withMessage("Someone tried to sign in with the email or username `user1` but failed.")
-                ->withContext(["failureMode" => "Some or all credentials were missing."])
-        );
     }
 
     /**
@@ -635,11 +595,6 @@ class EntryControllerTest extends SiteTestCase
 
         $this->expectExceptionMessage(t("This account has been banned."));
         $r = $this->bessy()->post("/entry/signin", $postBody);
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("user_signinFailed")
-                ->withMessage("User `{$this->userData["Email"]}` tried to sign in but failed.")
-                ->withContext(["failureMode" => "User is banned."])
-        );
     }
 
     /**
@@ -659,11 +614,6 @@ class EntryControllerTest extends SiteTestCase
 
         $this->expectExceptionMessage(t("This account has been banned."));
         $r = $this->bessy()->post("/entry/signin", $postBody);
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("user_signinFailed")
-                ->withMessage("User `{$this->userData["Email"]}` tried to sign in but failed.")
-                ->withContext(["failureMode" => "User is banned."])
-        );
     }
 
     /**
@@ -683,11 +633,6 @@ class EntryControllerTest extends SiteTestCase
 
         $this->expectExceptionMessage(t("This account has been temporarily banned."));
         $r = $this->bessy()->post("/entry/signin", $postBody);
-        $this->assertAuditLogged(
-            ExpectedAuditLog::create("user_signinFailed")
-                ->withMessage("User `{$this->userData["Email"]}` tried to sign in but failed.")
-                ->withContext(["failureMode" => "User is temporarily banned."])
-        );
     }
 
     /**
@@ -955,7 +900,7 @@ class EntryControllerTest extends SiteTestCase
             $categoryA["categoryID"]
         );
         $this->assertEquals(
-            $this->categoryModel->normalizePreferencesInput($defaultFollowedCategorySettings[0]["preferences"]),
+            \CategoriesApiController::normalizePreferencesInput($defaultFollowedCategorySettings[0]["preferences"]),
             $userPreferencesForCategoryA
         );
 
@@ -964,7 +909,7 @@ class EntryControllerTest extends SiteTestCase
             $categoryB["categoryID"]
         );
         $this->assertEquals(
-            $this->categoryModel->normalizePreferencesInput($defaultFollowedCategorySettings[1]["preferences"]),
+            \CategoriesApiController::normalizePreferencesInput($defaultFollowedCategorySettings[1]["preferences"]),
             $userPreferencesForCategoryB
         );
 
@@ -1197,8 +1142,7 @@ class EntryControllerTest extends SiteTestCase
             $this->bessy()->postHtml("/entry/passwordRequest", ["Email" => "invalid@test.com"]);
         });
         self::assertEmailNotSentTo("invalid@test.com");
-        $this->assertAuditLogged(ExpectedAuditLog::create(PasswordResetUserNotFoundEvent::eventType()));
-
+        $this->assertLogMessage("Can't find account associated with email/username invalid@test.com.");
         $lastHtml = $this->bessy()->getLastHtml();
         $lastHtml->assertContainsString(
             'If there\'s an account associated with this email, we\'ve sent a password reset link. Please check your email inbox.'
@@ -1209,8 +1153,6 @@ class EntryControllerTest extends SiteTestCase
             $this->bessy()->postHtml("/entry/passwordRequest", ["Email" => $this->userData["Email"]]);
         });
         $lastHtml = $this->bessy()->getLastHtml();
-        $this->assertAuditLogged(ExpectedAuditLog::create(PasswordResetEmailSentEvent::eventType()));
-
         $lastHtml->assertContainsString(
             'If there\'s an account associated with this email, we\'ve sent a password reset link. Please check your email inbox.'
         );

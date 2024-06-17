@@ -162,6 +162,7 @@ class ActivityModelTest extends SiteTestCase
 
         $this->assertInstanceOf(NotificationEvent::class, $this->lastEvent);
         $this->assertEquals("notification", $this->lastEvent->getType());
+        $this->assertNull($this->lastEvent->getSender());
         $this->assertArrayHasKey("notification", $this->lastEvent->getPayload());
     }
 

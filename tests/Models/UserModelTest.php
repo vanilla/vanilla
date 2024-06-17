@@ -12,7 +12,6 @@ use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Utility\ModelUtils;
-use VanillaTests\AuditLogTestTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\SiteTestCase;
@@ -32,7 +31,6 @@ class UserModelTest extends SiteTestCase
     use UsersAndRolesApiTestTrait {
         createUser as protected createUserByApi;
     }
-    use AuditLogTestTrait;
 
     public static $addons = ["vanilla", "dashboard", "conversations"];
 
@@ -488,11 +486,8 @@ class UserModelTest extends SiteTestCase
         $newRoleIDs = $this->userModel->getRoleIDs($userID);
         $this->assertSame($setRoleIDs, $newRoleIDs);
 
-        $this->assertLog([
-            "event" => "user_roleModification",
-            "data.rolesAdded.0" => Bootstrap::ROLE_ADMIN,
-            "data.rolesRemoved.0" => Bootstrap::ROLE_MEMBER,
-        ]);
+        $this->assertLog(["event" => "role_add", "data.role" => Bootstrap::ROLE_ADMIN]);
+        $this->assertLog(["event" => "role_remove", "data.role" => Bootstrap::ROLE_MEMBER]);
     }
 
     /**
@@ -509,7 +504,7 @@ class UserModelTest extends SiteTestCase
             $newRoleIDs
         );
 
-        $this->assertLog(["event" => "user_roleModification", "data.rolesAdded.0" => Bootstrap::ROLE_ADMIN]);
+        $this->assertLog(["event" => "role_add", "data.role" => Bootstrap::ROLE_ADMIN]);
 
         return $userID;
     }
@@ -526,7 +521,7 @@ class UserModelTest extends SiteTestCase
 
         $newRoleIDs = $this->userModel->getRoleIDs($userID);
         $this->assertEqualsCanonicalizing([$this->roleID(Bootstrap::ROLE_ADMIN)], $newRoleIDs);
-        $this->assertLog(["event" => "user_roleModification", "data.rolesRemoved.0" => Bootstrap::ROLE_MEMBER]);
+        $this->assertLog(["event" => "role_remove", "data.role" => Bootstrap::ROLE_MEMBER]);
     }
 
     /**

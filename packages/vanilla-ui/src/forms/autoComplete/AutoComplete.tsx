@@ -18,20 +18,14 @@ import { DropDownArrow } from "../shared/DropDownArrow";
 import { ClearIcon } from "../shared/ClearIcon";
 import { CloseIcon } from "../shared/CloseIcon";
 import { AutoCompleteOption, IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
-import {
-    AutoCompleteContext,
-    ComboboxStatus,
-    IAutoCompleteContext,
-    IAutoCompleteInputState,
-    useAutoCompleteContext,
-} from "@vanilla/ui/src/forms/autoComplete";
+import { AutoCompleteContext, IAutoCompleteContext, IAutoCompleteInputState } from "./AutoCompleteContext";
 import { useComboboxContext } from "@reach/combobox";
 import groupBy from "lodash-es/groupBy";
 import sortBy from "lodash-es/sortBy";
 import { useStackingContext } from "@vanilla/react-utils";
 
 function AutoCompleteArrow() {
-    const { size } = useAutoCompleteContext();
+    const { size } = useContext(AutoCompleteContext);
     const { zIndex } = useStackingContext();
     const classes = useMemo(() => autoCompleteClasses({ size, zIndex }), [size, zIndex]);
     return (
@@ -43,7 +37,7 @@ function AutoCompleteArrow() {
 
 function AutoCompleteClear(props: { onClear(): void }) {
     const { onClear } = props;
-    const { size } = useAutoCompleteContext();
+    const { size } = useContext(AutoCompleteContext);
     const { zIndex } = useStackingContext();
     const classes = useMemo(() => autoCompleteClasses({ size, zIndex }), [size, zIndex]);
     return (
@@ -68,7 +62,7 @@ function AutoCompleteClear(props: { onClear(): void }) {
 
 function AutoCompleteToken(props: { label: string; onUnSelect(): void }) {
     const { onUnSelect, label } = props;
-    const { size } = useAutoCompleteContext();
+    const { size } = useContext(AutoCompleteContext);
     const { zIndex } = useStackingContext();
     const classes = useMemo(() => autoCompleteClasses({ size, zIndex }), [size, zIndex]);
     return (
@@ -99,9 +93,13 @@ export interface IAutoCompleteOptionState {
     options: IAutoCompleteOptionProps[];
     optionByValue: { [value: string]: IAutoCompleteOptionProps };
     optionByLabel: { [label: string]: IAutoCompleteOptionProps };
+    optionProvider?: React.ReactNode;
 }
 
-function makeOptionState(options: IAutoCompleteOptionProps[]): IAutoCompleteOptionState {
+function makeOptionState(
+    options: IAutoCompleteOptionProps[],
+    optionProvider?: React.ReactNode,
+): IAutoCompleteOptionState {
     return {
         options,
         optionByValue: options.reduce(
@@ -118,8 +116,11 @@ function makeOptionState(options: IAutoCompleteOptionProps[]): IAutoCompleteOpti
             }),
             {},
         ),
+        optionProvider,
     };
 }
+
+type ComboboxStatus = "IDLE" | "SUGGESTING" | "NAVIGATING" | "INTERACTING";
 
 export interface IAutoCompleteProps {
     options?: IAutoCompleteOption[];
@@ -169,8 +170,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
     const classesInput = useMemo(() => inputClasses({ size }), [size]);
     const [controlledOptions, setControlledOptions] = useState<IAutoCompleteOptionProps[]>();
     const [arbitraryValues, setArbitraryValues] = useState<string[]>([]);
-    const [comboboxStatus, setComboboxStatus] = useState<ComboboxStatus>("IDLE");
-
+    const [comboboxState, setComboboxState] = useState<ComboboxStatus>();
     // This ref records the outmost container so that the pop over can use its size and placement
     const containerRef = useRef() as RefObject<HTMLDivElement>;
     const containerRect = useRect(containerRef);
@@ -186,8 +186,10 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         if (controlledOptions && controlledOptions.length) {
             options = options.filter((obj, index) => options.findIndex((item) => item.value == obj.value) === index);
         }
-        return makeOptionState(options);
-    }, [controlledOptions, props.options, comboboxStatus]);
+        return makeOptionState(options, optionProvider);
+    }, [controlledOptions, optionProvider, props.options]);
+
+    const values = value;
 
     // this prevents switching from multiple to non-multiple when the value is cleared
     const isMultiple = useMemo(() => {
@@ -198,23 +200,21 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
     const displayValue = isMultiple
         ? ""
         : (optionByValue && optionByValue[value]?.label) ?? (value ? String(value) : undefined);
-
-    const [inputValue, setInputValue] = useState<IAutoCompleteInputState["value"]>(displayValue);
-
+    const [state, setState] = useState<IAutoCompleteInputState>({
+        status: "initial",
+        value: displayValue,
+    });
     const [valuesState, setValuesState] = useState(value);
 
     /**
      * Filters options using the search string and returns them.
      */
     const filteredOptions = useMemo<IAutoCompleteOptionProps[]>(() => {
-        if (
-            !inputValue ||
-            (!!displayValue &&
-                (displayValue === inputValue || value === inputValue || optionByValue[value]?.label === inputValue))
-        ) {
+        if (state.status !== "suggesting") {
             return options;
         }
-        const lowerCaseSearch = (inputValue ?? "").trim().toLowerCase();
+        const inputValue = String(state.value ?? "");
+        const lowerCaseSearch = inputValue.trim().toLowerCase();
         const terms = lowerCaseSearch.split(/[ +]/);
         const matchedOptions = (options ?? []).map((option) => {
             const label = option.label ?? String(option.value ?? "");
@@ -225,38 +225,37 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
             .filter(({ option, matches }) => matches > 0)
             .sort((a, b) => b.matches - a.matches)
             .map(({ option }) => option);
-    }, [inputValue, options, displayValue]);
+    }, [state, options]);
 
     /**
      * When the controlled value changes, set the input value.
      */
     useEffect(() => {
         if (displayValue) {
-            //this also means it's NOT a multiple select box
             //when suggesting, we should not change the selection
-            if (comboboxStatus !== "SUGGESTING") {
-                setInputValue(displayValue);
+            if (state.status !== "suggesting") {
+                setState({ status: "selected", value: displayValue });
             }
-        } else if (Array.isArray(value)) {
-            setInputValue("");
-            setValuesState(value);
+        } else if (Array.isArray(values)) {
+            setState({ status: "selected", value: "" });
+            setValuesState(values);
         } else {
-            setInputValue("");
+            setState({ status: "initial", value: "" });
         }
-    }, [displayValue, value]);
+    }, [displayValue, values]);
 
     /**
      * When arbitrary values are allowed, add them to the controlled options list
      */
     useEffect(() => {
-        if (allowArbitraryInput && inputValue) {
+        if (allowArbitraryInput && state.value) {
             setControlledOptions([
                 {
-                    value: inputValue,
+                    value: state.value,
                 },
             ]);
         }
-    }, [inputValue, allowArbitraryInput]);
+    }, [state.value, allowArbitraryInput]);
 
     /**
      * Empty the input and call onChange with undefined value.
@@ -277,25 +276,25 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
     useEffect(() => {
         if (allowArbitraryInput) {
             setControlledOptions((prevState) => {
-                if (prevState && value && Array.isArray(value)) {
-                    return prevState.filter((controlled) => value.includes(controlled));
+                if (prevState && values && Array.isArray(values)) {
+                    return prevState.filter((controlled) => values.includes(controlled));
                 }
                 return prevState;
             });
 
-            setArbitraryValues(value && Array.isArray(value) ? value : []);
-            setValuesState(value && Array.isArray(value) ? value : []);
+            setArbitraryValues(values && Array.isArray(values) ? values : []);
+            setValuesState(values && Array.isArray(values) ? values : []);
         }
-    }, [value, allowArbitraryInput]);
+    }, [values, allowArbitraryInput]);
 
     /**
      * Handles closing the popover, clearing the query.
      */
     const afterSelectHandler = useCallback(() => {
         if (displayValue) {
-            setInputValue(displayValue);
+            setState({ status: "selected", value: displayValue });
         } else {
-            setInputValue("");
+            setState({ status: "initial", value: "" });
         }
         if (allowArbitraryInput) {
             setControlledOptions([]);
@@ -303,7 +302,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
     }, [displayValue, allowArbitraryInput]);
 
     /**
-     * Select a label and send its value through onChange.
+     * Select a label and send it's value through onChange.
      */
     const onSelect = useCallback(
         (label: string) => {
@@ -347,7 +346,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
      */
     const onInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
-            setInputValue(event.target.value);
+            setState({ status: "suggesting", value: event.target.value });
             onSearch && onSearch(event.target.value);
         },
         [onSearch],
@@ -358,16 +357,15 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
      */
     const context = useMemo<IAutoCompleteContext>(
         () => ({
-            inputState: {
-                value: inputValue,
-                status: comboboxStatus,
-            },
-            value,
+            onClear,
+            inputState: state,
+            setInputState: setState,
+            value: value ? value : state.value,
             size,
             setOptions: setControlledOptions,
             multiple: isMultiple,
         }),
-        [inputValue, onClear, value, size, isMultiple, comboboxStatus],
+        [state, onClear, value, size, isMultiple],
     );
 
     /**
@@ -386,7 +384,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
      */
     const removeArbitraryInput = (inputValue: string | number) => {
         if (allowArbitraryInput) {
-            const newValues = value.filter((v: string | number) => v !== inputValue);
+            const newValues = values.filter((v: string | number) => v !== inputValue);
             onChange && onChange(newValues.length === 0 ? undefined : newValues);
         }
     };
@@ -397,13 +395,13 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
      */
     const placeholderValue = useMemo<string | undefined>(() => {
         if (placeholder) {
-            if (selectedTokens.length > 0 || arbitraryValues.length > 0 || (!isMultiple && inputValue)) {
+            if (selectedTokens.length > 0 || arbitraryValues.length > 0 || (!isMultiple && state.value)) {
                 return undefined;
             }
             return placeholder;
         }
         return undefined;
-    }, [placeholder, selectedTokens, arbitraryValues, isMultiple, inputValue]);
+    }, [placeholder, selectedTokens, arbitraryValues, isMultiple, state]);
 
     const handleKeyDown = (event) => {
         /**
@@ -414,7 +412,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         if (
             !isUsingDirectionKeys &&
             inputRef?.current?.value.length !== 0 &&
-            comboboxStatus !== "IDLE" &&
+            comboboxState !== "IDLE" &&
             event.keyCode === 13
         ) {
             filteredOptions.length && onSelect(filteredOptions[0].label ?? filteredOptions[0].value);
@@ -425,7 +423,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
          */
         if (event.keyCode === 8 && inputRef?.current?.value.length === 0) {
             // Get the last token value
-            const lastValue = [value].flat().pop();
+            const lastValue = [values].flat().pop();
             // If there is a defined options list, remove its selection by label
             if (isMultiple) {
                 if (lastValue) {
@@ -469,7 +467,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                                     <AutoCompleteToken
                                         key={index}
                                         label={labelItem}
-                                        onUnSelect={() => !disabled && onSelect(labelItem)}
+                                        onUnSelect={() => onSelect(labelItem)}
                                     />
                                 );
                             })}
@@ -482,7 +480,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                                     <AutoCompleteToken
                                         key={`${index}${item}`}
                                         label={item}
-                                        onUnSelect={() => !disabled && removeArbitraryInput(item)}
+                                        onUnSelect={() => removeArbitraryInput(item)}
                                     />
                                 );
                             })}
@@ -497,7 +495,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                         autoFocus={autoFocus}
                         onChange={onInputChange}
                         placeholder={placeholderValue}
-                        value={String(inputValue)}
+                        value={String(state.value)}
                         className={cx(classesInput.input, classes.input, inputClassName)}
                         onKeyDown={handleKeyDown}
                         autoComplete="off"
@@ -512,7 +510,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                 </div>
                 <Reach.ComboboxPopover
                     className={cx(classes.popover, props.popoverClassName)}
-                    data-autocomplete-state={comboboxStatus}
+                    data-autocomplete-state={state.status}
                     /**
                      * This provides the popover the size and positioning of the parent wrapper
                      * instead of the input itself, which changes size with token inputs
@@ -537,7 +535,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                         )}
                     </Reach.ComboboxList>
                 </Reach.ComboboxPopover>
-                <ComboboxStatus onStatusChange={setComboboxStatus} />
+                <ComboboxState status={setComboboxState} />
             </Reach.Combobox>
             {optionProvider}
         </AutoCompleteContext.Provider>
@@ -548,14 +546,13 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
  * This kludge component is used to report the state of a ReachUI combo box to
  * the AutoComplete, the hook herein needs to be a child of the combobox being observed
  */
-interface IComboboxStatusProps {
-    onStatusChange(status: ComboboxStatus): void;
+interface IComboboxStateProps {
+    status(state: ComboboxStatus): void;
 }
-function ComboboxStatus(props: IComboboxStatusProps) {
+function ComboboxState(props: IComboboxStateProps) {
     const { state } = useComboboxContext();
-
     useEffect(() => {
-        props.onStatusChange(state);
+        props.status(state);
     }, [state]);
     return null;
 }

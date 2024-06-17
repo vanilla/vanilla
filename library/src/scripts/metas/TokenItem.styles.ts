@@ -30,16 +30,6 @@ export const TokenItemClasses = () => {
             color: ColorsUtils.colorOut(globalVariables().elementaryColors.darkText),
         }),
     });
-
-    const textContentCompact = css({
-        ...Mixins.padding({
-            vertical: 1,
-            horizontal: 6,
-        }),
-        color: "inherit",
-        fontWeight: "inherit",
-    });
-
     const button = css({
         marginLeft: -4,
     });
@@ -54,7 +44,6 @@ export const TokenItemClasses = () => {
     return {
         root,
         textContent,
-        textContentCompact,
         button,
         icon,
     };

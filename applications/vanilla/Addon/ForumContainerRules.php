@@ -14,21 +14,6 @@ use Garden\Web\PageControllerRoute;
 use Vanilla\AddonContainerRules;
 use Vanilla\Analytics\EventProviderService;
 use Vanilla\Analytics\SearchDiscussionEventProvider;
-use Vanilla\Forum\Controllers\Pages\AdminContentPageController;
-use Vanilla\AutomationRules\Actions\AddDiscussionToCollectionAction;
-use Vanilla\AutomationRules\Actions\AddTagToDiscussionAction;
-use Vanilla\AutomationRules\Actions\BumpDiscussionAction;
-use Vanilla\AutomationRules\Actions\CloseDiscussionAction;
-use Vanilla\AutomationRules\Actions\MoveDiscussionToCategoryAction;
-use Vanilla\AutomationRules\Actions\RemoveDiscussionFromCollectionAction;
-use Vanilla\AutomationRules\Actions\RemoveDiscussionFromTriggerCollectionAction;
-use Vanilla\AutomationRules\Actions\UserFollowCategoryAction;
-use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
-use Vanilla\AutomationRules\Triggers\StaleCollectionTrigger;
-use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
-use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
-use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
-use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Forum\Controllers\Pages\CategoryListPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionCategoryPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
@@ -44,7 +29,6 @@ use Vanilla\Forum\Layout\View\DiscussionThreadLayoutView;
 use Vanilla\Forum\Layout\View\LegacyNewDiscussionLayoutView;
 use Vanilla\Forum\Layout\Middleware\CategoryFilterMiddleware;
 use Vanilla\Forum\Layout\View\NestedCategoryListPageLayoutView;
-use Vanilla\Forum\Models\AiSuggestionSiteMetaExtra;
 use Vanilla\Forum\Models\CategoryCollectionProvider;
 use Vanilla\Forum\Models\CategorySiteMetaExtra;
 use Vanilla\Forum\Models\DiscussionCollectionProvider;
@@ -220,15 +204,10 @@ class ForumContainerRules extends AddonContainerRules
             -1
         );
 
-        PageControllerRoute::configurePageRoutes($container, [
-            "/dashboard/content" => AdminContentPageController::class,
-        ]);
-
         $container
             ->rule(SiteMeta::class)
             ->addCall("addExtra", [new Reference(PostingSiteMetaExtra::class)])
-            ->addCall("addExtra", [new Reference(CategorySiteMetaExtra::class)])
-            ->addCall("addExtra", [new Reference(AiSuggestionSiteMetaExtra::class)]);
+            ->addCall("addExtra", [new Reference(CategorySiteMetaExtra::class)]);
 
         // Collections.
         $container
@@ -244,28 +223,6 @@ class ForumContainerRules extends AddonContainerRules
         $container
             ->rule(QuickLinksVariableProvider::class)
             ->addCall("addQuickLinkProvider", [new Reference(ReactionsQuickLinksProvider::class)]);
-
-        //Automation Rules
-
-        $container
-            ->rule(AutomationRuleService::class)
-            ->addCall("addAutomationTrigger", [LastActiveDiscussionTrigger::class])
-            ->addCall("addAutomationTrigger", [StaleCollectionTrigger::class])
-            ->addCall("addAutomationTrigger", [StaleDiscussionTrigger::class])
-            ->addCall("addAutomationAction", [AddDiscussionToCollectionAction::class])
-            ->addCall("addAutomationAction", [AddTagToDiscussionAction::class])
-            ->addCall("addAutomationAction", [BumpDiscussionAction::class])
-            ->addCall("addAutomationAction", [CloseDiscussionAction::class])
-            ->addCall("addAutomationAction", [MoveDiscussionToCategoryAction::class])
-            ->addCall("addAutomationAction", [RemoveDiscussionFromCollectionAction::class])
-            ->addCall("addAutomationAction", [RemoveDiscussionFromTriggerCollectionAction::class])
-            ->addCall("addAutomationAction", [UserFollowCategoryAction::class]);
-
-        $container
-            ->rule(AutomationRuleService::class)
-            ->setShared(true)
-            ->rule(AutomationRuleModel::class)
-            ->setShared(true);
 
         if (!DebugUtils::isTestMode() && !function_exists("writeReactions")) {
             include PATH_APPLICATIONS . "/dashboard/views/reactions/reaction_functions.php";

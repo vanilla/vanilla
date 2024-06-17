@@ -15,7 +15,7 @@ use Vanilla\Theme\BoxThemeShim;
                 <?php
                 $Username = htmlspecialchars(val('Name', $User));
                 $Photo = val('Photo', $User);
-                $userID = $User->UserID ?? $User['UserID'];
+                $userID = $user->UserID ?? $user['UserID'];
 
 
                 if (val('Deleted', $User)) {

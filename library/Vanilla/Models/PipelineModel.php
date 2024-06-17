@@ -8,9 +8,6 @@ namespace Vanilla\Models;
 
 use Exception;
 use Vanilla\Database\Operation;
-use Vanilla\Database\Operation\CurrentDateFieldProcessor;
-use Vanilla\Database\Operation\CurrentIPAddressProcessor;
-use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\Pipeline;
 use Vanilla\Database\Operation\Processor;
 use Vanilla\InjectableInterface;
@@ -39,41 +36,6 @@ class PipelineModel extends Model implements InjectableInterface
         $this->pipeline = new Pipeline(function (Operation $op) {
             return $this->handleInnerOperation($op);
         });
-    }
-
-    /**
-     * @param bool $includeUpdate
-     * @param bool $includeIPAddress
-     * @param bool $preciseDates
-     */
-    public function addInsertUpdateProcessors(
-        bool $includeUpdate = true,
-        bool $includeIPAddress = false,
-        bool $preciseDates = false
-    ): void {
-        $request = \Gdn::request();
-        $session = \Gdn::session();
-        $userProcessor = new CurrentUserFieldProcessor($session);
-        $userProcessor->camelCase();
-
-        $dateProcessor = new CurrentDateFieldProcessor(["dateInserted"], ["dateUpdated"], $preciseDates);
-
-        $this->addPipelineProcessor($userProcessor);
-        $this->addPipelineProcessor($dateProcessor);
-
-        if (!$includeUpdate) {
-            $userProcessor->setUpdateFields([]);
-            $dateProcessor->setUpdateFields([]);
-        }
-
-        if ($includeIPAddress) {
-            $ipProcessor = new CurrentIPAddressProcessor($request);
-            $ipProcessor->camelCase();
-            if (!$includeUpdate) {
-                $ipProcessor->setUpdateFields([]);
-            }
-            $this->addPipelineProcessor($ipProcessor);
-        }
     }
 
     /**

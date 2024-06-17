@@ -11,11 +11,9 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
-use Vanilla\Dashboard\Events\LayoutEvent;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
-use Vanilla\Database\Operation\ResourceEventProcessor;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
@@ -28,19 +26,35 @@ use Vanilla\Utility\ModelUtils;
  */
 class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderInterface
 {
+    //region Properties
     private const TABLE_NAME = "layout";
 
+    /** @var LayoutViewModel $layoutViewModel */
+    private $layoutViewModel;
+
+    /** @var LayoutService $layoutProviderService */
+    private $layoutProviderService;
+
+    //endregion
+
+    //region Constructor
     /**
      * DI Constructor
+     *
+     * @param CurrentUserFieldProcessor $userFieldProcessor
+     * @param CurrentDateFieldProcessor $dateFieldProcessor
+     * @param JsonFieldProcessor $jsonFieldProcessor
+     * @param LayoutViewModel $layoutViewModel
+     * @param LayoutService $layoutProviderService
+     * @param \GDN_Cache $cache
      */
     public function __construct(
-        protected CurrentUserFieldProcessor $userFieldProcessor,
-        protected CurrentDateFieldProcessor $dateFieldProcessor,
-        protected JsonFieldProcessor $jsonFieldProcessor,
-        protected LayoutViewModel $layoutViewModel,
-        protected LayoutService $layoutProviderService,
-        protected \GDN_Cache $cache,
-        protected ResourceEventProcessor $resourceEventProcessor
+        CurrentUserFieldProcessor $userFieldProcessor,
+        CurrentDateFieldProcessor $dateFieldProcessor,
+        JsonFieldProcessor $jsonFieldProcessor,
+        LayoutViewModel $layoutViewModel,
+        LayoutService $layoutProviderService,
+        \GDN_Cache $cache
     ) {
         parent::__construct(self::TABLE_NAME, $cache);
 
@@ -52,10 +66,10 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
 
         $jsonFieldProcessor->setFields(["layout"]);
         $this->addPipelineProcessor($jsonFieldProcessor);
-
-        $this->resourceEventProcessor->setResourceEventClass(LayoutEvent::class);
-        $this->addPipelineProcessor($this->resourceEventProcessor);
+        $this->layoutViewModel = $layoutViewModel;
+        $this->layoutProviderService = $layoutProviderService;
     }
+    //endregion
 
     //region Public Methods
     /**

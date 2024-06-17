@@ -44,8 +44,6 @@ interface IProps {
     domNodesToAttach?: Node[];
 
     bgColor?: ColorHelper;
-
-    gradientClasses?: string;
 }
 
 /**
@@ -137,7 +135,6 @@ export function CollapsableContent(props: IProps) {
                         style={gradientProps}
                         className={classNames(
                             classes.gradient,
-                            props.gradientClasses,
                             props.allowsCssOverrides && "collapsableContent-gradient",
                         )}
                     />

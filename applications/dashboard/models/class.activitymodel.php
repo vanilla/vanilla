@@ -18,7 +18,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
-use Vanilla\Community\Events\ActivityQueryEvent;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Activity\Activity;
 use Vanilla\Dashboard\Models\ActivityService;
@@ -431,8 +430,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         }
         $limit = $limit ?: 30;
         $offset = $offset ?: 0;
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new ActivityQueryEvent($this->SQL));
+
         // Add some conditions here to only grab the latest record when ActivityTypeID, UserID, and ParentRecordID all match.
         $this->SQL
             ->select("a.*")
@@ -520,9 +518,9 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             $where["a2.ActivityTypeID"] = $where["ActivityTypeID"];
             unset($where["ActivityTypeID"]);
         }
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new ActivityQueryEvent($this->SQL, "a2"));
-        $sql = $this->SQL
+
+        $sql = $this->Database
+            ->createSql()
             ->select("a2.*")
             ->select("t.FullHeadline, t.ProfileHeadline, t.PluralHeadline, t.AllowComments, t.ShowIcon, t.RouteCode")
             ->select("t.Name", "", "ActivityType")
@@ -674,8 +672,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         if ($limit < 0) {
             $limit = 30;
         }
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new ActivityQueryEvent($this->SQL));
+
         $this->activityQuery(false);
 
         if ($notifyUserID === false || $notifyUserID === 0) {
@@ -684,7 +681,6 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->SQL->whereIn("NotifyUserID", (array) $notifyUserID);
 
         $this->fireEvent("BeforeGet");
-
         $result = $this->SQL
             ->orderBy("a.ActivityID", "desc")
             ->limit($limit, $offset)
@@ -796,6 +792,48 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
 
         $this->fireEvent("BeforeGetCount");
         return $this->SQL->get()->firstRow()->ActivityCount;
+    }
+
+    /**
+     * Get activity related to a particular role.
+     *
+     * Events: AfterGet.
+     *
+     * @param string $roleID Unique ID of role.
+     * @param int $offset Number to skip.
+     * @param int $limit Max number to return.
+     * @return Gdn_DataSet SQL results.
+     * @since 2.0.18
+     */
+    public function getForRole($roleID = "", $offset = 0, $limit = 50)
+    {
+        if (!is_array($roleID)) {
+            $roleID = [$roleID];
+        }
+
+        $offset = is_numeric($offset) ? $offset : 0;
+        if ($offset < 0) {
+            $offset = 0;
+        }
+
+        $limit = is_numeric($limit) ? $limit : 0;
+        if ($limit < 0) {
+            $limit = 0;
+        }
+
+        $this->activityQuery();
+        $result = $this->SQL
+            ->join("UserRole ur", "a.ActivityUserID = ur.UserID")
+            ->whereIn("ur.RoleID", $roleID)
+            ->where("t.Public", "1")
+            ->orderBy("a.DateInserted", "desc")
+            ->limit($limit, $offset)
+            ->get();
+
+        $this->EventArguments["Data"] = &$result;
+        $this->fireEvent("AfterGet");
+
+        return $result;
     }
 
     /**
@@ -1641,11 +1679,9 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $key = sprintf(self::NOTIFICATIONS_COUNT_CACHE_KEY, $userID);
         $notificationCount = $this->cache->get($key, null);
         if ($notificationCount === null) {
-            $eventManager = $this->getEventManager();
-            $eventManager->dispatch(new ActivityQueryEvent($this->SQL, "aCount"));
             $notifications = $this->SQL
                 ->select("ActivityID", "count", "total")
-                ->from($this->Name . " aCount")
+                ->from($this->Name)
                 ->where("NotifyUserID", $userID)
                 ->where("Notified", self::SENT_PENDING)
                 ->get()

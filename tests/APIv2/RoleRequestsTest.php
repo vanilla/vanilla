@@ -409,52 +409,6 @@ class RoleRequestsTest extends AbstractAPIv2Test
     }
 
     /**
-     * Test successfully updating the attributes field.
-     *
-     * @return void
-     */
-    public function testPatchingAttributes(): void
-    {
-        $this->meta["attributes"]["notifyDenied"] = true;
-        $this->api()->put("/role-requests/metas", $this->meta);
-        $this->setAdminApiUser();
-        $this->api()->patch("/role-requests/applications/{$this->application["roleRequestID"]}", [
-            "attributes" => [
-                "body" => "new value",
-                "Format" => "text",
-                "Email" => "dante@inferno.hell",
-            ],
-        ]);
-
-        $application = $this->api()
-            ->get("/role-requests/applications/{$this->application["roleRequestID"]}")
-            ->getBody();
-        $attributes = $application["attributes"];
-
-        $this->assertSame("new value", $attributes["body"]);
-        $this->assertSame("text", $attributes["format"]);
-        $this->assertSame("dante@inferno.hell", $attributes["email"]);
-    }
-
-    /**
-     * Test trying to update the attribute field with an invalid value.
-     *
-     * @return void
-     */
-    public function testPatchAttributeInvalidSchema(): void
-    {
-        $this->expectException(ClientException::class);
-        $this->meta["attributes"]["notifyDenied"] = true;
-        $this->api()->put("/role-requests/metas", $this->meta);
-        $this->setAdminApiUser();
-        $this->api()->patch("/role-requests/applications/{$this->application["roleRequestID"]}", [
-            "attributes" => [
-                "ThisFieldIsInvalid" => "it truly is",
-            ],
-        ]);
-    }
-
-    /**
      * A user should not be able to apply for a role twice.
      */
     public function testReApplyNotAllowed(): void

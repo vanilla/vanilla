@@ -54,9 +54,8 @@ export const metasCSS = () => {
             }),
         },
         "& > .MItem-Resolved": {
-            width: 16,
-            height: "auto",
-            aspectRatio: "1/1",
+            width: 13,
+            height: 14,
             padding: 0,
             marginBottom: 0,
             verticalAlign: "middle",
@@ -83,7 +82,7 @@ export const metasCSS = () => {
 
     // Special case for resolved
     cssOut(".resolved2-unresolved, .resolved2-resolved", {
-        top: -2,
+        top: 0,
         display: "block",
     });
 

@@ -81,22 +81,6 @@ export function bootstrapVanilla() {
         console.error(error);
     }
 
-    // Wire up audit logs
-    apiv2.interceptors.request.use((config) => {
-        // Apply audit log headers as necessary.
-        let auditLog = getMeta("auditLog");
-        if (auditLog) {
-            if (!config.headers) {
-                config.headers = {};
-            }
-            config.headers["X-Parent-Audit-Log-Id"] = auditLog.auditLogID;
-            config.headers["X-Parent-Audit-Log-Request-Path"] = auditLog.requestPath;
-            config.headers["X-Parent-Audit-Log-Request-Method"] = auditLog.requestMethod;
-            config.headers["X-Parent-Audit-Log-Request-Query"] = JSON.stringify(auditLog.requestQuery);
-        }
-        return config;
-    });
-
     // Make sure we mount our header/footer shadow doms before anything else happens.
     _executeReady()
         .then(() => {

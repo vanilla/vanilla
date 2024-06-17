@@ -157,7 +157,7 @@ export default function UserManagementTableCell(props: IProps) {
 interface IUserNameCellProps
     extends Omit<React.ComponentProps<typeof UserManagementTableCell>, "updateQuery" | "columnName"> {}
 
-export const UserNameCell = (props: IUserNameCellProps) => {
+const UserNameCell = (props: IUserNameCellProps) => {
     const { data: userData, wrappedVersion } = props;
     const classes = userManagementClasses();
     return (

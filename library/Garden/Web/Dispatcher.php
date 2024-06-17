@@ -21,10 +21,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\LocaleInterface;
-use Vanilla\Dashboard\Events\AccessDeniedEvent;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Logger;
-use Vanilla\Logging\AuditLogger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
@@ -241,16 +238,6 @@ class Dispatcher implements LoggerAwareInterface
                         ["responseCode" => $dispatchEx->getCode()]
                     );
                 }
-
-                if (
-                    $dispatchEx instanceof PermissionException &&
-                    // Only log permission exceptions if the user is logged in.
-                    $dispatchEx->getPermission() !== "Garden.SignIn.Allow" &&
-                    \Gdn::session()->isValid()
-                ) {
-                    $event = new AccessDeniedEvent($dispatchEx->getPermission());
-                    AuditLogger::log($event);
-                }
                 $response = null;
                 if (is_object($action ?? null) && $action instanceof Action) {
                     $obj = $action->getCallback()[0] ?? false;
@@ -335,8 +322,6 @@ class Dispatcher implements LoggerAwareInterface
      * This method dispatches the request to an appropriate callback depending on the available routes and renders the contents.
      *
      * @param RequestInterface $request The request to handle.
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function handle(RequestInterface $request)
     {
@@ -351,7 +336,6 @@ class Dispatcher implements LoggerAwareInterface
      * @param mixed $raw The raw response.
      * @param string $ob The contents of the output buffer, if any.
      * @return Data Returns the data response.
-     * @throws ResponseException
      */
     private function makeResponse($raw, $ob = "")
     {

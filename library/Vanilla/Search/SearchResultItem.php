@@ -534,7 +534,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
             // User data.
             "UserID" => $this->data["insertUserID"] ?? -1,
             "Name" => $this->data["insertUser"]["name"] ?? "Unknown",
-            "Photo" => $this->data["insertUser"]["photoUrl"] ?? "",
+            "Photo" => $this->data["insertUser"]["photoUrl"],
         ];
     }
 

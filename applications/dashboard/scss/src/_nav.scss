@@ -162,6 +162,39 @@
 //
 // No styleguide reference.
 
+.nav-heading {
+    margin-top: $spacer * 0.5;
+    margin-bottom: $spacer * 0.5;
+
+    a {
+        display: block;
+        padding-top: 16px;
+        padding-bottom: 16px;
+        padding-left: 12px;
+        border-bottom: 1px dotted rgba(0, 0, 0, 0.0875);
+        font-size: $font-size-sm;
+        font-weight: 600;
+        text-transform: uppercase;
+        text-decoration: none;
+
+        &::before {
+            @include caret;
+            position: relative;
+            top: -1px;
+            -webkit-transform: rotate(0deg);
+            tranform: rotate(0deg);
+            margin-left: -16px;
+            margin-right: 8px;
+            transition: all 0.1s ease-out;
+        }
+
+        &.collapsed::before {
+            -webkit-transform: rotate(-90deg);
+            transform: rotate(-90deg);
+        }
+    }
+}
+
 .nav-inline {
     font-size: 0;
 
@@ -177,7 +210,7 @@
 
 .panel-nav {
     a {
-        color: $grey-dark;
+        color: $grey;
     }
 
     .title {
@@ -238,36 +271,6 @@
     .nav-stacked {
         .nav-item + .nav-item {
             margin-top: 0;
-        }
-    }
-}
-
-.nav-heading {
-    margin-top: 6px;
-    margin-bottom: 6px;
-
-    a {
-        display: block;
-        font-size: 14px;
-        font-weight: 600;
-        text-transform: uppercase;
-        text-decoration: none;
-        position: relative;
-        line-height: 1.25;
-
-        &::before {
-            @include caret;
-            position: absolute;
-            transform: translate(0, -50%) rotate(0deg);
-            margin-left: -12px;
-            margin-right: 8px;
-            top: 50%;
-            left: 0;
-            transition: all 0.1s ease-out;
-        }
-
-        &.collapsed::before {
-            transform: translate(0, -50%) rotate(-90deg);
         }
     }
 }

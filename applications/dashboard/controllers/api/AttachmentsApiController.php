@@ -9,9 +9,10 @@ namespace Vanilla\Dashboard\Controllers\Api;
 
 use AbstractApiController;
 use AttachmentModel;
+use Garden\Container\ContainerException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
-use Vanilla\Community\Events\TicketEscalationEvent;
+use Gdn;
 use Vanilla\Dashboard\Models\AttachmentService;
 use Garden\Utils\ArrayUtils;
 use Garden\Web\Data;
@@ -48,8 +49,28 @@ class AttachmentsApiController extends AbstractApiController
      */
     public function post(array $body): Data
     {
-        $this->permission();
-        $attachment = $this->attachmentService->createAttachment($body);
+        $attachmentType = $body["attachmentType"] ?? "";
+
+        $provider = $this->getProvider($attachmentType);
+        if (!$provider) {
+            throw new NotFoundException("No provider was found for this attachment type.");
+        }
+
+        $basicBody = $this->attachmentModel->getAttachmentPostSchema()->validate($body);
+        $recordType = $basicBody["recordType"];
+        $recordID = $basicBody["recordID"];
+
+        if (!$provider->canCreateAttachmentForRecord($recordType, $recordID)) {
+            throw new ForbiddenException("You do not have permission to use this provider.");
+        }
+
+        $fullSchema = $this->attachmentModel
+            ->getAttachmentPostSchema()
+            ->merge($provider->getHydratedFormSchema($recordType, $recordID, $body));
+
+        $body = $fullSchema->validate($body);
+
+        $attachment = $provider->createAttachment($recordType, $recordID, $body);
 
         $attachment = $this->normalizeSingleAttachment($attachment);
 
@@ -67,8 +88,7 @@ class AttachmentsApiController extends AbstractApiController
      */
     public function index(array $query = []): \Garden\Web\Data
     {
-        // Record-specific permissions are checked in the AttachmentService->normalizeAttachments() method.
-        $this->permission();
+        $this->permission("staff.allow");
 
         $in = $this->schema([
             "recordType:s" => ["enum" => ["discussion", "comment", "user"]],
@@ -118,7 +138,7 @@ class AttachmentsApiController extends AbstractApiController
             throw new NotFoundException("No provider was found for this attachment source.");
         }
 
-        if (!$provider->canCreateAttachmentForRecord($query["recordType"], $query["recordID"])) {
+        if (!$provider->hasPermissions()) {
             throw new ForbiddenException("You do not have permission to use this provider.");
         }
 
@@ -144,7 +164,7 @@ class AttachmentsApiController extends AbstractApiController
      */
     public function post_refresh(array $body = [])
     {
-        $this->permission();
+        $this->permission("staff.allow");
 
         $in = $this->schema([
             "attachmentIDs:a" => ["items" => "int"],

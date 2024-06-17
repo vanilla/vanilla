@@ -1,1 +1,1 @@
-Halp: <?php echo "fo" . "o"; ?>
+Halp: <?php echo "foo"; ?>

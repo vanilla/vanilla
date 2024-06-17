@@ -8,15 +8,9 @@
  * @since 2.0
  */
 
-use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Vanilla\Dashboard\Events\PasswordResetCompletedEvent;
-use Vanilla\Dashboard\Events\PasswordResetFailedEvent;
-use Vanilla\Dashboard\Events\SsoSyncFailedEvent;
-use Vanilla\Dashboard\Events\UserSignInFailedEvent;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
-use Vanilla\Logging\AuditLogger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\DebugUtils;
 use Vanilla\Logger;
@@ -181,7 +175,6 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
         // Where are we in the process? Still need to gather (render view) or are we validating?
         $authenticationStep = $authenticator->currentStep();
-        $email = $this->Form->getFormValue("Email", null) ?: $this->Form->getFormValue("Username", null) ?: "Unknown";
 
         switch ($authenticationStep) {
             // User is already logged in
@@ -195,7 +188,10 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 $reaction = $authenticator->loginResponse();
                 if ($this->Form->isPostBack()) {
                     $this->addCredentialErrorToForm($this->getCredentialErrorString());
-                    AuditLogger::log(new UserSignInFailedEvent($email, "Some or all credentials were missing."));
+                    $this->logger->warning("{username} failed to sign in. Some or all credentials were missing.", [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        "event" => "signin_failure",
+                    ]);
                 }
                 break;
 
@@ -222,22 +218,30 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                         switch ($authenticationResponse) {
                             case Gdn_Authenticator::AUTH_PERMISSION:
                                 $this->addCredentialErrorToForm("ErrorPermission");
-                                AuditLogger::log(new UserSignInFailedEvent($email, "Permission denied."));
+                                $this->logger->warning("{username} failed to sign in. Permission denied.", [
+                                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                                    "event" => "signin_failure",
+                                ]);
                                 $reaction = $authenticator->failedResponse();
                                 break;
 
                             case Gdn_Authenticator::AUTH_DENIED:
                                 $this->addCredentialErrorToForm($this->getCredentialErrorString());
-                                AuditLogger::log(new UserSignInFailedEvent($email, "Authentication denied."));
+                                $this->logger->warning("{username} failed to sign in. Authentication denied.", [
+                                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                                    "event" => "signin_falure",
+                                ]);
                                 $reaction = $authenticator->failedResponse();
                                 break;
 
                             case Gdn_Authenticator::AUTH_INSUFFICIENT:
                                 // Unable to comply with auth request, more information is needed from user.
-                                $this->addCredentialErrorToForm("ErrorInsufficient");
-                                AuditLogger::log(
-                                    new UserSignInFailedEvent($email, "More information needed from user.")
+                                $this->logger->warning(
+                                    "{username} failed to sign in. More information needed from user.",
+                                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY, "event" => "signin_failure"]
                                 );
+                                $this->addCredentialErrorToForm("ErrorInsufficient");
+
                                 $reaction = $authenticator->failedResponse();
                                 break;
 
@@ -1443,8 +1447,11 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                 if (!$user) {
                     $this->addCredentialErrorToForm($this->getCredentialErrorString());
-                    $auditEvent = new UserSignInFailedEvent($email, "User not found.");
-                    AuditLogger::log($auditEvent);
+                    $this->logger->info("Failed to sign in. User not found: {signin}", [
+                        "signin" => $email,
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        Logger::FIELD_EVENT => "signin_failure",
+                    ]);
 
                     $this->fireEvent("BadSignIn", [
                         "Email" => $email,
@@ -1493,22 +1500,15 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                                 $this->categoryModel->setDefaultCategoryPreferences(val("UserID", $user), true);
 
                                 if (BanModel::isBanned($user->Banned, BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)) {
-                                    AuditLogger::log(new UserSignInFailedEvent($user->Email, "User is banned."));
                                     // If account has been banned manually or by a ban rule.
                                     $this->Form->addError("This account has been banned.");
                                     Gdn::session()->end();
                                 } elseif (BanModel::isBanned($user->Banned, BanModel::BAN_WARNING)) {
                                     // If account has been banned by the "Warnings and notes" plugin or similar.
-                                    AuditLogger::log(
-                                        new UserSignInFailedEvent($user->Email, "User is temporarily banned.")
-                                    );
                                     $this->Form->addError("This account has been temporarily banned.");
                                     Gdn::session()->end();
                                 } elseif (!Gdn::session()->checkPermission("Garden.SignIn.Allow")) {
                                     // If account does not have the sign in permission
-                                    AuditLogger::log(
-                                        new UserSignInFailedEvent($user->Email, "Account cannot be accessed.")
-                                    );
                                     $this->Form->addError("Sorry, permission denied. This account cannot be accessed.");
                                     Gdn::session()->end();
                                 } else {
@@ -1532,9 +1532,11 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                                 }
                             } else {
                                 $this->addCredentialErrorToForm($this->getCredentialErrorString());
-                                $auditEvent = new UserSignInFailedEvent($email, "Invalid password.");
-                                AuditLogger::log($auditEvent);
-
+                                $this->logger->warning("{username} failed to sign in.  Invalid password.", [
+                                    "InsertName" => $user->Name,
+                                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                                    Logger::FIELD_EVENT => "signin_failure",
+                                ]);
                                 Gdn::userModel()->incrementLoginAttempt($user->UserID);
                                 if (Gdn::userModel()->isSuspendedAndResetBasedOnTime($user->UserID)) {
                                     $this->addCredentialErrorToForm(Gdn::userModel()->suspendedErrorMessage());
@@ -2068,25 +2070,18 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         $passwordResetKey = $session->stash("passwordResetKey", "", false);
         $this->UserModel->addPasswordStrength($this);
 
-        if (!is_numeric($userID)) {
-            throw new NotFoundException("User", ["userID" => $userID]);
-        }
-
-        $user = $this->UserModel->getID($userID, DATASET_TYPE_ARRAY);
-        if (!$user) {
-            throw new NotFoundException("User", ["userID" => $userID]);
-        }
-
         if (
+            !is_numeric($userID) ||
             $passwordResetKey == "" ||
             hash_equals($this->UserModel->getAttribute($userID, "PasswordResetKey", ""), $passwordResetKey) === false
         ) {
             $this->Form->addError(
                 "Failed to authenticate your password reset request. Try using the reset request form again."
             );
-            AuditLogger::log(
-                new PasswordResetFailedEvent($user["Name"], $userID, "Failed to authenticate password reset.")
-            );
+            $this->logger->notice("{username} failed to authenticate password reset request.", [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                "event" => "password_reset_failure",
+            ]);
             $this->fireEvent("PasswordResetFailed", [
                 "UserID" => $userID,
             ]);
@@ -2101,7 +2096,10 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                         "Your password reset token has expired. Try using the reset request form again."
                     )
             );
-            AuditLogger::log(new PasswordResetFailedEvent($user["Name"], $userID, "Password reset token expired."));
+            $this->logger->notice("{username} has an expired reset token.", [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                "event" => "password_reset_failure",
+            ]);
 
             $this->fireEvent("PasswordResetFailed", [
                 "UserID" => $userID,
@@ -2113,8 +2111,6 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             if ($user) {
                 $user = arrayTranslate($user, ["UserID", "Name", "Email"]);
                 $this->setData("User", $user);
-            } else {
-                throw new NotFoundException("User");
             }
 
             if ($this->Form->isPostBack() === true) {
@@ -2134,14 +2130,23 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 $password = $this->Form->getFormValue("Password", "");
                 $passwordMatch = $this->Form->getFormValue("PasswordMatch", "");
                 if ($password == "") {
-                    AuditLogger::log(new PasswordResetFailedEvent($user["Name"], $userID, "Password is invalid."));
+                    $this->logger->notice("Failed to reset the password for {username}. Password is invalid.", [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        "event" => "password_reset_failure",
+                    ]);
                 } elseif ($password != $passwordMatch) {
-                    AuditLogger::log(new PasswordResetFailedEvent($user["Name"], $userID, "Passwords did not match."));
+                    $this->logger->notice("Failed to reset the password for {username}. Passwords did not match.", [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        "event" => "password_reset_failure",
+                    ]);
                 }
 
                 if ($this->Form->errorCount() == 0) {
                     $user = $this->UserModel->passwordReset($userID, $password);
-                    AuditLogger::log(new PasswordResetCompletedEvent($userID));
+                    $this->logger->notice("{username} has reset their password.", [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        "event" => "password_reset",
+                    ]);
                     Gdn::session()->start($user->UserID, true);
                     $this->setRedirectTo("/", false);
                 }
@@ -2655,7 +2660,13 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 }
                 if (count($profileErrors)) {
                     //If there are validation errors don't stop the registration workflow, log the errors and continue the workflow.
-                    AuditLogger::log(new SsoSyncFailedEvent(Gdn_Validation::resultsAsArray($profileErrors)));
+                    $this->logger->notice(
+                        "Failed to synchronize SSO profile data.\n" . Gdn_Validation::resultsAsText($profileErrors),
+                        [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_EVENT => "syncConnect_user_error",
+                        ]
+                    );
                 }
             }
         }

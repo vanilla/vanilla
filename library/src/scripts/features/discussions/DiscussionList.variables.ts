@@ -243,13 +243,6 @@ export const discussionListVariables = useThemeCache(
         const announcementTag = makeThemeVars("announcementTag", tagPresetVariables()[labels.tagPreset]);
 
         /**
-         * @varGroup discussionList.closedTag
-         * @description Discussons that have been marked as closed.
-         * @expand tagPreset
-         */
-        const closedTag = makeThemeVars("closedTag", tagPresetVariables()[labels.tagPreset]);
-
-        /**
          * @varGroup discussionList.qnaStatusUnanswered
          * @description Q&A status: questions that have no answers.
          * @expand tagPreset
@@ -278,7 +271,6 @@ export const discussionListVariables = useThemeCache(
             labels,
             userTags,
             announcementTag,
-            closedTag,
             qnaStatusUnanswered,
             qnaStatusAnswered,
             qnaStatusAccepted,

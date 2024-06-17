@@ -1,8 +1,10 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
+import { LoadStatus } from "@library/@types/api/core";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { DiscussionListItemMeta } from "@library/features/discussions/DiscussionListItemMeta";
 import { STORY_TAGS } from "@library/storybook/storyData";
 import { render, screen } from "@testing-library/react";
@@ -19,7 +21,22 @@ describe("Tags", () => {
             setMeta("featureFlags.customLayout.discussionList.Enabled", false);
         });
         it("Tags url in Discussion List Item Meta", () => {
-            render(<DiscussionListItemMeta {...discussion} />);
+            render(
+                <TestReduxProvider
+                    state={{
+                        discussions: {
+                            discussionsByID: {
+                                10: {
+                                    status: LoadStatus.SUCCESS,
+                                    data: discussion,
+                                },
+                            },
+                        },
+                    }}
+                >
+                    <DiscussionListItemMeta {...discussion} />
+                </TestReduxProvider>,
+            );
             const userTag = screen.queryByRole("link", { name: "UserTag" });
             expect(userTag?.getAttribute("href")?.includes(`/discussions?tagID=${tagID}`)).toBe(false);
         });
@@ -39,7 +56,22 @@ describe("Tags", () => {
             setMeta("featureFlags.customLayout.discussionList.Enabled", true);
         });
         it("Tags url in Discussion List Item Meta", () => {
-            render(<DiscussionListItemMeta {...discussion} />);
+            render(
+                <TestReduxProvider
+                    state={{
+                        discussions: {
+                            discussionsByID: {
+                                10: {
+                                    status: LoadStatus.SUCCESS,
+                                    data: discussion,
+                                },
+                            },
+                        },
+                    }}
+                >
+                    <DiscussionListItemMeta {...discussion} />
+                </TestReduxProvider>,
+            );
             const userTag = screen.queryByRole("link", { name: "UserTag" });
             expect(userTag?.getAttribute("href")?.includes(`/discussions?tagID=${tagID}`)).toBe(true);
         });

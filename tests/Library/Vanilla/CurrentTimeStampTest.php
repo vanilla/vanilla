@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use Monolog\DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Vanilla\CurrentTimeStamp;
 
@@ -323,17 +322,5 @@ class CurrentTimeStampTest extends TestCase
             "rollover" => $thirtySecInterval,
             "expected" => $rolloverWindowStart,
         ];
-    }
-
-    /**
-     * Test that we preservce microsecond precision.
-     *
-     * @return void
-     */
-    public function testMicrosecondPrecision()
-    {
-        $initial = 1716305592.3225;
-        CurrentTimeStamp::mockTime(DateTimeImmutable::createFromFormat("U.u", $initial));
-        $this->assertSame($initial, CurrentTimeStamp::getPrecise());
     }
 }

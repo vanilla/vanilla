@@ -200,10 +200,7 @@ class VanillaHtmlFormatter
         ];
 
         if (!$allowExtended) {
-            $config["elements"] .= "-video-audio";
-            if (!self::c("Garden.Format.AllowIFrames")) {
-                $config["elements"] .= "-iframe";
-            }
+            $config["elements"] .= "-iframe-video-audio";
         }
 
         // If we don't allow URL embeds, don't allow HTML media embeds, either.

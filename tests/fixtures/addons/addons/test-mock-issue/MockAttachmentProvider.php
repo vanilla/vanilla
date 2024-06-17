@@ -15,6 +15,7 @@ use UserModel;
 use Garden\Schema\Schema;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AttachmentProviderInterface;
+use Vanilla\Formatting\DateTimeFormatter;
 
 /**
  * Mock issue provider for tests.
@@ -108,19 +109,11 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getIsEscalation(): bool
-    {
-        return true;
-    }
-
-    /**
      * Verify that the user has the `staff.allow` permission.
      *
      * @return bool
      */
-    public function hasReadPermissions(): bool
+    public function hasPermissions(): bool
     {
         return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
     }
@@ -220,28 +213,17 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     /**
      * @inheritDoc
      */
-    public function getWriteableContentScope(): string
+    public function canEscalateOwnPost(): bool
     {
-        if ($this->userModel->checkPermission(\Gdn::session()->User, "staff.allow")) {
-            return AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_ALL;
-        }
-        return AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_NONE;
+        return false;
     }
 
     /**
      * @inheritDoc
      */
-    public function canViewBasicAttachment(array $attachment): bool
+    public function canViewAttachment(array $attachment): bool
     {
-        return $this->hasReadPermissions();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function canViewFullAttachment(array $attachment): bool
-    {
-        return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
+        return $this->hasPermissions();
     }
 
     /**
@@ -249,7 +231,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
      */
     public function canCreateAttachmentForRecord(string $recordType, int $recordID): bool
     {
-        return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
+        return $this->hasPermissions();
     }
 
     /**

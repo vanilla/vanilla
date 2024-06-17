@@ -820,10 +820,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure
 
         $return .= "{$column->Type}";
 
-        if ($column->Type === "datetime" && $column->Precision != "") {
-            $return .= "($column->Precision)";
-        }
-
         $lengthTypes = $this->types("defineLength");
         if ($column->Length != "" && in_array($column->Type, $lengthTypes)) {
             if ($column->Precision != "") {

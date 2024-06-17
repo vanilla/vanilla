@@ -11,8 +11,6 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
-use Garden\Web\Pagination;
-use LocalesApiController;
 use PHPUnit\Exception;
 use Vanilla\DateFilterSchema;
 use Vanilla\Exception\Database\NoResultsException;
@@ -20,8 +18,6 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\CollectionModel;
 use Vanilla\ApiUtils;
-use Vanilla\Models\CollectionRecordModel;
-use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\SchemaUtils;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
@@ -34,26 +30,19 @@ class CollectionsApiController extends \AbstractApiController
     /** @var CollectionModel */
     protected $collectionModel;
 
-    /** @var CollectionRecordModel */
-    protected $collectionRecordModel;
-
-    /** @var LocalesApiController $localeApi */
+    /** @var \LocalesApiController $localeApi */
     private $localeApi;
 
     /**
      * CollectionsApiController constructor.
      *
      * @param CollectionModel $collectionModel
-     * @param LocalesApiController $localeApi
+     * @param \LocalesApiController $localeApi
      *
      */
-    public function __construct(
-        CollectionModel $collectionModel,
-        CollectionRecordModel $collectionRecordModel,
-        LocalesApiController $localeApi
-    ) {
+    public function __construct(CollectionModel $collectionModel, \LocalesApiController $localeApi)
+    {
         $this->collectionModel = $collectionModel;
-        $this->collectionRecordModel = $collectionRecordModel;
         $this->localeApi = $localeApi;
     }
 
@@ -70,7 +59,7 @@ class CollectionsApiController extends \AbstractApiController
     {
         $this->permission("community.manage");
         $in = Schema::parse([
-            "collectionID?" => RangeExpression::createSchema([":int"]),
+            "collectionID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"]),
             "name:s?",
             "dateUpdated?" => new DateFilterSchema([
                 "description" => "When the collection was updated.",
@@ -109,7 +98,7 @@ class CollectionsApiController extends \AbstractApiController
             "dateUpdated:dt|n",
             "insertUserID:i",
             "updateUserID:i|n",
-            "records:a" => $this->collectRecordGetSchema(),
+            "records:a" => $this->collectionRecordSchema(),
         ]);
         SchemaUtils::validateArray($results, $out, true);
 
@@ -130,7 +119,7 @@ class CollectionsApiController extends \AbstractApiController
     public function get(int $collectionID): Data
     {
         $this->permission("community.manage");
-        $result = $this->collectionModel->getCollectionRecordByCollectionID($collectionID);
+        $result = $this->collectionModel->getCollectionRecordByID($collectionID);
         $out = Schema::parse([
             "collectionID:i",
             "name:s",
@@ -138,7 +127,7 @@ class CollectionsApiController extends \AbstractApiController
             "dateUpdated:dt|n",
             "insertUserID:i",
             "updateUserID:i|n",
-            "records:a" => $this->collectRecordGetSchema(),
+            "records:a" => $this->collectionRecordSchema(),
         ]);
         $result = $out->validate($result, true);
 
@@ -191,7 +180,7 @@ class CollectionsApiController extends \AbstractApiController
             } catch (Exception $ex) {
                 ErrorLogger::error(
                     "Failed to add record {$validatedBody["record"]["recordType"]}_{$validatedBody["record"]["recordID"]} to collection {$collectionID}",
-                    ["collections"]
+                    ["collecitons"]
                 );
             }
         }
@@ -212,76 +201,6 @@ class CollectionsApiController extends \AbstractApiController
         ]);
 
         return $updatedCollections;
-    }
-
-    /**
-     * @param string $locale
-     * @param array $query
-     * @return Data
-     * @throws HttpException
-     * @throws PermissionException
-     * @throws ValidationException
-     */
-    public function get_contents(string $locale, array $query): Data
-    {
-        $this->permission("community.manage");
-        $in = Schema::parse([
-            "collectionID?" => RangeExpression::createSchema([":int"]),
-            "dateAddedToCollection?" => new DateFilterSchema([
-                "description" => "Date a record has been added to collection.",
-                "x-filter" => [
-                    "field" => "dateInserted",
-                    "processor" => [DateFilterSchema::class, "dateFilterField"],
-                ],
-            ]),
-            "page:i?" => [
-                "description" => "Page number. [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
-                "default" => 1,
-                "minimum" => 1,
-            ],
-            "limit:i?" => [
-                "description" => "Desired number of collection records.",
-                "minimum" => 1,
-                "default" => CollectionRecordModel::LIMIT_DEFAULT,
-            ],
-            "expand?" => ApiUtils::getExpandDefinition(["collection"]),
-        ])->addValidator("locale", [$this->localeApi, "validateLocale"]);
-
-        if (!$this->localeApi->isValidLocale($locale)) {
-            throw new ClientException("Invalid locale provided.");
-        }
-        $query = $in->validate($query);
-
-        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
-
-        $expand = $query["expand"] ?? [];
-
-        $where = ApiUtils::queryToFilters($in, $query);
-
-        if (!empty($query["collectionID"])) {
-            $where["collectionID"] = $query["collectionID"];
-        }
-
-        $totalRecordCount = $this->collectionRecordModel->getCount($where);
-        $results = [];
-        if ($totalRecordCount > 0) {
-            $results = $this->collectionRecordModel->getCollectionRecords($where, $limit, $offset);
-            $results = $this->collectionModel->filterCollectionRecords($results, $locale, false);
-            if (!empty("collection") && $this->isExpandField("collection", $expand)) {
-                $results = $this->expandCollection($results);
-            }
-            $out = $this->schema([":a" => $this->collectionContentsSchema()], "out");
-
-            $results = $out->validate($results);
-        }
-
-        // When crawling the endpoint use a more pager.
-        $paging =
-            $totalRecordCount === 0
-                ? ApiUtils::morePagerInfo($results, "/api/v2/collections/contents", $query, $in)
-                : ApiUtils::numberedPagerInfo($totalRecordCount, "/api/v2collections/contents", $query, $in);
-        $pagingObject = Pagination::tryCursorPagination($paging, $query, $results, "");
-        return new Data($results, $pagingObject);
     }
 
     /**
@@ -328,7 +247,7 @@ class CollectionsApiController extends \AbstractApiController
      * @param int $collectionID
      * @param string $locale
      * @return Data
-     * @throws ValidationException|NoResultsException
+     * @throws ValidationException
      */
     public function get_content(int $collectionID, string $locale): Data
     {
@@ -337,7 +256,7 @@ class CollectionsApiController extends \AbstractApiController
             "locale:s",
         ])->addValidator("locale", [$this->localeApi, "validateLocale"]);
         $in->validate(["id" => $collectionID, "locale" => $locale]);
-        $results = $this->collectionModel->getCollectionRecordContentByID($collectionID, $locale);
+        $result = $this->collectionModel->getCollectionRecordContentByID($collectionID, $locale);
         $out = Schema::parse([
             "collectionID:i",
             "name:s",
@@ -345,10 +264,10 @@ class CollectionsApiController extends \AbstractApiController
             "dateUpdated:dt|n",
             "insertUserID:i",
             "updateUserID:i|n",
-            "records:a" => $this->collectRecordGetSchema()->merge(Schema::parse(["record:o"])),
+            "records:a" => $this->collectionRecordSchema()->merge(Schema::parse(["record:o"])),
         ]);
-        $results = $out->validate($results);
-        return new Data($results);
+        $result = $out->validate($result);
+        return new Data($result);
     }
 
     /**
@@ -433,56 +352,5 @@ class CollectionsApiController extends \AbstractApiController
             "recordType:s" => ["enum" => $this->collectionModel->getAllRecordTypes()],
             "sort:i?",
         ]);
-    }
-
-    /**
-     * Get a schema for the collection record display.
-     *
-     * @return Schema
-     */
-    private function collectRecordGetSchema(): Schema
-    {
-        return Schema::parse([
-            "collectionID:i",
-            "recordID:i",
-            "recordType:s" => ["enum" => $this->collectionModel->getAllRecordTypes()],
-            "dateAddedToCollection:dt",
-            "sort:i?",
-        ]);
-    }
-
-    /**
-     * Get the schema for the collection contents.
-     *
-     * @return Schema
-     */
-    private function collectionContentsSchema(): Schema
-    {
-        return Schema::parse([
-            "collectionID:i",
-            "recordType:s",
-            "recordID:i",
-            "dateAddedToCollection:dt",
-            "sort:i",
-            "collection:o?" => Schema::parse(["collectionID:i", "name:s"]),
-            "record:o",
-        ]);
-    }
-
-    /**
-     * Expand collection record
-     *
-     * @param array $results
-     * @return array
-     */
-    private function expandCollection(array $results): array
-    {
-        foreach ($results as &$result) {
-            $result["collection"] = [
-                "collectionID" => $result["collectionID"],
-                "name" => $result["name"],
-            ];
-        }
-        return $results;
     }
 }

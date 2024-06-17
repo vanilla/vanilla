@@ -117,8 +117,11 @@ TWIG
         }
 
         $notificationPreferences = $this->categoryModel->getPreferencesByCategoryID($userID, $categoryID);
-        $normalizedPreferences = $this->categoryModel->normalizePreferencesOutput($notificationPreferences);
-        $emailDigestEnabled = !Gdn::config("Garden.Email.Disabled") && Gdn::config("Garden.Digest.Enabled");
+        $normalizedPreferences = CategoriesApiController::normalizePreferencesOutput($notificationPreferences);
+        $emailDigestEnabled =
+            !Gdn::config("Garden.Email.Disabled") &&
+            Gdn::config("Garden.Digest.Enabled") &&
+            Gdn::config("Feature.Digest.Enabled");
         $isEmailDisabled =
             Gdn::config("Garden.Email.Disabled") || !Gdn::session()->checkPermission("Garden.Email.View");
         return [

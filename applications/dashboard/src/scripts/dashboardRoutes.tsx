@@ -6,7 +6,6 @@
 
 import { getDashboardUserManagementRoutes } from "@dashboard/users/userManagement/UserManagementRoutes";
 import RouteHandler from "@library/routing/RouteHandler";
-import { getAutomationRulesRoutes } from "@dashboard/automationRules/AutomationRules.routes";
 
 const RoleApplicationsRoute = new RouteHandler(
     () => import("@dashboard/roleRequests/pages/RoleApplicationsPage"),
@@ -14,17 +13,6 @@ const RoleApplicationsRoute = new RouteHandler(
     () => "/manage/requests/role-applications",
 );
 
-const AuditLogsRoute = new RouteHandler(
-    () => import("@dashboard/auditLogs/AuditLogsPage").then((imp) => imp.AuditLogsPage),
-    "/dashboard/settings/audit-logs",
-    () => "/dashboard/settings/audit-logs",
-);
-
 export function getDashboardRoutes() {
-    return [
-        RoleApplicationsRoute.route,
-        ...getDashboardUserManagementRoutes(),
-        ...getAutomationRulesRoutes(),
-        AuditLogsRoute.route,
-    ];
+    return [RoleApplicationsRoute.route, ...getDashboardUserManagementRoutes()];
 }

@@ -5,15 +5,21 @@
  */
 
 import React from "react";
-import { renderHook, RenderHookResult } from "@testing-library/react-hooks";
+import { renderHook, act } from "@testing-library/react-hooks";
 import { useApiLookup } from "./AutoCompleteLookupOptions";
 import { mockAPI } from "@library/__tests__/utility";
 import apiv2 from "@library/apiv2";
-import MockAdapter from "axios-mock-adapter";
+import { vitest } from "vitest";
 
-const makeSingleResponse = (id: string) => {
+vitest.mock("@vanilla/react-utils", () => ({
+    useIsMounted: () => {
+        return () => true;
+    },
+}));
+
+const makeSingleResponse = (id: number) => {
     return {
-        value: parseInt(id),
+        value: id,
         label: `label ${id}`,
     };
 };
@@ -29,106 +35,126 @@ const makeSearchResponse = (amount: number) => {
         });
 };
 
-const mockLookup = {
-    searchUrl: "http://vanillaforums.tld/search/%s",
-    singleUrl: "http://vanillaforums.tld/single/%s",
-    valueKey: "value",
-    labelKey: "label",
-    extraLabelKey: "extraLabel",
-    resultsKey: ".",
-    excludeLookups: ["exclude"],
-    processOptions: (options: any) => options,
-    group: "group",
-};
+describe("AutoCompleteLookupOptions", () => {
+    let mockAdapter: any;
 
-describe("useApiLookup", () => {
-    let mockAdapter: MockAdapter;
-
-    beforeAll(() => {
+    beforeEach(() => {
         mockAdapter = mockAPI();
     });
 
-    describe("handleSearch", () => {
-        const mockSearchTerm = "mock search term";
-        const searchResponse = makeSearchResponse(7);
-        let hookResult: RenderHookResult<unknown, ReturnType<typeof useApiLookup>>;
+    afterEach(() => {
+        mockAdapter.reset();
+    });
+    it("Options from search url are available for unpopulated input", async () => {
+        mockAdapter.onGet(/vanillaforums\.tld\/search/).reply(200, makeSearchResponse(7));
 
-        beforeAll(async () => {
-            mockAdapter.onGet(/vanillaforums\.tld\/search/).reply(200, searchResponse);
-            mockAdapter.onGet(/\/vanillaforums\.tld\/single\/\d+/).reply((config) => {
-                const id = config.url?.split("/").pop();
-                return [200, makeSingleResponse(id!)];
-            });
-            hookResult = renderHook(() => useApiLookup(mockLookup, apiv2));
-            await hookResult.result.current.handleSearch(mockSearchTerm);
+        const lookup = {
+            searchUrl: "http://vanillaforums.tld/search/%s",
+            singleUrl: "http://vanillaforums.tld/single/%s",
+            valueKey: "value",
+            labelKey: "label",
+            extraLabelKey: "extraLabel",
+            resultsKey: ".",
+            excludeLookups: ["exclude"],
+            processOptions: (options: any) => options,
+            group: "group",
+        };
+
+        const { result, unmount, waitForNextUpdate } = renderHook(() => {
+            return useApiLookup(lookup, apiv2, "", "", "");
         });
 
-        afterAll(() => {
-            mockAdapter.reset();
-        });
+        await waitForNextUpdate();
 
-        it("Makes a search request", async () => {
-            expect(mockAdapter.history.get.length).toBe(1);
-        });
-        it("saved the results", async () => {
-            expect(hookResult.result.current.options.length).toBe(searchResponse.length);
-        });
-
-        describe("Caching results", () => {
-            it("Will not make a second search request for the same search term", async () => {
-                await hookResult.result.current.handleSearch(mockSearchTerm);
-                expect(mockAdapter.history.get.length).toBe(1);
-            });
-
-            it("Will not make API requests for individual options which it has previously retrieved through search", async () => {
-                await hookResult.result.current.loadIndividualOptions([`${searchResponse[0].value}`]);
-                expect(mockAdapter.history.get.length).toBe(1);
-            });
-
-            it("Will make API requests for individual options which it has not previously retrieved through search", async () => {
-                await hookResult.result.current.loadIndividualOptions(["99"]);
-                expect(mockAdapter.history.get.length).toBe(2);
-            });
-        });
+        // There should be 3 items in the options
+        expect(result.current[0]?.length).toBe(7);
+        unmount();
     });
 
-    describe("loadIndividualOptions", () => {
-        const mockValues = ["1", "2", "3"];
-        let hookResult: RenderHookResult<unknown, ReturnType<typeof useApiLookup>>;
+    it("Options from search url are available for populated single input", async () => {
+        mockAdapter.onGet(/vanillaforums\.tld\/search/).reply(200, makeSearchResponse(3));
+        mockAdapter.onGet(/vanillaforums\.tld\/single\/21/).reply(200, makeSingleResponse(21));
 
-        beforeAll(async () => {
-            mockAdapter.onGet(/\/vanillaforums\.tld\/single\/\d+/).reply((config) => {
-                const id = config.url?.split("/").pop();
-                return [200, makeSingleResponse(id!)];
-            });
-            hookResult = renderHook(() => {
-                return useApiLookup(mockLookup, apiv2);
-            });
-            await hookResult.result.current.loadIndividualOptions(mockValues);
+        const lookup = {
+            searchUrl: "http://vanillaforums.tld/search/%s",
+            singleUrl: "http://vanillaforums.tld/single/%s",
+            valueKey: "value",
+            labelKey: "label",
+            extraLabelKey: "extraLabel",
+            resultsKey: ".",
+            excludeLookups: ["exclude"],
+            processOptions: (options: any) => options,
+            group: "group",
+        };
+
+        const { result, unmount, waitForNextUpdate } = renderHook(() => {
+            return useApiLookup(lookup, apiv2, "21", "21", "21");
         });
 
-        afterAll(() => {
-            mockAdapter.reset();
+        await waitForNextUpdate();
+        await waitForNextUpdate();
+
+        // There should be 3 items in the options
+        expect(result.current[0]?.length).toBe(3);
+        unmount();
+    });
+
+    it("Options from search url are available for populated multi-input", async () => {
+        mockAdapter.onGet(/vanillaforums\.tld\/search/).reply(200, makeSearchResponse(3));
+        mockAdapter.onGet(/vanillaforums\.tld\/single\/42/).reply(200, makeSingleResponse(42));
+        mockAdapter.onGet(/vanillaforums\.tld\/single\/78/).reply(200, makeSingleResponse(78));
+
+        const lookup = {
+            searchUrl: "http://vanillaforums.tld/search/%s",
+            singleUrl: "http://vanillaforums.tld/single/%s",
+            valueKey: "value",
+            labelKey: "label",
+            extraLabelKey: "extraLabel",
+            resultsKey: ".",
+            excludeLookups: ["exclude"],
+            processOptions: (options: any) => options,
+            group: "group",
+        };
+
+        const { result, unmount, waitForNextUpdate } = renderHook(() => {
+            return useApiLookup(lookup, apiv2, [42, 78], [42, 78], [42, 78]);
         });
 
-        it("Makes requests for each value", async () => {
-            expect(mockAdapter.history.get.length).toBe(mockValues.length);
-            expect(hookResult.result.current.options.length).toBe(mockValues.length);
+        await waitForNextUpdate();
+
+        // There should be 5 items in the options
+        expect(result.current[0]?.length).toBeGreaterThan(5);
+        unmount();
+    });
+
+    it("Requests each ID in array", async () => {
+        mockAdapter.onGet(/vanillaforums\.tld\/single\/1/).reply(200, makeSingleResponse(1));
+        mockAdapter.onGet(/vanillaforums\.tld\/single\/2/).reply(200, makeSingleResponse(2));
+
+        const lookup = {
+            searchUrl: "http://vanillaforums.tld/search/%s",
+            singleUrl: "http://vanillaforums.tld/single/%s",
+            valueKey: "value",
+            labelKey: "label",
+            extraLabelKey: "extraLabel",
+            resultsKey: "results",
+            excludeLookups: ["exclude"],
+            processOptions: (options: any) => options,
+            group: "group",
+        };
+
+        const { result, unmount, waitForNextUpdate } = renderHook(() => {
+            return useApiLookup(lookup, apiv2, [1, 2], [1, 2], [1, 2]);
         });
 
-        it("Will not request excluded values", async () => {
-            await hookResult.result.current.loadIndividualOptions([mockLookup.excludeLookups[0]]);
-            expect(mockAdapter.history.get.length).toBe(mockValues.length);
-        });
+        await waitForNextUpdate();
 
-        it("Does not make subsequent requests for cached values", async () => {
-            await hookResult.result.current.loadIndividualOptions(mockValues.slice(0, 1));
-            expect(mockAdapter.history.get.length).toBe(mockValues.length);
+        // Verify options are updated with both values
+        const options = result.current[0] ?? [];
+        [1, 2].forEach((id) => {
+            const option = options.find((o) => o.value === id);
+            expect(option).toBeTruthy();
         });
-
-        it("Will make subsequent request for non-cached values", async () => {
-            await hookResult.result.current.loadIndividualOptions(["98"]);
-            expect(mockAdapter.history.get.length).toBe(mockValues.length + 1);
-        });
+        unmount();
     });
 });

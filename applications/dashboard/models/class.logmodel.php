@@ -20,9 +20,6 @@ use Vanilla\Models\CommunityNotificationGenerator;
 use Vanilla\PrunableTrait;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
-use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
-use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
-use Garden\Web\Exception\NotFoundException;
 
 /**
  * Handles additional logging.
@@ -1422,95 +1419,5 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
         }
 
         return [strtolower($recordType) => $data];
-    }
-
-    /**
-     * Get the log for automation rules based on the dispatch UUID.
-     *
-     * @param string $dispatchUUID
-     * @param string $recordType
-     * @param int $limit
-     * @param int $offset
-     * @param bool $expandData
-     * @return array
-     * @throws NotFoundException
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws \Garden\Schema\ValidationException
-     * @throws \Vanilla\Exception\Database\NoResultsException
-     */
-    public function getAutomationLogsByDispatchID(
-        string $dispatchUUID,
-        string $recordType = "",
-        int $limit = 50,
-        int $offset = 0,
-        bool $expandData = false
-    ): array {
-        $automationRevisionModel = Gdn::getContainer()->get(AutomationRuleRevisionModel::class);
-        $automationRuleService = Gdn::getContainer()->get(AutomationRuleService::class);
-        if ($offset < 0) {
-            $offset = 0;
-        }
-        // Force the operation to be Automation
-        $where["l.Operation"] = "Automation";
-        $where["l.DispatchUUID"] = $dispatchUUID;
-
-        if (empty($recordType)) {
-            return $this->getWhere($where, "", "desc", $limit, $offset);
-        }
-        $sql = Gdn::sql();
-        $sql->select("l.*")->select("iu.Name as InsertName");
-        if ($recordType === "User") {
-            $sql->select(["u.Name as RecordName", "u.Email as RecordEmail"]);
-        } else {
-            $sql->select(["d.Name as RecordName", "d.Body as RecordBody", "d.Format"]);
-        }
-        $sql->from("Log l")->join("User iu", "l.InsertUserID = iu.UserID", "left");
-        if ($recordType === "User") {
-            $sql->join("User u", "l.RecordUserID = u.UserID", "left");
-        } else {
-            $sql->join("Discussion d", "l.RecordID = d.DiscussionID", "left");
-        }
-        $result = $sql
-            ->where($where)
-            ->limit($limit, $offset)
-            ->orderBy("l.LogID", "desc")
-            ->get()
-            ->resultArray();
-        if (!$result) {
-            return [];
-        }
-        $revisionID = $result[0]["AutomationRuleRevisionID"];
-        $revisionRecord = $automationRevisionModel->selectSingle(["automationRuleRevisionID" => $revisionID]);
-        if (empty($revisionRecord)) {
-            throw new NotFoundException("The revision data is not found for revisionID {$revisionID} is not found.", [
-                "automationRuleRevisionID" => $revisionID,
-                "automationRuleDispatchUUID" => $dispatchUUID,
-            ]);
-        }
-        if ($expandData) {
-            $actionType = $revisionRecord["actionType"];
-            $actionClass = $automationRuleService->getAction($actionType);
-            if (empty($actionClass)) {
-                throw new NotFoundException("The action class for actionType {$actionType} is not found.", [
-                    "actionType" => $actionType,
-                    "automationRuleRevisionID" => $revisionID,
-                    "automationRuleDispatchUUID" => $dispatchUUID,
-                ]);
-            }
-            $action = new $actionClass($revisionRecord["automationRuleID"]);
-        }
-        // Deserialize the data.
-        foreach ($result as &$row) {
-            $row["Data"] = dbdecode($row["Data"]);
-            if (!$row["Data"]) {
-                $row["Data"] = [];
-            }
-            if ($expandData) {
-                $row["logData"] = $action->expandLogData($row["Data"]);
-            }
-        }
-
-        return $result;
     }
 }

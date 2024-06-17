@@ -177,39 +177,6 @@ HTML;
     }
 
     /**
-     * Test replacing an embed iframe with a specified dom element.
-     *
-     * @return void
-     */
-    public function testReplaceEmbedsIFrame(): void
-    {
-        $dom = new HtmlDocument('<p><iframe src="https://test.test"></iframe></p>');
-        $expected = '<p><a href="https://test.test">https://test.test</a></p>';
-        $node = $dom->getDom()->createElement("a", "https://test.test");
-        $node->setAttribute("href", "https://test.test");
-        DomUtils::replaceEmbeds($dom->getDom(), $node, ["iframe"]);
-        $this->assertHtmlStringEqualsHtmlString($expected, $dom->getInnerHtml());
-    }
-
-    /**
-     * Test replacing a video with a specified dom element.
-     *
-     * @return void
-     * @throws \DOMException
-     */
-    public function testReplaceEmbedsVideo(): void
-    {
-        $dom = new HtmlDocument(
-            '<p><span class="VideoWrap"><a href="https://test.test">https://test.test</a></span></p>'
-        );
-        $expected = '<p><a href="https://test.test">https://test.test</a></p>';
-        $node = $dom->getDom()->createElement("a", "https://test.test");
-        $node->setAttribute("href", "https://test.test");
-        DomUtils::replaceEmbeds($dom->getDom(), $node);
-        $this->assertHtmlStringEqualsHtmlString($expected, $dom->getInnerHtml());
-    }
-
-    /**
      * Provide tests for `testStripImagesFixed()`.
      *
      * @return array

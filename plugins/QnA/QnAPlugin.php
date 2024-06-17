@@ -1547,7 +1547,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             $category = (array) $categoryModel->getByCode($categoryUrlCode);
             $category = $categoryModel::permissionCategory($category);
             $isAllowedTypes = isset($category["AllowedDiscussionTypes"]);
-            $isAllowedQuestion = in_array("Question", (array) $category["AllowedDiscussionTypes"] ?? []);
+            $isAllowedQuestion = in_array("Question", (array) $category["AllowedDiscussionTypes"]);
         }
 
         if ($category && !$isAllowedQuestion && $isAllowedTypes) {

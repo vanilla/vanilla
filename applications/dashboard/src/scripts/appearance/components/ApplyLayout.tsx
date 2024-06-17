@@ -169,7 +169,7 @@ export function ApplyLayout(props: IProps) {
                         choices: {
                             api: {
                                 searchUrl: `/subcommunities?name=%s`,
-                                singleUrl: `/subcommunities/%s`,
+                                singleUrl: `/subcommunities`,
                                 labelKey: "name",
                                 valueKey: "subcommunityID",
                                 extraLabelKey: "locale",

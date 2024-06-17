@@ -39,7 +39,7 @@ const ThreadItemActionsClasses = useThemeCache(() => {
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
-        gap: globalVars.gutter.half,
+        gap: globalVars.gutter.size,
     });
 
     const actionItem = css({

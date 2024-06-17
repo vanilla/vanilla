@@ -1,18 +1,17 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IUserFragment } from "@library/@types/api/users";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
-import UserActions, { useUserActions } from "@library/features/users/UserActions";
+import UserActions from "@library/features/users/UserActions";
 import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import NotificationsActions from "@library/features/notifications/NotificationsActions";
 import { useSelector } from "react-redux";
-import { useContext, useEffect } from "react";
 import { IUsersState, IInjectableUserState, IPermissions } from "./userTypes";
 import clone from "lodash-es/clone";
 
@@ -247,6 +246,7 @@ export function mapUsersStoreState(state: ICoreStoreState): IInjectableUserState
     };
 }
 
+/** @deprecated  */
 export function useUsersState(): IInjectableUserState {
     return useSelector(mapUsersStoreState);
 }

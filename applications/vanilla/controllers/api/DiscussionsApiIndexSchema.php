@@ -17,8 +17,8 @@ use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
-use Vanilla\Utility\SchemaUtils;
 
 /**
  * Parameter schema for the discussions API controller index.
@@ -34,10 +34,10 @@ class DiscussionsApiIndexSchema extends Schema
     {
         parent::__construct(
             $this->parseInternal([
-                "discussionID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"])->setField("x-filter", [
+                "discussionID?" => RangeExpression::createSchema([":int"])->setField("x-filter", [
                     "field" => "discussionID",
                 ]),
-                "categoryID:i?" => \Vanilla\Schema\RangeExpression::createSchema([":int"])
+                "categoryID:i?" => RangeExpression::createSchema([":int"])
                     ->setField("x-filter", [
                         "field" => "CategoryID",
                     ])
@@ -81,7 +81,7 @@ class DiscussionsApiIndexSchema extends Schema
                         "processor" => [DateFilterSchema::class, "dateFilterField"],
                     ],
                 ]),
-                "tagID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"]),
+                "tagID?" => RangeExpression::createSchema([":int"]),
                 "type:a?" => [
                     "description" => "Filter by discussion type.",
                     "x-filter" => [
@@ -106,6 +106,9 @@ class DiscussionsApiIndexSchema extends Schema
                     "description" =>
                         "Only fetch discussions from followed categories. Pinned discussions are mixed in.",
                 ],
+                "score?" => RangeExpression::createSchema([":int"])->setField("x-filter", [
+                    "field" => "Score",
+                ]),
                 "pinned:b?" => [
                     "x-control" => SchemaForm::toggle(new FormOptions("Announcements", "Only fetch announcements.")),
                 ],

@@ -57,6 +57,27 @@ class ProfileFieldsApiController extends \AbstractApiController
     }
 
     /**
+     * Get a single profile field
+     *
+     * @param string $apiName
+     * @return Data
+     */
+    public function get(string $apiName): Data
+    {
+        $this->permission("Garden.Settings.Manage");
+
+        $record = $this->profileFieldModel->selectSingle([
+            "apiName" => $apiName,
+        ]);
+
+        $out = $this->schema($this->profileFieldModel->getOutputSchema(), ["ProfileFieldOutput", "out"]);
+
+        $validatedRecord = $out->validate($record);
+
+        return new Data($validatedRecord);
+    }
+
+    /**
      * Create a profile field.
      *
      * @param array $body

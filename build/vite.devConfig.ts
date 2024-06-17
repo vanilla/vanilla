@@ -24,6 +24,22 @@ export default defineConfig(() => {
     return {
         ...commonConfig,
         mode: "development",
+        optimizeDeps: {
+            exclude: [
+                "@vanilla/utils",
+                "@vanilla/ui",
+                "@vanilla/react-utils",
+                "@vanilla/dom-utils",
+                "@vanilla/icons",
+                "@vanilla/i18n",
+            ],
+            include: [
+                "@vanilla/utils > tabbable",
+                "@vanilla/ui > @reach/accordion",
+                "@vanilla/ui > @reach/combobox",
+                "@vanilla/ui > @reach/rect",
+            ],
+        },
         define: {
             "process.env.NODE_ENV": '"development"',
             "process.env.IS_WEBPACK": true,

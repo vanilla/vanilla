@@ -14,8 +14,8 @@ use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
-use Mimey\MimeTypes;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Web\MimeTypeDetector;
 
 /**
  * Validation for uploaded files.
@@ -40,9 +40,6 @@ class UploadedFileSchema extends Schema
 
     /** @var bool */
     private $allowUnknownTypes = false;
-
-    /** @var MimeTypes */
-    private $mimeTypes;
 
     /** Trigger warning-level errors when content-type validation fails. */
     private $triggerContentTypeError = true;
@@ -97,8 +94,6 @@ class UploadedFileSchema extends Schema
 
         $this->setMaxSize($maxSize);
         $this->setAllowedExtensions(array_map("strtolower", $allowedExtensions));
-
-        $this->mimeTypes = new MimeTypes();
         $this->setAllowUnknownTypes($options[self::OPTION_ALLOW_UNKNOWN_TYPES] ?? false);
 
         parent::__construct([
@@ -222,14 +217,14 @@ class UploadedFileSchema extends Schema
      */
     private function validateContentTypeExtension(string $mime, string $extension, ValidationField $field): void
     {
-        $validExtensions = $this->mimeTypes->getAllExtensions($mime);
+        $validExtensions = MimeTypeDetector::getExtensionsForMimeType($mime);
 
         if (in_array($extension, $validExtensions) || $mime === self::TEXT_CONTENT_TYPE) {
             return;
         }
 
         if (!empty($mime)) {
-            $validTypes = $this->mimeTypes->getAllMimeTypes($extension);
+            $validTypes = MimeTypeDetector::getMimesForExtension($extension);
             // Check to see if the mime type is part of the valid mime type string.
             // This code looks redundant, but sometimes mime_content_type() returns odd double strings.
             // ex: application/vnd.openxmlformats-officedocument.wordprocessingml.documentapplication/vnd.openxmlformats-officedocument.wordprocessingml.document

@@ -1,12 +1,12 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { css } from "@emotion/css";
 import { useToast } from "@library/features/toaster/ToastContext";
-import { useCurrentUser, useCurrentUserID, useUser } from "@library/features/users/userHooks";
+import { useCurrentUser } from "@library/features/users/userHooks";
 import SmartLink from "@library/routing/links/SmartLink";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n";
@@ -38,21 +38,20 @@ function ToastContent() {
  * notify them if its unconfirmed
  */
 export function useEmailConfirmationToast() {
-    const data = useCurrentUser();
     const { addToast } = useToast();
     const currentUser = useCurrentUser();
     const isGuest = currentUser?.userID === 0;
     const toastID = useRef<string | null>(null);
 
     useEffect(() => {
-        if (data && !isGuest) {
-            if (!data.emailConfirmed && !toastID.current) {
+        if (currentUser && !isGuest) {
+            if (!currentUser.emailConfirmed && !toastID.current) {
                 toastID.current = addToast({
                     body: <ToastContent />,
                 });
             }
         }
-    }, [data]);
+    }, [currentUser]);
 
     return null;
 }

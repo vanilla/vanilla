@@ -34,7 +34,6 @@ use Vanilla\Formatting\TextDOMInterface;
 use Vanilla\Formatting\UserMentionsTrait;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\ArrayUtils;
-
 /**
  *
  */

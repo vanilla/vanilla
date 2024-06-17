@@ -278,11 +278,7 @@ class NotificationPreferencesApiController extends \AbstractApiController
      */
     public function validateLocale(string $selectedLocale): bool
     {
-        $enabledLocales = $this->localeModel->enabledLocalePacks();
-        if (!in_array("en", $enabledLocales)) {
-            $enabledLocales["en"] = "en";
-        }
-        return in_array($selectedLocale, $enabledLocales);
+        return $this->localeModel->isEnabled($selectedLocale);
     }
 
     /*

@@ -16,8 +16,8 @@ interface IProps {
     title: string;
     multiple: boolean;
     disabled: boolean;
-    value: string | List<string>;
-    allowedValues: List<string>;
+    value: string | string[];
+    allowedValues: string[];
     allowEmptyValue: boolean;
     onChange: (newValue: any) => void;
 }
@@ -31,12 +31,12 @@ export function SwaggerSelect(props: IProps) {
             className={cx(inputClasses().inputContainer, props.disabled && css(disabledInput()))}
             size="small"
             disabled={props.disabled}
-            value={extractListArray(props.value)}
+            value={props.value}
             placeholder={"--"}
             clear={true}
             multiple={props.multiple}
             onChange={props.onChange}
-            options={props.allowedValues.toArray().map((value) => {
+            options={props.allowedValues.map((value) => {
                 return {
                     label: value,
                     value,

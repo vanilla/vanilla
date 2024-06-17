@@ -176,6 +176,9 @@ class InternalRequest extends HttpRequest implements RequestInterface
         if (!empty($this->getBody())) {
             $request->setBody($this->getBody());
         }
+        foreach ($this->getHeaders() as $headerName => $_) {
+            $request->setHeader($headerName, $this->getHeader($headerName));
+        }
 
         return $request;
     }

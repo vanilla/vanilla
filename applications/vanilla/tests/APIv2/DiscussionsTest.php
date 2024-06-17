@@ -485,6 +485,78 @@ class DiscussionsTest extends AbstractResourceTest
     }
 
     /**
+     * Test GET `/discussions` API endpoint filtering by score.
+     */
+    public function testHasScoreFiltering()
+    {
+        $this->resetTable("Discussion");
+        $this->resetTable("Comment");
+        $this->createCategory([
+            "name" => "sortTestCategory",
+        ]);
+        $categoryId = $this->lastInsertedCategoryID;
+        $discussions = [];
+        // Create a discussion with a score value 1.
+        $discussions["score1"] = $this->createDiscussion([
+            "name" => "Discussion with score 1",
+            "categoryID" => $categoryId,
+            "score" => 1,
+        ]);
+        // Create 2 discussion with a score value 5.
+        $discussions["score5"][] = $this->createDiscussion([
+            "name" => "Discussion with score 5-1",
+            "categoryID" => $categoryId,
+            "score" => 5,
+        ]);
+        $discussions["score5"][] = $this->createDiscussion([
+            "name" => "Discussion with score 5-2",
+            "categoryID" => $categoryId,
+            "score" => 5,
+        ]);
+        // Create a discussion with a score value -3.
+        $discussions["score-3"][] = $this->createDiscussion([
+            "name" => "Discussion with score -3",
+            "categoryID" => $categoryId,
+            "score" => -3,
+        ]);
+
+        // Get a list of all discussion
+        $discussionList = $this->api()
+            ->get($this->baseUrl)
+            ->getBody();
+        $this->assertCount(4, $discussionList);
+
+        // Get a list of discussions with score 1.
+        $discussionWithScore1 = $this->api()
+            ->get($this->baseUrl, ["score" => 1])
+            ->getBody();
+
+        $this->assertCount(1, $discussionWithScore1);
+        $this->assertEquals($discussions["score1"]["discussionID"], $discussionWithScore1[0]["discussionID"]);
+        $this->assertEquals(1, $discussionWithScore1[0]["score"]);
+
+        // Get a list of discussions with score 5.
+        $discussionWithScore5 = $this->api()
+            ->get($this->baseUrl, ["score" => 5])
+            ->getBody();
+        $this->assertCount(2, $discussionWithScore5);
+        $this->assertContainsEquals($discussions["score5"][0]["discussionID"], [
+            $discussionWithScore5[0]["discussionID"],
+            $discussionWithScore5[1]["discussionID"],
+        ]);
+        $this->assertContainsEquals($discussions["score5"][1]["discussionID"], [
+            $discussionWithScore5[0]["discussionID"],
+            $discussionWithScore5[1]["discussionID"],
+        ]);
+
+        // Get a list of discussions with score -3.
+        $discussionWithScoreMinus3 = $this->api()
+            ->get($this->baseUrl, ["score" => -3])
+            ->getBody();
+        $this->assertCount(1, $discussionWithScoreMinus3);
+        $this->assertEquals($discussions["score-3"][0]["discussionID"], $discussionWithScoreMinus3[0]["discussionID"]);
+    }
+    /**
      * Test PATCH /discussions/<id> with a single field update.
      *
      * @param string $field The name of the field to patch.

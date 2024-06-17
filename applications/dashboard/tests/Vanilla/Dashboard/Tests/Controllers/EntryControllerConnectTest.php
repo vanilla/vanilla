@@ -146,10 +146,12 @@ class EntryControllerConnectTest extends SiteTestCase
         $categoryModel = $this->container()->get(\CategoryModel::class);
         $followedCategories = $categoryModel->getFollowed($ssoUSer["UserID"]);
         $userPreference = $categoryModel->getPreferencesByCategoryID($ssoUSer["UserID"], $categoryA["categoryID"]);
-        $this->assertEquals(
-            \CategoriesApiController::normalizePreferencesInput($defaultCategoryPreferences[0]["preferences"]),
-            $userPreference
-        );
+        $expectedPreferences = $categoryModel->normalizePreferencesInput($defaultCategoryPreferences[0]["preferences"]);
+
+        // We will loop through in case another test added some permissions.
+        foreach ($expectedPreferences as $key => $preference) {
+            $this->assertEquals($preference, $userPreference[$key]);
+        }
 
         $this->assertCount(1, $followedCategories);
         $this->assertArrayHasKey($categoryA["categoryID"], $followedCategories);

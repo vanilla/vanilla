@@ -27,11 +27,7 @@ export function DiscussionOriginalPostAssetPreview(props: IProps) {
     return (
         <Widget>
             <QueryClientProvider client={queryClient}>
-                <DiscussionOriginalPostAsset
-                    {...props}
-                    category={LayoutEditorPreviewData.discussion().category!}
-                    discussion={discussion}
-                />
+                <DiscussionOriginalPostAsset {...props} category={discussion.category!} discussion={discussion} />
             </QueryClientProvider>
         </Widget>
     );

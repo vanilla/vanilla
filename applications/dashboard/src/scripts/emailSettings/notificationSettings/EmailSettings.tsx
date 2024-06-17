@@ -24,7 +24,7 @@ import { MemoryRouter } from "react-router";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { getEmailSettingsSchemas } from "@dashboard/emailSettings/EmailSettings.utils";
-import { getDefaultValuesFromSchema } from "@vanilla/json-schema-forms/src/utils";
+import { extractDataByKeyLookup } from "@vanilla/json-schema-forms/src/utils";
 import { useFormik } from "formik";
 
 const EMAIL_STYLES_SECTION = "Email Styles";
@@ -39,7 +39,7 @@ export function EmailSettings() {
     const [showTestEmailModal, setShowTestEmailModal] = useState<boolean>(false);
     const [showPreviewEmailModal, setShowPreviewEmailModal] = useState<boolean>(false);
 
-    const defaultValues = getDefaultValuesFromSchema(emailSettingsSchema);
+    const defaultValues = extractDataByKeyLookup(emailSettingsSchema, "default");
 
     const isReady = isLoaded && !!settings.data;
 

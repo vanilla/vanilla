@@ -7,13 +7,18 @@
 
 namespace VanillaTests\Library\Core;
 
+use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\BootstrapTestCase;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\SiteTestCase;
 
 /**
  * Tests for the `Gdn_Smarty` class.
  */
-class SmartyTest extends BootstrapTestCase
+class SmartyTest extends SiteTestCase
 {
+    use CommunityApiTestTrait;
+
     /**
      * @var \Gdn_Smarty
      */
@@ -29,7 +34,6 @@ class SmartyTest extends BootstrapTestCase
         $dir = PATH_ROOT . "/tests/cache/smarty";
         touchFolder($dir);
         $this->smarty->smarty()->setCompileDir($dir);
-        $this->smarty->enableSecurity($this->smarty->smarty());
         $this->smarty->smarty()->setTemplateDir(PATH_ROOT . "/tests/fixtures/smarty");
     }
 
@@ -128,7 +132,7 @@ class SmartyTest extends BootstrapTestCase
      */
     public function testUnsafeTemplates(string $path): void
     {
-        $this->expectException(\SmartyCompilerException::class);
+        $this->expectException(\Smarty\CompilerException::class);
         $lines = file($path);
         $this->expectExceptionMessage(trim($lines[0]));
         $r = $this->fetch($path);
@@ -148,7 +152,7 @@ class SmartyTest extends BootstrapTestCase
         $exception = null;
         try {
             $rendered = $this->fetch($path);
-        } catch (\SmartyCompilerException $e) {
+        } catch (\Smarty\CompilerException $e) {
             $exception = $e;
         }
 
@@ -226,5 +230,23 @@ class SmartyTest extends BootstrapTestCase
         foreach ($paths as $path) {
             yield basename($path) => [$path];
         }
+    }
+
+    /**
+     * Test that we can render our a legacy default.master.tpl
+     */
+    public function testRenderKeystoneDiscussions()
+    {
+        \Gdn::config()->saveToConfig("Garden.Theme", "keystone");
+
+        $this->createDiscussion(["name" => "hello world"]);
+        $html = $this->bessy()->getHtml(
+            "/discussions",
+            [],
+            [
+                TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL,
+            ]
+        );
+        $html->assertContainsString("hello world");
     }
 }

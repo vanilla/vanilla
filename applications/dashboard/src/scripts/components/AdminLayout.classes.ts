@@ -27,6 +27,7 @@ export const adminLayoutClasses = useThemeCache(() => {
     const layout = css({
         display: "flex",
         flex: 1,
+        minHeight: "100%",
     });
 
     const leftPanel = css({

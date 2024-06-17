@@ -114,11 +114,15 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
             {displayResolved && (
                 <MetaIcon
                     className={classes.resolved}
-                    icon={resolved ? "meta-resolved" : "meta-unresolved"}
+                    icon={resolved ? "cmd-approve" : "cmd-alert"}
                     aria-label={resolved ? t("Resolved") : t("Unresolved")}
                 />
             )}
-            {closed && <MetaTag tagPreset={variables.labels.tagPreset}>{t("Closed")}</MetaTag>}
+            {closed && (
+                <MetaTag tagPreset={variables.labels.tagPreset} className={classes.closedTag}>
+                    {t("Closed")}
+                </MetaTag>
+            )}
 
             {pinned && <MetaTag className={classes.announcementTag}>{t("Announcement")}</MetaTag>}
 

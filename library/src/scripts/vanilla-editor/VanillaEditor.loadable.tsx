@@ -87,6 +87,7 @@ interface IProps {
     editorRef?: React.RefObject<MyEditor>;
     showConversionNotice?: boolean;
     onBlur?: React.TextareaHTMLAttributes<HTMLDivElement>["onBlur"];
+    containerClasses?: string;
 }
 
 export function createVanillaEditor(options?: { initialValue?: MyEditor; id?: string }) {
@@ -223,7 +224,7 @@ export function VanillaEditorLoadable(props: IProps) {
             >
                 <ConversionNotice showConversionNotice={showConversionNotice} />
                 <VanillaEditorBoundsContext>
-                    <VanillaEditorContainer boxShadow>
+                    <VanillaEditorContainer boxShadow className={props.containerClasses}>
                         <VanillaEditorFocusContext>
                             <Plate<MyValue>
                                 id={editorID}

@@ -36,13 +36,12 @@ class CategorySiteMetaExtra extends SiteMetaExtra
      */
     public function getValue(): array
     {
-        $featureFlag = $this->config->get("Feature.Digest.Enabled", false);
         $digestConfig = $this->config->get("Garden.Digest.Enabled", false);
         $emailDisabled = $this->config->get("Garden.Email.Disabled");
         return [
             "emails" => [
                 "enabled" => !$emailDisabled,
-                "digest" => !$emailDisabled && $digestConfig && $featureFlag,
+                "digest" => !$emailDisabled && $digestConfig,
             ],
         ];
     }

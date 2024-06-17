@@ -1,0 +1,144 @@
+{
+	"Doc Block Enum": {
+		"prefix": "@enum",
+		"description": "Outputs a single enum line for a doc block.",
+		"body": [
+			"@enum ${1:option1} | ${2:option2}"
+		]
+	},
+	"Doc Block Expand Options": {
+		"prefix": "@expand",
+		"description": "Outputs a single expand line for a doc block.",
+		"body": [
+			"@expand ${1|background,border,box,button,clickable,contentBoxes,contributionItems,font,spacing,stackedList,tag|}"
+		]
+	},
+	"Theme Variable Group": {
+		"prefix": "@varGroup",
+		"description": "Outputs a default doc block for theme variable groups.",
+		"body": [
+			"/**",
+			" * @varGroup ${1/(\\s)/./g}",
+			" * @access ${3|internal,public|}",
+			" */"
+		]
+	},
+	"Theme Variable": {
+		"prefix": "@var",
+		"description": "Outputs a doc block for a theme variable.",
+		"body": [
+			"/**",
+			" * @var ${1/(\\s)/./g}",
+			" * @type ${2:number | string}",
+			" * @access ${3|internal,public|}",
+			" */"
+		]
+	},
+	"Enum Variable": {
+		"prefix": "@varEnum",
+		"description": "Outputs a doc block for a theme variable that requires specific choices.",
+		"body": [
+			"/**",
+			" * @var ${1/(\\s)/./g}",
+			" * @description ${2:Value must be one of the given options.}",
+			" * @type ${3|string,number|}",
+			" * @enum ${4:option1} | ${5:option2}",
+			" * @access ${6|internal,public|}",
+			" */"
+		]
+	},
+	"Color Variable": {
+		"prefix": "@varColor",
+		"description": "Outputs a doc block for a color variable.",
+		"body": [
+			"/**",
+			" * @var ${1/(\\s)/./g}",
+			" * @title ${2:Color}",
+			" * @description ${3:Hexidecimal colors preferred (Either #RRGGBB or #RRGGBBAA)}",
+			" * @type string",
+			" * @format color",
+			" * @access ${4|internal,public|}",
+			" */"
+		]
+	},
+	"URL Variable": {
+		"prefix": "@varUrl",
+		"description": "Outputs a doc block for a URL variable.",
+		"body": [
+			"/**",
+			" * @var ${1/(\\s)/./g}",
+			" * @title ${2:URL}",
+			" * @description ${3:URL to a resource}",
+			" * @type string",
+			" * @format url",
+			" * @access ${4|internal,public|}",
+			" */"
+		]
+	},
+	"Alignment Variable": {
+		"prefix": "@varAlignment",
+		"description": "Outputs a doc block for an alignment variable.",
+		"body": [
+			"/**",
+			" * @var ${1/(\\s)/./g}",
+			" * @title ${2:Alignment}",
+			" * @type string",
+			" * @enum left | center | right",
+			" * @access ${3|internal,public|}",
+			" */"
+		]
+	},
+	"BorderType Variable": {
+		"prefix": "@varBorderType",
+		"description": "Outputs a doc block for a BorderType variable.",
+		"body": [
+			"/**",
+			" * @var ${1/(\\s)/./g}",
+			" * @title ${2:Border Type}",
+			" * @type string",
+			" * @enum border | separator | separator_between | none | shadow | shadow_as_border",
+			" * @access ${3|internal,public|}",
+			" */"
+		]
+	},
+	"TagPreset Variable": {
+		"prefix": "@varTagPreset",
+		"description": "Outputs a doc block for a TagPreset variable.",
+		"body": [
+			"/**",
+			" * @var ${1/(\\s)/./g}",
+			" * @title ${2:Tag Preset}",
+			" * @type string",
+			" * @enum standard | primary | greyscale | colored | success | error",
+			" * @access ${3|internal,public|}",
+			" */"
+		]
+	
+	},
+	"ButtonPreset Variable": {
+		"prefix": "@varButtonPreset",
+		"description": "Outputs a doc block for a ButtonPreset variable.",
+		"body": [
+			"/**",
+			" * @var ${1/(\\s)/./g}",
+			" * @title ${2:Button Preset}",
+			" * @type string",
+			" * @enum solid | outline | transparent | advanced | hide",
+			" * @access ${3|internal,public|}",
+			" */"
+		]
+	},
+	"ButtonType Variable": {
+		"prefix": "@varButtonType",
+		"description": "Outputs a doc block for a ButtonType variable.",
+		"body": [
+			"/**",
+			" * @var ${1/(\\s)/./g}",
+			" * @title ${2:Button Type}",
+			" * @type string",
+			" * @enum standard | primary | outline | transparent | translucid | custom | reset | radioAsButton | text | textPrimary | icon | iconMember | iconCompact | titleBarLink | dashboardStandard | dashboardPrimary | dashboardSecondary | dashboardLink | notStandard",
+			" * @access ${3|internal,public|}",
+			" */"
+		]
+	}
+}

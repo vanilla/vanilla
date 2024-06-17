@@ -38,7 +38,7 @@ interface DashboardMeBoxProps extends IMeBoxProps {
  */
 export default function DashboardMeBox(props: DashboardMeBoxProps) {
     const { currentUser, forceOpen, forceOpenAsModal } = props;
-    const userInfo = currentUser.data;
+    const userInfo = currentUser;
     const user = useUser({ userID: userInfo?.userID as number });
     const signOutUrl = useSignOutLink();
     const siteID = getMeta("context.siteID");

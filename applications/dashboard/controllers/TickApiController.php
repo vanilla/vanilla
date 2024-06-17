@@ -5,31 +5,32 @@
  */
 
 use Garden\Web\Data;
+use Garden\Web\RequestInterface;
 use Gdn_Statistics as Statistics;
 use Vanilla\Analytics\EventProviderService;
 use Vanilla\Utility\UrlUtils;
+use Vanilla\Web\BotDetector;
 
 /**
  * API Controller for site analytics.
  */
 class TickApiController extends AbstractApiController
 {
-    /** @var Statistics */
     private Statistics $statistics;
-
-    /** @var EventProviderService */
     private EventProviderService $eventProviderService;
+    private BotDetector $botDetector;
 
     /**
-     * TickApiController constructor.
-     *
-     * @param Statistics $statistics
-     * @param EventProviderService $eventProviderService
+     * DI.
      */
-    public function __construct(Statistics $statistics, EventProviderService $eventProviderService)
-    {
+    public function __construct(
+        Gdn_Statistics $statistics,
+        EventProviderService $eventProviderService,
+        BotDetector $botDetector
+    ) {
         $this->statistics = $statistics;
         $this->eventProviderService = $eventProviderService;
+        $this->botDetector = $botDetector;
     }
 
     /**
@@ -65,11 +66,19 @@ class TickApiController extends AbstractApiController
      * Collect an analytics tick.
      *
      * @param array $body
+     * @param RequestInterface $request
+     *
      * @return Data
      * @throws Exception
      */
-    public function post(array $body): Data
+    public function post(array $body, RequestInterface $request): Data
     {
+        if ($this->botDetector->isBot($request)) {
+            // Don't do anything if the request is from a bot.
+            // We don't want to track bots.
+            return new Data(["didTrack" => false, "message" => "Bot request"]);
+        }
+
         $this->statistics->tick();
         $this->statistics->fireEvent("AnalyticsTick");
 
@@ -85,6 +94,6 @@ class TickApiController extends AbstractApiController
         }
 
         $this->eventProviderService->handleRequest($body);
-        return new Data("");
+        return new Data(["didTrack" => true]);
     }
 }

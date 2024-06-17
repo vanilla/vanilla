@@ -29,8 +29,10 @@ class TickTest extends SiteTestCase
                 "Garden.Analytics.Views.DenormalizeWriteback" => 1,
             ],
             function () {
-                $this->expectNotToPerformAssertions();
-                $this->api()->post("tick");
+                $body = $this->api()
+                    ->post("tick")
+                    ->getBody();
+                $this->assertEquals(true, $body["didTrack"]);
             }
         );
     }
@@ -53,7 +55,11 @@ class TickTest extends SiteTestCase
 
             // Test recording an ipv6 address
             \Gdn::request()->setIP("2001:0db8:85a3:0000:0000:8a2e:0370:7334");
-            $this->api()->post("tick");
+            $body = $this->api()
+                ->post("tick")
+                ->getBody();
+            $this->assertEquals(true, $body["didTrack"]);
+
             $ips = $userModel->getIPs($user["userID"]);
             $this->assertCount(2, $ips);
             $this->assertSame("2001:db8:85a3::8a2e:370:7334", $ips[1]); // shortened ipv6 format
@@ -64,5 +70,23 @@ class TickTest extends SiteTestCase
             $ips = $userModel->getIPs($user["userID"]);
             $this->assertCount(2, $ips);
         }, $user);
+    }
+
+    /**
+     * Test that we don't track events from bots.
+     *
+     * @return void
+     */
+    public function testNoTrackBot()
+    {
+        $body = $this->api()
+            ->post("/tick", [], ["User-Agent" => "Googlebot/2.1"])
+            ->getBody();
+        $this->assertFalse($body["didTrack"]);
+
+        $body = $this->api()
+            ->post("/tick", [], ["X-Known-Bot" => "1"])
+            ->getBody();
+        $this->assertFalse($body["didTrack"]);
     }
 }

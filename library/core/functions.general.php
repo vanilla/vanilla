@@ -641,18 +641,22 @@ if (!function_exists("dateCompare")) {
      *
      * This function compares two dates in a way that is similar to {@link strcmp()}.
      *
-     * @param int|string $date1 A timestamp or string representation of a date.
-     * @param int|string $date2 A timestamp or string representation of a date.
+     * @param int|string|DateTimeInterface $date1 A timestamp or string representation of a date.
+     * @param int|string|DateTimeInterface $date2 A timestamp or string representation of a date.
      * @return int Returns < 0 if {@link $date1} is less than {@link $date2}; > 0 if {@link $date1} is greater than
      * {@link $date2}, and 0 if they are equal.
      * @since 2.1
      */
     function dateCompare($date1, $date2)
     {
-        if (!is_numeric($date1)) {
+        if ($date1 instanceof DateTimeInterface) {
+            $date1 = $date1->getTimestamp();
+        } elseif (!is_numeric($date1)) {
             $date1 = strtotime($date1);
         }
-        if (!is_numeric($date2)) {
+        if ($date2 instanceof DateTimeInterface) {
+            $date2 = $date2->getTimestamp();
+        } elseif (!is_numeric($date2)) {
             $date2 = strtotime($date2);
         }
 

@@ -12,7 +12,7 @@
  * @param array $params The parameters passed into the function. This currently takes no parameters.
  *  - <b>code</b>: The text code set in the theme's information.
  *  - <b>default</b>: The default text if the user hasn't overridden.
- * @param Smarty $smarty The smarty object rendering the template.
+ * @param Smarty\Smarty $smarty The smarty object rendering the template.
  * @return string The text.
  */
 function smarty_function_text($params, &$smarty)

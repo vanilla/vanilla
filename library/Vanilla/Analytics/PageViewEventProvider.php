@@ -41,7 +41,7 @@ class PageViewEventProvider implements EventProviderInterface
     {
         return Schema::parse([
             "url:s?" => [
-                "description" => "URL of page view to track for analytics",
+                "description" => "URL of the current page",
             ],
             "referrer:s?" => [
                 "description" => "URL of referrer",

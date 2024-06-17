@@ -282,7 +282,11 @@ components:
                     items:
                         type: integer
                     type: array
+                intitialBody:
+                    description: Initial convesation message body.
+                    type: string
+                initialFormat:
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/Format"
             required:
                 - participantUserIDs
-                - name
             type: object

@@ -16,6 +16,7 @@ use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\HtmlUtils;
 use Vanilla\Utility\StringUtils;
 use Vanilla\Web\Asset\LegacyAssetModel;
+use Vanilla\Web\Asset\LocaleAsset;
 use Vanilla\Web\Asset\NoScriptStylesAsset;
 use Vanilla\Web\Asset\ViteAssetProvider;
 use Vanilla\Web\CacheControlConstantsInterface;
@@ -2190,6 +2191,9 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             // Only get css & ui Components if this is NOT a syndication request
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
                 $cssAnchors = LegacyAssetModel::getAnchors();
+                $assetProvider = \Gdn::getContainer()->get(ViteAssetProvider::class);
+                $bootstrapInline = $assetProvider->getBootstrapInlineScript();
+                $this->Head->addScript("", "", false, ["content" => $bootstrapInline, HeadModule::SORT_KEY => -1]);
 
                 $this->EventArguments["CssFiles"] = &$this->_CssFiles;
                 $this->fireEvent("BeforeAddCss");
@@ -2301,7 +2305,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                     }
                 }
 
-                $this->addViteAsseViteAssts();
+                $this->addViteAssets();
                 $this->addThemeAssets();
                 $this->registerDashboardReduxActions();
 
@@ -2475,13 +2479,16 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
      */
     private function addThemeAssets()
     {
-        if (!$this->allowCustomTheming || !$this->isRenderingMasterView() || $this->MasterView === "admin") {
+        if (!$this->isRenderingMasterView()) {
             // We only want to load theme data for full page loads & controllers that require theming data.
             return;
         }
 
         /** @var ThemePreloadProvider $themeProvider */
         $themeProvider = Gdn::getContainer()->get(ThemePreloadProvider::class);
+        if (!$this->allowCustomTheming || $this->MasterView === "admin") {
+            $themeProvider->setForcedThemeKey("theme-dashboard");
+        }
 
         $this->registerReduxActionProvider($themeProvider);
         $themeScript = $themeProvider->getThemeScript();
@@ -2495,12 +2502,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     /**
      * Add the assets from ViteAssetProvider to the page.
      */
-    private function addViteAsseViteAssts()
+    private function addViteAssets()
     {
         $assetProvider = \Gdn::getContainer()->get(ViteAssetProvider::class);
         $section = $this->MasterView === "admin" ? "admin" : "forum";
-        $bootstrapInline = $assetProvider->getBootstrapInlineScript();
-        $this->Head->addScript("", "module", false, ["content" => $bootstrapInline]);
         if ($assetProvider->isHotBuild()) {
             $hotBuildInline = $assetProvider->getHotBuildInlineScript();
             $this->Head->addScript("", "module", false, ["content" => $hotBuildInline]);
@@ -2509,8 +2514,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             $assets = $assetProvider->getEnabledEntryAssets($section);
         }
         foreach ($assets as $viteAsset) {
-            if ($viteAsset->isScript()) {
+            if ($viteAsset->isScriptModule()) {
                 $this->Head->addScript($viteAsset->getWebPath(), "module", false);
+            } elseif ($viteAsset->isScript()) {
+                $this->Head->addScript($viteAsset->getWebPath(), "text/javascript", false, ["defer" => "defer"]);
             } elseif ($viteAsset->isStyleSheet()) {
                 $this->Head->addCss($viteAsset->getWebPath(), null, false);
             }

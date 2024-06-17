@@ -105,16 +105,16 @@ class BuildCommand extends Console\Command\Command
             $env["BUILD_VERBOSE"] = "true";
         }
 
-        $command = ["yarn"];
+        $command = [];
         if ($this->isDev) {
             // Dev build.
-            $command[] = "vite --config ./build/vite.devConfig.ts";
+            $command[] = "yarn vite --config ./build/vite.devConfig.ts";
             if ($this->isVerbose) {
                 $command[] = "--debug";
             }
         } else {
             // Prod build
-            $command[] = "esrun ./build/vite.buildProd.ts";
+            $command[] = "node -r esbuild-register ./build/vite.buildProd.ts";
             if ($this->isAnalyze) {
                 $env["BUILD_ANALYZE"] = "true";
             }

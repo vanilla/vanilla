@@ -278,6 +278,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver
                 case "longtext":
                     $length = self::BYTE_LENGTH_LONGTEXT;
                     break;
+                case "datetime":
+                    $precision = $length;
+                    $length = null;
             }
 
             // MySQL 8.0+ returns types without parenthesis like "int unsigned"

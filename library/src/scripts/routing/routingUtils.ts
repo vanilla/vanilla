@@ -8,6 +8,7 @@ import { INavigationItem } from "@library/@types/api/core";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import { siteUrl } from "@library/utility/appUtils";
 import { isNumeric, spaceshipCompare } from "@vanilla/utils";
+import qs from "qs";
 import { useLocation } from "react-router";
 
 export function findMatchingPath(paths: string[], currentPath: string): string | null {
@@ -55,8 +56,9 @@ export function useActiveNavRecord(
 export function useQueryParam<T>(param: string): T | null;
 export function useQueryParam<T>(param: string, defaultValue: T): T;
 export function useQueryParam<T>(param: string, defaultValue?: T): T | null {
-    const query = new URLSearchParams(useLocation().search);
-    let paramValue = query.get(param);
+    const search = useLocation().search;
+    const query = qs.parse(search, { ignoreQueryPrefix: true });
+    let paramValue = query[param];
 
     if (paramValue == null) {
         return defaultValue ?? null;

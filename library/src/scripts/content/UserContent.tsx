@@ -16,6 +16,7 @@ interface IProps {
     className?: string;
     content: string;
     ignoreHashScrolling?: boolean;
+    moderateEmbeds?: boolean;
 }
 
 /**
@@ -26,6 +27,12 @@ interface IProps {
 export default function UserContent(props: IProps) {
     let content = props.content;
     content = useUnsafeResponsiveTableHTML(content);
+    const contentWithModerationContainers = useModerateEmbeds(content);
+
+    if (props.moderateEmbeds) {
+        content = contentWithModerationContainers;
+    }
+
     useHashScrolling(content, props.ignoreHashScrolling);
 
     const classes = userContentClasses();
@@ -52,6 +59,36 @@ function useUnsafeResponsiveTableHTML(html: string) {
         element.innerHTML = html;
 
         element.querySelectorAll("table").forEach(responsifyTable);
+
+        return element.innerHTML;
+    }, [html]);
+}
+
+function useModerateEmbeds(html: string) {
+    return useMemo(() => {
+        const element = document.createElement("div");
+        element.innerHTML = html;
+
+        const embedsArray = Array.from(element.getElementsByClassName("embedImage-link")).concat(
+            Array.from(element.getElementsByClassName("js-embed")),
+        );
+
+        embedsArray.forEach((embed) => {
+            const outerContainer = document.createElement("div");
+            outerContainer.classList.add("moderationImageAndButtonContainer");
+
+            const moderationContainer = document.createElement("div");
+            moderationContainer.classList.add("moderationContainer");
+            moderationContainer.classList.add("blur");
+
+            // wrap the image/embed in the container which will be blurred
+            embed.parentNode?.insertBefore(moderationContainer, embed);
+            moderationContainer.appendChild(embed);
+
+            // Wrap button and embeded image in outer container
+            moderationContainer.parentNode?.insertBefore(outerContainer, moderationContainer);
+            outerContainer.appendChild(moderationContainer);
+        });
 
         return element.innerHTML;
     }, [html]);

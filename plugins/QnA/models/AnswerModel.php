@@ -51,7 +51,7 @@ class AnswerModel implements EventFromRowInterface
      */
     public function normalizeRow(array $row): array
     {
-        $out = $this->commentModel->schema()->merge(Schema::parse(["qnA:s?", "dateAccepted:s?", "acceptUserID:s?"]));
+        $out = $this->commentModel->schema()->merge(Schema::parse(["qnA:s?", "dateAccepted:s?", "acceptedUserID:s?"]));
         // Preserve original attributes
         $attributes = $row["attributes"] ?? [];
 

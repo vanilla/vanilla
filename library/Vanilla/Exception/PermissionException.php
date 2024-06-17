@@ -14,6 +14,9 @@ use Garden\Web\Exception\ForbiddenException;
  */
 class PermissionException extends ForbiddenException
 {
+    /** @var string|string[] */
+    private $permission;
+
     /**
      * Construct a {@link PermissionException} object.
      *
@@ -22,6 +25,7 @@ class PermissionException extends ForbiddenException
      */
     public function __construct($permission, array $context = [])
     {
+        $this->permission = $permission;
         $permissions = array_filter((array) $permission, function ($v) {
             return $v[0] !== "!";
         });
@@ -39,5 +43,13 @@ class PermissionException extends ForbiddenException
         $message = \Gdn::translate("Permission Problem");
 
         parent::__construct($message, $context);
+    }
+
+    /**
+     * @return string|string[]
+     */
+    public function getPermission()
+    {
+        return $this->permission;
     }
 }

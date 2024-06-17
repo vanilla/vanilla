@@ -1,0 +1,505 @@
+openapi: 3.0.2
+info:
+paths:
+    /reports:
+        post:
+            tags: ["Reports & Escalations"]
+            summary: Create a report
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ReportInsert"
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Report"
+
+        get:
+            tags:
+                - Reports & Escalations
+            summary: Get a list of reports
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Report"
+            parameters:
+                - name: recordType
+                  in: query
+                  schema:
+                      type: string
+                      enum: ["discussion", "comment"]
+                - name: reportReasonID
+                  description: Filter by a report reason. Multiple reasonIDs can be passed in a CSV or array.
+                  in: query
+                  schema:
+                      type: string
+                - name: recordID
+                  description: Filter by a range or CSV of discussion recordIDs.
+                  in: query
+                  schema:
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
+                - name: placeRecordType
+                  in: query
+                  schema:
+                      type: string
+                      enum: ["category"]
+                - name: placeRecordID
+                  description: Filter by a range or CSV of category placeRecordIDs.
+                  in: query
+                  schema:
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
+                - name: insertUserID
+                  description: Filter by a range or CSV of users that made the report.
+                  in: query
+                  schema:
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
+                - name: insertUserRoleID
+                  description: Filter by a range or CSV of users' roles that made the report.
+                  in: query
+                  schema:
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
+                - name: recordUserID
+                  description: Filter by a range or CSV of users who's content was reported.
+                  in: query
+                  schema:
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
+                - name: status
+                  description: Filter by one or more statuses (CSV & array supported).
+                  in: query
+                  schema:
+                      type: array
+                      default:
+                          - new
+                      items:
+                          type: string
+                          enum:
+                              - new
+                              - escalated
+                              - dismissed
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+                - description: |
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 100
+                      maximum: 500
+                      minimum: 1
+    /reports/dismiss:
+        post:
+            tags:
+                - Reports & Escalations
+            summary: Dismiss a report
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                reportID:
+                                    description: The ID of the report to dismiss
+                                    type: integer
+                                verifyRecordUser:
+                                    description: Mark the user that was reported as verified. This prevents them from tripping spam automations in the future.
+                                    type: boolean
+                            required:
+                                - reportID
+            responses:
+                "204":
+                    description: No Content
+    /reports/reasons:
+        get:
+            tags:
+                - Reports & Escalations
+            summary: Get a list of report reasons
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/ReportReason"
+    /reports/:reportID:
+        get:
+            tags:
+                - Reports & Escalations
+            summary: Get a report
+            parameters:
+                - name: reportID
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Report"
+    /reports/triage:
+        get:
+            tags:
+                - Reports & Escalations
+            summary: Get a list of posts to be triaged
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                      type: integer
+                - name: page
+                  in: query
+                  schema:
+                      type: integer
+                      default: 1
+                - name: internalStatusID
+                  in: query
+                  schema:
+                      type: integer
+                - name: recordUserID
+                  description: Filter by a range or CSV of users who created the content.
+                  in: query
+                  schema:
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
+                - name: recordUserRoleID
+                  description: Filter by a range or CSV of users' roles who created the content.
+                  in: query
+                  schema:
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
+                - name: sort
+                  in: query
+                  schema:
+                      type: string
+                      enum: ["recordDateInserted", "-recordDateInserted"]
+                      default: "-recordDateInserted"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+                - description: |
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 100
+                      maximum: 500
+                      minimum: 1
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/TriageRecord"
+#        delete:
+#            tags:
+#                - Reports & Escalations
+#            summary: Delete a report
+#            parameters:
+#                - name: reportID
+#                  in: path
+#                  required: true
+#                  schema:
+#                      type: integer
+#            responses:
+#                "204":
+#                    description: No Content
+
+components:
+    schemas:
+        ReportReasonFragment:
+            type: object
+            properties:
+                reportReasonID:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                sort:
+                    type: integer
+                reportID:
+                    type: integer
+            required: ["reportReasonID", "name", "description", "sort"]
+        ReportReason:
+            type: object
+            properties:
+                reportReasonID:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                dateInserted:
+                    type: string
+                    format: date-time
+                dateUpdated:
+                    type: string
+                    format: date-time
+                insertUserID:
+                    type: integer
+                updateUserID:
+                    type: integer
+                sort:
+                    type: integer
+            required:
+                - reportReasonID
+                - name
+                - description
+                - dateInserted
+                - insertUserID
+                - sort
+        ReportInsert:
+            type: object
+            properties:
+                recordType:
+                    description: Type of record being reported.
+                    type: string
+                    enum: ["discussion", "comment"]
+                recordID:
+                    description: ID of the record being reported.
+                    type: integer
+                reportReasonIDs:
+                    description: One or more reasons for the report.
+                    type: array
+                    items:
+                        type: string
+                    example: ["spam", "fraud-or-scam"]
+                noteBody:
+                    description: Additional information about the report.
+                    type: string
+                noteFormat:
+                    description: Format of the note field.
+                    type: string
+            required:
+                - recordType
+                - recordID
+                - reportReasonIDs
+                - noteBody
+                - noteFormat
+        TriageRecord:
+            type: object
+            properties:
+                # Information about the record
+                recordType:
+                    description: Type of record being reported.
+                    type: string
+                    enum: ["discussion", "comment"]
+                recordID:
+                    description: ID of the record being reported.
+                    type: integer
+                recordName:
+                    description: Name of the record being reported.
+                    type: string
+                recordHtml:
+                    description: Rendered HTML contents of the reported record.
+                    type: string
+                recordExcerpt:
+                    description: Excerpt of the reported record.
+                    type: string
+                recordUrl:
+                    description: URL of the record being reported.
+                    type: string
+                recordIsLive:
+                    description: Whether the record still exists.
+                    type: boolean
+                recordWasEdited:
+                    description: Whether the record was edited after the report was made.
+                    type: boolean
+                placeRecordType:
+                    description: Type of record the reported record is placed in.
+                    type: string
+                    enum: ["category"]
+                placeRecordID:
+                    description: ID of the record the reported record is placed in.
+                    type: integer
+                placeRecordName:
+                    description: Name of the record the reported record is placed in.
+                    type: string
+                placeRecordUrl:
+                    description: URL of the record the reported record is placed in.
+                    type: string
+                    format: uri
+                recordUserID:
+                    description: ID of the user who made the reported record.
+                    type: integer
+                recordUser:
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                recordDateInserted:
+                    type: string
+                    format: date-time
+                recordDateUpdated:
+                    type: string
+                    format: date-time
+
+                # Triage contents
+                reportReasons:
+                    description: Full report reasons
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/ReportReasonFragment"
+                countReports:
+                    description: The number of reports made about this record.
+                    type: integer
+                countReportUsers:
+                    description: The number of unique users who have reported this record.
+                    type: integer
+                reportUserIDs:
+                    description: The IDs of the users who have reported this record.
+                    type: array
+                    items:
+                        type: integer
+                reportUsers:
+                    description: The users who have reported this record.
+                    type: array
+                    items:
+                        $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                dateLastReport:
+                    description: The date of the most recent report made about this record.
+                    type: string
+                    format: date-time
+            required:
+                - recordType
+                - recordID
+                - recordName
+                - recordHtml
+                - recordUrl
+                - recordIsLive
+                - recordWasEdited
+                - recordUserID
+                - recordDateInserted
+                - placeRecordType
+                - placeRecordID
+                - reportReasons
+                - countReportUsers
+                - countReports
+                - reportUserIDs
+                - reportUsers
+
+        Report:
+            type: object
+            properties:
+                reportID:
+                    type: integer
+
+                # Information about the record
+                recordType:
+                    description: Type of record being reported.
+                    type: string
+                    enum: ["discussion", "comment"]
+                recordID:
+                    description: ID of the record being reported.
+                    type: integer
+                recordName:
+                    description: Name of the record being reported.
+                    type: string
+                recordHtml:
+                    description: Rendered HTML contents of the reported record.
+                    type: string
+                recordExcerpt:
+                    description: Excerpt of the reported record.
+                    type: string
+                recordUrl:
+                    description: URL of the record being reported.
+                    type: string
+                recordIsLive:
+                    description: Whether the record still exists.
+                    type: boolean
+                recordWasEdited:
+                    description: Whether the record was edited after the report was made.
+                    type: boolean
+                placeRecordType:
+                    description: Type of record the reported record is placed in.
+                    type: string
+                    enum: ["category"]
+                placeRecordID:
+                    description: ID of the record the reported record is placed in.
+                    type: integer
+                placeRecordName:
+                    description: Name of the record the reported record is placed in.
+                    type: string
+                placeRecordUrl:
+                    description: URL of the record the reported record is placed in.
+                    type: string
+                    format: uri
+                recordUserID:
+                    description: ID of the user who made the reported record.
+                    type: integer
+                recordUser:
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                recordDateInserted:
+                    type: string
+                    format: date-time
+                recordDateUpdated:
+                    type: string
+                    format: date-time
+
+                # Report contents
+                reportReasons:
+                    description: Full report reasons
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/ReportReasonFragment"
+                noteHtml:
+                    type: string
+                    description: Additional information about the report in HTML format.
+
+                # User Info
+                insertUserID:
+                    description: ID of the user making the report.
+                    type: integer
+                insertUser:
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                reportedUserID:
+                    description: ID of the user being reported.
+                    type: integer
+                reportedUser:
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+
+                updateUserID:
+                    description: ID of the user who last updated the report.
+                    type: integer
+                updateUser:
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                dateInserted:
+                    description: Date the report was made.
+                    type: string
+                    format: date-time
+                dateUpdated:
+                    description: Date the report was last updated.
+                    type: string
+                    format: date-time
+            required:
+                - reportID
+                - recordType
+                - recordID
+                - recordName
+                - recordHtml
+                - recordUrl
+                - recordIsLive
+                - recordWasEdited
+                - recordUserID
+                - recordDateInserted
+                - placeRecordType
+                - placeRecordID
+                - reportReasonIDs
+                - insertUserID
+                - reportedUserID
+                - updateUserID
+                - dateInserted
+                - dateUpdated
+                - noteHtml

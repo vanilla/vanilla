@@ -56,7 +56,7 @@ if ($this->Data !== false && $displayModule) {
                     $attributes = attribute($attributes);
                 }
 
-                echo '<li class=" ClearFix ' . $CssClass . '" ' . $attributes . ">";
+                echo '<li class=" ClearFix ' . htmlspecialchars($CssClass) . '" ' . $attributes . ">";
 
                 if ($Category->CountAllDiscussions > 0) {
                     $CountText =

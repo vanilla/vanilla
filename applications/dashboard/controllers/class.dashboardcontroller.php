@@ -8,6 +8,10 @@
  * @since 2.0
  */
 
+use Vanilla\Dashboard\Events\DashboardAccessEvent;
+use Vanilla\Dashboard\Events\DashboardApiAccessEvent;
+use Vanilla\Logging\AuditLogger;
+
 /**
  * Root class for the Dashboard's controllers.
  */
@@ -15,6 +19,8 @@ class DashboardController extends Gdn_Controller
 {
     /** @var bool Custom theming is not allowed in the dashboard. */
     protected $allowCustomTheming = false;
+
+    protected bool $auditLogEnabled = true;
 
     /**
      * Set PageName.
@@ -25,7 +31,7 @@ class DashboardController extends Gdn_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->PageName = "dashboard";
+        $this->_PageName = "dashboard";
     }
 
     /**
@@ -58,7 +64,62 @@ class DashboardController extends Gdn_Controller
 
         $this->MasterView = "admin";
         Gdn_Theme::section("Dashboard");
+
         parent::initialize();
+    }
+
+    /**
+     * Override for audit logging.
+     *
+     * @param $view
+     * @param $controllerName
+     * @param $applicationFolder
+     * @param $assetName
+     */
+    public function xRender(
+        $view = "",
+        $controllerName = false,
+        $applicationFolder = false,
+        $assetName = "Content"
+    ): void {
+        $this->trackAuditLog();
+        parent::xRender($view, $controllerName, $applicationFolder, $assetName);
+    }
+
+    /**
+     * Track the current request and parent request if available as an audit log.
+     *
+     * @return void
+     */
+    public function trackAuditLog(): void
+    {
+        if (!$this->auditLogEnabled) {
+            return;
+        }
+
+        $request = \Gdn::request();
+
+        if ($request->getMethod() !== "GET") {
+            // We only handle GET requests here.
+            // Post requests that actually change things will be audit logged through explicit access.
+            return;
+        }
+
+        // This is a full request.
+        if ($this->isRenderingMasterView()) {
+            // This handles full page loads and injects a tag into the pages so we can differentiate between
+            // full page requests and modals.
+            $accessEvent = new DashboardAccessEvent();
+            $this->addDefinition("auditLog", $accessEvent->asPageMeta());
+            AuditLogger::log($accessEvent);
+            return;
+        }
+
+        // Try to construct a parent audit log event.
+        $apiEvent = DashboardApiAccessEvent::tryFromHeaders($request);
+        if ($apiEvent !== null) {
+            AuditLogger::log($apiEvent);
+        }
     }
 
     /**

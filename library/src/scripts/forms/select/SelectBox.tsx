@@ -24,6 +24,7 @@ export interface ISelectBoxItem {
     className?: string;
     icon?: React.ReactNode;
     url?: string;
+    data?: any;
 }
 
 export interface ISelectBoxProps {

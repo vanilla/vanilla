@@ -38,4 +38,12 @@ class LocaleAsset extends SiteAsset
     {
         return $this->makeAssetPath("/api/v2/locales", $this->localeKey, "translations.js");
     }
+
+    /**
+     * @return bool
+     */
+    public function isScript(): bool
+    {
+        return true;
+    }
 }

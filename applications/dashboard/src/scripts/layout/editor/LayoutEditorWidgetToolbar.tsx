@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -35,6 +35,7 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
     const { $hydrate, ...widgetProps } = widgetSpec ?? {};
     const [isWidgetSettingsModalOpen, setWidgetSettingsModalOpen] = useState(false);
     const isAsset = $hydrate?.includes("asset");
+    const widget = $hydrate ? catalog?.assets[$hydrate] ?? catalog?.widgets[$hydrate] : undefined;
 
     const trashButton = (
         <EmbedButton
@@ -125,7 +126,7 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                     {isAsset ? <span>{trashButton}</span> : trashButton}
                 </ConditionalWrap>
             </EmbedMenu>
-            {!!$hydrate && catalog?.widgets[$hydrate] && (
+            {!!catalog && !!$hydrate && !!widget && (
                 <WidgetSettingsModal
                     key={$hydrate}
                     exitHandler={() => {
@@ -140,13 +141,13 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                         setWidgetSettingsModalOpen(false);
                     }}
                     isVisible={isWidgetSettingsModalOpen}
-                    schema={catalog.widgets[$hydrate].schema}
-                    name={catalog.widgets[$hydrate].name}
+                    schema={widget.schema}
+                    name={widget.name}
                     initialValues={widgetProps}
                     widgetCatalog={catalog.widgets}
                     middlewaresCatalog={catalog.middlewares ?? {}}
-                    widgetID={$hydrate ?? ""}
-                    assetCatalog={catalog?.assets}
+                    widgetID={$hydrate}
+                    assetCatalog={catalog.assets}
                 />
             )}
         </>

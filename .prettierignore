@@ -51,7 +51,7 @@ tests/fixtures/**/*.htm
 applications/dashboard/scss/vendors
 
 # PHP files with mixed HTML
-**/views/**
+**/views/**/*.php
 
 # These classes have mixed HTML.
 ./applications/dashboard/models/class.attachmentmodel.php

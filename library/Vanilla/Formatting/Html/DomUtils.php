@@ -114,6 +114,33 @@ final class DomUtils
     }
 
     /**
+     * Replace embeds with another dom element.
+     *
+     * @param DOMDocument $dom
+     * @param \DOMNode $replacement
+     * @param array $embedClasses
+     * @return void
+     */
+    public static function replaceEmbeds(
+        DOMDocument $dom,
+        \DOMNode $replacement,
+        array $embedClasses = self::EMBED_CLASSES
+    ): void {
+        $xpath = new \DomXPath($dom);
+        foreach ($embedClasses as $key => $value) {
+            $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClasses[$key]')]");
+            $xpathTagsQuery = $xpath->query("//div[@data-embedjson] | //video | //iframe");
+            $dataClassItem = $xpathQuery->item(0);
+            $dataTagsItem = $xpathTagsQuery->item(0);
+            if ($dataClassItem) {
+                $dataClassItem->parentNode->replaceChild($replacement, $dataClassItem);
+            } elseif ($dataTagsItem) {
+                $dataTagsItem->parentNode->replaceChild($replacement, $dataTagsItem);
+            }
+        }
+    }
+
+    /**
      * Remove images from the dom.
      *
      * @param DOMDocument $dom

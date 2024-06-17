@@ -30,7 +30,8 @@ import { AsyncCreatable } from "react-select";
 import { cx } from "@emotion/css";
 import { Icon } from "@vanilla/icons";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
-import { isUserGuest, useUsersState } from "@library/features/users/userModel";
+import { isUserGuest } from "@library/features/users/userModel";
+import { useCurrentUser } from "@library/features/users/userHooks";
 
 export interface ICompactSearchProps {
     className?: string;
@@ -64,8 +65,8 @@ export function CompactSearch(props: ICompactSearchProps) {
     const searchInputRef = useRef<AsyncCreatable<any> | null>(null);
     const resultsRef = useRef<HTMLDivElement | null>(null);
     const openSearchButtonRef = useRef<HTMLButtonElement | null>(null);
-    const { currentUser } = useUsersState();
-    const isGuest = isUserGuest(currentUser.data);
+    const currentUser = useCurrentUser();
+    const isGuest = isUserGuest(currentUser);
 
     const { focusOnMount, open = false, withLabel } = props;
     const prevOpen = useLastValue(open);

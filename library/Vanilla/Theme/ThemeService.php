@@ -6,11 +6,16 @@
 
 namespace Vanilla\Theme;
 
+use Garden\Events\ResourceEvent;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Events\ThemeApplyEvent;
+use Vanilla\Dashboard\Events\ThemeEvent;
+use Vanilla\Events\EventAction;
+use Vanilla\Logging\AuditLogger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\ModelCache;
 use Vanilla\Site\SiteSectionModel;
@@ -129,7 +134,7 @@ class ThemeService
      *
      * @param VariablesProviderInterface $provider
      */
-    public function addVariableProvider(VariablesProviderInterface $provider)
+    public function addVariableProvider(VariablesProviderInterface $provider): void
     {
         $this->variableProviders[] = $provider;
         if ($provider instanceof VariableDefaultsProviderInterface) {
@@ -140,7 +145,7 @@ class ThemeService
     /**
      * Clear all variable providers.
      */
-    public function clearVariableProviders()
+    public function clearVariableProviders(): void
     {
         $this->variableProviders = [];
     }
@@ -153,6 +158,14 @@ class ThemeService
     public function getVariableProviders(): array
     {
         return $this->variableProviders;
+    }
+
+    /**
+     * @return void
+     */
+    public function clearThemeProviders(): void
+    {
+        $this->themeProviders = [];
     }
 
     /**
@@ -275,6 +288,9 @@ class ThemeService
         // Clear the cache.
         $this->invalidateCache();
 
+        $auditEvent = new ThemeEvent(EventAction::ADD, $theme);
+        AuditLogger::log($auditEvent);
+
         $theme = $this->getTheme($theme->getThemeID());
         return $theme;
     }
@@ -294,6 +310,8 @@ class ThemeService
 
         // Clear the cache.
         $this->invalidateCache();
+        $auditEvent = new ThemeEvent(EventAction::UPDATE, $theme);
+        AuditLogger::log($auditEvent);
 
         $theme = $this->normalizeTheme($theme);
         return $theme;
@@ -307,7 +325,12 @@ class ThemeService
     public function deleteTheme($themeID)
     {
         $provider = $this->getWritableThemeProvider($themeID);
+        $theme = $provider->getTheme($themeID);
+
         $provider->deleteTheme($themeID);
+        $auditEvent = new ThemeEvent(EventAction::DELETE, $theme);
+        AuditLogger::log($auditEvent);
+
         // Clear the cache.
         $this->invalidateCache();
     }
@@ -332,6 +355,8 @@ class ThemeService
         $this->invalidateCache();
 
         $newTheme = $this->normalizeTheme($newTheme);
+        AuditLogger::log(new ThemeApplyEvent($newTheme));
+
         return $newTheme;
     }
 

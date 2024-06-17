@@ -19,7 +19,7 @@ import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarCont
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { t } from "@vanilla/i18n";
 import { JsonSchemaForm, JSONSchemaType } from "@vanilla/json-schema-forms";
-import { getDefaultValuesFromSchema } from "@vanilla/json-schema-forms/src/utils";
+import { extractDataByKeyLookup } from "@vanilla/json-schema-forms/src/utils";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { useFormik } from "formik";
 import React, { useEffect, useMemo } from "react";
@@ -251,7 +251,8 @@ export default function BrandingAndSEOPage() {
     const isLoaded = [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status);
 
     const { values, submitForm, setValues } = useFormik<object>({
-        initialValues: isLoaded && !!settings.data ? settings.data : getDefaultValuesFromSchema(BRANDING_SETTINGS),
+        initialValues:
+            isLoaded && !!settings.data ? settings.data : extractDataByKeyLookup(BRANDING_SETTINGS, "default"),
 
         enableReinitialize: true,
 

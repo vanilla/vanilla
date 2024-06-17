@@ -3,7 +3,8 @@ body {
     width: 100%;
     height: 100%;
 }
-.storybookDashboardStyles {
+
+:where(.storybookDashboardStyles) {
     $staticVariables: true;
     @import "../../../scss/admin.scss";
 

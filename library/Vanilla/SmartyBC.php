@@ -12,10 +12,8 @@ use Smarty;
 
 /**
  * Smarty Backward Compatibility Wrapper Class
- *
- * @package Smarty
  */
-class SmartyBC extends Smarty
+class SmartyBC extends Smarty\Smarty
 {
     /**
      * Smarty 2 BC
@@ -23,14 +21,6 @@ class SmartyBC extends Smarty
      * @var string
      */
     public $_version = self::SMARTY_VERSION;
-
-    /**
-     * This is an array of directories where trusted php scripts reside.
-     *
-     * @var array
-     * @deprecated
-     */
-    public $trusted_dir = [];
 
     /**
      * Initialize new SmartyBC object
@@ -49,7 +39,7 @@ class SmartyBC extends Smarty
      */
     public function assign_by_ref($tpl_var, &$value)
     {
-        $this->assignByRef($tpl_var, $value);
+        $this->assign($tpl_var, $value);
     }
 
     /**
@@ -62,7 +52,7 @@ class SmartyBC extends Smarty
      */
     public function append_by_ref($tpl_var, &$value, $merge = false)
     {
-        $this->appendByRef($tpl_var, $value, $merge);
+        $this->append($tpl_var, $value, $merge);
     }
 
     /**
@@ -84,7 +74,7 @@ class SmartyBC extends Smarty
      * @param bool   $cacheable
      * @param mixed  $cache_attrs
      *
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function register_function($function, $function_impl, $cacheable = true, $cache_attrs = null)
@@ -101,26 +91,6 @@ class SmartyBC extends Smarty
     public function unregister_function($function)
     {
         $this->unregisterPlugin("function", $function);
-    }
-
-    /**
-     * Registers object to be used in templates
-     *
-     * @param string  $object        name of template object
-     * @param object  $object_impl   the referenced PHP object to register
-     * @param array   $allowed       list of allowed methods (empty = all)
-     * @param boolean $smarty_args   smarty argument format, else traditional
-     * @param array   $block_methods list of methods that are block format
-     *
-     * @throws   \SmartyException
-     * @internal param array $block_functs list of methods that are block format
-     * @deprecated
-     */
-    public function register_object($object, $object_impl, $allowed = [], $smarty_args = true, $block_methods = [])
-    {
-        settype($allowed, "array");
-        settype($smarty_args, "boolean");
-        $this->registerObject($object, $object_impl, $allowed, $smarty_args, $block_methods);
     }
 
     /**
@@ -142,7 +112,7 @@ class SmartyBC extends Smarty
      * @param bool   $cacheable
      * @param mixed  $cache_attrs
      *
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function register_block($block, $block_impl, $cacheable = true, $cache_attrs = null)
@@ -168,7 +138,7 @@ class SmartyBC extends Smarty
      * @param string $function_impl name of PHP function to register
      * @param bool   $cacheable
      *
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function register_compiler_function($function, $function_impl, $cacheable = true)
@@ -193,7 +163,7 @@ class SmartyBC extends Smarty
      * @param string $modifier      name of template modifier
      * @param string $modifier_impl name of PHP function to register
      *
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function register_modifier($modifier, $modifier_impl)
@@ -213,18 +183,6 @@ class SmartyBC extends Smarty
     }
 
     /**
-     * Registers a resource to fetch a template
-     *
-     * @param string $type      name of resource
-     * @param array  $functions array of functions to handle resource
-     * @deprecated
-     */
-    public function register_resource($type, $functions)
-    {
-        $this->registerResource($type, $functions);
-    }
-
-    /**
      * Unregister a resource
      *
      * @param string $type name of resource
@@ -241,7 +199,7 @@ class SmartyBC extends Smarty
      *
      * @param callable $function
      *
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function register_prefilter($function)
@@ -266,7 +224,7 @@ class SmartyBC extends Smarty
      *
      * @param callable $function
      *
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function register_postfilter($function)
@@ -291,7 +249,7 @@ class SmartyBC extends Smarty
      *
      * @param callable $function
      *
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function register_outputfilter($function)
@@ -316,7 +274,7 @@ class SmartyBC extends Smarty
      * @param string $type filter type
      * @param string $name filter name
      *
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function load_filter($type, $name)
@@ -362,7 +320,7 @@ class SmartyBC extends Smarty
      *
      * @return bool
      * @throws \Exception
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function is_cached($tpl_file, $cache_id = null, $compile_id = null)
@@ -402,7 +360,7 @@ class SmartyBC extends Smarty
      * @param string $tpl_file
      *
      * @return bool
-     * @throws \SmartyException
+     * @throws Smarty\Exception
      * @deprecated
      */
     public function template_exists($tpl_file)

@@ -85,14 +85,9 @@ export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<T, Exclu
     }[Keys];
 
 export interface INavigationItemBadge {
-    type: navigationItemBadgeType;
-    text: string;
+    type: "text" | "view";
+    text?: string;
     url?: string;
-}
-
-export enum navigationItemBadgeType {
-    TEXT = "text",
-    VIEW = "view",
 }
 
 export interface INavigationItem {

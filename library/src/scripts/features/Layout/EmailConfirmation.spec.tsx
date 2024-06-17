@@ -1,18 +1,16 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
-import { IMe } from "@library/@types/api/users";
-import { LoadStatus } from "@library/@types/api/core";
 import { useEmailConfirmationToast } from "@library/features/Layout/EmailConfirmation.hook";
 import { ToastContext } from "@library/features/toaster/ToastContext";
 import { renderHook } from "@testing-library/react-hooks";
 import { vitest } from "vitest";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 
 describe("EmailConfirmation", () => {
     it("Toast is created when a user is unconfirmed", async () => {
@@ -21,26 +19,7 @@ describe("EmailConfirmation", () => {
 
         const wrapper = ({ children }) => {
             return (
-                <TestReduxProvider
-                    state={{
-                        users: {
-                            current: {
-                                status: LoadStatus.SUCCESS,
-                                data: {
-                                    ...(mockCurrentUser as unknown as IMe),
-                                },
-                            },
-                            usersByID: {
-                                7: {
-                                    status: LoadStatus.SUCCESS,
-                                    data: {
-                                        ...mockCurrentUser,
-                                    },
-                                },
-                            },
-                        },
-                    }}
-                >
+                <CurrentUserContextProvider currentUser={mockCurrentUser}>
                     <ToastContext.Provider
                         value={{
                             toasts: null,
@@ -51,7 +30,7 @@ describe("EmailConfirmation", () => {
                     >
                         {children}
                     </ToastContext.Provider>
-                </TestReduxProvider>
+                </CurrentUserContextProvider>
             );
         };
 
@@ -64,26 +43,7 @@ describe("EmailConfirmation", () => {
 
         const wrapper = ({ children }) => {
             return (
-                <TestReduxProvider
-                    state={{
-                        users: {
-                            current: {
-                                status: LoadStatus.SUCCESS,
-                                data: {
-                                    ...(mockCurrentUser as unknown as IMe),
-                                },
-                            },
-                            usersByID: {
-                                8: {
-                                    status: LoadStatus.SUCCESS,
-                                    data: {
-                                        ...mockCurrentUser,
-                                    },
-                                },
-                            },
-                        },
-                    }}
-                >
+                <CurrentUserContextProvider currentUser={mockCurrentUser}>
                     <ToastContext.Provider
                         value={{
                             toasts: null,
@@ -94,7 +54,7 @@ describe("EmailConfirmation", () => {
                     >
                         {children}
                     </ToastContext.Provider>
-                </TestReduxProvider>
+                </CurrentUserContextProvider>
             );
         };
 
@@ -107,18 +67,7 @@ describe("EmailConfirmation", () => {
 
         const wrapper = ({ children }) => {
             return (
-                <TestReduxProvider
-                    state={{
-                        users: {
-                            current: {
-                                status: LoadStatus.SUCCESS,
-                                data: {
-                                    ...(mockCurrentUser as unknown as IMe),
-                                },
-                            },
-                        },
-                    }}
-                >
+                <CurrentUserContextProvider currentUser={mockCurrentUser}>
                     <ToastContext.Provider
                         value={{
                             toasts: null,
@@ -129,7 +78,7 @@ describe("EmailConfirmation", () => {
                     >
                         {children}
                     </ToastContext.Provider>
-                </TestReduxProvider>
+                </CurrentUserContextProvider>
             );
         };
 

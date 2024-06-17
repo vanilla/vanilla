@@ -14,6 +14,14 @@ use Vanilla\Events\EventAction;
  */
 trait AssertLoggingTrait
 {
+    /**
+     * @return void
+     */
+    public function setupAssertLoggingTrait(): void
+    {
+        \Gdn::config()->saveToConfig("auditLog.enabled", true);
+    }
+
     protected $resourceName = "n/a";
 
     /**

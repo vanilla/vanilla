@@ -15,7 +15,7 @@ interface INoticeProps {
 
 const Notice: FunctionComponent<React.PropsWithChildren<INoticeProps>> = ({ children, className }) => {
     const classes = noticeClasses();
-    return <div className={cx(classes.root, className)}>{children}</div>;
+    return <span className={cx(classes.root, className)}>{children}</span>;
 };
 
 export default Notice;

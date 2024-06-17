@@ -1,8 +1,10 @@
 {
     "name": "@vanilla/variable-parser",
     "version": "1.0.0",
+    "type": "module",
     "description": "A javascript parser that extracts variable definitions to a JSON schema.",
     "main": "src/index.ts",
+    "module": "src/index.ts",
     "repository": "https://github.com/vanilla/vanilla/tree/master/packages/vanilla-variable-parser",
     "author": "Adam (charrondev) Charron",
     "license": "gpl-2.0-only",

@@ -93,6 +93,15 @@ class SettingsController extends DashboardController
     }
 
     /**
+     * Render the reports page.
+     */
+    public function reports()
+    {
+        $this->permission("Garden.Settings.Manage");
+        $this->render("reports");
+    }
+
+    /**
      * Highlight menu path. Automatically run on every use.
      *
      * @since 2.0.0
@@ -306,6 +315,17 @@ class SettingsController extends DashboardController
                 $this->informMessage(t("Your settings have been saved."));
             }
         }
+        $this->render();
+    }
+
+    /**
+     * @return void
+     */
+    public function auditLogs()
+    {
+        $this->permission("site.manage");
+        $this->setHighlightRoute("dashboard/settings/audit-logs");
+        $this->title(t("Audit Logs"));
         $this->render();
     }
 
@@ -851,6 +871,23 @@ class SettingsController extends DashboardController
     }
 
     /**
+     * Manage automation rules settings page.
+     *
+     * @return void
+     */
+    public function automationRules()
+    {
+        $this->permission("Garden.Settings.Manage");
+        $this->setHighlightRoute("dashboard/settings/automation-rules");
+        $this->title(t("Automation Rules Settings"));
+        if (Gdn::config("Feature.AutomationRules.Enabled")) {
+            $this->render("automation-rules");
+        } else {
+            $this->renderException(notFoundException());
+        }
+    }
+
+    /**
      * Outgoing Email management screen.
      *
      * @since 2.0.0
@@ -873,7 +910,7 @@ class SettingsController extends DashboardController
         $this->permission(["Garden.Settings.Manage", "Garden.Community.Manage"]);
         $this->setHighlightRoute("dashboard/settings/digest");
         $this->title(t("Digest Settings"));
-        $emailDigestEnabled = !Gdn::config("Garden.Email.Disabled") && Gdn::config("Feature.Digest.Enabled");
+        $emailDigestEnabled = !Gdn::config("Garden.Email.Disabled");
         if ($emailDigestEnabled) {
             $this->render();
         } else {

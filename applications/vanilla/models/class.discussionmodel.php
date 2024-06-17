@@ -19,6 +19,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Community\Events\DiscussionQueryEvent;
 use Vanilla\Community\Events\DiscussionStatusEvent;
 use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Contracts\Formatting\FormatFieldInterface;
@@ -31,6 +32,7 @@ use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Database\SetLiterals\RawExpression;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\PermissionException;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
@@ -51,7 +53,6 @@ use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Scheduler\LongRunnerQuantityTotal;
 use Vanilla\Scheduler\LongRunnerSuccessID;
 use Vanilla\Scheduler\LongRunnerTimeoutException;
-use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\SchemaFactory;
 use Vanilla\Search\SearchService;
@@ -861,6 +862,8 @@ class DiscussionModel extends Gdn_Model implements
         $this->EventArguments["Wheres"] = &$wheres;
         $this->EventArguments["sql"] = &$this->SQL;
         $this->fireEvent("BeforeGet"); // @see 'BeforeGetCount' for consistency in results vs. counts
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL));
 
         $removeAnnouncements = true;
         if (strtolower(val("Announce", $wheres)) == "all") {
@@ -1074,7 +1077,8 @@ class DiscussionModel extends Gdn_Model implements
         $this->EventArguments["Wheres"] = &$where;
         $this->EventArguments["Selects"] = &$selects;
         $this->getEventManager()->fire("discussionModel_beforeGet", $this, $this->EventArguments);
-
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL));
         $finalQuery = $this->getWhereQuery(
             $where,
             $orderBy,
@@ -1279,19 +1283,16 @@ class DiscussionModel extends Gdn_Model implements
      */
     public function getPagingCount(array $where = [], $filterType = false, $userID = false): int
     {
-        $limit = Gdn::config("Vanilla.APIv2.MaxCount", 10000);
-        $sql = $this->getWhereQuery($where, [], ["d.DiscussionID"], $limit, false, $filterType, $userID);
-        $countQuery = $sql
-            ->resetSelects()
-            ->select("d.DiscussionID")
-            ->getSelect();
-        $countQuery = <<<SQL
-SELECT COUNT(*) as count FROM ({$countQuery}) cq
-SQL;
-
-        $result = $this->SQL->query($countQuery);
-
-        return $result->firstRow(DATASET_TYPE_ARRAY)["count"];
+        $count = $this->getWhereQuery(
+            $where,
+            [],
+            ["d.DiscussionID"],
+            false,
+            false,
+            $filterType,
+            $userID
+        )->getPagingCount("d.DiscussionID");
+        return $count;
     }
 
     /**
@@ -1780,7 +1781,8 @@ SQL;
         } else {
             $this->SQL->limit($limit, $offset);
         }
-
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL));
         $this->fireEvent("BeforeGetByUser");
 
         $data = $this->SQL->get();
@@ -2009,6 +2011,7 @@ SQL;
      * @param array $wheres SQL conditions.
      * @param null $unused Not used.
      * @return int Number of discussions.
+     * @throws Exception
      * @since 2.0.0
      * @access public
      *
@@ -2118,9 +2121,10 @@ SQL;
      *
      * @param array|'' $wheres SQL conditions.
      * @return int Number of discussions.
+     * @throws Exception
+     * @since 2.0.0
      * @deprecated since 2.3
      *
-     * @since 2.0.0
      */
     public function getUnreadCount($wheres = "")
     {
@@ -4217,7 +4221,14 @@ SQL;
 
         // Get the discussion's parsed body's first image & get the srcset for it.
         $result["image"] = $this->formatterService->parseMainImage($bodyParsed, $format);
-
+        if (FeatureFlagHelper::featureEnabled("AISuggestions") && isset($result["attributes"]["suggestions"])) {
+            $result["suggestions"] = $result["attributes"]["suggestions"] ?? [];
+            $result["visibleSuggestions"] = $result["attributes"]["visibleSuggestions"] ?? [];
+            unset($result["attributes"]["suggestions"]);
+            if (isset($result["attributes"]["suggestions"])) {
+                unset($result["attributes"]["visibleSuggestions"]);
+            }
+        }
         return $result;
     }
 
@@ -4999,6 +5010,7 @@ SQL;
      * @param array $discussionIDs DiscussionIDs to move.
      *
      * @return int
+     * @throws Exception
      */
     public function getTotalCount(array $discussionIDs): int
     {

@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { render, screen, fireEvent, act, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, act, cleanup, waitFor } from "@testing-library/react";
 import { MembersSearchFilterPanel } from "@dashboard/components/panels/MembersSearchFilterPanel";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
@@ -92,8 +92,12 @@ describe("MembersSearchFilterPanel", () => {
             );
         });
 
+        await waitFor(() => {
+            expect(screen.queryByText("Filter Results")).toBeInTheDocument();
+        });
+
         // Username input
-        expect(screen.getByRole("textbox", { name: "Username" })).toBeInTheDocument();
+        expect(screen.queryByRole("textbox", { name: "Username" })).toBeInTheDocument();
         // Email input should not be visible
         expect(screen.queryByRole("textbox", { name: "Email" })).not.toBeInTheDocument();
 
@@ -149,10 +153,10 @@ describe("MembersSearchFilterPanel", () => {
 
         expect(usernameField).toHaveValue("testy");
 
-        await act(async () => {
-            fireEvent.click(screen.getByRole("button", { name: "Clear All" }));
-        });
+        fireEvent.click(screen.getByRole("button", { name: "Clear All" }));
 
-        expect(usernameField).toHaveValue("");
+        await waitFor(() => {
+            expect(usernameField).toHaveValue("");
+        });
     });
 });

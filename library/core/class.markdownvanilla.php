@@ -17,6 +17,8 @@
  */
 class MarkdownVanilla extends \Michelf\MarkdownExtra
 {
+    const RENDER_ERROR_MESSAGE = "There was an error rendering this Markdown post.";
+
     /**
      * Add all Vanilla customizations to markdown parsing
      *
@@ -249,7 +251,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra
      * @param  string $text
      * @return string
      */
-    public function transform($text)
+    public function transformInternal($text): string
     {
         $this->setup();
 
@@ -289,5 +291,14 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra
         $this->teardown();
 
         return $text . "\n";
+    }
+
+    public function transform($text): string
+    {
+        try {
+            return $this->transformInternal($text);
+        } catch (Error $error) {
+            return "<p>" . t(self::RENDER_ERROR_MESSAGE) . "</p>/n";
+        }
     }
 }

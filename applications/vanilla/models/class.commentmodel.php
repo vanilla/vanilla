@@ -16,6 +16,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\Attributes;
+use Vanilla\Community\Events\CommentQueryEvent;
 use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Dashboard\Models\UserMentionsInterface;
 use Vanilla\Dashboard\Models\UserMentionsModel;
@@ -285,6 +286,8 @@ class CommentModel extends Gdn_Model implements
         $limit = false,
         $offset = false
     ) {
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
         $where = $this->stripWherePrefixes($where);
         [$where, $options] = $this->splitWhere($where, ["joinUsers" => true, "joinDiscussions" => false]);
 
@@ -296,6 +299,7 @@ class CommentModel extends Gdn_Model implements
 
         $innerSelectSql = $innerSelect->getSelect();
         $result = $this->SQL
+            ->select("c.*")
             ->from($this->Name . " c")
             ->join("($innerSelectSql) c2", "c.CommentID = c2.CommentID")
             ->get();
@@ -329,6 +333,8 @@ class CommentModel extends Gdn_Model implements
         $this->EventArguments["Offset"] = &$offset;
         $this->EventArguments["Where"] = &$where;
         $this->fireEvent("BeforeGet");
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
 
         // Use a subquery to force late-loading of comments. This optimizes pagination.
         $sql2 = clone $this->SQL;
@@ -392,6 +398,8 @@ class CommentModel extends Gdn_Model implements
         // Build main query
         $this->commentQuery(true, false);
         $this->fireEvent("BeforeGet");
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
         $this->SQL
             ->select("d.Name", "", "DiscussionName")
             ->where("c.InsertUserID", $userID)
@@ -472,6 +480,8 @@ class CommentModel extends Gdn_Model implements
             $this->SQL->limit($limit, $offset);
         }
         $this->fireEvent("BeforeGetByUser");
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
         $data = $this->SQL->get();
 
         $result = &$data->result();
@@ -585,6 +595,8 @@ class CommentModel extends Gdn_Model implements
         // Apply the base of the query.
         $this->commentQuery(false, false);
 
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
         if ($sort === "dateUpdated") {
             $this->orderBy("sortDateUpdated");
             $query->select("c.dateUpdated, c.dateInserted", "COALESCE", "sortDateUpdated");

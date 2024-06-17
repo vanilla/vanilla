@@ -403,7 +403,7 @@ SQL;
             ->getUpdateSql();
         $expected = <<<SQL
 update `GDN_test` `test`
-set `a` = case when `a` is null or '2020-06-20 00:00:00' $expected `a` then '2020-06-20 00:00:00' else `a` end
+set `a` = case when `a` is null or '2020-06-20 00:00:00.000000' $expected `a` then '2020-06-20 00:00:00.000000' else `a` end
 SQL;
         $this->assertSame($expected, $sql);
     }

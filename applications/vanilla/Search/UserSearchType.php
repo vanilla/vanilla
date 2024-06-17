@@ -14,6 +14,8 @@ use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Cloud\ElasticSearch\Driver\Query\ElasticBool;
+use Vanilla\Cloud\ElasticSearch\Driver\Query\ElasticTermsAssertion;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\DateFilterSchema;
 use Vanilla\Exception\PermissionException;
@@ -197,6 +199,11 @@ class UserSearchType extends AbstractSearchType
                 $query->setDateFilterSchema("dateUpdated", $dateUpdated);
             }
 
+            if (!is_null($query->getQueryParameter("emailConfirmed", null))) {
+                $emailConfirmed = (bool) $query->getQueryParameter("emailConfirmed");
+                $query->setFilter("emailConfirmed", [$emailConfirmed]);
+            }
+
             // Sorts
             $sort = $query->getQueryParameter("sort", "dateLastActive");
             $sortField = ltrim($sort, "-");
@@ -241,6 +248,7 @@ class UserSearchType extends AbstractSearchType
                         "type" => "integer",
                     ],
                 ],
+                "emailConfirmed:b?",
                 "dateLastActive?" => new DateFilterSchema(),
                 "dateUpdated?" => new DateFilterSchema(),
                 "sort:s?" => [

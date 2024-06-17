@@ -7,11 +7,12 @@
 import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { IApiError } from "@library/@types/api/core";
+import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
 import { useUserCanStillEditDiscussionOrComment } from "@library/features/discussions/discussionHooks";
 import { IntegrationButtonAndModal } from "@library/features/discussions/integrations/Integrations";
 import {
-    IntegrationContextProvider,
-    useAttachmentIntegrations,
+    WriteableIntegrationContextProvider,
+    useWriteableAttachmentIntegrations,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IPermission, IPermissionOptions, PermissionChecker, PermissionMode } from "@library/features/users/Permission";
@@ -21,7 +22,10 @@ import DropDown, { DropDownOpenDirection, FlyoutType, IDropDownProps } from "@li
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import ModalConfirm from "@library/modal/ModalConfirm";
+import { ToolTip } from "@library/toolTip/ToolTip";
 import { getMeta } from "@library/utility/appUtils";
 import { useMutation } from "@tanstack/react-query";
 import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
@@ -62,6 +66,8 @@ export function CommentOptionsMenu(props: IProps) {
         resourceID: comment.categoryID,
     };
 
+    const canReport = hasPermission("flag.add");
+
     const toast = useToast();
     const deleteMutation = useMutation({
         mutationFn: CommentsApi.delete,
@@ -82,7 +88,7 @@ export function CommentOptionsMenu(props: IProps) {
     const isOwnComment = comment.insertUserID === currentUser?.userID;
 
     const { canStillEdit, humanizedRemainingTime } = useUserCanStillEditDiscussionOrComment(discussion, comment);
-    const availableIntegrations = useAttachmentIntegrations();
+    const writeableIntegrations = useWriteableAttachmentIntegrations();
 
     if (canStillEdit) {
         items.push(
@@ -161,23 +167,36 @@ export function CommentOptionsMenu(props: IProps) {
 
     let integrationItems: React.ReactNode[] = [];
 
-    availableIntegrations
+    writeableIntegrations
         .filter(({ recordTypes }) => recordTypes.includes("comment"))
+        .filter(({ writeableContentScope }) => (writeableContentScope === "own" ? isOwnComment : true))
         .forEach(({ attachmentType }) => {
             integrationItems.push(
-                <IntegrationContextProvider
+                <WriteableIntegrationContextProvider
                     recordType="comment"
                     attachmentType={attachmentType}
                     recordID={comment.commentID}
                 >
                     <IntegrationButtonAndModal onSuccess={onMutateSuccess} />
-                </IntegrationContextProvider>,
+                </WriteableIntegrationContextProvider>,
             );
         });
 
     if (integrationItems.length > 0) {
         items.push(<DropDownItemSeparator />);
         items.push(...integrationItems);
+    }
+
+    if (items.length > 0 && canReport) {
+        items.push(<DropDownItemSeparator />);
+        items.push(
+            <ReportRecordOption
+                discussionName={discussion.name}
+                recordType={"comment"}
+                recordID={comment.commentID}
+                onSuccess={onMutateSuccess}
+            />,
+        );
     }
 
     return items.length > 0 ? (
@@ -192,5 +211,25 @@ export function CommentOptionsMenu(props: IProps) {
                 return <React.Fragment key={i}>{item}</React.Fragment>;
             })}
         </DropDown>
-    ) : null;
+    ) : (
+        <>
+            {canReport ? (
+                <ReportRecordOption
+                    discussionName={discussion.name}
+                    recordType={"comment"}
+                    recordID={comment.commentID}
+                    onSuccess={onMutateSuccess}
+                    customTrigger={(props) => {
+                        return (
+                            <ToolTip label={t("Report content")}>
+                                <Button buttonType={ButtonTypes.ICON} onClick={props.onClick}>
+                                    <Icon icon="post-flag" />
+                                </Button>
+                            </ToolTip>
+                        );
+                    }}
+                />
+            ) : null}
+        </>
+    );
 }

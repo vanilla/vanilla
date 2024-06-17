@@ -15,7 +15,6 @@ use UserModel;
 use Garden\Schema\Schema;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AttachmentProviderInterface;
-use Vanilla\Formatting\DateTimeFormatter;
 
 /**
  * Mock issue provider for tests.
@@ -109,11 +108,19 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getIsEscalation(): bool
+    {
+        return true;
+    }
+
+    /**
      * Verify that the user has the `staff.allow` permission.
      *
      * @return bool
      */
-    public function hasPermissions(): bool
+    public function hasReadPermissions(): bool
     {
         return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
     }
@@ -213,17 +220,28 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     /**
      * @inheritDoc
      */
-    public function canEscalateOwnPost(): bool
+    public function getWriteableContentScope(): string
     {
-        return false;
+        if ($this->userModel->checkPermission(\Gdn::session()->User, "staff.allow")) {
+            return AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_ALL;
+        }
+        return AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_NONE;
     }
 
     /**
      * @inheritDoc
      */
-    public function canViewAttachment(array $attachment): bool
+    public function canViewBasicAttachment(array $attachment): bool
     {
-        return $this->hasPermissions();
+        return $this->hasReadPermissions();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function canViewFullAttachment(array $attachment): bool
+    {
+        return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
     }
 
     /**
@@ -231,7 +249,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
      */
     public function canCreateAttachmentForRecord(string $recordType, int $recordID): bool
     {
-        return $this->hasPermissions();
+        return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
     }
 
     /**

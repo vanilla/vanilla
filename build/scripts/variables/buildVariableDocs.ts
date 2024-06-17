@@ -10,7 +10,7 @@ import {
     JsonSchemaFlatAdapter,
     JsonSchemaNestedAdapter,
     VariableParser,
-} from "@vanilla/variable-parser";
+} from "../../../packages/vanilla-variable-parser/src/index";
 import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";

@@ -6,7 +6,7 @@
 
 namespace Vanilla\Theme\Asset;
 
-use Mimey\MimeTypes;
+use Vanilla\Web\MimeTypeDetector;
 
 /**
  * Image theme asset.
@@ -39,11 +39,11 @@ class ImageThemeAsset extends ThemeAsset
      */
     public function getContentType(): string
     {
-        $mimeTypes = new MimeTypes();
         $path = parse_url($this->getUrl(), PHP_URL_PATH);
         $ext = pathinfo($path, PATHINFO_EXTENSION);
 
-        return $mimeTypes->getMimeType($ext);
+        $mimeType = MimeTypeDetector::getMimesForExtension($ext);
+        return $mimeType[0];
     }
 
     /**

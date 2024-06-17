@@ -111,6 +111,7 @@ class ReactionsEventsTest extends VanillaTestCase
                 "tagID" => $reaction["TagID"],
                 "recordName" => $discussion["Name"],
                 "recordUrl" => DiscussionModel::discussionUrl($discussion),
+                "reactionCount" => 1,
             ])
         );
     }
@@ -147,6 +148,7 @@ class ReactionsEventsTest extends VanillaTestCase
                 "tagID" => $reaction["TagID"],
                 "recordName" => CommentModel::generateCommentName($discussion["name"]),
                 "recordUrl" => CommentModel::commentUrl(ArrayUtils::pascalCase($comment)),
+                "reactionCount" => 1,
             ])
         );
         $this->assertSame($reaction["Points"], $reactionPoints[0]["Points"]);

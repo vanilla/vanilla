@@ -59,7 +59,8 @@
                     "apiParams": {
                         "includeChildCategories": true,
                         "sort": "-dateLastComment",
-                        "slotType": "a"
+                        "slotType": "a",
+                        "limit": 10
                     },
                     "discussionOptions": {
                         "excerpt": {

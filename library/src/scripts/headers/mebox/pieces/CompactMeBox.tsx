@@ -18,7 +18,6 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IMeBoxProps } from "@library/headers/mebox/MeBox";
 import Tabs from "@library/navigation/tabs/Tabs";
-import { IInjectableUserState } from "@library/features/users/userTypes";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import classNames from "classnames";
 import Modal from "@library/modal/Modal";
@@ -28,7 +27,7 @@ import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 import { TouchScrollable } from "react-scrolllock";
 import { UserIcon, UserIconTypes } from "@library/icons/titleBar";
 
-interface IProps extends IInjectableUserState, IMeBoxProps {}
+interface IProps extends IMeBoxProps {}
 
 interface IState {
     open: boolean;
@@ -45,7 +44,7 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const userInfo = this.props.currentUser.data;
+        const userInfo = this.props.currentUser;
         if (!userInfo) {
             return null;
         }

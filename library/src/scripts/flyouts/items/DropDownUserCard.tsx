@@ -11,8 +11,9 @@ import { mapUsersStoreState } from "@library/features/users/userModel";
 import { IInjectableUserState } from "@library/features/users/userTypes";
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { connect } from "react-redux";
-import classNames from "classnames";
-import { makeProfileUrl } from "@library/utility/appUtils";
+import { getMeta, makeProfileUrl, t } from "@library/utility/appUtils";
+import Permission from "@library/features/users/Permission";
+import { cx } from "@emotion/css";
 
 export interface IProps extends IInjectableUserState {
     className?: string;
@@ -25,26 +26,48 @@ export interface IProps extends IInjectableUserState {
 export class DropDownUserCard extends React.Component<IProps> {
     public render() {
         const currentUser = this.props.currentUser.data!;
+        const customFieldsEnabled = getMeta("featureFlags.CustomProfileFields.Enabled");
         const profileLink = makeProfileUrl(currentUser.userID, currentUser.name);
         const classesUserDropDown = userDropDownClasses();
+
         return (
-            <li className={classNames(classesUserDropDown.userCard, "dropDown-userCard", this.props.className)}>
+            <li className={cx(classesUserDropDown.userCard, "dropDown-userCard", this.props.className)}>
                 <SmartLink
                     to={profileLink}
-                    className={classNames("userDropDown-userCardPhotoLink", classesUserDropDown.userCardPhotoLink)}
+                    className={cx("userDropDown-userCardPhotoLink", classesUserDropDown.userCardPhotoLink)}
                 >
                     <UserPhoto
-                        className={classNames("userDropDown-userCardPhoto", classesUserDropDown.userCardPhoto)}
+                        className={cx("userDropDown-userCardPhoto", classesUserDropDown.userCardPhoto)}
                         userInfo={currentUser}
                         size={this.props.photoSize || UserPhotoSize.LARGE}
                     />
                 </SmartLink>
-                <SmartLink
-                    to={profileLink}
-                    className={classNames("userDropDown-userCardName", classesUserDropDown.userCardName)}
-                >
-                    {currentUser.name}
-                </SmartLink>
+                <div className={classesUserDropDown.userInfo}>
+                    <SmartLink
+                        to={profileLink}
+                        className={cx("userDropDown-userCardName", classesUserDropDown.userCardName)}
+                    >
+                        {currentUser.name}
+                    </SmartLink>
+                    <span className={classesUserDropDown.email}>{currentUser?.email}</span>
+                    <Permission
+                        permission={"profiles.edit"}
+                        fallback={
+                            <>
+                                <SmartLink className={classesUserDropDown.accountLinks} to={"/profile/preferences"}>
+                                    {t("Edit Preferences")}
+                                </SmartLink>
+                            </>
+                        }
+                    >
+                        <SmartLink
+                            className={classesUserDropDown.accountLinks}
+                            to={customFieldsEnabled ? "/profile/account-privacy" : "/profile/edit"}
+                        >
+                            {t(customFieldsEnabled ? "Account & Privacy Settings" : "Edit Profile")}
+                        </SmartLink>
+                    </Permission>
+                </div>
             </li>
         );
     }

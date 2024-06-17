@@ -10,7 +10,7 @@
  * A placeholder for future menu items.
  *
  * @param array $params The parameters passed into the function.
- * @param Smarty $smarty The smarty object rendering the template.
+ * @param Smarty\Smarty $smarty The smarty object rendering the template.
  * @return string
  */
 function smarty_function_custom_menu($params, &$smarty)

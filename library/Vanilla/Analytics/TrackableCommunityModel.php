@@ -10,7 +10,9 @@ namespace Vanilla\Analytics;
 use CategoryModel;
 use CommentModel;
 use DiscussionModel;
+use DiscussionStatusModel;
 use Vanilla\Community\Events\SubscriptionChangeEvent;
+use Vanilla\Community\Events\TrackableDiscussionAnalyticsEvent;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Utility\ArrayUtils;
 
@@ -28,19 +30,24 @@ class TrackableCommunityModel
     /** @var CommentModel */
     private $commentModel;
 
+    private DiscussionStatusModel $discussionStatusModel;
+
     /**
      * DI.
      *
      * @param DiscussionModel $discussionModel
+     * @param DiscussionStatusModel $discussionStatusModel
      * @param TrackableUserModel $userUtils
      * @param CommentModel $commentModel
      */
     public function __construct(
         DiscussionModel $discussionModel,
+        DiscussionStatusModel $discussionStatusModel,
         TrackableUserModel $userUtils,
         CommentModel $commentModel
     ) {
         $this->discussionModel = $discussionModel;
+        $this->discussionStatusModel = $discussionStatusModel;
         $this->userUtils = $userUtils;
         $this->commentModel = $commentModel;
     }
@@ -126,6 +133,8 @@ class TrackableCommunityModel
         // Tracking events don't need the body. It takes up a lot of space unnecessarily.
         $discussion["body"] = null;
 
+        $discussion["statusName"] =
+            $this->discussionStatusModel->tryGetStatusFragment($discussion["statusID"])["name"] ?? "";
         $discussion["discussionType"] = ucfirst($discussion["type"]);
         $discussion["firstCommentID"] = $firstCommentID;
         $discussion["category"] = $this->getTrackableCategory($discussion["categoryID"]);
@@ -138,6 +147,8 @@ class TrackableCommunityModel
         $discussion["countComments"] = (int) $discussion["countComments"];
         $discussion["dateInserted"] = TrackableDateUtils::getDateTime($discussion["dateInserted"]);
         $discussion["discussionUser"] = $this->userUtils->getTrackableUser($discussion["insertUserID"]);
+        $eventManager = \Gdn::eventManager();
+        $eventManager->dispatch(new TrackableDiscussionAnalyticsEvent($discussion));
 
         return $discussion;
     }

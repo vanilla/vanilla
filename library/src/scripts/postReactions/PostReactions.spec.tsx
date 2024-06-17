@@ -5,7 +5,6 @@
  */
 
 import { IUserFragment } from "@library/@types/api/users";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { mockAPI } from "@library/__tests__/utility";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
@@ -22,6 +21,7 @@ import { useReactionLog } from "./PostReactions.hooks";
 import { PostReactionsLog } from "./PostReactionsLog";
 import { vitest } from "vitest";
 import MockAdapter from "axios-mock-adapter/types";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 
 let mockAdapter: MockAdapter;
 const REACTIONS_URL = "/discussions/1/reactions";
@@ -36,7 +36,9 @@ function queryClientWrapper() {
     const queryClient = new QueryClient();
     const Wrapper = ({ children }) => (
         <QueryClientProvider client={queryClient}>
-            <TestReduxProvider state={{ users: { current: UserFixture.adminAsCurrent } }}>{children}</TestReduxProvider>
+            <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
+                {children}
+            </CurrentUserContextProvider>
         </QueryClientProvider>
     );
 
@@ -52,7 +54,7 @@ function MockProvider(props: { children: ReactNode }) {
     };
 
     return (
-        <TestReduxProvider state={{ users: { current: UserFixture.adminAsCurrent } }}>
+        <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
             <PostReactionsContext.Provider
                 value={{
                     reactionLog,
@@ -64,7 +66,7 @@ function MockProvider(props: { children: ReactNode }) {
             >
                 {props.children}
             </PostReactionsContext.Provider>
-        </TestReduxProvider>
+        </CurrentUserContextProvider>
     );
 }
 

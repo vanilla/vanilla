@@ -18,7 +18,6 @@ export const injectSpoilerComponent = <V extends Value = Value>(
 
     if (element.type === spoilerType) {
         // eslint-disable-next-line no-console
-        console.log("injectSpoilerComponent", props);
 
         const SpoilerComponent = ({ children }) => (
             <div className="spoiler isShowingSpoiler">

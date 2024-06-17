@@ -26,8 +26,6 @@ use Vanilla\Web\Controller;
  */
 class RoleRequestsApiController extends Controller
 {
-    public const DEFAULT_TTL = "5 days";
-
     /**
      * @var RoleRequestModel
      */
@@ -364,7 +362,6 @@ class RoleRequestsApiController extends Controller
     public function patch_applications(int $roleRequestID, array $body, array $query = []): Data
     {
         $this->permission("Garden.Community.Manage");
-
         $row = $this->requestModel->selectSingle(["roleRequestID" => $roleRequestID]);
         $roleID = $row["roleID"];
 
@@ -372,17 +369,12 @@ class RoleRequestsApiController extends Controller
             throw new PermissionException("Garden.Settings.Manage");
         }
 
-        $in = Schema::parse(["status"])->add($this->requestModel->getWriteSchema());
+        $in = Schema::parse(["status?", "attributes?"])
+            ->add($this->requestModel->getWriteSchema())
+            ->setField("properties.attributes", ["type" => "object"]);
         $body = $in->validate($body);
 
-        // Set the expiry for closed applications.
-        if (in_array($body["status"], [RoleRequestModel::STATUS_APPROVED, RoleRequestModel::STATUS_DENIED])) {
-            $body["ttl"] = self::DEFAULT_TTL;
-        } else {
-            $body["dateExpires"] = null;
-        }
-
-        $this->requestModel->update($body, ["roleRequestID" => $roleRequestID, "status <>" => $body["status"]]);
+        $this->requestModel->update($body, ["roleRequestID" => $roleRequestID]);
         $result = $this->getInternal($roleRequestID, $query);
         return $result;
     }

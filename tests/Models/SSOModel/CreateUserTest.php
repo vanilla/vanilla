@@ -7,7 +7,11 @@
 
 namespace VanillaTests\Models\SSOModel;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ServerException;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
@@ -73,12 +77,12 @@ class CreateUserTest extends SharedBootstrapTestCase
      * @param $options
      * @param $expectedResult
      *
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws \Garden\Schema\ValidationException
-     * @throws \Garden\Web\Exception\ClientException
-     * @throws \Garden\Web\Exception\NotFoundException
-     * @throws \Garden\Web\Exception\ServerException
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws ClientException
+     * @throws NotFoundException
+     * @throws ServerException
      */
     public function testCreateUser($configurations, $ssoDataArray, $options, $expectedResult)
     {

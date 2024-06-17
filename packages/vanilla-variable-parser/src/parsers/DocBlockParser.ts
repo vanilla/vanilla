@@ -219,7 +219,7 @@ export class DocBlockParser<T extends DocBlockResult = DocBlockResult> {
                     // Try to match some text.
                     const lineMatch = line.match(GENERIC_TEXT_LINE);
                     if (lineMatch) {
-                        currentValue += "\n" + lineMatch.groups?.text ?? "";
+                        currentValue += "\n" + (lineMatch.groups?.text ?? "");
                     }
                 } else {
                     // this is a line that doesn't actually match at all.

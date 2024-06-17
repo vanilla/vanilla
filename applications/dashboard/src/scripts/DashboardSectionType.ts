@@ -4,17 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { Loadable, LoadStatus } from "@library/@types/api/core";
+import { INavigationItemBadge, Loadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 
 export interface IDashboardSectionStore extends ICoreStoreState {
     dashboard: IDashboardSectionState;
-}
-
-export interface IDashboardLinkBadge {
-    type: string;
-    url?: string;
-    text?: string;
 }
 
 export interface IDashboardGroupLink {
@@ -23,7 +17,7 @@ export interface IDashboardGroupLink {
     parentID: string;
     url: string;
     react: boolean;
-    badge?: IDashboardLinkBadge;
+    badge?: INavigationItemBadge;
 }
 
 export interface IDashboardSectionGroup {

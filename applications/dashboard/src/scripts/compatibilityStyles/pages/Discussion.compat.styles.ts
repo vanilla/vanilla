@@ -128,7 +128,7 @@ export const discussionCompatCSS = () => {
 
     cssOut("body.Discussion .MItem-Resolved", {
         width: 20,
-        height: 14,
+        height: 16,
         padding: 0,
         marginBottom: 0,
         verticalAlign: "middle",

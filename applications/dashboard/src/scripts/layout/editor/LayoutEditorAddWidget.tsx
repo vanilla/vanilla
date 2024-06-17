@@ -18,7 +18,7 @@ import { cx } from "@library/styles/styleShim";
 import { Icon } from "@vanilla/icons";
 import { useFocusOnActivate } from "@vanilla/react-utils";
 import React, { useRef, useState } from "react";
-import { extractDataByKeyLookup } from "./utils";
+import { extractDataByKeyLookup } from "@vanilla/json-schema-forms";
 
 interface IProps {
     path: ILayoutEditorDestinationPath;

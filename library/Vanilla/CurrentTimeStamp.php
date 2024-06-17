@@ -9,6 +9,7 @@ namespace Vanilla;
 
 use DateTimeImmutable;
 use Firebase\JWT\JWT;
+use http\Exception\RuntimeException;
 use Vanilla\Utility\DebugUtils;
 
 /**
@@ -23,8 +24,10 @@ final class CurrentTimeStamp
      * Format dates consistent with MySQL requirements.
      */
     const MYSQL_DATE_FORMAT = "Y-m-d H:i:s";
+    const MYSQL_DATE_FORMAT_PRECISE = "Y-m-d H:i:s.u";
+    const PRECISE_DATE_FORMAT = "U.u";
 
-    /** @var int */
+    /** @var string */
     private static $timeMock = null;
 
     /**
@@ -46,23 +49,42 @@ final class CurrentTimeStamp
     }
 
     /**
+     * @return float
+     */
+    public static function getPrecise(): float
+    {
+        return self::$timeMock ?? microtime(true);
+    }
+
+    /**
      * Get the current date time object.
      *
      * @return \DateTimeImmutable
      */
     public static function getDateTime(): \DateTimeImmutable
     {
-        return new \DateTimeImmutable("@" . self::get());
+        $timestamp = (string) self::getPrecise();
+        if (!str_contains($timestamp, ".")) {
+            $timestamp .= ".0";
+        }
+        $date = \DateTimeImmutable::createFromFormat(self::PRECISE_DATE_FORMAT, $timestamp);
+        if (!$date instanceof DateTimeImmutable) {
+            throw new \RuntimeException("Could not parse timestamp {$timestamp} into DateTimeImmutable.");
+        }
+
+        return $date;
     }
 
     /**
      * Get the current date as a MySQL formatted string (UTC).
      *
+     * @param bool $precise Use microsecond precision.
+     *
      * @return string
      */
-    public static function getMySQL(): string
+    public static function getMySQL(bool $precise = false): string
     {
-        return gmdate(self::MYSQL_DATE_FORMAT, self::get());
+        return self::getDateTime()->format($precise ? self::MYSQL_DATE_FORMAT_PRECISE : self::MYSQL_DATE_FORMAT);
     }
 
     /**
@@ -100,8 +122,8 @@ final class CurrentTimeStamp
     {
         self::assertTestMode();
         $date = self::coerceDateTime($toMock);
-        self::$timeMock = $date->getTimestamp();
-        JWT::$timestamp = self::$timeMock;
+        self::$timeMock = (float) $date->format(self::PRECISE_DATE_FORMAT);
+        JWT::$timestamp = $date->getTimestamp();
         return $date;
     }
 

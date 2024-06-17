@@ -17,6 +17,7 @@ import { ErrorIcon } from "@library/icons/common";
 import { Icon } from "@vanilla/icons";
 import { IServerError } from "@library/@types/api/core";
 import LinkAsButton from "@library/routing/LinkAsButton";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 
 export type IMessageProps =
     | {
@@ -51,7 +52,7 @@ export type IMessageProps =
                 stringContents: string;
             }
           | {
-                error: IServerError;
+                error: IServerError | IError;
             }
       );
 
@@ -173,7 +174,11 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
             </div>
             {/* Does not visually render, but sends message to screen reader users*/}
             {!!stringContents && (
-                <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={stringContents} aria-live="assertive" />
+                <LiveMessage
+                    clearOnUnmount={!!props.clearOnUnmount}
+                    message={stringContents as any}
+                    aria-live="assertive"
+                />
             )}
         </>
     );

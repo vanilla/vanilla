@@ -49,6 +49,7 @@ class Logger implements LoggerInterface
         self::FIELD_SERVICE,
     ];
 
+    public const CHANNEL_AUDIT = "audit";
     public const CHANNEL_ADMIN = "admin";
     public const CHANNEL_APPLICATION = "application";
     public const CHANNEL_MODERATION = "moderation";

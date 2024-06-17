@@ -292,4 +292,19 @@ class LocaleModel
     {
         return ["ar", "fa", "he", "ku", "ps", "sd", "ug", "ur", "yi"];
     }
+
+    /**
+     * Check if the current locale is an enabled locale
+     *
+     * @param string $selectedLocale
+     * @return bool
+     */
+    public function isEnabled(string $selectedLocale): bool
+    {
+        $enabledLocales = $this->enabledLocalePacks();
+        if (!in_array("en", $enabledLocales)) {
+            $enabledLocales["en"] = "en";
+        }
+        return in_array($selectedLocale, $enabledLocales);
+    }
 }

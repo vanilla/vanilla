@@ -270,4 +270,23 @@ class GdnFormatTest extends MinimalContainerTestCase
         }
         $this->assertEquals($tooManyAlphas, \Gdn_Format::mentions($tooManyAlphas));
     }
+    /**
+     * @link https://higherlogic.atlassian.net/browse/VNLA-6276
+     *
+     * @return void
+     */
+    public function testYoutubeEmbedNoMinutes(): void
+    {
+        $markdown = <<<MD
+Why are we discussing superbowls  in a baseball thread?  Anyway  here is the definitive answer on this topic\r\n\r\nhttps://www.youtube.com/watch?v=GXtXE2-MaUYt=41s
+MD;
+
+        $actual = \Gdn_Format::markdown($markdown);
+        $expected = <<<HTML
+<p>Why are we discussing superbowls  in a baseball thread?  Anyway  here is the definitive answer on this topic</p>
+<p><span class="VideoWrap"><span class="Video YouTube" data-youtube="youtube-GXtXE2-MaUY?autoplay=1&amp;start=41"><span class="VideoPreview"><a href="https://www.youtube.com/watch?v=GXtXE2-MaUY"><img src="https://img.youtube.com/vi/GXtXE2-MaUY/0.jpg" width="640" height="385" border="0" class="embedImage-img importedEmbed-img"></img>https://www.youtube.com/watch?v=GXtXE2-MaUYt=41s</a></span><span class="VideoPlayer"></span></span></span></p>
+HTML;
+
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
 }

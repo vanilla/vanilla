@@ -26,6 +26,7 @@ export const inputClasses = ({ size = "default" }: InputClassesProps) => ({
         color: "#3c4146",
         border: "solid 1px #bfcbd8",
         backgroundColor: "#ffffff",
+        fontWeight: "initial",
 
         ...{
             small: {

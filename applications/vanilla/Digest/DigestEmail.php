@@ -14,8 +14,6 @@ use Vanilla\Logging\ErrorLogger;
 
 class DigestEmail extends \Gdn_Email implements LoggerAwareInterface
 {
-    public const FEATURE_FLAG = "Digest";
-
     use LoggerAwareTrait;
 
     // Day names for strtotime based on the digest.dayOfWeek config.

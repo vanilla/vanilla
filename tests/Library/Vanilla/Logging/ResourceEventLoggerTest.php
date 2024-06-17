@@ -12,13 +12,17 @@ use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Logging\ResourceEventLogger;
 use Psr\Log\LoggerInterface;
 use Vanilla\Logger;
+use VanillaTests\AuditLogTestTrait;
 use VanillaTests\Library\Vanilla\TestLogger;
+use VanillaTests\SiteTestCase;
 
 /**
  * Test for the ResourceEventLogger.
  */
-class ResourceEventLoggerTest extends TestCase
+class ResourceEventLoggerTest extends SiteTestCase
 {
+    use AuditLogTestTrait;
+
     /** @var ResourceEventLogger */
     private $eventLogger;
 
@@ -30,9 +34,10 @@ class ResourceEventLoggerTest extends TestCase
      */
     public function setUp(): void
     {
+        parent::setUp();
         $parentLogger = new Logger();
         $this->logger = new TestLogger($parentLogger);
-
+        \Gdn::getContainer()->setInstance(LoggerInterface::class, $this->logger);
         $this->eventLogger = new ResourceEventLogger($this->logger);
     }
 
@@ -88,13 +93,13 @@ class ResourceEventLoggerTest extends TestCase
 
         $expected = [
             "info",
-            "Comment updated.",
+            "Comment updated by `circleci`.",
             [
-                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
-                "event" => $event->getType() . "_" . $event->getAction(),
+                Logger::FIELD_CHANNEL => "audit",
+                "event" => $event->getFullEventName(),
                 "comment" => $payload["comment"],
-                "resourceAction" => $event->getAction(),
-                "resourceType" => $event->getType(),
+                Logger::FIELD_USERID => 2,
+                Logger::FIELD_USERNAME => "circleci",
             ],
         ];
 
@@ -113,15 +118,13 @@ class ResourceEventLoggerTest extends TestCase
 
         $expected = [
             "info",
-            "Comment updated by {username}.",
+            "Comment updated by `foo`.",
             [
-                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
-                "event" => $event->getType() . "_" . $event->getAction(),
-                "comment" => $payload["comment"],
-                "resourceAction" => $event->getAction(),
-                "resourceType" => $event->getType(),
+                Logger::FIELD_CHANNEL => "audit",
+                "event" => $event->getFullEventName(),
                 Logger::FIELD_USERID => 123,
                 Logger::FIELD_USERNAME => "foo",
+                "comment" => [],
             ],
         ];
 

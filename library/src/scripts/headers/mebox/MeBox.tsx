@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,12 +9,11 @@ import classNames from "classnames";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
 import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
-import { IInjectableUserState } from "@library/features/users/userTypes";
 import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDropDown";
 import { t } from "@library/utility/appUtils";
-import apiv2 from "@library/apiv2";
-import { useIsMounted } from "@vanilla/react-utils";
-export interface IMeBoxProps extends IInjectableUserState {
+import { IMe } from "@library/@types/api/users";
+export interface IMeBoxProps {
+    currentUser?: IMe;
     countClass?: string;
     className?: string;
     countsClass?: string;
@@ -29,7 +28,7 @@ export interface IMeBoxProps extends IInjectableUserState {
  */
 export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
-        const userInfo = this.props.currentUser.data;
+        const userInfo = this.props.currentUser;
         if (!userInfo) {
             return null;
         }

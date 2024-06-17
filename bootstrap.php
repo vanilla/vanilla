@@ -17,10 +17,9 @@ use Vanilla\Formatting\FormatConfig;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
-use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
+use Vanilla\Formatting\Html\Processor\ExternalLinksAndIFramesProcessor;
 use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\HttpCacheMiddleware;
-use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
@@ -36,7 +35,6 @@ use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\Search\GlobalSearchType;
 use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchTypeCollectorInterface;
-use Vanilla\Site\OwnSite;
 use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\FsThemeProvider;
@@ -408,12 +406,11 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
 
     ->rule(BaseFormat::class)
-    ->addCall("addHtmlProcessor", [new Reference(ExternalLinksProcessor::class)])
+    ->addCall("addHtmlProcessor", [new Reference(ExternalLinksAndIFramesProcessor::class)])
 
     ->rule(BaseFormat::class)
     ->addCall("addHtmlProcessor", [new Reference(ImageHtmlProcessor::class)])
-
-    ->rule(ExternalLinksProcessor::class)
+    ->rule(ExternalLinksAndIFramesProcessor::class)
     ->addCall("setWarnLeaving", [ContainerUtils::config("Garden.Format.WarnLeaving")])
 
     ->rule(LegacyEmbedReplacer::class)

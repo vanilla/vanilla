@@ -127,9 +127,10 @@ describe("labelize()", () => {
         baz`,
             "Foo Bar Baz",
         ],
+        ["Garden.Registration.ManageCaptcha", "Garden Registration Manage Captcha"],
     ];
     tests.forEach(([str, expected]) => {
-        it("str", () => {
+        it(str, () => {
             expect(labelize(str)).toBe(expected);
         });
     });

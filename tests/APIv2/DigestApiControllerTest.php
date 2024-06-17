@@ -54,15 +54,14 @@ class DigestApiControllerTest extends AbstractAPIv2Test
         //With digest configs enabled
         $this->runWithConfig(
             [
-                "Feature.Digest.Enabled" => true,
                 "Garden.Digest.Enabled" => true,
                 "Garden.Digest.DayOfWeek" => 1.0,
             ],
             function () {
-                $currentDate = new \DateTimeImmutable("now", new \DateTimeZone("America/New_York"));
+                $currentDate = CurrentTimeStamp::mockTime("2021-05-05T09:05:30+05:00");
                 $nextScheduledDate = $currentDate
                     ->modify("next monday")
-                    ->setTime(9, 0)
+                    ->setTime(13, 0)
                     ->setTimezone(new \DateTimeZone("UTC"));
                 $upcomingDates = [];
                 $upcomingDates[] = $nextScheduledDate->format(DATE_ATOM);
@@ -82,8 +81,8 @@ class DigestApiControllerTest extends AbstractAPIv2Test
                 $this->assertEquals($expectedData, $body);
 
                 //make some entries to the digest table
-                $date = new \DateTimeImmutable();
-                $dateScheduled = $date->setISODate(date("Y") - 1, 50);
+                $date = CurrentTimeStamp::getDateTime();
+                $dateScheduled = $date->setISODate($date->format("Y") - 1, 50);
                 $scheduleDates = [];
                 for ($i = 0; $i < 3; $i++) {
                     $dateScheduled = $dateScheduled->modify("+1 week");
@@ -155,7 +154,6 @@ class DigestApiControllerTest extends AbstractAPIv2Test
         $dayOfWeek = date("w", $nextScheduleDate->getTimestamp());
         $this->runWithConfig(
             [
-                "Feature.Digest.Enabled" => true,
                 "Garden.Digest.Enabled" => true,
                 "Garden.Digest.DayOfWeek" => $dayOfWeek,
             ],
@@ -204,7 +202,6 @@ class DigestApiControllerTest extends AbstractAPIv2Test
     {
         $this->runWithConfig(
             [
-                "Feature.Digest.Enabled" => true,
                 "Garden.Digest.Enabled" => true,
                 "Garden.Digest.DayOfWeek" => 1,
             ],
@@ -240,7 +237,6 @@ class DigestApiControllerTest extends AbstractAPIv2Test
     {
         $this->runWithConfig(
             [
-                "Feature.Digest.Enabled" => true,
                 "Garden.Digest.Enabled" => true,
                 "Garden.Digest.DayOfWeek" => 1,
             ],

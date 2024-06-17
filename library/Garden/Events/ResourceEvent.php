@@ -6,16 +6,31 @@
 
 namespace Garden\Events;
 
+use Garden\Web\RequestInterface;
 use Gdn;
+use Ramsey\Uuid\Uuid;
+use Vanilla\Dashboard\Models\UserFragment;
 use Vanilla\Events\EventAction;
+use Vanilla\Logger;
+use Vanilla\Logging\AuditLogEventInterface;
+use Vanilla\Logging\BasicAuditLogTrait;
+use Vanilla\Logging\LoggableEventInterface;
+use Vanilla\Logging\LoggerUtils;
+use Vanilla\Logging\ResourceEventLogger;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\StringUtils;
 
 /**
  * An event affecting a specific resource.
  */
-abstract class ResourceEvent implements \JsonSerializable
+abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterface
 {
+    use BasicAuditLogTrait {
+        getSessionUserID as getTraitSessionUserID;
+        getSessionUsername as getTraitSessionUsername;
+    }
+
     /** A resource has been removed. */
     public const ACTION_DELETE = EventAction::DELETE;
 
@@ -40,6 +55,11 @@ abstract class ResourceEvent implements \JsonSerializable
     /** @var array $apiParams */
     protected $apiParams;
 
+    protected string $auditLogID;
+
+    /** @var RequestInterface */
+    protected RequestInterface $auditRequest;
+
     /**
      * Create the event.
      *
@@ -54,8 +74,19 @@ abstract class ResourceEvent implements \JsonSerializable
         $this->apiParams = [
             "expand" => [ModelUtils::EXPAND_CRAWL],
         ];
-        $this->sender = $sender;
+        $this->sender = $sender ?? \Gdn::userModel()->currentFragment();
         $this->type = $this->typeFromClass();
+        $this->auditLogID = Uuid::uuid4()->toString();
+    }
+
+    /**
+     * Return true to bypass {@link ResourceEventLogger} filters.
+     *
+     * @return bool
+     */
+    public function bypassLogFilters(): bool
+    {
+        return false;
     }
 
     /**
@@ -244,5 +275,147 @@ abstract class ResourceEvent implements \JsonSerializable
     public function getBaseAction(): string
     {
         return $this->getAction();
+    }
+
+    ///
+    /// Audit Logging
+    ///
+
+    /**
+     * We can format audit messages for all resource events.
+     * {@inheritDoc}
+     */
+    public static function canFormatAuditMessage(string $eventType, array $context, array $meta): bool
+    {
+        $isResourceEvent = $meta["isResourceEvent"] ?? false;
+        return $isResourceEvent;
+    }
+
+    /**
+     * User the explicit log entry message if {@link LoggableEventInterface} is implemented.
+     * {@inheritDoc}
+     */
+    public static function formatAuditMessage(string $eventType, array $context, array $meta): string
+    {
+        if ($logEntryMessage = $meta["logEntryMessage"] ?? null) {
+            return $logEntryMessage;
+        }
+
+        // Otherwise do our best with the event name.
+        return StringUtils::labelize($eventType);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAuditEventType(): string
+    {
+        return $this->getFullEventName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAuditContext(): array
+    {
+        if ($this instanceof LoggableEventInterface) {
+            $logEntry = $this->getLogEntry();
+            $context = $logEntry->getContext();
+            // remove some common fields we don't care about
+            unset(
+                $context[Logger::FIELD_EVENT],
+                $context[Logger::FIELD_CHANNEL],
+                $context[Logger::FIELD_USERID],
+                $context[Logger::FIELD_USERNAME],
+                $context["resourceAction"],
+                $context["resourceType"]
+            );
+            return $context;
+        }
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAuditMeta(): array
+    {
+        $message =
+            $this instanceof LoggableEventInterface
+                ? $this->getLogEntry()->getMessage()
+                : LoggerUtils::resourceEventLogMessage($this);
+        return [
+            "isResourceEvent" => true,
+            "logEntryMessage" => $message,
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAuditLogID(): string
+    {
+        return $this->auditLogID;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getModifications(): ?array
+    {
+        $existingData = $this->getPayload()["existingData"] ?? null;
+        if ($existingData === null) {
+            return null;
+        }
+
+        $newData = $this->getPayload()[$this->getType()] ?? null;
+        if ($newData === null) {
+            return null;
+        }
+
+        foreach ($existingData as $key => $value) {
+            if (str_starts_with($key, "date")) {
+                unset($existingData[$key]);
+            }
+        }
+
+        foreach ($newData as $key => $value) {
+            if (str_starts_with($key, "date")) {
+                unset($newData[$key]);
+            }
+        }
+        $diff = LoggerUtils::diffArrays($existingData, $newData);
+        return empty($diff) ? null : $diff;
+    }
+
+    /**
+     * @return string
+     */
+    public static function eventType(): string
+    {
+        // Actually get's overridden.
+        return "resourceEvent";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSessionUserID(): int
+    {
+        if (isset($this->sender["userID"])) {
+            return $this->sender["userID"];
+        }
+        return $this->getTraitSessionUserID();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSessionUsername(): string
+    {
+        if (isset($this->sender["name"])) {
+            return $this->sender["name"];
+        }
+        return $this->getTraitSessionUsername();
     }
 }

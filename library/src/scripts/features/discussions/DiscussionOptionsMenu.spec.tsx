@@ -42,16 +42,16 @@ const renderInProvider = async (permissions?: string[]) => {
                     state={{
                         discussions: {
                             discussionsByID: {
-                                10: {
+                                [`${discussion.discussionID}`]: {
                                     status: LoadStatus.SUCCESS,
                                     data: discussion,
                                 },
                             },
                             deleteStatusesByID: {
-                                10: LoadStatus.SUCCESS,
+                                [`${discussion.discussionID}`]: LoadStatus.SUCCESS,
                             },
                             patchStatusByPatchID: {
-                                "10-sink": LoadStatus.SUCCESS,
+                                [`${discussion.discussionID}-sink`]: LoadStatus.SUCCESS,
                             },
                         },
                     }}
@@ -136,6 +136,7 @@ describe("Discussion List Options Menu", () => {
             "Revision History",
             "Deleted Comments",
             "Check Analytics Data",
+            "Report",
         ];
         addDiscussionOption({
             permission: {

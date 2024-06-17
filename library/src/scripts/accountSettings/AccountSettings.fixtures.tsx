@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -11,6 +11,7 @@ import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { AccountSettingsContext } from "@library/accountSettings/AccountSettingsContext";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { IUser } from "@library/@types/api/users";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 
 export function UserEditingSelf({
     children,
@@ -29,9 +30,6 @@ export function UserEditingSelf({
         <TestReduxProvider
             state={{
                 users: {
-                    current: {
-                        ...UserFixture.adminAsCurrent,
-                    },
                     usersByID: {
                         2: {
                             status: LoadStatus.SUCCESS,
@@ -42,19 +40,21 @@ export function UserEditingSelf({
                 },
             }}
         >
-            <AccountSettingsContext.Provider
-                value={{
-                    canEditEmails: editEmailsConfigValue,
-                    canEditUsers: false,
-                    canEditUsernames: hasEditUsernamesPermission,
-                    viewingUser: UserFixture.createMockUser({ userID: 2, ...mockUserOverrides }),
-                    minPasswordLength: 12,
-                    isViewingSelf: true,
-                    viewingUserID: 2,
-                }}
-            >
-                {children}
-            </AccountSettingsContext.Provider>
+            <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
+                <AccountSettingsContext.Provider
+                    value={{
+                        canEditEmails: editEmailsConfigValue,
+                        canEditUsers: false,
+                        canEditUsernames: hasEditUsernamesPermission,
+                        viewingUser: UserFixture.createMockUser({ userID: 2, ...mockUserOverrides }),
+                        minPasswordLength: 12,
+                        isViewingSelf: true,
+                        viewingUserID: 2,
+                    }}
+                >
+                    {children}
+                </AccountSettingsContext.Provider>
+            </CurrentUserContextProvider>
         </TestReduxProvider>
     );
 }

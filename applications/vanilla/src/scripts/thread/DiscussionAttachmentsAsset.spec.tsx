@@ -4,9 +4,11 @@
  * @license Proprietary
  */
 
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { INTEGRATIONS_META_KEY } from "@library/features/discussions/integrations/Integrations.context";
 import {
+    FAKE_ATTACHMENT,
     FAKE_INTEGRATIONS_CATALOG,
     IntegrationsTestWrapper,
     mockApi,
@@ -17,7 +19,7 @@ import { RenderResult, act, render } from "@testing-library/react";
 import DiscussionAttachmentsAsset from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import { vitest } from "vitest";
 
-const mockDiscussion = LayoutEditorPreviewData.discussion();
+const mockDiscussion: IDiscussion = { ...LayoutEditorPreviewData.discussion(), attachments: [FAKE_ATTACHMENT] };
 
 beforeAll(() => {
     setMeta(INTEGRATIONS_META_KEY, FAKE_INTEGRATIONS_CATALOG);

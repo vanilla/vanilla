@@ -17,15 +17,21 @@ class CurrentDateFieldProcessor implements Processor
 {
     private array $insertFields;
     private array $updateFields;
+    private bool $precise;
 
     /**
      * @param array|string[] $insertFields
      * @param array|string[] $updateFields
+     * @param bool $precise Use microsecond date precision.
      */
-    public function __construct(array $insertFields = ["DateInserted"], array $updateFields = ["DateUpdated"])
-    {
+    public function __construct(
+        array $insertFields = ["DateInserted"],
+        array $updateFields = ["DateUpdated"],
+        bool $precise = false
+    ) {
         $this->insertFields = $insertFields;
         $this->updateFields = $updateFields;
+        $this->precise = $precise;
     }
 
     /**
@@ -89,10 +95,14 @@ class CurrentDateFieldProcessor implements Processor
             if ($fieldExists) {
                 $set = $operation->getSet();
                 if (empty($set[$field] ?? null) || $operation->getMode() === Operation::MODE_DEFAULT) {
-                    $set[$field] = CurrentTimeStamp::getMySQL();
+                    $set[$field] = CurrentTimeStamp::getMySQL($this->precise);
                 } else {
                     if ($set[$field] instanceof \DateTimeImmutable) {
-                        $set[$field] = $set[$field]->format(CurrentTimeStamp::MYSQL_DATE_FORMAT);
+                        $set[$field] = $set[$field]->format(
+                            $this->precise
+                                ? CurrentTimeStamp::MYSQL_DATE_FORMAT_PRECISE
+                                : CurrentTimeStamp::MYSQL_DATE_FORMAT
+                        );
                     }
                 }
                 $operation->setSet($set);

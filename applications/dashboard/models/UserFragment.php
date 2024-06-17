@@ -106,7 +106,7 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
      * @param int $flags
      * @return array
      */
-    private function getSensitiveData(int $flags): array
+    public function getSensitiveData(int $flags): array
     {
         $sensitive = [];
 

@@ -9,7 +9,8 @@ import UserContent from "@library/content/UserContent";
 import { userContentVariables } from "@library/content/UserContent.variables";
 import { DetailedErrors } from "@library/errorPages/DetailedErrorMessages";
 import { pageErrorMessageClasses } from "@library/errorPages/pageErrorMessageStyles";
-import { isUserGuest, useUsersState } from "@library/features/users/userModel";
+import { useCurrentUser } from "@library/features/users/userHooks";
+import { isUserGuest } from "@library/features/users/userModel";
 import { buttonClasses } from "@library/forms/Button.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { SearchErrorIcon } from "@library/icons/common";
@@ -104,8 +105,8 @@ export function parseErrorCode(errorCode?: string | number): IError {
 }
 
 function ErrorSignIn() {
-    const { currentUser } = useUsersState();
-    if (currentUser.status === LoadStatus.SUCCESS && currentUser.data && isUserGuest(currentUser.data)) {
+    const currentUser = useCurrentUser();
+    if (!!currentUser && isUserGuest(currentUser)) {
         return (
             <LinkAsButton to={`/entry/signin?Target=${encodeURIComponent(window.location.href)}`}>
                 {t("Sign In")}

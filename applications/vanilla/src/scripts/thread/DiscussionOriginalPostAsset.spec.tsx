@@ -1,6 +1,6 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,12 +8,12 @@ import React, { ReactNode } from "react";
 import { act, render, screen, within } from "@testing-library/react";
 import DiscussionOriginalPostAsset from "@vanilla/addon-vanilla/thread/DiscussionOriginalPostAsset";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
-import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
 import { DiscussionFixture } from "./__fixtures__/Discussion.Fixture";
 import { GUEST_USER_ID } from "@library/features/users/userModel";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 
 const MOCK_CATEGORY_FRAGMENT: ICategoryFragment = {
     categoryID: DiscussionFixture.mockDiscussion.categoryID,
@@ -37,25 +37,11 @@ async function renderInProvider(children: ReactNode, currentUser?: Partial<IMe>)
 
     await act(async () => {
         render(
-            <QueryClientProvider client={queryClient}>
-                <TestReduxProvider
-                    state={{
-                        users: {
-                            current: {
-                                status: LoadStatus.SUCCESS,
-                                data: {
-                                    isAdmin: false,
-                                    countUnreadNotifications: 0,
-                                    countUnreadConversations: 0,
-                                    ...currentUser,
-                                } as IMe,
-                            },
-                        },
-                    }}
-                >
-                    {children}
-                </TestReduxProvider>
-            </QueryClientProvider>,
+            <TestReduxProvider>
+                <QueryClientProvider client={queryClient}>
+                    <CurrentUserContextProvider currentUser={currentUser as IMe}>{children}</CurrentUserContextProvider>
+                </QueryClientProvider>
+            </TestReduxProvider>,
         );
     });
 }

@@ -173,7 +173,7 @@ trait RssWidgetTrait
             }
         }
 
-        if (!$rssFeedContent) {
+        if (!isset($rssFeedContent)) {
             return null;
         }
 

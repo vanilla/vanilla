@@ -70,7 +70,7 @@ export function ThreadItem(props: IProps) {
                 <>
                     {userContent}
                     {props.actions}
-                    <ThreadItemActions reactions={props.reactions} />
+                    {props.reactions && <ThreadItemActions reactions={props.reactions} />}
                     {!!props.attachmentsContent && (
                         <div className={classes.attachmentsContentWrapper}>{props.attachmentsContent}</div>
                     )}

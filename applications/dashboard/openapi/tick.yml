@@ -11,6 +11,7 @@ paths:
                             oneOf:
                                 - $ref: "#/components/schemas/PageView"
                                 - $ref: "#/components/schemas/TrackableSearch"
+                                - $ref: "#/components/schemas/ExternalNavigation"
 
                 required: true
             responses:
@@ -135,3 +136,11 @@ components:
                 - domain
                 - searchResults
                 - searchQuery
+        ExternalNavigation:
+            properties:
+                destinationUrl:
+                    description: External URL the user navigated to
+                    type: string
+            required:
+                - destinationUrl
+            type: object

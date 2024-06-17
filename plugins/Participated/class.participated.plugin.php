@@ -8,6 +8,7 @@
  */
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Smarty\Smarty;
 use Vanilla\Theme\VariableProviders\QuickLink;
 use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;

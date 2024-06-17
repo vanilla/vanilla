@@ -49,7 +49,7 @@ paths:
                                 type: array
                     description: Success
             tags:
-                - Messages
+                - Conversations
             summary: List user messages.
         post:
             responses:
@@ -60,7 +60,7 @@ paths:
                                 $ref: "#/components/schemas/Message"
                     description: Success
             tags:
-                - Messages
+                - Conversations
             requestBody:
                 content:
                     application/json:
@@ -86,7 +86,7 @@ paths:
                                 $ref: "#/components/schemas/Message"
                     description: Success
             tags:
-                - Messages
+                - Conversations
             summary: Get a message.
 components:
     schemas:

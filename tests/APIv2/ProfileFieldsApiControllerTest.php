@@ -94,14 +94,6 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
     /**
      * @inheritDoc
      */
-    public function testGet()
-    {
-        $this->markTestSkipped("This resource doesn't have a GET /profile-fields/{id} endpoint");
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function testGetEdit($record = null)
     {
         $this->markTestSkipped("This resource doesn't have a GET /profile-fields/{id}/edit endpoint");

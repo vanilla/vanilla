@@ -67,6 +67,22 @@
         return decodeURIComponent(escape(string));
     };
 
+    var auditLog = gdn.meta.auditLog;
+    if (auditLog) {
+        var auditLog = gdn.meta.auditLog;
+        if (auditLog) {
+            $.ajaxPrefilter(function (options) {
+                if (!options.headers) {
+                    options.headers = {};
+                }
+                options.headers["X-Parent-Audit-Log-Id"] = auditLog.auditLogID;
+                options.headers["X-Parent-Audit-Log-Request-Path"] = auditLog.requestPath;
+                options.headers["X-Parent-Audit-Log-Request-Method"] = auditLog.requestMethod;
+                options.headers["X-Parent-Audit-Log-Request-Query"] = JSON.stringify(auditLog.requestQuery);
+            });
+        }
+    }
+
     $.extend({
         // private property
         keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",

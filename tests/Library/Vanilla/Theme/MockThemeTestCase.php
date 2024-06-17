@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Vanilla\Theme;
 
 use Vanilla\AddonManager;
 use Vanilla\Theme\Asset\CssThemeAsset;
+use Vanilla\Theme\Theme;
 use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
@@ -17,11 +18,13 @@ use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\Theme\MockThemeProvider;
 use VanillaTests\MinimalContainerTestCase;
+use VanillaTests\SiteTestCase;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for getting the current theme from the theme model.
  */
-abstract class MockThemeTestCase extends MinimalContainerTestCase
+abstract class MockThemeTestCase extends SiteTestCase
 {
     /** @var MockThemeProvider */
     protected $mockThemeProvider;
@@ -29,37 +32,23 @@ abstract class MockThemeTestCase extends MinimalContainerTestCase
     /** @var MockAddonManager */
     protected $addonManager;
 
-    /**
-     * If someone wants to untangle this be my guest.
-     *
-     * @return bool
-     */
-    protected static function useCommonBootstrap(): bool
+    public function setUp(): void
     {
-        return false;
-    }
+        parent::setUp();
 
-    /**
-     * Prepare the container.
-     */
-    public function configureContainer(): void
-    {
-        // Fresh container.
-        parent::configureContainer();
+        $this->addonManager = new MockAddonManager();
 
         self::container()
-            // Instances.
-            ->rule(AddonManager::class)
-            ->setShared(true)
-            ->setClass(MockAddonManager::class)
+            ->setInstance(AddonManager::class, $this->addonManager)
             ->setInstance(\Gdn_Cache::class, new \Gdn_Dirtycache());
 
-        $this->addonManager = self::container()->get(AddonManager::class);
+        self::container()->get(MockThemeProvider::class);
+        self::container()->setInstance(ThemeService::class, null);
         $this->mockThemeProvider = self::container()->get(MockThemeProvider::class);
 
-        self::container()
-            ->rule(ThemeService::class)
-            ->addCall("addThemeProvider", [$this->mockThemeProvider]);
+        $themeService = self::container()->get(ThemeService::class);
+        $themeService->clearThemeProviders();
+        $themeService->addThemeProvider($this->mockThemeProvider);
     }
 
     /**

@@ -644,6 +644,7 @@ class VanillaHooks extends Gdn_Plugin
             "Vanilla.Comments.Add" => 1,
             "Vanilla.Comments.Edit" => 1,
             "Vanilla.Comments.Delete" => 1,
+            "Vanilla.Posts.Moderate" => 1,
         ]);
         $sender->addDefault(
             RoleModel::TYPE_MODERATOR,
@@ -658,6 +659,7 @@ class VanillaHooks extends Gdn_Plugin
                 "Vanilla.Comments.Add" => 1,
                 "Vanilla.Comments.Edit" => 1,
                 "Vanilla.Comments.Delete" => 1,
+                "Vanilla.Posts.Moderate" => 1,
             ],
             "Category",
             -1
@@ -675,6 +677,7 @@ class VanillaHooks extends Gdn_Plugin
             "Vanilla.Comments.Add" => 1,
             "Vanilla.Comments.Edit" => 1,
             "Vanilla.Comments.Delete" => 1,
+            "Vanilla.Posts.Moderate" => 1,
         ]);
         $sender->addDefault(
             RoleModel::TYPE_ADMINISTRATOR,
@@ -689,6 +692,7 @@ class VanillaHooks extends Gdn_Plugin
                 "Vanilla.Comments.Add" => 1,
                 "Vanilla.Comments.Edit" => 1,
                 "Vanilla.Comments.Delete" => 1,
+                "Vanilla.Posts.Moderate" => 1,
             ],
             "Category",
             -1
@@ -1207,9 +1211,8 @@ class VanillaHooks extends Gdn_Plugin
                 "Moderation",
                 t("Flood Control"),
                 "/vanilla/settings/floodcontrol",
-                "content.flood-control",
-                "nav-flood-control",
-                $sort
+                "site.flood-control",
+                "nav-flood-control"
             );
     }
 

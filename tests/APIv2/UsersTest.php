@@ -370,8 +370,10 @@ class UsersTest extends AbstractResourceTest
                 "discussions.sink",
                 "discussions.view",
                 "email.view",
+                "flag.add",
                 "internalInfo.view",
                 "personalInfo.view",
+                "posts.moderate",
                 "profile.editusernames",
                 "profiles.edit",
                 "profiles.view",
@@ -635,6 +637,25 @@ class UsersTest extends AbstractResourceTest
         $user = $this->createUser(["name" => __FUNCTION__]);
         $response = $this->api()->patch("/users/{$user["userID"]}", ["private" => true]);
         $this->assertTrue($response->getBody()["private"]);
+    }
+
+    /**
+     * Test that the private field can be patched.
+     */
+    public function testPatchSuggestAnswersField()
+    {
+        $user = $this->createUser(["name" => __FUNCTION__]);
+        $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
+        $this->assertArrayNotHasKey("suggestAnswers", $response->getBody());
+        $this->runWithConfig(
+            ["Feature.AISuggestions.Enabled" => true, "aiSuggestions.enabled" => true],
+            function () use ($user) {
+                $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
+                $this->assertSame("0", $response->getBody()["suggestAnswers"]);
+                $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => true]);
+                $this->assertSame("1", $response->getBody()["suggestAnswers"]);
+            }
+        );
     }
 
     /**

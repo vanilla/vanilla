@@ -62,6 +62,11 @@ export function dateStringInUrlToDateRange(dateStringInUrl: string): { start?: s
         const datesArray = dateString.split(",");
         dateRange.start = datesArray[0];
         dateRange.end = datesArray[1];
+
+        // exact date
+    } else if (dateStringInUrl.length > 0) {
+        dateRange.start = dateStringInUrl;
+        dateRange.end = dateStringInUrl;
     }
 
     return dateRange;

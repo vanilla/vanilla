@@ -54,8 +54,11 @@ class LayoutPageTest extends SiteTestCase
     public function testPreloadLayout()
     {
         $layoutPage = $this->container()->get(LayoutPage::class);
-        $page = $layoutPage->preloadLayout(new LayoutQuery("home")); //, 'home', 1, $params);
+        $page = $layoutPage->preloadLayout(new LayoutQuery("home"));
 
+        $seoContent = $page->getSeoContent();
+        $this->assertStringContainsString("Quick Links", $seoContent);
+        $this->assertStringContainsString("Recent Discussions", $seoContent);
         $this->assertSame("Home - LayoutPageTest", $page->getSeoTitle());
         $this->assertSame("", $page->getSeoDescription());
     }

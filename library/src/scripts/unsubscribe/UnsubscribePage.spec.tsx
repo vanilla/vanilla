@@ -1,12 +1,12 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { mockAPI } from "@library/__tests__/utility";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { UnsubscribePageImpl } from "@library/unsubscribe/UnsubscribePage";
 import { UnsubscribeFixture } from "@library/unsubscribe/__fixtures__/Unsubscribe.Fixture";
 import { IUnsubscribeToken } from "@library/unsubscribe/unsubscribePage.types";
@@ -27,17 +27,9 @@ function queryClientWrapper() {
     const queryClient = new QueryClient();
     const Wrapper = ({ children }) => (
         <QueryClientProvider client={queryClient}>
-            <TestReduxProvider
-                state={{
-                    users: {
-                        current: {
-                            ...UserFixture.adminAsCurrent,
-                        },
-                    },
-                }}
-            >
+            <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
                 {children}
-            </TestReduxProvider>
+            </CurrentUserContextProvider>
         </QueryClientProvider>
     );
     return Wrapper;
@@ -49,19 +41,11 @@ function renderInProviders(token: IUnsubscribeToken) {
 
     return render(
         <QueryClientProvider client={queryClient}>
-            <TestReduxProvider
-                state={{
-                    users: {
-                        current: {
-                            ...UserFixture.adminAsCurrent,
-                        },
-                    },
-                }}
-            >
+            <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
                 <MemoryRouter>
                     <UnsubscribePageImpl token={token} />
                 </MemoryRouter>
-            </TestReduxProvider>
+            </CurrentUserContextProvider>
         </QueryClientProvider>,
     );
 }

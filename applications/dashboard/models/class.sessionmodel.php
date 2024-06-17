@@ -56,11 +56,12 @@ class SessionModel extends Gdn_Model
      *
      * @param int $userID user ID for creating session.
      * @param string|null $sessionID Session ID to use for the new session.
+     * @param array $attributes Attributes to store in the session.
      *
      * @return bool|array Current session.
      * @throws \Garden\Schema\ValidationException Exception when insert fails.
      */
-    public function startNewSession(int $userID, string $sessionID = null)
+    public function startNewSession(int $userID, string $sessionID = null, array $attributes = [])
     {
         $sessionName = "sid";
 
@@ -75,7 +76,7 @@ class SessionModel extends Gdn_Model
                 "UserID" => $userID,
                 "DateInserted" => CurrentTimeStamp::getMySQL(),
                 "DateExpires" => $this->getPersistExpiry()->format(CurrentTimeStamp::MYSQL_DATE_FORMAT),
-                "Attributes" => [],
+                "Attributes" => $attributes,
             ];
             if ($sessionID != null) {
                 $session["SessionID"] = $sessionID;
@@ -86,20 +87,12 @@ class SessionModel extends Gdn_Model
             ModelUtils::validationResultToValidationException($this);
             $session["SessionID"] = $sessionID;
             trace("Inserting session stash $sessionID");
-
-            // Save a session cookie.
-            $path = c("Garden.Cookie.Path", "/");
-            $domain = c("Garden.Cookie.Domain", "");
-            $expire = 0;
-
-            // If the domain being set is completely incompatible with the
-            // current domain then make the domain work.
-            $currentHost = Gdn::request()->host();
-            if (!stringEndsWith($currentHost, trim($domain, "."))) {
-                $domain = "";
-            }
         } elseif (($session["UserID"] == 0 && $userID > 0) || $userID !== $session["UserID"]) {
-            $this->update(["UserID" => $userID], ["SessionID" => $sessionID ?? $session["SessionID"]]);
+            $update = ["UserID" => $userID];
+            if (!empty($attributes)) {
+                $update["Attributes"] = $attributes;
+            }
+            $this->update($update, ["SessionID" => $sessionID ?? $session["SessionID"]]);
             $session = $this->getID($sessionID ?? $tempSessionID, DATASET_TYPE_ARRAY);
         }
 

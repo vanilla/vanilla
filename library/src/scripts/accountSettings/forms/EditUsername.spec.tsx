@@ -18,8 +18,10 @@ import { vitest } from "vitest";
 describe("Edit Username", () => {
     beforeEach(() => {
         const mockAdapter = mockAPI();
-        mockAdapter.onGet("/users/by-names").replyOnce(200, []);
+        mockAdapter.onGet("/users/by-names").reply(200, []);
+        mockAdapter.onPatch(/\/users\/.*/).reply(200, {});
     });
+
     it("Requires a password confirmation if the session user does not have the user.edit permission", async () => {
         await act(async () => {
             render(
@@ -63,9 +65,7 @@ describe("Edit Username", () => {
             );
         });
         const usernameInput = screen.getByRole("textbox");
-        await act(async () => {
-            fireEvent.change(usernameInput, { target: { value: "test name" } });
-        });
+        fireEvent.change(usernameInput, { target: { value: "test name" } });
         expect(mockFunction).toHaveBeenCalled();
     });
 

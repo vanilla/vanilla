@@ -44,6 +44,9 @@ class CategoriesApiController extends AbstractApiController
     private $categorySchema;
 
     /** @var Schema */
+    private $categoryPreferencesSchema;
+
+    /** @var Schema */
     private $idParamSchema;
 
     /** @var BreadcrumbModel */
@@ -321,12 +324,12 @@ class CategoriesApiController extends AbstractApiController
         }
         $this->permission($permission);
 
-        $out = $this->getPreferencesApiSchema();
+        $out = $this->categoryPreferencesSchema("out");
 
         $this->category($id);
 
         $preferences = $this->categoryModel->getPreferencesByCategoryID($userID, $id);
-        $normalizedPreferences = $this->normalizePreferencesOutput($preferences);
+        $normalizedPreferences = $this->categoryModel->normalizePreferencesOutput($preferences);
         $result = $out->validate($normalizedPreferences);
 
         return new Data($result);
@@ -730,7 +733,7 @@ class CategoriesApiController extends AbstractApiController
                 if (empty($userPreferences[$row["CategoryID"]])) {
                     continue;
                 } else {
-                    $rows[$key]["preferences"] = $this->normalizePreferencesOutput(
+                    $rows[$key]["preferences"] = $this->categoryModel->normalizePreferencesOutput(
                         $userPreferences[$row["CategoryID"]]["preferences"]
                     );
                 }
@@ -763,7 +766,9 @@ class CategoriesApiController extends AbstractApiController
 
         $normalizedPreferences = [];
         foreach ($preferences as $key => $preferenceSet) {
-            $preferenceSet["preferences"] = $this->normalizePreferencesOutput($preferenceSet["preferences"]);
+            $preferenceSet["preferences"] = $this->categoryModel->normalizePreferencesOutput(
+                $preferenceSet["preferences"]
+            );
             $normalizedPreferences[$key] = $preferenceSet;
         }
         $result = $out->validate(array_values($normalizedPreferences));
@@ -780,7 +785,7 @@ class CategoriesApiController extends AbstractApiController
         $fragmentSchema = $this->categoryModel->fragmentSchema();
         $preferencesSchema = SchemaFactory::parse(
             [
-                "preferences" => $this->getPreferencesApiSchema(),
+                "preferences" => $this->categoryPreferencesSchema(),
             ],
             "CategoryFragmentPreferences"
         );
@@ -874,7 +879,7 @@ class CategoriesApiController extends AbstractApiController
         }
         $this->permission($permission);
 
-        $apiSchema = $this->getPreferencesApiSchema();
+        $apiSchema = $this->categoryPreferencesSchema("in");
 
         $this->category($id);
 
@@ -898,13 +903,13 @@ class CategoriesApiController extends AbstractApiController
             }
         }
 
-        $normalizedBody = $this->normalizePreferencesInput($body);
+        $normalizedBody = $this->categoryModel->normalizePreferencesInput($body);
 
         $this->categoryModel->setPreferences($userID, $id, $normalizedBody);
 
         $preferences = $this->categoryModel->getPreferencesByCategoryID($userID, $id);
 
-        $normalizedOutput = $this->normalizePreferencesOutput($preferences);
+        $normalizedOutput = $this->categoryModel->normalizePreferencesOutput($preferences);
         $result = $apiSchema->validate($normalizedOutput);
         return new Data($result);
     }
@@ -1084,7 +1089,7 @@ class CategoriesApiController extends AbstractApiController
                 "children:a?" => $childSchema->merge(Schema::parse(["depth:i", "children:a", "sort:i"])),
                 "sort:i?",
                 "lastPost?" => \Vanilla\SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
-                "preferences?" => $this->getPreferencesApiSchema(),
+                "preferences?" => $this->categoryPreferencesSchema(),
             ])
         );
         return $schema;
@@ -1115,78 +1120,29 @@ class CategoriesApiController extends AbstractApiController
     /**
      * Get the api schema for category notification preferences.
      *
+     * @param string $type
      * @return Schema
      */
-    public static function getPreferencesApiSchema(): Schema
+    public function categoryPreferencesSchema(string $type = ""): Schema
     {
-        $preferenceSchemaArray = [
-            self::OUTPUT_PREFERENCE_FOLLOW . ":b",
-            self::OUTPUT_PREFERENCE_DISCUSSION_APP . ":b",
-            self::OUTPUT_PREFERENCE_DISCUSSION_EMAIL . ":b",
-            self::OUTPUT_PREFERENCE_COMMENT_APP . ":b",
-            self::OUTPUT_PREFERENCE_COMMENT_EMAIL . ":b",
-        ];
+        $schema = $this->schema(
+            Schema::parse([
+                self::OUTPUT_PREFERENCE_FOLLOW . ":b",
+                self::OUTPUT_PREFERENCE_DISCUSSION_APP . ":b",
+                self::OUTPUT_PREFERENCE_DISCUSSION_EMAIL . ":b",
+                self::OUTPUT_PREFERENCE_COMMENT_APP . ":b",
+                self::OUTPUT_PREFERENCE_COMMENT_EMAIL . ":b",
+            ]),
+            $type
+        );
+
         if (CategoryModel::isDigestEnabled()) {
-            $preferenceSchemaArray[] = self::OUTPUT_PREFERENCE_DIGEST . ":b?";
-        }
-        return Schema::parse($preferenceSchemaArray);
-    }
-
-    /**
-     * Get a map of the category preferences with the api fields as keys and the corresponding db fields as values.
-     *
-     * @return string[]
-     */
-    public static function getPreferencesMap(): array
-    {
-        $map = [
-            self::OUTPUT_PREFERENCE_FOLLOW => "Preferences.Follow",
-            self::OUTPUT_PREFERENCE_DISCUSSION_APP => "Preferences.Popup.NewDiscussion",
-            self::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => "Preferences.Email.NewDiscussion",
-            self::OUTPUT_PREFERENCE_COMMENT_APP => "Preferences.Popup.NewComment",
-            self::OUTPUT_PREFERENCE_COMMENT_EMAIL => "Preferences.Email.NewComment",
-        ];
-        if (CategoryModel::isDigestEnabled()) {
-            $map[self::OUTPUT_PREFERENCE_DIGEST] = "Preferences.Email.Digest";
+            $schema->add(Schema::parse([self::OUTPUT_PREFERENCE_DIGEST . ":b?"]), true);
         }
 
-        return $map;
-    }
+        $this->categoryPreferencesSchema = $this->schema($schema, "CategoryPreferences");
 
-    /**
-     * Convert preference field names and values for db input.
-     *
-     * @param array $preferencesToInput
-     * @return array
-     */
-    public static function normalizePreferencesInput(array $preferencesToInput): array
-    {
-        $preferencesMap = self::getPreferencesMap();
-        $input = [];
-        foreach ($preferencesToInput as $apiName => $value) {
-            if (isset($preferencesMap[$apiName])) {
-                $input[$preferencesMap[$apiName]] = (bool) $value;
-            }
-        }
-
-        return $input;
-    }
-
-    /**
-     * Convert preference field names and values for api output.
-     *
-     * @param array $preferencesToOutput
-     * @return array
-     */
-    public static function normalizePreferencesOutput(array $preferencesToOutput): array
-    {
-        $preferencesMap = array_flip(self::getPreferencesMap());
-        $output = [];
-        foreach ($preferencesMap as $dbName => $apiName) {
-            $output[$apiName] = $preferencesToOutput[$dbName] ?? false;
-        }
-
-        return $output;
+        return $this->schema($this->categoryPreferencesSchema, $type);
     }
 
     /**

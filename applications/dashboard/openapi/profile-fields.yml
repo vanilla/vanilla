@@ -108,6 +108,26 @@ paths:
                     description: Server Error
 
     /profile-fields/{apiName}:
+        get:
+            summary: Get a profile field by its api name.
+            tags:
+                - Profile Fields
+            parameters:
+                - description: The ID of the profile field
+                  in: path
+                  name: apiName
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ProfileField"
+                "404":
+                    description: Not Found
         patch:
             summary: Update a profile field.
             tags:

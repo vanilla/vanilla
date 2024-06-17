@@ -23,6 +23,8 @@ import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import gdn from "@library/gdn";
 import { setMeta } from "@library/utility/appUtils";
 import localLogoUrl from "./titleBarStoryLogo.png";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
+import { ReduxThemeContextProvider } from "@library/theming/Theme.context";
 
 loadTranslations({});
 
@@ -64,12 +66,6 @@ const scope = {
 
 function TestTitleBar(props: { hasConversations: boolean }) {
     const initialState = testStoreState({
-        users: {
-            current: {
-                status: LoadStatus.SUCCESS,
-                data: makeMockRegisterUser,
-            },
-        },
         theme: {
             assets: {
                 data: {
@@ -98,36 +94,55 @@ function TestTitleBar(props: { hasConversations: boolean }) {
     return (
         <MemoryRouter>
             <Provider store={getStore(initialState, true)}>
-                <TitleBarDeviceProvider>
-                    <StoryFullPage>
-                        <StoryHeading>Hamburger menu</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} />
+                <ReduxThemeContextProvider>
+                    <CurrentUserContextProvider currentUser={makeMockRegisterUser}>
+                        <TitleBarDeviceProvider>
+                            <StoryFullPage>
+                                <StoryHeading>Hamburger menu</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} />
 
-                        <StoryHeading>Hamburger menu - open</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                                <StoryHeading>Hamburger menu - open</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
 
-                        <StoryHeading>Hamburger menu - open with scope</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} scope={scope} />
+                                <StoryHeading>Hamburger menu - open with scope</StoryHeading>
+                                <TitleBar
+                                    useMobileBackButton={false}
+                                    isFixed={false}
+                                    forceVisibility={true}
+                                    scope={scope}
+                                />
 
-                        <StoryHeading>Big Logo</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} />
+                                <StoryHeading>Big Logo</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} />
 
-                        <StoryHeading>Big Logo - open</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                                <StoryHeading>Big Logo - open</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
 
-                        <StoryHeading>Big Logo - open with scope</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} scope={scope} />
+                                <StoryHeading>Big Logo - open with scope</StoryHeading>
+                                <TitleBar
+                                    useMobileBackButton={false}
+                                    isFixed={false}
+                                    forceVisibility={true}
+                                    scope={scope}
+                                />
 
-                        <StoryHeading>Extra Navigation links</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} />
+                                <StoryHeading>Extra Navigation links</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} />
 
-                        <StoryHeading>Extra Navigation links - open</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                                <StoryHeading>Extra Navigation links - open</StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
 
-                        <StoryHeading>Extra Navigation links - open with scope</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} scope={scope} />
-                    </StoryFullPage>
-                </TitleBarDeviceProvider>
+                                <StoryHeading>Extra Navigation links - open with scope</StoryHeading>
+                                <TitleBar
+                                    useMobileBackButton={false}
+                                    isFixed={false}
+                                    forceVisibility={true}
+                                    scope={scope}
+                                />
+                            </StoryFullPage>
+                        </TitleBarDeviceProvider>
+                    </CurrentUserContextProvider>
+                </ReduxThemeContextProvider>
             </Provider>
         </MemoryRouter>
     );

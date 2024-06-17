@@ -37,4 +37,13 @@ interface ConfigurationInterface
      * @return bool|int
      */
     public function saveToConfig($name, $value = "", $options = []);
+
+    /**
+     * Save one or more config values, but don't log them to audit logs.
+     *
+     * @param string|array $name
+     * @param mixed $value
+     * @return bool|int
+     */
+    public function saveWithoutAuditLog(string|array $name, mixed $value = "");
 }

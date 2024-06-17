@@ -12,7 +12,7 @@
  * @param array $params The parameters passed into the function.
  * The parameters that can be passed to this function are as follows.
  * - <b>name</b>: The name of the file.
- * @param Smarty $smarty The smarty object rendering the template.
+ * @param Smarty\Smarty $smarty The smarty object rendering the template.
  * @return string The rendered asset.
  */
 function smarty_function_include_file($params, &$smarty)

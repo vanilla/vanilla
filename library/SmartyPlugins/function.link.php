@@ -17,7 +17,7 @@
  * - <b>withdomain</b>: Whether or not to add the domain to the url.
  * - <b>text</b>: Html text to be put inside an anchor. If this value is set then an html <a></a> is returned rather than just a url.
  * - <b>id, class, etc.</b>: When an anchor is generated then any other attributes are passed through and will be written in the resulting tag.
- * @param Smarty $smarty The smarty object rendering the template.
+ * @param Smarty\Smarty $smarty The smarty object rendering the template.
  * @return string The url.
  */
 function smarty_function_link($params, &$smarty)

@@ -10,6 +10,7 @@ namespace Vanilla\Dashboard\Addon;
 use ExtendedUserFieldsExpander;
 use Garden\Container\ContainerConfigurationInterface;
 use Garden\Container\Reference;
+use Garden\Events\ResourceEvent;
 use Garden\Web\Dispatcher;
 use Garden\Web\PageControllerRoute;
 use Gdn_Session;
@@ -18,6 +19,7 @@ use UserProfileFieldsExpander;
 use SearchMembersEventProvider;
 use Vanilla\AddonContainerRules;
 use Vanilla\Analytics\EventProviderService;
+use Vanilla\Analytics\ExternalNavigationEventProvider;
 use Vanilla\Analytics\PageViewEventProvider;
 use Vanilla\Analytics\SearchAllEventProvider;
 use Vanilla\Analytics\SearchPlacesEventProvider;
@@ -39,11 +41,31 @@ use Vanilla\Dashboard\Controllers\LeavingController;
 use Vanilla\Dashboard\Controllers\Pages\AppearancePageController;
 use Vanilla\Dashboard\Controllers\Pages\DeveloperProfilesPageController;
 use Vanilla\Dashboard\Controllers\Pages\HomePageController;
+use Vanilla\Dashboard\Events\AccessDeniedEvent;
+use Vanilla\Dashboard\Events\AddonToggledEvent;
+use Vanilla\Dashboard\Events\AiSuggestionAccessEvent;
+use Vanilla\Dashboard\Events\ConfigurationChangeEvent;
+use Vanilla\Dashboard\Events\DashboardAccessEvent;
+use Vanilla\Dashboard\Events\DashboardApiAccessEvent;
+use Vanilla\Dashboard\Events\LayoutApplyEvent;
+use Vanilla\Dashboard\Events\PasswordResetCompletedEvent;
+use Vanilla\Dashboard\Events\PasswordResetEmailSentEvent;
+use Vanilla\Dashboard\Events\PasswordResetFailedEvent;
+use Vanilla\Dashboard\Events\PasswordResetUserNotFoundEvent;
+use Vanilla\Dashboard\Events\SsoSyncFailedEvent;
+use Vanilla\Dashboard\Events\ThemeApplyEvent;
+use Vanilla\Dashboard\Events\UserRoleModificationEvent;
+use Vanilla\Dashboard\Events\UserSignInEvent;
+use Vanilla\Dashboard\Events\UserSignInFailedEvent;
+use Vanilla\Dashboard\Events\UserSpoofEvent;
 use Vanilla\Dashboard\Layout\View\LegacyProfileLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacyRegistrationLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacySigninLayoutView;
 use Vanilla\Dashboard\Models\ActivityService;
+use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\AttachmentMeta;
+use Vanilla\Dashboard\Models\AutomationRuleModel;
+use Vanilla\Dashboard\Models\CategoryAiSuggestionSource;
 use Vanilla\Dashboard\Models\ModerationMessagesFilterOpenApi;
 use Vanilla\Dashboard\Models\ProfileFieldsOpenApi;
 use Vanilla\Dashboard\Models\RolesExpander;
@@ -54,9 +76,12 @@ use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
+use Vanilla\Logging\AuditLogService;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\OpenAPIBuilder;
+use Vanilla\SamlSSO\Events\JsConnectAuditEvent;
+use Vanilla\SamlSSO\Events\OAuth2AuditEvent;
 use Vanilla\Web\APIExpandMiddleware;
 
 /**
@@ -112,7 +137,8 @@ class DashboardContainerRules extends AddonContainerRules
             ->addCall("registerEventProvider", [new Reference(PageViewEventProvider::class)])
             ->addCall("registerEventProvider", [new Reference(SearchAllEventProvider::class)])
             ->addCall("registerEventProvider", [new Reference(SearchPlacesEventProvider::class)])
-            ->addCall("registerEventProvider", [new Reference(SearchMembersEventProvider::class)]);
+            ->addCall("registerEventProvider", [new Reference(SearchMembersEventProvider::class)])
+            ->addCall("registerEventProvider", [new Reference(ExternalNavigationEventProvider::class)]);
 
         $container
             ->rule(LayoutService::class)
@@ -159,5 +185,39 @@ class DashboardContainerRules extends AddonContainerRules
             ->addCall("addFilter", ["filter" => new Reference(\ReactionsFilterOpenApi::class)]);
 
         $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(AttachmentMeta::class)]);
+
+        $container
+            ->rule(AuditLogService::class)
+            ->addCall("registerEventClasses", [
+                [
+                    DashboardAccessEvent::class,
+                    DashboardApiAccessEvent::class,
+                    ResourceEvent::class,
+                    UserSpoofEvent::class,
+                    UserSignInEvent::class,
+                    AccessDeniedEvent::class,
+                    UserSignInFailedEvent::class,
+                    PasswordResetFailedEvent::class,
+                    PasswordResetCompletedEvent::class,
+                    PasswordResetUserNotFoundEvent::class,
+                    PasswordResetEmailSentEvent::class,
+                    SsoSyncFailedEvent::class,
+                    UserRoleModificationEvent::class,
+                    ConfigurationChangeEvent::class,
+                    AddonToggledEvent::class,
+                    ThemeApplyEvent::class,
+                    LayoutApplyEvent::class,
+                    OAuth2AuditEvent::class,
+                    JsConnectAuditEvent::class,
+                    AiSuggestionAccessEvent::class,
+                ],
+            ]);
+
+        //Automation container rules
+        $container->rule(AutomationRuleModel::class)->setShared(true);
+
+        $container
+            ->rule(AiSuggestionSourceService::class)
+            ->addCall("registerSuggestionSource", [new Reference(CategoryAiSuggestionSource::class)]);
     }
 }

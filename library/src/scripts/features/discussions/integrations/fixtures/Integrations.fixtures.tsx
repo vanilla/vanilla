@@ -10,33 +10,59 @@ import {
     IAttachmentIntegrationCatalog,
     IIntegrationsApi,
 } from "@library/features/discussions/integrations/Integrations.types";
-import { api } from "@library/notificationPreferences";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { JsonSchema } from "@vanilla/json-schema-forms";
-import React, { PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 import { fn } from "@storybook/test";
 import {
     AttachmentIntegrationsApiContextProvider,
     AttachmentIntegrationsContextProvider,
 } from "../Integrations.context";
 
-export const FAKE_INTEGRATION: IAttachmentIntegration = {
+export const FAKE_WRITEABLE_INTEGRATION: IAttachmentIntegration = {
     name: "fakeIntegration",
-    label: "Fake Integration for Discussion",
+    label: "Fake Integration for Discussions And Comments",
     attachmentType: "fakeIntegration",
     recordTypes: ["discussion", "comment"],
+    writeableContentScope: "all",
     submitButton: "Create Task",
     externalIDLabel: "Task #",
     title: "Todo List Service - Task",
     logoIcon: "meta-external",
 };
 
+export const FAKE_ESCALATE_OWN_CONTENT_ONLY_INTEGRATION: IAttachmentIntegration = {
+    name: "fakeEscalateOwnContentOnlyIntegration",
+    label: "Fake Escalate Own Content Only Integration for Discussions",
+    attachmentType: "fakeEscalateOwnContentOnlyIntegration",
+    recordTypes: ["discussion"],
+    writeableContentScope: "own",
+    submitButton: "Create Thing",
+    externalIDLabel: "Thing #",
+    title: "Stuff Service - Thing",
+    logoIcon: "meta-external",
+};
+
+export const FAKE_READ_ONLY_INTEGRATION: IAttachmentIntegration = {
+    name: "fakeReadOnlyIntegration",
+    label: "Fake Read-Only Integration for Discussions",
+    attachmentType: "fakeReadOnlyIntegration",
+    recordTypes: ["discussion"],
+    writeableContentScope: "none",
+    submitButton: "Create Item",
+    externalIDLabel: "Item #",
+    title: "Read-only Service - Item",
+    logoIcon: "meta-external",
+};
+
 export const FAKE_INTEGRATIONS_CATALOG: IAttachmentIntegrationCatalog = {
-    [FAKE_INTEGRATION.attachmentType]: FAKE_INTEGRATION,
+    [FAKE_WRITEABLE_INTEGRATION.attachmentType]: FAKE_WRITEABLE_INTEGRATION,
+    [FAKE_ESCALATE_OWN_CONTENT_ONLY_INTEGRATION.attachmentType]: FAKE_ESCALATE_OWN_CONTENT_ONLY_INTEGRATION,
+    [FAKE_READ_ONLY_INTEGRATION.attachmentType]: FAKE_READ_ONLY_INTEGRATION,
 };
 
 export const FAKE_INTEGRATION_SCHEMAS: Record<string, JsonSchema> = {
-    [FAKE_INTEGRATION.attachmentType]: {
+    [FAKE_WRITEABLE_INTEGRATION.attachmentType]: {
         type: "object",
         properties: {
             title: {
@@ -61,11 +87,26 @@ export const FAKE_INTEGRATION_SCHEMAS: Record<string, JsonSchema> = {
         },
         required: ["title"],
     },
+    [FAKE_ESCALATE_OWN_CONTENT_ONLY_INTEGRATION.attachmentType]: {
+        type: "object",
+        properties: {
+            title: {
+                type: "string",
+                title: "Title",
+                default: "A new thing",
+                "x-control": {
+                    label: "Title",
+                    inputType: "textBox",
+                },
+            },
+        },
+        required: ["title"],
+    },
 };
 
 export const FAKE_ATTACHMENT: IAttachment = {
     attachmentID: 1,
-    attachmentType: "fakeIntegration",
+    attachmentType: FAKE_WRITEABLE_INTEGRATION["attachmentType"],
     recordType: "discussion",
     recordID: `${9999999}`,
     state: "Completed",

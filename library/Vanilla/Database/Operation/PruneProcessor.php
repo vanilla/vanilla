@@ -17,7 +17,6 @@ class PruneProcessor implements Processor
 {
     use PrunableTrait {
         prune as protected;
-        delete as protected;
     }
 
     /**

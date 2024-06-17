@@ -100,6 +100,25 @@ trait SiteTestTrait
     private $userFixturesCreated = false;
 
     /**
+     * @param array $configs
+     * @return void
+     */
+    public function setConfigs(array $configs)
+    {
+        \Gdn::config()->saveToConfig($configs);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function setConfig(string $key, mixed $value): void
+    {
+        \Gdn::config()->saveToConfig($key, $value);
+    }
+
+    /**
      * Get the names of addons to install.
      *
      * @return string[] Returns an array of addon names.
@@ -626,6 +645,14 @@ TEMPLATE;
         } finally {
             $themeService->clearVariableProviders();
         }
+    }
+
+    /**
+     * Use the legacy keystone theme.
+     */
+    public function useLegacyTheme(): void
+    {
+        $this->api()->put("/themes/current", ["themeID" => "keystone"]);
     }
 
     /**

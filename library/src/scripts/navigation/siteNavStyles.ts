@@ -280,6 +280,8 @@ export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = 
         }),
     );
 
+    const badge = css({});
+
     return {
         root,
         children,
@@ -294,6 +296,7 @@ export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = 
         iconGroup,
         icon,
         checkMark,
+        badge,
     };
 });
 
@@ -357,9 +360,21 @@ export const siteNavNodeDashboardClasses = useThemeCache(
                 : {}),
         });
 
+        const badge = css({
+            fontSize: 11,
+            display: "inline-block",
+            padding: "2px 4px",
+            marginLeft: 4,
+            backgroundColor: "#595959",
+            color: "#fff",
+            verticalAlign: "text-bottom",
+            borderRadius: 4,
+        });
+
         return {
             link,
             label,
+            badge,
         };
     },
 );

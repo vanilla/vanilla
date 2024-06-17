@@ -8,11 +8,12 @@ namespace VanillaTests\Library\Garden\Events;
 
 use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\Events\TestResourceEvent;
+use VanillaTests\SiteTestCase;
 
 /**
  * Test capabilities of ResourceEvent data class.
  */
-class ResourceEventTest extends TestCase
+class ResourceEventTest extends SiteTestCase
 {
     /**
      * Test setting the action.

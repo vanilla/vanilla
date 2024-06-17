@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -22,7 +22,6 @@ use Vanilla\Database\Select;
 use Vanilla\DiscussionTypeConverter;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
-use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Forum\Models\DiscussionMergeModel;
@@ -1771,14 +1770,13 @@ class DiscussionsApiController extends AbstractApiController
         ])
             ->requireOneOf(["statusID", "internalStatusID"])
             ->add(DiscussionExpandSchema::commonExpandSchema())
-            ->add($this->fullSchema())
             ->setDescription("Change a status of the discussion.");
 
         $out = $this->schema($this->discussionSchema(), "out");
         $body = $in->validate($body);
 
         // Coalesce values for convenience.
-        $statusID = $body["statusID"] ?? null;
+        $statusID = $body["statusID"] ?? ($body["internalStatusID"] ?? null);
         $statusNotes = $body["statusNotes"] ?? null;
         $row = $this->discussionStatusModel->updateDiscussionStatus($id, $statusID, $statusNotes);
         $row = $this->normalizeOutput($row);

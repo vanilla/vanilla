@@ -164,8 +164,6 @@ components:
                 - type
                 - foreignUserID
                 - source
-                - sourceID
-                - sourceUrl
                 - status
                 - insertUserID
         AttachmentPost:

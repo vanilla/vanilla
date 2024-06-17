@@ -158,6 +158,32 @@ class Model implements InjectableInterface
     }
 
     /**
+     * Select a paging count.
+     *
+     * @param array $where
+     * @param int|null $limit
+     * @return int
+     */
+    public function selectPagingCount(array $where, int $limit = null): int
+    {
+        $sql = $this->createSql();
+        $limit = $limit ?? \Gdn::config("Vanilla.APIv2.MaxCount", 10000);
+        $innerQuery = $this->createSql()
+            ->from($this->getTable())
+            ->select($this->getPrimaryKey())
+            ->where($where)
+            ->getSelect(true);
+
+        $countQuery = <<<SQL
+SELECT COUNT(*) as count FROM ({$innerQuery}) iq
+SQL;
+
+        $result = $this->createSql()->query($countQuery);
+
+        return $result->firstRow(DATASET_TYPE_ARRAY)["count"];
+    }
+
+    /**
      * Get resource rows from a database table.
      *
      * @param array $where Conditions for the select query.
@@ -173,36 +199,35 @@ class Model implements InjectableInterface
      */
     public function select(array $where = [], array $options = []): array
     {
-        $orderFields = $options[self::OPT_ORDER] ?? ($options["orderFields"] ?? []);
-        $orderDirection = $options[self::OPT_DIRECTION] ?? "asc";
-        $limit = $options[self::OPT_LIMIT] ?? false;
-        $offset = $options[self::OPT_OFFSET] ?? 0;
+        $query = $this->createSql()
+            ->from($this->table)
+            ->where($where);
+
+        $query = $query->applyModelOptions($options, $this->getReadSchema());
+        $result = $query->get()->resultArray();
+
+        $result = $this->validateOutputRows($result, $options);
+        return $result;
+    }
+
+    /**
+     * Validate output rows from a select.
+     *
+     * @param array $rows
+     * @param array $options
+     * @return array
+     */
+    protected function validateOutputRows(array $rows, array $options)
+    {
         $selects = $options[self::OPT_SELECT] ?? [];
-
-        $sqlDriver = $this->createSql();
-
-        if (!empty($selects)) {
-            if (is_string($selects)) {
-                $selects = ArrayUtils::explodeTrim(",", $selects);
-            }
-            $selects = $this->translateSelects($selects);
-
-            $sqlDriver->select($selects);
+        if (is_string($selects)) {
+            $selects = ArrayUtils::explodeTrim(",", $selects);
         }
-
-        $joins = $options[self::OPT_JOINS] ?? false;
-        if ($joins) {
-            $this->applyJoins($joins, $sqlDriver);
-        }
-
-        $result = $sqlDriver
-            ->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
-            ->resultArray();
-
+        $selects = \Gdn_SQLDriver::translateSelects($selects, $this->getReadSchema());
         if (empty($selects)) {
             $schema = $this->getReadSchema();
         } else {
-            $selectExpressions = $sqlDriver->parseSelectExpression($selects);
+            $selectExpressions = $this->createSql()->parseSelectExpression($selects);
             $selectFinalFieldNames = [];
             foreach ($selectExpressions as $selectExpression) {
                 $selectFinalFieldNames[] = $selectExpression["Alias"] ?: $selectExpression["Field"];
@@ -210,11 +235,25 @@ class Model implements InjectableInterface
 
             $schema = Schema::parse($selectFinalFieldNames)->add($this->getReadSchema());
         }
-        foreach ($result as &$row) {
+        foreach ($rows as &$row) {
             $row = $schema->validate($row);
         }
+        return $rows;
+    }
 
-        return $result;
+    /**
+     * Apply options to a query.
+     *
+     * @param \Gdn_SQLDriver $query
+     * @param array $options
+     *
+     * @return \Gdn_SQLDriver
+     *
+     * @deprecated Use {@link \Gdn_SQLDriver::applyModelOptions()} instead.
+     */
+    protected function applyOptionsToQuery(\Gdn_SQLDriver $query, array $options = []): \Gdn_SQLDriver
+    {
+        return $query->applyModelOptions($options, $this->getReadSchema());
     }
 
     /**
@@ -400,28 +439,6 @@ class Model implements InjectableInterface
     }
 
     /**
-     * Translate selects with some additional support.
-     *
-     * @param array $selects
-     * @return array
-     */
-    private function translateSelects(array $selects): array
-    {
-        $negatives = [];
-        foreach ($selects as $select) {
-            if ($select[0] === "-") {
-                $negatives[] = substr($select, 1);
-            }
-        }
-
-        if (!empty($negatives)) {
-            $columns = array_keys($this->getReadSchema()->getField("properties"));
-            $selects = array_values(array_diff($columns, $negatives));
-        }
-        return $selects;
-    }
-
-    /**
      * Get or generate the schema returned by the database.
      *
      * @return Schema
@@ -432,23 +449,6 @@ class Model implements InjectableInterface
             $this->databaseSchema = $this->database->simpleSchema($this->getTable());
         }
         return $this->databaseSchema;
-    }
-
-    /**
-     * Apply joins to sql query.
-     *
-     * @param array $joins
-     * @param \Gdn_SQLDriver $sqlDriver
-     */
-    protected function applyJoins(array $joins, \Gdn_SQLDriver $sqlDriver): void
-    {
-        foreach ($joins as $join) {
-            $tableName = $join["tableName"] ?? "";
-            $on = $join["on"] ?? "";
-            $joinType = $join["joinType"] ?? "";
-
-            $sqlDriver->join($tableName, $on, $joinType);
-        }
     }
 
     /**

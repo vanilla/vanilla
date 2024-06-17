@@ -12,6 +12,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { homeWidgetContainerVariables } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IImage } from "@library/@types/api/core";
 import { RecordID } from "@vanilla/utils";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 
 export enum CollectionRecordTypes {
     ARTICLE = "article",
@@ -25,6 +26,8 @@ export enum CollectionRecordTypes {
 export interface ICollection {
     collectionID: RecordID;
     name: string;
+    dateInserted: string;
+    dateUpdated: string;
     records: ICollectionResource[];
 }
 
@@ -32,7 +35,10 @@ export interface ICollectionResource {
     recordID: RecordID;
     recordType: CollectionRecordTypes;
     sort?: number;
-    record?: ICollectionRecord;
+    collectionID?: RecordID;
+    collection?: Partial<ICollection>;
+    dateAddedToCollection?: string;
+    record?: ICollectionRecord | IDiscussion; // only discussion for now, but will be expanded to other types in the future
 }
 
 export interface ICollectionRecord {

@@ -130,8 +130,17 @@ class ComposerHelper
             exit($installReturn);
         }
         // Run build
-        $buildCommand = "yarn esrun ./build/vite.buildProd.ts 2>&1";
+        $buildCommand = "node -r esbuild-register ./build/vite.buildProd.ts 2>&1";
         printf("\nBuilding frontend assets\n");
+        printf("\n$buildCommand\n");
+        system($buildCommand, $buildResult);
+        if ($buildResult !== 0) {
+            printf("The build failed with code $buildResult");
+            exit($buildResult);
+        }
+
+        $buildCommand = "node -r esbuild-register ./build/scripts/variables/buildVariableDocs.ts 2>&1";
+        printf("\nBuilding variable documentation\n");
         printf("\n$buildCommand\n");
         system($buildCommand, $buildResult);
         if ($buildResult !== 0) {

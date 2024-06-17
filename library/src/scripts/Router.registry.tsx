@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { globalValueRef } from "@vanilla/utils";
 import React from "react";
 
 class RouteRegistry {
@@ -27,4 +28,5 @@ class RouteRegistry {
     };
 }
 
-export const RouterRegistry = new RouteRegistry();
+const RouterRegistryRef = globalValueRef("RouterRegistry", new RouteRegistry());
+export const RouterRegistry = RouterRegistryRef.current();

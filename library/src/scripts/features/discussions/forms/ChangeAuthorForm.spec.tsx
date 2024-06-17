@@ -1,6 +1,6 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -14,7 +14,6 @@ import { mockAPI } from "@library/__tests__/utility";
 import { act } from "react-dom/test-utils";
 import { IUser } from "@library/@types/api/users";
 import { ToastContext } from "@library/features/toaster/ToastContext";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { vitest } from "vitest";
 import MockAdapter from "axios-mock-adapter/types";
 
@@ -52,11 +51,9 @@ const mockToastProps = {
 const renderInProvider = async () => {
     render(
         <QueryClientProvider client={queryClient}>
-            <TestReduxProvider>
-                <ToastContext.Provider value={mockToastProps}>
-                    <ChangeAuthorForm discussion={baseDiscussion} onCancel={() => null} />
-                </ToastContext.Provider>
-            </TestReduxProvider>
+            <ToastContext.Provider value={mockToastProps}>
+                <ChangeAuthorForm discussion={baseDiscussion} onCancel={() => null} />
+            </ToastContext.Provider>
         </QueryClientProvider>,
     );
 };

@@ -21,6 +21,7 @@ use Vanilla\Formatting\Formats;
 use Vanilla\Formatting\FormatUtil;
 use Vanilla\Formatting\Html;
 use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Logging\ErrorLogger;
 
 /**
  * Output formatter.
@@ -851,17 +852,20 @@ class Gdn_Format
             if (!isset($matches[4]) || $inTag || $inAnchor) {
                 return $matches[0];
             }
+            $url = $matches[4];
             // We are not in a tag and what we matched starts with //
-            if (preg_match("#^//#", $matches[4])) {
+            if (preg_match("#^//#", $url)) {
                 return $matches[0];
             }
 
-            $url = $matches[4];
-
             if ($doEmbeds) {
-                $embeddedResult = self::getLegacyReplacer()->replaceUrl($url ?? "");
-                if ($embeddedResult !== "") {
-                    return $embeddedResult;
+                try {
+                    $embeddedResult = self::getLegacyReplacer()->replaceUrl($url);
+                    if ($embeddedResult !== "") {
+                        return $embeddedResult;
+                    }
+                } catch (\Throwable $e) {
+                    ErrorLogger::warning($e, ["embedReplacer"]);
                 }
             }
 

@@ -14,6 +14,12 @@
 $staticVariables: false;
 @import "../../../packages/vanilla-theme-core/scss/base/variables";
 
+#app {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
 // Copied from applications/dashboard/scss/src/_buttons.scss L114
 
 .heading {

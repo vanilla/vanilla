@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -13,7 +13,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react-hooks";
 import { mockAPI } from "@library/__tests__/utility";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { LoadStatus } from "@library/@types/api/core";
 import { useLocalStorage } from "@vanilla/react-utils";
 import { StackableTableColumnsConfig, StackableTableSortOption } from "@dashboard/tables/StackableTable/StackableTable";
@@ -30,6 +29,7 @@ import {
 import UserManagementColumnsConfig from "@dashboard/users/userManagement/UserManagementColumnsConfig";
 import { LiveAnnouncer } from "react-aria-live";
 import { vitest } from "vitest";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 
 describe("UserManagement", () => {
     const mockUser = {
@@ -177,21 +177,7 @@ describe("UserManagement", () => {
                     })
                 }
             >
-                <TestReduxProvider
-                    state={{
-                        users: {
-                            current: {
-                                ...UserFixture.adminAsCurrent,
-                            },
-                            usersByID: {},
-                            patchStatusByPatchID: {
-                                "2-userPatch-0": {
-                                    status: LoadStatus.LOADING,
-                                },
-                            },
-                        },
-                    }}
-                >
+                <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
                     <UserManagementContext.Provider
                         value={{
                             profileFields: profileFields,
@@ -211,7 +197,7 @@ describe("UserManagement", () => {
                             <UserManagementImpl />
                         </MemoryRouter>
                     </UserManagementContext.Provider>
-                </TestReduxProvider>
+                </CurrentUserContextProvider>
             </QueryClientProvider>,
         );
     }

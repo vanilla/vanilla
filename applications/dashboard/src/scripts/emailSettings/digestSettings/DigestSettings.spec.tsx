@@ -26,10 +26,6 @@ const queryClient = new QueryClient({
     },
 });
 
-beforeAll(() => {
-    setMeta("featureFlags.Digest.Enabled", true);
-});
-
 let mockApi: MockAdapter;
 beforeEach(() => {
     mockApi = mockAPI();

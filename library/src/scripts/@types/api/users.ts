@@ -3,8 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { ILoadable } from "@library/@types/api/core";
-
 export interface IUserFragment {
     userID: number;
     name: string;
@@ -15,6 +13,7 @@ export interface IUserFragment {
     title?: string;
     banned?: number;
     private?: boolean;
+    email?: string;
 }
 
 export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}
@@ -22,8 +21,8 @@ export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}
 export interface IMe extends IUserFragment {
     countUnreadNotifications: number;
     countUnreadConversations: number;
-    isAdmin: boolean;
-    emailConfirmed: boolean;
+    isAdmin?: boolean;
+    emailConfirmed?: boolean;
 }
 
 export interface ICount {
@@ -34,12 +33,10 @@ export interface ICount {
 export type IMeCounts = ICount[];
 
 export interface IUserRoles {
-    roles: [
-        {
-            roleID: number;
-            name: string;
-        },
-    ];
+    roles: Array<{
+        roleID: number;
+        name: string;
+    }>;
 }
 
 export interface IUser extends IUserFragment, IUserRoles {

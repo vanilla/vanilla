@@ -72,9 +72,7 @@ class ScheduleWeeklyDigestJob extends LocalApiJob implements LoggerAwareInterfac
      */
     public function run(): JobExecutionStatus
     {
-        $isDigestEnabled =
-            FeatureFlagHelper::featureEnabled(DigestEmail::FEATURE_FLAG) &&
-            $this->config->get("Garden.Digest.Enabled", false);
+        $isDigestEnabled = $this->config->get("Garden.Digest.Enabled", false);
         if (!$isDigestEnabled) {
             $this->logger->debug(
                 "Weekly digest was not generated because digest is disabled.",

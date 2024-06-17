@@ -11,6 +11,7 @@ use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AttachmentService;
+use Vanilla\Dashboard\Models\AttachmentProviderInterface;
 use VanillaTests\Fixtures\Addons\TestMockIssue\MockAttachmentProvider;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -148,7 +149,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
      *
      * @return void
      */
-    public function testPostPermissions(): void
+    public function testPostWithoutPermissions(): void
     {
         $discussion = $this->createDiscussion();
         $member = $this->createUser();
@@ -156,7 +157,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
         $this->api()->setUserID($member["userID"]);
 
         $this->expectException(ForbiddenException::class);
-        $this->expectExceptionMessage("You do not have permission to use this provider.");
+        $this->expectExceptionMessage("You do not have permission to create attachments using this provider.");
         $this->api()
             ->post("/attachments", $attachmentData)
             ->getBody();
@@ -239,7 +240,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
     }
 
     /**
-     * Test that getting attachments without the required permission throws an error.
+     * Test that getting an attachment without the required permission returns an empty array.
      *
      * @return void
      */
@@ -253,9 +254,11 @@ class AttachmentsApiControllerTest extends SiteTestCase
         $member = $this->createUser();
         $this->api()->setUserID($member["userID"]);
 
-        $this->expectException(ForbiddenException::class);
-        $this->expectExceptionMessage("Permission Problem");
-        $this->api()->get("/attachments", ["recordType" => "discussion", "recordID" => $discussion["discussionID"]]);
+        // Because we don't have permission to view this attachment, we should get an empty array.
+        $attachments = $this->api()
+            ->get("/attachments", ["recordType" => "discussion", "recordID" => $discussion["discussionID"]])
+            ->getBody();
+        $this->assertEmpty($attachments);
     }
 
     /**
@@ -296,9 +299,9 @@ class AttachmentsApiControllerTest extends SiteTestCase
                 "externalIDLabel" => "Mock #",
                 "logoIcon" => "logo-mock",
                 "name" => "Mock Provider",
-                "canEscalateOwnPost" => false,
                 "escalationDelayUnit" => null,
                 "escalationDelayLength" => 0,
+                "writeableContentScope" => AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_ALL,
             ],
         ];
         $response = $this->api()->get("/attachments/catalog");

@@ -985,6 +985,10 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                 $row["recordName"] = $record["Name"];
             }
 
+            $existingReactionCount = $record["Attributes"]["React"][$reactionType["UrlCode"]] ?? 0;
+
+            $row["reactionCount"] = $existingReactionCount + $inc;
+
             $reactionEvent = $this->eventFromRow(
                 $row,
                 $reactionAdded ? ReactionEvent::ACTION_INSERT : ReactionEvent::ACTION_DELETE
@@ -1856,6 +1860,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                 "recordID:i",
                 "recordName:s?",
                 "recordUrl:s?",
+                "reactionCount:i?",
                 "tagID:i",
                 "userID:i",
                 "dateInserted:dt",

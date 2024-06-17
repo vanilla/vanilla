@@ -349,7 +349,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
             $this->props["title"] = $this->getHydrateParam(str_replace("/", ".", $this->props["title"]["ref"]));
         }
 
-        if ($this->props["description"] === "") {
+        if (!isset($this->props["description"]) || $this->props["description"] === "") {
             $this->props["description"] = $siteSection->getSectionDescription();
         }
 

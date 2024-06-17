@@ -7,8 +7,9 @@
 import { IntegrationButtonAndModal } from "@library/features/discussions/integrations/Integrations";
 import {
     AttachmentIntegrationsContextProvider,
-    IntegrationContextProvider,
-    useAttachmentIntegrations,
+    WriteableIntegrationContextProvider,
+    ReadableIntegrationContextProvider,
+    useWriteableAttachmentIntegrations,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
@@ -31,7 +32,14 @@ export function LegacyThreadAttachmentsAsset(props: IProps) {
         <div>
             <AttachmentIntegrationsContextProvider>
                 {props.attachments?.map((attachment, i) => {
-                    return <DiscussionAttachment key={i} attachment={attachment} />;
+                    return (
+                        <ReadableIntegrationContextProvider
+                            key={attachment.attachmentID}
+                            attachmentType={attachment.attachmentType}
+                        >
+                            <DiscussionAttachment key={i} attachment={attachment} />
+                        </ReadableIntegrationContextProvider>
+                    );
                 })}
             </AttachmentIntegrationsContextProvider>
         </div>
@@ -42,6 +50,7 @@ interface IFormProps {
     recordType: string;
     recordID: number;
     redirectTarget: string;
+    isAuthor: boolean;
 }
 
 export function LegacyIntegrationsOptionsMenuItems(props: IFormProps) {
@@ -53,28 +62,29 @@ export function LegacyIntegrationsOptionsMenuItems(props: IFormProps) {
 }
 
 function LegacyIntegrationsOptionsMenuItemsImpl(props: IFormProps) {
-    const integrations = useAttachmentIntegrations();
+    const { isAuthor } = props;
+    const writeableIntegrations = useWriteableAttachmentIntegrations()
+        .filter((integration) => integration.recordTypes.includes(props.recordType))
+        .filter(({ writeableContentScope }) => (writeableContentScope === "own" ? isAuthor : true));
 
-    return (
+    return writeableIntegrations.length > 0 ? (
         <>
-            {integrations
-                .filter((integration) => integration.recordTypes.includes(props.recordType))
-                .map((integration) => {
-                    return (
-                        <IntegrationContextProvider
-                            key={integration.attachmentType}
-                            recordType={props.recordType}
-                            attachmentType={integration.attachmentType}
-                            recordID={props.recordID}
-                        >
-                            <IntegrationButtonAndModal
-                                onSuccess={async () => {
-                                    window.location.href = props.redirectTarget;
-                                }}
-                            />
-                        </IntegrationContextProvider>
-                    );
-                })}
+            {writeableIntegrations.map((integration) => {
+                return (
+                    <WriteableIntegrationContextProvider
+                        key={integration.attachmentType}
+                        recordType={props.recordType}
+                        attachmentType={integration.attachmentType}
+                        recordID={props.recordID}
+                    >
+                        <IntegrationButtonAndModal
+                            onSuccess={async () => {
+                                window.location.href = props.redirectTarget;
+                            }}
+                        />
+                    </WriteableIntegrationContextProvider>
+                );
+            })}
         </>
-    );
+    ) : null;
 }

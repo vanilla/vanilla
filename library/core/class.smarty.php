@@ -17,8 +17,8 @@ use Vanilla\SmartyBC;
  */
 class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
 {
-    /** @var Smarty The smarty object used for the template. */
-    protected $_Smarty = null;
+    /** @var Smarty\Smarty|null The smarty object used for the template. */
+    protected ?Smarty\Smarty $_Smarty = null;
 
     /**
      *
@@ -47,7 +47,6 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
         if ($session->isValid()) {
             $user = [
                 "Name" => htmlspecialchars($session->User->Name),
-                "Photo" => "",
                 "CountNotifications" => (int) val("CountNotifications", $session->User, 0),
                 "CountUnreadConversations" => (int) val("CountUnreadConversations", $session->User, 0),
                 "SignedIn" => true,
@@ -63,10 +62,7 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
             }
             $user["Photo"] = $photo;
         } else {
-            $user = false; /*array(
-            'Name' => '',
-            'CountNotifications' => 0,
-            'SignedIn' => FALSE);*/
+            $user = false;
         }
         $smarty->assign("User", $user);
 
@@ -114,8 +110,6 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
 
         // Assign the controller data last so the controllers override any default data.
         $smarty->assign($controller->Data);
-
-        $this->enableSecurity($smarty);
     }
 
     /**
@@ -151,27 +145,27 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
     }
 
     /**
-     *
-     *
-     * @return Smarty The smarty object used for rendering.
+     * @return Smarty\Smarty The smarty object used for rendering.
      */
-    public function smarty()
+    public function smarty(): Smarty\Smarty
     {
         if (is_null($this->_Smarty)) {
             $smarty = new SmartyBC();
+            $this->_Smarty = $smarty;
+
             $smarty->error_reporting = ErrorLogger::ERROR_SUPPRESSED;
 
+            // All smarty behaviour will need to be re-evaluated in PHP 9.x
             $smarty->setCacheDir(PATH_CACHE . "/Smarty/cache");
             $smarty->setCompileDir(PATH_CACHE . "/Smarty/compile");
-            $smarty->addPluginsDir(PATH_LIBRARY . "/SmartyPlugins");
+            @$smarty->addPluginsDir(PATH_LIBRARY . "/SmartyPlugins");
             $smarty->setDebugTemplate(PATH_APPLICATIONS . "/dashboard/views/debug.tpl");
             $smarty->registerPlugin("function", "debug_vars", [$this, "debugVars"], false);
             $smarty->addDefaultModifiers(["default:false"]);
 
-            //         Gdn::pluginManager()->Trace = TRUE;
             Gdn::pluginManager()->callEventHandlers($smarty, "Gdn_Smarty", "Init");
-
-            $this->_Smarty = $smarty;
+            $this->enableSecurity($smarty);
+            $smarty->default_modifiers[] = "default:false";
         }
         return $this->_Smarty;
     }
@@ -195,12 +189,11 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
         try {
             $result = $smarty->fetch($path, null, $compileID);
             // echo wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
-            $return =
+            $return = !(
                 $result == "" ||
                 strpos($result, "<title>Fatal Error</title>") > 0 ||
                 strpos($result, "<h1>Something has gone wrong.</h1>") > 0
-                    ? false
-                    : true;
+            );
         } catch (Exception $ex) {
             $return = false;
         }
@@ -211,17 +204,17 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
      * Output template variables.
      *
      * @param mixed $params
-     * @param Smarty_Internal_TemplateBase $smarty
+     * @param Smarty\TemplateBase $smarty
      * @return string
      */
     public function debugVars($params, $smarty)
     {
-        $debug = new Smarty_Internal_Debug();
-        $ptr = $debug->get_debug_vars($smarty);
-        $vars = self::sanitizeVariables($ptr->tpl_vars);
+        $debug = new Smarty\Debug();
+        $templateVars = $debug->getTemplateVars();
+        $vars = self::sanitizeVariables($templateVars);
         ksort($vars);
 
-        $sm = new Smarty();
+        $sm = new SmartyBC();
         $sm->assign("assigned_vars", $vars);
         return $sm->fetch(PATH_APPLICATIONS . "/dashboard/views/debug_vars.tpl");
     }
@@ -270,38 +263,45 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
     /**
      * Enable the security features on a Smarty object.
      *
-     * @param Smarty $smarty
+     * @param SmartyBC $smarty
      */
-    public function enableSecurity(Smarty $smarty): void
+    public function enableSecurity(SmartyBC $smarty): void
     {
         $security = new SmartySecurityVanilla($smarty);
 
-        $security->php_handling = Smarty::PHP_REMOVE;
         $security->allow_constants = false;
         $security->allow_super_globals = false;
         $security->streams = null;
 
-        $security->setPhpFunctions(
-            array_merge($security->php_functions, [
-                "array", // Yes, Smarty really blocks this.
-                "category",
-                "categoryUrl",
-                "checkPermission",
-                "commentUrl",
-                "discussionUrl",
-                "inSection",
-                "inCategory",
-                "ismobile",
-                "multiCheckPermission",
-                "getValue",
-                "setValue",
-                "url",
-                "useragenttype",
-                "userUrl",
-            ])
-        );
+        $functions = [
+            "category",
+            "categoryUrl",
+            "checkPermission",
+            "commentUrl",
+            "discussionUrl",
+            "inSection",
+            "inCategory",
+            "ismobile",
+            "multiCheckPermission",
+            "getValue",
+            "setValue",
+            "url",
+            "useragenttype",
+            "userUrl",
+            "sprintf",
+            "substr",
+        ];
 
-        $security->php_modifiers = array_merge($security->php_functions, ["sprintf"]);
+        foreach ($functions as $function) {
+            $this->smarty()->registerPlugin(\Smarty\Smarty::PLUGIN_MODIFIER, $function, $function);
+            $lowercase = strtolower($function);
+            if ($lowercase !== $function) {
+                $this->smarty()->registerPlugin(\Smarty\Smarty::PLUGIN_MODIFIER, $lowercase, $function);
+            }
+        }
+
+        // Casing issue
+        $this->smarty()->registerPlugin(\Smarty\Smarty::PLUGIN_MODIFIER, "InSection", "inSection");
 
         $smarty->enableSecurity($security);
     }

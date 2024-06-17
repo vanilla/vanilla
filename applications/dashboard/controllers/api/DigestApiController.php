@@ -81,9 +81,7 @@ class DigestApiController extends Controller
                 $data["sent"] = array_reverse($recentScheduledDates);
             }
         }
-        $isDigestEnabled =
-            FeatureFlagHelper::featureEnabled(DigestEmail::FEATURE_FLAG) &&
-            $this->config->get("Garden.Digest.Enabled", false);
+        $isDigestEnabled = $this->config->get("Garden.Digest.Enabled", false);
         if ($isDigestEnabled) {
             $data["upcoming"] = $this->getFutureScheduledDates($dayOfWeek ?? null);
         }

@@ -24,7 +24,7 @@ import {
     removeMentionInput,
 } from "@udecode/plate-mention";
 import uniqueId from "lodash-es/uniqueId";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { connect } from "react-redux";
 
 interface IProps extends IInjectableSuggestionsProps {
@@ -39,14 +39,18 @@ function MentionToolbar(props: IProps) {
 
     const text = useComboboxSelectors.text() ?? "";
 
-    const items = (suggestions?.data ?? []).map((data) => {
-        const { userID, name: text } = data;
-        return {
-            key: `${userID}`,
-            text,
-            data,
-        };
-    });
+    const items = useMemo(
+        () =>
+            (suggestions?.data ?? []).map((data) => {
+                const { userID, name: text } = data;
+                return {
+                    key: `${userID}`,
+                    text,
+                    data,
+                };
+            }),
+        [suggestions],
+    );
 
     const showLoader = props.isLoading;
     const loaderID = uniqueId("mentionList-noResults-");

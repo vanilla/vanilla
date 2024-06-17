@@ -10,7 +10,7 @@ use Gdn_Request;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Html\HtmlDocument;
-use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
+use Vanilla\Formatting\Html\Processor\ExternalLinksAndIFramesProcessor;
 use VanillaTests\BootstrapTrait;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 use VanillaTests\SetupTraitsTrait;
@@ -26,7 +26,7 @@ class ExternalLinksProcessorTest extends VanillaTestCase
     /** @var FormatService */
     private $formatService;
 
-    /** @var ExternalLinksProcessor */
+    /** @var ExternalLinksAndIFramesProcessor */
     private $processor;
 
     /** @var Gdn_Request */
@@ -41,7 +41,7 @@ class ExternalLinksProcessorTest extends VanillaTestCase
         $this->setUpTestTraits();
 
         $this->container()->call(function (
-            ExternalLinksProcessor $processor,
+            ExternalLinksAndIFramesProcessor $processor,
             FormatService $formatService,
             Gdn_Request $request
         ) {
@@ -200,6 +200,58 @@ HTML
 </div>
 HTML
             ,
+            ],
+        ];
+    }
+
+    /**
+     * Test processing iframes.
+     *
+     * @param HtmlDocument $document
+     * @param array $config
+     * @param string $expected
+     * @return void
+     * @dataProvider provideTestIFrameProcessing
+     */
+    public function testIFrameProcessing(HtmlDocument $document, array $config, string $expected): void
+    {
+        $this->runWithConfig($config, function () use ($document, $expected) {
+            $actual = $this->processor->processDocument($document)->getInnerHtml();
+            $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+        });
+    }
+
+    /**
+     * Provide data for testing iframe processing.
+     *
+     * @return array[]
+     */
+    public function provideTestIFrameProcessing(): array
+    {
+        $document = new HtmlDocument('<p><iframe src="https://test.test"></iframe></p>');
+        return [
+            "IFrame with trusted domain and embeds allowed" => [
+                $document,
+                [
+                    "Garden.Embeds.DisableUrlEmbeds" => false,
+                    "Garden.Format.AllowIFrames" => true,
+                    "Garden.TrustedDomains" => ["test.test"],
+                ],
+                '<p><iframe src="https://test.test" sandbox="allow-same-origin allow-scripts allow-forms" loading="lazy" allowFullScreen="1"></iframe></p>',
+            ],
+            "IFrame with untrusted domain and embeds allowed" => [
+                $document,
+                [
+                    "Garden.Embeds.DisableUrlEmbeds" => false,
+                    "Garden.Format.AllowIFrames" => true,
+                    "Garden.TrustedDomains" => ["example.com"],
+                ],
+                '<p><a href="https://vanilla.test/externallinksprocessortest/home/leaving?allowTrusted=1&amp;target=https%3A%2F%2Ftest.test">https://test.test</a></p>',
+            ],
+            "IFrame with embeds disabled" => [
+                $document,
+                ["Garden.Embeds.DisableUrlEmbeds" => true, "Garden.Format.AllowIFrames" => true],
+                '<p><a href="https://vanilla.test/externallinksprocessortest/home/leaving?allowTrusted=1&amp;target=https%3A%2F%2Ftest.test">https://test.test</a></p>',
             ],
         ];
     }

@@ -9,7 +9,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import "../../../../../scss/admin-new.scss";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { JsonSchema } from "@vanilla/json-schema-forms";
-import { extractDataByKeyLookup } from "@dashboard/layout/editor/utils";
+import { extractDataByKeyLookup } from "@vanilla/json-schema-forms";
 
 //FIXME FIXME this story is not generating on production build in chromatic
 //https://higherlogic.atlassian.net/browse/VNLA-1459

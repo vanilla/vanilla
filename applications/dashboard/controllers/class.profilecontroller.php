@@ -2276,7 +2276,7 @@ EOT;
         $reactionModel = new ReactionModel();
         $data = $reactionModel->getRecordsWhere(
             [
-                "TagID" => $reactionType["TagID"],
+                "TagID" => $reactionType["TagID"] ?? null,
                 "RecordType" => ["Discussion-Total", "Comment-Total"],
                 "UserID" => $userID,
                 "Total >" => 0,
@@ -2310,7 +2310,7 @@ EOT;
         }
         $this->canonicalUrl(url($canonicalUrl, true));
 
-        $this->_setBreadcrumbs(t($reactionType["Name"]), $this->canonicalUrl());
+        $this->_setBreadcrumbs(t($reactionType["Name"] ?? "Unknown"), $this->canonicalUrl());
         $this->setTabView("Reactions", "DataList", "reactions", "dashboard");
         $this->addJsFile("jquery-ui.min.js");
         $this->addJsFile("reactions.js", "vanilla");

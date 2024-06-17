@@ -82,13 +82,16 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         display: "flex",
         justifyContent: "space-between",
         flexWrap: "wrap",
-        alignItems: "end",
     });
 
     const titleAndNoticeAndMetasWrapper = css({
         display: "flex",
         flexWrap: "wrap",
-        alignItems: "center",
+        flexGrow: 1,
+    });
+
+    const positionNoticeInCorner = css({
+        justifyContent: "space-between",
     });
 
     const title = css({
@@ -119,6 +122,8 @@ const AttachmentLayoutClasses = useThemeCache(() => {
 
     const externalLinkWrapper = css({
         ...extendItemContainer(metasVars.spacing.horizontal! as number),
+        marginRight: -metasVars.spacing.horizontal! as number,
+        flexBasis: "fit-content",
     });
 
     const externalLink = css({
@@ -180,6 +185,7 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         textSection,
         header,
         titleAndNoticeAndMetasWrapper,
+        positionNoticeInCorner,
         title,
         inlineMetas,
         metasRow,

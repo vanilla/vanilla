@@ -578,6 +578,7 @@ if (!function_exists("getDiscussionOptionsDropdown")):
             "recordType" => "discussion",
             "recordID" => $discussionID,
             "redirectTarget" => discussionUrl($discussion, true),
+            "isAuthor" => $session->UserID == $discussion->InsertUserID,
         ]);
 
         // DEPRECATED
@@ -713,6 +714,7 @@ if (!function_exists("getCommentOptions")):
             "recordType" => "comment",
             "recordID" => $comment->CommentID,
             "redirectTarget" => commentUrl($comment),
+            "isAuthor" => $session->UserID == $comment->InsertUserID,
         ]);
 
         // DEPRECATED (as of 2.1)

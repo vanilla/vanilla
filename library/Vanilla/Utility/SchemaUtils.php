@@ -56,6 +56,68 @@ final class SchemaUtils
     }
 
     /**
+     * Utility that marks one field as requiring another field.
+     *
+     * @param string $field This field requires $reqiresOtherField
+     * @param string $requiresOtherField This field is required for the $field to be valid.
+     * @return callable
+     */
+    public static function fieldRequirement(string $field, string $requiresOtherField): callable
+    {
+        return function ($value, ValidationField $validationField) use ($field, $requiresOtherField) {
+            if (!ArrayUtils::isArray($value)) {
+                return $value;
+            }
+            if (
+                ArrayUtils::arrayKeyExists($field, $value) &&
+                !ArrayUtils::arrayKeyExists($requiresOtherField, $value)
+            ) {
+                $validationField->addError("fieldRequirement", [
+                    "messageCode" => "{field} requires {requiresOtherField} to be present.",
+                    "field" => $field,
+                    "requiresOtherField" => $requiresOtherField,
+                ]);
+                return Invalid::value();
+            }
+            return $value;
+        };
+    }
+
+    /**
+     * Return a validation function that will require all of the specified properties to be present if one of them is present.
+     *
+     * @param string[] $properties
+     *
+     * @return callable
+     */
+    public static function onlyTogether(array $properties): callable
+    {
+        return function ($value, ValidationField $field) use ($properties) {
+            if (!ArrayUtils::isArray($value)) {
+                return $value;
+            }
+            $hasOne = false;
+            $hasAll = true;
+            foreach ($properties as $property) {
+                if (ArrayUtils::arrayKeyExists($property, $value)) {
+                    $hasOne = true;
+                } else {
+                    $hasAll = false;
+                }
+            }
+
+            if ($hasOne && !$hasAll) {
+                $field->addError("onlyTogether", [
+                    "messageCode" => "All of {properties} must be present if one of them is present.",
+                    "properties" => $properties,
+                ]);
+                return Invalid::value();
+            }
+            return $value;
+        };
+    }
+
+    /**
      * Validate each row of an array in place.
      *
      * Although schemas can validate arrays, this can prove to be inefficient because the schema returns a new copy of

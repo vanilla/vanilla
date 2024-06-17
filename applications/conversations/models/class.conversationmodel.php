@@ -515,7 +515,7 @@ class ConversationModel extends ConversationsModel implements AggregateCountable
         $iDs = [];
         foreach ($data as &$row) {
             $row["CountNewMessages"] = $row["CountMessages"] - $row["CountReadMessages"];
-            if ($row["UserLastMessageID"]) {
+            if ($row["UserLastMessageID"] ?? null) {
                 $row["LastMessageID"] = $row["UserLastMessageID"];
             }
             $iDs[] = $row["LastMessageID"];

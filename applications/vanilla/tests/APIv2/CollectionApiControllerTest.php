@@ -10,7 +10,11 @@ namespace VanillaTests\APIv2;
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
+use Vanilla\Controllers\Api\CollectionsApiController;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Models\CollectionModel;
+use Vanilla\Models\CollectionRecordModel;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\TestLoggerTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -22,6 +26,9 @@ class CollectionApiControllerTest extends AbstractResourceTest
     use ExpectExceptionTrait;
     use CommunityApiTestTrait;
     use TestLoggerTrait;
+
+    private CollectionRecordModel $collectionRecordModel;
+    private CollectionsApiController $collectionsApiController;
 
     protected $baseUrl = "/collections";
 
@@ -37,6 +44,16 @@ class CollectionApiControllerTest extends AbstractResourceTest
     protected $testPagingOnIndex = false;
 
     protected $patchFields = ["name", "records"];
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->collectionRecordModel = $this->container()->get(CollectionRecordModel::class);
+        $this->collectionsApiController = $this->container()->get(CollectionsApiController::class);
+    }
 
     /**
      * @param array $collectionRecord
@@ -118,6 +135,7 @@ class CollectionApiControllerTest extends AbstractResourceTest
     public function testCollectionPost(): array
     {
         $collectionRecord = $this->getRecord();
+
         // Test permission error (403)
         $this->runWithUser(function () use ($collectionRecord) {
             $this->runWithExpectedExceptionCode(403, function () use ($collectionRecord) {
@@ -125,7 +143,11 @@ class CollectionApiControllerTest extends AbstractResourceTest
             });
         }, \UserModel::GUEST_USER_ID);
 
-        return parent::testPost($collectionRecord);
+        $response = $this->api()->post($this->baseUrl, $collectionRecord);
+        $this->assertEquals(201, $response->getStatusCode());
+        $collection = $response->getBody();
+        $this->assertArraySubsetRecursive($collectionRecord, $collection);
+        return $collection;
     }
 
     /**
@@ -137,9 +159,47 @@ class CollectionApiControllerTest extends AbstractResourceTest
      */
     public function testPost($record = null, array $extra = []): array
     {
-        $this->record = $this->getrecord();
+        $record = $record ?? $this->getrecord();
 
-        return parent::testPost($this->record);
+        $post = $record + $extra;
+        $result = $this->api()->post($this->baseUrl, $post);
+
+        $this->assertEquals(201, $result->getStatusCode());
+        $body = $result->getBody();
+        $this->assertArraySubsetRecursive($record, $body);
+        $this->record = $body;
+        return $body;
+    }
+
+    /**
+     * Test post endpoint, test for duplication prevention
+     *
+     */
+    public function testPostNoDuplication()
+    {
+        $collectionRecord = $this->getRecord();
+        $collectionModel = $this->container()->get(CollectionModel::class);
+        $this->testPost($collectionRecord);
+        $updatedCollectionRecord = $collectionRecord;
+        $category = $this->createCategory(["name" => "CG Category - new"]);
+        $updatedCollectionRecord["records"] = [
+            [
+                "recordID" => $category["categoryID"],
+                "recordType" => "category",
+                "sort" => 1,
+            ],
+        ];
+        $this->api()->post($this->baseUrl, $updatedCollectionRecord);
+        // Making sure only 1 collection is created
+        $collections = $collectionModel->select(["name" => $collectionRecord["name"]]);
+        $this->assertCount(1, $collections);
+
+        $newCollectionRecord = $this->getRecord();
+        $this->testPost($newCollectionRecord);
+
+        // New collection is created
+        $collections = $collectionModel->select(["name" => $newCollectionRecord["name"]]);
+        $this->assertCount(1, $collections);
     }
 
     /**
@@ -180,8 +240,8 @@ class CollectionApiControllerTest extends AbstractResourceTest
         $collectionRecord = $this->getrecord("desc");
         $result = $this->api()->post($this->baseUrl, $collectionRecord);
         $this->assertSame($collectionRecord["name"], $result["name"]);
-        $this->assertEquals($collectionRecord["records"][1], $result["records"][0]);
-        $this->assertEquals($collectionRecord["records"][0], $result["records"][1]);
+        $this->assertArraySubsetRecursive($collectionRecord["records"][1], $result["records"][0]);
+        $this->assertArraySubsetRecursive($collectionRecord["records"][0], $result["records"][1]);
     }
 
     /**
@@ -236,7 +296,7 @@ class CollectionApiControllerTest extends AbstractResourceTest
         $patchedResult = $this->api()->patch($this->baseUrl . "/{$result[$this->pk]}", $updatedRecord);
         $this->assertSame($updatedRecord["name"], $patchedResult["name"]);
         $this->assertCount(1, $patchedResult["records"]);
-        $this->assertEquals($updatedRecord["records"], $patchedResult["records"]);
+        $this->assertArraySubsetRecursive($updatedRecord["records"], $patchedResult["records"]);
 
         $this->assertArrayHasKey("dateInserted", $patchedResult);
         $this->assertIsString($patchedResult["dateInserted"]);
@@ -291,7 +351,7 @@ class CollectionApiControllerTest extends AbstractResourceTest
         //test on delete collection gives back error
         $this->api()->delete($this->baseUrl . "/{$collectionRecordContent[$this->pk]}");
         $this->expectExceptionCode(404);
-        $response = $this->api()->get($url);
+        $this->api()->get($url);
     }
 
     /**
@@ -513,6 +573,33 @@ class CollectionApiControllerTest extends AbstractResourceTest
     }
 
     /**
+     * Test GET /collections returns empty collections.
+     *
+     */
+    public function testGetCollectionReturnsEmptyCollections()
+    {
+        // Create a collection with records.
+        $collectionData = $this->testCollectionPost();
+
+        // Remove records from the collection.
+        $this->collectionRecordModel->delete(["collectionID" => $collectionData["collectionID"]]);
+
+        $collections = $this->api()
+            ->get($this->baseUrl)
+            ->getBody();
+
+        $found = false;
+        foreach ($collections as $collection) {
+            if ($collection["collectionID"] == $collectionData["collectionID"]) {
+                $this->assertEquals([], $collection["records"]);
+                $found = true;
+            }
+        }
+
+        $this->assertTrue($found, "The collection was not found in the list of collections.");
+    }
+
+    /**
      * Test the results are filterable by `dateUpdated`.
      *
      * @return void
@@ -634,5 +721,189 @@ class CollectionApiControllerTest extends AbstractResourceTest
     public function testGetEdit($record = null)
     {
         $this->markTestSkipped("This resource doesn't have a GET /collections/{id}/edit endpoint");
+    }
+
+    /**
+     * Test collections/Contents endpoint throws exception if provided with invalid locale
+     *
+     * @return void
+     */
+    public function testCollectionContentsThrowsClintExceptionOnInvalidLocale()
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage("Invalid locale provided.");
+        $this->api()->get($this->baseUrl . "/contents/ar");
+    }
+
+    /**
+     * Test for /collections/contents endpoint
+     *
+     * @return array
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testCollectionContents(): array
+    {
+        $data = [];
+        $this->resetTable("collection");
+        $this->resetTable("collectionRecord");
+
+        // Test that if there are no collections, the endpoint returns an empty array
+        $response = $this->api()->get($this->baseUrl . "/contents/en");
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertEmpty($body);
+
+        $oldestDate = CurrentTimeStamp::mockTime(strtotime("-10 days"));
+
+        // Create a category
+        $this->createCategory(["name" => "Collection Test Category"]);
+        //create 3 discussions
+        $discussions = $this->createDiscussionSet(3);
+
+        // Create two collections with the discussions
+        $recordSet1 = [
+            ["recordID" => $discussions[0]["discussionID"], "recordType" => "discussion", "sort" => 1],
+            ["recordID" => $discussions[1]["discussionID"], "recordType" => "discussion", "sort" => 2],
+        ];
+        $recordSet2 = [
+            ["recordID" => $discussions[1]["discussionID"], "recordType" => "discussion", "sort" => 1],
+            ["recordID" => $discussions[2]["discussionID"], "recordType" => "discussion", "sort" => 2],
+        ];
+
+        $collection1 = $this->createCollection($recordSet1, ["name" => "Collection 1"]);
+        $collection2 = $this->createCollection($recordSet2, ["name" => "Collection 2"]);
+
+        // Add a new discussion to the existing collections
+        $midDate = CurrentTimeStamp::mockTime(strtotime("-5 days"));
+        $discussions = $this->createDiscussionSet(2);
+        $recordSet1[] = ["recordID" => $discussions[0]["discussionID"], "recordType" => "discussion", "sort" => 3];
+        $recordSet2[] = ["recordID" => $discussions[1]["discussionID"], "recordType" => "discussion", "sort" => 3];
+
+        $recordset = end($recordSet1);
+        // update the collections with new Data
+        $this->addCollectionRecord($recordset, $collection1["collectionID"]);
+        $recordset = end($recordSet2);
+        $this->addCollectionRecord($recordset, $collection2["collectionID"]);
+
+        // update the collections with new Data
+        CurrentTimeStamp::clearMockTime();
+
+        $discussions = $this->createDiscussionSet(2);
+        $recordSet1[] = ["recordID" => $discussions[0]["discussionID"], "recordType" => "discussion", "sort" => 4];
+        $recordSet2[] = ["recordID" => $discussions[1]["discussionID"], "recordType" => "discussion", "sort" => 4];
+
+        $recordset = end($recordSet1);
+        $this->addCollectionRecord($recordset, $collection1["collectionID"]);
+        $recordset = end($recordSet2);
+        $this->addCollectionRecord($recordset, $collection2["collectionID"]);
+
+        $updatedCollection1 = $this->api()
+            ->get($this->baseUrl . "/{$collection1["collectionID"]}")
+            ->getBody();
+        $updatedCollection2 = $this->api()
+            ->get($this->baseUrl . "/{$collection2["collectionID"]}")
+            ->getBody();
+
+        // Test that we receive all the records when we add no filters
+        $response = $this->api()->get($this->baseUrl . "/contents/en");
+        $result = $response->getBody();
+        $totalRecords = count($recordSet1) + count($recordSet2);
+        $this->assertCount($totalRecords, $result);
+        $record = $result[0];
+        $keys = ["collectionID", "recordType", "recordID", "dateAddedToCollection", "sort", "record"];
+        foreach ($keys as $key) {
+            $this->assertArrayHasKey($key, $record);
+        }
+        return $data = [
+            "records" => [$recordSet1, $recordSet2],
+            "collections" => [$updatedCollection1, $updatedCollection2],
+            "dates" => [$oldestDate, $midDate],
+        ];
+    }
+
+    /**
+     * Test for /collections/contents endpoint, filter by collectionID
+     *
+     * @param array $data
+     * @return void
+     * @depends testCollectionContents
+     */
+    public function testCollectionContentsFilterByCollectionID(array $data)
+    {
+        $collection1 = $data["collections"][0];
+        $response = $this->api()->get($this->baseUrl . "/contents/en", [
+            "collectionID" => $collection1["collectionID"],
+        ]);
+        $result = $response->getBody();
+        $this->assertCount(count($collection1["records"]), $result);
+        $recordIDs = array_column($result, "recordID");
+        $this->assertEquals(array_column($collection1["records"], "recordID"), $recordIDs);
+    }
+
+    /**
+     * Test for /collections/contents endpoint, filter by date
+     *
+     * @param array $data
+     * @return void
+     * @depends testCollectionContents
+     */
+    public function testCollectionContentsFilterByDateRange(array $data)
+    {
+        $expectedCount = count($data["records"][0]) + count($data["records"][1]) - 2; // eliminate the recently added records
+        $oldestDate = $data["dates"][0];
+        $midDate = $data["dates"][1];
+        $startRange = $oldestDate->sub(new \DateInterval("P1D"))->format("Y-m-d");
+        $endRange = $midDate->add(new \DateInterval("P1D"))->format("Y-m-d");
+        $response = $this->api()->get($this->baseUrl . "/contents/en", [
+            "dateAddedToCollection" => "[$startRange, $endRange]",
+        ]);
+        $result = $response->getBody();
+        $this->assertCount($expectedCount, $result);
+        $collectionRecords1 = array_column($data["collections"][0]["records"], "recordID");
+        $collectionRecords2 = array_column($data["collections"][1]["records"], "recordID");
+        array_pop($collectionRecords1);
+        array_pop($collectionRecords2);
+        $recordIDs = array_column($result, "recordID");
+        $this->assertEquals(array_merge($collectionRecords1, $collectionRecords2), $recordIDs);
+    }
+
+    /**
+     * Generate a set of dummy discussions for testing
+     *
+     * @param int $cnt
+     * @return array
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    private function createDiscussionSet(int $cnt)
+    {
+        $discussions = [];
+        for ($i = 0; $i < $cnt; $i++) {
+            $discussions[] = $this->createDiscussion([
+                "name" => "Collection Discussion -" . uniqid(),
+                "categoryID" => $this->lastInsertedCategoryID,
+            ]);
+        }
+        return $discussions;
+    }
+
+    /**
+     * Add a new collection record to existing collection
+     *
+     * @param array $collectionRecord
+     * @param int $collectionID
+     * @return array
+     */
+    private function addCollectionRecord(array $collectionRecord, int $collectionID): array
+    {
+        $response = $this->api()->put($this->baseUrl . "/by-resource", [
+            "record" => $collectionRecord,
+            "collectionIDs" => [$collectionID],
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        return $response->getBody();
     }
 }

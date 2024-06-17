@@ -7,7 +7,7 @@
 import { JSONSchema4 } from "json-schema";
 import { VariableParser } from "..";
 import { IVariable, IVariableDoc, IVariableGroup } from "./VariableParser";
-import { spaceshipCompare } from "@vanilla/utils";
+import { spaceshipCompare } from "../../../vanilla-utils/index";
 import { JsonSchemaFlatAdapter } from "./JsonSchemaFlatAdapter";
 
 const ROOT_KEY = "$root";

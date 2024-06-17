@@ -1,11 +1,11 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
-import { fireEvent, waitFor, screen, act } from "@testing-library/react";
+import { fireEvent, screen, act } from "@testing-library/react";
 import { CommentEditor } from "@vanilla/addon-vanilla/thread/CommentEditor";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { ICommentEdit } from "@dashboard/@types/api/comment";
@@ -40,9 +40,6 @@ describe("CommentEditor", () => {
                 commentEdit={MOCK_COMMENT_EDIT}
                 onClose={() => null}
             />,
-            {
-                enableNetworkRequests: false,
-            },
         );
 
         await screen.findByTestId("vanilla-editor");
@@ -61,9 +58,7 @@ describe("CommentEditor", () => {
                 onClose={() => null}
                 onSuccess={mockOnSuccess}
             />,
-            {
-                enableNetworkRequests: true,
-            },
+            true,
         );
 
         await screen.findByTestId("vanilla-editor");

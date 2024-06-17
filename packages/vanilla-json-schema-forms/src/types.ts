@@ -37,6 +37,7 @@ interface IChoices {
         valueKey: string;
         labelKey: string;
         extraLabelKey?: string;
+        excludeLookups?: string[];
     };
 }
 

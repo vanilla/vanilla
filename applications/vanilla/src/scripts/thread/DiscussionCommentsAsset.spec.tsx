@@ -1,6 +1,6 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,8 +9,6 @@ import { fireEvent, render, act, waitFor, within, RenderResult, screen } from "@
 import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
-import { LoadStatus } from "@library/@types/api/core";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import { mockAPI } from "@library/__tests__/utility";
@@ -19,6 +17,8 @@ import { LiveAnnouncer } from "react-aria-live";
 import { ICommentEdit } from "@dashboard/@types/api/comment";
 import { vitest } from "vitest";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 
 const MOCK_DISCUSSION: React.ComponentProps<typeof DiscussionCommentsAsset>["discussion"] = {
     ...DiscussionFixture[0],
@@ -55,26 +55,15 @@ async function renderInProvider(children: ReactNode) {
     });
 
     return render(
-        <LiveAnnouncer>
-            <TestReduxProvider
-                state={{
-                    users: {
-                        current: {
-                            status: LoadStatus.SUCCESS,
-                            data: {
-                                ...UserFixture.createMockUser({ userID: 1 }),
-                                countUnreadNotifications: 0,
-                                countUnreadConversations: 0,
-                            },
-                        },
-                    },
-                }}
-            >
-                <QueryClientProvider client={queryClient}>
-                    <PermissionsFixtures.AllPermissions>{children}</PermissionsFixtures.AllPermissions>
-                </QueryClientProvider>
-            </TestReduxProvider>
-        </LiveAnnouncer>,
+        <TestReduxProvider>
+            <LiveAnnouncer>
+                <CurrentUserContextProvider currentUser={UserFixture.createMockUser({ userID: 1 })}>
+                    <QueryClientProvider client={queryClient}>
+                        <PermissionsFixtures.AllPermissions>{children}</PermissionsFixtures.AllPermissions>
+                    </QueryClientProvider>
+                </CurrentUserContextProvider>
+            </LiveAnnouncer>
+        </TestReduxProvider>,
     );
 }
 
@@ -158,26 +147,15 @@ async function renderWithAPI(children: ReactNode) {
     });
 
     return render(
-        <LiveAnnouncer>
-            <TestReduxProvider
-                state={{
-                    users: {
-                        current: {
-                            status: LoadStatus.SUCCESS,
-                            data: {
-                                ...UserFixture.createMockUser({ userID: 1 }),
-                                countUnreadNotifications: 0,
-                                countUnreadConversations: 0,
-                            },
-                        },
-                    },
-                }}
-            >
-                <QueryClientProvider client={queryClient}>
-                    <PermissionsFixtures.AllPermissions>{children}</PermissionsFixtures.AllPermissions>
-                </QueryClientProvider>
-            </TestReduxProvider>
-        </LiveAnnouncer>,
+        <TestReduxProvider>
+            <LiveAnnouncer>
+                <CurrentUserContextProvider currentUser={UserFixture.createMockUser({ userID: 1 })}>
+                    <QueryClientProvider client={queryClient}>
+                        <PermissionsFixtures.AllPermissions>{children}</PermissionsFixtures.AllPermissions>
+                    </QueryClientProvider>
+                </CurrentUserContextProvider>
+            </LiveAnnouncer>
+        </TestReduxProvider>,
     );
 }
 

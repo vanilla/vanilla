@@ -1,19 +1,18 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React, { ReactNode } from "react";
-import { LoadStatus } from "@library/@types/api/core";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { FollowedContentContext } from "@library/followedContent/FollowedContentContext";
-import { CategoryDisplayAs, CategoryPostNotificationType } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { CategoryDisplayAs } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { STORY_USER } from "@library/storybook/storyData";
 import { CategorySortOption } from "@dashboard/@types/api/category";
 import { CategoryPreferencesFixture } from "@dashboard/userPreferences/__fixtures__/CategoryNotificationPreferences.Fixture";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 
 export const mockedCategories = [
     {
@@ -50,21 +49,7 @@ export const mockedCategories = [
 
 function HasFollowedCategories({ children }: { children: ReactNode }) {
     return (
-        <TestReduxProvider
-            state={{
-                users: {
-                    current: {
-                        ...UserFixture.adminAsCurrent,
-                    },
-                    usersByID: {
-                        2: {
-                            status: LoadStatus.SUCCESS,
-                            data: UserFixture.createMockUser({ userID: 2 }),
-                        },
-                    },
-                },
-            }}
-        >
+        <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
             <FollowedContentContext.Provider
                 value={{
                     userID: 1,
@@ -76,27 +61,13 @@ function HasFollowedCategories({ children }: { children: ReactNode }) {
             >
                 {children}
             </FollowedContentContext.Provider>
-        </TestReduxProvider>
+        </CurrentUserContextProvider>
     );
 }
 
 function NoFollowedCategories({ children }: { children: ReactNode }) {
     return (
-        <TestReduxProvider
-            state={{
-                users: {
-                    current: {
-                        ...UserFixture.adminAsCurrent,
-                    },
-                    usersByID: {
-                        2: {
-                            status: LoadStatus.SUCCESS,
-                            data: UserFixture.createMockUser({ userID: 2 }),
-                        },
-                    },
-                },
-            }}
-        >
+        <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
             <FollowedContentContext.Provider
                 value={{
                     userID: 1,
@@ -108,7 +79,7 @@ function NoFollowedCategories({ children }: { children: ReactNode }) {
             >
                 {children}
             </FollowedContentContext.Provider>
-        </TestReduxProvider>
+        </CurrentUserContextProvider>
     );
 }
 

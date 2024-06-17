@@ -8,11 +8,11 @@ import {
     AttachmentIntegrationsApiContextProvider,
     AttachmentIntegrationsContextProvider,
     INTEGRATIONS_META_KEY,
-    IntegrationContextProvider,
+    WriteableIntegrationContextProvider,
 } from "@library/features/discussions/integrations/Integrations.context";
 import {
     FAKE_API,
-    FAKE_INTEGRATION,
+    FAKE_WRITEABLE_INTEGRATION,
     FAKE_INTEGRATIONS_CATALOG,
     FAKE_INTEGRATION_SCHEMAS,
 } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
@@ -52,21 +52,21 @@ describe("IntegrationButtonAndModal", () => {
                 <QueryClientProvider client={queryClient}>
                     <AttachmentIntegrationsApiContextProvider api={mockApi}>
                         <AttachmentIntegrationsContextProvider integrations={FAKE_INTEGRATIONS_CATALOG}>
-                            <IntegrationContextProvider
+                            <WriteableIntegrationContextProvider
                                 {...{
-                                    attachmentType: FAKE_INTEGRATION["attachmentType"],
+                                    attachmentType: FAKE_WRITEABLE_INTEGRATION["attachmentType"],
                                     recordType: "discussion",
                                     recordID: 1,
                                 }}
                             >
                                 <IntegrationButtonAndModal />
-                            </IntegrationContextProvider>
+                            </WriteableIntegrationContextProvider>
                         </AttachmentIntegrationsContextProvider>
                     </AttachmentIntegrationsApiContextProvider>
                 </QueryClientProvider>,
             );
         });
-        button = await screen.findByText(FAKE_INTEGRATION.label);
+        button = await screen.findByText(FAKE_WRITEABLE_INTEGRATION.label);
     });
 
     it("Renders a button with the integration's `label` property", async () => {
@@ -95,7 +95,7 @@ describe("IntegrationButtonAndModal", () => {
             it("The form contains fields corresponding to the schema. The fields have the default values from the schema", async () => {
                 const form = await within(modal).findByRole<HTMLFormElement>("form");
 
-                const schema = FAKE_INTEGRATION_SCHEMAS[FAKE_INTEGRATION.attachmentType];
+                const schema = FAKE_INTEGRATION_SCHEMAS[FAKE_WRITEABLE_INTEGRATION.attachmentType];
 
                 expect.assertions(Object.keys(schema.properties).length * 2);
 
@@ -111,7 +111,7 @@ describe("IntegrationButtonAndModal", () => {
             it("The form contains a submit button with the label from the integration", async () => {
                 const form = within(modal).getByRole("form");
                 const submitButton = await within(form).findByRole<HTMLButtonElement>("button", {
-                    name: FAKE_INTEGRATION.submitButton,
+                    name: FAKE_WRITEABLE_INTEGRATION.submitButton,
                 });
                 expect(submitButton).toBeInTheDocument();
                 expect(submitButton.type).toBe("submit");
@@ -120,11 +120,8 @@ describe("IntegrationButtonAndModal", () => {
             describe("Submitting the form", () => {
                 it("Calls the API's `postAttachment` method", async () => {
                     const form = within(modal).getByRole("form");
-                    const submitButton = await within(form).findByRole<HTMLButtonElement>("button", {
-                        name: FAKE_INTEGRATION.submitButton,
-                    });
                     await act(async () => {
-                        fireEvent.click(submitButton);
+                        fireEvent.submit(form);
                     });
                     expect(mockApi.postAttachment).toHaveBeenCalledTimes(1);
                 });

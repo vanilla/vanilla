@@ -16,6 +16,7 @@ export interface IGetUsersQueryParams {
     name?: string;
     email?: string;
     emailDomain?: string[];
+    emailConfirmed?: boolean;
     limit?: number;
     page?: number;
     sort?: UserSortParams;

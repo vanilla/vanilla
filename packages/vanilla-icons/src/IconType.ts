@@ -28,6 +28,24 @@ export const coreIconsData = {
         viewBox: "0 0 18 18",
         fill: "none",
     },
+    "cmd-alert": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "cmd-approve": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "cmd-dismiss": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
     "dashboard-edit": {
         width: "22",
         height: "22",
@@ -40,6 +58,12 @@ export const coreIconsData = {
         fill: "none",
     },
     "data-article": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "data-checked": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -312,22 +336,12 @@ export const coreIconsData = {
         height: "24",
         viewBox: "0 0 24 24",
     },
-    "meta-resolved": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
     "meta-smile": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
     },
     "meta-time": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
-    "meta-unresolved": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -410,6 +424,12 @@ export const coreIconsData = {
         fill: "none",
     },
     "notification-running": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "post-flag": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -546,6 +566,9 @@ export const coreIconsData = {
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
+    },
+    "search-close": {
+        viewBox: "0 0 9.5 9.5",
     },
     "search-discussion": {
         width: "24",

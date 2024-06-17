@@ -11,32 +11,30 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\ConfigurationException;
 use Vanilla\ApiUtils;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * API Controller for the `/conversations` resource.
  */
 class ConversationsApiController extends AbstractApiController
 {
-    /** @var Gdn_Configuration */
-    private $config;
-
-    /** @var ConversationModel */
-    private $conversationModel;
-
-    /** @var UserModel */
-    private $userModel;
+    private Gdn_Configuration $config;
+    private ConversationModel $conversationModel;
+    private ConversationMessageModel $conversationMessageModel;
+    private UserModel $userModel;
 
     /**
      * ConversationsApiController constructor.
-     *
-     * @param Gdn_Configuration $config
-     * @param ConversationModel $conversationModel
-     * @param UserModel $userModel
      */
-    public function __construct(Gdn_Configuration $config, ConversationModel $conversationModel, UserModel $userModel)
-    {
+    public function __construct(
+        Gdn_Configuration $config,
+        ConversationModel $conversationModel,
+        ConversationMessageModel $conversationMessageModel,
+        UserModel $userModel
+    ) {
         $this->config = $config;
         $this->conversationModel = $conversationModel;
+        $this->conversationMessageModel = $conversationMessageModel;
         $this->userModel = $userModel;
     }
 
@@ -409,6 +407,18 @@ class ConversationsApiController extends AbstractApiController
             throw new ServerException("Unable to insert conversation.", 500);
         }
 
+        if (isset($body["initialFormat"]) && isset($body["initialBody"])) {
+            // Make sure the post content is valid.
+            \Gdn::formatService()->filter($body["initialBody"], $body["initialFormat"]);
+            $messageData = [
+                "ConversationID" => $conversationID,
+                "Body" => $body["initialBody"],
+                "Format" => $body["initialFormat"],
+            ];
+            $this->conversationMessageModel->save($messageData);
+            $this->validateModel($this->conversationMessageModel);
+        }
+
         $conversation = $this->conversationByID($conversationID, $this->getSession()->UserID, 5);
         $conversation = $this->normalizeOutput($conversation);
         return $out->validate($conversation);
@@ -473,14 +483,12 @@ class ConversationsApiController extends AbstractApiController
                     "items" => [
                         "type" => "integer",
                     ],
+                    "minLength" => 2,
                     "description" => "List of userID of the participants.",
                 ],
-                "name" => null,
+                "initialBody?",
+                "initialFormat?" => new \Vanilla\Models\FormatSchema(),
             ];
-            if (!$this->config->get("Conversations.Subjects.Visible", false)) {
-                unset($inSchema["name"]);
-            }
-
             $postSchema = $this->schema(Schema::parse($inSchema)->add($this->fullSchema()), "ConversationPost");
         }
 

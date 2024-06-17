@@ -72,11 +72,15 @@ export const LinkContextProvider = (props: IProps) => {
      */
     const isDynamicNavigation = useCallback(
         (href: string): boolean => {
+            const link = new URL(href, window.location.href);
+            const isCurrentPage = link.pathname === window.location.pathname && link.search === window.location.search;
+
+            if (isCurrentPage) {
+                return false;
+            }
             if (useLayoutRouting) {
                 return isLayoutRoute(href);
             }
-            const link = new URL(href, window.location.href);
-            const isCurrentPage = link.pathname === window.location.pathname && link.search === window.location.search;
 
             let matchesContext = false;
             for (const context of linkContexts) {
@@ -86,7 +90,7 @@ export const LinkContextProvider = (props: IProps) => {
                 }
             }
 
-            return matchesContext && !isCurrentPage;
+            return matchesContext;
         },
         [linkContexts, useLayoutRouting],
     );

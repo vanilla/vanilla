@@ -3,6 +3,8 @@
 // This is the global application configuration file that sets up default values for configuration settings.
 $Configuration = [];
 
+$Configuration["auditLog"]["enabled"] = true;
+
 // Auto-enable some addons.
 $Configuration['EnabledPlugins']['stubcontent'] = true;
 $Configuration['EnabledPlugins']['swagger-ui'] = true;

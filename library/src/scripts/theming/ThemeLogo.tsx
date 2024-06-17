@@ -9,45 +9,15 @@ import React from "react";
 import { connect } from "react-redux";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { t } from "@library/utility/appUtils";
+import { useThemeContext } from "./Theme.context";
 
 export enum LogoType {
     DESKTOP = "logo",
     MOBILE = "mobileLogo",
 }
 
-class ThemeLogo extends React.Component<IProps> {
-    public render() {
-        let content;
-
-        const themeDesktopUrl = titleBarVariables().logo.desktop.url;
-        const themeMobileUrl = titleBarVariables().logo.mobile.url;
-
-        const isDesktop = this.props.type === LogoType.DESKTOP;
-        const themeUrl = isDesktop ? themeDesktopUrl : themeMobileUrl;
-        const finalUrl = this.props.overwriteLogo ?? themeUrl ?? this.props.logoUrl;
-
-        if (finalUrl) {
-            content = (
-                <img
-                    className={this.props.className}
-                    src={finalUrl}
-                    alt={t("Home")}
-                    onLoad={() => {
-                        // This helps the MegaMenu re-position
-                        window.dispatchEvent(new Event("resize"));
-                    }}
-                />
-            );
-        } else {
-            content = <VanillaLogo className={this.props.className} isMobile={!isDesktop} />;
-        }
-
-        return content;
-    }
-}
-
-function logoUrlFromState(state: ICoreStoreState, logoType: LogoType): string | null {
-    const assets = state.theme.assets.data || {};
+function logoUrlFromState(themeState: ICoreStoreState["theme"], logoType: LogoType): string | null {
+    const assets = themeState.assets.data || {};
     let logo;
 
     if (logoType === LogoType.DESKTOP) {
@@ -63,19 +33,44 @@ function logoUrlFromState(state: ICoreStoreState, logoType: LogoType): string | 
     }
 }
 
-interface IOwnProps {
+interface IProps {
     alt: string;
     className?: string;
     type: LogoType;
     overwriteLogo?: string; // for storybook only
 }
 
-type IProps = IOwnProps & ReturnType<typeof mapStateToProps>;
+function ThemeLogo(props: IProps) {
+    let content;
 
-function mapStateToProps(state: ICoreStoreState, ownProps: IOwnProps) {
-    return {
-        logoUrl: logoUrlFromState(state, ownProps.type),
-    };
+    const themeState = useThemeContext();
+
+    const logoUrl = logoUrlFromState(themeState, props.type);
+
+    const themeDesktopUrl = titleBarVariables().logo.desktop.url;
+    const themeMobileUrl = titleBarVariables().logo.mobile.url;
+
+    const isDesktop = props.type === LogoType.DESKTOP;
+    const themeUrl = isDesktop ? themeDesktopUrl : themeMobileUrl;
+    const finalUrl = props.overwriteLogo ?? themeUrl ?? logoUrl;
+
+    if (finalUrl) {
+        content = (
+            <img
+                className={props.className}
+                src={finalUrl}
+                alt={t("Home")}
+                onLoad={() => {
+                    // This helps the MegaMenu re-position
+                    window.dispatchEvent(new Event("resize"));
+                }}
+            />
+        );
+    } else {
+        content = <VanillaLogo className={props.className} isMobile={!isDesktop} />;
+    }
+
+    return content;
 }
 
-export default connect(mapStateToProps)(ThemeLogo);
+export default ThemeLogo;

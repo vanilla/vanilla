@@ -962,7 +962,7 @@ class Gdn_Request implements RequestInterface
         }
         $this->port($port);
 
-        $path = $_SERVER["PATH_INFO"] ?? "";
+        $path = $_SERVER["PATH_INFO"] ?? ($_SERVER["REQUEST_URI"] ?? "");
 
         // Some hosts block PATH_INFO from being passed (or even manually set).
         // We set X_PATH_INFO in the .htaccess as a fallback for those situations.

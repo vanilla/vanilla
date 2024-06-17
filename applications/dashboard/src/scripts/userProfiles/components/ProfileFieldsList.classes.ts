@@ -46,7 +46,7 @@ export default function ProfileFieldsListClasses() {
     const dashboardHeaderStyles = css({
         background: "#FBFCFF",
         "& tr, & tr th": {
-            borderBottom: "none",
+            borderBottom: "1px solid #D8D8D8",
         },
         "& th:not(:first-of-type)": {
             borderLeft: "1px solid #D8D8D8",

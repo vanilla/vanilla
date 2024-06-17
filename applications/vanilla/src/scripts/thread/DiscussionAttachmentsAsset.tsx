@@ -7,10 +7,9 @@
 import React, { useCallback, useEffect } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import {
-    IntegrationContextProvider,
-    useAttachmentIntegrations,
-    useIntegrationContext,
+    ReadableIntegrationContextProvider,
     useRefreshStaleAttachments,
+    useReadableIntegrationContext,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import AttachmentLayout from "@library/features/discussions/integrations/components/AttachmentLayout";
@@ -39,7 +38,7 @@ export function DiscussionAttachmentsAsset(props: IProps) {
 
     const refreshStaleDiscussionAttachments = useCallback(async () => {
         if (!!attachments && attachments.length > 0) {
-            await refreshStaleAttachments(attachments.map(({ attachmentID }) => attachmentID));
+            await refreshStaleAttachments(attachments);
             await invalidateDiscussionQuery();
         }
     }, [attachments?.length]);
@@ -51,10 +50,8 @@ export function DiscussionAttachmentsAsset(props: IProps) {
     return (
         <>
             {attachments?.map((attachment) => (
-                <IntegrationContextProvider
+                <ReadableIntegrationContextProvider
                     key={attachment.attachmentID}
-                    recordType={"discussion"}
-                    recordID={discussion.discussionID}
                     attachmentType={attachment.attachmentType}
                 >
                     <DiscussionAttachment
@@ -62,7 +59,7 @@ export function DiscussionAttachmentsAsset(props: IProps) {
                         attachment={attachment}
                         onSuccessfulRefresh={invalidateDiscussionQuery}
                     />
-                </IntegrationContextProvider>
+                </ReadableIntegrationContextProvider>
             ))}
         </>
     );
@@ -73,9 +70,7 @@ export function DiscussionAttachment(props: { attachment: IAttachment; onSuccess
         attachment: { state, status, sourceUrl, sourceID, dateUpdated, dateInserted, metadata, insertUser },
     } = props;
 
-    const integrations = useAttachmentIntegrations();
-
-    const integration = integrations.find((i) => i.attachmentType === props.attachment.attachmentType);
+    const integration = useReadableIntegrationContext();
 
     const title = integration?.title ?? "Unknown Integration";
     const externalIDLabel = integration?.externalIDLabel ?? "Unknown #";

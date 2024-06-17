@@ -75,6 +75,11 @@ paths:
                   schema:
                       default: false
                       type: boolean
+                - name: score
+                  description: Filter by score.
+                  in: query
+                  schema:
+                      type: integer
                 - name: pinned
                   description: >
                       Whether or not to include pinned discussions. If true, only
@@ -1364,6 +1369,40 @@ components:
                     description: The statusID current applied to the discussion.
                 status:
                     $ref: "#/components/schemas/StatusFragment"
+                visibleSuggestions:
+                    type: boolean
+                    description: Whether the discussion has visible suggestions
+                    x-feature: "Feature.AISuggestions.Enabled"
+                suggestions:
+                    type: array
+                    items:
+                        properties:
+                            format:
+                                type: string
+                                description: Source of the suggestion
+                            type:
+                                type: string
+                                description: Type of suggestion discussion/comment
+                            id:
+                                type: integer
+                                description: Index of the suggestion
+                            url:
+                                type: string
+                                description: URL of the suggestion
+                            title:
+                                type: string
+                                description: Title of the suggestion
+                            summary:
+                                type: string
+                                description: Summary of the suggestion
+                            hidden:
+                                type: boolean
+                                description: Whether the suggestion is dismissed
+                            commentID:
+                                type: integer
+                                description: Comment ID of the suggestion
+                        type: object
+                    x-feature: "Feature.AISuggestions.Enabled"
             required:
                 - discussionID
                 - type

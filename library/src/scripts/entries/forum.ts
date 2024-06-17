@@ -5,12 +5,13 @@
  */
 
 import { onPageViewWithContext } from "@library/analytics/AnalyticsData";
-import { trackPageView } from "@library/analytics/tracking";
+import { trackPageView, trackLink } from "@library/analytics/tracking";
 import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
-import { getMeta } from "@library/utility/appUtils";
+import { getMeta, setMeta } from "@library/utility/appUtils";
 
 // Tracking page views
 trackPageView();
+setMeta("trackLegacyPageViews", true);
 
 onPageViewWithContext((event: CustomEvent) => {
     trackPageView(window.location.href, event.detail);
@@ -19,3 +20,5 @@ onPageViewWithContext((event: CustomEvent) => {
 if (getMeta("inputFormat.desktop")?.match(/rich2/i)) {
     supportsFrames(true);
 }
+
+trackLink();

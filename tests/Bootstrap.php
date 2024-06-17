@@ -29,6 +29,7 @@ use Vanilla\Contracts\Site\VanillaSiteProvider;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Controllers\API\ConfigApiController;
+use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RemoteResourceModel;
 use Vanilla\Dashboard\UserLeaderService;
@@ -36,9 +37,6 @@ use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 use Vanilla\Forum\Widgets\DiscussionDiscussionsWidget;
-use Vanilla\Layout\GlobalLayoutRecordProvider;
-use Vanilla\Layout\CategoryLayoutRecordProvider;
-use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -59,8 +57,8 @@ use Vanilla\Widgets\WidgetService;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
-use VanillaTests\Fixtures\FileUtils;
 use VanillaTests\Fixtures\MockEmail;
+use VanillaTests\Fixtures\MockSuggestionModel;
 use VanillaTests\Fixtures\MockWidgets\MockWidget1;
 use VanillaTests\Fixtures\MockWidgets\MockWidget2;
 use VanillaTests\Fixtures\MockWidgets\MockWidget3;
@@ -444,6 +442,10 @@ class Bootstrap
             ->setConstructorArgs([ContainerUtils::config("Context.Secret", "secret")])
 
             ->rule(DiscussionStatusModel::class)
+            ->setShared(true)
+
+            ->rule(AiSuggestionSourceService::class)
+            ->addCall("registerSuggestionSource", [new Reference(MockSuggestionModel::class)])
             ->setShared(true)
 
             ->rule(RecordStatusModel::class)

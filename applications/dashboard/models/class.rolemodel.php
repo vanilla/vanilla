@@ -8,8 +8,16 @@
  * @since 2.0
  */
 
+use Garden\Events\ResourceEvent;
+use Garden\Schema\Schema;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
+use Vanilla\Community\Events\CategoryEvent;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
+use Vanilla\Dashboard\Events\RoleEvent;
 use Vanilla\Models\ModelCache;
+use Vanilla\Models\PermissionFragmentSchema;
+use Vanilla\Models\UserFragmentSchema;
 
 /**
  * Handles role data.
@@ -755,6 +763,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
             }
             // Now update the role permissions
             $role = $this->getByRoleID($roleID);
+            $resourceEvent = $this->eventFromRow((array) $role, $insert ? "create" : "update");
+            $this->getEventManager()->dispatch($resourceEvent);
 
             if ($doPermissions) {
                 $permissionModel = Gdn::permissionModel();
@@ -810,6 +820,54 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
             $roleID = false;
         }
         return $roleID;
+    }
+
+    /**
+     * Generate a comment event object, based on a database row.
+     *
+     * @param array $row
+     * @param string $action
+     *
+     * @return ResourceEvent
+     */
+    public function eventFromRow(array $row, string $action): ResourceEvent
+    {
+        $row = ApiUtils::convertOutputKeys($row);
+
+        $row = $this->schema()->validate($row);
+
+        $sender = Gdn::userModel()->currentFragment();
+
+        $result = new RoleEvent($action, ["role" => $row], $sender);
+        return $result;
+    }
+
+    /**
+     * Get a schema instance comprised of all available role fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function schema(): Schema
+    {
+        $schema = Schema::parse([
+            "roleID:i" => "ID of the role.",
+            "name:s" => "Name of the role.",
+            "description:s|n" => [
+                "description" => "Description of the role.",
+                "minLength" => 0,
+            ],
+            "type:s|n" => [
+                "description" => "Default type of this role.",
+                "minLength" => 0,
+            ],
+            "deletable:b" => "Is the role deletable?",
+            "canSession:b" => "Can users in this role start a session?",
+            "personalInfo:b" => "Is membership in this role personal information?",
+            "permissions:a?" => new PermissionFragmentSchema(),
+            "assignable:b?" => "Can the current user assign this role?",
+            "domains:s?" => "Email domains to auto-assignment of domain",
+        ]);
+        return $schema;
     }
 
     /**
@@ -944,6 +1002,12 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
     {
         $roleID = (int) $roleID;
 
+        $existingRole = $this->getByRoleID($roleID);
+        if (!$existingRole) {
+            throw new NotFoundException("Role not found.", ["roleID" => $roleID]);
+            return false;
+        }
+
         // Grab the affected users
         $userModel = Gdn::userModel();
         $affectedUsers = $userModel->getByRole($roleID)->resultArray();
@@ -959,6 +1023,9 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
                 ->set("UserRole.RoleID", $newRoleID)
                 ->where(["UserRole.RoleID" => $roleID])
                 ->put();
+            $replacementRole = $this->getByRoleID($newRoleID);
+        } else {
+            $replacementRole = null;
         }
 
         // Remove permissions for this role.
@@ -974,6 +1041,23 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
         $this->SQL->delete("UserRole", ["RoleID" => $roleID]);
         $result = $this->SQL->delete("Role", ["RoleID" => $roleID]);
         $this->clearCache();
+
+        $resourceEvent = $this->eventFromRow((array) $existingRole, "delete");
+        if ($replacementRole !== null) {
+            $replacementRole = $this->eventFromRow((array) $replacementRole, "update")->getPayload()["role"];
+            $resourceEvent->setPayload(
+                array_merge(
+                    [
+                        "countAffectedUsers" => count($affectedUsers),
+                        "replacementRole" => $replacementRole,
+                    ],
+                    $resourceEvent->getPayload()
+                )
+            );
+        }
+
+        $this->getEventManager()->dispatch($resourceEvent);
+
         return $result;
     }
 

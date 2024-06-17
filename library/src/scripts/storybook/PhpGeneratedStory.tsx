@@ -23,6 +23,7 @@ import { initAllUserContent } from "@library/content";
 import { applyCompatibilityUserCards } from "@library/features/userCard/UserCard.compat";
 import { setMeta, _executeReady } from "@library/utility/appUtils";
 import { classNames } from "react-select/lib/utils";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 loadTranslations({});
 const staticCssFiles = import.meta.glob(
@@ -33,6 +34,16 @@ const staticCssFiles = import.meta.glob(
     ],
     { query: "?url" },
 );
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            enabled: false,
+            retry: false,
+            staleTime: Infinity,
+        },
+    },
+});
 
 async function resolveCssUrls(cssPaths: string[]) {
     const allModules: Array<Promise<unknown>> = [];
@@ -69,7 +80,11 @@ export function PhpGeneratedStory(props: { html: string; bodyClasses: string; cs
 
     useEffect(() => {
         applySharedPortalContext((props) => {
-            return <Provider store={getStore()}>{props.children}</Provider>;
+            return (
+                <QueryClientProvider client={queryClient}>
+                    <Provider store={getStore()}>{props.children}</Provider>
+                </QueryClientProvider>
+            );
         });
     }, []);
 

@@ -26,7 +26,7 @@ export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
             reactPlugin({
                 plugins: [
                     [
-                        "@swc/plugin-emotion",
+                        "@vanilla/plugin-emotion",
                         {
                             // default is true. It will be disabled when build type is production.
                             sourceMap: false,

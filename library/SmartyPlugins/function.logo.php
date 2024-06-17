@@ -10,7 +10,7 @@
  * Writes the site logo to the page.
  *
  * @param array $params The parameters passed into the function.
- * @param Smarty $smarty The smarty object rendering the template.
+ * @param Smarty\Smarty $smarty The smarty object rendering the template.
  * @return string The HTML img tag or site title if no logo is set.
  */
 function smarty_function_logo($params, &$smarty)

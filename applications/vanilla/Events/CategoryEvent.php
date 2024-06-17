@@ -48,4 +48,14 @@ class CategoryEvent extends ResourceEvent implements LoggableEventInterface
         [$recordType, $recordID] = $this->getRecordTypeAndID();
         return "/api/v2/categories/$recordID";
     }
+
+    /**
+     * Return true to bypass {@link ResourceEventLogger} filters.
+     *
+     * @return bool
+     */
+    public function bypassLogFilters(): bool
+    {
+        return true;
+    }
 }

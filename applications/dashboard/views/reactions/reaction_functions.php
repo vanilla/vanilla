@@ -76,24 +76,39 @@ if (!function_exists("writeReactions")) {
         Gdn::controller()->fireEvent("BeforeFlag");
 
         if (!empty($flags) && is_array($flags)) {
-            echo Gdn_Theme::bulletItem("Flags");
+            if (Gdn::config("Feature.CommunityManagement.Enabled", false)) {
+                $discussionOrCommentID = $row->CommentID ?? $row->DiscussionID;
+                $discussionName = $row->DiscussionName ?? $row->Name;
 
-            echo ' <span class="FlagMenu ToggleFlyout">';
-            // Write the handle.
-            echo reactionButton($row, "Flag", ["LinkClass" => "FlyoutButton", "IsHeading" => true]);
-            echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+                echo '<a class="ReactButton js-legacyDiscussionOrCommentReport" href="#" tabindex="0"  title="Flag" rel="nofollow" role="button" data-recordType="' .
+                    $recordType .
+                    '" data-recordID="' .
+                    $discussionOrCommentID .
+                    '" data-discussionName="' .
+                    $discussionName .
+                    '"><span class="ReactSprite ReactFlag"></span><span class="ReactLabel">' .
+                    t("Flag") .
+                    "</span></a>";
+            } else {
+                echo Gdn_Theme::bulletItem("Flags");
 
-            foreach ($flags as $flag) {
-                if (is_callable($flag)) {
-                    echo "<li>" . call_user_func($flag, $row, $recordType, $iD) . "</li>";
-                } else {
-                    echo "<li>" . reactionButton($row, $flag["UrlCode"]) . "</li>";
+                echo ' <span class="FlagMenu ToggleFlyout">';
+                // Write the handle.
+                echo reactionButton($row, "Flag", ["LinkClass" => "FlyoutButton", "IsHeading" => true]);
+                echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+
+                foreach ($flags as $flag) {
+                    if (is_callable($flag)) {
+                        echo "<li>" . call_user_func($flag, $row, $recordType, $iD) . "</li>";
+                    } else {
+                        echo "<li>" . reactionButton($row, $flag["UrlCode"]) . "</li>";
+                    }
                 }
-            }
 
-            Gdn::controller()->fireEvent("AfterFlagOptions");
-            echo "</ul>";
-            echo "</span> ";
+                Gdn::controller()->fireEvent("AfterFlagOptions");
+                echo "</ul>";
+                echo "</span> ";
+            }
         }
         Gdn::controller()->fireEvent("AfterFlag");
 

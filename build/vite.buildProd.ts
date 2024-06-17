@@ -13,7 +13,7 @@ import { DYNAMIC_ENTRY_DIR_PATH, LIBRARY_SRC_DIRECTORY, DIST_DIRECTORY } from ".
 import EntryModel from "./scripts/utility/EntryModel";
 import { printSection } from "./scripts/utility/utils";
 import { makeViteBuildConfig } from "./vite.makeBuildConfig";
-
+import "./vite.buildLegacyDashboard";
 // @ts-check
 
 run();

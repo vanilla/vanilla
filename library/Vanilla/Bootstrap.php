@@ -96,6 +96,11 @@ class Bootstrap
             ->setAliasOf(\Vanilla\Logger::class)
             ->setClass(\Vanilla\Logger::class)
 
+            ->rule(Vanilla\Logging\AuditLogService::class)
+            ->setShared(true)
+            ->rule(Vanilla\Logging\AuditLogModel::class)
+            ->setShared(true)
+
             ->rule(Vanilla\Logging\LogDecorator::class)
             ->setShared(true)
 
@@ -106,6 +111,7 @@ class Bootstrap
             ->setInherit(true)
             ->addCall("addMiddleware", [new Reference(Vanilla\Web\Middleware\HttpRequestTimerMiddleware::class)]);
 
+        $container->rule(Vanilla\Web\BotDetector::class)->setShared(true);
         $container->rule(TraceCollector::class)->setShared(true);
 
         // Image Srcset
@@ -260,6 +266,7 @@ class Bootstrap
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\RoleTokenAuthMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(Vanilla\Logging\AuditLogApiMiddleware::class)])
 
             // Middleware configuration
             ->rule(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)

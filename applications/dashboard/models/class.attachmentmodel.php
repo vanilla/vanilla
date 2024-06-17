@@ -410,8 +410,8 @@ class AttachmentModel extends Gdn_Model
             "foreignID:s",
             "foreignUserID:i",
             "source:s",
-            "sourceID:s",
-            "sourceUrl:s",
+            "sourceID:s?",
+            "sourceUrl:s?",
             "status:s",
             "lastModifiedDate:dt",
             "metadata:a" => [

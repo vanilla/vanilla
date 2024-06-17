@@ -79,11 +79,11 @@ final class ArrayUtils
      * @param null $default
      * @return mixed
      */
-    public static function getByPath(string $path, $array, $default = null)
+    public static function getByPath(string $path, $array, $default = null, string $separator = self::PATH_SEPARATOR)
     {
         self::assertArray($array, __METHOD__ . "() expects argument 2 to be an array or array-like object.");
 
-        $keys = explode(self::PATH_SEPARATOR, $path);
+        $keys = explode($separator, $path);
 
         $search = function ($array, array $keys) use ($default, &$search) {
             self::assertArray($array, "Unexpected argument type. Expected an array or array-like object.");
@@ -228,11 +228,11 @@ final class ArrayUtils
      * @param mixed $value
      * @return mixed
      */
-    public static function setByPath(string $path, &$array, $value)
+    public static function setByPath(string $path, &$array, $value, string $separator = self::PATH_SEPARATOR)
     {
         self::assertArray($array, __METHOD__ . "() expects argument 2 to be an array or array-like object.");
 
-        $keys = explode(self::PATH_SEPARATOR, $path);
+        $keys = explode($separator, $path);
         $search = function ($array, array $keys) use ($value, &$search) {
             $currentKey = reset($keys);
             $isLastKey = count($keys) === 1;

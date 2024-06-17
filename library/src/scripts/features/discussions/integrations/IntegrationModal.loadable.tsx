@@ -5,7 +5,7 @@
  */
 
 import { IApiError, IServerError, LoadStatus } from "@library/@types/api/core";
-import { useIntegrationContext } from "@library/features/discussions/integrations/Integrations.context";
+import { useWriteableIntegrationContext } from "@library/features/discussions/integrations/Integrations.context";
 import { IPostAttachmentParams } from "@library/features/discussions/integrations/Integrations.types";
 import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
@@ -25,7 +25,7 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@vanilla/i18n";
 import { EMPTY_SCHEMA, IJsonSchemaFormHandle, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { getDefaultValuesFromSchema, mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
+import { extractDataByKeyLookup, mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
 import { useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import Message from "@library/messages/Message";
@@ -54,8 +54,7 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
         postAttachment,
         CustomIntegrationForm,
         beforeSubmit,
-        ...rest
-    } = useIntegrationContext();
+    } = useWriteableIntegrationContext();
 
     useEffect(() => {
         // request the schema when the modal is opened
@@ -89,7 +88,7 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
     const { values, submitForm, setValues, isSubmitting, resetForm, dirty } = useFormik<IPostAttachmentParams>({
         initialValues: {
             ...{},
-            ...getDefaultValuesFromSchema(integrationSchema ?? EMPTY_SCHEMA),
+            ...extractDataByKeyLookup(integrationSchema ?? EMPTY_SCHEMA, "default"),
         },
         onSubmit: async (values) => {
             setServerError(null);

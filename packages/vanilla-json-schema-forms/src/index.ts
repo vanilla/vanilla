@@ -6,3 +6,4 @@
 
 export * from "./JsonSchemaForm";
 export * from "./types";
+export * from "./utils";

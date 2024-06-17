@@ -13,7 +13,7 @@ import { IUserFragment } from "@library/@types/api/users";
 import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps {
-    userFragment: Partial<IUserFragment> & Pick<IUserFragment, "userID" | "name">;
+    userFragment: Partial<IUserFragment> & Pick<IUserFragment, "userID">;
     className?: string;
     children?: React.ReactNode;
     isUserCard?: boolean;
@@ -44,7 +44,7 @@ export default function ProfileLink(props: IProps) {
  */
 function InnerLink(props: IProps) {
     const { userFragment, isUserCard = true } = props;
-    const children = props.children || userFragment.name;
+    const children = props.children || userFragment.name || "Deleted User";
     const profileURL = makeProfileUrl(userFragment.userID, userFragment.name);
     const context = useUserCardTrigger();
 

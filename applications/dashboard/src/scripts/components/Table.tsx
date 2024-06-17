@@ -108,6 +108,7 @@ export interface ITableRowProps {
     prepareRow(arg0: Row): void;
     rowClassNames?: string;
     cellClassNames?: string;
+    truncateCells: boolean;
 }
 
 const TableRows = (props: ITableRowProps) => {
@@ -122,6 +123,7 @@ const TableRows = (props: ITableRowProps) => {
                 return (
                     <tr {...row.getRowProps()} key={`body-${rowIndex}`} className={cx(classes.row, rowClassNames)}>
                         {row.cells.map((cell, cellIndex) => {
+                            const cellContent = cell.render("Cell");
                             return (
                                 <td
                                     {...cell.getCellProps()}
@@ -134,10 +136,20 @@ const TableRows = (props: ITableRowProps) => {
                                         cellClassNames,
                                     )}
                                 >
-                                    <span className={classes.cellContentWrap}>
-                                        <TruncatedText className={classes.cellContentTruncate} lines={2}>
-                                            {cell.render("Cell")}
-                                        </TruncatedText>
+                                    <span
+                                        className={
+                                            props.truncateCells
+                                                ? classes.cellContentWrapTruncated
+                                                : classes.cellContentWrap
+                                        }
+                                    >
+                                        {props.truncateCells ? (
+                                            <TruncatedText className={classes.cellContentTruncate} lines={2}>
+                                                {cellContent}{" "}
+                                            </TruncatedText>
+                                        ) : (
+                                            cellContent
+                                        )}
                                     </span>
                                 </td>
                             );
@@ -185,6 +197,7 @@ export interface ITableProps {
     headerClassNames?: string;
     rowClassNames?: string;
     cellClassNames?: string;
+    truncateCells?: boolean;
 }
 
 export const Table = (props: ITableProps) => {
@@ -207,6 +220,7 @@ export const Table = (props: ITableProps) => {
         headerClassNames,
         rowClassNames,
         cellClassNames,
+        truncateCells = true,
     } = props;
 
     const classes = tableClasses();
@@ -373,12 +387,13 @@ export const Table = (props: ITableProps) => {
                             rowClassNames={rowClassNames}
                             hiddenHeaders={hiddenHeaders}
                         />
-                        <tbody {...getTableBodyProps}>
+                        <tbody {...getTableBodyProps()}>
                             <TableRows
                                 rows={paginate ? page : rows}
                                 prepareRow={prepareRow}
                                 rowClassNames={rowClassNames}
                                 cellClassNames={cellClassNames}
+                                truncateCells={truncateCells}
                             />
                         </tbody>
                     </table>

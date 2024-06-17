@@ -5,7 +5,6 @@
  */
 
 import apiv2 from "@library/apiv2";
-import gdn from "@library/gdn";
 import Permission from "@library/features/users/Permission";
 import UserActions from "@library/features/users/UserActions";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
@@ -16,13 +15,38 @@ import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { getMeta, getSiteSection, t } from "@library/utility/appUtils";
-import classNames from "classnames";
-import React, { ReactNode, useMemo } from "react";
+import { cx } from "emotion";
 import { connect } from "react-redux";
-import { DropDownEditProfileLink } from "@library/flyouts/items/DropDownEditProfileLink";
 import { extraUserDropDownComponents } from "@library/headers/mebox/pieces/UserDropdownExtras";
 import { useSignOutLink } from "@library/contexts/EntryLinkContext";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { notEmpty, stableObjectHash } from "@vanilla/utils";
+
+interface AdminItem {
+    name: string;
+    url: string;
+    permissions: string[];
+    orPermissions?: string[];
+}
+
+const ADMIN_ITEMS: AdminItem[] = [
+    {
+        name: "Appearance",
+        url: "/appearance",
+        permissions: ["site.manage", "settings.view"],
+    },
+    {
+        name: "Analytics",
+        url: "/analytics",
+        permissions: ["site.manage", "settings.view"],
+        orPermissions: ["data.view", "dashboards.manage"],
+    },
+    {
+        name: "Settings",
+        url: "/dashboard/role",
+        permissions: ["site.manage", "settings.view"],
+    },
+];
 
 /**
  * Implements User Drop down for header
@@ -33,15 +57,15 @@ function UserDropDownContentsImpl(props: IProps) {
     const siteSection = getSiteSection();
     const { hasPermission } = usePermissionsContext();
 
-    const dashboardMenuItem: ReactNode = useMemo(() => {
-        if (hasPermission(["site.manage", "settings.view"])) {
-            return <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />;
-        }
-        if (!hasPermission(["site.manage", "settings.view"]) && hasPermission(["data.view", "dashboards.manage"])) {
-            return <DropDownItemLink to={"/analytics"} name={t("Analytics")} />;
-        }
-        return null;
-    }, []);
+    const makeAdminItems = () => {
+        const dropDownItems = ADMIN_ITEMS.map((item) => {
+            const permissions = hasPermission(item.permissions) || hasPermission(item.orPermissions ?? []);
+            if (permissions) {
+                return <DropDownItemLink key={stableObjectHash(item)} to={item.url} name={t(item.name)} />;
+            }
+        }).filter(notEmpty);
+        return <>{dropDownItems.length > 0 && <DropDownSection title={t("Admin")}>{dropDownItems}</DropDownSection>}</>;
+    };
 
     if (!userInfo) {
         return null;
@@ -55,11 +79,11 @@ function UserDropDownContentsImpl(props: IProps) {
     const classesDropDown = dropDownClasses();
 
     const reportUrl = getMeta("reporting.url", null);
+    const cmdEnabled = getMeta("featureFlags.CommunityManagement.Enabled", false);
 
     return (
-        <ul className={classNames(classesDropDown.verticalPadding, props.className)}>
+        <ul className={cx(classesDropDown.verticalPadding, props.className)}>
             <DropDownUserCard className="userDropDown-userCard" />
-            <DropDownEditProfileLink />
             {extraUserDropDownComponents.map((ComponentName, index) => {
                 return <ComponentName key={index} getCountByName={getCountByName} />;
             })}
@@ -87,21 +111,33 @@ function UserDropDownContentsImpl(props: IProps) {
                         name={t("Applicants")}
                         count={getCountByName("Applicants")}
                     />
-                    <DropDownItemLinkWithCount
-                        to={"/dashboard/log/spam"}
-                        name={t("Spam Queue")}
-                        count={getCountByName("SpamQueue")}
-                    />
-                    <DropDownItemLinkWithCount
-                        to={"/dashboard/log/moderation"}
-                        name={t("Moderation Queue")}
-                        count={getCountByName("ModerationQueue")}
-                    />
+                    {cmdEnabled ? (
+                        <>
+                            <DropDownItemLink to={"/dashboard/content/triage"} name={t("Triage")} />
+                            <DropDownItemLink to={"/dashboard/content/reports"} name={t("Reports")} />
+                            <DropDownItemLink to={"/dashboard/content/escalations"} name={t("Escalations")} />
+                        </>
+                    ) : (
+                        <>
+                            <DropDownItemLinkWithCount
+                                to={"/dashboard/log/spam"}
+                                name={t("Spam Queue")}
+                                count={getCountByName("SpamQueue")}
+                            />
+                            <DropDownItemLinkWithCount
+                                to={"/dashboard/log/moderation"}
+                                name={t("Moderation Queue")}
+                                count={getCountByName("ModerationQueue")}
+                            />
+                        </>
+                    )}
+
                     {reportUrl && <DropDownItemLinkWithCount to={reportUrl} name={t("Reported Posts")} />}
                 </DropDownSection>
             </Permission>
             <DropDownItemSeparator />
-            {dashboardMenuItem}
+            {makeAdminItems()}
+            <DropDownItemSeparator />
             <DropDownItemLink to={signOutUrl} name={t("Sign Out")} />
         </ul>
     );

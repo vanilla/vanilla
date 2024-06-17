@@ -11,7 +11,6 @@
             "@knowledge/*": ["./cloud/plugins/knowledge/src/scripts/*"],
             "@vanillaanalytics/*": ["./cloud/plugins/vanillaanalytics/src/scripts/*"],
             "@FederatedSearch/*": ["./cloud/plugins/FederatedSearch/src/scripts/*"],
-            "@AutomationRules/*": ["./cloud/plugins/AutomationRules/src/scripts/*"],
             "@oauth2/*": ["./plugins/oauth2/src/scripts/*"],
             "@webhooks/*": ["./cloud/plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./cloud/plugins/themingapi/src/scripts/*"],
@@ -48,12 +47,6 @@
         "types": ["vitest/globals", "jquery"],
         "esModuleInterop": true
     },
-    "ts-node": {
-        "esm": true,
-        "transpileOnly": true,
-        "files": true,
-        "swc": true
-    },
     "include": [
         "build/**/*.ts",
         "build/**/*.tsx",
@@ -73,7 +66,7 @@
         "addons/themes/*/src/scripts/**/*.ts",
         "addons/themes/*/src/scripts/**/*.tsx",
         ".storybookAppPages/*.ts*",
-        "vitest.config.ts"
+        "vitest.config.mts"
     ],
     "files": ["library/src/scripts/htmlWidget/HtmlWidgetEditor.d.ts", "node_modules/vite/client.d.ts"],
     "exclude": [

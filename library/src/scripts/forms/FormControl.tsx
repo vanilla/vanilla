@@ -23,7 +23,8 @@ import RadioButton from "@library/forms/RadioButton";
 import { useUniqueID } from "@library/utility/idUtils";
 import { RadioGroupContext } from "@library/forms/RadioGroupContext";
 import { useIsInModal } from "@library/modal/Modal.context";
-import { AutoComplete } from "@vanilla/ui";
+import { AutoComplete, AutoCompleteLookupOptions } from "@vanilla/ui";
+import apiv2 from "@library/apiv2";
 
 const createOptionsFromRecord = (options?: Record<string, React.ReactNode>): IComboBoxOption[] => {
     return options
@@ -64,9 +65,8 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                             onBlur,
                         }}
                         multiLineProps={{
-                            overflow: "scroll",
+                            // resize: "vertical",
                             rows: 5,
-                            maxRows: 5,
                         }}
                     />
                 );
@@ -182,6 +182,7 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                 <>
                     {props.useNewDropdown ? (
                         <AutoComplete
+                            multiple={control.multiple}
                             options={options}
                             value={value}
                             onBlur={onBlur}
@@ -190,6 +191,11 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                                 onChange(value);
                             }}
                             disabled={disabled}
+                            optionProvider={
+                                control.choices.api ? (
+                                    <AutoCompleteLookupOptions lookup={control.choices.api} />
+                                ) : undefined
+                            }
                         />
                     ) : (
                         <SelectOne
@@ -218,6 +224,36 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
             );
         }
         case "tokens": {
+            if (props.useNewDropdown) {
+                const multiple = true;
+
+                const { api, staticOptions } = control.choices;
+                const createOptions = () => {
+                    if (staticOptions) {
+                        return Array.isArray(staticOptions)
+                            ? staticOptions
+                            : Object.entries(staticOptions).map(([value, label]) => ({
+                                  value,
+                                  label: String(label),
+                              }));
+                    }
+                    return undefined;
+                };
+                return (
+                    <AutoComplete
+                        value={value}
+                        clear={false}
+                        placeholder={control.placeholder}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        optionProvider={api ? <AutoCompleteLookupOptions api={apiv2} lookup={api} /> : undefined}
+                        options={createOptions()}
+                        multiple={true}
+                        required={required}
+                        disabled={props.disabled}
+                    />
+                );
+            }
             const options = createOptionsFromRecord(control.choices.staticOptions);
 
             const currentValue: IComboBoxOption[] = Object.values(value ?? {}).map((value: string | number) => {
@@ -236,7 +272,7 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                         onChange={(options) => onChange(options.map(({ value }) => value))}
                         onBlur={onBlur}
                         options={options}
-                        inModal={isInModal}
+                        inModal={true}
                     />
                     {!!required && (
                         <input
@@ -299,8 +335,8 @@ export function FormControlGroup(props: React.PropsWithChildren<IControlGroupPro
     return (
         <InputBlock
             required={required}
-            label={inputType !== "checkBox" ? label : undefined}
-            labelNote={inputType !== "checkBox" ? description : undefined}
+            label={!["checkBox", "richeditor"].includes(inputType) ? label : undefined}
+            labelNote={!["checkBox", "richeditor"].includes(inputType) ? description : undefined}
             legend={legend}
             tooltip={tooltip}
             tooltipIcon={tooltipIcon}

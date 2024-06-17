@@ -14,6 +14,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { css, CSSObject } from "@emotion/css";
 import { important, percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { CSSProperties } from "react";
 
 export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("userPhoto", forcedVars);
@@ -29,6 +30,7 @@ export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) =
     );
 
     const sizing = makeThemeVars("sizing", {
+        xsmall: 24,
         small: 28,
         medium: 40,
         large: 100,
@@ -50,6 +52,7 @@ export const userPhotoMixins = (vars = userPhotoVariables()) => {
         ...objectFitWithFallback(),
         padding: important(0),
         margin: important(0),
+        verticalAlign: "initial",
         ...{
             "&&": {
                 width: percent(100),
@@ -58,37 +61,18 @@ export const userPhotoMixins = (vars = userPhotoVariables()) => {
         },
     };
 
-    const small = {
-        width: styleUnit(vars.sizing.small),
-        height: styleUnit(vars.sizing.small),
-        flexBasis: styleUnit(vars.sizing.small),
-    };
-
-    const medium = {
-        width: styleUnit(vars.sizing.medium),
-        height: styleUnit(vars.sizing.medium),
-        flexBasis: styleUnit(vars.sizing.medium),
-    };
-
-    const large = {
-        width: styleUnit(vars.sizing.large),
-        height: styleUnit(vars.sizing.large),
-        flexBasis: styleUnit(vars.sizing.large),
-    };
-
-    const xlarge = {
-        width: styleUnit(vars.sizing.xlarge),
-        height: styleUnit(vars.sizing.xlarge),
-        flexBasis: styleUnit(vars.sizing.xlarge),
+    const sizeFn = (size: any) => {
+        return {
+            width: styleUnit(size),
+            height: styleUnit(size),
+            flexBasis: styleUnit(size),
+        };
     };
 
     return {
         root,
         photo,
-        small,
-        medium,
-        large,
-        xlarge,
+        sizeFn,
     };
 };
 
@@ -100,10 +84,11 @@ export const userPhotoClasses = useThemeCache(() => {
 
     const root = css(mixinStyles.root);
     const photo = css(mixinStyles.photo);
-    const small = css(mixinStyles.small);
-    const medium = css(mixinStyles.medium);
-    const large = css(mixinStyles.large);
-    const xlarge = css(mixinStyles.xlarge);
+    const xsmall = css(mixinStyles.sizeFn(vars.sizing.xsmall));
+    const small = css(mixinStyles.sizeFn(vars.sizing.small));
+    const medium = css(mixinStyles.sizeFn(vars.sizing.medium));
+    const large = css(mixinStyles.sizeFn(vars.sizing.large));
+    const xlarge = css(mixinStyles.sizeFn(vars.sizing.xlarge));
 
     const noPhoto = css({
         display: "block",
@@ -116,6 +101,7 @@ export const userPhotoClasses = useThemeCache(() => {
 
     return {
         root,
+        xsmall,
         small,
         medium,
         large,

@@ -7,7 +7,14 @@
 
 namespace Vanilla\Dashboard\Models;
 
+use AttachmentModel;
+use Garden\EventManager;
 use Garden\Schema\Schema;
+use Garden\Utils\ContextException;
+use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Community\Events\EscalationEvent;
+use Vanilla\Community\Events\TicketEscalationEvent;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\ArrayUtils;
@@ -19,6 +26,26 @@ use Vanilla\Utility\DebugUtils;
 class AttachmentService
 {
     private $providers = [];
+
+    private AttachmentModel $attachmentModel;
+    private \CommentModel $commentModel;
+    private \DiscussionModel $discussionModel;
+    private EventManager $eventManager;
+
+    /**
+     * DI.
+     */
+    public function __construct(
+        AttachmentModel $attachmentModel,
+        \CommentModel $commentModel,
+        \DiscussionModel $discussionModel,
+        EventManager $eventManager
+    ) {
+        $this->attachmentModel = $attachmentModel;
+        $this->commentModel = $commentModel;
+        $this->discussionModel = $discussionModel;
+        $this->eventManager = $eventManager;
+    }
 
     /**
      * Add a provider to the service.
@@ -62,20 +89,24 @@ class AttachmentService
     {
         $catalog = [];
         foreach ($this->getAllProviders() as $provider) {
-            if ($provider->hasPermissions()) {
-                $catalog[$provider->getTypeName()] = [
-                    "name" => $provider->getProviderName(),
+            if ($provider->hasReadPermissions()) {
+                $catalogEntry = [];
+
+                $catalogEntry = array_merge($catalogEntry, [
+                    "writeableContentScope" => $provider->getWriteableContentScope(),
                     "attachmentType" => $provider->getTypeName(),
-                    "label" => $provider->getCreateLabelCode(),
-                    "submitButton" => $provider->getSubmitLabelCode(),
-                    "recordTypes" => $provider->getRecordTypes(),
                     "title" => $provider->getTitleLabelCode(),
                     "externalIDLabel" => $provider->getExternalIDLabelCode(),
                     "logoIcon" => $provider->getLogoIconName(),
-                    "canEscalateOwnPost" => $provider->canEscalateOwnPost(),
+                    "name" => $provider->getProviderName(),
+                    "label" => $provider->getCreateLabelCode(),
+                    "submitButton" => $provider->getSubmitLabelCode(),
+                    "recordTypes" => $provider->getRecordTypes(),
                     "escalationDelayUnit" => $provider->getEscalationDelayUnit(),
                     "escalationDelayLength" => $provider->getEscalationDelayLength(),
-                ];
+                ]);
+
+                $catalog[$provider->getTypeName()] = $catalogEntry;
             }
         }
         return $catalog;
@@ -113,9 +144,14 @@ class AttachmentService
         return $resultsOrdered;
     }
 
+    /**
+     * Refresh stale attachments.
+     *
+     * @param array $attachmentRows
+     * @return array
+     */
     public function refreshStale(array $attachmentRows): array
     {
-        $attachmentIDsOrdered = array_column($attachmentRows, "AttachmentID");
         $staleAttachments = array_filter($attachmentRows, function ($attachment) {
             $provider = $this->getProvider($attachment["Type"]);
             if (!$provider) {
@@ -159,7 +195,7 @@ class AttachmentService
                 continue;
             }
 
-            if (!$provider->canViewAttachment($attachment)) {
+            if (!($provider->canViewBasicAttachment($attachment) || $provider->canViewFullAttachment($attachment))) {
                 // Current user doesn't have access.
                 continue;
             }
@@ -197,5 +233,101 @@ class AttachmentService
 
         $result = $schema->validate($normalizedAttachments);
         return $result;
+    }
+
+    /**
+     * Get a record that we can attatch to.
+     *
+     * @param string $recordType
+     * @param string $recordID
+     * @return array{name: string, url: string, body: string, insertUserID: int, dateInserted: string}
+     */
+    public function getRecordToAttachTo(string $recordType, string $recordID): array
+    {
+        switch ($recordType) {
+            case "discussion":
+                $record = $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
+
+                if (!$record) {
+                    throw new NotFoundException("Record not found");
+                }
+                $record = $this->discussionModel->normalizeRow($record);
+                break;
+            case "comment":
+                $record = $this->commentModel->getID($recordID, DATASET_TYPE_ARRAY);
+
+                if (!$record) {
+                    throw new NotFoundException("Record not found");
+                }
+
+                $record = $this->commentModel->normalizeRow($record);
+                break;
+            default:
+                throw new ContextException("Invalid record type.", 400, [
+                    "recordType" => $recordType,
+                    "recordID" => $recordID,
+                ]);
+        }
+        return $record;
+    }
+
+    /**
+     * Create an attachment.
+     *
+     * @param array $body
+     * @return array
+     * @throws ForbiddenException
+     * @throws NotFoundException
+     */
+    public function createAttachment(array $body)
+    {
+        $attachmentType = $body["attachmentType"] ?? "";
+        $provider = $this->getProvider($attachmentType);
+        if (!$provider) {
+            throw new NotFoundException("No provider was found for this attachment type.");
+        }
+        $basicBody = $this->attachmentModel->getAttachmentPostSchema()->validate($body);
+        $recordType = $basicBody["recordType"];
+        $recordID = $basicBody["recordID"];
+
+        if (!$provider->canCreateAttachmentForRecord($recordType, $recordID)) {
+            throw new ForbiddenException("You do not have permission to create attachments using this provider.");
+        }
+
+        $fullSchema = $this->attachmentModel
+            ->getAttachmentPostSchema()
+            ->merge($provider->getHydratedFormSchema($recordType, $recordID, $body));
+
+        $body = $fullSchema->validate($body);
+
+        $attachment = $provider->createAttachment($recordType, $recordID, $body);
+        // Dispatch a Discussion event (close)
+        if ($recordType === "discussion") {
+            $discussion = $this->discussionModel->normalizeRow(
+                $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY)
+            );
+            $trackingEventInterface = EscalationEvent::fromDiscussion(
+                EscalationEvent::POST_COLLECTION_NAME,
+                [
+                    "recordType" => $recordType,
+                    "isEscalation" => $provider->getIsEscalation(),
+                    "attachment" => $attachment,
+                ],
+                $discussion
+            );
+        } elseif ($recordType === "comment") {
+            $comment = $this->commentModel->normalizeRow($this->commentModel->getID($recordID, DATASET_TYPE_ARRAY));
+            $trackingEventInterface = EscalationEvent::fromComment(
+                EscalationEvent::POST_COLLECTION_NAME,
+                [
+                    "recordType" => $recordType,
+                    "isEscalation" => $provider->getIsEscalation(),
+                    "attachment" => $attachment,
+                ],
+                $comment
+            );
+        }
+        $this->eventManager->dispatch($trackingEventInterface);
+        return $attachment;
     }
 }

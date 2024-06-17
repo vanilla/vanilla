@@ -83,7 +83,7 @@ export function DiscussionCommentsAsset(props: IProps) {
         if (!commentListQuery.isPreviousData && commentListQuery.isSuccess) {
             const attachments = (commentListQuery.data?.data ?? []).map((comment) => comment.attachments ?? []).flat();
             if (attachments.length > 0) {
-                await refreshStaleAttachments(attachments.map(({ attachmentID }) => attachmentID));
+                await refreshStaleAttachments(attachments);
                 await invalidateCommentListQuery();
             }
         }

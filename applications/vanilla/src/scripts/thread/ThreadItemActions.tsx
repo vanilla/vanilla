@@ -7,8 +7,8 @@
 import { IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { t } from "@library/utility/appUtils";
-import React from "react";
-import { useThreadItemContext } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
+import React, { useState } from "react";
+import { IThreadItemContext, useThreadItemContext } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 import { useDiscussionThreadContext } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
 import ThreadItemActionsClasses from "@vanilla/addon-vanilla/thread/ThreadItemActions.classes";
 import { cx } from "@emotion/css";
@@ -20,6 +20,7 @@ import { IReaction } from "@dashboard/@types/api/reaction";
 import { PostReactionsProvider } from "@library/postReactions/PostReactionsContext";
 import { PostReactionsLogAsModal } from "@library/postReactions/PostReactionsLog";
 import ThreadItemShareMenu from "@vanilla/addon-vanilla/thread/ThreadItemShareMenu";
+import { ReportModal } from "@vanilla/addon-vanilla/thread/ReportModal";
 
 function QuoteButton(props: { scrapeUrl: string }) {
     const { scrapeUrl } = props;
@@ -90,4 +91,9 @@ export default function ThreadItemActions(props: IProps) {
             </PostReactionsProvider>
         </div>
     );
+}
+
+export interface IReportRecordProps {
+    recordType: IThreadItemContext["recordType"];
+    recordID: IThreadItemContext["recordID"];
 }

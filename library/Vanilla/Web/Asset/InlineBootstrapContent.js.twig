@@ -36,5 +36,23 @@ if (!window.onVanillaContentUpdate) {
         }
     }
 }
+if (!window.onPageView) {
+    window.onPageView = function (handler) {
+        if (typeof handler !== "function") {
+            console.error("Cannot register a vanilla ready handler that is not a function.");
+            return;
+        }
+        document.addEventListener("X-PageView", function () {
+            if (!window.__VANILLA_INTERNAL_IS_READY__) {
+                return;
+            }
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        })
+
+        if (window.__VANILLA_INTERNAL_IS_READY__) {
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        }
+    }
+}
 window.__VANILLA_ENABLED_ADDON_KEYS__ = {{ enabledAddonKeys }};
 {%- endautoescape -%}

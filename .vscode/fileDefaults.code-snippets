@@ -1,0 +1,121 @@
+{
+	"New Blank File (Vanilla Workspace)": {
+		"prefix": "vnbf",
+		"description": "Outputs a default author block for a file.",
+		"body": [
+			"/**",
+			" * @author ${1:Author Name} <${2:author email}>",
+			" * @copyright 2009-$CURRENT_YEAR Vanilla Forums Inc.",
+			" * @license ${3|Proprietary,GPL-2.0-only|}",
+			" */",
+			"",
+			"${4:$LINE_COMMENT Add your code here}"
+		]
+	},
+	"New React Component (Vanilla Workspace)": {
+		"prefix": "vnrc",
+		"description": "Outputs a new React component file.",
+		"body": [
+			"/**",
+			" * @author ${1:Author Name} <${2:author email}>",
+			" * @copyright 2009-$CURRENT_YEAR Vanilla Forums Inc.",
+			" * @license ${3|Proprietary,GPL-2.0-only|}",
+			" */",
+			"",
+			"interface IProps {",
+			"\t${4:propName}: ${5:string};",
+			"}",
+			"",
+			"export function ${6:$TM_FILENAME_BASE}(props: IProps) {",
+			"\treturn <div>$6 Component</div>;",
+			"}"
+		]
+	},
+	"New Test File (Vanilla Workspace)": {
+		"prefix": "vntf",
+		"description": "Outputs a new test file.",
+		"body": [
+			"/**",
+			" * @author ${1:Author Name} <${2:author email}>",
+			" * @copyright 2009-$CURRENT_YEAR Vanilla Forums Inc.",
+			" * @license ${3|Proprietary,GPL-2.0-only|}",
+			" */",
+			"",
+			"import { fireEvent, render, waitFor, screen } from \"@testing-library/react\";",
+			"import { ${TM_FILENAME_BASE/(.*)\\...+$/$1/} } from \"./${TM_FILENAME_BASE/(.*)\\...+$/$1/}\";",
+			"",
+			"describe(\"${TM_FILENAME_BASE/(.*)\\...+$/$1/}\",() => {",
+			"\tit(\"${4:Renders component}\",() => {",
+			"\t\trender(<${TM_FILENAME_BASE/(.*)\\...+$/$1/} />);",
+			"\t\tscreen.debug();$0",
+			"\t});",
+			"});"
+		]
+	},
+	"New Styles File (Vanilla Workspace)": {
+		"prefix": "vnstf",
+		"description": "Outputs a new styles file.",
+		"body": [
+			"/**",
+			" * @author ${1:Author Name} <${2:author email}>",
+			" * @copyright 2009-$CURRENT_YEAR Vanilla Forums Inc.",
+			" * @license ${3|Proprietary,GPL-2.0-only|}",
+			" */",
+			"",
+			"import { css } from \"@emotion/css\";",
+			"import { ColorsUtils } from \"@library/styles/ColorsUtils\";",
+			"import { Mixins } from \"@library/styles/Mixins\";",
+			"import { globalVariables } from \"@library/styles/globalStyleVars\";",
+			"import { useThemeCache } from \"@library/styles/styleUtils\";",
+			"",
+			"export const ${TM_FILENAME_BASE/(.*)\\...+$/${1:/camelcase}/}Classes = useThemeCache(() => {",
+			"\tconst globalVars = globalVariables();",
+			"",
+			"\tconst root = css({",
+			"\t\t$LINE_COMMENT Add your styles here. Below is for demonstration purposes only.",
+			"\t\t...Mixins.margins({ all: globalVars.gutter.size }),",
+			"\t\tcolor: ColorsUtils.colorOut(globalVars.mainColors.fg),",
+			"\t});",
+			"",
+			"\treturn { root };",
+			"});"
+		]
+	},
+	"New Storybook File (Vanilla Workspace)": {
+		"prefix": "vnsbf",
+		"description": "Outputs a new Storybook file.",
+		"body": [
+			"/**",
+			" * @author ${1:Author Name} <${2:author email}>",
+			" * @copyright 2009-$CURRENT_YEAR Vanilla Forums Inc.",
+			" * @license ${3|Proprietary,GPL-2.0-only|}",
+			" */",
+			"",
+			"import { ${TM_FILENAME_BASE/(.*)\\...+$/$1/} } from \"./${TM_FILENAME_BASE/(.*)\\...+$/$1/}\";",
+			"import { storyWithConfig } from \"@library/storybook/StoryContext\";",
+			"",
+			"export default {",
+			"\ttitle: \"${5:Story Parent}/${TM_FILENAME_BASE/(.*)\\...+$/$1/}\",",
+			"};",
+			"",
+			"export const ${TM_FILENAME_BASE/(.*)\\...+$/$1/}Story = storyWithConfig({ useWrappers: false }, () => {",
+			"\treturn <${TM_FILENAME_BASE/(.*)\\...+$/$1/} />;",
+			"});"
+		]
+	},
+	"New Types File (Vanilla Workspace)": {
+		"prefix": "vntpf",
+		"description": "Outputs a new types file.",
+		"body": [
+			"/**",
+			" * @author ${1:Author Name} <${2:author email}>",
+			" * @copyright 2009-$CURRENT_YEAR Vanilla Forums Inc.",
+			" * @license ${3|Proprietary,GPL-2.0-only|}",
+			" */",
+			"",
+			"export interface ${4:I${TM_FILENAME_BASE/(.*)\\...+$/$1/}Props} {",
+			"\t${5:propName}: ${6:string};",
+			"}",
+		]
+	},
+}

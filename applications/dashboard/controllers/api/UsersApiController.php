@@ -144,7 +144,7 @@ class UsersApiController extends AbstractApiController
      * @param array $body The request body.
      * @throws NotFoundException if the user could not be found.
      */
-    public function delete($id, array $body)
+    public function delete($id, array $body = [])
     {
         $this->permission("Garden.Users.Delete");
 
@@ -668,6 +668,9 @@ class UsersApiController extends AbstractApiController
                     ],
                     "x-filter" => ["field" => "ipAddresses"],
                 ],
+                "emailConfirmed:b?" => [
+                    "x-filter" => ["field" => "u.Confirmed"],
+                ],
                 "page:i?" => [
                     "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
                     "default" => 1,
@@ -696,7 +699,7 @@ class UsersApiController extends AbstractApiController
             ["UserIndex", "in"]
         )
             ->addValidator("", SchemaUtils::onlyOneOf(["dateInserted", "dateUpdated", "roleID"]))
-            ->addValidator("ipAddresses", $this->userModel->createIpAddressesValidator());
+            ->addValidator("ipAddresses", $this->createIpAddressesValidator());
 
         $query = $in->validate($query);
         $expand = $query["expand"] ?? [];
@@ -772,6 +775,25 @@ class UsersApiController extends AbstractApiController
         $meta = Pagination::tryCursorPagination($paging, $query, $result, "userID") + ["api-allow" => ["email"]];
 
         return new Data($result, $meta);
+    }
+
+    /**
+     * Returns a function for use by Schema::addValidator() to validate an array of IP addresses.
+     *
+     * @return Closure
+     */
+    public function createIpAddressesValidator(): Closure
+    {
+        return function (array $ipAddresses, \Garden\Schema\ValidationField $field) {
+            if (!$this->checkPermission()) {
+                $field->addError("You don't have permission to filter by IP address", ["status" => 403]);
+            }
+            foreach ($ipAddresses as $ipAddress) {
+                if (!filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
+                    $field->addError("$ipAddress is not a valid IP address");
+                }
+            }
+        };
     }
 
     /**
@@ -859,7 +881,7 @@ class UsersApiController extends AbstractApiController
         // Don't allow this to propagate into our paging urls.
         $requestHadCursor = isset($query["cursor"]);
         unset($query["cursor"]);
-        $rows = $this->index($finalQuery)->getData();
+        $rows = !empty($userIDs) ? $this->index($finalQuery)->getData() : [];
         $paging = ApiUtils::numberedPagerInfo(
             $searchResults->getTotalCount(),
             "/api/v2/users",
@@ -1480,6 +1502,7 @@ class UsersApiController extends AbstractApiController
                 "name?",
                 "email?",
                 "showEmail?",
+                "suggestAnswers?",
                 "photo?",
                 "emailConfirmed?",
                 "bypassSpam?",
@@ -1524,6 +1547,7 @@ class UsersApiController extends AbstractApiController
                 "name?",
                 "email?",
                 "showEmail?",
+                "suggestAnswers?",
                 "password?",
                 "private?",
                 "profileFields:o?" => $this->profileFieldModel->getUserProfileFieldSchema(true),

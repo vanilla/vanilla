@@ -12,8 +12,10 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Psr\Container\ContainerExceptionInterface;
+use Vanilla\Logging\AuditLogger;
 use Vanilla\Models\UserAuthenticationProviderFragmentSchema;
 use Vanilla\Permissions;
+use Vanilla\SamlSSO\Events\OAuth2AuditEvent;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\StringUtils;
 use Vanilla\Web\CacheControlConstantsInterface;
@@ -810,7 +812,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
         // If there are no unwanted side effects, remove this config call and set it to `false`.
         $proxyOptions["Cookies"] = \Gdn::config()->get("OAuth2.Flags.SendCookies", false);
 
-        $this->log("Proxy Request Sent in API", [
+        $this->log("OAuth2 Proxy Request Sent in API", [
             "headers" => $headers,
             "proxyOptions" => $proxyOptions,
             "params" => $params,
@@ -820,8 +822,8 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
 
         // Extract response only if it arrives as JSON
         if (stripos($proxy->ContentType, "application/json") !== false) {
-            $this->log("API JSON Response", ["response" => $response]);
             $response = json_decode($proxy->ResponseBody, true);
+            $this->log("OAuth2 API JSON Response", ["response" => $response]);
         }
 
         // Return any errors
@@ -1366,9 +1368,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
      */
     public function log($message, $data)
     {
-        if (c("Vanilla.SSO.Debug")) {
-            Logger::event("sso_logging", Logger::INFO, $message, $data);
-        }
+        AuditLogger::log(new OAuth2AuditEvent("debug", $message, $data));
     }
 
     /**

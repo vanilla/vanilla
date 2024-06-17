@@ -11,6 +11,9 @@ use Vanilla\JsConnect\JsConnectJSONP;
 use Vanilla\JsConnect\JsConnectServer;
 use Vanilla\JsConnect\Models\JsConnectAuthenticatorTypeProvider;
 use Vanilla\JsConnect\Models\JsConnectValidation;
+use Vanilla\Logging\AuditLogger;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\SamlSSO\Events\JsConnectAuditEvent;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Web\CacheControlConstantsInterface;
@@ -1293,10 +1296,12 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
                     $message = t("Your sso timed out.", "Your sso timed out during the request. Please try again.");
                 }
 
-                Logger::event("jsconnect_error", Logger::ERROR, "Displaying Error Page.", [
-                    "JsData" => $jsData,
-                    "ErrorMessage" => $message,
-                ]);
+                AuditLogger::log(
+                    new JsConnectAuditEvent("error", "Displaying Error Page.", [
+                        "jsData" => $jsData,
+                        "errorMessage" => $message,
+                    ])
+                );
                 Gdn::dispatcher()
                     ->passData("Exception", $message ? htmlspecialchars($message) : htmlspecialchars($error))
                     ->dispatch("home/error");
@@ -1306,7 +1311,11 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
             $provider = self::getProvider($client_id);
 
             if (empty($provider)) {
-                Logger::event("jsconnect_error", Logger::ERROR, "No Provider Found", ["Client ID" => $client_id]);
+                AuditLogger::log(
+                    new JsConnectAuditEvent("error", "No provider found.", [
+                        "clientID" => $client_id,
+                    ])
+                );
                 throw notFoundException("Provider");
             }
 
@@ -1387,38 +1396,47 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
         unset($jsData["sig"], $jsData["sigStr"], $jsData["string"]);
 
         if (!$clientID) {
-            Logger::event("jsconnect_error", Logger::ERROR, "No Client ID Found", [
-                "JsData" => $jsData,
-                "JsDataReceived" => $jsDataReceived,
-            ]);
+            AuditLogger::log(
+                new JsConnectAuditEvent("error", "No clientID found.", [
+                    "jsData" => $jsData,
+                    "jsDataReceived" => $jsDataReceived,
+                ])
+            );
             throw new Gdn_UserException(sprintf(t("ValidateRequired"), "client_id"), 400);
         }
         $provider = self::getProvider($clientID);
         if (!$provider) {
-            Logger::event("jsconnect_error", Logger::ERROR, "No Provider Found", [
-                "JsData" => $jsData,
-                "JsDataReceived" => $jsDataReceived,
-                "Client_id" => $clientID,
-            ]);
+            AuditLogger::log(
+                new JsConnectAuditEvent("error", "No provider found.", [
+                    "clientID" => $clientID,
+                    "jsData" => $jsData,
+                    "jsDataReceived" => $jsDataReceived,
+                ])
+            );
             throw new Gdn_UserException(sprintf(t("Unknown client: %s."), htmlspecialchars($clientID)), 400);
         }
 
         if (!val("TestMode", $provider)) {
             if (!$signature) {
-                Logger::event("jsconnect_error", Logger::ERROR, "No Signature Found", [
-                    "JsData" => $jsData,
-                    "JsDataReceived" => $jsDataReceived,
-                ]);
+                AuditLogger::log(
+                    new JsConnectAuditEvent("error", "No signature found.", [
+                        "jsData" => $jsData,
+                        "JsDataReceived" => $jsDataReceived,
+                    ])
+                );
+
                 throw new Gdn_UserException(sprintf(t("ValidateRequired"), "signature"), 400);
             }
 
             if ($version === "2") {
                 // Verify IP Address.
                 if (Gdn::request()->ipAddress() !== val("ip", $jsData, null)) {
-                    Logger::event("jsconnect_error", Logger::ERROR, "No IP Found", [
-                        "JsData" => $jsData,
-                        "JsDataReceived" => $jsDataReceived,
-                    ]);
+                    AuditLogger::log(
+                        new JsConnectAuditEvent("error", "No IP address found.", [
+                            "jsData" => $jsData,
+                            "jsDataReceived" => $jsDataReceived,
+                        ])
+                    );
                     throw new Gdn_UserException(t("IP address invalid."), 400);
                 }
 
@@ -1426,10 +1444,12 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
                 $nonceModel = new UserAuthenticationNonceModel();
                 $nonce = val("nonce", $jsData, null);
                 if ($nonce === null) {
-                    Logger::event("jsconnect_error", Logger::ERROR, "No Nonce Found in JSData", [
-                        "JsData" => $jsData,
-                        "JsDataReceived" => $jsDataReceived,
-                    ]);
+                    AuditLogger::log(
+                        new JsConnectAuditEvent("error", "No nonce found in JSData.", [
+                            "jsData" => $jsData,
+                            "jsDataReceived" => $jsDataReceived,
+                        ])
+                    );
                     throw new Gdn_UserException(t("Nonce not found."), 400);
                 }
 
@@ -1440,23 +1460,28 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
                     $foundNonce = $nonceModel->getWhere(["Nonce" => $nonce])->firstRow(DATASET_TYPE_ARRAY);
                 }
                 if (!$foundNonce) {
-                    Logger::event("jsconnect_error", Logger::ERROR, "No Nonce Found in Stash", [
-                        "JsData" => $jsData,
-                        "JsDataReceived" => $jsDataReceived,
-                    ]);
+                    AuditLogger::log(
+                        new JsConnectAuditEvent("error", "No nonce found in stash.", [
+                            "jsData" => $jsData,
+                            "jsDataReceived" => $jsDataReceived,
+                        ])
+                    );
+
                     throw new Gdn_UserException(t("Nonce not found."), 400);
                 }
 
                 // Clear nonce from the database.
                 $nonceModel->delete(["Nonce" => $nonce]);
                 if (strtotime($foundNonce["Timestamp"]) < time() - self::NONCE_EXPIRATION) {
-                    Logger::event("jsconnect_error", Logger::ERROR, "Timestamp Failed", [
-                        "JsData" => $jsData,
-                        "JsDataReceived" => $jsDataReceived,
-                        "Timestamp" => $foundNonce["Timestamp"],
-                        "Time" => time(),
-                        "NonceExpiry" => self::NONCE_EXPIRATION,
-                    ]);
+                    AuditLogger::log(
+                        new JsConnectAuditEvent("error", "Nonce expired.", [
+                            "jsData" => $jsData,
+                            "jsDataReceived" => $jsDataReceived,
+                            "timestamp" => $foundNonce["Timestamp"],
+                            "time" => time(),
+                            "nonceExpiry" => self::NONCE_EXPIRATION,
+                        ])
+                    );
                     throw new Gdn_UserException(t("Nonce expired."), 400);
                 }
 
@@ -1474,20 +1499,25 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
                 val("HashType", $provider, "md5")
             );
             if (hash_equals($signature, $calculatedSignature) === false) {
-                Logger::event("jsconnect_error", Logger::ERROR, "Invalid Signature", [
-                    "JsData" => $jsData,
-                    "JsDataReceived" => $jsDataReceived,
-                    "Signature" => $signature,
-                    "HashType" => $provider["HashType"] ?? "md5",
-                ]);
+                AuditLogger::log(
+                    new JsConnectAuditEvent("error", "Invalid signature.", [
+                        "jsData" => $jsData,
+                        "jsDataReceived" => $jsDataReceived,
+                        "signature" => $signature,
+                        "hashType" => $provider["HashType"] ?? "md5",
+                    ])
+                );
                 throw new Gdn_UserException(t("Signature invalid."), 400);
             }
         }
-        Logger::event("jsconnect_success", Logger::INFO, "JSData Passed Validation", [
-            "JsData" => $jsData,
-            "JsDataReceived" => $jsDataReceived,
-            "HashType" => val("HashType", $provider, "md5"),
-        ]);
+
+        AuditLogger::log(
+            new JsConnectAuditEvent("success", "JSData passed validation.", [
+                "jsData" => $jsData,
+                "jsDataReceived" => $jsDataReceived,
+                "hashType" => val("HashType", $provider, "md5"),
+            ])
+        );
         $this->setSSOData($sender, $form, $jsData, $clientID, $provider);
     }
 
@@ -1514,11 +1544,14 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
             $form->addHidden("Target", $state[JsConnectServer::FIELD_TARGET] ?? "/");
             $form->setFormValue("Target", $state[JsConnectServer::FIELD_TARGET] ?? "/");
         } catch (\Exception $ex) {
-            Logger::event("jsconnect_error", Logger::ERROR, $ex->getMessage(), [
-                "jwt" => $jwt,
-                "protocol" => self::PROTOCOL_V3,
-            ]);
-            throw new \Gdn_UserException($ex->getMessage(), $ex->getCode());
+            AuditLogger::log(
+                new JsConnectAuditEvent("error", $ex->getMessage(), [
+                    "jwt" => $jwt,
+                    "protocol" => self::PROTOCOL_V3,
+                ])
+            );
+            ErrorLogger::error($ex, ["jsconnect"]);
+            throw new \Gdn_UserException($ex->getMessage(), $ex->getCode(), $ex);
         }
 
         $header = JsConnect::decodeJWTHeader($jwt);
@@ -1540,10 +1573,12 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
             $sender->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
             redirectTo($url, 302, false);
         } else {
-            Logger::event("jsconnect_success", Logger::INFO, "JSData Passed Validation", [
-                "user" => $user,
-                "protocol" => self::PROTOCOL_V3,
-            ]);
+            AuditLogger::log(
+                new JsConnectAuditEvent("success", "JSData passed validation.", [
+                    "user" => $user,
+                    "protocol" => self::PROTOCOL_V3,
+                ])
+            );
             $this->setSSOData($sender, $form, $user, $clientID, $provider);
         }
     }

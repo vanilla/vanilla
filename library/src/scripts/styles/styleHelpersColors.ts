@@ -11,4 +11,7 @@ export const ensureColorHelper = (colorValue: string | ColorHelper) => {
     return typeof colorValue === "string" ? color(colorValue) : colorValue;
 };
 
-export const colorOut = ColorsUtils.colorOut;
+// Left in for backwards compatibility with custom themes.
+export const colorOut = (...args) => {
+    return ColorsUtils.colorOut(...args);
+};

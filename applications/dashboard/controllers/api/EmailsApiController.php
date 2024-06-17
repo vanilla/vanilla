@@ -111,7 +111,7 @@ class EmailsApiController extends \AbstractApiController
     public function post_sendTestDigest(array $body): Data
     {
         $this->permission("community.manage");
-        FeatureFlagHelper::ensureFeature(DigestEmail::FEATURE_FLAG);
+
         $in = Schema::parse([
             "destinationAddress:s" => [
                 "format" => "email",
@@ -160,7 +160,6 @@ class EmailsApiController extends \AbstractApiController
     {
         // Must be system user to run this.
         $this->permission("Garden.Admin.Only");
-        FeatureFlagHelper::ensureFeature(DigestEmail::FEATURE_FLAG);
 
         if (!$this->config->get("Garden.Digest.Enabled")) {
             throw new ClientException("Email digest is not enabled.");

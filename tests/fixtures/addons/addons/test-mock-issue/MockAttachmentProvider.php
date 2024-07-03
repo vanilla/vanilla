@@ -128,6 +128,14 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     /**
      * @inheritDoc
      */
+    public function hasWritePermissions(): bool
+    {
+        return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getRecordTypes(): array
     {
         return ["discussion", "comment", "user"];
@@ -220,12 +228,9 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     /**
      * @inheritDoc
      */
-    public function getWriteableContentScope(): string
+    public function canEscalateOwnContent(): bool
     {
-        if ($this->userModel->checkPermission(\Gdn::session()->User, "staff.allow")) {
-            return AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_ALL;
-        }
-        return AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_NONE;
+        return false;
     }
 
     /**
@@ -241,7 +246,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
      */
     public function canViewFullAttachment(array $attachment): bool
     {
-        return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
+        return $this->hasWritePermissions();
     }
 
     /**
@@ -249,7 +254,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
      */
     public function canCreateAttachmentForRecord(string $recordType, int $recordID): bool
     {
-        return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
+        return $this->hasWritePermissions();
     }
 
     /**

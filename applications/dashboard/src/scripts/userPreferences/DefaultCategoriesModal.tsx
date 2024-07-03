@@ -1,11 +1,11 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { t } from "@vanilla/i18n";
-import React, { useState, useEffect, useMemo, FormEvent } from "react";
+import React, { useState, useEffect, useMemo, FormEvent, useCallback } from "react";
 import ProfileFieldsListClasses from "@dashboard/userProfiles/components/ProfileFieldsList.classes";
 import UserPreferencesClasses from "@dashboard/userPreferences/UserPreferences.classes";
 import { followedContentClasses } from "@library/followedContent/FollowedContent.classes";
@@ -20,7 +20,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import apiv2 from "@library/apiv2";
-import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
+import { useConfigMutation, useConfigQuery } from "@library/config/configHooks";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardAutoComplete } from "@dashboard/forms/DashboardAutoComplete";
 import { AutoCompleteLookupOptions, IAutoCompleteOption } from "@vanilla/ui";
@@ -65,7 +65,7 @@ export interface ILegacyCategoryPreferences {
     postNotifications: string;
 }
 
-const CONFIG_KEY = "preferences.categoryFollowed.defaults";
+export const CONFIG_KEY = "preferences.categoryFollowed.defaults";
 
 /**
  * Display a UI to allow users to set default followed categories and
@@ -75,8 +75,10 @@ const CONFIG_KEY = "preferences.categoryFollowed.defaults";
  */
 export default function DefaultCategoriesModal(props: IProps) {
     // Get the saved preferences
-    const defaultFollowedCategories = useConfigsByKeys([CONFIG_KEY]);
-    const { isLoading: isPatchLoading, patchConfig, error: patchError } = useConfigPatcher();
+    const { status: defaultFollowedCategoriesStatus, data: defaultFollowedCategoriesData } = useConfigQuery([
+        CONFIG_KEY,
+    ]);
+    const { isLoading: isPatchLoading, mutateAsync: patchConfig } = useConfigMutation();
 
     // Cache form state by categoryID
     const [followedCategories, setFollowedCategories] = useState<
@@ -112,16 +114,21 @@ export default function DefaultCategoriesModal(props: IProps) {
     };
 
     // Get a category list
-    const { isLoading, error, data } = useQuery<any, IError, ICategory[]>({
+    const {
+        isLoading,
+        error,
+        status: categoriesStatus,
+    } = useQuery<any, IError, ICategory[]>({
         queryKey: ["categoriesData"],
         queryFn: async () => {
-            const response = await apiv2.get<ICategory[]>(`categories`, {
+            const { data } = await apiv2.get<ICategory[]>(`categories`, {
                 params: {
                     outputFormat: "flat",
                     limit: 30,
                 },
             });
-            return response.data;
+            addToCategoryList(data);
+            return data;
         },
     });
 
@@ -129,7 +136,7 @@ export default function DefaultCategoriesModal(props: IProps) {
     const getCategoriesMutation = useMutation({
         mutationKey: ["getCategoriesByID"],
         mutationFn: async (categoryID: Array<ICategory["categoryID"]>) => {
-            return await await apiv2.get<ICategory[]>(`categories`, {
+            return await apiv2.get<ICategory[]>(`categories`, {
                 params: {
                     categoryID,
                 },
@@ -146,56 +153,60 @@ export default function DefaultCategoriesModal(props: IProps) {
         },
     });
 
-    useEffect(() => {
-        data && addToCategoryList(data);
-    }, [data]);
-
     // Cross reference the config value and category list to build up default followed categories
     useEffect(() => {
-        if (defaultFollowedCategories?.data?.[CONFIG_KEY] && categoriesList) {
-            try {
-                const parsedConfig: ISavedDefaultCategory[] | ILegacyCategoryPreferences[] = JSON.parse(
-                    defaultFollowedCategories?.data?.[CONFIG_KEY],
-                );
+        if (defaultFollowedCategoriesStatus === "success" && categoriesStatus === "success") {
+            if (defaultFollowedCategoriesData?.[CONFIG_KEY]) {
+                try {
+                    const parsedConfig: ISavedDefaultCategory[] | ILegacyCategoryPreferences[] = JSON.parse(
+                        defaultFollowedCategoriesData?.[CONFIG_KEY],
+                    );
 
-                const config = convertOldConfig(parsedConfig);
+                    const config = convertOldConfig(parsedConfig);
 
-                // We might not have followed category data. Make a list of IDs and fetch em
-                const missingCategories = config
-                    .map((defaultCategory) => {
-                        if (!categoriesList[defaultCategory.categoryID]) {
-                            return defaultCategory.categoryID;
-                        }
-                    })
-                    .filter(notEmpty);
+                    // We might not have followed category data. Make a list of IDs and fetch em
+                    const missingCategories = config
+                        .map((defaultCategory) => {
+                            if (!categoriesList[defaultCategory.categoryID]) {
+                                return defaultCategory.categoryID;
+                            }
+                        })
+                        .filter(notEmpty);
 
-                if (missingCategories.length > 0 && !getCategoriesMutation.isLoading) {
-                    getCategoriesMutation.mutate(missingCategories);
+                    if (missingCategories.length > 0 && !getCategoriesMutation.isLoading) {
+                        getCategoriesMutation.mutate(missingCategories);
+                    }
+
+                    setFollowedCategories((prev) => {
+                        const returnedObj = {
+                            ...prev,
+                            ...config.reduce((acc, current) => {
+                                const category = categoriesList[current.categoryID];
+                                return {
+                                    ...acc,
+                                    ...(category
+                                        ? {
+                                              [current.categoryID]: {
+                                                  ...category,
+                                                  preferences: current.preferences,
+                                              },
+                                          }
+                                        : {}),
+                                };
+                            }, prev),
+                        };
+
+                        return returnedObj;
+                    });
+                } catch (error) {
+                    logDebug(error);
                 }
-
-                setFollowedCategories((prev) => {
-                    return config.reduce((acc, current) => {
-                        const category = categoriesList[current.categoryID];
-                        if (category) {
-                            return {
-                                ...acc,
-                                [current.categoryID]: {
-                                    ...category,
-                                    preferences: current.preferences,
-                                },
-                            };
-                        }
-                        return prev;
-                    }, prev);
-                });
-            } catch (error) {
-                logDebug(error);
             }
         }
-    }, [defaultFollowedCategories, categoriesList]);
+    }, [defaultFollowedCategoriesStatus, categoriesStatus]);
 
     // Save a subset of ICategory to the config
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const configValue: ISavedDefaultCategory[] = Object.values(followedCategories).reduce(
             (acc, currentCategory) => {
@@ -217,49 +228,29 @@ export default function DefaultCategoriesModal(props: IProps) {
 
         try {
             const serializedConfig = { [CONFIG_KEY]: JSON.stringify(configValue) };
-            patchConfig(serializedConfig).then((result) => {
-                if (result.meta.requestStatus === "fulfilled") {
-                    props.onCancel();
-                }
-            });
+            await patchConfig(serializedConfig);
+            props.onCancel();
         } catch (error) {
             logDebug(error);
         }
     };
 
-    // Surface errors as toast
-    useEffect(() => {
-        // When we first receive an error message add a toast.
-        if (patchError?.message) {
-            toast.addToast({
-                dismissible: true,
-                body: <>{patchError.message}</>,
-            });
-        }
-    }, [patchError]);
-
     // Create dropdown list options from the returned category list
     const categoryOptions = useMemo<IAutoCompleteOption[]>(() => {
-        if (categoriesList) {
-            const fetchedCategoryIDs = Object.keys(categoriesList);
-            if (fetchedCategoryIDs.length > 0) {
-                return fetchedCategoryIDs
-                    .map((categoryID) => {
-                        return {
-                            label: categoriesList[categoryID].name,
-                            value: categoryID,
-                            extraLabel:
-                                categoriesList[categoryID].breadcrumbs?.[
-                                    categoriesList[categoryID].breadcrumbs?.length - 2
-                                ]?.name ?? "",
-                        };
-                    })
-                    .filter((category) => {
-                        return !followedCategories[category.value];
-                    });
-            }
-        }
-        return [];
+        const fetchedCategoryIDs = Object.keys(categoriesList);
+        return fetchedCategoryIDs
+            .map((categoryID) => {
+                return {
+                    label: categoriesList[categoryID].name,
+                    value: categoryID,
+                    extraLabel:
+                        categoriesList[categoryID].breadcrumbs?.[categoriesList[categoryID].breadcrumbs?.length - 2]
+                            ?.name ?? "",
+                };
+            })
+            .filter((category) => {
+                return !(`${category.value}` in followedCategories);
+            });
     }, [categoriesList, followedCategories]);
 
     // Update a followed category's preferences
@@ -410,10 +401,11 @@ export default function DefaultCategoriesModal(props: IProps) {
                                                     labelKey: "name",
                                                     valueKey: "categoryID",
                                                 }}
-                                                lookupResult={(result) => {
+                                                handleLookupResults={useCallback((result) => {
                                                     const results = result.map(({ data }) => data);
                                                     addToCategoryList(results);
-                                                }}
+                                                }, [])}
+                                                addLookupResultsToOptions={false}
                                             />
                                         }
                                         options={categoryOptions}

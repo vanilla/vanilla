@@ -42,16 +42,16 @@ const renderInProvider = async (permissions?: string[]) => {
                     state={{
                         discussions: {
                             discussionsByID: {
-                                [`${discussion.discussionID}`]: {
+                                10: {
                                     status: LoadStatus.SUCCESS,
                                     data: discussion,
                                 },
                             },
                             deleteStatusesByID: {
-                                [`${discussion.discussionID}`]: LoadStatus.SUCCESS,
+                                10: LoadStatus.SUCCESS,
                             },
                             patchStatusByPatchID: {
-                                [`${discussion.discussionID}-sink`]: LoadStatus.SUCCESS,
+                                "10-sink": LoadStatus.SUCCESS,
                             },
                         },
                     }}

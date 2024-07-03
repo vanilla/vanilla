@@ -9,6 +9,7 @@
  */
 
 use Garden\Utils\ContextException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\DebugUtils;
 use Whoops\Handler\PrettyPageHandler;
@@ -699,7 +700,8 @@ function permissionException($permission = null)
             sprintf(t("You need the %s permission to do that."), $permission)
         );
     }
-    return new Gdn_UserException($message, 403);
+    $prev = new PermissionException($permission);
+    return new Gdn_UserException($message, 403, $prev);
 }
 
 /**

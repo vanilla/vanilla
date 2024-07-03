@@ -1054,6 +1054,15 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
                     $resourceEvent->getPayload()
                 )
             );
+        } else {
+            $resourceEvent->setPayload(
+                array_merge(
+                    [
+                        "countAffectedUsers" => count($affectedUsers),
+                    ],
+                    $resourceEvent->getPayload()
+                )
+            );
         }
 
         $this->getEventManager()->dispatch($resourceEvent);

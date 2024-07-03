@@ -9,11 +9,12 @@ import { queryResultToILoadable } from "@library/ReactQueryUtils";
 import { IntegrationsApi } from "@library/features/discussions/integrations/Integrations.api";
 import {
     IAttachment,
+    IAttachmentIntegration,
     IAttachmentIntegrationCatalog,
     ICustomIntegrationContext,
     IIntegrationsApi,
     IPostAttachmentParams,
-    IAttachmentIntegration,
+    IWriteableAttachmentIntegration,
     isWriteableAttachmentIntegration,
 } from "@library/features/discussions/integrations/Integrations.types";
 import { getMeta } from "@library/utility/appUtils";
@@ -61,7 +62,7 @@ function getIntegrationsFromMeta(): IAttachmentIntegrationCatalog | undefined {
 }
 interface IAttachmentIntegrationsContextValue {
     integrations: IAttachmentIntegration[];
-    writeableIntegrations: IAttachmentIntegration[];
+    writeableIntegrations: IWriteableAttachmentIntegration[];
     refreshStaleAttachments: (attachments: IAttachment[]) => Promise<void>;
 }
 
@@ -102,9 +103,11 @@ export function AttachmentIntegrationsContextProvider(
     const integrationsValue = integrationsQuery.data ?? initialIntegrations;
 
     const integrations = Object.values(integrationsValue ?? {});
-    const writeableIntegrations = integrationsValue
-        ? Object.values(integrationsValue).filter((integration) => isWriteableAttachmentIntegration(integration))
-        : [];
+    const writeableIntegrations = (
+        integrationsValue
+            ? Object.values(integrationsValue).filter((integration) => isWriteableAttachmentIntegration(integration))
+            : []
+    ) as IWriteableAttachmentIntegration[];
 
     const refreshStaleAttachments = useMutation({
         mutationFn: async (attachments: IAttachment[]) => {
@@ -187,9 +190,9 @@ interface IWriteableIntegrationContextValue {
     schema: ILoadable<JsonSchema>;
     postAttachment: (values: IPostAttachmentParams) => Promise<IAttachment>;
 
-    label: IAttachmentIntegration["label"];
-    submitButton: IAttachmentIntegration["submitButton"];
-    name: IAttachmentIntegration["name"];
+    label: IWriteableAttachmentIntegration["label"];
+    submitButton: IWriteableAttachmentIntegration["submitButton"];
+    name: IWriteableAttachmentIntegration["name"];
 
     // context customizations
     transformLayout?: ICustomIntegrationContext["transformLayout"];

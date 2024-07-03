@@ -319,4 +319,24 @@ trait UsersAndRolesApiTestTrait
             return $registrationResults;
         });
     }
+
+    /**
+     * Create a user applicant record.
+     *
+     * @param array $overrides
+     * @return array
+     */
+    public function createApplicant(array $overrides = []): array
+    {
+        $salt = substr($this->generateSalt(), 10);
+        $body = $overrides + [
+            "email" => "test_$salt@test.com",
+            "name" => "user_$salt",
+            "discoveryText" => "Hello there.",
+            "password" => $salt,
+        ];
+
+        $result = $this->api()->post("/applicants", $body);
+        return $result->getBody();
+    }
 }

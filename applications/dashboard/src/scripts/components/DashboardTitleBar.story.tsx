@@ -1,11 +1,15 @@
 /**
  * @author Dominic Lacaille <dominic.lacaille@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 import * as React from "react";
 import DashboardTitleBar from "@dashboard/components/DashboardTitleBar";
+import { testStoreState } from "@library/__tests__/testStoreState";
+import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
+import { Provider } from "react-redux";
+import getStore from "@library/redux/getStore";
 import { setMeta } from "@library/utility/appUtils";
 import { useEffect } from "react";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
@@ -14,7 +18,6 @@ import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import { IDashboardSection } from "@dashboard/DashboardSectionType";
-import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 
 export default {
     title: "Headers/Dashboard Title Bar",
@@ -412,7 +415,7 @@ const mockSections: IDashboardSection[] = [
     },
 ];
 
-const mockRegisterUserInfo: IMe = {
+const makeMockRegisterUserInfo: IMe = {
     name: "Neena",
     userID: 1,
     isAdmin: true,
@@ -443,6 +446,15 @@ const dumbHumburgerContent = (
     </>
 );
 
+const initialState = testStoreState({
+    users: {
+        current: {
+            status: LoadStatus.SUCCESS,
+            data: makeMockRegisterUserInfo,
+        },
+    },
+});
+
 export const RegularDashboardTitleBar = storyWithConfig({ useWrappers: false }, () => {
     return <DashboardTitleBar sections={mockSections} />;
 });
@@ -452,11 +464,11 @@ export const TitleBarWithMeboxOpen = storyWithConfig({ useWrappers: false }, () 
         setMeta("context.siteID", -1);
     });
     return (
-        <CurrentUserContextProvider currentUser={mockRegisterUserInfo}>
+        <Provider store={getStore(initialState, true)}>
             <PermissionsFixtures.AllPermissions>
                 <DashboardTitleBar forceMeBoxOpen={true} sections={mockSections} />
             </PermissionsFixtures.AllPermissions>
-        </CurrentUserContextProvider>
+        </Provider>
     );
 });
 
@@ -465,11 +477,11 @@ export const MeboxOpenWithAccountAndSupportLinks = storyWithConfig({ useWrappers
         setMeta("context.siteID", 1);
     });
     return (
-        <CurrentUserContextProvider currentUser={mockRegisterUserInfo}>
+        <Provider store={getStore(initialState, true)}>
             <PermissionsFixtures.AllPermissions>
                 <DashboardTitleBar forceMeBoxOpen={true} sections={mockSections} />
             </PermissionsFixtures.AllPermissions>
-        </CurrentUserContextProvider>
+        </Provider>
     );
 });
 
@@ -482,7 +494,7 @@ export const TitleBarWithHamburgerOpenOnSmallerViews = storyWithConfig(
             setMeta("context.siteID", 1);
         });
         return (
-            <CurrentUserContextProvider currentUser={mockRegisterUserInfo}>
+            <Provider store={getStore(initialState, true)}>
                 <PermissionsFixtures.AllPermissions>
                     <DashboardTitleBar
                         hamburgerContent={dumbHumburgerContent}
@@ -491,7 +503,7 @@ export const TitleBarWithHamburgerOpenOnSmallerViews = storyWithConfig(
                         sections={[]}
                     />
                 </PermissionsFixtures.AllPermissions>
-            </CurrentUserContextProvider>
+            </Provider>
         );
     },
 );
@@ -501,7 +513,7 @@ export const MeboxOpenOnSmallerViews = storyWithConfig({ useWrappers: false }, (
         setMeta("context.siteID", 1);
     });
     return (
-        <CurrentUserContextProvider currentUser={mockRegisterUserInfo}>
+        <Provider store={getStore(initialState, true)}>
             <PermissionsFixtures.AllPermissions>
                 <DashboardTitleBar
                     forceMeBoxOpen={true}
@@ -510,6 +522,6 @@ export const MeboxOpenOnSmallerViews = storyWithConfig({ useWrappers: false }, (
                     sections={mockSections}
                 />
             </PermissionsFixtures.AllPermissions>
-        </CurrentUserContextProvider>
+        </Provider>
     );
 });

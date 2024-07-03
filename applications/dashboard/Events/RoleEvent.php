@@ -46,14 +46,28 @@ class RoleEvent extends ResourceEvent implements LoggableEventInterface
                 $message = "Role `{$roleName}` was updated.";
                 break;
             case ResourceEvent::ACTION_DELETE:
-                $replacementRoleName = $this->getPayload()["replacementRole"]["name"] ?? "Unknown";
+                $replacementRoleName = $this->getPayload()["replacementRole"]["name"] ?? null;
                 $countAffected = $this->getPayload()["countAffectedUsers"] ?? 0;
-                $message = "Role `{$roleName}` was deleted and replaced with `$replacementRoleName` affecting `{$countAffected}` users.";
+                if ($replacementRoleName) {
+                    $message = "Role `{$roleName}` was deleted and replaced with `$replacementRoleName`, affecting `{$countAffected}` users.";
+                } else {
+                    $message = "Role `{$roleName}` was deleted, affecting `{$countAffected}` users.";
+                }
                 break;
             default:
                 $message = LoggerUtils::resourceEventLogMessage($this);
                 break;
         }
         return $message;
+    }
+
+    /**
+     * Make sure these are always logged.
+     *
+     * @return bool
+     */
+    public function bypassLogFilters(): bool
+    {
+        return true;
     }
 }

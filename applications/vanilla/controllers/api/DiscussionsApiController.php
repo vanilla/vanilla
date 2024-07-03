@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -22,6 +22,7 @@ use Vanilla\Database\Select;
 use Vanilla\DiscussionTypeConverter;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Forum\Models\DiscussionMergeModel;

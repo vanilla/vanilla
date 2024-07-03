@@ -50,7 +50,6 @@ interface IFormProps {
     recordType: string;
     recordID: number;
     redirectTarget: string;
-    isAuthor: boolean;
 }
 
 export function LegacyIntegrationsOptionsMenuItems(props: IFormProps) {
@@ -62,29 +61,28 @@ export function LegacyIntegrationsOptionsMenuItems(props: IFormProps) {
 }
 
 function LegacyIntegrationsOptionsMenuItemsImpl(props: IFormProps) {
-    const { isAuthor } = props;
-    const writeableIntegrations = useWriteableAttachmentIntegrations()
-        .filter((integration) => integration.recordTypes.includes(props.recordType))
-        .filter(({ writeableContentScope }) => (writeableContentScope === "own" ? isAuthor : true));
+    const writeableIntegrations = useWriteableAttachmentIntegrations();
 
-    return writeableIntegrations.length > 0 ? (
+    return (
         <>
-            {writeableIntegrations.map((integration) => {
-                return (
-                    <WriteableIntegrationContextProvider
-                        key={integration.attachmentType}
-                        recordType={props.recordType}
-                        attachmentType={integration.attachmentType}
-                        recordID={props.recordID}
-                    >
-                        <IntegrationButtonAndModal
-                            onSuccess={async () => {
-                                window.location.href = props.redirectTarget;
-                            }}
-                        />
-                    </WriteableIntegrationContextProvider>
-                );
-            })}
+            {writeableIntegrations
+                .filter((integration) => integration.recordTypes.includes(props.recordType))
+                .map((integration) => {
+                    return (
+                        <WriteableIntegrationContextProvider
+                            key={integration.attachmentType}
+                            recordType={props.recordType}
+                            attachmentType={integration.attachmentType}
+                            recordID={props.recordID}
+                        >
+                            <IntegrationButtonAndModal
+                                onSuccess={async () => {
+                                    window.location.href = props.redirectTarget;
+                                }}
+                            />
+                        </WriteableIntegrationContextProvider>
+                    );
+                })}
         </>
-    ) : null;
+    );
 }

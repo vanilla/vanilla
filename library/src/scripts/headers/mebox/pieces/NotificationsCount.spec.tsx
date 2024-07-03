@@ -5,23 +5,31 @@
 
 import { render, RenderResult } from "@testing-library/react";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { LoadStatus } from "@library/@types/api/core";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
-import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 
 describe("NotificationsCount", () => {
     let result: RenderResult;
 
     async function renderNotifcationsCount(unreadNotifications: number) {
         result = render(
-            <CurrentUserContextProvider
-                currentUser={{
-                    ...UserFixture.createMockUser({ userID: 1 }),
-                    countUnreadNotifications: unreadNotifications,
-                    countUnreadConversations: 1,
+            <TestReduxProvider
+                state={{
+                    users: {
+                        current: {
+                            status: LoadStatus.SUCCESS,
+                            data: {
+                                ...UserFixture.createMockUser({ userID: 1 }),
+                                countUnreadNotifications: unreadNotifications,
+                                countUnreadConversations: 1,
+                            },
+                        },
+                    },
                 }}
             >
                 <NotificationsCount compact={true} />
-            </CurrentUserContextProvider>,
+            </TestReduxProvider>,
         );
     }
 

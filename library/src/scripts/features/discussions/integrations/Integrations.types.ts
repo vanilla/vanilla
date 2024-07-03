@@ -11,23 +11,27 @@ import { IFieldError, JsonSchema } from "@vanilla/json-schema-forms";
 import { RecordID } from "@vanilla/utils";
 import { FormikHelpers } from "formik";
 
-type WriteableContentScope = "all" | "own" | "none";
-
-export interface IAttachmentIntegration {
+interface IReadableAttachmentIntegration {
     attachmentType: string;
     title: string;
     externalIDLabel: string;
     logoIcon: IconType;
+}
 
-    writeableContentScope: WriteableContentScope;
+export interface IWriteableAttachmentIntegration extends IReadableAttachmentIntegration {
     name: string;
     label: string;
     recordTypes: string[];
     submitButton: string;
 }
+export type IAttachmentIntegration = IReadableAttachmentIntegration | IWriteableAttachmentIntegration;
 
-export function isWriteableAttachmentIntegration(integration: IAttachmentIntegration): boolean {
-    return ["all", "own"].includes(integration.writeableContentScope);
+export function isWriteableAttachmentIntegration(
+    integration: IAttachmentIntegration,
+): integration is IWriteableAttachmentIntegration {
+    return (
+        "name" in integration && "label" in integration && "recordTypes" in integration && "submitButton" in integration
+    );
 }
 
 export type IAttachmentIntegrationCatalog = Record<string, IAttachmentIntegration>;

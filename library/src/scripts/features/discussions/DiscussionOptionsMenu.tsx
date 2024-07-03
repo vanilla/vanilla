@@ -71,7 +71,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         mode: PermissionMode.RESOURCE_IF_JUNCTION,
     };
 
-    const writeableIntegrations = useWriteableAttachmentIntegrations();
+    const availableWriteableIntegrations = useWriteableAttachmentIntegrations();
 
     const currentUserID = useCurrentUserID();
 
@@ -86,7 +86,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
 
     const canBump = hasPermission("curation.manage");
 
-    const canReport = hasPermission("flag.add");
+    const canReport = hasPermission("flag.add") && getMeta("featureFlags.CommunityManagement.Enabled", false);
 
     const items: React.ReactNode[] = [];
 
@@ -230,9 +230,8 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         items.push(...changeLogItems);
     }
 
-    writeableIntegrations
+    availableWriteableIntegrations
         .filter(({ recordTypes }) => recordTypes.includes("discussion"))
-        .filter(({ writeableContentScope }) => (writeableContentScope === "own" ? isAuthor : true))
         .forEach(({ attachmentType }) => {
             permissionCheckedAndIntegrationItems.push(
                 <WriteableIntegrationContextProvider

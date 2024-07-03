@@ -11,7 +11,6 @@ use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AttachmentService;
-use Vanilla\Dashboard\Models\AttachmentProviderInterface;
 use VanillaTests\Fixtures\Addons\TestMockIssue\MockAttachmentProvider;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -299,9 +298,9 @@ class AttachmentsApiControllerTest extends SiteTestCase
                 "externalIDLabel" => "Mock #",
                 "logoIcon" => "logo-mock",
                 "name" => "Mock Provider",
+                "canEscalateOwnContent" => false,
                 "escalationDelayUnit" => null,
                 "escalationDelayLength" => 0,
-                "writeableContentScope" => AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_ALL,
             ],
         ];
         $response = $this->api()->get("/attachments/catalog");

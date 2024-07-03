@@ -1980,19 +1980,4 @@ class CategoryModelTest extends SiteTestCase
         $after = $this->categoryModel->getID(-1, DATASET_TYPE_ARRAY);
         $this->assertEquals($before["CountAllDiscussions"] + 1, $after["CountAllDiscussions"]);
     }
-
-    /**
-     * Test to make sure we sanitize the xss when creating a new category.
-     *
-     * @return void
-     */
-    public function testSanitizingCategoryName(): void
-    {
-        // Make sure we use the model to cover both the old controllers and the API.
-        $categoryID = $this->categoryModel->save(
-            $this->newCategory(["Name" => "<img src=x onVector=X-Vector onerror=alert(42)>"])
-        );
-        $category = $this->categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
-        $this->assertEquals("&lt;img src=x onVector=X-Vector onerror=alert(42)&gt;", $category["Name"]);
-    }
 }

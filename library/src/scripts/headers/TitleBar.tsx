@@ -1,10 +1,11 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { useBannerContext } from "@library/banner/BannerContext";
+import { isUserGuest, useUsersState } from "@library/features/users/userModel";
 import Hamburger from "@library/flyouts/Hamburger";
 import MeBox from "@library/headers/mebox/MeBox";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
@@ -38,8 +39,6 @@ import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
 import { SkipNavLink, SkipNavContent } from "@reach/skip-nav";
 import { LogoAlignment } from "@library/headers/LogoAlignment";
-import { useCurrentUser, useCurrentUserSignedIn } from "@library/features/users/userHooks";
-import { useThemeForcedVariables } from "@library/theming/Theme.context";
 
 interface IProps {
     container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.
@@ -85,8 +84,8 @@ export default function TitleBar(_props: IProps) {
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
     const showMobileDropDown = isCompact && !isSearchOpen && !!props.title;
     const classesMeBox = meBoxClasses();
-    const currentUserIsSignedIn = useCurrentUserSignedIn();
-    const isGuest = !currentUserIsSignedIn;
+    const { currentUser } = useUsersState();
+    const isGuest = isUserGuest(currentUser.data);
     const vars = titleBarVariables();
     const classes = titleBarClasses();
     const logoClasses = titleBarLogoClasses();
@@ -97,8 +96,8 @@ export default function TitleBar(_props: IProps) {
     // When previewing and updating the colors live, there can be flickering of some components.
     // As a result we want to hide them on first render for these cases.
 
-    const isPreviewing = !!useThemeForcedVariables();
-    const [isPreviewFirstRender, setIsPreviewFirstRender] = useState(isPreviewing);
+    const isPreviewing = useSelector((state: ICoreStoreState) => state.theme.forcedVariables);
+    const [isPreviewFirstRender, setIsPreviewFirstRender] = useState(!!isPreviewing);
     useEffect(() => {
         if (isPreviewFirstRender) {
             setIsPreviewFirstRender(false);
@@ -499,9 +498,8 @@ function useScrollTransition() {
 
 function DesktopMeBox() {
     const classes = titleBarClasses();
-    const currentUser = useCurrentUser();
-    const currentUserIsSignedIn = useCurrentUserSignedIn();
-    const isGuest = !currentUserIsSignedIn;
+    const { currentUser } = useUsersState();
+    const isGuest = isUserGuest(currentUser.data);
     const registerLink = useRegisterLink();
     const signinLink = useSignInLink();
     const guestVars = titleBarVariables().guest;
@@ -546,9 +544,8 @@ function DesktopMeBox() {
 export { TitleBar };
 
 function MobileMeBox() {
-    const currentUser = useCurrentUser();
-    const currentUserIsSignedIn = useCurrentUserSignedIn();
-    const isGuest = !currentUserIsSignedIn;
+    const { currentUser } = useUsersState();
+    const isGuest = isUserGuest(currentUser.data);
     const classes = titleBarClasses();
     const signinLink = useSignInLink();
     if (isGuest) {

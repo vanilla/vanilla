@@ -8,12 +8,12 @@ import { fireEvent, render, waitFor, screen } from "@testing-library/react";
 import ReportModal from "./ReportModal.loadable";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { mockAPI } from "@library/__tests__/utility";
-import { ComponentProps } from "react";
+import { ComponentProps, useEffect } from "react";
 import MockAdapter from "axios-mock-adapter";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import { CurrentUserContextProvider } from "@library/features/users/userHooks";
+import { LoadStatus } from "@library/@types/api/core";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -27,19 +27,17 @@ const queryClient = new QueryClient({
 
 async function renderInProvider(props?: Partial<ComponentProps<typeof ReportModal>>) {
     render(
-        <TestReduxProvider>
-            <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
-                <QueryClientProvider client={queryClient}>
-                    <ReportModal
-                        discussionName={"Mock discussion name"}
-                        recordID={"1"}
-                        recordType={"discussion"}
-                        isVisible={true}
-                        onVisibilityChange={() => null}
-                        {...props}
-                    />
-                </QueryClientProvider>
-            </CurrentUserContextProvider>
+        <TestReduxProvider state={{ users: { current: UserFixture.adminAsCurrent, suggestions: {} } }}>
+            <QueryClientProvider client={queryClient}>
+                <ReportModal
+                    discussionName={"Mock discussion name"}
+                    recordID={"1"}
+                    recordType={"discussion"}
+                    isVisible={true}
+                    onVisibilityChange={() => null}
+                    {...props}
+                />
+            </QueryClientProvider>
         </TestReduxProvider>,
     );
 }
@@ -86,19 +84,17 @@ describe("ReportModal", () => {
 
     it("Posts escalation", async () => {
         render(
-            <TestReduxProvider>
+            <TestReduxProvider state={{ users: { current: UserFixture.adminAsCurrent, suggestions: {} } }}>
                 <PermissionsFixtures.AllPermissions>
-                    <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
-                        <QueryClientProvider client={queryClient}>
-                            <ReportModal
-                                discussionName={"Mock discussion name"}
-                                recordID={"1"}
-                                recordType={"discussion"}
-                                isVisible={true}
-                                onVisibilityChange={() => null}
-                            />
-                        </QueryClientProvider>
-                    </CurrentUserContextProvider>
+                    <QueryClientProvider client={queryClient}>
+                        <ReportModal
+                            discussionName={"Mock discussion name"}
+                            recordID={"1"}
+                            recordType={"discussion"}
+                            isVisible={true}
+                            onVisibilityChange={() => null}
+                        />
+                    </QueryClientProvider>
                 </PermissionsFixtures.AllPermissions>
             </TestReduxProvider>,
         );

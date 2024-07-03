@@ -32,7 +32,13 @@ interface IAutoCompleteLookupProps {
     lookup: ILookupApi;
     ignoreLookupOnMount?: boolean;
     api?: AxiosInstance;
-    lookupResult?(result: any): void;
+    handleLookupResults?(result: IAutoCompleteOption[]): void;
+    /**
+     * Whether the results of the lookup should be added to the context's options.
+     * Defaults to `true`.
+     * To manage the options list yourself, set this to `false` and pass an implementation of `handleLookupResults`.
+     */
+    addLookupResultsToOptions?: boolean;
 }
 
 /**
@@ -52,7 +58,7 @@ const apiCaches = new Map<string, any>();
  * This component does not return any DOM elements.
  */
 export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
-    const { lookup, lookupResult, ignoreLookupOnMount } = props;
+    const { lookup, handleLookupResults, ignoreLookupOnMount, addLookupResultsToOptions = true } = props;
     const contextApi = useApiContext();
     const api = props.api ?? contextApi;
     const { options, handleSearch, loadIndividualOptions } = useApiLookup(lookup, api, ignoreLookupOnMount);
@@ -86,16 +92,18 @@ export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
     useEffect(() => {
         const isLoading = options.length === 0;
         if (!isLoading) {
-            setOptions((oldOptions) => {
-                return uniqBy([...(oldOptions ?? []), ...options], "value");
-            });
+            if (addLookupResultsToOptions) {
+                setOptions((oldOptions) => {
+                    return uniqBy([...(oldOptions ?? []), ...options], "value");
+                });
+            }
             try {
-                lookupResult?.(options);
+                handleLookupResults?.(options);
             } catch (err) {
                 logError("Failed to lookup autocomplete options", err);
             }
         }
-    }, [lookupResult, setOptions, options]);
+    }, [handleLookupResults, setOptions, options]);
 
     return null;
 }

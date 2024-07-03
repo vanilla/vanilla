@@ -66,7 +66,7 @@ export function CommentOptionsMenu(props: IProps) {
         resourceID: comment.categoryID,
     };
 
-    const canReport = hasPermission("flag.add");
+    const canReport = hasPermission("flag.add") && getMeta("featureFlags.CommunityManagement.Enabled", false);
 
     const toast = useToast();
     const deleteMutation = useMutation({
@@ -88,7 +88,7 @@ export function CommentOptionsMenu(props: IProps) {
     const isOwnComment = comment.insertUserID === currentUser?.userID;
 
     const { canStillEdit, humanizedRemainingTime } = useUserCanStillEditDiscussionOrComment(discussion, comment);
-    const writeableIntegrations = useWriteableAttachmentIntegrations();
+    const availableWriteableIntegrations = useWriteableAttachmentIntegrations();
 
     if (canStillEdit) {
         items.push(
@@ -167,9 +167,8 @@ export function CommentOptionsMenu(props: IProps) {
 
     let integrationItems: React.ReactNode[] = [];
 
-    writeableIntegrations
+    availableWriteableIntegrations
         .filter(({ recordTypes }) => recordTypes.includes("comment"))
-        .filter(({ writeableContentScope }) => (writeableContentScope === "own" ? isOwnComment : true))
         .forEach(({ attachmentType }) => {
             integrationItems.push(
                 <WriteableIntegrationContextProvider

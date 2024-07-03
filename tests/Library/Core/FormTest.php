@@ -704,4 +704,30 @@ EOT;
 
         return $r;
     }
+
+    /**
+     * Test to make sure the values of a checkBoxList form do not contain any XSS.
+     *
+     * @return void
+     */
+    public function testCheckBoxXSS(): void
+    {
+        $actual = $this->form->checkBoxList(
+            "foo",
+            [
+                [
+                    "id" => 0,
+                    "bar" => "<img src=x onVector=X-Vector onerror=alert(42)>",
+                ],
+            ],
+            null,
+            ["ValueField" => "CategoryID", "TextField" => "bar"]
+        );
+
+        $this->assertEquals(
+            '<ul class="CheckBoxList"><li><div class="checkbox"><label for="foo1"><input type="hidden" name="Checkboxes[]" value="foo" /><input type="checkbox" id="foo1" name="foo[]" value="" checked="checked" class="" /> &lt;img src=x onVector=X-Vector onerror=alert(42)&gt;</label></div></li>
+</ul>',
+            $actual
+        );
+    }
 }

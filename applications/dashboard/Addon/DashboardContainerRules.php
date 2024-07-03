@@ -43,7 +43,6 @@ use Vanilla\Dashboard\Controllers\Pages\DeveloperProfilesPageController;
 use Vanilla\Dashboard\Controllers\Pages\HomePageController;
 use Vanilla\Dashboard\Events\AccessDeniedEvent;
 use Vanilla\Dashboard\Events\AddonToggledEvent;
-use Vanilla\Dashboard\Events\AiSuggestionAccessEvent;
 use Vanilla\Dashboard\Events\ConfigurationChangeEvent;
 use Vanilla\Dashboard\Events\DashboardAccessEvent;
 use Vanilla\Dashboard\Events\DashboardApiAccessEvent;
@@ -209,7 +208,6 @@ class DashboardContainerRules extends AddonContainerRules
                     LayoutApplyEvent::class,
                     OAuth2AuditEvent::class,
                     JsConnectAuditEvent::class,
-                    AiSuggestionAccessEvent::class,
                 ],
             ]);
 

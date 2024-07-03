@@ -120,8 +120,11 @@ describe("IntegrationButtonAndModal", () => {
             describe("Submitting the form", () => {
                 it("Calls the API's `postAttachment` method", async () => {
                     const form = within(modal).getByRole("form");
+                    const submitButton = await within(form).findByRole<HTMLButtonElement>("button", {
+                        name: FAKE_WRITEABLE_INTEGRATION.submitButton,
+                    });
                     await act(async () => {
-                        fireEvent.submit(form);
+                        fireEvent.click(submitButton);
                     });
                     expect(mockApi.postAttachment).toHaveBeenCalledTimes(1);
                 });

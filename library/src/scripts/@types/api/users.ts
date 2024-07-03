@@ -21,8 +21,8 @@ export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}
 export interface IMe extends IUserFragment {
     countUnreadNotifications: number;
     countUnreadConversations: number;
-    isAdmin?: boolean;
-    emailConfirmed?: boolean;
+    isAdmin: boolean;
+    emailConfirmed: boolean;
 }
 
 export interface ICount {

@@ -1,10 +1,13 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary */
 
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { LeavingPageImpl } from "@library/leavingPage/LeavingPage";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { LoadStatus } from "@library/@types/api/core";
+import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { MemoryRouter } from "react-router";
 
 describe("Leaving Page", () => {
@@ -12,9 +15,22 @@ describe("Leaving Page", () => {
     const EXTERNAL_URL = "https://exampleexternalsite.com";
     it("Should render the page with back to home, external link as text and button as link", async () => {
         render(
-            <MemoryRouter>
-                <LeavingPageImpl siteName={SITE_NAME} target={EXTERNAL_URL} />
-            </MemoryRouter>,
+            <TestReduxProvider
+                state={{
+                    users: {
+                        usersByID: {
+                            2: {
+                                status: LoadStatus.SUCCESS,
+                                data: UserFixture.createMockUser(),
+                            },
+                        },
+                    },
+                }}
+            >
+                <MemoryRouter>
+                    <LeavingPageImpl siteName={SITE_NAME} target={EXTERNAL_URL} />
+                </MemoryRouter>
+            </TestReduxProvider>,
         );
 
         expect(screen.getByText(`Back to ${SITE_NAME}`)).toBeInTheDocument();
@@ -33,13 +49,26 @@ describe("Leaving Page", () => {
 
     it("We will have an error page if the url is not valid or its an internal link", async () => {
         render(
-            <MemoryRouter>
-                <LeavingPageImpl siteName={SITE_NAME} target={"invalidurl"} />
-            </MemoryRouter>,
+            <TestReduxProvider
+                state={{
+                    users: {
+                        usersByID: {
+                            2: {
+                                status: LoadStatus.SUCCESS,
+                                data: UserFixture.createMockUser(),
+                            },
+                        },
+                    },
+                }}
+            >
+                <MemoryRouter>
+                    <LeavingPageImpl siteName={SITE_NAME} target={"invalidurl"} />
+                </MemoryRouter>
+            </TestReduxProvider>,
         );
 
         expect(
-            screen.queryByRole("button", {
+            await screen.queryByRole("button", {
                 name: "Continue to External Site",
             }),
         ).not.toBeInTheDocument();

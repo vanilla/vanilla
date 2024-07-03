@@ -18,6 +18,8 @@ import { useNotificationPreferencesContext } from "@library/notificationPreferen
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { useLocales } from "@library/config/configHooks";
 import { useFormik } from "formik";
+import { useQuery } from "@tanstack/react-query";
+import apiv2 from "@library/apiv2";
 
 export function EmailLanguagePreferencesImpl(props: {
     localeOptions: IComboBoxOption[] | undefined;
@@ -113,9 +115,21 @@ export function EmailLanguagePreferencesImpl(props: {
 }
 
 export default function EmailLanguagePreferences() {
-    const { localeOptions } = useLocales();
+    const locales = useQuery({
+        queryKey: ["locales"],
+        queryFn: async () => {
+            const response = await apiv2.get("/locales");
+            return response.data;
+        },
+    });
     const { preferences, editPreferences } = useNotificationPreferencesContext();
 
+    const localeOptions = locales.data?.map((locale: any) => {
+        return {
+            value: locale.localeKey,
+            label: locale.displayNames[locale.localeKey],
+        };
+    });
     const dataIsReady = !!preferences?.data;
 
     if (dataIsReady) {

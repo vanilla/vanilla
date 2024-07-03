@@ -2314,7 +2314,7 @@ class CategoryModel extends Gdn_Model implements
                 }
 
                 $category["LastTitle"] = $discussion["Name"];
-                $category["LastUrl"] = DiscussionModel::discussionUrl($discussion, false, true) . "#latest";
+                $category["LastUrl"] = discussionUrl($discussion, false, true) . "#latest";
                 $category["LastDiscussionUserID"] = $discussion["InsertUserID"];
                 $category["LastUserID"] = $discussion["LastCommentUserID"] ?? $discussion["InsertUserID"];
                 $user = Gdn::userModel()->getID($category["LastUserID"]);
@@ -2819,10 +2819,9 @@ class CategoryModel extends Gdn_Model implements
     /**
      * Get list of categories (disregarding user permission for admins).
      *
-     * @return object SQL results.
-     * @throws Exception
      * @since 2.0.0
-     * @deprecated This function isn't secure and might blow up if there are too many categories.
+     *
+     * @return object SQL results.
      */
     public function getAll()
     {
@@ -3760,10 +3759,6 @@ class CategoryModel extends Gdn_Model implements
         $CustomPermissions =
             (bool) val("CustomPermissions", $formPostValues) || is_array(val("Permissions", $formPostValues));
         $CustomPoints = val("CustomPoints", $formPostValues, null);
-
-        if (isset($formPostValues["Name"])) {
-            $formPostValues["Name"] = htmlspecialchars($formPostValues["Name"]);
-        }
 
         if (isset($formPostValues["AllowedDiscussionTypes"]) && is_array($formPostValues["AllowedDiscussionTypes"])) {
             $formPostValues["AllowedDiscussionTypes"] = dbencode($formPostValues["AllowedDiscussionTypes"]);

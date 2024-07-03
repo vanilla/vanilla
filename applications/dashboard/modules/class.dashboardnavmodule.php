@@ -161,6 +161,10 @@ class DashboardNavModule extends SiteNavModule
             // The url gets resolved to the first url the user has permission to see.
             foreach ($section["url"] as $permission => $url) {
                 if (Gdn::session()->checkPermission($permission)) {
+                    // Keep old url for moderation section if community management is disabled.
+                    if ($sectionKey === "Moderation" && !Gdn::config("Feature.CommunityManagement.Enabled")) {
+                        return "/dashboard/user";
+                    }
                     return $url;
                 }
             }

@@ -9,7 +9,6 @@ namespace Vanilla\QnA\Addon;
 
 use CommentModel;
 use Garden\PsrEventHandlersInterface;
-use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Gdn;
 use DiscussionModel;
@@ -109,16 +108,5 @@ class QnaEventHandler implements PsrEventHandlersInterface
         return $qnaPlugin->commentsApiController_patch_answer($commentsApiController, $commentID, [
             "status" => "accepted",
         ]);
-    }
-
-    /**
-     * Mark Comment as accepted answer
-     *
-     * @param Schema $schema
-     * @return Schema
-     */
-    public function aiSuggestionsApiController_normalizeComment(Schema $schema): Schema
-    {
-        return $schema->merge(Schema::parse(["qnA:s?", "dateAccepted:s?", "acceptedUserID:s?"]));
     }
 }

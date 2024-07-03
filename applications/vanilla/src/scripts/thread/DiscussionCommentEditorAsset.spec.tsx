@@ -1,6 +1,6 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -8,10 +8,10 @@ import React from "react";
 import { fireEvent, render, waitFor, screen, act } from "@testing-library/react";
 import DiscussionCommentEditorAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentEditorAsset";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { LoadStatus } from "@library/@types/api/core";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { mockAPI } from "@library/__tests__/utility";
-import { CurrentUserContextProvider } from "@library/features/users/userHooks";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -24,12 +24,23 @@ const queryClient = new QueryClient({
 
 const renderInProvider = async (props?: Partial<React.ComponentProps<typeof DiscussionCommentEditorAsset>>) => {
     render(
-        <TestReduxProvider>
-            <CurrentUserContextProvider currentUser={UserFixture.createMockUser({ userID: 1 })}>
-                <QueryClientProvider client={queryClient}>
-                    <DiscussionCommentEditorAsset {...props} discussionID={0} categoryID={0} />
-                </QueryClientProvider>
-            </CurrentUserContextProvider>
+        <TestReduxProvider
+            state={{
+                users: {
+                    current: {
+                        status: LoadStatus.SUCCESS,
+                        data: {
+                            ...UserFixture.createMockUser({ userID: 1 }),
+                            countUnreadNotifications: 0,
+                            countUnreadConversations: 0,
+                        },
+                    },
+                },
+            }}
+        >
+            <QueryClientProvider client={queryClient}>
+                <DiscussionCommentEditorAsset {...props} discussionID={0} categoryID={0} />
+            </QueryClientProvider>
         </TestReduxProvider>,
     );
     await vi.dynamicImportSettled();

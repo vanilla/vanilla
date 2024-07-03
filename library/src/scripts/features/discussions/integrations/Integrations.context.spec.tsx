@@ -18,12 +18,6 @@ import {
 } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
 import { setMeta } from "@library/utility/appUtils";
 import { RenderResult, act, renderHook } from "@testing-library/react-hooks";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
-import DiscussionOptionsMenu from "@library/features/discussions/DiscussionOptionsMenu";
-import { fireEvent, render } from "@testing-library/react";
-import { RenderResult as ReactRenderResult } from "@testing-library/react";
-import { CurrentUserContextProvider } from "@library/features/users/userHooks";
-import { IMe } from "@library/@types/api/users";
 
 beforeEach(() => {
     setMeta(INTEGRATIONS_META_KEY, undefined);
@@ -48,12 +42,8 @@ describe("WriteableAttachmentIntegrationsContext", () => {
             expect(mockApi.getIntegrationsCatalog).not.toHaveBeenCalled();
         });
 
-        it("provides the writeable integrations from the meta", () => {
-            expect(result.current).toEqual(
-                Object.values(FAKE_INTEGRATIONS_CATALOG).filter(
-                    (integration) => integration.writeableContentScope !== "none",
-                ),
-            );
+        it("provides the integrations from the meta", () => {
+            expect(result.current).toEqual(Object.values(FAKE_INTEGRATIONS_CATALOG));
         });
     });
 
@@ -73,11 +63,7 @@ describe("WriteableAttachmentIntegrationsContext", () => {
         });
 
         it("provides the integrations retrieved from the API", () => {
-            expect(result.current).toEqual(
-                Object.values(FAKE_INTEGRATIONS_CATALOG).filter(
-                    (integration) => integration.writeableContentScope !== "none",
-                ),
-            );
+            expect(result.current).toEqual(Object.values(FAKE_INTEGRATIONS_CATALOG));
         });
     });
 });
@@ -119,88 +105,5 @@ describe("WriteableIntegrationContext", () => {
             await result.current.getSchema();
         });
         expect(mockApi.getAttachmentSchema).toHaveBeenCalledTimes(1);
-    });
-});
-
-describe("DiscussionOptionsMenu", () => {
-    let result: ReactRenderResult;
-
-    const discussion = DiscussionFixture.fakeDiscussions[0];
-
-    describe("When the discussion is authored by the current user", () => {
-        beforeEach(async () => {
-            await act(async () => {
-                result = render(
-                    <IntegrationsTestWrapper>
-                        <CurrentUserContextProvider
-                            currentUser={{ ...discussion.insertUser, userID: discussion.insertUserID } as IMe}
-                        >
-                            <DiscussionOptionsMenu discussion={discussion} />
-                        </CurrentUserContextProvider>
-                    </IntegrationsTestWrapper>,
-                );
-            });
-
-            const button = await result.findByRole("button", { name: "Discussion Options" });
-            fireEvent.click(button);
-        });
-
-        it("Renders option buttons for integrations where writeableContentScope is `all`", async () => {
-            const expectedIntegrations = Object.values(FAKE_INTEGRATIONS_CATALOG).filter(
-                (integration) => integration.writeableContentScope === "all",
-            );
-            expect(expectedIntegrations.length).toBeGreaterThan(0);
-            expectedIntegrations.forEach((integration) =>
-                expect(result.queryByText(integration.label)).toBeInTheDocument(),
-            );
-        });
-
-        it("Does not render option buttons for integrations where writeableContentScope is `none`", async () => {
-            const expectedIntegrations = Object.values(FAKE_INTEGRATIONS_CATALOG).filter(
-                (integration) => integration.writeableContentScope === "none",
-            );
-            expect(expectedIntegrations.length).toBeGreaterThan(0);
-            expectedIntegrations.forEach((integration) =>
-                expect(result.queryByText(integration.label)).not.toBeInTheDocument(),
-            );
-        });
-
-        it("Renders option buttons for integrations where writeableContentScope is `own`", async () => {
-            const expectedIntegrations = Object.values(FAKE_INTEGRATIONS_CATALOG).filter(
-                (integration) => integration.writeableContentScope === "own",
-            );
-            expect(expectedIntegrations.length).toBeGreaterThan(0);
-            expectedIntegrations.forEach((integration) =>
-                expect(result.queryByText(integration.label)).toBeInTheDocument(),
-            );
-        });
-    });
-
-    describe("When the discussion is not authored by current user", () => {
-        beforeEach(async () => {
-            await act(async () => {
-                result = render(
-                    <IntegrationsTestWrapper>
-                        <CurrentUserContextProvider
-                            currentUser={{ ...discussion.insertUser, userID: discussion.insertUserID + 1 } as IMe}
-                        >
-                            <DiscussionOptionsMenu discussion={discussion} />
-                        </CurrentUserContextProvider>
-                    </IntegrationsTestWrapper>,
-                );
-            });
-            const button = await result.findByRole("button", { name: "Discussion Options" });
-            fireEvent.click(button);
-        });
-
-        it("Does not render option buttons for integrations where writeableContentScope is `own`", async () => {
-            const expectedIntegrations = Object.values(FAKE_INTEGRATIONS_CATALOG).filter(
-                (integration) => integration.writeableContentScope === "own",
-            );
-            expect(expectedIntegrations.length).toBeGreaterThan(0);
-            expectedIntegrations.forEach((integration) =>
-                expect(result.queryByText(integration.label)).not.toBeInTheDocument(),
-            );
-        });
     });
 });

@@ -18,9 +18,11 @@ use Garden\Web\Exception\ForbiddenException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Events\PasswordResetEmailSentEvent;
 use Vanilla\Dashboard\Events\PasswordResetUserNotFoundEvent;
+use Vanilla\Dashboard\Activity\ApplicantActivity;
 use Vanilla\Dashboard\Events\UserEvent;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
@@ -29,7 +31,6 @@ use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Dashboard\Events\UserPointEvent;
 use Vanilla\Dashboard\Events\UserRoleModificationEvent;
 use Vanilla\Dashboard\Events\UserRoleRemoveEvent;
-use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Dashboard\Models\UserFragment;
 use Vanilla\Dashboard\Models\UserVisitUpdater;
@@ -3435,18 +3436,6 @@ class UserModel extends Gdn_Model implements
                     $this->sendEmailConfirmationEmail($user, true);
                 }
 
-                if ($userID) {
-                    if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
-                        if (array_key_exists("SuggestAnswers", $formPostValues)) {
-                            $this->userMetaModel->setUserMeta(
-                                $userID,
-                                "SuggestAnswers",
-                                forceBool($formPostValues["SuggestAnswers"], "1", "1", "0")
-                            );
-                        }
-                    }
-                }
-
                 $this->clearCache($userID, [self::CACHE_TYPE_USER]);
                 $this->EventArguments["UserID"] = $userID;
                 $this->fireEvent("AfterSave");
@@ -3456,7 +3445,17 @@ class UserModel extends Gdn_Model implements
         } else {
             $userID = false;
         }
-
+        if ($userID) {
+            if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
+                if (array_key_exists("SuggestAnswers", $formPostValues)) {
+                    $this->userMetaModel->setUserMeta(
+                        $userID,
+                        "SuggestAnswers",
+                        forceBool($formPostValues["SuggestAnswers"], "1", "1", "0")
+                    );
+                }
+            }
+        }
         if ($userID && !$insert) {
             // Events for inserts are dispatched in `insertInternal()`
             $user = $this->getID($userID);
@@ -3591,16 +3590,10 @@ class UserModel extends Gdn_Model implements
                 $result["sortEmail"] = mb_convert_case(Normalizer::normalize($result["email"]), MB_CASE_LOWER);
             }
         }
-
         if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
-            $aiConfig = AiSuggestionSourceService::aiSuggestionConfigs();
-            if ($aiConfig["enabled"]) {
-                $result["suggestAnswers"] = $this->userMetaModel->getUserMeta(
-                    $result["userID"],
-                    "SuggestAnswers",
-                    true
-                )["SuggestAnswers"];
-            }
+            $result["suggestAnswers"] = $this->userMetaModel->getUserMeta($result["userID"], "SuggestAnswers", true)[
+                "SuggestAnswers"
+            ];
         }
         return $result;
     }
@@ -3965,8 +3958,10 @@ class UserModel extends Gdn_Model implements
         $removedRoles = array_diff($oldRoles, $newRoles);
         $newRoles = array_diff($newRoles, $oldRoles);
 
-        $auditEvent = new UserRoleModificationEvent($user->Name, $user->UserID, $newRoles, $removedRoles);
-        AuditLogger::log($auditEvent);
+        if (!empty($removedRoles) || !empty($newRoles)) {
+            $auditEvent = new UserRoleModificationEvent($user->Name, $user->UserID, $newRoles, $removedRoles);
+            AuditLogger::log($auditEvent);
+        }
     }
 
     /**
@@ -4721,38 +4716,40 @@ class UserModel extends Gdn_Model implements
      *
      * @param int $userID
      * @param string $username
+     * @throws Exception
      */
-    public function triggerApplicantNotification($userID = 0, $username = "")
+    public function triggerApplicantNotification($userID = 0, $username = ""): void
     {
-        if ($userID > 0 && !empty($username)) {
-            // Notification text
-            $label = t("NewApplicantEmail", "New applicant:");
-            $story = anchor(Gdn_Format::text($label . " " . $username), externalUrl("dashboard/user/applicants"));
-
-            try {
-                $data = Gdn::database()
-                    ->sql()
-                    ->getWhere("UserMeta", ["Name" => "Preferences.Email.Applicant"])
-                    ->resultArray();
-                $activityModel = new ActivityModel();
-                foreach ($data as $row) {
-                    $activityModel->add(
-                        $userID,
-                        "Applicant",
-                        $story,
-                        $row["UserID"],
-                        "",
-                        "/dashboard/user/applicants",
-                        "Only"
-                    );
-                }
-            } catch (Exception $ex) {
-                $this->logger->error($ex->getMessage(), [
-                    Logger::FIELD_EVENT => "applicant_notification_failure",
-                    "exception" => $ex,
-                ]);
-            }
+        if ($userID <= 0 || empty($username)) {
+            return;
         }
+
+        if ($username == "") {
+            $username = t("Unknown");
+        }
+
+        $activity = [
+            "ActivityType" => ApplicantActivity::getActivityTypeID(),
+            "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
+            "ActivityUserID" => $userID,
+            "HeadlineFormat" => sprintf(ApplicantActivity::getProfileHeadline(), $username),
+            "PluralHeadlineFormat" => sprintf(ApplicantActivity::getPluralHeadline(), $username),
+            "RecordType" => "user",
+            "RecordID" => $userID,
+            "Route" => "/dashboard/user/applicants",
+            "Data" => [
+                "userID" => $userID,
+                "name" => $username,
+                "Reason" => ApplicantActivity::getActivityReason(),
+            ],
+        ];
+        $notificationGenerator = Gdn::getContainer()->get(PermissionNotificationGenerator::class);
+
+        // Kludge to set the session of the user as the one of the applicant for the longrunner.
+        $sessionUser = $this->session->UserID;
+        $this->session->UserID = $userID;
+        $notificationGenerator->notify($activity, "Garden.Users.Approve", "Applicant");
+        $this->session->UserID = $sessionUser;
     }
 
     /**

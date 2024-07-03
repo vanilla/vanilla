@@ -13,6 +13,9 @@ use Vanilla\Dashboard\Addon\AbstractProfileFieldEventHandler;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 
+// Needed because special classes are loaded before the autoloader is ready.
+require_once PATH_APPLICATIONS . "/dashboard/Addon/AbstractProfileFieldEventHandler.php";
+
 /**
  * Automation rule event that captures profile fields update and triggers the category follow action.
  */

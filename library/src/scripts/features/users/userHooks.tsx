@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -12,69 +12,30 @@ import {
     useUserActions,
 } from "@library/features/users/UserActions";
 import { IUsersStoreState } from "@library/features/users/userTypes";
-import { useCallback, useContext, useDebugValue, useEffect } from "react";
+import { useCallback, useDebugValue, useEffect } from "react";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { GUEST_USER_ID } from "@library/features/users/userModel";
-import { IMe, IUser, IUserFragment } from "@library/@types/api/users";
+import { IMe, IUser } from "@library/@types/api/users";
 import { useUniqueID } from "@library/utility/idUtils";
-import React from "react";
-
-interface ICurrentUserContextValue {
-    currentUser: IMe | undefined;
-}
-
-const CurrentUserContext = React.createContext<ICurrentUserContextValue>({
-    currentUser: undefined,
-});
-
-export function useCurrentUserContext(): ICurrentUserContextValue {
-    return useContext(CurrentUserContext);
-}
-
-export function useCurrentUser(): ICurrentUserContextValue["currentUser"] {
-    const context = useCurrentUserContext();
-    return context.currentUser;
-}
 
 export function useCurrentUserID(): IUser["userID"] | undefined {
-    const currentUser = useCurrentUser();
-    return currentUser?.userID;
+    return useSelector((state: ICoreStoreState) => {
+        return state.users.current.data?.userID;
+    });
+}
+
+export function useCurrentUser(): IMe | undefined {
+    return useSelector((state: ICoreStoreState) => {
+        return state.users.current.data;
+    });
 }
 
 export function useCurrentUserSignedIn(): boolean {
-    const currentUser = useCurrentUser();
-    return currentUser?.userID !== GUEST_USER_ID;
-}
-
-export function CurrentUserContextProvider(props: {
-    currentUser: IMe | IUserFragment | undefined;
-    children: React.ReactNode;
-}) {
-    const { currentUser, children } = props;
-    const user: IMe | undefined = currentUser
-        ? {
-              ...currentUser,
-              countUnreadNotifications:
-                  "countUnreadNotifications" in currentUser ? currentUser.countUnreadNotifications : 0,
-              countUnreadConversations:
-                  "countUnreadConversations" in currentUser ? currentUser.countUnreadConversations : 0,
-              isAdmin: "isAdmin" in currentUser ? currentUser.isAdmin : false,
-              emailConfirmed: "emailConfirmed" in currentUser ? currentUser.emailConfirmed : false,
-          }
-        : undefined;
-    return <CurrentUserContext.Provider value={{ currentUser: user }}>{children}</CurrentUserContext.Provider>;
-}
-
-export function ReduxCurrentUserContextProvider(props: { children: React.ReactNode }) {
-    const { children } = props;
-
-    const currentUser = useSelector((state: ICoreStoreState) => {
-        return state.users.current.data;
+    return useSelector((state: ICoreStoreState) => {
+        return !!(state.users.current.data && state.users.current.data.userID !== GUEST_USER_ID);
     });
-
-    return <CurrentUserContextProvider currentUser={currentUser}>{children}</CurrentUserContextProvider>;
 }
 
 export function useUser(query: Partial<IGetUserByIDQuery>): ILoadable<IUser> {

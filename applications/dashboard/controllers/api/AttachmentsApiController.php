@@ -118,7 +118,7 @@ class AttachmentsApiController extends AbstractApiController
             throw new NotFoundException("No provider was found for this attachment source.");
         }
 
-        if (!$provider->canCreateAttachmentForRecord($query["recordType"], $query["recordID"])) {
+        if (!$provider->hasWritePermissions()) {
             throw new ForbiddenException("You do not have permission to use this provider.");
         }
 

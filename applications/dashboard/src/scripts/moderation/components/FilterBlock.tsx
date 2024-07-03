@@ -231,7 +231,7 @@ export function FilterBlock(props: FilterBlockProps) {
                                 <AutoCompleteLookupOptions
                                     api={apiv2}
                                     lookup={props.dynamicOptionApi}
-                                    lookupResult={debouncedCacheResults}
+                                    handleLookupResults={debouncedCacheResults}
                                 />
                             }
                             options={

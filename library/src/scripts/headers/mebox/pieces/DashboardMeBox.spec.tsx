@@ -14,7 +14,7 @@ describe("DashboardMeBox", () => {
     it("Renders user name", () => {
         const { findByText } = render(
             <TestReduxProvider>
-                <DashboardMeBox currentUser={UserFixture.adminAsCurrent.data} forceOpen />
+                <DashboardMeBox currentUser={UserFixture.adminAsCurrent} forceOpen />
             </TestReduxProvider>,
         );
         expect(findByText(/admin/)).toBeTruthy();

@@ -18,16 +18,6 @@ interface AttachmentProviderInterface
 
     const ESCALATION_DELAY_UNITS = ["minute", "hour", "day", "week", "month", "year"];
 
-    const WRITEABLE_CONTENT_SCOPE_ALL = "all";
-    const WRITEABLE_CONTENT_SCOPE_OWN = "own";
-    const WRITEABLE_CONTENT_SCOPE_NONE = "none";
-
-    const WRITEABLE_CONTENT_SCOPES = [
-        self::WRITEABLE_CONTENT_SCOPE_ALL,
-        self::WRITEABLE_CONTENT_SCOPE_OWN,
-        self::WRITEABLE_CONTENT_SCOPE_NONE,
-    ];
-
     /**
      * Create a new issue in the external service and return the saved associated attachment data.
      *
@@ -81,11 +71,11 @@ interface AttachmentProviderInterface
     public function getHydratedFormSchema(string $recordType, int $recordID, array $args): Schema;
 
     /**
-     * Get the scope of content on which the user can create attachments.
-     * Must be one of `AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPES`.
-     * @return string
+     * Verify that the user is authorized to create attachments using this provider.
+     *
+     * @return bool
      */
-    public function getWriteableContentScope(): string;
+    public function hasWritePermissions(): bool;
 
     /**
      * Verify that the user is authorized to read attachments from this provider.
@@ -142,6 +132,13 @@ interface AttachmentProviderInterface
      * @return int
      */
     public function getRefreshTimeSeconds(): int;
+
+    /**
+     * If a user can escalate their own post to this provider.
+     *
+     * @return bool
+     */
+    public function canEscalateOwnContent(): bool;
 
     /**
      * Get units used to calculate time span before a user can escalate their own post.

@@ -15,8 +15,10 @@ use Garden\EventManager;
 use Garden\Events\BulkUpdateEvent;
 use Gdn;
 use RoleModel;
+use UserMetaModel;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Formatting\Formats\MarkdownFormat;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Scheduler\LongRunnerAction;
@@ -119,6 +121,7 @@ class DiscussionModelTest extends SiteTestCase
         $this->insertDiscussions(3, ["CategoryID" => $this->privateCategory["CategoryID"]]);
         DiscussionModel::cleanForTests();
         $this->activityModel = Gdn::getContainer()->get(ActivityModel::class);
+        $this->userPreferenceModel = Gdn::getContainer()->get(UserNotificationPreferencesModel::class);
     }
 
     /**
@@ -1386,25 +1389,18 @@ class DiscussionModelTest extends SiteTestCase
 
             // Create a member user.
             $discussionUser = $this->createUser([
-                "Name" => "testDiscussion",
-                "Email" => __FUNCTION__ . "@example1.com",
-                "Password" => "vanilla",
-                "RoleID" => $this->memberID,
+                "name" => "testDiscussion",
             ]);
 
             $memberUser = $this->createUser([
-                "Name" => "testNotications2",
-                "Email" => __FUNCTION__ . "@example1.com",
-                "Password" => "vanilla",
-                "RoleID" => $this->memberID,
+                "name" => "testNotications2",
             ]);
 
             $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
 
-            $userMeta = [
-                sprintf("Preferences.Email.NewDiscussion.%d", $categoryAdmin["categoryID"]) => 1,
-            ];
-            $this->userModel::setMeta($memberUser["userID"], $userMeta);
+            $this->userPreferenceModel->save($memberUser["userID"], [
+                "Popup.NewDiscussion.{$categoryAdmin["categoryID"]}" => 1,
+            ]);
 
             $discussionMember = [
                 "CategoryID" => $categoryAdmin["categoryID"],

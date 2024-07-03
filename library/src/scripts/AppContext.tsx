@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 import { DiscussionCheckboxProvider } from "@library/features/discussions/DiscussionCheckboxContext";
@@ -28,8 +28,6 @@ import { ToastProvider } from "@library/features/toaster/ToastContext";
 import { PermissionsContextProvider } from "@library/features/users/PermissionsContext";
 import { ReactQueryContext } from "@library/ReactQueryContext";
 import { SiteSectionContextProvider } from "./utility/SiteSectionContext";
-import { ReduxCurrentUserContextProvider } from "./features/users/userHooks";
-import { ReduxThemeContextProvider } from "./theming/Theme.context";
 
 interface IProps {
     children: React.ReactNode;
@@ -69,7 +67,6 @@ export function AppContext(props: IProps) {
         [
             ReactQueryContext,
             [Provider, { store }],
-            ReduxCurrentUserContextProvider,
             ApiV2Context,
             SiteSectionContextProvider,
             PermissionsContextProvider,
@@ -87,7 +84,6 @@ export function AppContext(props: IProps) {
                     variablesOnly: props.variablesOnly,
                 },
             ],
-            ReduxThemeContextProvider,
             FontSizeCalculatorProvider,
             ...ExtraContextProviders,
             TitleBarDeviceProvider,

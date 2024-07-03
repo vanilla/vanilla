@@ -647,15 +647,12 @@ class UsersTest extends AbstractResourceTest
         $user = $this->createUser(["name" => __FUNCTION__]);
         $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
         $this->assertArrayNotHasKey("suggestAnswers", $response->getBody());
-        $this->runWithConfig(
-            ["Feature.AISuggestions.Enabled" => true, "aiSuggestions.enabled" => true],
-            function () use ($user) {
-                $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
-                $this->assertSame("0", $response->getBody()["suggestAnswers"]);
-                $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => true]);
-                $this->assertSame("1", $response->getBody()["suggestAnswers"]);
-            }
-        );
+        $this->runWithConfig(["Feature.AISuggestions.Enabled" => true], function () use ($user) {
+            $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
+            $this->assertSame("0", $response->getBody()["suggestAnswers"]);
+            $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => true]);
+            $this->assertSame("1", $response->getBody()["suggestAnswers"]);
+        });
     }
 
     /**

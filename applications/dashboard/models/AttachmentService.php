@@ -89,19 +89,27 @@ class AttachmentService
     {
         $catalog = [];
         foreach ($this->getAllProviders() as $provider) {
-            if ($provider->hasReadPermissions()) {
+            if ($provider->hasReadPermissions() || $provider->hasWritePermissions()) {
                 $catalogEntry = [];
 
                 $catalogEntry = array_merge($catalogEntry, [
-                    "writeableContentScope" => $provider->getWriteableContentScope(),
                     "attachmentType" => $provider->getTypeName(),
                     "title" => $provider->getTitleLabelCode(),
                     "externalIDLabel" => $provider->getExternalIDLabelCode(),
                     "logoIcon" => $provider->getLogoIconName(),
-                    "name" => $provider->getProviderName(),
-                    "label" => $provider->getCreateLabelCode(),
-                    "submitButton" => $provider->getSubmitLabelCode(),
-                    "recordTypes" => $provider->getRecordTypes(),
+                ]);
+
+                if ($provider->hasWritePermissions()) {
+                    $catalogEntry = array_merge($catalogEntry, [
+                        "name" => $provider->getProviderName(),
+                        "label" => $provider->getCreateLabelCode(),
+                        "submitButton" => $provider->getSubmitLabelCode(),
+                        "recordTypes" => $provider->getRecordTypes(),
+                    ]);
+                }
+
+                $catalogEntry = array_merge($catalogEntry, [
+                    "canEscalateOwnContent" => $provider->canEscalateOwnContent(),
                     "escalationDelayUnit" => $provider->getEscalationDelayUnit(),
                     "escalationDelayLength" => $provider->getEscalationDelayLength(),
                 ]);

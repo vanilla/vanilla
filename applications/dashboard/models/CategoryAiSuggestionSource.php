@@ -15,6 +15,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use UserMetaModel;
 use Vanilla\Controllers\Api\SearchApiController;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormChoicesInterface;
 use Vanilla\OpenAI\OpenAIClient;
@@ -153,18 +154,15 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
         $searchResult = $this->searchApiController->index($params);
         $results = $searchResult->getData()->getResultItems();
 
-        $persona = $this->userMetaModel->getUserMeta($config["userID"], "aiAssistant.%", prefix: "aiAssistant.");
-        $persona = $persona + ["toneOfVoice" => "friendly", "levelOfTech" => "layman", "useBrEnglish" => false];
+        $toneOfVoice = $this->userMetaModel->getUserMeta($config["userID"], "toneOfVoice", "Friendly");
+        $levelOfTech = $this->userMetaModel->getUserMeta($config["userID"], "levelOfTech", "Layman's Terms");
 
         $formattedResult = [];
         $summarySchema = Schema::parse(["properties:o" => Schema::parse(["summary:s"])]);
         foreach ($results as $result) {
             $prompt = OpenAIPrompt::create()->instruct(
-                "You are an answer bot, giving an answer to the following question: $question.  With the question as the \"title\", answer the question using the text provided in a {$persona["toneOfVoice"]} tone of voice for an audience that can understand the material with a {$persona["levelOfTech"]} level of technical knowledge."
+                "You are an answer bot, giving an answer to the following question: $question.  With the question as the \"title\", answer the question using the text provided in $toneOfVoice tone of voice for an audience that can understand the material in $levelOfTech."
             );
-            if ($persona["useBrEnglish"]) {
-                $prompt->instruct("Respond in British English");
-            }
             $prompt->addUserMessage($result->getBody());
             $summary = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT4, $prompt, $summarySchema)["properties"];
             if ($result["recordID"] != $discussion["DiscussionID"]) {

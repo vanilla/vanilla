@@ -1,13 +1,13 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
 import { render, act, fireEvent, waitFor, screen, getByRole } from "@testing-library/react";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import DefaultCategoriesModal, {
+    CONFIG_KEY,
     ILegacyCategoryPreferences,
     ISavedDefaultCategory,
 } from "@dashboard/userPreferences/DefaultCategoriesModal";
@@ -19,35 +19,28 @@ import { mockAPI } from "@library/__tests__/utility";
 import { DEFAULT_NOTIFICATION_PREFERENCES } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import MockAdapter from "axios-mock-adapter/types";
 
+let mockAdapter: MockAdapter;
 const queryClient = new QueryClient();
 
+beforeEach(() => {
+    queryClient.clear();
+    mockAdapter = mockAPI();
+});
+
 const renderInProvider = (preferences: ILegacyCategoryPreferences[] | ISavedDefaultCategory[]) => {
+    mockAdapter.onGet(/config/).reply(200, {
+        [CONFIG_KEY]: JSON.stringify(preferences),
+    });
+
     return render(
         <QueryClientProvider client={queryClient}>
-            <TestReduxProvider
-                state={{
-                    config: {
-                        configsByLookupKey: {
-                            [stableObjectHash(["preferences.categoryFollowed.defaults"])]: {
-                                status: LoadStatus.SUCCESS,
-                                data: {
-                                    "preferences.categoryFollowed.defaults": JSON.stringify(preferences),
-                                },
-                            },
-                        },
-                    },
-                }}
-            >
-                <DefaultCategoriesModal isVisible={true} onCancel={() => null} />
-            </TestReduxProvider>
+            <DefaultCategoriesModal isVisible={true} onCancel={() => null} />
         </QueryClientProvider>,
     );
 };
 
 describe("DefaultCategoriesModal", () => {
-    let mockAdapter: MockAdapter;
     beforeEach(() => {
-        mockAdapter = mockAPI();
         mockAdapter.onGet(/categories/).reply(200, CategoryPreferencesFixture.getMockCategoryResponse());
     });
     it("renders empty table state", async () => {
@@ -84,21 +77,27 @@ describe("DefaultCategoriesModal", () => {
         renderInProvider([config]);
         // Ensure everything is loaded
         await waitFor(() => expect(screen.getByText("Mock Category 2")).toBeInTheDocument());
+
         // Find the posts popup checkbox
         const checkbox = screen.getByRole("checkbox", {
             name: "Notification popup",
             description: "Notify of new posts",
         });
+
         // Click it, will mutate state
         await act(async () => {
             fireEvent.click(checkbox);
         });
+
         // Save the changed configuration
-        fireEvent.click(screen.getByText("Save"));
+        await act(async () => {
+            fireEvent.click(screen.getByText("Save"));
+        });
+
         // Expect the config endpoint to be patched
         expect(mockAdapter.history.patch.length).toBe(1);
         // Ensure the request body has the updated preferences
-        const requestBody = JSON.parse(mockAdapter.history.patch[0].data)["preferences.categoryFollowed.defaults"];
+        const requestBody = JSON.parse(mockAdapter.history.patch[0].data)[CONFIG_KEY];
         const expected = [
             {
                 ...config,
@@ -132,11 +131,13 @@ describe("DefaultCategoriesModal", () => {
             fireEvent.click(removeButton);
         });
         // Save the changed configuration
-        fireEvent.click(screen.getByText("Save"));
+        await act(async () => {
+            fireEvent.click(screen.getByText("Save"));
+        });
         // Expect the config endpoint to be patched
         expect(mockAdapter.history.patch.length).toBe(1);
         // Ensure the request body has the updated preferences
-        const requestBody = JSON.parse(mockAdapter.history.patch[0].data)["preferences.categoryFollowed.defaults"];
+        const requestBody = JSON.parse(mockAdapter.history.patch[0].data)[CONFIG_KEY];
         expect(JSON.parse(requestBody)).toHaveLength(0);
     });
     it("confirmation modal is displayed if changes are made", async () => {

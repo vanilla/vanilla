@@ -32,7 +32,6 @@ use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Database\SetLiterals\RawExpression;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\PermissionException;
-use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
@@ -53,6 +52,7 @@ use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Scheduler\LongRunnerQuantityTotal;
 use Vanilla\Scheduler\LongRunnerSuccessID;
 use Vanilla\Scheduler\LongRunnerTimeoutException;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\SchemaFactory;
 use Vanilla\Search\SearchService;
@@ -4221,14 +4221,7 @@ SQL;
 
         // Get the discussion's parsed body's first image & get the srcset for it.
         $result["image"] = $this->formatterService->parseMainImage($bodyParsed, $format);
-        if (FeatureFlagHelper::featureEnabled("AISuggestions") && isset($result["attributes"]["suggestions"])) {
-            $result["suggestions"] = $result["attributes"]["suggestions"] ?? [];
-            $result["visibleSuggestions"] = $result["attributes"]["visibleSuggestions"] ?? [];
-            unset($result["attributes"]["suggestions"]);
-            if (isset($result["attributes"]["suggestions"])) {
-                unset($result["attributes"]["visibleSuggestions"]);
-            }
-        }
+
         return $result;
     }
 

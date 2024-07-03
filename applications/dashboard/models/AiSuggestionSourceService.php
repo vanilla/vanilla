@@ -19,7 +19,6 @@ use Psr\Log\LoggerAwareTrait;
 use UserMetaModel;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\FeatureFlagHelper;
-use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
@@ -206,7 +205,6 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         if (!isset($discussion["Attributes"]["suggestions"])) {
             $discussion["Attributes"]["suggestions"] = [];
         }
-        $discussion["Attributes"]["visibleSuggestions"] = true;
         $discussion["Attributes"]["suggestions"] = array_merge(
             $discussion["Attributes"]["suggestions"],
             $suggestionsMerged
@@ -235,16 +233,16 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         $attributes = $discussion["Attributes"] ?? [];
         $suggestions = $attributes["suggestions"] ?? [];
         $comments = [];
-
         foreach ($suggestionIndex as $index) {
-            if (($suggestions[$index] ?? false) && ($suggestions[$index]["commentID"] ?? null) === null) {
-                $comment = $this->createComment($suggestions[$index]["summary"], $discussion, $suggestionUserID);
-                $suggestions[$index]["commentID"] = $comment["commentID"];
-                $comments[] = $comment;
+            if ($suggestions[$index] ?? false) {
+                $comments[] = $this->createComment(
+                    json_encode($suggestions[$index]["summary"]),
+                    $discussion,
+                    $suggestionUserID
+                );
             }
         }
-        $attributes["suggestions"] = $suggestions;
-        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($attributes));
+
         return $comments;
     }
 
@@ -263,8 +261,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
     {
         $newComment = [
             "DiscussionID" => $discussion["DiscussionID"],
-            "Body" => Gdn::formatService()->renderHtml($body, "text"),
-            "Format" => HtmlFormat::FORMAT_KEY,
+            "Body" => $body,
+            "Format" => $discussion["Format"],
             "InsertUserID" => $suggestionUserID,
         ];
 
@@ -276,36 +274,6 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         $comment = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
 
         return $this->commentModel->normalizeRow($comment);
-    }
-
-    /**
-     * Delete comments based on accepted suggestions.
-     *
-     * @param int $discussionID
-     * @param array $suggestionIndex
-     *
-     * @return bool
-     */
-
-    public function deleteComments(int $discussionID, array $suggestionIndex): bool
-    {
-        $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
-        if (!$this->suggestionEnabled() && "question" !== strtolower($discussion["Type"])) {
-            return false;
-        }
-        $attributes = $discussion["Attributes"] ?? [];
-        $suggestions = $attributes["suggestions"] ?? [];
-        foreach ($suggestionIndex as $index) {
-            if ($suggestions[$index] ?? false) {
-                $commentID = $suggestions[$index]["commentID"];
-                $this->commentModel->deleteID($commentID);
-                $suggestions[$index]["commentID"] = null;
-            }
-        }
-        $attributes["suggestions"] = $suggestions;
-        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($attributes));
-
-        return true;
     }
 
     /**
@@ -395,43 +363,5 @@ PROMPT
             ]);
         }
         return Schema::parse($schemaArray);
-    }
-
-    /**
-     * Toggle display state of suggestions for a discussion.
-     *
-     * @param array $discussion The discussion record.
-     * @param array|null $suggestionIDs Array of suggestion IDs or null to toggle all suggestions.
-     * @param bool $hide Whether to hide or show the suggestions.
-     * @return void
-     */
-    public function toggleSuggestions(array $discussion, ?array $suggestionIDs = null, bool $hide = true): void
-    {
-        $suggestions = $discussion["Attributes"]["suggestions"] ?? [];
-
-        foreach ($suggestions as $index => &$suggestion) {
-            if (is_null($suggestionIDs) || in_array($index, $suggestionIDs)) {
-                $suggestion["hidden"] = $hide;
-            }
-        }
-
-        $discussion["Attributes"]["suggestions"] = $suggestions;
-        $discussionID = $discussion["DiscussionID"];
-        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($discussion["Attributes"]));
-    }
-
-    /**
-     * Update visible suggestions segment for the discussion.
-     *
-     * @param array $discussion
-     * @param bool $visible
-     *
-     * @return void
-     */
-    public function updateVisibleSuggestions(array $discussion, bool $visible = true): void
-    {
-        $discussion["Attributes"]["visibleSuggestions"] = $visible;
-        $discussionID = $discussion["DiscussionID"];
-        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($discussion["Attributes"]));
     }
 }

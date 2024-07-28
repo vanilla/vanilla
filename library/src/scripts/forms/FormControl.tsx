@@ -151,6 +151,7 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                     onBlur={onBlur}
                     disabled={disabled}
                     checked={value}
+                    labelBold={control.labelBold}
                 />
             );
         }
@@ -168,6 +169,11 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                                 tooltip={
                                     control.tooltipsPerOption && control.tooltipsPerOption[optionValue]
                                         ? control.tooltipsPerOption[optionValue]
+                                        : undefined
+                                }
+                                note={
+                                    control.notesPerOption && control.notesPerOption[optionValue]
+                                        ? control.notesPerOption[optionValue]
                                         : undefined
                                 }
                             />
@@ -320,7 +326,7 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
 export function FormControlGroup(props: React.PropsWithChildren<IControlGroupProps>) {
     const { children, controls, validation, required } = props;
 
-    const { inputType, label, legend, description, tooltip, tooltipIcon } = controls[0];
+    const { inputType, label, legend, description, tooltip, tooltipIcon, fullSize } = controls[0];
 
     const errors =
         validation?.errors
@@ -334,6 +340,7 @@ export function FormControlGroup(props: React.PropsWithChildren<IControlGroupPro
 
     return (
         <InputBlock
+            tight={fullSize}
             required={required}
             label={!["checkBox", "richeditor"].includes(inputType) ? label : undefined}
             labelNote={!["checkBox", "richeditor"].includes(inputType) ? description : undefined}

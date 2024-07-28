@@ -14,37 +14,43 @@ use Garden\Utils\ContextException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Community\Events\EscalationEvent;
-use Vanilla\Community\Events\TicketEscalationEvent;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
+use Vanilla\Forum\Models\CommunityManagement\EscalationStatusProviderInterface;
 use Vanilla\Logging\ErrorLogger;
+use Vanilla\Models\Model;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\DebugUtils;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Class AttachmentService
  */
 class AttachmentService
 {
-    private $providers = [];
+    use TwigRenderTrait;
 
-    private AttachmentModel $attachmentModel;
-    private \CommentModel $commentModel;
-    private \DiscussionModel $discussionModel;
-    private EventManager $eventManager;
+    private array $providers = [];
 
     /**
      * DI.
      */
     public function __construct(
-        AttachmentModel $attachmentModel,
-        \CommentModel $commentModel,
-        \DiscussionModel $discussionModel,
-        EventManager $eventManager
+        private AttachmentModel $attachmentModel,
+        private \CommentModel $commentModel,
+        private \DiscussionModel $discussionModel,
+        private EventManager $eventManager
     ) {
-        $this->attachmentModel = $attachmentModel;
-        $this->commentModel = $commentModel;
-        $this->discussionModel = $discussionModel;
-        $this->eventManager = $eventManager;
+    }
+
+    /**
+     * Not DIed to prevent infinite loops.
+     *
+     * @return EscalationModel
+     */
+    private function escalationModel(): EscalationModel
+    {
+        return \Gdn::getContainer()->get(EscalationModel::class);
     }
 
     /**
@@ -53,7 +59,7 @@ class AttachmentService
      * @param AttachmentProviderInterface $provider
      * @return void
      */
-    public function addProvider(AttachmentProviderInterface $provider)
+    public function addProvider(AttachmentProviderInterface $provider): void
     {
         $this->providers[$provider->getTypeName()] = $provider;
     }
@@ -105,6 +111,9 @@ class AttachmentService
                     "escalationDelayUnit" => $provider->getEscalationDelayUnit(),
                     "escalationDelayLength" => $provider->getEscalationDelayLength(),
                 ]);
+
+                //Get if there is any additional info to be displayed in the catalog
+                $catalogEntry = array_merge($catalogEntry, $provider->getAdditionalCatalogInfo());
 
                 $catalog[$provider->getTypeName()] = $catalogEntry;
             }
@@ -262,6 +271,40 @@ class AttachmentService
 
                 $record = $this->commentModel->normalizeRow($record);
                 break;
+            case "escalation":
+                $escalation =
+                    $this->escalationModel()->queryEscalations(
+                        ["escalationID" => $recordID],
+                        options: [
+                            Model::OPT_LIMIT => 1,
+                        ]
+                    )[0] ?? null;
+                if ($escalation === null) {
+                    throw new NotFoundException("Escalation", [
+                        "escalationID" => $escalation,
+                    ]);
+                }
+
+                $record = $escalation;
+
+                // Construct a nice body from the escalation.
+                $twig = <<<TWIG
+<p><a href="{{ escalation.url }}">{{escalation.name}}</a> was escalated from a post in the <a href="{{ escalation.placeRecordUrl }}">{{escalation.placeRecordName}}</a> category.</p>
+<p>It was reported {{escalation.countReports}} times for the following reasons:</p>
+<ul>
+{% for reason in escalation.reportReasons %}
+<li><strong>{{ reason.name }}</strong> - {{ reason.description }}</li>
+{% endfor %}
+</ul>
+<p>See <a href="{{ escalation.url }}">the escalation details</a> in Vanilla.</p>
+TWIG;
+                $html = $this->renderTwigFromString($twig, [
+                    "escalation" => $escalation,
+                ]);
+                // Make sure we don't have extra newlines screwing up rich formatting.
+                $html = str_replace("\n", "", $html);
+                $record["body"] = $html;
+                break;
             default:
                 throw new ContextException("Invalid record type.", 400, [
                     "recordType" => $recordType,
@@ -326,8 +369,24 @@ class AttachmentService
                 ],
                 $comment
             );
+        } else {
+            $trackingEventInterface = null;
         }
-        $this->eventManager->dispatch($trackingEventInterface);
+        if ($trackingEventInterface) {
+            $this->eventManager->dispatch($trackingEventInterface);
+        }
+
+        if ($provider instanceof EscalationStatusProviderInterface && $recordType === "escalation") {
+            $this->escalationModel()->update(
+                set: [
+                    "status" => $provider->getStatusID(),
+                ],
+                where: [
+                    "escalationID" => $recordID,
+                ]
+            );
+        }
+
         return $attachment;
     }
 }

@@ -8,17 +8,12 @@
 namespace Vanilla\Dashboard\Models;
 
 use CategoryModel;
-use DiscussionModel;
-use Garden\Schema\Schema;
 use Gdn;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use UserMetaModel;
 use Vanilla\Controllers\Api\SearchApiController;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormChoicesInterface;
-use Vanilla\OpenAI\OpenAIClient;
-use Vanilla\OpenAI\OpenAIPrompt;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Site\SiteSectionModel;
 
@@ -26,40 +21,17 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
 {
     use LoggerAwareTrait;
 
-    /** @var OpenAIClient */
-    private OpenAIClient $openAIClient;
-
-    /** @var DiscussionModel  */
-    private DiscussionModel $discussionModel;
-
-    /** @var UserMetaModel  */
-    private UserMetaModel $userMetaModel;
-
-    /** @var SearchApiController */
-    protected SearchApiController $searchApiController;
-
     /** @var LongRunner */
     private LongRunner $longRunner;
 
     /**
      * Constructor
      *
-     * @param OpenAIClient $openAIClient
      * @param SearchApiController $searchApiController
-     * @param DiscussionModel $discussionModel
-     * @param UserMetaModel $userMetaModel
      */
-    public function __construct(
-        OpenAIClient $openAIClient,
-        SearchApiController $searchApiController,
-        DiscussionModel $discussionModel,
-        UserMetaModel $userMetaModel
-    ) {
-        $this->openAIClient = $openAIClient;
-        $this->searchApiController = $searchApiController;
+    public function __construct(private SearchApiController $searchApiController)
+    {
         $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
-        $this->discussionModel = $discussionModel;
-        $this->userMetaModel = $userMetaModel;
     }
 
     /**
@@ -73,7 +45,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
     /**
      * @inheritDoc
      */
-    public function getExclusionDropdownChoices(): FormChoicesInterface
+    public function getExclusionDropdownChoices(): ?FormChoicesInterface
     {
         return new ApiFormChoices(
             "/api/v2/categories/search?query=%s&limit=30",
@@ -94,7 +66,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
     /**
      * @inheritDoc
      */
-    public function getExclusionLabel(): string
+    public function getExclusionLabel(): ?string
     {
         return t("Categories to Exclude from AI Answers");
     }
@@ -102,26 +74,8 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
     /**
      * @inheritdoc
      */
-    public function generateSuggestions(array $discussion): array
+    public function generateSuggestions(array $discussion, string $keywords): array
     {
-        $this->discussionModel->formatField($discussion, "Body", $discussion["Format"]);
-
-        $discussionBody = $discussion["Name"] . $discussion["Body"];
-        $question = $discussion["Body"];
-        try {
-            $prompt = OpenAIPrompt::create()->instruct(
-                "You are a recommendation bot, giving comma separated list of 5 'keywords' related to a list of documents provided."
-            );
-            $schema = Schema::parse(["properties:o" => Schema::parse(["keywords:s"])]);
-            $prompt->addUserMessage("Recommend based on '$discussionBody'");
-            $result = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT4, $prompt, $schema)["properties"];
-            $keywords = $result["keywords"];
-        } catch (\Exception $e) {
-            $this->logger->warning(
-                "Error generating Vanilla category suggestions for discussion {$discussion["DiscussionID"]}: {$e->getMessage()}"
-            );
-            $keywords = $question;
-        }
         $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
         $siteSection = $siteSectionModel->getCurrentSiteSection();
         $currentLocale = $siteSection->getContentLocale();
@@ -136,7 +90,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
         ];
         $config = AiSuggestionSourceService::aiSuggestionConfigs();
         $providerConfig = $config["sources"][$this->getName()];
-        if (count($providerConfig["exclusionIDs"]) > 0) {
+        if (count($providerConfig["exclusionIDs"] ?? []) > 0) {
             $categoryModel = GDN::getContainer()->get(CategoryModel::class);
             $categoryIDs = [];
             foreach ($categoryModel->getSearchCategoryIDs() as $categoryID) {
@@ -153,28 +107,17 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
         $searchResult = $this->searchApiController->index($params);
         $results = $searchResult->getData()->getResultItems();
 
-        $persona = $this->userMetaModel->getUserMeta($config["userID"], "aiAssistant.%", prefix: "aiAssistant.");
-        $persona = $persona + ["toneOfVoice" => "friendly", "levelOfTech" => "layman", "useBrEnglish" => false];
-
         $formattedResult = [];
-        $summarySchema = Schema::parse(["properties:o" => Schema::parse(["summary:s"])]);
         foreach ($results as $result) {
-            $prompt = OpenAIPrompt::create()->instruct(
-                "You are an answer bot, giving an answer to the following question: $question.  With the question as the \"title\", answer the question using the text provided in a {$persona["toneOfVoice"]} tone of voice for an audience that can understand the material with a {$persona["levelOfTech"]} level of technical knowledge."
-            );
-            if ($persona["useBrEnglish"]) {
-                $prompt->instruct("Respond in British English");
-            }
-            $prompt->addUserMessage($result->getBody());
-            $summary = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT4, $prompt, $summarySchema)["properties"];
             if ($result["recordID"] != $discussion["DiscussionID"]) {
                 $formattedResult[] = [
                     "format" => "Vanilla",
+                    "sourceIcon" => "search-discussion",
                     "type" => $result["type"],
                     "id" => $result["recordID"],
                     "url" => $result["url"],
                     "title" => $result["name"],
-                    "summary" => $summary["summary"],
+                    "summary" => $result->getBody(), //$answer["answer"],
                     "hidden" => false,
                 ];
             }

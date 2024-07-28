@@ -13,11 +13,23 @@ export const communityManagementPageClasses = () => {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: "6px 28px",
+        padding: "6px 18px",
+        minHeight: 45,
         backgroundColor: "white",
         position: "sticky",
         top: 98, // 🪄 number
         zIndex: 1050,
+    });
+
+    const secondaryTitleBarStart = css({
+        display: "flex",
+        alignItems: "center",
+        gap: 32,
+    });
+
+    const secondaryTitleBarButtons = css({
+        display: "flex",
+        gap: 16,
     });
 
     const pager = css({
@@ -26,7 +38,7 @@ export const communityManagementPageClasses = () => {
 
     const content = css({
         margin: "16px 0",
-        padding: "0 28px",
+        padding: "0 18px",
     });
 
     const list = css({
@@ -35,10 +47,17 @@ export const communityManagementPageClasses = () => {
         gap: 16,
     });
 
+    const listItemLink = css({
+        display: "inline-flex",
+    });
+
     return {
         secondaryTitleBar,
+        secondaryTitleBarStart,
+        secondaryTitleBarButtons,
         pager,
         content,
         list,
+        listItemLink,
     };
 };

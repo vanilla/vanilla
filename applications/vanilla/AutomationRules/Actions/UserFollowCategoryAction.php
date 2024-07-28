@@ -15,8 +15,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Dashboard\AutomationRules\Models\UserInterface;
-use Vanilla\Dashboard\AutomationRules\Triggers\ProfileFieldSelectionTrigger;
-use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
+use Vanilla\Dashboard\AutomationRules\Models\UserRuleDataType;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Forms\ApiFormChoices;
@@ -27,10 +26,7 @@ use Vanilla\Logger;
 /**
  * Action class for following a specific category
  */
-class UserFollowCategoryAction extends AutomationAction implements
-    AutomationActionInterface,
-    UserInterface,
-    EventActionInterface
+class UserFollowCategoryAction extends AutomationAction implements UserInterface, EventActionInterface
 {
     private int $userID;
 
@@ -68,7 +64,15 @@ class UserFollowCategoryAction extends AutomationAction implements
      */
     public static function getName(): string
     {
-        return "Follow a specific category";
+        return "Follow category";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "users";
     }
 
     /**
@@ -82,6 +86,7 @@ class UserFollowCategoryAction extends AutomationAction implements
                 "items" => [
                     "type" => "integer",
                 ],
+                "required" => true,
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Category to Follow", "Select one or more categories to follow"),
                     new ApiFormChoices(
@@ -104,7 +109,7 @@ class UserFollowCategoryAction extends AutomationAction implements
      */
     public static function getTriggers(): array
     {
-        return [UserEmailDomainTrigger::getType(), ProfileFieldSelectionTrigger::getType()];
+        return UserRuleDataType::getTriggers();
     }
 
     /**
@@ -192,12 +197,14 @@ class UserFollowCategoryAction extends AutomationAction implements
             foreach ($followCategoryIDs as $categoryID) {
                 try {
                     // This can rarely result in an error if the category is deleted or any permissions on the category is changed.
-                    if ($this->categoryModel->follow($userId, $categoryID, true)) {
-                        $followedCategories[] = $categoryID;
-                    }
-                } catch (Exception $e) {
+                    $this->categoryModel->setPreferences($userId, $categoryID, ["Preferences.Follow" => true]);
+                    $followedCategories[] = $categoryID;
+                } catch (\Throwable $e) {
                     // Don't throw the exception, just log it
                     $errorMessage[$categoryID] = $e->getMessage();
+                    if ($e->getPrevious()) {
+                        $errorMessage[$categoryID] .= ", " . $e->getPrevious()->getMessage();
+                    }
                     continue;
                 }
             }
@@ -266,7 +273,7 @@ class UserFollowCategoryAction extends AutomationAction implements
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
-        $userID = $object["recordID"] ?? $object["userID"];
+        $userID = $object["recordID"] ?? ($object["userID"] ?? $object["UserID"]);
         $this->setUserID($userID);
         return $this->execute();
     }

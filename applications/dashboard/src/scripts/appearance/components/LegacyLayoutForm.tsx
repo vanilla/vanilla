@@ -203,6 +203,7 @@ export function LegacyLayoutFormPage(props: IProps) {
             activeSectionID={"appearance"}
             customTitleBar={
                 <AdminTitleBar
+                    useTwoColumnContainer
                     title={props.title}
                     description={
                         <>

@@ -17,7 +17,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Tests for /api/v2/escalations
  */
-class EscalationsTest extends SiteTestCase
+class EscalationsTest extends AbstractAPIv2Test
 {
     use CommunityApiTestTrait;
     use ExpectExceptionTrait;
@@ -156,9 +156,7 @@ class EscalationsTest extends SiteTestCase
 
         // now restore it
         $patched = $this->api()
-            ->patch("/escalations/{$escalation["escalationID"]}", [
-                "recordIsLive" => true,
-            ])
+            ->patch("/escalations/{$escalation["escalationID"]}", ["recordIsLive" => true])
             ->getBody();
 
         $this->assertDataLike(
@@ -346,12 +344,12 @@ class EscalationsTest extends SiteTestCase
         $esc1 = $this->createEscalation($disc1, ["reportID" => $report1["reportID"]]);
 
         $disc2 = $this->createDiscussion();
-        $esc2 = $this->createEscalation($disc2, ["reportReasonIDs" => ["abuse", "sexual-content"]]);
+        $esc2 = $this->createEscalation($disc2, ["reportReasonIDs" => ["abuse", "inappropriate"]]);
 
         $this->assertEscalations(["reportReasonID" => ["spam"]], [$esc1]);
         $this->assertEscalations(["reportReasonID" => ["abuse"]], [$esc1, $esc2]);
-        $this->assertEscalations(["reportReasonID" => ["abuse", "sexual-content"]], [$esc1, $esc2]);
-        $this->assertEscalations(["reportReasonID" => ["sexual-content"]], [$esc2]);
+        $this->assertEscalations(["reportReasonID" => ["abuse", "inappropriate"]], [$esc1, $esc2]);
+        $this->assertEscalations(["reportReasonID" => ["inappropriate"]], [$esc2]);
     }
 
     /**
@@ -400,5 +398,186 @@ class EscalationsTest extends SiteTestCase
         $expectedEscalationIDs = array_column($expectedEscalations, "escalationID");
         $actualEscalationIDs = array_column($escalations, "escalationID");
         $this->assertEquals($expectedEscalationIDs, $actualEscalationIDs, "Did not find expected escalations.");
+    }
+
+    /**
+     * Test creation and refeshing of attachments.
+     *
+     * @return void
+     */
+    public function testEscalationAttachment(): void
+    {
+        $date = CurrentTimeStamp::mockTime("2024-01-01");
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createReport($discussion, ["reportReasonIDs" => ["spam"]]);
+        $escalation = $this->createEscalation($discussion, [
+            "reportReasonIDs" => ["spam", "abuse"],
+        ]);
+
+        $discussion = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}", [
+                "expand" => "attachments",
+            ])
+            ->getBody();
+
+        $this->assertCount(1, $discussion["attachments"]);
+
+        $attachment = $discussion["attachments"][0];
+        $expectedMeta = [
+            [
+                "labelCode" => "Name",
+                "value" => "This is an escalation",
+            ],
+            [
+                "labelCode" => "# Reports",
+                "value" => 2,
+            ],
+            [
+                "labelCode" => "Last Reported",
+                "value" => $date->format(\DateTime::RFC3339_EXTENDED),
+                "format" => "date-time",
+            ],
+            [
+                "labelCode" => "Report Reasons",
+                "value" => ["Spam / Solicitation", "Abuse"],
+            ],
+            [
+                "labelCode" => "Last Modified",
+                "value" => $date->format(\DateTime::RFC3339_EXTENDED),
+                "format" => "date-time",
+            ],
+        ];
+        $this->assertSame($expectedMeta, $attachment["metadata"]);
+        $this->assertEquals("open", $attachment["status"]);
+        $this->api()->patch("/escalations/{$escalation["escalationID"]}", [
+            "status" => "in-progress",
+        ]);
+
+        // We can refresh attachments too.
+        $this->api()->post("/attachments/refresh", [
+            "attachmentIDs" => [$attachment["attachmentID"]],
+        ]);
+
+        $discussion = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}", [
+                "expand" => "attachments",
+            ])
+            ->getBody();
+
+        $attachment = $discussion["attachments"][0];
+        $this->assertEquals("in-progress", $attachment["status"]);
+    }
+
+    /**
+     * Test CRUD from comments on escalations.
+     *
+     * @return void
+     */
+    public function testCommentsCrud()
+    {
+        $this->resetTable("Comment");
+        $category = $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createComment();
+        $escalation = $this->createEscalation($discussion, [
+            "name" => "My Escalation",
+        ]);
+
+        // Now I can comment on the escalation.
+        $comment = $this->createEscalationComment();
+        $expectedComment = [
+            "parentRecordID" => $escalation["escalationID"],
+            "parentRecordType" => "escalation",
+            "name" => "Re: My Escalation",
+            "url" => url(
+                "/dashboard/content/escalations/{$escalation["escalationID"]}?commentID={$comment["commentID"]}",
+                true
+            ),
+            "body" => "Hello Comment",
+            "discussionID" => null,
+            "categoryID" => $category["categoryID"],
+        ];
+        $this->assertDataLike($expectedComment, $comment);
+
+        $this->runWithExpectedExceptionMessage("cannot be reported", function () use ($comment) {
+            $this->createReport($comment);
+        });
+
+        // We can patch the comment
+        $this->api()->patch("/comments/{$comment["commentID"]}", [
+            "body" => "This is a new body",
+        ]);
+        $expectedComment["body"] = "This is a new body";
+
+        // We can fetch the comment
+        $comment = $this->api()
+            ->get("/comments/{$comment["commentID"]}")
+            ->getBody();
+        $this->assertDataLike($expectedComment, $comment);
+
+        // We can fetch the comment from the index by ID.
+        $comment = $this->api()
+            ->get("/comments", ["commentID" => $comment["commentID"]])
+            ->getBody()[0];
+        $this->assertDataLike($expectedComment, $comment);
+
+        // We can fetch the comment from the index by parentRecordID.
+        $comments = $this->api()
+            ->get("/comments", ["parentRecordType" => "escalation", "parentRecordID" => $escalation["escalationID"]])
+            ->getBody();
+        $this->assertCount(1, $comments);
+
+        $this->assertDataLike($expectedComment, $comments[0]);
+
+        // Our escalation comment count should have been incremented.
+        $escalation = $this->api()
+            ->get("/escalations/{$escalation["escalationID"]}")
+            ->getBody();
+        $this->assertEquals(1, $escalation["countComments"]);
+
+        // And finally we can delete the comment
+        $this->api()->delete("/comments/{$comment["commentID"]}");
+        $this->runWithExpectedExceptionCode(404, function () use ($comment) {
+            $this->api()->get("/comments/{$comment["commentID"]}");
+        });
+
+        // Our escalation comment count should have been decremented.
+        $escalation = $this->api()
+            ->get("/escalations/{$escalation["escalationID"]}")
+            ->getBody();
+        $this->assertEquals(0, $escalation["countComments"]);
+    }
+
+    /**
+     * Test that we can create an initial comment when making an escalation.
+     *
+     * @return void
+     */
+    public function testCreateEscalationWithInitialComment(): void
+    {
+        $cat = $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $escalation = $this->createEscalation($discussion, [
+            "initialCommentBody" => "This is an initial comment",
+            "initialCommentFormat" => "text",
+        ]);
+        $this->assertEquals(1, $escalation["countComments"]);
+
+        $comments = $this->api()
+            ->get("/comments", ["parentRecordType" => "escalation", "parentRecordID" => $escalation["escalationID"]])
+            ->getBody();
+        $this->assertCount(1, $comments);
+        $comment = $comments[0];
+
+        $this->assertDataLike(
+            [
+                "parentRecordID" => $escalation["escalationID"],
+                "parentRecordType" => "escalation",
+                "body" => "This is an initial comment",
+                "categoryID" => $cat["categoryID"],
+            ],
+            $comment
+        );
     }
 }

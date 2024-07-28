@@ -10,12 +10,15 @@ namespace Vanilla\Forum\Controllers\Pages;
 use Garden\Web\Data;
 use Vanilla\Web\PageDispatchController;
 
+/**
+ * Handle /dashboard/content requests.
+ */
 class AdminContentPageController extends PageDispatchController
 {
     public function index(string $path): Data
     {
         $data = $this->usePage(\DashboardPage::class)
-            ->permission(["site.manage", "community.moderate"])
+            ->permission(["site.manage", "community.moderate", "staff.allow"])
             ->setSeoTitle(t("Moderation Content"))
             ->setSeoRequired(false)
             ->blockRobots()

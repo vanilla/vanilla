@@ -43,6 +43,7 @@ import ToggleInputInLegacyForm from "@library/forms/ToggleInputInLegacyForm";
 import { ExternalSearchSettingsPage } from "@dashboard/pages/ExternalSearchSettingsPage";
 import { MemoryRouter } from "react-router";
 import { RouterRegistry } from "@library/Router.registry";
+import { AISuggestions } from "@dashboard/aiSuggestions/AISuggestions";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -134,3 +135,5 @@ addComponent("ExternalSearchSettingsPage", ExternalSearchSettingsPage);
 addComponent("automationRules", () => {
     return <Router sectionRoots={["/settings/automation-rules"]} />;
 });
+
+addComponent("aiSuggestions", AISuggestions);

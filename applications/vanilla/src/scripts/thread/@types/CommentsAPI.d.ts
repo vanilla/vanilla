@@ -6,7 +6,9 @@
 
 declare namespace CommentsApi {
     export interface IndexParams {
-        discussionID: string | number;
+        parentRecordType?: "discussion" | "escalation";
+        parentRecordID?: string | number;
+        discussionID?: string | number;
         limit: number;
         page: number;
         expand?: string[];

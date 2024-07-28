@@ -21,6 +21,19 @@ paths:
                   name: discussionID
                   schema:
                       type: integer
+                - name: parentRecordType
+                  in: query
+                  description: The type of the parent record. Must be used with parentRecordID.
+                  schema:
+                      type: string
+                      enum:
+                          - discussion
+                          - escalation
+                - name: parentRecordID
+                  in: query
+                  description: The ID of the parent record. Must be used with parentRecordType.
+                  schema:
+                      type: integer
                 - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
@@ -58,6 +71,8 @@ paths:
                               - insertUser
                               - all
                               - reactions
+                              - attachments
+                              - reportMeta
                           type: string
                       type: array
                   style: form
@@ -590,6 +605,15 @@ components:
                 discussionID:
                     description: The ID of the discussion.
                     type: integer
+                parentRecordType:
+                    description: The type of the parent record.
+                    type: string
+                    enum:
+                        - discussion
+                        - escalation
+                parentRecordID:
+                    description: The ID of the parent record.
+                    type: integer
                 insertUser:
                     $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
                 insertUserID:
@@ -627,12 +651,42 @@ components:
                 url:
                     description: The full URL to the comment.
                     type: string
+                reportMeta:
+                    $ref: "../../vanilla/openapi/reports.yml#/components/schemas/ReportMeta"
+                countReports:
+                    type: integer
+                    default: 0
+                    description: The number of reports on the discussion.
+                    x-feature: "Feature.CommunityManagement.Enabled"
+                suggestion:
+                    type: object
+                    properties:
+                        format:
+                            type: string
+                            description: Source of the suggestion
+                        sourceIcon:
+                            type: string
+                            description: Icon of the suggestion source
+                        type:
+                            type: string
+                            description: Type of suggestion discussion/comment
+                        id:
+                            type: integer
+                            description: Index of the suggestion
+                        url:
+                            type: string
+                            description: URL of the suggestion
+                        title:
+                            type: string
+                            description: Title of the suggestion
+                    x-feature: "Feature.AISuggestions.Enabled"
             required:
                 - commentID
-                - discussionID
                 - categoryID
                 - name
                 - body
+                - parentRecordID
+                - parentRecordType
                 - dateInserted
                 - dateUpdated
                 - insertUserID

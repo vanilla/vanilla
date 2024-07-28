@@ -25,6 +25,7 @@ import {
     loadingPlaceholder,
     mapApiValuesToFormValues,
     mapFormValuesToApiValues,
+    getTriggerAdditionalSettings,
 } from "@dashboard/automationRules/AutomationRules.utils";
 import { IFieldError, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
@@ -91,7 +92,7 @@ export function AutomationRulesAddEditImpl(props: { automationRuleID?: string })
                 : [],
         );
 
-        // some adjustments for more user friendly error messages
+        // some adjustments for profile field and time threshold errors
         if (err.errors) {
             Object.keys(err.errors).forEach((key) => {
                 if (key === values.trigger?.triggerValue.profileField) {
@@ -102,14 +103,14 @@ export function AutomationRulesAddEditImpl(props: { automationRuleID?: string })
                         };
                     });
                 }
-                if (
-                    (key === "triggerTimeThreshold" || key === "maxTimeThreshold") &&
-                    err.errors[key]?.[0]?.code === "invalid"
-                ) {
-                    err.errors[key] = err.errors[key].map((e) => {
+
+                // let's adjust the error path if the field is in additionalSettings
+                // TODO: we should do a generic function to handle all keys from additionalSettings
+                if (key === "triggerTimeLookBackLimit") {
+                    err.errors["triggerTimeLookBackLimit"] = err.errors[key].map((e) => {
                         return {
                             ...e,
-                            message: t("Value is not a valid integer."),
+                            path: "additionalSettings.triggerValue",
                         };
                     });
                 }
@@ -126,7 +127,7 @@ export function AutomationRulesAddEditImpl(props: { automationRuleID?: string })
 
     const { values, submitForm, setValues, isSubmitting, dirty, setFieldValue, initialValues } =
         useFormik<AutomationRuleFormValues>({
-            initialValues: mapApiValuesToFormValues(recipe),
+            initialValues: mapApiValuesToFormValues(recipe, automationRulesCatalog, profileFields),
             onSubmit: async function (values) {
                 try {
                     const addUpdateRecipeParams = { ...mapFormValuesToApiValues(values), name: ruleName };
@@ -202,6 +203,30 @@ export function AutomationRulesAddEditImpl(props: { automationRuleID?: string })
             }
         }
 
+        // apply the default value for trigger additional settings for time based triggers
+        const triggerAdditionalSettings = getTriggerAdditionalSettings(
+            values.trigger?.triggerType,
+            automationRulesCatalog,
+        );
+        if (triggerAdditionalSettings?.length) {
+            const shouldSetDefaultAdditionalSettings =
+                !values.additionalSettings &&
+                (!isEditing ||
+                    (recipe &&
+                        !triggerAdditionalSettings?.some(
+                            (key) => typeof recipe.trigger.triggerValue[key] !== "undefined",
+                        )));
+
+            if (shouldSetDefaultAdditionalSettings) {
+                setFieldValue("additionalSettings", {
+                    triggerValue: {
+                        applyToNewContentOnly: false,
+                        triggerTimeLookBackLimit: undefined,
+                    },
+                });
+            }
+        }
+
         // special case when action value is categoryID, for both categoryFollowAction and moveToCategoryAction it is the same, so we need to reset the value when action type is changed
         if (
             !isEqual(values, initialValues) &&
@@ -214,7 +239,15 @@ export function AutomationRulesAddEditImpl(props: { automationRuleID?: string })
                 values.action?.actionType === "categoryFollowAction" ? [] : "",
             );
         }
-    }, [values.trigger?.triggerType, values.action?.actionType, automationRulesCatalog, initialValues]);
+    }, [
+        values.additionalSettings,
+        values.trigger?.triggerType,
+        values.action?.actionType,
+        automationRulesCatalog,
+        initialValues,
+        recipe,
+        isEditing,
+    ]);
 
     const schema = useMemo(() => {
         return getTriggerActionFormSchema(values, profileFields, automationRulesCatalog);
@@ -402,9 +435,6 @@ export function AutomationRulesAddEditImpl(props: { automationRuleID?: string })
                     />
                 </div>
             </section>
-            <section>
-                <div className={cx(dashboardClasses().extendRow, classes.sectionHeader)}>{t("Edit Variables")}</div>
-            </section>
             {isLoading && isEditing ? (
                 loadingPlaceholder("addEdit")
             ) : (
@@ -419,6 +449,24 @@ export function AutomationRulesAddEditImpl(props: { automationRuleID?: string })
                         instance={values}
                         FormControlGroup={DashboardFormControlGroup}
                         FormControl={DashboardFormControl}
+                        FormGroupWrapper={(props) => {
+                            return (
+                                <>
+                                    {props.header && (
+                                        <section className={dashboardClasses().extendRow}>
+                                            <div
+                                                className={cx(classes.sectionHeader, {
+                                                    [classes.noBorderTop]: props.header !== "Trigger",
+                                                })}
+                                            >
+                                                {t(props.header)}
+                                            </div>
+                                        </section>
+                                    )}
+                                    {props.children}
+                                </>
+                            );
+                        }}
                         disabled={isRuleRunning}
                         onChange={setValues}
                     />

@@ -9,6 +9,7 @@ namespace Vanilla\Dashboard\Controllers\Api;
 
 use CommentModel;
 use Garden\EventManager;
+use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Utils\ArrayUtils;
 use Garden\Web\Data;
@@ -20,6 +21,8 @@ use Vanilla\Dashboard\Events\AiSuggestionAccessEvent;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Logging\AuditLogger;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerAction;
 
 /**
  * API Controller for the `/ai-suggestions` resource.
@@ -63,6 +66,8 @@ class AiSuggestionsApiController extends \AbstractApiController
 
     protected \UserMetaModel $userMetaModel;
 
+    protected \DiscussionModel $discussionModel;
+
     /** @var CommentModel  */
     private CommentModel $commentModel;
     protected AiSuggestionSourceService $suggestionSourceService;
@@ -70,6 +75,8 @@ class AiSuggestionsApiController extends \AbstractApiController
     protected bool $auditLogEnabled = true;
 
     protected \DiscussionsApiController $discussionsApi;
+
+    protected LongRunner $longRunner;
 
     /**
      * D.I
@@ -83,16 +90,20 @@ class AiSuggestionsApiController extends \AbstractApiController
         ConfigurationInterface $config,
         \UserModel $userModel,
         \UserMetaModel $userMetaModel,
+        \DiscussionModel $discussionModel,
         CommentModel $commentModel,
         AiSuggestionSourceService $suggestionSourceService,
-        \DiscussionsApiController $discussionsApi
+        \DiscussionsApiController $discussionsApi,
+        LongRunner $longRunner
     ) {
         $this->config = $config;
         $this->userModel = $userModel;
         $this->userMetaModel = $userMetaModel;
+        $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
         $this->suggestionSourceService = $suggestionSourceService;
         $this->discussionsApi = $discussionsApi;
+        $this->longRunner = $longRunner;
     }
 
     /**
@@ -113,7 +124,7 @@ class AiSuggestionsApiController extends \AbstractApiController
                 "toneOfVoice:s" => ["enum" => self::TONES, "default" => self::TONE_FRIENDLY],
                 "levelOfTech:s" => ["enum" => self::LEVELS, "default" => self::LEVEL_LAYMAN],
                 "useBrEnglish:b?" => ["default" => false],
-                "sources?" => $this->suggestionSourceService->getSourcesSchema(),
+                "sources?" => $this->suggestionSourceService->getSettingsSchema(),
             ],
             "out"
         );
@@ -142,17 +153,22 @@ class AiSuggestionsApiController extends \AbstractApiController
         FeatureFlagHelper::ensureFeature("AISuggestions");
         $this->permission("settings.manage");
 
-        $in = $this->schema([
-            "enabled:b",
-            "name:s",
-            "icon:s?",
-            "toneOfVoice:s" => ["enum" => self::TONES],
-            "levelOfTech:s" => ["enum" => self::LEVELS],
-            "useBrEnglish:b?" => ["default" => false],
-            "sources" => $this->suggestionSourceService->getSettingsSchema(),
-        ]);
+        $in = $this->schema(["enabled:b"]);
+        if ($body["enabled"] ?? false) {
+            $in->merge(
+                Schema::parse([
+                    "name:s",
+                    "icon:s?",
+                    "toneOfVoice:s" => ["enum" => self::TONES],
+                    "levelOfTech:s" => ["enum" => self::LEVELS],
+                    "useBrEnglish:b?" => ["default" => false],
+                    "sources?" => $this->suggestionSourceService->getSettingsSchema(),
+                ])
+            );
+        }
 
         $body = $in->validate($body);
+
         $signInEvent = new AiSuggestionAccessEvent("configUpdate", $body);
         AuditLogger::log($signInEvent);
 
@@ -162,25 +178,12 @@ class AiSuggestionsApiController extends \AbstractApiController
 
         $settings = ArrayUtils::pluck($body, ["enabled", "sources"]);
         foreach ($settings as $name => $setting) {
-            $this->config->saveToConfig("aiSuggestions.$name", $setting);
+            if (isset($setting)) {
+                $this->config->saveToConfig("aiSuggestions.$name", $setting);
+            }
         }
 
         return $this->get_settings();
-    }
-
-    /**
-     * Get the schema for updating suggestion sources
-     *
-     * @return Data
-     */
-    public function get_sources(): Data
-    {
-        FeatureFlagHelper::ensureFeature("AISuggestions");
-        $this->permission("settings.manage");
-
-        $schema = $this->suggestionSourceService->getSourcesSchema();
-
-        return new Data($schema);
     }
 
     /**
@@ -191,9 +194,7 @@ class AiSuggestionsApiController extends \AbstractApiController
      */
     public function post_dismiss(array $body): Data
     {
-        if (!$this->suggestionSourceService->suggestionEnabled()) {
-            throw new ClientException("AI Suggestions is not enabled.");
-        }
+        $this->ensureSuggestionsEnabled();
         $in = $this->schema(["discussionID:i", "suggestionIDs:a" => ["items" => ["type" => "integer"]]]);
         $body = $in->validate($body);
 
@@ -212,9 +213,7 @@ class AiSuggestionsApiController extends \AbstractApiController
      */
     public function post_restore(array $body): Data
     {
-        if (!$this->suggestionSourceService->suggestionEnabled()) {
-            throw new ClientException("AI Suggestions is not enabled.");
-        }
+        $this->ensureSuggestionsEnabled();
         $in = $this->schema(["discussionID:i"]);
         $body = $in->validate($body);
 
@@ -233,9 +232,7 @@ class AiSuggestionsApiController extends \AbstractApiController
      */
     public function post_suggestionsVisibility(array $body): Data
     {
-        if (!$this->suggestionSourceService->suggestionEnabled()) {
-            throw new ClientException("AI Suggestions is not enabled.");
-        }
+        $this->ensureSuggestionsEnabled();
         $in = $this->schema(["discussionID:i", "visible:b"]);
         $body = $in->validate($body);
 
@@ -287,6 +284,7 @@ class AiSuggestionsApiController extends \AbstractApiController
                     "HashMethod" => "Random",
                     "Email" => "ai-assistant@stub.vanillacommunity.example",
                     "Photo" => \UserModel::getDefaultAvatarUrl(),
+                    "Admin" => "2", // Making it not spoof-able
                 ]
             );
         } else {
@@ -309,9 +307,7 @@ class AiSuggestionsApiController extends \AbstractApiController
      */
     public function post_acceptSuggestion(array $data): Data
     {
-        if (!$this->suggestionSourceService->suggestionEnabled()) {
-            throw new ClientException("AI Suggestions are not enabled.");
-        }
+        $this->ensureSuggestionsEnabled();
         $in = $this->schema([
             "allSuggestions:b",
             "discussionID:i",
@@ -361,9 +357,7 @@ class AiSuggestionsApiController extends \AbstractApiController
      */
     public function post_removeAcceptSuggestion(array $data): Data
     {
-        if (!$this->suggestionSourceService->suggestionEnabled()) {
-            throw new ClientException("AI Suggestions are not enabled.");
-        }
+        $this->ensureSuggestionsEnabled();
         $in = $this->schema([
             "allSuggestions:b",
             "discussionID:i",
@@ -389,5 +383,45 @@ class AiSuggestionsApiController extends \AbstractApiController
             $body["allSuggestions"] ? [0, 1, 2] : $body["suggestionIDs"]
         );
         return new Data(["removed" => $status]);
+    }
+
+    /**
+     * Handles the /ai-suggestions/generate endpoint.
+     *
+     * @param array $body
+     * @return mixed
+     */
+    public function put_generate(array $body)
+    {
+        $this->ensureSuggestionsEnabled();
+
+        $in = $this->schema(["discussionID:i"]);
+        $body = $in->validate($body);
+        $discussionID = $body["discussionID"];
+
+        $discussion = $this->discussionsApi->discussionByID($discussionID);
+        $this->checkPermission($discussion);
+        if (strtolower($discussion["Type"]) !== "question") {
+            throw new ClientException("Suggestions may only be generated on questions");
+        }
+
+        $attributes = $discussion["Attributes"];
+        $attributes["suggestions"] = [];
+        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($attributes));
+        $action = new LongRunnerAction(AiSuggestionSourceService::class, "generateSuggestions", [$discussionID, true]);
+        return $this->longRunner->runApi($action);
+    }
+
+    /**
+     * This method is intended as a one-liner to check if suggestions are enabled globally and per-user.
+     *
+     * @return void
+     * @throws ClientException
+     */
+    private function ensureSuggestionsEnabled(): void
+    {
+        if (!$this->suggestionSourceService->suggestionEnabled()) {
+            throw new ClientException("AI Suggestions are not enabled.");
+        }
     }
 }

@@ -7,15 +7,10 @@
 
 namespace Models;
 
-use Gdn_Session;
-use Psr\Log\LoggerInterface;
-use UserModel;
 use Vanilla\AutomationRules\Actions\UserFollowCategoryAction;
 use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
 use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
-use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
-use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
 use Vanilla\Exception\Database\NoResultsException;
 use VanillaTests\AutomationRules\AutomationRulesTestTrait;
 use VanillaTests\AutomationRules\Models\MockAutomationRuleModel;
@@ -37,15 +32,7 @@ class AutomationRuleModelTest extends SiteTestCase
     {
         parent::setUp();
 
-        /** @var AutomationRuleModel $mockAutomationRuleModel */
-        $mockAutomationRuleModel = new MockAutomationRuleModel(
-            $this->container()->get(Gdn_Session::class),
-            $this->container()->get(UserModel::class),
-            $this->container()->get(AutomationRuleRevisionModel::class),
-            $this->container()->get(AutomationRuleDispatchesModel::class),
-            $this->container()->get(LoggerInterface::class),
-            $this->container()->get(\Gdn_Database::class)
-        );
+        $mockAutomationRuleModel = $this->container()->get(MockAutomationRuleModel::class);
         $this->container()->setInstance(AutomationRuleModel::class, $mockAutomationRuleModel);
         $this->initialize();
     }

@@ -374,16 +374,11 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
         }
 
         foreach ($existingData as $key => $value) {
-            if (str_starts_with($key, "date")) {
+            if (str_contains(strtolower($key), "date")) {
                 unset($existingData[$key]);
             }
         }
 
-        foreach ($newData as $key => $value) {
-            if (str_starts_with($key, "date")) {
-                unset($newData[$key]);
-            }
-        }
         $diff = LoggerUtils::diffArrays($existingData, $newData);
         return empty($diff) ? null : $diff;
     }

@@ -12,17 +12,17 @@ use DiscussionModel;
 use Exception;
 use Garden\EventManager;
 use Garden\Schema\Schema;
+use Garden\Utils\ArrayUtils;
 use Gdn;
 use Generator;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use UserMetaModel;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Activity\AiSuggestionsActivity;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
-use Vanilla\Forms\FormOptions;
-use Vanilla\Forms\SchemaForm;
 use Vanilla\OpenAI\OpenAIClient;
 use Vanilla\OpenAI\OpenAIPrompt;
 use Vanilla\Scheduler\LongRunner;
@@ -62,6 +62,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
     /** @var LongRunner */
     private LongRunner $longRunner;
 
+    private \ActivityModel $activityModel;
+
     /**
      * AI Suggestion constructor.
      *
@@ -78,7 +80,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         DiscussionModel $discussionModel,
         CommentModel $commentModel,
         UserMetaModel $userMetaModel,
-        LongRunner $longRunner
+        LongRunner $longRunner,
+        \ActivityModel $activityModel
     ) {
         $this->config = $config;
         $this->openAIClient = $openAIClient;
@@ -87,6 +90,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         $this->commentModel = $commentModel;
         $this->userMetaModel = $userMetaModel;
         $this->longRunner = $longRunner;
+        $this->activityModel = $activityModel;
     }
 
     /**
@@ -130,7 +134,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
     }
 
     /**
-     * Check if AI suggestions are enabled.
+     * Check if AI suggestions are enabled for the user.
      *
      * @return bool
      */
@@ -140,7 +144,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
     }
 
     /**
-     * Check if AI suggestions are enabled.
+     * Check if AI suggestions are enabled for the user and in the app.
      *
      * @return bool
      */
@@ -150,6 +154,17 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         return $this->aiSuggestionFeatureEnabled() &&
             $this->checkIfUserHasEnabledAiSuggestions() === true &&
             $aiConfig["enabled"];
+    }
+
+    /**
+     * Check if AI suggestions feature is enabled in the app.
+     *
+     * @return bool
+     */
+    public function suggestionFeatureEnabled(): bool
+    {
+        $aiConfig = $this->aiSuggestionConfigs();
+        return $this->aiSuggestionFeatureEnabled() && $aiConfig["enabled"];
     }
 
     /**
@@ -165,7 +180,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
             return;
         }
 
-        $action = new LongRunnerAction(self::class, "generateSuggestions", [$recordID, $discussion]);
+        $action = new LongRunnerAction(self::class, "generateSuggestions", [$recordID]);
         $this->longRunner->runDeferred($action);
     }
 
@@ -173,14 +188,15 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      * Generate suggestions for a discussion LongRunner.
      *
      * @param int $recordID
-     * @param array $discussion
      * @return Generator
      */
-    public function generateSuggestions(int $recordID, array $discussion): Generator
+    public function generateSuggestions(int $recordID): Generator
     {
+        $discussion = $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
         $aiConfig = $this->aiSuggestionConfigs()["sources"];
         $suggestions = [];
         try {
+            $keywords = $this->generateKeywords($discussion);
             /** @var AiSuggestionSourceInterface|null $source */
             foreach ($this->suggestionSources as $source) {
                 //Skip this search path if it's not enabled in configs.
@@ -188,7 +204,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
                 if (($providerConfig["enabled"] ?? false) === false) {
                     continue;
                 }
-                $localSuggestions = $source->generateSuggestions($discussion);
+                $localSuggestions = $source->generateSuggestions($discussion, $keywords);
                 $suggestions = array_merge($localSuggestions, $suggestions);
                 yield new LongRunnerSuccessID($source->getName());
             }
@@ -199,21 +215,139 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         }
 
         try {
+            $suggestions = $this->processResponses($discussion, $suggestions);
             $suggestionsMerged = $this->calculateTopSuggestions($suggestions, $discussion);
         } catch (Exception $e) {
             $suggestionsMerged = $suggestions;
         }
-        if (!isset($discussion["Attributes"]["suggestions"])) {
-            $discussion["Attributes"]["suggestions"] = [];
-        }
-        $discussion["Attributes"]["visibleSuggestions"] = true;
-        $discussion["Attributes"]["suggestions"] = array_merge(
-            $discussion["Attributes"]["suggestions"],
-            $suggestionsMerged
-        );
+        $discussion["Attributes"]["suggestions"] = $suggestionsMerged;
         $this->discussionModel->setProperty($recordID, "Attributes", dbencode($discussion["Attributes"]));
 
+        if (!empty($suggestionsMerged)) {
+            $this->notifyAiSuggestions($discussion);
+        }
+
         return LongRunner::FINISHED;
+    }
+
+    /**
+     * Generate keywords from a discussion.
+     *
+     * @param array $discussion
+     * @return string
+     */
+    public function generateKeywords(array $discussion): string
+    {
+        $this->discussionModel->formatField($discussion, "Body", $discussion["Format"]);
+
+        $discussionBody = $discussion["Name"] . $discussion["Body"];
+        $question = $discussion["Body"];
+        try {
+            $prompt = OpenAIPrompt::create()->instruct(
+                "You are a recommendation bot, giving comma separated list of 5 'keywords' related to a list of documents provided."
+            );
+            $schema = Schema::parse(["properties:o" => Schema::parse(["keywords:s"])]);
+            $prompt->addUserMessage("Recommend based on '$discussionBody'");
+            $result = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $schema)["properties"];
+            $keywords = $result["keywords"];
+        } catch (\Exception $e) {
+            $this->logger->warning(
+                "Error generating Vanilla category suggestions for discussion {$discussion["DiscussionID"]}: {$e->getMessage()}"
+            );
+            $keywords = $question;
+        }
+        return $keywords;
+    }
+
+    /**
+     * Turn returned responses into answers to the main question
+     *
+     * @param array $discussion
+     * @param array $potentialAnswers
+     * @return array
+     */
+    public function processResponses(array $discussion, array $potentialAnswers): array
+    {
+        $answerSchema = AiSuggestionSourceService::getAnswerSchema();
+
+        foreach ($potentialAnswers as &$article) {
+            $prompt = AiSuggestionSourceService::getBasePrompt($article["summary"]);
+            $prompt->addUserMessage($discussion["Body"]);
+            $answer = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $answerSchema);
+            if ($answer["hasAnswer"]) {
+                $article["summary"] = $answer["answer"];
+            }
+        }
+        return $potentialAnswers;
+    }
+
+    /**
+     * Get the base prompt for querying OpenAI for an answer to a discussion using various sources.
+     *
+     * @param string $sourceText
+     * @return OpenAIPrompt
+     */
+    public static function getBasePrompt(string $sourceText): OpenAIPrompt
+    {
+        $config = AiSuggestionSourceService::aiSuggestionConfigs();
+
+        $persona = Gdn::userMetaModel()->getUserMeta($config["userID"], "aiAssistant.%", [], "aiAssistant.");
+        $persona = $persona + ["toneOfVoice" => "friendly", "levelOfTech" => "layman", "useBrEnglish" => false];
+
+        $prompt = OpenAIPrompt::create()->instruct(
+            <<<PROMPT
+You are an answer bot, giving an answer to the user's question.
+Answer the question using the text provided in a {$persona["toneOfVoice"]} tone of voice
+for an audience that can understand the material with a {$persona["levelOfTech"]} level of technical knowledge.
+PROMPT
+        );
+        if ($persona["useBrEnglish"]) {
+            $prompt->instruct("Respond in British English.");
+        }
+        $prompt->instruct(
+            "Use ONLY the content derived from the following source text. If the answer cannot be derived from the source text alone, respond with a `hasAnswer` field with a value of `false`."
+        );
+        $prompt->instruct("Source Text:\n$sourceText");
+
+        return $prompt;
+    }
+
+    /**
+     * Get the schema for storing the answer response from OpenAI.
+     *
+     * @return Schema
+     */
+    public static function getAnswerSchema(): Schema
+    {
+        return Schema::parse(["answer:s", "hasAnswer:b?" => ["default" => true]]);
+    }
+
+    /**
+     * @param array $discussion
+     * @return void
+     * @throws Exception
+     */
+    private function notifyAiSuggestions(array $discussion): void
+    {
+        $assistantUserID = Gdn::userModel()
+            ->getWhere(["UserID" => self::aiSuggestionConfigs()["userID"] ?? null])
+            ->value("UserID");
+
+        if (empty($assistantUserID)) {
+            return;
+        }
+
+        $activity = [
+            "ActivityType" => "AiSuggestions",
+            "ActivityUserID" => $assistantUserID,
+            "NotifyUserID" => $discussion["InsertUserID"],
+            "HeadlineFormat" => AiSuggestionsActivity::getProfileHeadline(),
+            "RecordType" => "Discussion",
+            "RecordID" => $discussion["DiscussionID"],
+            "Route" => DiscussionModel::discussionUrl($discussion),
+        ];
+
+        $this->activityModel->save($activity, "AiSuggestions");
     }
 
     /**
@@ -238,7 +372,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
 
         foreach ($suggestionIndex as $index) {
             if (($suggestions[$index] ?? false) && ($suggestions[$index]["commentID"] ?? null) === null) {
-                $comment = $this->createComment($suggestions[$index]["summary"], $discussion, $suggestionUserID);
+                $comment = $this->createComment($suggestions[$index], $discussion, $suggestionUserID);
                 $suggestions[$index]["commentID"] = $comment["commentID"];
                 $comments[] = $comment;
             }
@@ -251,7 +385,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
     /**
      * Create 1 comment from the suggestion.
      *
-     * @param string $body
+     * @param array $suggestion
      * @param array $discussion
      * @param int $suggestionUserID
      * @return array
@@ -259,13 +393,16 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Web\Exception\NotFoundException
      */
-    public function createComment(string $body, array $discussion, int $suggestionUserID): array
+    public function createComment(array $suggestion, array $discussion, int $suggestionUserID): array
     {
         $newComment = [
             "DiscussionID" => $discussion["DiscussionID"],
-            "Body" => Gdn::formatService()->renderHtml($body, "text"),
+            "Body" => Gdn::formatService()->renderHtml($suggestion["summary"], "text"),
             "Format" => HtmlFormat::FORMAT_KEY,
             "InsertUserID" => $suggestionUserID,
+            "Attributes" => [
+                "suggestion" => ArrayUtils::pluck($suggestion, ["sourceIcon", "title", "url", "format", "type"]),
+            ],
         ];
 
         $commentID = $this->commentModel->save($newComment);
@@ -324,7 +461,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         $prompt = OpenAIPrompt::create()->instruct(
             <<<PROMPT
 You are given a list of articles. Sort the articles from most to least relevant based on their relevance to the following discussion.
-Return the results as an array of objects. Each object contains the articleID and its sort value.
+Return the top 3 results as an array of objects. Each object contains the articleID and its sort value.
 
 $bodyPlainText
 PROMPT
@@ -342,7 +479,7 @@ PROMPT
             ]);
         }
 
-        $sortedSuggestions = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT4, $prompt, $sortSchema);
+        $sortedSuggestions = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $sortSchema);
         $sortedSuggestions = array_column($sortedSuggestions, "sortValue", "articleID");
         uksort($suggestions, function ($item1, $item2) use ($sortedSuggestions) {
             return $sortedSuggestions[$item1] <=> $sortedSuggestions[$item2];
@@ -360,41 +497,29 @@ PROMPT
         $schema = [];
         foreach ($this->suggestionSources as $suggestionSource) {
             $schema[$suggestionSource->getName() . "?"] = Schema::parse([
-                "enabled:b",
-                "exclusionIDs:a" => ["items" => ["type" => "integer"]],
+                "enabled:b?" => ["default" => false],
+                "exclusionIDs:a?" => ["items" => ["type" => "integer"]],
             ]);
         }
         return Schema::parse($schema);
     }
 
     /**
-     * Get the schema for rendering fields for the dashboard.
+     * Get a catalog of all the available sources for rendering fields on the dashboard.
      *
-     * @return Schema
+     * @return array
      */
-    public function getSourcesSchema(): Schema
+    public function getSourcesCatalog(): array
     {
-        $schemaArray = [];
+        $catalog = [];
         foreach ($this->suggestionSources as $suggestionSource) {
-            $schemaArray[$suggestionSource->getName() . "?"] = Schema::parse([
-                "enabled:b" => [
-                    "default" => false,
-                    "x-control" => SchemaForm::checkBox(
-                        new FormOptions($suggestionSource->getToggleLabel()),
-                        labelType: "none"
-                    ),
-                ],
-                "exclusionIDs" => [
-                    "default" => null,
-                    "x-control" => SchemaForm::dropDown(
-                        new FormOptions($suggestionSource->getExclusionLabel()),
-                        $suggestionSource->getExclusionDropdownChoices(),
-                        multiple: true
-                    ),
-                ],
-            ]);
+            $catalog[$suggestionSource->getName()] = [
+                "enabledLabel" => $suggestionSource->getToggleLabel(),
+                "exclusionLabel" => $suggestionSource->getExclusionLabel(),
+                "exclusionChoices" => $suggestionSource->getExclusionDropdownChoices()?->getChoices(),
+            ];
         }
-        return Schema::parse($schemaArray);
+        return $catalog;
     }
 
     /**
@@ -430,8 +555,28 @@ PROMPT
      */
     public function updateVisibleSuggestions(array $discussion, bool $visible = true): void
     {
-        $discussion["Attributes"]["visibleSuggestions"] = $visible;
+        $discussion["Attributes"]["showSuggestions"] = $visible;
         $discussionID = $discussion["DiscussionID"];
         $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($discussion["Attributes"]));
+    }
+
+    /**
+     * Returns a schema for validating suggestion data.
+     *
+     * @return Schema
+     */
+    public static function getSuggestionSchema(): Schema
+    {
+        return Schema::parse([
+            "format:s",
+            "sourceIcon:s?",
+            "type:s",
+            "id:i?",
+            "url:s",
+            "title:s",
+            "summary:s?",
+            "hidden:b?",
+            "commentID:i?",
+        ]);
     }
 }

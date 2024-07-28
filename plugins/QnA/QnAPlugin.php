@@ -4,31 +4,31 @@
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
+use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\EventManager;
 use Garden\PsrEventHandlersInterface;
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Gdn_Session as SessionInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\ApiUtils;
-use Garden\Container\Container;
 use Vanilla\Community\Events\DiscussionStatusEvent;
+use Vanilla\Zendesk\Events\ZendeskArticleDiscussionEvent;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusStructureEvent;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Modules\QnAWidgetModule;
+use Vanilla\QnA\Models\AnswerModel;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QnAJsonLD;
 use Vanilla\QnA\Models\QuestionSearchType;
-use Vanilla\QnA\Models\AnswerModel;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Utility\ModelUtils;
-use Gdn_Session as SessionInterface;
 use Vanilla\Widgets\WidgetService;
 
 /**
@@ -283,7 +283,11 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public static function getPsrEventHandlerMethods(): array
     {
-        return ["handleDiscussionStatusEvent", "handleRecordStatusStructureEvent"];
+        return [
+            "handleDiscussionStatusEvent",
+            "handleRecordStatusStructureEvent",
+            "handleZendeskArticleDiscussionEvent",
+        ];
     }
 
     /**
@@ -445,6 +449,34 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         if ($qnA && isset($args["CssClass"])) {
             $args["CssClass"] = concatSep(" ", $args["CssClass"], "QnA-Item-$qnA");
         }
+    }
+
+    /**
+     * Add accepted answer to the Zendesk article body.
+     *
+     * @param array $record
+     * @return array
+     */
+    public function handleZendeskArticleDiscussionEvent(
+        ZendeskArticleDiscussionEvent $zendeskArticleDiscussionEvent
+    ): ZendeskArticleDiscussionEvent {
+        if ($zendeskArticleDiscussionEvent->getDiscussionType() === "question") {
+            $acceptedAnswers = $this->getDiscussionAnswersByType(
+                $zendeskArticleDiscussionEvent->getDiscussionID(),
+                "accepted"
+            );
+            if (empty($acceptedAnswers)) {
+                return $zendeskArticleDiscussionEvent;
+            }
+            $acceptedAnswerBody = "<p>";
+            $acceptedAnswerBody .= "<h2>" . plural(count($acceptedAnswers), "Answer", "Answers") . "</h2>";
+            foreach ($acceptedAnswers as $answer) {
+                $acceptedAnswerBody .= $answer["body"];
+            }
+            $acceptedAnswerBody .= "</p>";
+            $zendeskArticleDiscussionEvent->appendToDiscussionBody($acceptedAnswerBody);
+        }
+        return $zendeskArticleDiscussionEvent;
     }
 
     /**
@@ -1897,13 +1929,18 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function commentSchema_init(Schema $schema)
     {
-        $schema->merge(
-            Schema::parse([
-                "attributes" => Schema::parse([
-                    "answer?" => $this->fullAnswerMetaDataSchema(),
-                ]),
-            ])
-        );
+        $attributes = $schema->getField("properties.attributes");
+
+        // Add to an existing "attributes" field or create a new one?
+        if ($attributes instanceof Schema) {
+            $attributes->merge(Schema::parse(["answer?" => $this->fullAnswerMetaDataSchema()]));
+        } else {
+            $schema->merge(
+                Schema::parse([
+                    "attributes?" => Schema::parse(["answer?" => $this->fullAnswerMetaDataSchema()]),
+                ])
+            );
+        }
     }
 
     /**
@@ -1946,7 +1983,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             }
             return $comment;
         }
-        $discussionID = $comment["discussionID"];
+        $discussionID = $comment["discussionID"] ?? null;
+        if ($discussionID === null) {
+            return $comment;
+        }
 
         if (!isset($this->discussionsCache[$discussionID])) {
             // This has the potential to be pretty bad, performance wise, so we at least cached the results.

@@ -145,8 +145,8 @@ class AnswerModel implements EventFromRowInterface
     public function applyCommentQnAChange($discussion, $updatedAnswer, $currentQnAStatus, $newQnAStatus)
     {
         // Determine QnA change
+        $change = 0;
         if ($currentQnAStatus != $newQnAStatus) {
-            $change = 0;
             $eventAction = AnswerEvent::ACTION_UPDATE;
             switch ($newQnAStatus) {
                 case "Rejected":

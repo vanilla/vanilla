@@ -17,6 +17,8 @@ export interface ISort {
 }
 
 interface IProps {
+    sortLabel?: string;
+    sortID?: string;
     sortOptions: ISelectBoxItem[];
     defaultSort?: ISelectBoxItem;
     selectedSort?: ISelectBoxItem;
@@ -43,8 +45,8 @@ const sortLabel = css({
 export function Sort(props: IProps) {
     return (
         <label className={sort}>
-            <span id={"sortID"} className={sortLabel}>
-                {`${t("Sort By")}: `}
+            <span id={props.sortID ?? "sortID"} className={sortLabel}>
+                {props.sortLabel ?? `${t("Sort By")}: `}
             </span>
             <SelectBox
                 options={props.sortOptions}

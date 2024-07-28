@@ -32,7 +32,6 @@ import { usePermissionsContext } from "@library/features/users/PermissionsContex
 import { DiscussionListItemMeta } from "@library/features/discussions/DiscussionListItemMeta";
 import { useDiscussionActions } from "@library/features/discussions/DiscussionActions";
 import { useDiscussionsDispatch } from "@library/features/discussions/discussionsReducer";
-import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 
 interface IProps {
     discussion: IDiscussion;
@@ -92,14 +91,12 @@ export default function DiscussionListItem(props: IProps) {
             {currentUserSignedIn && (
                 <>
                     <DiscussionBookmarkToggle discussion={discussion} />
-                    <AttachmentIntegrationsContextProvider>
-                        <DiscussionOptionsMenu
-                            discussion={discussion}
-                            onMutateSuccess={async () => {
-                                await dispatch(getDiscussionByIDs({ discussionIDs: [discussionID] }));
-                            }}
-                        />
-                    </AttachmentIntegrationsContextProvider>
+                    <DiscussionOptionsMenu
+                        discussion={discussion}
+                        onMutateSuccess={async () => {
+                            await dispatch(getDiscussionByIDs({ discussionIDs: [discussionID] }));
+                        }}
+                    />
                 </>
             )}
         </>

@@ -875,7 +875,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    $elem.html($.parseHTML(data + '')).trigger('contentLoad');
+                    $elem.html($.parseHTML(data.trim() + '')).trigger('contentLoad');
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');

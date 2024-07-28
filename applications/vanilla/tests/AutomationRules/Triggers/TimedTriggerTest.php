@@ -85,8 +85,11 @@ class TimedTriggerTest extends SiteTestCase
                 "data" => [
                     "type" => "noMax",
                     "triggerValue" => [
-                        "triggerTimeThreshold" => 1,
-                        "triggerTimeUnit" => "hour",
+                        "applyToNewContentOnly" => true,
+                        "triggerTimeDelay" => [
+                            "length" => 1,
+                            "unit" => "hour",
+                        ],
                     ],
                 ],
             ],
@@ -95,10 +98,15 @@ class TimedTriggerTest extends SiteTestCase
                 "data" => [
                     "type" => "withMax",
                     "triggerValue" => [
-                        "triggerTimeThreshold" => 1,
-                        "triggerTimeUnit" => "hour",
-                        "maxTimeThreshold" => 2,
-                        "maxTimeUnit" => "hour",
+                        "applyToNewContentOnly" => false,
+                        "triggerTimeLookBackLimit" => [
+                            "length" => 2,
+                            "unit" => "hour",
+                        ],
+                        "triggerTimeDelay" => [
+                            "length" => 1,
+                            "unit" => "hour",
+                        ],
                     ],
                 ],
             ],
@@ -107,10 +115,15 @@ class TimedTriggerTest extends SiteTestCase
                 "data" => [
                     "type" => "withTimeSinceLastRun",
                     "triggerValue" => [
-                        "triggerTimeThreshold" => 1,
-                        "triggerTimeUnit" => "hour",
-                        "maxTimeThreshold" => 2,
-                        "maxTimeUnit" => "hour",
+                        "applyToNewContentOnly" => false,
+                        "triggerTimeLookBackLimit" => [
+                            "length" => 2,
+                            "unit" => "hour",
+                        ],
+                        "triggerTimeDelay" => [
+                            "length" => 1,
+                            "unit" => "hour",
+                        ],
                     ],
                     "timeInterval" => new \DateInterval("PT1H"), //1 hour ago
                 ],
@@ -119,8 +132,11 @@ class TimedTriggerTest extends SiteTestCase
                 "data" => [
                     "type" => "withTimeSinceLastRunNoMax",
                     "triggerValue" => [
-                        "triggerTimeThreshold" => 1,
-                        "triggerTimeUnit" => "hour",
+                        "applyToNewContentOnly" => true,
+                        "triggerTimeDelay" => [
+                            "length" => 1,
+                            "unit" => "hour",
+                        ],
                     ],
                     "timeInterval" => new \DateInterval("P1D"), // last run was a day ago
                 ],
@@ -129,8 +145,11 @@ class TimedTriggerTest extends SiteTestCase
                 "data" => [
                     "type" => "withTimeSinceLastRunNoMaxThreshold",
                     "triggerValue" => [
-                        "triggerTimeThreshold" => 1,
-                        "triggerTimeUnit" => "day",
+                        "applyToNewContentOnly" => true,
+                        "triggerTimeDelay" => [
+                            "length" => 1,
+                            "unit" => "day",
+                        ],
                     ],
                     "timeInterval" => new \DateInterval("PT1H"), // last run was an hour ago
                 ],

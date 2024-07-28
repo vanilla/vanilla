@@ -79,7 +79,6 @@ export function useUpdateRecipe(automationRuleID: AddEditAutomationRuleParams["a
         mutationKey: ["update_automationRule", automationRuleID],
         onSuccess: () => {
             queryClient.invalidateQueries(["automationRules"]);
-            queryClient.invalidateQueries(["automationRule", automationRuleID]);
         },
     });
 }

@@ -5,6 +5,9 @@ $Configuration = [];
 
 $Configuration["auditLog"]["enabled"] = true;
 
+// Community Management
+$Configuration["communityManagement"]["triage"]["enabled"] = true;
+
 // Auto-enable some addons.
 $Configuration['EnabledPlugins']['stubcontent'] = true;
 $Configuration['EnabledPlugins']['swagger-ui'] = true;
@@ -174,6 +177,7 @@ $Configuration['Preferences']['Popup']['WallComment'] = '1';
 $Configuration['Preferences']['Popup']['ActivityComment'] = '1';
 $Configuration['Preferences']['Popup']['DiscussionComment'] = '1';
 $Configuration['Preferences']['Popup']['Mention'] = '1';
+$Configuration['Preferences']['Popup']['AiSuggestions'] = '1';
 
 // Module visibility and sorting.
 $Configuration['Garden']['Modules']['ShowGuestModule'] = true;

@@ -6,7 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
-use Vanilla\Forum\Menu\UserCounterProvider;
+use Vanilla\Forum\Menu\ForumCounterProvider;
 use Vanilla\Menu\Counter;
 
 /**
@@ -56,7 +56,7 @@ class CounterProvidersTest extends AbstractAPIv2Test
     {
         $session = self::container()->get(\Gdn_Session::class);
 
-        $provider = new UserCounterProvider($session);
+        $provider = new ForumCounterProvider($session);
 
         $counters = $provider->getMenuCounters();
 
@@ -88,26 +88,6 @@ class CounterProvidersTest extends AbstractAPIv2Test
         $counter = $counters[0];
         $this->assertInstanceOf(Counter::class, $counter);
         $this->assertEquals("Applicants", $counter->getName());
-    }
-
-    /**
-     * Test LogCounterProvider.
-     */
-    public function testLogCounterProvider()
-    {
-        $session = self::container()->get(\Gdn_Session::class);
-
-        $provider = new \LogCounterProvider(self::container()->get(\LogModel::class), $session);
-
-        $counters = $provider->getMenuCounters();
-
-        $this->assertTrue(is_array($counters));
-        $this->assertEquals(2, count($counters));
-
-        foreach ($counters as $counter) {
-            $this->assertInstanceOf(Counter::class, $counter);
-            $this->assertTrue(in_array($counter->getName(), ["SpamQueue", "ModerationQueue"]));
-        }
     }
 
     /**

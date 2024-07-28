@@ -36,6 +36,8 @@ async function renderInProvider(props?: Partial<ComponentProps<typeof ReportModa
                         recordType={"discussion"}
                         isVisible={true}
                         onVisibilityChange={() => null}
+                        placeRecordType={"category"}
+                        placeRecordID={"1"}
                         {...props}
                     />
                 </QueryClientProvider>
@@ -48,7 +50,7 @@ describe("ReportModal", () => {
     let mockAdapter: MockAdapter;
     beforeAll(() => {
         mockAdapter = mockAPI();
-        mockAdapter.onGet("/reports/reasons").reply(200, [
+        mockAdapter.onGet("/report-reasons").reply(200, [
             {
                 reportReasonID: "reason-1",
                 name: "Mock Reason Name 1",
@@ -96,6 +98,8 @@ describe("ReportModal", () => {
                                 recordType={"discussion"}
                                 isVisible={true}
                                 onVisibilityChange={() => null}
+                                placeRecordType={"category"}
+                                placeRecordID={"1"}
                             />
                         </QueryClientProvider>
                     </CurrentUserContextProvider>

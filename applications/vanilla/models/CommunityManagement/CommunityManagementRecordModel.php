@@ -9,6 +9,7 @@ namespace Vanilla\Forum\Models\CommunityManagement;
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\SchemaUtils;
@@ -151,8 +152,8 @@ class CommunityManagementRecordModel
      *
      * @param string $recordType
      * @param int $recordID
-     * @return array|mixed
-     * @throws \Exception
+     * @return array|false
+     * @throws NotFoundException
      */
     public function getRecord(string $recordType, int $recordID)
     {
@@ -164,6 +165,11 @@ class CommunityManagementRecordModel
                 if (!$comment) {
                     return $comment;
                 }
+
+                if ($comment["parentRecordType"] === "escalation") {
+                    throw new ClientException("Escalation comments cannot be reported.");
+                }
+
                 $discussion = $this->discussionModel->getID($comment["DiscussionID"], DATASET_TYPE_ARRAY);
                 if (!$discussion) {
                     return $discussion;
@@ -174,7 +180,7 @@ class CommunityManagementRecordModel
                 ]);
 
             default:
-                throw new \Exception("Invalid record type.");
+                throw new ClientException("Invalid record type.", 400);
         }
     }
 
@@ -187,7 +193,7 @@ class CommunityManagementRecordModel
     {
         return Schema::parse([
             "recordType:s",
-            "recordID:i",
+            "recordID:i?",
             "placeRecordType:s",
             "placeRecordID:i",
             "placeRecordUrl:s?",
@@ -224,7 +230,10 @@ class CommunityManagementRecordModel
                 1
             )[0] ?? null;
         if ($logRecord === null) {
-            throw new ClientException("Could not locate the deleted record to restore.");
+            throw new ClientException("Could not locate the deleted record to restore.", 400, [
+                "recordType" => $recordType,
+                "recordID" => $recordID,
+            ]);
         }
 
         $this->logModel->restore($logRecord, true);

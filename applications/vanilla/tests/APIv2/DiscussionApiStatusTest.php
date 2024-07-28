@@ -228,7 +228,7 @@ class DiscussionApiStatusTest extends SiteTestCase
             ->get("/discussions/{$discussion["discussionID"]}", ["expand" => "status.log"])
             ->getBody();
         $this->assertEquals(RecordStatusModel::DISCUSSION_STATUS_NONE, $result["status"]["statusID"]);
-        $this->assertEquals(RecordStatusModel::DISCUSSION_INTERNAL_STATUS_NONE, $result["internalStatus"]["statusID"]);
+        $this->assertEquals(RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED, $result["internalStatus"]["statusID"]);
     }
 
     /**

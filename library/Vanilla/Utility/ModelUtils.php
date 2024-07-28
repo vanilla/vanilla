@@ -39,6 +39,10 @@ class ModelUtils
      */
     public static function isExpandOption(string $value, $options, bool $excludeAll = false): bool
     {
+        if (is_array($options) && isset($options["expand"])) {
+            $options = $options["expand"];
+        }
+
         if ($value === self::EXPAND_CRAWL) {
             // Specific handling for crawl.
             // It does not match all, or true.

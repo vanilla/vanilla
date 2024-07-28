@@ -242,15 +242,8 @@ class Dispatcher implements LoggerAwareInterface
                     );
                 }
 
-                if (
-                    $dispatchEx instanceof PermissionException &&
-                    // Only log permission exceptions if the user is logged in.
-                    $dispatchEx->getPermission() !== "Garden.SignIn.Allow" &&
-                    \Gdn::session()->isValid()
-                ) {
-                    $event = new AccessDeniedEvent($dispatchEx->getPermission());
-                    AuditLogger::log($event);
-                }
+                AccessDeniedEvent::tryLog($dispatchEx);
+
                 $response = null;
                 if (is_object($action ?? null) && $action instanceof Action) {
                     $obj = $action->getCallback()[0] ?? false;

@@ -5,7 +5,6 @@
  */
 
 import apiv2 from "@library/apiv2";
-import Translate from "@library/content/Translate";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { useUser } from "@library/features/users/userHooks";
 import Button from "@library/forms/Button";
@@ -39,19 +38,6 @@ export function MessageAuthorModal(props: IProps) {
 
     const [message, setMessage] = React.useState<MyValue | undefined>();
 
-    const user = useUser({ userID: messageInfo?.userID ?? -1 });
-
-    const initialMessage: MyValue = [
-        {
-            type: "p",
-            children: [
-                {
-                    text: `Hello ${user.data?.name ?? "member"},\n\nThis is regarding your post: ${messageInfo?.url}`,
-                },
-            ],
-        },
-    ];
-
     const toast = useToast();
     // Assuming conversations here
     const messageMutation = useMutation({
@@ -80,10 +66,16 @@ export function MessageAuthorModal(props: IProps) {
     return (
         <Modal isVisible={isVisible} exitHandler={handleClose} size={ModalSizes.MEDIUM}>
             <Frame
-                header={<FrameHeader title={t("Create Escalation")} closeFrame={handleClose} />}
+                header={<FrameHeader title={t("Message Post Author")} closeFrame={handleClose} />}
                 body={
                     <FrameBody hasVerticalPadding>
-                        <VanillaEditor onChange={setMessage} initialContent={initialMessage} />
+                        {isVisible && (
+                            <MessageAuthorEditor
+                                userID={messageInfo?.userID}
+                                url={messageInfo?.url}
+                                onChange={setMessage}
+                            />
+                        )}
                     </FrameBody>
                 }
                 footer={
@@ -97,15 +89,29 @@ export function MessageAuthorModal(props: IProps) {
                             }}
                             buttonType={ButtonTypes.TEXT_PRIMARY}
                         >
-                            {messageMutation.isLoading ? (
-                                <ButtonLoader />
-                            ) : (
-                                <Translate source={"Message <0/>"} c0={user.data?.name} />
-                            )}
+                            {messageMutation.isLoading ? <ButtonLoader /> : t("Send")}
                         </Button>
                     </FrameFooter>
                 }
             />
         </Modal>
     );
+}
+
+function MessageAuthorEditor(props: { userID?: number; url?: string; onChange: (value: MyValue) => void }) {
+    const { onChange } = props;
+
+    const user = useUser({ userID: props.userID ?? -1 });
+
+    const initialMessage: MyValue = [
+        {
+            type: "p",
+            children: [
+                {
+                    text: `Hello ${user.data?.name ?? "member"},\n\nThis is regarding your post: ${props.url}`,
+                },
+            ],
+        },
+    ];
+    return <VanillaEditor onChange={onChange} initialContent={initialMessage} />;
 }

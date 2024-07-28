@@ -216,6 +216,7 @@ class EmailDigestGeneratorTest extends SiteTestCase
                 "backgroundColor" => $config["Garden.EmailTemplate.BackgroundColor"],
                 "buttonTextColor" => $config["Garden.EmailTemplate.ButtonTextColor"],
                 "buttonBackgroundColor" => $config["Garden.EmailTemplate.ButtonBackgroundColor"],
+                "containerBackgroundColor" => $config["Garden.EmailTemplate.ContainerBackgroundColor"],
             ];
             $actual = $this->emailDigestGenerator->getTemplateSettings();
             $this->assertEquals($expected, $actual);

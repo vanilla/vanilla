@@ -7,10 +7,12 @@
 import { IRecordStatus } from "@dashboard/@types/api/discussion";
 import { IUserFragment } from "@library/@types/api/users";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
+import { RecordID } from "@vanilla/utils";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 export interface ICommunityManagementRecord {
     recordType: string;
-    recordID: string;
+    recordID: string | null;
     placeRecordType: string;
     placeRecordID: number;
     recordName: string;
@@ -24,8 +26,7 @@ export interface ICommunityManagementRecord {
     recordUser?: IUserFragment;
     placeRecordUrl: string;
     placeRecordName: string;
-    recordDateInserted: string;
-    recordDateUpdated: string;
+    recordDateInserted: string | null;
     recordHtml: string;
 }
 
@@ -52,6 +53,10 @@ export interface IReport extends ICommunityManagementRecord {
     status: string;
     noteHtml: string;
     reasons: IReason[];
+    isPending: boolean;
+    isPendingUpdate: boolean;
+    escalationID: number | null;
+    escalationUrl: string | null;
 }
 
 /**
@@ -65,8 +70,8 @@ interface IPostReport {
 }
 
 /**
- * GET /api/v2/reports/reasons
- * GET /api/v2/reports/reasons/:reasonID
+ * GET /api/v2/report-reasons
+ * GET /api/v2/report-reasons/:reasonID
  */
 export interface IReason {
     reportReasonJunctionID: number;
@@ -76,10 +81,17 @@ export interface IReason {
     description: string;
     sort: number;
     // Check post.moderate permission on the category.
-    visibility: "public" | "moderator";
+    deleted: boolean;
+    roleIDs?: number[];
+    roles?: Array<{ name: string; roleID: number }>;
+    countReports: number;
+}
+export interface IReasonPostPatch {
+    reason: Partial<IReason>;
+    reportReasonID?: IReason["reportReasonID"];
 }
 
-// Sorting Reasons PUT /api/v2/reports/reasons/sort
+// Sorting Reasons PUT /api/v2/report-reasons/sort
 
 /**
  * POST /api/v2/reports/dismiss
@@ -97,13 +109,13 @@ export type IDismissReport = {
 );
 
 /**
- * POST /api/v2/reports/reasons
- * PATCH /api/v2/reports/reasons/:reportReasonID
+ * POST /api/v2/report-reasons
+ * PATCH /api/v2/report-reasons/:reportReasonID
  */
 interface IPostReason {
     name: string;
     description: string;
-    visibility: IReason["visibility"];
+    roleIDs?: number[];
 }
 
 /**
@@ -128,6 +140,7 @@ export interface ITriageRecord extends ICommunityManagementRecord {
     reportUsers: IUserFragment[];
     recordStatus?: IRecordStatus;
     recordInternalStatus?: IRecordStatus;
+    attachments?: IAttachment[];
 }
 
 interface IRemovePost {
@@ -151,14 +164,22 @@ export type IPostEscalation = {
     name: string;
     status: IEscalation["status"];
     assignedUserID?: number;
-    noteBody?: string;
-    noteFormat?: string;
+    initialCommentBody?: string;
+    initialCommentFormat?: string;
 } & (
     | {
           reportID?: number;
       }
     | IPostReport
 ) &
+    (
+        | {
+              recordType?: string;
+              recordID?: string;
+              reportReasonIDs: string[];
+          }
+        | IPostReport
+    ) &
     IRemovePost;
 
 /**
@@ -175,7 +196,7 @@ export type IPostEscalation = {
  * }
  */
 export interface IEscalation extends ICommunityManagementRecord {
-    escalationID: number;
+    escalationID: RecordID;
     dateInserted: string;
     dateUpdated: string; // Updated by comments or new report being added.
     insertUserID: number;
@@ -202,6 +223,9 @@ export interface IEscalation extends ICommunityManagementRecord {
     // Expands
     attachments?: IAttachment[];
     reports?: IReport[];
+
+    // Require here.
+    recordID: string;
 }
 
 type IPatchEscalation = {
@@ -219,6 +243,15 @@ export enum EscalationStatus {
     OPEN = "open",
     IN_PROGRESS = "in-progress",
     ON_HOLD = "on-hold",
-    EXTERNAL_ZENDESK = "external-zendesk",
     DONE = "done",
+    IN_ZENDESK = "in-zendesk",
+}
+
+export interface PutReportReasonParams {
+    [reportReasonID: IReason["reportReasonID"]]: NonNullable<IReason["sort"]>;
+}
+
+export interface IReportsData {
+    results: IReport[];
+    pagination: ILinkPages;
 }

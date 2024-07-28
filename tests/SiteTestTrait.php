@@ -127,6 +127,16 @@ trait SiteTestTrait
     {
         // These applications must currently all be enabled at startup or things can get flaky.
         $addons = array_unique(array_merge(["dashboard", "conversations", "vanilla"], static::$addons));
+        // Make sure stub content is last
+        usort($addons, function (string $a, string $b) {
+            if ($b === "stubcontent") {
+                return -1;
+            }
+            if ($a === "stubcontent") {
+                return 1;
+            }
+            return 0;
+        });
         return $addons;
     }
 

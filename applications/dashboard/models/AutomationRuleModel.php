@@ -18,8 +18,8 @@ use InvalidArgumentException;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use UserModel;
-use Vanilla\AutomationRules\Actions\AutomationActionInterface;
-use Vanilla\AutomationRules\Trigger\AutomationTriggerInterface;
+use Vanilla\AutomationRules\Actions\AutomationAction;
+use Vanilla\AutomationRules\Trigger\AutomationTrigger;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
@@ -38,17 +38,10 @@ class AutomationRuleModel extends PipelineModel
 {
     use LoggerAwareTrait;
     const MAX_LIMIT = 150;
-
     const STATUS_ACTIVE = "active";
     const STATUS_INACTIVE = "inactive";
     const STATUS_DELETED = "deleted";
-
     const STATUS_OPTIONS = [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED];
-    private AutomationRuleService $automationRuleService;
-    private Gdn_Session $session;
-    private UserModel $userModel;
-    private AutomationRuleRevisionModel $automationRuleRevisionModel;
-    private AutomationRuleDispatchesModel $automationRuleDispatchesModel;
 
     /**
      * AutomationRuleModel constructor.
@@ -58,22 +51,17 @@ class AutomationRuleModel extends PipelineModel
      * @param AutomationRuleRevisionModel $automationRuleRevisionModel
      * @param AutomationRuleDispatchesModel $automationRuleDispatchesModel
      * @param LoggerInterface $logger
+     * @param AutomationRuleService $automationRuleService
      */
     public function __construct(
-        Gdn_Session $session,
-        UserModel $userModel,
-        AutomationRuleRevisionModel $automationRuleRevisionModel,
-        AutomationRuleDispatchesModel $automationRuleDispatchesModel,
+        private Gdn_Session $session,
+        private UserModel $userModel,
+        private AutomationRuleRevisionModel $automationRuleRevisionModel,
+        private AutomationRuleDispatchesModel $automationRuleDispatchesModel,
         LoggerInterface $logger
     ) {
         parent::__construct("automationRule");
-
-        $this->session = $session;
-        $this->userModel = $userModel;
-        $this->automationRuleRevisionModel = $automationRuleRevisionModel;
-        $this->automationRuleDispatchesModel = $automationRuleDispatchesModel;
         $this->setLogger($logger);
-
         $dateProcessor = new CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
@@ -137,15 +125,10 @@ class AutomationRuleModel extends PipelineModel
 
     /**
      * @return AutomationRuleService
-     * @throws ContainerException
-     * @throws NotFoundException
      */
     protected function automationRuleService(): AutomationRuleService
     {
-        if (empty($this->automationRuleService)) {
-            $this->automationRuleService = Gdn::getContainer()->get(AutomationRuleService::class);
-        }
-        return $this->automationRuleService;
+        return Gdn::getContainer()->get(AutomationRuleService::class);
     }
 
     /**
@@ -263,6 +246,7 @@ class AutomationRuleModel extends PipelineModel
         if (empty($automationRules)) {
             return $automationRules;
         }
+        $automationRulesCount = count($automationRules);
         if ($includeRecentDispatch) {
             $automationRuleDispatchesModel = Gdn::getContainer()->get(AutomationRuleDispatchesModel::class);
             $automationRuleRevisionIDs = array_column($automationRules, "automationRuleRevisionID");
@@ -282,7 +266,7 @@ class AutomationRuleModel extends PipelineModel
                     : $automationRule["triggerValue"],
             ];
             $triggerClass = $triggerTypes[$automationRule["triggerType"]] ?? "";
-            if (is_a($triggerClass, AutomationTriggerInterface::class, true)) {
+            if (is_a($triggerClass, AutomationTrigger::class, true)) {
                 $automationRule["trigger"]["triggerName"] = $triggerClass::getName();
             } else {
                 unset($automationRules[$key]); // remove the recipe if the trigger is not valid anymore
@@ -295,7 +279,7 @@ class AutomationRuleModel extends PipelineModel
                     : $automationRule["actionValue"],
             ];
             $actionClass = $actionTypes[$automationRule["actionType"]] ?? "";
-            if (is_a($actionClass, AutomationActionInterface::class, true)) {
+            if (is_a($actionClass, AutomationAction::class, true)) {
                 $automationRule["action"]["actionName"] = $actionClass::getName();
             } else {
                 unset($automationRules[$key]); // remove the recipe if the action is not valid anymore
@@ -308,7 +292,7 @@ class AutomationRuleModel extends PipelineModel
                     $mostRecentDispatches[$automationRule["automationRuleRevisionID"]] ?? [];
             }
         }
-        return $automationRules;
+        return count($automationRules) === $automationRulesCount ? $automationRules : array_values($automationRules);
     }
 
     /**
@@ -338,6 +322,12 @@ class AutomationRuleModel extends PipelineModel
         $triggerValue = $inputData["trigger"]["triggerValue"] ?? null;
         $actionType = $inputData["action"]["actionType"] ?? null;
         $actionValue = $inputData["action"]["actionValue"] ?? null;
+        $automationRuleService = $this->automationRuleService();
+        $trigger = $automationRuleService->getAutomationTrigger($triggerType);
+        // Trigger can be null if the it is not fully enabled, feature flag is turned off.
+        if ($trigger === null || !in_array($automationRuleService->getAction($actionType), $trigger::getActions())) {
+            $validationField->addError("$actionType is not a valid action type.", ["code" => 403]);
+        }
 
         $automationRules = $this->getAutomationRulesByTriggerActionOrValues(
             $triggerType,

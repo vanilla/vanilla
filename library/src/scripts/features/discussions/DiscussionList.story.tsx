@@ -32,6 +32,7 @@ export default {
 };
 
 setMeta("ui.useAdminCheckboxes", true);
+setMeta("triage.enabled", true);
 
 const loggedInStoreState = {
     users: {

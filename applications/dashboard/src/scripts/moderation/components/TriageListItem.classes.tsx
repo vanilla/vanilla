@@ -52,16 +52,29 @@ export const triageListItemClasses = () => {
         justifyContent: "end",
         alignItems: "center",
         gap: 21,
-        minHeight: 42,
+        paddingTop: 8,
+        paddingBottom: 8,
+        width: "100%",
+    });
+
+    const attachments = css({
+        paddingLeft: 16,
+        paddingRight: 16,
+    });
+
+    const description = css({
+        marginTop: 4,
     });
 
     return {
         container,
         main,
+        description,
         statusIcon,
         metaLine,
         quickActions,
         footer,
         actions,
+        attachments,
     };
 };

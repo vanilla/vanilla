@@ -14,6 +14,13 @@ use Garden\Web\PageControllerRoute;
 use Vanilla\AddonContainerRules;
 use Vanilla\Analytics\EventProviderService;
 use Vanilla\Analytics\SearchDiscussionEventProvider;
+use Vanilla\AutomationRules\Actions\CreateEscalationAction;
+use Vanilla\AutomationRules\Triggers\ReportPostTrigger;
+use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
+use Vanilla\Dashboard\AutomationRules\Triggers\ProfileFieldSelectionTrigger;
+use Vanilla\Dashboard\AutomationRules\Triggers\TimeSinceUserRegistrationTrigger;
+use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
+use Vanilla\Dashboard\Models\AttachmentService;
 use Vanilla\Forum\Controllers\Pages\AdminContentPageController;
 use Vanilla\AutomationRules\Actions\AddDiscussionToCollectionAction;
 use Vanilla\AutomationRules\Actions\AddTagToDiscussionAction;
@@ -56,6 +63,7 @@ use Vanilla\Forum\Models\Totals\CategorySiteTotalProvider;
 use Vanilla\Forum\Models\Totals\CommentSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\DiscussionSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\PostSiteTotalProvider;
+use Vanilla\Forum\Models\VanillaEscalationAttachmentProvider;
 use Vanilla\Forum\Widgets\DiscussionAnnouncementsWidget;
 use Vanilla\Forum\Widgets\DiscussionDiscussionsWidget;
 use Vanilla\Forum\Widgets\DiscussionTagsAsset;
@@ -246,12 +254,15 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addQuickLinkProvider", [new Reference(ReactionsQuickLinksProvider::class)]);
 
         //Automation Rules
-
         $container
             ->rule(AutomationRuleService::class)
             ->addCall("addAutomationTrigger", [LastActiveDiscussionTrigger::class])
             ->addCall("addAutomationTrigger", [StaleCollectionTrigger::class])
             ->addCall("addAutomationTrigger", [StaleDiscussionTrigger::class])
+            ->addCall("addAutomationTrigger", [ProfileFieldSelectionTrigger::class])
+            ->addCall("addAutomationTrigger", [TimeSinceUserRegistrationTrigger::class])
+            ->addCall("addAutomationTrigger", [UserEmailDomainTrigger::class])
+            ->addCall("addAutomationTrigger", [ReportPostTrigger::class])
             ->addCall("addAutomationAction", [AddDiscussionToCollectionAction::class])
             ->addCall("addAutomationAction", [AddTagToDiscussionAction::class])
             ->addCall("addAutomationAction", [BumpDiscussionAction::class])
@@ -259,7 +270,13 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addAutomationAction", [MoveDiscussionToCategoryAction::class])
             ->addCall("addAutomationAction", [RemoveDiscussionFromCollectionAction::class])
             ->addCall("addAutomationAction", [RemoveDiscussionFromTriggerCollectionAction::class])
-            ->addCall("addAutomationAction", [UserFollowCategoryAction::class]);
+            ->addCall("addAutomationAction", [UserFollowCategoryAction::class])
+            ->addCall("addAutomationAction", [AddRemoveUserRoleAction::class])
+            ->addCall("addAutomationAction", [CreateEscalationAction::class]);
+
+        $container
+            ->rule(AttachmentService::class)
+            ->addCall("addProvider", [new Reference(VanillaEscalationAttachmentProvider::class)]);
 
         $container
             ->rule(AutomationRuleService::class)

@@ -416,14 +416,20 @@
 // Styleguide 1.9.1.
 
 .badge {
-    display: inline-block;
-    vertical-align: middle;
-    padding: 0 ($spacer * 0.25);
-    margin-left: $spacer * 0.25;
-    font-size: $font-size-xs;
-    background-color: rgba(0, 0, 0, 0.1875);
-    color: $white;
+    display: inline;
+    vertical-align: text-bottom;
+    padding: 0 4px;
+    margin-left: 3px;
+    position: relative;
+    top: 1px;
+    font-size: 11px;
+    color: $brand-primary;
+    border: 1px solid $brand-primary;
     border-radius: 4px;
+
+    &:empty {
+        display: none;
+    }
 
     .btn-group & {
         margin-top: -2px;

@@ -17,6 +17,7 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Schema\RangeExpression;
+use Vanilla\Forms\FieldMatchConditional;
 
 abstract class TimedAutomationTrigger extends AutomationTrigger
 {
@@ -42,27 +43,32 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
          */
 
         $currentDate = new DateTimeImmutable();
+
         $endDate = $currentDate->sub(
             DateInterval::createFromDateString(
-                $triggerValue["triggerTimeThreshold"] . " " . $triggerValue["triggerTimeUnit"]
+                $triggerValue["triggerTimeDelay"]["length"] . " " . $triggerValue["triggerTimeDelay"]["unit"]
             )
         );
         // If there was no last run, use current trigger interval value
         if ($lastRunDate === null) {
-            if (empty($triggerValue["maxTimeThreshold"])) {
+            if ($triggerValue["applyToNewContentOnly"] === true) {
                 // We need to find records with in the minute range
+                $sinceDate = $endDate->sub(DateInterval::createFromDateString("1 minute"));
+            } elseif (empty($triggerValue["triggerTimeLookBackLimit"]["length"])) {
                 $sinceDate = $endDate->sub(DateInterval::createFromDateString("1 minute"));
             } else {
                 $sinceDate = $currentDate->sub(
                     DateInterval::createFromDateString(
-                        $triggerValue["maxTimeThreshold"] . " " . $triggerValue["maxTimeUnit"]
+                        $triggerValue["triggerTimeLookBackLimit"]["length"] .
+                            " " .
+                            $triggerValue["triggerTimeLookBackLimit"]["unit"]
                     )
                 );
             }
         } else {
             $sinceDate = $lastRunDate->sub(
                 DateInterval::createFromDateString(
-                    $triggerValue["triggerTimeThreshold"] . " " . $triggerValue["triggerTimeUnit"]
+                    $triggerValue["triggerTimeDelay"]["length"] . " " . $triggerValue["triggerTimeDelay"]["unit"]
                 )
             );
         }
@@ -77,54 +83,64 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
     public static function getTimeIntervalSchema(): array
     {
         return [
-            "triggerTimeThreshold:i" => [
-                "minimum" => 1,
-                "step" => 1,
-                "x-control" => SchemaForm::textBox(
+            "triggerTimeDelay" => [
+                "type" => "object",
+                "required" => true,
+                "x-control" => SchemaForm::timeDuration(
                     new FormOptions(
                         "Trigger Delay",
                         "Set the duration after which the rule will trigger.  Whole numbers only.",
                         "",
                         "Set the duration something needs to exist and meet the rule criteria for prior to the the rule triggering and acting upon it"
                     ),
-                    "number"
+                    null,
+                    ["hour", "day", "week", "year"]
                 ),
+                "properties" => [
+                    "length" => ["type" => "string"],
+                    "unit" => ["type" => "string"],
+                ],
             ],
-            "triggerTimeUnit:s" => [
-                "enum" => ["hour", "day", "week", "year"],
-                "x-control" => SchemaForm::dropDown(
-                    new FormOptions("Trigger Time Unit", "Select the time unit."),
-                    new StaticFormChoices([
-                        "hour" => "Hour",
-                        "day" => "Day",
-                        "week" => "Week",
-                        "year" => "Year",
-                    ])
-                ),
-            ],
-            "maxTimeThreshold:i?" => [
-                "step" => 1,
-                "x-control" => SchemaForm::textBox(
+        ];
+    }
+
+    /**
+     * Get additional settings schema for the trigger, this will go in the end of trigger/action form fields.
+     *
+     * @return array
+     */
+    public static function getAdditionalSettingsSchema(): array
+    {
+        return [
+            "applyToNewContentOnly" => [
+                "type" => "boolean",
+                "default" => false,
+                "x-control" => SchemaForm::checkBox(
                     new FormOptions(
-                        "Oldest Retrieved Content Cap",
-                        "Any data older than this will be excluded from triggering the rule.  Whole numbers only.",
-                        "",
-                        "For the initial run or when running this rule once, there may be data that you feel goes too far into the past to act on. This number is the cut-off time; anything older than this will not be included in the run."
+                        "Apply to new content only",
+                        "When enabled, this rule will only be applied to new content that meets the trigger criteria."
                     ),
-                    "number"
+                    null,
+                    "none"
                 ),
             ],
-            "maxTimeUnit:s?" => [
-                "enum" => ["hour", "day", "week", "year"],
-                "x-control" => SchemaForm::dropDown(
-                    new FormOptions("Oldest Content Unit", "Select the time unit."),
-                    new StaticFormChoices([
-                        "hour" => "Hour",
-                        "day" => "Day",
-                        "week" => "Week",
-                        "year" => "Year",
-                    ])
+            "triggerTimeLookBackLimit" => [
+                "type" => "object",
+                "x-control" => SchemaForm::timeDuration(
+                    new FormOptions("Look-back Limit", "Do not apply the rule to content that is older than this.", ""),
+                    new FieldMatchConditional(
+                        "additionalSettings.triggerValue.applyToNewContentOnly",
+                        Schema::parse([
+                            "type" => "boolean",
+                            "const" => false,
+                        ])
+                    ),
+                    ["hour", "day", "week", "year"]
                 ),
+                "properties" => [
+                    "length" => ["type" => "string"],
+                    "unit" => ["type" => "string"],
+                ],
             ],
         ];
     }
@@ -135,20 +151,24 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
     public static function getTimeIntervalParseSchema(): array
     {
         return [
-            "maxTimeThreshold:i?" => [
-                "type" => "integer",
-                "nullable" => true,
+            "applyToNewContentOnly:b" => [
+                "type" => "boolean",
+                "default" => false,
             ],
-            "maxTimeUnit:s?" => [
-                "type" => "string",
-                "nullable" => true,
-                "enum" => ["hour", "day", "week", "year"],
+            "triggerTimeDelay:o" => [
+                "length:i",
+                "unit:s" => [
+                    "enum" => ["hour", "day", "week", "year"],
+                ],
             ],
-            "triggerTimeThreshold:i",
-            "triggerTimeUnit" => [
-                "type" => "string",
-                "nullable" => false,
-                "enum" => ["hour", "day", "week", "year"],
+            "triggerTimeLookBackLimit:o?" => [
+                "length:i?" => [
+                    "nullable" => true,
+                ],
+                "unit:s?" => [
+                    "nullable" => true,
+                    "enum" => ["hour", "day", "week", "year"],
+                ],
             ],
         ];
     }
@@ -162,31 +182,36 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
     protected static function addTimedValidations(Schema &$schema)
     {
         $schema
-            ->addValidator("maxTimeThreshold", function ($maxTimeThreshold, ValidationField $field) {
-                if (
-                    !empty($maxTimeThreshold) &&
-                    (!is_numeric($maxTimeThreshold) ||
-                        floor($maxTimeThreshold) !== ceil($maxTimeThreshold) ||
-                        $maxTimeThreshold < 0)
-                ) {
-                    $field->addError("Oldest Retrieved Content Cap should be positive whole numbers only.");
-                    return Invalid::value();
+            ->addFilter("triggerTimeLookBackLimit", function ($triggerTimeLookBackLimit) {
+                if (isset($triggerTimeLookBackLimit["unit"]) && $triggerTimeLookBackLimit["unit"] == "") {
+                    $triggerTimeLookBackLimit["unit"] = "hour";
                 }
-                return $maxTimeThreshold;
+                return $triggerTimeLookBackLimit;
             })
-            ->addValidator("triggerTimeThreshold", function ($triggerTimeThreshold, ValidationField $field) {
-                if (empty($triggerTimeThreshold)) {
+            ->addValidator("triggerTimeDelay", function ($triggerTimeDelay, ValidationField $field) {
+                if (empty($triggerTimeDelay["length"]) || empty($triggerTimeDelay["unit"])) {
                     $field->addError("missingField");
                     return Invalid::value();
                 } elseif (
-                    !is_numeric($triggerTimeThreshold) ||
-                    floor($triggerTimeThreshold) !== ceil($triggerTimeThreshold) ||
-                    $triggerTimeThreshold < 0
+                    !is_numeric($triggerTimeDelay["length"]) ||
+                    floor($triggerTimeDelay["length"]) !== ceil($triggerTimeDelay["length"]) ||
+                    $triggerTimeDelay["length"] < 0
                 ) {
                     $field->addError("Trigger Delay should be positive whole numbers only.");
                     return Invalid::value();
                 }
-                return $triggerTimeThreshold;
+                return $triggerTimeDelay;
+            })
+            ->addValidator("triggerTimeLookBackLimit", function ($triggerTimeLookBackLimit, ValidationField $field) {
+                if (
+                    (!empty($triggerTimeLookBackLimit["length"]) && !is_numeric($triggerTimeLookBackLimit["length"])) ||
+                    floor($triggerTimeLookBackLimit["length"]) !== ceil($triggerTimeLookBackLimit["length"]) ||
+                    $triggerTimeLookBackLimit["length"] < 0
+                ) {
+                    $field->addError("Look-back Limit should be positive whole numbers only.");
+                    return Invalid::value();
+                }
+                return $triggerTimeLookBackLimit;
             });
     }
 
@@ -207,6 +232,7 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
             "items" => [
                 "type" => "string",
             ],
+            "required" => true,
             "default" => array_keys($formChoices),
             "enum" => array_keys($formChoices),
             "x-control" => SchemaForm::dropDown(
@@ -216,6 +242,8 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
                 true
             ),
         ];
+
+        $schema["additionalSettings"] = self::getAdditionalSettingsSchema();
 
         return Schema::parse($schema);
     }
@@ -269,36 +297,57 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
                 "enum" => [static::getType()],
             ],
             "triggerValue:o" => static::getTriggerValueSchema(),
-        ])->addValidator("triggerValue", function ($postFields, ValidationField $field) {
-            if (!empty($postFields["maxTimeThreshold"]) && empty($postFields["maxTimeUnit"])) {
-                $field->setName("triggerValue.maxTimeUnit")->addError("Field is required.", [
-                    "code" => 403,
-                ]);
-                return Invalid::value();
-            }
-            if (
-                !empty($postFields["maxTimeUnit"]) &&
-                !empty($postFields["triggerTimeUnit"]) &&
-                !empty($postFields["triggerTimeThreshold"]) &&
-                !empty($postFields["maxTimeThreshold"])
-            ) {
-                $maxTimeThreshold = strtotime("+{$postFields["maxTimeThreshold"]}" . " " . $postFields["maxTimeUnit"]);
-                $triggerTimeThreshold = strtotime(
-                    "+{$postFields["triggerTimeThreshold"]}" . " " . $postFields["triggerTimeUnit"]
-                );
-                if ($maxTimeThreshold < $triggerTimeThreshold) {
-                    $field
-                        ->setName("triggerValue.maxTimeThreshold")
-                        ->addError("Oldest Retrieved Content Cap should be greater than Trigger Time Threshold.");
-                    return Invalid::value();
+        ])
+            ->addFilter("triggerValue", function ($triggerValue) {
+                if (
+                    isset($triggerValue["applyToNewContentOnly"]) &&
+                    $triggerValue["applyToNewContentOnly"] === true &&
+                    !empty($triggerValue["triggerTimeLookBackLimit"]["length"])
+                ) {
+                    unset($triggerValue["triggerTimeLookBackLimit"]);
                 }
-            }
-            return $postFields;
-        });
+                return $triggerValue;
+            })
+            ->addValidator("triggerValue", function ($postFields, ValidationField $field) {
+                if ($postFields["applyToNewContentOnly"] === false) {
+                    if (empty($postFields["triggerTimeLookBackLimit"]["length"])) {
+                        $field->setName("triggerValue.triggerTimeLookBackLimit")->addError("Field is required.", [
+                            "code" => 403,
+                        ]);
+                        return Invalid::value();
+                    }
+                    if (empty($postFields["triggerTimeLookBackLimit"]["unit"])) {
+                        $field->setName("triggerValue.triggerTimeLookBackLimit")->addError("Field is required.", [
+                            "code" => 403,
+                        ]);
+                        return Invalid::value();
+                    }
+
+                    $maxTime = strtotime(
+                        "+{$postFields["triggerTimeLookBackLimit"]["length"]}" .
+                            " " .
+                            $postFields["triggerTimeLookBackLimit"]["unit"]
+                    );
+                    $triggerTime = strtotime(
+                        "+{$postFields["triggerTimeDelay"]["length"]}" . " " . $postFields["triggerTimeDelay"]["unit"]
+                    );
+                    if ($maxTime < $triggerTime) {
+                        $field
+                            ->setName("triggerValue.triggerTimeLookBackLimit")
+                            ->addError("Look-back Limit should be greater than Trigger Delay.");
+                        return Invalid::value();
+                    }
+                }
+                return $postFields;
+            });
     }
 
     /**
-     * @inheridoc
+     * provide `where` condition based on trigger values and date offset
+     *
+     * @param array $triggerValue
+     * @param DateTimeImmutable|null $lastRunDate
+     * @return array
      */
     public function getWhereArray(array $triggerValue, ?DateTimeImmutable $lastRunDate = null): array
     {

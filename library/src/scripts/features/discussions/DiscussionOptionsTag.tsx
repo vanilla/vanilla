@@ -1,6 +1,6 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -11,7 +11,7 @@ import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import TagDiscussionForm from "@library/features/discussions/forms/TagDiscussionForm";
-import { cx, css } from "@emotion/css";
+import { css } from "@emotion/css";
 
 export const DiscussionOptionsTag: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
     discussion,
@@ -25,9 +25,11 @@ export const DiscussionOptionsTag: FunctionComponent<{ discussion: IDiscussion; 
         !!onSuccess && (await onSuccess());
         close();
     }
-    const visibleOverrideForSuggestions = css(`
-        overflow: visible!important
-    `);
+    const visibleOverrideForSuggestions = css({
+        "&&": {
+            overflow: "visible",
+        },
+    });
 
     return (
         <>

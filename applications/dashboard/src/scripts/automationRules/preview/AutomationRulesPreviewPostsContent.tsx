@@ -4,21 +4,18 @@
  */
 
 import { t } from "@vanilla/i18n";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
-import Translate from "@library/content/Translate";
-import { humanReadableNumber } from "@library/content/NumberFormatted";
 import NumberedPager from "@library/features/numberedPager/NumberedPager";
-import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 import { DISCUSSIONS_MAX_PAGE_COUNT, useDiscussionList } from "@library/features/discussions/discussionHooks";
 import { LoadStatus } from "@library/@types/api/core";
 import { MetaItem } from "@library/metas/Metas";
 import { cx } from "@emotion/css";
 import DateTime from "@library/content/DateTime";
-import { ErrorIcon } from "@library/icons/common";
-import Message from "@library/messages/Message";
 import { AutomationRulesPreviewContent } from "@dashboard/automationRules/preview/AutomationRulesPreviewContent";
+import { loadingPlaceholder } from "@dashboard/automationRules/AutomationRules.utils";
+import { AutomationRulesPreviewContentHeader } from "@dashboard/automationRules/preview/AutomationRulesPreviewContentHeader";
 
 interface IProps extends Omit<React.ComponentProps<typeof AutomationRulesPreviewContent>, "formValues"> {
     query: IGetDiscussionListParams;
@@ -55,57 +52,15 @@ export function AutomationRulesPreviewPostsContent(props: IProps) {
         }
     }, [discussionsData?.pagination?.currentPage, discussionsData?.pagination?.total]);
 
-    const message = useMemo(() => {
-        if (totalResults) {
-            return (
-                <>
-                    <div className={classes.bold}>
-                        <Translate
-                            source={"Posts Matching Criteria Now: <0 />"}
-                            c0={
-                                totalResults >= DISCUSSIONS_MAX_PAGE_COUNT
-                                    ? `${humanReadableNumber(totalResults)}+`
-                                    : totalResults
-                            }
-                        />
-                    </div>
-                    <div>
-                        {props.fromStatusToggle
-                            ? t(
-                                  "The action will apply to them when the rule is enabled. In future, other posts who meet the trigger criteria will have the action applied to them as well.",
-                              )
-                            : t("The action will be applied to only them if you proceed.")}
-                    </div>
-                    <div className={classes.italic}>
-                        {t("Note: Actions will not affect posts that already have the associated action applied.")}
-                    </div>
-                </>
-            );
-        } else if (status === LoadStatus.SUCCESS && !discussionsData?.discussionList.length) {
-            return (
-                <>
-                    {t(
-                        "This will not affect any posts right now. It will affect those that meet the criteria in future.",
-                    )}
-                </>
-            );
-        }
-    }, [discussionsData]);
-
     return (
         <>
-            {status === LoadStatus.ERROR && (
-                <div className={classes.padded()}>
-                    <Message
-                        type="error"
-                        stringContents={t(
-                            "Failed to load the preview data. Please check your trigger and action values.",
-                        )}
-                        icon={<ErrorIcon />}
-                    />
-                </div>
-            )}
-            <div>{message}</div>
+            <AutomationRulesPreviewContentHeader
+                contentType="Posts"
+                totalResults={totalResults}
+                emptyResults={status === LoadStatus.SUCCESS && !discussionsData?.discussionList.length}
+                fromStatusToggle={props.fromStatusToggle}
+                hasError={status === LoadStatus.ERROR}
+            />
             {totalResults && currentPage && (
                 <div>
                     <NumberedPager
@@ -123,18 +78,7 @@ export function AutomationRulesPreviewPostsContent(props: IProps) {
                 </div>
             )}
             <ul>
-                {status === LoadStatus.LOADING && (
-                    <div className={classes.padded(true)} style={{ marginTop: 16 }}>
-                        {Array.from({ length: 12 }, (_, index) => (
-                            <div key={index} className={classes.flexContainer()} style={{ marginBottom: 16 }}>
-                                <LoadingRectangle
-                                    style={{ width: 25, height: 25, marginRight: 10, borderRadius: "50%" }}
-                                />
-                                <LoadingRectangle style={{ width: "95%", height: 25 }} />
-                            </div>
-                        ))}
-                    </div>
-                )}
+                {status === LoadStatus.LOADING && loadingPlaceholder("preview")}
                 {hasDiscussions &&
                     discussionsData?.discussionList.map((discussion, index) => (
                         <li

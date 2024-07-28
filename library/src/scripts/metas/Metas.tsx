@@ -10,11 +10,16 @@ import { cx } from "@emotion/css";
 import classNames from "classnames";
 import { Tag } from "@library/metas/Tags";
 import { TagPreset, tagsVariables } from "@library/metas/Tags.variables";
-import { Icon, IconType } from "@vanilla/icons";
+import { Icon, IconSize, IconType } from "@vanilla/icons";
 import { iconVariables } from "@library/icons/iconStyles";
 import SmartLink from "@library/routing/links/SmartLink";
+import ProfileLink from "@library/navigation/ProfileLink";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+import { IUserFragment } from "@library/@types/api/users";
 
-interface IProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+    flex?: boolean;
+}
 
 export function Metas(props: IProps) {
     const classes = metasClasses();
@@ -24,7 +29,8 @@ export function Metas(props: IProps) {
 
 export const MetaItem = React.forwardRef(function MetaItem(props: IProps, ref: React.RefObject<HTMLDivElement>) {
     const classes = metasClasses();
-    return <div {...props} ref={ref} className={cx(classes.meta, props.className)} />;
+    const { flex, ...rest } = props;
+    return <div {...rest} ref={ref} className={cx(classes.meta, flex && classes.metaFlexed, props.className)} />;
 });
 
 export function MetaLink(props: React.ComponentProps<typeof SmartLink>) {
@@ -62,8 +68,10 @@ export const MetaTag = React.forwardRef(function MetaTag(
 export function MetaIcon(props: React.ComponentProps<typeof Icon>) {
     const { className, children, ...rest } = props;
     const {
-        standard: { height: iconHeight },
+        standard: { height },
     } = iconVariables();
+
+    const iconHeight = props.size ? IconSize[props.size] : height;
     const classes = metasClasses();
 
     return (
@@ -100,5 +108,18 @@ export function MetaButton(
                 {children}
             </button>
         </MetaItem>
+    );
+}
+
+export function MetaProfile(props: { user: IUserFragment; className?: string }) {
+    const classes = metasClasses();
+
+    return (
+        <span className={cx(classes.profileMeta, props.className)}>
+            <ProfileLink userFragment={props.user} isUserCard>
+                <UserPhoto size={UserPhotoSize.XSMALL} userInfo={props.user} />
+                {props.user.name}
+            </ProfileLink>
+        </span>
     );
 }

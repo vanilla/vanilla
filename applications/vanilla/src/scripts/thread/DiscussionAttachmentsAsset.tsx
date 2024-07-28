@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import {
     ReadableIntegrationContextProvider,
@@ -75,6 +75,7 @@ export function DiscussionAttachment(props: { attachment: IAttachment; onSuccess
     const title = integration?.title ?? "Unknown Integration";
     const externalIDLabel = integration?.externalIDLabel ?? "Unknown #";
     const logoIcon = integration?.logoIcon ?? "meta-external";
+    const attachmentTypeIcon = integration?.attachmentTypeIcon;
 
     return (
         <AttachmentLayout
@@ -83,6 +84,7 @@ export function DiscussionAttachment(props: { attachment: IAttachment; onSuccess
             url={sourceUrl}
             idLabel={externalIDLabel}
             icon={<Icon icon={logoIcon} height={60} width={60} />}
+            attachmentTypeIcon={attachmentTypeIcon ? <Icon icon={attachmentTypeIcon} /> : undefined}
             id={sourceID ? `${sourceID}` : undefined}
             dateUpdated={dateUpdated ?? dateInserted}
             user={insertUser}

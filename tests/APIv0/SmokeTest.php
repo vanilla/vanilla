@@ -99,6 +99,7 @@ class SmokeTest extends SiteTestCase
         $this->config->saveToConfig([
             "Garden.Registration.Method" => "Basic",
             "Garden.Registration.ConfirmEmail" => false,
+            "Garden.Registration.SSOConfirmEmail" => false,
             "Garden.Registration.SkipCaptcha" => true,
         ]);
 

@@ -3,15 +3,17 @@
  * @license GPL-2.0-only
  */
 
-import { IUserFragment } from "@library/@types/api/users";
+import { IReaction } from "@dashboard/@types/api/reaction";
+import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { IImage } from "@library/@types/api/core";
+import { IUserFragment } from "@library/@types/api/users";
+import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { RecordID } from "@vanilla/utils";
-import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { IReaction } from "@dashboard/@types/api/reaction";
-import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
+import { IReason } from "@dashboard/moderation/CommunityManagementTypes";
 
 export interface IDiscussion {
     discussionID: RecordID;
@@ -45,6 +47,7 @@ export interface IDiscussion {
     excerpt?: string;
     body?: string;
     tags?: ITag[];
+    countReports?: number;
 
     pinLocation?: "recent" | "category";
 
@@ -55,8 +58,24 @@ export interface IDiscussion {
     dismissed?: boolean;
 
     reactions?: IReaction[];
+    statusID: number;
     status?: IRecordStatus;
+    internalStatusID?: number;
+    internalStatus?: IRecordStatus;
     attachments?: IAttachment[];
+    reportMeta?: IReportMeta;
+    suggestions?: ISuggestedAnswer[];
+    showSuggestions?: boolean;
+}
+
+export interface IReportMeta {
+    countReports: number;
+    countReportUsers: number;
+    dateLastReport: string;
+    reportReasonIDs: string[];
+    reportReasons: IReason[];
+    reportUserIDs: number[];
+    reportUsers: IUserFragment[];
 }
 
 export interface IRecordStatus {

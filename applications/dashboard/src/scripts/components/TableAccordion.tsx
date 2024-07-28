@@ -24,8 +24,7 @@ interface IProps {
 
 export function TableAccordion(props: IProps) {
     const { toggleButtonContent, onExpandChange } = props;
-    const [ownIsExpanded, setIsExpanded] = useState(props.isExpanded ?? false);
-    const isExpanded = props.isExpanded ?? ownIsExpanded;
+    const [isExpanded, setIsExpanded] = useState(props.isExpanded ?? false);
 
     const ref = useRef<HTMLDivElement>(null);
     const measurements = useMeasure(ref);

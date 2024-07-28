@@ -841,9 +841,9 @@ abstract class Gdn_SQLDriver
      *
      * @return int
      */
-    public function getPagingCount(string $primaryKeyField): int
+    public function getPagingCount(string $primaryKeyField, ?int $limit = null): int
     {
-        $limit = Gdn::config("Vanilla.APIv2.MaxCount", 10000);
+        $limit = $limit ?? Gdn::config("Vanilla.APIv2.MaxCount", 10000);
         $countQuery = $this->resetSelects()
             ->select($primaryKeyField)
             ->limit($limit)

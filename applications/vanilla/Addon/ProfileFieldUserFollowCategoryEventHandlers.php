@@ -10,21 +10,21 @@ use Garden\EventHandlersInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\AutomationRules\Actions\UserFollowCategoryAction;
 use Vanilla\Dashboard\Addon\AbstractProfileFieldEventHandler;
-use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
-use Vanilla\Dashboard\Models\AutomationRuleModel;
 
+// Needed because special classes are loaded before the autoloader is ready.
+require_once PATH_APPLICATIONS . "/dashboard/Addon/AbstractProfileFieldEventHandler.php";
 /**
  * Automation rule event that captures profile fields update and triggers the category follow action.
  */
 class ProfileFieldUserFollowCategoryEventHandlers extends AbstractProfileFieldEventHandler implements
     EventHandlersInterface
 {
-    public function __construct(
-        AutomationRuleService $automationRuleService,
-        AutomationRuleModel $automationRuleModel,
-        LoggerInterface $log
-    ) {
-        parent::__construct($automationRuleService, $automationRuleModel, $log);
+    /**
+     * D.I.
+     */
+    public function __construct(LoggerInterface $log)
+    {
+        parent::__construct($log);
         $this->actionType = UserFollowCategoryAction::getType();
     }
 

@@ -90,6 +90,7 @@ class InstallModel
             "Garden.Unsubscribe.Salt" => $this->config->get("Garden.Unsubscribe.Salt") ?: betterRandomString(32, "Aa0"),
             "Garden.Cookie.Domain" => "",
             "Garden.Registration.ConfirmEmail" => true,
+            "Garden.Registration.SSOConfirmEmail" => false,
             "Garden.Email.SupportName" => $data["site"]["title"],
         ];
         $this->config->saveToConfig($config);

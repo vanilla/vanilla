@@ -89,6 +89,7 @@ export const accountSettingsClasses = useThemeCache(() => {
 
     const fitWidth = css({
         maxWidth: "fit-content",
+        paddingTop: "0",
     });
 
     const instructions = css({

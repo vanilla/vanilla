@@ -4,10 +4,9 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { act, fireEvent, render } from "@testing-library/react";
-import { deserializeHtml, LegacyVanillaEditor, emailLinkCheck } from "@library/vanilla-editor/VanillaEditor.loadable";
 import { mockAPI } from "@library/__tests__/utility";
+import { LegacyVanillaEditor, deserializeHtml, emailLinkCheck } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { act, fireEvent, render } from "@testing-library/react";
 
 describe("deserializeHtml", () => {
     const MOCK_HTML = `<p>This is a <strong>test</strong> html <span class="some-class-name">fragment</span></p>`;

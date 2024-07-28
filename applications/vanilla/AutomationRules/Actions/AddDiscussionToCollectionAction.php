@@ -11,8 +11,7 @@ use Garden\Container\NotFoundException;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
-use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
-use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
@@ -21,7 +20,7 @@ use Vanilla\Logger;
 use Vanilla\Models\CollectionModel;
 use Gdn;
 
-class AddDiscussionToCollectionAction extends AutomationAction implements AutomationActionInterface
+class AddDiscussionToCollectionAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
@@ -43,6 +42,14 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Automa
     /**
      * @inheridoc
      */
+    public static function getContentType(): string
+    {
+        return "posts";
+    }
+
+    /**
+     * @inheridoc
+     */
     public static function getSchema(): Schema
     {
         $schema = [
@@ -51,6 +58,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Automa
                 "items" => [
                     "type" => "integer",
                 ],
+                "required" => true,
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Collection to add to", "Select one or more collections."),
                     new ApiFormChoices("/api/v2/collections", "/api/v2/collections/%s", "collectionID", "name"),
@@ -68,7 +76,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Automa
      */
     public static function getTriggers(): array
     {
-        return [StaleDiscussionTrigger::getType(), LastActiveDiscussionTrigger::getType()];
+        return DiscussionRuleDataType::getTriggers();
     }
 
     /**

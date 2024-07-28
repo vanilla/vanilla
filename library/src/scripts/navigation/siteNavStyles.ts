@@ -362,12 +362,14 @@ export const siteNavNodeDashboardClasses = useThemeCache(
 
         const badge = css({
             fontSize: 11,
-            display: "inline-block",
-            padding: "2px 4px",
-            marginLeft: 4,
-            backgroundColor: "#595959",
-            color: "#fff",
+            display: "inline",
+            padding: "0px 4px",
+            position: "relative",
+            top: -1,
+            marginLeft: 6,
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
             verticalAlign: "text-bottom",
+            border: `1px solid ${ColorsUtils.colorOut(globalVars.mainColors.primary)}`,
             borderRadius: 4,
         });
 

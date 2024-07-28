@@ -10,7 +10,6 @@ import { ITriageRecord } from "@dashboard/moderation/CommunityManagementTypes";
 import { TriageListItem } from "@dashboard/moderation/components/TriageListItem";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
@@ -27,57 +26,60 @@ import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerMod
 import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { EmptyState } from "@dashboard/moderation/components/EmptyState";
+import { IMessageInfo, MessageAuthorModal } from "@dashboard/moderation/components/MessageAuthorModal";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import { CONF_ESCALATIONS_ENABLED } from "@dashboard/communityManagementSettings/ModerationContentSettingsPage";
+import { useConfigsByKeys } from "@library/config/configHooks";
+import Message from "@library/messages/Message";
+import { getMeta } from "@library/utility/appUtils";
 
 interface IProps {}
 
 const filterDefaults: ITriageFilters & ISort = {
-    recordInternalStatusID: [TriageInternalStatus.UNRESOLVED],
-    recordUserID: [],
-    recordUserRoleID: [],
-    placeRecordID: [],
+    internalStatusID: [TriageInternalStatus.UNRESOLVED],
+    insertUserID: [],
+    insertUserRoleID: [],
+    categoryID: [],
     sort: "-recordDateInserted",
 };
 
 interface ITriageData {
-    results: ITriageRecord[];
+    results: IDiscussion[];
     pagination: ILinkPages;
     sort: string;
 }
 
 const sortOptions = [
-    { value: "-recordDateInserted", name: t("Newest Post") },
-    { value: "recordDateInserted", name: t("Oldest Post") },
+    { value: "-dateInserted", name: t("Newest Post") },
+    { value: "dateInserted", name: t("Oldest Post") },
 ];
 
 function TriagePage(props: IProps) {
     const cmdClasses = communityManagementPageClasses();
-    const [recordToEscalate, setRecordToEscalate] = useState<ITriageRecord | null>(null);
+    const [recordToEscalate, setRecordToEscalate] = useState<IDiscussion | null>(null);
 
     const device = useTitleBarDevice();
     const { hasCollision } = useCollisionDetector();
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
     const [selectedSort, setSelectedSort] = useState<ISelectBoxItem>();
+    const [authorMessage, setAuthorMessage] = useState<IMessageInfo | null>(null);
 
-    const initialStatusIDs = useQueryParam("recordInternalStatusID", filterDefaults.recordInternalStatusID);
-    const initialRecordUserID = useQueryParam("recordUserID", filterDefaults.recordUserID);
-    const initialRecordUserRoleID = useQueryParam("recordUserRoleID", filterDefaults.recordUserRoleID);
-    const initialPlaceRecordID = useQueryParam("placeRecordID", filterDefaults.placeRecordID);
+    const initialStatusIDs = useQueryParam("internalStatusID", filterDefaults.internalStatusID);
+    const initialRecordUserID = useQueryParam("insertUserID", filterDefaults.insertUserID);
+    const initialRecordUserRoleID = useQueryParam("insertUserRoleID", filterDefaults.insertUserRoleID);
+    const initialPlaceRecordID = useQueryParam("categoryID", filterDefaults.categoryID);
 
     const [filters, setFilters] = useState<ITriageFilters>({
-        recordInternalStatusID: initialStatusIDs,
-        recordUserID: initialRecordUserID,
-        recordUserRoleID: initialRecordUserRoleID,
-        placeRecordID: initialPlaceRecordID,
+        internalStatusID: initialStatusIDs,
+        insertUserID: initialRecordUserID,
+        insertUserRoleID: initialRecordUserRoleID,
+        categoryID: initialPlaceRecordID,
     });
 
     const handleFilterSet = (newFilters: ITriageFilters) => {
         const tmpFilters = { ...filters, ...newFilters };
-        if (tmpFilters?.placeRecordID?.length > 0) {
-            tmpFilters.placeRecordType = "category";
-        }
-        if (!tmpFilters?.placeRecordID || tmpFilters?.placeRecordID?.length === 0) {
-            tmpFilters.placeRecordType = undefined;
-        }
         setFilters(tmpFilters);
     };
 
@@ -87,8 +89,14 @@ function TriagePage(props: IProps) {
 
     const triageQuery = useQuery<any, IError, ITriageData>({
         queryFn: async () => {
-            const response = await apiv2.get("/reports/triage", {
-                params: { ...filters, expand: "users", sort: selectedSort?.value, limit: 100, page },
+            const response = await apiv2.get("/discussions", {
+                params: {
+                    ...filters,
+                    expand: ["reportMeta", "category", "attachments", "status"],
+                    sort: selectedSort?.value,
+                    limit: 100,
+                    page,
+                },
             });
             const pagination = SimplePagerModel.parseHeaders(response.headers);
 
@@ -109,68 +117,76 @@ function TriagePage(props: IProps) {
     };
 
     return (
-        <AdminLayout
-            title={t("Triage Dashboard")}
-            leftPanel={!isCompact && <ModerationNav />}
-            rightPanel={<TriageFilters value={filters} onFilter={(newFilters) => handleFilterSet(newFilters)} />}
-            content={
-                <AttachmentIntegrationsContextProvider>
-                    <section className={cmdClasses.secondaryTitleBar}>
-                        <span>
-                            <Sort
-                                sortOptions={sortOptions}
-                                selectedSort={selectedSort}
-                                onChange={(sort) => {
-                                    setSelectedSort(sort);
-                                    if (page !== 1) setPage(1);
-                                }}
+        <>
+            <DocumentTitle title={t("Triage")} />
+            <AdminLayout
+                title={t("Triage Dashboard")}
+                leftPanel={!isCompact && <ModerationNav />}
+                rightPanel={<TriageFilters value={filters} onFilter={(newFilters) => handleFilterSet(newFilters)} />}
+                content={
+                    <>
+                        <section className={cmdClasses.secondaryTitleBar}>
+                            <span>
+                                <Sort
+                                    sortOptions={sortOptions}
+                                    selectedSort={selectedSort}
+                                    onChange={(sort) => {
+                                        setSelectedSort(sort);
+                                        if (page !== 1) setPage(1);
+                                    }}
+                                />
+                            </span>
+                            <NumberedPager
+                                className={cmdClasses.pager}
+                                isMobile={false}
+                                showNextButton={false}
+                                onChange={setPage}
+                                {...paginationProps}
                             />
-                        </span>
-                        <NumberedPager
-                            className={cmdClasses.pager}
-                            isMobile={false}
-                            showNextButton={false}
-                            onChange={setPage}
-                            {...paginationProps}
+                        </section>
+                        <section className={cmdClasses.content}>
+                            {triageQuery.isLoading && (
+                                <div>
+                                    <Loader />
+                                </div>
+                            )}
+                            {triageQuery.isSuccess && triageQuery.data.results.length === 0 && (
+                                <EmptyState subtext={t("New posts matching your filters will appear here")} />
+                            )}
+                            {triageQuery.isSuccess && (
+                                <div className={cmdClasses.list}>
+                                    {triageQuery.data.results.map((discussion: IDiscussion) => (
+                                        <TriageListItem
+                                            key={discussion.discussionID}
+                                            discussion={discussion}
+                                            onEscalate={(discussion) => {
+                                                setRecordToEscalate(discussion);
+                                            }}
+                                            onMessageAuthor={(userID, url) => setAuthorMessage({ userID, url })}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+                        <EscalateModal
+                            escalationType={"record"}
+                            report={null}
+                            recordType={recordToEscalate?.type}
+                            record={recordToEscalate ?? null}
+                            isVisible={!!recordToEscalate}
+                            onClose={() => {
+                                setRecordToEscalate(null);
+                            }}
                         />
-                    </section>
-                    <section className={cmdClasses.content}>
-                        {triageQuery.isLoading && (
-                            <div>
-                                <Loader />
-                            </div>
-                        )}
-                        {triageQuery.isSuccess && triageQuery.data.results.length === 0 && (
-                            <div>
-                                <p>{t("All reports are handled! 😀")}</p>
-                            </div>
-                        )}
-                        {triageQuery.isSuccess && (
-                            <div className={cmdClasses.list}>
-                                {triageQuery.data.results.map((triageItem: ITriageRecord) => (
-                                    <TriageListItem
-                                        key={triageItem.recordID}
-                                        triageItem={triageItem}
-                                        onEscalate={(report) => {
-                                            setRecordToEscalate(report);
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </section>
-                    <EscalateModal
-                        report={null}
-                        recordID={recordToEscalate?.recordID ?? null}
-                        recordType={recordToEscalate?.recordType ?? null}
-                        isVisible={!!recordToEscalate}
-                        onClose={() => {
-                            setRecordToEscalate(null);
-                        }}
-                    />
-                </AttachmentIntegrationsContextProvider>
-            }
-        />
+                        <MessageAuthorModal
+                            messageInfo={authorMessage}
+                            isVisible={!!authorMessage}
+                            onClose={() => setAuthorMessage(null)}
+                        />
+                    </>
+                }
+            />
+        </>
     );
 }
 

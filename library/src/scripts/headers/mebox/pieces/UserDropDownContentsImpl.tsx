@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import apiv2 from "@library/apiv2";
 import Permission from "@library/features/users/Permission";
 import UserActions from "@library/features/users/UserActions";
@@ -79,7 +80,74 @@ function UserDropDownContentsImpl(props: IProps) {
     const classesDropDown = dropDownClasses();
 
     const reportUrl = getMeta("reporting.url", null);
-    const cmdEnabled = getMeta("featureFlags.CommunityManagement.Enabled", false);
+    const betaEnabled = getMeta("featureFlags.CommunityManagementBeta.Enabled", false);
+    const cmdEnabled = getMeta("featureFlags.escalations.Enabled", false);
+
+    const moderationItems: React.ReactNode[] = [];
+    if (hasPermission("users.approve")) {
+        moderationItems.push(
+            <DropDownItemLinkWithCount
+                to={"/dashboard/user/applicants"}
+                name={t("Applicants")}
+                count={getCountByName("Applicants")}
+            />,
+        );
+    }
+
+    if (getMeta("triage.enabled", false) && hasPermission("staff.allow")) {
+        moderationItems.push(
+            <DropDownItemLinkWithCount
+                to={"/dashboard/content/triage"}
+                name={t("Triage")}
+                count={getCountByName("triage")}
+            />,
+        );
+    }
+
+    if (betaEnabled && cmdEnabled && hasPermission(["community.moderate", "posts.moderate"])) {
+        moderationItems.push(
+            <>
+                <DropDownItemLinkWithCount
+                    to={"/dashboard/content/reports"}
+                    name={t("Reports")}
+                    count={getCountByName("reports")}
+                />
+                <DropDownItemLinkWithCount
+                    to={"/dashboard/content/escalations"}
+                    name={t("Escalations")}
+                    count={getCountByName("escalations")}
+                />
+            </>,
+        );
+    }
+
+    if (hasPermission("community.moderate")) {
+        if (getCountByName("SpamQueue") > 0 || !cmdEnabled || !betaEnabled) {
+            moderationItems.push(
+                <DropDownItemLinkWithCount
+                    to={"/dashboard/log/spam"}
+                    name={t("Spam Queue")}
+                    count={getCountByName("SpamQueue")}
+                />,
+            );
+        }
+
+        if (getCountByName("FlaggedQueue") > 0 || !cmdEnabled || !betaEnabled) {
+            moderationItems.push(
+                <DropDownItemLinkWithCount
+                    to={"/dashboard/log/moderation"}
+                    name={t("Moderation Queue")}
+                    count={getCountByName("ModerationQueue")}
+                />,
+            );
+        }
+
+        if (!cmdEnabled || !betaEnabled) {
+            moderationItems.push(
+                <>{reportUrl && <DropDownItemLinkWithCount to={reportUrl} name={t("Reported Posts")} />}</>,
+            );
+        }
+    }
 
     return (
         <ul className={cx(classesDropDown.verticalPadding, props.className)}>
@@ -104,37 +172,13 @@ function UserDropDownContentsImpl(props: IProps) {
                     />
                 </DropDownSection>
             ) : null}
-            <Permission permission={["community.moderate"]}>
+            {moderationItems.length > 0 && (
                 <DropDownSection title={t("Moderation")}>
-                    <DropDownItemLinkWithCount
-                        to={"/dashboard/user/applicants"}
-                        name={t("Applicants")}
-                        count={getCountByName("Applicants")}
-                    />
-                    {cmdEnabled ? (
-                        <>
-                            <DropDownItemLink to={"/dashboard/content/triage"} name={t("Triage")} />
-                            <DropDownItemLink to={"/dashboard/content/reports"} name={t("Reports")} />
-                            <DropDownItemLink to={"/dashboard/content/escalations"} name={t("Escalations")} />
-                        </>
-                    ) : (
-                        <>
-                            <DropDownItemLinkWithCount
-                                to={"/dashboard/log/spam"}
-                                name={t("Spam Queue")}
-                                count={getCountByName("SpamQueue")}
-                            />
-                            <DropDownItemLinkWithCount
-                                to={"/dashboard/log/moderation"}
-                                name={t("Moderation Queue")}
-                                count={getCountByName("ModerationQueue")}
-                            />
-                        </>
-                    )}
-
-                    {reportUrl && <DropDownItemLinkWithCount to={reportUrl} name={t("Reported Posts")} />}
+                    {moderationItems.map((item, i) => {
+                        return <React.Fragment key={i}>{item}</React.Fragment>;
+                    })}
                 </DropDownSection>
-            </Permission>
+            )}
             <DropDownItemSeparator />
             {makeAdminItems()}
             <DropDownItemSeparator />

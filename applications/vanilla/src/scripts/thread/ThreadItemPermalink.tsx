@@ -30,7 +30,15 @@ export default function ThreadItemPermalink() {
                 title={t("Copy Link")}
                 aria-label={t("Copy Link")}
                 onClick={async () => {
-                    await handleCopyUrl();
+                    const queryParams = new URLSearchParams(window.location.search);
+
+                    // Special handling for Q&A tabbed comment section
+                    if (queryParams.has("tab")) {
+                        await handleCopyUrl("tab", queryParams.get("tab"));
+                    } else {
+                        await handleCopyUrl();
+                    }
+
                     toast.addToast({
                         body: <>{t("Link copied to clipboard.")}</>,
                         autoDismiss: true,

@@ -48,6 +48,7 @@ trait PermissionsTranslationTrait
             "discussions.delete",
             "events.view",
             "events.manage",
+            "posts.moderate",
         ],
     ];
 
@@ -75,12 +76,7 @@ trait PermissionsTranslationTrait
     ];
 
     /** @var array Permissions that have been deprecated and should no longer be used. */
-    private $deprecatedPermissions = [
-        "Garden.Activity.Delete",
-        "Garden.Activity.View",
-        "Vanilla.Approval.Require",
-        "Vanilla.Comments.Me",
-    ];
+    private $deprecatedPermissions = ["Garden.Activity.Delete", "Garden.Activity.View", "Vanilla.Comments.Me"];
 
     /** @var array A static mapping of updated permission names. */
     private $renamedPermissions = [

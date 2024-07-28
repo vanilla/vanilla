@@ -201,7 +201,7 @@ components:
                     type: array
                     items:
                         type: string
-                    example: ["spam", "fraud-or-scam"]
+                    example: ["spam", "abuse"]
                 noteBody:
                     description: Additional information about the report.
                     type: string
@@ -213,6 +213,12 @@ components:
                 recordIsLive:
                     type: boolean
                     description: If false, remove the post from the frontend.
+
+                initialCommentBody:
+                    type: string
+                    description: Create an initial comment on the escalation.
+                initialCommentFormat:
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/Format"
             required:
                 - name
                 - recordType
@@ -224,6 +230,10 @@ components:
                 name:
                     description: Title of the escalation.
                     type: string
+                url:
+                    description: HTML url of the escalation.
+                    type: string
+                    format: uri
                 status:
                     type: string
                     description: Status of the escalation.

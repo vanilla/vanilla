@@ -436,4 +436,5 @@ export const STORY_DISCUSSION = {
         categoryID: 1111111111111111,
     },
     reactions: STORY_REACTIONS,
+    statusID: 1,
 };

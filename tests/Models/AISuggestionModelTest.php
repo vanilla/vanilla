@@ -12,7 +12,10 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Utility\ArrayUtils;
+use VanillaTests\ExpectedNotification;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\NotificationsApiTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -23,6 +26,7 @@ class AISuggestionModelTest extends SiteTestCase
 {
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
+    use NotificationsApiTestTrait;
 
     public static $addons = ["qna"];
 
@@ -30,21 +34,24 @@ class AISuggestionModelTest extends SiteTestCase
 
     private AiSuggestionSourceService $suggestionSourceService;
 
+    private array $assistantUser;
+
     /**
      * Instantiate fixtures.
      */
     public function setUp(): void
     {
         parent::setUp();
-        $this->createUser();
+        $assistantUser = $this->createUser();
         \Gdn::config()->saveToConfig([
             "Feature.AISuggestions.Enabled" => true,
             "aiSuggestions" => [
                 "enabled" => true,
-                "userID" => $this->lastUserID,
+                "userID" => $assistantUser["userID"],
                 "sources" => ["mockSuggestion" => ["enabled" => true]],
             ],
         ]);
+        $this->assistantUser = $assistantUser;
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->suggestionSourceService = $this->container()->get(AiSuggestionSourceService::class);
     }
@@ -63,15 +70,18 @@ class AISuggestionModelTest extends SiteTestCase
         $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
         $suggestions = $newDiscussion["Attributes"]["suggestions"];
         $this->assertCount(3, $suggestions);
-        $this->assertSame($suggestions[0], [
-            "format" => "Vanilla",
-            "type" => "mockSuggestion",
-            "id" => 0,
-            "url" => "someplace.com/here",
-            "title" => "answer 1",
-            "summary" => "This is how you do this.",
-            "hidden" => false,
-        ]);
+        $this->assertSame(
+            [
+                "format" => "Vanilla",
+                "type" => "mockSuggestion",
+                "id" => 0,
+                "url" => "someplace.com/here",
+                "title" => "answer 1",
+                "summary" => "This is how you do this.",
+                "hidden" => false,
+            ],
+            $suggestions[0]
+        );
 
         $createdComments = $this->runWithUser(function () use ($discussion) {
             $suggestion = $this->container()->get(AiSuggestionSourceService::class);
@@ -99,15 +109,18 @@ class AISuggestionModelTest extends SiteTestCase
         $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
         $suggestions = $newDiscussion["Attributes"]["suggestions"];
         $this->assertCount(3, $suggestions);
-        $this->assertSame($suggestions[0], [
-            "format" => "Vanilla",
-            "type" => "mockSuggestion",
-            "id" => 0,
-            "url" => "someplace.com/here",
-            "title" => "answer 1",
-            "summary" => "This is how you do this.",
-            "hidden" => false,
-        ]);
+        $this->assertSame(
+            [
+                "format" => "Vanilla",
+                "type" => "mockSuggestion",
+                "id" => 0,
+                "url" => "someplace.com/here",
+                "title" => "answer 1",
+                "summary" => "This is how you do this.",
+                "hidden" => false,
+            ],
+            $suggestions[0]
+        );
 
         $createdComments = $this->runWithUser(function () use ($discussion) {
             $suggestion = $this->container()->get(AiSuggestionSourceService::class);
@@ -187,17 +200,17 @@ class AISuggestionModelTest extends SiteTestCase
 
         // Test that suggestions are not hidden by default
         $this->assertCount(3, $suggestions);
-        $this->assertSame($suggestions[0]["hidden"], false);
-        $this->assertSame($suggestions[1]["hidden"], false);
-        $this->assertSame($suggestions[2]["hidden"], false);
+        $this->assertSame(false, $suggestions[0]["hidden"]);
+        $this->assertSame(false, $suggestions[1]["hidden"]);
+        $this->assertSame(false, $suggestions[2]["hidden"]);
 
         // Hide the first two suggestions.
         $this->suggestionSourceService->toggleSuggestions($newDiscussion, [0, 1]);
         $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
         $suggestions = $newDiscussion["Attributes"]["suggestions"];
-        $this->assertSame($suggestions[0]["hidden"], true);
-        $this->assertSame($suggestions[1]["hidden"], true);
-        $this->assertSame($suggestions[2]["hidden"], false);
+        $this->assertSame(true, $suggestions[0]["hidden"]);
+        $this->assertSame(true, $suggestions[1]["hidden"]);
+        $this->assertSame(false, $suggestions[2]["hidden"]);
         return $newDiscussion;
     }
 
@@ -213,8 +226,48 @@ class AISuggestionModelTest extends SiteTestCase
         $this->suggestionSourceService->toggleSuggestions($discussion, hide: false);
         $discussion = $this->discussionModel->getID($discussion["DiscussionID"], DATASET_TYPE_ARRAY);
         $suggestions = $discussion["Attributes"]["suggestions"];
-        $this->assertSame($suggestions[0]["hidden"], false);
-        $this->assertSame($suggestions[1]["hidden"], false);
-        $this->assertSame($suggestions[2]["hidden"], false);
+        $this->assertSame(false, $suggestions[0]["hidden"]);
+        $this->assertSame(false, $suggestions[1]["hidden"]);
+        $this->assertSame(false, $suggestions[2]["hidden"]);
+    }
+
+    /**
+     * Tests that notifications are sent after suggestions are generated.
+     *
+     * @return void
+     */
+    public function testNotificationsAfterSuggestionsGenerated()
+    {
+        $user = $this->createUser();
+        $this->runWithUser(function () {
+            $discussion = $this->createDiscussion(["type" => "question"]);
+            $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+            $suggestions = $newDiscussion["Attributes"]["suggestions"];
+            $this->assertCount(3, $suggestions);
+        }, $user);
+
+        $this->assertUserHasNotificationsLike($user, [
+            new ExpectedNotification("Default", [$this->assistantUser["name"], "has suggested answers: check it out"]),
+        ]);
+        $this->assertUserHasNoEmails($user);
+    }
+
+    /**
+     * Provides test coverage for suggestions notification preferences and checks that e-mail is not available.
+     *
+     * @return void
+     */
+    public function testSuggestionsNotificationPreferences()
+    {
+        $schema = $this->api()
+            ->get("/notification-preferences/schema")
+            ->getBody();
+
+        $notificationPreferences = ArrayUtils::getByPath(
+            "properties.notifications.properties.followedPosts.properties.AiSuggestions.properties",
+            $schema
+        );
+        $this->assertArrayNotHasKey("email", $notificationPreferences);
+        $this->assertArrayHasKey("popup", $notificationPreferences);
     }
 }

@@ -15,6 +15,7 @@ interface IProps extends React.ComponentProps<typeof DashboardFormLabel> {
     tag?: ElementType;
     children?: React.ReactNode;
     inputID?: string;
+    labelID?: string;
     className?: string;
     required?: boolean;
     errors?: IFieldError[];
@@ -25,7 +26,7 @@ export function DashboardFormGroup(props: IProps) {
     const Tag = fieldset ? "div" : props.tag ?? "li";
     const uniqueID = useUniqueID("formGroup-");
     const inputID = props.inputID ?? uniqueID;
-    const labelID = inputID + "-label";
+    const labelID = props.labelID ?? inputID + "-label";
 
     const classes = dashboardFormGroupClasses();
 

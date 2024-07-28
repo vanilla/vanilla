@@ -17,11 +17,12 @@ use Garden\Web\Exception\ClientException;
 use Gdn;
 use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
 use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 
-class MoveDiscussionToCategoryAction extends AutomationAction implements AutomationActionInterface
+class MoveDiscussionToCategoryAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
@@ -37,7 +38,15 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Automat
      */
     public static function getName(): string
     {
-        return "Move to a specific category";
+        return "Move post";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -51,6 +60,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Automat
                 "items" => [
                     "type" => "integer",
                 ],
+                "required" => true,
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Category to move to", "Select a category"),
                     new ApiFormChoices(
@@ -71,7 +81,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Automat
      */
     public static function getTriggers(): array
     {
-        return [StaleDiscussionTrigger::getType(), LastActiveDiscussionTrigger::getType()];
+        return DiscussionRuleDataType::getTriggers();
     }
 
     /**

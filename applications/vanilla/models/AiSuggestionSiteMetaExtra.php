@@ -14,14 +14,18 @@ use Vanilla\Dashboard\Models\AiSuggestionSourceService;
  */
 class AiSuggestionSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
 {
+    private AiSuggestionSourceService $aiSuggestionSourceService;
+    protected \UserModel $userModel;
+
     /**
      * DI.
      *
      * @param AiSuggestionSourceService $aiSuggestionSourceService
      */
-    public function __construct(AiSuggestionSourceService $aiSuggestionSourceService)
+    public function __construct(AiSuggestionSourceService $aiSuggestionSourceService, \UserModel $userModel)
     {
         $this->aiSuggestionSourceService = $aiSuggestionSourceService;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -29,7 +33,15 @@ class AiSuggestionSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
      */
     public function getValue(): array
     {
-        $meta = $this->aiSuggestionSourceService->suggestionEnabled();
-        return ["aiSuggestion" => $meta];
+        $answerSuggestionsEnabled = $this->aiSuggestionSourceService->suggestionFeatureEnabled();
+        $assistantID = $this->aiSuggestionSourceService->aiSuggestionConfigs()["userID"] ?? 0;
+        $aiAssistant = null;
+        if ($assistantID > 0) {
+            $aiAssistant = $this->userModel->getFragmentByID($assistantID, true);
+        }
+        return [
+            "answerSuggestionsEnabled" => $answerSuggestionsEnabled,
+            "aiAssistant" => $aiAssistant,
+        ];
     }
 }

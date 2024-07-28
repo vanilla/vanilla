@@ -172,12 +172,32 @@ class CollectionApiControllerTest extends AbstractResourceTest
     }
 
     /**
+     * Test duplicate collection name throws errors
+     *
+     * @param array $collection
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @depends testPost
+     */
+    public function testDuplicatedCollectionNameThrowErrors(array $collection): void
+    {
+        $collectionRecord = $this->getRecord();
+        $collectionRecord["name"] = $collection["name"];
+        $this->expectExceptionCode(400);
+        $this->expectExceptionMessage("A collection with the name {$collectionRecord["name"]} already exists.");
+        $this->api()->post($this->baseUrl, $collectionRecord);
+    }
+
+    /**
      * Test post endpoint, test for duplication prevention
      *
      */
     public function testPostNoDuplication()
     {
         $collectionRecord = $this->getRecord();
+        $collectionRecord["name"] = "Marvel Collection";
         $collectionModel = $this->container()->get(CollectionModel::class);
         $this->testPost($collectionRecord);
         $updatedCollectionRecord = $collectionRecord;
@@ -189,7 +209,12 @@ class CollectionApiControllerTest extends AbstractResourceTest
                 "sort" => 1,
             ],
         ];
-        $this->api()->post($this->baseUrl, $updatedCollectionRecord);
+        $this->runWithExpectedExceptionMessage(
+            "A collection with the name Marvel Collection already exists.",
+            function () use ($updatedCollectionRecord) {
+                $this->api()->post($this->baseUrl, $updatedCollectionRecord);
+            }
+        );
         // Making sure only 1 collection is created
         $collections = $collectionModel->select(["name" => $collectionRecord["name"]]);
         $this->assertCount(1, $collections);
@@ -304,6 +329,45 @@ class CollectionApiControllerTest extends AbstractResourceTest
         $this->assertIsString($patchedResult["dateUpdated"]);
         $this->assertIsInt($result["updateUserID"]);
         $this->assertEquals(\Gdn::session()->UserID, $result["updateUserID"]);
+    }
+
+    /**
+     * Test that while patching a collection the users can't select same name for record if it already exists
+     *
+     * @return void
+     */
+    public function testCollectionPatchDuplicateNameValidation()
+    {
+        $collectionRecord = $this->getrecord();
+        $collectionRecord["name"] = "Marvel Series Collection";
+        $result = $this->api()->post($this->baseUrl, $collectionRecord);
+        $collection1 = $result->getBody();
+        $collectionRecord["name"] = "DC Series Collection";
+        $result = $this->api()->post($this->baseUrl, $collectionRecord);
+        $collection2 = $result->getBody();
+        $newDiscussionRecord = $this->createDiscussion(["name" => "Avengers Epic"]);
+        $newRecord = [
+            "recordID" => $newDiscussionRecord["discussionID"],
+            "recordType" => "discussion",
+            "sort" => 1,
+        ];
+        $updatedRecord = [
+            "name" => "DC Series Collection",
+            "records" => [$newRecord],
+        ];
+        $this->runWithExpectedExceptionMessage(
+            "A collection with the name DC Series Collection already exists.",
+            function () use ($collection1, $updatedRecord) {
+                $this->api()->patch($this->baseUrl . "/{$collection1["collectionID"]}", $updatedRecord);
+            }
+        );
+        // We should be able to update the collection with the same name if it's the same collection
+        $updatedRecord = [
+            "name" => "Marvel Series Collection",
+            "records" => [$newRecord],
+        ];
+        $result = $this->api()->patch($this->baseUrl . "/{$collection1["collectionID"]}", $updatedRecord);
+        $this->assertEquals(200, $result->getStatusCode());
     }
 
     /**

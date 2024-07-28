@@ -11,8 +11,7 @@ use Garden\Container\NotFoundException;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
-use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
-use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
@@ -20,7 +19,7 @@ use Vanilla\Forms\SchemaForm;
 use TagModel;
 use Vanilla\Logger;
 
-class AddTagToDiscussionAction extends AutomationAction implements AutomationActionInterface
+class AddTagToDiscussionAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
@@ -36,7 +35,15 @@ class AddTagToDiscussionAction extends AutomationAction implements AutomationAct
      */
     public static function getName(): string
     {
-        return "Add a tag";
+        return "Add tag";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -50,6 +57,7 @@ class AddTagToDiscussionAction extends AutomationAction implements AutomationAct
                 "items" => [
                     "type" => "integer",
                 ],
+                "required" => true,
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Tags to add", "Select one or more tags"),
                     new ApiFormChoices("/api/v2/tags?type=User&limit=30&query=%s", "/api/v2/tags/%s", "tagID", "name"),
@@ -67,7 +75,7 @@ class AddTagToDiscussionAction extends AutomationAction implements AutomationAct
      */
     public static function getTriggers(): array
     {
-        return [StaleDiscussionTrigger::getType(), LastActiveDiscussionTrigger::getType()];
+        return DiscussionRuleDataType::getTriggers();
     }
 
     /**

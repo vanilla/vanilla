@@ -103,7 +103,7 @@ $panelMaxHeight: calc(100vh - #{$navbar-height * 2});
 
 .panel-left {
     position: sticky;
-    top: 0;
+    top: 16px;
     max-height: $panelMaxHeight;
     padding-bottom: 0;
 
@@ -121,7 +121,7 @@ $panelMaxHeight: calc(100vh - #{$navbar-height * 2});
     position: sticky;
     max-height: $panelMaxHeight;
 
-    top: 0;
+    top: 16px;
 
     .panel-content {
         max-height: $panelMaxHeight;

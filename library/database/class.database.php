@@ -123,6 +123,31 @@ class Gdn_Database implements InjectableInterface
     }
 
     /**
+     * Run a some callback within a database transaction.
+     *
+     * If a transaction is already started the callback will be executed directly.
+     *
+     * @param callable $callback
+     *
+     * @return mixed
+     */
+    public function runWithTransaction(callable $callback): mixed
+    {
+        if ($this->isInTransaction()) {
+            return call_user_func($callback);
+        }
+        try {
+            $this->beginTransaction();
+            $result = call_user_func($callback);
+            $this->commitTransaction();
+            return $result;
+        } catch (\Throwable $e) {
+            $this->rollbackTransaction();
+            throw $e;
+        }
+    }
+
+    /**
      * Begin a transaction on the database.
      */
     public function beginTransaction()

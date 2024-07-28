@@ -23,6 +23,7 @@ export interface IMe extends IUserFragment {
     countUnreadConversations: number;
     isAdmin?: boolean;
     emailConfirmed?: boolean;
+    suggestAnswers?: boolean;
 }
 
 export interface ICount {
@@ -69,6 +70,7 @@ export interface IUser extends IUserFragment, IUserRoles {
     lastIPAddress?: string;
     insertIPAddress?: string;
     points?: number;
+    suggestAnswers?: boolean;
 }
 
 export interface IInvitees {

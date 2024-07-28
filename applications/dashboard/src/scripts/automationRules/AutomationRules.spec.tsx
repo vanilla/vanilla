@@ -136,12 +136,10 @@ describe("AutomationRules", () => {
         staleDiscussionTriggerOption && staleDiscussionTriggerOption.click();
 
         // corresponding fields are displayed
-        const durationField = await screen.findByText("Trigger Time Threshold");
-        const intervalField = await screen.findAllByText(/Time Unit/);
+        const triggerTimeDelayField = await screen.findByText("Trigger Delay");
         const postTypeField = await screen.findByText("Post Type");
 
-        expect(durationField).toBeInTheDocument();
-        expect(intervalField.length).toBeGreaterThan(0);
+        expect(triggerTimeDelayField).toBeInTheDocument();
         expect(postTypeField).toBeInTheDocument();
 
         // default values for postType field are populated

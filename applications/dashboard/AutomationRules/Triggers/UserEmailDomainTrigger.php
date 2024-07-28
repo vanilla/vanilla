@@ -12,10 +12,8 @@ use Exception;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
-use Vanilla\AutomationRules\Actions\UserFollowCategoryAction;
 use Vanilla\AutomationRules\Trigger\AutomationTrigger;
-use Vanilla\AutomationRules\Trigger\AutomationTriggerInterface;
-use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
+use Vanilla\Dashboard\AutomationRules\Models\UserRuleDataType;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Logger;
@@ -23,7 +21,7 @@ use Vanilla\Logger;
 /**
  * Class UserEmailDomainTrigger
  */
-class UserEmailDomainTrigger extends AutomationTrigger implements AutomationTriggerInterface
+class UserEmailDomainTrigger extends AutomationTrigger
 {
     use UserSearchTrait;
     /**
@@ -39,7 +37,15 @@ class UserEmailDomainTrigger extends AutomationTrigger implements AutomationTrig
      */
     public static function getName(): string
     {
-        return "A user registers with or updated to a certain email domain";
+        return "New/Updated Email domain";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "users";
     }
 
     /**
@@ -47,26 +53,18 @@ class UserEmailDomainTrigger extends AutomationTrigger implements AutomationTrig
      */
     public static function getActions(): array
     {
-        $classes = [UserFollowCategoryAction::class, AddRemoveUserRoleAction::class];
-        $actionTypes = [];
-        foreach ($classes as $class) {
-            if (class_exists($class)) {
-                $actionTypes[] = $class::getType();
-            }
-        }
-
-        return $actionTypes;
+        return UserRuleDataType::getActions();
     }
 
     /**
      * @inheridoc
      */
-
     public static function getSchema(): Schema
     {
         $schema = [
             "emailDomain" => [
                 "type" => "string",
+                "required" => true,
                 "x-control" => SchemaForm::textBox(
                     new FormOptions("Email Domain", "Enter one or more comma-separated email domains"),
                     "string"
@@ -120,7 +118,6 @@ class UserEmailDomainTrigger extends AutomationTrigger implements AutomationTrig
         ]);
 
         $schema->merge($emailDomainSchema);
-        self::addActionTypeValidation($schema);
     }
 
     /**

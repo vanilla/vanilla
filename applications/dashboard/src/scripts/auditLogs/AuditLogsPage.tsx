@@ -463,6 +463,10 @@ function FormattedContextValue(props: { value: any }) {
         return <TokenItem>null</TokenItem>;
     }
 
+    if (typeof value === "boolean") {
+        return <TokenItem>{value ? "true" : "false"}</TokenItem>;
+    }
+
     if (Array.isArray(value)) {
         return (
             <>

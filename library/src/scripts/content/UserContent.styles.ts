@@ -340,6 +340,7 @@ export function userContentMixin(): CSSObject {
         },
         "& table": {
             width: percent(100),
+            fontSize: "clamp(12px, 1dvw, 94%)",
         },
         // Rest of the table styles
         "& .tableWrapper th": {
@@ -347,6 +348,8 @@ export function userContentMixin(): CSSObject {
         },
         "& .tableWrapper td, & .tableWrapper th": {
             overflowWrap: "break-word",
+            textOverflow: "ellipsis",
+            wordBreak: "keep-all",
             minWidth: 80,
             ...Mixins.padding({
                 vertical: 6,
@@ -368,6 +371,10 @@ export function userContentMixin(): CSSObject {
                 : {}),
             "& > *:not(ul):not(ol)": {
                 margin: 0,
+            },
+            "& p, & code": {
+                textOverflow: "ellipsis",
+                wordBreak: "keep-all",
             },
         },
         "& .tableWrapper tr:nth-child(even)": vars.tables.striped
@@ -690,6 +697,10 @@ export const userContentClasses = useThemeCache(() => {
                           borderRight: singleBorder(vars.tables.verticalBorders.borders),
                       }
                     : {}),
+                "& span, & p": {
+                    textOverflow: "ellipsis",
+                    wordBreak: "keep-all",
+                },
             },
             "& tr:nth-child(even)": vars.tables.striped
                 ? {

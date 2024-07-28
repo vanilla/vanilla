@@ -8,7 +8,7 @@ import apiv2 from "@library/apiv2";
 import Translate from "@library/content/Translate";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useToast } from "@library/features/toaster/ToastContext";
-import { IPermission } from "@library/features/users/Permission";
+import { IPermission, PermissionMode } from "@library/features/users/Permission";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import Button from "@library/forms/Button";
 import Checkbox from "@library/forms/Checkbox";
@@ -41,6 +41,8 @@ interface IProps {
     discussionName: string;
     recordID: IReportRecordProps["recordID"];
     recordType: IReportRecordProps["recordType"];
+    placeRecordType: string;
+    placeRecordID: RecordID;
     isVisible: boolean;
     onVisibilityChange: (visible: boolean) => void;
     onSuccess?: () => Promise<void>;
@@ -79,7 +81,13 @@ export default function ReportModalLoadable(props: IProps) {
     const { discussion: isNewDiscussionThreadPage } = useDiscussionThreadContext();
 
     // Moderators have extra options in this modal
-    const isModerator = hasPermission("moderation.manage");
+    const isModerator =
+        hasPermission("community.moderate") ||
+        hasPermission("posts.moderate", {
+            resourceType: props.placeRecordType,
+            resourceID: typeof props.placeRecordID === "string" ? parseInt(props.placeRecordID) : props.placeRecordID,
+            mode: PermissionMode.RESOURCE_IF_JUNCTION,
+        });
 
     const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
     const [escalateImmediately, setEscalateImmediately] = useState(false);
@@ -91,7 +99,7 @@ export default function ReportModalLoadable(props: IProps) {
     // Get report reasons
     const reportReasons = useQuery<any, IError, IReportReason[]>({
         queryFn: async () => {
-            const response = await apiv2.get(`/reports/reasons`);
+            const response = await apiv2.get(`/report-reasons`);
             return response.data;
         },
         queryKey: ["reportReasons"],

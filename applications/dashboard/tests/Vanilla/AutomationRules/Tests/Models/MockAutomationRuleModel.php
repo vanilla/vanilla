@@ -37,14 +37,16 @@ class MockAutomationRuleModel extends AutomationRuleModel
         AutomationRuleRevisionModel $automationRuleRevisionModel,
         AutomationRuleDispatchesModel $automationRuleDispatchesModel,
         LoggerInterface $logger,
-        Gdn_Database $database
+        Gdn_Database $database,
+        AutomationRuleService $automationRuleService
     ) {
         parent::__construct(
             $session,
             $userModel,
             $automationRuleRevisionModel,
             $automationRuleDispatchesModel,
-            $logger
+            $logger,
+            $automationRuleService
         );
         $this->database = $database;
     }

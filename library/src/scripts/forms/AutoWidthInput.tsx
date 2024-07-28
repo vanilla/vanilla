@@ -2,8 +2,12 @@ import { css, cx } from "@emotion/css";
 import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
+interface AutoWidthProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    maximumWidth?: number;
+}
+
 export const AutoWidthInput = React.forwardRef(function AutoWidthInput(
-    props: React.InputHTMLAttributes<HTMLInputElement>,
+    props: AutoWidthProps,
     ref: React.RefObject<HTMLInputElement>,
 ) {
     const spanRef = useRef<HTMLSpanElement>(null);
@@ -17,6 +21,7 @@ export const AutoWidthInput = React.forwardRef(function AutoWidthInput(
     });
 
     const { value, placeholder } = props;
+    const { maximumWidth, ...inputProps } = props;
     const classes = autoWidthInputClasses();
 
     const measureSpan = useCallback(
@@ -30,7 +35,7 @@ export const AutoWidthInput = React.forwardRef(function AutoWidthInput(
             // Measure the span widht.
             const rect = spanRef.current.getBoundingClientRect();
             let newWidth = rect.width + 12;
-            newWidth = Math.min(Math.max(80, newWidth), 300);
+            newWidth = Math.min(Math.max(80, newWidth), props.maximumWidth ?? 300);
             setMinWidth(newWidth);
         },
         [placeholder],
@@ -49,7 +54,7 @@ export const AutoWidthInput = React.forwardRef(function AutoWidthInput(
     return (
         <>
             <input
-                {...props}
+                {...inputProps}
                 ref={ref}
                 className={cx(props.className, minWidthClass)}
                 onChange={handleChange}

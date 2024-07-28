@@ -13,9 +13,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Vanilla\AutomationRules\Actions\RemoveDiscussionFromTriggerCollectionAction;
 use Vanilla\AutomationRules\Models\AutomationRuleLongRunnerGenerator;
-use Vanilla\AutomationRules\Trigger\AutomationTriggerInterface;
 use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
-use Vanilla\AutomationRules\Trigger\TimedAutomationTriggerInterface;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
@@ -26,9 +24,7 @@ use Vanilla\Models\Model;
 /**
  * Trigger class to handle stale records in a collection
  */
-class StaleCollectionTrigger extends TimedAutomationTrigger implements
-    AutomationTriggerInterface,
-    TimedAutomationTriggerInterface
+class StaleCollectionTrigger extends TimedAutomationTrigger
 {
     /**
      * @inheridoc
@@ -43,7 +39,15 @@ class StaleCollectionTrigger extends TimedAutomationTrigger implements
      */
     public static function getName(): string
     {
-        return "A certain amount of time has passed since a post was added to a selected collection";
+        return "Time since added to collection";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -51,7 +55,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger implements
      */
     public static function getActions(): array
     {
-        return [RemoveDiscussionFromTriggerCollectionAction::getType()];
+        return [RemoveDiscussionFromTriggerCollectionAction::class];
     }
 
     /**
@@ -65,6 +69,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger implements
             "items" => [
                 "type" => "integer",
             ],
+            "required" => true,
             "x-control" => SchemaForm::dropDown(
                 new FormOptions("Collection to remove from", "Select one or more collections."),
                 new ApiFormChoices("/api/v2/collections", "/api/v2/collections/%s", "collectionID", "name"),
@@ -72,6 +77,8 @@ class StaleCollectionTrigger extends TimedAutomationTrigger implements
                 true
             ),
         ];
+
+        $schema["additionalSettings"] = self::getAdditionalSettingsSchema();
 
         return Schema::parse($schema);
     }
@@ -118,7 +125,6 @@ class StaleCollectionTrigger extends TimedAutomationTrigger implements
             "trigger:o" => self::getTimedTriggerSchema(),
         ]);
         $schema->merge($collectionSchema);
-        self::addActionTypeValidation($schema);
     }
 
     /**

@@ -3,6 +3,8 @@
  * @license GPL-2.0-only
  */
 
+import { IPermissions } from "@library/features/users/userTypes";
+
 export interface IRole {
     roleID: number;
     name: string;
@@ -11,6 +13,7 @@ export interface IRole {
     deletable: boolean;
     canSession: boolean;
     personalInfo: boolean;
+    permissions?: IPermissions["permissions"];
 }
 
 export interface IRoleFragment {

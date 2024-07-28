@@ -91,6 +91,9 @@ export const generateButtonStyleProperties = (props: {
     const result: CSSObject = {
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
+        "&&": {
+            textTransform: "initial",
+        },
         overflow: "hidden",
         width: "auto",
         maxWidth: percent(100),

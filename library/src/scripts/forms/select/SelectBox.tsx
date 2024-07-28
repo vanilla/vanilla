@@ -19,7 +19,7 @@ import { cx } from "@emotion/css";
 
 export interface ISelectBoxItem {
     value: string;
-    name?: string;
+    name?: string | React.ReactNode;
     content?: React.ReactNode;
     className?: string;
     icon?: React.ReactNode;
@@ -178,7 +178,7 @@ function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onCli
     const { item, isSelected, onClick } = props;
     if ("url" in item) {
         return (
-            <DropDownItemLink className={cx({ isSelected: isSelected })} name={item.name} to={item.url || ""}>
+            <DropDownItemLink className={cx({ isSelected: isSelected })} name={`${item.name}`} to={item.url || ""}>
                 <SelectBoxContents item={item} isSelected={isSelected} />
             </DropDownItemLink>
         );

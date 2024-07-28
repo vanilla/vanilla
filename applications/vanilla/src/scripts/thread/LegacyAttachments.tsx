@@ -6,14 +6,12 @@
 
 import { IntegrationButtonAndModal } from "@library/features/discussions/integrations/Integrations";
 import {
-    AttachmentIntegrationsContextProvider,
     WriteableIntegrationContextProvider,
     ReadableIntegrationContextProvider,
     useWriteableAttachmentIntegrations,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
-import React from "react";
 
 interface IProps {
     attachments?: IAttachment[];
@@ -30,18 +28,16 @@ export function LegacyThreadAttachmentsAsset(props: IProps) {
 
     return (
         <div>
-            <AttachmentIntegrationsContextProvider>
-                {props.attachments?.map((attachment, i) => {
-                    return (
-                        <ReadableIntegrationContextProvider
-                            key={attachment.attachmentID}
-                            attachmentType={attachment.attachmentType}
-                        >
-                            <DiscussionAttachment key={i} attachment={attachment} />
-                        </ReadableIntegrationContextProvider>
-                    );
-                })}
-            </AttachmentIntegrationsContextProvider>
+            {props.attachments?.map((attachment, i) => {
+                return (
+                    <ReadableIntegrationContextProvider
+                        key={attachment.attachmentID}
+                        attachmentType={attachment.attachmentType}
+                    >
+                        <DiscussionAttachment key={i} attachment={attachment} />
+                    </ReadableIntegrationContextProvider>
+                );
+            })}
         </div>
     );
 }
@@ -54,11 +50,7 @@ interface IFormProps {
 }
 
 export function LegacyIntegrationsOptionsMenuItems(props: IFormProps) {
-    return (
-        <AttachmentIntegrationsContextProvider>
-            <LegacyIntegrationsOptionsMenuItemsImpl {...props} />
-        </AttachmentIntegrationsContextProvider>
-    );
+    return <LegacyIntegrationsOptionsMenuItemsImpl {...props} />;
 }
 
 function LegacyIntegrationsOptionsMenuItemsImpl(props: IFormProps) {

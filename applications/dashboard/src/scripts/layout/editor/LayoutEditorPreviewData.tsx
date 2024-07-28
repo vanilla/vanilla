@@ -3,27 +3,27 @@
  * @license GPL-2.0-only
  */
 
+import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { IReaction } from "@dashboard/@types/api/reaction";
+import { IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { IUserFragment } from "@library/@types/api/users";
-import { STORY_LEADERS } from "@library/storybook/storyData";
+import { ICategoryItem } from "@library/categoriesWidget/CategoryItem";
+import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
+import { ITag } from "@library/features/tags/TagsReducer";
 import { IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
 import { ILeader } from "@library/leaderboardWidget/LeaderboardWidget";
-import { STORY_USER } from "@library/storybook/storyData";
-import { ITag } from "@library/features/tags/TagsReducer";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { IAddPost, PostTypes } from "@library/newPostMenu/NewPostMenu";
 import { NewPostMenuPreview } from "@library/newPostMenu/NewPostMenu.preview";
-import { ISiteTotalCount, ISiteTotalApiCount } from "@library/siteTotals/SiteTotals.variables";
+import { ISiteTotalApiCount, ISiteTotalCount } from "@library/siteTotals/SiteTotals.variables";
+import { STORY_LEADERS, STORY_USER } from "@library/storybook/storyData";
+import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
+import { getMeta, siteUrl } from "@library/utility/appUtils";
 import { uuidv4 } from "@vanilla/utils";
-import { IComment } from "@dashboard/@types/api/comment";
-import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import random from "lodash-es/random";
-import { ICategoryItem } from "@library/categoriesWidget/CategoryItem";
-import { ICrumb } from "@library/navigation/Breadcrumbs";
 import userPhotoUrl from "./icons/userphoto.svg";
-import { IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { IReaction } from "@dashboard/@types/api/reaction";
-import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
-import { siteUrl } from "@library/utility/appUtils";
 
 export class LayoutEditorPreviewData {
     currentWidgetSchemaFromCatalog: IWidgetCatalog = {};
@@ -219,6 +219,7 @@ export class LayoutEditorPreviewData {
 
     public static discussion(): IDiscussion {
         const user = this.randomUser();
+        const suggestions = this.suggestions();
         return {
             discussionID: 9999999,
             type: "discussion",
@@ -245,6 +246,8 @@ export class LayoutEditorPreviewData {
             },
             reactions: this.reactions(),
             attachments: this.attachments(),
+            statusID: 1,
+            ...(suggestions && { suggestions, showSuggestions: true }),
         };
     }
 
@@ -347,6 +350,26 @@ export class LayoutEditorPreviewData {
         };
     }
 
+    public static suggestions(): ISuggestedAnswer[] | undefined {
+        const showSuggestions = getMeta("answerSuggestionsEnabled", false);
+        if (showSuggestions) {
+            return Array(3)
+                .fill(0)
+                .map((_, idx) => ({
+                    format: "Vanilla",
+                    type: "discussion",
+                    id: idx + 1,
+                    url: siteUrl("/#"),
+                    title: "Suggested Discussion Title",
+                    summary:
+                        "This is an AI generated summary from the referenced discussion post that might answer the question. The summary is created in a way for it to be used as an accepted answer.",
+                    hidden: false,
+                }));
+        }
+
+        return undefined;
+    }
+
     /**
      * Return mock discussions to be consumed by layout widgets.
      */
@@ -376,6 +399,7 @@ export class LayoutEditorPreviewData {
                     url: siteUrl("/#"),
                     categoryID: 1111111111111111,
                 },
+                statusID: 1,
             },
             {
                 discussionID: 99999998,
@@ -402,6 +426,7 @@ export class LayoutEditorPreviewData {
                     url: siteUrl("/#"),
                     categoryID: 22222222222222,
                 },
+                statusID: 1,
             },
             {
                 discussionID: 99999991,
@@ -427,6 +452,7 @@ export class LayoutEditorPreviewData {
                     url: siteUrl("/#"),
                     categoryID: 33333333333,
                 },
+                statusID: 1,
                 tags: [{ tagID: 1111111, name: "User Tag", urlcode: "#" }],
             },
         ];

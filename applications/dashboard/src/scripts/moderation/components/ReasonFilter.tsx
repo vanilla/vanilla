@@ -14,7 +14,7 @@ type IProps = {} & Omit<FilterBlockProps, "staticOptions">;
  * Filter block with reasons for reports
  */
 export function ReasonFilter(props: IProps) {
-    const { isLoading, reasons } = useReportReasons();
+    const { isLoading, reasons } = useReportReasons({ includeSystem: true });
 
     const reasonOptions = useMemo(() => {
         if (isLoading) {

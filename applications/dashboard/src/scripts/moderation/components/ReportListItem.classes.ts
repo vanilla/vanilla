@@ -14,20 +14,23 @@ export const reportListItemClasses = () => {
     const container = css({
         display: "flex",
         flexDirection: "column",
-        padding: "16px 16px 8px",
+        padding: "12px 16px 8px",
         // From mockup
         borderRadius: 6,
         ...shadowHelper().embed(),
     });
     const header = css({
         display: "flex",
-        justifyContent: "space-between",
         alignItems: "center",
         marginBottom: 8,
 
         "& h3": {
             margin: 0,
         },
+    });
+
+    const status = css({
+        whiteSpace: "nowrap",
     });
 
     const reporterProfile = css({
@@ -74,6 +77,7 @@ export const reportListItemClasses = () => {
         },
     });
     const recordItem = css({
+        marginTop: 4,
         borderLeft: "6px solid rgb(216, 217, 219)",
         paddingLeft: 16,
         "& h3": {
@@ -99,6 +103,7 @@ export const reportListItemClasses = () => {
         gap: 16,
         marginTop: 8,
         marginRight: 16,
+        marginLeft: 16,
     });
 
     const gradientOverride = css({
@@ -117,6 +122,7 @@ export const reportListItemClasses = () => {
         reportSummary,
         reporterProfile,
         gradientOverride,
+        status,
         adminStyleOverrides,
     };
 };

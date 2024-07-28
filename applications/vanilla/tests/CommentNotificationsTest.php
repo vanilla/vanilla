@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Forum;
 
+use PermissionNotificationGenerator;
 use Vanilla\Models\CommunityNotificationGenerator;
 use Vanilla\Scheduler\LongRunnerAction;
 use VanillaTests\DatabaseTestTrait;
@@ -240,11 +241,15 @@ class CommentNotificationsTest extends SiteTestCase
         $activity = $this->getCommentActivity($category["name"], $comment, $discussion);
 
         // Process the activity.
-        $longRunnerAction = new LongRunnerAction(
-            CommunityNotificationGenerator::class,
-            "categoryNotificationsIterator",
-            [$activity, $discussionFromDB["DiscussionID"], "comment"]
-        );
+        $longRunnerAction = new LongRunnerAction(PermissionNotificationGenerator::class, "notificationGenerator", [
+            $activity,
+            "discussions.view",
+            "NewComment" . "." . $category["categoryID"],
+            0,
+            "Category",
+            $category["categoryID"],
+        ]);
+
         $longRunner = $this->getLongRunner();
         // To trigger the looping through a "large" record set.
         \Gdn::config()->saveToConfig([
@@ -261,7 +266,7 @@ class CommentNotificationsTest extends SiteTestCase
         $this->assertSame(3, $longRunnerResult["progress"]["countTotalIDs"]);
         $this->assertCount(2, $longRunnerResult["progress"]["successIDs"]);
         $this->assertEquals(
-            "Comment_{$comment["commentID"]}_User_{$user1["userID"]}_NotificationType_category",
+            "User_{$user1["userID"]}_NotificationType_Comment_Preference_NewComment.{$category["categoryID"]}",
             $longRunnerResult["progress"]["successIDs"][0]
         );
 
@@ -273,7 +278,7 @@ class CommentNotificationsTest extends SiteTestCase
         $this->assertSame(3, $responseBody["progress"]["countTotalIDs"]);
         $this->assertCount(1, $responseBody["progress"]["successIDs"]);
         $this->assertEquals(
-            "Comment_{$comment["commentID"]}_User_{$user3["userID"]}_NotificationType_category",
+            "User_{$user3["userID"]}_NotificationType_Comment_Preference_NewComment.{$category["categoryID"]}",
             $responseBody["progress"]["successIDs"][0]
         );
     }

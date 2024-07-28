@@ -12,6 +12,8 @@ import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardCheckGroup, DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
+import { DashboardCurrencyInput } from "@dashboard/forms/DashboardCurrencyInput";
+import { DashboardRatioInput } from "@dashboard/forms/DashboardRatioInput";
 import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorator";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { StoryContent } from "@library/storybook/StoryContent";
@@ -358,6 +360,48 @@ export function InputWithAutoWidth() {
                 <AutoWidthInput
                     placeholder={"Type your text here"}
                     className={cx(autoWidthInputClasses().themeInput)}
+                />
+            </form>
+        </>
+    );
+}
+
+export function CurrencyInput() {
+    const [value, setValue] = useState("3.75");
+
+    return (
+        <>
+            <StoryHeading depth={1}>Currency Input</StoryHeading>
+            <form>
+                <DashboardCurrencyInput
+                    inputProps={{
+                        type: "number",
+                        value: value,
+                        onChange: (event) => {
+                            setValue(event.target.value);
+                        },
+                    }}
+                />
+            </form>
+        </>
+    );
+}
+
+export function RatioInput() {
+    const [value, setValue] = useState(34);
+
+    return (
+        <>
+            <StoryHeading depth={1}>Ratio Input</StoryHeading>
+            <form>
+                <DashboardRatioInput
+                    inputProps={{
+                        type: "number",
+                        value: value,
+                        onChange: (event) => {
+                            setValue(parseInt(event.target.value));
+                        },
+                    }}
                 />
             </form>
         </>

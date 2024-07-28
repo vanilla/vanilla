@@ -58,10 +58,15 @@ class BumpDiscussionActionTest extends SiteTestCase
             "trigger" => [
                 "triggerType" => LastActiveDiscussionTrigger::getType(),
                 "triggerValue" => [
-                    "maxTimeThreshold" => 5,
-                    "maxTimeUnit" => "day",
-                    "triggerTimeThreshold" => 4,
-                    "triggerTimeUnit" => "day",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 5,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 4,
+                        "unit" => "day",
+                    ],
                     "postType" => ["discussion"],
                 ],
             ],

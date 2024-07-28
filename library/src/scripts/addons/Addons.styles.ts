@@ -57,6 +57,12 @@ export const addonClasses = useThemeCache(() => {
         width: "100%",
     });
 
+    const previewContainerCompact = css({
+        height: "auto",
+        width: 84,
+        minWidth: "initial",
+    });
+
     const textContainer = css({
         flex: 2,
         flexGrow: 1,
@@ -109,6 +115,7 @@ export const addonClasses = useThemeCache(() => {
         previewContainer,
         previewContainerMobile,
         previewImage,
+        previewContainerCompact,
         textContainer,
         title,
         description,

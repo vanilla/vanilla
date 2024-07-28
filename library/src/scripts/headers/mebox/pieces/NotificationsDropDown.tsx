@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,9 +9,10 @@ import NotificationsContents from "@library/headers/mebox/pieces/NotificationsCo
 import type NotificationsContentsImpl from "@library/headers/mebox/pieces/NotificationsContentsImpl";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { getMeta, t } from "@library/utility/appUtils";
+import { getMeta } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";
+import { sprintf } from "sprintf-js";
 
 interface IProps extends React.ComponentProps<typeof NotificationsContentsImpl> {
     countUnread: number;
@@ -45,8 +46,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
             <DropDown
                 contentID={this.id + "-content"}
                 handleID={this.id + "-handle"}
-                // Intentionally not setting this. We want the button contents to be read out which may include an unread count.
-                name={undefined}
+                name={sprintf("Notifications: %s", this.props.countUnread)}
                 renderLeft={!getMeta("ui.isDirectionRTL", false)}
                 buttonClassName={classesHeader.button}
                 contentsClassName={classesHeader.dropDownContents}

@@ -4,7 +4,7 @@
  */
 
 import { mockAPI } from "@library/__tests__/utility";
-import { mockRecipesList } from "@dashboard/automationRules/AutomationRules.fixtures";
+import { mockAutomationRulesCatalog, mockRecipesList } from "@dashboard/automationRules/AutomationRules.fixtures";
 import { AutomationRulesListImpl } from "@dashboard/automationRules/AutomationRulesList";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -86,7 +86,7 @@ const renderInProvider = (children: React.ReactNode, values?: IAutomationRulesCo
                 <AutomationRulesContext.Provider
                     value={{
                         profileFields: undefined,
-                        automationRulesCatalog: undefined,
+                        automationRulesCatalog: mockAutomationRulesCatalog,
                         ...values,
                     }}
                 >
@@ -145,7 +145,7 @@ describe("AutomationRules Preview", () => {
         const modal = await screen.findByRole("dialog");
         expect(modal).toBeInTheDocument();
 
-        const message = await within(modal).findByText(/This will not affect anyone right now/);
+        const message = await within(modal).findByText(/This will not affect any users right now/);
         expect(message).toBeInTheDocument();
     });
 

@@ -39,10 +39,7 @@ class LogController extends DashboardController
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception("Requires POST", 405);
         }
-        $this->permission(
-            ["Garden.Moderation.Manage", "Moderation.Spam.Manage", "Moderation.ModerationQueue.Manage"],
-            false
-        );
+        $this->permission(["Garden.Moderation.Manage"], false);
         $action = Gdn::request()->post("Action", false);
         $logIDs = Gdn::request()->post("IDs", false);
 
@@ -85,12 +82,7 @@ class LogController extends DashboardController
     public function count($operation)
     {
         // Don't use Gdn_Controller->permission() here because this isn't a "real page".
-        if (
-            !Gdn::session()->checkPermission(
-                ["Garden.Moderation.Manage", "Moderation.Spam.Manage", "Moderation.ModerationQueue.Manage"],
-                false
-            )
-        ) {
+        if (!Gdn::session()->checkPermission(["Garden.Moderation.Manage"], false)) {
             $this->statusCode(403);
             echo "";
             return;
@@ -123,7 +115,7 @@ class LogController extends DashboardController
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception("Requires POST", 405);
         }
-        $this->permission(["Garden.Moderation.Manage", "Moderation.ModerationQueue.Manage"], false);
+        $this->permission(["Garden.Moderation.Manage"], false);
         $logIDs = Gdn::request()->post("LogIDs");
         $this->LogModel->deleteIDs($logIDs);
         $this->render("Blank", "Utility");
@@ -138,7 +130,7 @@ class LogController extends DashboardController
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception("Requires POST", 405);
         }
-        $this->permission(["Garden.Moderation.Manage", "Moderation.Spam.Manage"], false);
+        $this->permission(["Garden.Moderation.Manage"], false);
         $logIDs = Gdn::request()->post("LogIDs");
         $logIDs = explode(",", $logIDs);
 
@@ -339,7 +331,7 @@ class LogController extends DashboardController
      */
     public function moderation($page = "")
     {
-        $this->permission(["Garden.Moderation.Manage", "Moderation.ModerationQueue.Manage"], false);
+        $this->permission(["Garden.Moderation.Manage"], false);
 
         $where = ["Operation" => ["Moderate", "Pending"]];
 
@@ -383,10 +375,7 @@ class LogController extends DashboardController
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception("Requires POST", 405);
         }
-        $this->permission(
-            ["Garden.Moderation.Manage", "Moderation.Spam.Manage", "Moderation.ModerationQueue.Manage"],
-            false
-        );
+        $this->permission(["Garden.Moderation.Manage"], false);
         $logIDs = Gdn::request()->post("LogIDs");
 
         // Grab the logs.
@@ -403,7 +392,7 @@ class LogController extends DashboardController
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception("Requires POST", 405);
         }
-        $this->permission(["Garden.Moderation.Manage", "Moderation.Spam.Manage"], false);
+        $this->permission(["Garden.Moderation.Manage"], false);
         $logIDs = Gdn::request()->post("LogIDs");
 
         $logs = [];
@@ -472,7 +461,7 @@ class LogController extends DashboardController
      */
     public function spam($page = "")
     {
-        $this->permission(["Garden.Moderation.Manage", "Moderation.Spam.Manage"], false);
+        $this->permission(["Garden.Moderation.Manage"], false);
         [$offset, $limit] = offsetLimit($page, 10);
         $this->setData("Title", t("Spam Queue"));
 

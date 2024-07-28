@@ -96,11 +96,17 @@ paths:
                       default: 100
                       maximum: 500
                       minimum: 1
-    /reports/dismiss:
-        post:
+    /reports/:reportID/approve-record:
+        parameters:
+            - name: reportID
+              in: path
+              required: true
+              schema:
+                  type: integer
+        patch:
             tags:
                 - Reports & Escalations
-            summary: Dismiss a report
+            summary: Approve a pending or removed post that was premoderated.
             requestBody:
                 required: true
                 content:
@@ -108,22 +114,60 @@ paths:
                         schema:
                             type: object
                             properties:
-                                reportID:
-                                    description: The ID of the report to dismiss
-                                    type: integer
                                 verifyRecordUser:
-                                    description: Mark the user that was reported as verified. This prevents them from tripping spam automations in the future.
                                     type: boolean
-                            required:
-                                - reportID
+                                    description: If true mark the user as verified.
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Report"
+    /reports/:reportID/reject-record:
+        parameters:
+            - name: reportID
+              in: path
+              required: true
+              schema:
+                  type: integer
+        patch:
+            tags:
+                - Reports & Escalations
+            summary: Reject a pending or live post that was premoderated and ensure it is deleted.
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Report"
+    /reports/:reportID/dismiss:
+        parameters:
+            - name: reportID
+              in: path
+              required: true
+              schema:
+                  type: integer
+        post:
+            tags:
+                - Reports & Escalations
+            summary: Dismiss a user's report.
             responses:
                 "204":
                     description: No Content
-    /reports/reasons:
+    /report-reasons:
         get:
             tags:
                 - Reports & Escalations
-            summary: Get a list of report reasons
+            summary: Get a list of report reasons for the current sessioned user. `community.manage` permission grants permission to all reasons.
+            parameters:
+                - name: includeDeleted
+                  description: Allow selecting deleted reports. Requires `moderation.manage` permission.
+                  in: query
+                  schema:
+                      type: boolean
+                      default: false
             responses:
                 "200":
                     description: OK
@@ -133,6 +177,127 @@ paths:
                                 type: array
                                 items:
                                     $ref: "#/components/schemas/ReportReason"
+        post:
+            tags:
+                - Reports & Escalations
+            summary: Create a report reason
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ReportReasonPost"
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ReportReason"
+                "409":
+                    description: Conflict. Returned if the reportReasonID already exists.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Report reason already exists."
+                                    code:
+                                        type: number
+                                        example: 409
+                                    conflictingReason:
+                                        $ref: "#/components/schemas/ReportReason"
+    /report-reasons/:reportReasonID:
+        get:
+            tags:
+                - Reports & Escalations
+            summary: Get a report reason if you have permission for it.
+            parameters:
+                - name: reportReasonID
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                - name: includeDeleted
+                  description: Allow selecting deleted reports. Requires `moderation.manage` permission.
+                  in: query
+                  schema:
+                      type: boolean
+                      default: false
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ReportReason"
+                "404":
+                    description: Not Found. Also returned if there is no permission to not leak reasonIDs.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Report reason not found."
+        patch:
+            tags:
+                - Reports & Escalations
+            summary: Update a report reason
+            parameters:
+                - name: reportReasonID
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ReportReasonPost"
+            responses:
+                "201":
+                    description: Updated
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ReportReason"
+        delete:
+            tags:
+                - Reports & Escalations
+            summary: Delete a report reason. If the report has already been used, the reason will be marked as deleted but still exist in the underyling system for usage when viewing existing reports.
+            parameters:
+                - name: reportID
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "204":
+                    description: No Content
+    /report-reasons/sorts:
+        put:
+            tags:
+                - Reports & Escalations
+            summary: Update the sort order of report reasons
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            description: Mapping of reportReasonID to new sorts.
+                            example:
+                                "spam": 1
+                                "abuse": 2
+                                "sexual-content": 3
+            responses:
+                "204":
+                    description: No Content
     /reports/:reportID:
         get:
             tags:
@@ -151,41 +316,34 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Report"
-    /reports/triage:
+    /reports/automation:
         get:
             tags:
                 - Reports & Escalations
-            summary: Get a list of posts to be triaged
+            summary: List of Posts that where reported set number of times.
             parameters:
-                - name: limit
+                - name: countReports
                   in: query
-                  schema:
-                      type: integer
-                - name: page
-                  in: query
+                  required: true
                   schema:
                       type: integer
                       default: 1
-                - name: internalStatusID
+                - name: reportReasonID
                   in: query
-                  schema:
-                      type: integer
-                - name: recordUserID
-                  description: Filter by a range or CSV of users who created the content.
-                  in: query
-                  schema:
-                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
-                - name: recordUserRoleID
-                  description: Filter by a range or CSV of users' roles who created the content.
-                  in: query
-                  schema:
-                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
-                - name: sort
-                  in: query
+                  required: false
                   schema:
                       type: string
-                      enum: ["recordDateInserted", "-recordDateInserted"]
-                      default: "-recordDateInserted"
+                - name: placeRecordID
+                  description: Filter by a range or CSV of category placeRecordIDs.
+                  in: query
+                  schema:
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
+                - name: includeSubcategories
+                  description: Include reports from subcategories.
+                  in: query
+                  schema:
+                      type: boolean
+                      default: false
                 - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
@@ -204,21 +362,7 @@ paths:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/TriageRecord"
-#        delete:
-#            tags:
-#                - Reports & Escalations
-#            summary: Delete a report
-#            parameters:
-#                - name: reportID
-#                  in: path
-#                  required: true
-#                  schema:
-#                      type: integer
-#            responses:
-#                "204":
-#                    description: No Content
-
+                                    $ref: "#/components/schemas/ReportCounter"
 components:
     schemas:
         ReportReasonFragment:
@@ -234,7 +378,9 @@ components:
                     type: integer
                 reportID:
                     type: integer
-            required: ["reportReasonID", "name", "description", "sort"]
+                deleted:
+                    type: boolean
+            required: ["reportReasonID", "name", "description", "sort", "deleted"]
         ReportReason:
             type: object
             properties:
@@ -256,6 +402,24 @@ components:
                     type: integer
                 sort:
                     type: integer
+                roleIDs:
+                    type: array
+                    items:
+                        type: integer
+                roles:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            roleID:
+                                type: integer
+                            name:
+                                type: string
+                deleted:
+                    type: boolean
+                countReports:
+                    type: integer
+                    description: The number of reports that have used this reason. Only available with `community.manage` permission.
             required:
                 - reportReasonID
                 - name
@@ -263,6 +427,40 @@ components:
                 - dateInserted
                 - insertUserID
                 - sort
+                - deleted
+        ReportReasonPost:
+            type: object
+            properties:
+                reportReasonID:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                sort:
+                    type: integer
+                roleIDs:
+                    type: array
+                    items:
+                        type: integer
+            required:
+                - reportReasonID
+                - name
+                - description
+                - roleIDs
+        ReportReasonPatch:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                sort:
+                    type: integer
+                roleIDs:
+                    type: array
+                    items:
+                        type: integer
         ReportInsert:
             type: object
             properties:
@@ -278,7 +476,7 @@ components:
                     type: array
                     items:
                         type: string
-                    example: ["spam", "fraud-or-scam"]
+                    example: ["spam", "abuse"]
                 noteBody:
                     description: Additional information about the report.
                     type: string
@@ -389,6 +587,78 @@ components:
                 - countReports
                 - reportUserIDs
                 - reportUsers
+        ReportMeta:
+            type: object
+            properties:
+                reportsReasons:
+                    type: array
+                    description: Report reasons.
+                    items:
+                        $ref: "#/components/schemas/ReportReasonFragment"
+                reportUserIDs:
+                    description: User IDs that have reported this post.
+                    type: array
+                    items:
+                        type: integer
+                reportUsers:
+                    description: Users that have reported this post.
+                    type: array
+                    items:
+                        $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                countReportUsers:
+                    description: The number of users that have reported this post.
+                    type: number
+                dateLastReport:
+                    description: The date of the last report on the post.
+                    type: string
+                    format: date-time
+                countReports:
+                    type: integer
+                    default: 0
+                    description: The number of reports on the post.
+        ReportCounter:
+            type: object
+            properties:
+                # Information about the record
+                recordType:
+                    description: Type of record being reported.
+                    type: string
+                    enum: ["discussion", "comment"]
+                recordID:
+                    description: ID of the record being reported.
+                    type: integer
+                recordName:
+                    description: Name of the record being reported.
+                    type: string
+                recordHtml:
+                    description: Rendered HTML contents of the reported record.
+                    type: string
+                placeRecordType:
+                    description: Type of record the reported record is placed in.
+                    type: string
+                    enum: ["category"]
+                placeRecordID:
+                    description: ID of the record the reported record is placed in.
+                    type: integer
+                placeRecordName:
+                    description: Name of the record the reported record is placed in.
+                    type: string
+
+                # Report contents
+                reportReasons:
+                    description: Full report reasons
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/ReportReasonFragment"
+            required:
+                - recordType
+                - recordID
+                - recordName
+                - recordHtml
+                - placeRecordType
+                - placeRecordID
+                - placeRecordName
+                - reportReasonIDs
 
         Report:
             type: object
@@ -447,6 +717,12 @@ components:
                 recordDateUpdated:
                     type: string
                     format: date-time
+                isPending:
+                    description: Whether the reported content is a pending post (Eg. premoderation report).
+                    type: boolean
+                isPendingUpdate:
+                    description: Whether the reported content is a pending update for a post that was live.
+                    type: boolean
 
                 # Report contents
                 reportReasons:

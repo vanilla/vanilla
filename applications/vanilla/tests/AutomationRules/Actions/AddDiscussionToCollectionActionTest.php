@@ -90,10 +90,15 @@ class AddDiscussionToCollectionActionTest extends SiteTestCase
             "trigger" => [
                 "triggerType" => LastActiveDiscussionTrigger::getType(),
                 "triggerValue" => [
-                    "maxTimeThreshold" => 3,
-                    "maxTimeUnit" => "day",
-                    "triggerTimeThreshold" => 1,
-                    "triggerTimeUnit" => "day",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 3,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "day",
+                    ],
                     "postType" => ["discussion"],
                 ],
             ],

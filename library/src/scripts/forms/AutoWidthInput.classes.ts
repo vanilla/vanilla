@@ -34,6 +34,8 @@ export const autoWidthInputClasses = useThemeCache(() => {
     const hiddenInputMeasure = css({
         visibility: "hidden",
         opacity: 0,
+        top: 0,
+        left: 0,
         position: "absolute",
         zIndex: -100,
         width: "auto !important",

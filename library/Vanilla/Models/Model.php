@@ -9,9 +9,13 @@ namespace Vanilla\Models;
 use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
+use Garden\Schema\ValidationField;
+use Vanilla\Database\SetLiterals\RawExpression;
+use Vanilla\Database\SetLiterals\SetLiteral;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\InjectableInterface;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\InstanceValidatorSchema;
 use Webmozart\Assert\Assert;
 
 /**
@@ -110,6 +114,7 @@ class Model implements InjectableInterface
         if ($this->writeSchema === null) {
             $schema = clone $this->getDatabaseSchema();
             $this->configureWriteSchema($schema);
+
             $this->writeSchema = $schema;
         }
         return $this->writeSchema;

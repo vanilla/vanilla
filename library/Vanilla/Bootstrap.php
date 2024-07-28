@@ -151,6 +151,14 @@ class Bootstrap
             ->setShared(true)
 
             ->rule(Model::class)
+            ->setInherit(true)
+            ->setShared(true);
+
+        $container
+            ->rule(Vanilla\Premoderation\PremoderationService::class)
+            ->addCall("registerHandler", [new Reference(Vanilla\Premoderation\ApprovalPremoderator::class)])
+            ->setShared(true)
+            ->rule(Vanilla\Dashboard\Models\PremoderationModel::class)
             ->setShared(true);
 
         $container->rule(Vanilla\OpenAI\OpenAIClient::class)->setShared(true);

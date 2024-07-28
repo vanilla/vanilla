@@ -16,11 +16,7 @@ import FrameHeader from "@library/layout/frame/FrameHeader";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import {
-    NotificationPreferencesContextProvider,
-    api,
-    useNotificationPreferencesContext,
-} from "@library/notificationPreferences";
+import { useNotificationPreferencesContext } from "@library/notificationPreferences";
 import { ITabData, Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { t } from "@vanilla/i18n";
@@ -35,7 +31,8 @@ import { INotificationPreferences, utils } from "@library/notificationPreference
 import { ISectionProps, JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { useFormik } from "formik";
 import { defaultNotificationPreferencesFormClasses } from "@dashboard/userPreferences/DefaultNotificationPreferences/DefaultNotificationPreferences.classes";
-import { translateDescription } from "@library/notificationPreferences/NotificationPreferences";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { translateDescription } from "@library/notificationPreferences/utils";
 
 export default function DefaultNotificationPreferences() {
     const [modalVisible, setModalVisible] = useState(false);
@@ -50,27 +47,25 @@ export default function DefaultNotificationPreferences() {
 
     return (
         <>
-            <div className={dashboardClasses().buttonRow}>
-                <div className="label-wrap">
-                    <Heading depth={3}>{t("Default Notification Preferences")}</Heading>
-                    <p>
-                        {t(
-                            "When new users register, they will be subscribed to the following notification preferences by default. Users can customize their preferences in their profile settings.",
-                        )}
-                    </p>
-                </div>
-                <Button
-                    onClick={() => {
-                        openModal();
-                    }}
-                >
-                    {t("Edit Default Notifications")}
-                </Button>
-            </div>
+            <DashboardFormGroup
+                label={t("Default Notification Preferences")}
+                description={t(
+                    "When new users register, they will be subscribed to the following notification preferences by default. Users can customize their preferences in their profile settings.",
+                )}
+                labelType={DashboardLabelType.WIDE}
+            >
+                <span className={"input-wrap-right"}>
+                    <Button
+                        onClick={() => {
+                            openModal();
+                        }}
+                    >
+                        {t("Edit Default Notifications")}
+                    </Button>
+                </span>
+            </DashboardFormGroup>
 
-            <NotificationPreferencesContextProvider userID={"defaults"} api={api}>
-                <DefaultNotificationPreferencesModal isVisible={modalVisible} exitHandler={() => closeModal()} />
-            </NotificationPreferencesContextProvider>
+            <DefaultNotificationPreferencesModal isVisible={modalVisible} exitHandler={() => closeModal()} />
         </>
     );
 }
@@ -103,24 +98,19 @@ export function DefaultNotificationPreferencesModal(
         initialValues: preferences?.data ?? {},
         onSubmit: async function (values, { resetForm }) {
             try {
-                await editPreferences(values, {
-                    onSuccess: () => {
-                        toast.addToast({
-                            autoDismiss: true,
-                            body: <>{t("Success! Your changes were saved.")}</>,
-                        });
-                        props.exitHandler?.();
-                        resetForm();
-                    },
-                    onError: (e) => {
-                        toast.addToast({
-                            dismissible: true,
-                            body: <>{t(e.message)}</>,
-                        });
-                    },
+                await editPreferences(values);
+                toast.addToast({
+                    autoDismiss: true,
+                    body: <>{t("Success! Your changes were saved.")}</>,
                 });
+                props.exitHandler?.();
+                resetForm();
             } catch (e) {
                 resetForm();
+                toast.addToast({
+                    dismissible: true,
+                    body: <>{t(e.message)}</>,
+                });
             }
         },
         enableReinitialize: true,

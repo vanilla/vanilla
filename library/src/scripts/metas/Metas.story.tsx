@@ -39,7 +39,7 @@ export function StoryMetasMinimal() {
         <>
             <MetaItem>120 Views</MetaItem>
             <MetaItem>4.3k Comments</MetaItem>
-            <MetaIcon icon="meta-external" />
+            <MetaIcon icon="meta-external-compact" />
             <MetaItem>
                 <DateTime timestamp={STORY_DATE_STARTS}></DateTime>
             </MetaItem>

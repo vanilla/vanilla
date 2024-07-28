@@ -27,7 +27,6 @@ const NotificationPreferencesApi: INotificationPreferencesApi = {
         const response = apiv2.patch<INotificationPreferences>(`${API_ENDPOINT}/${userID}`, {
             ...preferences,
         });
-
         return (await response).data;
     },
 };

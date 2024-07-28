@@ -188,7 +188,7 @@ export default function RichLinkToolbar() {
                                     url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "") //removes protocol and www
                                 }
                             </TruncatedText>
-                            <Icon icon="meta-external" className={classes.linkPreviewIcon} />
+                            <Icon icon="meta-external-compact" className={classes.linkPreviewIcon} />
                         </a>
                     }
                 />

@@ -18,6 +18,7 @@ import { ICollection } from "@library/featuredCollections/Collections.variables"
 import { useCollectionList } from "@library/featuredCollections/collectionsHooks";
 import { useStatusOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
 import { IGroupOption } from "@library/forms/select/Tokens.loadable";
+import { t } from "@vanilla/i18n";
 
 export interface IAutomationRulesContext {
     profileFields?: ProfileField[];
@@ -92,7 +93,7 @@ export function AutomationRulesProvider(props: { children: ReactNode }) {
 
     const ideaStatusesByID = useMemo(() => {
         if (discussionStatusesData) {
-            const ideas = [...(discussionStatusesData as IGroupOption[])].find((option) => option.label === "Ideas");
+            const ideas = [...(discussionStatusesData as IGroupOption[])].find((option) => option.label === t("Ideas"));
             if (ideas && ideas?.options?.length > 0) {
                 return Object.fromEntries(ideas.options.map((status) => [status.value, status.label]));
             }

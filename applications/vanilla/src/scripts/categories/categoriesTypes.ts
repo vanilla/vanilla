@@ -1,10 +1,11 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { ILoadable } from "@library/@types/api/core";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { INotificationPreferences } from "@library/notificationPreferences";
+import { t } from "@vanilla/i18n";
 import { RecordID } from "@vanilla/utils";
 
 export interface ICategoryFragment {
@@ -47,21 +48,3 @@ export enum CategoryPostNotificationType {
     DISCUSSIONS = "discussions",
     ALL = "all",
 }
-export interface ICategoryPreferences {
-    "preferences.followed": boolean;
-    "preferences.email.comments": boolean;
-    "preferences.email.posts": boolean;
-    "preferences.popup.comments": boolean;
-    "preferences.popup.posts": boolean;
-    "preferences.email.digest"?: boolean;
-}
-
-export const DEFAULT_NOTIFICATION_PREFERENCES: ICategoryPreferences = {
-    "preferences.followed": false,
-    "preferences.email.comments": false,
-    "preferences.email.posts": false,
-    "preferences.popup.comments": false,
-    "preferences.popup.posts": false,
-};
-
-export const CATEGORIES_STORE_KEY = "categories";

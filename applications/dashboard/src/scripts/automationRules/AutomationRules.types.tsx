@@ -3,15 +3,20 @@
  * @license Proprietary
  */
 
+import { IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
+import { IGetUsersQueryParams } from "@dashboard/users/userManagement/UserManagement.hooks";
 import { IUserFragment } from "@library/@types/api/users";
 import { IGetCategoryListParams } from "@library/categoriesWidget/CategoryList.hooks";
+import { IGetCollectionResourcesParams } from "@library/featuredCollections/collectionsHooks";
 import { IGetTagsParams } from "@library/features/tags/TagsHooks";
 import { JsonSchema } from "@vanilla/json-schema-forms";
+import { IGetReportsForAutomationRulesParams } from "@dashboard/automationRules/preview/AutomationRulesPreviewReportedPostsContent";
 
 export type AutomationRuleTriggerType =
     | "emailDomainTrigger"
     | "ideationVoteTrigger"
     | "profileFieldTrigger"
+    | "reportPostTrigger"
     | "staleDiscussionTrigger"
     | "staleCollectionTrigger"
     | "lastActiveDiscussionTrigger"
@@ -24,6 +29,9 @@ export type AutomationRuleActionType =
     | "categoryFollowAction"
     | "changeIdeationStatusAction"
     | "closeDiscussionAction"
+    | "createEscalationAction"
+    | "escalateGithubIssueAction"
+    | "escalateToZendeskAction"
     | "moveToCategoryAction"
     | "removeDiscussionFromCollectionAction"
     | "removeDiscussionFromTriggerCollectionAction";
@@ -36,6 +44,7 @@ export interface IAutomationRuleTrigger {
     triggerType: AutomationRuleTriggerType;
     name: string;
     triggerActions: AutomationRuleActionType[];
+    contentType: "users" | "posts";
     schema?: JsonSchema<any>;
 }
 
@@ -43,6 +52,7 @@ export interface IAutomationRuleAction {
     actionType: AutomationRuleActionType;
     name: string;
     actionTriggers: AutomationRuleTriggerType[];
+    contentType: "users" | "posts";
     schema?: JsonSchema<any>;
 }
 
@@ -118,14 +128,16 @@ export type AutomationRuleFormValues = {
         actionType: AutomationRuleActionType | "";
         actionValue: Record<string, any>;
     };
+    additionalSettings?: {
+        triggerValue?: Record<string, any>;
+        actionValue?: Record<string, any>;
+    };
 };
 
 export type AddEditAutomationRuleParams = AutomationRuleFormValues & {
     name?: IAutomationRule["name"];
     automationRuleID?: IAutomationRule["automationRuleID"];
 };
-
-export type AutomationRulePreviewContentType = "users" | "posts";
 
 export type AutomationRulesAdditionalDataQuery = {
     categoriesQuery?: IGetCategoryListParams;
@@ -137,3 +149,9 @@ export interface IAutomationRulesHistoryFilter
     dateUpdated?: { start?: string; end?: string };
     dateFinished?: { start?: string; end?: string };
 }
+
+export type AutomationRulePreviewQuery =
+    | IGetUsersQueryParams
+    | IGetDiscussionListParams
+    | IGetCollectionResourcesParams
+    | IGetReportsForAutomationRulesParams;

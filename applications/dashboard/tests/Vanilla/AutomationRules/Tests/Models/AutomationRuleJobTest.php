@@ -100,10 +100,15 @@ class AutomationRuleJobTest extends SiteTestCase
             [
                 "type" => StaleDiscussionTrigger::getType(),
                 "value" => [
-                    "maxTimeThreshold" => "5",
-                    "maxTimeUnit" => "day",
-                    "triggerTimeThreshold" => "1",
-                    "triggerTimeUnit" => "day",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 5,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "day",
+                    ],
                     "postType" => ["discussion"],
                 ],
             ],
@@ -121,10 +126,15 @@ class AutomationRuleJobTest extends SiteTestCase
             [
                 "type" => StaleCollectionTrigger::getType(),
                 "value" => [
-                    "maxTimeThreshold" => "5",
-                    "maxTimeUnit" => "day",
-                    "triggerTimeThreshold" => "1",
-                    "triggerTimeUnit" => "day",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 5,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "day",
+                    ],
                     "collectionID" => [$collectionID],
                 ],
             ],

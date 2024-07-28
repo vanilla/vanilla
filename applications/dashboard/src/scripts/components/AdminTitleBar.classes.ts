@@ -22,8 +22,8 @@ export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperti
         zIndex: zIndex ?? 1,
     });
 
-    const container = useThemeCache((useTwoColumnContainer?: boolean, compact?: boolean) => {
-        const gutterSize = compact ? 18 : 28;
+    const container = useThemeCache((useTwoColumnContainer?: boolean, hasActions?: boolean) => {
+        const gutterSize = 18;
         return css(
             {
                 display: "flex",
@@ -31,7 +31,7 @@ export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperti
                 margin: 0,
                 ...Mixins.padding(
                     Variables.spacing({
-                        vertical: 12,
+                        vertical: hasActions ? 7 : 12,
                         left: gutterSize,
                         right: useTwoColumnContainer
                             ? calc(
@@ -69,8 +69,8 @@ export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperti
     const titleAndDescriptionContainer = css({});
 
     const titleWrap = css({
-        fontSize: "20px",
-        fontWeight: "bold",
+        fontSize: "18px",
+        fontWeight: 600,
         color: "#555a62",
         marginBottom: 0,
         display: "flex",
@@ -83,7 +83,15 @@ export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperti
         marginRight: 16,
     });
 
-    const actionsWrapper = css({ display: "flex", flexDirection: "row", alignItems: "center" });
+    const actionsWrapper = css({
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        "& button, &[role='button']": {
+            minHeight: "32px",
+            lineHeight: "30px",
+        },
+    });
 
     const descriptionWrapper = css({
         display: "flex",
@@ -209,6 +217,7 @@ export const adminEditTitleBarClasses = useThemeCache(() => {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
+        marginLeft: -18,
     });
 
     const noLeftPanel = css(

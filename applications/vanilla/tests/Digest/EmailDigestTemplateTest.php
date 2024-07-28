@@ -120,6 +120,7 @@ HTML
                 "imageAlt" => "Vanilla Forums Digest",
                 "textColor" => "#555a62",
                 "backgroundColor" => "#ffffff",
+                "containerBackgroundColor" => "#dddddd",
                 "buttonTextColor" => "#ffffff",
                 "buttonBackgroundColor" => "#22a3db",
                 "categories" => [

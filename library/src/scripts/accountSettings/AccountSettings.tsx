@@ -1,31 +1,33 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { useState, useEffect, useMemo, ReactNode } from "react";
-import { accountSettingsClasses } from "@library/accountSettings/AccountSettings.classes";
-import Heading from "@library/layout/Heading";
-import { t } from "@vanilla/i18n";
-import CheckBox from "@library/forms/Checkbox";
-import { IUser } from "@library/@types/api/users";
-import { AccountSettingsDetail, AccountSettingType } from "@library/accountSettings/AccountSettingsDetail";
-import { usePatchUser } from "@library/features/users/userHooks";
 import { LoadStatus } from "@library/@types/api/core";
+import { IUser } from "@library/@types/api/users";
+import { accountSettingsClasses } from "@library/accountSettings/AccountSettings.classes";
+import { AccountSettingProvider, useAccountSettings } from "@library/accountSettings/AccountSettingsContext";
+import { AccountSettingType, AccountSettingsDetail } from "@library/accountSettings/AccountSettingsDetail";
+import { AccountSettingsModal } from "@library/accountSettings/AccountSettingsModal";
+import { StatusIndicator } from "@library/accountSettings/StatusIndicator";
+import Translate from "@library/content/Translate";
+import { ErrorPageBoundary } from "@library/errorPages/ErrorPageBoundary";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IPatchUserParams } from "@library/features/users/UserActions";
-import { AccountSettingsModal } from "@library/accountSettings/AccountSettingsModal";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { ToolTip } from "@library/toolTip/ToolTip";
+import { usePatchUser } from "@library/features/users/userHooks";
 import Button from "@library/forms/Button";
+import CheckBox from "@library/forms/Checkbox";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { Icon } from "@vanilla/icons";
-import { StatusIndicator } from "@library/accountSettings/StatusIndicator";
 import { ApproveIcon } from "@library/icons/common";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import Heading from "@library/layout/Heading";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
-import { AccountSettingProvider, useAccountSettings } from "@library/accountSettings/AccountSettingsContext";
-import { ErrorPageBoundary } from "@library/errorPages/ErrorPageBoundary";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import { getMeta } from "@library/utility/appUtils";
+import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 
 export interface IAccountSettingsProps {
     /** The userID of the user to be edited */
@@ -67,9 +69,13 @@ export function AccountSettingsImpl() {
     const [emailConfirmed, setEmailConfirmed] = useState<IUser["emailConfirmed"] | null>(null);
     const [showEmail, setShowEmail] = useState<IUser["showEmail"]>(false);
     const [showProfile, setShowProfile] = useState<IUser["private"]>(false);
+    const [suggestAnswers, setSuggestAnswers] = useState<IUser["suggestAnswers"]>(true);
 
     const [editType, setEditType] = useState<AccountSettingType | null>(null);
     const [visibility, setVisibility] = useState<boolean>(false);
+
+    const aiSuggestionsEnabled = getMeta("answerSuggestionsEnabled", false);
+    const aiAssistant = getMeta("aiAssistant", { name: "AI Suggestion Assistant" });
 
     const handleEditClick = (type: AccountSettingType) => {
         setEditType(type);
@@ -78,16 +84,17 @@ export function AccountSettingsImpl() {
 
     useEffect(() => {
         if (viewingUser) {
-            setUsername(viewingUser?.name ?? username);
-            setEmail(viewingUser?.email ?? email);
-            setEmailConfirmed(viewingUser?.emailConfirmed ?? emailConfirmed);
-            setShowEmail(viewingUser?.showEmail ?? showEmail);
-            setShowProfile(viewingUser?.private != null ? !viewingUser.private : showProfile);
+            setUsername(viewingUser.name ?? username);
+            setEmail(viewingUser.email ?? email);
+            setEmailConfirmed(viewingUser.emailConfirmed ?? emailConfirmed);
+            setShowEmail(viewingUser.showEmail ?? showEmail);
+            setShowProfile(viewingUser.private != null ? !viewingUser.private : showProfile);
             setPassword(
                 <span aria-label={t("masked password")} className="password">
                     ﹡﹡﹡﹡﹡﹡﹡﹡﹡﹡﹡﹡
                 </span>,
             );
+            setSuggestAnswers(viewingUser.suggestAnswers ?? suggestAnswers);
         }
     }, [viewingUser]);
 
@@ -118,7 +125,7 @@ export function AccountSettingsImpl() {
             })
             .catch((error) => {
                 toast.addToast({
-                    autoDismiss: false,
+                    dismissible: true,
                     body: <>{t("An error occurred updating your privacy setting.")}</>,
                 });
             });
@@ -128,6 +135,31 @@ export function AccountSettingsImpl() {
                 autoDismiss: true,
                 body: <>{t(toastMessage)}</>,
             });
+    };
+
+    const toggleSuggestAnswers = async (event) => {
+        const { checked } = event.target;
+        const patchParams: IPatchUserParams = {
+            userID: viewingUserID,
+            suggestAnswers: checked,
+        };
+
+        try {
+            await patchUser(patchParams);
+            toast.addToast({
+                autoDismiss: true,
+                body: checked ? (
+                    <Translate source="<0/> will suggest answers on Q&A posts" c0={aiAssistant?.name} />
+                ) : (
+                    <Translate source="<0 /> will not suggest answers on Q&A posts" c0={aiAssistant?.name} />
+                ),
+            });
+        } catch (err) {
+            toast.addToast({
+                dismissible: true,
+                body: <>{t("An error ocurred updating your privacy setting.")}</>,
+            });
+        }
     };
 
     const wrappedEditButton = (condition: boolean, tooltip: string, ariaLabel: string, type: AccountSettingType) => {
@@ -250,6 +282,21 @@ export function AccountSettingsImpl() {
                 visibility={visibility}
                 onVisibilityChange={setVisibility}
             />
+            {aiSuggestionsEnabled && (
+                <>
+                    <Heading depth={2} className={classes.subtitle}>
+                        {t("Community Preferences")}
+                    </Heading>
+                    <CheckBox
+                        id="suggest-answers"
+                        label={<Translate source="Suggest <0/> Answers on my Q&A Posts" c0={aiAssistant?.name} />}
+                        labelBold={false}
+                        checked={suggestAnswers}
+                        onChange={toggleSuggestAnswers}
+                        className={classes.fitWidth}
+                    />
+                </>
+            )}
         </section>
     );
 }

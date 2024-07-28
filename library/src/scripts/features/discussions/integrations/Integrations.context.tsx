@@ -108,10 +108,7 @@ export function AttachmentIntegrationsContextProvider(
 
     const refreshStaleAttachments = useMutation({
         mutationFn: async (attachments: IAttachment[]) => {
-            const writeableIntegrationsAttachmentTypes = writeableIntegrations.map((i) => i.attachmentType);
-            const attachmentIDs = attachments
-                .filter(({ attachmentType }) => writeableIntegrationsAttachmentTypes.includes(attachmentType))
-                .map(({ attachmentID }) => attachmentID);
+            const attachmentIDs = attachments.map(({ attachmentID }) => attachmentID);
 
             if (attachmentIDs.length > 0) {
                 await api.refreshAttachments({ attachmentIDs, onlyStale: true });
@@ -138,12 +135,14 @@ interface IReadableIntegrationContextValue {
     title: IAttachmentIntegration["title"];
     externalIDLabel: IAttachmentIntegration["externalIDLabel"];
     logoIcon: IAttachmentIntegration["logoIcon"];
+    attachmentTypeIcon: IAttachmentIntegration["attachmentTypeIcon"];
 }
 
 const ReadableIntegrationContext = createContext<IReadableIntegrationContextValue>({
     title: "",
     externalIDLabel: "",
-    logoIcon: "meta-external",
+    logoIcon: "meta-external-compact",
+    attachmentTypeIcon: undefined,
 });
 
 export function useReadableIntegrationContext() {
@@ -155,7 +154,6 @@ export function ReadableIntegrationContextProvider(
         attachmentType: string;
     }>,
 ) {
-    const api = useAttachmentIntegrationsApi();
     const integrations = useAttachmentIntegrations();
     const { children, attachmentType } = props;
 
@@ -167,7 +165,7 @@ export function ReadableIntegrationContextProvider(
         return null;
     }
 
-    const { title, externalIDLabel, logoIcon = "meta-external" } = integration ?? {};
+    const { title, externalIDLabel, logoIcon = "meta-external-compact", attachmentTypeIcon } = integration ?? {};
 
     return (
         <ReadableIntegrationContext.Provider
@@ -175,6 +173,7 @@ export function ReadableIntegrationContextProvider(
                 title,
                 externalIDLabel,
                 logoIcon,
+                attachmentTypeIcon,
             }}
         >
             {children}
@@ -190,6 +189,7 @@ interface IWriteableIntegrationContextValue {
     label: IAttachmentIntegration["label"];
     submitButton: IAttachmentIntegration["submitButton"];
     name: IAttachmentIntegration["name"];
+    postSuccessMessage?: IAttachmentIntegration["postSuccessMessage"];
 
     // context customizations
     transformLayout?: ICustomIntegrationContext["transformLayout"];
@@ -204,6 +204,7 @@ const WriteableIntegrationContext = createContext<IWriteableIntegrationContextVa
     label: "",
     submitButton: "",
     name: "",
+    postSuccessMessage: undefined,
 });
 
 export function useWriteableIntegrationContext() {
@@ -227,7 +228,9 @@ export function WriteableIntegrationContextProvider(
         submitButton = "",
         title = "",
         externalIDLabel = "",
-        logoIcon = "meta-external",
+        logoIcon = "meta-external-compact",
+        attachmentTypeIcon,
+        postSuccessMessage,
     } = integration ?? {};
 
     const customContextQuery = useQuery({
@@ -281,6 +284,8 @@ export function WriteableIntegrationContextProvider(
                     title,
                     externalIDLabel,
                     logoIcon,
+                    attachmentTypeIcon,
+                    postSuccessMessage,
                     schema,
                     getSchema: async () => {
                         const response = await schemaQuery.refetch();

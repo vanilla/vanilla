@@ -24,6 +24,7 @@ use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\ImageSrcSet\ImageSrcSet;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Layout\LayoutViewModel;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\ModelCache;
@@ -518,7 +519,11 @@ class CategoryModel extends Gdn_Model implements
     public function getCategoryIDsWithPermissionForUser(int $userID, string $permission): array
     {
         $userModel = \Gdn::userModel();
-        $userRoleIDs = $userModel->getRoleIDs($userID);
+        $roleModel = \Gdn::getContainer()->get(RoleModel::class);
+        $userRoleIDs =
+            $userID === UserModel::GUEST_USER_ID
+                ? $roleModel->getDefaultRoles(RoleModel::TYPE_GUEST)
+                : $userModel->getRoleIDs($userID);
         // Use this in our cache key so that we invalidate this cache when permissions are changed.
         $permissionsIncrement = $userModel->getPermissionsIncrement();
 
@@ -533,7 +538,6 @@ class CategoryModel extends Gdn_Model implements
                     ->join("Role R", "R.RoleID = P.RoleID ")
                     ->where([
                         "P.JunctionTable" => "Category",
-                        "C.CategoryID <>" => \CategoryModel::ROOT_ID,
                         "R.RoleID" => $userRoleIDs,
                         "P.{$permission}" => 1,
                     ])
@@ -1158,7 +1162,7 @@ class CategoryModel extends Gdn_Model implements
         $filterNonDiscussionCategories = $options["filterNonDiscussionCategories"] ?? false;
 
         foreach ($categories as $categoryID => $category) {
-            if (!$category["PermsDiscussionsView"]) {
+            if (!($category["PermsDiscussionsView"] ?? false)) {
                 $unfiltered = false;
                 continue;
             }
@@ -2819,10 +2823,9 @@ class CategoryModel extends Gdn_Model implements
     /**
      * Get list of categories (disregarding user permission for admins).
      *
-     * @return object SQL results.
-     * @throws Exception
      * @since 2.0.0
-     * @deprecated This function isn't secure and might blow up if there are too many categories.
+     *
+     * @return object SQL results.
      */
     public function getAll()
     {
@@ -3761,10 +3764,6 @@ class CategoryModel extends Gdn_Model implements
             (bool) val("CustomPermissions", $formPostValues) || is_array(val("Permissions", $formPostValues));
         $CustomPoints = val("CustomPoints", $formPostValues, null);
 
-        if (isset($formPostValues["Name"])) {
-            $formPostValues["Name"] = htmlspecialchars($formPostValues["Name"]);
-        }
-
         if (isset($formPostValues["AllowedDiscussionTypes"]) && is_array($formPostValues["AllowedDiscussionTypes"])) {
             $formPostValues["AllowedDiscussionTypes"] = dbencode($formPostValues["AllowedDiscussionTypes"]);
         } else {
@@ -4499,6 +4498,10 @@ class CategoryModel extends Gdn_Model implements
                 $categoryID = $categoryPreference["categoryID"];
                 $category = $this->getOne($categoryID);
 
+                if ($category["DisplayAs"] !== "Discussions") {
+                    continue;
+                }
+
                 if (empty($category) || !self::checkPermission($categoryID, "Vanilla.Discussions.View")) {
                     continue;
                 }
@@ -4519,11 +4522,14 @@ class CategoryModel extends Gdn_Model implements
                 Vanilla\Logger::FIELD_CHANNEL => Vanilla\Logger::CHANNEL_APPLICATION,
                 Vanilla\Logger::FIELD_EVENT => "configuration",
             ]);
-        } catch (Exception $exception) {
-            $this->logger->debug("Setting Default Category Preference for the user failed", [
-                "error" => $exception->getMessage(),
-                "trace" => $exception->getTraceAsString(),
-            ]);
+        } catch (\Throwable $exception) {
+            ErrorLogger::error(
+                "Setting Default Category Preference for the user failed",
+                ["categoryFollowing"],
+                [
+                    "exception" => $exception,
+                ]
+            );
         }
     }
 

@@ -13,16 +13,16 @@ import { PageBox } from "@library/layout/PageBox";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 import { BorderType } from "@library/styles/styleHelpersBorders";
+import { AcceptedAnswerComment, IAcceptedAnswerProps } from "@library/suggestedAnswers/AcceptedAnswerComment";
+import ThreadItemClasses from "@vanilla/addon-vanilla/thread/ThreadItem.classes";
 import ThreadItemActions from "@vanilla/addon-vanilla/thread/ThreadItemActions";
 import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
 import React from "react";
-import ThreadItemClasses from "@vanilla/addon-vanilla/thread/ThreadItem.classes";
 import { useThreadItemContext } from "./ThreadItemContext";
 
 interface IProps {
     content: string;
     editor?: React.ReactNode;
-    contentMeta: React.ReactNode;
     user: IUserFragment;
     userPhotoLocation: "header" | "left";
     collapsed?: boolean;
@@ -31,6 +31,7 @@ interface IProps {
     actions?: React.ReactNode;
     reactions?: IReaction[];
     attachmentsContent?: React.ReactNode;
+    suggestionContent?: IAcceptedAnswerProps;
 }
 
 function getThreadItemID(recordType: string, recordID: string | number) {
@@ -39,13 +40,18 @@ function getThreadItemID(recordType: string, recordID: string | number) {
 }
 
 export function ThreadItem(props: IProps) {
-    const { content, contentMeta, user, userPhotoLocation, collapsed } = props;
+    const { content, user, userPhotoLocation, collapsed, suggestionContent } = props;
 
     const headerHasUserPhoto = userPhotoLocation === "header";
 
     const classes = ThreadItemClasses(headerHasUserPhoto);
 
-    let userContent = <UserContent content={content} className={classes.userContent} />;
+    let userContent = suggestionContent ? (
+        <AcceptedAnswerComment {...suggestionContent} className={classes.userContent} />
+    ) : (
+        <UserContent content={content} className={classes.userContent} />
+    );
+
     if (collapsed) {
         userContent = (
             <CollapsableContent maxHeight={200} overshoot={250}>
@@ -60,12 +66,7 @@ export function ThreadItem(props: IProps) {
 
     let result = (
         <>
-            <ThreadItemHeader
-                options={props.options}
-                user={user}
-                metas={contentMeta}
-                excludePhoto={!headerHasUserPhoto}
-            />
+            <ThreadItemHeader options={props.options} user={user} excludePhoto={!headerHasUserPhoto} />
             {props.editor || (
                 <>
                     {userContent}

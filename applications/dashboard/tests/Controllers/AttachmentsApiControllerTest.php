@@ -303,6 +303,19 @@ class AttachmentsApiControllerTest extends SiteTestCase
                 "escalationDelayLength" => 0,
                 "writeableContentScope" => AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_ALL,
             ],
+            "vanilla-escalation" => [
+                "recordTypes" => ["discussion", "comment"],
+                "label" => "You should never see this.",
+                "attachmentType" => "vanilla-escalation",
+                "submitButton" => "You should never see this.",
+                "title" => "Vanilla - Escalation",
+                "externalIDLabel" => "Escalation #",
+                "logoIcon" => "vanilla-logo",
+                "name" => "Vanilla",
+                "escalationDelayUnit" => null,
+                "escalationDelayLength" => 0,
+                "writeableContentScope" => "none",
+            ],
         ];
         $response = $this->api()->get("/attachments/catalog");
         $body = $response->getBody();

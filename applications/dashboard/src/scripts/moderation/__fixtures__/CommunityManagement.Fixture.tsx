@@ -41,7 +41,6 @@ export class CommunityManagementFixture {
             placeRecordUrl: "https://example.tld",
             placeRecordName: "Example Category Name",
             recordDateInserted: new Date(2024, 3, 5).toISOString(),
-            recordDateUpdated: new Date(2024, 3, 7).toISOString(),
             recordHtml: STORY_IPSUM_LONG + STORY_IPSUM_LONG2,
             ...record,
         };
@@ -55,7 +54,8 @@ export class CommunityManagementFixture {
             name: "Spam",
             description: `This post violates ${reason?.name || "spam"} rules.`,
             sort: 0,
-            visibility: "public",
+            countReports: 5,
+            deleted: false,
             ...reason,
         };
     }
@@ -99,6 +99,10 @@ export class CommunityManagementFixture {
             status: "Open",
             noteHtml: "<p>This post is spam. This user is re-posting the same content everywhere on the community</p>",
             reasons: reasons,
+            isPending: false,
+            isPendingUpdate: false,
+            escalationID: null,
+            escalationUrl: null,
             ...report,
         };
     }
@@ -132,6 +136,7 @@ export class CommunityManagementFixture {
             reportIDs: reports.map((report) => report.reportID),
             reportReasonIDs: reports.flatMap((report) => report.reasons.map((reason) => `${reason.reportID}`)),
             reportUserIDs: reports.map((report) => report?.insertUser?.userID).filter(notEmpty),
+            recordID: record.recordID ?? "4",
             ...escalation,
         };
     }

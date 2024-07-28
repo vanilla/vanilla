@@ -1647,7 +1647,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
                 ->select("ActivityID", "count", "total")
                 ->from($this->Name . " aCount")
                 ->where("NotifyUserID", $userID)
-                ->where("Notified", self::SENT_PENDING)
+                ->where("Notified", [self::SENT_PENDING, self::SENT_TOAST])
                 ->get()
                 ->resultArray();
             if (!is_array($notifications) || !isset($notifications[0])) {

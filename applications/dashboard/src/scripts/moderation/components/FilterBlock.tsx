@@ -177,7 +177,7 @@ export function FilterBlock(props: FilterBlockProps) {
                     {props.staticOptions.map((option) => {
                         return (
                             <CheckBox
-                                key={option.name}
+                                key={`${option.name}`}
                                 className={classes.checkbox}
                                 label={t(`${option.name}`)}
                                 labelBold={false}
@@ -231,14 +231,14 @@ export function FilterBlock(props: FilterBlockProps) {
                                 <AutoCompleteLookupOptions
                                     api={apiv2}
                                     lookup={props.dynamicOptionApi}
-                                    lookupResult={debouncedCacheResults}
+                                    handleLookupResults={debouncedCacheResults}
                                 />
                             }
                             options={
                                 props.dynamicOptionApi?.optionOverride &&
                                 props.dynamicOptionApi?.optionOverride.map((option) => ({
                                     ...option,
-                                    label: option.name,
+                                    label: `${option.name}`,
                                 }))
                             }
                             autoFocus={true}

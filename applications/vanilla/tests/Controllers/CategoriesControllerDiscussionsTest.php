@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Forum\Controllers;
 
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
@@ -66,9 +67,12 @@ class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test
     public function testAnnouncementsPinnedComeFirst(): void
     {
         $category = $this->createCategory();
+        CurrentTimeStamp::mockTime("2024-01-01");
         $disc1 = $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
-        $disc2 = $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
         $disc3 = $this->createDiscussion(["pinned" => false, "categoryID" => $category["categoryID"]]);
+
+        CurrentTimeStamp::mockTime("2024-01-02");
+        $disc2 = $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
         $disc4 = $this->createDiscussion(["pinned" => false, "categoryID" => $category["categoryID"]]);
 
         $discussions = $this->bessy()

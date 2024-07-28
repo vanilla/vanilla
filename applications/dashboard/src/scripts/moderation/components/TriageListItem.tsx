@@ -4,48 +4,51 @@
  * @license Proprietary
  */
 
-import { ITriageRecord } from "@dashboard/moderation/CommunityManagementTypes";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { AssociatedReportMetas } from "@dashboard/moderation/components/AssosciatedReportMetas";
 import { TriageInternalStatus } from "@dashboard/moderation/components/TriageFilters.constants";
 import { triageListItemClasses } from "@dashboard/moderation/components/TriageListItem.classes";
+import { IUser } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
+import UserContent from "@library/content/UserContent";
+import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import DropDownSwitchButton from "@library/flyouts/DropDownSwitchButton";
-import DropDownItem from "@library/flyouts/items/DropDownItem";
-import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
-import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import { ListItem } from "@library/lists/ListItem";
+import { ListItem, ListItemContext } from "@library/lists/ListItem";
+import { ListItemLayout } from "@library/lists/ListItem.variables";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { Metas, MetaItem, MetaIcon } from "@library/metas/Metas";
+import { MetaIcon, MetaItem, MetaProfile, Metas } from "@library/metas/Metas";
 import { metasClasses } from "@library/metas/Metas.styles";
-import ProfileLink from "@library/navigation/ProfileLink";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import SmartLink from "@library/routing/links/SmartLink";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@library/utility/appUtils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import { Icon } from "@vanilla/icons";
+import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 
 interface IProps {
-    triageItem: ITriageRecord;
-    onEscalate: (triageItem: ITriageRecord) => void;
+    discussion: IDiscussion;
+    onEscalate: (discussion: IDiscussion) => void;
+    onMessageAuthor: (authorID: IUser["userID"], recordUrl: IDiscussion["url"]) => void;
 }
 
 export function TriageListItem(props: IProps) {
-    const { triageItem, onEscalate } = props;
+    const { discussion, onEscalate } = props;
     const classes = triageListItemClasses();
-    const isResolved = triageItem.recordInternalStatus?.statusID?.toString() == TriageInternalStatus.RESOLVED;
+    const isResolved = discussion.internalStatusID?.toString() == TriageInternalStatus.RESOLVED;
     const toast = useToast();
     const queryClient = useQueryClient();
     const resolveMutation = useMutation({
-        mutationFn: (options: { discussionID: string; internalStatusID: TriageInternalStatus }) => {
+        mutationFn: (options: {
+            discussionID: IDiscussion["discussionID"];
+            internalStatusID: TriageInternalStatus;
+        }) => {
             const { discussionID, internalStatusID } = options;
             return apiv2.put(`/discussions/${discussionID}/status`, {
                 internalStatusID: internalStatusID,
@@ -60,65 +63,60 @@ export function TriageListItem(props: IProps) {
         },
     });
 
+    const escalation = discussion.attachments?.find((item) => item.attachmentType === "vanilla-escalation");
+    const detailUrl = `/dashboard/content/triage/${discussion.discussionID}`;
+
     return (
         <div className={classes.container}>
             <div className={classes.main}>
-                <ListItem
-                    as={"div"}
-                    url={`/dashboard/content/triage/${triageItem.recordID}`} // Fix this URL
-                    name={triageItem.recordName}
-                    description={triageItem.recordHtml ?? triageItem.recordExcerpt}
-                    truncateDescription={false}
-                    icon={
-                        <ProfileLink userFragment={triageItem.recordUser ?? deletedUserFragment()}>
-                            <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={triageItem.recordUser} />
-                        </ProfileLink>
-                    }
-                    metas={
-                        <>
-                            <Metas>
-                                <MetaIcon
-                                    icon={isResolved ? "cmd-approve" : "cmd-alert"}
-                                    aria-label={isResolved ? t("Resolved") : t("Unresolved")}
-                                />
-                                <MetaItem>
-                                    <Translate
-                                        source="Posted by <0/> in <1/>"
-                                        c0={
-                                            <SmartLink
-                                                to={`${triageItem.recordUser?.url}`}
-                                                className={metasClasses().metaLink}
-                                            >
-                                                {triageItem.recordUser?.name}
-                                            </SmartLink>
-                                        }
-                                        c1={
-                                            <SmartLink
-                                                to={`${triageItem.placeRecordUrl}`}
-                                                className={metasClasses().metaLink}
-                                            >
-                                                {triageItem.placeRecordName}
-                                            </SmartLink>
-                                        }
+                <ListItemContext.Provider value={{ layout: ListItemLayout.TITLE_METAS_DESCRIPTION }}>
+                    <ListItem
+                        as={"div"}
+                        url={detailUrl}
+                        name={discussion.name}
+                        nameClassName={communityManagementPageClasses().listItemLink}
+                        description={<UserContent className={classes.description} content={discussion.body!} />}
+                        truncateDescription={false}
+                        metas={
+                            <>
+                                <Metas>
+                                    <MetaIcon
+                                        icon={isResolved ? "cmd-approve" : "cmd-alert"}
+                                        aria-label={isResolved ? t("Resolved") : t("Unresolved")}
                                     />
-                                </MetaItem>
-                                <MetaItem>
-                                    <MetaIcon icon="meta-time" style={{ marginLeft: -4 }} />
-                                    <DateTime timestamp={triageItem.recordDateInserted}></DateTime>
-                                </MetaItem>
-                            </Metas>
-                            {triageItem.countReports > 0 && (
-                                <Metas className={classes.metaLine}>
-                                    <AssociatedReportMetas
-                                        reasons={triageItem.reportReasons}
-                                        countReports={triageItem.countReports}
-                                        dateLastReport={triageItem.dateLastReport}
-                                    />
+                                    <MetaItem flex>
+                                        <Translate
+                                            source="Posted by <0/> in <1/>"
+                                            c0={<MetaProfile user={discussion.insertUser ?? deletedUserFragment()} />}
+                                            c1={
+                                                <SmartLink
+                                                    to={`${discussion.category?.url}`}
+                                                    className={metasClasses().metaLink}
+                                                >
+                                                    {discussion.category?.name}
+                                                </SmartLink>
+                                            }
+                                        />
+                                    </MetaItem>
+                                    <MetaItem>
+                                        <MetaIcon icon="meta-time" style={{ marginLeft: -4 }} />
+                                        <DateTime timestamp={discussion.dateInserted}></DateTime>
+                                    </MetaItem>
                                 </Metas>
-                            )}
-                        </>
-                    }
-                />
+                                {discussion.reportMeta && discussion.reportMeta?.countReports > 0 && (
+                                    <Metas className={classes.metaLine}>
+                                        <AssociatedReportMetas
+                                            reasons={discussion.reportMeta.reportReasons}
+                                            countReports={discussion.reportMeta.countReports}
+                                            dateLastReport={discussion.reportMeta.dateLastReport}
+                                        />
+                                    </Metas>
+                                )}
+                            </>
+                        }
+                    />
+                </ListItemContext.Provider>
+
                 <div className={classes.quickActions}>
                     {!isResolved && (
                         <ToolTip label={t("Resolve post")}>
@@ -126,7 +124,7 @@ export function TriageListItem(props: IProps) {
                                 buttonType={ButtonTypes.ICON_COMPACT}
                                 onClick={() => {
                                     resolveMutation.mutate({
-                                        discussionID: triageItem.recordID,
+                                        discussionID: discussion.discussionID,
                                         internalStatusID: TriageInternalStatus.RESOLVED,
                                     });
                                 }}
@@ -137,72 +135,50 @@ export function TriageListItem(props: IProps) {
                     )}
                     <ToolTip label={t("View post in community")}>
                         <span>
-                            <LinkAsButton
-                                buttonType={ButtonTypes.ICON_COMPACT}
-                                to={triageItem.recordUrl}
-                                target="_blank"
-                            >
+                            <LinkAsButton buttonType={ButtonTypes.ICON_COMPACT} to={discussion.url} target="_blank">
                                 <Icon icon="meta-external" />
                             </LinkAsButton>
                         </span>
                     </ToolTip>
-                    <DropDown
-                        buttonType={ButtonTypes.ICON_COMPACT}
-                        flyoutType={FlyoutType.LIST}
-                        buttonContents={<Icon icon="navigation-circle-ellipsis" />}
-                    >
-                        <DropDownSwitchButton
-                            label={isResolved ? t("Unresolve") : t("Resolve")}
-                            isLoading={resolveMutation.isLoading}
-                            onClick={() => {
-                                resolveMutation.mutate({
-                                    discussionID: triageItem.recordID,
-                                    internalStatusID: isResolved
-                                        ? TriageInternalStatus.UNRESOLVED
-                                        : TriageInternalStatus.RESOLVED,
-                                });
-                            }}
-                            status={isResolved}
-                        />
-                        <DropDownItemButton
-                            onClick={() => {
-                                onEscalate(triageItem);
-                            }}
-                        >
-                            {t("Escalate")}
-                        </DropDownItemButton>
-                        <DropDownItemSeparator />
-                        <DropDownItemButton onClick={(e) => null}>
-                            <Translate source={"Message <0/>"} c0={triageItem.recordUser?.name} />
-                        </DropDownItemButton>
-                        <DropDownItemSeparator />
-                        <DropDownItemButton
-                            onClick={() => {
-                                onEscalate(triageItem);
-                            }}
-                        >
-                            {t("Escalate and Assign")}
-                        </DropDownItemButton>
-                        <DropDownItemButton
-                            onClick={() => {
-                                onEscalate(triageItem);
-                            }}
-                        >
-                            {t("Escalate to Zendesk")}
-                        </DropDownItemButton>
-                    </DropDown>
                 </div>
+            </div>
+            <div className={classes.attachments}>
+                {(discussion.attachments ?? []).length > 0 &&
+                    discussion.attachments?.map((attachment) => (
+                        <ReadableIntegrationContextProvider
+                            key={attachment.attachmentID}
+                            attachmentType={attachment.attachmentType}
+                        >
+                            <DiscussionAttachment key={attachment.attachmentID} attachment={attachment} />
+                        </ReadableIntegrationContextProvider>
+                    ))}
             </div>
             <footer className={classes.footer}>
                 <div className={classes.actions}>
+                    <LinkAsButton to={detailUrl} buttonType={ButtonTypes.TEXT}>
+                        {t("View Details")}
+                    </LinkAsButton>
+                    <span style={{ flex: 1 }} />
                     <Button
-                        buttonType={ButtonTypes.TEXT_PRIMARY}
-                        onClick={() => {
-                            onEscalate(triageItem);
-                        }}
+                        buttonType={ButtonTypes.TEXT}
+                        onClick={() => props.onMessageAuthor(discussion.insertUserID, discussion.url)}
                     >
-                        {t("Escalate")}
+                        {t("Message Post Author")}
                     </Button>
+                    {!escalation ? (
+                        <Button
+                            buttonType={ButtonTypes.TEXT_PRIMARY}
+                            onClick={() => {
+                                onEscalate(discussion);
+                            }}
+                        >
+                            {t("Escalate")}
+                        </Button>
+                    ) : (
+                        <LinkAsButton buttonType={ButtonTypes.TEXT_PRIMARY} to={escalation.sourceUrl!}>
+                            {t("View Escalation")}
+                        </LinkAsButton>
+                    )}
                 </div>
             </footer>
         </div>

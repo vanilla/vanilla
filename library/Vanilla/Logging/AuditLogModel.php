@@ -89,6 +89,7 @@ class AuditLogModel extends PipelineModel
             ),
             "spoofUserID" => $spoofUserID,
             "orcUserEmail" => $orcUserEmail,
+            "insertUserID" => $auditLogEvent->getSessionUserID(),
         ];
         // Ignore duplicate entries.
         // This could happen if the same event was logged twice in the same request.

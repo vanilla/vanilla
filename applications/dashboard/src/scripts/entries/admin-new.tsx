@@ -41,7 +41,7 @@ RouterRegistry.addRoutes(getDeveloperRoutes());
 supportsFrames(true);
 addPageComponent(AdminApp);
 
-const SETTINGS_PERMISSIONS = ["settings.manage", "community.moderate", "moderation.manage"];
+const SETTINGS_PERMISSIONS = ["settings.manage", "community.moderate", "posts.moderate"];
 const ANALYTICS_PERMISSIONS = ["data.view", "dashboards.manage"];
 
 function AdminApp() {

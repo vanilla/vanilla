@@ -14,6 +14,8 @@ interface IProps {
     discussionName: string;
     recordType: "discussion" | "comment";
     recordID: RecordID;
+    placeRecordType: string;
+    placeRecordID: RecordID;
     customTrigger?: CustomTriggerRender;
     onSuccess?: () => Promise<void>;
     initialVisibility?: boolean;
@@ -47,6 +49,8 @@ export function ReportRecordOption(props: IProps) {
                 discussionName={props.discussionName}
                 recordID={props.recordID}
                 recordType={props.recordType}
+                placeRecordID={props.placeRecordID}
+                placeRecordType={props.placeRecordType}
                 isVisible={isVisible}
                 onVisibilityChange={() => close()}
                 onSuccess={handleSuccess}

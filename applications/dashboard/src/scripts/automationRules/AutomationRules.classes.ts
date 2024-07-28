@@ -239,6 +239,43 @@ export const automationRulesClasses = useThemeCache(() => {
         borderBottom: "1px solid #dddee0",
     });
 
+    const addEditLoader = css({
+        display: "flex",
+        justifyContent: "space-between",
+        "& > span": {
+            width: "27%",
+            height: 24,
+            marginTop: 16,
+        },
+        "& > span:last-of-Type": {
+            width: "70%",
+        },
+    });
+
+    const historyLoader = css({
+        "& td > span": {
+            width: 100,
+            height: 16,
+            marginTop: 16,
+        },
+        "& td:first-of-type > span": {
+            width: 300,
+        },
+    });
+
+    const previewLoader = css({
+        marginTop: 16,
+        paddingTop: 16,
+        paddingBottom: 16,
+        "& > div": {
+            marginBottom: 16,
+            display: "flex",
+            alignItems: "center",
+            "& > span:first-of-type": { width: 25, height: 25, marginRight: 10, borderRadius: "50%" },
+            "& > span:last-of-type": { width: "95%", height: 25 },
+        },
+    });
+
     return {
         headerContainer,
         searchAndFilterContainer,
@@ -279,5 +316,8 @@ export const automationRulesClasses = useThemeCache(() => {
         previewDiscussionItem,
         previewDiscussionMeta,
         previewDiscussionBorder,
+        addEditLoader,
+        historyLoader,
+        previewLoader,
     };
 });

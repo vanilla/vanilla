@@ -141,6 +141,11 @@ paths:
                       type: integer
                   x-filter:
                       field: d.InsertUserID
+                - name: insertUserRoleID
+                  description: Filter by author role. One or more roleIDs can be passed in a CSV.
+                  in: query
+                  schema:
+                      type: string
                 - $ref: "#/components/parameters/DiscussionExpand"
                 - name: groupID
                   description: The group the discussion is in.
@@ -512,6 +517,14 @@ paths:
             tags:
                 - Discussions
             summary: Merge discussions.
+    "/discussions/resolve-bulk":
+        post:
+            summary: Mark all discussions you can triage as resolved.
+            responses:
+                "201":
+                    description: Success
+            tags:
+                - Discussions
     "/discussions/{id}/bookmark":
         put:
             parameters:
@@ -1174,6 +1187,8 @@ components:
                         - tags
                         - status
                         - status.log
+                        - reportMeta
+                        - attachments
             style: form
     schemas:
         CategoryFragment:
@@ -1369,10 +1384,12 @@ components:
                     description: The statusID current applied to the discussion.
                 status:
                     $ref: "#/components/schemas/StatusFragment"
-                visibleSuggestions:
+                showSuggestions:
                     type: boolean
                     description: Whether the discussion has visible suggestions
                     x-feature: "Feature.AISuggestions.Enabled"
+                reportMeta:
+                    $ref: "../../vanilla/openapi/reports.yml#/components/schemas/ReportMeta"
                 suggestions:
                     type: array
                     items:
@@ -1380,6 +1397,9 @@ components:
                             format:
                                 type: string
                                 description: Source of the suggestion
+                            sourceIcon:
+                                type: string
+                                description: Icon of the suggestion source
                             type:
                                 type: string
                                 description: Type of suggestion discussion/comment

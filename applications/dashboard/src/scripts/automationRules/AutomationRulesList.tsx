@@ -11,7 +11,7 @@ import { cx } from "@emotion/css";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ISortOption, ITableData, Table } from "@dashboard/components/Table";
 import DateTime from "@library/content/DateTime";
 import LinkAsButton from "@library/routing/LinkAsButton";
@@ -37,10 +37,6 @@ import { iconClasses } from "@library/icons/iconStyles";
 import { Icon } from "@vanilla/icons";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import Button from "@library/forms/Button";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { useMeasure } from "@vanilla/react-utils";
-import { animated, useSpring } from "react-spring";
-import { DropDownArrow } from "@vanilla/ui/src/forms/shared/DropDownArrow";
 import { TableAccordion } from "@dashboard/components/TableAccordion";
 
 export function AutomationRulesListImpl() {

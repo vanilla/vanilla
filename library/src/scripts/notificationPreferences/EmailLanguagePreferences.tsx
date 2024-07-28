@@ -16,21 +16,16 @@ import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { FormControl, FormControlGroup } from "@library/forms/FormControl";
 import { useNotificationPreferencesContext } from "@library/notificationPreferences";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
-import { useLocales } from "@library/config/configHooks";
 import { useFormik } from "formik";
+import { useQuery } from "@tanstack/react-query";
+import apiv2 from "@library/apiv2";
 
 export function EmailLanguagePreferencesImpl(props: {
+    value?: string;
     localeOptions: IComboBoxOption[] | undefined;
-    preferences?: INotificationPreferences;
-    editPreferences?: (
-        preferences: INotificationPreferences,
-        options?: {
-            onSuccess?: (data: INotificationPreferences) => void;
-            onError?: (error: Error) => void;
-        },
-    ) => Promise<INotificationPreferences>;
+    onSubmit?: (vals: { language: string }) => Promise<void>;
 }) {
-    const { localeOptions, preferences, editPreferences } = props;
+    const { localeOptions, onSubmit, value: currentLanguage } = props;
     const formClasses = notificationPreferencesFormClasses();
     const toast = useToast();
 
@@ -38,24 +33,22 @@ export function EmailLanguagePreferencesImpl(props: {
         NotificationLanguage: string;
     }>({
         initialValues: {
-            NotificationLanguage: (preferences?.NotificationLanguage as string) ?? localeOptions?.[0]?.value ?? "",
+            NotificationLanguage: currentLanguage ?? `${localeOptions?.[0]?.value ?? ""}`,
         },
         enableReinitialize: true,
         onSubmit: async (vals) => {
-            await editPreferences?.(vals, {
-                onSuccess: () => {
-                    toast.addToast({
-                        autoDismiss: true,
-                        body: <>{t("Success! Your changes were saved.")}</>,
-                    });
-                },
-                onError: (e) => {
-                    toast.addToast({
-                        dismissible: true,
-                        body: <>{t(e.message)}</>,
-                    });
-                },
-            });
+            try {
+                await onSubmit?.({ language: vals.NotificationLanguage });
+                toast.addToast({
+                    autoDismiss: true,
+                    body: <>{t("Success! Your changes were saved.")}</>,
+                });
+            } catch (e) {
+                toast.addToast({
+                    dismissible: true,
+                    body: <>{t(e.message)}</>,
+                });
+            }
         },
     });
 
@@ -113,17 +106,31 @@ export function EmailLanguagePreferencesImpl(props: {
 }
 
 export default function EmailLanguagePreferences() {
-    const { localeOptions } = useLocales();
-    const { preferences, editPreferences } = useNotificationPreferencesContext();
+    const { preferences, patchLanguage } = useNotificationPreferencesContext();
+    const locales = useQuery({
+        queryKey: ["locales"],
+        queryFn: async () => {
+            const response = await apiv2.get("/locales");
+            return response.data;
+        },
+    });
 
+    const localeOptions = locales.data?.map((locale: any) => {
+        return {
+            value: locale.localeKey,
+            label: locale.displayNames[locale.localeKey],
+        };
+    });
     const dataIsReady = !!preferences?.data;
 
     if (dataIsReady) {
         return (
             <EmailLanguagePreferencesImpl
                 localeOptions={localeOptions}
-                preferences={preferences.data}
-                editPreferences={editPreferences}
+                value={(preferences.data?.NotificationLanguage as string) ?? undefined}
+                onSubmit={async ({ language }) => {
+                    await patchLanguage(language);
+                }}
             />
         );
     } else {

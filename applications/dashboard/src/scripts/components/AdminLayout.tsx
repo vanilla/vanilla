@@ -41,8 +41,8 @@ type IProps = {
           description?: ReactNode;
           /** Any extra nodes appearing near title for highlight reasons(e.g. APPLIED etc) */
           titleLabel?: ReactNode;
-          /** Make the titlebar more compact. This is needed sometimes to align the titlebar with the content. */
-          compactTitleBar?: boolean;
+          /** Any nodes that should appear before the title(e.g. Banner messages) */
+          preTitle?: ReactNode;
       }
     | {
           /** Replaces the default <AdminTitleBar /> */
@@ -55,7 +55,7 @@ type IProps = {
           actionsWrapperClassName?: never;
           description?: never;
           titleLabel?: never;
-          compactTitleBar?: never;
+          preTitle?: never;
       }
 );
 
@@ -72,7 +72,7 @@ export default function AdminLayout(props: IProps) {
         contentClassNames,
         description,
         titleLabel,
-        compactTitleBar,
+        preTitle,
     } = props;
 
     const topTitleBar = useMemo(
@@ -80,18 +80,20 @@ export default function AdminLayout(props: IProps) {
             customTitleBar ? (
                 customTitleBar
             ) : (
-                <AdminTitleBar
-                    useTwoColumnContainer={!props.rightPanel}
-                    title={title ?? ""}
-                    description={description}
-                    containerClassName={props.titleBarContainerClassName}
-                    titleAndActionsContainerClassName={titleAndActionsContainerClassName}
-                    actions={titleBarActions}
-                    titleLabel={titleLabel}
-                    compact={compactTitleBar}
-                />
+                <>
+                    {preTitle}
+                    <AdminTitleBar
+                        useTwoColumnContainer={!props.rightPanel}
+                        title={title ?? ""}
+                        description={description}
+                        containerClassName={props.titleBarContainerClassName}
+                        titleAndActionsContainerClassName={titleAndActionsContainerClassName}
+                        actions={titleBarActions}
+                        titleLabel={titleLabel}
+                    />
+                </>
             ),
-        [classes, customTitleBar, title, titleAndActionsContainerClassName, titleBarActions, compactTitleBar],
+        [classes, customTitleBar, title, titleAndActionsContainerClassName, titleBarActions, preTitle],
     );
 
     return (

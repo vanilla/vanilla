@@ -1,10 +1,9 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { useState } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import Button from "@library/forms/Button";
 import Frame from "@library/layout/frame/Frame";

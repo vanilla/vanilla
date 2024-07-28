@@ -18,12 +18,17 @@ export interface IAttachmentIntegration {
     title: string;
     externalIDLabel: string;
     logoIcon: IconType;
+    attachmentTypeIcon?: IconType;
 
     writeableContentScope: WriteableContentScope;
     name: string;
     label: string;
     recordTypes: string[];
     submitButton: string;
+    postSuccessMessage?: {
+        message: string;
+        linkText: string;
+    };
 }
 
 export function isWriteableAttachmentIntegration(integration: IAttachmentIntegration): boolean {
@@ -31,6 +36,20 @@ export function isWriteableAttachmentIntegration(integration: IAttachmentIntegra
 }
 
 export type IAttachmentIntegrationCatalog = Record<string, IAttachmentIntegration>;
+
+export type MetaData = {
+    labelCode: string;
+    value: string | number | string[];
+    url?: string;
+} & (
+    | {
+          format?: "user";
+          userFragment: IUserFragment;
+      }
+    | {
+          format?: "date-time";
+      }
+);
 
 export interface IAttachment {
     attachmentID: RecordID;
@@ -47,12 +66,7 @@ export interface IAttachment {
     insertUser?: IUserFragment;
     state?: string;
     status?: string;
-    metadata: Array<{
-        labelCode: string;
-        value: string | number;
-        url?: string;
-        format?: "date-time";
-    }>;
+    metadata: MetaData[];
 }
 
 export interface IGetAttachmentSchemaParams {

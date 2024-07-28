@@ -28,7 +28,7 @@ export const FAKE_WRITEABLE_INTEGRATION: IAttachmentIntegration = {
     submitButton: "Create Task",
     externalIDLabel: "Task #",
     title: "Todo List Service - Task",
-    logoIcon: "meta-external",
+    logoIcon: "meta-external-compact",
 };
 
 export const FAKE_ESCALATE_OWN_CONTENT_ONLY_INTEGRATION: IAttachmentIntegration = {
@@ -40,7 +40,7 @@ export const FAKE_ESCALATE_OWN_CONTENT_ONLY_INTEGRATION: IAttachmentIntegration 
     submitButton: "Create Thing",
     externalIDLabel: "Thing #",
     title: "Stuff Service - Thing",
-    logoIcon: "meta-external",
+    logoIcon: "meta-external-compact",
 };
 
 export const FAKE_READ_ONLY_INTEGRATION: IAttachmentIntegration = {
@@ -52,7 +52,7 @@ export const FAKE_READ_ONLY_INTEGRATION: IAttachmentIntegration = {
     submitButton: "Create Item",
     externalIDLabel: "Item #",
     title: "Read-only Service - Item",
-    logoIcon: "meta-external",
+    logoIcon: "meta-external-compact",
 };
 
 export const FAKE_INTEGRATIONS_CATALOG: IAttachmentIntegrationCatalog = {

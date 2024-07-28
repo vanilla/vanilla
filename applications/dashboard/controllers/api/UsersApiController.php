@@ -548,6 +548,7 @@ class UsersApiController extends AbstractApiController
                     ],
                     "type" => "array",
                 ],
+                "suggestAnswers:b?",
             ])->add($this->getUserFragmentSchema()),
             "out"
         );
@@ -1502,7 +1503,7 @@ class UsersApiController extends AbstractApiController
                 "name?",
                 "email?",
                 "showEmail?",
-                "suggestAnswers?",
+                "suggestAnswers:b?",
                 "photo?",
                 "emailConfirmed?",
                 "bypassSpam?",
@@ -1547,7 +1548,7 @@ class UsersApiController extends AbstractApiController
                 "name?",
                 "email?",
                 "showEmail?",
-                "suggestAnswers?",
+                "suggestAnswers:b?",
                 "password?",
                 "private?",
                 "profileFields:o?" => $this->profileFieldModel->getUserProfileFieldSchema(true),

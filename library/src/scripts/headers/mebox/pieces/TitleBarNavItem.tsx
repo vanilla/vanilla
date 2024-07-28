@@ -72,7 +72,7 @@ export const TitleBarNavItem = React.forwardRef(function TitleBarNavItem(
                         classes.link,
                         buttonType ? getClassForButtonType(buttonType) : "",
                     )}
-                    role="menulink"
+                    role="menuitem"
                     aria-haspopup={hasPopupMenu}
                     aria-expanded={(hasPopupMenu && isActive) ?? undefined}
                 >
@@ -86,7 +86,7 @@ export const TitleBarNavItem = React.forwardRef(function TitleBarNavItem(
                     onMouseEnter={passthru.onMouseEnter}
                     onKeyDown={passthru.onKeyDown}
                     buttonType={ButtonTypes.TEXT}
-                    role="menubutton"
+                    role="menuitem"
                     className={classNames(
                         classes.navLinkAsButton,
                         linkClassName,

@@ -169,6 +169,7 @@ export function useUserCardTrigger(): {
                   role: "button",
                   onClick: (e) => {
                       e.preventDefault();
+                      e.stopPropagation();
                       context.setIsOpen(!context.isOpen);
                   },
                   onKeyPress: (e) => {

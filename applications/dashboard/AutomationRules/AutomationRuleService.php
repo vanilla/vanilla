@@ -9,96 +9,73 @@
 namespace Vanilla\Dashboard\AutomationRules;
 
 use Exception;
-use Vanilla\AutomationRules\Actions\AutomationActionInterface;
-use Vanilla\AutomationRules\Trigger\AutomationTriggerInterface;
-use Vanilla\AutomationRules\Trigger\TimedAutomationTriggerInterface;
-use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
-use Vanilla\Dashboard\AutomationRules\Triggers\ProfileFieldSelectionTrigger;
-use Vanilla\Dashboard\AutomationRules\Triggers\TimeSinceUserRegistrationTrigger;
-use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
+use Vanilla\AutomationRules\Actions\AutomationAction;
+use Vanilla\AutomationRules\Trigger\AutomationTrigger;
+use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
 
 class AutomationRuleService
 {
-    /** @var array<class-string<AutomationTriggerInterface>> */
+    /** @var array<class-string<AutomationTrigger>> */
     private array $automationTriggers = [];
 
-    /** @var array<class-string<AutomationActionInterface>> */
+    /** @var array<class-string<AutomationAction>> */
     private array $automationActions = [];
-
-    /**
-     * constructor
-     */
-    public function __construct()
-    {
-        // Mount the triggers alphabetically.
-        $this->addAutomationTrigger(ProfileFieldSelectionTrigger::class);
-        $this->addAutomationTrigger(TimeSinceUserRegistrationTrigger::class);
-        $this->addAutomationTrigger(UserEmailDomainTrigger::class);
-
-        // Mount the actions alphabetically.
-        $this->addAutomationAction(AddRemoveUserRoleAction::class);
-    }
 
     /**
      * Add an automation trigger
      *
-     * @param string $automationTrigger
+     * @param <class-string<AutomationTrigger>> $automationTrigger
      * @return void
      * @throws Exception
      */
     public function addAutomationTrigger(string $automationTrigger): void
     {
-        if (!is_a($automationTrigger, AutomationTriggerInterface::class, true)) {
-            throw new Exception(
-                sprintf(
-                    "%s is an invalid automation trigger. Triggers should implement the AutomationTriggerInterface.",
-                    $automationTrigger
-                )
-            );
-        }
         $this->automationTriggers[$automationTrigger::getType()] = $automationTrigger;
     }
 
     /**
      * Add an automation action
      *
-     * @param string $automationAction
+     * @param <class-string<AutomationAction> $automationAction
      * @return void
      * @throws Exception
      */
     public function addAutomationAction(string $automationAction): void
     {
-        if (!is_a($automationAction, AutomationActionInterface::class, true)) {
-            throw new Exception(
-                sprintf(
-                    "%s is an invalid automation action. Actions should implement the AutomationActionInterface.",
-                    $automationAction
-                )
-            );
-        }
         $this->automationActions[$automationAction::getType()] = $automationAction;
     }
 
     /**
      * Get the automation triggers
      *
-     * @return array
+     * @return array<class-string<AutomationTrigger>>
      */
     public function getAutomationTriggers(): array
     {
-        return $this->automationTriggers;
+        $triggerTypes = [];
+        foreach ($this->automationTriggers as $key => $trigger) {
+            if ($trigger::canAddTrigger()) {
+                $triggerTypes[$key] = $trigger;
+            }
+        }
+
+        return $triggerTypes;
     }
 
     /**
      * Get the automation trigger class
      *
      * @param string $trigger
-     * @return AutomationTriggerInterface
+     * @return AutomationTrigger|null
      */
-    public function getAutomationTrigger(string $trigger): AutomationTriggerInterface
+    public function getAutomationTrigger(string $trigger): ?AutomationTrigger
     {
         $class = $this->automationTriggers[$trigger];
-        return new $class();
+        $trigger = new $class();
+        if ($trigger::canAddTrigger()) {
+            return $trigger;
+        }
+        return null;
     }
 
     /**
@@ -108,7 +85,14 @@ class AutomationRuleService
      */
     public function getAutomationActions(): array
     {
-        return $this->automationActions;
+        $actionTypes = [];
+        foreach ($this->automationActions as $key => $action) {
+            if ($action::canAddAction()) {
+                $actionTypes[$key] = $action;
+            }
+        }
+
+        return $actionTypes;
     }
 
     /**
@@ -119,7 +103,11 @@ class AutomationRuleService
      */
     public function isActionRegistered(string $actionType): bool
     {
-        return isset($this->automationActions[$actionType]);
+        $action = $this->automationActions[$actionType];
+        if (isset($action) && $action::canAddAction()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -130,7 +118,11 @@ class AutomationRuleService
      */
     public function isTriggerRegistered(string $triggerType): bool
     {
-        return isset($this->automationTriggers[$triggerType]);
+        $trigger = $this->automationTriggers[$triggerType];
+        if (isset($trigger) && $trigger::canAddTrigger()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -141,7 +133,11 @@ class AutomationRuleService
      */
     public function getAction(string $actionType): ?string
     {
-        return $this->automationActions[$actionType] ?? null;
+        $action = $this->automationActions[$actionType] ?? null;
+        if (isset($action) && $action::canAddAction()) {
+            return $action;
+        }
+        return null;
     }
 
     /**
@@ -153,7 +149,10 @@ class AutomationRuleService
     {
         $triggerTypes = [];
         foreach ($this->automationTriggers as $type => $trigger) {
-            if (is_a($trigger, TimedAutomationTriggerInterface::class, true)) {
+            if (!$trigger::canAddTrigger()) {
+                continue;
+            }
+            if (is_a($trigger, TimedAutomationTrigger::class, true)) {
                 $triggerTypes[] = $type;
             }
         }

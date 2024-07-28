@@ -6,10 +6,14 @@
 
 import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import { IPostEscalation, IReport } from "@dashboard/moderation/CommunityManagementTypes";
+import {
+    EscalationStatus,
+    IEscalation,
+    IPostEscalation,
+    IReport,
+} from "@dashboard/moderation/CommunityManagementTypes";
 import { IUser } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
-import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
 import { FormControlGroup, FormControlWithNewDropdown } from "@library/forms/FormControl";
@@ -21,15 +25,20 @@ import FrameHeader from "@library/layout/frame/FrameHeader";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
-import { JSONSchemaType, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { useEffect, useState } from "react";
+import { JSONSchemaType, JsonSchemaForm, PartialSchemaDefinition } from "@vanilla/json-schema-forms";
+import { useEffect, useMemo, useState } from "react";
+import { labelize } from "@vanilla/utils";
+import { IApiError } from "@library/@types/api/core";
+import Translate from "@library/content/Translate";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps {
-    recordID: IReport["recordID"] | null;
-    recordType: IReport["recordType"] | null;
-    report: IReport | null;
+    escalationType: "report" | "record";
+    recordType?: string;
+    record?: IDiscussion | IComment | null;
+    report?: IReport | null;
     isVisible: boolean;
     onClose: () => void;
 }
@@ -38,10 +47,11 @@ interface EscalateForm {
     name: IPostEscalation["name"];
     status: IPostEscalation["status"]; // some enum here
     assignee?: IUser["userID"];
-    noteBody: IPostEscalation["noteBody"];
-    noteFormat: IPostEscalation["noteFormat"];
+    initialCommentBody: IPostEscalation["initialCommentBody"];
+    initialCommentFormat: IPostEscalation["initialCommentFormat"];
     removePost: boolean;
     removeMethod: IPostEscalation["removeMethod"];
+    reportReasonIDs?: string[];
 }
 
 // This probably belongs in the BE
@@ -63,13 +73,9 @@ const ESCALATE_SCHEMA: JSONSchemaType<EscalateForm> = {
                 label: t("Status on Creation"),
                 inputType: "dropDown",
                 choices: {
-                    staticOptions: {
-                        open: t("Open"),
-                        "in-progress": t("In Progress"),
-                        "on-hold": t("On Hold"),
-                        done: t("Done"),
-                        "external-zendesk": t("Moved to Zendesk"),
-                    },
+                    staticOptions: Object.fromEntries(
+                        Object.values(EscalationStatus).map((status) => [status, labelize(status)]),
+                    ),
                 },
             },
         },
@@ -89,7 +95,7 @@ const ESCALATE_SCHEMA: JSONSchemaType<EscalateForm> = {
                 },
             },
         },
-        noteBody: {
+        initialCommentBody: {
             type: "string",
             default: "",
             "x-control": {
@@ -126,68 +132,127 @@ const ESCALATE_SCHEMA: JSONSchemaType<EscalateForm> = {
 
 const initialFormValues: EscalateForm = {
     name: "",
-    status: "",
+    status: EscalationStatus.OPEN,
     removePost: false,
     removeMethod: "wipe",
-    noteBody: JSON.stringify([{ children: [{ text: "" }], type: "p" }]),
-    noteFormat: "rich2",
+    initialCommentBody: JSON.stringify([{ children: [{ text: "" }], type: "p" }]),
+    initialCommentFormat: "rich2",
 };
 
 export function EscalateModal(props: IProps) {
-    const { report, isVisible, onClose } = props;
-    const { recordID, recordType } = report ?? {};
+    const { escalationType, report, record, recordType, isVisible, onClose } = props;
 
     const [values, setValues] = useState<EscalateForm>(initialFormValues);
     const toast = useToast();
 
-    const record = useQuery<any, IError, IDiscussion | IComment>({
-        queryFn: async () => {
-            const response = await apiv2.get(`/${report?.recordType}s/${report?.recordID}`);
+    useEffect(() => {
+        if (escalationType === "report" && report) {
+            setValues((prev) => ({
+                ...prev,
+                name: report.recordName,
+                status: "open",
+            }));
+        }
+        if (escalationType === "record" && record) {
+            if (recordType === "discussion") {
+                setValues((prev) => ({
+                    ...prev,
+                    name: (record as IDiscussion).name,
+                    status: "open",
+                }));
+            }
+            if (recordType === "comment") {
+                setValues((prev) => ({
+                    ...prev,
+                    name: (record as IComment).name,
+                    status: "open",
+                }));
+            }
+        }
+    }, [escalationType, report, recordType, record, isVisible]);
+
+    const schema = useMemo(() => {
+        if (escalationType === "record") {
+            const reasonProperty: PartialSchemaDefinition<EscalateForm> = {
+                type: "array",
+                items: {
+                    type: "string",
+                },
+                "x-control": {
+                    label: t("Report Reason"),
+                    inputType: "dropDown",
+                    multiple: true,
+                    choices: {
+                        api: {
+                            searchUrl: "/api/v2/report-reasons?limit=100",
+                            singleUrl: "/api/v2/report-reasons/%s",
+                            labelKey: "name",
+                            valueKey: "reportReasonID",
+                        },
+                    },
+                },
+            };
+
+            const keyValues = Object.entries(ESCALATE_SCHEMA.properties);
+            keyValues.splice(2, 0, ["reportReasonIDs", reasonProperty]);
+            const newProperties = Object.fromEntries(keyValues);
+
+            return {
+                ...ESCALATE_SCHEMA,
+                properties: newProperties,
+                required: [...ESCALATE_SCHEMA.required, "reportReasonIDs"],
+            };
+        }
+        return ESCALATE_SCHEMA;
+    }, [escalationType]);
+
+    const createEscalation = useMutation<IEscalation, IApiError, EscalateForm>({
+        mutationFn: async (escalation) => {
+            const makePayload = {
+                name: escalation.name,
+                status: escalation.status,
+                assignedUserID: escalation.assignee,
+                ...(escalation.initialCommentBody !== initialFormValues.initialCommentBody && {
+                    initialCommentBody: escalation.initialCommentBody,
+                    initialCommentFormat: "rich2",
+                }),
+                ...(escalation.removePost && {
+                    removePost: escalation.removePost,
+                    removeMethod: escalation.removeMethod,
+                }),
+                ...(escalationType === "report" &&
+                    report && {
+                        recordID: report?.recordID,
+                        recordType: report?.recordType,
+                        reportID: report?.reportID,
+                    }),
+                ...(escalationType === "record" &&
+                    record && {
+                        recordID: record?.["discussionID"] ?? record?.["commentID"],
+                        recordType: recordType,
+                        reportReasonIDs: escalation.reportReasonIDs,
+                    }),
+            };
+            const response = await apiv2.post(`/escalations`, makePayload);
             return response.data;
         },
-        queryKey: ["report", recordID, recordType, report?.recordType, report?.recordID],
-        enabled: !!report,
-    });
-
-    const createEscalation = useMutation<any, IError, EscalateForm>({
-        mutationFn: async (escalation) => {
-            if (report) {
-                const makePayload: IPostEscalation = {
-                    name: escalation.name,
-                    status: escalation.status,
-                    assignedUserID: escalation.assignee,
-                    noteBody: escalation.noteBody,
-                    noteFormat: "rich2",
-                    ...(escalation.removePost && {
-                        removePost: escalation.removePost,
-                        removeMethod: escalation.removeMethod,
-                    }),
-                    recordID: report?.recordID,
-                    recordType: report?.recordType,
-                    reportID: report?.reportID,
-                };
-                const response = await apiv2.post(`/escalations`, makePayload);
-                return response.data;
-            }
-            return null;
-        },
-        onSuccess: () => {
+        onSuccess: (data) => {
             toast.addToast({
-                autoDismiss: true,
-                body: t("Escalation created"),
+                autoDismiss: false,
+                body: (
+                    <Translate
+                        source={"Escalation created. Go to: <0/>"}
+                        c0={() => (
+                            <SmartLink to={`/dashboard/content/escalations/${data.escalationID}`}>
+                                {data.name}
+                            </SmartLink>
+                        )}
+                    />
+                ),
             });
             onClose();
         },
     });
-
-    useEffect(() => {
-        if (record?.data) {
-            setValues((prev) => ({
-                ...prev,
-                name: record.data.name,
-            }));
-        }
-    }, [record.data]);
 
     const handleClose = () => {
         setValues(initialFormValues);
@@ -200,19 +265,15 @@ export function EscalateModal(props: IProps) {
                 header={<FrameHeader title={t("Create Escalation")} closeFrame={handleClose} />}
                 body={
                     <FrameBody hasVerticalPadding>
-                        {record.isLoading && <div>Loading...</div>}
-                        {record.isError && <div>Error loading reports</div>}
-                        {record.isSuccess && (
-                            <JsonSchemaForm
-                                disabled={createEscalation.isLoading}
-                                // fieldErrors={error?.errors ?? {}}
-                                schema={ESCALATE_SCHEMA}
-                                instance={values}
-                                FormControlGroup={FormControlGroup}
-                                FormControl={FormControlWithNewDropdown}
-                                onChange={setValues}
-                            />
-                        )}
+                        <JsonSchemaForm
+                            disabled={createEscalation.isLoading}
+                            fieldErrors={createEscalation?.error?.response.data?.errors}
+                            schema={schema}
+                            instance={values}
+                            FormControlGroup={FormControlGroup}
+                            FormControl={FormControlWithNewDropdown}
+                            onChange={setValues}
+                        />
                     </FrameBody>
                 }
                 footer={

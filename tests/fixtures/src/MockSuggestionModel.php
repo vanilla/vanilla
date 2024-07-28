@@ -30,7 +30,7 @@ class MockSuggestionModel implements AiSuggestionSourceInterface
     /**
      * @inheritdoc
      */
-    public function generateSuggestions(array $discussion): array
+    public function generateSuggestions(array $discussion, string $keywords): array
     {
         $this->discussionModel->formatField($discussion, "Body", $discussion["Format"]);
 
@@ -72,7 +72,7 @@ class MockSuggestionModel implements AiSuggestionSourceInterface
         return "mockSuggestion";
     }
 
-    public function getExclusionDropdownChoices(): FormChoicesInterface
+    public function getExclusionDropdownChoices(): ?FormChoicesInterface
     {
         return new ApiFormChoices(
             "/api/v2/categories/search?query=%s&limit=30",
@@ -87,7 +87,7 @@ class MockSuggestionModel implements AiSuggestionSourceInterface
         return t("Mock Source for testing");
     }
 
-    public function getExclusionLabel(): string
+    public function getExclusionLabel(): ?string
     {
         return t("Where to stop mocking about");
     }

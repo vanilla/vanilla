@@ -17,6 +17,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Addon;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Events\DiscussionQueryEvent;
@@ -26,10 +27,12 @@ use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Dashboard\Models\AggregateCountableInterface;
+use Vanilla\Dashboard\Models\PremoderationModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\UserMentionsInterface;
 use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Database\SetLiterals\RawExpression;
+use Vanilla\Events\DiscussionPermissionQueryEvent;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
@@ -41,6 +44,7 @@ use Vanilla\Forum\Jobs\DeferredResourceEventJob;
 use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\MainImageSchema;
+use Vanilla\Premoderation\PremoderationItem;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerFailedID;
@@ -63,6 +67,7 @@ use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\Deprecation;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\SystemCallableInterface;
 
 /**
@@ -1230,6 +1235,12 @@ class DiscussionModel extends Gdn_Model implements
             unset($where["d.Announce"]);
         }
 
+        // If we have a user role where, make sure we join on that table.
+        $insertUserRoleIDs = $where["uri.RoleID"] ?? null;
+        if (!empty($insertUserRoleIDs)) {
+            $sql->join("UserRole uri", "d.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
+        }
+
         $this->EventArguments["SQL"] = $sql;
         $this->fireEvent("BeforeGetSubQuery");
 
@@ -1239,6 +1250,7 @@ class DiscussionModel extends Gdn_Model implements
         if (!empty($orderBy)) {
             $sql->orderBy($orderBy);
         }
+        $sql->groupBy("d.DiscussionID");
 
         $sql->limit($limit);
         $sql->offset($offset);
@@ -2273,6 +2285,7 @@ class DiscussionModel extends Gdn_Model implements
             ->from("Discussion d")
             ->join("UserDiscussion w", "d.DiscussionID = w.DiscussionID and w.UserID = " . $session->UserID, "left")
             ->where("d.DiscussionID", $id)
+            ->groupBy("d.DiscussionID")
             ->get()
             ->firstRow();
 
@@ -2498,6 +2511,14 @@ class DiscussionModel extends Gdn_Model implements
     }
 
     /**
+     * @return PremoderationModel
+     */
+    private function premoderationModel(): PremoderationModel
+    {
+        return Gdn::getContainer()->get(PremoderationModel::class);
+    }
+
+    /**
      * Inserts or updates the discussion via form values.
      *
      * Events: BeforeSaveDiscussion, AfterValidateDiscussion, AfterSaveDiscussion.
@@ -2685,9 +2706,11 @@ class DiscussionModel extends Gdn_Model implements
                 $fields = $validation->schemaValidationFields();
 
                 // Check for spam.
-                $spam = SpamModel::isSpam("Discussion", $fields);
-                if ($spam) {
-                    return SPAM;
+                if (!FeatureFlagHelper::featureEnabled("escalations")) {
+                    $spam = SpamModel::isSpam("Discussion", $fields);
+                    if ($spam) {
+                        return SPAM;
+                    }
                 }
 
                 // Get DiscussionID if one was sent
@@ -2698,27 +2721,52 @@ class DiscussionModel extends Gdn_Model implements
                 if ($discussionID > 0) {
                     // Updating
                     $stored = $this->getID($discussionID, DATASET_TYPE_OBJECT);
+                    if (!$stored) {
+                        throw new NotFoundException("Discussion", [
+                            "discussionID" => $discussionID,
+                        ]);
+                    }
 
                     // Make sure that the discussion get formatted in the method defined by Garden.
                     if (c("Garden.ForceInputFormatter")) {
                         $fields["Format"] = Gdn::config("Garden.InputFormatter", "");
                     }
 
-                    $isValid = true;
-                    $invalidReturnType = false;
-                    $insertUserID = val("InsertUserID", $stored);
-                    $dateInserted = val("DateInserted", $stored);
-                    $this->EventArguments["DiscussionData"] = array_merge($fields, [
-                        "DiscussionID" => $discussionID,
-                        "InsertUserID" => $insertUserID,
-                        "DateInserted" => $dateInserted,
-                    ]);
-                    $this->EventArguments["IsValid"] = &$isValid;
-                    $this->EventArguments["InvalidReturnType"] = &$invalidReturnType;
-                    $this->fireEvent("AfterValidateDiscussion");
+                    if (!($settings["skipSpamCheck"] ?? false)) {
+                        if (FeatureFlagHelper::featureEnabled("escalations")) {
+                            $premodItem = new PremoderationItem(
+                                userID: $this->sessionInterface->UserID,
+                                userName: $this->sessionInterface->User->Name,
+                                userEmail: $this->sessionInterface->User->Email,
+                                recordName: $fields["Name"] ?? $stored->Name,
+                                recordBody: $fields["Body"] ?? $stored->Body,
+                                recordFormat: $fields["Format"] ?? $stored->Format,
+                                isEdit: true,
+                                placeRecordType: "category",
+                                placeRecordID: $fields["CategoryID"] ?? $stored->CategoryID,
+                                recordType: "discussion",
+                                recordID: $discussionID,
+                                rawRow: $fields
+                            );
+                            $this->premoderationModel()->premoderateItem($premodItem);
+                        } else {
+                            $isValid = true;
+                            $invalidReturnType = false;
+                            $insertUserID = val("InsertUserID", $stored);
+                            $dateInserted = val("DateInserted", $stored);
+                            $this->EventArguments["DiscussionData"] = array_merge($fields, [
+                                "DiscussionID" => $discussionID,
+                                "InsertUserID" => $insertUserID,
+                                "DateInserted" => $dateInserted,
+                            ]);
+                            $this->EventArguments["IsValid"] = &$isValid;
+                            $this->EventArguments["InvalidReturnType"] = &$invalidReturnType;
+                            $this->fireEvent("AfterValidateDiscussion");
 
-                    if (!$isValid) {
-                        return $invalidReturnType;
+                            if (!$isValid) {
+                                return $invalidReturnType;
+                            }
+                        }
                     }
 
                     // The primary key was removed from the form fields, but we need it for logging.
@@ -2757,22 +2805,42 @@ class DiscussionModel extends Gdn_Model implements
                     }
 
                     // Check for approval
-                    $approvalRequired = checkRestriction("Vanilla.Approval.Require");
-                    if ($approvalRequired && !val("Verified", Gdn::session()->User)) {
-                        LogModel::insert("Pending", "Discussion", $fields);
+                    if (!($settings["skipSpamCheck"] ?? false)) {
+                        if (FeatureFlagHelper::featureEnabled("escalations")) {
+                            $premodItem = new PremoderationItem(
+                                userID: $this->sessionInterface->UserID,
+                                userName: $this->sessionInterface->User->Name,
+                                userEmail: $this->sessionInterface->User->Email,
+                                recordName: $fields["Name"],
+                                recordBody: $fields["Body"],
+                                recordFormat: $fields["Format"],
+                                isEdit: false,
+                                placeRecordType: "category",
+                                placeRecordID: $fields["CategoryID"],
+                                recordType: "discussion",
+                                recordID: null,
+                                rawRow: $fields
+                            );
+                            $this->premoderationModel()->premoderateItem($premodItem);
+                        } else {
+                            $approvalRequired = checkRestriction("Vanilla.Approval.Require");
+                            if ($approvalRequired && !val("Verified", Gdn::session()->User)) {
+                                LogModel::insert("Pending", "Discussion", $fields);
 
-                        return UNAPPROVED;
-                    }
+                                return UNAPPROVED;
+                            }
 
-                    $isValid = true;
-                    $invalidReturnType = false;
-                    $this->EventArguments["DiscussionData"] = $fields;
-                    $this->EventArguments["IsValid"] = &$isValid;
-                    $this->EventArguments["InvalidReturnType"] = &$invalidReturnType;
-                    $this->fireEvent("AfterValidateDiscussion");
+                            $isValid = true;
+                            $invalidReturnType = false;
+                            $this->EventArguments["DiscussionData"] = $fields;
+                            $this->EventArguments["IsValid"] = &$isValid;
+                            $this->EventArguments["InvalidReturnType"] = &$invalidReturnType;
+                            $this->fireEvent("AfterValidateDiscussion");
 
-                    if (!$isValid) {
-                        return $invalidReturnType;
+                            if (!$isValid) {
+                                return $invalidReturnType;
+                            }
+                        }
                     }
 
                     // Create discussion
@@ -4006,6 +4074,8 @@ SQL;
             "headline" => $name,
             "description" => sliceString($body, 500),
             "discussionUrl" => discussionUrl($discussion),
+            "url" => discussionUrl($discussion),
+            "text" => $body,
             "dateCreated" => $dateInserted,
         ];
 
@@ -4114,6 +4184,9 @@ SQL;
 
         $row["statusID"] = $this->discussionStatusModel->filterActiveStatusID($row["statusID"] ?? null);
 
+        // Handle legacy resolved fields
+        $row["resolved"] = $row["internalStatusID"] === RecordStatusModel::DISCUSSION_STATUS_RESOLVED;
+
         // Hide away inactive record statuses.
         // This query should generally always be cached in
 
@@ -4144,6 +4217,8 @@ SQL;
         if (ModelUtils::isExpandOption("lastPost", $expand)) {
             $lastPost = [
                 "discussionID" => $row["DiscussionID"] ?? null,
+                "parentRecordType" => "discussion",
+                "parentRecordID" => $row["DiscussionID"] ?? null,
                 "insertUserID" => $row["LastUserID"] ?? null,
             ];
             $lastPost["dateInserted"] = $row["DateLastComment"] ?? ($row["DateInserted"] ?? null);
@@ -4221,14 +4296,17 @@ SQL;
 
         // Get the discussion's parsed body's first image & get the srcset for it.
         $result["image"] = $this->formatterService->parseMainImage($bodyParsed, $format);
+
+        // Return suggestions if suggestions are enabled and exist for the discussion
         if (FeatureFlagHelper::featureEnabled("AISuggestions") && isset($result["attributes"]["suggestions"])) {
             $result["suggestions"] = $result["attributes"]["suggestions"] ?? [];
-            $result["visibleSuggestions"] = $result["attributes"]["visibleSuggestions"] ?? [];
+            $result["showSuggestions"] = $result["attributes"]["showSuggestions"] ?? $result["countComments"] == 0;
             unset($result["attributes"]["suggestions"]);
             if (isset($result["attributes"]["suggestions"])) {
-                unset($result["attributes"]["visibleSuggestions"]);
+                unset($result["attributes"]["showSuggestions"]);
             }
         }
+
         return $result;
     }
 
@@ -4374,11 +4452,18 @@ SQL;
             "status?" => RecordStatusModel::getSchemaFragment(),
             "trending:o?",
             "reactions?" => $this->reactionModel->getReactionSummaryFragment(),
+            "reportMeta?" => \Vanilla\Forum\Models\CommunityManagement\ReportModel::reportMetaSchema(),
             "attachments:a?",
+            "countReports:i?",
+            "suggestions:a?",
+            "showSuggestions:b?",
         ];
         if (\Gdn::session()->checkPermission("staff.allow")) {
-            $schema["internalStatusID:i"] = ["default" => 0];
+            $schema["internalStatusID:i"] = ["default" => RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED];
             $schema["internalStatus?"] = RecordStatusModel::getSchemaFragment();
+            $schema["resolved:b"] = [
+                "default" => false,
+            ];
         }
 
         $result = Schema::parse($schema);
@@ -4386,7 +4471,7 @@ SQL;
     }
 
     /**
-     * Get a schema representing ser-specific discussion fields.
+     * Get a schema representing user-specific discussion fields.
      *
      * @return Schema
      */
@@ -5163,5 +5248,30 @@ CASE WHEN CountComments = 0 AND coalesce(Score, 0) <= 0
 END)
 SQL
         );
+    }
+
+    /**
+     * Given a SQL query where we have `GDN_Discussion as discussion` apply permission filters.
+     *
+     * @param Gdn_SQLDriver $sql
+     *
+     * @return void
+     */
+    public function applyDiscussionCategoryPermissionsWhere(Gdn_SQLDriver $sql): void
+    {
+        $permCategoryIDs = $this->categoryModel->getCategoryIDsWithPermissionForUser(
+            userID: Gdn::session()->UserID,
+            permission: "Vanilla.Discussions.View"
+        );
+
+        $whereGroups = [
+            [
+                "d.CategoryID" => $permCategoryIDs,
+            ],
+        ];
+
+        $event = new DiscussionPermissionQueryEvent($sql, $whereGroups);
+        $this->getEventManager()->dispatch($event);
+        $event->applyWheresToQuery();
     }
 }

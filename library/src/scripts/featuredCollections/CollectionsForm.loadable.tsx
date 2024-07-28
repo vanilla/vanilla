@@ -36,7 +36,6 @@ import { Icon } from "@vanilla/icons";
 import { useLastValue } from "@vanilla/react-utils";
 import { useFormik } from "formik";
 import sortBy from "lodash-es/sortBy";
-import uniq from "lodash-es/uniq";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 type FormValues = {
@@ -165,11 +164,8 @@ export function CollectionsFormLoadable(props: IProps) {
     const { values, setFieldValue, handleSubmit, isSubmitting, setValues } = formik;
 
     const hasDuplicates = useMemo<boolean>(() => {
-        const fullList = [...options.map(({ label }) => label), ...values.newCollections]
-            .filter((name) => name !== "")
-            .map((name) => name.toLowerCase());
-
-        return uniq(fullList).length !== fullList.length;
+        const existingOptions = options.map(({ label }) => label.toLocaleLowerCase());
+        return values.newCollections.some((name) => existingOptions.includes(name.toLowerCase()));
     }, [values.newCollections, options]);
 
     const handleAddCollection = () => {

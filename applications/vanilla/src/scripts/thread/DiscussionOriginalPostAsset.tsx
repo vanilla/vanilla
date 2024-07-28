@@ -22,9 +22,9 @@ import React from "react";
 import { discussionThreadClasses } from "@vanilla/addon-vanilla/thread/DiscussionThread.classes";
 import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
 import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
-import ThreadItemPermalink from "@vanilla/addon-vanilla/thread/ThreadItemPermalink";
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 import { Icon } from "@vanilla/icons";
+import { ReportCountMeta } from "@vanilla/addon-vanilla/thread/ReportCountMeta";
 
 interface IProps {
     discussion: IDiscussion;
@@ -61,6 +61,8 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                 recordUrl={discussion.url}
                 name={discussion.name}
                 timestamp={discussion.dateInserted}
+                attributes={discussion.attributes}
+                authorID={discussion.insertUserID}
             >
                 <PageHeadingBox
                     title={
@@ -83,6 +85,11 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                     actions={
                         currentUserSignedIn && (
                             <div className={css({ display: "flex", alignItems: "center", gap: 4 })}>
+                                <ReportCountMeta
+                                    countReports={discussion.countReports}
+                                    recordID={discussion.discussionID}
+                                    recordType="discussion"
+                                />
                                 <DiscussionBookmarkToggle
                                     discussion={discussion}
                                     onSuccess={invalidateDiscussionQuery}
@@ -102,7 +109,6 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                     }}
                     user={discussion.insertUser!}
                     content={discussion.body!}
-                    contentMeta={<ThreadItemPermalink />}
                     userPhotoLocation={"header"}
                     collapsed={page > 1}
                     reactions={discussion.type !== "idea" ? discussion.reactions : undefined}

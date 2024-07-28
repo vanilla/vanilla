@@ -24,6 +24,7 @@ export class DiscussionFixture {
         countUnread: 0,
         bookmarked: false,
         categoryID: 123,
+        statusID: 1,
     };
 
     public static mockDiscussion: IDiscussion = {
@@ -43,6 +44,7 @@ export class DiscussionFixture {
         pinned: false,
         score: 2,
         resolved: false,
+        statusID: 1,
     };
 
     public static fakeDiscussions: IDiscussion[] = [

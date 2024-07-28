@@ -43,6 +43,7 @@ interface IChoices {
 
 interface ICheckBoxControl extends ICommonControl {
     inputType: "checkBox" | "toggle";
+    labelBold?: boolean;
 }
 
 export interface ITokensControl extends ICommonControl {
@@ -63,7 +64,10 @@ interface IRadioControl extends ICommonControl {
     inputType: "radio";
     choices: IChoices;
     enum?: string[];
-    tooltipsPerOption?: Record<string, string>; // for radio buttons, this is an object of value - tooltip pairs
+    // for radio buttons, this is an object of value - tooltip pairs
+    tooltipsPerOption?: Record<string, string>;
+    // note to display with each option
+    notesPerOption?: Record<string, string>;
 }
 
 interface ITextBoxControl extends ICommonControl {
@@ -73,6 +77,7 @@ interface ITextBoxControl extends ICommonControl {
     max?: React.InputHTMLAttributes<HTMLInputElement>["max"];
     minLength?: React.InputHTMLAttributes<HTMLInputElement>["minLength"];
     maxLength?: React.InputHTMLAttributes<HTMLInputElement>["maxLength"];
+    pattern?: React.InputHTMLAttributes<HTMLInputElement>["pattern"];
 }
 
 interface ICodeBoxControl extends ICommonControl {
@@ -107,6 +112,11 @@ export interface IDatePickerControl extends ICommonControl {
     inputType: "datePicker";
     min?: React.InputHTMLAttributes<HTMLInputElement>["min"];
     max?: React.InputHTMLAttributes<HTMLInputElement>["max"];
+}
+
+export interface IDurationPickerControl extends ICommonControl {
+    inputType: "timeDuration";
+    supportedUnits?: string[];
 }
 
 export interface IDateRangeControl extends ICommonControl {
@@ -149,6 +159,7 @@ export type IFormControl =
     | IUploadControl
     | IDatePickerControl
     | IDateRangeControl
+    | IDurationPickerControl
     | IDragAndDropControl
     | IEmptyControl
     | IModalControl

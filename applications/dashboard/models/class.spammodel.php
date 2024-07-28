@@ -66,6 +66,11 @@ class SpamModel extends Gdn_Pluggable
             return false;
         }
 
+        if (\Gdn::session()->isUserVerified()) {
+            // Verified user's don't run through spam checks.
+            return false;
+        }
+
         $options += [
             "Log" => true,
             "Operation" => LogModel::TYPE_SPAM,

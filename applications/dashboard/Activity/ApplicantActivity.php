@@ -97,7 +97,7 @@ class ApplicantActivity extends Activity
      */
     public static function getNotificationPermissions(): array
     {
-        return ["settings.manage"];
+        return ["Garden.Users.Approve"];
     }
 
     /**

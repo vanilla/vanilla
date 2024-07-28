@@ -13,6 +13,10 @@ import { DiscussionOriginalPostAssetPreview } from "@vanilla/addon-vanilla/threa
 import { DiscussionTagAssetPreview } from "@vanilla/addon-vanilla/thread/DiscussionTagAsset.preview";
 import { RouterRegistry } from "@library/Router.registry";
 import { getCommunityManagementRoutes } from "@dashboard/moderation/CommunityManagementRoutes";
+import { SuggestedAnswersPreview } from "@library/suggestedAnswers/SuggestedAnswers.preview";
+import { getMeta } from "@library/utility/appUtils";
+
+const suggestionsEnabled = getMeta("answerSuggestionsEnabled", false);
 
 registerWidgetOverviews({
     TagWidget: TagWidgetPreview,
@@ -21,6 +25,7 @@ registerWidgetOverviews({
     DiscussionOriginalPostAsset: DiscussionOriginalPostAssetPreview,
     DiscussionCommentEditorAsset: DiscussionCommentEditorAsset,
     DiscussionTagAsset: DiscussionTagAssetPreview,
+    DiscussionSuggestionsAsset: suggestionsEnabled ? SuggestedAnswersPreview : () => null,
 });
 
 RouterRegistry.addRoutes(getCommunityManagementRoutes());

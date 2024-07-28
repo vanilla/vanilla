@@ -5,6 +5,7 @@
  */
 
 import { css } from "@emotion/css";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleUnit } from "@library/styles/styleUnit";
@@ -102,6 +103,8 @@ export const userDropDownClasses = useThemeCache(() => {
 
     const accountLinks = css({
         fontSize: styleUnit(globalVars.fonts.size.medium),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.darkText),
+        ...Mixins.linkDecoration(),
     });
 
     return {

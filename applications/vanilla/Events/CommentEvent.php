@@ -112,11 +112,11 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getDiscussionID(): int
+    public function getDiscussionID(): ?int
     {
-        return $this->payload["comment"]["discussionID"];
+        return $this->payload["comment"]["discussionID"] ?? null;
     }
 
     /**

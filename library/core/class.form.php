@@ -1140,8 +1140,11 @@ class Gdn_Form extends Gdn_Pluggable
      *    Setting 'InlineErrors' to FALSE prevents error message even if $this->InlineErrors is enabled.
      * @return string
      */
-    public function checkBox($fieldName, $label = "", $attributes = [])
+    public function checkBox($fieldName, $label = "", $attributes = [], bool $sanitize = true)
     {
+        if ($sanitize) {
+            $label = htmlspecialchars($label);
+        }
         $value = arrayValueI("value", $attributes, true);
         $attributes["value"] = $value;
         $display = val("display", $attributes, "wrap");
@@ -1178,12 +1181,13 @@ class Gdn_Form extends Gdn_Pluggable
 
         $input = $this->input($fieldName, "checkbox", $attributes);
         if ($label != "") {
+            $title = htmlspecialchars(val("title", $attributes, ""));
             $labelElement =
                 '<label for="' .
                 arrayValueI("id", $attributes, $this->escapeID($fieldName, false)) .
                 '"' .
                 attribute("class", $class) .
-                attribute("title", val("title", $attributes)) .
+                attribute("title", $title) .
                 ">";
 
             if ($display === "wrap") {

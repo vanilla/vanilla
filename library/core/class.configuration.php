@@ -24,7 +24,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     const CONFIG_FILE_CACHE_KEY = "garden.config.%s";
 
     /** @var array  configs to omit*/
-    const OMIT_LOGGING = ["SystemAccessToken", "Garden.Update"];
+    const OMIT_LOGGING = ["SystemAccessToken", "Garden.Update", "EnabledPlugins"];
 
     /** @var string  */
     public $NotFound = "NOT_FOUND";

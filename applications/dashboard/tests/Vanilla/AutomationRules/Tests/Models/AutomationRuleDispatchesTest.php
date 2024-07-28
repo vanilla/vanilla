@@ -176,10 +176,15 @@ class AutomationRuleDispatchesTest extends SiteTestCase
             "trigger" => [
                 "type" => "staleDiscussionTrigger",
                 "value" => [
-                    "maxTimeThreshold" => "4",
-                    "maxTimeUnit" => "day",
-                    "triggerTimeThreshold" => "1",
-                    "triggerTimeUnit" => "day",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 4,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "day",
+                    ],
                     "postType" => ["discussion"],
                 ],
             ],
@@ -214,10 +219,15 @@ class AutomationRuleDispatchesTest extends SiteTestCase
             "trigger" => [
                 "type" => StaleDiscussionTrigger::getType(),
                 "value" => [
-                    "maxTimeThreshold" => 3,
-                    "maxTimeUnit" => "day",
-                    "triggerTimeThreshold" => 2,
-                    "triggerTimeUnit" => "day",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 3,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 2,
+                        "unit" => "day",
+                    ],
                     "postType" => ["discussion"],
                 ],
             ],

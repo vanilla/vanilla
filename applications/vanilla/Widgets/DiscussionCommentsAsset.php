@@ -48,7 +48,7 @@ class DiscussionCommentsAsset extends AbstractLayoutAsset implements HydrateAwar
             "discussionID" => $discussionID,
             "page" => $page,
             "limit" => $limit,
-            "expand" => ["insertUser", "reactions", "attachments"],
+            "expand" => ["insertUser", "reactions", "attachments", "countReports"],
         ];
         $comments = $this->internalClient->get("/comments", $apiParams)->asData();
         $props =

@@ -65,7 +65,7 @@ export default function DashboardTitleBar(props: IProps) {
                                     <hr className={dropdownClasses.separator} />
                                     <SmartLink className={dropdownClasses.action} to={"/"}>
                                         <div className={classes.iconWrapper}>
-                                            <Icon icon="meta-external" />
+                                            <Icon icon="meta-external-compact" />
                                         </div>
                                         {t("Visit Site")}
                                     </SmartLink>

@@ -6,11 +6,12 @@
 
 import React, { ReactNode, useContext, useState, useEffect } from "react";
 import { IUser } from "@library/@types/api/users";
-import { ICategory, ICategoryPreferences } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { CategorySortOption } from "@dashboard/@types/api/category";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
+import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
 
 export interface IFollowedContent extends ICategory {
     dateFollowed: string;

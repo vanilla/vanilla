@@ -5,6 +5,7 @@
  */
 
 import { DeserializeHtml, Nullable } from "@udecode/plate-common";
+import { ELEMENT_MENTION } from "@library/vanilla-editor/plugins/mentionPlugin/createMentionPlugin";
 
 export const deserializeMentionHtml: Nullable<DeserializeHtml> | null | undefined = {
     isElement: true,
@@ -13,13 +14,19 @@ export const deserializeMentionHtml: Nullable<DeserializeHtml> | null | undefine
 };
 
 function getNode(el) {
-    const { dataset, href } = el;
+    const { dataset, href, pathname } = el;
+    let name = dataset.username;
+
+    if (!name) {
+        const pathParts = decodeURI(pathname).split("/");
+        name = pathParts.pop();
+    }
 
     return {
-        type: "@",
+        type: ELEMENT_MENTION,
         children: [{ text: "" }],
         userID: dataset.userid,
-        name: dataset.username,
+        name,
         url: href,
         domID: `mentionSuggestion${dataset.userid}`,
     };

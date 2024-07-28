@@ -121,16 +121,24 @@ class Gdn_Theme
             }
 
             $row["Url"] = !empty($row["Url"]) ? url($row["Url"]) : "#";
-            $cssClass = "CrumbLabel " . val("CssClass", $row);
+            $cssClass = "CrumbLabel " . htmlspecialchars(val("CssClass", $row));
             if ($dataCount == count($data)) {
                 $cssClass .= " Last";
             }
+
+            $sanitizedRow = [
+                "Name" => htmlspecialchars($row["Name"]),
+                "Url" => htmlspecialchars($row["Url"]),
+                "CssClass" => htmlspecialchars($cssClass),
+            ];
 
             $label =
                 '<span class="' .
                 $cssClass .
                 '">' .
-                ($count === 0 ? formatString($baseFormat, $row) : formatString($format, $row) . "</span>") .
+                ($count === 0
+                    ? formatString($baseFormat, $sanitizedRow)
+                    : formatString($format, $sanitizedRow) . "</span>") .
                 "</span>";
             $result = concatSep('<span class="Crumb">' . t("Breadcrumbs Crumb", "›") . "</span> ", $result, $label);
 
@@ -588,10 +596,10 @@ class Gdn_Theme
     /**
      * The current section the site is in. This can be one or more values. Think of it like a server-side css-class.
      *
-     * @since 2.1
-     *
      * @param string $section The name of the section.
      * @param string $method One of: add, remove, set, get.
+     * @since 2.1
+     *
      */
     public static function section($section, $method = "add")
     {

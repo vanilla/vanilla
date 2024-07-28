@@ -24,6 +24,7 @@ use Vanilla\Analytics\PageViewEventProvider;
 use Vanilla\Analytics\SearchAllEventProvider;
 use Vanilla\Analytics\SearchPlacesEventProvider;
 use Vanilla\Dashboard\Activity\ActivityCommentActivity;
+use Vanilla\Dashboard\Activity\AiSuggestionsActivity;
 use Vanilla\Dashboard\Activity\ApplicantActivity;
 use Vanilla\Dashboard\Activity\BookmarkCommentActivity;
 use Vanilla\Dashboard\Activity\CategoryCommentActivity;
@@ -130,7 +131,8 @@ class DashboardContainerRules extends AddonContainerRules
             ->addCall("registerActivity", [CategoryDiscussionActivity::class])
             ->addCall("registerActivity", [CategoryCommentActivity::class])
             ->addCall("registerActivity", [ParticipateCommentActivity::class])
-            ->addCall("registerActivity", [EmailDigestActivity::class]);
+            ->addCall("registerActivity", [EmailDigestActivity::class])
+            ->addCall("registerActivity", [AiSuggestionsActivity::class]);
 
         $container
             ->rule(EventProviderService::class)

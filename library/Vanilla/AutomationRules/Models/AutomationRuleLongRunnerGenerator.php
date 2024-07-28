@@ -7,9 +7,10 @@
 
 namespace Vanilla\AutomationRules\Models;
 
+use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Psr\Log\LoggerInterface;
-use Vanilla\AutomationRules\Trigger\TimedAutomationTriggerInterface;
+
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Logger;
@@ -113,7 +114,7 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
                         AutomationRuleDispatchesModel::STATUS_RUNNING
                     );
                 }
-                if ($triggerClass instanceof TimedAutomationTriggerInterface) {
+                if ($triggerClass instanceof TimedAutomationTrigger) {
                     $lastRunDate = $params["lastRunDate"];
                     $where = $triggerClass->getWhereArray($automationRule["trigger"]["triggerValue"], $lastRunDate);
                     $where = $actionClass->addWhereArray($where, $actionValue);

@@ -17,6 +17,7 @@ import { ReadableIntegrationContextProvider } from "@library/features/discussion
 import { DiscussionAttachment } from "./DiscussionAttachmentsAsset";
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 import { IBoxOptions } from "@library/styles/cssUtilsTypes";
+import { ReportCountMeta } from "@vanilla/addon-vanilla/thread/ReportCountMeta";
 
 interface IProps {
     comment: IComment;
@@ -93,15 +94,22 @@ export function CommentThreadItem(props: IProps) {
                     ) : null
                 }
                 options={
-                    <CommentOptionsMenu
-                        discussion={props.discussion}
-                        comment={comment}
-                        onCommentEdit={() => {
-                            setIsEditing(true);
-                        }}
-                        onMutateSuccess={onMutateSuccess}
-                        isEditLoading={isEditing && editCommentQuery.isLoading}
-                    />
+                    <>
+                        <ReportCountMeta
+                            countReports={comment.countReports}
+                            recordID={comment.commentID}
+                            recordType="comment"
+                        />
+                        <CommentOptionsMenu
+                            discussion={props.discussion}
+                            comment={comment}
+                            onCommentEdit={() => {
+                                setIsEditing(true);
+                            }}
+                            onMutateSuccess={onMutateSuccess}
+                            isEditLoading={isEditing && editCommentQuery.isLoading}
+                        />
+                    </>
                 }
             />
         </ThreadItemContextProvider>

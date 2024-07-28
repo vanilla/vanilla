@@ -25,6 +25,10 @@ import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/D
 import ThreadItemPermalink from "@vanilla/addon-vanilla/thread/ThreadItemPermalink";
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 import { Icon } from "@vanilla/icons";
+import { TagPreset } from "@library/metas/Tags.variables";
+import Translate from "@library/content/Translate";
+import SmartLink from "@library/routing/links/SmartLink";
+import { ReportCountMeta } from "@vanilla/addon-vanilla/thread/ReportCountMeta";
 
 interface IProps {
     discussion: IDiscussion;
@@ -83,6 +87,11 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                     actions={
                         currentUserSignedIn && (
                             <div className={css({ display: "flex", alignItems: "center", gap: 4 })}>
+                                <ReportCountMeta
+                                    countReports={discussion.countReports}
+                                    recordID={discussion.discussionID}
+                                    recordType="discussion"
+                                />
                                 <DiscussionBookmarkToggle
                                     discussion={discussion}
                                     onSuccess={invalidateDiscussionQuery}

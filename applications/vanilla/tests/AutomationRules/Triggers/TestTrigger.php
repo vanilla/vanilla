@@ -68,4 +68,20 @@ class TestTrigger extends TimedAutomationTrigger
             "max" => $max,
         ];
     }
+
+    /**
+     * @inheridoc
+     */
+    public function getRecordCountsToProcess(array $where): int
+    {
+        return 0;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "test";
+    }
 }

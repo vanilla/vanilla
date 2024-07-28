@@ -86,7 +86,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
 
     const canBump = hasPermission("curation.manage");
 
-    const canReport = hasPermission("flag.add");
+    const canReport = hasPermission("flag.add") && getMeta("featureFlags.CommunityManagement.Enabled", false);
 
     const items: React.ReactNode[] = [];
 

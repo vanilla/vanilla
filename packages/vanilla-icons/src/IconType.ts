@@ -184,16 +184,16 @@ export const coreIconsData = {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        strokewidth: "1.4",
         fill: "currentColor",
         stroke: "currentColor",
+        strokeWidth: "1.4",
     },
     "discussion-bookmark": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        strokewidth: "1.4",
         stroke: "currentColor",
+        strokeWidth: "1.4",
     },
     "editor-eye-slash": {
         width: "24",
@@ -326,10 +326,16 @@ export const coreIconsData = {
         height: "24",
         viewBox: "0 0 24 24",
     },
+    "meta-external-compact": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
     "meta-external": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
+        fill: "none",
     },
     "meta-like": {
         width: "24",

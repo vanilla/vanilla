@@ -10,6 +10,7 @@
 
 use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Events\CategoryEvent;
@@ -1054,6 +1055,15 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
                     $resourceEvent->getPayload()
                 )
             );
+        } else {
+            $resourceEvent->setPayload(
+                array_merge(
+                    [
+                        "countAffectedUsers" => count($affectedUsers),
+                    ],
+                    $resourceEvent->getPayload()
+                )
+            );
         }
 
         $this->getEventManager()->dispatch($resourceEvent);
@@ -1127,7 +1137,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
                 $roleType = val("Type", $role);
                 $newType = val("Type", $formPostValues, null);
                 if (
-                    c("Garden.Registration.ConfirmEmail") &&
+                    (Gdn::config("Garden.Registration.ConfirmEmail") ||
+                        Gdn::config("Garden.Registration.SSOConfirmEmail")) &&
                     $roleType === self::TYPE_UNCONFIRMED &&
                     $newType !== self::TYPE_UNCONFIRMED &&
                     $newType !== null
@@ -1158,5 +1169,25 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
             $row = ["roleID" => (int) $row["RoleID"], "name" => $row["Name"]];
         }
         return $result;
+    }
+
+    /**
+     * Validator for 'viewers' and 'editors' field
+     *
+     * @param array $roleIDs
+     * @param ValidationField $validationField
+     * @return bool
+     */
+    public function roleIDsValidator(array $roleIDs, \Garden\Schema\ValidationField $validationField): bool
+    {
+        $roles = array_column($this::roles(), "RoleID");
+        $valid = true;
+        foreach ($roleIDs as $roleID) {
+            if (!in_array($roleID, $roles)) {
+                $validationField->getValidation()->addError($validationField->getName(), "Invalid role id: " . $roleID);
+                $valid = false;
+            }
+        }
+        return $valid;
     }
 }

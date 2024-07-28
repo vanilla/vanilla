@@ -73,7 +73,7 @@ export function ReportGroup(props: IProps) {
                     </SmartLink>
                     <ToolTip label={t("Go to post")}>
                         <SmartLink to={reportGroup.recordUrl}>
-                            <Icon icon={"meta-external"} />
+                            <Icon icon={"meta-external-compact"} />
                         </SmartLink>
                     </ToolTip>
                     <MetaItem>

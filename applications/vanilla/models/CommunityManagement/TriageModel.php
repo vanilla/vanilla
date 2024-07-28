@@ -10,6 +10,7 @@ namespace Vanilla\Forum\Models\CommunityManagement;
 use Garden\Schema\Schema;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
 
 /**
@@ -17,33 +18,19 @@ use Vanilla\Utility\SchemaUtils;
  */
 class TriageModel
 {
-    private \Gdn_Database $db;
-    private ReportModel $reportModel;
-    private ReportReasonModel $reportReasonModel;
-    private FormatService $formatService;
-    private \CategoryModel $categoryModel;
-    private \Gdn_Session $session;
-    private RecordStatusModel $recordStatusModel;
-
     /**
      * Constructor.
      */
     public function __construct(
-        \Gdn_Database $db,
-        ReportModel $reportModel,
-        ReportReasonModel $reportReasonModel,
-        FormatService $formatService,
-        \CategoryModel $categoryModel,
-        \Gdn_Session $session,
-        RecordStatusModel $recordStatusModel
+        private \Gdn_Database $db,
+        private ReportModel $reportModel,
+        private ReportReasonModel $reportReasonModel,
+        private FormatService $formatService,
+        private \CategoryModel $categoryModel,
+        private \Gdn_Session $session,
+        private RecordStatusModel $recordStatusModel,
+        private \AttachmentModel $attachmentModel
     ) {
-        $this->db = $db;
-        $this->reportModel = $reportModel;
-        $this->reportReasonModel = $reportReasonModel;
-        $this->formatService = $formatService;
-        $this->categoryModel = $categoryModel;
-        $this->session = $session;
-        $this->recordStatusModel = $recordStatusModel;
     }
 
     /**
@@ -99,6 +86,9 @@ class TriageModel
         );
         $discussionQuery->where(["d.CategoryID" => $visibleCategoryIDs]);
 
+        $permissionCategoryIDs = $this->categoryModel->getSearchCategoryIDs();
+        $discussionQuery->where(["d.CategoryID" => $permissionCategoryIDs]);
+
         // Apply the other wheres
         if (($filters["placeRecordType"] ?? null) === "category" && isset($filters["placeRecordID"])) {
             $discussionQuery->where("d.CategoryID", $filters["placeRecordID"]);
@@ -124,7 +114,7 @@ class TriageModel
      * Query discussions/comments to triage.
      *
      * @param array{placeRecordType?: string, placeRecordID?: mixed, recordInternalStatusID?: mixed} $filters
-     * @param array $options Standard model options.
+     * @param array $options Standard model options + expand support.
      * @return array<array>
      */
     public function queryTriaged(array $filters, array $options): array
@@ -157,6 +147,7 @@ class TriageModel
         $this->reportReasonModel->expandReportReasonArrays($results);
         $this->reportModel->expandReportUsers($results);
         $this->recordStatusModel->expandStatuses($results);
+        $this->attachmentModel->joinAttachments($results);
 
         SchemaUtils::validateArray($results, self::triageRecordSchema());
 
@@ -192,7 +183,8 @@ class TriageModel
     {
         return SchemaUtils::composeSchemas(
             CommunityManagementRecordModel::fullRecordSchema(),
-            ReportModel::reportRelatedSchema()
+            ReportModel::reportRelatedSchema(),
+            Schema::parse(["attachments:a?"])
         );
     }
 }

@@ -24,6 +24,7 @@ export interface IComment {
     attributes: any;
     reactions?: IReaction[];
     attachments?: IAttachment[];
+    countReports?: number;
 }
 
 export interface ICommentEdit {

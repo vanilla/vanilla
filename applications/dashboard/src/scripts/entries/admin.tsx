@@ -43,6 +43,7 @@ import ToggleInputInLegacyForm from "@library/forms/ToggleInputInLegacyForm";
 import { ExternalSearchSettingsPage } from "@dashboard/pages/ExternalSearchSettingsPage";
 import { MemoryRouter } from "react-router";
 import { RouterRegistry } from "@library/Router.registry";
+import { CommunityManagementSettings } from "@dashboard/communityManagementSettings/CommunityManagementSettings";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -67,6 +68,7 @@ addComponent("UserPreferences", UserPreferences);
 addComponent("EmailSettings", EmailSettings);
 addComponent("DigestSettings", DigestSettings);
 addComponent("toggleInputInLegacyForm", ToggleInputInLegacyForm);
+addComponent("communityManagement", CommunityManagementSettings);
 
 applySharedPortalContext((props) => {
     const [navHeight, setNavHeight] = useState(0);

@@ -5,7 +5,6 @@
  */
 
 import { IApiError, ILoadable } from "@library/@types/api/core";
-import { IUser } from "@library/@types/api/users";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import {
     INotificationPreferences,
@@ -26,12 +25,16 @@ export interface INotificationPreferencesContextValue {
             onError?: (error: Error) => void;
         },
     ) => Promise<INotificationPreferences>;
+    patchLanguage: (language: string) => Promise<INotificationPreferences>;
 }
 
 export const NotificationPreferencesContext = createContext<INotificationPreferencesContextValue>({
     schema: null,
     preferences: null,
     editPreferences: async function (_preferences) {
+        return {};
+    },
+    patchLanguage: async function (_language) {
         return {};
     },
 });
@@ -92,6 +95,13 @@ export function NotificationPreferencesContextProvider(
     const schema: INotificationPreferencesContextValue["schema"] = queryResultToILoadable(schemaQuery);
     const preferences: INotificationPreferencesContextValue["preferences"] = queryResultToILoadable(preferencesQuery);
 
+    async function patchLanguage(language: string) {
+        return await editPreferencesMutation.mutateAsync({
+            ...(preferencesQuery.data ?? {}),
+            ...({ NotificationLanguage: language } as any),
+        });
+    }
+
     return (
         <NotificationPreferencesContext.Provider
             value={{
@@ -99,6 +109,7 @@ export function NotificationPreferencesContextProvider(
                     schema,
                     preferences,
                     editPreferences: editPreferencesMutation.mutateAsync,
+                    patchLanguage,
                 },
             }}
         >

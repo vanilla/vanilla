@@ -40,6 +40,9 @@ export const durationPickerClasses = useThemeCache(() => {
             "&&:focus, &&:active, &&:hover, &&.focus-visible": {
                 borderTopRightRadius: 0,
                 borderBottomRightRadius: 0,
+                marginLeft: 1,
+                position: "relative",
+                zIndex: 1,
             },
         },
     });

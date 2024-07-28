@@ -118,6 +118,10 @@ export type AutomationRuleFormValues = {
         actionType: AutomationRuleActionType | "";
         actionValue: Record<string, any>;
     };
+    additionalSettings?: {
+        triggerValue?: Record<string, any>;
+        actionValue?: Record<string, any>;
+    };
 };
 
 export type AddEditAutomationRuleParams = AutomationRuleFormValues & {

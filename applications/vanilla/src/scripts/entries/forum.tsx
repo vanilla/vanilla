@@ -34,7 +34,7 @@ import { UserSpotlight } from "@library/userSpotlight/UserSpotlight";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
 import { onReady } from "@library/utility/appUtils";
 import { addComponent } from "@library/utility/componentRegistry";
-import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
+import CategoryFollowDropDown from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import "@vanilla/addon-vanilla/forms/autosave";
 import { accessibleRoleButton } from "@vanilla/addon-vanilla/legacy/legacyAccessibility";
 import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacyHashScrolling";

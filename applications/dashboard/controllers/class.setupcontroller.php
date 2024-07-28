@@ -156,6 +156,7 @@ class SetupController extends DashboardController
             "Database.User",
             "Database.Password",
             "Garden.Registration.ConfirmEmail",
+            "Garden.Registration.SSOConfirmEmail",
             "Garden.Email.SupportName",
         ]);
 

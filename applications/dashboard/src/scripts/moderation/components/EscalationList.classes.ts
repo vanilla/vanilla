@@ -26,6 +26,9 @@ export const escalationClasses = useThemeCache(() => {
     const actions = css({});
     const listItemContainer = css({
         padding: "8px 16px",
+        "&:empty": {
+            display: "none",
+        },
     });
     const actionBar = css({
         display: "flex",
@@ -33,6 +36,8 @@ export const escalationClasses = useThemeCache(() => {
         gap: 12,
         borderTop: singleBorder(),
         marginTop: 6,
+        paddingTop: 0,
+        paddingBottom: 2,
     });
     const moreActions = css({
         transform: "translateX(8px)",

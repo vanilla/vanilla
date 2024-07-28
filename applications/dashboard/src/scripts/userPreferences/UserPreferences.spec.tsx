@@ -1,19 +1,15 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { UserPreferences } from "@dashboard/userPreferences/UserPreferences";
-import { LoadStatus } from "@library/@types/api/core";
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { mockAPI } from "@library/__tests__/utility";
 import { NotificationPreferencesContextProvider } from "@library/notificationPreferences";
 import { createMockApi } from "@library/notificationPreferences/fixtures/NotificationPreferences.fixtures";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { stableObjectHash } from "@vanilla/utils";
-import React from "react";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -27,24 +23,9 @@ function MockWrappedUserPreferences() {
     const mockApi = createMockApi();
     return (
         <QueryClientProvider client={queryClient}>
-            <TestReduxProvider
-                state={{
-                    config: {
-                        configsByLookupKey: {
-                            [stableObjectHash(["preferences.categoryFollowed.defaults"])]: {
-                                status: LoadStatus.SUCCESS,
-                                data: {
-                                    "preferences.categoryFollowed.defaults": "[]",
-                                },
-                            },
-                        },
-                    },
-                }}
-            >
-                <NotificationPreferencesContextProvider {...{ api: mockApi, userID: "defaults" }}>
-                    <UserPreferences />
-                </NotificationPreferencesContextProvider>
-            </TestReduxProvider>
+            <NotificationPreferencesContextProvider {...{ api: mockApi, userID: "defaults" }}>
+                <UserPreferences />
+            </NotificationPreferencesContextProvider>
         </QueryClientProvider>
     );
 }

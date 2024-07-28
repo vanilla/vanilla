@@ -49,6 +49,7 @@ class ApplicantsTest extends AbstractResourceTest
         $configuration = static::container()->get("Config");
         $configuration->set("Garden.Registration.Method", "Approval");
         $configuration->set("Garden.Registration.ConfirmEmail", false);
+        $configuration->set("Garden.Registration.SSOConfirmEmail", false);
         $configuration->set("Garden.Registration.SkipCaptcha", true);
         $configuration->set("Garden.Email.Disabled", true);
     }

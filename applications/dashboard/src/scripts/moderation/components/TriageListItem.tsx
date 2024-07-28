@@ -11,12 +11,14 @@ import { triageListItemClasses } from "@dashboard/moderation/components/TriageLi
 import apiv2 from "@library/apiv2";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
+import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownSwitchButton from "@library/flyouts/DropDownSwitchButton";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -31,6 +33,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@library/utility/appUtils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import { Icon } from "@vanilla/icons";
 
 interface IProps {
@@ -59,6 +62,8 @@ export function TriageListItem(props: IProps) {
             });
         },
     });
+
+    const escalation = triageItem.attachments?.find((item) => item.attachmentType === "vanilla-escalation");
 
     return (
         <div className={classes.container}>
@@ -119,6 +124,7 @@ export function TriageListItem(props: IProps) {
                         </>
                     }
                 />
+
                 <div className={classes.quickActions}>
                     {!isResolved && (
                         <ToolTip label={t("Resolve post")}>
@@ -146,63 +152,43 @@ export function TriageListItem(props: IProps) {
                             </LinkAsButton>
                         </span>
                     </ToolTip>
-                    <DropDown
-                        buttonType={ButtonTypes.ICON_COMPACT}
-                        flyoutType={FlyoutType.LIST}
-                        buttonContents={<Icon icon="navigation-circle-ellipsis" />}
+                </div>
+            </div>
+            <div className={classes.attachments}>
+                {(triageItem.attachments ?? []).length > 0 &&
+                    triageItem.attachments?.map((attachment) => (
+                        <ReadableIntegrationContextProvider
+                            key={attachment.attachmentID}
+                            attachmentType={attachment.attachmentType}
+                        >
+                            <DiscussionAttachment key={attachment.attachmentID} attachment={attachment} />
+                        </ReadableIntegrationContextProvider>
+                    ))}
+            </div>
+            <footer className={classes.footer}>
+                <div className={classes.actions}>
+                    <Button
+                        buttonType={ButtonTypes.TEXT}
+                        onClick={() => {
+                            // TODO: implement
+                        }}
                     >
-                        <DropDownSwitchButton
-                            label={isResolved ? t("Unresolve") : t("Resolve")}
-                            isLoading={resolveMutation.isLoading}
-                            onClick={() => {
-                                resolveMutation.mutate({
-                                    discussionID: triageItem.recordID,
-                                    internalStatusID: isResolved
-                                        ? TriageInternalStatus.UNRESOLVED
-                                        : TriageInternalStatus.RESOLVED,
-                                });
-                            }}
-                            status={isResolved}
-                        />
-                        <DropDownItemButton
+                        <Translate source={"Message <0/>"} c0={triageItem.recordUser?.name} />
+                    </Button>
+                    {!escalation ? (
+                        <Button
+                            buttonType={ButtonTypes.TEXT_PRIMARY}
                             onClick={() => {
                                 onEscalate(triageItem);
                             }}
                         >
                             {t("Escalate")}
-                        </DropDownItemButton>
-                        <DropDownItemSeparator />
-                        <DropDownItemButton onClick={(e) => null}>
-                            <Translate source={"Message <0/>"} c0={triageItem.recordUser?.name} />
-                        </DropDownItemButton>
-                        <DropDownItemSeparator />
-                        <DropDownItemButton
-                            onClick={() => {
-                                onEscalate(triageItem);
-                            }}
-                        >
-                            {t("Escalate and Assign")}
-                        </DropDownItemButton>
-                        <DropDownItemButton
-                            onClick={() => {
-                                onEscalate(triageItem);
-                            }}
-                        >
-                            {t("Escalate to Zendesk")}
-                        </DropDownItemButton>
-                    </DropDown>
-                </div>
-            </div>
-            <footer className={classes.footer}>
-                <div className={classes.actions}>
-                    <Button
-                        buttonType={ButtonTypes.TEXT_PRIMARY}
-                        onClick={() => {
-                            onEscalate(triageItem);
-                        }}
-                    >
-                        {t("Escalate")}
-                    </Button>
+                        </Button>
+                    ) : (
+                        <LinkAsButton buttonType={ButtonTypes.TEXT_PRIMARY} to={escalation.sourceUrl!}>
+                            {t("View Escalation")}
+                        </LinkAsButton>
+                    )}
                 </div>
             </footer>
         </div>

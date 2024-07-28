@@ -3,19 +3,18 @@
  * @license Proprietary
  */
 
-import { useEffect, useMemo } from "react";
 import { t } from "@vanilla/i18n";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
-import {
-    AutomationRuleFormValues,
-    AutomationRulesAdditionalDataQuery,
-} from "@dashboard/automationRules/AutomationRules.types";
+import { AutomationRuleFormValues } from "@dashboard/automationRules/AutomationRules.types";
 import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { TokenItem } from "@library/metas/TokenItem";
 import { ProfileFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import Message from "@library/messages/Message";
 import { Icon } from "@vanilla/icons";
+import { isTimeBasedTrigger } from "@dashboard/automationRules/AutomationRules.utils";
+import AutomationRulesSummaryQuery from "./AutomationRulesSummaryQuery";
+import Translate from "@library/content/Translate";
 
 interface IAutomationRulesSummaryProps {
     formValues: AutomationRuleFormValues;
@@ -27,16 +26,8 @@ interface IAutomationRulesSummaryProps {
 export default function AutomationRulesSummary(props: IAutomationRulesSummaryProps) {
     const { formValues, isEditing, isRuleRunning } = props;
     const classes = automationRulesClasses();
-    const {
-        automationRulesCatalog,
-        rolesByID,
-        profileFields,
-        tags,
-        collections,
-        categories,
-        ideaStatusesByID,
-        setAdditionalDataQuery,
-    } = useAutomationRules();
+    const { automationRulesCatalog, rolesByID, profileFields, tags, collections, categories, ideaStatusesByID } =
+        useAutomationRules();
 
     const isLoading = isEditing
         ? props.isLoading ||
@@ -50,24 +41,24 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
 
     const summaryMessages = {
         triggers: {
-            emailDomainTrigger: t("A user logs in or registers with email domain:"),
+            emailDomainTrigger: t("A user registers or logs in with email domain:"),
             profileFieldTrigger: t("A user registers or updates a profile field:"),
-            staleDiscussionTrigger: t("Time since last comment:"),
-            staleCollectionTrigger: t("A post was added to collection:"),
-            lastActiveDiscussionTrigger: t("A post was inactive since:"),
-            timeSinceUserRegistrationTrigger: t("A user has been registered for:"),
-            ideationVoteTrigger: t("An idea with"),
+            staleDiscussionTrigger: t("A post has not received any comments"),
+            staleCollectionTrigger: t("A post has been added to a collection"),
+            lastActiveDiscussionTrigger: t("A post has not had any activity"),
+            timeSinceUserRegistrationTrigger: t("A user has been registered"),
+            ideationVoteTrigger: t("An idea has received"),
         },
         actions: {
             addRemoveRoleAction: t("Assign role:"),
             categoryFollowAction: t("Follow categories:"),
-            closeDiscussionAction: t("Close the discussion"),
-            bumpDiscussionAction: t("Bump the discussion"),
+            closeDiscussionAction: t("Close the post"),
+            bumpDiscussionAction: t("Bump the post"),
             moveToCategoryAction: t("Move to category:"),
-            addTagAction: t("Add tag:"),
+            addTagAction: t("Add tags:"),
             addToCollectionAction: t("Add to collection:"),
             removeDiscussionFromCollectionAction: t("Remove from collection:"),
-            removeDiscussionFromTriggerCollectionAction: t("Remove from the collection"),
+            removeDiscussionFromTriggerCollectionAction: t("Remove from collection:"),
             changeIdeationStatusAction: t("Change the status of the idea to"),
         },
     };
@@ -114,50 +105,49 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
 
     const isEmailDomainTrigger = formValues.trigger?.triggerType === "emailDomainTrigger";
 
-    const isTimeDurationTriggerType = [
-        "staleDiscussionTrigger",
-        "staleCollectionTrigger",
-        "lastActiveDiscussionTrigger",
-        "timeSinceUserRegistrationTrigger",
-    ].includes(formValues.trigger?.triggerType ?? "");
-    const durationValue =
+    // time duration values
+    const isTimeDurationTriggerType = isTimeBasedTrigger(formValues.trigger?.triggerType, automationRulesCatalog);
+    const triggerDelayValue =
+        isTimeDurationTriggerType && !Number.isNaN(formValues.trigger?.triggerValue?.triggerTimeDelay?.length)
+            ? formValues.trigger?.triggerValue?.triggerTimeDelay?.length
+            : false;
+    const triggerDelayUnit = formValues.trigger?.triggerValue?.triggerTimeDelay?.unit;
+    const lookBackLimitValue =
         isTimeDurationTriggerType &&
-        formValues.trigger?.triggerValue?.triggerTimeThreshold?.toString().match(/^\d+$/) &&
-        formValues.trigger?.triggerValue?.triggerTimeThreshold;
-    const intervalValue = formValues.trigger?.triggerValue?.triggerTimeUnit;
+        !Number.isNaN(formValues.additionalSettings?.triggerValue?.triggerTimeLookBackLimit?.length)
+            ? formValues.additionalSettings?.triggerValue?.triggerTimeLookBackLimit?.length
+            : false;
+    const lookBackLimitUnit = formValues.additionalSettings?.triggerValue?.triggerTimeLookBackLimit?.unit;
 
-    // lets check if we should fetch new data
-    const additionalDataQuery = useMemo(() => {
-        const query: AutomationRulesAdditionalDataQuery = {};
-        if (categoryValue && categories) {
-            const newCategoriesToFetch = Array.isArray(categoryValue)
-                ? categoryValue.filter(
-                      (categoryID) => !categories.find((category) => category.categoryID === categoryID),
-                  )
-                : !categories.find((category) => category.categoryID === categoryValue)
-                ? [categoryValue]
-                : [];
-            query["categoriesQuery"] = { categoryID: newCategoriesToFetch };
-        }
-        if (tags && hasTagOrCollectionValue && formValues.action?.actionValue?.tagID) {
-            query["tagsQuery"] = {
-                tagID: formValues.action?.actionValue?.tagID.filter(
-                    (tagID) => !tags.find((tag) => tag.tagID === tagID),
-                ),
-            };
-        }
-        return query;
-    }, [categories, categoryValue, tags, formValues.action?.actionValue?.tagID]);
-
-    useEffect(() => {
-        if (
-            (additionalDataQuery.categoriesQuery?.categoryID &&
-                additionalDataQuery.categoriesQuery?.categoryID?.length > 0) ||
-            (additionalDataQuery.tagsQuery?.tagID && additionalDataQuery.tagsQuery?.tagID?.length > 0)
-        ) {
-            setAdditionalDataQuery?.(additionalDataQuery);
-        }
-    }, [additionalDataQuery]);
+    const valueAsTokenItem = (
+        value: string | number | string[] | number[],
+        valueSeparator: "or" | "and" = "and",
+        dataToLookUpForName?: any,
+        needleToLookUp?: string,
+    ) => {
+        return Array.isArray(value) ? (
+            value.map((val, index) => (
+                <span key={index}>
+                    {val !== "" && (
+                        <TokenItem className={classes.summaryValue}>
+                            {dataToLookUpForName
+                                ? dataToLookUpForName?.find((entry) => entry[needleToLookUp ?? ""] === val)?.name
+                                : val}
+                        </TokenItem>
+                    )}
+                    {value.length > 1 && index !== value.length - 1 && (
+                        <span className={classes.rightGap(4)}>{`${t(valueSeparator)} `}</span>
+                    )}
+                </span>
+            ))
+        ) : (
+            <TokenItem>
+                {dataToLookUpForName
+                    ? dataToLookUpForName?.find((entry) => entry[needleToLookUp ?? ""] === value)?.name
+                    : value}
+            </TokenItem>
+        );
+    };
 
     const summarySectionContent = (
         <>
@@ -168,79 +158,63 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
                         <span>{`${summaryMessages.triggers[formValues.trigger?.triggerType]} `}</span>
                         {isProfileFieldTrigger && (
                             <>
-                                {formValues.trigger?.triggerValue?.profileField && (
-                                    <TokenItem className={classes.bold}>
-                                        {
-                                            profileFields?.find(
-                                                (field) =>
-                                                    field.apiName === formValues.trigger?.triggerValue?.profileField,
-                                            )?.label
-                                        }
-                                    </TokenItem>
-                                )}
+                                {formValues.trigger?.triggerValue?.profileField &&
+                                    valueAsTokenItem(
+                                        profileFields?.find(
+                                            (field) => field.apiName === formValues.trigger?.triggerValue?.profileField,
+                                        )?.label ?? "",
+                                    )}
                                 {(Array.isArray(profileFieldValue)
                                     ? !!profileFieldValue.length
                                     : hasProfileFieldValue) && (
                                     <>
                                         <span>{` ${t("with")} `}</span>
-                                        {Array.isArray(profileFieldValue) ? (
-                                            profileFieldValue.map((value, index) => (
-                                                <TokenItem key={index} className={classes.summaryValue}>
-                                                    {value}
-                                                </TokenItem>
-                                            ))
-                                        ) : (
-                                            <TokenItem className={classes.summaryValue}>
-                                                {isProfileFieldValueCheckbox
-                                                    ? profileFieldValue
-                                                        ? t("Yes")
-                                                        : t("No")
-                                                    : profileFieldValue}
-                                            </TokenItem>
-                                        )}
+                                        {Array.isArray(profileFieldValue)
+                                            ? valueAsTokenItem(profileFieldValue, "or")
+                                            : valueAsTokenItem(
+                                                  isProfileFieldValueCheckbox
+                                                      ? profileFieldValue
+                                                          ? t("Yes")
+                                                          : t("No")
+                                                      : profileFieldValue,
+                                              )}
                                     </>
                                 )}
                             </>
                         )}
                         {isEmailDomainTrigger &&
                             formValues.trigger?.triggerValue?.emailDomain &&
-                            formValues.trigger?.triggerValue?.emailDomain.split(",").map((emailDomain, index) => (
-                                <TokenItem className={classes.summaryValue} key={index}>
-                                    {emailDomain.trim()}
-                                </TokenItem>
-                            ))}
-                        {hasTriggerCollectionValue && (
-                            <>
-                                {triggerCollectionValue.map((collectionID, index) => (
-                                    <TokenItem className={classes.summaryValue} key={index}>
-                                        {
-                                            collections?.find((collection) => collection.collectionID === collectionID)
-                                                ?.name
-                                        }
-                                    </TokenItem>
-                                ))}
-                                {`${t("since")} `}
-                            </>
-                        )}
+                            valueAsTokenItem(formValues.trigger?.triggerValue?.emailDomain.split(","), "or")}
                         {ideaScoreTriggerValue && (
                             <>
-                                <TokenItem className={classes.summaryValue}>{ideaScoreTriggerValue}</TokenItem>
-                                {ideaScoreTriggerValue === 1 ? `${t("vote")}` : `${t("votes")}`}
+                                {valueAsTokenItem(ideaScoreTriggerValue)}
+                                {ideaScoreTriggerValue == 1 ? ` ${t("upvote")}` : ` ${t("upvotes")}`}
                             </>
                         )}
-                        {isTimeDurationTriggerType && (
+                        {hasTriggerCollectionValue && (
+                            <>{valueAsTokenItem(triggerCollectionValue, "or", collections, "collectionID")}</>
+                        )}
+                        {triggerDelayValue && (
                             <>
-                                {durationValue && (
-                                    <TokenItem className={classes.summaryValue}>{durationValue}</TokenItem>
-                                )}
-                                {intervalValue && (
-                                    <TokenItem className={classes.bold}>
-                                        {durationValue && parseInt(durationValue) > 1
-                                            ? `${intervalValue}s`
-                                            : intervalValue}
-                                    </TokenItem>
+                                {`${t("for")}: `}
+                                <span className={classes.rightGap(4)}>{valueAsTokenItem(triggerDelayValue)}</span>
+                                {valueAsTokenItem(
+                                    triggerDelayValue > 1 ? t(`${triggerDelayUnit}s`) : t(triggerDelayUnit),
                                 )}
                             </>
+                        )}
+                        {lookBackLimitValue && !formValues.additionalSettings?.triggerValue?.applyToNewContentOnly && (
+                            <div>
+                                <Translate
+                                    source="Up to <0 /> ago."
+                                    c0={
+                                        <span>
+                                            {lookBackLimitValue}{" "}
+                                            {lookBackLimitValue > 1 ? t(`${lookBackLimitUnit}s`) : t(lookBackLimitUnit)}
+                                        </span>
+                                    }
+                                />
+                            </div>
                         )}
                     </div>
                 )}
@@ -253,72 +227,31 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
                     <div>
                         <div className={classes.summaryTitle}>{`${t("Action")}: `}</div>
                         <span>{`${summaryMessages.actions[formValues.action?.actionType]} `}</span>
-                        <span className={classes.bold}>
-                            {hasRoleValues && formValues.action?.actionValue?.addRoleID && (
-                                <TokenItem className={classes.summaryValue}>
-                                    {rolesByID[formValues.action?.actionValue?.addRoleID]?.name}
-                                </TokenItem>
-                            )}
+                        <span>
+                            {hasRoleValues &&
+                                formValues.action?.actionValue?.addRoleID &&
+                                valueAsTokenItem(rolesByID[formValues.action?.actionValue?.addRoleID]?.name)}
                             {hasRoleValues && formValues.action?.actionValue?.removeRoleID && (
                                 <>
-                                    <span className={classes.normalFontWeight}>{`${t("and remove role")}: `}</span>
-                                    <TokenItem className={classes.summaryValue}>
-                                        {rolesByID[formValues.action?.actionValue?.removeRoleID]?.name}
-                                    </TokenItem>
+                                    <span className={classes.normalFontWeight}>{` ${t("and remove role")}: `}</span>
+                                    {valueAsTokenItem(rolesByID[formValues.action?.actionValue?.removeRoleID]?.name)}
                                 </>
                             )}
                             {hasTagOrCollectionValue && (
                                 <>
                                     {formValues.action?.actionType === "addTagAction" &&
-                                        tagValue.map((tagID, index) => (
-                                            <TokenItem className={classes.summaryValue} key={index}>
-                                                {tags?.find((tag) => tag.tagID === tagID)?.name}
-                                            </TokenItem>
-                                        ))}
+                                        valueAsTokenItem(tagValue, "and", tags, "tagID")}
                                     {["addToCollectionAction", "removeDiscussionFromCollectionAction"].includes(
                                         formValues.action?.actionType ?? "",
-                                    ) &&
-                                        collectionValue.map((collectionID, index) => (
-                                            <TokenItem className={classes.summaryValue} key={index}>
-                                                {
-                                                    collections?.find(
-                                                        (collection) => collection.collectionID === collectionID,
-                                                    )?.name
-                                                }
-                                            </TokenItem>
-                                        ))}
+                                    ) && valueAsTokenItem(collectionValue, "and", collections, "collectionID")}
                                 </>
                             )}
-                            {hasCategoryValues && categories && (
-                                <>
-                                    {Array.isArray(categoryValue) ? (
-                                        (categoryValue ?? []).map((categoryID, index) => {
-                                            const categoryName = categories.find(
-                                                (category) => category.categoryID === categoryID,
-                                            )?.name;
-                                            if (categoryName) {
-                                                return (
-                                                    <TokenItem className={classes.summaryValue} key={index}>
-                                                        {categoryName}
-                                                    </TokenItem>
-                                                );
-                                            }
-                                        })
-                                    ) : (
-                                        <TokenItem className={classes.bold}>
-                                            {
-                                                categories?.find((category) => category.categoryID === categoryValue)
-                                                    ?.name
-                                            }
-                                        </TokenItem>
-                                    )}
-                                </>
-                            )}
-                            {ideaStatusActionValue && ideaStatusesByID && (
-                                <TokenItem className={classes.summaryValue}>
-                                    {ideaStatusesByID[ideaStatusActionValue]}
-                                </TokenItem>
-                            )}
+                            {hasCategoryValues &&
+                                categories &&
+                                valueAsTokenItem(categoryValue, "and", categories, "categoryID")}
+                            {ideaStatusActionValue &&
+                                ideaStatusesByID &&
+                                valueAsTokenItem(ideaStatusesByID[ideaStatusActionValue])}
                         </span>
                     </div>
                 )}
@@ -329,6 +262,8 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
         </>
     );
 
+    const shouldCheckAdditionalQuery = (categories && categoryValue) || (tags && tagValue);
+
     return isLoading ? (
         <>
             <LoadingRectangle height={20} width={350} className={classes.verticalGap} />
@@ -336,6 +271,14 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
         </>
     ) : (
         <>
+            {shouldCheckAdditionalQuery && (
+                <AutomationRulesSummaryQuery
+                    categories={categories}
+                    tags={tags}
+                    categoryValue={categoryValue}
+                    tagValue={tagValue}
+                />
+            )}
             {isEditing && isRuleRunning && (
                 <Message
                     type="warning"

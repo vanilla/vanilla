@@ -55,7 +55,8 @@ export class CommunityManagementFixture {
             name: "Spam",
             description: `This post violates ${reason?.name || "spam"} rules.`,
             sort: 0,
-            visibility: "public",
+            countReports: 5,
+            deleted: false,
             ...reason,
         };
     }

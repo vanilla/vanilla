@@ -65,10 +65,15 @@ class MoveDiscussionToCategoryActionTest extends SiteTestCase
             "trigger" => [
                 "triggerType" => StaleDiscussionTrigger::getType(),
                 "triggerValue" => [
-                    "maxTimeThreshold" => 12,
-                    "maxTimeUnit" => "day",
-                    "triggerTimeThreshold" => 6,
-                    "triggerTimeUnit" => "day",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 12,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 6,
+                        "unit" => "day",
+                    ],
                     "postType" => ["discussion"],
                 ],
             ],

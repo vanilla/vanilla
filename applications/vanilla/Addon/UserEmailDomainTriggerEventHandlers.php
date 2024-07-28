@@ -71,8 +71,7 @@ class UserEmailDomainTriggerEventHandlers implements PsrEventHandlersInterface
     {
         $ruleCount = $this->automationRuleModel->getTotalAutomationRulesByTriggerActionStatus(
             $this->triggerType,
-            $actionType,
-            AutomationRuleModel::STATUS_ACTIVE
+            $actionType
         );
 
         if (!$ruleCount && DebugUtils::isTestMode()) {
@@ -163,7 +162,8 @@ class UserEmailDomainTriggerEventHandlers implements PsrEventHandlersInterface
      */
     private function processUserEmailDomainTrigger(int $userID, string $email)
     {
-        foreach ($this->actionTypes as $actionType) {
+        foreach ($this->actionTypes as $action) {
+            $actionType = $action::getType();
             if (!$this->isActionAvailableForExecution($actionType)) {
                 continue;
             }

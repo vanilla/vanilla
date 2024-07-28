@@ -73,6 +73,7 @@ interface ITextBoxControl extends ICommonControl {
     max?: React.InputHTMLAttributes<HTMLInputElement>["max"];
     minLength?: React.InputHTMLAttributes<HTMLInputElement>["minLength"];
     maxLength?: React.InputHTMLAttributes<HTMLInputElement>["maxLength"];
+    pattern?: React.InputHTMLAttributes<HTMLInputElement>["pattern"];
 }
 
 interface ICodeBoxControl extends ICommonControl {
@@ -107,6 +108,11 @@ export interface IDatePickerControl extends ICommonControl {
     inputType: "datePicker";
     min?: React.InputHTMLAttributes<HTMLInputElement>["min"];
     max?: React.InputHTMLAttributes<HTMLInputElement>["max"];
+}
+
+export interface IDurationPickerControl extends ICommonControl {
+    inputType: "timeDuration";
+    supportedUnits?: string[];
 }
 
 export interface IDateRangeControl extends ICommonControl {
@@ -149,6 +155,7 @@ export type IFormControl =
     | IUploadControl
     | IDatePickerControl
     | IDateRangeControl
+    | IDurationPickerControl
     | IDragAndDropControl
     | IEmptyControl
     | IModalControl

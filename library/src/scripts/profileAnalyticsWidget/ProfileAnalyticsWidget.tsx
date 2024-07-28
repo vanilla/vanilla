@@ -44,7 +44,7 @@ export function ProfileAnalyticsWidget(props: IUserAnalyticsProps) {
                 <div className={classes.link}>
                     <SmartLink to={`/analytics/v2/dashboards/drilldown/user?userID=${userID}`} target={"_blank"}>
                         {t("Check Analytics Data")}
-                        <Icon icon="meta-external" />
+                        <Icon icon="meta-external-compact" />
                     </SmartLink>
                 </div>
             );

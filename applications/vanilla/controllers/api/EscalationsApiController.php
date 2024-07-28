@@ -16,6 +16,7 @@ use Vanilla\Forum\Models\CommunityManagement\CommunityManagementRecordModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
+use Vanilla\Forum\Models\VanillaEscalationAttachmentProvider;
 use Vanilla\Models\Model;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\SchemaUtils;
@@ -53,7 +54,7 @@ class EscalationsApiController extends \AbstractApiController
                 "type" => "array",
                 "items" => [
                     "type" => "string",
-                    "enum" => EscalationModel::STATUSES,
+                    "enum" => $this->escalationsModel->getStatusIDs(),
                 ],
                 "style" => "form",
                 "x-filter" => true,
@@ -71,7 +72,7 @@ class EscalationsApiController extends \AbstractApiController
                 "type" => "array",
                 "items" => [
                     "type" => "string",
-                    "enum" => $this->reportReasonModel->getAvailableReasonIDs(),
+                    "enum" => $this->reportReasonModel->getPermissionAvailableReasonIDs(),
                 ],
                 "style" => "form",
                 "x-filter" => true,
@@ -146,7 +147,7 @@ class EscalationsApiController extends \AbstractApiController
                 "default" => true,
             ],
             "status:s?" => [
-                "enum" => EscalationModel::STATUSES,
+                "enum" => $this->escalationsModel->getStatusIDs(),
             ],
         ]);
 
@@ -195,6 +196,9 @@ class EscalationsApiController extends \AbstractApiController
         }
 
         $result = $this->getEscalation($escalationID);
+        $attachmentProvider = \Gdn::getContainer()->get(VanillaEscalationAttachmentProvider::class);
+        $attachmentProvider->createAttachmentFromEscalation($result);
+
         return $result;
     }
 
@@ -214,7 +218,7 @@ class EscalationsApiController extends \AbstractApiController
             "name:s?",
             "assignedUserID:i|n?",
             "status:s?" => [
-                "enum" => EscalationModel::STATUSES,
+                "enum" => $this->escalationsModel->getStatusIDs(),
             ],
         ]);
 

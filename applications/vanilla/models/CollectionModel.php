@@ -17,6 +17,7 @@ use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
 use UserModel;
 use Gdn_Session;
+use Garden\Schema\Invalid;
 
 /**
  * A model for handling collection
@@ -443,6 +444,27 @@ class CollectionModel extends PipelineModel
         }
 
         return $valid;
+    }
+
+    /**
+     * Validate if the collection name is unique
+     *
+     * @param int|null $collectionID
+     */
+    public function validateCollectionName(?int $collectionID = null): \Closure
+    {
+        return function (string $collectionName, ValidationField $field) use ($collectionID) {
+            $where = ["name" => $collectionName];
+            if (!empty($collectionID)) {
+                $where["collectionID <>"] = $collectionID;
+            }
+            $count = $this->createSql()->getCount(self::TABLE_NAME, $where);
+            if ($count > 0) {
+                $field->addError("A collection with the name $collectionName already exists.", ["status" => 400]);
+                return Invalid::value();
+            }
+            return $collectionName;
+        };
     }
 
     /**

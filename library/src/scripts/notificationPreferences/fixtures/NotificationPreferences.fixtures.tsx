@@ -11,7 +11,6 @@ import {
     NotificationPreferencesSchemaType,
 } from "@library/notificationPreferences";
 import { JSONSchemaType } from "@vanilla/json-schema-forms";
-import { fn } from "@storybook/test";
 
 const preferenceSchema: JSONSchemaType<INotificationPreference> = {
     type: "object",
@@ -112,11 +111,14 @@ export const mockPreferences: INotificationPreferences = {
     },
 };
 
-export function createMockApi(): INotificationPreferencesApi {
+export function createMockApi(preferences?: INotificationPreferences): INotificationPreferencesApi {
     return {
-        getSchema: fn().mockReturnValue(mockSchema),
-        getUserPreferences: fn().mockReturnValue(mockPreferences),
-        patchUserPreferences: fn(async function (params) {
+        getSchema: vitest.fn().mockReturnValue(mockSchema),
+        getUserPreferences: vitest.fn().mockReturnValue({
+            ...mockPreferences,
+            ...preferences,
+        }),
+        patchUserPreferences: vitest.fn(async function (params) {
             return {
                 ...params.preferences,
             };

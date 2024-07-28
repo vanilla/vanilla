@@ -401,4 +401,73 @@ class EscalationsTest extends SiteTestCase
         $actualEscalationIDs = array_column($escalations, "escalationID");
         $this->assertEquals($expectedEscalationIDs, $actualEscalationIDs, "Did not find expected escalations.");
     }
+
+    /**
+     * Test creation and refeshing of attachments.
+     *
+     * @return void
+     */
+    public function testEscalationAttachment(): void
+    {
+        $date = CurrentTimeStamp::mockTime("2024-01-01");
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createReport($discussion, ["reportReasonIDs" => ["spam"]]);
+        $escalation = $this->createEscalation($discussion, [
+            "reportReasonIDs" => ["spam", "abuse"],
+        ]);
+
+        $discussion = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}", [
+                "expand" => "attachments",
+            ])
+            ->getBody();
+
+        $this->assertCount(1, $discussion["attachments"]);
+
+        $attachment = $discussion["attachments"][0];
+        $expectedMeta = [
+            [
+                "labelCode" => "Name",
+                "value" => "This is an escalation",
+            ],
+            [
+                "labelCode" => "# Reports",
+                "value" => 2,
+            ],
+            [
+                "labelCode" => "Last Reported",
+                "value" => $date->format(\DateTime::RFC3339_EXTENDED),
+                "format" => "date-time",
+            ],
+            [
+                "labelCode" => "Report Reasons",
+                "value" => ["Spam", "Abuse"],
+            ],
+            [
+                "labelCode" => "Last Modified",
+                "value" => $date->format(\DateTime::RFC3339_EXTENDED),
+                "format" => "date-time",
+            ],
+        ];
+        $this->assertSame($expectedMeta, $attachment["metadata"]);
+        $this->assertEquals("open", $attachment["status"]);
+        $this->api()->patch("/escalations/{$escalation["escalationID"]}", [
+            "status" => "in-progress",
+        ]);
+
+        // We can refresh attachments too.
+        $this->api()->post("/attachments/refresh", [
+            "attachmentIDs" => [$attachment["attachmentID"]],
+        ]);
+
+        $discussion = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}", [
+                "expand" => "attachments",
+            ])
+            ->getBody();
+
+        $attachment = $discussion["attachments"][0];
+        $this->assertEquals("in-progress", $attachment["status"]);
+    }
 }

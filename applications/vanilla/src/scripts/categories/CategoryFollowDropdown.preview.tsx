@@ -6,7 +6,7 @@
 
 import { Widget } from "@library/layout/Widget";
 import { getMeta } from "@library/utility/appUtils";
-import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
+import CategoryFollowDropDown from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import React from "react";
 
 interface IProps extends React.ComponentProps<typeof CategoryFollowDropDown> {}
@@ -22,7 +22,7 @@ export function CategoryFollowWidgetPreview(props: IProps) {
                 categoryID={-10}
                 categoryName={"General"}
                 emailDigestEnabled={emailEnabled}
-                emailEnabled={emailEnabled}
+                notificationPreferences={{} as any}
                 // For preview
                 preview
                 // Style overrides

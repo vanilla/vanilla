@@ -57,8 +57,9 @@ export const mockRecipesList: IAutomationRule[] = [
             triggerType: "staleDiscussionTrigger",
             triggerName: "trigger2Name",
             triggerValue: {
-                triggerTimeThreshold: "1",
-                triggerTimeUnit: "day",
+                applyToNewContentOnly: false,
+                triggerTimeDelay: { length: 4, unit: "hour" },
+                triggerTimeLookBackLimit: { length: 2, unit: "day" },
                 postType: ["discussion"],
             },
         },
@@ -144,8 +145,7 @@ export const mockRecipesList: IAutomationRule[] = [
             triggerType: "staleDiscussionTrigger",
             triggerName: "trigger5Name",
             triggerValue: {
-                duration: "2",
-                interval: "hour",
+                triggerTimeDelay: { length: 1, unit: "day" },
                 postType: ["discussion", "question"],
             },
         },
@@ -194,71 +194,67 @@ export const mockDispatches: IAutomationRuleDispatch[] = [
     },
 ];
 
-const timeInputsSchemaProperties = {
-    maxTimeThreshold: {
-        type: "integer",
-        minimum: 1,
-        step: 1,
+const triggerDelaySchemaProperties = {
+    triggerTimeDelay: {
+        type: "object",
         "x-control": {
-            description: "Any data older than this will be excluded from triggering the rule.",
-            label: "Max Time Threshold",
-            inputType: "textBox",
+            description: "Set the duration after which the rule will trigger.  Whole numbers only.",
+            label: "Trigger Delay",
+            inputType: "timeDuration",
             placeholder: "",
-            type: "number",
-            tooltip: "",
+            tooltip:
+                "Set the duration something needs to exist and meet the rule criteria for prior to the the rule triggering and acting upon it",
+            supportedUnits: ["hour", "day", "week", "year"],
+        },
+        properties: {
+            length: {
+                type: "string",
+            },
+            unit: {
+                type: "string",
+            },
         },
     },
-    maxTimeUnit: {
-        type: "string",
-        enum: ["hour", "day", "week", "year"],
-        "x-control": {
-            description: "Select the time unit.",
-            label: "Max Time Unit",
-            inputType: "dropDown",
-            placeholder: "",
-            choices: {
-                staticOptions: {
-                    hour: "Hour",
-                    day: "Day",
-                    week: "Week",
-                    year: "Year",
+};
+
+const additionalSettingsSchemaProperties = {
+    additionalSettings: {
+        applyToNewContentOnly: {
+            type: "boolean",
+            default: false,
+            "x-control": {
+                description:
+                    "When enabled, this rule will only be applied to new content that meets the trigger criteria.",
+                label: "Apply to new content only",
+                inputType: "checkBox",
+                labelType: "none",
+            },
+        },
+        triggerTimeLookBackLimit: {
+            type: "object",
+            "x-control": {
+                description: "Do not apply the rule to content that is older than this.",
+                label: "Look-back Limit",
+                inputType: "timeDuration",
+                placeholder: "",
+                tooltip: "",
+                supportedUnits: ["hour", "day", "week", "year"],
+                conditions: [
+                    {
+                        field: "additionalSettings.triggerValue.applyToNewContentOnly",
+                        type: "boolean",
+                        const: false,
+                    },
+                ],
+            },
+            properties: {
+                length: {
+                    type: "string",
+                },
+                unit: {
+                    type: "string",
                 },
             },
-            multiple: false,
-            tooltip: "",
-        },
-    },
-    triggerTimeThreshold: {
-        type: "integer",
-        minimum: 1,
-        step: 1,
-        "x-control": {
-            description: "Set the duration after which the rule will trigger.",
-            label: "Trigger Time Threshold",
-            inputType: "textBox",
-            placeholder: "",
-            type: "number",
-            tooltip: "",
-        },
-    },
-    triggerTimeUnit: {
-        type: "string",
-        enum: ["hour", "day", "week", "year"],
-        "x-control": {
-            description: "Select the time unit.",
-            label: "Trigger Time Unit",
-            inputType: "dropDown",
-            placeholder: "",
-            choices: {
-                staticOptions: {
-                    hour: "Hour",
-                    day: "Day",
-                    week: "Week",
-                    year: "Year",
-                },
-            },
-            multiple: false,
-            tooltip: "",
         },
     },
 };
@@ -332,7 +328,7 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             schema: {
                 type: "object",
                 properties: {
-                    ...timeInputsSchemaProperties,
+                    ...triggerDelaySchemaProperties,
                     postType: {
                         type: "array",
                         items: {
@@ -355,8 +351,9 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                             tooltip: "",
                         },
                     },
+                    ...additionalSettingsSchemaProperties,
                 },
-                required: ["maxTimeThreshold", "maxTimeUnit", "triggerTimeThreshold", "triggerTimeUnit", "postType"],
+                required: ["triggerTimeDelay", "postType"],
             },
         },
         lastActiveDiscussionTrigger: {
@@ -373,7 +370,7 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             schema: {
                 type: "object",
                 properties: {
-                    ...timeInputsSchemaProperties,
+                    ...triggerDelaySchemaProperties,
                     postType: {
                         type: "array",
                         items: {
@@ -396,8 +393,9 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                             tooltip: "",
                         },
                     },
+                    ...additionalSettingsSchemaProperties,
                 },
-                required: ["maxTimeThreshold", "maxTimeUnit", "triggerTimeThreshold", "triggerTimeUnit", "postType"],
+                required: ["triggerTimeDelay", "postType"],
             },
         },
         staleCollectionTrigger: {
@@ -406,8 +404,8 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             triggerActions: ["removeDiscussionFromTriggerCollectionAction"],
             schema: {
                 type: "object",
-                properties: timeInputsSchemaProperties,
-                required: ["maxTimeThreshold", "maxTimeUnit", "triggerTimeThreshold", "triggerTimeUnit"],
+                properties: triggerDelaySchemaProperties,
+                required: ["triggerTimeDelay"],
             },
         },
         timeSinceUserRegistrationTrigger: {
@@ -416,8 +414,8 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             triggerActions: ["addRemoveRoleAction"],
             schema: {
                 type: "object",
-                properties: timeInputsSchemaProperties,
-                required: ["maxTimeThreshold", "maxTimeUnit", "triggerTimeThreshold", "triggerTimeUnit"],
+                properties: triggerDelaySchemaProperties,
+                required: ["triggerTimeDelay"],
             },
         },
         ideationVoteTrigger: {

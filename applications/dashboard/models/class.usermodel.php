@@ -18,9 +18,11 @@ use Garden\Web\Exception\ForbiddenException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Events\PasswordResetEmailSentEvent;
 use Vanilla\Dashboard\Events\PasswordResetUserNotFoundEvent;
+use Vanilla\Dashboard\Activity\ApplicantActivity;
 use Vanilla\Dashboard\Events\UserEvent;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
@@ -28,7 +30,6 @@ use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Dashboard\Events\UserPointEvent;
 use Vanilla\Dashboard\Events\UserRoleModificationEvent;
-use Vanilla\Dashboard\Events\UserRoleRemoveEvent;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Dashboard\Models\UserFragment;
@@ -141,6 +142,7 @@ class UserModel extends Gdn_Model implements
     public const OPT_FORCE_SYNC = "forceSync";
     public const OPT_TRUSTED_PROVIDER = "trustedProvider";
     public const OPT_NO_CONFIRM_EMAIL = "NoConfirmEmail";
+    public const OPT_SSO_REGISTRATION = "SSORegistration";
     public const OPT_FIX_UNIQUE = "FixUnique";
     public const OPT_SAVE_ROLES = "SaveRoles";
     public const OPT_VALIDATE_NAME = "ValidateName";
@@ -925,7 +927,19 @@ class UserModel extends Gdn_Model implements
      */
     public static function requireConfirmEmail()
     {
-        return c("Garden.Registration.ConfirmEmail") && !self::noEmail();
+        return (Gdn::config("Garden.Registration.ConfirmEmail") ||
+            Gdn::config("Garden.Registration.SSOConfirmEmail")) &&
+            !self::noEmail();
+    }
+
+    /**
+     * Whether or not the application requires email confirmation.
+     *
+     * @return bool
+     */
+    public static function requireSSOConfirmEmail()
+    {
+        return c("Garden.Registration.SSOConfirmEmail") && !self::noEmail();
     }
 
     /**
@@ -1292,6 +1306,7 @@ class UserModel extends Gdn_Model implements
         }
 
         $result = $this->save($newUser, [
+            self::OPT_SSO_REGISTRATION => true,
             self::OPT_NO_CONFIRM_EMAIL => true,
             self::OPT_FIX_UNIQUE => true,
             self::OPT_SAVE_ROLES => isset($newUser["RoleID"]),
@@ -1319,6 +1334,7 @@ class UserModel extends Gdn_Model implements
 
         $options += [
             self::OPT_CHECK_CAPTCHA => false,
+            self::OPT_SSO_REGISTRATION => true,
             self::OPT_NO_CONFIRM_EMAIL => isset($userData["Email"]) || !UserModel::requireConfirmEmail(),
             self::OPT_NO_ACTIVITY => true,
             self::OPT_SYNC_EXISTING => true,
@@ -1496,7 +1512,10 @@ class UserModel extends Gdn_Model implements
         unset($fields["Roles"]);
 
         // Massage the roles for email confirmation.
-        if (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $options)) {
+        if (
+            (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $options)) ||
+            (self::requireSSOConfirmEmail() && val(self::OPT_SSO_REGISTRATION, $options))
+        ) {
             $confirmRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
 
             if (!empty($confirmRoleIDs)) {
@@ -3180,7 +3199,10 @@ class UserModel extends Gdn_Model implements
             }
 
             // Check for email confirmation.
-            if (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $settings)) {
+            if (
+                (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $settings)) ||
+                (self::requireSSOConfirmEmail() && val(self::OPT_SSO_REGISTRATION, $settings))
+            ) {
                 $emailIsSet = isset($fields["Email"]);
                 $emailIsNotConfirmed = array_key_exists("Confirmed", $fields) && $fields["Confirmed"] == 0;
                 $validSession = $this->session->isValid();
@@ -3965,8 +3987,10 @@ class UserModel extends Gdn_Model implements
         $removedRoles = array_diff($oldRoles, $newRoles);
         $newRoles = array_diff($newRoles, $oldRoles);
 
-        $auditEvent = new UserRoleModificationEvent($user->Name, $user->UserID, $newRoles, $removedRoles);
-        AuditLogger::log($auditEvent);
+        if (!empty($removedRoles) || !empty($newRoles)) {
+            $auditEvent = new UserRoleModificationEvent($user->Name, $user->UserID, $newRoles, $removedRoles);
+            AuditLogger::log($auditEvent);
+        }
     }
 
     /**
@@ -4721,38 +4745,40 @@ class UserModel extends Gdn_Model implements
      *
      * @param int $userID
      * @param string $username
+     * @throws Exception
      */
-    public function triggerApplicantNotification($userID = 0, $username = "")
+    public function triggerApplicantNotification($userID = 0, $username = ""): void
     {
-        if ($userID > 0 && !empty($username)) {
-            // Notification text
-            $label = t("NewApplicantEmail", "New applicant:");
-            $story = anchor(Gdn_Format::text($label . " " . $username), externalUrl("dashboard/user/applicants"));
-
-            try {
-                $data = Gdn::database()
-                    ->sql()
-                    ->getWhere("UserMeta", ["Name" => "Preferences.Email.Applicant"])
-                    ->resultArray();
-                $activityModel = new ActivityModel();
-                foreach ($data as $row) {
-                    $activityModel->add(
-                        $userID,
-                        "Applicant",
-                        $story,
-                        $row["UserID"],
-                        "",
-                        "/dashboard/user/applicants",
-                        "Only"
-                    );
-                }
-            } catch (Exception $ex) {
-                $this->logger->error($ex->getMessage(), [
-                    Logger::FIELD_EVENT => "applicant_notification_failure",
-                    "exception" => $ex,
-                ]);
-            }
+        if ($userID <= 0 || empty($username)) {
+            return;
         }
+
+        if ($username == "") {
+            $username = t("Unknown");
+        }
+
+        $activity = [
+            "ActivityType" => ApplicantActivity::getActivityTypeID(),
+            "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
+            "ActivityUserID" => $userID,
+            "HeadlineFormat" => sprintf(ApplicantActivity::getProfileHeadline(), $username),
+            "PluralHeadlineFormat" => sprintf(ApplicantActivity::getPluralHeadline(), $username),
+            "RecordType" => "user",
+            "RecordID" => $userID,
+            "Route" => "/dashboard/user/applicants",
+            "Data" => [
+                "userID" => $userID,
+                "name" => $username,
+                "Reason" => ApplicantActivity::getActivityReason(),
+            ],
+        ];
+        $notificationGenerator = Gdn::getContainer()->get(PermissionNotificationGenerator::class);
+
+        // Kludge to set the session of the user as the one of the applicant for the longrunner.
+        $sessionUser = $this->session->UserID;
+        $this->session->UserID = $userID;
+        $notificationGenerator->notify($activity, "Garden.Users.Approve", "Applicant");
+        $this->session->UserID = $sessionUser;
     }
 
     /**

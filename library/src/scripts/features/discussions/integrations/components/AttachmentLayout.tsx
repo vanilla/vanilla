@@ -18,6 +18,8 @@ import { IUserFragment } from "@library/@types/api/users";
 import { t } from "@vanilla/i18n";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { cx } from "@emotion/css";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+import { TokenItem } from "@library/metas/TokenItem";
 
 export interface IAttachmentLayoutProps {
     icon?: React.ReactNode;
@@ -79,7 +81,7 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                                 <div className={classes.detailValue}>
                                     <SmartLink to={url} className={classes.externalLink}>
                                         <strong>{id}</strong>
-                                        <Icon className={classes.externalIcon} icon="meta-external" size="default" />
+                                        <Icon className={classes.externalIcon} icon="meta-external-compact" />
                                     </SmartLink>
                                 </div>
                             </div>
@@ -90,25 +92,57 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                     {(metadata ?? [])?.map((detail, index) => {
                         let valueContents: React.ReactNode = detail.value;
 
-                        if (detail.format === "date-time") {
-                            valueContents = (
-                                <DateTime
-                                    timestamp={detail.value.toString()}
-                                    mode="fixed"
-                                    type={DateFormats.EXTENDED}
-                                />
-                            );
+                        switch (detail.format) {
+                            case "user":
+                                valueContents = (
+                                    <ProfileLink
+                                        className={classes.userMetaValue}
+                                        userFragment={detail.userFragment}
+                                        isUserCard
+                                    >
+                                        <UserPhoto userInfo={detail.userFragment} size={UserPhotoSize.XSMALL} />
+                                        <span>{detail.userFragment.name}</span>
+                                    </ProfileLink>
+                                );
+                                break;
+                            case "date-time":
+                                valueContents = (
+                                    <DateTime
+                                        timestamp={detail.value.toString()}
+                                        mode="fixed"
+                                        type={DateFormats.EXTENDED}
+                                    />
+                                );
+                                break;
+                            default:
+                                valueContents = detail.value;
                         }
 
-                        if (detail.labelCode)
+                        if (detail.labelCode) {
                             if (detail.url) {
                                 valueContents = (
                                     <SmartLink to={detail.url} className={classes.detailLink}>
                                         {valueContents}
-                                        <Icon className={classes.externalIcon} icon="meta-external" size="default" />
+                                        <Icon
+                                            className={classes.externalIcon}
+                                            icon="meta-external-compact"
+                                            size="default"
+                                        />
                                     </SmartLink>
                                 );
                             }
+                        }
+
+                        if (Array.isArray(detail.value)) {
+                            valueContents = (
+                                <div className={classes.tokens}>
+                                    {detail.value.map((listItem: string, index) => (
+                                        <TokenItem key={`${listItem}${index}`}>{listItem}</TokenItem>
+                                    ))}
+                                </div>
+                            );
+                        }
+
                         return (
                             <div key={index} className={classes.detailItem}>
                                 <div className={classes.detailLabel}>{t(detail.labelCode)}</div>

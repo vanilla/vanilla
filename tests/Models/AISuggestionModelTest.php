@@ -12,7 +12,10 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Utility\ArrayUtils;
+use VanillaTests\ExpectedNotification;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\NotificationsApiTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -23,6 +26,7 @@ class AISuggestionModelTest extends SiteTestCase
 {
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
+    use NotificationsApiTestTrait;
 
     public static $addons = ["qna"];
 
@@ -30,21 +34,24 @@ class AISuggestionModelTest extends SiteTestCase
 
     private AiSuggestionSourceService $suggestionSourceService;
 
+    private array $assistantUser;
+
     /**
      * Instantiate fixtures.
      */
     public function setUp(): void
     {
         parent::setUp();
-        $this->createUser();
+        $assistantUser = $this->createUser();
         \Gdn::config()->saveToConfig([
             "Feature.AISuggestions.Enabled" => true,
             "aiSuggestions" => [
                 "enabled" => true,
-                "userID" => $this->lastUserID,
+                "userID" => $assistantUser["userID"],
                 "sources" => ["mockSuggestion" => ["enabled" => true]],
             ],
         ]);
+        $this->assistantUser = $assistantUser;
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->suggestionSourceService = $this->container()->get(AiSuggestionSourceService::class);
     }
@@ -216,5 +223,45 @@ class AISuggestionModelTest extends SiteTestCase
         $this->assertSame($suggestions[0]["hidden"], false);
         $this->assertSame($suggestions[1]["hidden"], false);
         $this->assertSame($suggestions[2]["hidden"], false);
+    }
+
+    /**
+     * Tests that notifications are sent after suggestions are generated.
+     *
+     * @return void
+     */
+    public function testNotificationsAfterSuggestionsGenerated()
+    {
+        $user = $this->createUser();
+        $this->runWithUser(function () {
+            $discussion = $this->createDiscussion(["type" => "question"]);
+            $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+            $suggestions = $newDiscussion["Attributes"]["suggestions"];
+            $this->assertCount(3, $suggestions);
+        }, $user);
+
+        $this->assertUserHasNotificationsLike($user, [
+            new ExpectedNotification("Default", [$this->assistantUser["name"], "has suggested answers: check it out"]),
+        ]);
+        $this->assertUserHasNoEmails($user);
+    }
+
+    /**
+     * Provides test coverage for suggestions notification preferences and checks that e-mail is not available.
+     *
+     * @return void
+     */
+    public function testSuggestionsNotificationPreferences()
+    {
+        $schema = $this->api()
+            ->get("/notification-preferences/schema")
+            ->getBody();
+
+        $notificationPreferences = ArrayUtils::getByPath(
+            "properties.notifications.properties.followedPosts.properties.AiSuggestions.properties",
+            $schema
+        );
+        $this->assertArrayNotHasKey("email", $notificationPreferences);
+        $this->assertArrayHasKey("popup", $notificationPreferences);
     }
 }

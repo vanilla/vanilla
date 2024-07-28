@@ -19,6 +19,8 @@ import { ListItemLayout } from "@library/lists/ListItem.variables";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { t } from "@vanilla/i18n";
+import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
+import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 
 interface IProps {
     discussion?: IDiscussion;
@@ -39,13 +41,27 @@ export function PostDetail(props: IProps) {
                             url={discussion.url}
                             truncateDescription={false}
                             description={
-                                <ConditionalWrap
-                                    condition={!!props.truncatePost}
-                                    component={CollapsableContent}
-                                    componentProps={{ maxHeight: 80 }}
-                                >
-                                    <UserContent content={discussion.body ?? ""} />
-                                </ConditionalWrap>
+                                <>
+                                    <ConditionalWrap
+                                        condition={!!props.truncatePost}
+                                        component={CollapsableContent}
+                                        componentProps={{ maxHeight: 80 }}
+                                    >
+                                        <UserContent content={discussion.body ?? ""} />
+                                    </ConditionalWrap>
+                                    {(discussion.attachments ?? []).length > 0 &&
+                                        discussion.attachments?.map((attachment) => (
+                                            <ReadableIntegrationContextProvider
+                                                key={attachment.attachmentID}
+                                                attachmentType={attachment.attachmentType}
+                                            >
+                                                <DiscussionAttachment
+                                                    key={attachment.attachmentID}
+                                                    attachment={attachment}
+                                                />
+                                            </ReadableIntegrationContextProvider>
+                                        ))}
+                                </>
                             }
                             metas={
                                 <DiscussionListItemMeta

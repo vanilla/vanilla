@@ -29,6 +29,7 @@ import { IFormGroupProps } from "@vanilla/ui";
 import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/AutoCompleteLookupOptions";
 import isEmpty from "lodash-es/isEmpty";
 import React from "react";
+import { DashboardDurationPicker } from "@dashboard/forms/DashboardDurationPicker";
 
 interface IControlOverride<T = ICommonControl> {
     /** This boolean controls if the associated component (in callback) should be rendered */
@@ -89,8 +90,10 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                 type: !isMultiline ? type : undefined,
                 placeholder: control.placeholder,
                 multiline: isMultiline ? true : false,
+                className: isMultiline ? dashboardClasses().multiLineInput : undefined,
                 inputID: control.inputID,
                 "aria-label": control.inputAriaLabel,
+                pattern: control.pattern,
                 ...(typeIsNumber && {
                     min: schema.minimum ?? schema.min,
                     max: schema.maximum ?? schema.max,
@@ -255,6 +258,17 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     disabled={props.disabled}
                     placeholder={control.placeholder}
                     inputAriaLabel={control.inputAriaLabel || control.label}
+                />
+            );
+        }
+        case "timeDuration": {
+            return (
+                <DashboardDurationPicker
+                    value={value}
+                    onChange={onChange}
+                    errors={fieldErrors}
+                    supportedUnits={control.supportedUnits}
+                    disabled={props.disabled}
                 />
             );
         }

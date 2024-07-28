@@ -7,6 +7,8 @@
 
 namespace Vanilla\Dashboard\Events;
 
+use Vanilla\Exception\PermissionException;
+use Vanilla\Logging\AuditLogger;
 use Vanilla\Logging\BasicAuditLogEvent;
 
 /**
@@ -39,5 +41,30 @@ class AccessDeniedEvent extends BasicAuditLogEvent
     public static function formatAuditMessage(string $eventType, array $context, array $meta): string
     {
         return "User denied access because they lack one or more permissions";
+    }
+
+    /**
+     * Try to log an exception as an access denied.
+     *
+     * @param \Throwable $throwable
+     * @return void
+     * @throws \Exception
+     */
+    public static function tryLog(\Throwable $throwable): void
+    {
+        $auditEx = $throwable;
+        if ($auditEx instanceof \Gdn_UserException && $auditEx->getPrevious() instanceof PermissionException) {
+            $auditEx = $auditEx->getPrevious();
+        }
+
+        if (
+            $auditEx instanceof PermissionException &&
+            // Only log permission exceptions if the user is logged in.
+            $auditEx->getPermission() !== "Garden.SignIn.Allow" &&
+            \Gdn::session()->isValid()
+        ) {
+            $event = new AccessDeniedEvent($auditEx->getPermission());
+            AuditLogger::log($event);
+        }
     }
 }

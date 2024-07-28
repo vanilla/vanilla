@@ -12,7 +12,6 @@ import { ReportStatus } from "@dashboard/moderation/components/ReportFilters.con
 import { ReportListItem } from "@dashboard/moderation/components/ReportListItem";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
@@ -27,6 +26,7 @@ import { useCollisionDetector } from "@vanilla/react-utils";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { Sort } from "@library/sort/Sort";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { EmptyState } from "@dashboard/moderation/components/EmptyState";
 
 const defaultFilterValues = {
     statuses: [ReportStatus.NEW],
@@ -127,7 +127,7 @@ export function ReportsPage() {
                     />
                 }
                 content={
-                    <AttachmentIntegrationsContextProvider>
+                    <>
                         <section className={cmdClasses.secondaryTitleBar}>
                             <span>
                                 <Sort
@@ -151,9 +151,7 @@ export function ReportsPage() {
                                 </div>
                             )}
                             {reports.isSuccess && reports.data.results.length === 0 && (
-                                <div>
-                                    <p>{t("All reports are handled! 😀")}</p>
-                                </div>
+                                <EmptyState subtext={t("Reports matching your filters will appear here")} />
                             )}
                             {reports.isSuccess && (
                                 <div className={cmdClasses.list}>
@@ -181,7 +179,7 @@ export function ReportsPage() {
                                 setReportToEscalate(null);
                             }}
                         />
-                    </AttachmentIntegrationsContextProvider>
+                    </>
                 }
             />
         </>

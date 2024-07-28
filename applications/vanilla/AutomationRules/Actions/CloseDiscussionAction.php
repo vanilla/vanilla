@@ -13,9 +13,10 @@ use Garden\Schema\Schema;
 use Gdn;
 use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
 use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Exception\Database\NoResultsException;
 
-class CloseDiscussionAction extends AutomationAction implements AutomationActionInterface
+class CloseDiscussionAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
@@ -31,7 +32,15 @@ class CloseDiscussionAction extends AutomationAction implements AutomationAction
      */
     public static function getName(): string
     {
-        return "Close the discussion";
+        return "Close post";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -60,7 +69,7 @@ class CloseDiscussionAction extends AutomationAction implements AutomationAction
      */
     public static function getTriggers(): array
     {
-        return [StaleDiscussionTrigger::getType(), LastActiveDiscussionTrigger::getType()];
+        return DiscussionRuleDataType::getTriggers();
     }
 
     /**

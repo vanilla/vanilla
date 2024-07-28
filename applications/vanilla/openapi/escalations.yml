@@ -224,6 +224,10 @@ components:
                 name:
                     description: Title of the escalation.
                     type: string
+                url:
+                    description: HTML url of the escalation.
+                    type: string
+                    format: uri
                 status:
                     type: string
                     description: Status of the escalation.

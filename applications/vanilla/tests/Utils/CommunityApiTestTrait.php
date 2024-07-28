@@ -86,6 +86,17 @@ trait CommunityApiTestTrait
             TestCase::fail("Could not determine recordType and recordID from post data.");
         }
 
+        if (isset($overrides["reportReasonIDs"])) {
+            // In case someone passed a full reason array.
+            $overrides["reportReasonIDs"] = array_map(function (mixed $reportReasonID) {
+                if (is_array($reportReasonID) && isset($reportReasonID["reportReasonID"])) {
+                    return $reportReasonID["reportReasonID"];
+                } else {
+                    return $reportReasonID;
+                }
+            }, $overrides["reportReasonIDs"]);
+        }
+
         $defaults = [
             "recordType" => $recordType,
             "recordID" => $recordID,
@@ -100,6 +111,31 @@ trait CommunityApiTestTrait
         $report = $response->getBody();
         $this->lastReportID = $report["reportID"];
         return $report;
+    }
+
+    /**
+     * Create a report reason and return it.
+     *
+     * @param array $overrides
+     *
+     * @return array
+     */
+    public function createReportReason(array $overrides = []): array
+    {
+        $name = "customReason" . VanillaTestCase::id("reason");
+
+        $defaults = [
+            "reportReasonID" => $name,
+            "name" => $name,
+            "description" => "This is a description of reason {$name}",
+        ];
+
+        $body = $overrides + $defaults;
+
+        $response = $this->api()->post("/report-reasons", $body);
+        TestCase::assertEquals(201, $response->getStatusCode());
+
+        return $response->getBody();
     }
 
     /**
@@ -472,6 +508,15 @@ trait CommunityApiTestTrait
         return $response->getBody();
     }
 
+    /**
+     * Mock an attachment on a post.
+     *
+     * @param string $recordType
+     * @param int $recordID
+     * @return array|object
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
     public function createAttachment(string $recordType, int $recordID)
     {
         $recordType = strtolower($recordType);
@@ -564,5 +609,16 @@ trait CommunityApiTestTrait
     private function generateCollectionSalt(): string
     {
         return "-" . round(microtime(true) * 1000) . rand(1, 1000);
+    }
+
+    /**
+     * Return a mocked rich body.
+     *
+     * @param string $content
+     * @return string
+     */
+    public static function richBody(string $content): string
+    {
+        return "[{\"type\":\"p\",\"children\":[{\"text\":\"{$content}\"}]}]";
     }
 }

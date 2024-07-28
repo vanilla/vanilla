@@ -279,6 +279,7 @@ class SettingsController extends DashboardController
                 return "$name $value";
             }
         }
+        return [];
     }
 
     /**
@@ -623,6 +624,21 @@ class SettingsController extends DashboardController
         $this->setHighlightRoute("dashboard/settings/preferences");
         $this->title(t("User Preferences"));
         $this->render();
+    }
+
+    /**
+     * Community Management Dashboard Settings
+     */
+    public function communityManagement()
+    {
+        $this->permission(["Garden.Settings.Manage"], false);
+        $this->setHighlightRoute("dashboard/settings/community-management");
+        $this->title(t("Community Management"));
+        if (Gdn::config("Feature.CommunityManagement.Enabled")) {
+            $this->render("community-management");
+        } else {
+            $this->renderException(notFoundException());
+        }
     }
 
     /**
@@ -1498,6 +1514,7 @@ class SettingsController extends DashboardController
             "Garden.Registration.InviteExpiration",
             "Garden.Registration.InviteTarget",
             "Garden.Registration.ConfirmEmail",
+            "Garden.Registration.SSOConfirmEmail",
         ];
         $configurationModel->setField($registrationOptions);
 
@@ -1527,7 +1544,8 @@ class SettingsController extends DashboardController
 
             if (
                 $this->data("ConfirmationSupported") === false &&
-                $this->Form->getValue("Garden.Registration.ConfirmEmail")
+                ($this->Form->getValue("Garden.Registration.ConfirmEmail") ||
+                    $this->Form->getValue("Garden.Registration.SSOConfirmEmail"))
             ) {
                 $this->Form->addError('A role with default type "unconfirmed" is required to use email confirmation.');
             }

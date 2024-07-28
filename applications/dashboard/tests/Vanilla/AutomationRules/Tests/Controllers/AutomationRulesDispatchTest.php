@@ -200,10 +200,14 @@ class AutomationRulesDispatchTest extends AbstractAPIv2Test
         $trigger2 = [
             "type" => StaleDiscussionTrigger::getType(),
             "value" => [
-                "maxTimeThreshold" => 1,
-                "maxTimeUnit" => "week",
-                "triggerTimeThreshold" => 1,
-                "triggerTimeUnit" => "day",
+                "triggerTimeLookBackLimit" => [
+                    "length" => 1,
+                    "unit" => "week",
+                ],
+                "triggerTimeDelay" => [
+                    "length" => 1,
+                    "unit" => "day",
+                ],
             ],
         ];
         $action2 = ["type" => BumpDiscussionAction::getType(), "value" => []];
@@ -334,10 +338,15 @@ class AutomationRulesDispatchTest extends AbstractAPIv2Test
         $trigger = [
             "type" => LastActiveDiscussionTrigger::getType(),
             "value" => [
-                "maxTimeThreshold" => 5,
-                "maxTimeUnit" => "day",
-                "triggerTimeThreshold" => 4,
-                "triggerTimeUnit" => "day",
+                "applyToNewContentOnly" => false,
+                "triggerTimeLookBackLimit" => [
+                    "length" => 5,
+                    "unit" => "day",
+                ],
+                "triggerTimeDelay" => [
+                    "length" => 4,
+                    "unit" => "day",
+                ],
                 "postType" => ["discussion"],
             ],
         ];

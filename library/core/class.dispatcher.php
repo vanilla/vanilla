@@ -22,6 +22,7 @@ use Vanilla\AddonManager;
 use Vanilla\Analytics\Models\OpenAIPrompt;
 use Vanilla\Analytics\Models\OpenAIPrompter;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Events\AccessDeniedEvent;
 use Vanilla\Exception\ExitException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\DebugUtils;
@@ -1042,6 +1043,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable
                 exit();
             }
         } catch (Throwable $ex) {
+            AccessDeniedEvent::tryLog($ex);
+
             $dispatcherExceptionEvent = new DispatcherExceptionEvent($ex, $request);
             $this->eventManager->dispatch($dispatcherExceptionEvent);
             if ($this->rethrowExceptions) {

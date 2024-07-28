@@ -17,8 +17,22 @@ export const discussionThreadClasses = useThemeCache(() => {
         marginInlineEnd: 4,
     });
 
+    const reportsTag = css({
+        flexShrink: 0,
+        inlineMarginStart: 4,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 4,
+        padding: "4px inherit",
+        "& svg": {
+            transform: "translateY(-1%)",
+        },
+    });
+
     return {
         closedTag,
         resolved,
+        reportsTag,
     };
 });

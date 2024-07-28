@@ -25,6 +25,7 @@ import { useCollisionDetector } from "@vanilla/react-utils";
 import { useState } from "react";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { EscalationFilters, IEscalationFilters } from "@dashboard/moderation/components/EscalationFilters";
+import { EmptyState } from "@dashboard/moderation/components/EmptyState";
 
 interface IProps {}
 
@@ -144,9 +145,7 @@ function EscalationsPage(props: IProps) {
                             </div>
                         )}
                         {escalationsQuery.isSuccess && escalationsQuery.data.results.length === 0 && (
-                            <div>
-                                <p>{t("All escalations are handled! 😀")}</p>
-                            </div>
+                            <EmptyState subtext={t("Escalations matching your filters will appear here")} />
                         )}
                         {escalationsQuery.isSuccess && (
                             <div className={cmdClasses.list}>

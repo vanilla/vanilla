@@ -13,6 +13,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
 use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
@@ -21,7 +22,7 @@ use Vanilla\Logger;
 use Vanilla\Models\CollectionModel;
 use Gdn;
 
-class AddDiscussionToCollectionAction extends AutomationAction implements AutomationActionInterface
+class AddDiscussionToCollectionAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
@@ -38,6 +39,14 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Automa
     public static function getName(): string
     {
         return "Add to collection";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -68,7 +77,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Automa
      */
     public static function getTriggers(): array
     {
-        return [StaleDiscussionTrigger::getType(), LastActiveDiscussionTrigger::getType()];
+        return DiscussionRuleDataType::getTriggers();
     }
 
     /**

@@ -366,7 +366,7 @@ class CollectionsApiController extends \AbstractApiController
     public function patch(int $collectionID, array $body): Data
     {
         $this->permission("community.manage");
-        $in = $this->patchSchema();
+        $in = $this->patchSchema($collectionID);
         $body = $in->validate($body);
 
         $collectionRecord = $this->collectionModel->select(["collectionID" => $collectionID]);
@@ -391,17 +391,20 @@ class CollectionsApiController extends \AbstractApiController
                 "maxItems" => 30,
                 "items" => $this->collectionRecordSchema(),
             ],
-        ])->addValidator("records", [$this->collectionModel, "validateCollectionRecords"]);
+        ])
+            ->addValidator("records", [$this->collectionModel, "validateCollectionRecords"])
+            ->addValidator("name", $this->collectionModel->validateCollectionName());
     }
 
     /**
      * @return Schema
      */
-    private function patchSchema(): Schema
+    private function patchSchema(int $collectionID): Schema
     {
         return Schema::parse(["name?", "records?"])
             ->add($this->postSchema())
-            ->addValidator("records", [$this->collectionModel, "validateCollectionRecords"]);
+            ->addValidator("records", [$this->collectionModel, "validateCollectionRecords"])
+            ->addValidator("name", $this->collectionModel->validateCollectionName($collectionID));
     }
 
     /**

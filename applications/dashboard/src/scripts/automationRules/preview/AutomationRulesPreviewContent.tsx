@@ -30,23 +30,27 @@ interface IProps {
 
 export function AutomationRulesPreviewContent(props: IProps) {
     const { schema } = props;
-    const formValues = mapFormValuesToApiValues(props.formValues);
+    const apiValues = mapFormValuesToApiValues(props.formValues);
 
     let query: IGetUsersQueryParams | IGetDiscussionListParams | IGetCollectionResourcesParams = {};
     let rulePreviewContentType: AutomationRulePreviewContentType = "users";
 
     // for time based triggers
-    const maxTimeThreshold = formValues.trigger?.triggerValue?.maxTimeThreshold;
-    const maxTimeUnit = formValues.trigger?.triggerValue?.maxTimeUnit;
-    const triggerTimeThreshold = formValues.trigger?.triggerValue?.triggerTimeThreshold;
-    const triggerTimeUnit = formValues.trigger?.triggerValue?.triggerTimeUnit;
+    const lookBackTimeLength = apiValues.trigger?.triggerValue?.triggerTimeLookBackLimit?.length;
+    const lookBackTimeUnit = apiValues.trigger?.triggerValue?.triggerTimeLookBackLimit?.unit;
+    const triggerDelayLength = apiValues.trigger?.triggerValue?.triggerTimeDelay?.length;
+    const triggerDelayUnit = apiValues.trigger?.triggerValue?.triggerTimeDelay?.unit;
 
+    const shouldConsiderOffsetTime = !apiValues.trigger?.triggerValue.applyToNewContentOnly;
     const offsetTime =
-        maxTimeThreshold && maxTimeUnit && convertTimeIntervalToApiValues(parseInt(maxTimeThreshold), maxTimeUnit);
+        shouldConsiderOffsetTime &&
+        lookBackTimeLength &&
+        lookBackTimeUnit &&
+        convertTimeIntervalToApiValues(parseInt(lookBackTimeLength), lookBackTimeUnit);
     const triggerTime =
-        triggerTimeThreshold &&
-        triggerTimeUnit &&
-        convertTimeIntervalToApiValues(parseInt(triggerTimeThreshold), triggerTimeUnit);
+        triggerDelayLength &&
+        triggerDelayUnit &&
+        convertTimeIntervalToApiValues(parseInt(triggerDelayLength), triggerDelayUnit);
 
     const dateValueForAPI =
         triggerTime &&
@@ -57,19 +61,19 @@ export function AutomationRulesPreviewContent(props: IProps) {
               })
             : triggerTime.toUTCString().replace(/,/g, ""));
 
-    switch (formValues.trigger?.triggerType) {
+    switch (apiValues.trigger?.triggerType) {
         case "profileFieldTrigger":
-            const profileFieldApiKey = Object.keys(formValues.trigger?.triggerValue?.profileField || {})[0];
-            const profileFieldValue = formValues.trigger?.triggerValue?.profileField?.[profileFieldApiKey];
+            const profileFieldApiKey = Object.keys(apiValues.trigger?.triggerValue?.profileField || {})[0];
+            const profileFieldValue = apiValues.trigger?.triggerValue?.profileField?.[profileFieldApiKey];
             query = {
                 sort: "name",
-                ...(profileFieldValue && { profileFields: formValues.trigger?.triggerValue?.profileField }),
+                ...(profileFieldValue && { profileFields: apiValues.trigger?.triggerValue?.profileField }),
             };
             break;
         case "emailDomainTrigger":
             const emailDomainValue =
-                formValues.trigger?.triggerValue?.emailDomain &&
-                formValues.trigger?.triggerValue?.emailDomain.split(",").map((domain) => domain.trim());
+                apiValues.trigger?.triggerValue?.emailDomain &&
+                apiValues.trigger?.triggerValue?.emailDomain.split(",").map((domain) => domain.trim());
 
             query = {
                 ...(!!emailDomainValue?.length && {
@@ -90,22 +94,22 @@ export function AutomationRulesPreviewContent(props: IProps) {
 
             query = {
                 limit: 30,
-                type: formValues.trigger?.triggerValue.postType,
-                ...(formValues.trigger?.triggerType === "staleDiscussionTrigger" && {
+                type: apiValues.trigger?.triggerValue.postType,
+                ...(apiValues.trigger?.triggerType === "staleDiscussionTrigger" && {
                     hasComments: false,
                     dateInserted: dateValueForAPI,
                 }),
-                ...(formValues.trigger?.triggerType === "lastActiveDiscussionTrigger" && {
+                ...(apiValues.trigger?.triggerType === "lastActiveDiscussionTrigger" && {
                     dateLastComment: dateValueForAPI,
                 }),
-                ...(formValues.trigger?.triggerType === "ideationVoteTrigger" &&
-                    formValues.trigger?.triggerValue?.score && {
+                ...(apiValues.trigger?.triggerType === "ideationVoteTrigger" &&
+                    apiValues.trigger?.triggerValue?.score && {
                         type: "idea",
-                        score: formValues.trigger?.triggerValue?.score,
+                        score: apiValues.trigger?.triggerValue?.score,
                     }),
-                ...(formValues.trigger?.triggerType === "staleCollectionTrigger" &&
-                    formValues.trigger?.triggerValue?.collectionID.length && {
-                        collectionID: formValues.trigger?.triggerValue?.collectionID,
+                ...(apiValues.trigger?.triggerType === "staleCollectionTrigger" &&
+                    apiValues.trigger?.triggerValue?.collectionID.length && {
+                        collectionID: apiValues.trigger?.triggerValue?.collectionID,
                         dateAddedToCollection: dateValueForAPI,
                     }),
             };
@@ -115,11 +119,11 @@ export function AutomationRulesPreviewContent(props: IProps) {
     // reset the query to empty if we did not set required fields for the trigger
     if (
         schema &&
-        (!formValues.trigger?.triggerType ||
+        (!apiValues.trigger?.triggerType ||
             (schema.properties?.trigger?.properties?.triggerValue?.required ?? []).some((requiredField) => {
-                return Array.isArray(formValues.trigger?.triggerValue[requiredField])
-                    ? formValues.trigger?.triggerValue[requiredField].length === 0
-                    : !formValues.trigger?.triggerValue[requiredField];
+                return Array.isArray(apiValues.trigger?.triggerValue[requiredField])
+                    ? apiValues.trigger?.triggerValue[requiredField].length === 0
+                    : !apiValues.trigger?.triggerValue[requiredField];
             }))
     ) {
         query = {};
@@ -137,7 +141,7 @@ export function AutomationRulesPreviewContent(props: IProps) {
             ) : rulePreviewContentType === "users" ? (
                 <AutomationRulesPreviewUsersContent query={query as IGetUsersQueryParams} {...commonProps} />
             ) : rulePreviewContentType === "posts" ? (
-                formValues.trigger?.triggerType === "staleCollectionTrigger" ? (
+                apiValues.trigger?.triggerType === "staleCollectionTrigger" ? (
                     <AutomationRulesPreviewCollectionRecordsContent query={query as IGetCollectionResourcesParams} />
                 ) : (
                     <AutomationRulesPreviewPostsContent query={query as IGetDiscussionListParams} {...commonProps} />

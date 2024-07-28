@@ -30,6 +30,7 @@ import { ReactQueryContext } from "@library/ReactQueryContext";
 import { SiteSectionContextProvider } from "./utility/SiteSectionContext";
 import { ReduxCurrentUserContextProvider } from "./features/users/userHooks";
 import { ReduxThemeContextProvider } from "./theming/Theme.context";
+import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 
 interface IProps {
     children: React.ReactNode;
@@ -96,6 +97,7 @@ export function AppContext(props: IProps) {
             DeviceProvider,
             ToastProvider,
             DiscussionCheckboxProvider,
+            AttachmentIntegrationsContextProvider,
         ],
         props.children,
     );

@@ -10,6 +10,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 const wrap = true;
 
@@ -34,6 +35,8 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         ...(wrap && {
             flexWrap: "wrap",
         }),
+        // Prevent odd border radius overlap.
+        overflow: "hidden",
     });
 
     const logoSection = css({
@@ -178,6 +181,25 @@ const AttachmentLayoutClasses = useThemeCache(() => {
 
     const detailValue = css({});
 
+    const userMetaValue = css({
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        gap: 4,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium"),
+        }),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.darkText),
+        ...Mixins.linkDecoration(),
+    });
+
+    const tokens = css({
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 4,
+    });
+
     return {
         root,
         logoSection,
@@ -198,6 +220,8 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         detailLabel,
         detailLink,
         detailValue,
+        userMetaValue,
+        tokens,
     };
 });
 

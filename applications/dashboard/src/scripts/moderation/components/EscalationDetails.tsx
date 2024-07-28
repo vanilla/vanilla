@@ -13,6 +13,7 @@ import { ReportRecordMeta } from "@dashboard/moderation/components/ReportRecordM
 import { css } from "@emotion/css";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
+import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { PageBoxContextProvider } from "@library/layout/PageBox.context";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { List } from "@library/lists/List";
@@ -23,6 +24,7 @@ import Notice from "@library/metas/Notice";
 import BackLink from "@library/routing/links/BackLink";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { CommentThreadItem } from "@vanilla/addon-vanilla/thread/CommentThreadItem";
+import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 import { t } from "@vanilla/i18n";
 
@@ -76,6 +78,20 @@ export function EscalationDetails(props: IProps) {
                     </PageBoxContextProvider>
                 </ListItemContext.Provider>
             </section>
+            {(escalation.attachments ?? []).length > 0 && (
+                <section className={classes.section}>
+                    <DashboardFormSubheading>{t("Attachments")}</DashboardFormSubheading>
+
+                    {escalation.attachments?.map((attachment) => (
+                        <ReadableIntegrationContextProvider
+                            key={attachment.attachmentID}
+                            attachmentType={attachment.attachmentType}
+                        >
+                            <DiscussionAttachment key={attachment.attachmentID} attachment={attachment} />
+                        </ReadableIntegrationContextProvider>
+                    ))}
+                </section>
+            )}
             <section className={classes.section}>
                 <DashboardFormSubheading>{t("Reports")}</DashboardFormSubheading>
                 <CompactReportList reports={reports} />

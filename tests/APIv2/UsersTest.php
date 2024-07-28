@@ -857,6 +857,7 @@ class UsersTest extends AbstractResourceTest
         $configuration = static::container()->get("Config");
         $configuration->set("Garden.Registration.Method", "Basic");
         $configuration->set("Garden.Registration.ConfirmEmail", false);
+        $configuration->set("Garden.Registration.SSOConfirmEmail", false);
         $configuration->set("Garden.Registration.SkipCaptcha", true);
         $configuration->set("Garden.Email.Disabled", true);
 
@@ -875,6 +876,7 @@ class UsersTest extends AbstractResourceTest
         $configuration = static::container()->get("Config");
         $configuration->set("Garden.Registration.Method", "Basic");
         $configuration->set("Garden.Registration.ConfirmEmail", false);
+        $configuration->set("Garden.Registration.SSOConfirmEmail", false);
         $configuration->set("Garden.Registration.SkipCaptcha", true);
         $configuration->set("Garden.Email.Disabled", true);
 
@@ -965,6 +967,7 @@ class UsersTest extends AbstractResourceTest
         $configuration = static::container()->get("Config");
         $configuration->set("Garden.Registration.Method", "Invitation");
         $configuration->set("Garden.Registration.ConfirmEmail", false);
+        $configuration->set("Garden.Registration.SSOConfirmEmail", false);
         $configuration->set("Garden.Registration.SkipCaptcha", true);
         $configuration->set("Garden.Email.Disabled", true);
 

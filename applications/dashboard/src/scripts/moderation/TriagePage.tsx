@@ -10,7 +10,6 @@ import { ITriageRecord } from "@dashboard/moderation/CommunityManagementTypes";
 import { TriageListItem } from "@dashboard/moderation/components/TriageListItem";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
@@ -27,6 +26,7 @@ import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerMod
 import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { EmptyState } from "@dashboard/moderation/components/EmptyState";
 
 interface IProps {}
 
@@ -114,7 +114,7 @@ function TriagePage(props: IProps) {
             leftPanel={!isCompact && <ModerationNav />}
             rightPanel={<TriageFilters value={filters} onFilter={(newFilters) => handleFilterSet(newFilters)} />}
             content={
-                <AttachmentIntegrationsContextProvider>
+                <>
                     <section className={cmdClasses.secondaryTitleBar}>
                         <span>
                             <Sort
@@ -141,9 +141,7 @@ function TriagePage(props: IProps) {
                             </div>
                         )}
                         {triageQuery.isSuccess && triageQuery.data.results.length === 0 && (
-                            <div>
-                                <p>{t("All reports are handled! 😀")}</p>
-                            </div>
+                            <EmptyState subtext={t("New posts matching your filters will appear here")} />
                         )}
                         {triageQuery.isSuccess && (
                             <div className={cmdClasses.list}>
@@ -168,7 +166,7 @@ function TriagePage(props: IProps) {
                             setRecordToEscalate(null);
                         }}
                     />
-                </AttachmentIntegrationsContextProvider>
+                </>
             }
         />
     );

@@ -769,6 +769,7 @@ class CommentModel extends Gdn_Model implements
             "reactions?" => $this->reactionModel->getReactionSummaryFragment(),
             "attachments:a?" =>
                 "Attachments associated with this comment. Requires the 'Garden.Staff.Allow' permission.",
+            "countReports:i?",
         ]);
         return $result;
     }

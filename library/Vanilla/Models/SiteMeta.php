@@ -16,6 +16,7 @@ use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Search\SearchService;
 use Vanilla\Site\OwnSite;
@@ -166,7 +167,8 @@ class SiteMeta implements \JsonSerializable
         UserModel $userModel,
         AddonManager $addonManager,
         OwnSite $site,
-        RoleTokenFactory $roleTokenFactory
+        RoleTokenFactory $roleTokenFactory,
+        private EscalationModel $escalationModel
     ) {
         $this->request = $request;
         $this->siteSectionModel = $siteSectionModel;

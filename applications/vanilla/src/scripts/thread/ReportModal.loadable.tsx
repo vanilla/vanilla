@@ -79,7 +79,7 @@ export default function ReportModalLoadable(props: IProps) {
     const { discussion: isNewDiscussionThreadPage } = useDiscussionThreadContext();
 
     // Moderators have extra options in this modal
-    const isModerator = hasPermission("moderation.manage");
+    const isModerator = hasPermission("community.manage");
 
     const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
     const [escalateImmediately, setEscalateImmediately] = useState(false);
@@ -91,7 +91,7 @@ export default function ReportModalLoadable(props: IProps) {
     // Get report reasons
     const reportReasons = useQuery<any, IError, IReportReason[]>({
         queryFn: async () => {
-            const response = await apiv2.get(`/reports/reasons`);
+            const response = await apiv2.get(`/report-reasons`);
             return response.data;
         },
         queryKey: ["reportReasons"],

@@ -7,6 +7,9 @@
 
 namespace Vanilla\Dashboard\Addon;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Gdn;
 use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Vanilla\Dashboard\AutomationRules\Triggers\ProfileFieldSelectionTrigger;
@@ -18,18 +21,13 @@ abstract class AbstractProfileFieldEventHandler
 {
     protected string $actionType;
     protected string $triggerType;
-
     protected LoggerInterface $log;
-    protected AutomationRuleService $automationRuleService;
 
-    protected AutomationRuleModel $automationRuleModel;
-    public function __construct(
-        AutomationRuleService $automationRuleService,
-        AutomationRuleModel $automationRuleModel,
-        LoggerInterface $log
-    ) {
-        $this->automationRuleService = $automationRuleService;
-        $this->automationRuleModel = $automationRuleModel;
+    /**
+     * D.I.
+     */
+    public function __construct(LoggerInterface $log)
+    {
         $this->log = $log;
         $this->triggerType = ProfileFieldSelectionTrigger::getType();
         $this->actionType = ""; // override the action type in the child class
@@ -43,7 +41,7 @@ abstract class AbstractProfileFieldEventHandler
     protected function isActionAvailableForExecution(): bool
     {
         if (
-            !$this->automationRuleModel->getTotalAutomationRulesByTriggerActionStatus(
+            !$this->getAutomaticRuleModel()->getTotalAutomationRulesByTriggerActionStatus(
                 $this->triggerType,
                 $this->actionType
             )
@@ -119,7 +117,7 @@ abstract class AbstractProfileFieldEventHandler
         if (!$this->isActionAvailableForExecution()) {
             return;
         }
-        $activeAutomationRules = $this->automationRuleModel->getActiveAutomationRules(
+        $activeAutomationRules = $this->getAutomaticRuleModel()->getActiveAutomationRules(
             $this->triggerType,
             $this->actionType
         );
@@ -152,12 +150,36 @@ abstract class AbstractProfileFieldEventHandler
      */
     protected function executeAction(int $automationRuleID, int $userID)
     {
-        $action = $this->automationRuleService->getAction($this->actionType);
+        $action = $this->getAutomaticRuleService()->getAction($this->actionType);
         if (!$action) {
             return;
         }
         $triggerAction = new $action($automationRuleID);
         $triggerAction->setUserID($userID);
         $triggerAction->execute();
+    }
+
+    /**
+     * Return the AutomationRuleService object from the container to make sure it has been initialized properly.
+     *
+     * @return AutomationRuleService
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
+    protected function getAutomaticRuleService(): AutomationRuleService
+    {
+        return Gdn::getContainer()->get(AutomationRuleService::class);
+    }
+
+    /**
+     * Return the AutomationRuleModel object from the container to make sure it has been initialized properly.
+     *
+     * @return AutomationRuleModel
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
+    protected function getAutomaticRuleModel(): AutomationRuleModel
+    {
+        return Gdn::getContainer()->get(AutomationRuleModel::class);
     }
 }

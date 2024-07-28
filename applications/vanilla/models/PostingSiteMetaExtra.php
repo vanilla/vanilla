@@ -7,22 +7,20 @@
 
 namespace Vanilla\Forum\Models;
 
+use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
+
 /**
  * Class for adding extra site meta related to posting settings.
  */
 class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
 {
-    /** @var \Vanilla\Contracts\ConfigurationInterface */
-    protected $config;
-
     /**
      * DI.
-     *
-     * @param \Vanilla\Contracts\ConfigurationInterface $config
      */
-    public function __construct(\Vanilla\Contracts\ConfigurationInterface $config)
-    {
-        $this->config = $config;
+    public function __construct(
+        private \Vanilla\Contracts\ConfigurationInterface $config,
+        private EscalationModel $escalationModel
+    ) {
     }
 
     /**
@@ -56,6 +54,9 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
             "trustedDomains" => $trustedDomains,
             "disableUrlEmbeds" => $disableUrlEmbeds,
             "postTypes" => $postTypes,
+            "escalation" => [
+                "statuses" => $this->escalationModel->getStatuses(),
+            ],
         ];
     }
 }

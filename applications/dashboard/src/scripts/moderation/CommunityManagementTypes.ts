@@ -65,8 +65,8 @@ interface IPostReport {
 }
 
 /**
- * GET /api/v2/reports/reasons
- * GET /api/v2/reports/reasons/:reasonID
+ * GET /api/v2/report-reasons
+ * GET /api/v2/report-reasons/:reasonID
  */
 export interface IReason {
     reportReasonJunctionID: number;
@@ -76,10 +76,17 @@ export interface IReason {
     description: string;
     sort: number;
     // Check post.moderate permission on the category.
-    visibility: "public" | "moderator";
+    deleted: boolean;
+    roleIDs?: number[];
+    roles?: Array<{ name: string; roleID: number }>;
+    countReports: number;
+}
+export interface IReasonPostPatch {
+    reason: Partial<IReason>;
+    reportReasonID?: IReason["reportReasonID"];
 }
 
-// Sorting Reasons PUT /api/v2/reports/reasons/sort
+// Sorting Reasons PUT /api/v2/report-reasons/sort
 
 /**
  * POST /api/v2/reports/dismiss
@@ -97,13 +104,13 @@ export type IDismissReport = {
 );
 
 /**
- * POST /api/v2/reports/reasons
- * PATCH /api/v2/reports/reasons/:reportReasonID
+ * POST /api/v2/report-reasons
+ * PATCH /api/v2/report-reasons/:reportReasonID
  */
 interface IPostReason {
     name: string;
     description: string;
-    visibility: IReason["visibility"];
+    roleIDs?: number[];
 }
 
 /**
@@ -128,6 +135,7 @@ export interface ITriageRecord extends ICommunityManagementRecord {
     reportUsers: IUserFragment[];
     recordStatus?: IRecordStatus;
     recordInternalStatus?: IRecordStatus;
+    attachments?: IAttachment[];
 }
 
 interface IRemovePost {
@@ -221,4 +229,8 @@ export enum EscalationStatus {
     ON_HOLD = "on-hold",
     EXTERNAL_ZENDESK = "external-zendesk",
     DONE = "done",
+}
+
+export interface PutReportReasonParams {
+    [reportReasonID: IReason["reportReasonID"]]: NonNullable<IReason["sort"]>;
 }

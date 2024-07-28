@@ -2819,10 +2819,9 @@ class CategoryModel extends Gdn_Model implements
     /**
      * Get list of categories (disregarding user permission for admins).
      *
-     * @return object SQL results.
-     * @throws Exception
      * @since 2.0.0
-     * @deprecated This function isn't secure and might blow up if there are too many categories.
+     *
+     * @return object SQL results.
      */
     public function getAll()
     {
@@ -3761,10 +3760,6 @@ class CategoryModel extends Gdn_Model implements
             (bool) val("CustomPermissions", $formPostValues) || is_array(val("Permissions", $formPostValues));
         $CustomPoints = val("CustomPoints", $formPostValues, null);
 
-        if (isset($formPostValues["Name"])) {
-            $formPostValues["Name"] = htmlspecialchars($formPostValues["Name"]);
-        }
-
         if (isset($formPostValues["AllowedDiscussionTypes"]) && is_array($formPostValues["AllowedDiscussionTypes"])) {
             $formPostValues["AllowedDiscussionTypes"] = dbencode($formPostValues["AllowedDiscussionTypes"]);
         } else {
@@ -4498,6 +4493,10 @@ class CategoryModel extends Gdn_Model implements
             foreach ($defaultPreferences as $categoryPreference) {
                 $categoryID = $categoryPreference["categoryID"];
                 $category = $this->getOne($categoryID);
+
+                if ($category["DisplayAs"] !== "Discussions") {
+                    continue;
+                }
 
                 if (empty($category) || !self::checkPermission($categoryID, "Vanilla.Discussions.View")) {
                     continue;

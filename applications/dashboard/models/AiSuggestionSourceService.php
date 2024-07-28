@@ -18,6 +18,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use UserMetaModel;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Activity\AiSuggestionsActivity;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
@@ -62,6 +63,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
     /** @var LongRunner */
     private LongRunner $longRunner;
 
+    private \ActivityModel $activityModel;
+
     /**
      * AI Suggestion constructor.
      *
@@ -78,7 +81,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         DiscussionModel $discussionModel,
         CommentModel $commentModel,
         UserMetaModel $userMetaModel,
-        LongRunner $longRunner
+        LongRunner $longRunner,
+        \ActivityModel $activityModel
     ) {
         $this->config = $config;
         $this->openAIClient = $openAIClient;
@@ -87,6 +91,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         $this->commentModel = $commentModel;
         $this->userMetaModel = $userMetaModel;
         $this->longRunner = $longRunner;
+        $this->activityModel = $activityModel;
     }
 
     /**
@@ -165,7 +170,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
             return;
         }
 
-        $action = new LongRunnerAction(self::class, "generateSuggestions", [$recordID, $discussion]);
+        $action = new LongRunnerAction(self::class, "generateSuggestions", [$recordID]);
         $this->longRunner->runDeferred($action);
     }
 
@@ -173,11 +178,11 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      * Generate suggestions for a discussion LongRunner.
      *
      * @param int $recordID
-     * @param array $discussion
      * @return Generator
      */
-    public function generateSuggestions(int $recordID, array $discussion): Generator
+    public function generateSuggestions(int $recordID): Generator
     {
+        $discussion = $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
         $aiConfig = $this->aiSuggestionConfigs()["sources"];
         $suggestions = [];
         try {
@@ -213,7 +218,39 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         );
         $this->discussionModel->setProperty($recordID, "Attributes", dbencode($discussion["Attributes"]));
 
+        if (!empty($suggestionsMerged)) {
+            $this->notifyAiSuggestions($discussion);
+        }
+
         return LongRunner::FINISHED;
+    }
+
+    /**
+     * @param array $discussion
+     * @return void
+     * @throws Exception
+     */
+    private function notifyAiSuggestions(array $discussion): void
+    {
+        $assistantUserID = Gdn::userModel()
+            ->getWhere(["UserID" => self::aiSuggestionConfigs()["userID"] ?? null])
+            ->value("UserID");
+
+        if (empty($assistantUserID)) {
+            return;
+        }
+
+        $activity = [
+            "ActivityType" => "AiSuggestions",
+            "ActivityUserID" => $assistantUserID,
+            "NotifyUserID" => $discussion["InsertUserID"],
+            "HeadlineFormat" => AiSuggestionsActivity::getProfileHeadline(),
+            "RecordType" => "Discussion",
+            "RecordID" => $discussion["DiscussionID"],
+            "Route" => DiscussionModel::discussionUrl($discussion),
+        ];
+
+        $this->activityModel->save($activity, "AiSuggestions");
     }
 
     /**

@@ -108,10 +108,7 @@ export function AttachmentIntegrationsContextProvider(
 
     const refreshStaleAttachments = useMutation({
         mutationFn: async (attachments: IAttachment[]) => {
-            const writeableIntegrationsAttachmentTypes = writeableIntegrations.map((i) => i.attachmentType);
-            const attachmentIDs = attachments
-                .filter(({ attachmentType }) => writeableIntegrationsAttachmentTypes.includes(attachmentType))
-                .map(({ attachmentID }) => attachmentID);
+            const attachmentIDs = attachments.map(({ attachmentID }) => attachmentID);
 
             if (attachmentIDs.length > 0) {
                 await api.refreshAttachments({ attachmentIDs, onlyStale: true });
@@ -143,7 +140,7 @@ interface IReadableIntegrationContextValue {
 const ReadableIntegrationContext = createContext<IReadableIntegrationContextValue>({
     title: "",
     externalIDLabel: "",
-    logoIcon: "meta-external",
+    logoIcon: "meta-external-compact",
 });
 
 export function useReadableIntegrationContext() {
@@ -167,7 +164,7 @@ export function ReadableIntegrationContextProvider(
         return null;
     }
 
-    const { title, externalIDLabel, logoIcon = "meta-external" } = integration ?? {};
+    const { title, externalIDLabel, logoIcon = "meta-external-compact" } = integration ?? {};
 
     return (
         <ReadableIntegrationContext.Provider
@@ -227,7 +224,7 @@ export function WriteableIntegrationContextProvider(
         submitButton = "",
         title = "",
         externalIDLabel = "",
-        logoIcon = "meta-external",
+        logoIcon = "meta-external-compact",
     } = integration ?? {};
 
     const customContextQuery = useQuery({

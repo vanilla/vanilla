@@ -136,7 +136,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
         ];
         $config = AiSuggestionSourceService::aiSuggestionConfigs();
         $providerConfig = $config["sources"][$this->getName()];
-        if (count($providerConfig["exclusionIDs"]) > 0) {
+        if (count($providerConfig["exclusionIDs"] ?? []) > 0) {
             $categoryModel = GDN::getContainer()->get(CategoryModel::class);
             $categoryIDs = [];
             foreach ($categoryModel->getSearchCategoryIDs() as $categoryID) {

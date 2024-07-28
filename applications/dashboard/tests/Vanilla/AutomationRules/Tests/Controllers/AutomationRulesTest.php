@@ -11,14 +11,10 @@ use Vanilla\AutomationRules\Actions\BumpDiscussionAction;
 use Garden\Container\ContainerException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
-use Gdn_Session;
-use Psr\Log\LoggerInterface;
-use UserModel;
 use Vanilla\AddonManager;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
-use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Exception\Database\NoResultsException;
 use VanillaTests\APIv2\AbstractAPIv2Test;
@@ -54,15 +50,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
         $this->automationRuleDispatchesModel = $this->container()->get(AutomationRuleDispatchesModel::class);
         $this->addonManager = $this->container()->get(AddonManager::class);
         $this->createUserFixtures();
-        /** @var AutomationRuleModel */
-        $mockAutomationRuleModel = new MockAutomationRuleModel(
-            $this->container()->get(Gdn_Session::class),
-            $this->container()->get(UserModel::class),
-            $this->container()->get(AutomationRuleRevisionModel::class),
-            $this->automationRuleDispatchesModel,
-            $this->container()->get(LoggerInterface::class),
-            $this->container()->get(\Gdn_Database::class)
-        );
+        $mockAutomationRuleModel = $this->container()->get(MockAutomationRuleModel::class);
         $this->container()->setInstance(AutomationRuleModel::class, $mockAutomationRuleModel);
     }
 
@@ -108,65 +96,71 @@ class AutomationRulesTest extends AbstractAPIv2Test
      */
     private function getExpectedCatalogTriggerArray(): array
     {
-        $durationSchema = [
-            "type" => "integer",
-            "minimum" => 1,
-            "step" => 1,
+        $triggerTimeDelaySchema = [
+            "type" => "object",
             "x-control" => [
-                "description" => "Enter the time duration, whole numbers only.",
-                "label" => "Duration",
-                "inputType" => "textBox",
+                "description" => "Set the duration after which the rule will trigger.  Whole numbers only.",
+                "label" => "Trigger Delay",
+                "inputType" => "timeDuration",
                 "placeholder" => "",
-                "type" => "number",
-                "tooltip" => "",
+                "tooltip" =>
+                    "Set the duration something needs to exist and meet the rule criteria for prior to the the rule triggering and acting upon it",
+                "supportedUnits" => ["hour", "day", "week", "year"],
+            ],
+            "properties" => [
+                "length" => [
+                    "type" => "string",
+                ],
+                "unit" => [
+                    "type" => "string",
+                ],
             ],
         ];
-        $startDurationSchema = $endDurationSchema = $durationSchema;
 
-        $startDurationSchema["x-control"]["description"] =
-            "Any data older than this will be excluded from triggering the rule.  Whole numbers only.";
-        $startDurationSchema["x-control"]["label"] = "Oldest Retrieved Content Cap";
-        $startDurationSchema["x-control"]["tooltip"] =
-            "For the initial run or when running this rule once, there may be data that you feel goes too far into the past to act on. This number is the cut-off time; anything older than this will not be included in the run.";
-        unset($startDurationSchema["minimum"]);
-
-        $endDurationSchema["x-control"]["description"] =
-            "Set the duration after which the rule will trigger.  Whole numbers only.";
-        $endDurationSchema["x-control"]["label"] = "Trigger Delay";
-        $endDurationSchema["x-control"]["tooltip"] =
-            "Set the duration something needs to exist and meet the rule criteria for prior to the the rule triggering and acting upon it";
-
-        $maxSchema = [
-            "type" => "string",
-            "enum" => ["hour", "day", "week", "year"],
-            "x-control" => [
-                "description" => "Select the time unit.",
-                "label" => "Trigger Time Unit",
-                "inputType" => "dropDown",
-                "placeholder" => "",
-                "choices" => [
-                    "staticOptions" => [
-                        "hour" => "Hour",
-                        "day" => "Day",
-                        "week" => "Week",
-                        "year" => "Year",
+        $triggerAdditionalSettingsSchema = [
+            "applyToNewContentOnly" => [
+                "type" => "boolean",
+                "default" => false,
+                "x-control" => [
+                    "description" =>
+                        "When enabled, this rule will only be applied to new content that meets the trigger criteria.",
+                    "label" => "Apply to new content only",
+                    "inputType" => "checkBox",
+                    "labelType" => "none",
+                ],
+            ],
+            "triggerTimeLookBackLimit" => [
+                "type" => "object",
+                "x-control" => [
+                    "description" => "Do not apply the rule to content that is older than this.",
+                    "label" => "Look-back Limit",
+                    "inputType" => "timeDuration",
+                    "placeholder" => "",
+                    "tooltip" => "",
+                    "supportedUnits" => ["hour", "day", "week", "year"],
+                    "conditions" => [
+                        [
+                            "field" => "additionalSettings.triggerValue.applyToNewContentOnly",
+                            "type" => "boolean",
+                            "const" => false,
+                        ],
                     ],
                 ],
-                "multiple" => false,
-                "tooltip" => "",
+                "properties" => [
+                    "length" => [
+                        "type" => "string",
+                    ],
+                    "unit" => [
+                        "type" => "string",
+                    ],
+                ],
             ],
         ];
 
-        $intervalSchema = $maxSchema;
-        $intervalSchema["minLength"] = 1;
-        $maxSchema["x-control"]["label"] = "Oldest Content Unit";
         $timeTriggerSchema = [
             "type" => "object",
             "properties" => [
-                "maxTimeThreshold" => $startDurationSchema,
-                "maxTimeUnit" => $maxSchema,
-                "triggerTimeThreshold" => $endDurationSchema,
-                "triggerTimeUnit" => $intervalSchema,
+                "triggerTimeDelay" => $triggerTimeDelaySchema,
                 "postType" => [
                     "type" => "array",
                     "items" => [
@@ -188,13 +182,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "tooltip" => "",
                     ],
                 ],
+                "additionalSettings" => $triggerAdditionalSettingsSchema,
             ],
-            "required" => ["triggerTimeThreshold", "triggerTimeUnit", "postType"],
+            "required" => ["triggerTimeDelay", "postType", "additionalSettings"],
         ];
         $triggers = [
             "emailDomainTrigger" => [
                 "triggerType" => "emailDomainTrigger",
-                "name" => "A user registers with or updated to a certain email domain",
+                "name" => "New/Updated Email domain",
                 "triggerActions" => ["categoryFollowAction", "addRemoveRoleAction"],
                 "schema" => [
                     "type" => "object",
@@ -213,11 +208,12 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     ],
                     "required" => ["emailDomain"],
                 ],
+                "contentType" => "users",
             ],
             "profileFieldTrigger" => [
                 "triggerType" => "profileFieldTrigger",
-                "name" => "A user registers or updates a certain profile field with a certain value",
-                "triggerActions" => ["addRemoveRoleAction", "categoryFollowAction"],
+                "name" => "New/Updated Profile field",
+                "triggerActions" => ["categoryFollowAction", "addRemoveRoleAction"],
                 "schema" => [
                     "type" => "object",
                     "properties" => [
@@ -245,66 +241,66 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     ],
                     "required" => ["profileField"],
                 ],
+                "contentType" => "users",
             ],
             "staleDiscussionTrigger" => [
                 "triggerType" => "staleDiscussionTrigger",
-                "name" =>
-                    "A certain amount of time has passed since a post has been created but has not received any comments",
+                "name" => "Time since a post has no comments",
                 "triggerActions" => [
-                    "closeDiscussionAction",
-                    "bumpDiscussionAction",
-                    "addTagAction",
-                    "moveToCategoryAction",
                     "addToCollectionAction",
+                    "addTagAction",
+                    "bumpDiscussionAction",
+                    "closeDiscussionAction",
+                    "moveToCategoryAction",
                     "removeDiscussionFromCollectionAction",
                 ],
                 "schema" => $timeTriggerSchema,
+                "contentType" => "posts",
             ],
             "staleCollectionTrigger" => [
                 "triggerType" => "staleCollectionTrigger",
-                "name" => "A certain amount of time has passed since a post was added to a selected collection",
+                "name" => "Time since added to collection",
                 "triggerActions" => ["removeDiscussionFromTriggerCollectionAction"],
                 "schema" => [
                     "type" => "object",
                     "properties" => [
-                        "maxTimeThreshold" => $startDurationSchema,
-                        "maxTimeUnit" => $maxSchema,
-                        "triggerTimeThreshold" => $endDurationSchema,
-                        "triggerTimeUnit" => $intervalSchema,
+                        "triggerTimeDelay" => $triggerTimeDelaySchema,
                         "collectionID" => self::getCollectionSchema("Collection to remove from")["properties"][
                             "collectionID"
                         ],
+                        "additionalSettings" => $triggerAdditionalSettingsSchema,
                     ],
-                    "required" => ["triggerTimeThreshold", "triggerTimeUnit", "collectionID"],
+                    "required" => ["triggerTimeDelay", "collectionID", "additionalSettings"],
                 ],
+                "contentType" => "posts",
             ],
             "lastActiveDiscussionTrigger" => [
                 "triggerType" => "lastActiveDiscussionTrigger",
-                "name" => "A certain amount of time has passed since a post has been active",
+                "name" => "Time since post had no activity",
                 "triggerActions" => [
-                    "closeDiscussionAction",
-                    "bumpDiscussionAction",
-                    "addTagAction",
-                    "moveToCategoryAction",
                     "addToCollectionAction",
+                    "addTagAction",
+                    "bumpDiscussionAction",
+                    "closeDiscussionAction",
+                    "moveToCategoryAction",
                     "removeDiscussionFromCollectionAction",
                 ],
                 "schema" => $timeTriggerSchema,
+                "contentType" => "posts",
             ],
             "timeSinceUserRegistrationTrigger" => [
                 "triggerType" => "timeSinceUserRegistrationTrigger",
-                "name" => "A certain amount of time has passed since a user registered",
-                "triggerActions" => ["addRemoveRoleAction"],
+                "name" => "Time since Registration",
+                "triggerActions" => ["categoryFollowAction", "addRemoveRoleAction"],
                 "schema" => [
                     "type" => "object",
                     "properties" => [
-                        "maxTimeThreshold" => $startDurationSchema,
-                        "maxTimeUnit" => $maxSchema,
-                        "triggerTimeThreshold" => $endDurationSchema,
-                        "triggerTimeUnit" => $intervalSchema,
+                        "triggerTimeDelay" => $triggerTimeDelaySchema,
+                        "additionalSettings" => $triggerAdditionalSettingsSchema,
                     ],
-                    "required" => ["triggerTimeThreshold", "triggerTimeUnit"],
+                    "required" => ["triggerTimeDelay", "additionalSettings"],
                 ],
+                "contentType" => "users",
             ],
         ];
         return $triggers;
@@ -406,34 +402,38 @@ class AutomationRulesTest extends AbstractAPIv2Test
         return [
             "categoryFollowAction" => [
                 "actionType" => "categoryFollowAction",
-                "name" => "Follow a specific category",
-                "actionTriggers" => ["emailDomainTrigger", "profileFieldTrigger"],
+                "name" => "Follow category",
+                "actionTriggers" => ["emailDomainTrigger", "profileFieldTrigger", "timeSinceUserRegistrationTrigger"],
                 "schema" => $this->getCategorySchema(
                     "Category to Follow",
                     "Select one or more categories to follow",
                     true,
                     true
                 ),
+                "contentType" => "users",
             ],
             "moveToCategoryAction" => [
                 "actionType" => "moveToCategoryAction",
-                "name" => "Move to a specific category",
+                "name" => "Move post",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
                 "schema" => $this->getCategorySchema("Category to move to", "Select a category"),
+                "contentType" => "posts",
             ],
             "closeDiscussionAction" => [
                 "actionType" => "closeDiscussionAction",
-                "name" => "Close the discussion",
+                "name" => "Close post",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+                "contentType" => "posts",
             ],
             "bumpDiscussionAction" => [
                 "actionType" => "bumpDiscussionAction",
-                "name" => "Bump the discussion",
+                "name" => "Bump post",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+                "contentType" => "posts",
             ],
             "addTagAction" => [
                 "actionType" => "addTagAction",
-                "name" => "Add a tag",
+                "name" => "Add tag",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
                 "schema" => [
                     "type" => "object",
@@ -464,22 +464,25 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     ],
                     "required" => ["tagID"],
                 ],
+                "contentType" => "posts",
             ],
             "addToCollectionAction" => [
                 "actionType" => "addToCollectionAction",
                 "name" => "Add to collection",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
                 "schema" => $this->getCollectionSchema("Collection to add to"),
+                "contentType" => "posts",
             ],
             "removeDiscussionFromCollectionAction" => [
                 "actionType" => "removeDiscussionFromCollectionAction",
-                "name" => "Remove discussion from collection",
+                "name" => "Remove from collection",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
                 "schema" => $this->getCollectionSchema("Collection to remove from"),
+                "contentType" => "posts",
             ],
             "addRemoveRoleAction" => [
                 "actionType" => "addRemoveRoleAction",
-                "name" => "Assign/remove a specific role to the user",
+                "name" => "Assign/Remove role",
                 "actionTriggers" => ["emailDomainTrigger", "profileFieldTrigger", "timeSinceUserRegistrationTrigger"],
                 "schema" => [
                     "type" => "object",
@@ -527,11 +530,13 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     ],
                     "required" => ["addRoleID"],
                 ],
+                "contentType" => "users",
             ],
             "removeDiscussionFromTriggerCollectionAction" => [
                 "actionType" => "removeDiscussionFromTriggerCollectionAction",
-                "name" => "Remove discussion from trigger collection",
+                "name" => "Remove from trigger collection",
                 "actionTriggers" => ["staleCollectionTrigger"],
+                "contentType" => "posts",
             ],
         ];
     }
@@ -949,10 +954,9 @@ class AutomationRulesTest extends AbstractAPIv2Test
             "trigger" => [
                 "triggerType" => "staleDiscussionTrigger",
                 "triggerValue" => [
-                    "maxTimeThreshold" => 2,
-                    "triggerTimeUnit" => "week",
-                    "triggerTimeThreshold" => 1,
-                    "maxTimeUnit" => "week",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => "",
+                    "triggerTimeDelay" => "",
                     "postType" => "",
                 ],
             ],
@@ -964,11 +968,23 @@ class AutomationRulesTest extends AbstractAPIv2Test
         $bodyTrigger["action"]["actionValue"] = "";
         return [
             "test required duration" => [
-                $this->modifyRecord($body, ["triggerTimeThreshold" => "", "postType" => ["discussion"]]),
-                "trigger.triggerValue.triggerTimeThreshold is not a valid integer.",
+                $this->modifyRecord($body, [
+                    "triggerTimeDelay" => [
+                        "length" => "",
+                        "unit" => "week",
+                    ],
+                    "postType" => ["discussion"],
+                ]),
+                "trigger.triggerValue.triggerTimeDelay.length is not a valid integer.",
             ],
             "test required duration to be whole number" => [
-                $this->modifyRecord($body, ["triggerTimeThreshold" => -5, "postType" => ["discussion"]]),
+                $this->modifyRecord($body, [
+                    "triggerTimeDelay" => [
+                        "length" => -5,
+                        "unit" => "week",
+                    ],
+                    "postType" => ["discussion"],
+                ]),
                 "Trigger Delay should be positive whole numbers only.",
             ],
             "test postType is a valid array with values" => [
@@ -976,12 +992,26 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 "Invalid post type, Valid post types are: [\"discussion\"]",
             ],
             "test invalid maxTimeThreshold" => [
-                $this->modifyRecord($body, ["maxTimeThreshold" => -1]),
-                "Oldest Retrieved Content Cap should be positive whole numbers only.",
+                $this->modifyRecord($body, [
+                    "triggerTimeLookBackLimit" => [
+                        "length" => -1,
+                        "unit" => "week",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "week",
+                    ],
+                ]),
+                "Look-back Limit should be positive whole numbers only.",
             ],
             "test invalid triggerTimeUnit" => [
-                $this->modifyRecord($body, ["triggerTimeUnit" => "minute"]),
-                "trigger.triggerValue.triggerTimeUnit must be one of: hour, day, week, year.",
+                $this->modifyRecord($body, [
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "minute",
+                    ],
+                ]),
+                "trigger.triggerValue.triggerTimeDelay.unit must be one of: hour, day, week, year.",
             ],
             "test invalid tags" => [
                 $this->modifyRecord($bodyTrigger, ["actionType" => "addTagAction", "actionValue" => ["tagID" => [25]]]),
@@ -1008,7 +1038,20 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 ]),
                 "The category 25 is not a valid category.",
             ],
-            "test success" => [$this->modifyRecord($bodyTrigger, ["actionValue" => []]), ""],
+            "test success" => [
+                $this->modifyRecord($bodyTrigger, [
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 2,
+                        "unit" => "week",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "hour",
+                    ],
+                    "actionValue" => [],
+                ]),
+                "",
+            ],
         ];
     }
 

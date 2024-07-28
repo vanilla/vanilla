@@ -119,11 +119,18 @@ paths:
             responses:
                 "204":
                     description: No Content
-    /reports/reasons:
+    /report-reasons:
         get:
             tags:
                 - Reports & Escalations
-            summary: Get a list of report reasons
+            summary: Get a list of report reasons for the current sessioned user. `community.manage` permission grants permission to all reasons.
+            parameters:
+                - name: includeDeleted
+                  description: Allow selecting deleted reports. Requires `moderation.manage` permission.
+                  in: query
+                  schema:
+                      type: boolean
+                      default: false
             responses:
                 "200":
                     description: OK
@@ -133,6 +140,127 @@ paths:
                                 type: array
                                 items:
                                     $ref: "#/components/schemas/ReportReason"
+        post:
+            tags:
+                - Reports & Escalations
+            summary: Create a report reason
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ReportReasonPost"
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ReportReason"
+                "409":
+                    description: Conflict. Returned if the reportReasonID already exists.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Report reason already exists."
+                                    code:
+                                        type: number
+                                        example: 409
+                                    conflictingReason:
+                                        $ref: "#/components/schemas/ReportReason"
+    /report-reasons/:reportReasonID:
+        get:
+            tags:
+                - Reports & Escalations
+            summary: Get a report reason if you have permission for it.
+            parameters:
+                - name: reportReasonID
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                - name: includeDeleted
+                  description: Allow selecting deleted reports. Requires `moderation.manage` permission.
+                  in: query
+                  schema:
+                      type: boolean
+                      default: false
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ReportReason"
+                "404":
+                    description: Not Found. Also returned if there is no permission to not leak reasonIDs.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Report reason not found."
+        patch:
+            tags:
+                - Reports & Escalations
+            summary: Update a report reason
+            parameters:
+                - name: reportReasonID
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ReportReasonPost"
+            responses:
+                "201":
+                    description: Updated
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ReportReason"
+        delete:
+            tags:
+                - Reports & Escalations
+            summary: Delete a report reason. If the report has already been used, the reason will be marked as deleted but still exist in the underyling system for usage when viewing existing reports.
+            parameters:
+                - name: reportID
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "204":
+                    description: No Content
+    /report-reasons/sorts:
+        put:
+            tags:
+                - Reports & Escalations
+            summary: Update the sort order of report reasons
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            description: Mapping of reportReasonID to new sorts.
+                            example:
+                                "spam": 1
+                                "abuse": 2
+                                "sexual-content": 3
+            responses:
+                "204":
+                    description: No Content
     /reports/:reportID:
         get:
             tags:
@@ -205,19 +333,6 @@ paths:
                                 type: array
                                 items:
                                     $ref: "#/components/schemas/TriageRecord"
-#        delete:
-#            tags:
-#                - Reports & Escalations
-#            summary: Delete a report
-#            parameters:
-#                - name: reportID
-#                  in: path
-#                  required: true
-#                  schema:
-#                      type: integer
-#            responses:
-#                "204":
-#                    description: No Content
 
 components:
     schemas:
@@ -234,7 +349,9 @@ components:
                     type: integer
                 reportID:
                     type: integer
-            required: ["reportReasonID", "name", "description", "sort"]
+                deleted:
+                    type: boolean
+            required: ["reportReasonID", "name", "description", "sort", "deleted"]
         ReportReason:
             type: object
             properties:
@@ -256,6 +373,24 @@ components:
                     type: integer
                 sort:
                     type: integer
+                roleIDs:
+                    type: array
+                    items:
+                        type: integer
+                roles:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            roleID:
+                                type: integer
+                            name:
+                                type: string
+                deleted:
+                    type: boolean
+                countReports:
+                    type: integer
+                    description: The number of reports that have used this reason. Only available with `community.manage` permission.
             required:
                 - reportReasonID
                 - name
@@ -263,6 +398,40 @@ components:
                 - dateInserted
                 - insertUserID
                 - sort
+                - deleted
+        ReportReasonPost:
+            type: object
+            properties:
+                reportReasonID:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                sort:
+                    type: integer
+                roleIDs:
+                    type: array
+                    items:
+                        type: integer
+            required:
+                - reportReasonID
+                - name
+                - description
+                - roleIDs
+        ReportReasonPatch:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                sort:
+                    type: integer
+                roleIDs:
+                    type: array
+                    items:
+                        type: integer
         ReportInsert:
             type: object
             properties:

@@ -10,7 +10,6 @@ import { getSiteSection } from "@library/utility/appUtils";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
 import { DiscussionThreadPaginationContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadPaginationContext";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 
 interface IDiscussionThreadPageParams {
     id: IDiscussion["discussionID"];
@@ -34,11 +33,9 @@ export function registerDiscussionThreadPage() {
         },
         (layoutQuery, page) => {
             return (
-                <AttachmentIntegrationsContextProvider>
-                    <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
-                        {page}
-                    </DiscussionThreadPaginationContextProvider>
-                </AttachmentIntegrationsContextProvider>
+                <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
+                    {page}
+                </DiscussionThreadPaginationContextProvider>
             );
         },
     );
@@ -60,11 +57,9 @@ export function registerDiscussionThreadPage() {
         },
         (layoutQuery, page) => {
             return (
-                <AttachmentIntegrationsContextProvider>
-                    <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
-                        {page}
-                    </DiscussionThreadPaginationContextProvider>
-                </AttachmentIntegrationsContextProvider>
+                <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
+                    {page}
+                </DiscussionThreadPaginationContextProvider>
             );
         },
     );

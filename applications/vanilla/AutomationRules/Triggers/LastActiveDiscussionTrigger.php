@@ -7,27 +7,18 @@
 
 namespace Vanilla\AutomationRules\Triggers;
 
-use Vanilla\AutomationRules\Actions\AddDiscussionToCollectionAction;
-use Vanilla\AutomationRules\Actions\AddTagToDiscussionAction;
-use Vanilla\AutomationRules\Actions\BumpDiscussionAction;
-use Vanilla\AutomationRules\Actions\CloseDiscussionAction;
 use DateTimeImmutable;
 use DiscussionModel;
 use Garden\Schema\Schema;
 use Gdn;
-use Vanilla\AutomationRules\Actions\MoveDiscussionToCategoryAction;
-use Vanilla\AutomationRules\Actions\RemoveDiscussionFromCollectionAction;
 use Vanilla\AutomationRules\Models\AutomationRuleLongRunnerGenerator;
-use Vanilla\AutomationRules\Trigger\AutomationTriggerInterface;
 use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
-use Vanilla\AutomationRules\Trigger\TimedAutomationTriggerInterface;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 
 /**
  * Class StaleDiscussionTrigger
  */
-class LastActiveDiscussionTrigger extends TimedAutomationTrigger implements
-    AutomationTriggerInterface,
-    TimedAutomationTriggerInterface
+class LastActiveDiscussionTrigger extends TimedAutomationTrigger
 {
     /**
      * @inheridoc
@@ -42,7 +33,15 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger implements
      */
     public static function getName(): string
     {
-        return "A certain amount of time has passed since a post has been active";
+        return "Time since post had no activity";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -50,14 +49,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger implements
      */
     public static function getActions(): array
     {
-        return [
-            CloseDiscussionAction::getType(),
-            BumpDiscussionAction::getType(),
-            AddTagToDiscussionAction::getType(),
-            MoveDiscussionToCategoryAction::getType(),
-            AddDiscussionToCollectionAction::getType(),
-            RemoveDiscussionFromCollectionAction::getType(),
-        ];
+        return DiscussionRuleDataType::getActions();
     }
 
     /**
@@ -69,7 +61,6 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger implements
             "trigger:o" => self::getTimedTriggerSchema(),
         ]);
         $schema->merge($discussionCommentSchema);
-        self::addActionTypeValidation($schema);
     }
 
     /**

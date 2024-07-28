@@ -32,6 +32,15 @@ export function DashboardToggle(props: IProps) {
     const { inputID, labelType } = formGroup || {};
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
 
+    let wellAndSlider = (
+        <>
+            <div tabIndex={0}>
+                <div className="toggle-well" />
+                <div className="toggle-slider" />
+            </div>
+        </>
+    );
+
     let toggle = (
         <label
             className={classNames("toggle-wrap", {
@@ -53,8 +62,7 @@ export function DashboardToggle(props: IProps) {
                     checked={props.checked}
                     onChange={(event) => props.onChange(!!event.target.checked)}
                 />
-                <div className="toggle-well" />
-                <div className="toggle-slider" />
+                {wellAndSlider}
             </div>
         </label>
     );

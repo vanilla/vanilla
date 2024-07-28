@@ -75,10 +75,15 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
             "trigger" => [
                 "triggerType" => StaleDiscussionTrigger::getType(),
                 "triggerValue" => [
-                    "maxTimeThreshold" => 3,
-                    "maxTimeUnit" => "day",
-                    "triggerTimeThreshold" => 2,
-                    "triggerTimeUnit" => "day",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 3,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 2,
+                        "unit" => "day",
+                    ],
                     "postType" => ["discussion"],
                 ],
             ],
@@ -145,10 +150,15 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
             "trigger" => [
                 "triggerType" => StaleDiscussionTrigger::getType(),
                 "triggerValue" => [
-                    "maxTimeThreshold" => 12,
-                    "maxTimeUnit" => "day",
-                    "triggerTimeThreshold" => 6,
-                    "triggerTimeUnit" => "day",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 12,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 6,
+                        "unit" => "day",
+                    ],
                     "postType" => ["discussion"],
                 ],
             ],
@@ -251,10 +261,15 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
             "trigger" => [
                 "triggerType" => LastActiveDiscussionTrigger::getType(),
                 "triggerValue" => [
-                    "maxTimeThreshold" => 7,
-                    "maxTimeUnit" => "week",
-                    "triggerTimeThreshold" => 3,
-                    "triggerTimeUnit" => "week",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 7,
+                        "unit" => "week",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 3,
+                        "unit" => "week",
+                    ],
                     "postType" => ["discussion"],
                 ],
             ],

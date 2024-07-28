@@ -102,7 +102,15 @@ class LoggerUtils
                 continue;
             }
 
-            if ($value !== $newData[$key]) {
+            $oldValue = $newData[$key];
+            if ($value instanceof \DateTimeInterface) {
+                $value = $value->format(\DateTimeInterface::RFC3339_EXTENDED);
+            }
+            if ($oldValue instanceof \DateTimeInterface) {
+                $oldValue = $oldValue->format(\DateTimeInterface::RFC3339_EXTENDED);
+            }
+
+            if ($value !== $oldValue) {
                 $diff[$key] = [
                     "old" => $value,
                     "new" => $newData[$key],

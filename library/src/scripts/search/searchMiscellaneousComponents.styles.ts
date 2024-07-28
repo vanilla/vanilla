@@ -26,6 +26,7 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
         ...Mixins.margin({
             all: 0,
         }),
+        marginInlineEnd: 8,
     });
 
     const sortLabel = css({

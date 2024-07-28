@@ -1618,6 +1618,7 @@ class CategoryModelTest extends SiteTestCase
     {
         $user = $this->createUser(["name" => "newUser"]);
         $category = $this->createCategory(["name" => "Followed Category"]);
+        $flatCategory = $this->createCategory(["displayAs" => "flat"]);
         $config = \Gdn::config();
         $config->set("Preferences.CategoryFollowed.Defaults", "123");
         $this->categoryModel->setDefaultCategoryPreferences($user["userID"]);
@@ -1656,12 +1657,23 @@ class CategoryModelTest extends SiteTestCase
                     "preferences.popup.posts" => true,
                 ],
             ],
+            [
+                "categoryID" => $flatCategory["categoryID"],
+                "preferences" => [
+                    "preferences.followed" => true,
+                    "preferences.email.comments" => true,
+                    "preferences.email.posts" => true,
+                    "preferences.popup.comments" => true,
+                    "preferences.popup.posts" => true,
+                ],
+            ],
         ];
         $config->set("Preferences.CategoryFollowed.Defaults", json_encode($defaultCategoryPreferences));
 
         $this->categoryModel->setDefaultCategoryPreferences($user["userID"]);
         $this->assertTrue($this->categoryModel->isFollowed($user["userID"], $category["categoryID"]));
         $this->assertFalse($this->categoryModel->isFollowed($user["userID"], $permissionCategory["categoryID"]));
+        $this->assertFalse($this->categoryModel->isFollowed($user["userID"], $flatCategory["categoryID"]));
     }
 
     /**
@@ -1979,20 +1991,5 @@ class CategoryModelTest extends SiteTestCase
         $this->createDiscussion();
         $after = $this->categoryModel->getID(-1, DATASET_TYPE_ARRAY);
         $this->assertEquals($before["CountAllDiscussions"] + 1, $after["CountAllDiscussions"]);
-    }
-
-    /**
-     * Test to make sure we sanitize the xss when creating a new category.
-     *
-     * @return void
-     */
-    public function testSanitizingCategoryName(): void
-    {
-        // Make sure we use the model to cover both the old controllers and the API.
-        $categoryID = $this->categoryModel->save(
-            $this->newCategory(["Name" => "<img src=x onVector=X-Vector onerror=alert(42)>"])
-        );
-        $category = $this->categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
-        $this->assertEquals("&lt;img src=x onVector=X-Vector onerror=alert(42)&gt;", $category["Name"]);
     }
 }

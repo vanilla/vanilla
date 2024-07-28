@@ -160,8 +160,16 @@ class InternalClient extends SiteHttpClient
                 }
 
                 if (DebugUtils::isDebug() || DebugUtils::isTestMode()) {
+                    $traces = [];
+                    $ex = $previousEx;
+                    while ($ex !== null) {
+                        $traces[] = DebugUtils::stackTraceString($ex->getTrace());
+                        $ex = $ex->getPrevious();
+                    }
+                    $trace = implode("\n\nCaused By\n\n", $traces);
+
                     $exception = $exception->withContext([
-                        "trace" => DebugUtils::stackTraceString($previousEx->getTrace()),
+                        "trace" => $trace,
                     ]);
                 }
             }

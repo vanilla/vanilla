@@ -48,7 +48,7 @@ describe("ReportModal", () => {
     let mockAdapter: MockAdapter;
     beforeAll(() => {
         mockAdapter = mockAPI();
-        mockAdapter.onGet("/reports/reasons").reply(200, [
+        mockAdapter.onGet("/report-reasons").reply(200, [
             {
                 reportReasonID: "reason-1",
                 name: "Mock Reason Name 1",

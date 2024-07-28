@@ -224,7 +224,7 @@ export const dashboardClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingInline: globalVars.widget.paddingBothSides,
+        paddingInline: 10,
 
         "& .label-wrap": {
             // Create the 58.3333333% used from the old 24 col grid system css
@@ -245,6 +245,12 @@ export const dashboardClasses = useThemeCache(() => {
         width: "100%",
         "& > input": {
             flex: 1,
+        },
+    });
+
+    const multiLineInput = css({
+        "& textarea": {
+            fontSize: "14px",
         },
     });
 
@@ -273,5 +279,6 @@ export const dashboardClasses = useThemeCache(() => {
         passwordInput,
         spaceBetweenFormGroup,
         buttonRow,
+        multiLineInput,
     };
 });

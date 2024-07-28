@@ -21,6 +21,7 @@ use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Forum\Models\CommunityManagement\TriageModel;
 use Vanilla\Models\Model;
 use Vanilla\Schema\RangeExpression;
+use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
 
 /**
@@ -37,20 +38,9 @@ class ReportsApiController extends \AbstractApiController
         private \UserModel $userModel,
         private FormatService $formatService,
         private CommunityManagementRecordModel $communityManagementRecordModel,
-        private TriageModel $triageModel
+        private TriageModel $triageModel,
+        private \AttachmentModel $attachmentModel
     ) {
-    }
-
-    /**
-     * GET /api/v2/reports/reasons
-     *
-     * @return array
-     */
-    public function get_reasons(): array
-    {
-        $this->permission();
-        $reasons = $this->reportReasonModel->select();
-        return $reasons;
     }
 
     /**
@@ -101,7 +91,7 @@ class ReportsApiController extends \AbstractApiController
             "reportReasonIDs:a" => [
                 "items" => [
                     "type" => "string",
-                    "enum" => $this->reportReasonModel->getAvailableReasonIDs(),
+                    "enum" => $this->reportReasonModel->getPermissionAvailableReasonIDs(),
                 ],
             ],
         ]);
@@ -116,6 +106,11 @@ class ReportsApiController extends \AbstractApiController
     public function post(array $body): array
     {
         $this->permission("flag.add");
+
+        $availableReasonIDs = $this->reportReasonModel->getPermissionAvailableReasonIDs();
+        if (empty($availableReasonIDs)) {
+            throw new ClientException("No report reasons available.", 403);
+        }
 
         $in = $this->postSchema();
 
@@ -206,7 +201,6 @@ class ReportsApiController extends \AbstractApiController
                     "enum" => ReportModel::STATUSES,
                 ],
                 "x-filter" => ["field" => "r.status"],
-                "default" => [ReportModel::STATUS_NEW],
             ],
             "recordType:s?" => [
                 "x-filter" => ["field" => "r.recordType"],
@@ -231,7 +225,7 @@ class ReportsApiController extends \AbstractApiController
                 "type" => "array",
                 "items" => [
                     "type" => "string",
-                    "enum" => $this->reportReasonModel->getAvailableReasonIDs(),
+                    "enum" => $this->reportReasonModel->selectReasonIDs(),
                 ],
                 "style" => "form",
                 "x-filter" => ["field" => "rrj.reportReasonID"],

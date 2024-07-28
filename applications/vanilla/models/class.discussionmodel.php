@@ -4375,6 +4375,7 @@ SQL;
             "trending:o?",
             "reactions?" => $this->reactionModel->getReactionSummaryFragment(),
             "attachments:a?",
+            "countReports:i?",
         ];
         if (\Gdn::session()->checkPermission("staff.allow")) {
             $schema["internalStatusID:i"] = ["default" => 0];

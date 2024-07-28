@@ -55,6 +55,11 @@ export const triageListItemClasses = () => {
         minHeight: 42,
     });
 
+    const attachments = css({
+        paddingLeft: 16,
+        paddingRight: 16,
+    });
+
     return {
         container,
         main,
@@ -63,5 +68,6 @@ export const triageListItemClasses = () => {
         quickActions,
         footer,
         actions,
+        attachments,
     };
 };

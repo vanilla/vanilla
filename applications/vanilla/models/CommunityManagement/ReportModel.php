@@ -65,6 +65,51 @@ class ReportModel extends PipelineModel
     }
 
     /**
+     * Join a count of reports onto a set of DB rows.
+     *
+     * @param array $rowOrRows
+     * @param string $recordType
+     *
+     * @return void
+     */
+    public function expandCountReports(array &$rowOrRows, string $recordType): void
+    {
+        if (ArrayUtils::isAssociative($rowOrRows)) {
+            $rows = [&$rowOrRows];
+        } else {
+            $rows = &$rowOrRows;
+        }
+
+        $recordIDField = "{$recordType}ID";
+        $recordIDs = array_column($rows, $recordIDField);
+
+        $countRows = $this->createSql()
+            ->select("recordID", "count", "countReports")
+            ->select("recordID")
+            ->from("report")
+            ->where([
+                "recordType" => $recordType,
+                "recordID" => $recordIDs,
+            ])
+            ->groupBy(["recordType", "recordID"])
+            ->get()
+            ->resultArray();
+
+        $countRowsByRecordID = array_column($countRows, null, "recordID");
+
+        foreach ($rows as &$row) {
+            $recordID = $row[$recordIDField] ?? null;
+            $countRow = $countRowsByRecordID[$recordID] ?? null;
+            if ($countRow === null) {
+                $row["countReports"] = 0;
+                continue;
+            }
+
+            $row["countReports"] = $countRow["countReports"];
+        }
+    }
+
+    /**
      * @param array $where
      *
      * @return \Gdn_SQLDriver

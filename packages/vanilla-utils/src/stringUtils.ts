@@ -148,7 +148,7 @@ export function splitStringLoosely(toSplit: string, splitWith: string): string[]
     });
 }
 
-interface IMentionMatch {
+export interface IMentionMatch {
     match: string;
     rawMatch: string;
 }

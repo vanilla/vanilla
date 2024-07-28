@@ -45,6 +45,7 @@ export interface IDiscussion {
     excerpt?: string;
     body?: string;
     tags?: ITag[];
+    countReports?: number;
 
     pinLocation?: "recent" | "category";
 

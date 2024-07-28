@@ -582,7 +582,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             )
             ->addLinkIf(
                 !Gdn::config("Garden.Email.Disabled") &&
-                    Gdn::config("Feature.Digest.Enabled") &&
                     $session->checkPermission(["Garden.Community.Manage", "Garden.Settings.Manage"]),
                 t("Digest Settings"),
                 "/dashboard/settings/digest",
@@ -592,6 +591,14 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             )
             ->addGroup(t("Discussions"), "forum", "", ["after" => "email"])
             ->addLinkIf("Garden.Settings.Manage", t("Tagging"), "settings/tagging", "forum.tagging", $sort)
+            ->addLinkIf(
+                "Garden.Settings.Manage",
+                t("Community Management"),
+                "/dashboard/settings/community-management",
+                "forum.community-management",
+                "",
+                $sort
+            )
             ->addGroup(t("Reputation"), "reputation", "", ["after" => "forum"])
             ->addGroup(t("Connections"), "connect", "", ["after" => "reputation"])
             ->addLinkIf(

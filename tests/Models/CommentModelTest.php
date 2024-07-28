@@ -9,6 +9,7 @@ namespace VanillaTests\Models;
 use ActivityModel;
 use CategoryModel;
 use Gdn;
+use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -62,6 +63,7 @@ class CommentModelTest extends SiteTestCase
         $eventManager->unbindClass(self::class);
         $eventManager->addListenerMethod(self::class, "handleCommentEvent");
         $this->activityModel = Gdn::getContainer()->get(ActivityModel::class);
+        $this->userPreferenceModel = Gdn::getContainer()->get(UserNotificationPreferencesModel::class);
     }
 
     /**
@@ -353,10 +355,9 @@ class CommentModelTest extends SiteTestCase
 
             $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
 
-            $userMeta = [
-                sprintf("Preferences.Email.NewComment.%d", $categoryAdmin["categoryID"]) => 1,
-            ];
-            $this->userModel::setMeta($memberUser["userID"], $userMeta);
+            $this->userPreferenceModel->save($memberUser["userID"], [
+                "Popup.NewComment.{$categoryAdmin["categoryID"]}" => 1,
+            ]);
 
             $discussionMember = [
                 "CategoryID" => $categoryAdmin["categoryID"],

@@ -29,6 +29,7 @@ const escalationAssigneeClasses = (inCard?: boolean) => ({
         alignItems: "center",
         gap: 8,
         padding: "0px!important",
+        marginLeft: -6,
         maxWidth: 200,
         position: "relative",
         transition: "border-color 230ms",

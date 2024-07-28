@@ -1245,7 +1245,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
         // Synchronize the user's data.
         $saved = $userModel->save(["UserID" => $userID, "ProfileFields" => $profileFields] + $data, [
-            UserModel::OPT_NO_CONFIRM_EMAIL => true,
+            UserModel::OPT_NO_CONFIRM_EMAIL => !UserModel::requireSSOConfirmEmail(),
             UserModel::OPT_FIX_UNIQUE => true,
             UserModel::OPT_SAVE_ROLES => $saveRoles,
             UserModel::OPT_VALIDATE_NAME => !$isTrustedProvider,
@@ -1738,9 +1738,14 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     }
                 }
             } catch (Exception $ex) {
+                ErrorLogger::error("Failed registering the user", [
+                    "exception" => $ex,
+                    "values" => $values,
+                ]);
                 $this->Form->addError($ex);
+            } finally {
+                $this->render();
             }
-            $this->render();
         } else {
             $this->render();
         }

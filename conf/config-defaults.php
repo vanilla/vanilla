@@ -174,6 +174,7 @@ $Configuration['Preferences']['Popup']['WallComment'] = '1';
 $Configuration['Preferences']['Popup']['ActivityComment'] = '1';
 $Configuration['Preferences']['Popup']['DiscussionComment'] = '1';
 $Configuration['Preferences']['Popup']['Mention'] = '1';
+$Configuration['Preferences']['Popup']['AiSuggestions'] = '1';
 
 // Module visibility and sorting.
 $Configuration['Garden']['Modules']['ShowGuestModule'] = true;

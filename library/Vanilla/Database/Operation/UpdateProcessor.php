@@ -33,11 +33,9 @@ class UpdateProcessor implements Processor
      */
     public function handle(Operation $operation, callable $stack)
     {
-        switch ($operation->getType()) {
-            case Operation::TYPE_UPDATE:
-                return call_user_func($this->onUpdate, $operation, $stack);
-            default:
-                return $stack($operation);
-        }
+        return match ($operation->getType()) {
+            Operation::TYPE_UPDATE => call_user_func($this->onUpdate, $operation, $stack),
+            default => $stack($operation),
+        };
     }
 }

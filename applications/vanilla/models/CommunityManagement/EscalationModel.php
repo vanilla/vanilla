@@ -8,10 +8,12 @@
 namespace Vanilla\Forum\Models\CommunityManagement;
 
 use Garden\Schema\Schema;
+use Vanilla\Dashboard\Models\AttachmentService;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Models\Model;
 use Vanilla\Models\PipelineModel;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\SchemaUtils;
 
 /**
@@ -23,39 +25,21 @@ class EscalationModel extends PipelineModel
     public const STATUS_OPEN = "open";
     public const STATUS_IN_PROGRESS = "in-progress";
     public const STATUS_ON_HOLD = "on-hold";
-    public const STATUS_EXTERNAL_STAR = "external-zendesk";
     public const STATUS_DONE = "done";
-
-    public const STATUSES = [
-        self::STATUS_OPEN,
-        self::STATUS_IN_PROGRESS,
-        self::STATUS_ON_HOLD,
-        self::STATUS_EXTERNAL_STAR,
-        self::STATUS_DONE,
-    ];
-
-    private \Gdn_Session $session;
-    private \CategoryModel $categoryModel;
-    private ReportModel $reportModel;
-    private ReportReasonModel $reportReasonModel;
-    private CommunityManagementRecordModel $communityManagementRecordModel;
 
     /**
      * Constructor
      */
     public function __construct(
-        \Gdn_Session $session,
-        \CategoryModel $categoryModel,
-        ReportModel $reportModel,
-        ReportReasonModel $reportReasonModel,
-        CommunityManagementRecordModel $communityManagementRecordModel
+        private \Gdn_Session $session,
+        private \CategoryModel $categoryModel,
+        private ReportModel $reportModel,
+        private ReportReasonModel $reportReasonModel,
+        private CommunityManagementRecordModel $communityManagementRecordModel,
+        private \AttachmentModel $attachmentModel,
+        private AttachmentService $attachmentService
     ) {
         parent::__construct("escalation");
-        $this->session = $session;
-        $this->categoryModel = $categoryModel;
-        $this->reportModel = $reportModel;
-        $this->reportReasonModel = $reportReasonModel;
-        $this->communityManagementRecordModel = $communityManagementRecordModel;
 
         $this->addPipelineProcessor(new CurrentDateFieldProcessor(["dateInserted"], ["dateUpdated"]));
         $userProcessor = new CurrentUserFieldProcessor($session);
@@ -172,13 +156,12 @@ class EscalationModel extends PipelineModel
      *
      * @return array<array>
      */
-    public function queryEscalations(array $filters, array $options): array
+    public function queryEscalations(array $filters, array $options = []): array
     {
         $query = $this->createSql()
             ->from("escalation e")
             ->select([
                 "e.*",
-                "COUNT(r.reportID) as countReports",
                 "MAX(r.dateInserted) as dateLastReport",
                 "JSON_ARRAYAGG(rrj.reportReasonID) as reportReasonIDs",
                 "JSON_ARRAYAGG(r.insertUserID) as reportUserIDs",
@@ -199,11 +182,15 @@ class EscalationModel extends PipelineModel
             $row["reportReasonIDs"] = array_unique(array_filter(json_decode($row["reportReasonIDs"])));
             $row["reportUserIDs"] = array_unique(array_filter(json_decode($row["reportUserIDs"])));
             $row["reportIDs"] = array_unique(array_filter(json_decode($row["reportIDs"])));
+            $row["countReports"] = count($row["reportIDs"]);
         }
 
         $this->communityManagementRecordModel->joinLiveRecordData($rows);
         $this->reportReasonModel->expandReportReasonArrays($rows);
         $this->reportModel->expandReportUsers($rows);
+        $this->normalizeRows($rows);
+        $this->attachmentModel->joinAttachments($rows);
+
         SchemaUtils::validateArray($rows, $this->escalationSchema());
         return $rows;
     }
@@ -233,6 +220,8 @@ class EscalationModel extends PipelineModel
                 "reportIDs:a",
                 "countReports:i",
                 "dateLastReport:dt",
+                "url:s",
+                "attachments:a?",
             ]),
             CommunityManagementRecordModel::minimalRecordSchema()
         );
@@ -276,5 +265,53 @@ class EscalationModel extends PipelineModel
                 "placeRecordID",
             ])
             ->createIndexIfNotExists("IX_escalation_assignedUserID", ["assignedUserID"]);
+    }
+
+    /**
+     * @param array $rowsOrRow
+     */
+    public function normalizeRows(array &$rowsOrRow): void
+    {
+        if (ArrayUtils::isAssociative($rowsOrRow)) {
+            $rows = [&$rowsOrRow];
+        } else {
+            $rows = &$rowsOrRow;
+        }
+
+        foreach ($rows as &$row) {
+            $row["url"] = url("/dashboard/content/escalations/{$row["escalationID"]}", true);
+        }
+    }
+
+    /**
+     * Get all available escalation statuses.
+     *
+     * @return array<string, string> A mapping of statusID => status label code.
+     */
+    public function getStatuses(): array
+    {
+        $statuses = [
+            self::STATUS_OPEN => "Open",
+            self::STATUS_IN_PROGRESS => "In Progress",
+            self::STATUS_ON_HOLD => "On Hold",
+            self::STATUS_DONE => "Done",
+        ];
+
+        $attachmentProviders = $this->attachmentService->getAllProviders();
+        foreach ($attachmentProviders as $attachmentProvider) {
+            if ($attachmentProvider instanceof EscalationStatusProviderInterface) {
+                $statuses[$attachmentProvider->getStatusID()] = $attachmentProvider->getStatusLabelCode();
+            }
+        }
+
+        return $statuses;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getStatusIDs(): array
+    {
+        return array_keys($this->getStatuses());
     }
 }

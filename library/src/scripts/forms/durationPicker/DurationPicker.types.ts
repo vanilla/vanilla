@@ -4,11 +4,9 @@
  * @license Proprietary
  */
 
-import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { IButtonProps } from "@library/forms/Button";
 import { IInputTextProps } from "@library/forms/InputTextBlock";
 import { ISelectOneProps } from "@library/forms/select/SelectOne";
-import { t } from "@library/utility/appUtils";
 
 export enum DurationPickerUnit {
     MINUTES = "minute",
@@ -18,11 +16,6 @@ export enum DurationPickerUnit {
     MONTHS = "month",
     YEARS = "year",
 }
-
-export const unitOptions: IComboBoxOption[] = Object.entries(DurationPickerUnit).map(([key, value]) => ({
-    label: t(key.toLowerCase()),
-    value,
-}));
 
 export interface IDurationValue {
     length?: number;
@@ -42,4 +35,6 @@ export interface IDurationPickerProps {
         tooltip?: string;
         onClick: (newValue: IDurationValue) => void;
     };
+    supportedUnits?: DurationPickerUnit[];
+    disabled?: boolean;
 }

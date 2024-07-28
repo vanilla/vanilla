@@ -7,22 +7,15 @@
 
 namespace Vanilla\AutomationRules\Triggers;
 
-use Vanilla\AutomationRules\Actions\AddDiscussionToCollectionAction;
-use Vanilla\AutomationRules\Actions\AddTagToDiscussionAction;
-use Vanilla\AutomationRules\Actions\BumpDiscussionAction;
-use Vanilla\AutomationRules\Actions\CloseDiscussionAction;
 use DateTimeImmutable;
 use DiscussionModel;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Gdn;
-use Vanilla\AutomationRules\Actions\MoveDiscussionToCategoryAction;
-use Vanilla\AutomationRules\Actions\RemoveDiscussionFromCollectionAction;
 use Vanilla\AutomationRules\Models\AutomationRuleLongRunnerGenerator;
-use Vanilla\AutomationRules\Trigger\AutomationTriggerInterface;
 use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
-use Vanilla\AutomationRules\Trigger\TimedAutomationTriggerInterface;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
@@ -30,9 +23,7 @@ use Vanilla\Forms\StaticFormChoices;
 /**
  * Class StaleDiscussionTrigger
  */
-class StaleDiscussionTrigger extends TimedAutomationTrigger implements
-    AutomationTriggerInterface,
-    TimedAutomationTriggerInterface
+class StaleDiscussionTrigger extends TimedAutomationTrigger
 {
     /**
      * @inheridoc
@@ -47,7 +38,15 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger implements
      */
     public static function getName(): string
     {
-        return "A certain amount of time has passed since a post has been created but has not received any comments";
+        return "Time since a post has no comments";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -55,14 +54,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger implements
      */
     public static function getActions(): array
     {
-        return [
-            CloseDiscussionAction::getType(),
-            BumpDiscussionAction::getType(),
-            AddTagToDiscussionAction::getType(),
-            MoveDiscussionToCategoryAction::getType(),
-            AddDiscussionToCollectionAction::getType(),
-            RemoveDiscussionFromCollectionAction::getType(),
-        ];
+        return DiscussionRuleDataType::getActions();
     }
 
     /**
@@ -91,6 +83,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger implements
                 true
             ),
         ];
+        $schema["additionalSettings"] = self::getAdditionalSettingsSchema();
 
         return Schema::parse($schema);
     }
@@ -140,7 +133,6 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger implements
             "trigger:o" => self::getTimedTriggerSchema(),
         ]);
         $schema->merge($discussionCommentSchema);
-        self::addActionTypeValidation($schema);
     }
 
     /**

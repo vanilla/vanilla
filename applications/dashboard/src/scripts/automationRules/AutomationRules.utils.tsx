@@ -7,6 +7,7 @@ import {
     AddEditAutomationRuleParams,
     AutomationRuleActionType,
     AutomationRuleFormValues,
+    AutomationRuleTriggerType,
     IAutomationRule,
     IAutomationRuleDispatch,
     IAutomationRulesCatalog,
@@ -30,17 +31,67 @@ export const EMPTY_AUTOMATION_RULE_FORM_VALUES: AutomationRuleFormValues = {
 };
 
 /**
+ *  Checks if the trigger is time based
+ */
+export const isTimeBasedTrigger = (
+    triggerType?: AutomationRuleTriggerType | string,
+    catalog?: IAutomationRulesCatalog,
+): boolean => {
+    if (triggerType && catalog) {
+        return catalog.triggers[triggerType]?.schema?.properties?.triggerTimeDelay ? true : false;
+    }
+    return false;
+};
+
+/**
  *  Mainly adjustments for profile field form fields
  */
-export function mapApiValuesToFormValues(recipe?: IAutomationRule | IAutomationRuleDispatch): AutomationRuleFormValues {
+export function mapApiValuesToFormValues(
+    recipe?: IAutomationRule | IAutomationRuleDispatch,
+    catalog?: IAutomationRulesCatalog,
+    profileFields?: ProfileField[],
+): AutomationRuleFormValues {
     if (recipe) {
-        const triggerValue = recipe.trigger.triggerValue?.profileField
-            ? {
-                  ...recipe.trigger.triggerValue,
-                  profileField: Object.keys(recipe.trigger.triggerValue?.profileField)[0],
-                  ...recipe.trigger.triggerValue?.profileField,
-              }
-            : recipe.trigger.triggerValue;
+        // profile field adjustments
+        let triggerValue = recipe.trigger.triggerValue;
+        if (triggerValue?.profileField) {
+            const profileFieldApiName = Object.keys(triggerValue?.profileField)[0];
+            const isNumericTokensProfileField = profileFields?.find(
+                (field) =>
+                    field.apiName === profileFieldApiName &&
+                    field.formType === "tokens" &&
+                    field.dataType === "number[]",
+            );
+
+            triggerValue = {
+                ...triggerValue,
+                profileField: profileFieldApiName,
+                [profileFieldApiName]: isNumericTokensProfileField
+                    ? // we do this so our autocomplete does not mess up the values, it always expects an string values
+                      triggerValue?.profileField[profileFieldApiName].map((value) => value.toString())
+                    : triggerValue?.profileField[profileFieldApiName],
+            };
+        }
+
+        // if there are trigger values that belong to additional settings, move them under additionalSettings
+        const triggerAdditionalSettings = Object.keys(
+            catalog?.triggers[recipe.trigger.triggerType]?.schema?.properties?.additionalSettings ?? {},
+        );
+        const additionalSettings: any = {};
+
+        if (
+            triggerAdditionalSettings.length > 0 &&
+            triggerAdditionalSettings.some((key) => typeof triggerValue[key] !== "undefined")
+        ) {
+            Object.keys(triggerValue).forEach((key) => {
+                if (!additionalSettings.triggerValue) {
+                    additionalSettings.triggerValue = {};
+                }
+                if (triggerAdditionalSettings.includes(key)) {
+                    additionalSettings.triggerValue[key] = triggerValue[key];
+                }
+            });
+        }
 
         return {
             trigger: {
@@ -48,9 +99,9 @@ export function mapApiValuesToFormValues(recipe?: IAutomationRule | IAutomationR
                 triggerValue: triggerValue,
             },
             action: { ...recipe.action },
+            ...(Object.keys(additionalSettings).length > 0 && { additionalSettings: additionalSettings }),
         };
     }
-
     return EMPTY_AUTOMATION_RULE_FORM_VALUES;
 }
 
@@ -72,8 +123,18 @@ export function mapFormValuesToApiValues(values: AutomationRuleFormValues): AddE
     if (adjustedValues.action?.actionValue?.collectionID) {
         adjustedValues.action.actionValue.recordType = "discussion";
     }
+
+    // bring additional settings triggerValue fields to the top level triggerValue
+    if (adjustedValues.trigger && adjustedValues.additionalSettings?.triggerValue) {
+        adjustedValues.trigger.triggerValue = {
+            ...adjustedValues.trigger.triggerValue,
+            ...adjustedValues.additionalSettings.triggerValue,
+        };
+    }
+
     return adjustedValues;
 }
+
 /**
  *  Converts time threshold and time unit to api values
  */
@@ -124,6 +185,41 @@ export function getTriggerActionFormSchema(
         });
     }
 
+    const triggerDropdownOptions = Object.keys(automationRulesCatalog?.triggers ?? {}).map((trigger) => {
+        return {
+            value: trigger,
+            label: automationRulesCatalog?.triggers[trigger].name,
+            group:
+                automationRulesCatalog?.triggers[trigger].contentType === "users"
+                    ? t("User Management")
+                    : t("Post Management"),
+        };
+    });
+
+    const perTriggerActions = Object.keys(automationRulesCatalog?.actions ?? {}).filter((actionType) =>
+        currentFormValues?.trigger?.triggerType
+            ? automationRulesCatalog?.triggers[currentFormValues?.trigger.triggerType].triggerActions.includes(
+                  actionType as AutomationRuleActionType,
+              )
+            : true,
+    );
+
+    const actionDropdownOptions = perTriggerActions.length
+        ? Object.values(perTriggerActions ?? {}).map((action) => {
+              return {
+                  value: action,
+                  label: automationRulesCatalog?.actions[action]?.name,
+                  group:
+                      automationRulesCatalog?.actions[action].contentType === "users"
+                          ? t("User Management")
+                          : t("Post Management"),
+              };
+          })
+        : [];
+
+    const selectedTriggerType = currentFormValues.trigger?.triggerType;
+    const selectedActionType = currentFormValues.action?.actionType;
+
     const triggerActionSchema = {
         type: "object",
         description: "Trigger and Action Schema",
@@ -131,6 +227,10 @@ export function getTriggerActionFormSchema(
             trigger: {
                 type: "object",
                 description: "Trigger Schema",
+                "x-control": {
+                    label: t("Trigger"),
+                    description: "",
+                },
                 required: ["triggerType"],
                 properties: {
                     triggerType: {
@@ -141,12 +241,7 @@ export function getTriggerActionFormSchema(
                             label: t("Rule Trigger"),
                             inputType: "dropDown",
                             choices: {
-                                staticOptions: Object.fromEntries(
-                                    Object.keys(automationRulesCatalog?.triggers ?? {}).map((trigger) => [
-                                        trigger,
-                                        automationRulesCatalog?.triggers[trigger].name,
-                                    ]),
-                                ),
+                                staticOptions: triggerDropdownOptions,
                             },
                             multiple: false,
                         },
@@ -179,6 +274,10 @@ export function getTriggerActionFormSchema(
             action: {
                 type: "object",
                 description: "Action Schema",
+                "x-control": {
+                    label: t("Action"),
+                    description: "",
+                },
                 required: ["actionType"],
                 properties: {
                     actionType: {
@@ -189,17 +288,7 @@ export function getTriggerActionFormSchema(
                             label: t("Rule Action"),
                             inputType: "dropDown",
                             choices: {
-                                staticOptions: Object.fromEntries(
-                                    Object.keys(automationRulesCatalog?.actions ?? {})
-                                        .filter((actionType) =>
-                                            currentFormValues?.trigger?.triggerType
-                                                ? automationRulesCatalog?.triggers[
-                                                      currentFormValues?.trigger.triggerType
-                                                  ].triggerActions.includes(actionType as AutomationRuleActionType)
-                                                : true,
-                                        )
-                                        .map((action) => [action, automationRulesCatalog?.actions[action].name]),
-                                ),
+                                staticOptions: actionDropdownOptions,
                             },
                             multiple: false,
                         },
@@ -217,32 +306,37 @@ export function getTriggerActionFormSchema(
         },
     };
 
-    if (currentFormValues.trigger?.triggerType) {
-        let triggerRequiredKeys = Object.keys(
-            triggerActionSchema.properties.trigger.properties.triggerValue.properties,
-        );
-        // bit of adjustments for time based triggers
-        if (
-            [
-                "staleDiscussionTrigger",
-                "staleCollectionTrigger",
-                "lastActiveDiscussionTrigger",
-                "timeSinceUserRegistrationTrigger",
-            ].includes(currentFormValues.trigger.triggerType)
-        ) {
-            triggerRequiredKeys = triggerRequiredKeys.filter((key) => key !== "maxTimeThreshold");
-            if (
-                !currentFormValues.trigger?.triggerValue?.maxTimeThreshold ||
-                currentFormValues.trigger?.triggerValue?.maxTimeThreshold === "" ||
-                !currentFormValues.trigger?.triggerValue?.maxTimeThreshold.toString().match(/^\d+$/)
-            ) {
-                triggerRequiredKeys = triggerRequiredKeys.filter((key) => key !== "maxTimeUnit");
-            }
+    if (selectedTriggerType) {
+        const triggerAdditionalSettings =
+            automationRulesCatalog?.triggers[selectedTriggerType]?.schema?.properties?.additionalSettings;
+        if (triggerAdditionalSettings) {
+            triggerActionSchema.properties["additionalSettings"] = {
+                type: "object",
+                "x-control": {
+                    label: t("Additional settings"),
+                    description: "",
+                },
+                properties: {
+                    triggerValue: {
+                        type: "object",
+                        properties: {
+                            ...automationRulesCatalog?.triggers[selectedTriggerType]?.schema?.properties
+                                ?.additionalSettings,
+                        },
+                    },
+                },
+            };
         }
+
+        // additionalSettings are normally optional
+        const triggerRequiredKeys = Object.keys(
+            triggerActionSchema.properties.trigger.properties.triggerValue.properties,
+        ).filter((field) => field !== "additionalSettings");
+
         triggerActionSchema.properties.trigger.properties.triggerValue["required"] = triggerRequiredKeys;
     }
 
-    if (currentFormValues.action?.actionType) {
+    if (selectedActionType) {
         const actionRequiredKeys = Object.keys(triggerActionSchema.properties.action.properties.actionValue.properties);
         triggerActionSchema.properties.action.properties.actionValue["required"] = actionRequiredKeys.filter(
             (key) => key !== "removeRoleID",

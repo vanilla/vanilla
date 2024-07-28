@@ -66,7 +66,7 @@ export function CommentOptionsMenu(props: IProps) {
         resourceID: comment.categoryID,
     };
 
-    const canReport = hasPermission("flag.add");
+    const canReport = hasPermission("flag.add") && getMeta("featureFlags.CommunityManagement.Enabled", false);
 
     const toast = useToast();
     const deleteMutation = useMutation({

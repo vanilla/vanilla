@@ -30,12 +30,6 @@ class CommentsApiController extends AbstractApiController
     use CommunitySearchSchemaTrait;
     use \Vanilla\Formatting\FormatCompatTrait;
 
-    /** @var CommentModel */
-    private $commentModel;
-
-    /** @var DiscussionModel */
-    private $discussionModel;
-
     /** @var Schema */
     private $commentSchema;
 
@@ -45,29 +39,16 @@ class CommentsApiController extends AbstractApiController
     /** @var Schema */
     private $idParamSchema;
 
-    /** @var UserModel */
-    private $userModel;
-
-    private ReactionModel $reactionModel;
-
     /**
-     * CommentsApiController constructor.
-     *
-     * @param CommentModel $commentModel
-     * @param DiscussionModel $discussionModel
-     * @param UserModel $userModel
-     * @param ReactionModel $reactionModel
+     * DI.
      */
     public function __construct(
-        CommentModel $commentModel,
-        DiscussionModel $discussionModel,
-        UserModel $userModel,
-        ReactionModel $reactionModel
+        private CommentModel $commentModel,
+        private DiscussionModel $discussionModel,
+        private UserModel $userModel,
+        private ReactionModel $reactionModel,
+        private \Vanilla\Forum\Models\CommunityManagement\ReportModel $reportModel
     ) {
-        $this->commentModel = $commentModel;
-        $this->discussionModel = $discussionModel;
-        $this->userModel = $userModel;
-        $this->reactionModel = $reactionModel;
     }
 
     /**
@@ -415,7 +396,13 @@ class CommentsApiController extends AbstractApiController
                         "field" => "InsertUserID",
                     ],
                 ],
-                "expand?" => ApiUtils::getExpandDefinition(["insertUser", "-body", "attachments", "reactions"]),
+                "expand?" => ApiUtils::getExpandDefinition([
+                    "insertUser",
+                    "-body",
+                    "attachments",
+                    "reactions",
+                    "countReports",
+                ]),
             ],
             ["CommentIndex", "in"]
         )
@@ -465,6 +452,12 @@ class CommentsApiController extends AbstractApiController
 
         if (ModelUtils::isExpandOption("reactions", $query["expand"])) {
             $this->reactionModel->expandCommentReactions($rows);
+        }
+
+        $permissions = $this->getSession()->getPermissions();
+        $hasReportViewPermission = $permissions->hasAny(["posts.moderate", "community.manage"]);
+        if (ModelUtils::isExpandOption("countReports", $query["expand"]) && $hasReportViewPermission) {
+            $this->reportModel->expandCountReports($rows, "comment");
         }
 
         $result = $out->validate($rows);

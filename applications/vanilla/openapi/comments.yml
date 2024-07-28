@@ -58,6 +58,8 @@ paths:
                               - insertUser
                               - all
                               - reactions
+                              - attachments
+                              - countReports
                           type: string
                       type: array
                   style: form
@@ -627,6 +629,11 @@ components:
                 url:
                     description: The full URL to the comment.
                     type: string
+                countReports:
+                    type: integer
+                    default: 0
+                    description: The number of reports on the discussion.
+                    x-feature: "Feature.CommunityManagement.Enabled"
             required:
                 - commentID
                 - discussionID

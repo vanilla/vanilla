@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web\JsInterpop;
 
+use Garden\Utils\ContextException;
 use Garden\Web\Data;
 use Garden\Web\Exception\HttpException;
 use Vanilla\Utility\DebugUtils;
@@ -46,7 +47,11 @@ class ReduxErrorAction extends ReduxAction
         }
 
         if (DebugUtils::isDebug()) {
-            $data["trace"] = DebugUtils::stackTraceString($throwable->getTrace());
+            if (method_exists($throwable, "getContext") && isset($throwable->getContext()["trace"])) {
+                $data["trace"] = $throwable->getContext()["trace"];
+            } else {
+                $data["trace"] = DebugUtils::stackTraceString($throwable->getTrace());
+            }
         }
 
         parent::__construct(self::ACTION_TYPE, new Data($data));

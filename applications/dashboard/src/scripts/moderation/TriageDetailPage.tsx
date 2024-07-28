@@ -9,6 +9,7 @@ import { EscalateModal } from "@dashboard/moderation/components/EscalateModal";
 import { PostDetail } from "@dashboard/moderation/components/PostDetail";
 import { TriageActionPanel } from "@dashboard/moderation/components/TriageActionPanel";
 import { TriageInternalStatus } from "@dashboard/moderation/components/TriageFilters.constants";
+import { TriageListItem } from "@dashboard/moderation/components/TriageListItem";
 import { css } from "@emotion/css";
 import apiv2 from "@library/apiv2";
 import Translate from "@library/content/Translate";
@@ -53,7 +54,9 @@ function TriageDetailPage(props: IProps) {
 
     const post = useQuery<any, IError, IDiscussion>({
         queryFn: async () => {
-            const response = await apiv2.get(`/discussions/${recordID}?expand=users&expand=category`);
+            const response = await apiv2.get(
+                `/discussions/${recordID}?expand=users&expand=category&expand=attachments`,
+            );
             return response.data;
         },
         queryKey: ["post", recordID],

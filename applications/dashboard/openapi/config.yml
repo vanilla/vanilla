@@ -824,3 +824,11 @@ components:
                     x-key: "Garden.ExternalSearch.ResultsInNewTab"
                     x-read: community.manage
                     x-write: community.manage
+                "communityManagement.enabled":
+                    description: |
+                        Switch reporting ingestion to use the new community management system.
+                    type: boolean
+                    default: false
+                    x-key: "Feature.CommunityManagement.Enabled"
+                    x-read: community.manage
+                    x-write: community.manage

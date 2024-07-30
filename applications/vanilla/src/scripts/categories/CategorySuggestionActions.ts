@@ -25,7 +25,7 @@ export default class CategorySuggestionActions extends ReduxActions<IForumStoreS
         }
         const apiThunk = bindThunkAction(CategorySuggestionActions.loadCategories, async () => {
             // See if we have an existing item.
-            const params = { query, parentCategoryID, expand: ["breadcrumbs"] };
+            const params = { query, parentCategoryID, expand: ["breadcrumbs"], limit: 50 };
             const response = await this.api.get("/categories/search", { params });
             return response.data;
         })({ query });

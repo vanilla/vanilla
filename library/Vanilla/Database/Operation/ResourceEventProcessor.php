@@ -42,6 +42,11 @@ class ResourceEventProcessor implements Processor
     private $restrictedProperties = [];
 
     /**
+     * @var string|null set this value to overwrite the payload key.
+     */
+    private ?string $resourceEventType = null;
+
+    /**
      * DI.
      *
      * @param EventManager $eventManager
@@ -238,7 +243,7 @@ class ResourceEventProcessor implements Processor
             // We can only process actions that have a model caller.
             return [];
         }
-        $recordType = $model->getTable();
+        $recordType = $this->resourceEventType ?? $model->getTable();
 
         $where = $operation->getWhere();
         $metaID = $operation->getMeta(self::META_NEW_INSERT_ID, null);
@@ -305,5 +310,10 @@ class ResourceEventProcessor implements Processor
                 $this->addDirtyRecord($resourceType, $resourceIDs);
             }
         }
+    }
+
+    public function setResourceEventType(string $resourceEventType): void
+    {
+        $this->resourceEventType = $resourceEventType;
     }
 }

@@ -8,6 +8,7 @@
 namespace VanillaTests;
 
 use Garden\Container\Container;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\AddonModel;
 
 /**

@@ -1297,14 +1297,18 @@ class UserModelTest extends SiteTestCase
     {
         $this->enableFeature(ProfileFieldModel::FEATURE_FLAG);
         $profileField = $this->createProfileField(["registrationOptions" => "optional"]);
-        $this->getEventManager()->bind(UserEvent::class, function (UserEvent $event) use ($profileField) {
+        $callbackFired = false;
+
+        $userEventCallback = function (UserEvent $event) use ($profileField, &$callbackFired) {
             $userID = $event->getUniquePrimaryKeyValue();
             $userProfileFields = $this->profileFieldModel->getUserProfileFields($userID);
             $this->assertArrayHasKey($profileField["apiName"], $userProfileFields);
             $this->assertEquals("hehehe", $userProfileFields[$profileField["apiName"]]);
+            $callbackFired = true;
 
             return $event;
-        });
+        };
+        $this->getEventManager()->bind(UserEvent::class, $userEventCallback);
         $this->runWithConfig(["Garden.Registration.Method" => "Basic"], function () use ($profileField) {
             $this->bessy()->postHtml("/entry/register", [
                 "Email" => "u105@example.com",
@@ -1317,7 +1321,97 @@ class UserModelTest extends SiteTestCase
                 "TermsOfService" => "1",
             ]);
         });
+        $this->getEventManager()->unbind(UserEvent::class, $userEventCallback);
+        $this->assertTrue($callbackFired);
 
         $this->disableFeature(ProfileFieldModel::FEATURE_FLAG);
+    }
+
+    /**
+     * Test that user email changes by an admin user are saved to the user email column directly.
+     *
+     * @return array
+     * @throws \Gdn_UserException
+     */
+    public function testUserEmailChangesByAdminAreUpdatedDirectly(): array
+    {
+        // First create the user with confirmed set to true.
+        $user = $this->createUserByApi(["email" => "confirm-reset-test@example.com", "emailConfirmed" => true]);
+        $this->assertTrue($user["emailConfirmed"]);
+
+        // Calling the save function as an admin user, the email is updated directly with no pending attribute needed.
+        $this->userModel->save(["UserID" => $user["userID"], "Email" => "confirm-reset-test-1@example.com"]);
+        $userFromModel = $this->userModel->getID($user["userID"], DATASET_TYPE_ARRAY);
+        $this->assertEquals(1, $userFromModel["Confirmed"]);
+        $this->assertArrayNotHasKey("EmailKey", $userFromModel["Attributes"]);
+        $this->assertArrayNotHasKey("PendingEmail", $userFromModel["Attributes"]);
+
+        return $user;
+    }
+
+    /**
+     * Test that user email changes by the user themselves is stored as a pending email and a confirmation email is sent.
+     *
+     * @depends testUserEmailChangesByAdminAreUpdatedDirectly
+     * @param array $user
+     * @return array
+     */
+    public function testUserEmailChangesByUserAreSavedAsPendingEmail(array $user): array
+    {
+        // For a user updating their own email, test that EmailKey and PendingEmail are stored as attributes.
+        $this->runWithUser(function () use ($user) {
+            $this->userModel->save(["UserID" => $user["userID"], "Email" => "confirm-reset-test-2@example.com"]);
+            $userFromModel = $this->userModel->getID($user["userID"], DATASET_TYPE_ARRAY);
+            $this->assertEquals(1, $userFromModel["Confirmed"]);
+            $this->assertArrayHasKey("EmailKey", $userFromModel["Attributes"]);
+            $this->assertArrayHasKey("PendingEmail", $userFromModel["Attributes"]);
+            $this->assertSame("confirm-reset-test-2@example.com", $userFromModel["Attributes"]["PendingEmail"]);
+        }, $user);
+        return $user;
+    }
+
+    /**
+     * Test that when a user has a pending email, and they update the email using the original email value,
+     * the pending email value is cleared.
+     *
+     * @depends testUserEmailChangesByUserAreSavedAsPendingEmail
+     * @param array $user
+     * @return void
+     */
+    public function testUserEmailRestoreByUserClearsPendingEmail(array $user)
+    {
+        // For a user restoring their email to the original value, test that PendingEmail is cleared.
+        $this->runWithUser(function () use ($user) {
+            $this->userModel->save(["UserID" => $user["userID"], "Email" => "confirm-reset-test-1@example.com"]);
+            $userFromModel = $this->userModel->getID($user["userID"], DATASET_TYPE_ARRAY);
+            $this->assertEquals(1, $userFromModel["Confirmed"]);
+            $this->assertArrayHasKey("EmailKey", $userFromModel["Attributes"]);
+            $this->assertNull($userFromModel["Attributes"]["PendingEmail"]);
+        }, $user);
+    }
+
+    /**
+     * Test that when a user updates their email, and they click the confirmation link to confirm the email,
+     * the pending email is cleared and their email address is updated.
+     *
+     * @return void
+     */
+    public function testEmailConfirmationLinkClearsPendingEmail()
+    {
+        $user = $this->createUserByApi();
+        $originalEmail = $user["email"];
+        $this->runWithUser(function () use ($user, $originalEmail) {
+            $this->userModel->save(["UserID" => $user["userID"], "Email" => "confirm-reset-test-3@example.com"]);
+            $userFromModel = $this->userModel->getID($user["userID"], DATASET_TYPE_ARRAY);
+            $this->assertArrayHasKey("PendingEmail", $userFromModel["Attributes"]);
+            $this->assertSame("confirm-reset-test-3@example.com", $userFromModel["Attributes"]["PendingEmail"]);
+            $this->assertSame($originalEmail, $userFromModel["Email"]);
+            $this->assertEmailSentTo("confirm-reset-test-3@example.com");
+
+            $this->bessy()->get("/entry/emailconfirm/{$user["userID"]}/{$userFromModel["Attributes"]["EmailKey"]}");
+            $userFromModel = $this->userModel->getID($user["userID"], DATASET_TYPE_ARRAY);
+            $this->assertSame("confirm-reset-test-3@example.com", $userFromModel["Email"]);
+            $this->assertArrayNotHasKey("PendingEmail", $userFromModel["Attributes"]);
+        }, $user);
     }
 }

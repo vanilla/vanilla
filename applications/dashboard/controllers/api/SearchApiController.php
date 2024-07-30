@@ -16,6 +16,7 @@ use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Search\SearchResults;
+use Vanilla\Search\SearchTypeaheadResult;
 use Vanilla\Utility\UrlUtils;
 
 /**
@@ -63,7 +64,15 @@ class SearchApiController extends AbstractApiController
         // Paging
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
-        $searchResults = $driver->search($query, new SearchOptions($offset, $limit));
+        $searchResults = $driver->search(
+            $query,
+            new SearchOptions(
+                $offset,
+                $limit,
+                includeTypeaheads: $query["includeTypeaheads"] ?? false,
+                includeResults: $query["includeResults"] ?? true
+            )
+        );
 
         $expands = $query["expand"] ?? [];
         if (isset($query["collapse"]) && $query["collapse"]) {
@@ -105,8 +114,10 @@ class SearchApiController extends AbstractApiController
      */
     public function applyExpandFields(SearchResults &$rows, $expandFields)
     {
-        $populate = function (SearchResultItem &$row) use ($expandFields) {
-            $row->setExpands($expandFields);
+        $populate = function (SearchResultItem|SearchTypeaheadResult &$row) use ($expandFields) {
+            if ($row instanceof SearchResultItem) {
+                $row->setExpands($expandFields);
+            }
         };
 
         foreach ($rows as &$row) {

@@ -2,13 +2,7 @@ import path from "path";
 import { mergeConfig, UserConfig } from "vite";
 import { VANILLA_ROOT } from "./scripts/env";
 import reactPlugin from "@vitejs/plugin-react-swc";
-import {
-    getAddonKeyFromChunkID,
-    isEntryChunk,
-    isLibraryChunk,
-    warmupGlobs,
-    makeViteCommonConfig,
-} from "./vite.commonConfig";
+import { getAddonKeyFromChunkID, isEntryChunk, isLibraryChunk, makeViteCommonConfig } from "./vite.commonConfig";
 
 export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
     const buildConfig: UserConfig = {
@@ -117,9 +111,6 @@ export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
             },
             hmr: {
                 host: "frontend.vanilla.localhost",
-            },
-            warmup: {
-                clientFiles: warmupGlobs,
             },
             watch: {
                 ignored: [

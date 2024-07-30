@@ -30,6 +30,7 @@ use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Controllers\API\ConfigApiController;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
+use Vanilla\Dashboard\Models\AttachmentService;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RemoteResourceModel;
 use Vanilla\Dashboard\UserLeaderService;
@@ -446,7 +447,6 @@ class Bootstrap
 
             ->rule(AiSuggestionSourceService::class)
             ->addCall("registerSuggestionSource", [new Reference(MockSuggestionModel::class)])
-            ->setShared(true)
 
             ->rule(RecordStatusModel::class)
             ->setShared(true);
@@ -456,6 +456,8 @@ class Bootstrap
             ->setConstructorArgs(["cachePath" => PATH_ROOT . "/tests/cache/openapi.php"])
             ->rule(ConfigApiController::class)
             ->setConstructorArgs(["cachePath" => PATH_ROOT . "/tests/cache/config-schema.php"]);
+
+        $container->rule(AttachmentService::class)->setShared(false);
     }
 
     /**

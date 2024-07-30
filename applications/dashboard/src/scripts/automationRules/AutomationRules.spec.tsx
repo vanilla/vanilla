@@ -10,12 +10,12 @@ import {
     mockProfileField,
     mockRecipesList,
 } from "@dashboard/automationRules/AutomationRules.fixtures";
-import { AutomationRulesListImpl } from "@dashboard/automationRules/AutomationRulesList";
+import { AutomationRulesList } from "@dashboard/automationRules/AutomationRulesList";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { AutomationRulesContext, IAutomationRulesContext } from "@dashboard/automationRules/AutomationRules.context";
-import { AutomationRulesAddEditImpl } from "@dashboard/automationRules/AutomationRulesAddEditRule";
+import { AutomationRulesAddEdit } from "@dashboard/automationRules/pages/AutomationRulesAddEditPage";
 import { mockRolesState } from "@dashboard/components/panels/MembersSearchFilterPanel.spec";
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import { createReducer } from "@reduxjs/toolkit";
@@ -60,7 +60,9 @@ describe("AutomationRules", () => {
 
     beforeAll(() => {
         mockAdapter = mockAPI();
-        mockAdapter.onGet(/automation-rules\/recipes/).reply(200, mockRecipesList);
+        mockAdapter.onGet("/automation-rules/recipes?expand=all").reply((config) => {
+            return config.params.escalations ? [200, [mockRecipesList[5]]] : [200, mockRecipesList];
+        });
         mockAdapter.onGet(/automation-rules\/2\/recipe/).reply(200, mockRecipesList[1]);
         mockAdapter.onGet(/automation-rules\/3\/recipe/).reply(200, mockRecipesList[2]);
         mockAdapter.onGet(/automation-rules\/4\/recipe/).reply(200, mockRecipesList[3]);
@@ -74,7 +76,7 @@ describe("AutomationRules", () => {
     });
 
     it("Automation Rules List Page - Add Rule Button, Table, Search and Filter are on place", async () => {
-        renderInProvider(<AutomationRulesListImpl />);
+        renderInProvider(<AutomationRulesList />);
 
         const addRuleButton = await screen.findByRole("button", { name: "Add Rule" });
         const table = await screen.findByRole("table");
@@ -86,7 +88,7 @@ describe("AutomationRules", () => {
         });
     });
     it("Automation Rules List Page - Recipes are translated into table values", async () => {
-        renderInProvider(<AutomationRulesListImpl />);
+        renderInProvider(<AutomationRulesList />);
 
         const table = await screen.findByRole("table");
         const tableRows = table.querySelectorAll("tbody tr");
@@ -107,8 +109,17 @@ describe("AutomationRules", () => {
         expect(tableRows[1].querySelectorAll("button")[1]).toBeDisabled();
     });
 
+    it("Escalation Rules List Page - Only rules having escalation actions", async () => {
+        renderInProvider(<AutomationRulesList isEscalationRulesList />);
+
+        const table = await screen.findByRole("table");
+        const tableRows = table.querySelectorAll("tbody tr");
+        expect(tableRows).toHaveLength(1);
+        expect(tableRows[0]).toHaveTextContent(mockRecipesList[5].name);
+    });
+
     it("Automation Rules Add/Edit - Adding a rule, check some trigger action dependencies and default values", async () => {
-        renderInProvider(<AutomationRulesAddEditImpl />, {
+        renderInProvider(<AutomationRulesAddEdit />, {
             automationRulesCatalog: mockAutomationRulesCatalog,
             rolesByID: mockRolesState.rolesByID?.data,
             profileFields: [mockProfileField],
@@ -136,12 +147,10 @@ describe("AutomationRules", () => {
         staleDiscussionTriggerOption && staleDiscussionTriggerOption.click();
 
         // corresponding fields are displayed
-        const durationField = await screen.findByText("Trigger Time Threshold");
-        const intervalField = await screen.findAllByText(/Time Unit/);
+        const triggerTimeDelayField = await screen.findByText("Trigger Delay");
         const postTypeField = await screen.findByText("Post Type");
 
-        expect(durationField).toBeInTheDocument();
-        expect(intervalField.length).toBeGreaterThan(0);
+        expect(triggerTimeDelayField).toBeInTheDocument();
         expect(postTypeField).toBeInTheDocument();
 
         // default values for postType field are populated
@@ -156,7 +165,9 @@ describe("AutomationRules", () => {
         actionDropDown && actionDropDown.click();
         const actionDropDownOptions = await screen.findAllByRole("option");
 
-        expect(actionDropDownOptions).toHaveLength(6);
+        expect(actionDropDownOptions).toHaveLength(
+            mockAutomationRulesCatalog.triggers.staleDiscussionTrigger.triggerActions.length,
+        );
         actionDropDownOptions.forEach((option) => {
             const optionText = option.querySelector("span")?.textContent;
             expect(
@@ -168,7 +179,7 @@ describe("AutomationRules", () => {
     });
 
     it("Automation Rules Add/Edit - Adding a rule, the case when values having same name with different parent type (e.g. followCategoryAction and moveToCategoryAction, both have categoryID as a value)", async () => {
-        renderInProvider(<AutomationRulesAddEditImpl />, {
+        renderInProvider(<AutomationRulesAddEdit />, {
             automationRulesCatalog: mockAutomationRulesCatalog,
             rolesByID: mockRolesState.rolesByID?.data,
             profileFields: [mockProfileField],
@@ -226,7 +237,7 @@ describe("AutomationRules", () => {
     });
 
     it("Automation Rules Add/Edit - Recipe data (profileFieldTrigger-addRemoveRoleAction) is correctly populated in form values", async () => {
-        renderInProvider(<AutomationRulesAddEditImpl automationRuleID="3" />, {
+        renderInProvider(<AutomationRulesAddEdit automationRuleID="3" />, {
             automationRulesCatalog: mockAutomationRulesCatalog,
             rolesByID: mockRolesState.rolesByID?.data,
             profileFields: [mockProfileField],
@@ -251,7 +262,7 @@ describe("AutomationRules", () => {
     });
 
     it("Automation Rules Add/Edit - Recipe data (emailDomainTrigger-categoryFollowAction) is correctly populated in form values", async () => {
-        renderInProvider(<AutomationRulesAddEditImpl automationRuleID="4" />, {
+        renderInProvider(<AutomationRulesAddEdit automationRuleID="4" />, {
             automationRulesCatalog: mockAutomationRulesCatalog,
             rolesByID: mockRolesState.rolesByID?.data,
             categories: mockCategoriesData,
@@ -274,7 +285,7 @@ describe("AutomationRules", () => {
         expect(textFieldValues.includes(mockRecipesList[3].trigger?.triggerValue?.emailDomain)).toBe(true);
     });
     it("Automation Rules Add/Edit - Editing a rule when its running - Disabled view", async () => {
-        renderInProvider(<AutomationRulesAddEditImpl automationRuleID="2" />, {
+        renderInProvider(<AutomationRulesAddEdit automationRuleID="2" />, {
             automationRulesCatalog: mockAutomationRulesCatalog,
             rolesByID: mockRolesState.rolesByID?.data,
         });
@@ -296,6 +307,67 @@ describe("AutomationRules", () => {
         // running status is displayed
         const running = await screen.findByText("Running");
         expect(running).toBeInTheDocument();
+    });
+
+    it("Escalation Rules Add/Edit - Adding an escalation rule, triggers dropdown should have only triggers containing at least one escalation actions, actions dropdown should contain anly escalation actions", async () => {
+        const escalationActions = ["createEscalationAction", "escalateToZendeskAction", "escalateGithubIssueAction"];
+        const mockEscalationRulesCatalog = { ...mockAutomationRulesCatalog };
+        Object.keys(mockEscalationRulesCatalog.triggers).forEach((trigger) => {
+            if (
+                !mockEscalationRulesCatalog.triggers[trigger].triggerActions.some((action) =>
+                    escalationActions.includes(action),
+                )
+            ) {
+                delete mockEscalationRulesCatalog.triggers[trigger];
+            }
+        });
+        Object.keys(mockEscalationRulesCatalog.actions).forEach((action) => {
+            if (!escalationActions.includes(action)) {
+                delete mockEscalationRulesCatalog.actions[action];
+            }
+        });
+        renderInProvider(<AutomationRulesAddEdit />, {
+            automationRulesCatalog: mockEscalationRulesCatalog,
+            rolesByID: mockRolesState.rolesByID?.data,
+            profileFields: [mockProfileField],
+        });
+
+        const dropDowns = await screen.findAllByRole("combobox");
+
+        expect(dropDowns).toHaveLength(2);
+
+        const triggerDropDown = dropDowns[0];
+        triggerDropDown && triggerDropDown.click();
+        const triggerDropDownOptions = await screen.findAllByRole("option");
+
+        expect(triggerDropDownOptions).toHaveLength(Object.keys(mockEscalationRulesCatalog.triggers).length);
+
+        const staleDiscussionTriggerOption = await screen.findByText(
+            mockAutomationRulesCatalog.triggers.staleDiscussionTrigger.name,
+        );
+        expect(staleDiscussionTriggerOption).toBeInTheDocument();
+
+        staleDiscussionTriggerOption && staleDiscussionTriggerOption.click();
+
+        // action dropdown options are only escalation actions supported by the selected trigger
+        const actionDropDown = dropDowns[1];
+        actionDropDown && actionDropDown.click();
+        const actionDropDownOptions = await screen.findAllByRole("option");
+
+        const expectedActions = mockEscalationRulesCatalog.triggers.staleDiscussionTrigger.triggerActions.filter(
+            (actionType) => escalationActions.includes(actionType),
+        );
+
+        expect(actionDropDownOptions).toHaveLength(expectedActions.length);
+
+        actionDropDownOptions.forEach((option) => {
+            const optionText = option.querySelector("span")?.textContent;
+            expect(
+                expectedActions
+                    .map((actionType) => mockEscalationRulesCatalog.actions[actionType].name)
+                    .includes((optionText ?? "") as AutomationRuleActionType),
+            ).toBeTruthy();
+        });
     });
     it("Automation Rules Summary - Form values (profileFieldTrigger-addRemoveRoleAction) are present in summary section", async () => {
         renderInProvider(<AutomationRulesSummary formValues={mapApiValuesToFormValues(mockRecipesList[2])} />, {

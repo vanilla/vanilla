@@ -6,6 +6,7 @@
  */
 
 use Garden\Web\Exception\ClientException;
+use Vanilla\FeatureFlagHelper;
 
 /**
  * Class Gdn_UploadSvg
@@ -39,11 +40,24 @@ class Gdn_UploadSvg extends Gdn_Upload
      */
     public function validateUpload($inputName, $throwException = true): ?string
     {
+        $expectedMimeTypes = ["image/svg+xml", "image/svg"];
         // Add some .svg-specific validation here.
-        if (!in_array($_FILES[$inputName]["type"], ["image/svg+xml", "image/svg"])) {
+        if (!in_array($_FILES[$inputName]["type"], $expectedMimeTypes)) {
             throw new ClientException(t("You must upload an .svg file."));
         }
         $tmpName = parent::validateUpload($inputName, $throwException);
+        if (FeatureFlagHelper::featureEnabled("validateContentTypes")) {
+            $fInfo = new finfo(FILEINFO_MIME_TYPE);
+            $mimeType = $fInfo->file($tmpName);
+            $mimeType = strtolower($mimeType);
+            if (!in_array($mimeType, $expectedMimeTypes)) {
+                if ($throwException) {
+                    throw new Gdn_UserException(t("Your image file is not a valid image file."));
+                }
+                return false;
+            }
+        }
+
         return $tmpName;
     }
 

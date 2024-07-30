@@ -11,6 +11,7 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\DiscussionTypeHandler;
+use Vanilla\Forum\Menu\CommunityManagementCounterProvider;
 use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Theme\ThemeSectionModel;
 
@@ -30,7 +31,8 @@ class VanillaHooks extends Gdn_Plugin
             ->addCall("addProvider", [new Reference(\Vanilla\Forum\Navigation\ForumBreadcrumbProvider::class)])
 
             ->rule(\Vanilla\Menu\CounterModel::class)
-            ->addCall("addProvider", [new Reference(\Vanilla\Forum\Menu\UserCounterProvider::class)])
+            ->addCall("addProvider", [new Reference(\Vanilla\Forum\Menu\ForumCounterProvider::class)])
+            ->addCall("addProvider", [new Reference(CommunityManagementCounterProvider::class)])
 
             ->rule(ThemeSectionModel::class)
             ->addCall("registerLegacySection", [t("Forum")])
@@ -1211,7 +1213,7 @@ class VanillaHooks extends Gdn_Plugin
                 "Moderation",
                 t("Flood Control"),
                 "/vanilla/settings/floodcontrol",
-                "site.flood-control",
+                "settings.flood-control",
                 "nav-flood-control"
             );
     }

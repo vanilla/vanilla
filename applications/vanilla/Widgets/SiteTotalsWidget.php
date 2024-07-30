@@ -413,7 +413,7 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
         $urlQuery = ["counts" => $counts];
 
         if (isset($apiParams["filter"]) && isset($apiParams["siteSectionID"])) {
-            $urlQuery["siteSectionID"] = [$apiParams["siteSectionID"]];
+            $urlQuery["siteSectionID"] = $apiParams["siteSectionID"];
         }
 
         $countResponse = $this->api->get("/site-totals", $urlQuery)->getBody();

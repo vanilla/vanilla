@@ -7,18 +7,29 @@
 
 namespace Vanilla\Forum\Models\CommunityManagement;
 
+use Garden\Container\ContainerException;
 use Garden\Schema\Schema;
-use Google\ApiCore\ValidationException;
-use Vanilla\Dashboard\Models\RecordStatusModel;
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
+use Gdn;
+use Gdn_SQLDriver;
+use PermissionNotificationGenerator;
+use Ramsey\Uuid\Uuid;
+use Vanilla\Community\Events\ReportEvent;
+use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Activity\ReportActivity;
+use Vanilla\Database\Operation\BooleanFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
-use Vanilla\Formatting\FormatFieldTrait;
+use Vanilla\Database\Operation\JsonFieldProcessor;
+use Vanilla\Database\Operation\ResourceEventProcessor;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Formatting\Formats\WysiwygFormat;
 use Vanilla\Formatting\FormatService;
-use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\ArrayUtils;
-use Vanilla\Utility\SchemaUtils;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Model for GDN_report table.
@@ -27,49 +38,172 @@ use Vanilla\Utility\SchemaUtils;
 class ReportModel extends PipelineModel
 {
     public const STATUS_NEW = "new";
+    public const STATUS_REJECTED = "rejected";
     public const STATUS_ESCALATED = "escalated";
     public const STATUS_DISMISSED = "dismissed";
 
-    public const STATUSES = [self::STATUS_NEW, self::STATUS_ESCALATED, self::STATUS_DISMISSED];
-
-    private \Gdn_Session $session;
-    private FormatService $formatService;
-    private \CategoryModel $categoryModel;
-    private \UserModel $userModel;
-    private ReportReasonModel $reportReasonModel;
-    private CommunityManagementRecordModel $communityManagementRecordModel;
+    public const STATUSES = [self::STATUS_NEW, self::STATUS_ESCALATED, self::STATUS_DISMISSED, self::STATUS_REJECTED];
 
     /**
      * Constructor.
      */
     public function __construct(
-        \Gdn_Session $session,
-        FormatService $formatService,
-        \CategoryModel $categoryModel,
-        \UserModel $userModel,
-        ReportReasonModel $reportReasonModel,
-        CommunityManagementRecordModel $communityManagementRecordModel
+        private \Gdn_Session $session,
+        private FormatService $formatService,
+        private \CategoryModel $categoryModel,
+        private \UserModel $userModel,
+        private ReportReasonModel $reportReasonModel,
+        private CommunityManagementRecordModel $communityManagementRecordModel,
+        private ResourceEventProcessor $resourceEventProcessor
     ) {
         parent::__construct("report");
-        $this->session = $session;
-        $this->formatService = $formatService;
-        $this->categoryModel = $categoryModel;
-        $this->userModel = $userModel;
-        $this->reportReasonModel = $reportReasonModel;
-        $this->communityManagementRecordModel = $communityManagementRecordModel;
-
         $this->addPipelineProcessor(new CurrentDateFieldProcessor(["dateInserted"], ["dateUpdated"]));
         $userProcessor = new CurrentUserFieldProcessor($session);
         $userProcessor->camelCase();
         $this->addPipelineProcessor($userProcessor);
+        $this->addPipelineProcessor(new JsonFieldProcessor(["premoderatedRecord"]));
+        $this->addPipelineProcessor(new BooleanFieldProcessor(["isPending", "isPendingUpdate"]));
+
+        $this->resourceEventProcessor->setResourceEventClass(ReportEvent::class);
+        $this->addPipelineProcessor($this->resourceEventProcessor);
+    }
+
+    /**
+     * Join a count of reports onto a set of DB rows.
+     *
+     * @param array $rowOrRows
+     * @param string $recordType
+     *
+     * @return void
+     */
+    public function expandReportMeta(array &$rowOrRows, string $recordType): void
+    {
+        if (ArrayUtils::isAssociative($rowOrRows)) {
+            $rows = [&$rowOrRows];
+        } else {
+            $rows = &$rowOrRows;
+        }
+
+        $recordIDField = "{$recordType}ID";
+        $recordIDs = array_column($rows, $recordIDField);
+
+        $countRows = $this->createSql()
+            ->select([
+                "r.recordID",
+                "COUNT(DISTINCT(r.reportID)) as countReports",
+                "MAX(r.dateInserted) as dateLastReport",
+                "JSON_ARRAYAGG(rrj.reportReasonID) as reportReasonIDs",
+                "JSON_ARRAYAGG(r.insertUserID) as reportUserIDs",
+            ])
+            ->from("report r")
+            ->leftJoin("reportReasonJunction rrj", "r.reportID = rrj.reportID")
+            ->where([
+                "recordType" => $recordType,
+                "recordID" => $recordIDs,
+            ])
+            ->groupBy(["recordType", "recordID"])
+            ->get()
+            ->resultArray();
+
+        $countRowsByRecordID = array_column($countRows, null, "recordID");
+
+        foreach ($countRowsByRecordID as &$countRow) {
+            $countRow["reportReasonIDs"] = array_unique(array_filter(json_decode($countRow["reportReasonIDs"], true)));
+            $countRow["reportUserIDs"] = array_unique(array_filter(json_decode($countRow["reportUserIDs"], true)));
+            $countRow["countReportUsers"] = count($countRow["reportUserIDs"]);
+        }
+
+        $this->reportReasonModel->expandReportReasonArrays($countRowsByRecordID);
+        $this->expandReportUsers($countRowsByRecordID);
+
+        foreach ($rows as &$row) {
+            $recordID = $row[$recordIDField] ?? null;
+            $foundCountRow = $countRowsByRecordID[$recordID] ?? null;
+            if ($foundCountRow === null) {
+                $row["reportMeta"] = [
+                    "countReports" => 0,
+                    "countReportUsers" => 0,
+                    "dateLastReport" => null,
+                    "reportReasonIDs" => [],
+                    "reportReasons" => [],
+                    "reportUserIDs" => [],
+                    "reportUsers" => [],
+                ];
+                continue;
+            }
+
+            $row["reportMeta"] = $foundCountRow;
+        }
+    }
+
+    /**
+     * Get where of ReportIDs.
+     *
+     * @param array $where
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function createCountedReportsWhere(array $where): array
+    {
+        $query = $this->createCountedReportsQuery($where);
+        $groupedResult = $query->get()->resultArray();
+        $reportIDs = array_column($groupedResult, "maxReportID");
+        return ["r.reportID" => $reportIDs];
+    }
+
+    /**
+     * Get Query for counted reports.
+     *
+     * @param array $where
+     *
+     * @return Gdn_SQLDriver
+     */
+    public function createCountedReportsQuery(array $where): Gdn_SQLDriver
+    {
+        $wherePrefixes = [];
+        foreach ($where as $key => $value) {
+            $wherePrefixes[] = explode(".", $key)[0] ?? null;
+        }
+        $wherePrefixes = array_unique($wherePrefixes);
+        $countReports = $where["countReports"];
+        unset($where["countReports"]);
+
+        $includeSubcategories = $where["includeSubcategories"] ?? false;
+        unset($where["includeSubcategories"]);
+
+        $query = $this->createSql()
+            ->select("r.recordID", "count", "countReports")
+            ->select("r.recordID")
+            ->select("r.recordType")
+            ->select("r.reportID", "max", "maxReportID")
+            ->from("report r")
+            ->where($where)
+            ->groupBy("r.recordID, r.recordType")
+            ->having("countReports >=", $countReports);
+
+        if (in_array("rrj", $wherePrefixes)) {
+            $query->leftJoin("reportReasonJunction rrj", "r.reportID = rrj.reportID");
+        }
+        if (in_array("ur", $wherePrefixes)) {
+            $query->leftJoin("UserRole ur", "r.insertUserID = ur.UserID");
+        }
+        if (in_array("placeRecordID", $where)) {
+            $categories = [];
+            foreach ($where["placeRecordID"] as $categoryID) {
+                $categories[] = $this->categoryModel->getSearchCategoryIDs($categoryID, false, $includeSubcategories);
+            }
+            $query->where(["r.placeRecordType" => "category", "r.placeRecordID" => $categories]);
+        }
+        return $query;
     }
 
     /**
      * @param array $where
      *
-     * @return \Gdn_SQLDriver
+     * @return Gdn_SQLDriver
      */
-    private function createVisibleReportsQuery(array $where): \Gdn_SQLDriver
+    private function createVisibleReportsQuery(array $where): Gdn_SQLDriver
     {
         $wherePrefixes = [];
         foreach ($where as $key => $value) {
@@ -79,6 +213,7 @@ class ReportModel extends PipelineModel
 
         $query = $this->createSql()
             ->select("r.*")
+            ->select("MAX(rej.escalationID) as escalationID")
             ->from("report r")
             ->where($where)
             ->groupBy("r.reportID");
@@ -89,13 +224,16 @@ class ReportModel extends PipelineModel
         if (in_array("ur", $wherePrefixes)) {
             $query->leftJoin("UserRole ur", "r.insertUserID = ur.UserID");
         }
+        $query->leftJoin("reportEscalationJunction rej", "r.reportID = rej.reportID");
 
         // Filter category permissions
-        $visibleCategoryIDs = $this->categoryModel->getCategoryIDsWithPermissionForUser(
-            $this->session->UserID,
-            "Vanilla.Posts.Moderate"
-        );
-        $query->where(["r.placeRecordType" => "category", "r.placeRecordID" => $visibleCategoryIDs]);
+        if (!$this->session->checkPermission("community.moderate")) {
+            $visibleCategoryIDs = $this->categoryModel->getCategoryIDsWithPermissionForUser(
+                $this->session->UserID,
+                "Vanilla.Posts.Moderate"
+            );
+            $query->where(["r.placeRecordType" => "category", "r.placeRecordID" => $visibleCategoryIDs]);
+        }
         return $query;
     }
 
@@ -119,11 +257,13 @@ class ReportModel extends PipelineModel
 
     /**
      * @param array $where
+     * @param int $limit
+     *
      * @return int
      */
-    public function countVisibleReports(array $where): int
+    public function countVisibleReports(array $where, int $limit = 10000): int
     {
-        $count = $this->createVisibleReportsQuery($where)->getPagingCount("r.reportID");
+        $count = $this->createVisibleReportsQuery($where)->getPagingCount("r.reportID", $limit);
         return $count;
     }
 
@@ -172,6 +312,15 @@ class ReportModel extends PipelineModel
                 $this->formatService->renderHTML($report["recordBody"], $report["recordFormat"])
             );
             unset($report["noteBody"], $report["noteFormat"], $report["recordBody"], $report["recordBodyFormat"]);
+            $report["isPendingUpdate"] = (bool) $report["isPendingUpdate"];
+            $report["isPending"] = (bool) $report["isPending"];
+            unset($report["premoderatedRecord"]);
+            if (isset($report["escalationID"])) {
+                $report["escalationUrl"] = EscalationModel::escalationUrl($report["escalationID"]);
+            } else {
+                $report["escalationUrl"] = null;
+                $report["escalationID"] = null;
+            }
         }
         $this->communityManagementRecordModel->joinLiveRecordData($reports);
         return $reports;
@@ -202,12 +351,16 @@ class ReportModel extends PipelineModel
             // About the post
             ->column("recordUserID", "int")
             ->column("recordType", "varchar(50)")
-            ->column("recordID", "int")
+            ->column("recordID", "int", true)
             ->column("placeRecordType", "varchar(50)")
             ->column("placeRecordID", "int")
             ->column("recordName", "text")
             ->column("recordBody", "mediumtext")
             ->column("recordFormat", "mediumtext")
+            ->column("recordDateInserted", "datetime", true)
+            ->column("premoderatedRecord", "json", true)
+            ->column("isPending", "tinyint(1)", "0")
+            ->column("isPendingUpdate", "tinyint(1)", "0")
             ->set(false, false);
 
         $structure
@@ -272,12 +425,12 @@ class ReportModel extends PipelineModel
      *
      * @return Schema
      */
-    public static function reportRelatedSchema(): Schema
+    public static function reportMetaSchema(): Schema
     {
         return Schema::parse([
             "reportReasons:a" => ReportReasonModel::reasonFragmentSchema(),
-            "countReports:i",
             "dateLastReport:dt?",
+            "countReports:i",
             "countReportUsers:i",
             "reportUserIDs:a" => [
                 "items" => [
@@ -286,5 +439,187 @@ class ReportModel extends PipelineModel
             ],
             "reportUsers:a" => new UserFragmentSchema(),
         ]);
+    }
+
+    /**
+     * Given a reportID that has premoderation data, save the premoderated record into the appropriate record table.
+     * Then mark the report as done.
+     *
+     * @param int $reportID
+     * @return void
+     */
+    public function saveRecordFromPremoderation(int $reportID): void
+    {
+        $report = $this->selectSingle(["reportID" => $reportID]);
+        $premoderatedRecord = $report["premoderatedRecord"];
+        if (empty($premoderatedRecord)) {
+            throw new ServerException("No premoderated record found.");
+        }
+
+        $premoderatedRecord["InsertUserID"] = $report["recordUserID"]; // Preserve the original user.
+        if (!$report["isPendingUpdate"]) {
+            $premoderatedRecord["DateInserted"] = CurrentTimeStamp::getMySQL(); // Forward date the post in case it took a while to moderate.
+        }
+
+        switch ($report["recordType"]) {
+            case "discussion":
+                if (isset($report["recordID"])) {
+                    $premoderatedRecord["DiscussionID"] = $report["recordID"];
+                    $premoderatedRecord["DateUpdated"] = CurrentTimeStamp::getMySQL();
+                }
+                $discussionModel = \Gdn::getContainer()->get(\DiscussionModel::class);
+                $discussionID = $discussionModel->save($premoderatedRecord, [
+                    "CheckPermission" => false,
+                    "SpamCheck" => false,
+                    "skipSpamCheck" => true,
+                ]);
+                $recordID = $discussionID;
+                ModelUtils::validationResultToValidationException($discussionModel);
+                ModelUtils::validateSaveResultPremoderation($discussionModel, "discussion");
+
+                break;
+            case "comment":
+                if (isset($report["recordID"])) {
+                    $premoderatedRecord["CommentID"] = $report["recordID"];
+                    $premoderatedRecord["DateUpdated"] = CurrentTimeStamp::getMySQL();
+                }
+                $commentModel = \Gdn::getContainer()->get(\CommentModel::class);
+                $commentID = $commentModel->save($premoderatedRecord, [
+                    "CheckPermission" => false,
+                    "SpamCheck" => false,
+                    "skipSpamCheck" => true,
+                ]);
+                $recordID = $commentID;
+                ModelUtils::validationResultToValidationException($commentModel);
+                ModelUtils::validateSaveResultPremoderation($commentModel, "comment");
+                break;
+            default:
+                throw new ServerException("Invalid record type.");
+        }
+
+        // Persist this recordID into the escalation record
+        $this->update(
+            set: [
+                "recordID" => $recordID,
+                "premoderatedRecord" => null,
+                "isPending" => false,
+                "isPendingUpdate" => false,
+            ],
+            where: ["reportID" => $reportID]
+        );
+    }
+
+    /**
+     * Fetch a report based on its ID.
+     *
+     * @param int $reportID
+     * @return array|null
+     * @throws NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function getReport(int $reportID): ?array
+    {
+        try {
+            $report = $this->selectSingle(["reportID" => $reportID]);
+        } catch (NoResultsException $resultsException) {
+            throw new NotFoundException("report", ["reportID" => $reportID], $resultsException);
+        }
+
+        return $this->normalizeRows([$report])[0] ?? null;
+    }
+
+    /**
+     * Overwrite the `insert()` function to send out notifications.
+     *
+     * @param array $set
+     * @param array $options
+     * @return int
+     * @throws NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function insert(array $set, array $options = [])
+    {
+        $reportID = parent::insert($set, $options);
+        if (!empty($set["reportReasonIDs"])) {
+            $this->putReasonsForReport($reportID, $set["reportReasonIDs"]);
+        }
+
+        $report = $this->getReport($reportID);
+        $this->notifyNewReport($report);
+
+        return $reportID;
+    }
+
+    /**
+     * Send out notifications for a new report.
+     *
+     * @param array $report
+     * @return void
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function notifyNewReport(array $report): void
+    {
+        $reporter = $this->userModel->getID($report["insertUserID"]);
+        $activity = [
+            "ActivityType" => ReportActivity::getActivityTypeID(),
+            "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
+            "ActivityUserID" => $report["insertUserID"],
+            "HeadlineFormat" => sprintf(ReportActivity::getProfileHeadline(), $reporter->Name, $report["recordName"]),
+            "PluralHeadlineFormat" => sprintf(ReportActivity::getPluralHeadline(), $report["recordName"]),
+            "RecordType" => $report["recordType"],
+            "RecordID" => $report["recordID"],
+            "Route" => $report["recordUrl"],
+            "Data" => [
+                "escalationID" => $report["reportID"],
+                "name" => $report["recordName"],
+                "Reason" => ReportActivity::getActivityReason(),
+                "reportID" => $report["reportID"],
+            ],
+            "Ext" => [
+                "Email" => [
+                    "Format" => WysiwygFormat::FORMAT_KEY,
+                    "Story" => $this->getReportEmailBody($report),
+                ],
+            ],
+        ];
+
+        $notificationGenerator = Gdn::getContainer()->get(PermissionNotificationGenerator::class);
+        $notificationGenerator->notify(
+            activity: $activity,
+            permissions: "Garden.Moderation.Manage",
+            preference: ReportActivity::getPreference(),
+            hasDefaultPreferences: true
+        );
+    }
+
+    /**
+     * Generate the email for a new report notification.
+     *
+     * @param array $report
+     * @return string
+     */
+    private static function getReportEmailBody(array $report): string
+    {
+        $body = "<div>" . ReportActivity::getActivityReason();
+        if (!isset($report["reasons"])) {
+            return $body . "<div>";
+        }
+
+        $body = "<h4>" . t("Reporting reason: ") . "</h4>";
+
+        $reports = [];
+        foreach ($report["reasons"] as $reason) {
+            $reports[] = t($reason["name"]);
+        }
+
+        $body .= "<p>" . implode(", ", $reports) . "</p>";
+
+        if (isset($report["noteHtml"])) {
+            $body .= "<h4>" . t("Additional notes: ") . "</h4>";
+            $body .= $report["noteHtml"];
+        }
+
+        return $body . "<div>";
     }
 }

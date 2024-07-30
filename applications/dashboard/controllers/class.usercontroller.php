@@ -226,7 +226,7 @@ class UserController extends DashboardController
 
                 $newUserID = $this->Form->save([
                     "SaveRoles" => true,
-                    "NoConfirmEmail" => true,
+                    UserModel::OPT_NO_CONFIRM_EMAIL => true,
                     "ValidateName" => false,
                 ]);
                 if ($newUserID !== false) {
@@ -1103,7 +1103,10 @@ class UserController extends DashboardController
             }
         }
 
-        $userID = Gdn::userModel()->save($user, ["SaveRoles" => isset($user["RoleID"]), "NoConfirmEmail" => true]);
+        $userID = Gdn::userModel()->save($user, [
+            "SaveRoles" => isset($user["RoleID"]),
+            UserModel::OPT_NO_CONFIRM_EMAIL => true,
+        ]);
         if ($userID) {
             if (!isset($user["UserID"])) {
                 $user["UserID"] = $userID;

@@ -37,11 +37,11 @@ describe("SearchBar", () => {
         const button = screen.getByRole("button", { name: "Everywhere" });
         expect(button).toBeInTheDocument();
         fireEvent.click(button);
-        const list = screen.getByRole("list");
-        expect(list).toBeInTheDocument();
-        const firstOption = within(list).getByText(/scope 1/, { exact: false });
+        const menu = screen.getByRole("menu");
+        expect(menu).toBeInTheDocument();
+        const firstOption = within(menu).getByText(/scope 1/, { exact: false });
         expect(firstOption).toBeInTheDocument();
-        const secondOption = within(list).getByText(/Everywhere/, { exact: false });
+        const secondOption = within(menu).getByText(/Everywhere/, { exact: false });
         expect(secondOption).toBeInTheDocument();
     });
 

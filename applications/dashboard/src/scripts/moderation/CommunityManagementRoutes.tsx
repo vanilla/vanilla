@@ -42,6 +42,20 @@ const EscalationsDetailPageRoute = new RouteHandler(
     Loader,
 );
 
+const ContentSettingsPageRoute = new RouteHandler(
+    () => import("@dashboard/communityManagementSettings/ModerationContentSettingsPage"),
+    `/dashboard/content/settings`,
+    () => `/dashboard/content/settings`,
+    Loader,
+);
+
+const PremoderationSettingsPageRoute = new RouteHandler(
+    () => import("@dashboard/communityManagementSettings/PremoderationSettingsPage"),
+    "/dashboard/content/premoderation",
+    () => "/dashboard/content/premoderation",
+    Loader,
+);
+
 export function getCommunityManagementRoutes() {
     return [
         ReportsListPageRoute.route,
@@ -49,5 +63,7 @@ export function getCommunityManagementRoutes() {
         TriageDetailPageRoute.route,
         EscalationsListPageRoute.route,
         EscalationsDetailPageRoute.route,
+        ContentSettingsPageRoute.route,
+        PremoderationSettingsPageRoute.route,
     ];
 }

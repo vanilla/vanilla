@@ -13,10 +13,8 @@ use Garden\Container\NotFoundException;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
-use Vanilla\AutomationRules\Actions\UserFollowCategoryAction;
 use Vanilla\AutomationRules\Trigger\AutomationTrigger;
-use Vanilla\AutomationRules\Trigger\AutomationTriggerInterface;
-use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
+use Vanilla\Dashboard\AutomationRules\Models\UserRuleDataType;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
@@ -26,7 +24,7 @@ use Vanilla\Logger;
 /**
  * Class ProfileFieldTrigger
  */
-class ProfileFieldSelectionTrigger extends AutomationTrigger implements AutomationTriggerInterface
+class ProfileFieldSelectionTrigger extends AutomationTrigger
 {
     use UserSearchTrait;
     /**
@@ -42,7 +40,15 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger implements Automati
      */
     public static function getName(): string
     {
-        return "A user registers or updates a certain profile field with a certain value";
+        return "New/Updated Profile field";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "users";
     }
 
     /**
@@ -50,7 +56,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger implements Automati
      */
     public static function getActions(): array
     {
-        return [AddRemoveUserRoleAction::getType(), UserFollowCategoryAction::getType()];
+        return UserRuleDataType::getActions();
     }
 
     /**
@@ -61,8 +67,12 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger implements Automati
         $schema = [
             "profileField" => [
                 "type" => "string",
+                "required" => true,
                 "x-control" => SchemaForm::dropDown(
-                    new FormOptions("Profile Field", "Select a profile field"),
+                    new FormOptions(
+                        "Profile Field",
+                        "Dropdown (Single-, Multi-, or Numeric) and Single Checkbox profile field types are eligible for automation."
+                    ),
                     new ApiFormChoices(
                         "/api/v2/profile-fields?enabled=true&formType[]=dropdown&formType[]=tokens&formType[]=checkbox",
                         "/api/v2/profile-fields/%s",
@@ -147,7 +157,6 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger implements Automati
             ],
         ]);
         $schema->merge($profileFieldSchema);
-        self::addActionTypeValidation($profileFieldSchema);
     }
 
     /**

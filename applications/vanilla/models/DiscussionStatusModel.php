@@ -16,42 +16,25 @@ use Vanilla\Logging\ErrorLogger;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Models\ModelCache;
 
 /**
  * Model for discussions status updates.
  */
 class DiscussionStatusModel
 {
-    /** @var DiscussionModel */
-    private $discussionModel;
-
-    /** @var RecordStatusModel */
-    private $recordStatusModel;
-
-    /** @var RecordStatusLogModel */
-    private $recordStatusLogModel;
-
-    /** @var UserModel */
-    private $userModel;
-
     /**
-     * Class constructor.
-     *
-     * @param DiscussionModel $discussionModel
-     * @param RecordStatusModel $recordStatusModel
-     *
-     * @param UserModel $userModel
+     * DI.
      */
     public function __construct(
-        DiscussionModel $discussionModel,
-        RecordStatusModel $recordStatusModel,
-        RecordStatusLogModel $recordStatusLogModel,
-        UserModel $userModel
+        private DiscussionModel $discussionModel,
+        private RecordStatusModel $recordStatusModel,
+        private RecordStatusLogModel $recordStatusLogModel,
+        private UserModel $userModel,
+        private CategoryModel $categoryModel,
+        private Gdn_Session $session,
+        private Gdn_Cache $cache
     ) {
-        $this->discussionModel = $discussionModel;
-        $this->recordStatusModel = $recordStatusModel;
-        $this->recordStatusLogModel = $recordStatusLogModel;
-        $this->userModel = $userModel;
     }
 
     /**
@@ -236,5 +219,65 @@ class DiscussionStatusModel
 
         // It's fine.
         return $statusID;
+    }
+
+    /**
+     * Get the count of discussions with a particular statusID. 15 seconds cache time. Counts are filtered to user permissions.
+     *
+     * @param array $statusIDs
+     * @param int $limit
+     * @param bool $isInternal
+     * @return int
+     */
+    public function getCountStatusID(
+        array $statusIDs,
+        int $limit = 10000,
+        bool $isInternal = false,
+        bool $cached = true
+    ): int {
+        // Filter for current permissions.
+        $visibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs([
+            "forceArrayReturn" => true,
+            "filterHideDiscussions" => true,
+            "filterArchivedCategories" => true,
+        ]);
+
+        $modelCache = new ModelCache("discussionStatus", $this->cache);
+
+        $doFetch = function () use ($statusIDs, $limit, $isInternal, $visibleCategoryIDs) {
+            $where = [
+                "CategoryID" => $visibleCategoryIDs,
+            ];
+            if ($isInternal) {
+                $where["internalStatusID"] = $statusIDs;
+            } else {
+                $where["statusID"] = $statusIDs;
+            }
+            $count = $this->discussionModel
+                ->createSql()
+                ->from("Discussion")
+                ->where($where)
+                ->getPagingCount("DiscussionID", $limit);
+
+            return $count;
+        };
+
+        if ($cached) {
+            return $modelCache->getCachedOrHydrate(
+                [
+                    "discussionStatus/count",
+                    "statusIDs" => $statusIDs,
+                    "limit" => $limit,
+                    "isInternal" => $isInternal,
+                    "cats" => $visibleCategoryIDs,
+                ],
+                $doFetch,
+                [
+                    Gdn_Cache::FEATURE_EXPIRY => 15, // 15 seconds.
+                ]
+            );
+        } else {
+            return $doFetch();
+        }
     }
 }

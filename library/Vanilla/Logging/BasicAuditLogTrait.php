@@ -147,6 +147,9 @@ trait BasicAuditLogTrait
     public function getSessionUsername(): string
     {
         $user = \Gdn::session()->User;
+        if (!$user && $this->getSessionUserID() > 0) {
+            $user = \Gdn::userModel()->getID($this->getSessionUserID());
+        }
         $username = $user ? $user->Name : "Guest";
         return $username;
     }

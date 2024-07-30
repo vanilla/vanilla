@@ -6,13 +6,12 @@
 
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
-import { IReport } from "@dashboard/moderation/CommunityManagementTypes";
+import { IReport, IReportsData } from "@dashboard/moderation/CommunityManagementTypes";
 import { IReportFilters, ReportFilters } from "@dashboard/moderation/components/ReportFilters";
 import { ReportStatus } from "@dashboard/moderation/components/ReportFilters.constants";
 import { ReportListItem } from "@dashboard/moderation/components/ReportListItem";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
@@ -21,12 +20,14 @@ import Loader from "@library/loaders/Loader";
 import { useQueryParam, useQueryParamPage } from "@library/routing/routingUtils";
 import { useQueryStringSync } from "@library/routing/QueryString";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
-import { EscalateModal } from "@dashboard/moderation/components/EscalateModal";
 import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { Sort } from "@library/sort/Sort";
-import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
+import SimplePagerModel from "@library/navigation/SimplePagerModel";
+import { EmptyState } from "@dashboard/moderation/components/EmptyState";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import { DisabledBanner } from "@dashboard/moderation/components/DisabledBanner";
 
 const defaultFilterValues = {
     statuses: [ReportStatus.NEW],
@@ -43,19 +44,12 @@ const sortOptions = [
     { value: "dateInserted", name: t("Oldest Report") },
 ];
 
-interface IReportsData {
-    results: IReport[];
-    pagination: ILinkPages;
-}
-
 export function ReportsPage() {
     const cmdClasses = communityManagementPageClasses();
 
     const device = useTitleBarDevice();
     const { hasCollision } = useCollisionDetector();
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
-
-    const [reportToEscalate, setReportToEscalate] = useState<IReport | null>(null);
 
     const initialStatuses = useQueryParam("statuses", defaultFilterValues.statuses);
     const initialReasons = useQueryParam("reportReasonID", defaultFilterValues.reportReasonID);
@@ -110,7 +104,9 @@ export function ReportsPage() {
 
     return (
         <>
+            <DocumentTitle title={t("Reports")} />
             <AdminLayout
+                preTitle={<DisabledBanner />}
                 title={t("Reports")}
                 leftPanel={!isCompact && <ModerationNav />}
                 rightPanel={
@@ -127,7 +123,7 @@ export function ReportsPage() {
                     />
                 }
                 content={
-                    <AttachmentIntegrationsContextProvider>
+                    <>
                         <section className={cmdClasses.secondaryTitleBar}>
                             <span>
                                 <Sort
@@ -151,37 +147,17 @@ export function ReportsPage() {
                                 </div>
                             )}
                             {reports.isSuccess && reports.data.results.length === 0 && (
-                                <div>
-                                    <p>{t("All reports are handled! 😀")}</p>
-                                </div>
+                                <EmptyState subtext={t("Reports matching your filters will appear here")} />
                             )}
                             {reports.isSuccess && (
                                 <div className={cmdClasses.list}>
                                     {reports.data.results.map((report: IReport) => {
-                                        return (
-                                            <ReportListItem
-                                                key={report.reportID}
-                                                to={`/dashboard/content/triage/${report.recordID}`}
-                                                report={report}
-                                                onEscalate={(report) => {
-                                                    setReportToEscalate(report);
-                                                }}
-                                            />
-                                        );
+                                        return <ReportListItem key={report.reportID} report={report} />;
                                     })}
                                 </div>
                             )}
                         </section>
-                        <EscalateModal
-                            recordID={reportToEscalate?.recordID ?? null}
-                            recordType={reportToEscalate?.recordType ?? null}
-                            report={reportToEscalate}
-                            isVisible={!!reportToEscalate}
-                            onClose={() => {
-                                setReportToEscalate(null);
-                            }}
-                        />
-                    </AttachmentIntegrationsContextProvider>
+                    </>
                 }
             />
         </>

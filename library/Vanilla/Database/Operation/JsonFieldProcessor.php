@@ -76,8 +76,9 @@ class JsonFieldProcessor implements Processor
                 $json = $set[$field];
                 if (is_array($json)) {
                     $json = LoggerUtils::stringifyDates($json);
+                    $json = ipEncodeRecursive($json);
                 }
-                $json = json_encode($json, $this->jsonFlags);
+                $json = $json === null ? null : json_encode($json, $this->jsonFlags);
                 if ($json === false) {
                     throw new \InvalidArgumentException("Unable to encode field as JSON.", 400);
                 }
@@ -112,6 +113,9 @@ class JsonFieldProcessor implements Processor
             foreach ($fields as $field) {
                 if (array_key_exists($field, $row)) {
                     $row[$field] = json_decode($row[$field], true);
+                    if (is_array($row[$field])) {
+                        $row[$field] = ipDecodeRecursive($row[$field]);
+                    }
                 }
             }
         }

@@ -4,68 +4,59 @@
  * @license Proprietary
  */
 
-import { IDiscussion } from "@dashboard/@types/api/discussion";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
+import {
+    useEscalationQuery,
+    useEscalationCommentsQuery,
+    useEscalationMutation,
+    useRevisionOptions,
+} from "@dashboard/moderation/CommunityManagement.hooks";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
-import { IEscalation, IReport } from "@dashboard/moderation/CommunityManagementTypes";
-import { CommunityManagementFixture } from "@dashboard/moderation/__fixtures__/CommunityManagement.Fixture";
-import { CompactReportList } from "@dashboard/moderation/components/CompactReportList";
-import { EscalationActionPanel } from "@dashboard/moderation/components/EscalationActionPanel";
+import { IEscalation } from "@dashboard/moderation/CommunityManagementTypes";
+import { detailPageClasses } from "@dashboard/moderation/DetailPage.classes";
+import { PostRevisionProvider, usePostRevision } from "@dashboard/moderation/PostRevisionContext";
+import { AssociatedReportMetas } from "@dashboard/moderation/components/AssosciatedReportMetas";
+import { EscalationActions } from "@dashboard/moderation/components/EscalationActions";
+import { EscalationAssignee } from "@dashboard/moderation/components/EscalationAssignee";
+import { EscalationCommentEditor } from "@dashboard/moderation/components/EscalationCommentEditor";
 import { EscalationMetas } from "@dashboard/moderation/components/EscalationMetas";
 import { PostDetail } from "@dashboard/moderation/components/PostDetail";
-import { css, cx } from "@emotion/css";
-import apiv2 from "@library/apiv2";
-import { IError } from "@library/errorPages/CoreErrorMessages";
-import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import { PageHeadingBox } from "@library/layout/PageHeadingBox";
+import { ReportHistoryList } from "@dashboard/moderation/components/ReportHistoryList";
+import { cx } from "@emotion/css";
+import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
+import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
+import { AutoWidthInput } from "@library/forms/AutoWidthInput";
+import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import { PageBox } from "@library/layout/PageBox";
 import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
-import { Metas, MetaItem } from "@library/metas/Metas";
-import Notice from "@library/metas/Notice";
+import { Metas } from "@library/metas/Metas";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import BackLink from "@library/routing/links/BackLink";
-import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { Sort } from "@library/sort/Sort";
+import { BorderType } from "@library/styles/styleHelpersBorders";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { CommentThreadItem } from "@vanilla/addon-vanilla/thread/CommentThreadItem";
+import DiscussionAttachmentsAsset, {
+    DiscussionAttachment,
+} from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
+import DiscussionCommentEditorAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentEditorAsset";
 import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
 import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
 import { useCollisionDetector } from "@vanilla/react-utils";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import { RouteComponentProps } from "react-router";
 
-interface IProps extends RouteComponentProps<{ escalationID: string }> {}
-
-const classes = {
-    section: css({
-        marginBottom: 24,
-    }),
-    title: css({
-        display: "flex",
-        marginTop: 8,
-    }),
-    backlink: css({
-        position: "absolute",
-        left: 0,
-        top: 10,
-        fontSize: 24,
-        transform: "translateX(calc(-100% - 4px))",
-        margin: 0,
-    }),
-    titleOverride: css({
-        "& > div": {
-            marginBottom: 28,
-            "& h2": {
-                marginBottom: 16,
-            },
-        },
-    }),
-};
-
-const override = css({
-    // So specific 😓
-    "& > div > h2 > span": {
-        overflow: "visible",
-    },
-});
+interface IProps extends RouteComponentProps<{ escalationID: string }> {
+    escalationID: IEscalation["escalationID"];
+    escalation?: IEscalation;
+}
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -78,128 +69,227 @@ const queryClient = new QueryClient({
 });
 
 const discussion = LayoutEditorPreviewData.discussion();
-const comments = LayoutEditorPreviewData.comments(5);
 
-function EscalationsDetailPage(props: IProps) {
+function EscalationsDetailPageImpl(props: IProps) {
+    const { escalationID, escalation } = props;
     const cmdClasses = communityManagementPageClasses();
-
+    const classes = detailPageClasses();
+    const postRevision = usePostRevision();
     const device = useTitleBarDevice();
     const { hasCollision } = useCollisionDetector();
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
+    const { options, selectedOption } = useRevisionOptions();
 
-    const escalation = useQuery<any, IError, IEscalation>({
-        queryFn: async () => {
-            const response = await apiv2.get(`/escalations/${props.match.params.escalationID}?expand=users`);
-            return response.data;
-        },
-        queryKey: ["escalation", props.match.params.escalationID],
-        keepPreviousData: true,
-    });
+    const escalationMutation = useEscalationMutation(escalationID);
+    const comments = useEscalationCommentsQuery(escalationID);
 
-    const post = useQuery<any, IError, IDiscussion>({
-        queryFn: async ({ queryKey }) => {
-            const id = queryKey[1];
-            if (!id) return Promise.resolve({ data: null });
-            const response = await apiv2.get(`/discussions/${id}?expand=users&expand=category`);
-            return response.data;
-        },
-        queryKey: ["post", escalation.data?.recordID],
-    });
+    const queryClient = useQueryClient();
+    const invalidateQueries = async () => {
+        queryClient.invalidateQueries(["escalations"]);
+        queryClient.invalidateQueries(["escalation", escalationID]);
+        queryClient.invalidateQueries(["escalationComments", escalationID]);
+    };
 
-    // Until reports expands are available // Cannot use multiple expands
-    const reports = useQuery<any, IError, IReport[]>({
-        queryFn: async ({ queryKey }) => {
-            const recordID = queryKey[1];
-            const recordType = queryKey[2];
-            if (!recordID) return Promise.resolve({ data: null });
-            //  This API has a problem
-            const response = await apiv2.get(`/reports?recordID=${recordID}&recordType=${recordType}&expand=users`);
-            // return response.data;
-            return CommunityManagementFixture.getEscalation().reports;
-        },
-        queryKey: ["reports", escalation.data?.recordID, escalation.data?.recordType],
-    });
+    const editableRef = useRef<HTMLInputElement | null>();
+
+    const focusAndSelectAll = (event?: any) => {
+        if (editableRef.current && editableRef.current !== document.activeElement) {
+            if (event) event.preventDefault();
+            editableRef.current.focus();
+            document.execCommand("selectAll");
+        }
+    };
+
+    const [title, setTitle] = useState(escalation?.name ?? "");
+
+    useEffect(() => {
+        escalation && setTitle(escalation.name);
+    }, [escalation]);
+
+    const saveTitle = () => {
+        escalationMutation.mutate({ payload: { name: title } });
+    };
 
     return (
-        <>
+        <ErrorBoundary>
+            {escalation?.name && <DocumentTitle title={escalation?.name} />}
             <AdminLayout
-                titleAndActionsContainerClassName={override}
                 title={
-                    <PageHeadingBox
-                        title={
-                            <>
-                                <span className={classes.title}>
-                                    <BackLink className={classes.backlink} />
-                                    {/* TODO: Add skeleton here */}
-                                    <span>{escalation.isSuccess ? escalation.data.name : t("Loading...")}</span>
-                                </span>
-                            </>
-                        }
-                        description={
-                            <Metas>
-                                {escalation.isSuccess ? (
-                                    <>
-                                        <MetaItem>
-                                            <Notice>{escalation.data.status}</Notice>
-                                        </MetaItem>
-                                        <EscalationMetas escalation={escalation.data} />
-                                    </>
+                    <div className={classes.titleLayout}>
+                        <BackLink className={classes.backlink} />
+                        {escalation && escalation.name.length > 0 && (
+                            <div className={classes.editableTitleLayout}>
+                                <AutoWidthInput
+                                    required
+                                    onChange={(event) => setTitle(event.target.value)}
+                                    className={cx(autoWidthInputClasses().themeInput, classes.editableTitleInput)}
+                                    ref={(ref) => (editableRef.current = ref)}
+                                    value={title}
+                                    placeholder={t("Enter a title for this escalation")}
+                                    disabled={!escalation || escalationMutation.isLoading}
+                                    onFocus={(event) => event.target.select()}
+                                    autoFocus={false}
+                                    onKeyDown={(event) => {
+                                        if (event.key === "Enter") {
+                                            event.preventDefault();
+                                            title !== escalation.name && saveTitle();
+                                            (event.target as HTMLElement).blur();
+                                        }
+                                    }}
+                                    onMouseDown={focusAndSelectAll}
+                                    maxLength={100}
+                                    maximumWidth={Infinity}
+                                />
+                                {title !== escalation.name ? (
+                                    <Button
+                                        buttonType={ButtonTypes.ICON}
+                                        onClick={() => saveTitle()}
+                                        disabled={escalationMutation.isLoading}
+                                    >
+                                        <Icon icon={"data-checked"} />
+                                    </Button>
                                 ) : (
-                                    // TODO: Add skeleton here
-                                    t("Loading...")
+                                    <Button buttonType={ButtonTypes.ICON} onClick={focusAndSelectAll}>
+                                        <Icon icon={"data-pencil"} />
+                                    </Button>
                                 )}
+                            </div>
+                        )}
+                    </div>
+                }
+                description={
+                    escalation && (
+                        <>
+                            <Metas>
+                                <EscalationMetas escalation={escalation} />
                             </Metas>
-                        }
-                    />
+                            {escalation.dateLastReport && (
+                                <AssociatedReportMetas
+                                    countReports={escalation.countReports}
+                                    reasons={escalation.reportReasons}
+                                    dateLastReport={escalation.dateLastReport}
+                                />
+                            )}
+                        </>
+                    )
                 }
                 leftPanel={!isCompact && <ModerationNav />}
-                rightPanel={<>{escalation.isSuccess && <EscalationActionPanel escalation={escalation.data} />}</>}
+                rightPanel={
+                    <>
+                        <EscalationActions escalationID={escalationID} />
+                        <ReportHistoryList />
+                    </>
+                }
                 content={
-                    <section className={cx(cmdClasses.content, classes.titleOverride)}>
-                        {post.isSuccess && (
-                            <div>
-                                <PostDetail discussion={post.data} truncatePost />
-                            </div>
-                        )}
-                        {escalation.isSuccess && reports.isSuccess && (
-                            <div>
-                                <DashboardFormSubheading>{t("Reports")}</DashboardFormSubheading>
-                                {escalation.data.countReports > 0 && <CompactReportList reports={reports.data} />}
-                                {escalation.data.countReports === 0 && (
-                                    <div>
-                                        <p>{t("There are no reports for this post")}</p>
-                                    </div>
+                    <>
+                        <section className={cx(cmdClasses.secondaryTitleBar, classes.secondaryTitleBarTop)}>
+                            <span className={cmdClasses.secondaryTitleBarStart}>
+                                {postRevision.reports && postRevision.reports.length > 0 && (
+                                    <Sort
+                                        sortID={"postRevision"}
+                                        sortLabel={t("Revision: ")}
+                                        sortOptions={options}
+                                        selectedSort={selectedOption}
+                                        onChange={(revision) => {
+                                            postRevision.setActiveRevision(+revision.value);
+                                        }}
+                                    />
                                 )}
-                            </div>
-                        )}
-                        {escalation.isSuccess && (
-                            <div>
-                                <DashboardFormSubheading>{t("Comments")}</DashboardFormSubheading>
-                                {escalation.data.countComments > 0 && (
-                                    <QueryClientProvider client={queryClient}>
-                                        {/* TODO: all things discussion here should become generic for an escalation*/}
-                                        <DiscussionCommentsAsset
-                                            renderTitle={false}
-                                            comments={{
-                                                data: comments,
-                                                paging: LayoutEditorPreviewData.paging(5),
-                                            }}
-                                            apiParams={{ discussionID: discussion.discussionID, limit: 30, page: 1 }}
-                                            discussion={discussion}
+                            </span>
+                            <span className={cmdClasses.secondaryTitleBarButtons}>
+                                <label className={classes.assigneeDropdown}>
+                                    <span>{t("Assignee: ")}</span>
+                                    {escalation && (
+                                        <EscalationAssignee
+                                            escalation={escalation}
+                                            className={classes.assigneeOverrides}
+                                            autoCompleteClasses={classes.autoCompleteOverrides}
                                         />
-                                    </QueryClientProvider>
-                                )}
-                                {escalation.data.countComments === 0 && (
-                                    <div>
-                                        <p>{t("There are no comments for this escalation")}</p>
-                                    </div>
-                                )}
+                                    )}
+                                </label>
+                            </span>
+                        </section>
+                        <section className={classes.layout}>
+                            {postRevision.mostRecentRevision && (
+                                <div>
+                                    <PostDetail />
+                                </div>
+                            )}
+                            {escalation && (escalation.attachments ?? []).length > 0 && (
+                                <div>
+                                    <DashboardFormSubheading>{t("Escalation Attachments")}</DashboardFormSubheading>
+
+                                    {escalation.attachments?.map((attachment) => (
+                                        <ReadableIntegrationContextProvider
+                                            key={attachment.attachmentID}
+                                            attachmentType={attachment.attachmentType}
+                                        >
+                                            <DiscussionAttachment
+                                                key={attachment.attachmentID}
+                                                attachment={attachment}
+                                            />
+                                        </ReadableIntegrationContextProvider>
+                                    ))}
+                                </div>
+                            )}
+                            {escalation && (
+                                <div>
+                                    <DashboardFormSubheading>{t("Internal Comments")}</DashboardFormSubheading>
+                                    {comments.data && comments?.data?.length < 1 && (
+                                        <p>
+                                            {t(
+                                                "There are no internal comments yet. Create a comment from the box below.",
+                                            )}
+                                        </p>
+                                    )}
+                                    <PageBox
+                                        options={{
+                                            borderType: BorderType.NONE,
+                                        }}
+                                    >
+                                        {comments?.data?.map((comment) => {
+                                            return (
+                                                <CommentThreadItem
+                                                    key={comment.commentID}
+                                                    comment={comment}
+                                                    discussion={discussion}
+                                                    onMutateSuccess={invalidateQueries}
+                                                    userPhotoLocation={"header"}
+                                                    boxOptions={{
+                                                        borderType: BorderType.SEPARATOR,
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                    </PageBox>
+                                </div>
+                            )}
+                            <div>
+                                <DashboardFormSubheading>{t("Add a comment")}</DashboardFormSubheading>
+                                <div className={classes.commentsWrapper}>
+                                    <EscalationCommentEditor escalationID={escalationID} />
+                                </div>
                             </div>
-                        )}
-                    </section>
+                        </section>
+                    </>
                 }
             />
-        </>
+        </ErrorBoundary>
+    );
+}
+
+function EscalationsDetailPage(props: IProps) {
+    const escalationQuery = useEscalationQuery(props.match.params.escalationID);
+    const { recordType, recordID } = escalationQuery.data ?? {};
+    return (
+        <PostRevisionProvider recordType={recordType} recordID={recordID}>
+            <EscalationsDetailPageImpl
+                {...props}
+                escalationID={props.match.params.escalationID}
+                escalation={escalationQuery.data}
+            />
+            ;
+        </PostRevisionProvider>
     );
 }
 

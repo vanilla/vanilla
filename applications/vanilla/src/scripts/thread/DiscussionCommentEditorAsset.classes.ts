@@ -35,9 +35,14 @@ export const discussionCommentEditorClasses = useThemeCache(() => {
         },
     });
 
+    const previewDisablePointerEvents = css({
+        pointerEvents: "none",
+    });
+
     return {
         pageBox,
         editorPostActions,
         draftMessage,
+        previewDisablePointerEvents,
     };
 });

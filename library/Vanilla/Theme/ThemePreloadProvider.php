@@ -11,6 +11,7 @@ use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use PHPUnit\Framework\Error\Notice;
 use PHPUnit\Framework\Error\Warning;
+use Vanilla\Addon;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Theme\Asset\HtmlThemeAsset;
 use Vanilla\Theme\Asset\JavascriptThemeAsset;
@@ -31,20 +32,11 @@ use Vanilla\Web\JsInterpop\ReduxErrorAction;
  */
 class ThemePreloadProvider implements ReduxActionProviderInterface
 {
-    /** @var SiteMeta */
-    private $siteMeta;
-
-    /** @var \ThemesApiController */
-    private $themesApi;
-
-    /** @var ThemeService */
-    private $themeService;
-
-    /** @var AssetPreloadModel */
-    private $assetPreloader;
-
     /** @var Theme */
     private $theme;
+
+    /** @var Addon */
+    private $themeAddon;
 
     /** @var \Throwable */
     private $themeFetchError;
@@ -57,22 +49,12 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
 
     /**
      * DI.
-     *
-     * @param SiteMeta $siteMeta
-     * @param \ThemesApiController $themesApi
-     * @param ThemeService $themeService
-     * @param AssetPreloadModel $assetPreloader
      */
     public function __construct(
-        SiteMeta $siteMeta,
-        \ThemesApiController $themesApi,
-        ThemeService $themeService,
-        AssetPreloadModel $assetPreloader
+        private \ThemesApiController $themesApi,
+        private ThemeService $themeService,
+        private AssetPreloadModel $assetPreloader
     ) {
-        $this->siteMeta = $siteMeta;
-        $this->themesApi = $themesApi;
-        $this->assetPreloader = $assetPreloader;
-        $this->themeService = $themeService;
     }
 
     private function clearLocaleCaches(): void
@@ -97,22 +79,6 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
     {
         $this->clearLocaleCaches();
         $this->revisionID = $revisionID;
-    }
-
-    /**
-     * @return string|int
-     */
-    private function getThemeKeyToPreload()
-    {
-        return $this->forcedThemeKey ?: $this->siteMeta->getActiveThemeKey();
-    }
-
-    /**
-     * @return int
-     */
-    private function getThemeRevisionID(): ?int
-    {
-        return $this->revisionID ?? $this->siteMeta->getActiveThemeRevisionID();
     }
 
     /**
@@ -189,7 +155,8 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
      */
     private function loadData()
     {
-        $themeKey = $this->getThemeKeyToPreload();
+        $currentTheme = $this->themeService->getCurrentTheme();
+        $themeKey = $this->forcedThemeKey ?: $currentTheme->getThemeID();
 
         // Forced theme keys disable addon variables.
         $args = [
@@ -199,7 +166,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
         if (!empty($this->revisionID)) {
             // when theme-settings/{id}/revisions preview
             $args["revisionID"] = $this->revisionID;
-        } elseif (!$this->forcedThemeKey && !empty(($revisionID = $this->siteMeta->getActiveThemeRevisionID()))) {
+        } elseif (!$this->forcedThemeKey && !empty(($revisionID = $currentTheme->getRevisionID()))) {
             $args["revisionID"] = $revisionID;
         }
 

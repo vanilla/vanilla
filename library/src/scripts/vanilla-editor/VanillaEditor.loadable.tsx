@@ -83,6 +83,8 @@ interface IProps {
     initialContent?: MyValue | string;
     /** Optionally force mobile so toolbar is not on left side */
     isMobile?: boolean;
+    /** Show a static message for the layout editor instead of an editable field */
+    isPreview?: boolean;
 
     editorRef?: React.RefObject<MyEditor>;
     showConversionNotice?: boolean;
@@ -225,29 +227,41 @@ export function VanillaEditorLoadable(props: IProps) {
                 <ConversionNotice showConversionNotice={showConversionNotice} />
                 <VanillaEditorBoundsContext>
                     <VanillaEditorContainer boxShadow className={props.containerClasses}>
-                        <VanillaEditorFocusContext>
-                            <Plate<MyValue>
-                                id={editorID}
-                                editor={editor}
-                                editableProps={{
-                                    onBlur: props.onBlur,
-                                    autoFocus: false,
-                                    placeholder: "Type…",
-                                    scrollSelectionIntoView: () => undefined,
-                                    className: cx(
-                                        userContentClasses().root,
-                                        vanillaEditorClasses().root({ horizontalPadding: true }),
-                                    ),
-                                    "aria-label": t(
-                                        "To access the paragraph format menu, press control, shift, and P. To access the text format menu, press control, shift, and I. Use the arrow keys to navigate in each menu.",
-                                    ),
-                                }}
+                        {props?.isPreview ? (
+                            <div
+                                className={cx(
+                                    userContentClasses().root,
+                                    vanillaEditorClasses().root({ horizontalPadding: true }),
+                                )}
                             >
-                                <MarkToolbar />
-                                <MentionToolbar pluginKey="@" />
-                                <QuoteEmbedToolbar />
-                            </Plate>
-                        </VanillaEditorFocusContext>
+                                {t("This is a preview and cannot be edited.")}
+                            </div>
+                        ) : (
+                            <VanillaEditorFocusContext>
+                                <Plate<MyValue>
+                                    id={editorID}
+                                    editor={editor}
+                                    editableProps={{
+                                        onBlur: props.onBlur,
+                                        autoFocus: false,
+                                        placeholder: "Type…",
+                                        scrollSelectionIntoView: () => undefined,
+                                        className: cx(
+                                            userContentClasses().root,
+                                            vanillaEditorClasses().root({ horizontalPadding: true }),
+                                        ),
+                                        "aria-label": t(
+                                            "To access the paragraph format menu, press control, shift, and P. To access the text format menu, press control, shift, and I. Use the arrow keys to navigate in each menu.",
+                                        ),
+                                    }}
+                                >
+                                    <MarkToolbar />
+                                    <MentionToolbar pluginKey="@" />
+                                    <QuoteEmbedToolbar />
+                                </Plate>
+                            </VanillaEditorFocusContext>
+                        )}
+
                         <PersistentToolbar
                             uploadEnabled={uploadEnabled}
                             flyoutsDirection={"above"}

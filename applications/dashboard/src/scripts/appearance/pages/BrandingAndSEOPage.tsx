@@ -270,7 +270,6 @@ export default function BrandingAndSEOPage() {
             adminBarHamburgerContent={<AppearanceNav asHamburger />}
             activeSectionID={"appearance"}
             title={t("Branding & SEO")}
-            compactTitleBar
             titleBarActions={
                 <Button
                     buttonType={ButtonTypes.OUTLINE}

@@ -208,7 +208,7 @@ export function ListItem(props: IListItemProps) {
                                     <TruncatedText lines={3}>{props.name}</TruncatedText>
                                 </SmartLink>
                             ) : (
-                                <span className={cx(props.className)}>{props.name}</span>
+                                <span className={cx(props.nameClassName)}>{props.name}</span>
                             )}
                         </Heading>
                         {((!hasImage && asTile && !hasCheckbox) || (!isMobileMedia && asTile && hasCheckbox)) &&

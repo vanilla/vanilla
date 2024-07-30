@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\FeatureFlagHelper;
+
 /**
  * Renders the dashboard nav.
  *
@@ -42,7 +44,7 @@ class DashboardNavModule extends SiteNavModule
         "Moderation" => [
             "permission" => [
                 "Garden.Moderation.Manage",
-                "Moderation.ModerationQueue.Manage",
+                "Vanilla.Posts.Manage",
                 "Garden.Community.Manage",
                 "Garden.Users.Add",
                 "Garden.Users.Edit",
@@ -51,14 +53,15 @@ class DashboardNavModule extends SiteNavModule
                 "Garden.Users.Approve",
             ],
             "section" => "Moderation",
-            "title" => "Dashboard",
+            "title" => "Moderation",
             "description" => "Community Management",
             "url" => [
                 "Garden.Moderation.Manage" => "/dashboard/content/reports",
+                "Vanilla.Posts.Manage" => "/dashboard/content/reports",
+                "staff.allow" => "/dashboard/content/triage",
                 "Garden.Users.Add" => "/dashboard/user",
                 "Garden.Users.Edit" => "/dashboard/user",
                 "Garden.Users.Delete" => "/dashboard/user",
-                "Moderation.ModerationQueue.Manage" => "/dashboard/log/moderation",
                 "Garden.Community.Manage" => "/dashboard/message",
                 "Garden.Settings.Manage" => "/dashboard/settings/bans",
                 "Garden.Users.Approve" => "/dashboard/user/applicants",
@@ -161,6 +164,18 @@ class DashboardNavModule extends SiteNavModule
             // The url gets resolved to the first url the user has permission to see.
             foreach ($section["url"] as $permission => $url) {
                 if (Gdn::session()->checkPermission($permission)) {
+                    // Maybe we want this to more dynamic later?
+                    if ($sectionKey === "Moderation") {
+                        if (c("triage.enabled") && checkPermission("staff.allow")) {
+                            return "/dashboard/content/triage";
+                        }
+
+                        if (FeatureFlagHelper::featureEnabled("escalations")) {
+                            return "/dashboard/content/reports";
+                        } else {
+                            return "/dashboard/log/moderation";
+                        }
+                    }
                     return $url;
                 }
             }

@@ -75,7 +75,7 @@ class StaleCollectionTriggerTest extends SiteTestCase
         }
 
         return [
-            "name" => $collectionName ?? "Test Collection - " . date("i"),
+            "name" => $collectionName ?? "Test Collection - " . date("i-s"),
             "records" => $records,
         ];
     }
@@ -102,14 +102,19 @@ class StaleCollectionTriggerTest extends SiteTestCase
     private function automationRuleRecord(array $triggerOverRides = []): array
     {
         $body = [
-            "name" => "Stale Collection Automation Rule - " . date("i"),
+            "name" => "Stale Collection Automation Rule - " . CurrentTimeStamp::getDateTime()->format("U"),
             "trigger" => [
                 "triggerType" => StaleCollectionTrigger::getType(),
                 "triggerValue" => [
-                    "maxTimeThreshold" => "",
-                    "maxTimeUnit" => null,
-                    "triggerTimeThreshold" => "",
-                    "triggerTimeUnit" => "",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => "",
+                        "unit" => null,
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => "",
+                        "unit" => "",
+                    ],
                     "collectionID" => [1],
                 ],
             ],
@@ -137,22 +142,31 @@ class StaleCollectionTriggerTest extends SiteTestCase
         return [
             "testEmptyMaxTimeUnit" => [
                 "body" => $this->automationRuleRecord([
-                    "maxTimeThreshold" => "2",
-                    "triggerTimeThreshold" => "1",
-                    "triggerTimeUnit" => "hour",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 2,
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "hour",
+                    ],
                     "collectionID" => [1],
                 ]),
                 "errorMessage" => "Field is required.",
             ],
             "test validation is thrown when maxTimeThreshold is less than triggerTimeThreshold" => [
                 "body" => $this->automationRuleRecord([
-                    "maxTimeThreshold" => "1",
-                    "maxTimeUnit" => "hour",
-                    "triggerTimeThreshold" => "4",
-                    "triggerTimeUnit" => "hour",
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 1,
+                        "unit" => "hour",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 4,
+                        "unit" => "hour",
+                    ],
                     "collectionID" => [1],
                 ]),
-                "errorMessage" => "Oldest Retrieved Content Cap should be greater than Trigger Time Threshold.",
+                "errorMessage" => "Look-back Limit should be greater than Trigger Delay.",
             ],
         ];
     }
@@ -176,10 +190,14 @@ class StaleCollectionTriggerTest extends SiteTestCase
 
         // Create a new automation rule for stale collection
         $automationRuleRecord = $this->automationRuleRecord([
-            "maxTimeThreshold" => "1",
-            "maxTimeUnit" => "day",
-            "triggerTimeThreshold" => "1",
-            "triggerTimeUnit" => "hour",
+            "triggerTimeLookBackLimit" => [
+                "length" => 1,
+                "unit" => "day",
+            ],
+            "triggerTimeDelay" => [
+                "length" => 1,
+                "unit" => "hour",
+            ],
             "collectionID" => [$collectionID],
         ]);
         $result = $this->api()->post("automation-rules", $automationRuleRecord);
@@ -204,6 +222,9 @@ class StaleCollectionTriggerTest extends SiteTestCase
      */
     public function testLongRunnerExecution()
     {
+        CurrentTimeStamp::mockTime("+5 seconds");
+        $this->resetTable("collectionRecord");
+        $this->resetTable("collection");
         // Create two collection records
         $collectionRecord1 = $this->createCollection($this->getRecord("Stale Collection -1", 5));
         $collectionRecord2 = $this->createCollection($this->getRecord("Stale Collection -2", 4));
@@ -233,10 +254,14 @@ class StaleCollectionTriggerTest extends SiteTestCase
 
         // Create a new automation rule for stale collection
         $automationRuleRecord = $this->automationRuleRecord([
-            "maxTimeThreshold" => "1",
-            "maxTimeUnit" => "day",
-            "triggerTimeThreshold" => "1",
-            "triggerTimeUnit" => "hour",
+            "triggerTimeLookBackLimit" => [
+                "length" => 1,
+                "unit" => "day",
+            ],
+            "triggerTimeDelay" => [
+                "length" => 1,
+                "unit" => "hour",
+            ],
             "collectionID" => [$collectionRecord2["collectionID"], $collectionRecord1["collectionID"]],
         ]);
         $result = $this->api()->post("automation-rules", $automationRuleRecord);

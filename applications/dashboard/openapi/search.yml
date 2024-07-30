@@ -211,6 +211,18 @@ paths:
                       type: array
                   style: form
                 - $ref: "#/components/parameters/ProfileFieldFilters"
+                - name: includeTypeaheads
+                  in: query
+                  schema:
+                      type: boolean
+                  description: >
+                      BETA: Include typeahead results in the search response.
+                - name: includeResults
+                  in: query
+                  schema:
+                      type: boolean
+                  description: >
+                      BETA: Include search results in the search response.
             responses:
                 "200":
                     content:

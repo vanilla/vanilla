@@ -28,8 +28,9 @@ export function MenuBarSubMenuItem(props: IProps) {
 
     return (
         <div
-            role="none"
+            role="button"
             title={typeof props.children === "string" ? props.children : undefined}
+            aria-label={typeof props.children === "string" ? props.children : undefined}
             {...contextProps}
             className={cx(classes.subMenuItem, "subMenuItem", { active: props.active })}
             onKeyDown={(event) => {

@@ -3,22 +3,18 @@
  * @license Proprietary
  */
 
-import { t } from "@vanilla/i18n";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
 import { IGetUsersQueryParams, useGetUsers } from "@dashboard/users/userManagement/UserManagement.hooks";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import Translate from "@library/content/Translate";
-import { humanReadableNumber } from "@library/content/NumberFormatted";
 import { USERS_LIMIT_PER_PAGE, USERS_MAX_PAGE_COUNT } from "@dashboard/users/userManagement/UserManagementUtils";
 import NumberedPager from "@library/features/numberedPager/NumberedPager";
 import { cx } from "@emotion/css";
-import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
-import Message from "@library/messages/Message";
-import { ErrorIcon } from "@library/icons/common";
 import { AutomationRulesPreviewContent } from "@dashboard/automationRules/preview/AutomationRulesPreviewContent";
+import { loadingPlaceholder } from "@dashboard/automationRules/AutomationRules.utils";
+import { AutomationRulesPreviewContentHeader } from "@dashboard/automationRules/preview/AutomationRulesPreviewContentHeader";
 
 interface IProps extends Omit<React.ComponentProps<typeof AutomationRulesPreviewContent>, "formValues"> {
     query: IGetUsersQueryParams;
@@ -39,66 +35,16 @@ export function AutomationRulesPreviewUsersContent(props: IProps) {
         }
     }, [data]);
 
-    const message = useMemo(() => {
-        if (countUsersResults > 0) {
-            return (
-                <>
-                    <div className={classes.bold}>
-                        <Translate
-                            source={"Users Matching Criteria Now: <0 />"}
-                            c0={
-                                countUsersResults && countUsersResults >= USERS_MAX_PAGE_COUNT
-                                    ? `${humanReadableNumber(countUsersResults)}+`
-                                    : countUsersResults
-                            }
-                        />
-                    </div>
-                    <div>
-                        {props.fromStatusToggle
-                            ? t(
-                                  "The action will apply to them when the rule is enabled. In future, other users who meet the trigger criteria will have the action applied to them as well.",
-                              )
-                            : t("The action will be applied to only them if you proceed.")}
-                    </div>
-                    <div className={classes.italic}>
-                        {t("Note: Actions will not affect users that already have the associated action applied.")}
-                    </div>
-                </>
-            );
-        } else if (data?.users && data?.users.length === 0) {
-            return (
-                <>
-                    {t("This will not affect anyone right now. It will affect those that meet the criteria in future.")}
-                </>
-            );
-        }
-    }, [data]);
-
     return (
         <>
-            <div>{message}</div>
-            {error && (
-                <div className={classes.padded()}>
-                    <Message
-                        type="error"
-                        stringContents={t(
-                            "Failed to load the preview data. Please check your trigger and action values.",
-                        )}
-                        icon={<ErrorIcon />}
-                    />
-                </div>
-            )}
-            {isLoading && (
-                <div className={classes.padded(true)} style={{ marginTop: 16 }}>
-                    {Array.from({ length: 12 }, (_, index) => (
-                        <div key={index} className={classes.flexContainer()} style={{ marginBottom: 16 }}>
-                            <LoadingRectangle style={{ width: 25, height: 25, marginRight: 10, borderRadius: "50%" }} />
-                            <LoadingRectangle style={{ width: "95%", height: 25 }} />
-                        </div>
-                    ))}
-                </div>
-            )}
-
+            <AutomationRulesPreviewContentHeader
+                contentType="Users"
+                totalResults={countUsersResults}
+                emptyResults={data?.users && data?.users.length === 0}
+                fromStatusToggle={props.fromStatusToggle}
+                hasError={Boolean(error)}
+            />
+            {isLoading && loadingPlaceholder("preview")}
             <div>
                 {(hasData || countUsersResults >= USERS_MAX_PAGE_COUNT) && (
                     <NumberedPager

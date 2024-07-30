@@ -49,7 +49,7 @@ vnla docker --service vanilla,mailhog
 
 **The following web services will then be accessible**
 
--   https://dev.vanilla.localhost
+-   https://dev.vanilla.localhost, https://vanilla.localhost/OTHER_SITE_SLUGS - Vanilla Sites
 -   https://vanilla.localhost/dev - Same site as the previous
 -   https://kibana.vanilla.localhost - Logs/Kibana instance
 -   https://queue.vanilla.localhost - Dashboard for the queue if you are running with it.
@@ -58,14 +58,14 @@ vnla docker --service vanilla,mailhog
 -   https://imgproxy.vanilla.localhost - Image resizing service
 -   https://elasticsearch.vanilla.localhost - ElasticSearch instance for kibana/logs and search service.
 
-**_You can spawn a new site by creating a new empty database and navigating to https://vanlla.localhost/some-unique-slug to configure the site._**
+## `vnla spawn-site`
 
-### Migrating From [`vanilla-docker`](https://github.com/vanilla/docker)
+This command spawns a local site in the docker environment.
 
--   Completely stop your vanilla-docker containers.
--   Run `vnla docker`.
--   You will prompted to migrate your databases. Confirm this choice.
--   Never run `vanilla-docker` again.
+```shell
+vnla spawn-site
+# Follow interactive instructions.
+```
 
 ## `vnla backport`
 

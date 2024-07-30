@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { IComment, ICommentEdit } from "@dashboard/@types/api/comment";
+import { IComment, ICommentEdit, IPremoderatedRecordResponse } from "@dashboard/@types/api/comment";
 import apiv2 from "@library/apiv2";
 import SimplePagerModel, { IWithPaging } from "@library/navigation/SimplePagerModel";
 import { RecordID } from "@vanilla/utils";
@@ -25,7 +25,7 @@ const CommentsApi = {
         const result = await apiv2.get<ICommentEdit>(`/comments/${commentID}/edit`);
         return result.data;
     },
-    post: async (apiParams: CommentsApi.PostParams): Promise<IComment> => {
+    post: async (apiParams: CommentsApi.PostParams): Promise<IComment | IPremoderatedRecordResponse> => {
         const result = await apiv2.post("/comments", apiParams);
         return result.data;
     },

@@ -36,6 +36,15 @@ class DiscussionsController extends VanillaController
     public $enableFollowingFilter = false;
 
     /**
+     * @return void
+     */
+    public function unresolved()
+    {
+        $this->permission("staff.allow");
+        redirectTo("/dashboard/content/triage");
+    }
+
+    /**
      * "Table" layout for discussions. Mimics more traditional forum discussion layout.
      *
      * @param string $page Multiplied by PerPage option to determine offset.

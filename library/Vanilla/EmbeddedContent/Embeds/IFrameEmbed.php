@@ -6,7 +6,11 @@
 
 namespace Vanilla\EmbeddedContent\Embeds;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
+use Gdn;
+use Gdn_Request;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedUtils;
 
@@ -57,11 +61,33 @@ class IFrameEmbed extends AbstractEmbed
      */
     public function renderHtml(): string
     {
-        // Ensure the iframe domain is trusted or in knowledge, or skip it
+        // Ensure the iframe domain is trusted or in knowledge, and not coming from the same site or skip it
+        if ($this->isCurrentHost($this->data["url"])) {
+            return "";
+        }
+
         $url = $this->data["url"] ?? null;
         if (($url && isTrustedDomain($url)) || $this->data["isKnowledge"]) {
             return parent::renderHtml();
         }
         return "";
+    }
+
+    /**
+     * Check if the current host is the same as the iframe url.
+     *
+     * @param $url
+     * @return bool
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
+    protected function isCurrentHost($url): bool
+    {
+        $urlParts = parse_url($url);
+        $domain = $urlParts["host"];
+        $request = Gdn::getContainer()->get(Gdn_Request::class);
+        $currentHost = $request->getHost();
+
+        return $currentHost === $domain;
     }
 }

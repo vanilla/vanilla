@@ -102,6 +102,7 @@ export function DiscussionListFilter(props: IProps) {
                     <ToolTip label={t("Clear all filters")}>
                         <span>
                             <Button
+                                title={t("Clear all filters")}
                                 buttonType={ButtonTypes.ICON_COMPACT}
                                 onClick={clearAllFilters}
                                 className={classes.filterAndSortingButton}

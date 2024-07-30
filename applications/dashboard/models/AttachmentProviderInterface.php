@@ -188,4 +188,11 @@ interface AttachmentProviderInterface
      * Get the provider name.
      */
     public function getProviderName(): string;
+
+    /**
+     * Get any additional catalog schema specific to the Attachment
+     *
+     * @return array
+     */
+    public function getAdditionalCatalogInfo(): array;
 }

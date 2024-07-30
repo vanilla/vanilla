@@ -8,8 +8,6 @@
 namespace VanillaTests\Forum\Controllers\Api;
 
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Formatting\Formats\MarkdownFormat;
-use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -74,7 +72,7 @@ class ReportsTest extends SiteTestCase
                 "recordFormat" => "text",
                 "noteHtml" => "<p><em>Bold</em></p>",
                 "recordHtml" => "Hello Discussion",
-                "reasons.0.name" => "Spam",
+                "reasons.0.name" => "Spam / Solicitation",
                 "reasons.1.name" => "Abuse",
                 "recordIsLive" => true,
                 "recordWasEdited" => false,
@@ -118,27 +116,27 @@ class ReportsTest extends SiteTestCase
     public function testListAndFilterReports(): void
     {
         $this->resetTable("report");
+
         $cat1 = $this->createCategory(["name" => "Cat1"]);
         $discussion1 = $this->createDiscussion(["name" => "Discussion1"]);
         $report1 = $this->createReport($discussion1);
         $cat2 = $this->createCategory(["name" => "Cat2"]);
         $discussion2 = $this->createDiscussion();
+        $comment1 = $this->createComment();
+        $comment1Report = $this->createReport($comment1);
         $comment2 = $this->createComment();
-        $report2 = $this->createReport($comment2);
-        $permCat = $this->createPermissionedCategory(
-            ["name" => "PermCat"],
-            [\RoleModel::ADMIN_ID],
-            [
-                "posts.moderate" => [\RoleModel::ADMIN_ID],
-            ]
-        );
+        $comment2Report = $this->createReport($comment2);
+        $cat3 = $this->createCategory(["name" => "Cat 3"]);
         $permDiscussion = $this->createDiscussion();
-        $permReport = $this->createReport($permDiscussion);
+        $cat3Report = $this->createReport($permDiscussion);
+
+        $cat1And2Moderator = $this->createCategoryMod([$cat1, $cat2]);
+        $cat3Moderator = $this->createCategoryMod($cat3);
 
         $reports = $this->api()
             ->get("/reports")
             ->getBody();
-        $this->assertCount(3, $reports);
+        $this->assertCount(4, $reports);
 
         // I can filter to a specific category
         $reports = $this->api()
@@ -147,23 +145,22 @@ class ReportsTest extends SiteTestCase
                 "placeRecordID" => [$cat1["categoryID"], $cat2["categoryID"]],
             ])
             ->getBody();
-        $this->assertCount(2, $reports);
+        $this->assertCount(3, $reports);
 
         // I can filter to a specific record
         $reports = $this->api()
             ->get("/reports", ["recordType" => "comment", "recordID" => $comment2["commentID"]])
             ->getBody();
         $this->assertCount(1, $reports);
-        $this->assertEquals($report2["reportID"], $reports[0]["reportID"]);
+        $this->assertEquals($comment2Report["reportID"], $reports[0]["reportID"]);
 
-        $regularModerator = $this->createUser(["roleID" => [\RoleModel::MOD_ID]]);
-        $this->runWithUser(function () use ($permCat) {
+        $this->runWithUser(function () use ($cat3) {
             // If I don't have permission to see a report, I don't see the report.
             $reports = $this->api()
                 ->get("/reports")
                 ->getBody();
-            $this->assertCount(2, $reports);
-        }, $regularModerator);
+            $this->assertCount(3, $reports);
+        }, $cat1And2Moderator);
     }
 
     /**
@@ -233,12 +230,12 @@ class ReportsTest extends SiteTestCase
         $disc1 = $this->createDiscussion();
 
         $report1 = $this->createReport($disc1, ["reportReasonIDs" => ["spam"]]);
-        $report2 = $this->createReport($disc1, ["reportReasonIDs" => ["spam", "abuse", "sexual-content"]]);
+        $report2 = $this->createReport($disc1, ["reportReasonIDs" => ["spam", "abuse", "inappropriate"]]);
         $report3 = $this->createReport($disc1, ["reportReasonIDs" => ["abuse"]]);
 
         $reports = $this->api()
             ->get("/reports", [
-                "reportReasonID" => ["spam", "sexual-content"],
+                "reportReasonID" => ["spam", "inappropriate"],
             ])
             ->getBody();
         $this->assertCount(2, $reports);
@@ -252,7 +249,7 @@ class ReportsTest extends SiteTestCase
 
         $reports = $this->api()
             ->get("/reports", [
-                "reportReasonID" => "abuse,sexual-content",
+                "reportReasonID" => "abuse,inappropriate",
             ])
             ->getBody();
         $this->assertCount(2, $reports);
@@ -262,6 +259,50 @@ class ReportsTest extends SiteTestCase
                 "reportID" => [$report2["reportID"], $report3["reportID"]],
             ],
             $reports
+        );
+    }
+
+    /**
+     * Test that we can create and get for automation from the API.
+     */
+    public function testReportAutomationEndpoint(): void
+    {
+        $this->createCategory(["name" => "My Category"]);
+        CurrentTimeStamp::mockTime("2022-05-05");
+        $discussion = $this->createDiscussion(["name" => "my discussion"]);
+        $this->createReport($discussion, [
+            "reportReasonIDs" => ["spam", "abuse"],
+            "noteBody" => "*Bold*",
+        ]);
+        $this->createReport($discussion, [
+            "reportReasonIDs" => ["spam", "abuse"],
+            "noteBody" => "*Bold1*",
+        ]);
+        $this->createReport($discussion, [
+            "reportReasonIDs" => ["spam", "abuse"],
+            "noteBody" => "*Bold2*",
+        ]);
+
+        $discussionNew = $this->createDiscussion(["name" => "my discussion"]);
+        $this->createReport($discussionNew, [
+            "reportReasonIDs" => ["spam", "abuse"],
+            "noteBody" => "*Bold*",
+        ]);
+
+        $newReport = $this->api()
+            ->get("/reports/automation", [
+                "placeRecordType" => "category",
+                "placeRecordID" => $this->lastInsertedCategoryID,
+                "countReports" => 2,
+            ])
+            ->getBody();
+        $this->assertCount(1, $newReport);
+        $this->assertRowsLike(
+            [
+                "recordID" => [$discussion["discussionID"]],
+                "recordType" => ["discussion"],
+            ],
+            $newReport
         );
     }
 }

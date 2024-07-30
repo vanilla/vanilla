@@ -30,37 +30,38 @@ class MockSuggestionModel implements AiSuggestionSourceInterface
     /**
      * @inheritdoc
      */
-    public function generateSuggestions(array $discussion): array
+    public function generateSuggestions(array $discussion, string $keywords): array
     {
-        $this->discussionModel->formatField($discussion, "Body", $discussion["Format"]);
-
         $formattedResult = [
             [
                 "format" => "Vanilla",
                 "type" => $this->getName(),
-                "id" => 0,
+                "documentID" => 0,
                 "url" => "someplace.com/here",
                 "title" => "answer 1",
                 "summary" => "This is how you do this.",
                 "hidden" => false,
+                "sourceIcon" => "mock",
             ],
             [
                 "format" => "Vanilla",
                 "type" => $this->getName(),
-                "id" => 1,
+                "documentID" => 1,
                 "url" => "someplace.com/else",
                 "title" => "answer 2",
                 "summary" => "This is how you do this a different way.",
                 "hidden" => false,
+                "sourceIcon" => "mock",
             ],
             [
                 "format" => "Vanilla",
                 "type" => $this->getName(),
-                "id" => 2,
+                "documentID" => 2,
                 "url" => "someplace.com/else1",
                 "title" => "answer 3",
                 "summary" => "This is how you do this, a third way.",
                 "hidden" => false,
+                "sourceIcon" => "mock",
             ],
         ];
 
@@ -72,7 +73,7 @@ class MockSuggestionModel implements AiSuggestionSourceInterface
         return "mockSuggestion";
     }
 
-    public function getExclusionDropdownChoices(): FormChoicesInterface
+    public function getExclusionDropdownChoices(): ?FormChoicesInterface
     {
         return new ApiFormChoices(
             "/api/v2/categories/search?query=%s&limit=30",
@@ -87,7 +88,7 @@ class MockSuggestionModel implements AiSuggestionSourceInterface
         return t("Mock Source for testing");
     }
 
-    public function getExclusionLabel(): string
+    public function getExclusionLabel(): ?string
     {
         return t("Where to stop mocking about");
     }

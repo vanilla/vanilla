@@ -7,6 +7,7 @@
 
 namespace Vanilla\Dashboard\AutomationRules\Actions;
 
+use Vanilla\Dashboard\AutomationRules\Models\UserRuleDataType;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Exception;
 use Garden\Container\ContainerException;
@@ -16,12 +17,8 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Gdn;
 use Vanilla\Dashboard\AutomationRules\Models\UserInterface;
-use Vanilla\Dashboard\AutomationRules\Triggers\ProfileFieldSelectionTrigger;
-use Vanilla\Dashboard\AutomationRules\Triggers\TimeSinceUserRegistrationTrigger;
-use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
 use UserModel;
 use Vanilla\AutomationRules\Actions\AutomationAction;
-use Vanilla\AutomationRules\Actions\AutomationActionInterface;
 use Vanilla\AutomationRules\Actions\EventActionInterface;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Forms\ApiFormChoices;
@@ -32,10 +29,7 @@ use Vanilla\Logger;
 /**
  * Automation rule action that assigns or removes a specific role to the user.
  */
-class AddRemoveUserRoleAction extends AutomationAction implements
-    AutomationActionInterface,
-    UserInterface,
-    EventActionInterface
+class AddRemoveUserRoleAction extends AutomationAction implements UserInterface, EventActionInterface
 {
     private int $userID;
     public string $affectedRecordType = "User";
@@ -71,7 +65,15 @@ class AddRemoveUserRoleAction extends AutomationAction implements
      */
     public static function getName(): string
     {
-        return "Assign/remove a specific role to the user";
+        return "Assign/Remove role";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "users";
     }
 
     /**
@@ -79,11 +81,7 @@ class AddRemoveUserRoleAction extends AutomationAction implements
      */
     public static function getTriggers(): array
     {
-        return [
-            UserEmailDomainTrigger::getType(),
-            ProfileFieldSelectionTrigger::getType(),
-            TimeSinceUserRegistrationTrigger::getType(),
-        ];
+        return UserRuleDataType::getTriggers();
     }
 
     /**
@@ -96,15 +94,16 @@ class AddRemoveUserRoleAction extends AutomationAction implements
             "properties" => [
                 "addRoleID" => [
                     "type" => "string",
+                    "required" => true,
                     "x-control" => SchemaForm::dropDown(
-                        new FormOptions("Assign Role", "Select a role to be assigned"),
+                        new FormOptions("Assign Role"),
                         new ApiFormChoices("/api/v2/roles", "/api/v2/roles/%s", "roleID", "name")
                     ),
                 ],
                 "removeRoleID" => [
                     "type" => "string",
                     "x-control" => SchemaForm::dropDown(
-                        new FormOptions("Remove Role (optional)", "Select a role to be removed"),
+                        new FormOptions("Remove Role (optional)"),
                         new ApiFormChoices("/api/v2/roles", "/api/v2/roles/%s", "roleID", "name")
                     ),
                 ],

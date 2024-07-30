@@ -6,7 +6,6 @@
 
 import { IReport } from "@dashboard/moderation/CommunityManagementTypes";
 import { isHtmlEmpty } from "@dashboard/moderation/communityManagmentUtils";
-import { DismissReportModal } from "@dashboard/moderation/components/DismissReportModal";
 import { reportListItemClasses } from "@dashboard/moderation/components/ReportListItem.classes";
 import { ReportRecordMeta } from "@dashboard/moderation/components/ReportRecordMeta";
 import { cx } from "@emotion/css";
@@ -21,7 +20,7 @@ import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhot
 import Heading from "@library/layout/Heading";
 import { ListItem, ListItemContext } from "@library/lists/ListItem";
 import { ListItemLayout } from "@library/lists/ListItem.variables";
-import { MetaIcon, MetaItem } from "@library/metas/Metas";
+import { MetaIcon, MetaItem, Metas, MetaProfile } from "@library/metas/Metas";
 import Notice from "@library/metas/Notice";
 import { Tag } from "@library/metas/Tags";
 import { TagPreset } from "@library/metas/Tags.variables";
@@ -32,40 +31,101 @@ import { t } from "@vanilla/i18n";
 import { LocationDescriptor } from "history";
 import { useState } from "react";
 import BlurContainer from "@dashboard/moderation/components/BlurContainerUserContent";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { Icon } from "@vanilla/icons";
+import { detailPageClasses } from "@dashboard/moderation/DetailPage.classes";
+import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
+import { EscalateModal } from "@dashboard/moderation/components/EscalateModal";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import apiv2 from "@library/apiv2";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import { useToast } from "@library/features/toaster/ToastContext";
+import { ReportStatus, reportStatusLabel } from "@dashboard/moderation/components/ReportFilters.constants";
+import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
 
 interface IProps {
-    to: LocationDescriptor;
     report: IReport;
-    onEscalate(report: IReport): void;
 }
 
 export function ReportListItem(props: IProps) {
-    const { to, report, onEscalate } = props;
-    const [showDismiss, setShowDismiss] = useState(false);
+    const { report } = props;
     const classes = reportListItemClasses();
+    const url = "/dashboard/content/triage/" + report.reportID;
+    const [showEscalate, setShowEscalate] = useState(false);
+    const { fetchDashboardSections } = useDashboardSectionActions();
+
+    const queryClient = useQueryClient();
+    const toast = useToast();
+    function invalidateCaches() {
+        queryClient.invalidateQueries(["reports"]);
+        queryClient.invalidateQueries(["post"]);
+        fetchDashboardSections();
+    }
+
+    const dismissMutation = useMutation({
+        mutationFn: async () => {
+            const response = await apiv2.patch(`/reports/${report.reportID}/dismiss`);
+            invalidateCaches();
+            toast.addToast({
+                autoDismiss: true,
+                body: t("Report dismissed."),
+            });
+            return response;
+        },
+        mutationKey: [report.reportID],
+    });
+
+    const approveMutation = useMutation({
+        mutationFn: async () => {
+            const response = await apiv2.patch(`/reports/${report.reportID}/approve-record`);
+            invalidateCaches();
+            toast.addToast({
+                autoDismiss: true,
+                body: t("Post approved."),
+            });
+            return response;
+        },
+        mutationKey: [report.reportID],
+    });
+
+    const rejectMutation = useMutation({
+        mutationFn: async () => {
+            const response = await apiv2.patch(`/reports/${report.reportID}/reject-record`);
+            invalidateCaches();
+            toast.addToast({
+                autoDismiss: true,
+                body: t("Post rejected."),
+            });
+            return response;
+        },
+        mutationKey: [report.reportID],
+    });
 
     return (
         <div className={classes.container}>
             <header className={classes.header}>
-                <span className={classes.titleGroup}>
-                    <SmartLink to={to}>
-                        <Heading depth={3}>
-                            <Translate source={"Report from <0/>"} c0={report.insertUser?.name} />
-                        </Heading>
-                    </SmartLink>
-                </span>
-                <div className={classes.actions}>
+                <Metas>
                     {report.reasons.map((reason) => (
-                        <ToolTip
-                            key={`${report.recordName}-${report.recordID}-${reason.reportReasonID}`}
-                            label={reason.description}
-                        >
-                            <span>
-                                <Tag preset={TagPreset.STANDARD}>{reason.name}</Tag>
-                            </span>
-                        </ToolTip>
+                        <MetaItem key={reason.reportReasonID}>
+                            <Tag preset={TagPreset.STANDARD} tooltipLabel={reason.description}>
+                                {reason.name}
+                            </Tag>
+                        </MetaItem>
                     ))}
-                </div>
+
+                    <MetaItem flex>
+                        <Translate
+                            source={"Reported by <0/>"}
+                            c0={<MetaProfile user={report.insertUser ?? deletedUserFragment()} />}
+                        />
+                    </MetaItem>
+                    <MetaItem>
+                        <MetaIcon icon="meta-time" style={{ marginLeft: -4 }} />
+                        <DateTime timestamp={report.dateInserted}></DateTime>
+                    </MetaItem>
+                </Metas>
+                <span style={{ flex: 1 }}></span>
+                <Notice className={classes.status}>{reportStatusLabel(report.status)}</Notice>
             </header>
             {/* Report */}
             <ListItem
@@ -80,20 +140,6 @@ export function ReportListItem(props: IProps) {
                     )
                 }
                 truncateDescription={false}
-                metas={
-                    <span style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
-                        <MetaItem className={classes.reporterProfile}>
-                            <ProfileLink userFragment={report.insertUser ?? deletedUserFragment()} isUserCard>
-                                <UserPhoto size={UserPhotoSize.XSMALL} userInfo={report.insertUser} />
-                                {report.insertUser?.name}
-                            </ProfileLink>
-                        </MetaItem>
-                        <MetaItem>
-                            <MetaIcon icon="meta-time" style={{ marginLeft: -4 }} />
-                            <DateTime timestamp={report.dateInserted}></DateTime>
-                        </MetaItem>
-                    </span>
-                }
             />
 
             {/* Record */}
@@ -101,8 +147,20 @@ export function ReportListItem(props: IProps) {
                 <BlurContainer>
                     <ListItem
                         className={cx(classes.recordItem, classes.adminStyleOverrides)}
+                        nameClassName={communityManagementPageClasses().listItemLink}
                         as={"div"}
-                        name={<>{report.recordName}</>}
+                        name={
+                            <span className={detailPageClasses().headerIconLayout}>
+                                {report.recordName}
+                                <span>
+                                    <ToolTip label={t("View post in community")}>
+                                        <span>
+                                            <Icon icon="meta-external" size={"compact"} />
+                                        </span>
+                                    </ToolTip>
+                                </span>
+                            </span>
+                        }
                         url={report.recordUrl}
                         description={
                             <CollapsableContent maxHeight={50} gradientClasses={classes.gradientOverride}>
@@ -116,37 +174,64 @@ export function ReportListItem(props: IProps) {
             </ListItemContext.Provider>
             <div className={classes.reportSummaryContainer}>
                 <div className={classes.reportSummary}>
-                    {report.status === "new" ? (
-                        <>
-                            <Button
-                                buttonType={ButtonTypes.TEXT}
-                                onClick={() => {
-                                    setShowDismiss(true);
-                                }}
-                            >
-                                {t("Dismiss")}
-                            </Button>
+                    <>
+                        {report.status === "new" ? (
+                            <>
+                                {report.isPending ? (
+                                    <>
+                                        <Button
+                                            buttonType={ButtonTypes.TEXT}
+                                            onClick={() => {
+                                                rejectMutation.mutate();
+                                            }}
+                                        >
+                                            {rejectMutation.isLoading ? <ButtonLoader /> : t("Reject")}
+                                        </Button>
+                                        <Button
+                                            buttonType={ButtonTypes.TEXT}
+                                            onClick={() => {
+                                                approveMutation.mutate();
+                                            }}
+                                        >
+                                            {approveMutation.isLoading ? <ButtonLoader /> : t("Approve")}
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <Button
+                                        buttonType={ButtonTypes.TEXT}
+                                        onClick={() => {
+                                            dismissMutation.mutate();
+                                        }}
+                                    >
+                                        {dismissMutation.isLoading ? <ButtonLoader /> : t("Dismiss")}
+                                    </Button>
+                                )}
+                            </>
+                        ) : (
+                            <></>
+                        )}
+
+                        {report.escalationUrl ? (
+                            <SmartLink to={report.escalationUrl}>{t("View Escalation")}</SmartLink>
+                        ) : (
                             <Button
                                 buttonType={ButtonTypes.TEXT_PRIMARY}
                                 onClick={() => {
-                                    onEscalate(report);
+                                    setShowEscalate(true);
                                 }}
                             >
                                 {t("Escalate")}
                             </Button>
-                        </>
-                    ) : (
-                        <>
-                            <Notice>{report.status}</Notice>
-                        </>
-                    )}
+                        )}
+                    </>
                 </div>
             </div>
-            <DismissReportModal
-                reportIDs={report.reportID}
-                isVisible={showDismiss}
+            <EscalateModal
+                escalationType={"report"}
+                report={report}
+                isVisible={showEscalate}
                 onClose={() => {
-                    setShowDismiss(false);
+                    setShowEscalate(false);
                 }}
             />
         </div>

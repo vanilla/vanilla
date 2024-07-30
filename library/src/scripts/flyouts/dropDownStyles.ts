@@ -222,7 +222,7 @@ export const dropDownClasses = useThemeCache(() => {
                     display: "flex",
                     justifyContent: "space-between",
                 },
-                "&:hover": {
+                "&:hover, &.isFocused": {
                     background: globalVars.states.hover.highlight.toString(),
                 },
             },

@@ -164,10 +164,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userMetaModel = Gdn::getContainer()->get(UserMetaModel::class);
         $this->cache = Gdn::getContainer()->get(CacheInterface::class);
         $this->unsubscribeSalt = \Gdn::config()->get("Garden.Unsubscribe.Salt");
-        $this->activityService =
-            $activityService instanceof ActivityService
-                ? $activityService
-                : Gdn::getContainer()->get(ActivityService::class);
+        $this->activityService = Gdn::getContainer()->get(ActivityService::class);
     }
 
     /**
@@ -1643,13 +1640,20 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         if ($notificationCount === null) {
             $eventManager = $this->getEventManager();
             $eventManager->dispatch(new ActivityQueryEvent($this->SQL, "aCount"));
+
+            $innerQuery = $this->getBatchedQuery([
+                "NotifyUserID" => $userID,
+            ]);
+
             $notifications = $this->SQL
-                ->select("ActivityID", "count", "total")
-                ->from($this->Name . " aCount")
+                ->select("aCount.ActivityID", "count", "total")
+                ->from("($innerQuery) a")
+                ->join("Activity aCount", "a.ActivityID = aCount.ActivityID")
                 ->where("NotifyUserID", $userID)
-                ->where("Notified", self::SENT_PENDING)
+                ->where("Notified", [self::SENT_PENDING, self::SENT_TOAST])
                 ->get()
                 ->resultArray();
+
             if (!is_array($notifications) || !isset($notifications[0])) {
                 $notificationCount = 0;
             } else {

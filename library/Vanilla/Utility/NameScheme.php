@@ -27,10 +27,15 @@ abstract class NameScheme
      * @param array $keysSkipRecursion Skip recursion for the following keys.
      * @return array Returns the converted array.
      */
-    public function convertArrayKeys(array $array, array $keysSkipRecursion = [])
+    public function convertArrayKeys(array $array, array $keysSkipRecursion = [], array $excludedKeys = [])
     {
         $result = [];
         foreach ($array as $key => $value) {
+            if (in_array($key, $excludedKeys)) {
+                $result[$key] = $value;
+                continue;
+            }
+
             $key = $this->convert($key);
             if (!in_array($key, $keysSkipRecursion)) {
                 if (is_array($value)) {

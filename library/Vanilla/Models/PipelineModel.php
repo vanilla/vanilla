@@ -220,18 +220,13 @@ class PipelineModel extends Model implements InjectableInterface
             return $callback($op);
         }
 
-        switch ($op->getType()) {
-            case Operation::TYPE_INSERT:
-                return parent::insert($op->getSet(), $op->getOptions());
-            case Operation::TYPE_UPDATE:
-                return parent::update($op->getSet(), $op->getWhere(), $op->getOptions());
-            case Operation::TYPE_DELETE:
-                return parent::delete($op->getWhere(), $op->getOptions());
-            case Operation::TYPE_SELECT:
-                return parent::select($op->getWhere(), $op->getOptions());
-            default:
-                throw new \InvalidArgumentException("Invalid operation: " . $op->getType());
-        }
+        return match ($op->getType()) {
+            Operation::TYPE_INSERT => parent::insert($op->getSet(), $op->getOptions()),
+            Operation::TYPE_UPDATE => parent::update($op->getSet(), $op->getWhere(), $op->getOptions()),
+            Operation::TYPE_DELETE => parent::delete($op->getWhere(), $op->getOptions()),
+            Operation::TYPE_SELECT => parent::select($op->getWhere(), $op->getOptions()),
+            default => throw new \InvalidArgumentException("Invalid operation: " . $op->getType()),
+        };
     }
 
     /**

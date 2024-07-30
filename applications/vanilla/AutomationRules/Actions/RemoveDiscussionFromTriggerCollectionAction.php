@@ -11,7 +11,7 @@ use Vanilla\AutomationRules\Triggers\StaleCollectionTrigger;
 use Vanilla\Models\CollectionModel;
 use Vanilla\Models\CollectionRecordModel;
 
-class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction implements AutomationActionInterface
+class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
@@ -27,7 +27,15 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction imple
      */
     public static function getName(): string
     {
-        return "Remove discussion from trigger collection";
+        return "Remove from trigger collection";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -56,7 +64,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction imple
      */
     public static function getTriggers(): array
     {
-        return [StaleCollectionTrigger::getType()];
+        return [StaleCollectionTrigger::class];
     }
 
     /**
@@ -76,7 +84,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction imple
                 "collectionID" => $object["collectionID"],
             ],
         ];
-        $this->insertTimedDiscussionLog($object["recordID"], $logData);
+        $this->insertPostLog($object["recordID"], $logData);
         $collectionRecord->delete($where);
         return true;
     }

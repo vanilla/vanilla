@@ -7,7 +7,6 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\ValidationException;
-use Vanilla\Utility\SchemaUtils;
 use Vanilla\Utility\UrlUtils;
 
 /**
@@ -15,49 +14,26 @@ use Vanilla\Utility\UrlUtils;
  */
 class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
 {
-    /** @var SearchResultItem[] */
-    private $resultItems;
-
-    /** @var int */
-    private $totalCount;
-
-    /** @var int */
-    private $offset;
-
-    /** @var int */
-    private $limit;
-
-    /** @var string[] $terms */
-    private $terms;
-
-    private ?string $cursor;
-
-    private array $aggregations;
-
     /**
      * Constructor.
      *
-     * @param SearchResultItem[] $resultItems
+     * @param array<SearchResultItem|SearchTypeaheadResult> $resultItems
      * @param int $totalCount
      * @param int $offset
      * @param int $limit
+     * @param string[] $terms
+     * @param string|null $cursor
+     * @param array $aggregations
      */
     public function __construct(
-        array $resultItems,
-        int $totalCount,
-        int $offset,
-        int $limit,
-        array $terms = [],
-        ?string $cursor = null,
-        array $aggregations = []
+        private array $resultItems,
+        private int $totalCount,
+        private int $offset,
+        private int $limit,
+        private array $terms = [],
+        private ?string $cursor = null,
+        private array $aggregations = []
     ) {
-        $this->resultItems = $resultItems;
-        $this->totalCount = $totalCount;
-        $this->offset = $offset;
-        $this->limit = $limit;
-        $this->terms = $terms;
-        $this->cursor = $cursor;
-        $this->aggregations = $aggregations;
     }
 
     /**
@@ -177,12 +153,14 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
         $results = [];
         $schema = SearchResultItem::legacySchema();
         foreach ($this->resultItems as $serviceResult) {
-            try {
-                $legacyResult = $schema->validate($serviceResult->asLegacyArray());
-                $results[] = $legacyResult;
-            } catch (ValidationException $e) {
-                $formatted = formatException($e);
-                trigger_error("Validation of result failed.\n$formatted");
+            if ($serviceResult instanceof SearchResultItem) {
+                try {
+                    $legacyResult = $schema->validate($serviceResult->asLegacyArray());
+                    $results[] = $legacyResult;
+                } catch (ValidationException $e) {
+                    $formatted = formatException($e);
+                    trigger_error("Validation of result failed.\n$formatted");
+                }
             }
         }
         return $results;
@@ -212,10 +190,12 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
 
         $resultItems = $this->getResultItems();
         foreach ($resultItems as &$resultItem) {
-            $itemUrl = $resultItem->getUrl();
-            $itemUrl = UrlUtils::concatQuery($itemUrl, $utmParameters);
+            if ($resultItem instanceof SearchResultItem) {
+                $itemUrl = $resultItem->getUrl();
+                $itemUrl = UrlUtils::concatQuery($itemUrl, $utmParameters);
 
-            $resultItem->setUrl($itemUrl);
+                $resultItem->setUrl($itemUrl);
+            }
         }
         $this->setResultItems($resultItems);
     }

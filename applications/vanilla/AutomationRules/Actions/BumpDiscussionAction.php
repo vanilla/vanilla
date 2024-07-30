@@ -14,9 +14,10 @@ use Gdn;
 use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
 use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Exception\Database\NoResultsException;
 
-class BumpDiscussionAction extends AutomationAction implements AutomationActionInterface
+class BumpDiscussionAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
@@ -32,7 +33,15 @@ class BumpDiscussionAction extends AutomationAction implements AutomationActionI
      */
     public static function getName(): string
     {
-        return "Bump the discussion";
+        return "Bump post";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -61,7 +70,7 @@ class BumpDiscussionAction extends AutomationAction implements AutomationActionI
      */
     public static function getTriggers(): array
     {
-        return [StaleDiscussionTrigger::getType(), LastActiveDiscussionTrigger::getType()];
+        return DiscussionRuleDataType::getTriggers();
     }
 
     /**
@@ -82,7 +91,7 @@ class BumpDiscussionAction extends AutomationAction implements AutomationActionI
                 "recordID" => $object["DiscussionID"],
             ],
         ];
-        $this->insertTimedDiscussionLog($object["DiscussionID"], $logData);
+        $this->insertPostLog($object["DiscussionID"], $logData);
         return true;
     }
 

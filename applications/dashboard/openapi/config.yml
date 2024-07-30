@@ -589,7 +589,7 @@ components:
                     description: |
                         This is where we store the default followed categories
                     type: string
-                    default: ""
+                    default: "[]"
                     x-key: "Preferences.CategoryFollowed.Defaults"
                     x-read: community.manage
                     x-write: community.manage
@@ -824,3 +824,53 @@ components:
                     x-key: "Garden.ExternalSearch.ResultsInNewTab"
                     x-read: community.manage
                     x-write: community.manage
+                "escalations.enabled":
+                    description: |
+                        Enable the new escalations system and disable intake into legacy reporting systems.
+                    type: boolean
+                    default: false
+                    x-key: "Feature.escalations.Enabled"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "triage.enabled":
+                    description: |
+                        Enable the triage system
+                    type: boolean
+                    default: false
+                    x-key: "triage.enabled"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.categoryIDs":
+                    description: |
+                        Categories that require premoderation
+                    type: array
+                    items:
+                        type: integer
+                    default: []
+                    x-key: "premoderation.categoryIDs"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.discussions":
+                    description: |
+                        Should discussions require premoderation.
+                    type: boolean
+                    default: false
+                    x-key: "premoderation.discussions"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.comments":
+                    description: |
+                        Should comments require premoderation.
+                    type: boolean
+                    default: false
+                    x-key: "premoderation.comments"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.keywords":
+                    description: |
+                        Keywords that require premoderation. This should be a semicolon separated list of keywords.
+                    type: string
+                    default: ""
+                    x-key: "premoderation.keywords"
+                    x-read: community.moderate
+                    x-write: community.moderate

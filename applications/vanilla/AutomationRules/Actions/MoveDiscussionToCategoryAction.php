@@ -17,11 +17,12 @@ use Garden\Web\Exception\ClientException;
 use Gdn;
 use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
 use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 
-class MoveDiscussionToCategoryAction extends AutomationAction implements AutomationActionInterface
+class MoveDiscussionToCategoryAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
@@ -37,7 +38,15 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Automat
      */
     public static function getName(): string
     {
-        return "Move to a specific category";
+        return "Move post";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -51,10 +60,14 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Automat
                 "items" => [
                     "type" => "integer",
                 ],
+                "required" => true,
                 "x-control" => SchemaForm::dropDown(
-                    new FormOptions("Category to move to", "Select a category"),
+                    new FormOptions(
+                        "Category to move to",
+                        "Category settings are respected by automation rules. Posts will only be moved into categories that accept that post type."
+                    ),
                     new ApiFormChoices(
-                        "/api/v2/categories/search?query=%s&limit=30",
+                        "/api/v2/categories/search?query=%s&limit=30&displayAs[]=Discussions",
                         "/api/v2/categories/%s",
                         "categoryID",
                         "name"
@@ -71,7 +84,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Automat
      */
     public static function getTriggers(): array
     {
-        return [StaleDiscussionTrigger::getType(), LastActiveDiscussionTrigger::getType()];
+        return DiscussionRuleDataType::getTriggers();
     }
 
     /**
@@ -102,7 +115,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Automat
                 "toCategoryID" => $actionValue["categoryID"],
             ],
         ];
-        $this->insertTimedDiscussionLog($object["DiscussionID"], $logData);
+        $this->insertPostLog($object["DiscussionID"], $logData);
         return true;
     }
 

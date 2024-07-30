@@ -365,49 +365,6 @@ class DiscussionController extends VanillaController
     }
 
     /**
-     * Display comments in a discussion since a particular CommentID.
-     *
-     * @param int $discussionID Unique discussion ID
-     * @param int $lastCommentID Only shows comments posted after this one
-     */
-    public function getNew($discussionID, $lastCommentID = 0)
-    {
-        $this->setData("Discussion", $this->DiscussionModel->getID($discussionID), true);
-
-        // Check permissions.
-        $this->categoryPermission($this->Discussion->CategoryID, "Vanilla.Discussions.View");
-        $this->setData("CategoryID", $this->CategoryID = $this->Discussion->CategoryID, true);
-
-        // Get the comments.
-        $comments = $this->CommentModel->getNew($discussionID, $lastCommentID);
-        $this->setData("Comments", $comments, true);
-        $comments = $comments->result();
-
-        // Set the data.
-        if (count($comments) > 0) {
-            $lastComment = $comments[count($comments) - 1];
-            // Mark the comment read.
-            $this->setData("Offset", $this->Discussion->CountComments, true);
-            $this->DiscussionModel->setWatch(
-                $this->Discussion,
-                $this->Discussion->CountComments,
-                $this->Discussion->CountComments,
-                $this->Discussion->CountComments
-            );
-
-            $lastCommentID = $this->json("LastCommentID");
-            if (is_null($lastCommentID) || $lastComment->CommentID > $lastCommentID) {
-                $this->json("LastCommentID", $lastComment->CommentID);
-            }
-        } else {
-            $this->setData("Offset", $this->CommentModel->getOffset($lastCommentID), true);
-        }
-
-        $this->View = "comments";
-        $this->render();
-    }
-
-    /**
      * Highlight route & add common JS definitions.
      *
      * Always called by dispatcher before controller's requested method.
@@ -439,7 +396,7 @@ class DiscussionController extends VanillaController
         $discussionID = $comment->DiscussionID;
 
         // Figure out how many comments are before this one
-        $offset = $this->CommentModel->getOffset($comment);
+        $offset = $this->CommentModel->getDiscussionThreadOffset($comment);
         $limit = Gdn::config("Vanilla.Comments.PerPage", 30);
 
         $pageNumber = pageNumber($offset, $limit, true);

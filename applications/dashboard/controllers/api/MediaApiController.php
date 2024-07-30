@@ -364,13 +364,12 @@ class MediaApiController extends AbstractApiController
         ) {
             $allowedExtensions = array_merge($allowedExtensions, $this::UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS);
         }
+        $validateContentTypes = FeatureFlagHelper::featureEnabled("validateContentTypes");
         $uploadSchema = new UploadedFileSchema([
             UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => $allowedExtensions,
-            UploadedFileSchema::OPTION_VALIDATE_CONTENT_TYPES => FeatureFlagHelper::featureEnabled(
-                "validateContentTypes"
-            ),
+            UploadedFileSchema::OPTION_VALIDATE_CONTENT_TYPES => $validateContentTypes,
             UploadedFileSchema::OPTION_ALLOW_UNKNOWN_TYPES => true,
-            UploadedFileSchema::OPTION_ALLOW_NON_STRICT_TYPES => true, // less strict because mime_content_type isn't super accurate
+            UploadedFileSchema::OPTION_ALLOW_NON_STRICT_TYPES => !$validateContentTypes, // if validateContentTypes is disabled, allow non-strict types
         ]);
 
         $in = $this->schema(

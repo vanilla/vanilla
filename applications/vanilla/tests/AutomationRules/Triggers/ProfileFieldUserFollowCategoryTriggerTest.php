@@ -203,7 +203,7 @@ class ProfileFieldUserFollowCategoryTriggerTest extends SiteTestCase
                 "automationRuleID" => $automationRule["automationRuleID"],
                 "automationRuleDispatchUUID" => $dispatchedRecord["automationRuleDispatchUUID"],
                 "categoryID" => 999,
-                "error" => "Category not found.",
+                "error" => "Failed setting users notification preference., Category not found.",
             ],
         ]);
         $this->assertEquals(
@@ -225,7 +225,10 @@ class ProfileFieldUserFollowCategoryTriggerTest extends SiteTestCase
 
         $this->assertEquals("triggered", $dispatchedRecord["dispatchType"]);
         $this->assertEquals("warning", $dispatchedRecord["status"]);
-        $this->assertEquals("CategoryID: 999 - Category not found.", $dispatchedRecord["errorMessage"]);
+        $this->assertEquals(
+            "CategoryID: 999 - Failed setting users notification preference., Category not found.",
+            $dispatchedRecord["errorMessage"]
+        );
         $this->assertEquals($currentUserID, $dispatchedRecord["dispatchUserID"]);
 
         $dispatchLogRecord = $dispatchLog[0];

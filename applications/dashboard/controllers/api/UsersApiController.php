@@ -548,6 +548,7 @@ class UsersApiController extends AbstractApiController
                     ],
                     "type" => "array",
                 ],
+                "suggestAnswers:b?",
             ])->add($this->getUserFragmentSchema()),
             "out"
         );
@@ -1036,7 +1037,7 @@ class UsersApiController extends AbstractApiController
 
         $userData = $this->normalizeInput($body);
         $settings = [
-            "NoConfirmEmail" => true,
+            UserModel::OPT_NO_CONFIRM_EMAIL => true,
             "SaveRoles" => array_key_exists("RoleID", $userData),
             "ValidateName" => false,
         ];
@@ -1502,7 +1503,7 @@ class UsersApiController extends AbstractApiController
                 "name?",
                 "email?",
                 "showEmail?",
-                "suggestAnswers?",
+                "suggestAnswers:b?",
                 "photo?",
                 "emailConfirmed?",
                 "bypassSpam?",
@@ -1547,7 +1548,7 @@ class UsersApiController extends AbstractApiController
                 "name?",
                 "email?",
                 "showEmail?",
-                "suggestAnswers?",
+                "suggestAnswers:b?",
                 "password?",
                 "private?",
                 "profileFields:o?" => $this->profileFieldModel->getUserProfileFieldSchema(true),

@@ -65,8 +65,6 @@ class Permissions implements \JsonSerializable
         "Moderation.Warnings.Add" => true, // Legacy reactions permission.
         "Moderation.Warnings.View" => true, // Maybe a typo?
         "Moderation.Signatures.Edit" => true,
-        "Moderation.ModerationQueue.Manage" => true, // Legacy moderation permission.
-        "Moderation.Spam.Manage" => true, // Legacy moderation permission.
         "Garden.Profile.EditPhotos" => true,
         "Moderation.Users.Ban" => true,
         "Moderation.UserNotes.Add" => true,

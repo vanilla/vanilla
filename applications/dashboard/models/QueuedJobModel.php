@@ -108,7 +108,7 @@ class QueuedJobModel extends PipelineModel implements LoggerAwareInterface
      * @param SchedulerInterface $scheduler
      * @param LockService $lockService
      * @param \Gdn_Database $database
-     * @param LoggerInterface $logger ,
+     * @param LoggerInterface $logger
      */
     public function __construct(
         ConfigurationInterface $config,

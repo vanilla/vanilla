@@ -18,9 +18,11 @@ use Garden\Web\Exception\ForbiddenException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Events\PasswordResetEmailSentEvent;
 use Vanilla\Dashboard\Events\PasswordResetUserNotFoundEvent;
+use Vanilla\Dashboard\Activity\ApplicantActivity;
 use Vanilla\Dashboard\Events\UserEvent;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
@@ -28,7 +30,6 @@ use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Dashboard\Events\UserPointEvent;
 use Vanilla\Dashboard\Events\UserRoleModificationEvent;
-use Vanilla\Dashboard\Events\UserRoleRemoveEvent;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Dashboard\Models\UserFragment;
@@ -141,6 +142,7 @@ class UserModel extends Gdn_Model implements
     public const OPT_FORCE_SYNC = "forceSync";
     public const OPT_TRUSTED_PROVIDER = "trustedProvider";
     public const OPT_NO_CONFIRM_EMAIL = "NoConfirmEmail";
+    public const OPT_SSO_REGISTRATION = "SSORegistration";
     public const OPT_FIX_UNIQUE = "FixUnique";
     public const OPT_SAVE_ROLES = "SaveRoles";
     public const OPT_VALIDATE_NAME = "ValidateName";
@@ -203,7 +205,7 @@ class UserModel extends Gdn_Model implements
     /** @var UserMetaModel */
     private $userMetaModel;
 
-    /** @var SessionModel|mixed|object  */
+    /** @var SessionModel|mixed|object */
     private SessionModel $sessionModel;
 
     private ReactionModel $reactionModel;
@@ -628,13 +630,13 @@ class UserModel extends Gdn_Model implements
     /**
      * Check whether a user has access to view discussions in a particular category.
      *
-     * @since 2.0.18
-     * @example $UserModel->getCategoryViewPermission($userID, $categoryID).
-     *
      * @param int $userID
      * @param int $categoryID
      * @param ?string $permission
      * @return bool Whether user has permission.
+     * @since 2.0.18
+     * @example $UserModel->getCategoryViewPermission($userID, $categoryID).
+     *
      */
     public function getCategoryViewPermission(int $userID, int $categoryID, ?string $permission = null)
     {
@@ -925,7 +927,19 @@ class UserModel extends Gdn_Model implements
      */
     public static function requireConfirmEmail()
     {
-        return c("Garden.Registration.ConfirmEmail") && !self::noEmail();
+        return (Gdn::config("Garden.Registration.ConfirmEmail") ||
+            Gdn::config("Garden.Registration.SSOConfirmEmail")) &&
+            !self::noEmail();
+    }
+
+    /**
+     * Whether or not the application requires email confirmation.
+     *
+     * @return bool
+     */
+    public static function requireSSOConfirmEmail()
+    {
+        return c("Garden.Registration.SSOConfirmEmail") && !self::noEmail();
     }
 
     /**
@@ -1065,6 +1079,7 @@ class UserModel extends Gdn_Model implements
     {
         $attributes = val("Attributes", $user);
         $storedEmailKey = val("EmailKey", $attributes);
+        $pendingEmail = val("PendingEmail", $attributes);
         $userID = val("UserID", $user);
 
         if (!$storedEmailKey || $emailKey != $storedEmailKey) {
@@ -1101,8 +1116,11 @@ class UserModel extends Gdn_Model implements
         $this->saveRoles($userID, $roles, [self::OPT_LOG_ROLE_CHANGES => Gdn::config("ExtraLogging.Enabled", false)]);
 
         // Remove the email confirmation attributes.
-        $this->saveAttribute($userID, ["EmailKey" => null]);
+        $this->saveAttribute($userID, ["EmailKey" => null, "PendingEmail" => null]);
         $this->setField($userID, "Confirmed", 1);
+        if ($pendingEmail) {
+            $this->setField($userID, "Email", $pendingEmail);
+        }
         return true;
     }
 
@@ -1292,6 +1310,7 @@ class UserModel extends Gdn_Model implements
         }
 
         $result = $this->save($newUser, [
+            self::OPT_SSO_REGISTRATION => true,
             self::OPT_NO_CONFIRM_EMAIL => true,
             self::OPT_FIX_UNIQUE => true,
             self::OPT_SAVE_ROLES => isset($newUser["RoleID"]),
@@ -1319,6 +1338,7 @@ class UserModel extends Gdn_Model implements
 
         $options += [
             self::OPT_CHECK_CAPTCHA => false,
+            self::OPT_SSO_REGISTRATION => true,
             self::OPT_NO_CONFIRM_EMAIL => isset($userData["Email"]) || !UserModel::requireConfirmEmail(),
             self::OPT_NO_ACTIVITY => true,
             self::OPT_SYNC_EXISTING => true,
@@ -1496,7 +1516,10 @@ class UserModel extends Gdn_Model implements
         unset($fields["Roles"]);
 
         // Massage the roles for email confirmation.
-        if (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $options)) {
+        if (
+            (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $options)) ||
+            (self::requireSSOConfirmEmail() && val(self::OPT_SSO_REGISTRATION, $options))
+        ) {
             $confirmRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
 
             if (!empty($confirmRoleIDs)) {
@@ -2593,7 +2616,9 @@ class UserModel extends Gdn_Model implements
         $rolesDataArray = Gdn::cache()->get($userRolesKey);
 
         if ($rolesDataArray === Gdn_Cache::CACHEOP_FAILURE) {
-            $rolesDataArray = $this->SQL->getWhere("UserRole", ["UserID" => $userID], "RoleID")->resultArray();
+            $rolesDataArray = $this->createSql()
+                ->getWhere("UserRole", ["UserID" => $userID], "RoleID")
+                ->resultArray();
             $rolesDataArray = array_column($rolesDataArray, "RoleID");
             // Add result to cache
             $this->userCacheRoles($userID, $rolesDataArray);
@@ -3180,32 +3205,35 @@ class UserModel extends Gdn_Model implements
             }
 
             // Check for email confirmation.
-            if (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $settings)) {
-                $emailIsSet = isset($fields["Email"]);
-                $emailIsNotConfirmed = array_key_exists("Confirmed", $fields) && $fields["Confirmed"] == 0;
-                $validSession = $this->session->isValid();
-
+            if (
+                (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $settings)) ||
+                (self::requireSSOConfirmEmail() && val(self::OPT_SSO_REGISTRATION, $settings))
+            ) {
                 $currentUserEmailIsBeingChanged =
-                    $validSession &&
+                    $this->session->isValid() &&
                     $userID == $this->session->UserID &&
-                    ($emailIsSet && $fields["Email"] != $this->session->User->Email) &&
+                    isset($fields["Email"]) &&
                     !$this->session->checkPermission("Garden.Users.Edit");
 
                 // Email address has changed
-                if ($emailIsSet && $emailIsNotConfirmed && $currentUserEmailIsBeingChanged) {
+                if ($currentUserEmailIsBeingChanged) {
                     $attributes = val("Attributes", $this->session->User);
                     if (is_string($attributes)) {
                         $attributes = dbdecode($attributes);
                     }
 
                     $confirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
-                    if (!empty($confirmEmailRoleID)) {
-                        // The confirm email role is set and it exists so go ahead with the email confirmation.
+                    if ($fields["Email"] === $this->session->User->Email) {
+                        // The user is restoring the original email address, null out any pending email.
+                        setValue("PendingEmail", $attributes, null);
+                    } elseif (!empty($confirmEmailRoleID)) {
+                        // The user is changing their email address, and we have the unconfirmed role, go ahead with email confirmation.
                         $emailKey = $this->confirmationCode();
                         setValue("EmailKey", $attributes, $emailKey);
-                        $fields["Attributes"] = dbencode($attributes);
-                        $fields["Confirmed"] = 0;
+                        setValue("PendingEmail", $attributes, $fields["Email"]);
+                        unset($fields["Email"]);
                     }
+                    $fields["Attributes"] = dbencode($attributes);
                 }
             }
             $this->EventArguments[self::OPT_SAVE_ROLES] = &$saveRoles;
@@ -3427,11 +3455,10 @@ class UserModel extends Gdn_Model implements
 
                 // Send the confirmation email.
                 if (isset($emailKey)) {
-                    if (!is_array($user)) {
-                        $user = $this->getID($userID, DATASET_TYPE_ARRAY);
-                    }
                     // do not rate-limit when editing email.
                     $this->clearRateLimitCache($userID);
+                    $this->clearCache($userID, [self::CACHE_TYPE_USER]);
+                    $user = $this->getID($userID, DATASET_TYPE_ARRAY);
                     $this->sendEmailConfirmationEmail($user, true);
                 }
 
@@ -3489,8 +3516,8 @@ class UserModel extends Gdn_Model implements
      * @param array $row
      * @param string $action
      * @param array|null $existingData
-     * @throws \Garden\Schema\ValidationException
      * @return UserEvent
+     * @throws \Garden\Schema\ValidationException
      */
     public function eventFromRow(array $row, string $action, ?array $existingData = null): ResourceEvent
     {
@@ -3579,6 +3606,7 @@ class UserModel extends Gdn_Model implements
             }
         }
         $row["Private"] = (bool) ($row["Attributes"]["Private"] ?? false);
+        $row["PendingEmail"] = $row["Attributes"]["PendingEmail"] ?? null;
 
         $result = ArrayUtils::camelCase($row);
 
@@ -3674,6 +3702,7 @@ class UserModel extends Gdn_Model implements
             "banned",
             "bypassSpam",
             "email?",
+            "pendingEmail?",
             "sortEmail?",
             "emailConfirmed",
             "dateInserted",
@@ -3687,7 +3716,7 @@ class UserModel extends Gdn_Model implements
             "points",
             "roles?",
             "showEmail",
-            "suggestAnswers?",
+            "suggestAnswers:b?",
             "userID",
             "title?",
             "countDiscussions?",
@@ -3965,8 +3994,10 @@ class UserModel extends Gdn_Model implements
         $removedRoles = array_diff($oldRoles, $newRoles);
         $newRoles = array_diff($newRoles, $oldRoles);
 
-        $auditEvent = new UserRoleModificationEvent($user->Name, $user->UserID, $newRoles, $removedRoles);
-        AuditLogger::log($auditEvent);
+        if (!empty($removedRoles) || !empty($newRoles)) {
+            $auditEvent = new UserRoleModificationEvent($user->Name, $user->UserID, $newRoles, $removedRoles);
+            AuditLogger::log($auditEvent);
+        }
     }
 
     /**
@@ -4721,38 +4752,40 @@ class UserModel extends Gdn_Model implements
      *
      * @param int $userID
      * @param string $username
+     * @throws Exception
      */
-    public function triggerApplicantNotification($userID = 0, $username = "")
+    public function triggerApplicantNotification($userID = 0, $username = ""): void
     {
-        if ($userID > 0 && !empty($username)) {
-            // Notification text
-            $label = t("NewApplicantEmail", "New applicant:");
-            $story = anchor(Gdn_Format::text($label . " " . $username), externalUrl("dashboard/user/applicants"));
-
-            try {
-                $data = Gdn::database()
-                    ->sql()
-                    ->getWhere("UserMeta", ["Name" => "Preferences.Email.Applicant"])
-                    ->resultArray();
-                $activityModel = new ActivityModel();
-                foreach ($data as $row) {
-                    $activityModel->add(
-                        $userID,
-                        "Applicant",
-                        $story,
-                        $row["UserID"],
-                        "",
-                        "/dashboard/user/applicants",
-                        "Only"
-                    );
-                }
-            } catch (Exception $ex) {
-                $this->logger->error($ex->getMessage(), [
-                    Logger::FIELD_EVENT => "applicant_notification_failure",
-                    "exception" => $ex,
-                ]);
-            }
+        if ($userID <= 0 || empty($username)) {
+            return;
         }
+
+        if ($username == "") {
+            $username = t("Unknown");
+        }
+
+        $activity = [
+            "ActivityType" => ApplicantActivity::getActivityTypeID(),
+            "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
+            "ActivityUserID" => $userID,
+            "HeadlineFormat" => sprintf(ApplicantActivity::getProfileHeadline(), $username),
+            "PluralHeadlineFormat" => sprintf(ApplicantActivity::getPluralHeadline(), $username),
+            "RecordType" => "user",
+            "RecordID" => $userID,
+            "Route" => "/dashboard/user/applicants",
+            "Data" => [
+                "userID" => $userID,
+                "name" => $username,
+                "Reason" => ApplicantActivity::getActivityReason(),
+            ],
+        ];
+        $notificationGenerator = Gdn::getContainer()->get(PermissionNotificationGenerator::class);
+
+        // Kludge to set the session of the user as the one of the applicant for the longrunner.
+        $sessionUser = $this->session->UserID;
+        $this->session->UserID = $userID;
+        $notificationGenerator->notify($activity, "Garden.Users.Approve", "Applicant");
+        $this->session->UserID = $sessionUser;
     }
 
     /**
@@ -5987,13 +6020,14 @@ SQL;
         }
 
         $user = (array) $user;
+        $toEmail = $user["Email"];
 
         if (is_string($user["Attributes"])) {
             $user["Attributes"] = dbdecode($user["Attributes"]);
         }
 
         // Make sure the user needs email confirmation.
-        if ($user["Confirmed"] && !$force) {
+        if ($user["Confirmed"] && !isset($user["Attributes"]["PendingEmail"]) && !$force) {
             $this->Validation->addValidationResult("Role", 'Your email doesn\'t need confirmation.');
 
             // Remove the email key.
@@ -6003,6 +6037,10 @@ SQL;
             }
 
             return;
+        }
+
+        if (isset($user["Attributes"]["PendingEmail"])) {
+            $toEmail = $user["Attributes"]["PendingEmail"];
         }
 
         // Make sure there is a confirmation code.
@@ -6022,7 +6060,7 @@ SQL;
         $appTitle = Gdn::config("Garden.Title");
         $email = new Gdn_Email();
         $email->subject(sprintf(t("[%s] Confirm Your Email Address"), $appTitle));
-        $email->to($user["Email"]);
+        $email->to($toEmail);
 
         $emailUrlFormat = "{/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}";
         $data = [];
@@ -7213,6 +7251,19 @@ SQL;
             ->resultArray();
 
         $userMetasByUserID = ArrayUtils::arrayColumnArrays($userMetas, null, "UserID");
+        // Gather the enabled profile fields API names.
+        $config = Gdn::getContainer()->get(ConfigurationInterface::class);
+        $profileFieldEnabled = $config->get(ProfileFieldModel::CONFIG_FEATURE_FLAG, false);
+        if ($profileFieldEnabled) {
+            $enabledProfileFields = \Gdn::getContainer()
+                ->get(ProfileFieldModel::class)
+                ->getEnabledProfileFieldsIndexed();
+            $enabledProfileFieldsApiNames = array_map(function (array $field) {
+                return $field["apiName"];
+            }, $enabledProfileFields);
+            // Gender is a special case, as it is not a built-in profile field.
+            $enabledProfileFieldsApiNames[] = "Gender";
+        }
 
         foreach ($users as &$user) {
             $userID = $user["UserID"] ?? null;
@@ -7224,7 +7275,14 @@ SQL;
             $metasForUser = [];
             foreach ($userMetaRows as $meta) {
                 $fieldName = str_replace("Profile.", "", $meta["Name"]);
-                $metasForUser[$fieldName] = $meta["Value"];
+                if ($profileFieldEnabled) {
+                    // Check that the profile field  is enabled before adding it to the user array.
+                    if (in_array($fieldName, $enabledProfileFieldsApiNames)) {
+                        $metasForUser[$fieldName] = $meta["Value"];
+                    }
+                } else {
+                    $metasForUser[$fieldName] = $meta["Value"];
+                }
             }
 
             // 1 time Soft-migration of these values into user meta.

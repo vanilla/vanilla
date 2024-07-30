@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -23,6 +23,7 @@ export interface IMe extends IUserFragment {
     countUnreadConversations: number;
     isAdmin?: boolean;
     emailConfirmed?: boolean;
+    suggestAnswers?: boolean;
 }
 
 export interface ICount {
@@ -69,6 +70,8 @@ export interface IUser extends IUserFragment, IUserRoles {
     lastIPAddress?: string;
     insertIPAddress?: string;
     points?: number;
+    suggestAnswers?: boolean;
+    pendingEmail?: string;
 }
 
 export interface IInvitees {

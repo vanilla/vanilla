@@ -129,7 +129,14 @@ function TabbedCommentListAsset(props: IProps) {
         );
 
     const tabIDs = tabs.map((t) => t.tabID);
-    const defaultTabID = !!acceptedAnswers?.data?.length && acceptedAnswers.data.length > 0 ? "accepted" : "all";
+    const isCommentUrl = window.location.href.includes("/comment/");
+
+    // If the user followed a link to a comment, default to the "all" tab
+    // Otherwise default to the "accepted" tab if there are accepted answers, "all" if not
+    const defaultTabID =
+        !isCommentUrl && !!acceptedAnswers?.data?.length && acceptedAnswers.data.length > 0 ? "accepted" : "all";
+
+    // If a tab is specified, use that, otherwise use the default defined above
     const queryTab = useQueryParam("tab", defaultTabID);
 
     const [selectedTabIndex, _setSelectedTabIndex] = useState(
@@ -153,6 +160,7 @@ function TabbedCommentListAsset(props: IProps) {
             tab: tabIDs[selectedTabIndex],
         },
         {},
+        true,
         true,
     );
 

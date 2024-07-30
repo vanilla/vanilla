@@ -1021,7 +1021,6 @@ components:
                         - rank
                         - all
                         - profileFields
-                        - extended
                         - discoveryText
                     type: string
                 type: array

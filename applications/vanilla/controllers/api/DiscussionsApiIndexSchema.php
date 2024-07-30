@@ -149,10 +149,25 @@ class DiscussionsApiIndexSchema extends Schema
                     "maximum" => ApiUtils::getMaxLimit(),
                     "x-control" => self::getLimitFormOptions(),
                 ],
-                "insertUserID:i?" => [
+                "insertUserID?" => [
                     "description" => "Filter by author.",
+                    "style" => "form",
+                    "type" => "array",
+                    "items" => [
+                        "type" => "integer",
+                    ],
                     "x-filter" => [
                         "field" => "InsertUserID",
+                    ],
+                ],
+                "insertUserRoleID?" => [
+                    "type" => "array",
+                    "items" => [
+                        "type" => "integer",
+                    ],
+                    "style" => "form",
+                    "x-filter" => [
+                        "field" => "uri.RoleID",
                     ],
                 ],
                 "expand?" => \DiscussionExpandSchema::commonExpandDefinition(),
@@ -174,6 +189,7 @@ class DiscussionsApiIndexSchema extends Schema
                         "field" => "internalStatusID",
                     ],
                 ],
+                "resolved:b?", // Legacy
                 "reactionType:s?",
             ])
         );

@@ -17,6 +17,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Dashboard\AutomationRules\EscalationRuleService;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\AutomationRules\Schema\AutomationRuleInputSchema;
@@ -31,6 +32,7 @@ use Vanilla\Web\Controller;
 class AutomationRulesApiController extends Controller
 {
     private AutomationRuleService $automationRuleService;
+    private EscalationRuleService $escalationRuleService;
     private AutomationRuleDispatchesModel $automationRuleDispatchesModel;
     private AutomationRuleModel $automationRuleModel;
 
@@ -45,39 +47,63 @@ class AutomationRulesApiController extends Controller
      */
     public function __construct(
         AutomationRuleService $automationRuleService,
+        EscalationRuleService $escalationRuleService,
         AutomationRuleModel $automationRuleModel,
         AutomationRuleDispatchesModel $automationRuleDispatchesModel
     ) {
         $this->automationRuleService = $automationRuleService;
+        $this->escalationRuleService = $escalationRuleService;
         $this->automationRuleModel = $automationRuleModel;
         $this->automationRuleDispatchesModel = $automationRuleDispatchesModel;
     }
 
     /**
      * Get automation catalog
+     * @param array $query
+     * @return Data
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws ValidationException
      */
-    public function get_catalog(): Data
+    public function get_catalog(array $query = []): Data
     {
         $this->permission("Garden.Settings.Manage");
 
+        $in = Schema::parse([
+            "escalations:b?" => [
+                "default" => false,
+                "description" => "Filter by escalation triggers and actions.",
+            ],
+        ]);
+
+        $query = $in->validate($query);
+
         $out = Schema::parse(["triggers:o", "actions:o"]);
 
-        foreach ($this->automationRuleService->getAutomationTriggers() as $trigger) {
+        if ($query["escalations"]) {
+            $triggers = $this->escalationRuleService->getEscalationTriggers();
+            $actions = $this->escalationRuleService->getEscalationActions();
+        } else {
+            $triggers = $this->automationRuleService->getAutomationTriggers();
+            $actions = $this->automationRuleService->getAutomationActions();
+        }
+        $triggerActionSchema = [];
+        foreach ($triggers as $trigger) {
             $schema = $trigger::getSchema();
-            $triggerSchema["triggers"][$trigger::getType()] = $trigger::getBaseSchemaArray();
+            $triggerActionSchema["triggers"][$trigger::getType()] = $trigger::getBaseSchemaArray();
             if (!empty($schema->getSchemaArray())) {
-                $triggerSchema["triggers"][$trigger::getType()]["schema"] = $schema;
+                $triggerActionSchema["triggers"][$trigger::getType()]["schema"] = $schema;
             }
         }
-        foreach ($this->automationRuleService->getAutomationActions() as $action) {
+        foreach ($actions as $action) {
             $schema = $action::getSchema();
-            $triggerSchema["actions"][$action::getType()] = $action::getBaseSchemaArray();
+            $triggerActionSchema["actions"][$action::getType()] = $action::getBaseSchemaArray();
             if (!empty($schema->getSchemaArray())) {
-                $triggerSchema["actions"][$action::getType()]["schema"] = $schema;
+                $triggerActionSchema["actions"][$action::getType()]["schema"] = $schema;
             }
         }
 
-        $result = $out->validate($triggerSchema);
+        $result = $out->validate($triggerActionSchema);
         return new Data($result);
     }
 
@@ -103,6 +129,7 @@ class AutomationRulesApiController extends Controller
             "out"
         );
         $result = $out->validate($this->automationRuleModel->getAutomationRules($query));
+
         return new Data($result);
     }
 
@@ -173,7 +200,10 @@ class AutomationRulesApiController extends Controller
         }
         $triggerType = $body["trigger"]["triggerType"] ?? "";
         $actionType = $body["action"]["actionType"] ?? "";
-        $in = $this->schema($this->getAutomationRulePostPatchSchema($triggerType, $actionType));
+        $in = $this->schema($this->getAutomationRulePostPatchSchema($triggerType, $actionType))->addValidator(
+            "name",
+            $this->automationRuleModel->validateName()
+        );
         $body = $in->validate($body);
         $body = $this->getFormattedAutomationRule($body);
         $automationRuleID = $this->automationRuleModel->saveAutomationRule($body);
@@ -210,7 +240,7 @@ class AutomationRulesApiController extends Controller
                 $body["action"]["actionType"] ?? "",
                 "patch"
             )
-        );
+        )->addValidator("name", $this->automationRuleModel->validateName($id));
         $body = $in->validate($body);
         $body = $this->getFormattedAutomationRule($body);
         $this->automationRuleModel->saveAutomationRule($body, $id);

@@ -94,7 +94,7 @@ export default function SearchOption(props: IProps) {
                                 </span>
                             )}
                             {hasLocationData && <BreadCrumbString className={classesMetas.meta} crumbs={crumbs} />}
-                            {isForeign && <MetaIcon icon="meta-external" />}
+                            {isForeign && <MetaIcon icon="meta-external-compact" />}
                         </span>
                     </span>
                 </SmartLink>

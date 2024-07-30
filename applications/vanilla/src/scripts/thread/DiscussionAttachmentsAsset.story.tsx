@@ -7,6 +7,7 @@
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import {
     AttachmentIntegrationsApiContextProvider,
+    AttachmentIntegrationsContext,
     AttachmentIntegrationsContextProvider,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

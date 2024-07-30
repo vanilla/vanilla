@@ -110,6 +110,9 @@ class ActivityModelTest extends SiteTestCase
 
         $this->assertCount(1, $batch);
         $this->assertSame($batch[0]["count"], 2);
+
+        $batchedCount = $this->activityModel->getUserTotalUnread(3);
+        $this->assertEquals(1, $batchedCount);
     }
 
     public function testGetWhereBatchedByParentRecordID(): void
@@ -142,6 +145,9 @@ class ActivityModelTest extends SiteTestCase
 
         $this->assertCount(1, $batch);
         $this->assertSame($batch[0]["count"], 2);
+
+        $batchedCount = $this->activityModel->getUserTotalUnread(3);
+        $this->assertEquals(1, $batchedCount);
     }
 
     /**

@@ -1458,19 +1458,32 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
         if (empty($recordType)) {
             return $this->getWhere($where, "", "desc", $limit, $offset);
         }
+        $recordType = strtolower($recordType);
+
         $sql = Gdn::sql();
         $sql->select("l.*")->select("iu.Name as InsertName");
-        if ($recordType === "User") {
-            $sql->select(["u.Name as RecordName", "u.Email as RecordEmail"]);
+        if ($recordType === "user") {
+            $sql->select(["u.Name as RecordName", "u.Email as RecordEmail"])->join(
+                "User u",
+                "l.RecordUserID = u.UserID",
+                "left"
+            );
+        } elseif ($recordType === "discussion") {
+            $sql->select(["d.Name as RecordName", "d.Body as RecordBody", "d.Format"])->join(
+                "Discussion d",
+                "l.RecordID = d.DiscussionID",
+                "left"
+            );
+        } elseif ($recordType === "comment") {
+            $sql->select(["d.Name as RecordName", "c.Body as RecordBody", "c.Format"])
+                ->join("Comment c", "l.RecordID = c.CommentID", "left")
+                ->join("Discussion d", " c.DiscussionID = d.DiscussionID", "left");
         } else {
-            $sql->select(["d.Name as RecordName", "d.Body as RecordBody", "d.Format"]);
+            throw new Exception("The record type {$recordType} is not supported.");
         }
+
         $sql->from("Log l")->join("User iu", "l.InsertUserID = iu.UserID", "left");
-        if ($recordType === "User") {
-            $sql->join("User u", "l.RecordUserID = u.UserID", "left");
-        } else {
-            $sql->join("Discussion d", "l.RecordID = d.DiscussionID", "left");
-        }
+
         $result = $sql
             ->where($where)
             ->limit($limit, $offset)

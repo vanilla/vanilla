@@ -5,14 +5,11 @@
  */
 
 import { cx } from "@emotion/css";
+import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import Button from "@library/forms/Button";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { durationPickerClasses } from "@library/forms/durationPicker/DurationPicker.styles";
-import {
-    DurationPickerUnit,
-    IDurationPickerProps,
-    unitOptions,
-} from "@library/forms/durationPicker/DurationPicker.types";
+import { DurationPickerUnit, IDurationPickerProps } from "@library/forms/durationPicker/DurationPicker.types";
 import SelectOne from "@library/forms/select/SelectOne";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
@@ -29,6 +26,8 @@ export function DurationPicker(props: IDurationPickerProps) {
         lengthInputProps,
         unitInputProps,
         submitButton,
+        supportedUnits,
+        disabled,
         onChange,
         ...rest
     } = props;
@@ -38,6 +37,17 @@ export function DurationPicker(props: IDurationPickerProps) {
     const classes = durationPickerClasses();
     const lengthInputID = uniqueIDFromPrefix("duration-length-");
     const unitInputID = uniqueIDFromPrefix("duration-unit-");
+
+    const units = supportedUnits
+        ? Object.entries(DurationPickerUnit).filter((entry) =>
+              entry.some((value) => supportedUnits.includes(value as DurationPickerUnit)),
+          )
+        : Object.entries(DurationPickerUnit);
+
+    const unitOptions: IComboBoxOption[] = units.map(([key, value]) => ({
+        label: t(key.toLowerCase()),
+        value,
+    }));
 
     return (
         <div className={cx(classes.root, className)} {...rest}>
@@ -51,6 +61,7 @@ export function DurationPicker(props: IDurationPickerProps) {
                     min,
                     max,
                     className: classes.lengthInputBox,
+                    disabled: disabled,
                 }}
                 className={cx(classes.lengthInput, lengthClassName)}
                 wrapClassName={classes.lengthInputWrap}
@@ -61,7 +72,7 @@ export function DurationPicker(props: IDurationPickerProps) {
                 {...unitInputPropsRest}
                 options={unitOptions}
                 value={unitOptions.find((o) => o.value === value?.unit)}
-                defaultValue={unitOptions.find((o) => o.value === "day")}
+                defaultValue={unitOptions.find((o) => o.value === "day") || unitOptions[0]}
                 onChange={(o) => onChange({ ...value, unit: o?.value as DurationPickerUnit })}
                 inputClassName={cx({
                     "form-control": true,
@@ -72,6 +83,7 @@ export function DurationPicker(props: IDurationPickerProps) {
                 label={null}
                 labelID={unitInputID}
                 isClearable={false}
+                disabled={disabled}
             />
             {submitButton && (
                 <ConditionalWrap condition={Boolean(tooltip)} component={ToolTip} componentProps={{ label: tooltip }}>
@@ -80,6 +92,7 @@ export function DurationPicker(props: IDurationPickerProps) {
                         onClick={() => submitButton.onClick && submitButton.onClick(value)}
                         className={cx(classes.button, submitClassName)}
                         title={tooltip}
+                        disabled={disabled}
                     />
                 </ConditionalWrap>
             )}

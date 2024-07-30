@@ -1,13 +1,12 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-import { IMentionSuggestionData } from "@library/editor/pieces/MentionSuggestion";
 import { createCodeBlockEscapePlugin } from "@library/vanilla-editor/plugins/blockEscapePlugin/createCodeBlockEscapePlugin";
 import { createBlockquotePlugin } from "@library/vanilla-editor/plugins/blockquotePlugin/createBlockquotePlugin";
-import { MentionElement } from "@library/vanilla-editor/plugins/mentionPlugin/MentionElement";
+import { createMentionPlugin } from "@library/vanilla-editor/plugins/mentionPlugin/createMentionPlugin";
 import { createRichEmbedPlugin } from "@library/vanilla-editor/plugins/richEmbedPlugin/createRichEmbedPlugin";
 import { ELEMENT_RICH_EMBED_CARD } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 import { createSpoilerPlugin } from "@library/vanilla-editor/plugins/spoilerPlugin/createSpoilerPlugin";
@@ -24,11 +23,10 @@ import {
 } from "@udecode/plate-basic-marks";
 import { createExitBreakPlugin, createSoftBreakPlugin } from "@udecode/plate-break";
 import { createCodeBlockPlugin } from "@udecode/plate-code-block";
-import { createComboboxPlugin, TComboboxItemWithData } from "@udecode/plate-combobox";
+import { createComboboxPlugin } from "@udecode/plate-combobox";
 import { createHeadingPlugin } from "@udecode/plate-heading";
 import { createLinkPlugin, LinkPlugin } from "@udecode/plate-link";
 import { createListPlugin, ELEMENT_OL, ELEMENT_UL } from "@udecode/plate-list";
-import { createMentionPlugin, MentionPlugin } from "@udecode/plate-mention";
 import { createParagraphPlugin } from "@udecode/plate-paragraph";
 import { createResetNodePlugin } from "@udecode/plate-reset-node";
 import { createSelectOnBackspacePlugin } from "@udecode/plate-select";
@@ -36,7 +34,7 @@ import { createDeserializeCsvPlugin } from "@udecode/plate-serializer-csv";
 import { createDeserializeDocxPlugin } from "@udecode/plate-serializer-docx";
 import { createDeserializeMdPlugin } from "@udecode/plate-serializer-md";
 import { createTrailingBlockPlugin } from "@udecode/plate-trailing-block";
-import { deserializeMentionHtml } from "@library/vanilla-editor/plugins/mentionPlugin/deserializeMentionHtml";
+import { insertCodeBlockData } from "./codeBlockPlugin/insertCodeBlockData";
 
 export const VanillaEditorPlugins = createMyPlugins(
     [
@@ -145,6 +143,10 @@ export const VanillaEditorPlugins = createMyPlugins(
                 syntax: true,
                 syntaxPopularFirst: true,
             },
+            withOverrides: (editor) => {
+                editor.insertData = (data) => insertCodeBlockData(editor, data);
+                return editor;
+            },
         }),
 
         createCodeBlockEscapePlugin(),
@@ -191,26 +193,7 @@ export const VanillaEditorPlugins = createMyPlugins(
         // https://github.com/udecode/plate/tree/main/packages/ui/nodes/mention
         createComboboxPlugin(),
 
-        createMentionPlugin<MentionPlugin<IMentionSuggestionData>, MyValue, MyEditor>({
-            key: "@",
-            component: MentionElement,
-            // pasted HTML from another post will be deserialized into this element
-            deserializeHtml: deserializeMentionHtml,
-            props: (oldProps) => {
-                return {
-                    prefix: oldProps.element.type, //use "@" as the prefix
-                };
-            },
-            options: {
-                insertSpaceAfterMention: true,
-                createMentionNode: (item: TComboboxItemWithData<IMentionSuggestionData>) => {
-                    return {
-                        ...item.data,
-                        value: "", // Useless to us.
-                    };
-                },
-            },
-        }),
+        createMentionPlugin(),
 
         /**
          * Paste support.

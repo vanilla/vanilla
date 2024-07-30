@@ -4,19 +4,24 @@ import { mockAPI } from "@library/__tests__/utility";
 import { FAKE_INTEGRATIONS_CATALOG } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
 import MockAdapter from "axios-mock-adapter";
 import TriagePage from "@dashboard/moderation/TriagePage";
+import { STORY_DISCUSSION } from "@library/storybook/storyData";
 
 describe("TriagePage", () => {
     let mockAdapter: MockAdapter;
     beforeAll(() => {
         mockAdapter = mockAPI();
-        mockAdapter.onGet(/reports\/triage.*/).reply(
+        mockAdapter.onGet(/discussions.*/).reply(
             200,
-            Array.from({ length: 3 }, (_, index) =>
-                CommunityManagementFixture.getReport({
-                    reportID: index + 1,
-                    recordName: `Example Triage Item ${index + 1}`,
-                }),
-            ),
+            Array.from({ length: 3 }, (_, index) => ({
+                ...STORY_DISCUSSION,
+                discussionID: index + 1,
+                name: `Example Triage Item ${index + 1}`,
+                reports: {
+                    ...CommunityManagementFixture.getReport({
+                        reportID: index + 1,
+                    }),
+                },
+            })),
         );
         mockAdapter.onGet("/attachments/catalog").reply(200, FAKE_INTEGRATIONS_CATALOG);
     });

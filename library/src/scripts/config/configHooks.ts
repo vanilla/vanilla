@@ -170,7 +170,7 @@ export const useLanguageConfig = (serviceType: string | undefined) => {
     };
 };
 
-const useDefaultLocaleCode = () => {
+export const useDefaultLocaleCode = () => {
     return useConfigsByKeys([LOCALE_KEY])?.data?.[LOCALE_KEY] ?? null;
 };
 

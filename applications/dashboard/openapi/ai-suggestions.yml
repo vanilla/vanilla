@@ -183,6 +183,26 @@ paths:
                     description: Success
                 "403":
                     $ref: "responses.yml#/components/responses/PermissionError"
+    /ai-suggestions/generate:
+        x-hidden: true
+        put:
+            summary: Regenerate suggestions on a discussion
+            tags:
+                - AI Suggestions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                discussionID:
+                                    type: integer
+                            required:
+                                - discussionID
+            responses:
+                200:
+                    $ref: "./responses.yml#/components/responses/LongRunnerResponse"
+
 components:
     schemas:
         AISuggestionsSettingsRequest:

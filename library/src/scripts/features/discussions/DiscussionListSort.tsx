@@ -61,6 +61,7 @@ export function DiscussionListSort(props: IDiscussionListSortProps) {
                 value={value}
                 onChange={handleOnChange}
                 describedBy={id}
+                name={t("Sort by")}
                 renderLeft={false}
                 horizontalOffset={true}
                 offsetPadding={true}

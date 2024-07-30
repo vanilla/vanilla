@@ -237,7 +237,11 @@ export default function DropDown(props: IDropDownProps) {
                                     {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
                                         props.children
                                     ) : (
-                                        <ContentTag className={cx("dropDownItems", classes.items)}>
+                                        <ContentTag
+                                            className={cx("dropDownItems", classes.items)}
+                                            role="menu"
+                                            aria-describedby={props.describedBy}
+                                        >
                                             {props.children}
                                         </ContentTag>
                                     )}

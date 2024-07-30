@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -15,7 +15,6 @@ import { formatUrl, siteUrl, t } from "@library/utility/appUtils";
 import { useLocation } from "react-router";
 import { useMeasure } from "@vanilla/react-utils";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
-import { titleBarMegaMenuVariables } from "@library/headers/TitleBarMegaMenu.styles";
 
 export interface ITitleBarNavProps {
     className?: string;
@@ -45,7 +44,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
     const megaMenuRef = useRef<IMegaMenuHandle>(null);
     const firstItemRef = useRef<HTMLAnchorElement | HTMLButtonElement>();
 
-    const active = expanded && expanded.children?.length && expanded;
+    const active = !!expanded && !!expanded.children?.length && expanded;
 
     const firstItemDimensions = useMeasure(firstItemRef as any, false, true);
     const { hasPermission } = usePermissionsContext();
@@ -83,10 +82,22 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
             switch (event.key) {
                 case "Enter":
                 case " ":
+                    event.preventDefault();
+                    if (item.children && item.children.length > 0) {
+                        onActive(event.target);
+                        setTimeout(() => {
+                            megaMenuRef.current?.focusFirstItem();
+                        });
+                    } else {
+                        (event.target as HTMLElement).click();
+                    }
+                    break;
                 case "ArrowDown":
                     event.preventDefault();
                     onActive(event.target);
-                    megaMenuRef.current?.focusFirstItem();
+                    setTimeout(() => {
+                        megaMenuRef.current?.focusFirstItem();
+                    });
                     break;
                 case "ArrowUp":
                     event.preventDefault();

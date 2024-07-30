@@ -11,6 +11,7 @@
  */
 
 use Vanilla\ImageResizer;
+use Vanilla\FeatureFlagHelper;
 
 /**
  * Handles image uploads
@@ -98,6 +99,15 @@ class Gdn_UploadImage extends Gdn_Upload
 
         // Make sure that all standard file upload checks are performed.
         $tmpFileName = parent::validateUpload($inputName, $throwException);
+        if (FeatureFlagHelper::featureEnabled("validateContentTypes")) {
+            $extension = strtolower(pathinfo($_FILES[$inputName]["name"], PATHINFO_EXTENSION));
+            if ($tmpFileName && !self::checkMimeType($tmpFileName, $extension)) {
+                if ($throwException) {
+                    throw new Gdn_UserException(t("MIME type doesn't match the image extension."));
+                }
+                return false;
+            }
+        }
 
         // Now perform image-specific checks.
         if ($tmpFileName) {
@@ -347,5 +357,29 @@ class Gdn_UploadImage extends Gdn_Upload
         $sender->Returns = [];
         Gdn::pluginManager()->callEventHandlers($sender, "Gdn_Upload", "SaveAs");
         return $sender->EventArguments["Parsed"];
+    }
+
+    /**
+     * Check if the image extension matches the mime type.
+     *
+     * $param string $tempName
+     * @param string $extension
+     * @return bool
+     */
+    public static function checkMimeType(string $tempName, string $extension): bool
+    {
+        $fInfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $fInfo->file($tempName);
+        $mimeType = strtolower($mimeType);
+        $expectedMimeTypes = match ($extension) {
+            "jpg", "jpeg" => ["image/jpeg", "image/pjpeg"],
+            "bmp" => ["image/bmp", "image/x-windows-bmp"],
+            "ico" => ["image/x-icon"],
+            default => ["image/$extension"],
+        };
+        if (in_array($mimeType, $expectedMimeTypes)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -22,7 +22,7 @@ class DiscussionListPageControllerTest extends SiteTestCase
 {
     use UsersAndRolesApiTestTrait;
 
-    public static $addons = ["vanilla", "QnA", "resolved2"];
+    public static $addons = ["vanilla", "QnA"];
 
     /**
      * @inheritDoc
@@ -97,7 +97,7 @@ class DiscussionListPageControllerTest extends SiteTestCase
     public function redirectUrlProvider(): array
     {
         return [
-            "redirect /discussions/unresolved" => ["/discussions/unresolved", "/discussions?status=unresolved"],
+            "redirect /discussions/unresolved" => ["/discussions/unresolved", "/dashboard/content/triage"],
             "redirect /discussions/unanswered" => [
                 "/discussions/unanswered",
                 "/discussions?type=question&status=unanswered",

@@ -18,6 +18,7 @@ import {
 } from "@udecode/plate-common";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { insertRichImage } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichImage";
+import { Buffer } from "buffer";
 
 export const normalizeRichEmbed = <V extends Value>(editor: PlateEditor<V>) => {
     const { normalizeNode } = editor;

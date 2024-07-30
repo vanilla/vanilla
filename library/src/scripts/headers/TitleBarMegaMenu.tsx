@@ -1,9 +1,9 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import useClasses, { titleBarMegaMenuVariables } from "./TitleBarMegaMenu.styles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
@@ -12,7 +12,7 @@ import { useMeasure } from "@vanilla/react-utils/src";
 import { TabHandler } from "@vanilla/dom-utils/src";
 import SmartLink from "@library/routing/links/SmartLink";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { hasPermission } from "@library/features/users/Permission";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 /** How much time is elapsed before the menu is hidden, either from loss of focus or mouseout. */
 const HIDE_TIMEOUT_MS = 250;
@@ -50,18 +50,18 @@ interface IProps {
 
 function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
     const { expanded, leftOffset = 0, onClose, menuItem } = props;
+    const { hasPermission } = usePermissionsContext();
 
     const classes = useClasses();
 
     const { getCalcedHashOffset } = useScrollOffset();
     const [isFocusWithin, setIsFocusWithin] = useState(false);
     const [isMouseWithin, setIsMouseWithin] = useState(false);
-    const [shouldFocusFirstItem, setShouldFocusFirstItem] = useState(false);
     const [isHidden, setIsHidden] = useState(true);
 
     const onCloseRef = useRef<(() => void) | undefined>(onClose);
 
-    const isExpanded = expanded && expanded.children?.length;
+    const isExpanded = !!expanded && !!expanded.children?.length;
     const isActive = isFocusWithin || isMouseWithin;
 
     const containerRef = useRef<HTMLElement>(null);
@@ -96,23 +96,10 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
 
     useImperativeHandle(ref, () => ({
         focusFirstItem: () => {
-            setShouldFocusFirstItem(true);
+            const firstItem = containerRef.current?.querySelector<HTMLElement>(`.${classes.menuItemChild} a`);
+            firstItem?.focus();
         },
     }));
-
-    const focusFirstItem = useCallback(() => {
-        if (shouldFocusFirstItem) {
-            const firstItem = containerRef.current?.querySelector<HTMLElement>(`.${classes.menuItemChild} a`);
-            if (firstItem) {
-                firstItem?.focus();
-                setShouldFocusFirstItem(false);
-            }
-        }
-    }, [shouldFocusFirstItem, classes.menuItemChild]);
-
-    useLayoutEffect(() => {
-        focusFirstItem();
-    }, [focusFirstItem]);
 
     useEffect(() => {
         if (!isActive) {
@@ -271,10 +258,7 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
             onBlur={() => setIsFocusWithin(false)}
         >
             <Container
-                ref={(ref) => {
-                    (containerRef as any).current = ref;
-                    focusFirstItem();
-                }}
+                ref={containerRef}
                 style={{
                     paddingLeft: calculateContainerOffset(),
                 }}

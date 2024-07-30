@@ -22,10 +22,14 @@ import { t } from "@vanilla/i18n";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { getDeveloperRoutes } from "@dashboard/developer/getDeveloperRoutes";
 import { RouterRegistry } from "@library/Router.registry";
+import { userProfilesSlice } from "@dashboard/userProfiles/state/UserProfiles.slice";
+import { getAutomationRulesRoutes } from "@dashboard/automationRules/AutomationRules.routes";
 
 registerContextProvider(TextEditorContextProvider);
 registerReducer(dashboardSectionSlice.name, dashboardSectionSlice.reducer);
 registerReducer(layoutSettingsSlice.name, layoutSettingsSlice.reducer);
+registerReducer(userProfilesSlice.name, userProfilesSlice.reducer);
+
 registerReducer("themeSettings", themeSettingsReducer);
 
 applySharedPortalContext((props) => {
@@ -38,10 +42,11 @@ applySharedPortalContext((props) => {
 
 RouterRegistry.addRoutes(getAppearanceRoutes());
 RouterRegistry.addRoutes(getDeveloperRoutes());
+RouterRegistry.addRoutes(getAutomationRulesRoutes());
 supportsFrames(true);
 addPageComponent(AdminApp);
 
-const SETTINGS_PERMISSIONS = ["settings.manage", "community.moderate", "moderation.manage"];
+const SETTINGS_PERMISSIONS = ["settings.manage", "community.moderate", "posts.moderate"];
 const ANALYTICS_PERMISSIONS = ["data.view", "dashboards.manage"];
 
 function AdminApp() {

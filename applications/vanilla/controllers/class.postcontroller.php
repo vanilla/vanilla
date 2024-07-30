@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Formatting\FormatService;
+use Vanilla\Premoderation\PremoderationException;
 
 /**
  * Handles posting and editing comments, discussions, and drafts via /post endpoint.
@@ -384,7 +385,11 @@ class PostController extends VanillaController
                         $draftID = $this->DraftModel->save($formValues);
                         $this->Form->setValidationResults($this->DraftModel->validationResults());
                     } else {
-                        $discussionID = $this->DiscussionModel->save($formValues);
+                        try {
+                            $discussionID = $this->DiscussionModel->save($formValues);
+                        } catch (PremoderationException $e) {
+                            $discussionID = SPAM;
+                        }
                         $this->Form->setValidationResults($this->DiscussionModel->validationResults());
 
                         if ($discussionID > 0) {
@@ -822,7 +827,11 @@ class PostController extends VanillaController
                 }
 
                 $Inserted = !$CommentID;
-                $CommentID = $this->CommentModel->save($FormValues);
+                try {
+                    $CommentID = $this->CommentModel->save($FormValues);
+                } catch (PremoderationException $e) {
+                    $CommentID = SPAM;
+                }
 
                 // The comment is now half-saved.
                 if (is_numeric($CommentID) && $CommentID > 0) {
@@ -940,7 +949,7 @@ class PostController extends VanillaController
                             //                     } else {
                             //                        // Make sure to load all new comments since the page was last loaded by this user
                             //								if ($DisplayNewCommentOnly)
-                            $this->Offset = $this->CommentModel->getOffset($CommentID);
+                            $this->Offset = $this->CommentModel->getDiscussionThreadOffset($CommentID);
                             $Comments = $this->CommentModel->getIDData($CommentID, ["Slave" => false]);
                             $this->setData("Comments", $Comments);
 

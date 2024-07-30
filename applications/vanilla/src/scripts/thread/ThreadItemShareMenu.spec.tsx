@@ -30,6 +30,7 @@ async function renderInProvider() {
                 recordUrl={mockDiscussion.url}
                 timestamp={mockDiscussion.dateInserted}
                 name={mockDiscussion.name}
+                authorID={mockDiscussion.insertUserID}
             >
                 <ThreadItemShareMenu />
             </ThreadItemContextProvider>

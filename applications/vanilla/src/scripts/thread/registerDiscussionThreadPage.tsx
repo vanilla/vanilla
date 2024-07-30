@@ -6,11 +6,10 @@
 
 import React from "react";
 import { registerLayoutPage } from "@library/features/Layout/LayoutPage.registry";
-import { getSiteSection } from "@library/utility/appUtils";
+import { getMeta, getSiteSection } from "@library/utility/appUtils";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
 import { DiscussionThreadPaginationContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadPaginationContext";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 
 interface IDiscussionThreadPageParams {
     id: IDiscussion["discussionID"];
@@ -34,11 +33,9 @@ export function registerDiscussionThreadPage() {
         },
         (layoutQuery, page) => {
             return (
-                <AttachmentIntegrationsContextProvider>
-                    <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
-                        {page}
-                    </DiscussionThreadPaginationContextProvider>
-                </AttachmentIntegrationsContextProvider>
+                <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
+                    {page}
+                </DiscussionThreadPaginationContextProvider>
             );
         },
     );
@@ -60,14 +57,14 @@ export function registerDiscussionThreadPage() {
         },
         (layoutQuery, page) => {
             return (
-                <AttachmentIntegrationsContextProvider>
-                    <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
-                        {page}
-                    </DiscussionThreadPaginationContextProvider>
-                </AttachmentIntegrationsContextProvider>
+                <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
+                    {page}
+                </DiscussionThreadPaginationContextProvider>
             );
         },
     );
+
+    const suggestionsEnabled = getMeta("answerSuggestionsEnabled", false);
 
     registerLoadableWidgets({
         DiscussionOriginalPostAsset: () =>
@@ -90,5 +87,11 @@ export function registerDiscussionThreadPage() {
             import(
                 /* webpackChunkName: "widgets/DiscussionTagAsset" */ "@vanilla/addon-vanilla/thread/DiscussionTagAsset"
             ),
+        DiscussionSuggestionsAsset: suggestionsEnabled
+            ? () =>
+                  import(
+                      /* webpackChunkName: "widgets/DiscussionSuggestionsAsset" */ "@library/suggestedAnswers/SuggestedAnswers"
+                  )
+            : () => Promise.resolve({ default: () => null }),
     });
 }

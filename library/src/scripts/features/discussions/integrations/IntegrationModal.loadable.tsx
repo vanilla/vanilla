@@ -6,10 +6,10 @@
 
 import { IApiError, IServerError, LoadStatus } from "@library/@types/api/core";
 import { useWriteableIntegrationContext } from "@library/features/discussions/integrations/Integrations.context";
-import { IPostAttachmentParams } from "@library/features/discussions/integrations/Integrations.types";
+import { IAttachment, IPostAttachmentParams } from "@library/features/discussions/integrations/Integrations.types";
 import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
-import { FormControl, FormControlGroup, FormControlWithNewDropdown } from "@library/forms/FormControl";
+import { FormControlGroup, FormControlWithNewDropdown } from "@library/forms/FormControl";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import Frame from "@library/layout/frame/Frame";
@@ -29,9 +29,9 @@ import { extractDataByKeyLookup, mapValidationErrorsToFormikErrors } from "@vani
 import { useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import Message from "@library/messages/Message";
-import ErrorMessages from "@library/forms/ErrorMessages";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import Translate from "@library/content/Translate";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IIntegrationModalProps extends Pick<React.ComponentProps<typeof Modal>, "isVisible" | "exitHandler"> {
     onSuccess?: () => Promise<void>;
@@ -49,6 +49,7 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
         name,
         label,
         submitButton,
+        postSuccessMessage,
         schema: { status: schemaStatus, data: integrationSchema, error: schemaError },
         getSchema,
         postAttachment,
@@ -67,12 +68,27 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
 
     const schemaFormRef = useRef<IJsonSchemaFormHandle | null>(null);
 
-    async function handleSuccess() {
+    async function handleSuccess(postResponse: IAttachment) {
         await onSuccess?.();
-        toast.addToast({
-            autoDismiss: true,
-            body: <Translate source="Success! Submitted to <0/>." c0={name} />,
-        });
+        const toastContent = postSuccessMessage?.message
+            ? {
+                  dismissible: true,
+                  body: (
+                      <>
+                          <div>{t(postSuccessMessage.message)}</div>
+                          {postResponse.sourceUrl && postSuccessMessage.linkText && (
+                              <div>
+                                  <SmartLink to={postResponse.sourceUrl}>{t(postSuccessMessage.linkText)}</SmartLink>
+                              </div>
+                          )}
+                      </>
+                  ),
+              }
+            : {
+                  autoDismiss: true,
+                  body: <Translate source="Success! Submitted to <0/>." c0={name} />,
+              };
+        toast.addToast(toastContent);
     }
 
     async function handleError(e: IApiError) {
@@ -94,9 +110,9 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
             setServerError(null);
             try {
                 const finalValues = beforeSubmit?.(values) ?? values;
-                await postAttachment(finalValues);
+                const postResponse = await postAttachment(finalValues);
                 handleClose();
-                await handleSuccess();
+                await handleSuccess(postResponse);
             } catch (e) {
                 await handleError(e);
             }

@@ -5,12 +5,14 @@ $Configuration = [];
 
 $Configuration["auditLog"]["enabled"] = true;
 
+// Community Management
+$Configuration["communityManagement"]["triage"]["enabled"] = true;
+
 // Auto-enable some addons.
 $Configuration['EnabledPlugins']['stubcontent'] = true;
 $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledApplications']['Dashboard'] = 'dashboard';
 $Configuration['EnabledPlugins']['rich-editor'] = true;
-$Configuration['EnabledPlugins']['FederatedSearch'] = true;
 
 // ImageUpload
 $Configuration['ImageUpload']['Limits']['Enabled'] = false;
@@ -19,9 +21,9 @@ $Configuration['ImageUpload']['Limits']['Height'] = '1400';
 
 // Database defaults.
 $Configuration['Database']['Engine'] = 'MySQL';
-$Configuration['Database']['Host'] = 'dbhost';
-$Configuration['Database']['Name'] = 'dbname';
-$Configuration['Database']['User'] = 'dbuser';
+$Configuration['Database']['Host'] = 'database';
+$Configuration['Database']['Name'] = 'vanilla_dev';
+$Configuration['Database']['User'] = 'root';
 $Configuration['Database']['Password']  = '';
 $Configuration['Database']['CharacterEncoding'] = 'utf8mb4';
 $Configuration['Database']['DatabasePrefix'] = 'GDN_';
@@ -30,6 +32,7 @@ $Configuration['Database']['ConnectionOptions'] = [
     12 => false, // PDO::ATTR_PERSISTENT
     1000 => true, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY (missing in some PHP installations)
 ];
+
 
 //Configuration for Dba Counts
 $Configuration['Dba']['Limit'] = 1000;
@@ -174,6 +177,7 @@ $Configuration['Preferences']['Popup']['WallComment'] = '1';
 $Configuration['Preferences']['Popup']['ActivityComment'] = '1';
 $Configuration['Preferences']['Popup']['DiscussionComment'] = '1';
 $Configuration['Preferences']['Popup']['Mention'] = '1';
+$Configuration['Preferences']['Popup']['AiSuggestions'] = '1';
 
 // Module visibility and sorting.
 $Configuration['Garden']['Modules']['ShowGuestModule'] = true;

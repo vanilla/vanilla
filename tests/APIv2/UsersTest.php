@@ -651,9 +651,9 @@ class UsersTest extends AbstractResourceTest
             ["Feature.AISuggestions.Enabled" => true, "aiSuggestions.enabled" => true],
             function () use ($user) {
                 $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
-                $this->assertSame("0", $response->getBody()["suggestAnswers"]);
+                $this->assertSame(false, $response->getBody()["suggestAnswers"]);
                 $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => true]);
-                $this->assertSame("1", $response->getBody()["suggestAnswers"]);
+                $this->assertSame(true, $response->getBody()["suggestAnswers"]);
             }
         );
     }
@@ -857,6 +857,7 @@ class UsersTest extends AbstractResourceTest
         $configuration = static::container()->get("Config");
         $configuration->set("Garden.Registration.Method", "Basic");
         $configuration->set("Garden.Registration.ConfirmEmail", false);
+        $configuration->set("Garden.Registration.SSOConfirmEmail", false);
         $configuration->set("Garden.Registration.SkipCaptcha", true);
         $configuration->set("Garden.Email.Disabled", true);
 
@@ -875,8 +876,12 @@ class UsersTest extends AbstractResourceTest
         $configuration = static::container()->get("Config");
         $configuration->set("Garden.Registration.Method", "Basic");
         $configuration->set("Garden.Registration.ConfirmEmail", false);
+        $configuration->set("Garden.Registration.SSOConfirmEmail", false);
         $configuration->set("Garden.Registration.SkipCaptcha", true);
         $configuration->set("Garden.Email.Disabled", true);
+        // Enable the fields
+        $this->api()->patch("/profile-fields/Title", ["enabled" => true]);
+        $this->api()->patch("/profile-fields/Location", ["enabled" => true]);
 
         $userMeta = [
             "Title" => "This user's custom title",
@@ -965,6 +970,7 @@ class UsersTest extends AbstractResourceTest
         $configuration = static::container()->get("Config");
         $configuration->set("Garden.Registration.Method", "Invitation");
         $configuration->set("Garden.Registration.ConfirmEmail", false);
+        $configuration->set("Garden.Registration.SSOConfirmEmail", false);
         $configuration->set("Garden.Registration.SkipCaptcha", true);
         $configuration->set("Garden.Email.Disabled", true);
 
@@ -1712,7 +1718,6 @@ class UsersTest extends AbstractResourceTest
         $user1 = $this->createUser();
         $this->api()->patch("/users/{$user1["userID"]}/profile-fields", [
             $number => 10,
-            $boolean => false,
             $date => "2022-10-10 12:00:00",
             $multipleStrings => ["a", "b", "c"],
         ]);
@@ -1735,9 +1740,11 @@ class UsersTest extends AbstractResourceTest
             $private => 66,
         ]);
 
+        $allUserIDs = implode(",", array_column([$user1, $user2, $user3], "userID"));
+
         // Test by `$multipleStrings` = a,b.
         $rows = $this->api()
-            ->get("/users?sort=userID&extended[$multipleStrings]=a,b")
+            ->get("/users?sort=userID&extended[$multipleStrings]=a,b&userID=$allUserIDs")
             ->getBody();
         $this->assertCount(2, $rows);
         $this->assertSame($user1["userID"], $rows[0]["userID"]);
@@ -1745,22 +1752,29 @@ class UsersTest extends AbstractResourceTest
 
         // Test by `$multipleStrings` = a,c & `number` = 20.
         $rows = $this->api()
-            ->get("/users?sort=userID&extended[$multipleStrings]=a,c&extended[$number]=10")
+            ->get("/users?sort=userID&extended[$multipleStrings]=a,c&extended[$number]=10&userID=$allUserIDs")
             ->getBody();
         $this->assertCount(1, $rows);
         $this->assertSame($user1["userID"], $rows[0]["userID"]);
 
         // Test by `boolean` = true.
         $rows = $this->api()
-            ->get("/users?sort=userID&extended[$boolean]=true")
+            ->get("/users?sort=userID&extended[$boolean]=true&userID=$allUserIDs")
             ->getBody();
         $this->assertCount(2, $rows);
         $this->assertSame($user2["userID"], $rows[0]["userID"]);
         $this->assertSame($user3["userID"], $rows[1]["userID"]);
 
+        // Test by `boolean` = false
+        $rows = $this->api()
+            ->get("/users?sort=userID&extended[$boolean]=false&userID=$allUserIDs")
+            ->getBody();
+        $this->assertCount(1, $rows);
+        $this->assertSame($user1["userID"], $rows[0]["userID"]);
+
         // Test by `date` = 2022-10-10.
         $rows = $this->api()
-            ->get("/users?sort=userID&extended[$date]=2022-10-10 12:00:00")
+            ->get("/users?sort=userID&extended[$date]=2022-10-10 12:00:00&userID=$allUserIDs")
             ->getBody();
         $this->assertCount(2, $rows);
         $this->assertSame($user1["userID"], $rows[0]["userID"]);
@@ -2589,5 +2603,36 @@ class UsersTest extends AbstractResourceTest
         $this->assertArrayNotHasKey("isAdmin", $retrievedByMember);
         $this->assertArrayNotHasKey("isSysAdmin", $retrievedByMember);
         $this->assertArrayNotHasKey("isSuperAdmin", $retrievedByMember);
+    }
+
+    /**
+     * Tests that when a user updates their own email address through the API,
+     * the new email is stored as pending email and returned as `pendingEmail` in API responses.
+     *
+     * @return void
+     */
+    public function testEmailChangeByMemberIsStoredAsPendingEmail()
+    {
+        $this->runWithConfig(["Garden.Registration.ConfirmEmail" => true], function () {
+            $user = $this->createUser();
+            $originalEmail = $user["email"];
+            $updatedEmail = "testEmailChangeByMemberIsStoredAsPendingEmail@example.com";
+            $this->runWithUser(function () use ($user, $originalEmail, $updatedEmail) {
+                $patchBody = $this->api()
+                    ->patch($this->baseUrl . "/" . $user["userID"], [
+                        "email" => $updatedEmail,
+                        "passwordConfirmation" => "testpassword",
+                    ])
+                    ->getBody();
+                $this->assertSame($updatedEmail, $patchBody["pendingEmail"]);
+                $this->assertSame($originalEmail, $patchBody["email"]);
+
+                $getBody = $this->api()
+                    ->get($this->baseUrl . "/" . $user["userID"])
+                    ->getBody();
+                $this->assertSame($updatedEmail, $getBody["pendingEmail"]);
+                $this->assertSame($originalEmail, $getBody["email"]);
+            }, $user);
+        });
     }
 }

@@ -28,6 +28,7 @@ class Policy
     const FORM_ACTION = "form-action";
     const FRAME_ANCESTORS = "frame-ancestors";
     const PLUGIN_TYPES = "plugin-types";
+    const BASE_URI = "base-uri";
 
     const VALID_DIRECTIVES = [
         self::DEFAULT_SRC,
@@ -45,6 +46,7 @@ class Policy
         self::FORM_ACTION,
         self::FRAME_ANCESTORS,
         self::PLUGIN_TYPES,
+        self::BASE_URI,
     ];
 
     const FRAME_ANCESTORS_SELF = "'self'";

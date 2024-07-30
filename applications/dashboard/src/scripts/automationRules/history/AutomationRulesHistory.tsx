@@ -138,6 +138,7 @@ export function AutomationRulesHistoryImpl() {
                             isLoading={isFetching}
                             updateQuery={updateQuery}
                             isFilteredByRuleID={!!query.automationRuleID}
+                            automationRulesCatalog={automationRulesCatalog}
                         />
                     )}
                 </div>

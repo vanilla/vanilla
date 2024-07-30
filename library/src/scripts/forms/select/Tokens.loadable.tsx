@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef } from "react";
+import React from "react";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
 import { t } from "@library/utility/appUtils";
 import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
@@ -39,6 +39,7 @@ export interface ITokenProps extends IOptionalComponentID {
     hideSelectedOptions?: boolean;
     fieldName?: string; //this one is for legacy form submits, hidden input should have a name so it appears in gdn form values
     inModal?: boolean;
+    formatOptionLabel?: React.ComponentProps<typeof Select<IComboBoxOption | IGroupOption>>["formatOptionLabel"];
 }
 
 interface IState {
@@ -107,17 +108,19 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
                             classNamePrefix={this.prefix}
                             className={classNames(this.prefix, className)}
                             placeholder={this.props.placeholder ? t(this.props.placeholder) : t("Select...")}
-                            aria-label={t("Search")}
+                            aria-label={!this.props.label ? t("Search") : undefined}
                             escapeClearsValue={true}
                             pageSize={20}
                             theme={this.getTheme}
                             styles={this.getStyles()}
                             backspaceRemovesValue={true}
+                            tabSelectsValue={false}
                             isMulti={true}
                             onFocus={this.onFocus}
                             onBlur={this.onBlur}
                             maxMenuHeight={this.props.maxHeight}
                             hideSelectedOptions={hideSelectedOptions}
+                            formatOptionLabel={this.props.formatOptionLabel}
                             {...portalProps}
                         />
                     </div>

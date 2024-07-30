@@ -49,3 +49,51 @@ export function AttachmentLayout(props: {}) {
         </div>
     );
 }
+
+export function EscalationAttachment(props: {}) {
+    return (
+        <div
+            style={{
+                maxWidth: "850px",
+            }}
+        >
+            <AttachmentLayoutComponent
+                title={"Vanilla Escalation"}
+                notice={"Open"}
+                url={"https://www.vanillaforums.com"}
+                dateUpdated={"2021-02-03 17:51:15"}
+                user={STORY_USER}
+                icon={<Icon icon={"vanilla-logo"} height={60} width={60} />}
+                metadata={[
+                    {
+                        labelCode: "Name",
+                        value: "Name of the escalation here",
+                    },
+                    {
+                        labelCode: "Assignee",
+                        value: STORY_USER["name"],
+                        format: "user",
+                        userFragment: STORY_USER,
+                    },
+                    {
+                        labelCode: "Number of Reports",
+                        value: 12,
+                    },
+                    {
+                        labelCode: "Number of Comments",
+                        value: 3,
+                    },
+                    {
+                        labelCode: "Report Reasons",
+                        value: ["Reason 1", "Reason 2", "Reason 3"],
+                    },
+                    {
+                        labelCode: "Last Reported",
+                        value: "1990-08-20T04:00:00Z",
+                        format: "date-time",
+                    },
+                ]}
+            />
+        </div>
+    );
+}

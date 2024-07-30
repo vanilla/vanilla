@@ -358,6 +358,13 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
             $userID,
             "Vanilla.Discussions.View"
         );
+        $userVisibleCategoryIDs = array_filter($userVisibleCategoryIDs, function (int $categoryID) {
+            if ($categoryID === \CategoryModel::ROOT_ID) {
+                // Omit the root category.
+                return false;
+            }
+            return true;
+        });
         // These categories are marked "Hide from recent discussions and other widgets".
         $excludedFromGlobalsCategoryIDs = $this->categoryModel->selectCachedIDs([
             "HideAllDiscussions" => true,
@@ -741,6 +748,8 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
             "imageAlt" => $this->config->get("Garden.Title") ?? "Vanilla Forums Digest",
             "textColor" => $templateConfig["TextColor"] ?? \EmailTemplate::DEFAULT_TEXT_COLOR,
             "backgroundColor" => $templateConfig["BackgroundColor"] ?? \EmailTemplate::DEFAULT_BACKGROUND_COLOR,
+            "containerBackgroundColor" =>
+                $templateConfig["ContainerBackgroundColor"] ?? \EmailTemplate::DEFAULT_CONTAINER_BACKGROUND_COLOR,
             "buttonTextColor" => $templateConfig["ButtonTextColor"] ?? \EmailTemplate::DEFAULT_BUTTON_TEXT_COLOR,
             "buttonBackgroundColor" =>
                 $templateConfig["ButtonBackgroundColor"] ?? \EmailTemplate::DEFAULT_BUTTON_BACKGROUND_COLOR,

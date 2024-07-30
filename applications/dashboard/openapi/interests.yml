@@ -1,0 +1,304 @@
+openapi: 3.0.2
+info:
+paths:
+    /interests:
+        x-hidden: true
+        get:
+            summary: List interests.
+            parameters:
+                - name: apiName
+                  description: Filter by apiName.
+                  in: query
+                  schema:
+                      type: string
+                - name: name
+                  description: Filter by name.
+                  in: query
+                  schema:
+                      type: string
+                - name: categoryIDs[]
+                  description: Filter by an array of category IDs.
+                  in: query
+                  schema:
+                      items:
+                          type: integer
+                      type: array
+                - name: tagIDs[]
+                  description: Filter by an array of tag IDs.
+                  in: query
+                  schema:
+                      items:
+                          type: integer
+                      type: array
+                - name: profileFields[]
+                  description: Filter by an array of profile field API names.
+                  in: query
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - name: isDefault
+                  description: Filter by default flag.
+                  in: query
+                  schema:
+                      type: boolean
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Interest"
+                                type: array
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+            tags:
+                - Interests & Suggested Content
+        post:
+            summary: Create an interest.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/InterestPost"
+            tags:
+                - Interests & Suggested Content
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Interest"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+
+    /interests/{interestID}:
+        x-hidden: true
+        get:
+            summary: Get an interest.
+            tags:
+                - Interests & Suggested Content
+            parameters:
+                - description: The ID of the interest.
+                  in: path
+                  name: interestID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Interest"
+                "404":
+                    description: Not Found
+        patch:
+            summary: Update an interest.
+            tags:
+                - Interests & Suggested Content
+            parameters:
+                - description: The ID of the interest.
+                  in: path
+                  name: interestID
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/InterestPatch"
+                required: true
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Interest"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+        delete:
+            summary: Delete an interest.
+            parameters:
+                - description: The ID of the interest
+                  in: path
+                  name: interestID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "204":
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+            tags:
+                - Interests & Suggested Content
+    /interests/toggle-suggested-content:
+        x-hidden: true
+        put:
+            summary: Enable or disable Suggested Content.
+            tags:
+                - Interests & Suggested Content
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                enabled:
+                                    description: Enabled state of Suggested Content
+                                    type: boolean
+                required: true
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                type: object
+                                properties:
+                                    enabled:
+                                        description: Enabled state of Suggested Content
+                                        type: boolean
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+components:
+    schemas:
+        InterestPost:
+            properties:
+                apiName:
+                    description: The API name of the interest.
+                    type: string
+                name:
+                    description: The name of the interest.
+                    type: string
+                profileFields:
+                    description: An array of profile fields associated with the interest.
+                    type: array
+                    items:
+                        type: object
+                categoryIDs:
+                    description: An array of category IDs associated with the interest.
+                    type: array
+                    items:
+                        type: integer
+                tagIDs:
+                    description: An array of tag IDs associated with the interest.
+                    type: array
+                    items:
+                        type: integer
+                isDefault:
+                    description: Whether the interest is a default.
+                    type: boolean
+            required:
+                - apiName
+                - name
+            type: object
+        InterestPatch:
+            properties:
+                name:
+                    description: The name of the interest.
+                    type: string
+                profileFields:
+                    description: An array of profile fields associated with the interest.
+                    type: array
+                    items:
+                        type: object
+                categoryIDs:
+                    description: An array of category IDs associated with the interest.
+                    type: array
+                    items:
+                        type: integer
+                tagIDs:
+                    description: An array of tag IDs associated with the interest.
+                    type: array
+                    items:
+                        type: integer
+                isDefault:
+                    description: Whether the interest is a default.
+                    type: boolean
+            required:
+                - name
+            type: object
+        Interest:
+            properties:
+                interestID:
+                    description: The ID of the interest.
+                    type: integer
+                apiName:
+                    description: The API name of the interest.
+                    type: string
+                name:
+                    description: The name of the interest.
+                    type: string
+                profileFields:
+                    description: An array of profile fields associated with the interest.
+                    type: array
+                    items:
+                        type: object
+                categoryIDs:
+                    description: An array of category IDs associated with the interest.
+                    type: array
+                    items:
+                        type: integer
+                tagIDs:
+                    description: An array of tag IDs associated with the interest.
+                    type: array
+                    items:
+                        type: integer
+                isDefault:
+                    description: Whether the interest is a default.
+                    type: boolean
+                categories:
+                    description: An array of categories associated with the interest.
+                    type: array
+                    items:
+                        type: object
+                tags:
+                    description: An array of tags associated with the interest.
+                    type: array
+                    items:
+                        type: object
+            required:
+                - interestID
+                - apiName
+                - name
+                - profileFields
+                - categoryIDs
+                - tagIDs
+                - isDefault
+                - categories
+                - tags
+            type: object

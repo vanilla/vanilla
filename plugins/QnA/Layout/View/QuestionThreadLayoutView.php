@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
+ * @copyright 2009-2023 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 namespace Vanilla\QnA\Layout\View;
 
 use Vanilla\Contracts\ConfigurationInterface;
@@ -8,12 +12,7 @@ use Vanilla\Http\InternalClient;
 use Vanilla\QnA\Layout\Assets\TabbedCommentListAsset;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Site\SiteSectionModel;
-
-/**
- * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
- * @license Proprietary
- */
+use Vanilla\Forum\Widgets\DiscussionSuggestionsAsset;
 
 class QuestionThreadLayoutView extends DiscussionThreadLayoutView
 {
@@ -25,7 +24,9 @@ class QuestionThreadLayoutView extends DiscussionThreadLayoutView
         SiteSectionModel $siteSectionModel
     ) {
         parent::__construct($internalClient, $discussionModel, $breadcrumbModel, $request, $siteSectionModel);
+
         $this->registerAssetClass(TabbedCommentListAsset::class);
+        $this->registerAssetClass(DiscussionSuggestionsAsset::class);
     }
 
     /**

@@ -11,14 +11,10 @@ use Vanilla\AutomationRules\Actions\BumpDiscussionAction;
 use Garden\Container\ContainerException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
-use Gdn_Session;
-use Psr\Log\LoggerInterface;
-use UserModel;
 use Vanilla\AddonManager;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
-use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Exception\Database\NoResultsException;
 use VanillaTests\APIv2\AbstractAPIv2Test;
@@ -49,20 +45,15 @@ class AutomationRulesTest extends AbstractAPIv2Test
     public function setUp(): void
     {
         parent::setUp();
+        \Gdn::config()->set("Feature.CommunityManagementBeta.Enabled", true);
+        \Gdn::config()->set("Feature.escalations.Enabled", true);
+
         $this->automationRuleService = $this->container()->get(AutomationRuleService::class);
         $this->automationRuleModel = $this->container()->get(AutomationRuleModel::class);
         $this->automationRuleDispatchesModel = $this->container()->get(AutomationRuleDispatchesModel::class);
         $this->addonManager = $this->container()->get(AddonManager::class);
         $this->createUserFixtures();
-        /** @var AutomationRuleModel */
-        $mockAutomationRuleModel = new MockAutomationRuleModel(
-            $this->container()->get(Gdn_Session::class),
-            $this->container()->get(UserModel::class),
-            $this->container()->get(AutomationRuleRevisionModel::class),
-            $this->automationRuleDispatchesModel,
-            $this->container()->get(LoggerInterface::class),
-            $this->container()->get(\Gdn_Database::class)
-        );
+        $mockAutomationRuleModel = $this->container()->get(MockAutomationRuleModel::class);
         $this->container()->setInstance(AutomationRuleModel::class, $mockAutomationRuleModel);
     }
 
@@ -102,71 +93,96 @@ class AutomationRulesTest extends AbstractAPIv2Test
     }
 
     /**
+     * Test that catalog only provides escalation triggers and actions when the escalation parameter is set to true
+     *
+     * @return void
+     */
+    public function testCatalogGivesBackOnlyEscalationTriggersAndActions(): void
+    {
+        $this->runWithUser(function () {
+            $response = $this->api()
+                ->get("automation-rules/catalog?escalations=true")
+                ->getBody();
+            $this->assertIsArray($response["triggers"]);
+            $this->assertIsArray($response["actions"]);
+            $this->assertEquals($this->getExpectedCatalogEscalationTriggerArray(), $response["triggers"]);
+            $this->assertEquals($this->getExpectedCatalogEscalationActionArray(), $response["actions"]);
+        }, $this->adminID);
+    }
+
+    /**
      * Expected schema array for triggers
      *
      * @return array[]
      */
     private function getExpectedCatalogTriggerArray(): array
     {
-        $durationSchema = [
-            "type" => "integer",
-            "minimum" => 1,
-            "step" => 1,
+        $triggerTimeDelaySchema = [
+            "type" => "object",
             "x-control" => [
-                "description" => "Enter the time duration, whole numbers only.",
-                "label" => "Duration",
-                "inputType" => "textBox",
+                "description" => "Set the duration after which the rule will trigger.  Whole numbers only.",
+                "label" => "Trigger Delay",
+                "inputType" => "timeDuration",
                 "placeholder" => "",
-                "type" => "number",
-                "tooltip" => "",
+                "tooltip" =>
+                    "Set the duration something needs to exist and meet the rule criteria for prior to the the rule triggering and acting upon it",
+                "supportedUnits" => ["hour", "day", "week", "year"],
             ],
+            "properties" => [
+                "length" => [
+                    "type" => "string",
+                ],
+                "unit" => [
+                    "type" => "string",
+                ],
+            ],
+            "required" => true,
         ];
-        $startDurationSchema = $endDurationSchema = $durationSchema;
 
-        $startDurationSchema["x-control"]["description"] =
-            "Any data older than this will be excluded from triggering the rule.  Whole numbers only.";
-        $startDurationSchema["x-control"]["label"] = "Oldest Retrieved Content Cap";
-        $startDurationSchema["x-control"]["tooltip"] =
-            "For the initial run or when running this rule once, there may be data that you feel goes too far into the past to act on. This number is the cut-off time; anything older than this will not be included in the run.";
-        unset($startDurationSchema["minimum"]);
-
-        $endDurationSchema["x-control"]["description"] =
-            "Set the duration after which the rule will trigger.  Whole numbers only.";
-        $endDurationSchema["x-control"]["label"] = "Trigger Delay";
-        $endDurationSchema["x-control"]["tooltip"] =
-            "Set the duration something needs to exist and meet the rule criteria for prior to the the rule triggering and acting upon it";
-
-        $maxSchema = [
-            "type" => "string",
-            "enum" => ["hour", "day", "week", "year"],
-            "x-control" => [
-                "description" => "Select the time unit.",
-                "label" => "Trigger Time Unit",
-                "inputType" => "dropDown",
-                "placeholder" => "",
-                "choices" => [
-                    "staticOptions" => [
-                        "hour" => "Hour",
-                        "day" => "Day",
-                        "week" => "Week",
-                        "year" => "Year",
+        $triggerAdditionalSettingsSchema = [
+            "applyToNewContentOnly" => [
+                "type" => "boolean",
+                "default" => false,
+                "x-control" => [
+                    "description" =>
+                        "When enabled, this rule will only be applied to new content that meets the trigger criteria.",
+                    "label" => "Apply to new content only",
+                    "inputType" => "checkBox",
+                    "labelType" => "none",
+                ],
+            ],
+            "triggerTimeLookBackLimit" => [
+                "type" => "object",
+                "x-control" => [
+                    "description" => "Do not apply the rule to content that is older than this.",
+                    "label" => "Look-back Limit",
+                    "inputType" => "timeDuration",
+                    "placeholder" => "",
+                    "tooltip" => "",
+                    "supportedUnits" => ["hour", "day", "week", "year"],
+                    "conditions" => [
+                        [
+                            "field" => "additionalSettings.triggerValue.applyToNewContentOnly",
+                            "type" => "boolean",
+                            "const" => false,
+                        ],
                     ],
                 ],
-                "multiple" => false,
-                "tooltip" => "",
+                "properties" => [
+                    "length" => [
+                        "type" => "string",
+                    ],
+                    "unit" => [
+                        "type" => "string",
+                    ],
+                ],
             ],
         ];
 
-        $intervalSchema = $maxSchema;
-        $intervalSchema["minLength"] = 1;
-        $maxSchema["x-control"]["label"] = "Oldest Content Unit";
         $timeTriggerSchema = [
             "type" => "object",
             "properties" => [
-                "maxTimeThreshold" => $startDurationSchema,
-                "maxTimeUnit" => $maxSchema,
-                "triggerTimeThreshold" => $endDurationSchema,
-                "triggerTimeUnit" => $intervalSchema,
+                "triggerTimeDelay" => $triggerTimeDelaySchema,
                 "postType" => [
                     "type" => "array",
                     "items" => [
@@ -175,7 +191,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "default" => ["discussion"],
                     "enum" => ["discussion"],
                     "x-control" => [
-                        "description" => "Select a post type.",
+                        "description" => "",
                         "label" => "Post Type",
                         "inputType" => "dropDown",
                         "placeholder" => "",
@@ -187,14 +203,16 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "multiple" => true,
                         "tooltip" => "",
                     ],
+                    "required" => true,
                 ],
+                "additionalSettings" => $triggerAdditionalSettingsSchema,
             ],
-            "required" => ["triggerTimeThreshold", "triggerTimeUnit", "postType"],
+            "required" => ["triggerTimeDelay", "postType", "additionalSettings"],
         ];
         $triggers = [
             "emailDomainTrigger" => [
                 "triggerType" => "emailDomainTrigger",
-                "name" => "A user registers with or updated to a certain email domain",
+                "name" => "New/Updated Email domain",
                 "triggerActions" => ["categoryFollowAction", "addRemoveRoleAction"],
                 "schema" => [
                     "type" => "object",
@@ -209,22 +227,25 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "type" => "string",
                                 "tooltip" => "",
                             ],
+                            "required" => true,
                         ],
                     ],
                     "required" => ["emailDomain"],
                 ],
+                "contentType" => "users",
             ],
             "profileFieldTrigger" => [
                 "triggerType" => "profileFieldTrigger",
-                "name" => "A user registers or updates a certain profile field with a certain value",
-                "triggerActions" => ["addRemoveRoleAction", "categoryFollowAction"],
+                "name" => "New/Updated Profile field",
+                "triggerActions" => ["categoryFollowAction", "addRemoveRoleAction"],
                 "schema" => [
                     "type" => "object",
                     "properties" => [
                         "profileField" => [
                             "type" => "string",
                             "x-control" => [
-                                "description" => "Select a profile field",
+                                "description" =>
+                                    "Dropdown (Single-, Multi-, or Numeric) and Single Checkbox profile field types are eligible for automation.",
                                 "label" => "Profile Field",
                                 "inputType" => "dropDown",
                                 "placeholder" => "",
@@ -241,70 +262,162 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "multiple" => false,
                                 "tooltip" => "",
                             ],
+                            "required" => true,
                         ],
                     ],
                     "required" => ["profileField"],
                 ],
+                "contentType" => "users",
             ],
             "staleDiscussionTrigger" => [
                 "triggerType" => "staleDiscussionTrigger",
-                "name" =>
-                    "A certain amount of time has passed since a post has been created but has not received any comments",
+                "name" => "Time since a post has no comments",
                 "triggerActions" => [
-                    "closeDiscussionAction",
-                    "bumpDiscussionAction",
-                    "addTagAction",
-                    "moveToCategoryAction",
                     "addToCollectionAction",
+                    "addTagAction",
+                    "bumpDiscussionAction",
+                    "closeDiscussionAction",
+                    "moveToCategoryAction",
                     "removeDiscussionFromCollectionAction",
                 ],
                 "schema" => $timeTriggerSchema,
+                "contentType" => "posts",
             ],
             "staleCollectionTrigger" => [
                 "triggerType" => "staleCollectionTrigger",
-                "name" => "A certain amount of time has passed since a post was added to a selected collection",
+                "name" => "Time since added to collection",
                 "triggerActions" => ["removeDiscussionFromTriggerCollectionAction"],
                 "schema" => [
                     "type" => "object",
                     "properties" => [
-                        "maxTimeThreshold" => $startDurationSchema,
-                        "maxTimeUnit" => $maxSchema,
-                        "triggerTimeThreshold" => $endDurationSchema,
-                        "triggerTimeUnit" => $intervalSchema,
+                        "triggerTimeDelay" => $triggerTimeDelaySchema,
                         "collectionID" => self::getCollectionSchema("Collection to remove from")["properties"][
                             "collectionID"
                         ],
+                        "additionalSettings" => $triggerAdditionalSettingsSchema,
                     ],
-                    "required" => ["triggerTimeThreshold", "triggerTimeUnit", "collectionID"],
+                    "required" => ["triggerTimeDelay", "collectionID", "additionalSettings"],
                 ],
+                "contentType" => "posts",
             ],
             "lastActiveDiscussionTrigger" => [
                 "triggerType" => "lastActiveDiscussionTrigger",
-                "name" => "A certain amount of time has passed since a post has been active",
+                "name" => "Time since post had no activity",
                 "triggerActions" => [
-                    "closeDiscussionAction",
-                    "bumpDiscussionAction",
-                    "addTagAction",
-                    "moveToCategoryAction",
                     "addToCollectionAction",
+                    "addTagAction",
+                    "bumpDiscussionAction",
+                    "closeDiscussionAction",
+                    "moveToCategoryAction",
                     "removeDiscussionFromCollectionAction",
                 ],
                 "schema" => $timeTriggerSchema,
+                "contentType" => "posts",
             ],
             "timeSinceUserRegistrationTrigger" => [
                 "triggerType" => "timeSinceUserRegistrationTrigger",
-                "name" => "A certain amount of time has passed since a user registered",
-                "triggerActions" => ["addRemoveRoleAction"],
+                "name" => "Time since Registration",
+                "triggerActions" => ["categoryFollowAction", "addRemoveRoleAction"],
                 "schema" => [
                     "type" => "object",
                     "properties" => [
-                        "maxTimeThreshold" => $startDurationSchema,
-                        "maxTimeUnit" => $maxSchema,
-                        "triggerTimeThreshold" => $endDurationSchema,
-                        "triggerTimeUnit" => $intervalSchema,
+                        "triggerTimeDelay" => $triggerTimeDelaySchema,
+                        "additionalSettings" => $triggerAdditionalSettingsSchema,
                     ],
-                    "required" => ["triggerTimeThreshold", "triggerTimeUnit"],
+                    "required" => ["triggerTimeDelay", "additionalSettings"],
                 ],
+                "contentType" => "users",
+            ],
+            "reportPostTrigger" => [
+                "triggerType" => "reportPostTrigger",
+                "name" => "Post received reports",
+                "triggerActions" => ["createEscalationAction"],
+                "schema" => [
+                    "type" => "object",
+                    "properties" => [
+                        "countReports" => [
+                            "type" => "integer",
+                            "required" => true,
+                            "x-control" => [
+                                "description" => "The number of reports received on a post",
+                                "label" => "Number of Reports",
+                                "inputType" => "textBox",
+                                "placeholder" => "",
+                                "type" => "integer",
+                                "tooltip" => "",
+                            ],
+                        ],
+                        "categoryID" => [
+                            "type" => "array",
+                            "items" => [
+                                "type" => "string",
+                            ],
+                            "x-control" => [
+                                "description" => "Select category",
+                                "label" => "Category",
+                                "inputType" => "dropDown",
+                                "placeholder" => "",
+                                "choices" => [
+                                    "api" => [
+                                        "searchUrl" => "/api/v2/categories",
+                                        "singleUrl" => "/api/v2/categories/%s",
+                                        "valueKey" => "categoryID",
+                                        "labelKey" => "name",
+                                        "extraLabelKey" => null,
+                                    ],
+                                ],
+                                "multiple" => true,
+                                "tooltip" => "",
+                            ],
+                        ],
+                        "includeSubcategories" => [
+                            "type" => "boolean",
+                            "x-control" => [
+                                "description" => "Include content from subcategories of the chosen category",
+                                "label" => "Include Subcategories",
+                                "inputType" => "checkBox",
+                                "labelType" => null,
+                            ],
+                        ],
+                        "reportReasonID" => [
+                            "type" => "array",
+                            "items" => [
+                                "type" => "string",
+                            ],
+                            "default" => [],
+                            "enum" => [
+                                "abuse",
+                                "approval-required",
+                                "deceptive-misleading",
+                                "inappropriate",
+                                "rule-breaking",
+                                "spam",
+                                "spam-automation",
+                            ],
+                            "x-control" => [
+                                "description" => "",
+                                "label" => "Report Reason",
+                                "inputType" => "dropDown",
+                                "placeholder" => "",
+                                "choices" => [
+                                    "staticOptions" => [
+                                        "spam" => "Spam / Solicitation",
+                                        "approval-required" => "Approval Required",
+                                        "deceptive-misleading" => "Deceptive / Misleading",
+                                        "inappropriate" => "Inappropriate",
+                                        "rule-breaking" => "Breaks Community Rules",
+                                        "spam-automation" => "Spam Automation",
+                                        "abuse" => "Abuse",
+                                    ],
+                                ],
+                                "multiple" => true,
+                                "tooltip" => "",
+                            ],
+                        ],
+                    ],
+                    "required" => ["countReports"],
+                ],
+                "contentType" => "posts",
             ],
         ];
         return $triggers;
@@ -342,6 +455,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "multiple" => true,
                         "tooltip" => "",
                     ],
+                    "required" => true,
                 ],
             ],
             "required" => ["collectionID"],
@@ -353,18 +467,10 @@ class AutomationRulesTest extends AbstractAPIv2Test
      * @param string $label
      * @param string $description
      * @param bool $multiple
-     * @param bool $discussionCategoriesOnly
      * @return array[]
      */
-    private function getCategorySchema(
-        string $label,
-        string $description,
-        bool $multiple = false,
-        bool $discussionCategoriesOnly = false
-    ): array {
-        $categoriesSearchUrl = $discussionCategoriesOnly
-            ? "/api/v2/categories/search?query=%s&limit=30&displayAs[]=Discussions"
-            : "/api/v2/categories/search?query=%s&limit=30";
+    private function getCategorySchema(string $label, string $description, bool $multiple = false): array
+    {
         return [
             "type" => "object",
             "properties" => [
@@ -373,6 +479,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "items" => [
                         "type" => "integer",
                     ],
+                    "required" => true,
                     "x-control" => [
                         "description" => $description,
                         "label" => $label,
@@ -380,7 +487,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "placeholder" => "",
                         "choices" => [
                             "api" => [
-                                "searchUrl" => $categoriesSearchUrl,
+                                "searchUrl" => "/api/v2/categories/search?query=%s&limit=30&displayAs[]=Discussions",
                                 "singleUrl" => "/api/v2/categories/%s",
                                 "valueKey" => "categoryID",
                                 "labelKey" => "name",
@@ -403,37 +510,46 @@ class AutomationRulesTest extends AbstractAPIv2Test
      */
     private function getExpectedCatalogActionArray(): array
     {
+        $roleIDs = $this->getModerationManagePermissionRoleIDs();
+        $qs = "?" . http_build_query(["roleIDs" => $roleIDs]);
+
         return [
             "categoryFollowAction" => [
                 "actionType" => "categoryFollowAction",
-                "name" => "Follow a specific category",
-                "actionTriggers" => ["emailDomainTrigger", "profileFieldTrigger"],
+                "name" => "Follow category",
+                "actionTriggers" => ["emailDomainTrigger", "profileFieldTrigger", "timeSinceUserRegistrationTrigger"],
                 "schema" => $this->getCategorySchema(
                     "Category to Follow",
                     "Select one or more categories to follow",
-                    true,
                     true
                 ),
+                "contentType" => "users",
             ],
             "moveToCategoryAction" => [
                 "actionType" => "moveToCategoryAction",
-                "name" => "Move to a specific category",
+                "name" => "Move post",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
-                "schema" => $this->getCategorySchema("Category to move to", "Select a category"),
+                "schema" => $this->getCategorySchema(
+                    "Category to move to",
+                    "Category settings are respected by automation rules. Posts will only be moved into categories that accept that post type."
+                ),
+                "contentType" => "posts",
             ],
             "closeDiscussionAction" => [
                 "actionType" => "closeDiscussionAction",
-                "name" => "Close the discussion",
+                "name" => "Close post",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+                "contentType" => "posts",
             ],
             "bumpDiscussionAction" => [
                 "actionType" => "bumpDiscussionAction",
-                "name" => "Bump the discussion",
+                "name" => "Bump post",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+                "contentType" => "posts",
             ],
             "addTagAction" => [
                 "actionType" => "addTagAction",
-                "name" => "Add a tag",
+                "name" => "Add tag",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
                 "schema" => [
                     "type" => "object",
@@ -460,26 +576,30 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "multiple" => true,
                                 "tooltip" => "",
                             ],
+                            "required" => true,
                         ],
                     ],
                     "required" => ["tagID"],
                 ],
+                "contentType" => "posts",
             ],
             "addToCollectionAction" => [
                 "actionType" => "addToCollectionAction",
                 "name" => "Add to collection",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
                 "schema" => $this->getCollectionSchema("Collection to add to"),
+                "contentType" => "posts",
             ],
             "removeDiscussionFromCollectionAction" => [
                 "actionType" => "removeDiscussionFromCollectionAction",
-                "name" => "Remove discussion from collection",
+                "name" => "Remove from collection",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
                 "schema" => $this->getCollectionSchema("Collection to remove from"),
+                "contentType" => "posts",
             ],
             "addRemoveRoleAction" => [
                 "actionType" => "addRemoveRoleAction",
-                "name" => "Assign/remove a specific role to the user",
+                "name" => "Assign/Remove role",
                 "actionTriggers" => ["emailDomainTrigger", "profileFieldTrigger", "timeSinceUserRegistrationTrigger"],
                 "schema" => [
                     "type" => "object",
@@ -487,7 +607,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "addRoleID" => [
                             "type" => "string",
                             "x-control" => [
-                                "description" => "Select a role to be assigned",
+                                "description" => "",
                                 "label" => "Assign Role",
                                 "inputType" => "dropDown",
                                 "placeholder" => "",
@@ -503,11 +623,12 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "multiple" => false,
                                 "tooltip" => "",
                             ],
+                            "required" => true,
                         ],
                         "removeRoleID" => [
                             "type" => "string",
                             "x-control" => [
-                                "description" => "Select a role to be removed",
+                                "description" => "",
                                 "label" => "Remove Role (optional)",
                                 "inputType" => "dropDown",
                                 "placeholder" => "",
@@ -527,11 +648,124 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     ],
                     "required" => ["addRoleID"],
                 ],
+                "contentType" => "users",
             ],
             "removeDiscussionFromTriggerCollectionAction" => [
                 "actionType" => "removeDiscussionFromTriggerCollectionAction",
-                "name" => "Remove discussion from trigger collection",
+                "name" => "Remove from trigger collection",
                 "actionTriggers" => ["staleCollectionTrigger"],
+                "contentType" => "posts",
+            ],
+            "createEscalationAction" => [
+                "actionType" => "createEscalationAction",
+                "name" => "Create Escalation",
+                "actionTriggers" => ["reportPostTrigger"],
+                "schema" => [
+                    "type" => "object",
+                    "properties" => [
+                        "recordIsLive" => [
+                            "type" => "boolean",
+                            "default" => false,
+                            "x-control" => [
+                                "description" => "Keep post visible in community",
+                                "label" => "Keep record live",
+                                "inputType" => "checkBox",
+                                "labelType" => null,
+                            ],
+                        ],
+                        "assignedModeratorID" => [
+                            "type" => "integer",
+                            "x-control" => [
+                                "description" => "Select what moderator escalations should be assigned to",
+                                "label" => "Assign Moderator",
+                                "inputType" => "dropDown",
+                                "placeholder" => "",
+                                "choices" => [
+                                    "api" => [
+                                        "searchUrl" => "/api/v2/users$qs",
+                                        "singleUrl" => "/api/v2/users/%s",
+                                        "valueKey" => "userID",
+                                        "labelKey" => "name",
+                                        "extraLabelKey" => null,
+                                    ],
+                                ],
+                                "multiple" => false,
+                                "tooltip" => "",
+                            ],
+                        ],
+                    ],
+                ],
+                "contentType" => "posts",
+            ],
+        ];
+    }
+
+    /**
+     * Get moderation manage permission role IDs
+     *
+     * @return array
+     */
+    private function getModerationManagePermissionRoleIDs(): array
+    {
+        $roles = $this->roleModel->getByPermission("Garden.Moderation.Manage")->resultArray();
+        return array_column($roles, "RoleID");
+    }
+
+    /**
+     * Expected escalation triggers
+     * @return array[]
+     */
+    private function getExpectedCatalogEscalationTriggerArray(): array
+    {
+        $triggers = ["reportPostTrigger", "staleDiscussionTrigger", "lastActiveDiscussionTrigger"];
+        return array_intersect_key($this->getExpectedCatalogTriggerArray(), array_flip($triggers));
+    }
+
+    private function getExpectedCatalogEscalationActionArray(): array
+    {
+        $roleIDs = $this->getModerationManagePermissionRoleIDs();
+        $qs = "?" . http_build_query(["roleIDs" => $roleIDs]);
+        return [
+            "createEscalationAction" => [
+                "actionType" => "createEscalationAction",
+                "name" => "Create Escalation",
+                "actionTriggers" => ["reportPostTrigger"],
+                "schema" => [
+                    "type" => "object",
+                    "properties" => [
+                        "recordIsLive" => [
+                            "type" => "boolean",
+                            "default" => false,
+                            "x-control" => [
+                                "description" => "Keep post visible in community",
+                                "label" => "Keep record live",
+                                "inputType" => "checkBox",
+                                "labelType" => null,
+                            ],
+                        ],
+                        "assignedModeratorID" => [
+                            "type" => "integer",
+                            "x-control" => [
+                                "description" => "Select what moderator escalations should be assigned to",
+                                "label" => "Assign Moderator",
+                                "inputType" => "dropDown",
+                                "placeholder" => "",
+                                "choices" => [
+                                    "api" => [
+                                        "searchUrl" => "/api/v2/users$qs",
+                                        "singleUrl" => "/api/v2/users/%s",
+                                        "valueKey" => "userID",
+                                        "labelKey" => "name",
+                                        "extraLabelKey" => null,
+                                    ],
+                                ],
+                                "multiple" => false,
+                                "tooltip" => "",
+                            ],
+                        ],
+                    ],
+                ],
+                "contentType" => "posts",
             ],
         ];
     }
@@ -949,10 +1183,9 @@ class AutomationRulesTest extends AbstractAPIv2Test
             "trigger" => [
                 "triggerType" => "staleDiscussionTrigger",
                 "triggerValue" => [
-                    "maxTimeThreshold" => 2,
-                    "triggerTimeUnit" => "week",
-                    "triggerTimeThreshold" => 1,
-                    "maxTimeUnit" => "week",
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => "",
+                    "triggerTimeDelay" => "",
                     "postType" => "",
                 ],
             ],
@@ -964,11 +1197,23 @@ class AutomationRulesTest extends AbstractAPIv2Test
         $bodyTrigger["action"]["actionValue"] = "";
         return [
             "test required duration" => [
-                $this->modifyRecord($body, ["triggerTimeThreshold" => "", "postType" => ["discussion"]]),
-                "trigger.triggerValue.triggerTimeThreshold is not a valid integer.",
+                $this->modifyRecord($body, [
+                    "triggerTimeDelay" => [
+                        "length" => "",
+                        "unit" => "week",
+                    ],
+                    "postType" => ["discussion"],
+                ]),
+                "trigger.triggerValue.triggerTimeDelay.length is not a valid integer.",
             ],
             "test required duration to be whole number" => [
-                $this->modifyRecord($body, ["triggerTimeThreshold" => -5, "postType" => ["discussion"]]),
+                $this->modifyRecord($body, [
+                    "triggerTimeDelay" => [
+                        "length" => -5,
+                        "unit" => "week",
+                    ],
+                    "postType" => ["discussion"],
+                ]),
                 "Trigger Delay should be positive whole numbers only.",
             ],
             "test postType is a valid array with values" => [
@@ -976,12 +1221,26 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 "Invalid post type, Valid post types are: [\"discussion\"]",
             ],
             "test invalid maxTimeThreshold" => [
-                $this->modifyRecord($body, ["maxTimeThreshold" => -1]),
-                "Oldest Retrieved Content Cap should be positive whole numbers only.",
+                $this->modifyRecord($body, [
+                    "triggerTimeLookBackLimit" => [
+                        "length" => -1,
+                        "unit" => "week",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "week",
+                    ],
+                ]),
+                "Look-back Limit should be positive whole numbers only.",
             ],
             "test invalid triggerTimeUnit" => [
-                $this->modifyRecord($body, ["triggerTimeUnit" => "minute"]),
-                "trigger.triggerValue.triggerTimeUnit must be one of: hour, day, week, year.",
+                $this->modifyRecord($body, [
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "minute",
+                    ],
+                ]),
+                "trigger.triggerValue.triggerTimeDelay.unit must be one of: hour, day, week, year.",
             ],
             "test invalid tags" => [
                 $this->modifyRecord($bodyTrigger, ["actionType" => "addTagAction", "actionValue" => ["tagID" => [25]]]),
@@ -1008,7 +1267,20 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 ]),
                 "The category 25 is not a valid category.",
             ],
-            "test success" => [$this->modifyRecord($bodyTrigger, ["actionValue" => []]), ""],
+            "test success" => [
+                $this->modifyRecord($bodyTrigger, [
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 2,
+                        "unit" => "week",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 1,
+                        "unit" => "hour",
+                    ],
+                    "actionValue" => [],
+                ]),
+                "",
+            ],
         ];
     }
 
@@ -1031,7 +1303,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
         $this->createCategory(["name" => "Fun Category"]);
         $categoryID[] = $this->lastInsertedCategoryID;
         $automationRule = [
-            "name" => "testRecipe",
+            "name" => "testPostRecipe",
             "trigger" => [
                 "triggerType" => "emailDomainTrigger",
                 "triggerValue" => ["emailDomain" => "example.com"],
@@ -1055,6 +1327,40 @@ class AutomationRulesTest extends AbstractAPIv2Test
         $this->assertEquals("inactive", $automationRecipe["status"]);
 
         return $automationRecipe["automationRuleID"];
+    }
+
+    /**
+     * Test that the creation of automation rule with same name throws validation error
+     *
+     * @return void
+     * @depends testPost
+     */
+    public function testAutomationRuleValidationForName(int $automationRuleID): void
+    {
+        $automationRule = $this->automationRuleModel->getAutomationRuleByID($automationRuleID);
+        $automationRuleName = $automationRule["name"];
+        $this->runWithExpectedExceptionMessage(
+            "Rule name already exists. Enter a unique name to proceed.",
+            function () use ($automationRuleName) {
+                $this->api()->post("automation-rules", [
+                    "name" => "$automationRuleName",
+                    "trigger" => [
+                        "triggerType" => "emailDomainTrigger",
+                        "triggerValue" => ["emailDomain" => "example.com"],
+                    ],
+                    "action" => ["actionType" => "categoryFollowAction", "actionValue" => ["categoryID" => [1]]],
+                ]);
+            }
+        );
+
+        //This should execute without error
+
+        $result = $this->api()->patch("automation-rules/$automationRuleID", [
+            "name" => $automationRuleName,
+            "trigger" => $automationRule["trigger"],
+            "action" => $automationRule["action"],
+        ]);
+        $this->assertEquals(200, $result->getStatusCode());
     }
 
     /**
@@ -1153,7 +1459,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
             $this->api()->patch("automation-rules/999", ["trigger" => [], "action" => []]);
         });
         $automationRule = [
-            "name" => "testRecipe",
+            "name" => "testPatchRecipe",
             "trigger" => [
                 "triggerType" => "emailDomainTrigger",
                 "triggerValue" => ["emailDomain" => "example.com"],

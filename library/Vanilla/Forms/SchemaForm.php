@@ -22,6 +22,7 @@ class SchemaForm
     const CODE_EDITOR_TYPE = "codeBox";
     const COLOR_TYPE = "color";
     const UPLOAD = "upload";
+    const TIME_DURATION = "timeDuration";
 
     /**
      * Create a "section" of the form on an object type.
@@ -253,7 +254,7 @@ class SchemaForm
     }
 
     /**
-     * Used upload inputs.
+     * Used for upload inputs.
      *
      * @param FormOptions $options
      * @param ?FieldMatchConditional $conditions
@@ -268,6 +269,38 @@ class SchemaForm
             "placeholder" => $options->getPlaceHolder(),
             "tooltip" => $options->getTooltip(),
         ];
+
+        if ($conditions) {
+            $result["conditions"] = [$conditions->getCondition()];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Used for time duration inputs (rendered through react only).
+     *
+     * @param FormOptions $options
+     * @param ?FieldMatchConditional $conditions
+     * @param ?array $supportedUnits
+     * @return array
+     */
+    public static function timeDuration(
+        FormOptions $options,
+        FieldMatchConditional $conditions = null,
+        null|array $supportedUnits = null
+    ): array {
+        $result = [
+            "description" => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "inputType" => self::TIME_DURATION,
+            "placeholder" => $options->getPlaceHolder(),
+            "tooltip" => $options->getTooltip(),
+        ];
+
+        if ($supportedUnits) {
+            $result["supportedUnits"] = $supportedUnits;
+        }
 
         if ($conditions) {
             $result["conditions"] = [$conditions->getCondition()];

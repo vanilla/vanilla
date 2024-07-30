@@ -7,6 +7,8 @@
 
 namespace Vanilla\AutomationRules\Actions;
 
+use AttachmentModel;
+use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Garden\Container\ContainerException;
@@ -18,7 +20,6 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Vanilla\AutomationRules\Models\AutomationRuleLongRunnerGenerator;
 use Vanilla\AutomationRules\Trigger\AutomationTrigger;
-use Vanilla\AutomationRules\Trigger\TimedAutomationTriggerInterface;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Scheduler\LongRunner;
@@ -47,6 +48,7 @@ abstract class AutomationAction
     const ACTION_TYPE = "actionType";
     const ACTION_NAME = "name";
     const ACTION_TRIGGERS = "actionTriggers";
+    const ACTION_CONTENT_TYPE = "contentType";
 
     /**
      * @param int $automationRuleID
@@ -93,10 +95,19 @@ abstract class AutomationAction
      */
     public static function getBaseSchemaArray(): array
     {
+        $triggerTypes = [];
+        $triggers = static::getTriggers();
+        foreach ($triggers as $trigger) {
+            if (class_exists($trigger)) {
+                $triggerTypes[] = $trigger::getType();
+            }
+        }
+
         return [
             self::ACTION_TYPE => static::getType(),
             self::ACTION_NAME => static::getName(),
-            self::ACTION_TRIGGERS => static::getTriggers(),
+            self::ACTION_TRIGGERS => $triggerTypes,
+            self::ACTION_CONTENT_TYPE => static::getContentType(),
         ];
     }
 
@@ -265,18 +276,18 @@ abstract class AutomationAction
     }
 
     /**
-     * Add log entry for timed discussion automation rules
+     * Add log entry for posts automation rules
      *
      * @param int $recordID
      * @param array $logData
+     * @param string $recordType
      * @return int
-     * @throws NoResultsException
      */
-    protected function insertTimedDiscussionLog(int $recordID, array $logData): int
+    protected function insertPostLog(int $recordID, array $logData = [], string $recordType = "Discussion"): int
     {
         $automationRule = $this->getAutomationRule();
         $log = [
-            "RecordType" => "Discussion",
+            "RecordType" => $recordType,
             "RecordID" => $recordID,
             "AutomationRuleRevisionID" => $automationRule["automationRuleRevisionID"],
             "Data" => $logData,
@@ -307,11 +318,34 @@ abstract class AutomationAction
     abstract static function getType(): string;
 
     /**
+     * Get the action content type
+     *
+     * @return string
+     */
+    abstract static function getContentType(): string;
+
+    /**
      * Get the action triggers
      *
-     * @return array
+     * @return array<AutomationTrigger::class>
      */
     abstract static function getTriggers(): array;
+
+    public static function isTriggeredByAi(string $triggerType, array $triggers): bool
+    {
+        $currentTrigger = null;
+        foreach ($triggers as $trigger) {
+            if ($trigger::getType() == $triggerType) {
+                $currentTrigger = $trigger;
+                break;
+            }
+        }
+        if (is_a($currentTrigger, \Vanilla\AutomationRules\Trigger\AiTriggerInterface::class, true)) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Add valid action based where clause to limit list of objects to act on.
@@ -331,17 +365,17 @@ abstract class AutomationAction
      * @param AutomationTrigger $triggerClass
      * @param bool $firstRun
      * @return array|string[]
-     * @throws \Garden\Web\Exception\NotFoundException
+     * @throws ContainerException
+     * @throws NoResultsException
+     * @throws NotFoundException
      */
     public function triggerLongRunnerRule(AutomationTrigger $triggerClass, bool $firstRun = false): array
     {
         if (
-            !$triggerClass instanceof TimedAutomationTriggerInterface &&
+            !$triggerClass instanceof TimedAutomationTrigger &&
             $this->dispatchType === AutomationRuleDispatchesModel::TYPE_TRIGGERED
         ) {
-            throw new \Exception(
-                "The trigger must implement the TimedAutomationTriggerInterface or triggered manually."
-            );
+            throw new \Exception("The trigger must implement the TimedAutomationTrigger or triggered manually.");
         }
         $automationRule = $this->getAutomationRule();
         $longRunnerParams = [
@@ -383,7 +417,7 @@ abstract class AutomationAction
             $firstRun &&
             $this->dispatchType === AutomationRuleDispatchesModel::TYPE_INITIAL &&
             $count === 0 &&
-            $triggerClass instanceof TimedAutomationTriggerInterface
+            $triggerClass instanceof TimedAutomationTrigger
         ) {
             //Create a dispatch entry with status of warning to indicate that the rule is active but no actionable items found.
             $this->logDispatched(
@@ -425,7 +459,7 @@ abstract class AutomationAction
     ): int {
         $automationRule = $this->getAutomationRule();
         $lastRunDate = null;
-        if ($triggerClass instanceof TimedAutomationTriggerInterface) {
+        if ($triggerClass instanceof TimedAutomationTrigger) {
             // If not first run, check the last run date for the offsets
             if (!$isFirstRun) {
                 $lastRunDate = $this->calculateTimeInterval(
@@ -483,5 +517,23 @@ abstract class AutomationAction
     public function expandLogData(array $logData): string
     {
         return "&nbsp;";
+    }
+
+    /**
+     * Execute the long runner action
+     * @param array $actionValue Action value.
+     * @param array $object Object to perform on.
+     * @return bool
+     */
+    abstract public function executeLongRunner(array $actionValue, array $object): bool;
+
+    /**
+     * Can This action can be added
+     *
+     * @return bool
+     */
+    public static function canAddAction(): bool
+    {
+        return true;
     }
 }

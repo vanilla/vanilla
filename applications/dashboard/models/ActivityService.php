@@ -7,9 +7,11 @@
 
 namespace Vanilla\Dashboard\Models;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
 use Gdn;
-use UserModel;
+use Gdn_Database;
 use Vanilla\Dashboard\Activity\Activity;
 use Vanilla\Dashboard\Activity\ActivityGroup;
 use Vanilla\Permissions;
@@ -22,9 +24,8 @@ class ActivityService
     /** @var array<string> */
     private $activityTypeIDs = [];
 
-    public function __construct(UserModel $userModel)
+    public function __construct(private Gdn_Database $database)
     {
-        $this->userModel = $userModel;
     }
 
     /**
@@ -33,10 +34,13 @@ class ActivityService
      * @param class-string<Activity> $activity
      * @return void
      */
-    public function registerActivity(string $activity): void
+    public function registerActivity(string $activity, bool $insertActivityType = true): void
     {
         $this->activities[] = $activity;
         $this->activityTypeIDs[] = $activity::getActivityTypeID();
+        if ($insertActivityType) {
+            $this->insertActivityType($activity);
+        }
     }
 
     /**
@@ -279,5 +283,40 @@ class ActivityService
             $preference = null;
         }
         return $preference;
+    }
+
+    /**
+     * Insert an ActivityType into GDN_ActivityType is it doesn't exist.
+     *
+     * @param string $activityType
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
+    private function insertActivityType(string $activityType): void
+    {
+        /** @var Activity $activity */
+        $activity = Gdn::getContainer()->get($activityType);
+
+        $sql = $this->database->createSql();
+        $activityExists = $sql
+            ->select("ActivityTypeID")
+            ->from("ActivityType")
+            ->where("Name", $activity::getActivityTypeID())
+            ->get()
+            ->numRows();
+
+        if ($activityExists === 0) {
+            $sql = $this->database->createSql();
+            $sql->insert("ActivityType", [
+                "Name" => $activity::getActivityTypeID(),
+                "AllowComments" => $activity::allowsComments(),
+                "ProfileHeadline" => $activity::getProfileHeadline(),
+                "FullHeadline" => $activity::getFullHeadline(),
+                "PluralHeadline" => $activity::getPluralHeadline(),
+                "Notify" => $activity::isNotificationType(),
+                "Public" => $activity::isPublicActivity(),
+            ]);
+        }
     }
 }

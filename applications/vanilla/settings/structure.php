@@ -6,6 +6,7 @@ use Vanilla\Forum\Digest\UserDigestModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportModel;
+use Vanilla\Premoderation\ApprovalPremoderator;
 
 if (!defined("APPLICATION")) {
     exit();
@@ -68,6 +69,8 @@ if ($config->get("Garden.InputFormatter") === "rich") {
 if ($config->get("Garden.MobileInputFormatter") === "rich") {
     $config->set("Garden.MobileInputFormatter", "Rich");
 }
+
+ApprovalPremoderator::structure($config);
 
 $Construct
     ->primaryKey("CategoryID")
@@ -202,7 +205,11 @@ $Construct
     ->column("Score", "float", null)
     ->column("Attributes", "text", true)
     ->column("RegardingID", "int(11)", true, "index")
-    ->column("hot", "bigint(20)", 0);
+    ->column("hot", "bigint(20)", 0)
+    // Legacy resolved fields.
+    ->column("CountResolved", "int", true)
+    ->column("DateResolved", "datetime", true)
+    ->column("ResolvedUserID", "int", true);
 
 $Construct->set($Explicit, $Drop);
 
@@ -260,6 +267,15 @@ foreach ($sorts as $sort) {
         $Construct->table("Discussion")->createIndexIfNotExists($backwardsName, $backwardsColumns);
     }
 }
+
+// We have 1 more index specifically for when we generate site maps.
+$Construct
+    ->table("Discussion")
+    ->createIndexIfNotExists("IX_Discussion_DateLastComment_DiscussionID_CategoryID", [
+        "DateLastComment",
+        "DiscussionID",
+        "CategoryID",
+    ]);
 
 // Clear out legacy indexes
 $Construct
@@ -341,42 +357,7 @@ $Construct
     ->createIndexIfNotExists("IX_UserDiscussion_DiscussionID_Bookmarked", ["DiscussionID", "Bookmarked"])
     ->createIndexIfNotExists("IX_UserDiscussion_DiscussionID_Participated", ["DiscussionID", "Participated"]);
 
-$Construct->table("Comment");
-
-if ($Construct->tableExists()) {
-    $CommentIndexes = $Construct->indexSqlDb();
-} else {
-    $CommentIndexes = [];
-}
-
-$Construct
-    ->table("Comment")
-    ->primaryKey("CommentID")
-    //->column('Type', 'varchar(10)', true)
-    //->column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
-    ->column("InsertUserID", "int", true, "index.InsertUserID_DiscussionID")
-    ->column("DiscussionID", "int", false, ["index.1", "index.InsertUserID_DiscussionID"])
-    ->column("UpdateUserID", "int", true)
-    ->column("DeleteUserID", "int", true)
-    ->column("Body", "mediumtext", false, "fulltext")
-    ->column("Format", "varchar(20)", true)
-    ->column("DateInserted", "datetime", null, ["index.1", "index"])
-    ->column("DateDeleted", "datetime", true)
-    ->column("DateUpdated", "datetime", true)
-    ->column("InsertIPAddress", "ipaddress", true)
-    ->column("UpdateIPAddress", "ipaddress", true)
-    ->column("Flag", "tinyint", 0)
-    ->column("Score", "float", null, ["index"])
-    ->column("Attributes", "text", true)
-    //->column('Source', 'varchar(20)', true)
-    ->set($Explicit, $Drop);
-
-if (isset($CommentIndexes["FK_Comment_DiscussionID"])) {
-    $SQL->query("drop index FK_Comment_DiscussionID on {$Px}Comment");
-}
-if (isset($CommentIndexes["FK_Comment_DateInserted"])) {
-    $SQL->query("drop index FK_Comment_DateInserted on {$Px}Comment");
-}
+CommentModel::structure($Construct);
 
 // Update the participated flag.
 if (!$ParticipatedExists) {
@@ -390,15 +371,6 @@ if (!$ParticipatedExists) {
         ->set("ud.Participated", 1)
         ->put();
 }
-
-// Allows the tracking of already-read comments & votes on a per-user basis.
-$Construct
-    ->table("UserComment")
-    ->column("UserID", "int", false, "primary")
-    ->column("CommentID", "int", false, "primary")
-    ->column("Score", "float", null)
-    ->column("DateLastViewed", "datetime", null) // null signals never
-    ->set($Explicit, $Drop);
 
 // Add extra columns to user table for tracking discussions & comments
 $Construct
@@ -596,6 +568,7 @@ $PermissionModel->define(
 );
 
 $PermissionModel->undefine("Vanilla.Spam.Manage");
+$PermissionModel->undefine("Vanilla.ModerationQueue.Manage");
 
 /*
 Apr 26th, 2010

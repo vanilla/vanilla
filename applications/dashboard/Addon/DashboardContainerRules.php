@@ -24,6 +24,7 @@ use Vanilla\Analytics\PageViewEventProvider;
 use Vanilla\Analytics\SearchAllEventProvider;
 use Vanilla\Analytics\SearchPlacesEventProvider;
 use Vanilla\Dashboard\Activity\ActivityCommentActivity;
+use Vanilla\Dashboard\Activity\AiSuggestionsActivity;
 use Vanilla\Dashboard\Activity\ApplicantActivity;
 use Vanilla\Dashboard\Activity\BookmarkCommentActivity;
 use Vanilla\Dashboard\Activity\CategoryCommentActivity;
@@ -32,7 +33,10 @@ use Vanilla\Dashboard\Activity\CommentMentionActivity;
 use Vanilla\Dashboard\Activity\DiscussionCommentActivity;
 use Vanilla\Dashboard\Activity\DiscussionMentionActivity;
 use Vanilla\Dashboard\Activity\EmailDigestActivity;
+use Vanilla\Dashboard\Activity\EscalationActivity;
+use Vanilla\Dashboard\Activity\MyEscalationActivity;
 use Vanilla\Dashboard\Activity\ParticipateCommentActivity;
+use Vanilla\Dashboard\Activity\ReportActivity;
 use Vanilla\Dashboard\Activity\WallCommentActivity;
 use Vanilla\Dashboard\AuthenticatorTypeService;
 use Vanilla\Dashboard\Controllers\Api\SiteTotalsFilterOpenApi;
@@ -62,6 +66,7 @@ use Vanilla\Dashboard\Layout\View\LegacyProfileLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacyRegistrationLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacySigninLayoutView;
 use Vanilla\Dashboard\Models\ActivityService;
+use Vanilla\Dashboard\Models\AiSuggestionSourceMeta;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\AttachmentMeta;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
@@ -70,6 +75,7 @@ use Vanilla\Dashboard\Models\ModerationMessagesFilterOpenApi;
 use Vanilla\Dashboard\Models\ProfileFieldsOpenApi;
 use Vanilla\Dashboard\Models\RolesExpander;
 use Vanilla\Dashboard\Models\SsoUsersExpander;
+use Vanilla\Dashboard\Models\SuggestedContentMeta;
 use Vanilla\Dashboard\Models\UsersExpander;
 use Vanilla\Dashboard\Models\UserSiteTotalProvider;
 use Vanilla\Dashboard\UserLeaderService;
@@ -80,6 +86,7 @@ use Vanilla\Logging\AuditLogService;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\OpenAPIBuilder;
+use Vanilla\Premoderation\SuperSpamAuditLog;
 use Vanilla\SamlSSO\Events\JsConnectAuditEvent;
 use Vanilla\SamlSSO\Events\OAuth2AuditEvent;
 use Vanilla\Web\APIExpandMiddleware;
@@ -130,7 +137,11 @@ class DashboardContainerRules extends AddonContainerRules
             ->addCall("registerActivity", [CategoryDiscussionActivity::class])
             ->addCall("registerActivity", [CategoryCommentActivity::class])
             ->addCall("registerActivity", [ParticipateCommentActivity::class])
-            ->addCall("registerActivity", [EmailDigestActivity::class]);
+            ->addCall("registerActivity", [EmailDigestActivity::class])
+            ->addCall("registerActivity", [AiSuggestionsActivity::class])
+            ->addCall("registerActivity", [EscalationActivity::class])
+            ->addCall("registerActivity", [MyEscalationActivity::class])
+            ->addCall("registerActivity", [ReportActivity::class]);
 
         $container
             ->rule(EventProviderService::class)
@@ -210,6 +221,7 @@ class DashboardContainerRules extends AddonContainerRules
                     OAuth2AuditEvent::class,
                     JsConnectAuditEvent::class,
                     AiSuggestionAccessEvent::class,
+                    SuperSpamAuditLog::class,
                 ],
             ]);
 
@@ -219,5 +231,7 @@ class DashboardContainerRules extends AddonContainerRules
         $container
             ->rule(AiSuggestionSourceService::class)
             ->addCall("registerSuggestionSource", [new Reference(CategoryAiSuggestionSource::class)]);
+        $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(AiSuggestionSourceMeta::class)]);
+        $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(SuggestedContentMeta::class)]);
     }
 }

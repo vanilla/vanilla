@@ -11,7 +11,7 @@ import { cx } from "@emotion/css";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ISortOption, ITableData, Table } from "@dashboard/components/Table";
 import DateTime from "@library/content/DateTime";
 import LinkAsButton from "@library/routing/LinkAsButton";
@@ -19,12 +19,12 @@ import { AutomationRulesSearchbar } from "@dashboard/automationRules/AutomationR
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
 import { AutomationRulesFilter } from "@dashboard/automationRules/AutomationRulesFilter";
 import { useRecipes } from "@dashboard/automationRules/AutomationRules.hooks";
-import { AutomationRulesProvider, useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
-import { ErrorPageBoundary } from "@library/errorPages/ErrorPageBoundary";
+import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
 import { IAutomationRule, IAutomationRulesFilterValues } from "@dashboard/automationRules/AutomationRules.types";
 import {
     loadingPlaceholder,
     mapApiValuesToFormValues,
+    RECIPES_MAX_LIMIT,
     sortDateColumn,
 } from "@dashboard/automationRules/AutomationRules.utils";
 import AutomationRulesSummary from "@dashboard/automationRules/AutomationRulesSummary";
@@ -37,17 +37,19 @@ import { iconClasses } from "@library/icons/iconStyles";
 import { Icon } from "@vanilla/icons";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import Button from "@library/forms/Button";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { useMeasure } from "@vanilla/react-utils";
-import { animated, useSpring } from "react-spring";
-import { DropDownArrow } from "@vanilla/ui/src/forms/shared/DropDownArrow";
 import { TableAccordion } from "@dashboard/components/TableAccordion";
 
-export function AutomationRulesListImpl() {
-    const classes = automationRulesClasses();
-    const [maxLimitModalVisible, setMaxLimitModalVisible] = useState<boolean>(false);
+interface IProps {
+    isEscalationRulesList?: boolean;
+    headerClassName?: string;
+    onRulesMaxLimitReach?: (value: boolean) => void;
+}
 
-    const RECIPES_MAX_LIMIT = 150;
+export function AutomationRulesList(props: IProps) {
+    const { isEscalationRulesList } = props;
+
+    const classes = automationRulesClasses(isEscalationRulesList);
+    const [maxLimitModalVisible, setMaxLimitModalVisible] = useState<boolean>(false);
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filters, setFilters] = useState<IAutomationRulesFilterValues>({});
@@ -66,13 +68,17 @@ export function AutomationRulesListImpl() {
         });
     };
 
-    const { recipes, isLoading, error, isRefetching } = useRecipes(!previewModalVisible);
+    const { recipes, isLoading, error, isRefetching } = useRecipes(!previewModalVisible, isEscalationRulesList);
 
     // let's store initial fetch order, so when we enable/disable auto-run,
     // we can keep the same order as api response is always ordered by dateLastRun and enabled first
     useEffect(() => {
         if (recipes && !initialOrderedRulesIDs?.length && !isRefetching) {
             setInitialOrderedRulesIDs?.(recipes.map((rule) => rule.automationRuleID));
+        }
+        // to notify parent components
+        if (recipes?.length === RECIPES_MAX_LIMIT) {
+            props.onRulesMaxLimitReach?.(true);
         }
     }, [recipes, isRefetching]);
 
@@ -128,6 +134,7 @@ export function AutomationRulesListImpl() {
                             toggleButtonContent={<span>{rule.name}</span>}
                             onExpandChange={(newVal) => onRuleExpandChange(rule.automationRuleID, newVal)}
                             isExpanded={expandedRules.includes(rule.automationRuleID)}
+                            contentClassName={isEscalationRulesList ? classes.leftGap(6) : undefined}
                         >
                             <AutomationRulesSummary formValues={mapApiValuesToFormValues(rule)} />
                         </TableAccordion>
@@ -163,7 +170,9 @@ export function AutomationRulesListImpl() {
                             onPreviewModalVisible={setPreviewModalVisible}
                         />
                     ),
-                    actions: <AutomationRulesActions {...rule} />,
+                    actions: (
+                        <AutomationRulesActions automationRule={rule} isEscalationRulesMode={isEscalationRulesList} />
+                    ),
                 };
             });
         }
@@ -180,28 +189,35 @@ export function AutomationRulesListImpl() {
 
     return (
         <>
-            <div className={classes.headerContainer}>
-                <DashboardHeaderBlock
-                    title={t("Automation Rules")}
-                    actionButtons={
-                        recipes?.length === RECIPES_MAX_LIMIT ? (
-                            <Button
-                                buttonType={ButtonTypes.DASHBOARD_PRIMARY}
-                                onClick={() => setMaxLimitModalVisible(true)}
-                            >
-                                {t("Add Rule")}
-                            </Button>
-                        ) : (
-                            <LinkAsButton
-                                style={{ marginLeft: "auto" }}
-                                buttonType={ButtonTypes.DASHBOARD_PRIMARY}
-                                to={"/settings/automation-rules/add"}
-                            >
-                                {t("Add Rule")}
-                            </LinkAsButton>
-                        )
-                    }
-                />
+            <div
+                className={cx(
+                    { [classes.headerContainer]: !isEscalationRulesList },
+                    { [props.headerClassName ?? ""]: isEscalationRulesList },
+                )}
+            >
+                {!isEscalationRulesList && (
+                    <DashboardHeaderBlock
+                        title={t("Automation Rules")}
+                        actionButtons={
+                            recipes?.length === RECIPES_MAX_LIMIT ? (
+                                <Button
+                                    buttonType={ButtonTypes.DASHBOARD_PRIMARY}
+                                    onClick={() => setMaxLimitModalVisible(true)}
+                                >
+                                    {t("Add Rule")}
+                                </Button>
+                            ) : (
+                                <LinkAsButton
+                                    style={{ marginLeft: "auto" }}
+                                    buttonType={ButtonTypes.DASHBOARD_PRIMARY}
+                                    to={"/settings/automation-rules/add"}
+                                >
+                                    {t("Add Rule")}
+                                </LinkAsButton>
+                            )
+                        }
+                    />
+                )}
                 <section>
                     <div className={classes.searchAndFilterContainer}>
                         <AutomationRulesSearchbar onSearch={setSearchQuery} />
@@ -210,7 +226,11 @@ export function AutomationRulesListImpl() {
                 </section>
             </div>
             <section>
-                <div className={cx(dashboardClasses().extendRow, classes.scrollTable)}>
+                <div
+                    className={cx(classes.scrollTable, {
+                        [dashboardClasses().extendRow]: !isEscalationRulesList,
+                    })}
+                >
                     {error && (
                         <div className={classes.padded()}>
                             <Message
@@ -257,15 +277,5 @@ export function AutomationRulesListImpl() {
                 {t("You cannot add more than 150 automation rules. Delete some rules and try again.")}
             </ModalConfirm>
         </>
-    );
-}
-
-export default function AutomationRulesList() {
-    return (
-        <AutomationRulesProvider>
-            <ErrorPageBoundary>
-                <AutomationRulesListImpl />
-            </ErrorPageBoundary>
-        </AutomationRulesProvider>
     );
 }

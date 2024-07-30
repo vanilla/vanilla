@@ -32,7 +32,7 @@ import debounce from "lodash-es/debounce";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { PreferencesTable } from "@library/preferencesTable/PreferencesTable";
-import { makeRowDescriptionId } from "@library/notificationPreferences/utils";
+import { makeRowDescriptionId, translateDescription } from "@library/notificationPreferences/utils";
 import { notificationPreferencesFormClasses } from "@library/preferencesTable/PreferencesTable.styles";
 import { RecordID } from "@vanilla/utils";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -210,7 +210,7 @@ const TableFormSection: NonNullable<React.ComponentProps<typeof JsonSchemaForm>[
                     return (
                         <ToolTip label={t("Notification popup")}>
                             <span>
-                                <Icon size="default" icon={"me-notifications"} />
+                                <Icon size="default" icon={"me-notifications"} className={formClasses.icon} />
                             </span>
                         </ToolTip>
                     );
@@ -245,7 +245,7 @@ const TableFormSection: NonNullable<React.ComponentProps<typeof JsonSchemaForm>[
                     return (
                         <ToolTip label={t("Email")}>
                             <span>
-                                <Icon size="default" icon={"me-inbox"} />
+                                <Icon size="default" icon={"me-inbox"} className={formClasses.icon} />
                             </span>
                         </ToolTip>
                     );
@@ -391,22 +391,4 @@ function SkeletonSubGroupWithTable() {
             <PreferencesTable table={table} />
         </PageBox>
     );
-}
-
-export function translateDescription(description: string): string {
-    let descriptionString = description;
-    let linkString = "";
-    if (descriptionString.includes("<a href=")) {
-        let link = description?.match(/\s?<a[^>]+href="(.*?)"[^>]*>(.*?)<\/a>\.?/g);
-        if (link != undefined && Array.isArray(link)) {
-            linkString = link[0];
-            // @ts-ignore
-            let linktext = linkString.match(/<a [^>]+>([^<]+)<\/a>/)[1];
-            if (linktext !== null) {
-                descriptionString = descriptionString?.replace(linkString, "");
-                linkString = linkString.replace(linktext, t(linktext));
-            }
-        }
-    }
-    return t(descriptionString) + linkString;
 }

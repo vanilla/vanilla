@@ -262,6 +262,12 @@ class ProfileFieldMigrationTest extends SiteTestCase
                 ProfileFieldModel::CONFIG_FEATURE_FLAG => true,
             ],
             function () {
+                $this->bessy()->get("/utility/update");
+
+                // Enable the fields
+                $this->api()->patch("/profile-fields/Title", ["enabled" => true]);
+                $this->api()->patch("/profile-fields/Location", ["enabled" => true]);
+
                 $this->runStructure();
                 // Title and location become stored as profile fields.
                 // We set a member user's `Title`, `Location`.

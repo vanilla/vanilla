@@ -551,14 +551,18 @@ class CommentsAnswerTest extends AbstractAPIv2Test
         $this->api()->setUserID(self::$siteInfo["adminUserID"]);
 
         // We should have a single notification with a plural headline.
-        $this->assertUserHasNotificationsLike($notifyUser, [
-            new ExpectedNotification("QuestionAnswer", [
-                "There are",
-                "2",
-                "new answers to your question",
-                $question["name"],
-            ]),
-        ]);
+        $this->assertUserHasNotificationsLike(
+            $notifyUser,
+            [
+                new ExpectedNotification("QuestionAnswer", [
+                    "There are",
+                    "2",
+                    "new answers to your question",
+                    $question["name"],
+                ]),
+            ],
+            true
+        );
     }
 
     /**

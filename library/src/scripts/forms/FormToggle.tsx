@@ -12,6 +12,7 @@ import LinkAsButton from "@library/routing/LinkAsButton";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { InformationIcon } from "@library/icons/common";
 import { t } from "@vanilla/i18n";
+import { useFormGroup, useOptionalFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 
 interface IProps {
     enabled: boolean;
@@ -25,6 +26,7 @@ interface IProps {
     visibleLabelUrl?: string;
     slim?: boolean;
     disabled?: boolean;
+    tooltip?: string;
 }
 
 export function FormToggle(props: IProps) {
@@ -41,15 +43,16 @@ export function FormToggle(props: IProps) {
         ...IDs
     } = props;
     const [isFocused, setIsFocused] = useState(false);
+    const labelContext = useOptionalFormGroup();
 
-    if (IDs.labelID == null && accessibleLabel == null && visibleLabel == null) {
+    if (labelContext.labelID == null && IDs.labelID == null && accessibleLabel == null && visibleLabel == null) {
         throw new Error("Either a labelID or accessibleLabel must be passed to <FormToggle />");
     }
 
     const ownLabelID = useUniqueID("formToggleLabel");
     const ownID = useUniqueID("formToggle");
-    const id = IDs.id ?? ownID;
-    const labelID = IDs.labelID ?? ownLabelID;
+    const id = IDs.id ?? labelContext.inputID ?? ownID;
+    const labelID = IDs.labelID ?? labelContext.labelID ?? ownLabelID;
     const classes = formToggleClasses(slim ? { formToggle: { options: { slim } } } : undefined);
 
     const WellContainer = visibleLabel ? "span" : "label";

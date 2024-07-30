@@ -8,43 +8,48 @@
 namespace Vanilla\Dashboard\Models;
 
 use AttachmentModel;
+use CommentModel;
+use DiscussionModel;
 use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Utils\ContextException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Gdn;
 use Vanilla\Community\Events\EscalationEvent;
-use Vanilla\Community\Events\TicketEscalationEvent;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
+use Vanilla\Forum\Models\CommunityManagement\EscalationStatusProviderInterface;
 use Vanilla\Logging\ErrorLogger;
+use Vanilla\Models\Model;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\DebugUtils;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Class AttachmentService
  */
 class AttachmentService
 {
-    private $providers = [];
+    use TwigRenderTrait;
 
-    private AttachmentModel $attachmentModel;
-    private \CommentModel $commentModel;
-    private \DiscussionModel $discussionModel;
-    private EventManager $eventManager;
+    private array $providers = [];
 
     /**
      * DI.
      */
-    public function __construct(
-        AttachmentModel $attachmentModel,
-        \CommentModel $commentModel,
-        \DiscussionModel $discussionModel,
-        EventManager $eventManager
-    ) {
-        $this->attachmentModel = $attachmentModel;
-        $this->commentModel = $commentModel;
-        $this->discussionModel = $discussionModel;
-        $this->eventManager = $eventManager;
+    public function __construct(private AttachmentModel $attachmentModel, private EventManager $eventManager)
+    {
+    }
+
+    /**
+     * Not DIed to prevent infinite loops.
+     *
+     * @return EscalationModel
+     */
+    private function escalationModel(): EscalationModel
+    {
+        return \Gdn::getContainer()->get(EscalationModel::class);
     }
 
     /**
@@ -53,7 +58,7 @@ class AttachmentService
      * @param AttachmentProviderInterface $provider
      * @return void
      */
-    public function addProvider(AttachmentProviderInterface $provider)
+    public function addProvider(AttachmentProviderInterface $provider): void
     {
         $this->providers[$provider->getTypeName()] = $provider;
     }
@@ -105,6 +110,9 @@ class AttachmentService
                     "escalationDelayUnit" => $provider->getEscalationDelayUnit(),
                     "escalationDelayLength" => $provider->getEscalationDelayLength(),
                 ]);
+
+                //Get if there is any additional info to be displayed in the catalog
+                $catalogEntry = array_merge($catalogEntry, $provider->getAdditionalCatalogInfo());
 
                 $catalog[$provider->getTypeName()] = $catalogEntry;
             }
@@ -246,21 +254,57 @@ class AttachmentService
     {
         switch ($recordType) {
             case "discussion":
-                $record = $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
+                $model = $this->getDiscussionModel();
+                $record = $model->getID($recordID, DATASET_TYPE_ARRAY);
 
                 if (!$record) {
                     throw new NotFoundException("Record not found");
                 }
-                $record = $this->discussionModel->normalizeRow($record);
+                $record = $model->normalizeRow($record);
                 break;
             case "comment":
-                $record = $this->commentModel->getID($recordID, DATASET_TYPE_ARRAY);
+                $model = $this->getCommentModel();
+                $record = $model->getID($recordID, DATASET_TYPE_ARRAY);
 
                 if (!$record) {
                     throw new NotFoundException("Record not found");
                 }
 
-                $record = $this->commentModel->normalizeRow($record);
+                $record = $model->normalizeRow($record);
+                break;
+            case "escalation":
+                $escalation =
+                    $this->escalationModel()->queryEscalations(
+                        ["escalationID" => $recordID],
+                        options: [
+                            Model::OPT_LIMIT => 1,
+                        ]
+                    )[0] ?? null;
+                if ($escalation === null) {
+                    throw new NotFoundException("Escalation", [
+                        "escalationID" => $escalation,
+                    ]);
+                }
+
+                $record = $escalation;
+
+                // Construct a nice body from the escalation.
+                $twig = <<<TWIG
+<p><a href="{{ escalation.url }}">{{escalation.name}}</a> was escalated from a post in the <a href="{{ escalation.placeRecordUrl }}">{{escalation.placeRecordName}}</a> category.</p>
+<p>It was reported {{escalation.countReports}} times for the following reasons:</p>
+<ul>
+{% for reason in escalation.reportReasons %}
+<li><strong>{{ reason.name }}</strong> - {{ reason.description }}</li>
+{% endfor %}
+</ul>
+<p>See <a href="{{ escalation.url }}">the escalation details</a> in Vanilla.</p>
+TWIG;
+                $html = $this->renderTwigFromString($twig, [
+                    "escalation" => $escalation,
+                ]);
+                // Make sure we don't have extra newlines screwing up rich formatting.
+                $html = str_replace("\n", "", $html);
+                $record["body"] = $html;
                 break;
             default:
                 throw new ContextException("Invalid record type.", 400, [
@@ -303,9 +347,8 @@ class AttachmentService
         $attachment = $provider->createAttachment($recordType, $recordID, $body);
         // Dispatch a Discussion event (close)
         if ($recordType === "discussion") {
-            $discussion = $this->discussionModel->normalizeRow(
-                $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY)
-            );
+            $model = $this->getDiscussionModel();
+            $discussion = $model->normalizeRow($model->getID($recordID, DATASET_TYPE_ARRAY));
             $trackingEventInterface = EscalationEvent::fromDiscussion(
                 EscalationEvent::POST_COLLECTION_NAME,
                 [
@@ -316,7 +359,8 @@ class AttachmentService
                 $discussion
             );
         } elseif ($recordType === "comment") {
-            $comment = $this->commentModel->normalizeRow($this->commentModel->getID($recordID, DATASET_TYPE_ARRAY));
+            $model = $this->getCommentModel();
+            $comment = $model->normalizeRow($model->getID($recordID, DATASET_TYPE_ARRAY));
             $trackingEventInterface = EscalationEvent::fromComment(
                 EscalationEvent::POST_COLLECTION_NAME,
                 [
@@ -326,8 +370,40 @@ class AttachmentService
                 ],
                 $comment
             );
+        } else {
+            $trackingEventInterface = null;
         }
-        $this->eventManager->dispatch($trackingEventInterface);
+        if ($trackingEventInterface) {
+            $this->eventManager->dispatch($trackingEventInterface);
+        }
+
+        if ($provider instanceof EscalationStatusProviderInterface && $recordType === "escalation") {
+            $this->escalationModel()->update(
+                set: [
+                    "status" => $provider->getStatusID(),
+                ],
+                where: [
+                    "escalationID" => $recordID,
+                ]
+            );
+        }
+
         return $attachment;
+    }
+
+    /**
+     * @return DiscussionModel
+     */
+    private function getDiscussionModel(): DiscussionModel
+    {
+        return Gdn::getContainer()->get(DiscussionModel::class);
+    }
+
+    /**
+     * @return CommentModel
+     */
+    private function getCommentModel(): CommentModel
+    {
+        return Gdn::getContainer()->get(CommentModel::class);
     }
 }

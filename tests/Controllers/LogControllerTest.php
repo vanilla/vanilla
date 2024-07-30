@@ -355,53 +355,6 @@ class LogControllerTest extends SiteTestCase
     }
 
     /**
-     * Test permission /log/edits/configuration.
-     */
-    public function testLogRecordConfigurationPermission(): void
-    {
-        \Gdn::session()->start($this->moderatorID);
-        $this->logModel->Insert("Edit", "Configuration", []);
-        // get a recordType configuration as an admin.
-        $this->expectExceptionMessage("You don't have permission to do that.");
-        $this->expectExceptionCode(403);
-        $this->runWithUser(function () {
-            $this->bessy()
-                ->get("/log/edits/configuration")
-                ->data("Log");
-        }, $this->moderatorID);
-
-        // get a recordType configuration as system user.
-        $this->runWithUser(function () {
-            return $this->bessy()
-                ->get("/log/edits/configuration")
-                ->data("Log");
-        }, 1);
-    }
-
-    /**
-     * Test Permission /log/edits/spoof.
-     */
-    public function testLogRecordSpoofPermission(): void
-    {
-        $this->logModel->Insert("Spoof", "Spoof", []);
-        // get a recordType configuration as an admin.
-        $this->expectExceptionMessage("You don't have permission to do that.");
-        $this->expectExceptionCode(403);
-        $this->runWithUser(function () {
-            $this->bessy()
-                ->get("/log/edits/spoof")
-                ->data("Log");
-        }, $this->moderatorID);
-
-        // get a recordType configuration as system user.
-        $this->runWithUser(function () {
-            return $this->bessy()
-                ->get("/log/edits/spoof")
-                ->data("Log");
-        }, 1);
-    }
-
-    /**
      * Test failed post restore.
      */
     public function testModerationRestoreFail(): void

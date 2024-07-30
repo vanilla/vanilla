@@ -375,9 +375,10 @@ class ProfileControllerTest extends SiteTestCase
         } else {
             $page->assertNoFormInput("AuthenticatePassword");
         }
+        $pendingFields = ["Email"];
         // Assert all the fields.
         $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
-        foreach ($fields as $name => $value) {
+        foreach (array_diff_key($fields, array_flip($pendingFields)) as $name => $value) {
             $this->assertEquals($user[$name], $value, "User.$name was not updated.");
         }
     }

@@ -8,6 +8,7 @@
 namespace VanillaTests\Models;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;

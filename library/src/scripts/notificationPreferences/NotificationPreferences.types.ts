@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -18,7 +18,7 @@ export interface INotificationPreference {
 }
 
 export interface INotificationPreferences {
-    [key: string]: INotificationPreference | string;
+    [key: string]: INotificationPreference;
 }
 
 interface IGetSchemaParams {}

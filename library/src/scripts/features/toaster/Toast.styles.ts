@@ -37,6 +37,9 @@ export const toastClasses = () => {
         p: {
             margin: 0,
         },
+        a: {
+            ...Mixins.clickable.itemState(),
+        },
     });
 
     const wide = css({

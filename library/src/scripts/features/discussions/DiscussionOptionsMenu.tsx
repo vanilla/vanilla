@@ -38,6 +38,7 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { DiscussionOptionsResolve } from "@library/features/discussions/DiscussionOptionsResolve";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -86,7 +87,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
 
     const canBump = hasPermission("curation.manage");
 
-    const canReport = hasPermission("flag.add");
+    const canReport = hasPermission("flag.add") && getMeta("featureFlags.escalations.Enabled", false);
 
     const items: React.ReactNode[] = [];
 
@@ -125,6 +126,11 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
     //FIXME: this looks like it should be a permission check
     if (canStillEdit && getMeta("TaggingAdd", true)) {
         firstGroupItems.push(<DiscussionOptionsTag discussion={discussion} onSuccess={onMutateSuccess} />);
+    }
+
+    const canResolve = hasPermission("staff.allow") && getMeta("triage.enabled", false);
+    if (canResolve) {
+        firstGroupItems.push(<DiscussionOptionsResolve discussion={discussion} onSuccess={onMutateSuccess} />);
     }
 
     // These items appear in the second section in the menu, after the edit et al but before the items added by plugins
@@ -258,13 +264,34 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
                 recordType={"discussion"}
                 recordID={discussion.discussionID}
                 onSuccess={onMutateSuccess}
+                placeRecordType="category"
+                placeRecordID={discussion.categoryID}
             />,
         );
     }
 
     return (
         <>
-            {items.length > 0 ? (
+            {canReport ? (
+                <ReportRecordOption
+                    discussionName={discussion.name}
+                    recordType={"discussion"}
+                    recordID={discussion.discussionID}
+                    onSuccess={onMutateSuccess}
+                    placeRecordType="category"
+                    placeRecordID={discussion.categoryID}
+                    customTrigger={(props) => {
+                        return (
+                            <ToolTip label={t("Report content")}>
+                                <Button buttonType={ButtonTypes.ICON} onClick={props.onClick}>
+                                    <Icon icon="post-flag" />
+                                </Button>
+                            </ToolTip>
+                        );
+                    }}
+                />
+            ) : null}
+            {items.length > 0 && (
                 <DropDown
                     buttonContents={<Icon icon="navigation-circle-ellipsis" />}
                     name={t("Discussion Options")}
@@ -275,26 +302,6 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
                         return <React.Fragment key={i}>{item}</React.Fragment>;
                     })}
                 </DropDown>
-            ) : (
-                <>
-                    {canReport ? (
-                        <ReportRecordOption
-                            discussionName={discussion.name}
-                            recordType={"discussion"}
-                            recordID={discussion.discussionID}
-                            onSuccess={onMutateSuccess}
-                            customTrigger={(props) => {
-                                return (
-                                    <ToolTip label={t("Report content")}>
-                                        <Button buttonType={ButtonTypes.ICON} onClick={props.onClick}>
-                                            <Icon icon="post-flag" />
-                                        </Button>
-                                    </ToolTip>
-                                );
-                            }}
-                        />
-                    ) : null}
-                </>
             )}
         </>
     );

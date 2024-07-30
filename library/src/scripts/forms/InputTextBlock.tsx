@@ -19,7 +19,7 @@ export enum InputTextBlockBaseClass {
 }
 
 export interface IInputProps {
-    value?: string;
+    value?: string | number;
     onFocus?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onBlur?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;

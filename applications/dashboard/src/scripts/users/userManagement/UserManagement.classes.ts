@@ -201,6 +201,9 @@ const userManagementClasses = useThemeCache(() => {
 
     const roleAsButton = css({
         padding: 0,
+        whiteSpace: "break-spaces",
+        wordBreak: "break-word",
+        textAlign: "start",
 
         "&:hover, &:focus, &.focus-visible, &:active": {
             textDecoration: "none",

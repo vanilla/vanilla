@@ -8,7 +8,7 @@ import AdminLayout from "@dashboard/components/AdminLayout";
 import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 import { EscalationStatus, IEscalation } from "@dashboard/moderation/CommunityManagementTypes";
-import { EscalationListItem } from "@dashboard/moderation/components/EscalationList";
+import { EscalationListItem } from "@dashboard/moderation/components/EscalationListItem";
 import { IMessageInfo, MessageAuthorModal } from "@dashboard/moderation/components/MessageAuthorModal";
 import { Sort } from "@library/sort/Sort";
 import apiv2 from "@library/apiv2";
@@ -25,6 +25,10 @@ import { useCollisionDetector } from "@vanilla/react-utils";
 import { useState } from "react";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { EscalationFilters, IEscalationFilters } from "@dashboard/moderation/components/EscalationFilters";
+import { EmptyState } from "@dashboard/moderation/components/EmptyState";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import { useEscalationMutation } from "@dashboard/moderation/CommunityManagement.hooks";
+import { DisabledBanner } from "@dashboard/moderation/components/DisabledBanner";
 
 interface IProps {}
 
@@ -39,7 +43,7 @@ const sortOptions = [
 ];
 
 const defaultValues = {
-    statuses: [EscalationStatus.OPEN],
+    statuses: [EscalationStatus.OPEN, EscalationStatus.IN_PROGRESS],
     reportReasonID: [],
     assignedUserID: [],
     recordUserID: [],
@@ -77,6 +81,8 @@ function EscalationsPage(props: IProps) {
 
     useQueryStringSync({ ...filters, page, sort: selectedSort?.value }, defaultValues);
 
+    const escalationMutation = useEscalationMutation();
+
     const escalationsQuery = useQuery<any, IError, IEscalationQueryData>({
         queryFn: async () => {
             const response = await apiv2.get("/escalations", {
@@ -93,7 +99,7 @@ function EscalationsPage(props: IProps) {
 
             return { results: response.data ?? [], pagination };
         },
-        queryKey: ["escalations", page, selectedSort?.value, filters.statuses, filters],
+        queryKey: ["escalations", page, selectedSort?.value, filters],
         keepPreviousData: true,
     });
 
@@ -107,69 +113,87 @@ function EscalationsPage(props: IProps) {
     };
 
     return (
-        <AdminLayout
-            title={t("Escalations Dashboard")}
-            leftPanel={!isCompact && <ModerationNav />}
-            rightPanel={
-                <EscalationFilters
-                    value={filters}
-                    onFilter={(newFilters) =>
-                        setFilters((prev) => {
-                            return {
-                                ...prev,
-                                ...newFilters,
-                            };
-                        })
-                    }
-                />
-            }
-            content={
-                <>
-                    <section className={cmdClasses.secondaryTitleBar}>
-                        <span>
-                            <Sort sortOptions={sortOptions} selectedSort={selectedSort} onChange={setSelectedSort} />
-                        </span>
-                        <NumberedPager
-                            className={cmdClasses.pager}
-                            isMobile={false}
-                            {...paginationProps}
-                            showNextButton={false}
-                            onChange={setPage}
-                        />
-                    </section>
-                    <section className={cmdClasses.content}>
-                        {escalationsQuery.isLoading && (
-                            <div>
-                                <Loader />
-                            </div>
+        <>
+            <DocumentTitle title={t("Escalations")} />
+
+            <AdminLayout
+                preTitle={<DisabledBanner />}
+                title={t("Escalations Dashboard")}
+                leftPanel={!isCompact && <ModerationNav />}
+                rightPanel={
+                    <EscalationFilters
+                        value={filters}
+                        onFilter={(newFilters) =>
+                            setFilters((prev) => {
+                                return {
+                                    ...prev,
+                                    ...newFilters,
+                                };
+                            })
+                        }
+                    />
+                }
+                content={
+                    <>
+                        <section className={cmdClasses.secondaryTitleBar}>
+                            <span>
+                                <Sort
+                                    sortOptions={sortOptions}
+                                    selectedSort={selectedSort}
+                                    onChange={setSelectedSort}
+                                />
+                            </span>
+                            <NumberedPager
+                                className={cmdClasses.pager}
+                                isMobile={false}
+                                {...paginationProps}
+                                showNextButton={false}
+                                onChange={setPage}
+                            />
+                        </section>
+                        <section className={cmdClasses.content}>
+                            {escalationsQuery.isLoading && (
+                                <div>
+                                    <Loader />
+                                </div>
+                            )}
+                            {escalationsQuery.isSuccess && escalationsQuery.data.results.length === 0 && (
+                                <EmptyState subtext={t("Escalations matching your filters will appear here")} />
+                            )}
+                            {escalationsQuery.isSuccess && (
+                                <div className={cmdClasses.list}>
+                                    {escalationsQuery.data.results.map((escalation) => (
+                                        <EscalationListItem
+                                            key={escalation.escalationID}
+                                            escalation={escalation}
+                                            onMessageAuthor={(messageInfo) => setAuthorMessage(messageInfo)}
+                                            onRecordVisibilityChange={(isRecordLive) =>
+                                                escalationMutation.mutateAsync({
+                                                    escalationID: escalation.escalationID,
+                                                    payload: { isRecordLive },
+                                                })
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+                        {authorMessage && (
+                            <MessageAuthorModal
+                                messageInfo={authorMessage}
+                                isVisible={!!authorMessage}
+                                onClose={() => setAuthorMessage(null)}
+                            />
                         )}
-                        {escalationsQuery.isSuccess && escalationsQuery.data.results.length === 0 && (
-                            <div>
-                                <p>{t("All escalations are handled! 😀")}</p>
-                            </div>
-                        )}
-                        {escalationsQuery.isSuccess && (
-                            <div className={cmdClasses.list}>
-                                {escalationsQuery.data.results.map((escalation) => (
-                                    <EscalationListItem
-                                        key={escalation.escalationID}
-                                        escalation={escalation}
-                                        onMessageAuthor={(userID, url) => setAuthorMessage({ userID, url })}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </section>
-                    {authorMessage && (
-                        <MessageAuthorModal
-                            messageInfo={authorMessage}
-                            isVisible={!!authorMessage}
-                            onClose={() => setAuthorMessage(null)}
-                        />
-                    )}
-                </>
-            }
-        />
+                    </>
+                }
+            />
+            <MessageAuthorModal
+                messageInfo={authorMessage}
+                isVisible={!!authorMessage}
+                onClose={() => setAuthorMessage(null)}
+            />
+        </>
     );
 }
 

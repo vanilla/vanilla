@@ -49,12 +49,6 @@ class DiscussionsApiController extends AbstractApiController
     use CommunitySearchSchemaTrait;
     use \Vanilla\Formatting\FormatCompatTrait;
 
-    /** @var CategoryModel */
-    private $categoryModel;
-
-    /** @var DiscussionModel */
-    private $discussionModel;
-
     /** @var Schema */
     private $discussionSchema;
 
@@ -67,87 +61,24 @@ class DiscussionsApiController extends AbstractApiController
     /** @var Schema */
     private $idParamSchema;
 
-    /** @var UserModel */
-    private $userModel;
-
-    /** @var CommentModel */
-    private $commentModel;
-
-    /** @var TagModel */
-    private $tagModel;
-
-    /** @var SiteSectionModel */
-    private $siteSectionModel;
-
-    /** @var DiscussionTypeConverter */
-    private $discussionTypeConverter;
-
     /**
-     * @var DiscussionExpandSchema
-     */
-    private $discussionExpandSchema;
-
-    /**
-     * @var Schema
-     */
-    private $discussionPatchSchema;
-
-    /** @var RecordStatusModel */
-    private $recordStatusModel;
-
-    /** @var RecordStatusLogModel */
-    private $recordStatusLogModel;
-
-    /** @var LongRunner */
-    private $longRunner;
-
-    /** @var DiscussionStatusModel */
-    private $discussionStatusModel;
-
-    private ReactionModel $reactionModel;
-
-    /**
-     * DiscussionsApiController constructor.
-     *
-     * @param DiscussionModel $discussionModel
-     * @param UserModel $userModel
-     * @param CategoryModel $categoryModel
-     * @param CommentModel $commentModel
-     * @param TagModel $tagModel
-     * @param SiteSectionModel $siteSectionModel
-     * @param DiscussionExpandSchema $discussionExpandableSchema
-     * @param RecordStatusModel $recordStatusModel
-     * @param RecordStatusLogModel $recordStatusLogModel
-     * @param LongRunner $longRunner
-     * @param DiscussionStatusModel $discussionStatusModel
-     * @param ReactionModel $reactionModel
+     * DI.
      */
     public function __construct(
-        DiscussionModel $discussionModel,
-        UserModel $userModel,
-        CategoryModel $categoryModel,
-        CommentModel $commentModel,
-        TagModel $tagModel,
-        SiteSectionModel $siteSectionModel,
-        DiscussionExpandSchema $discussionExpandableSchema,
-        RecordStatusModel $recordStatusModel,
-        RecordStatusLogModel $recordStatusLogModel,
-        LongRunner $longRunner,
-        DiscussionStatusModel $discussionStatusModel,
-        ReactionModel $reactionModel
+        private DiscussionModel $discussionModel,
+        private UserModel $userModel,
+        private CategoryModel $categoryModel,
+        private CommentModel $commentModel,
+        private TagModel $tagModel,
+        private SiteSectionModel $siteSectionModel,
+        private DiscussionExpandSchema $discussionExpandSchema,
+        private RecordStatusModel $recordStatusModel,
+        private RecordStatusLogModel $recordStatusLogModel,
+        private LongRunner $longRunner,
+        private DiscussionStatusModel $discussionStatusModel,
+        private ReactionModel $reactionModel,
+        private Gdn_Database $db
     ) {
-        $this->categoryModel = $categoryModel;
-        $this->discussionModel = $discussionModel;
-        $this->userModel = $userModel;
-        $this->commentModel = $commentModel;
-        $this->tagModel = $tagModel;
-        $this->siteSectionModel = $siteSectionModel;
-        $this->discussionExpandSchema = $discussionExpandableSchema;
-        $this->recordStatusModel = $recordStatusModel;
-        $this->recordStatusLogModel = $recordStatusLogModel;
-        $this->longRunner = $longRunner;
-        $this->discussionStatusModel = $discussionStatusModel;
-        $this->reactionModel = $reactionModel;
     }
 
     /**
@@ -575,6 +506,9 @@ class DiscussionsApiController extends AbstractApiController
                     ->add($this->fullSchema()),
                 "DiscussionPost"
             );
+            if ($this->getPermissions()->has("staff.allow")) {
+                $this->discussionPostSchema->merge(Schema::parse(["resolved:b?"]));
+            }
         }
         return $this->schema($this->discussionPostSchema, $type);
     }
@@ -587,25 +521,27 @@ class DiscussionsApiController extends AbstractApiController
      */
     public function discussionPatchSchema($type = "")
     {
-        if ($this->discussionPatchSchema === null) {
-            $this->discussionPatchSchema = $this->schema(
-                Schema::parse([
-                    "insertUserID?",
-                    "name?",
-                    "body?",
-                    "format?" => new \Vanilla\Models\FormatSchema(),
-                    "categoryID?",
-                    "closed?",
-                    "sink?",
-                    "pinned?",
-                    "pinLocation?",
-                ])
-                    ->add(DiscussionExpandSchema::commonExpandSchema())
-                    ->add($this->fullSchema()),
-                "DiscussionPatch"
-            );
+        $schema = $this->schema(
+            Schema::parse([
+                "insertUserID?",
+                "name?",
+                "body?",
+                "format?" => new \Vanilla\Models\FormatSchema(),
+                "categoryID?",
+                "closed?",
+                "sink?",
+                "pinned?",
+                "pinLocation?",
+            ])
+                ->add(DiscussionExpandSchema::commonExpandSchema())
+                ->add($this->fullSchema()),
+            "DiscussionPatch"
+        );
+        if ($this->getPermissions()->has("staff.allow")) {
+            $schema->merge(Schema::parse(["resolved:b?"]));
         }
-        return $this->schema($this->discussionPatchSchema, $type);
+
+        return $this->schema($schema, $type);
     }
 
     /**
@@ -918,6 +854,14 @@ class DiscussionsApiController extends AbstractApiController
         $where = ApiUtils::queryToFilters($in, $query);
         if ($where["statusID"] ?? false) {
             $where["statusID"] = $this->recordStatusModel->validateStatusesAreActive($where["statusID"], false);
+        }
+
+        if (isset($query["resolved"])) {
+            if ($query["resolved"] === true) {
+                $where["internalStatusID"] = [RecordStatusModel::DISCUSSION_STATUS_RESOLVED];
+            } else {
+                $where["internalStatusID"] = [RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED];
+            }
         }
 
         if ($where["internalStatusID"] ?? false) {
@@ -1295,6 +1239,14 @@ class DiscussionsApiController extends AbstractApiController
             "recordType" => "discussion",
             "statusID" => $statusID,
         ];
+        if (
+            !$this->getSession()
+                ->getPermissions()
+                ->has("staff.allow")
+        ) {
+            $where["isInternal"] = 0;
+        }
+
         $row = $this->recordStatusModel->selectSingle($where);
 
         $result = $out->validate($row);
@@ -1325,6 +1277,14 @@ class DiscussionsApiController extends AbstractApiController
         $where["isActive"] = 1;
 
         $where = $this->getEventManager()->fireFilter("discussionsApiController_indexStatuses", $where);
+
+        if (
+            !$this->getSession()
+                ->getPermissions()
+                ->has("staff.allow")
+        ) {
+            $where["isInternal"] = 0;
+        }
 
         $rows = $this->recordStatusModel->select($where);
 
@@ -1530,6 +1490,58 @@ class DiscussionsApiController extends AbstractApiController
         $this->discussionExpandSchema->commonExpand($row, $query["expand"] ?? []);
         $result = $out->validate($row);
         return new Data($result, ["status" => 201]);
+    }
+
+    /**
+     * Resolve all discussions.
+     *
+     * POST /api/v2/discussions/resolve-bulk
+     *
+     * @return void
+     */
+    public function post_resolveBulk(): void
+    {
+        $this->permission(["posts.moderate", "community.moderate"]);
+
+        if ($this->getSession()->checkPermission("community.moderate")) {
+            // No filter
+            $categoryWhere = [];
+        } else {
+            $categoryWhere = [
+                "CategoryID" => $this->categoryModel->getCategoryIDsWithPermissionForUser(
+                    $this->getSession()->UserID,
+                    "Vanilla.Posts.Moderate"
+                ),
+            ];
+        }
+
+        // Update the database if the migration flag is set
+        $hasUnresolved = true;
+        while ($hasUnresolved) {
+            $this->db
+                ->sql()
+                ->update("Discussion")
+                ->set("internalStatusID", RecordStatusModel::DISCUSSION_STATUS_RESOLVED)
+                ->where($categoryWhere)
+                ->where("internalStatusID", [
+                    RecordStatusModel::DISCUSSION_INTERNAL_STATUS_NONE,
+                    RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED,
+                ])
+                ->limit(100000)
+                ->put();
+            // See if we need to keep looping
+            $hasUnresolved =
+                $this->db
+                    ->createSql()
+                    ->from("Discussion")
+                    ->where($categoryWhere)
+                    ->where("internalStatusID", [
+                        RecordStatusModel::DISCUSSION_INTERNAL_STATUS_NONE,
+                        RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED,
+                    ])
+                    ->get(limit: 1)
+                    ->count() > 0;
+        }
     }
 
     /**

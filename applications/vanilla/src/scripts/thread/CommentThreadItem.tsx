@@ -6,17 +6,18 @@
 
 import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
+import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommentEditor } from "@vanilla/addon-vanilla/thread/CommentEditor";
 import { CommentOptionsMenu } from "@vanilla/addon-vanilla/thread/CommentOptionsMenu";
 import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
+import { ReportCountMeta } from "@vanilla/addon-vanilla/thread/ReportCountMeta";
 import { ThreadItem } from "@vanilla/addon-vanilla/thread/ThreadItem";
-import React, { useState } from "react";
-import CommentMeta from "@vanilla/addon-vanilla/thread/CommentMeta";
-import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
-import { DiscussionAttachment } from "./DiscussionAttachmentsAsset";
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
-import { IBoxOptions } from "@library/styles/cssUtilsTypes";
+import React, { useState } from "react";
+import { DiscussionAttachment } from "./DiscussionAttachmentsAsset";
+import { useDiscussionThreadContext } from "./DiscussionThreadContext";
 
 interface IProps {
     comment: IComment;
@@ -25,11 +26,14 @@ interface IProps {
     onMutateSuccess?: () => Promise<void>;
     actions?: React.ComponentProps<typeof ThreadItem>["actions"];
     boxOptions?: Partial<IBoxOptions>;
+    userPhotoLocation?: "header" | "left";
 }
 
 export function CommentThreadItem(props: IProps) {
     const { comment, onMutateSuccess, actions } = props;
     const [isEditing, setIsEditing] = useState(false);
+    const { discussion } = useDiscussionThreadContext();
+
     const editCommentQuery = useQuery({
         enabled: isEditing,
         queryFn: async () => {
@@ -51,6 +55,8 @@ export function CommentThreadItem(props: IProps) {
             recordUrl={comment.url}
             timestamp={comment.dateInserted}
             name={comment.name}
+            attributes={comment.attributes}
+            authorID={comment.insertUserID}
         >
             <ThreadItem
                 boxOptions={props.boxOptions ?? {}}
@@ -74,9 +80,8 @@ export function CommentThreadItem(props: IProps) {
                     )
                 }
                 user={comment.insertUser}
-                contentMeta={<CommentMeta comment={comment} />}
                 key={comment.commentID}
-                userPhotoLocation={"header"}
+                userPhotoLocation={props.userPhotoLocation ?? "header"}
                 reactions={comment.reactions}
                 attachmentsContent={
                     (comment.attachments ?? []).length > 0 ? (
@@ -93,15 +98,33 @@ export function CommentThreadItem(props: IProps) {
                     ) : null
                 }
                 options={
-                    <CommentOptionsMenu
-                        discussion={props.discussion}
-                        comment={comment}
-                        onCommentEdit={() => {
-                            setIsEditing(true);
-                        }}
-                        onMutateSuccess={onMutateSuccess}
-                        isEditLoading={isEditing && editCommentQuery.isLoading}
-                    />
+                    <>
+                        <ReportCountMeta
+                            countReports={comment.reportMeta?.countReports}
+                            recordID={comment.commentID}
+                            recordType="comment"
+                        />
+                        <CommentOptionsMenu
+                            discussion={props.discussion}
+                            comment={comment}
+                            onCommentEdit={() => {
+                                setIsEditing(true);
+                            }}
+                            onMutateSuccess={onMutateSuccess}
+                            isEditLoading={isEditing && editCommentQuery.isLoading}
+                        />
+                    </>
+                }
+                suggestionContent={
+                    comment.suggestion && {
+                        suggestion: {
+                            ...comment.suggestion,
+                            summary: comment.body,
+                        },
+                        discussion: discussion!,
+                        commentID: comment.commentID,
+                        onMutateSuccess,
+                    }
                 }
             />
         </ThreadItemContextProvider>

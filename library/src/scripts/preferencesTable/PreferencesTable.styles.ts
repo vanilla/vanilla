@@ -76,6 +76,10 @@ export const notificationPreferencesFormClasses = useThemeCache(() => {
         },
     });
 
+    const icon = css({
+        transform: `translateX(-${globalVars.gutter.quarter}px)`,
+    });
+
     const tableDescriptionWrapper = (weight?: React.CSSProperties["fontWeight"]) => {
         return css({
             ...Mixins.margin({ left: globalVars.gutter.quarter }),
@@ -101,6 +105,7 @@ export const notificationPreferencesFormClasses = useThemeCache(() => {
         checkbox,
         tableRow,
         tableCell,
+        icon,
         tableDescriptionWrapper,
     };
 });

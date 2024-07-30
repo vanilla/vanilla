@@ -9,13 +9,14 @@ namespace Vanilla\AutomationRules\Actions;
 use Garden\Schema\Schema;
 use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
 use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
+use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Logger;
 use Vanilla\Models\CollectionModel;
 
-class RemoveDiscussionFromCollectionAction extends AutomationAction implements AutomationActionInterface
+class RemoveDiscussionFromCollectionAction extends AutomationAction
 {
     public string $affectedRecordType = "CollectionRecord";
     /**
@@ -31,7 +32,15 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction implements A
      */
     public static function getName(): string
     {
-        return "Remove discussion from collection";
+        return "Remove from collection";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "posts";
     }
 
     /**
@@ -45,6 +54,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction implements A
                 "items" => [
                     "type" => "integer",
                 ],
+                "required" => true,
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Collection to remove from", "Select one or more collections."),
                     new ApiFormChoices("/api/v2/collections", "/api/v2/collections/%s", "collectionID", "name"),
@@ -62,7 +72,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction implements A
      */
     public static function getTriggers(): array
     {
-        return [StaleDiscussionTrigger::getType(), LastActiveDiscussionTrigger::getType()];
+        return DiscussionRuleDataType::getTriggers();
     }
 
     /**
@@ -117,7 +127,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction implements A
             ],
         ];
         $collectionModel->removeRecordFromCollections($record, $actionValue["collectionID"]);
-        $this->insertTimedDiscussionLog($object["DiscussionID"], $logData);
+        $this->insertPostLog($object["DiscussionID"], $logData);
         return true;
     }
 

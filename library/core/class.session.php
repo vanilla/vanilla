@@ -969,4 +969,15 @@ class Gdn_Session implements LoggerAwareInterface
             $this->setCookie($this::COOKIE_ANONYMIZE, null, -3600);
         }
     }
+
+    /**
+     * @return bool
+     */
+    public function isUserVerified(): bool
+    {
+        if (!$this->User) {
+            return false;
+        }
+        return (bool) $this->User->Verified;
+    }
 }

@@ -828,7 +828,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 $registerOptions = [
                     "CheckCaptcha" => false,
                     "ValidateEmail" => false,
-                    "NoConfirmEmail" => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
+                    UserModel::OPT_NO_CONFIRM_EMAIL => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
+                    UserModel::OPT_SSO_REGISTRATION => true,
                     "SaveRoles" => $saveRolesRegister,
                     "ValidateName" => !$isTrustedProvider,
                 ];
@@ -1023,7 +1024,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                 $registerOptions = [
                     "CheckCaptcha" => false,
-                    "NoConfirmEmail" => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
+                    UserModel::OPT_NO_CONFIRM_EMAIL => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
+                    UserModel::OPT_SSO_REGISTRATION => true,
                     "SaveRoles" => $saveRolesRegister,
                     "ValidateName" => !$isTrustedProvider,
                 ];
@@ -1246,6 +1248,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         // Synchronize the user's data.
         $saved = $userModel->save(["UserID" => $userID, "ProfileFields" => $profileFields] + $data, [
             UserModel::OPT_NO_CONFIRM_EMAIL => true,
+            UserModel::OPT_SSO_REGISTRATION => true,
             UserModel::OPT_FIX_UNIQUE => true,
             UserModel::OPT_SAVE_ROLES => $saveRoles,
             UserModel::OPT_VALIDATE_NAME => !$isTrustedProvider,
@@ -1738,6 +1741,10 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     }
                 }
             } catch (Exception $ex) {
+                ErrorLogger::error("Failed registering the user", [
+                    "exception" => $ex,
+                    "values" => $values,
+                ]);
                 $this->Form->addError($ex);
             }
             $this->render();
@@ -2405,7 +2412,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             $attributes = [];
 
             $description = !empty($field["description"])
-                ? '<div class="Gloss">' . $field["description"] . "</div>"
+                ? '<div class="Gloss">' . htmlspecialchars($field["description"]) . "</div>"
                 : null;
 
             if ($field["formType"] === "text-multiline") {
@@ -2467,7 +2474,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     "class" => "form-group",
                 ]);
             } else {
-                $label = $this->Form->label($field["label"], $name);
+                $label = $this->Form->label(htmlspecialchars($field["label"]), $name);
                 if ($description) {
                     $label .= $description;
                 }

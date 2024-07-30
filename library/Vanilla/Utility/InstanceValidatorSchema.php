@@ -7,14 +7,18 @@
 
 namespace Vanilla\Utility;
 
+use Garden\MetaInterface;
+use Garden\MetaTrait;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 
 /**
  * Utility class for generating validators that item(s) are an instance of something.
  */
-class InstanceValidatorSchema extends Schema
+class InstanceValidatorSchema extends Schema implements MetaInterface
 {
+    use MetaTrait;
+
     /** @var string */
     private $classNames;
 

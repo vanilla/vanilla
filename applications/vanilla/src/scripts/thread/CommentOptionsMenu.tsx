@@ -66,7 +66,7 @@ export function CommentOptionsMenu(props: IProps) {
         resourceID: comment.categoryID,
     };
 
-    const canReport = hasPermission("flag.add");
+    const canReport = hasPermission("flag.add") && getMeta("featureFlags.escalations.Enabled", false);
 
     const toast = useToast();
     const deleteMutation = useMutation({
@@ -195,23 +195,13 @@ export function CommentOptionsMenu(props: IProps) {
                 recordType={"comment"}
                 recordID={comment.commentID}
                 onSuccess={onMutateSuccess}
+                placeRecordType="category"
+                placeRecordID={discussion.categoryID}
             />,
         );
     }
 
-    return items.length > 0 ? (
-        <DropDown
-            name={t("Comment Options")}
-            buttonContents={<Icon icon="navigation-circle-ellipsis" />}
-            openDirection={DropDownOpenDirection.BELOW_LEFT}
-            flyoutType={FlyoutType.LIST}
-            isVisible={props.isVisible}
-        >
-            {items.map((item, i) => {
-                return <React.Fragment key={i}>{item}</React.Fragment>;
-            })}
-        </DropDown>
-    ) : (
+    return (
         <>
             {canReport ? (
                 <ReportRecordOption
@@ -219,6 +209,8 @@ export function CommentOptionsMenu(props: IProps) {
                     recordType={"comment"}
                     recordID={comment.commentID}
                     onSuccess={onMutateSuccess}
+                    placeRecordType="category"
+                    placeRecordID={discussion.categoryID}
                     customTrigger={(props) => {
                         return (
                             <ToolTip label={t("Report content")}>
@@ -229,6 +221,19 @@ export function CommentOptionsMenu(props: IProps) {
                         );
                     }}
                 />
+            ) : null}
+            {items.length > 0 ? (
+                <DropDown
+                    name={t("Comment Options")}
+                    buttonContents={<Icon icon="navigation-circle-ellipsis" />}
+                    openDirection={DropDownOpenDirection.BELOW_LEFT}
+                    flyoutType={FlyoutType.LIST}
+                    isVisible={props.isVisible}
+                >
+                    {items.map((item, i) => {
+                        return <React.Fragment key={i}>{item}</React.Fragment>;
+                    })}
+                </DropDown>
             ) : null}
         </>
     );

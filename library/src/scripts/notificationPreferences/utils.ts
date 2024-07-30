@@ -1,11 +1,11 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { ColumnType, INotificationPreference, INotificationPreferences } from "@library/notificationPreferences";
-import { getDeepPropertyListInDotNotation } from "@library/utility/appUtils";
+import { getDeepPropertyListInDotNotation, t } from "@library/utility/appUtils";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 import get from "lodash-es/get";
 import type { Row } from "react-table";
@@ -104,4 +104,21 @@ export function mapNestedFormValuesToNotificationPreferences(nestedFormValues: o
  */
 export function makeRowDescriptionId(row: Row<ColumnType>): string {
     return `description-${row.id}`;
+}
+
+/**
+ * Ensure description text, including any included links, is translated
+ */
+export function translateDescription(description: string): string {
+    const parser = new DOMParser();
+    const htmlContent = parser.parseFromString(description, "text/html");
+    const links = htmlContent.querySelectorAll("a");
+
+    links.forEach((link) => {
+        if (link.textContent) {
+            link.textContent = t(`${link.textContent}`);
+        }
+    });
+
+    return t(htmlContent.documentElement.innerHTML);
 }

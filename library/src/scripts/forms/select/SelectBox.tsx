@@ -19,7 +19,7 @@ import { cx } from "@emotion/css";
 
 export interface ISelectBoxItem {
     value: string;
-    name?: string;
+    name?: string | React.ReactNode;
     content?: React.ReactNode;
     className?: string;
     icon?: React.ReactNode;
@@ -44,6 +44,7 @@ export interface ISelectBoxProps {
     horizontalOffset?: boolean;
     afterButton?: React.ReactNode;
     overwriteButtonContents?: React.ReactNode;
+    name?: string;
 }
 
 /**
@@ -101,12 +102,10 @@ export default function SelectBox(props: ISelectBoxProps) {
     }
 
     return (
-        <div
-            aria-describedby={props.describedBy}
-            className={cx("selectBox", props.className)}
-            onKeyDown={(e) => handleKeyPress(e)}
-        >
+        <div className={cx("selectBox", props.className)} onKeyDown={(e) => handleKeyPress(e)}>
             <DropDown
+                name={props.name}
+                describedBy={props.describedBy}
                 isVisible={isVisible}
                 onVisibilityChange={(val) => {
                     if (ignoreRef.current !== true) {
@@ -178,7 +177,7 @@ function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onCli
     const { item, isSelected, onClick } = props;
     if ("url" in item) {
         return (
-            <DropDownItemLink className={cx({ isSelected: isSelected })} name={item.name} to={item.url || ""}>
+            <DropDownItemLink className={cx({ isSelected: isSelected })} name={`${item.name}`} to={item.url || ""}>
                 <SelectBoxContents item={item} isSelected={isSelected} />
             </DropDownItemLink>
         );

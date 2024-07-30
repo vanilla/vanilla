@@ -10,6 +10,9 @@ import { AccountSettingsImpl } from "@library/accountSettings/AccountSettings";
 import { IUser } from "@library/@types/api/users";
 import { mockAPI } from "@library/__tests__/utility";
 import * as AccountSettingsFixtures from "@library/accountSettings/AccountSettings.fixtures";
+import { setMeta } from "@library/utility/appUtils";
+import MockAdapter from "axios-mock-adapter";
+import { INITIAL_AISUGGESTION_SETTINGS } from "@dashboard/aiSuggestions/AISuggestions.types";
 
 const renderByViewingUserStatusWithPermissions = (
     isViewingSelf = true,
@@ -55,9 +58,17 @@ const assertEditButtonsStatus = (
 };
 
 describe("AccountSettings", () => {
+    let mockAdapter: MockAdapter;
+
+    beforeEach(() => {
+        mockAdapter = mockAPI();
+    });
+
     afterEach(() => {
         cleanup();
+        mockAdapter.reset();
     });
+
     it("Display the page header", () => {
         renderByViewingUserStatusWithPermissions();
         const header = screen.getByRole("heading", { name: "Account & Privacy Settings" });
@@ -227,5 +238,26 @@ describe("AccountSettings", () => {
         fireEvent.click(profileDisplayCheckbox);
 
         expect(mockAdapter.history.patch.length).toBeGreaterThan(0);
+    });
+
+    it("Display Community Preferences", async () => {
+        setMeta("answerSuggestionsEnabled", true);
+        setMeta("aiAssistant", { name: "Scuppy" });
+
+        render(
+            <AccountSettingsFixtures.UserEditingSelf>
+                <AccountSettingsImpl />
+            </AccountSettingsFixtures.UserEditingSelf>,
+        );
+
+        const header = await screen.findByRole("heading", { name: "Community Preferences" });
+        expect(header).toBeInTheDocument();
+        expect(header.tagName.toLocaleLowerCase()).toEqual("h2");
+
+        const suggestionCheckbox = await screen.getByRole("checkbox", {
+            name: "Suggest Scuppy Answers on my Q&A Posts",
+        });
+        expect(suggestionCheckbox).toBeInTheDocument();
+        expect(suggestionCheckbox).toBeChecked();
     });
 });

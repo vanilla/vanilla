@@ -173,10 +173,15 @@ class LastActiveDiscussionTriggerTest extends SiteTestCase
                     "trigger" => [
                         "type" => "lastActiveDiscussionTrigger",
                         "value" => [
-                            "maxTimeThreshold" => "4",
-                            "maxTimeUnit" => "day",
-                            "triggerTimeThreshold" => "1",
-                            "triggerTimeUnit" => "day",
+                            "applyToNewContentOnly" => false,
+                            "triggerTimeLookBackLimit" => [
+                                "length" => 4,
+                                "unit" => "day",
+                            ],
+                            "triggerTimeDelay" => [
+                                "length" => 1,
+                                "unit" => "day",
+                            ],
                             "postType" => ["discussion"],
                         ],
                     ],
@@ -190,10 +195,15 @@ class LastActiveDiscussionTriggerTest extends SiteTestCase
                     "trigger" => [
                         "type" => "lastActiveDiscussionTrigger",
                         "value" => [
-                            "maxTimeThreshold" => "2",
-                            "maxTimeUnit" => "hour",
-                            "triggerTimeThreshold" => "1",
-                            "triggerTimeUnit" => "hour",
+                            "applyToNewContentOnly" => false,
+                            "triggerTimeLookBackLimit" => [
+                                "length" => 2,
+                                "unit" => "hour",
+                            ],
+                            "triggerTimeDelay" => [
+                                "length" => 1,
+                                "unit" => "hour",
+                            ],
                             "postType" => ["discussion"],
                         ],
                     ],

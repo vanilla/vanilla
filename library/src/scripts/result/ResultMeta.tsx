@@ -112,7 +112,7 @@ export function ResultMeta(props: IProps) {
                 </MetaItem>
             )}
 
-            {isForeign && <MetaIcon icon="meta-external" />}
+            {isForeign && <MetaIcon icon="meta-external-compact" />}
 
             {displayDate && (
                 <MetaItem>

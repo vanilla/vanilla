@@ -12,6 +12,9 @@ use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Gdn_Configuration;
 use Ramsey\Uuid\Uuid;
+use Vanilla\AutomationRules\Actions\AutomationAction;
+use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
@@ -42,7 +45,6 @@ trait AutomationRulesTestTrait
         /** @var Gdn_Configuration $config */
         $config = self::container()->get(Gdn_Configuration::class);
         $config->set("Feature.AutomationRules.Enabled", true);
-
         $this->resetTable("automationRule");
         $this->resetTable("automationRuleRevision");
         $this->resetTable("automationRuleDispatches");
@@ -152,6 +154,54 @@ trait AutomationRulesTestTrait
             $where["automationRuleID"] = $automationRuleID;
         }
 
-        return $this->automationRuleDispatchesModel->select($where);
+        return $this->automationRuleDispatchesModel->select($where, [
+            "orderFields" => "dateFinished",
+            "orderDirection" => "asc",
+        ]);
+    }
+
+    /**
+     * Trigger an action on a single discussion and returns it.
+     *
+     * @param string $actionType
+     * @param array $actionValues
+     * @return array
+     */
+    public function triggerDiscussionAction(
+        string $actionType,
+        array $actionValues = [],
+        array $discussionOverrides = []
+    ): array {
+        CurrentTimeStamp::mockTime(strtotime("-10 days"));
+        $discussion = $this->createDiscussion($discussionOverrides);
+        CurrentTimeStamp::clearMockTime();
+
+        $automationRecord = [
+            "name" => "Stale Discussion Automation Rule",
+            "trigger" => [
+                "triggerType" => StaleDiscussionTrigger::getType(),
+                "triggerValue" => [
+                    "applyToNewContentOnly" => false,
+                    "triggerTimeLookBackLimit" => [
+                        "length" => 12,
+                        "unit" => "day",
+                    ],
+                    "triggerTimeDelay" => [
+                        "length" => 6,
+                        "unit" => "day",
+                    ],
+                    "postType" => ["discussion"],
+                ],
+            ],
+            "action" => [
+                "actionType" => $actionType,
+                "actionValue" => $actionValues,
+            ],
+            "status" => AutomationRuleModel::STATUS_ACTIVE,
+        ];
+
+        $this->api()->post("automation-rules", $automationRecord);
+
+        return $discussion;
     }
 }

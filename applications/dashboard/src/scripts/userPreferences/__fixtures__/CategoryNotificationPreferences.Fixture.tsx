@@ -4,13 +4,13 @@
  * @license Proprietary
  */
 
-import { ILegacyCategoryPreferences, ISavedDefaultCategory } from "@dashboard/userPreferences/DefaultCategoriesModal";
+import { ILegacyCategoryPreferences, IFollowedCategory } from "@dashboard/userPreferences/DefaultCategoriesModal";
 import {
     CategoryDisplayAs,
     CategoryPostNotificationType,
-    DEFAULT_NOTIFICATION_PREFERENCES,
     ICategory,
 } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { getDefaultCategoryNotificationPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
 
 export class CategoryPreferencesFixture {
     public static mockLegacyConfigs: ILegacyCategoryPreferences[] = [
@@ -36,11 +36,11 @@ export class CategoryPreferencesFixture {
         },
     ];
 
-    public static mockPreferenceConfig: ISavedDefaultCategory[] = [
+    public static mockPreferenceConfig: IFollowedCategory[] = [
         {
             categoryID: 1,
             preferences: {
-                ...DEFAULT_NOTIFICATION_PREFERENCES,
+                ...getDefaultCategoryNotificationPreferences(),
             },
         },
     ];

@@ -10,9 +10,11 @@ namespace Vanilla\Dashboard\Controllers\API;
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\FileUtils;
 use Vanilla\OpenAPIBuilder;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
+use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\Controller;
 
 /**
@@ -40,17 +42,7 @@ final class ConfigApiController extends Controller
     /**
      * All of the permissions that are valid for config writing.
      */
-    public const WRITE_PERMS = [self::PERM_COMMUNITY_MANAGER, self::PERM_ADMIN];
-
-    /**
-     * @var OpenAPIBuilder
-     */
-    private $apiBuilder;
-
-    /**
-     * @var ConfigurationInterface
-     */
-    private $config;
+    public const WRITE_PERMS = [self::PERM_COMMUNITY_MANAGER, self::PERM_MODERATOR, self::PERM_ADMIN];
 
     /**
      * @var string
@@ -58,27 +50,15 @@ final class ConfigApiController extends Controller
     private $cachePath;
 
     /**
-     * @var HtmlPlainTextConverter
-     */
-    private $plainTextConverter;
-
-    /**
-     * ConfigApiController constructor.
-     *
-     * @param OpenAPIBuilder $apiBuilder
-     * @param ConfigurationInterface $config
-     * @param HtmlPlainTextConverter $plainTextConverter
-     * @param string $cachePath
+     * DI.
      */
     public function __construct(
-        OpenAPIBuilder $apiBuilder,
-        ConfigurationInterface $config,
-        HtmlPlainTextConverter $plainTextConverter,
+        private OpenAPIBuilder $apiBuilder,
+        private ConfigurationInterface $config,
+        private HtmlPlainTextConverter $plainTextConverter,
+        private \Gdn_Database $db,
         string $cachePath = ""
     ) {
-        $this->apiBuilder = $apiBuilder;
-        $this->config = $config;
-        $this->plainTextConverter = $plainTextConverter;
         $this->cachePath = $cachePath ?: PATH_CACHE . "/config-schema.php";
     }
 

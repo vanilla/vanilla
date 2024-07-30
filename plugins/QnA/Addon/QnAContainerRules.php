@@ -52,7 +52,7 @@ class QnAContainerRules extends AddonContainerRules
             ->rule(ActivityService::class)
             ->addCall("registerActivity", [AnswerAcceptedActivity::class])
             ->addCall("registerActivity", [QuestionAnswerActivity::class])
-            ->addCall("registerActivity", [QuestionFollowUpActivity::class]);
+            ->addCall("registerActivity", [QuestionFollowUpActivity::class, false]);
 
         $container
             ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)

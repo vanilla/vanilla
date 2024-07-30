@@ -34,7 +34,12 @@ export function useUrlSearchParams(): URLSearchParams {
     return params;
 }
 
-export function useQueryStringSync(value: IStringMap, defaults?: IStringMap, syncOnFirstMount?: boolean) {
+export function useQueryStringSync(
+    value: IStringMap,
+    defaults?: IStringMap,
+    syncOnFirstMount?: boolean,
+    keepHash?: boolean,
+) {
     const history = useHistory();
     const location = useLocation();
     const isMountedRef = useRef(false);
@@ -51,6 +56,9 @@ export function useQueryStringSync(value: IStringMap, defaults?: IStringMap, syn
                 newPath += "?" + decodeURIComponent(query);
             }
 
+            if (keepHash && !!location.hash) {
+                newPath += location.hash;
+            }
             window.history.replaceState(null, "", newPath);
         }),
         [history],

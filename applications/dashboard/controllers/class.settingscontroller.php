@@ -279,6 +279,7 @@ class SettingsController extends DashboardController
                 return "$name $value";
             }
         }
+        return [];
     }
 
     /**
@@ -638,7 +639,7 @@ class SettingsController extends DashboardController
     public function bans($action = "", $search = "", $page = "", $iD = "")
     {
         Gdn_Theme::section("Moderation", "set");
-        $this->permission("Garden.Settings.Manage");
+        $this->permission("site.manage");
 
         // Page setup
         $this->title(t("Ban Rules"));
@@ -919,6 +920,21 @@ class SettingsController extends DashboardController
     }
 
     /**
+     * Manage AI Suggested Answers settings
+     */
+    public function aiSuggestions()
+    {
+        $this->permission("Garden.Settings.Manage");
+        $this->setHighlightRoute("settings/ai-suggestions");
+        $this->title(t("AI Suggested Answers"));
+        if (Gdn::config("Feature.AISuggestions.Enabled")) {
+            $this->render("ai-suggestions");
+        } else {
+            $this->renderException(notFoundException());
+        }
+    }
+
+    /**
      * Manages the Tagging.Discussions.Enabled setting.
      *
      * @param String $value Either 'true' or 'false', whether to enable tagging.
@@ -1032,7 +1048,6 @@ class SettingsController extends DashboardController
                 "Garden.Settings.Manage",
                 "Garden.Community.Manage",
                 "Garden.Moderation.Manage",
-                "Moderation.ModerationQueue.Manage",
                 "Garden.Users.Add",
                 "Garden.Users.Edit",
                 "Garden.Users.Delete",
@@ -1040,16 +1055,6 @@ class SettingsController extends DashboardController
             ],
             false
         );
-
-        // Send the user to the last section they navigated to in the dashboard.
-        $section = Gdn::session()->getPreference("DashboardNav.DashboardLandingPage", "DashboardHome");
-        if ($section) {
-            $sections = DashboardNavModule::getDashboardNav()->getSectionsInfo();
-            $url = val("url", val($section, $sections));
-            if ($url) {
-                redirectTo($url);
-            }
-        }
 
         // Resolve our default landing page redirection based on permissions.
         if (
@@ -1063,27 +1068,7 @@ class SettingsController extends DashboardController
         }
 
         // Still here?
-        redirectTo($this->getHomeUrl());
-    }
-
-    /**
-     * Get new home url
-     */
-    private function getHomeUrl()
-    {
-        $url = "dashboard/settings/home";
-
-        if (
-            Gdn::session()->checkPermission("Analytics.Data.View") &&
-            Gdn::addonManager()->isEnabled("vanillaanalytics", Vanilla\Addon::TYPE_ADDON) &&
-            !(bool) Gdn::config("VanillaAnalytics.DisableDashboard", false)
-        ) {
-            $url = (bool) Gdn::config("Feature.NewAnalytics.Enabled", false)
-                ? "/analytics/v2/dashboards"
-                : "/analytics";
-        }
-
-        return $url;
+        redirectTo("/dashboard/role");
     }
 
     public function home()
@@ -1498,6 +1483,7 @@ class SettingsController extends DashboardController
             "Garden.Registration.InviteExpiration",
             "Garden.Registration.InviteTarget",
             "Garden.Registration.ConfirmEmail",
+            "Garden.Registration.SSOConfirmEmail",
         ];
         $configurationModel->setField($registrationOptions);
 
@@ -1527,7 +1513,8 @@ class SettingsController extends DashboardController
 
             if (
                 $this->data("ConfirmationSupported") === false &&
-                $this->Form->getValue("Garden.Registration.ConfirmEmail")
+                ($this->Form->getValue("Garden.Registration.ConfirmEmail") ||
+                    $this->Form->getValue("Garden.Registration.SSOConfirmEmail"))
             ) {
                 $this->Form->addError('A role with default type "unconfirmed" is required to use email confirmation.');
             }

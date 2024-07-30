@@ -53,9 +53,11 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
         >
             <div className={cx(classes.optionText, icon && classes.iconLayout)}>
                 {icon && <UserPhoto size={UserPhotoSize.XSMALL} userInfo={icon ?? deletedUserFragment()} />}
-                <ComboboxOptionText />
-                {extraLabelContent && <span className={classes.parentLabel}>{` - ${extraLabelContent}`}</span>}
-                {props.data?.labelSuffix}
+                <span>
+                    <ComboboxOptionText />
+                    {extraLabelContent && <span className={classes.parentLabel}>{` - ${extraLabelContent}`}</span>}
+                    {props.data?.labelSuffix}
+                </span>
             </div>
             {selected && (
                 <span className={classes.checkmarkContainer}>

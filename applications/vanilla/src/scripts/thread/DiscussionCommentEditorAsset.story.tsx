@@ -12,7 +12,7 @@ export default {
     title: "Widgets/DiscussionCommentsEditor",
 };
 
-interface IProps extends Partial<React.ComponentProps<typeof DiscussionCommentEditorAsset>> {}
+type IProps = Partial<React.ComponentProps<typeof DiscussionCommentEditorAsset>> & {};
 
 const StoryCommentEditor = (props?: IProps) => {
     const queryClient = new QueryClient({

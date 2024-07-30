@@ -16,15 +16,13 @@ import { t } from "@vanilla/i18n";
 
 export type ITriageFilters = {
     /** Resolution status */
-    recordInternalStatusID: TriageInternalStatus[];
+    internalStatusID: TriageInternalStatus[];
     /** The person who made the post */
-    recordUserID: string[];
+    insertUserID: string[];
     /** The role of the person who made the post */
-    recordUserRoleID: string[];
+    insertUserRoleID: string[];
     /** The category of the post */
-    placeRecordID: string[];
-    /** Needed if filtered by category */
-    placeRecordType?: string;
+    categoryID: string[];
 };
 
 const triageFilterOptions: ISelectBoxItem[] = [
@@ -47,30 +45,30 @@ export function TriageFilters(props: IProps) {
     return (
         <FilterFrame title={t("Filter")} hideFooter>
             <FilterBlock
-                apiName={"recordInternalStatusID"}
+                apiName={"internalStatusID"}
                 label={"Status"}
-                initialFilters={props.value.recordInternalStatusID}
+                initialFilters={props.value.internalStatusID}
                 staticOptions={triageFilterOptions}
                 onFilterChange={props.onFilter}
             />
             <FilterBlock
-                apiName={"recordUserID"}
+                apiName={"insertUserID"}
                 label={"Post Author"}
-                initialFilters={props.value.recordUserID}
+                initialFilters={props.value.insertUserID}
                 dynamicOptionApi={userLookup}
                 onFilterChange={props.onFilter}
             />
             <FilterBlock
-                apiName={"recordUserRoleID"}
+                apiName={"insertUserRoleID"}
                 label={"Reporter Role"}
-                initialFilters={props.value.recordUserRoleID}
+                initialFilters={props.value.insertUserRoleID}
                 dynamicOptionApi={roleLookUp}
                 onFilterChange={props.onFilter}
             />
             <FilterBlock
-                apiName={"placeRecordID"}
+                apiName={"categoryID"}
                 label={"Category"}
-                initialFilters={props.value.placeRecordID}
+                initialFilters={props.value.categoryID}
                 dynamicOptionApi={categoryLookup}
                 onFilterChange={props.onFilter}
             />

@@ -54,6 +54,7 @@ export function ElementToolbar(props: IElementToolbarProps) {
             buttonProps={{
                 buttonType: ButtonTypes.CUSTOM,
             }}
+            name={t("Element Toolbar")}
             buttonClassName={menuBarClasses().menuItemIconContent}
             buttonContents={isEdgeCase ? <PilcrowIcon /> : <TopLevelIcon />}
             disabled={isEdgeCase}

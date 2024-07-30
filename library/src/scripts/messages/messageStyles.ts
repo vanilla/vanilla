@@ -210,7 +210,6 @@ export const messagesClasses = useThemeCache(() => {
             position: "relative",
             ...Mixins.padding(vars.actionButton.padding),
             marginLeft: vars.actionButton.padding.left,
-            minHeight: styleUnit(vars.actionButton.minHeight),
             whiteSpace: "nowrap",
             ...Mixins.font(vars.actionButton.font),
             ...allButtonStates({
@@ -296,13 +295,16 @@ export const messagesClasses = useThemeCache(() => {
     });
 
     const title = css({
-        ...Mixins.font(vars.text.font),
-        fontWeight: globalVars.fonts.weights.bold,
-        ...lineHeightAdjustment({
-            [`& + .${text}`]: {
-                marginTop: styleUnit(vars.title.margin.top),
-            },
-        }),
+        "&&": {
+            ...Mixins.font(vars.text.font),
+            fontWeight: globalVars.fonts.weights.bold,
+            ...Mixins.margin({ all: 0 }),
+            ...lineHeightAdjustment({
+                [`& + .${text}`]: {
+                    marginTop: styleUnit(vars.title.margin.top),
+                },
+            }),
+        },
     });
 
     return {

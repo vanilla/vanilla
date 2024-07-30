@@ -1090,10 +1090,14 @@ class ProfileFieldModel extends FullRecordCacheModel
                 continue;
             }
 
+            $condition = "in";
             $filterValues = $filters[$apiName];
-
             if ($filterValues instanceof RangeExpression) {
                 $filterValues = $filterValues->getValues()["="] ?? [];
+            }
+            if ($filterValues === false) {
+                $condition = "not in";
+                $filterValues = true;
             }
             $filterValues = is_array($filterValues) ? $filterValues : [$filterValues];
             $queryValues = [];
@@ -1107,7 +1111,7 @@ class ProfileFieldModel extends FullRecordCacheModel
                 ->select("m.UserID")
                 ->from("UserMeta m")
                 ->where("QueryValue", $queryValues);
-            $query->where("u.UserID in", "({$subquery->getSelect(true)})", false, false);
+            $query->where("u.UserID $condition", "({$subquery->getSelect(true)})", false, false);
         }
     }
 

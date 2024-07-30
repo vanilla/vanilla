@@ -22,3 +22,7 @@ export function useFormGroup(): IGroupContext {
     }
     return context!;
 }
+
+export function useOptionalFormGroup(): Partial<IGroupContext> {
+    return useContext(FormGroupContext) ?? {};
+}

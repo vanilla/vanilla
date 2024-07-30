@@ -7,7 +7,8 @@
 import { ICommunityManagementRecord } from "@dashboard/moderation/CommunityManagementTypes";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
-import { MetaItem, MetaIcon } from "@library/metas/Metas";
+import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { MetaIcon, MetaItem, MetaProfile } from "@library/metas/Metas";
 import { metasClasses } from "@library/metas/Metas.styles";
 import { Tag } from "@library/metas/Tags";
 import { TagPreset } from "@library/metas/Tags.variables";
@@ -22,14 +23,10 @@ export function ReportRecordMeta(props: IProps) {
     const { record } = props;
     return (
         <>
-            <MetaItem>
+            <MetaItem flex>
                 <Translate
                     source="Posted by <0/> in <1/>"
-                    c0={
-                        <SmartLink to={`${record.recordUrl}`} className={metasClasses().metaLink}>
-                            {record?.recordUser?.name}
-                        </SmartLink>
-                    }
+                    c0={<MetaProfile user={record.recordUser ?? deletedUserFragment()} />}
                     c1={
                         <SmartLink to={`${record.placeRecordUrl}`} className={metasClasses().metaLink}>
                             {record.placeRecordName}
@@ -38,11 +35,12 @@ export function ReportRecordMeta(props: IProps) {
                 />
             </MetaItem>
 
-            {/* TODO: This is not exposed on the API (or stored in the reports table) just yet, it might be meta we can drop altogether */}
-            {/* <MetaItem>
-                <MetaIcon icon="meta-time" />
-                <DateTime timestamp={record.recordDateInserted}></DateTime>
-            </MetaItem> */}
+            {record.recordDateInserted && (
+                <MetaItem>
+                    <MetaIcon icon="meta-time" />
+                    <DateTime timestamp={record.recordDateInserted}></DateTime>
+                </MetaItem>
+            )}
 
             {record.recordWasEdited && (
                 <MetaItem>

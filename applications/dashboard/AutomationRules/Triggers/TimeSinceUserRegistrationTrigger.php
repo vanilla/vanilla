@@ -12,21 +12,17 @@ use Garden\Schema\Schema;
 use Gdn;
 use UserModel;
 use Vanilla\AutomationRules\Models\AutomationRuleLongRunnerGenerator;
-use Vanilla\AutomationRules\Trigger\AutomationTriggerInterface;
 use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
-use Vanilla\AutomationRules\Trigger\TimedAutomationTriggerInterface;
-use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
+use Vanilla\Dashboard\AutomationRules\Models\UserRuleDataType;
 
 /**
  * Class StaleDiscussionTrigger
  */
-class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger implements
-    AutomationTriggerInterface,
-    TimedAutomationTriggerInterface /**
-
+class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
+{
+    /**
      * @inheridoc
      */
-{
     public static function getType(): string
     {
         return "timeSinceUserRegistrationTrigger";
@@ -37,7 +33,15 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger implements
      */
     public static function getName(): string
     {
-        return "A certain amount of time has passed since a user registered";
+        return "Time since Registration";
+    }
+
+    /**
+     * @inheridoc
+     */
+    public static function getContentType(): string
+    {
+        return "users";
     }
 
     /**
@@ -45,7 +49,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger implements
      */
     public static function getActions(): array
     {
-        return [AddRemoveUserRoleAction::getType()];
+        return UserRuleDataType::getActions();
     }
 
     /**
@@ -57,7 +61,6 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger implements
             "trigger:o" => self::getTimedTriggerSchema(),
         ]);
         $schema->merge($discussionCommentSchema);
-        self::addActionTypeValidation($schema);
     }
 
     /**
@@ -120,6 +123,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger implements
     static function getSchema(): Schema
     {
         $schema = self::getTimeIntervalSchema();
+        $schema["additionalSettings"] = self::getAdditionalSettingsSchema();
         return Schema::parse($schema);
     }
 

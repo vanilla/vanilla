@@ -34,7 +34,7 @@ describe("Discussion List Sort", () => {
         expect(button).toHaveTextContent(/Recently Commented/);
 
         fireEvent.click(button);
-        const dropdown = await screen.findByRole("list");
+        const dropdown = await screen.findByRole("menu");
 
         expect(dropdown).toBeInTheDocument();
         const trendingButton = within(dropdown).getByRole("button", { name: /Trending/ });

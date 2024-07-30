@@ -34,7 +34,7 @@ import { UserSpotlight } from "@library/userSpotlight/UserSpotlight";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
 import { onReady } from "@library/utility/appUtils";
 import { addComponent } from "@library/utility/componentRegistry";
-import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
+import CategoryFollowDropDown from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import "@vanilla/addon-vanilla/forms/autosave";
 import { accessibleRoleButton } from "@vanilla/addon-vanilla/legacy/legacyAccessibility";
 import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacyHashScrolling";
@@ -108,8 +108,9 @@ delegateEvent("click", ".js-legacyDiscussionOrCommentReport", (event, triggering
     event.preventDefault();
     const recordID = triggeringElement.getAttribute("data-recordID");
     const recordType = triggeringElement.getAttribute("data-recordType");
+    const categoryID = triggeringElement.getAttribute("data-categoryID");
     const discussionName = triggeringElement.getAttribute("data-discussionName");
-    if (!recordID || !recordType || !discussionName) {
+    if (!recordID || !recordType || !discussionName || !categoryID) {
         return;
     }
 
@@ -118,6 +119,8 @@ delegateEvent("click", ".js-legacyDiscussionOrCommentReport", (event, triggering
             discussionName={discussionName}
             recordID={parseInt(recordID, 10)}
             recordType={recordType as "discussion" | "comment"}
+            placeRecordType="category"
+            placeRecordID={categoryID}
             initialVisibility={true}
             customTrigger={() => null}
             isLegacyPage

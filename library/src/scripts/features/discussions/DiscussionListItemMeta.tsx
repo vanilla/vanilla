@@ -105,7 +105,8 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
         !!tags && tags.length > 0 && display.userTags && variables.userTags.maxNumber > 0;
 
     const canResolve = hasPermission("staff.allow", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
-    const displayResolved = resolved !== undefined && canResolve && display.resolved;
+    const displayResolved =
+        resolved !== undefined && canResolve && display.resolved && getMeta("triage.enabled", false);
 
     const customLayoutsForDiscussionListIsEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
 

@@ -4,6 +4,9 @@
  * @license gpl-2.0-only
  */
 
+import { IComment } from "@dashboard/@types/api/comment";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { IUser } from "@library/@types/api/users";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { t } from "@vanilla/i18n";
 import { RecordID, guessOperatingSystem, OS } from "@vanilla/utils";
@@ -15,7 +18,10 @@ export interface IThreadItemContext {
     recordUrl: string;
     timestamp: string;
     name: string;
-    handleCopyUrl: () => Promise<void>;
+    authorID?: IUser["userID"];
+    attributes?: IDiscussion["attributes"] | IComment["attributes"];
+    handleCopyUrl: (queryParam?, queryParamValue?) => Promise<void>;
+
     handleNativeShare?: () => Promise<void>;
     emailUrl: string;
     shareInMessageUrl?: string;
@@ -27,6 +33,7 @@ const ThreadItemContext = React.createContext<IThreadItemContext>({
     recordUrl: "",
     timestamp: "",
     name: "",
+    authorID: undefined,
     handleCopyUrl: async () => {},
     emailUrl: "",
     shareInMessageUrl: undefined,
@@ -66,8 +73,15 @@ export function ThreadItemContextProvider(
           }
         : undefined;
 
-    async function handleCopyUrl() {
-        await navigator.clipboard.writeText(shareData.url);
+    async function handleCopyUrl(queryParam = null, queryParamValue = "") {
+        if (queryParam) {
+            const urlWithQueryParam = new URL(shareData.url);
+            urlWithQueryParam.searchParams.set(queryParam, queryParamValue);
+
+            await navigator.clipboard.writeText(urlWithQueryParam.toString());
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+        }
     }
 
     const shareInMessageUrl = `/messages/add?content=${encodeURIComponent(

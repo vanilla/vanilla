@@ -20,6 +20,7 @@ export interface IAddon {
     enabled: boolean;
     onEnabledChange: (val: boolean) => void;
     imageUrl: string;
+    compactImage?: boolean;
     description?: React.ReactNode;
     notes?: React.ReactNode;
     disabled?: boolean;
@@ -36,6 +37,7 @@ const Addon = function (props: IProps) {
         previewContainer,
         previewContainerMobile,
         previewImage,
+        previewContainerCompact,
         textContainer,
         title,
         description,
@@ -50,7 +52,7 @@ const Addon = function (props: IProps) {
 
     const forceWrap = measure.width > 0 && measure.width < 600;
 
-    const image = <img className={previewImage} src={props.imageUrl} loading="lazy" />;
+    const image = <img className={cx(previewImage)} src={props.imageUrl} loading="lazy" />;
 
     let toggle = (
         <FormToggle
@@ -73,7 +75,9 @@ const Addon = function (props: IProps) {
     return (
         <div className={root} ref={rootRef}>
             <div className={cx(column, previewAndTextContainer)}>
-                {!forceWrap && <div className={previewContainer}>{image}</div>}
+                {!forceWrap && (
+                    <div className={cx(previewContainer, props.compactImage && previewContainerCompact)}>{image}</div>
+                )}
                 <div className={textContainer}>
                     <Heading depth={3} id={titleID} className={title}>
                         {props.name}

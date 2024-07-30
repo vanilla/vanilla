@@ -24,7 +24,7 @@ import { MetaItem, MetaLink } from "@library/metas/Metas";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { metasClasses } from "@library/metas/Metas.styles";
 import DateTime from "@library/content/DateTime";
-import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
+import CategoryFollowDropDown from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { SortAndPaginationInfo } from "@library/search/SortAndPaginationInfo";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
@@ -99,7 +99,6 @@ function FollowedCategoryRow(props: IFollowedContentRow) {
                         categoryName={name}
                         notificationPreferences={preferences}
                         emailDigestEnabled={emailDigestEnabled}
-                        emailEnabled={emailEnabled}
                     />
                 </div>
             }

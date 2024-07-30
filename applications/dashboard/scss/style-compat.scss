@@ -59,3 +59,18 @@ $staticVariables: true;
 body:not(.dashboard) svg {
     pointer-events: none !important;
 }
+
+// Legacy Resolved
+.MItem-Resolved {
+    position: relative;
+    padding: 1px 3px;
+    line-height: 14px;
+    vertical-align: middle;
+}
+
+.resolved2-unresolved,
+.resolved2-resolved {
+    position: relative;
+    display: inline-block;
+    top: 1px;
+}

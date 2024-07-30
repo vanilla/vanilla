@@ -53,6 +53,7 @@ trait NotificationsApiTestTrait
      *
      * @param int|array $userOrUserID
      * @param ExpectedNotification[] $expectedNotifications
+     * @param bool $batchNotifications
      */
     public function assertUserHasNotificationsLike($userOrUserID, array $expectedNotifications)
     {

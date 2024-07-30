@@ -31,6 +31,10 @@ export type IMessageProps =
           onConfirm?: () => void;
           /** Optional confirm label, defaults to "OK" */
           confirmText?: React.ReactNode;
+          /** Where the optional link should take the user */
+          linkURL?: string;
+          /** Optional link label */
+          linkText?: React.ReactNode;
           /** Handler for the cancel button */
           onCancel?: () => void;
           /** Optional confirm label, defaults to "Cancel" */
@@ -143,6 +147,7 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
                                 <LinkAsButton
                                     buttonType={ButtonTypes.TEXT}
                                     to={props.error.actionButton.url}
+                                    className={classes.actionButton}
                                     target={props.error.actionButton.target}
                                 >
                                     {t(props.error.actionButton.label)}
@@ -157,6 +162,15 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
                                 >
                                     {props.isActionLoading ? <ButtonLoader /> : props.cancelText || t("Cancel")}
                                 </Button>
+                            )}
+                            {props.linkURL && props.linkText && (
+                                <LinkAsButton
+                                    buttonType={ButtonTypes.TEXT}
+                                    to={props.linkURL}
+                                    className={classes.actionButton}
+                                >
+                                    {props.linkText}
+                                </LinkAsButton>
                             )}
                             {props.onConfirm && (
                                 <Button

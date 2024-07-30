@@ -57,6 +57,10 @@ class AutomationRuleInputSchema extends Schema
                     "minimum" => 1,
                     "maximum" => AutomationRuleModel::MAX_LIMIT,
                 ],
+                "escalations:b?" => [
+                    "default" => false,
+                    "description" => "Filter by rules with escalation actions.",
+                ],
                 "expand?" => ApiUtils::getExpandDefinition(
                     ["insertUserID", "updateUserID", "dispatchStatus", "all"],
                     null

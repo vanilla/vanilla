@@ -6,30 +6,19 @@
 
 import { IDraft } from "@dashboard/@types/api/draft";
 import { useDebouncedInput } from "@dashboard/hooks";
-import { css, cx } from "@emotion/css";
-import DateTime from "@library/content/DateTime";
-import Translate from "@library/content/Translate";
 import { useToast } from "@library/features/toaster/ToastContext";
-import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
-import { PageBox } from "@library/layout/PageBox";
-import { PageHeadingBox } from "@library/layout/PageHeadingBox";
-import ButtonLoader from "@library/loaders/ButtonLoader";
-import { BorderType } from "@library/styles/styleHelpersBorders";
-import { metasClasses } from "@library/metas/Metas.styles";
 import { MyValue } from "@library/vanilla-editor/typescript";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
-import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
-import { discussionCommentEditorClasses } from "@vanilla/addon-vanilla/thread/DiscussionCommentEditorAsset.classes";
 import { DraftsApi } from "@vanilla/addon-vanilla/thread/DraftsApi";
-import { t } from "@vanilla/i18n";
 import { logError, RecordID } from "@vanilla/utils";
 import isEqual from "lodash-es/isEqual";
-import React, { useEffect, useRef, useState } from "react";
-import { IComment } from "@dashboard/@types/api/comment";
+import { useEffect, useRef, useState } from "react";
+import { IComment, IPremoderatedRecordResponse } from "@dashboard/@types/api/comment";
 import { IError } from "@library/errorPages/CoreErrorMessages";
+import { NewCommentEditor } from "@vanilla/addon-vanilla/thread/components/NewCommentEditor";
+import { t } from "@vanilla/i18n";
 
 interface IDraftProps {
     draftID: number;
@@ -42,11 +31,12 @@ interface IProps {
     discussionID: RecordID;
     categoryID: number;
     draft?: IDraftProps;
+    isPreview?: boolean;
 }
 
-const EMPTY_DRAFT: MyValue = [{ type: "p", children: [{ text: "" }] }];
+export const EMPTY_DRAFT: MyValue = [{ type: "p", children: [{ text: "" }] }];
 
-export function DiscussionCommentEditorAsset(props: IProps) {
+export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "", categoryID: 0 }) {
     const { draft, discussionID } = props;
     const [ownDraft, setDraft] = useState<IDraftProps | undefined>(draft);
     const { addToast } = useToast();
@@ -63,16 +53,25 @@ export function DiscussionCommentEditorAsset(props: IProps) {
     };
 
     const postMutation = useMutation({
-        mutationFn: async (body: string) =>
-            await CommentsApi.post({
+        mutationFn: async (body: string) => {
+            const response = await CommentsApi.post({
                 format: "rich2",
                 discussionID,
                 ...(ownDraft?.draftID && { draftID: ownDraft?.draftID }),
                 body,
-            }),
+            });
+            if ("status" in response && response.status === 202) {
+                addToast({
+                    body: t("Your comment will appear after it is approved."),
+                    dismissible: true,
+                    autoDismiss: false,
+                });
+            }
+            return response;
+        },
     });
 
-    async function handlePostCommentSuccess(comment: IComment) {
+    async function handlePostCommentSuccess(comment: IComment | IPremoderatedRecordResponse) {
         resetState();
         await queryClient.invalidateQueries({ queryKey: ["discussion"] });
         await queryClient.invalidateQueries({ queryKey: ["commentList"] });
@@ -137,58 +136,24 @@ export function DiscussionCommentEditorAsset(props: IProps) {
         }
     }, [debouncedComment]);
 
-    const classes = discussionCommentEditorClasses();
-
     return (
-        <PageBox
-            options={{
-                borderType: BorderType.NONE,
+        <NewCommentEditor
+            editorKey={editorKey}
+            value={value}
+            onValueChange={setValue}
+            onPublish={async (value) => {
+                const newComment = await postMutation.mutateAsync(JSON.stringify(value));
+                await handlePostCommentSuccess(newComment);
             }}
-            className={classes.pageBox}
-        >
-            <form
-                onSubmit={async (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const newComment = await postMutation.mutateAsync(JSON.stringify(value));
-                    await handlePostCommentSuccess(newComment);
-                }}
-            >
-                <PageHeadingBox title={t("Leave a Comment")} />
-                <VanillaEditor
-                    key={editorKey}
-                    initialFormat={ownDraft?.format}
-                    initialContent={ownDraft?.body}
-                    onChange={(newValue) => {
-                        setValue(newValue);
-                    }}
-                />
-                <div className={classes.editorPostActions}>
-                    {lastSaved.current && (
-                        <span className={cx(metasClasses().metaStyle, classes.draftMessage)}>
-                            {draftMutation.isLoading ? (
-                                t("Saving draft...")
-                            ) : (
-                                <Translate
-                                    source="Draft saved <0/>"
-                                    c0={<DateTime timestamp={lastSaved.current.toUTCString()} mode="relative" />}
-                                />
-                            )}
-                        </span>
-                    )}
-                    <Button
-                        disabled={postMutation.isLoading || draftMutation.isLoading || isEqual(value, EMPTY_DRAFT)}
-                        buttonType={ButtonTypes.STANDARD}
-                        onClick={() => draftMutation.mutate()}
-                    >
-                        {t("Save Draft")}
-                    </Button>
-                    <Button disabled={postMutation.isLoading} submit buttonType={ButtonTypes.PRIMARY}>
-                        {postMutation.isLoading ? <ButtonLoader /> : t("Post Comment")}
-                    </Button>
-                </div>
-            </form>
-        </PageBox>
+            publishLoading={postMutation.isLoading}
+            draft={ownDraft}
+            onDraft={() => {
+                draftMutation.mutate();
+            }}
+            draftLoading={draftMutation.isLoading}
+            draftLastSaved={lastSaved.current}
+            isPreview={props.isPreview}
+        />
     );
 }
 

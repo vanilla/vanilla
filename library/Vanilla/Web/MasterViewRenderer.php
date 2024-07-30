@@ -155,8 +155,9 @@ class MasterViewRenderer
     {
         $template = null;
 
-        $themeViewPath = $this->siteMeta->getActiveThemeViewPath();
-        if ($themeViewPath) {
+        $themeAddon = $this->themePreloader->getPreloadTheme()->getAddon();
+        if ($themeAddon) {
+            $themeViewPath = $themeAddon->path("/views/");
             $defaultLayout = $themeViewPath . self::DEFAULT_LAYOUT_NAME;
             $homeLayout = $themeViewPath . self::HOME_LAYOUT_NAME;
 

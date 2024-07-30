@@ -43,6 +43,31 @@ class VanillaVanillaService extends AbstractService
     /**
      * @inheritDoc
      */
+    public function getVanillaConfigDefaults(): array
+    {
+        return [
+            // Typically captcha isn't configured on localhost.
+            "Garden.Registration.SkipCaptcha" => true,
+
+            // Bunch of feature flags to enable.
+            "Feature.CommunityManagementBeta.Enabled" => true,
+            "Feature.customLayout.discussionList.Enabled" => true,
+            "Feature.customLayout.home.Enabled" => true,
+            "Feature.customLayout.categoryList.Enabled" => true,
+            "Feature.customLayout.discussionThread.Enabled" => true,
+            "Feature.layoutEditor.discussionThread.Enabled" => true,
+            "Feature.escalations.Enabled" => true,
+            "Feature.CustomProfileFields.Enabled" => true,
+            "Feature.discussionSiteMaps.Enable" => true,
+            "Feature.NewUserManagement.Enabled" => true,
+            "Feature.Digest.Enabled" => true,
+            "Feature.UnsubscribeLink.Enabled" => true,
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getTargetDirectory(): string
     {
         return DockerCommand::VNLA_DOCKER_CWD;

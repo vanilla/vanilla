@@ -9,52 +9,28 @@ use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
+use Vanilla\Permissions;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Web\PermissionCheckTrait;
 
 /**
  * Class DiscussionExpandSchema
  */
 class DiscussionExpandSchema
 {
-    /** @var CategoryModel */
-    private $categoryModel;
-
-    /** @var TagModel */
-    private $tagModel;
-
-    /** @var RecordStatusModel */
-    private $recordStatusModel;
-
-    /** @var RecordStatusLogModel */
-    private $recordStatusLogModel;
-
-    private AttachmentModel $attachmentModel;
-
-    private ReactionModel $reactionModel;
-
     /**
-     * DiscussionsSchema constructor.
-     *
-     * @param CategoryModel $categoryModel
-     * @param TagModel $tagModel
-     * @param RecordStatusLogModel $recordStatusLogModel
-     * @param RecordStatusModel $recordStatusModel
-     * @param AttachmentModel $attachmentModel
+     * DI.
      */
     public function __construct(
-        CategoryModel $categoryModel,
-        TagModel $tagModel,
-        RecordStatusLogModel $recordStatusLogModel,
-        RecordStatusModel $recordStatusModel,
-        AttachmentModel $attachmentModel,
-        ReactionModel $reactionModel
+        private CategoryModel $categoryModel,
+        private TagModel $tagModel,
+        private RecordStatusLogModel $recordStatusLogModel,
+        private RecordStatusModel $recordStatusModel,
+        private AttachmentModel $attachmentModel,
+        private ReactionModel $reactionModel,
+        private \Vanilla\Forum\Models\CommunityManagement\ReportModel $reportModel,
+        private Gdn_Session $session
     ) {
-        $this->categoryModel = $categoryModel;
-        $this->tagModel = $tagModel;
-        $this->recordStatusLogModel = $recordStatusLogModel;
-        $this->recordStatusModel = $recordStatusModel;
-        $this->attachmentModel = $attachmentModel;
-        $this->reactionModel = $reactionModel;
     }
 
     /**
@@ -95,6 +71,8 @@ class DiscussionExpandSchema
             "status.log",
             "reactions",
             "attachments",
+            "reportMeta",
+            "countReports",
         ]);
     }
 
@@ -117,6 +95,12 @@ class DiscussionExpandSchema
         }
         if (ModelUtils::isExpandOption("attachments", $expandOption)) {
             $this->attachmentModel->joinAttachments($rows);
+        }
+
+        $permissions = $this->session->getPermissions();
+        $hasReportViewPermission = $permissions->hasAny(["posts.moderate", "community.moderate"]);
+        if (ModelUtils::isExpandOption("reportMeta", $expandOption) && $hasReportViewPermission) {
+            $this->reportModel->expandReportMeta($rows, "discussion");
         }
 
         // This one can be slightly performance intensive so don't do it unless explicitly asked.

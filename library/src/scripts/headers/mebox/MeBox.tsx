@@ -4,14 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useState } from "react";
-import classNames from "classnames";
+import { IMe } from "@library/@types/api/users";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
-import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
 import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
 import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDropDown";
+import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
 import { t } from "@library/utility/appUtils";
-import { IMe } from "@library/@types/api/users";
+import classNames from "classnames";
+import React from "react";
 export interface IMeBoxProps {
     currentUser?: IMe;
     countClass?: string;
@@ -44,7 +44,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
                 </div>
                 {separator}
                 <div className={classes.meboxItem}>
-                    <MessagesDropDown />
+                    <MessagesDropDown count={userInfo.countUnreadConversations} />
                     {withLabel && <div className={classes.label}>{t("Messages")}</div>}
                 </div>
                 {separator}

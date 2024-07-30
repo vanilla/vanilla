@@ -153,7 +153,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
             "discussions" => $this->discussions,
             "initialPaging" => $this->discussions->getPaging(),
             "title" => $params["title"] ?? $this->title,
-            "subtitle" => $params["subTitle"] ?? $this->subtitle,
+            "subtitle" => $params["subtitle"] ?? $this->subtitle,
             "description" => $params["description"] ?? $this->description,
             "noCheckboxes" => $params["noCheckboxes"] ?? true,
             "containerOptions" => $params["containerOptions"] ?? $this->getContainerOptions(),

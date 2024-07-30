@@ -12,12 +12,15 @@ use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Models\CommunityManagement\CommunityManagementRecordModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
-use Vanilla\Forum\Models\CommunityManagement\ReportModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
+use Vanilla\Forum\Models\VanillaEscalationAttachmentProvider;
+use Vanilla\Models\FormatSchema;
 use Vanilla\Models\Model;
 use Vanilla\Schema\RangeExpression;
+use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
 
 /**
@@ -32,7 +35,9 @@ class EscalationsApiController extends \AbstractApiController
         private EscalationModel $escalationsModel,
         private CommunityManagementRecordModel $communityManagementRecordModel,
         private ReportsApiController $reportsApiController,
-        private ReportReasonModel $reportReasonModel
+        private ReportReasonModel $reportReasonModel,
+        private \CommentModel $commentModel,
+        private FormatService $formatService
     ) {
     }
 
@@ -45,7 +50,7 @@ class EscalationsApiController extends \AbstractApiController
      */
     public function index(array $query = []): Data
     {
-        $this->permission("posts.moderate");
+        $this->permission(["posts.moderate", "community.moderate"]);
 
         $in = Schema::parse([
             "escalationID?" => RangeExpression::createSchema([":i"])->setField("x-filter", true),
@@ -53,7 +58,7 @@ class EscalationsApiController extends \AbstractApiController
                 "type" => "array",
                 "items" => [
                     "type" => "string",
-                    "enum" => EscalationModel::STATUSES,
+                    "enum" => $this->escalationsModel->getStatusIDs(),
                 ],
                 "style" => "form",
                 "x-filter" => true,
@@ -61,7 +66,14 @@ class EscalationsApiController extends \AbstractApiController
             "recordType:s?" => [
                 "x-filter" => true,
             ],
-            "recordID?" => RangeExpression::createSchema([":i"])->setField("x-filter", true),
+            "recordID?" => [
+                "type" => "array",
+                "items" => [
+                    "type" => "integer",
+                ],
+                "style" => "form",
+                "x-filter" => true,
+            ],
             "placeRecordType:s?" => [
                 "x-filter" => true,
             ],
@@ -71,7 +83,7 @@ class EscalationsApiController extends \AbstractApiController
                 "type" => "array",
                 "items" => [
                     "type" => "string",
-                    "enum" => $this->reportReasonModel->getAvailableReasonIDs(),
+                    "enum" => $this->reportReasonModel->selectReasonIDs(),
                 ],
                 "style" => "form",
                 "x-filter" => true,
@@ -121,7 +133,7 @@ class EscalationsApiController extends \AbstractApiController
      */
     public function get(int $escalationID): array
     {
-        $this->permission("posts.moderate");
+        $this->permission(["posts.moderate", "community.moderate"]);
         $escalation = $this->getEscalation($escalationID);
         return $escalation;
     }
@@ -134,7 +146,7 @@ class EscalationsApiController extends \AbstractApiController
      */
     public function post(array $body): array
     {
-        $this->permission("posts.moderate");
+        $this->permission(["posts.moderate", "community.moderate"]);
         $baseSchema = Schema::parse([
             "recordType:s",
             "recordID:i",
@@ -146,11 +158,14 @@ class EscalationsApiController extends \AbstractApiController
                 "default" => true,
             ],
             "status:s?" => [
-                "enum" => EscalationModel::STATUSES,
+                "enum" => $this->escalationsModel->getStatusIDs(),
             ],
-        ]);
+            "initialCommentBody:s?",
+            "initialCommentFormat?" => new FormatSchema(),
+        ])->addValidator("", SchemaUtils::onlyTogether(["initialCommentBody", "initialCommentFormat"]));
 
         $initialBody = $baseSchema->validate($body);
+
         // Validate deeper permissions
         $record = $this->communityManagementRecordModel->getRecord(
             $initialBody["recordType"],
@@ -163,8 +178,10 @@ class EscalationsApiController extends \AbstractApiController
             ]);
         }
 
-        // Check permissions on that particular category.
-        $this->permission("posts.moderate", $record["CategoryID"]);
+        // Check permissions on that particular category if the user isn't a global moderator.
+        if (!$this->getSession()->checkPermission("community.moderate")) {
+            $this->permission("posts.moderate", $record["CategoryID"]);
+        }
 
         if (isset($body["reportID"])) {
             $schema = SchemaUtils::composeSchemas($baseSchema, Schema::parse(["reportID:i"]));
@@ -174,6 +191,10 @@ class EscalationsApiController extends \AbstractApiController
             $schema = SchemaUtils::composeSchemas($baseSchema, $this->reportsApiController->postSchema());
             $body = $schema->validate($body);
             $report = $this->reportsApiController->post($body);
+        }
+
+        if (isset($body["initialCommentFormat"]) && isset($body["initialCommentBody"])) {
+            $this->formatService->filter($body["initialCommentBody"], $body["initialCommentFormat"]);
         }
 
         $escalationID = $this->escalationsModel->insert([
@@ -194,7 +215,22 @@ class EscalationsApiController extends \AbstractApiController
             $this->communityManagementRecordModel->removeRecord($body["recordType"], $body["recordID"]);
         }
 
+        $initialCommentBody = $body["initialCommentBody"] ?? null;
+        $initialCommentFormat = $body["initialCommentFormat"] ?? null;
+        if ($initialCommentBody !== null && $initialCommentFormat !== null) {
+            $commentID = $this->commentModel->save([
+                "Body" => $initialCommentBody,
+                "Format" => $initialCommentFormat,
+                "parentRecordType" => "escalation",
+                "parentRecordID" => $escalationID,
+            ]);
+            ModelUtils::validationResultToValidationException($this->commentModel);
+        }
+
         $result = $this->getEscalation($escalationID);
+        $attachmentProvider = \Gdn::getContainer()->get(VanillaEscalationAttachmentProvider::class);
+        $attachmentProvider->createAttachmentFromEscalation($result);
+
         return $result;
     }
 
@@ -207,21 +243,21 @@ class EscalationsApiController extends \AbstractApiController
      */
     public function patch(int $escalationID, array $body)
     {
-        $this->permission("posts.moderate");
+        $this->permission(["posts.moderate", "community.moderate"]);
 
         $in = Schema::parse([
             "recordIsLive:b?",
             "name:s?",
             "assignedUserID:i|n?",
             "status:s?" => [
-                "enum" => EscalationModel::STATUSES,
+                "enum" => $this->escalationsModel->getStatusIDs(),
             ],
         ]);
 
         $body = $in->validate($body);
 
+        // This does deeper permission checks.
         $existingEscalation = $this->getEscalation($escalationID);
-        $this->permission("posts.moderate", $existingEscalation["placeRecordID"]);
 
         $escalationModifications = $body;
         unset($escalationModifications["recordIsLive"]);
@@ -234,11 +270,13 @@ class EscalationsApiController extends \AbstractApiController
             $shouldRemoveRecord = $body["recordIsLive"] === false && $existingEscalation["recordIsLive"] === true;
             $shouldRestoreRecord = $body["recordIsLive"] === true && $existingEscalation["recordIsLive"] === false;
             if ($shouldRestoreRecord) {
+                // We have a record ID, so we can just restore the record from the log table.
                 $this->communityManagementRecordModel->restoreRecord(
                     $existingEscalation["recordType"],
                     $existingEscalation["recordID"]
                 );
             } elseif ($shouldRemoveRecord) {
+                // Remove the record and send it to the log table.
                 $this->communityManagementRecordModel->removeRecord(
                     $existingEscalation["recordType"],
                     $existingEscalation["recordID"]
@@ -247,6 +285,7 @@ class EscalationsApiController extends \AbstractApiController
         }
 
         $result = $this->getEscalation($escalationID);
+
         return $result;
     }
 
@@ -262,19 +301,15 @@ class EscalationsApiController extends \AbstractApiController
      */
     private function getEscalation(int $escalationID): array
     {
-        $rows = $this->escalationsModel->queryEscalations(
-            [
-                "escalationID" => $escalationID,
-            ],
-            [Model::OPT_LIMIT => 1]
-        );
-        $result = $rows[0] ?? null;
+        $result = $this->escalationsModel->getEscalation($escalationID);
+
         if ($result === null) {
             throw new NotFoundException("escalation", ["escalationID" => $escalationID]);
         }
 
-        $this->permission("posts.moderate", $result["placeRecordID"]);
-
+        if (!$this->getSession()->checkPermission("community.moderate")) {
+            $this->permission("posts.moderate", $result["placeRecordID"]);
+        }
         return $result;
     }
 }

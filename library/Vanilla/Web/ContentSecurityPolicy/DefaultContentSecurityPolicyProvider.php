@@ -52,6 +52,12 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
             $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, implode(" ", $whitelist));
         }
 
+        $objectSrc = $this->config->get("ContentSecurityPolicy.objectSrc", "'none'");
+        $scriptSrcPolicies[] = new Policy(Policy::OBJECT_SRC, $objectSrc);
+
+        $baseUri = $this->config->get("ContentSecurityPolicy.baseUri", "'self'");
+        $scriptSrcPolicies[] = new Policy(Policy::BASE_URI, $baseUri);
+
         return $scriptSrcPolicies;
     }
 

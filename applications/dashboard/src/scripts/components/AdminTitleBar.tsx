@@ -19,7 +19,6 @@ export interface IProps {
     actionsWrapperClassName?: string;
     description?: ReactNode;
     titleLabel?: ReactNode;
-    compact?: boolean;
     useTwoColumnContainer?: boolean;
 }
 
@@ -31,16 +30,19 @@ export default function AdminTitleBar(props: IProps) {
     return (
         <div className={classes.root}>
             <div
-                className={cx(classes.container(props.useTwoColumnContainer, props.compact), props.containerClassName)}
+                className={cx(
+                    classes.container(props.useTwoColumnContainer, !!props.actions),
+                    props.containerClassName,
+                )}
             >
                 <div className={cx(classes.titleAndActionsContainer, props.titleAndActionsContainerClassName)}>
                     <div className={classes.titleAndDescriptionContainer}>
-                        <h2 className={classes.titleWrap}>
+                        <h1 className={classes.titleWrap}>
                             <TruncatedText lines={1} className={classes.title}>
                                 {props.title ?? <LoadingRectangle height={32} width={300} />}
                             </TruncatedText>
                             {props.titleLabel ?? undefined}
-                        </h2>
+                        </h1>
                         {props.description && (
                             <div className={cx(classes.descriptionWrapper)}>
                                 <div className={userContentClasses().root}>

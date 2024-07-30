@@ -19,11 +19,35 @@ export const dashboardClasses = useThemeCache(() => {
 
     const style = styleFactory("dashboard");
 
+    const subHeading = css({
+        ...extendItemContainer(18),
+        paddingLeft: 18,
+        paddingRight: 18,
+        marginTop: -1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        fontWeight: 600,
+        fontSize: 14,
+        lineHeight: 1.5,
+    });
+
+    const subHeadingActions = css({
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        "& button, & [role='button']": {
+            minHeight: 28,
+            lineHeight: "26px",
+        },
+    });
+
     const subHeadingBackground = style({
         "&.subheading": {
             fontSize: "14px",
             marginBottom: "0",
-            paddingTop: "9px",
+            paddingTop: 9,
+            paddingBottom: 9,
             borderTop: "1px solid #D8D8D8",
             borderBottom: "1px solid #D8D8D8",
             backgroundColor: "#f6f9fb",
@@ -224,7 +248,7 @@ export const dashboardClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingInline: globalVars.widget.paddingBothSides,
+        paddingInline: 10,
 
         "& .label-wrap": {
             // Create the 58.3333333% used from the old 24 col grid system css
@@ -248,8 +272,80 @@ export const dashboardClasses = useThemeCache(() => {
         },
     });
 
+    const multiLineInput = css({
+        "& textarea": {
+            fontSize: "14px",
+        },
+    });
+
+    const currencyInput = css({
+        display: "flex",
+        alignItems: "center",
+
+        "& .dollar": {
+            position: "relative",
+            left: "25px",
+            fontSize: 16,
+            fontWeight: globalVars.fonts.weights.semiBold,
+        },
+
+        "& input": {
+            paddingLeft: "35px",
+        },
+    });
+
+    const readonlyRow = css({
+        paddingTop: 8,
+        paddingBottom: 8,
+    });
+    const readonlyTokens = css({
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: 8,
+        paddingTop: 8,
+        paddingBottom: 8,
+    });
+    const readonlyDescription = css({});
+    const readonlyEmptyMessage = css({});
+    const ratioInputContainer = css({
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        justifyContent: "space-between",
+        maxWidth: "7em",
+
+        "& input": {
+            textAlign: "center",
+        },
+
+        "@media (max-width: 300px)": {
+            flexDirection: "column",
+        },
+    });
+
+    const ratioInputReadOnlyNumerator = css({
+        padding: "6px 6px 6px 0",
+    });
+
+    const ratioInput = css({
+        maxWidth: "4em",
+        padding: 6,
+    });
+
+    const ratioInputSeparator = css({
+        padding: 6,
+        minWidth: "max-content",
+    });
+
+    const highlight = css({
+        backgroundColor: ColorsUtils.colorOut(globalVars.messageColors.error.bg.fade(0.25)),
+    });
+
     return {
+        subHeading,
         subHeadingBackground,
+        subHeadingActions,
         formList,
         inputWrapper,
         helpAsset,
@@ -273,5 +369,16 @@ export const dashboardClasses = useThemeCache(() => {
         passwordInput,
         spaceBetweenFormGroup,
         buttonRow,
+        currencyInput,
+        multiLineInput,
+        readonlyRow,
+        readonlyTokens,
+        readonlyDescription,
+        readonlyEmptyMessage,
+        ratioInputContainer,
+        ratioInputReadOnlyNumerator,
+        ratioInput,
+        ratioInputSeparator,
+        highlight,
     };
 });

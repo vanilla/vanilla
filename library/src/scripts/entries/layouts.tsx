@@ -23,7 +23,7 @@ import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import { LayoutError } from "@library/features/Layout/LayoutErrorBoundary";
 import { HamburgerMenuContextProvider } from "@library/contexts/HamburgerMenuContext";
-import { getSiteSection } from "@library/utility/appUtils";
+import { getMeta, getSiteSection } from "@library/utility/appUtils";
 import { logDebug } from "@vanilla/utils";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { CommunitySearchProvider } from "@vanilla/addon-vanilla/search/CommunitySearchProvider";
@@ -33,6 +33,8 @@ import SectionFullWidth from "@library/layout/SectionFullWidth";
 import SectionOneColumn from "@library/layout/SectionOneColumn";
 import ThreeColumnSection from "@library/layout/ThreeColumnSection";
 import TwoColumnSection from "@library/layout/TwoColumnSection";
+import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
+import { MetaIcon } from "@library/metas/Metas";
 
 // App Setup
 logDebug("Boot layout app");
@@ -147,3 +149,21 @@ onPageViewWithContext((event: CustomEvent) => {
 });
 
 trackLink();
+
+function ThreadItemHeaderAiAssistantIcon() {
+    return <MetaIcon icon="ai-sparkle-monocolor" size="compact" />;
+}
+
+if (getMeta("answerSuggestionsEnabled", false)) {
+    const aiAssistant = getMeta("aiAssistant");
+    const aiAssistantUserID = aiAssistant?.userID;
+    ThreadItemHeader.registerMetaItem(
+        ThreadItemHeaderAiAssistantIcon,
+        (context) => {
+            const { authorID } = context;
+            const isAiAssistant = !!authorID && !!aiAssistantUserID && aiAssistantUserID === authorID;
+            return isAiAssistant;
+        },
+        { placement: "author", order: 0 },
+    );
+}

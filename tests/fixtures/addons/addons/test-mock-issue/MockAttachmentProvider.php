@@ -267,4 +267,12 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     {
         return 0;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAdditionalCatalogInfo(): array
+    {
+        return [];
+    }
 }

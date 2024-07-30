@@ -72,6 +72,12 @@ export const metasClasses = useThemeCache(() => {
         },
     });
 
+    const metaFlexed = css({
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "0.5ch",
+    });
+
     // Get styles of meta, without the margins
     const metaStyle = css({
         display: "inline-block",
@@ -113,9 +119,20 @@ export const metasClasses = useThemeCache(() => {
         padding: 0,
     });
 
+    const profileMeta = css({
+        maxHeight: "unset",
+        "& a": {
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            ...metaLinkItemStyle(),
+        },
+    });
+
     return {
         root,
         meta,
+        metaFlexed,
         itemSpacing,
         metaLink,
         metaStyle,
@@ -124,5 +141,6 @@ export const metasClasses = useThemeCache(() => {
         inlineBlock,
         alignVerticallyInMetaItem,
         iconButton,
+        profileMeta,
     };
 });

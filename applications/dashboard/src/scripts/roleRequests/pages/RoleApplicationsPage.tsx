@@ -1,5 +1,5 @@
 import { RouteComponentProps } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { t } from "@vanilla/i18n";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import {
@@ -83,7 +83,7 @@ function RoleApplicationsBody(props: IProps) {
 
     const metaOptions = Object.values<IRoleRequestMeta>(metas.data).map((meta) => ({
         value: meta.roleID.toString(),
-        name: meta.role.name,
+        name: meta.name,
     }));
     metaOptions.unshift({ value: "", name: t("All") });
 

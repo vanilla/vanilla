@@ -21,8 +21,10 @@ import { useTagList } from "@library/features/tags/TagsHooks";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { AxiosResponseHeaders } from "axios";
+import { IGetUsersResponse, useGetUsers } from "@dashboard/users/userManagement/UserManagement.hooks";
 
-export function useRecipes(continiousFetch: boolean = true) {
+export function useRecipes(continiousFetch: boolean = true, escalationActionsFilter?: boolean) {
+    const queryParams = escalationActionsFilter ? { escalations: true } : {};
     const {
         data: recipes,
         isLoading,
@@ -30,12 +32,14 @@ export function useRecipes(continiousFetch: boolean = true) {
         isRefetching,
     } = useQuery<any, IApiError, IAutomationRule[]>({
         queryFn: async () => {
-            const response = await apiv2.get("/automation-rules/recipes?expand=all");
+            const response = await apiv2.get("/automation-rules/recipes?expand=all", {
+                params: queryParams,
+            });
             return response.data;
         },
         refetchOnMount: "always",
         refetchInterval: continiousFetch ? 15000 : false,
-        queryKey: ["automationRules"],
+        queryKey: ["automationRules", queryParams],
     });
 
     return { recipes, isLoading, error, isRefetching };
@@ -79,7 +83,6 @@ export function useUpdateRecipe(automationRuleID: AddEditAutomationRuleParams["a
         mutationKey: ["update_automationRule", automationRuleID],
         onSuccess: () => {
             queryClient.invalidateQueries(["automationRules"]);
-            queryClient.invalidateQueries(["automationRule", automationRuleID]);
         },
     });
 }
@@ -126,13 +129,16 @@ export function useRunAutomationRule(automationRuleID: AddEditAutomationRulePara
     });
 }
 
-export function useAutomationRulesCatalog() {
+export function useAutomationRulesCatalog(escalationActionsFilter?: boolean) {
+    const queryParams = escalationActionsFilter ? { escalations: true } : {};
     const { data, isLoading } = useQuery<any, IApiError, IAutomationRulesCatalog>({
         queryFn: async () => {
-            const response = await apiv2.get("/automation-rules/catalog");
+            const response = await apiv2.get("/automation-rules/catalog", {
+                params: queryParams,
+            });
             return response.data;
         },
-        queryKey: ["automationRulesCatalog"],
+        queryKey: ["automationRulesCatalog", queryParams],
     });
 
     return { data, isLoading };
@@ -173,16 +179,29 @@ export function useGetAdditionalData(query: AutomationRulesAdditionalDataQuery, 
 
     const { data: additionalTags } = useTagList(query?.tagsQuery ?? {}, Boolean(query?.tagsQuery?.tagID?.length));
 
+    const { data: additionalUsersData } = useGetUsers(
+        query?.usersQuery ?? {},
+        Boolean(query?.usersQuery?.userID?.length),
+    );
+
     useEffect(() => {
         if (additionalCategories) {
-            queryClient.setQueryData(["categoryList", initialQuery], (initialData) => {
-                return [...(initialData as ICategory[]), ...additionalCategories];
+            queryClient.setQueryData(["categoryList", initialQuery], (initialData: ICategory[]) => {
+                return [...initialData, ...additionalCategories];
             });
         }
         if (additionalTags) {
-            queryClient.setQueryData(["tags", initialQuery], (initialData) => {
-                return [...(initialData as ITag[]), ...additionalTags];
+            queryClient.setQueryData(["tags", initialQuery], (initialData: ITag[]) => {
+                return [...initialData, ...additionalTags];
             });
         }
-    }, [additionalCategories, additionalTags]);
+        if (additionalUsersData) {
+            queryClient.setQueryData(["users_userManagement", initialQuery], (initialData: IGetUsersResponse) => {
+                return {
+                    ...initialData,
+                    users: [...initialData?.users, ...additionalUsersData.users],
+                };
+            });
+        }
+    }, [additionalCategories, additionalTags, additionalUsersData]);
 }

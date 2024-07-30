@@ -108,7 +108,7 @@
 
   .nav-link {
     display: block;
-    padding: $nav-link-padding;
+    padding: 4px 15px 6px;
     margin-left: -3px;
     line-height: 20px;
     @include border-radius($nav-pills-border-radius);

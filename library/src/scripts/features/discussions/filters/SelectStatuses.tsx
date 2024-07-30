@@ -11,6 +11,7 @@ import { useStatusOptions } from "@library/features/discussions/filters/discussi
 import flatten from "lodash-es/flatten";
 import { IGroupOption } from "@library/forms/select/Tokens.loadable";
 import { useIsInModal } from "@library/modal/Modal.context";
+import { t } from "@vanilla/i18n";
 
 export interface ISelectStatusesProps {
     value: number[];
@@ -39,7 +40,24 @@ export function SelectStatuses(props: ISelectStatusesProps) {
             });
         }
 
-        return tmpGroups;
+        // Workaround fix for screen readers, can remove after we upgrade react-select
+        return tmpGroups.map((group) => {
+            if (group?.label === "Q & A") {
+                return {
+                    ...group,
+                    options: group?.options?.map((option) => ({ ...option, label: `${t("Q & A")}: ${option.label}` })),
+                };
+            }
+
+            if (group?.label === "Ideas") {
+                return {
+                    ...group,
+                    options: group?.options?.map((option) => ({ ...option, label: `${t("Ideas")}: ${option.label}` })),
+                };
+            }
+
+            return group;
+        });
     }, [groups, types]);
 
     const value = useMemo<IComboBoxOption[]>(() => {
@@ -62,6 +80,21 @@ export function SelectStatuses(props: ISelectStatusesProps) {
         return null;
     }
 
+    const formatOptionLabel: React.ComponentProps<typeof Tokens>["formatOptionLabel"] = ({ label }) => {
+        const formattedLabel = label.startsWith(`${t("Q & A")}: `)
+            ? label.replace(`${t("Q & A")}: `, "")
+            : label.startsWith(`${t("Ideas")}: `)
+            ? label.replace(`${t("Ideas")}: `, "")
+            : label;
+
+        return (
+            <>
+                <span className="sr-only">{label}</span>
+                {formattedLabel}
+            </>
+        );
+    };
+
     return (
         <Tokens
             value={value}
@@ -70,6 +103,7 @@ export function SelectStatuses(props: ISelectStatusesProps) {
             label={label}
             inModal={isInModal}
             showIndicator
+            formatOptionLabel={formatOptionLabel}
         />
     );
 }

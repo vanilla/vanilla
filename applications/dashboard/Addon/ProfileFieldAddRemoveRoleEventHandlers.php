@@ -11,8 +11,6 @@ namespace Vanilla\Dashboard\Addon;
 use Garden\EventHandlersInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
-use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
-use Vanilla\Dashboard\Models\AutomationRuleModel;
 
 // Needed because special classes are loaded before the autoloader is ready.
 require_once __DIR__ . "/AbstractProfileFieldEventHandler.php";
@@ -21,12 +19,12 @@ require_once __DIR__ . "/AbstractProfileFieldEventHandler.php";
  */
 class ProfileFieldAddRemoveRoleEventHandlers extends AbstractProfileFieldEventHandler implements EventHandlersInterface
 {
-    public function __construct(
-        AutomationRuleService $automationRuleService,
-        AutomationRuleModel $automationRuleModel,
-        LoggerInterface $log
-    ) {
-        parent::__construct($automationRuleService, $automationRuleModel, $log);
+    /**
+     * D.I.
+     */
+    public function __construct(LoggerInterface $log)
+    {
+        parent::__construct($log);
         $this->actionType = AddRemoveUserRoleAction::getType();
     }
 

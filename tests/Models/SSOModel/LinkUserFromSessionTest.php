@@ -8,6 +8,7 @@
 namespace VanillaTests\Models\SSOModel;
 
 use Garden\Web\Exception\ForbiddenException;
+use UserModel;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Models\SSOData;
 use Vanilla\Models\SSOModel;
@@ -46,7 +47,10 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase
         /** @var \UserModel $userModel */
         $userModel = self::container()->get(\UserModel::class);
         foreach (self::$users as &$user) {
-            $userID = $userModel->save($user, ["NoConfirmEmail" => true]);
+            $userID = $userModel->save($user, [
+                UserModel::OPT_NO_CONFIRM_EMAIL => true,
+                UserModel::OPT_SSO_REGISTRATION => true,
+            ]);
             if ($userID) {
                 $user["UserID"] = $userID;
             } else {

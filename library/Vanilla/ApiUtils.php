@@ -35,7 +35,7 @@ class ApiUtils
      * @param array $input API input (query, request body, etc.)
      * @return array An array with CapitalCase keys.
      */
-    public static function convertInputKeys(array $input)
+    public static function convertInputKeys(array $input, array $excludedKeys = [])
     {
         static $scheme;
 
@@ -43,7 +43,7 @@ class ApiUtils
             $scheme = new CapitalCaseScheme();
         }
 
-        $result = $scheme->convertArrayKeys($input);
+        $result = $scheme->convertArrayKeys($input, excludedKeys: $excludedKeys);
         return $result;
     }
 

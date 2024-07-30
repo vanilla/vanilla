@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { useState } from "react";
+import { t } from "@library/utility/appUtils";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import LocationBreadcrumbs from "@library/navigation/LocationBreadcrumbs";
 import { CategoryIcon, PlusCircleIcon } from "@library/icons/common";
@@ -82,6 +83,10 @@ export function CategoryPicker(props: IProps) {
 
     const picker = (
         <div className={classes.pickerWrapper}>
+            <label className="sr-only" htmlFor={id}>
+                {t("Select a category")}
+            </label>
+
             <select value={selectedValue} id={id} name={name} onChange={handleChange} className={classes.select}>
                 {defaultItem?.label && <option value={defaultItem.value}>{defaultItem.label}</option>}
                 {items.map((item, i) => {

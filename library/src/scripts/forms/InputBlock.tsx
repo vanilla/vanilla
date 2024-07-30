@@ -96,7 +96,11 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
         }
 
         return (
-            <OuterTag className={componentClasses} role={role}>
+            <OuterTag
+                className={componentClasses}
+                role={role}
+                aria-labelledby={role === "group" ? this.labelID : undefined}
+            >
                 {hasLegendOrLabel && (
                     <span className={classesInputBlock.labelAndDescription}>
                         <LegendOrSpanTag

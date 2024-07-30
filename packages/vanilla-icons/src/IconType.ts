@@ -11,6 +11,11 @@ export type IconData = {
 };
 
 export const coreIconsData = {
+    "ai-sparkle-monocolor": {
+        width: "16",
+        height: "16",
+        fill: "currentColor",
+    },
     "ai-sparkle": {
         width: "16",
         height: "16",
@@ -174,6 +179,12 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
+    "data-undo": {
+        width: "16",
+        height: "17",
+        viewBox: "0 0 16 17",
+        fill: "none",
+    },
     "data-up": {
         width: "24",
         height: "24",
@@ -184,16 +195,16 @@ export const coreIconsData = {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        strokewidth: "1.4",
         fill: "currentColor",
         stroke: "currentColor",
+        strokeWidth: "1.4",
     },
     "discussion-bookmark": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        strokewidth: "1.4",
         stroke: "currentColor",
+        strokeWidth: "1.4",
     },
     "editor-eye-slash": {
         width: "24",
@@ -326,10 +337,16 @@ export const coreIconsData = {
         height: "24",
         viewBox: "0 0 24 24",
     },
+    "meta-external-compact": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
     "meta-external": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
+        fill: "none",
     },
     "meta-like": {
         width: "24",
@@ -544,6 +561,12 @@ export const coreIconsData = {
         fill: "none",
     },
     "reaction-thumbs-up": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-very-negative": {
         width: "25",
         height: "24",
         viewBox: "0 0 25 24",

@@ -352,9 +352,11 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         }
 
         $cspModel = Gdn::getContainer()->get(ContentSecurityPolicyModel::class);
-        $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspModel->getHeaderString(
-            Policy::FRAME_ANCESTORS
-        );
+        $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspModel->getHeaderString([
+            Policy::FRAME_ANCESTORS,
+            Policy::BASE_URI,
+            Policy::OBJECT_SRC,
+        ]);
         $xFrameString = $cspModel->getXFrameString();
         if ($xFrameString !== null) {
             $this->_Headers[ContentSecurityPolicyModel::X_FRAME_OPTIONS] = $xFrameString;
@@ -2056,6 +2058,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
      */
     public function renderException($ex)
     {
+        $isContainerException = $ex instanceof \Garden\Container\NotFoundException;
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             try {
                 // Pick our route.
@@ -2065,7 +2068,11 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                         $route = "DefaultPermission";
                         break;
                     case 404:
-                        $route = "Default404";
+                        if ($isContainerException) {
+                            $route = "/home/error";
+                        } else {
+                            $route = "Default404";
+                        }
                         break;
                     default:
                         $route = "/home/error";
@@ -2090,7 +2097,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                         ->passData("Url", url())
                         ->passData("Breadcrumbs", $this->data("Breadcrumbs", []))
                         ->dispatch($route);
-                } elseif (in_array($ex->getCode(), [401, 403, 404])) {
+                } elseif (in_array($ex->getCode(), [401, 403, 404]) && !$isContainerException) {
                     // Default forbidden & not found codes.
                     Gdn::dispatcher()
                         ->passData("Message", $ex->getMessage())

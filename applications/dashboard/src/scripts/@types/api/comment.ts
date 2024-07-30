@@ -3,11 +3,18 @@
  * @license GPL-2.0-only
  */
 
-import { IDiscussion } from "@dashboard/@types/api/discussion";
-import { IUserFragment } from "@library/@types/api/users";
-import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { IDiscussion, IReportMeta } from "@dashboard/@types/api/discussion";
 import { IReaction } from "@dashboard/@types/api/reaction";
+import { IUserFragment } from "@library/@types/api/users";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
+import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+
+export interface IPremoderatedRecordResponse {
+    status: 202;
+    message: string;
+    escalationID?: number;
+}
 
 export interface IComment {
     name: string;
@@ -24,6 +31,8 @@ export interface IComment {
     attributes: any;
     reactions?: IReaction[];
     attachments?: IAttachment[];
+    reportMeta?: IReportMeta;
+    suggestion?: ISuggestedAnswer;
 }
 
 export interface ICommentEdit {

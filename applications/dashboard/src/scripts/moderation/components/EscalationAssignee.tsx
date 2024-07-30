@@ -12,14 +12,19 @@ import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { inputClasses } from "@library/forms/inputStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import { Mixins } from "@library/styles/Mixins";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
-import { AutoComplete, AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete";
+import {
+    AutoComplete,
+    AutoCompleteLookupOptions,
+    IAutoCompleteOption,
+    ILookupApi,
+} from "@vanilla/ui/src/forms/autoComplete";
 
 interface IProps {
     escalation: IEscalation;
     className?: string;
+    autoCompleteClasses?: string;
     inCard?: boolean;
 }
 
@@ -29,6 +34,7 @@ const escalationAssigneeClasses = (inCard?: boolean) => ({
         alignItems: "center",
         gap: 8,
         padding: "0px!important",
+        marginLeft: -6,
         maxWidth: 200,
         position: "relative",
         transition: "border-color 230ms",
@@ -75,7 +81,7 @@ export function EscalationAssignee(props: IProps) {
 
     const classes = escalationAssigneeClasses(props.inCard);
 
-    const userLookup = {
+    const userLookup: ILookupApi = {
         searchUrl: "/api/v2/users/by-names?name=%s*&limit=10",
         labelKey: "name",
         valueKey: "userID",
@@ -91,6 +97,15 @@ export function EscalationAssignee(props: IProps) {
                 };
             });
         },
+        initialOptions: escalation.assignedUser
+            ? [
+                  {
+                      value: escalation.assignedUser.userID,
+                      label: escalation.assignedUser.name,
+                      data: { icon: escalation.assignedUser.photoUrl },
+                  } as IAutoCompleteOption,
+              ]
+            : undefined,
     };
 
     const queryClient = useQueryClient();
@@ -131,7 +146,7 @@ export function EscalationAssignee(props: IProps) {
                     />
                 }
                 options={[{ value: -4, label: "Unassigned", data: { icon: deletedUserFragment() } }]}
-                className={classes.autoComplete}
+                className={cx(classes.autoComplete, props.autoCompleteClasses)}
                 size={props.inCard ? "small" : "default"}
             />
         </div>

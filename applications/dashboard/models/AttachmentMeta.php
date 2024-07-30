@@ -16,23 +16,14 @@ use Vanilla\Models\SiteMetaExtra;
  */
 class AttachmentMeta extends SiteMetaExtra
 {
-    protected AttachmentService $attachmentService;
-
-    /**
-     * @param AttachmentService $attachmentService
-     */
-    public function __construct(AttachmentService $attachmentService)
-    {
-        $this->attachmentService = $attachmentService;
-    }
-
     /**
      * @return array
      */
     public function getValue(): array
     {
+        $attachmentService = \Gdn::getContainer()->get(AttachmentService::class);
         return [
-            "externalAttachments" => $this->attachmentService->getCatalog(),
+            "externalAttachments" => $attachmentService->getCatalog(),
         ];
     }
 }

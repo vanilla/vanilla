@@ -93,7 +93,7 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
         $discussionID = $discussion["DiscussionID"];
 
         $this->commentModel->orderBy("c.DateInserted asc");
-        $offset = $this->commentModel->getOffset($comment["CommentID"]);
+        $offset = $this->commentModel->getDiscussionThreadOffset($comment);
         $limit = $this->configuration->get("Vanilla.Comments.PerPage", 30);
 
         $page = (int) pageNumber($offset, $limit, false);

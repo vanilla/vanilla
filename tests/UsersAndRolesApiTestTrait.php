@@ -12,6 +12,7 @@ use Garden\Http\HttpResponse;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Http\InternalClient;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * @method InternalClient api()
@@ -89,7 +90,7 @@ trait UsersAndRolesApiTestTrait
      *
      * @return mixed The result of the callback.
      */
-    protected function runWithUser(callable $callback, $userOrUserID)
+    protected function runWithUser(callable $callback, array|int $userOrUserID)
     {
         $userID = is_array($userOrUserID) ? $userOrUserID["userID"] : $userOrUserID;
         $apiUserBefore = $this->api()->getUserID();
@@ -142,10 +143,10 @@ trait UsersAndRolesApiTestTrait
      *
      * @param array $overrides
      * @param array $extras Extra fields to set directly through the model.
-     *
+     * @param array $notificationPreferences
      * @return array
      */
-    protected function createUser(array $overrides = [], array $extras = []): array
+    protected function createUser(array $overrides = [], array $extras = [], array $notificationPreferences = []): array
     {
         $salt = $this->generateSalt();
 
@@ -169,11 +170,102 @@ trait UsersAndRolesApiTestTrait
             \Gdn::userModel()->setField($this->lastUserID, $extras);
         }
 
+        if (!empty($notificationPreferences)) {
+            $this->api()->patch("/notification-preferences/$this->lastUserID", $notificationPreferences);
+        }
+
         return $result;
     }
 
     /**
-     * Create an user through the API.
+     * Create a user with the default moderator role.
+     *
+     * @param array $overrides
+     * @param array $extras
+     * @return array
+     */
+    protected function createGlobalMod(array $overrides = [], array $extras = []): array
+    {
+        $overrides = array_merge_recursive($overrides, [
+            "roleID" => [\RoleModel::MOD_ID],
+        ]);
+        return $this->createUser($overrides, $extras);
+    }
+
+    /**
+     * Create a user with a custom role that makes them the moderator of a specific category.
+     *
+     * @param array $categoryOrCategories
+     * @param array $overrides
+     * @param array $extras
+     *
+     * @return array
+     */
+    protected function createCategoryMod(array $categoryOrCategories, array $overrides = [], array $extras = []): array
+    {
+        return $this->createUserWithCategoryPermissions(
+            $categoryOrCategories,
+            [
+                "discussions.view" => true,
+                "discussions.add" => true,
+                "comments.add" => true,
+                "posts.moderate" => true,
+            ],
+            $overrides,
+            $extras
+        );
+    }
+
+    public function createUserWithCategoryPermissions(
+        array $categoryOrCategories,
+        array $permissionOnCategory = [
+            "discussions.view" => true,
+            "discussions.add" => true,
+            "comments.add" => true,
+            "comments.edit" => true,
+        ],
+        array $overrides = [],
+        array $extras = []
+    ) {
+        if (!method_exists($this, "createCategory")) {
+            TestCase::fail("Using createCategoryMod requires the CommunityApiTestTrait.");
+        }
+
+        if (isset($categoryOrCategories["categoryID"])) {
+            $categoryIDs = [$categoryOrCategories["categoryID"]];
+        } else {
+            $categoryIDs = array_column($categoryOrCategories, "categoryID");
+        }
+
+        // The category needs custom permissions
+        $categoryPermissions = [];
+
+        foreach ($categoryIDs as $categoryID) {
+            $categoryPermissions[] = [
+                "type" => "category",
+                "id" => $categoryID,
+                "permissions" => $permissionOnCategory,
+            ];
+        }
+
+        // Now let's make a role with permissions on the category.
+        $role = $this->createRole(
+            [],
+            [
+                "session.valid" => true,
+            ],
+            ...$categoryPermissions
+        );
+
+        $overrides = array_merge_recursive($overrides, [
+            "roleID" => [\RoleModel::MEMBER_ID, $role["roleID"]],
+        ]);
+
+        return $this->createUser($overrides, $extras);
+    }
+
+    /**
+     * Create a user through the API.
      *
      * @param array $updates
      *
@@ -318,5 +410,25 @@ trait UsersAndRolesApiTestTrait
             $this->assertIsObject($registrationResults);
             return $registrationResults;
         });
+    }
+
+    /**
+     * Create a user applicant record.
+     *
+     * @param array $overrides
+     * @return array
+     */
+    public function createApplicant(array $overrides = []): array
+    {
+        $salt = substr($this->generateSalt(), 10);
+        $body = $overrides + [
+            "email" => "test_$salt@test.com",
+            "name" => "user_$salt",
+            "discoveryText" => "Hello there.",
+            "password" => $salt,
+        ];
+
+        $result = $this->api()->post("/applicants", $body);
+        return $result->getBody();
     }
 }

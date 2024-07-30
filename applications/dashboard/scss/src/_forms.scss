@@ -136,6 +136,10 @@ form {
         @extend .col-sm-10;
         @extend .col-xs-12;
         flex-grow: 1;
+
+        & .info {
+            max-width: 80ch;
+        }
     }
 
     .input-wrap-right {

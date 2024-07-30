@@ -14,5 +14,11 @@
     },
     "scripts": {
         "build:icon-types": "node ./generateIconTypes.js"
+    },
+    "dependencies": {
+        "lodash-es": "^4.17.21"
+    },
+    "devDependencies": {
+        "@types/lodash-es": "^4.17.12"
     }
 }

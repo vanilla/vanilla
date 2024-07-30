@@ -165,7 +165,7 @@ const TableRows = (props: ITableRowProps) => {
 const TableWrap = ({ condition, wrapper, children }) => (condition ? wrapper(children) : children);
 
 export interface ITableData {
-    [key: string]: string | number | Date | ReactNode | undefined;
+    [key: string]: string | number | Date | ReactNode | JSX.Element | undefined;
 }
 
 export interface ISortOption {
@@ -185,6 +185,8 @@ export interface ITableProps {
     columnsNotSortable?: string[];
     customColumnSort?: ISortOption;
     customSortByFnPerColumn?: Record<string, SortByFn<any>>;
+    /** Specify column sizes in an array of numbers, representing percentages */
+    columnSizes?: number[];
     onSortChange?: (sortOptions) => void;
     initialSortBy?: ISortOption[];
     paginate?: boolean;
@@ -221,6 +223,7 @@ export const Table = (props: ITableProps) => {
         rowClassNames,
         cellClassNames,
         truncateCells = true,
+        columnSizes,
     } = props;
 
     const classes = tableClasses();
@@ -378,6 +381,13 @@ export const Table = (props: ITableProps) => {
                     )}
                 >
                     <table {...getTableProps()} className={cx(classes.table, tableClassNames)}>
+                        {columnSizes && (
+                            <colgroup>
+                                {columnSizes.map((size, index) => (
+                                    <col key={`col-${index}`} style={{ width: `${size}%` }} />
+                                ))}
+                            </colgroup>
+                        )}
                         <TableHeader
                             headerGroups={headerGroups}
                             sortable={sortable}

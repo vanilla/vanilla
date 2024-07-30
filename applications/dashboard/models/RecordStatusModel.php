@@ -39,6 +39,8 @@ class RecordStatusModel extends FullRecordCacheModel implements LoggerAwareInter
     private $eventManager;
 
     public const DISCUSSION_STATUS_NONE = 0;
+    public const DISCUSSION_STATUS_UNRESOLVED = 7;
+    public const DISCUSSION_STATUS_RESOLVED = 8;
 
     public const DISCUSSION_INTERNAL_STATUS_NONE = -1;
 
@@ -46,6 +48,8 @@ class RecordStatusModel extends FullRecordCacheModel implements LoggerAwareInter
     public static $systemDefinedIDs = [
         RecordStatusModel::DISCUSSION_STATUS_NONE,
         RecordStatusModel::DISCUSSION_INTERNAL_STATUS_NONE,
+        RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED,
+        RecordStatusModel::DISCUSSION_STATUS_RESOLVED,
     ];
 
     /** @var array */
@@ -68,14 +72,43 @@ class RecordStatusModel extends FullRecordCacheModel implements LoggerAwareInter
         "state" => "open",
         "recordType" => "discussion",
         "recordSubtype" => "discussion",
+        "isDefault" => 0,
+        "isSystem" => 1,
+        "isInternal" => 1,
+        "isActive" => 1,
+    ];
+
+    protected const DEFAULT_DISCUSSION_UNRESOLVED_STATUS = [
+        "statusID" => self::DISCUSSION_STATUS_UNRESOLVED,
+        "name" => "Unresolved",
+        "state" => "open",
+        "recordType" => "discussion",
+        "recordSubtype" => "discussion",
         "isDefault" => 1,
+        "isSystem" => 1,
+        "isInternal" => 1,
+        "isActive" => 1,
+    ];
+    /** @var array */
+    protected const DEFAULT_DISCUSSION_RESOLVED_STATUS = [
+        "statusID" => self::DISCUSSION_STATUS_RESOLVED,
+        "name" => "Resolved",
+        "state" => "closed",
+        "recordType" => "discussion",
+        "recordSubtype" => "discussion",
+        "isDefault" => 0,
         "isSystem" => 1,
         "isInternal" => 1,
         "isActive" => 1,
     ];
 
     /** @var array[] DEFAULT_STATUSES */
-    protected const DEFAULT_STATUSES = [self::DEFAULT_DISCUSSION_STATUS, self::DEFAULT_INTERNAL_DISCUSSION_STATUS];
+    protected const DEFAULT_STATUSES = [
+        self::DEFAULT_DISCUSSION_STATUS,
+        self::DEFAULT_INTERNAL_DISCUSSION_STATUS,
+        self::DEFAULT_DISCUSSION_UNRESOLVED_STATUS,
+        self::DEFAULT_DISCUSSION_RESOLVED_STATUS,
+    ];
     //endregion
 
     /** @var \Gdn_Dirtycache */

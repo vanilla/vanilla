@@ -77,7 +77,10 @@ class EntryControllerTest extends SiteTestCase
             ["Garden.Registration.Method" => "Basic", ProfileFieldModel::CONFIG_FEATURE_FLAG => true],
             function () {
                 //first create some profile fields with different formType/dataType
-                $this->createProfileField(["apiName" => "field-test-textInput"]);
+                $this->createProfileField([
+                    "apiName" => "field-test-textInput",
+                    "label" => "xss test: <svg onXss=1 onload=alert(document.domain)>",
+                ]);
                 $this->createProfileField([
                     "apiName" => "field-test-dropdown",
                     "label" => "field test dropdown",
@@ -93,18 +96,19 @@ class EntryControllerTest extends SiteTestCase
                 $this->createProfileField([
                     "apiName" => "field-test-checkbox",
                     "label" => "field test checkbox",
+                    "description" => "xss test: <svg onXss=1 onload=alert(document.domain)>",
                     "dataType" => "boolean",
                     "formType" => "checkbox",
                     "enabled" => true,
                 ]);
 
-                $expected = '<li class="form-group"><label for="Form_Profilefield-test-textInput">profile field test</label>
+                $expected = '<li class="form-group"><label for="Form_Profilefield-test-textInput">xss test: &lt;svg onXss=1 onload=alert(document.domain)&gt;</label>
 <div class="Gloss">this is a test</div><input type="text" id="Form_Profilefield-test-textInput" name="Profile[field-test-textInput]" value="" class="InputBox" /></li><li class="form-group"><label for="Form_Profilefield-test-dropdown">field test dropdown</label>
 <div class="Gloss">this is a test description for dropdown</div><select id="Form_Profilefield-test-dropdown" name="Profile[field-test-dropdown]" class="" data-value="">
 <option value=""></option>
 <option value="0">0</option>
 <option value="1">1</option>
-</select></li><li><div class="Gloss">this is a test</div><label for="Form_Profilefield-test-checkbox" class="CheckBoxLabel"><input type="hidden" name="Checkboxes[]" value="Profile[field-test-checkbox]" /><input type="checkbox" id="Form_Profilefield-test-checkbox" name="Profile[field-test-checkbox]" value="1" class="" /> field test checkbox</label></li>';
+</select></li><li><div class="Gloss">xss test: &lt;svg onXss=1 onload=alert(document.domain)&gt;</div><label for="Form_Profilefield-test-checkbox" class="CheckBoxLabel"><input type="hidden" name="Checkboxes[]" value="Profile[field-test-checkbox]" /><input type="checkbox" id="Form_Profilefield-test-checkbox" name="Profile[field-test-checkbox]" value="1" class="" /> field test checkbox</label></li>';
 
                 $this->expectOutputString($expected);
                 $this->controller->generateFormCustomProfileFields();

@@ -90,6 +90,7 @@ class UserFragmentSchema extends Schema
         $schemaRecord = [
             "userID" => $dbRecord["UserID"] ?? $dbRecord["userID"],
             "photoUrl" => $photoUrl,
+            "bypassSpam" => $dbRecord["bypassSpam"] ?? (bool) ($dbRecord["Verified"] ?? false),
             "url" => url(userUrl($dbRecord), true),
             "name" => $dbRecord["Name"] ?? ($dbRecord["name"] ?? "Unknown"),
             "private" => (bool) $privateProfile,

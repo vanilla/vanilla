@@ -28,7 +28,7 @@
                         $element.removeClass("Loading");
 
                         // Populate the current element with the server's response.
-                        $element.html(data);
+                        $element.html(data.trim());
                     },
                     "html"
                 );

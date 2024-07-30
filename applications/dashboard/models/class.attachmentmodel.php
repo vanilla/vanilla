@@ -67,6 +67,8 @@ class AttachmentModel extends Gdn_Model
     /** @var AttachmentModel */
     static $Instance = null;
 
+    const ESCALATED_BY_AI = "escalatedByAI";
+
     /**
      * Set up the attachment.
      */
@@ -156,6 +158,11 @@ class AttachmentModel extends Gdn_Model
             return "d-" . $id;
         } elseif ($id = $rowArray["UserID"] ?? ($rowArray["userID"] ?? false)) {
             return "u-" . $id;
+        } elseif ($id = $rowArray["escalationID"] ?? false) {
+            return "e-" . $id;
+        } elseif (isset($rowArray["recordType"]) && isset($rowArray["recordID"])) {
+            $recordTypeLetter = lcfirst(substr($rowArray["recordType"], 0, 1));
+            return $recordTypeLetter . "-" . $rowArray["recordID"];
         }
         throw new Gdn_UserException("Failed to get Type...");
     }
@@ -279,6 +286,9 @@ class AttachmentModel extends Gdn_Model
                 break;
             case "u":
                 $parts[0] = "User";
+                break;
+            case "e":
+                $parts[0] = "escalation";
                 break;
             default:
                 throw new InvalidArgumentException("Invalid foreign ID: {$foreignID}");

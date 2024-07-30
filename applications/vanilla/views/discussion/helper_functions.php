@@ -12,6 +12,7 @@ use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Dashboard\Controllers\Api\ProfileFieldsApiController;
 use Vanilla\Utility\HtmlUtils;
 use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\Dashboard\Models\AttachmentService;
 
 if (!function_exists("getCustomFields")):
     /**
@@ -574,12 +575,17 @@ if (!function_exists("getDiscussionOptionsDropdown")):
                 );
         }
 
-        $dropdown->addReact("integrations", "LegacyIntegrationsOptionsMenuItems", [
-            "recordType" => "discussion",
-            "recordID" => $discussionID,
-            "redirectTarget" => discussionUrl($discussion, true),
-            "isAuthor" => $session->UserID == $discussion->InsertUserID,
-        ]);
+        $integrationsCatalog = Gdn::getContainer()
+            ->get(AttachmentService::class)
+            ->getCatalog();
+        if (count($integrationsCatalog) > 0) {
+            $dropdown->addReact("integrations", "LegacyIntegrationsOptionsMenuItems", [
+                "recordType" => "discussion",
+                "recordID" => $discussionID,
+                "redirectTarget" => discussionUrl($discussion, true),
+                "isAuthor" => $session->UserID == $discussion->InsertUserID,
+            ]);
+        }
 
         // DEPRECATED
         $options = [];
@@ -710,12 +716,17 @@ if (!function_exists("getCommentOptions")):
             ];
         }
 
-        $options["Integrations"] = TwigStaticRenderer::renderReactModule("LegacyIntegrationsOptionsMenuItems", [
-            "recordType" => "comment",
-            "recordID" => $comment->CommentID,
-            "redirectTarget" => commentUrl($comment),
-            "isAuthor" => $session->UserID == $comment->InsertUserID,
-        ]);
+        $integrationsCatalog = Gdn::getContainer()
+            ->get(AttachmentService::class)
+            ->getCatalog();
+        if (count($integrationsCatalog) > 0) {
+            $options["Integrations"] = TwigStaticRenderer::renderReactModule("LegacyIntegrationsOptionsMenuItems", [
+                "recordType" => "comment",
+                "recordID" => $comment->CommentID,
+                "redirectTarget" => commentUrl($comment),
+                "isAuthor" => $session->UserID == $comment->InsertUserID,
+            ]);
+        }
 
         // DEPRECATED (as of 2.1)
         $sender->EventArguments["Type"] = "Comment";

@@ -123,11 +123,12 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
         $apiParams = $this->props["apiParams"];
 
         $followedFilter = $apiParams["followed"] ?? null;
+        $featuredFilter = $apiParams["filter"] === "featured";
 
         $params["followed"] = $followedFilter;
         $params["expand"] = "all";
 
-        if ($followedFilter) {
+        if ($followedFilter || $featuredFilter) {
             // Forcing ourselves to be flat.
             $params["outputFormat"] = "flat";
             $params["limit"] = 500;

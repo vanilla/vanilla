@@ -21,9 +21,9 @@ interface AiSuggestionSourceInterface
     /**
      * Get data for the exclusion dropdown.
      *
-     * @return FormChoicesInterface
+     * @return FormChoicesInterface|null
      */
-    public function getExclusionDropdownChoices(): FormChoicesInterface;
+    public function getExclusionDropdownChoices(): ?FormChoicesInterface;
 
     /**
      * Get the translated label for the toggle for enabling and disabling this suggestion source.
@@ -35,16 +35,17 @@ interface AiSuggestionSourceInterface
     /**
      * Get the translated label for the dropdown for selecting data to exclude.
      *
-     * @return string
+     * @return string|null
      */
-    public function getExclusionLabel(): string;
+    public function getExclusionLabel(): ?string;
 
     /**
      * Generate suggestions for a discussion.
      *
      * @param array $discussion a discussion array.
+     * @param string $keywords The keywords to generate suggestions for.
      *
      * @return array Returns the suggestions.
      */
-    public function generateSuggestions(array $discussion): array;
+    public function generateSuggestions(array $discussion, string $keywords): array;
 }

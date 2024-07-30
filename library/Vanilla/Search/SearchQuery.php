@@ -284,6 +284,12 @@ abstract class SearchQuery
                 "description" =>
                     "Token used to fetch next page of results. Cannot be combined with page. Warning: May lead to duplicate results if not sorted by primary key.",
             ],
+            "includeTypeaheads:b" => [
+                "default" => false,
+            ],
+            "includeResults:b" => [
+                "default" => true,
+            ],
         ]);
 
         foreach ($searchTypes as $searchType) {

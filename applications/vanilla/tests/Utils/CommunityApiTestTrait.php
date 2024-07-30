@@ -15,6 +15,7 @@ use Garden\Http\HttpResponse;
 use Garden\Schema\ValidationException;
 use Gdn_Format;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Http\InternalClient;
@@ -86,6 +87,17 @@ trait CommunityApiTestTrait
             TestCase::fail("Could not determine recordType and recordID from post data.");
         }
 
+        if (isset($overrides["reportReasonIDs"])) {
+            // In case someone passed a full reason array.
+            $overrides["reportReasonIDs"] = array_map(function (mixed $reportReasonID) {
+                if (is_array($reportReasonID) && isset($reportReasonID["reportReasonID"])) {
+                    return $reportReasonID["reportReasonID"];
+                } else {
+                    return $reportReasonID;
+                }
+            }, $overrides["reportReasonIDs"]);
+        }
+
         $defaults = [
             "recordType" => $recordType,
             "recordID" => $recordID,
@@ -100,6 +112,31 @@ trait CommunityApiTestTrait
         $report = $response->getBody();
         $this->lastReportID = $report["reportID"];
         return $report;
+    }
+
+    /**
+     * Create a report reason and return it.
+     *
+     * @param array $overrides
+     *
+     * @return array
+     */
+    public function createReportReason(array $overrides = []): array
+    {
+        $name = "customReason" . VanillaTestCase::id("reason");
+
+        $defaults = [
+            "reportReasonID" => $name,
+            "name" => $name,
+            "description" => "This is a description of reason {$name}",
+        ];
+
+        $body = $overrides + $defaults;
+
+        $response = $this->api()->post("/report-reasons", $body);
+        TestCase::assertEquals(201, $response->getStatusCode());
+
+        return $response->getBody();
     }
 
     /**
@@ -146,6 +183,81 @@ trait CommunityApiTestTrait
         $escalation = $response->getBody();
         $this->lastEscalationID = $escalation["escalationID"];
         return $escalation;
+    }
+
+    /**
+     * Assert that an escalation exists for a record.
+     *
+     * @param array $record A record specifying "commentID", "discussionID", or "escalationID".
+     * @param array $expectedEscalationFields Dot-notation fields to assert about the escalation.
+     * @return array The escalation.
+     */
+    protected function assertEscalationForRecord(array $record, array $expectedEscalationFields = []): array
+    {
+        $query = $this->prepareQueryForRecord($record);
+        $escalations = $this->api()
+            ->get("/escalations", $query)
+            ->getBody();
+        if (empty($escalations)) {
+            $this->fail("No escalations found for query:\n" . json_encode($query, JSON_PRETTY_PRINT));
+        }
+        $this->assertCount(1, $escalations, "Expected 1 escalation for record.");
+        $escalation = $escalations[0];
+        if (!empty($expectedEscalationFields)) {
+            $this->assertDataLike($expectedEscalationFields, $escalation);
+        }
+        return $escalation;
+    }
+
+    /**
+     * Assert that a report exists for a record.
+     *
+     * @param array $record A record specifying "commentID", "discussionID", or "escalationID".
+     * @param array $expectedReportFields Dot-notation fields to assert about the report.
+     * @return array The report.
+     */
+    protected function assertReportForRecord(array $record, array $expectedReportFields = []): array
+    {
+        $query = $this->prepareQueryForRecord($record);
+        $reports = $this->api()
+            ->get("/reports", $query)
+            ->getBody();
+        $this->assertCount(1, $reports, "Expected 1 report for record.");
+        $report = $reports[0];
+        if (!empty($expectedReportFields)) {
+            $this->assertDataLike($expectedReportFields, $report);
+        }
+        return $report;
+    }
+
+    /**
+     * @param array $record
+     * @return array
+     */
+    private function prepareQueryForRecord(array $record): array
+    {
+        if (isset($record["commentID"])) {
+            $query = [
+                "recordType" => "comment",
+                "recordID" => $record["commentID"],
+            ];
+        } elseif (isset($record["discussionID"])) {
+            $query = [
+                "recordType" => "discussion",
+                "recordID" => $record["discussionID"],
+            ];
+        } elseif (isset($record["escalationID"])) {
+            $query = [
+                "escalationID" => $record["escalationID"],
+            ];
+        } elseif (isset($record["reportID"])) {
+            $query = [
+                "reportID" => $record["reportID"],
+            ];
+        } else {
+            throw new \InvalidArgumentException("Record must have a commentID, discussionID or escalationID.");
+        }
+        return $query;
     }
 
     /**
@@ -371,6 +483,42 @@ trait CommunityApiTestTrait
     }
 
     /**
+     * Create an escalation comment.
+     *
+     * @param array $overrides Fields to override on the insert.
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function createEscalationComment(array $overrides = []): array
+    {
+        $overrides["parentRecordType"] = "escalation";
+        if (!isset($overrides["parentRecordID"])) {
+            // See if we have an escalationID
+            if ($this->lastEscalationID === null) {
+                throw new Exception("Could not insert a test escalation comment because no escalation was specified.");
+            }
+
+            $overrides["parentRecordID"] = $this->lastEscalationID;
+        }
+
+        $params = $overrides + [
+            "format" => TextFormat::FORMAT_KEY,
+            "body" => "Hello Comment",
+        ];
+        $this->lastCommunityResponse = $this->api()->post("/comments", $params);
+        $result = $this->lastCommunityResponse->getBody();
+        $this->lastInsertCommentID = $result["commentID"] ?? null;
+        if ($this->lastInsertCommentID === null) {
+            return $result;
+        }
+        if (isset($overrides["score"])) {
+            $this->setCommentScore($this->lastInsertCommentID, $overrides["score"]);
+        }
+        return $result;
+    }
+
+    /**
      * Create a comment.
      *
      * @param array $overrides Fields to override on the insert.
@@ -472,6 +620,15 @@ trait CommunityApiTestTrait
         return $response->getBody();
     }
 
+    /**
+     * Mock an attachment on a post.
+     *
+     * @param string $recordType
+     * @param int $recordID
+     * @return array|object
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
     public function createAttachment(string $recordType, int $recordID)
     {
         $recordType = strtolower($recordType);
@@ -564,5 +721,53 @@ trait CommunityApiTestTrait
     private function generateCollectionSalt(): string
     {
         return "-" . round(microtime(true) * 1000) . rand(1, 1000);
+    }
+
+    /**
+     * Return a mocked rich body.
+     *
+     * @param string $content
+     * @return string
+     */
+    public static function richBody(string $content): string
+    {
+        return "[{\"type\":\"p\",\"children\":[{\"text\":\"{$content}\"}]}]";
+    }
+
+    /**
+     * @param int|array $discussionOrDiscussionID
+     * @param bool $isResolved
+     *
+     * @return void
+     */
+    private function assertDiscussionResolved(int|array $discussionOrDiscussionID, bool $isResolved = true): void
+    {
+        $discussionID = is_array($discussionOrDiscussionID)
+            ? $discussionOrDiscussionID["discussionID"]
+            : $discussionOrDiscussionID;
+
+        $discussion = $this->api()
+            ->get("/discussions/{$discussionID}")
+            ->getBody();
+
+        $messagePhrase = $isResolved ? "to be resolved" : "to be unresolved";
+        $this->assertSame(
+            $isResolved,
+            $discussion["resolved"],
+            "Expected discussion {$discussion["discussionID"]} {$messagePhrase}."
+        );
+        if ($isResolved) {
+            $this->assertEquals(
+                RecordStatusModel::DISCUSSION_STATUS_RESOLVED,
+                $discussion["internalStatusID"],
+                "Expected internalStatusID to be resolved."
+            );
+        } else {
+            TestCase::assertNotEquals(
+                RecordStatusModel::DISCUSSION_STATUS_RESOLVED,
+                $discussion["internalStatusID"],
+                "Expected internalStatusID to not be resolved."
+            );
+        }
     }
 }

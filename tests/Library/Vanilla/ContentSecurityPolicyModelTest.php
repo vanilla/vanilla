@@ -49,6 +49,8 @@ class ContentSecurityPolicyModelTest extends MinimalContainerTestCase
         $this->assertStringEndsWith('\'self\'', $header);
         $this->assertStringContainsString("frame-ancestors ", $header);
         $this->assertStringNotContainsString("unsafe-eval", $header);
+        $this->assertStringContainsString("base-uri 'self'", $header);
+        $this->assertStringContainsString("object-src 'none'", $header);
         return $header;
     }
 

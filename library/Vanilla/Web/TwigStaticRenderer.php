@@ -19,6 +19,21 @@ class TwigStaticRenderer
     use TwigRenderTrait;
 
     /**
+     * Render a twig template from a string.
+     *
+     * @param string $template
+     * @param array $viewData
+     *
+     * @return \Twig\Markup
+     */
+    public static function renderString(string $template, array $viewData): \Twig\Markup
+    {
+        /** @var TwigStaticRenderer $selfInstance */
+        $selfInstance = \Gdn::getContainer()->get(TwigStaticRenderer::class);
+        return new \Twig\Markup($selfInstance->renderTwigFromString($template, $viewData), "utf-8");
+    }
+
+    /**
      * Render a twig template form a static context.
      * Classes should prefer using `TwigRenderTrait`.
      *

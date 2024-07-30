@@ -1,7 +1,7 @@
 import { roleLookUp, userLookup } from "@dashboard/moderation/communityManagmentUtils";
 import { FilterBlock } from "@dashboard/moderation/components/FilterBlock";
 import { ReasonFilter } from "@dashboard/moderation/components/ReasonFilter";
-import { ReportStatus } from "@dashboard/moderation/components/ReportFilters.constants";
+import { ReportStatus, reportStatusLabel } from "@dashboard/moderation/components/ReportFilters.constants";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { t } from "@vanilla/i18n";
@@ -24,22 +24,25 @@ interface IProps {
     onFilter: (value: IReportFilters) => void;
 }
 
-const reportFilterOptions: ISelectBoxItem[] = [
-    {
-        name: "New",
-        value: ReportStatus.NEW,
-    },
-    {
-        name: "Dismissed",
-        value: ReportStatus.DISMISSED,
-    },
-    {
-        name: "Escalated",
-        value: ReportStatus.ESCALATED,
-    },
-];
-
 export function ReportFilters(props: IProps) {
+    const reportFilterOptions: ISelectBoxItem[] = [
+        {
+            name: reportStatusLabel(ReportStatus.NEW),
+            value: ReportStatus.NEW,
+        },
+        {
+            name: reportStatusLabel(ReportStatus.DISMISSED),
+            value: ReportStatus.DISMISSED,
+        },
+        {
+            name: reportStatusLabel(ReportStatus.REJECTED),
+            value: ReportStatus.REJECTED,
+        },
+        {
+            name: reportStatusLabel(ReportStatus.ESCALATED),
+            value: ReportStatus.ESCALATED,
+        },
+    ];
     return (
         <FilterFrame title={t("Filter")} hideFooter>
             <FilterBlock

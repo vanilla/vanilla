@@ -105,17 +105,21 @@ export default function Banner(props: IBannerProps) {
             };
             return (
                 <picture>
-                    {vars.outerBackground.breakpoints.mobile.image && (
-                        <source
-                            srcSet={vars.outerBackground.breakpoints.mobile.image}
-                            media={`(max-width: ${twoColumnVariables().breakPoints.xs}px)`}
-                        />
-                    )}
-                    {vars.outerBackground.breakpoints.tablet.image && (
-                        <source
-                            srcSet={vars.outerBackground.breakpoints.tablet.image}
-                            media={`(max-width: ${twoColumnVariables().breakPoints.oneColumn}px)`}
-                        />
+                    {!props.backgroundImage && (
+                        <>
+                            {!!vars.outerBackground.breakpoints.mobile.image && (
+                                <source
+                                    srcSet={vars.outerBackground.breakpoints.mobile.image}
+                                    media={`(max-width: ${twoColumnVariables().breakPoints.xs}px)`}
+                                />
+                            )}
+                            {!!vars.outerBackground.breakpoints.tablet.image && (
+                                <source
+                                    srcSet={vars.outerBackground.breakpoints.tablet.image}
+                                    media={`(max-width: ${twoColumnVariables().breakPoints.oneColumn}px)`}
+                                />
+                            )}
+                        </>
                     )}
                     <img className={classes.backgroundImage} {...imgProps} role="presentation" />
                 </picture>

@@ -239,7 +239,7 @@ class StubContentPlugin extends Gdn_Plugin
                         ],
                         [
                             "ValidateEmail" => false,
-                            "NoConfirmEmail" => true,
+                            UserModel::OPT_NO_CONFIRM_EMAIL => true,
                             "SaveRoles" => true,
                             "ValidateName" => false,
                         ]
@@ -481,7 +481,7 @@ class StubContentPlugin extends Gdn_Plugin
                 $attributes["UserID"] = $record["row"]["UserID"];
                 $model->save($attributes, [
                     "ValidateEmail" => false,
-                    "NoConfirmEmail" => true,
+                    UserModel::OPT_NO_CONFIRM_EMAIL => true,
                 ]);
                 break;
 

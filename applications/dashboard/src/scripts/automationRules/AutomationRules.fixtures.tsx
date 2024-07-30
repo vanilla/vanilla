@@ -57,8 +57,9 @@ export const mockRecipesList: IAutomationRule[] = [
             triggerType: "staleDiscussionTrigger",
             triggerName: "trigger2Name",
             triggerValue: {
-                triggerTimeThreshold: "1",
-                triggerTimeUnit: "day",
+                applyToNewContentOnly: false,
+                triggerTimeDelay: { length: 4, unit: "hour" },
+                triggerTimeLookBackLimit: { length: 2, unit: "day" },
                 postType: ["discussion"],
             },
         },
@@ -144,8 +145,7 @@ export const mockRecipesList: IAutomationRule[] = [
             triggerType: "staleDiscussionTrigger",
             triggerName: "trigger5Name",
             triggerValue: {
-                duration: "2",
-                interval: "hour",
+                triggerTimeDelay: { length: 1, unit: "day" },
                 postType: ["discussion", "question"],
             },
         },
@@ -155,6 +155,33 @@ export const mockRecipesList: IAutomationRule[] = [
             actionValue: {
                 categoryID: [1, 2],
             },
+        },
+    },
+    {
+        automationRuleID: 6,
+        name: "Test Escalation Rule",
+        automationRuleRevisionID: 6,
+        dateInserted: STORY_DATE_STARTS,
+        insertUserID: 2,
+        updateUserID: 2,
+        dateUpdated: STORY_DATE_STARTS,
+        dateLastRun: STORY_DATE_ENDS,
+        status: "active",
+        recentDispatch: {
+            dispatchStatus: "success",
+        },
+        trigger: {
+            triggerType: "staleDiscussionTrigger",
+            triggerName: "triggerName",
+            triggerValue: {
+                triggerTimeDelay: { length: 1, unit: "day" },
+                postType: ["discussion", "question"],
+            },
+        },
+        action: {
+            actionType: "createEscalationAction",
+            actionName: "action6Name",
+            actionValue: {},
         },
     },
 ];
@@ -194,71 +221,68 @@ export const mockDispatches: IAutomationRuleDispatch[] = [
     },
 ];
 
-const timeInputsSchemaProperties = {
-    maxTimeThreshold: {
-        type: "integer",
-        minimum: 1,
-        step: 1,
+const triggerDelaySchemaProperties = {
+    triggerTimeDelay: {
+        type: "object",
+        required: true,
         "x-control": {
-            description: "Any data older than this will be excluded from triggering the rule.",
-            label: "Max Time Threshold",
-            inputType: "textBox",
+            description: "Set the duration after which the rule will trigger.  Whole numbers only.",
+            label: "Trigger Delay",
+            inputType: "timeDuration",
             placeholder: "",
-            type: "number",
-            tooltip: "",
+            tooltip:
+                "Set the duration something needs to exist and meet the rule criteria for prior to the the rule triggering and acting upon it",
+            supportedUnits: ["hour", "day", "week", "year"],
+        },
+        properties: {
+            length: {
+                type: "string",
+            },
+            unit: {
+                type: "string",
+            },
         },
     },
-    maxTimeUnit: {
-        type: "string",
-        enum: ["hour", "day", "week", "year"],
-        "x-control": {
-            description: "Select the time unit.",
-            label: "Max Time Unit",
-            inputType: "dropDown",
-            placeholder: "",
-            choices: {
-                staticOptions: {
-                    hour: "Hour",
-                    day: "Day",
-                    week: "Week",
-                    year: "Year",
+};
+
+const additionalSettingsSchemaProperties = {
+    additionalSettings: {
+        applyToNewContentOnly: {
+            type: "boolean",
+            default: false,
+            "x-control": {
+                description:
+                    "When enabled, this rule will only be applied to new content that meets the trigger criteria.",
+                label: "Apply to new content only",
+                inputType: "checkBox",
+                labelType: "none",
+            },
+        },
+        triggerTimeLookBackLimit: {
+            type: "object",
+            "x-control": {
+                description: "Do not apply the rule to content that is older than this.",
+                label: "Look-back Limit",
+                inputType: "timeDuration",
+                placeholder: "",
+                tooltip: "",
+                supportedUnits: ["hour", "day", "week", "year"],
+                conditions: [
+                    {
+                        field: "additionalSettings.triggerValue.applyToNewContentOnly",
+                        type: "boolean",
+                        const: false,
+                    },
+                ],
+            },
+            properties: {
+                length: {
+                    type: "string",
+                },
+                unit: {
+                    type: "string",
                 },
             },
-            multiple: false,
-            tooltip: "",
-        },
-    },
-    triggerTimeThreshold: {
-        type: "integer",
-        minimum: 1,
-        step: 1,
-        "x-control": {
-            description: "Set the duration after which the rule will trigger.",
-            label: "Trigger Time Threshold",
-            inputType: "textBox",
-            placeholder: "",
-            type: "number",
-            tooltip: "",
-        },
-    },
-    triggerTimeUnit: {
-        type: "string",
-        enum: ["hour", "day", "week", "year"],
-        "x-control": {
-            description: "Select the time unit.",
-            label: "Trigger Time Unit",
-            inputType: "dropDown",
-            placeholder: "",
-            choices: {
-                staticOptions: {
-                    hour: "Hour",
-                    day: "Day",
-                    week: "Week",
-                    year: "Year",
-                },
-            },
-            multiple: false,
-            tooltip: "",
         },
     },
 };
@@ -269,11 +293,13 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             triggerType: "emailDomainTrigger",
             name: "Email Domain Trigger Name",
             triggerActions: ["addRemoveRoleAction", "categoryFollowAction"],
+            contentType: "users",
             schema: {
                 type: "object",
                 properties: {
                     emailDomain: {
                         type: "string",
+                        required: true,
                         "x-control": {
                             description: "Enter one or more comma-separated email domains",
                             label: "Email Domain",
@@ -291,11 +317,13 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             triggerType: "profileFieldTrigger",
             name: "ProfileField Trigger Name",
             triggerActions: ["addRemoveRoleAction"],
+            contentType: "users",
             schema: {
                 type: "object",
                 properties: {
                     profileField: {
                         type: "string",
+                        required: true,
                         "x-control": {
                             description: "Select a profile field",
                             label: "Profile Field",
@@ -328,16 +356,19 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                 "moveToCategoryAction",
                 "addToCollectionAction",
                 "removeDiscussionFromCollectionAction",
+                "createEscalationAction",
             ],
+            contentType: "posts",
             schema: {
                 type: "object",
                 properties: {
-                    ...timeInputsSchemaProperties,
+                    ...triggerDelaySchemaProperties,
                     postType: {
                         type: "array",
                         items: {
                             type: "string",
                         },
+                        required: true,
                         default: ["discussion", "question"],
                         enum: ["discussion", "question"],
                         "x-control": {
@@ -355,8 +386,9 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                             tooltip: "",
                         },
                     },
+                    ...additionalSettingsSchemaProperties,
                 },
-                required: ["maxTimeThreshold", "maxTimeUnit", "triggerTimeThreshold", "triggerTimeUnit", "postType"],
+                required: ["triggerTimeDelay", "postType"],
             },
         },
         lastActiveDiscussionTrigger: {
@@ -370,10 +402,11 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                 "addToCollectionAction",
                 "removeDiscussionFromCollectionAction",
             ],
+            contentType: "posts",
             schema: {
                 type: "object",
                 properties: {
-                    ...timeInputsSchemaProperties,
+                    ...triggerDelaySchemaProperties,
                     postType: {
                         type: "array",
                         items: {
@@ -381,6 +414,7 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                         },
                         default: ["discussion", "question"],
                         enum: ["discussion", "question"],
+                        required: true,
                         "x-control": {
                             description: "Select a post type.",
                             label: "Post Type",
@@ -396,39 +430,44 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                             tooltip: "",
                         },
                     },
+                    ...additionalSettingsSchemaProperties,
                 },
-                required: ["maxTimeThreshold", "maxTimeUnit", "triggerTimeThreshold", "triggerTimeUnit", "postType"],
+                required: ["triggerTimeDelay", "postType"],
             },
         },
         staleCollectionTrigger: {
             triggerType: "staleCollectionTrigger",
             name: "A certain amount of time has passed since a post added to a collection",
             triggerActions: ["removeDiscussionFromTriggerCollectionAction"],
+            contentType: "posts",
             schema: {
                 type: "object",
-                properties: timeInputsSchemaProperties,
-                required: ["maxTimeThreshold", "maxTimeUnit", "triggerTimeThreshold", "triggerTimeUnit"],
+                properties: triggerDelaySchemaProperties,
+                required: ["triggerTimeDelay"],
             },
         },
         timeSinceUserRegistrationTrigger: {
             triggerType: "timeSinceUserRegistrationTrigger",
             name: "A certain amount of time has passed since a user registered",
             triggerActions: ["addRemoveRoleAction"],
+            contentType: "users",
             schema: {
                 type: "object",
-                properties: timeInputsSchemaProperties,
-                required: ["maxTimeThreshold", "maxTimeUnit", "triggerTimeThreshold", "triggerTimeUnit"],
+                properties: triggerDelaySchemaProperties,
+                required: ["triggerTimeDelay"],
             },
         },
         ideationVoteTrigger: {
             triggerType: "ideationVoteTrigger",
             name: "An idea receives a certain number of votes",
             triggerActions: ["changeIdeationStatusAction"],
+            contentType: "posts",
             schema: {
                 type: "object",
                 properties: {
                     score: {
                         type: "integer",
+                        required: true,
                         "x-control": {
                             description:
                                 "Enter the number of votes that a idea should receive to trigger this automation rule. Whole numbers only.",
@@ -443,12 +482,20 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                 required: ["score"],
             },
         },
+        reportPostTrigger: {
+            triggerType: "reportPostTrigger",
+            name: "Post Received reports",
+            triggerActions: ["createEscalationAction", "escalateGithubIssueAction", "escalateToZendeskAction"],
+            contentType: "posts",
+            schema: { properties: {} },
+        },
     },
     actions: {
         categoryFollowAction: {
             actionType: "categoryFollowAction",
             name: "Category Follow Action Name",
             actionTriggers: ["emailDomainTrigger", "profileFieldTrigger"],
+            contentType: "users",
             schema: {
                 type: "object",
                 properties: {
@@ -483,6 +530,7 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             actionType: "moveToCategoryAction",
             name: "Move to a specific category",
             actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+            contentType: "posts",
             schema: {
                 type: "object",
                 properties: {
@@ -516,16 +564,19 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             actionType: "closeDiscussionAction",
             name: "Close the discussion",
             actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+            contentType: "posts",
         },
         bumpDiscussionAction: {
             actionType: "bumpDiscussionAction",
             name: "Bump the discussion",
             actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+            contentType: "posts",
         },
         addTagAction: {
             actionType: "addTagAction",
             name: "Add a tag",
             actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+            contentType: "posts",
             schema: {
                 type: "object",
                 properties: {
@@ -559,6 +610,7 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             actionType: "addToCollectionAction",
             name: "Add to collection",
             actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+            contentType: "posts",
             schema: {
                 type: "object",
                 properties: {
@@ -592,6 +644,7 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             actionType: "removeDiscussionFromCollectionAction",
             name: "Remove from collection",
             actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+            contentType: "posts",
             schema: {
                 type: "object",
                 properties: {
@@ -625,11 +678,13 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             actionType: "removeDiscussionFromTriggerCollectionAction",
             name: "Remove from trigger collection",
             actionTriggers: ["staleCollectionTrigger"],
+            contentType: "posts",
         },
         addRemoveRoleAction: {
             actionType: "addRemoveRoleAction",
             name: "Role Action Name",
             actionTriggers: ["profileFieldTrigger"],
+            contentType: "users",
             schema: {
                 type: "object",
                 properties: {
@@ -681,6 +736,25 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             actionType: "changeIdeationStatusAction",
             name: "Change the ideation status",
             actionTriggers: ["ideationVoteTrigger"],
+            contentType: "posts",
+        },
+        createEscalationAction: {
+            actionType: "createEscalationAction",
+            name: "Create Escalation",
+            actionTriggers: ["reportPostTrigger"],
+            contentType: "posts",
+        },
+        escalateToZendeskAction: {
+            actionType: "escalateToZendeskAction",
+            name: "Escalate to Zendesk",
+            actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+            contentType: "posts",
+        },
+        escalateGithubIssueAction: {
+            actionType: "escalateGithubIssueAction",
+            name: "Escalate a post to Github",
+            actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+            contentType: "posts",
         },
     },
 };

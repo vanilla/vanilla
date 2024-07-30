@@ -47,6 +47,7 @@ export default function DiscussionListAssetCategoryFilter(props: IProps) {
                 className={discussionListClasses().filterAndSortingDropdown}
                 buttonType={ButtonTypes.TEXT_PRIMARY}
                 options={options}
+                name={t("Categories")}
                 describedBy={id}
                 value={activeOption}
                 renderLeft={false}

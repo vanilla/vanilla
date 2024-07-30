@@ -467,7 +467,11 @@ class UserSearchType extends AbstractSearchType
                     }
                     break;
                 case [ProfileFieldModel::DATA_TYPE_BOOL, ProfileFieldModel::FORM_TYPE_CHECKBOX]:
-                    $query->setFilter("profileFields.$apiName", [$value]);
+                    if ($value) {
+                        $query->setFilter("profileFields.$apiName", [true]);
+                    } else {
+                        $query->setFilter("profileFields.$apiName", [true], filterOp: SearchQuery::FILTER_OP_NOT);
+                    }
                     break;
                 case [ProfileFieldModel::DATA_TYPE_NUMBER, ProfileFieldModel::FORM_TYPE_NUMBER]:
                 case [ProfileFieldModel::DATA_TYPE_NUMBER_MUL, ProfileFieldModel::FORM_TYPE_TOKENS]:

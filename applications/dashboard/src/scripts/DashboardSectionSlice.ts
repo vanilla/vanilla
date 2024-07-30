@@ -21,7 +21,7 @@ export const dashboardSectionSlice = createSlice({
             })
             .addCase(fetchDashboardSections.fulfilled, (state, action) => {
                 state.dashboardSections.status = LoadStatus.SUCCESS;
-                state.dashboardSections.data = action.payload.result;
+                state.dashboardSections.data = action.payload.result ?? action.payload;
             })
             .addCase(fetchDashboardSections.rejected, (state, action) => {
                 state.dashboardSections.status = LoadStatus.ERROR;

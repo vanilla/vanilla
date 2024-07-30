@@ -47,7 +47,7 @@ export default function ThreadItemActions(props: IProps) {
     const { hasPermission } = usePermissionsContext();
     const { recordUrl, recordType, recordID } = useThreadItemContext();
     const { discussion } = useDiscussionThreadContext();
-    const { categoryID, closed } = discussion!;
+    const { categoryID, closed } = discussion ?? {};
 
     const classes = ThreadItemActionsClasses();
 

@@ -102,16 +102,20 @@ class ContentSecurityPolicyModel implements LoggerAwareInterface
     /**
      * Compose content security header string from policies list
      *
-     * @param string $filter CSP directive to filter out
+     * @param string|array $filter CSP directive to filter out
      * @return string
      */
-    public function getHeaderString(string $filter = "all"): string
+    public function getHeaderString(string|array $filter = "all"): string
     {
+        if (!is_array($filter)) {
+            $filter = [$filter];
+        }
+
         $directives = [];
         $policies = $this->getPolicies();
         foreach ($policies as $policy) {
             $directive = $policy->getDirective();
-            if ($filter === "all" || $directive === $filter) {
+            if (in_array("all", $filter) || in_array($directive, $filter)) {
                 $policyArgument = str_replace(["\r", "\n"], "", $policy->getArgument());
                 if (array_key_exists($directive, $directives)) {
                     $directives[$directive] .= " " . $policyArgument;
@@ -126,7 +130,7 @@ class ContentSecurityPolicyModel implements LoggerAwareInterface
     /**
      * Get an x-frame options header for backwards compatibility.
      *
-     * @return string
+     * @return string|null
      */
     public function getXFrameString(): ?string
     {

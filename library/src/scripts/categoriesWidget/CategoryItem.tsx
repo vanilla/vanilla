@@ -18,9 +18,9 @@ import { ICountResult } from "@library/search/searchTypes";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { CategoryItemMeta } from "@library/categoriesWidget/CategoryItemMeta";
 import CategoryFollowDropDown from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
-import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { useCurrentUser, useCurrentUserSignedIn } from "@library/features/users/userHooks";
 import { LocationDescriptor } from "history";
+import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
 
 export interface ICategoryItemOptions {
     imagePlacement?: IHomeWidgetItemOptions["imagePlacement"];
@@ -179,7 +179,6 @@ export default function CategoryItem(props: IProps) {
                         categoryName={category.name}
                         notificationPreferences={category.preferences}
                         emailDigestEnabled={getMeta("emails.digest", false)}
-                        emailEnabled={getMeta("emails.enabled")}
                         isCompact
                         preview={props.isPreview}
                         className={classes.listItemActionButton}

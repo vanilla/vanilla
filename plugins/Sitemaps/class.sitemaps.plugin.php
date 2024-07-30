@@ -253,10 +253,7 @@ class SitemapsPlugin extends Gdn_Plugin
                  */
                 for ($i = 0; $i < $category["CountDiscussions"]; $i += $limit) {
                     $siteMap = [
-                        "Loc" => url(
-                            "/sitemap-category-" . $urlCode . "-" . ($i + 1) . "-" . ($i + $limit) . ".xml",
-                            true
-                        ),
+                        "Loc" => url("/sitemap-category-{$urlCode}-" . ($i + 1) . "-{$limit}.xml", true),
                         "ChangeFreq" => "",
                         "Priority" => "",
                     ];

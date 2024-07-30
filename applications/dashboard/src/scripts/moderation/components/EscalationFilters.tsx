@@ -1,11 +1,5 @@
-/**
- * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
- * @license Proprietary
- */
-
-import { EscalationStatus } from "@dashboard/moderation/CommunityManagementTypes";
 import { roleLookUp, userLookup } from "@dashboard/moderation/communityManagmentUtils";
+import { getEscalationStatuses } from "@dashboard/moderation/components/escalationStatuses";
 import { FilterBlock } from "@dashboard/moderation/components/FilterBlock";
 import { ReasonFilter } from "@dashboard/moderation/components/ReasonFilter";
 import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
@@ -31,30 +25,11 @@ interface IProps {
     onFilter: (value: IEscalationFilters) => void;
 }
 
-const escalationFilterOptions: ISelectBoxItem[] = [
-    {
-        name: "Open",
-        value: EscalationStatus.OPEN,
-    },
-    {
-        name: "In Progress",
-        value: EscalationStatus.IN_PROGRESS,
-    },
-    {
-        name: "On Hold",
-        value: EscalationStatus.ON_HOLD,
-    },
-    {
-        name: "Done",
-        value: EscalationStatus.DONE,
-    },
-    {
-        name: "In Zendesk",
-        value: EscalationStatus.EXTERNAL_ZENDESK,
-    },
-];
-
 export function EscalationFilters(props: IProps) {
+    const escalationFilterOptions: ISelectBoxItem[] = Object.entries(getEscalationStatuses()).map(([id, label]) => {
+        return { value: id, name: label };
+    });
+
     return (
         <FilterFrame title={t("Filter")} hideFooter>
             <FilterBlock

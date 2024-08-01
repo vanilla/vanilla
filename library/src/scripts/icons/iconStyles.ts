@@ -3,18 +3,23 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, scale } from "csx";
-import { unit, colorOut, pointerEvents, ColorValues } from "@library/styles/styleHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { ColorHelper, important, scale } from "csx";
+import { pointerEvents } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { FillProperty, OpacityProperty, StrokeProperty, StrokeWidthProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
+import { Property } from "csstype";
+import { TLength } from "@library/styles/styleShim";
+import { css, cx } from "@emotion/css";
+import { IconSize } from "@vanilla/icons";
 
 interface IPathState {
-    stroke?: ColorValues | StrokeProperty;
-    fill?: ColorValues | FillProperty;
-    opacity?: OpacityProperty;
-    strokeWidth?: StrokeWidthProperty<TLength>;
+    stroke?: ColorHelper | Property.Stroke;
+    fill?: ColorHelper | Property.Fill;
+    opacity?: Property.Opacity;
+    strokeWidth?: Property.StrokeWidth<TLength>;
 }
 
 interface INestedPathState extends IPathState {
@@ -22,7 +27,7 @@ interface INestedPathState extends IPathState {
 }
 
 interface IBookmarkLoading extends INestedPathState {
-    halfFill?: ColorValues | string;
+    halfFill?: ColorHelper | string;
 }
 
 export interface IBookmarkProps {
@@ -37,18 +42,18 @@ export const svgStyles = (props: INestedPathState | undefined, debug?: boolean) 
     }
     let stroke = props.stroke;
     if (stroke !== "none") {
-        stroke = props.stroke ? colorOut(props.stroke) : props.stroke;
+        stroke = props.stroke ? ColorsUtils.colorOut(props.stroke) : props.stroke;
     }
 
     let fill = props.fill;
     if (fill !== "none") {
-        fill = props.fill ? colorOut(props.fill) : props.fill;
+        fill = props.fill ? ColorsUtils.colorOut(props.fill) : props.fill;
     }
 
     return {
         stroke: stroke,
         fill: fill,
-        strokeWidth: props.strokeWidth ? unit(props.strokeWidth) : undefined,
+        strokeWidth: props.strokeWidth ? styleUnit(props.strokeWidth) : undefined,
         opacity: props.opacity,
     };
 };
@@ -57,8 +62,8 @@ export const iconVariables = useThemeCache(() => {
     const themeVars = variableFactory("defaultIconSizes");
 
     const standard = themeVars("defaultIcon", {
-        width: 24,
-        height: 24,
+        width: IconSize.default,
+        height: IconSize.default,
     });
 
     const fileType = themeVars("defaultIcon", {
@@ -77,8 +82,8 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const vanillaLogo = themeVars("vanillaLogo", {
-        width: 80,
-        height: 32.3,
+        width: 79,
+        height: 33,
         mobile: {
             width: undefined,
             height: undefined,
@@ -98,21 +103,6 @@ export const iconVariables = useThemeCache(() => {
     const settings = themeVars("settings", {
         width: 20,
         height: 18,
-    });
-
-    const search = themeVars("settings", {
-        width: 18,
-        height: 20,
-    });
-
-    const notifications = themeVars("settings", {
-        width: 18,
-        height: 20,
-    });
-
-    const messages = themeVars("messages", {
-        width: 20.051,
-        height: 14.016,
     });
 
     const user = themeVars("user", {
@@ -159,19 +149,14 @@ export const iconVariables = useThemeCache(() => {
         height: 13,
     });
 
-    const signIn = themeVars("signIn", {
-        width: 24,
-        height: 18,
-    });
-
     const chevronUp = themeVars("selectedCategory", {
         width: 51,
         height: 17,
     });
 
     const plusCircle = themeVars("plusCircle", {
-        width: 14,
-        height: 14,
+        width: 16,
+        height: 16,
     });
 
     const deleteIcon = themeVars("deleteIcon", {
@@ -195,7 +180,7 @@ export const iconVariables = useThemeCache(() => {
         height: 16.02,
     });
 
-    const bookmarkIcon = themeVars("bookmarkIcon", {
+    const _bookmarkIcon = themeVars("_bookmarkIcon", {
         width: 12,
         height: 16,
         strokeWidth: 1,
@@ -224,6 +209,16 @@ export const iconVariables = useThemeCache(() => {
         height: 16.28,
     });
 
+    const typePlaces = themeVars("TypePlaces", {
+        width: 15 * 1.2,
+        height: 16.28 * 1.2,
+    });
+
+    const typeFlag = themeVars("TypeFlag", {
+        width: 26,
+        height: 26,
+    });
+
     const typeMember = themeVars("TypeMember", {
         width: 20,
         height: 20,
@@ -233,13 +228,40 @@ export const iconVariables = useThemeCache(() => {
         width: 18.444,
         height: 16.791,
     });
+
     const typePollsIcon = themeVars("TypePollsIcon", {
         width: 26,
         height: 26,
     });
+
     const typeQuestion = themeVars("TypeQuestion", {
         width: 26,
         height: 26,
+    });
+
+    const downvote = themeVars("downvote", {
+        width: 24,
+        height: 24,
+    });
+
+    const upvote = themeVars("upvote", {
+        width: 24,
+        height: 24,
+    });
+
+    const siteTotalMembersIcon = themeVars("SiteTotalMembersIcon", {
+        width: 24,
+        height: 24,
+    });
+
+    const siteTotalPostsIcon = themeVars("SiteTotalPostsIcon", {
+        width: 24,
+        height: 24,
+    });
+
+    const siteTotalOnlineIcon = themeVars("SiteTotalOnlineIcon", {
+        width: 24,
+        height: 24,
     });
 
     return {
@@ -251,9 +273,6 @@ export const iconVariables = useThemeCache(() => {
         compact,
         settings,
         warning,
-        search,
-        notifications,
-        messages,
         user,
         userWarning,
         close,
@@ -261,14 +280,16 @@ export const iconVariables = useThemeCache(() => {
         closeTiny,
         chevronLeftCompact,
         selectedCategory,
-        signIn,
         chevronUp,
         plusCircle,
         categoryIcon,
         deleteIcon,
         editIcon,
         documentation,
-        bookmarkIcon,
+        /**
+         * @deprecated
+         */
+        _bookmarkIcon,
         newPostMenuIcon,
         typeAll,
         typeDiscussions,
@@ -278,6 +299,13 @@ export const iconVariables = useThemeCache(() => {
         typeIdeasIcon,
         typePollsIcon,
         typeQuestion,
+        typePlaces,
+        typeFlag,
+        downvote,
+        upvote,
+        siteTotalMembersIcon,
+        siteTotalPostsIcon,
+        siteTotalOnlineIcon,
     };
 });
 
@@ -286,140 +314,125 @@ export const iconClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("icon");
 
-    const standard = style("defaultIcon", {
-        width: unit(vars.standard.width),
-        height: unit(vars.standard.height),
+    const standard = css({
+        width: styleUnit(vars.standard.width),
+        height: styleUnit(vars.standard.height),
     });
 
     const fileType = style("fileType", {
-        width: unit(vars.fileType.width),
-        height: unit(vars.fileType.height),
+        width: styleUnit(vars.fileType.width),
+        height: styleUnit(vars.fileType.height),
     });
 
     const newFolder = style("newFolder", {
-        width: unit(vars.newFolder.width),
-        height: unit(vars.newFolder.height),
-        paddingRight: unit(1),
+        width: styleUnit(vars.newFolder.width),
+        height: styleUnit(vars.newFolder.height),
+        paddingRight: styleUnit(1),
     });
 
     const attachmentError = style("attachmentError", {
-        width: unit(vars.attachmentError.width),
-        height: unit(vars.attachmentError.height),
+        width: styleUnit(vars.attachmentError.width),
+        height: styleUnit(vars.attachmentError.height),
     });
 
     const vanillaLogo = style("vanillaLogo", {
-        width: unit(vars.vanillaLogo.width),
-        height: unit(vars.vanillaLogo.height),
+        width: styleUnit(vars.vanillaLogo.width),
+        height: styleUnit(vars.vanillaLogo.height),
     });
 
     const vanillaLogoMobile = style("vanillaLogoMobile", {
-        width: unit(vars.vanillaLogo.mobile.width ?? vars.vanillaLogo.width),
-        height: unit(vars.vanillaLogo.mobile.height ?? vars.vanillaLogo.height),
+        width: styleUnit(vars.vanillaLogo.mobile.width ?? vars.vanillaLogo.width),
+        height: styleUnit(vars.vanillaLogo.mobile.height ?? vars.vanillaLogo.height),
     });
 
     const compact = style("compact", {
-        width: unit(vars.compact.width),
-        height: unit(vars.compact.height),
+        width: styleUnit(vars.compact.width),
+        height: styleUnit(vars.compact.height),
     });
 
     const settings = style("settings", {
-        width: unit(vars.settings.width),
-        height: unit(vars.settings.height),
+        width: styleUnit(vars.settings.width),
+        height: styleUnit(vars.settings.height),
+    });
+
+    const triangeTiny = style("triangeTiny", {
+        width: styleUnit(8),
+        height: styleUnit(8),
     });
 
     const warning = style("warning", {
-        width: unit(vars.warning.width),
-        height: unit(vars.warning.height),
-    });
-
-    const search = style("search", {
-        width: unit(vars.search.width),
-        height: unit(vars.search.height),
-    });
-
-    const notifications = style("notifications", {
-        width: unit(vars.notifications.width),
-        height: unit(vars.notifications.height),
-    });
-
-    const messages = style("messages", {
-        width: unit(vars.messages.width),
-        height: unit(vars.messages.height),
+        width: styleUnit(vars.warning.width),
+        height: styleUnit(vars.warning.height),
     });
 
     const user = style("user", {
-        width: unit(vars.user.width),
-        height: unit(vars.user.height),
+        width: styleUnit(vars.user.width),
+        height: styleUnit(vars.user.height),
     });
 
     const userWarning = style("userWarning", {
-        width: unit(vars.userWarning.width),
-        height: unit(vars.userWarning.height),
+        width: styleUnit(vars.userWarning.width),
+        height: styleUnit(vars.userWarning.height),
     });
 
     const close = style("close", {
-        width: unit(vars.close.width),
-        height: unit(vars.close.height),
+        width: styleUnit(vars.close.width),
+        height: styleUnit(vars.close.height),
     });
 
     // Same as close, but without extra padding
     const closeCompact = style("closeCompact", {
-        width: unit(vars.closeCompact.width),
-        height: unit(vars.closeCompact.height),
+        width: styleUnit(vars.closeCompact.width),
+        height: styleUnit(vars.closeCompact.height),
     });
 
     // For really small close buttons, like on tokens
     const closeTiny = style("closeTiny", {
         display: "block",
-        width: unit(vars.closeTiny.width),
-        height: unit(vars.closeTiny.height),
+        width: styleUnit(vars.closeTiny.width),
+        height: styleUnit(vars.closeTiny.height),
         margin: "auto",
     });
 
     const chevronLeftCompact = style("chevronLeftCompact", {
-        width: unit(vars.chevronLeftCompact().width),
-        height: unit(vars.chevronLeftCompact().height),
+        width: styleUnit(vars.chevronLeftCompact().width),
+        height: styleUnit(vars.chevronLeftCompact().height),
     });
 
     const chevronLeftSmallCompact = style("chevronLeftSmallCompact", {
-        $nest: {
+        ...{
             [`&&, &.${chevronLeftCompact}`]: {
-                width: unit(vars.chevronLeftCompact(true).width),
-                height: unit(vars.chevronLeftCompact(true).height),
+                width: styleUnit(vars.chevronLeftCompact(true).width),
+                height: styleUnit(vars.chevronLeftCompact(true).height),
             },
         },
     });
 
     const selectedCategory = style("selectedCategory", {
-        width: unit(vars.selectedCategory.width),
-        height: unit(vars.selectedCategory.height),
-    });
-
-    const signIn = style("signIn", {
-        width: unit(vars.signIn.width),
-        height: unit(vars.signIn.height),
+        width: styleUnit(vars.selectedCategory.width),
+        height: styleUnit(vars.selectedCategory.height),
     });
 
     const chevronUp = style("chevronUp", {
-        width: unit(vars.chevronUp.width),
-        height: unit(vars.chevronUp.height),
+        width: styleUnit(vars.chevronUp.width),
+        height: styleUnit(vars.chevronUp.height),
     });
 
     const plusCircle = style("plusCircle", {
-        width: unit(vars.plusCircle.width),
-        height: unit(vars.plusCircle.height),
+        width: styleUnit(vars.plusCircle.width),
+        height: styleUnit(vars.plusCircle.height),
     });
 
     const categoryIcon = style("categoryIcon", {
-        width: unit(vars.categoryIcon.width),
-        height: unit(vars.categoryIcon.height),
+        width: styleUnit(vars.categoryIcon.width),
+        height: styleUnit(vars.categoryIcon.height),
         opacity: vars.categoryIcon.opacity,
-        marginRight: unit(3),
+        marginRight: styleUnit(3),
     });
 
     const deleteIcon = style("deleteIcon", {
-        width: unit(vars.deleteIcon.width),
-        height: unit(vars.deleteIcon.height),
+        width: styleUnit(vars.deleteIcon.width),
+        height: styleUnit(vars.deleteIcon.height),
     });
 
     const isSmall = style("isSmall", {
@@ -428,41 +441,40 @@ export const iconClasses = useThemeCache(() => {
     });
 
     const editIcon = style("editIcon", {
-        width: unit(vars.editIcon.width),
-        height: unit(vars.editIcon.height),
+        width: styleUnit(vars.editIcon.width),
+        height: styleUnit(vars.editIcon.height),
     });
 
     const discussionIcon = style("discussionIcon", {
-        width: unit(vars.standard.width),
-        height: unit(vars.standard.height),
+        width: styleUnit(vars.standard.width),
+        height: styleUnit(vars.standard.height),
     });
 
-    const globeIcon = style("globeIcon", {
-        width: unit(vars.standard.width),
-        height: unit(vars.standard.height),
-    });
-
-    const hamburger = style("alertIconCompact", {
-        width: unit(vars.standard.width),
-        height: unit(vars.standard.height),
+    const hamburger = style("hamburgerIcon", {
+        width: styleUnit(vars.standard.width),
+        height: styleUnit(vars.standard.height),
     });
 
     const errorFgColor = style("errorFgColor", {
-        color: colorOut(globalVars.messageColors.error.fg),
+        color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
     });
 
     const warningFgColor = style("warningFgColor", {
-        color: colorOut(globalVars.messageColors.warning.fg),
+        color: ColorsUtils.colorOut(globalVars.messageColors.warning.fg),
+    });
+
+    const successFgColor = style("successFgColor", {
+        color: ColorsUtils.colorOut(globalVars.messageColors.success),
     });
 
     const documentation = style("documentation", {
         display: "block",
-        width: unit(vars.documentation.width),
-        height: unit(vars.documentation.height),
+        width: styleUnit(vars.documentation.width),
+        height: styleUnit(vars.documentation.height),
     });
 
     // Goes on link, not SVG to handle states
-    const bookmark = (
+    const _bookmark = (
         props: IBookmarkProps = {
             normalState: undefined as undefined | INestedPathState,
             loadingState: undefined as undefined | INestedPathState,
@@ -474,10 +486,10 @@ export const iconClasses = useThemeCache(() => {
 
         const {
             normalState = {
-                stroke: globalVars.mixPrimaryAndBg(0.7),
+                stroke: globalVars.mainColors.fg,
                 fill: "none",
                 state: {
-                    stroke: mainColors.primary,
+                    stroke: mainColors.statePrimary,
                 },
             },
             loadingState = {
@@ -492,80 +504,127 @@ export const iconClasses = useThemeCache(() => {
         } = props;
 
         return style("bookmark", {
-            width: unit(vars.bookmarkIcon.width),
-            height: unit(vars.bookmarkIcon.height),
-            opacity: 1,
-            display: "block",
-            position: "relative",
-            $nest: {
-                "& .svgBookmark": {
-                    ...pointerEvents(),
-                },
-                "& .svgBookmark-mainPath": svgStyles(normalState),
-                "&.Bookmarked:not(.Bookmarking) .svgBookmark-mainPath": svgStyles(bookmarkedState),
-                "&:hover:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-                "&:focus:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-                "&:active:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-                "&:Bookmarking .svgBookmark-mainPath": svgStyles({
-                    fill: important("none"),
-                    opacity: loadingState.opacity,
-                }),
-                "&:Bookmarking .svgBookmark-loadingPath": svgStyles({}),
-                "& .svgBookmark-loadingPath": {
-                    display: "none",
-                },
-                "&.Bookmarking .svgBookmark-loadingPath": {
-                    display: "block",
-                    ...svgStyles(loadingState, true),
-                },
+            svg: {
+                width: styleUnit(vars._bookmarkIcon.width),
+                height: styleUnit(vars._bookmarkIcon.height),
+                opacity: 1,
+                display: "block",
+                position: "relative",
+            },
+            ".svgBookmark": {
+                ...pointerEvents(),
+            },
+            ".svgBookmark-mainPath": svgStyles(normalState),
+            "&.Bookmarked:not(.Bookmarking) .svgBookmark-mainPath": svgStyles(bookmarkedState),
+            "&:hover:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+            "&:focus:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+            "&:active:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+            "&.Bookmarking .svgBookmark-mainPath": svgStyles({
+                fill: important("none"),
+                opacity: loadingState.opacity,
+            }),
+            ".svgBookmark-loadingPath": {
+                display: "none",
+            },
+            "&.Bookmarking .svgBookmark-loadingPath": {
+                display: "block",
+                ...svgStyles(loadingState, true),
             },
         });
     };
 
     const newPostMenuIcon = style("newPostMenuIcon", {
-        width: unit(vars.newPostMenuIcon.width),
-        height: unit(vars.newPostMenuIcon.height),
-        color: colorOut(globalVars.mainColors.primaryContrast),
+        width: styleUnit(vars.newPostMenuIcon.width),
+        height: styleUnit(vars.newPostMenuIcon.height),
+        color: ColorsUtils.colorOut(globalVars.mainColors.primaryContrast),
         margin: "auto",
     });
 
     const itemFlyout = style("itemFlyout", {
-        width: unit(vars.standard.width),
-        height: unit(vars.standard.height),
+        width: styleUnit(vars.standard.width),
+        height: styleUnit(vars.standard.height),
     });
 
     // Search types
     const typeAll = style("typeAll", {
-        width: unit(vars.typeAll.width),
-        height: unit(vars.typeAll.height),
+        width: styleUnit(vars.typeAll.width),
+        height: styleUnit(vars.typeAll.height),
     });
     const typeDiscussions = style("typeDiscussions", {
-        width: unit(vars.typeDiscussions.width),
-        height: unit(vars.typeDiscussions.height),
+        width: styleUnit(vars.typeDiscussions.width),
+        height: styleUnit(vars.typeDiscussions.height),
     });
     const typeArticles = style("typeArticles", {
-        width: unit(vars.typeArticles.width),
-        height: unit(vars.typeArticles.height),
+        width: styleUnit(vars.typeArticles.width),
+        height: styleUnit(vars.typeArticles.height),
     });
     const typeCategoriesAndGroups = style("TypeCategoriesAndGroups", {
-        width: unit(vars.typeCategoriesAndGroups.width),
-        height: unit(vars.typeCategoriesAndGroups.height),
+        width: styleUnit(vars.typeCategoriesAndGroups.width),
+        height: styleUnit(vars.typeCategoriesAndGroups.height),
     });
     const typeMember = style("TypeMember", {
-        width: unit(vars.typeMember.width),
-        height: unit(vars.typeMember.height),
+        width: styleUnit(vars.typeMember.width),
+        height: styleUnit(vars.typeMember.height),
     });
     const typeIdeasIcon = style("TypeIdeasIcon", {
-        width: unit(vars.typeIdeasIcon.width),
-        height: unit(vars.typeIdeasIcon.height),
+        width: styleUnit(vars.typeIdeasIcon.width),
+        height: styleUnit(vars.typeIdeasIcon.height),
     });
     const typePollsIcon = style("TypePollsIcon", {
-        width: unit(vars.typePollsIcon.width),
-        height: unit(vars.typePollsIcon.height),
+        width: styleUnit(vars.typePollsIcon.width),
+        height: styleUnit(vars.typePollsIcon.height),
     });
     const typeQuestion = style("TypeQuestion", {
-        width: unit(vars.typeQuestion.width),
-        height: unit(vars.typeQuestion.height),
+        width: styleUnit(vars.typeQuestion.width),
+        height: styleUnit(vars.typeQuestion.height),
+    });
+
+    const typePlaces = style("TypePlaces", {
+        width: styleUnit(vars.typePlaces.width),
+        height: styleUnit(vars.typePlaces.height),
+    });
+
+    const typeFlag = style("TypeFlag", {
+        width: styleUnit(vars.typeFlag.width),
+        height: styleUnit(vars.typeFlag.height),
+    });
+
+    const typeGroups = style("TypeGroups", {
+        width: styleUnit(vars.typeQuestion.width),
+        height: styleUnit(vars.typeQuestion.height),
+    });
+
+    const typeKnowledgeBase = style("TypeKnowledgeBase", {
+        width: styleUnit(vars.typeQuestion.width),
+        height: styleUnit(vars.typeQuestion.height),
+    });
+
+    const downvote = css({
+        width: styleUnit(vars.downvote.width),
+        height: styleUnit(vars.downvote.height),
+        stroke: ColorsUtils.colorOut(globalVars.mainColors.fg),
+    });
+
+    const upvote = cx(
+        downvote,
+        css({
+            transform: "rotate(180deg)",
+        }),
+    );
+
+    const siteTotalMembersIcon = css({
+        width: styleUnit(vars.siteTotalMembersIcon.width),
+        height: styleUnit(vars.siteTotalMembersIcon.height),
+    });
+
+    const siteTotalPostsIcon = css({
+        width: styleUnit(vars.siteTotalPostsIcon.width),
+        height: styleUnit(vars.siteTotalPostsIcon.height),
+    });
+
+    const siteTotalOnlineIcon = css({
+        width: styleUnit(vars.siteTotalOnlineIcon.width),
+        height: styleUnit(vars.siteTotalOnlineIcon.height),
     });
 
     return {
@@ -574,35 +633,35 @@ export const iconClasses = useThemeCache(() => {
         warning,
         errorFgColor,
         warningFgColor,
+        successFgColor,
         fileType,
         attachmentError,
         vanillaLogo,
         vanillaLogoMobile,
         compact,
         settings,
-        search,
-        notifications,
-        messages,
         user,
         userWarning,
         close,
         closeCompact,
         closeTiny,
+        triangeTiny,
         chevronLeftCompact,
         chevronLeftSmallCompact,
         selectedCategory,
-        signIn,
         chevronUp,
         plusCircle,
         categoryIcon,
         deleteIcon,
         editIcon,
         discussionIcon,
-        globeIcon,
         isSmall,
         hamburger,
         documentation,
-        bookmark,
+        /**
+         * @deprecated
+         */
+        _bookmark,
         newPostMenuIcon,
         itemFlyout,
         typeAll,
@@ -613,5 +672,14 @@ export const iconClasses = useThemeCache(() => {
         typeIdeasIcon,
         typePollsIcon,
         typeQuestion,
+        typePlaces,
+        typeFlag,
+        typeGroups,
+        typeKnowledgeBase,
+        downvote,
+        upvote,
+        siteTotalMembersIcon,
+        siteTotalPostsIcon,
+        siteTotalOnlineIcon,
     };
 });

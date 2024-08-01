@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit;
+<?php if (!defined("APPLICATION")) {
+    exit();
+}
 
 /**
  * test-old-theme Theme Hooks
@@ -8,7 +10,8 @@
  * @license   GPLv2
  * @since     1.0.0
  */
-class TestOldThemeThemeHooks implements Gdn_IPlugin {
+class TestOldThemeThemeHooks implements Gdn_IPlugin
+{
     /**
      * This will run when you "Enable" the theme
      *
@@ -16,7 +19,8 @@ class TestOldThemeThemeHooks implements Gdn_IPlugin {
      * @access public
      * @return bool
      */
-    public function setup() {
+    public function setup()
+    {
         return true;
     }
 }

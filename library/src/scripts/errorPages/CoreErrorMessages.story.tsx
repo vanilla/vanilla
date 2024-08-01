@@ -8,7 +8,7 @@ import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import React from "react";
 
 export default {
-    title: "Error Messages",
+    title: "Alerts/Errors",
 };
 
 export function CloudflareParsedErrorMessage() {

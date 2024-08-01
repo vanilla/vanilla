@@ -1,17 +1,25 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-@import "~library-scss/coreVariables";
+@import "./coreVariables";
 @import "~@vanilla/theme-core/scss/mixins/mixins";
 
-@import "~library-scss/utility/normalize";
-@import "~library-scss/utility/utilities";
-@import "~library-scss/utility/icons";
+@import "./utility/normalize";
+@import "./utility/utilities";
+@import "./utility/icons";
 
 // Embeds
-@import "~library-scss/embeds/embeds";
+@import "./embeds/embeds";
 
-@import "~library-scss/utility/scaffolding";
-@import "~library-scss/utility/utilities";
+@import "./utility/scaffolding";
+@import "./utility/utilities";
+
+// Clear reach warning
+// https://reach.tech/styling/
+:root {
+    --reach-tooltip: 1;
+    --reach-skip-nav: 1;
+    --reach-menu-button: 1;
+}

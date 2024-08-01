@@ -1,0 +1,21 @@
+{% macro labelList(parameters) %}
+    <ul class="card-label-list">
+        {% for parameter in parameters %}
+            <li>
+                <strong>{{ parameter.name }}</strong>
+                {% if isArray(parameter.value) %}
+                    {{ _self.labelList(parameter.value) }}
+                {% else %}
+                    <span>{{ parameter.value }}</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+<div class="card">
+    <div class="card-block card-block-minimal">
+        <h4 class="card-title">{{ widgetName }}</h4>
+        {{ _self.labelList(parameters) }}
+    </div>
+</div>

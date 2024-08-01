@@ -7,5 +7,6 @@
 /**
  * Representation of an error encountered when altering a database table.
  */
-class AlterDatabaseException extends Exception {
+class AlterDatabaseException extends Exception
+{
 }

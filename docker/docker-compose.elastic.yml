@@ -1,0 +1,40 @@
+name: "vanilla"
+services:
+    elasticsearch:
+        container_name: "elasticsearch"
+        image: docker.elastic.co/elasticsearch/elasticsearch:${ES_STACK_VERSION}
+        environment:
+            - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+            - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+            - action.destructive_requires_name=false
+            - xpack.security.enabled=false
+            - xpack.security.enrollment.enabled=false
+        mem_limit: 2g
+        volumes:
+            - elasticsearch-data:/usr/share/elasticsearch/data
+        ports:
+            - 9200:9200
+        networks:
+            - vanilla-network
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 1
+                delay: 180s
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://0.0.0.0:9200/_cluster/health"]
+            interval: 5s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+
+volumes:
+    elasticsearch-data:
+networks:
+    vanilla-network:
+        external: true
+        driver: "bridge"
+        name: "vanilla-network"

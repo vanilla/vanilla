@@ -11,6 +11,7 @@ use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedFilterInterface;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
@@ -18,8 +19,8 @@ use Vanilla\Formatting\Quill\Parser;
 /**
  * Class for filtering data inside of quote embeds.
  */
-class QuoteEmbedFilter implements EmbedFilterInterface {
-
+class QuoteEmbedFilter implements EmbedFilterInterface
+{
     /** @var FormatService */
     private $formatService;
 
@@ -32,16 +33,17 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
      * @param FormatService $formatService
      * @param UserProviderInterface $userProvider
      */
-    public function __construct(FormatService $formatService, UserProviderInterface $userProvider) {
+    public function __construct(FormatService $formatService, UserProviderInterface $userProvider)
+    {
         $this->formatService = $formatService;
         $this->userProvider = $userProvider;
     }
 
-
     /**
      * @inheritdoc
      */
-    public function canHandleEmbedType(string $embedType): bool {
+    public function canHandleEmbedType(string $embedType): bool
+    {
         return $embedType === QuoteEmbed::TYPE;
     }
 
@@ -50,9 +52,15 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
      *
      * @inheritdoc
      */
-    public function filterEmbed(AbstractEmbed $embed): AbstractEmbed {
+    public function filterEmbed(AbstractEmbed $embed): AbstractEmbed
+    {
+        if ($embed instanceof ErrorEmbed) {
+            // If we had an issue with actually rendering the embed, don't allow it take down the page.
+            return $embed;
+        }
+
         if (!($embed instanceof QuoteEmbed)) {
-            throw new EmbeddedContentException('Expected a quote embed. Instead got a ' . get_class($embed));
+            throw new EmbeddedContentException("Expected a quote embed. Instead got a " . get_class($embed));
         }
         $this->replaceUser($embed);
         $this->cleanupBody($embed);
@@ -69,9 +77,10 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
      *
      * @param QuoteEmbed $embed
      */
-    private function replaceUser(QuoteEmbed $embed) {
+    private function replaceUser(QuoteEmbed $embed)
+    {
         $verifiedUser = $this->userProvider->getFragmentByID($embed->getUserID(), true);
-        $embed->updateData(['insertUser' => $verifiedUser], false);
+        $embed->updateData(["insertUser" => $verifiedUser], false);
     }
 
     /**
@@ -82,9 +91,10 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
      *
      * @param QuoteEmbed $embed
      */
-    private function cleanupBody(QuoteEmbed $embed) {
-        $bodyRaw = $embed->getData()['bodyRaw'];
-        $format = $embed->getData()['format'];
+    private function cleanupBody(QuoteEmbed $embed)
+    {
+        $bodyRaw = $embed->getData()["bodyRaw"];
+        $format = $embed->getData()["format"];
 
         if ($embed->getDisplayOptons()->isRenderFullContent()) {
             $renderedBody = $this->formatService->renderHTML($bodyRaw, $format);
@@ -92,13 +102,20 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
             if (strtolower($format) === RichFormat::FORMAT_KEY) {
                 $bodyRaw = $this->stripNestedRichEmbeds($bodyRaw);
             }
+
+            if (strtolower($format) === Rich2Format::FORMAT_KEY) {
+                $bodyRaw = $this->stripNestedRich2Embeds($bodyRaw);
+            }
             $renderedBody = $this->formatService->renderQuote($bodyRaw, $format);
         }
 
-        $embed->updateData([
-            'body' => $renderedBody,
-            'bodyRaw' => $bodyRaw,
-        ], false);
+        $embed->updateData(
+            [
+                "body" => $renderedBody,
+                "bodyRaw" => $bodyRaw,
+            ],
+            false
+        );
     }
 
     /**
@@ -108,13 +125,14 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
      *
      * @return string
      */
-    private function stripNestedRichEmbeds(string $richRawBody): string {
+    private function stripNestedRichEmbeds(string $richRawBody): string
+    {
         $arrayBody = Parser::jsonToOperations($richRawBody);
         // Iterate through the nested embed.
         foreach ($arrayBody as $subInsertIndex => &$subInsertOp) {
-            $insert = &$subInsertOp['insert'];
+            $insert = &$subInsertOp["insert"];
             if (is_array($insert)) {
-                $url = $insert['embed-external']['data']['url'] ?? null;
+                $url = $insert["embed-external"]["data"]["url"] ?? null;
                 if ($url !== null) {
                     // Replace the embed with just a link.
                     $linkEmbedOps = $this->makeLinkEmbedInserts($url);
@@ -127,20 +145,50 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
     }
 
     /**
+     * Strip nested embeds from a raw rich 2 body.
+     *
+     * @param string $richRawBody A rich content body, JSON encoded.
+     *
+     * @return string
+     */
+    public static function stripNestedRich2Embeds(string $richRawBody): string
+    {
+        $arrayBody = Parser::jsonToOperations($richRawBody);
+        // Iterate through the nested embed.
+        foreach ($arrayBody as $subInsertIndex => &$subInsertOp) {
+            if (!isset($subInsertOp["embedData"]["embedType"])) {
+                continue;
+            }
+
+            if ($subInsertOp["embedData"]["embedType"] == "quote") {
+                $embedData = [
+                    "url" => $subInsertOp["embedData"]["url"],
+                    "embedType" => "link",
+                ];
+
+                $subInsertOp["embedData"] = $embedData;
+            }
+        }
+
+        return json_encode($arrayBody, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
      * Make the contents of a link embed.
      *
      * @param string $url
      * @return array
      */
-    private function makeLinkEmbedInserts(string $url): array {
+    private function makeLinkEmbedInserts(string $url): array
+    {
         return [
             [
-                'insert' => $url,
-                'attributes' => [
-                    'link' => $url,
+                "insert" => $url,
+                "attributes" => [
+                    "link" => $url,
                 ],
             ],
-            [ 'insert' => "\n" ],
+            ["insert" => "\n"],
         ];
     }
 }

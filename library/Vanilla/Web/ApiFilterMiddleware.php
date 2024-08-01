@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Dani M <danim@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -16,12 +16,14 @@ use Garden\Web\RequestInterface;
  *
  * @package Vanilla\Web
  */
-class ApiFilterMiddleware {
+class ApiFilterMiddleware
+{
+    const FIELD_ALLOW = "api-allow";
 
     /**
      * @var array The blacklisted fields.
      */
-    private $blacklist = ['password', 'email', 'insertipaddress', 'updateipaddress'];
+    private $blacklist = ["password", "email", "updateipaddress"];
 
     /**
      * Validate an api v2 response.
@@ -29,16 +31,20 @@ class ApiFilterMiddleware {
      * @param RequestInterface $request
      * @param callable $next
      * @return Data
+     * @throws ServerException
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         /** @var Data $response */
         $response = $next($request);
         $data = $response->getData();
-        $apiAllow = $response->getMeta('api-allow');
+
+        $apiAllow = $response->getMeta(self::FIELD_ALLOW);
         if (!is_array($apiAllow)) {
             $apiAllow = [];
         }
         // Make sure filtering is done for apiv2.
+
         if (is_array($data)) {
             // Check for blacklisted fields.
             $blacklist = array_flip($this->blacklist);
@@ -52,6 +58,7 @@ class ApiFilterMiddleware {
                 }
             });
         }
+
         return $response;
     }
 
@@ -60,7 +67,8 @@ class ApiFilterMiddleware {
      *
      * @param string $field The field to add to the blacklist.
      */
-    protected function addBlacklistField(string $field) {
+    protected function addBlacklistField(string $field)
+    {
         $field = strtolower($field);
         if (!in_array($field, $this->blacklist)) {
             $this->blacklist[] = $field;
@@ -72,7 +80,8 @@ class ApiFilterMiddleware {
      *
      * @param string $field The field to remove from the blacklist.
      */
-    protected function removeBlacklistField(string $field) {
+    protected function removeBlacklistField(string $field)
+    {
         if (($key = array_search(strtolower($field), $this->blacklist)) !== false) {
             unset($this->blacklist[$key]);
         }
@@ -83,7 +92,8 @@ class ApiFilterMiddleware {
      *
      * @return array Returns an array of the blacklisted fields.
      */
-    public function getBlacklistFields() {
+    public function getBlacklistFields()
+    {
         return $this->blacklist;
     }
 }

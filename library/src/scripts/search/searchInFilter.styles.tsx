@@ -3,16 +3,17 @@
  * @license GPL-2.0-only
  */
 
-import { nestedWorkaround } from "@dashboard/compatibilityStyles";
-import { buttonVariables } from "@library/forms/buttonStyles";
+import { buttonVariables } from "@library/forms/Button.variables";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, negativeUnit, unit } from "@library/styles/styleHelpers";
-import { margins } from "@library/styles/styleHelpersSpacing";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { negativeUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, translate } from "csx";
-import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const searchInFilterVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("searchInFilter", forcedVars);
@@ -48,47 +49,61 @@ export const searchInFilterClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         flexWrap: "wrap",
-        ...margins({
+        ...Mixins.margin({
             horizontal: vars.spacing.margin.horizontal,
             vertical: vars.spacing.margin.vertical + 7,
         }),
-        width: calc(`100% + ${unit(2 * vars.spacing.margin.horizontal)}`),
+        width: calc(`100% + ${styleUnit(2 * vars.spacing.margin.horizontal)}`),
         transform: translate(negativeUnit(vars.spacing.margin.horizontal * 2)),
-    } as NestedCSSProperties);
+    });
 
     const item = style("item", {
         display: "inline-flex",
         flexShrink: 1,
-        ...margins(vars.spacing.margin),
+        ...Mixins.margin(vars.spacing.margin),
     });
 
-    const label = style("label", {});
-    const input = style("input", {});
-
     // Style "button"
-    const labelStateStyles = generateButtonStyleProperties(buttonVariables().radio);
-    nestedWorkaround(`.${label}`, labelStateStyles.$nest);
+    const labelStateStyles = Mixins.button(buttonVariables().radio);
+
+    const label = style("label", {
+        ...labelStateStyles,
+        "&.isDisabled": {
+            pointerEvents: "none",
+            opacity: 0.5,
+        },
+    });
 
     // Style states on actual radio button
-    const hiddenInputStates = generateButtonStyleProperties(buttonVariables().radio, false, ` + .${label}`);
-    nestedWorkaround(`.${input}`, hiddenInputStates.$nest);
+    const hiddenInputStates = generateButtonStyleProperties({
+        buttonTypeVars: buttonVariables().radio,
+        stateSuffix: ` + .${label}`,
+    });
+
+    const input = style("input", {
+        ...hiddenInputStates,
+    });
 
     const separator = style("separator", {
         display: "inline-flex",
-        height: unit(24),
-        width: unit(globalVars.border.width),
-        backgroundColor: colorOut(globalVars.border.color),
-        ...margins({
+        height: styleUnit(24),
+        width: styleUnit(globalVars.border.width),
+        backgroundColor: ColorsUtils.colorOut(globalVars.border.color),
+        ...Mixins.margin({
             horizontal: vars.spacing.margin.horizontal,
         }),
     });
 
     const labelWrap = style("labelWrap", {
-        marginLeft: unit(9),
+        marginLeft: styleUnit(9),
     });
 
     const iconWrap = style("iconWrap", {
         display: "inline-flex",
+    });
+
+    const buttonAutoMinWidth = style("buttonAutoMinWidth", {
+        minWidth: "auto",
     });
 
     return {
@@ -100,5 +115,6 @@ export const searchInFilterClasses = useThemeCache(() => {
         separator,
         iconWrap,
         labelWrap,
+        buttonAutoMinWidth,
     };
 });

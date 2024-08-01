@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
-
+class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var SoundCloudEmbedFactory */
     private $factory;
 
@@ -26,7 +26,8 @@ class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new SoundCloudEmbedFactory($this->httpClient);
@@ -38,23 +39,24 @@ class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest) {
+    public function testSupportedDomains(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
-        return [
-            [ "https://soundcloud.com/secret-service-862007284/old-town-road-remix-feat-billy" ]
-        ];
+    public function supportedDomainsProvider(): array
+    {
+        return [["https://soundcloud.com/secret-service-862007284/old-town-road-remix-feat-billy"]];
     }
 
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
+    public function testCreateEmbedForUrl()
+    {
         $url = "https://soundcloud.com/secret-service-862007284/old-town-road-remix-feat-billy";
         $trackID = "600964365";
         $showArtwork = true;
@@ -77,7 +79,8 @@ class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
             "title" => "Old Town Road (Remix) [feat. Billy Ray Cyrus] by Lil Nas X",
             "description" => null,
             "thumbnail_url" => "http://i1.sndcdn.com/artworks-7PqTQwTM5TmY-0-t500x500.jpg",
-            "html" => "<iframe width=\"100%\" height=\"400\" scrolling=\"no\" frameborder=\"no\" src=\"https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F600964365&show_artwork=true\"></iframe>",
+            "html" =>
+                "<iframe width=\"100%\" height=\"400\" scrolling=\"no\" frameborder=\"no\" src=\"https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F600964365&show_artwork=true\"></iframe>",
             "author_name" => "Lil Nas X",
             "author_url" => "https://soundcloud.com/secret-service-862007284",
         ];
@@ -85,11 +88,7 @@ class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
 
         $this->httpClient->addMockResponse(
             $oembedUrl,
-            new HttpResponse(
-                200,
-                "Content-Type: application/json",
-                json_encode($data)
-            )
+            new HttpResponse(200, "Content-Type: application/json", json_encode($data))
         );
 
         // Check over the network.
@@ -115,5 +114,54 @@ class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
         // Just verify that this doesn't throw an exception.
         $dataEmbed = new SoundCloudEmbed($embedData);
         $this->assertInstanceOf(SoundCloudEmbed::class, $dataEmbed);
+    }
+
+    /**
+     * Provide data for Create Embed error tests
+     *
+     * @return array[]
+     */
+    public function createEmbedErrorsDataProvider(): array
+    {
+        return [
+            "500 Internal Server Error" => [
+                "statusCode" => 500,
+                "url" => "https://soundcloud.com/",
+                "rawBody" => json_encode("<!DOCTYPE html><html><head></head><body>Hey, I'm the body</body></html>"),
+                "expectedExceptionMessage" => 'Client exception: "Internal Server Error".',
+            ],
+            "200 OK with malformed body" => [
+                "statusCode" => 200,
+                "url" => "https://soundcloud.com/officialfreqrecords/darshdhaliwalnogoo",
+                "rawBody" => json_encode("<!DOCTYPE html><html><head></head><body>Hey, I'm the body</body></html>"),
+                "expectedExceptionMessage" => "URL did not yield an appropriate response.",
+            ],
+        ];
+    }
+
+    /**
+     * Test errors upon embed creation.
+     *
+     * @param int $statusCode HTTP status code.
+     * @param string $url Embed url.
+     * @param string $rawBody Returned raw body.
+     * @param string $expectedExceptionMessage Expected exception message
+     * @dataProvider createEmbedErrorsDataProvider
+     */
+    public function testCreateEmbedErrors(
+        int $statusCode,
+        string $url,
+        string $rawBody,
+        string $expectedExceptionMessage
+    ): void {
+        $oembedParams = http_build_query(["format" => "json", "url" => $url]);
+        $oembedUrl = SoundCloudEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;
+        $this->httpClient->addMockResponse(
+            $oembedUrl,
+            new HttpResponse($statusCode, "Content-Type: application/json", $rawBody)
+        );
+
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->factory->createEmbedForUrl($url);
     }
 }

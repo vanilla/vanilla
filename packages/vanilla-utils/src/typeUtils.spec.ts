@@ -3,10 +3,9 @@
  * @license GPL-2.0-only
  */
 
-import { isInstanceOfOneOf } from "./typeUtils";
+import { forceBool, isInstanceOfOneOf } from "./typeUtils";
 
 it("isInstanceOfOneOf", () => {
-    /* tslint:disable:max-classes-per-file */
     class Thing1 {}
     class Thing2 {}
     class Thing3 {}
@@ -18,4 +17,29 @@ it("isInstanceOfOneOf", () => {
 
     expect(isInstanceOfOneOf(thing2, classes)).toEqual(true);
     expect(isInstanceOfOneOf(5, classes)).not.toEqual(true);
+});
+
+describe("forceBool", () => {
+    const cases = [
+        ["true", true],
+        ["false", false],
+        [false, false],
+        [true, true],
+        [0, false],
+        [1, true],
+        [10000, true],
+        [-1, true],
+        ["other", true],
+        ["", false],
+        [[], true],
+        [{}, true],
+        [null, false],
+        [undefined, false],
+    ];
+
+    cases.forEach(([input, expected]) => {
+        it(`converts ${JSON.stringify(input)} to ${JSON.stringify(expected)}`, () => {
+            expect(forceBool(input)).toBe(expected);
+        });
+    });
 });

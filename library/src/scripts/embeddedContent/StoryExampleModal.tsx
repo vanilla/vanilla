@@ -7,7 +7,6 @@
 import React, { useRef, useState } from "react";
 import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
 import Button from "@library/forms/Button";
-import classNames from "classnames";
 import { useUniqueID } from "@library/utility/idUtils";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -52,12 +51,12 @@ export function StoryExampleModal(props: IProps) {
             <Modal
                 isVisible={open}
                 size={ModalSizes.SMALL}
-                elementToFocus={openButtonRef ? ((openButtonRef.current as unknown) as HTMLButtonElement) : undefined}
+                elementToFocus={openButtonRef ? (openButtonRef.current as unknown as HTMLButtonElement) : undefined}
                 exitHandler={() => {
                     setOpen(false);
                 }}
                 titleID={titleID}
-                elementToFocusOnExit={(openButtonRef.current as unknown) as HTMLButtonElement}
+                elementToFocusOnExit={openButtonRef.current as unknown as HTMLButtonElement}
             >
                 <Frame
                     header={
@@ -71,7 +70,7 @@ export function StoryExampleModal(props: IProps) {
                     }
                     body={
                         <FrameBody>
-                            <div className={classNames("frameBody-contents", classesFrameBody.contents)}>
+                            <div className={classesFrameBody.contents}>
                                 <InputTextBlock inputProps={{}} />
                             </div>
                         </FrameBody>
@@ -80,7 +79,7 @@ export function StoryExampleModal(props: IProps) {
                         <FrameFooter justifyRight={true}>
                             <Button
                                 className={classFrameFooter.actionButton}
-                                baseClass={ButtonTypes.TEXT}
+                                buttonType={ButtonTypes.TEXT}
                                 buttonRef={cancelRef}
                                 onClick={() => {
                                     /* do something before closing */
@@ -95,7 +94,7 @@ export function StoryExampleModal(props: IProps) {
                                     /* do something before closing */
                                     setOpen(false);
                                 }}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
                             >
                                 {"Save"}
                             </Button>

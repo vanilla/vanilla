@@ -1,2 +1,2 @@
-(Quote) (Image) @notAMention
- @@thisIsARealMention @@duplicateMention@@duplicateMention @@@@@@!@#$%^&amp;*()&quot;&quot;
+@notAMention
+ @thisIsARealMention @duplicateMention@duplicateMention@mention/slashes @@@@@@!@#$%^&amp;*()&quot;&quot;

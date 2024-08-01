@@ -1,0 +1,121 @@
+openapi: 3.0.3
+info:
+paths:
+    /notification-preferences/{id}:
+        x-hidden: true
+        parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                  type: integer
+        get:
+            summary: Get a user's notification preferences.
+            tags:
+                - Notification Preferences
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/NotificationPreferences"
+                "401":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+        patch:
+            summary: Update a user's notification preferences.
+            tags:
+                - Notification Preferences
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/NotificationPreferences"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/NotificationPreferences"
+                "401":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+    /notification-preferences/schema:
+        x-hidden: true
+        get:
+            parameters:
+                - in: query
+                  name: userID
+                  required: false
+                  schema:
+                      type: integer
+                - in: query
+                  name: schemaType
+                  required: false
+                  schema:
+                      type: string
+                      enum:
+                          - user
+                          - defaults
+            summary: Get the schema for the notification preferences page.
+            tags:
+                - Notification Preferences
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/NotificationPreferencesSchema"
+                            example:
+                                type: "object"
+                                properties:
+                                    notifications:
+                                        x-control:
+                                            label: "Notifications"
+                                            description: "Choose to be notified by notification popup or email."
+                                        type: "object"
+                                        properties:
+                                            followedPosts:
+                                                x-control:
+                                                    label: "Posts"
+                                                    description: null
+                                                type: "object"
+                                                properties:
+                                                    DiscussionComment:
+                                                        x-control:
+                                                            label: "Discussion Comment"
+                                                            description: "New comments on my posts"
+                                                        type: "object"
+                                                        properties:
+                                                            email:
+                                                                type: "boolean"
+                                                            popup:
+                                                                type: "boolean"
+components:
+    schemas:
+        NotificationPreferencesSchema:
+            type: object
+        NotificationActivityTypeSchema:
+            type: object
+            properties:
+                x-control:
+                    type: object
+                    properties:
+                        label:
+                            type: string
+                        description:
+                            type: string
+                properties:
+                    type: object
+                    properties:
+                        email:
+                            type: boolean
+                        popup:
+                            type: boolean
+        NotificationPreferences:
+            type: object

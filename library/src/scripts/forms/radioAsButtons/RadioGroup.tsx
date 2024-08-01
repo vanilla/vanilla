@@ -9,14 +9,14 @@ import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { IRadioGroupProps, RadioGroupProvider } from "@library/forms/radioAsButtons/RadioGroupContext";
 import classNames from "classnames";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/Button.styles";
 import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 interface IProps extends IRadioGroupProps {
     className?: string;
-    accessibleTitle: string;
+    accessibleTitle?: string;
     children: React.ReactNode;
-    setData: (data: any) => void;
+    setData?: (data: any) => void;
     buttonActiveClass?: string; // class that goes directly on the actual "button" element
     buttonClass?: string; // class that goes directly on the actual "button" element
 }
@@ -47,7 +47,7 @@ export function RadioGroup(props: IProps) {
             buttonClass={buttonClass}
             classes={classes}
         >
-            <fieldset className={classNames(classesInputBlock.root, rootClass, className)}>
+            <fieldset className={classNames(classesInputBlock.root, rootClass, className)} role="radiogroup">
                 <ScreenReaderContent tag="legend">{accessibleTitle}</ScreenReaderContent>
                 <div className={classes.items}>{children}</div>
             </fieldset>

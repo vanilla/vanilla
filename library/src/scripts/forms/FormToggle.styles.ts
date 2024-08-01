@@ -3,10 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
+import { variableFactory, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
-import { borders, colorOut, defaultTransition, timedTransition } from "@library/styles/styleHelpers";
+import { flexHelper } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { important } from "csx";
 
@@ -52,6 +55,7 @@ export const formToggleVariables = useThemeCache((forcedVars?: IThemeVariables) 
 export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) => {
     const vars = formToggleVariables(forcedVars);
     const style = styleFactory("formToggle");
+    const globalVars = globalVariables(forcedVars);
 
     const well = style("well", {
         cursor: "pointer",
@@ -59,8 +63,8 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
         position: "relative",
         height: vars.well.height,
         width: vars.well.width,
-        ...borders(vars.well.border),
-        backgroundColor: colorOut(vars.well.color),
+        ...Mixins.border(vars.well.border),
+        backgroundColor: ColorsUtils.colorOut(vars.well.color),
         transition: "0.3s linear background, 0.3s linear border",
     });
 
@@ -68,12 +72,12 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
         cursor: "pointer",
         height: vars.slider.height,
         width: vars.slider.width,
-        ...borders(vars.slider.border),
+        ...Mixins.border(vars.slider.border),
         position: "absolute",
         top: vars.sizing.gutter,
         bottom: vars.sizing.gutter,
         left: vars.sizing.gutter,
-        backgroundColor: colorOut(vars.slider.color),
+        backgroundColor: ColorsUtils.colorOut(vars.slider.color),
         transition: "0.3s linear border, 0.2s linear left",
     });
 
@@ -82,30 +86,33 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
         position: "relative",
         height: vars.well.height,
         width: vars.well.width,
-        $nest: {
+        ...{
             [`&.isOn .${slider}`]: {
                 left: vars.well.width / 2 + vars.sizing.gutter,
-                ...borders({ ...vars.slider.border, color: vars.slider.color }),
+                ...Mixins.border({ ...vars.slider.border, color: vars.slider.color }),
             },
             [`&.isOn .${well}`]: {
-                backgroundColor: colorOut(vars.well.colorActive),
-                ...borders({ ...vars.slider.border, color: vars.well.colorActive }),
+                backgroundColor: ColorsUtils.colorOut(vars.well.colorActive),
+                ...Mixins.border({ ...vars.slider.border, color: vars.well.colorActive }),
             },
             [`&.isIndeterminate .${slider}`]: {
                 left: vars.slider.width / 2 + vars.sizing.gutter,
             },
-            [`&.isFocused:not(.isDisabled):not(.isFocused) .${well}, &:not(.isDisabled):hover .${well}`]: {
-                ...borders({ ...vars.slider.border, color: vars.well.colorActive }),
+            [`&.isFocused .${well}, &:not(.isDisabled):hover .${well}`]: {
+                ...Mixins.border({ ...vars.slider.border, color: vars.well.colorActive }),
             },
-            [`&.isFocused:not(.isDisabled):not(.isFocused) .${slider}, &:not(.isDisabled):hover .${slider}`]: {
-                ...borders({ ...vars.slider.border, color: vars.well.colorActive }),
+            [`&.isFocused .${slider}, &:not(.isDisabled):hover .${slider}`]: {
+                ...Mixins.border({ ...vars.slider.border, color: vars.well.colorActive }),
             },
-            [`&.isOn.isFocused:not(.isDisabled):not(.isFocused) .${well}, &.isOn:not(.isDisabled):hover .${well}`]: {
-                ...borders({ ...vars.well.border, color: vars.well.colorActiveState }),
-                backgroundColor: colorOut(vars.well.colorActiveState),
+            [`&.isOn.isFocused .${well}, &.isOn:not(.isDisabled):hover .${well}`]: {
+                ...Mixins.border({ ...vars.well.border, color: vars.well.colorActiveState }),
+                backgroundColor: ColorsUtils.colorOut(vars.well.colorActiveState),
             },
-            [`&.isOn.isFocused:not(.isDisabled):not(.isFocused) .${slider}, &.isOn:not(.isDisabled):hover .${slider}`]: {
-                ...borders({ ...vars.slider.border, color: vars.slider.color }),
+            [`&.isOn:.isFocused .${slider}, &.isOn:not(.isDisabled):hover .${slider}`]: {
+                ...Mixins.border({ ...vars.slider.border, color: vars.slider.color }),
+            },
+            [`&.isFocused .${well}`]: {
+                boxShadow: `0 0 0 2px ${ColorsUtils.colorOut(vars.well.colorActive)}`,
             },
             [`&.isDisabled`]: {
                 cursor: important("default"),
@@ -120,5 +127,26 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
         },
     });
 
-    return { root, well, slider };
+    const visibleLabel = style("visibleLabel", {
+        ...flexHelper().middleLeft(),
+        fontWeight: globalVars.fonts.weights.bold,
+        ...Mixins.padding({
+            right: globalVars.gutter.half,
+            vertical: globalVars.gutter.quarter,
+        }),
+        ...{
+            "& svg": {
+                marginLeft: 6,
+            },
+        },
+    });
+    const visibleLabelContainer = style("visibleLabelContainer", {
+        ...flexHelper().middle(),
+        justifyContent: "space-between",
+        ...Mixins.margin({
+            vertical: globalVars.gutter.half,
+        }),
+    });
+
+    return { root, well, slider, visibleLabel, visibleLabelContainer };
 });

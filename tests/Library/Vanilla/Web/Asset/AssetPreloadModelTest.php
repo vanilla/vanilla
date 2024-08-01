@@ -9,7 +9,7 @@ namespace VanillaTests\Library\Vanilla\Web\Asset;
 
 use Vanilla\Web\Asset\AssetPreloader;
 use Vanilla\Web\Asset\AssetPreloadModel;
-use Vanilla\Web\Asset\ExternalAsset;
+use Vanilla\Web\Asset\WebAsset;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\SharedBootstrapTestCase;
@@ -17,35 +17,51 @@ use VanillaTests\SharedBootstrapTestCase;
 /**
  * Tests for the asset preload model.
  */
-class AssetPreloadModelTest extends MinimalContainerTestCase {
-
+class AssetPreloadModelTest extends MinimalContainerTestCase
+{
     use HtmlNormalizeTrait;
+
+    /**
+     * @return bool
+     */
+    protected static function useCommonBootstrap(): bool
+    {
+        return false;
+    }
 
     /**
      * Test that unique keys work.
      */
-    public function testDuplication() {
+    public function testDuplication()
+    {
         $model = new AssetPreloadModel();
         $first = "https://test.asset.com/1.js";
         $second = "https://test.asset.com/2.js";
         $key = "uniqueKey";
-        $model->addScript(new ExternalAsset($first), AssetPreloader::REL_PRELOAD, $key);
-        $model->addScript(new ExternalAsset($second), AssetPreloader::REL_PRELOAD, $key);
+        $model->addScript(new WebAsset($first), AssetPreloader::REL_PRELOAD, $key);
+        $model->addScript(new WebAsset($second), AssetPreloader::REL_PRELOAD, $key);
         $this->assertCount(1, $model->getPreloads());
-        $this->assertEquals($first, $model->getPreloads()[0]->getAsset()->getWebPath());
+        $this->assertEquals(
+            $first,
+            $model
+                ->getPreloads()[0]
+                ->getAsset()
+                ->getWebPath()
+        );
     }
 
     /**
      * Test the HTML rendering.
      */
-    public function testRendering() {
+    public function testRendering()
+    {
         $model = new AssetPreloadModel();
-        $model->addScript(new ExternalAsset("test-script"), AssetPreloader::REL_FULL);
-        $model->addScript(new ExternalAsset("test-script-preload"), AssetPreloader::REL_PRELOAD);
-        $model->addScript(new ExternalAsset("test-script-prefetch"), AssetPreloader::REL_PREFETCH);
-        $model->addStylesheet(new ExternalAsset("test-style"), AssetPreloader::REL_FULL);
-        $model->addStylesheet(new ExternalAsset("test-style-preload"), AssetPreloader::REL_PRELOAD);
-        $model->addStylesheet(new ExternalAsset("test-style-prefetch"), AssetPreloader::REL_PREFETCH);
+        $model->addScript(new WebAsset("test-script"), AssetPreloader::REL_FULL);
+        $model->addScript(new WebAsset("test-script-preload"), AssetPreloader::REL_PRELOAD);
+        $model->addScript(new WebAsset("test-script-prefetch"), AssetPreloader::REL_PREFETCH);
+        $model->addStylesheet(new WebAsset("test-style"), AssetPreloader::REL_FULL);
+        $model->addStylesheet(new WebAsset("test-style-preload"), AssetPreloader::REL_PRELOAD);
+        $model->addStylesheet(new WebAsset("test-style-prefetch"), AssetPreloader::REL_PREFETCH);
 
         $expected = <<<HTML
 <!-- Preload links, scripts, and stylesheets -->
@@ -59,9 +75,6 @@ class AssetPreloadModelTest extends MinimalContainerTestCase {
 
 HTML;
 
-        $this->assertEquals(
-            $expected,
-            $model->renderHtml()
-        );
+        $this->assertEquals($expected, $model->renderHtml());
     }
 }

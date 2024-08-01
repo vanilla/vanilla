@@ -5,14 +5,16 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { containerMainMediaQueries, containerMainStyles } from "@library/layout/components/containerStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, important, percent, px } from "csx";
-import { paddings, unit } from "@library/styles/styleHelpers";
-import { media } from "typestyle";
+import { CSSObject, injectGlobal } from "@emotion/css";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { calc, important, percent } from "csx";
+import { styleUnit } from "@library/styles/styleUnit";
+import { media } from "@library/styles/styleShim";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { Mixins } from "@library/styles/Mixins";
 
 export const forumLayoutVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -21,95 +23,95 @@ export const forumLayoutVariables = useThemeCache(() => {
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
         fullGutter: globalVars.constants.fullGutter,
-        panelWidth: 220, // main calculated based on panel width
+        panelWidth: 288, // main calculated based on panel width
         breakPoints: {
             // Other break points are calculated
             oneColumn: 1200,
             tablet: 991,
-            mobile: 768,
+            mobile: 806,
             xs: 576,
         },
     });
 
     const mediaQueries = () => {
-        const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+        const noBleed = (styles: CSSObject, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(panel.paddedWidth),
-                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.oneColumn + 1) : undefined,
+                    maxWidth: panel.paddedWidth,
+                    minWidth: useMinWidth ? foundationalWidths.breakPoints.oneColumn + 1 : undefined,
                 },
                 styles,
             );
         };
 
-        const noBleedDown = (styles: NestedCSSProperties) => {
+        const noBleedDown = (styles: CSSObject) => {
             return noBleed(styles, false);
         };
 
-        const oneColumn = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+        const oneColumn = (styles: CSSObject, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(foundationalWidths.breakPoints.oneColumn),
-                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.tablet + 1) : undefined,
+                    maxWidth: foundationalWidths.breakPoints.oneColumn,
+                    minWidth: useMinWidth ? foundationalWidths.breakPoints.tablet + 1 : undefined,
                 },
                 styles,
             );
         };
 
-        const oneColumnDown = (styles: NestedCSSProperties) => {
+        const oneColumnDown = (styles: CSSObject) => {
             return oneColumn(styles, false);
         };
 
-        const tablet = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+        const tablet = (styles: CSSObject, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(foundationalWidths.breakPoints.tablet),
-                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.mobile + 1) : undefined,
+                    maxWidth: foundationalWidths.breakPoints.tablet,
+                    minWidth: useMinWidth ? foundationalWidths.breakPoints.mobile + 1 : undefined,
                 },
                 styles,
             );
         };
 
-        const tabletDown = (styles: NestedCSSProperties) => {
+        const tabletDown = (styles: CSSObject) => {
             return tablet(styles, false);
         };
 
-        const mobile = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+        const mobile = (styles: CSSObject, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(foundationalWidths.breakPoints.mobile),
-                    minWidth: useMinWidth ? px(foundationalWidths.breakPoints.xs + 1) : undefined,
+                    maxWidth: foundationalWidths.breakPoints.mobile,
+                    minWidth: useMinWidth ? foundationalWidths.breakPoints.xs + 1 : undefined,
                 },
                 styles,
             );
         };
 
-        const aboveMobile = (styles: NestedCSSProperties) => {
+        const aboveMobile = (styles: CSSObject) => {
             return media(
                 {
-                    minWidth: px(foundationalWidths.breakPoints.mobile + 1),
+                    minWidth: foundationalWidths.breakPoints.mobile + 1,
                 },
                 styles,
             );
         };
 
-        const mobileDown = (styles: NestedCSSProperties) => {
+        const mobileDown = (styles: CSSObject) => {
             return mobile(styles, false);
         };
 
-        const xs = (styles: NestedCSSProperties) => {
+        const xs = (styles: CSSObject) => {
             return media(
                 {
-                    maxWidth: px(foundationalWidths.breakPoints.xs),
+                    maxWidth: foundationalWidths.breakPoints.xs,
                 },
                 styles,
             );
         };
 
-        const aboveXs = (styles: NestedCSSProperties) => {
+        const aboveXs = (styles: CSSObject) => {
             return media(
                 {
-                    minWidth: px(foundationalWidths.breakPoints.xs + 1),
+                    minWidth: foundationalWidths.breakPoints.xs + 1,
                 },
                 styles,
             );
@@ -135,16 +137,16 @@ export const forumLayoutVariables = useThemeCache(() => {
         size: foundationalWidths.fullGutter / 2, // 24
         halfSize: foundationalWidths.fullGutter / 4, // 12
         quarterSize: foundationalWidths.fullGutter / 8, // 6
-        mainGutterOffset: 60 - globalVars.gutter.size,
+        mainGutterOffset: foundationalWidths.fullGutter,
     });
 
     const panel = makeThemeVars("panel", {
         width: foundationalWidths.panelWidth,
-        paddedWidth: foundationalWidths.panelWidth + gutter.full,
+        paddedWidth: foundationalWidths.panelWidth + gutter.size,
     });
 
     const main = makeThemeVars("main", {
-        width: calc(`100% - ${unit(panel.paddedWidth + gutter.mainGutterOffset)}`),
+        width: calc(`100% - ${styleUnit(panel.paddedWidth + gutter.mainGutterOffset)}`),
         topSpacing: 40,
     });
 
@@ -165,59 +167,59 @@ export const forumLayoutVariables = useThemeCache(() => {
 });
 
 export const forumLayoutCSS = () => {
+    // shimPanelPageBoxes();
     const globalVars = globalVariables();
     const vars = forumLayoutVariables();
 
-    const mainColors = globalVars.mainColors;
     const mediaQueries = vars.mediaQueries();
 
-    cssOut(
-        `.Container, body.Section-Event.NoPanel .Frame-content > .Container`,
-        mediaQueries.tablet({
-            ...paddings({
-                horizontal: globalVars.gutter.half,
+    injectGlobal({
+        ".Frame": {
+            // DO NOT use 100vh here.
+            // It causes embedded sites to grow constantly.
+            // https://github.com/vanilla/support/issues/4334
+            // https://github.com/vanilla/support/issues/3802
+            minHeight: "initial",
+            // ".page" has a min-height 100vh and also contains the titlebar
+            // It is flexed so this will cause us to use the rest of the space.
+            flex: "1 0 auto",
+        },
+        ".Frame-content": {
+            ...Mixins.margin({
+                vertical: globalVars.spacer.mainLayout,
             }),
-        }),
-    );
-
-    cssOut(`body.Section-Event.NoPanel .Frame-content > .Container`, containerMainStyles() as NestedCSSProperties);
-
-    cssOut(`.Frame-content .HomepageTitle`, {
-        $nest: lineHeightAdjustment(),
+            ...mediaQueries.oneColumnDown({
+                ...Mixins.margin({
+                    vertical: globalVars.spacer.pageComponentCompact,
+                }),
+            }),
+        },
+        ".Breadcrumbs": {
+            marginBottom: 24,
+            padding: 0,
+        },
     });
 
     cssOut(
-        `.Frame-row`,
-        {
-            display: "flex",
-            flexWrap: "nowrap",
-            justifyContent: "space-between",
-            ...paddings({
-                horizontal: globalVars.gutter.half,
-            }),
-            $nest: {
-                "& > *": {
-                    ...paddings({
-                        horizontal: globalVars.gutter.half,
-                    }),
-                },
-            },
-        },
-        mediaQueries.oneColumnDown({
-            flexWrap: important("wrap"),
-        }),
-        mediaQueries.tablet({
-            ...paddings({
-                horizontal: 0,
+        `.Container, body.Section-Event.NoPanel .Frame-content > .Container`,
+        mediaQueries.mobileDown({
+            ...Mixins.padding({
+                horizontal: 12,
             }),
         }),
     );
+
+    cssOut(`body.Section-Event.NoPanel .Frame-content > .Container`, containerMainStyles());
+
+    cssOut(`.Frame-content .HomepageTitle`, {
+        ...lineHeightAdjustment(),
+    });
 
     cssOut(
         `.Panel`,
         {
-            width: unit(vars.panel.paddedWidth),
-            ...paddings({
+            width: styleUnit(vars.panel.paddedWidth),
+            ...Mixins.padding({
                 vertical: globalVars.gutter.half,
             }),
         },
@@ -229,9 +231,9 @@ export const forumLayoutCSS = () => {
     cssOut(
         `.Content.MainContent`,
         {
-            width: unit(vars.main.width),
-            ...paddings({
-                all: globalVars.gutter.half,
+            width: styleUnit(vars.main.width),
+            ...Mixins.padding({
+                vertical: globalVars.gutter.half,
             }),
         },
         mediaQueries.oneColumnDown({
@@ -244,15 +246,37 @@ export const forumLayoutCSS = () => {
     cssOut(`.Frame-row`, {
         display: "flex",
         flexWrap: "nowrap",
-        ...paddings({
-            all: globalVars.gutter.half,
+        justifyContent: "space-between",
+        ...Mixins.padding({
+            horizontal: globalVars.gutter.half,
         }),
-        $nest: {
-            "& > *": {
-                ...paddings({
-                    horizontal: globalVars.gutter.half,
-                }),
-            },
+        "& > *": {
+            ...Mixins.padding({
+                horizontal: globalVars.gutter.half,
+            }),
         },
+        ...mediaQueries.oneColumnDown({
+            flexWrap: important("wrap"),
+        }),
+        ...mediaQueries.mobileDown({
+            ...Mixins.padding({
+                horizontal: 0,
+            }),
+        }),
     });
 };
+
+function shimPanelPageBoxes() {
+    document.querySelectorAll(".Panel").forEach((panel) => {
+        const existingParent = panel.parentElement;
+        if (!existingParent) {
+            return;
+        }
+        const newWrapper = document.createElement("div");
+        newWrapper.classList.add("pageBox");
+        Array.from(panel.childNodes).forEach((node) => {
+            newWrapper.appendChild(node);
+        });
+        panel.appendChild(newWrapper);
+    });
+}

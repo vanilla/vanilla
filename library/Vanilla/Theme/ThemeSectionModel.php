@@ -19,8 +19,8 @@ namespace Vanilla\Theme;
  * Over time more parts of the App will begin to use the "modern" theming system and likely register a different section
  * based on some feature flag.
  */
-class ThemeSectionModel {
-
+class ThemeSectionModel
+{
     /** @var string[] */
     private $modernSections = [];
 
@@ -32,7 +32,8 @@ class ThemeSectionModel {
      *
      * @param string $appName Translated, user-visible name of the app using the modern system.
      */
-    public function registerModernSection(string $appName) {
+    public function registerModernSection(string $appName)
+    {
         if (!in_array($appName, $this->modernSections, true)) {
             $this->modernSections[] = $appName;
         }
@@ -43,7 +44,8 @@ class ThemeSectionModel {
      *
      * @param string $appName Translated, user-visible name of the app using the modern system.
      */
-    public function registerLegacySection(string $appName) {
+    public function registerLegacySection(string $appName)
+    {
         if (!in_array($appName, $this->legacySections, true)) {
             $this->legacySections[] = $appName;
         }
@@ -52,14 +54,16 @@ class ThemeSectionModel {
     /**
      * @return string[]
      */
-    public function getModernSections(): array {
+    public function getModernSections(): array
+    {
         return $this->modernSections;
     }
 
     /**
      * @return string[]
      */
-    public function getLegacySections(): array {
+    public function getLegacySections(): array
+    {
         return $this->legacySections;
     }
 }

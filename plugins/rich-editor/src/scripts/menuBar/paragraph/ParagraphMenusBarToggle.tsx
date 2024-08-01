@@ -16,11 +16,11 @@ import {
     Heading4Icon,
     Heading5Icon,
 } from "@library/icons/editorIcons";
-import { srOnly } from "@library/styles/styleHelpers";
+import { Mixins } from "@library/styles/Mixins";
 import { t } from "@library/utility/appUtils";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
-import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { richEditorClasses } from "@library/editor/richEditorStyles";
 import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
 import Formatter from "@rich-editor/quill/Formatter";
@@ -29,12 +29,12 @@ import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import classNames from "classnames";
 import Quill, { RangeStatic } from "quill/core";
 import React from "react";
-import { style } from "typestyle";
-import uniqueId from "lodash/uniqueId";
-import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
-import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import uniqueId from "lodash-es/uniqueId";
+import { IconForButtonWrap } from "@library/editor/pieces/IconForButtonWrap";
+import { richEditorVariables } from "@library/editor/richEditorVariables";
 import { FocusWatcher, TabHandler } from "@vanilla/dom-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { css } from "@emotion/css";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -60,7 +60,7 @@ const APPROXIMATE_MAX_MENU_HEIGHT = 170;
 
 // Implements the paragraph menubar
 export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState> {
-    private quill: Quill;
+    private editor: Quill;
     private ID: string;
     private componentID: string;
     private menuID: string;
@@ -75,7 +75,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         super(props);
 
         // Quill can directly on the class as it won't ever change in a single instance.
-        this.quill = props.quill!;
+        this.editor = props.editor!;
         this.ID = uniqueId("paragraphMenu") + "-formattingMenus";
         this.componentID = this.ID + "-component";
         this.menuID = this.ID + "-menu";
@@ -91,7 +91,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
      * @inheritDoc
      */
     public componentDidMount() {
-        this.focusWatcher = new FocusWatcher(this.selfRef.current!, newHasFocusState => {
+        this.focusWatcher = new FocusWatcher(this.selfRef.current!, (newHasFocusState) => {
             if (!newHasFocusState) {
                 this.setState({ hasFocus: false });
             }
@@ -121,13 +121,13 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         if (!this.props.mobile) {
             if (
                 (!this.isPilcrowVisible && !this.isMenuVisible) ||
-                isEmbedSelected(this.quill, this.props.lastGoodSelection)
+                isEmbedSelected(this.editor, this.props.lastGoodSelection)
             ) {
                 pilcrowClasses += " isHidden";
             }
         }
 
-        const formatter = new Formatter(this.quill, this.props.lastGoodSelection);
+        const formatter = new Formatter(this.editor, this.props.lastGoodSelection);
         const menuActiveFormats = menuState(formatter, this.props.activeFormats);
         const topLevelIcons = this.topLevelIcons(menuActiveFormats);
         const label = t("Toggle Paragraph Format Menu");
@@ -163,7 +163,10 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 </button>
                 <div
                     id={this.menuID}
-                    className={classNames(this.dropDownClasses, this.isMenuVisible ? "" : style(srOnly()))}
+                    className={classNames(
+                        this.dropDownClasses,
+                        this.isMenuVisible ? "" : css(Mixins.absolute.srOnly()),
+                    )}
                     style={this.toolbarStyles}
                     role="menu"
                 >
@@ -194,7 +197,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         return this.props.currentSelection;
     }
 
-    private topLevelIcons = menuActiveFormats => {
+    private topLevelIcons = (menuActiveFormats) => {
         let headingMenuIcon = <Heading2Icon />;
         if (menuActiveFormats.headings.heading3) {
             headingMenuIcon = <Heading3Icon />;
@@ -248,7 +251,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         if (!this.props.lastGoodSelection) {
             return {};
         }
-        const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
+        const bounds = this.editor.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
 
         // This is the pixel offset from the top needed to make things align correctly.
 
@@ -273,8 +276,8 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         if (!this.props.lastGoodSelection) {
             return "";
         }
-        const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
-        const scrollBounds = this.quill.scroll.domNode.getBoundingClientRect();
+        const bounds = this.editor.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
+        const scrollBounds = this.editor.scroll.domNode.getBoundingClientRect();
         const classes = richEditorClasses(this.props.legacyMode);
         const classesDropDown = dropDownClasses();
 
@@ -295,7 +298,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
      * This could likely be replaced by a CSS class in the future.
      */
     private get toolbarStyles(): React.CSSProperties {
-        if (this.isMenuVisible && !isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
+        if (this.isMenuVisible && !isEmbedSelected(this.editor, this.props.lastGoodSelection)) {
             return {};
         } else {
             // We hide the toolbar when its not visible.
@@ -335,7 +338,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 index: lastGoodSelection.index + lastGoodSelection.length,
                 length: 0,
             };
-            this.quill.setSelection(newSelection);
+            this.editor.setSelection(newSelection);
         } else {
             this.buttonRef && this.buttonRef.current && this.buttonRef.current.focus();
         }

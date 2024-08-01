@@ -20,7 +20,7 @@ export function prepareShadowRoot(
 ): HTMLElement {
     let html = element.innerHTML;
     // This is likely a noscript tag.
-    if (browserEscapesNoScript() || html.trim().includes("&lt;")) {
+    if (browserEscapesNoScript() || html.trim().startsWith("&lt;")) {
         html = unescapeHTML(html);
     }
     // Safari escapes the contents of the noscript.

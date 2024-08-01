@@ -3,9 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, margins, unit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
+import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const pageErrorMessageClasses = () => {
     const style = styleFactory("pageErrorMessage");
@@ -16,40 +19,53 @@ export const pageErrorMessageClasses = () => {
     });
 
     const title = style("title", {
-        fontSize: unit(globalVars.fonts.size.title),
-        lineHeight: globalVars.lineHeights.condensed,
-        fontWeight: globalVars.fonts.weights.semiBold,
-        textAlign: "center",
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("title", "semiBold"),
+            lineHeight: globalVars.lineHeights.condensed,
+            align: "center",
+        }),
     });
 
     const description = style("description", {
-        textAlign: "center",
-        fontSize: unit(globalVars.fonts.size.large),
-        marginTop: unit(12),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("large"),
+            align: "center",
+        }),
+        marginTop: styleUnit(12),
     });
 
     const cta = style("cta", {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        ...margins({
-            top: unit(21),
+        ...Mixins.margin({
+            top: styleUnit(21),
             horizontal: "auto",
         }),
     });
 
     const titleAsParagraph = style("titleAsParagraph", {
-        fontSize: globalVars.fonts.size.large,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("large"),
+        }),
+    });
+
+    const trace = css({
+        marginTop: 24,
+
+        "& > h2": {
+            marginBottom: 12,
+        },
     });
 
     const errorIcon = style("icon", {
-        $nest: {
+        ...{
             "&&": {
                 display: "block",
-                color: colorOut(globalVars.mainColors.primary),
-                height: unit(85),
-                width: unit(85),
-                ...margins({
+                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                height: styleUnit(85),
+                width: styleUnit(85),
+                ...Mixins.margin({
                     bottom: 12,
                     horizontal: "auto",
                 }),
@@ -64,5 +80,6 @@ export const pageErrorMessageClasses = () => {
         cta,
         titleAsParagraph,
         errorIcon,
+        trace,
     };
 };

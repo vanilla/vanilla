@@ -9,6 +9,9 @@
  * @since 2.0
  */
 
+use Vanilla\Utility\Timers;
+use Vanilla\Utility\TracedContainer;
+
 /**
  * Event Framework: Pluggable
  *
@@ -19,8 +22,8 @@
  *
  * @deprecated 3.0 - Use Garden\EventManager
  */
-abstract class Gdn_Pluggable {
-
+abstract class Gdn_Pluggable
+{
     /**
      * @var string The name of the class that has been instantiated. Typically this will be
      * a class that has extended this class.
@@ -50,9 +53,8 @@ abstract class Gdn_Pluggable {
      */
     public $Returns = [];
 
-
     /**
-     * @var enumerator An enumerator indicating what type of handler the method being called is.
+     * @var string An enum indicating what type of handler the method being called is.
      * Options are:
      *  HANDLER_TYPE_NORMAL: Standard call to a method on the object (DEFAULT).
      *  HANDLER_TYPE_OVERRIDE: Call to a method override.
@@ -72,7 +74,8 @@ abstract class Gdn_Pluggable {
      * overrides this one, parent::__construct(); should be called to ensure
      * interoperability.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->ClassName = get_class($this);
         $this->EventArguments = [];
         $this->Returns = [];
@@ -86,7 +89,8 @@ abstract class Gdn_Pluggable {
      * @param string $handlerName
      * @return
      */
-    public function getReturn($pluginName, $handlerName) {
+    public function getReturn($pluginName, $handlerName)
+    {
         return $this->Returns[strtolower($handlerName)][strtolower($pluginName)];
     }
 
@@ -98,11 +102,12 @@ abstract class Gdn_Pluggable {
      * @return $this
      * @deprecated 3.0 - Use Garden\EventManager::fire()
      */
-    public function fireAs($options) {
+    public function fireAs($options)
+    {
         if (!is_array($options)) {
-            $options = ['FireClass' => $options];
+            $options = ["FireClass" => $options];
         }
-        $this->FireAs = $options['FireClass'] ?? $this->FireAs;
+        $this->FireAs = $options["FireClass"] ?? $this->FireAs;
 
         return $this;
     }
@@ -114,15 +119,18 @@ abstract class Gdn_Pluggable {
      *  public function senderClassName_EventName_Handler($Sender) {}
      *
      * @param string $eventName The name of the event being fired.
-     * @param mixed $arguments Arguemnts to pass through to the event handlers.
+     * @param mixed $arguments Arguments to pass through to the event handlers.
      *
      * @return mixed
      * @deprecated 3.0 - Use Garden\EventManager::fire()
      */
-    public function fireEvent($eventName, $arguments = null) {
+    public function fireEvent($eventName, $arguments = null)
+    {
         if (!$this->ClassName) {
             $realClassName = get_class($this);
-            throw new Exception("Event fired from pluggable class '{$realClassName}', but Gdn_Pluggable::__construct() was never called.");
+            throw new Exception(
+                "Event fired from pluggable class '{$realClassName}', but Gdn_Pluggable::__construct() was never called."
+            );
         }
 
         $fireClass = !is_null($this->FireAs) ? $this->FireAs : $this->ClassName;
@@ -135,6 +143,27 @@ abstract class Gdn_Pluggable {
 
         // Look to the PluginManager to see if there are related event handlers and call them
         return Gdn::pluginManager()->callEventHandlers($this, $fireClass, $eventName);
+    }
+
+    /**
+     * Fire an event and track how long it takes.
+     *
+     * @param string $eventName
+     * @param array $arguments
+     *
+     * @return mixed
+     */
+    public function fireTimedEvent($eventName, $arguments = null)
+    {
+        return TracedContainer::trace(function () use ($eventName, $arguments) {
+            $timers = \Gdn::getContainer()->get(Timers::class);
+            $span = $timers->startGeneric("event", [
+                "eventName" => $eventName,
+            ]);
+            $result = $this->fireEvent($eventName, $arguments);
+            $span->finish();
+            return $result;
+        });
     }
 
     /**
@@ -159,29 +188,29 @@ abstract class Gdn_Pluggable {
      * @return mixed
      *
      */
-    public function __call($methodName, $arguments) {
+    public function __call($methodName, $arguments)
+    {
         // Define a return variable.
         $return = false;
 
         // We removed the SliceProvider class, which Pluggable previously extended.
         // If any of these methods are called, send out an error.
-        $sliceProviderMethods = ['enableSlicing', 'slice', 'addSliceAsset', 'renderSliceConfig'];
+        $sliceProviderMethods = ["enableSlicing", "slice", "addSliceAsset", "renderSliceConfig"];
 
         if (in_array($methodName, $sliceProviderMethods)) {
-            $message = 'Slicing has been removed from Gdn_Pluggable.';
+            $message = "Slicing has been removed from Gdn_Pluggable.";
             $message .= ' Try using the functionality provided by "js-form" instead.';
             throw new Exception($message);
         }
 
-
         // Was this method declared, or called?
-        if (substr($methodName, 0, 1) == 'x') {
+        if (substr($methodName, 0, 1) == "x") {
             // Declared
             $actualMethodName = substr($methodName, 1); // Remove the x prefix
             $referenceMethodName = $actualMethodName; // No x prefix
         } else {
             // Called
-            $actualMethodName = 'x'.$methodName; // Add the x prefix
+            $actualMethodName = "x" . $methodName; // Add the x prefix
             $referenceMethodName = $methodName; // No x prefix
         }
 
@@ -202,7 +231,7 @@ abstract class Gdn_Pluggable {
         $this->EventArguments = $arguments;
 
         // Call the "Before" event handlers
-        Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, 'Before');
+        Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, "Before");
 
         // Call this object's method
         if (Gdn::pluginManager()->hasMethodOverride($className, $referenceMethodName)) {
@@ -218,7 +247,7 @@ abstract class Gdn_Pluggable {
         }
 
         // Call the "After" event handlers
-        Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, 'After');
+        Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, "After");
 
         return $return;
     }

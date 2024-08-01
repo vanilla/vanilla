@@ -13,16 +13,18 @@ use Vanilla\Contracts\Site\TranslationProviderInterface;
  * Class TranslationModel
  * @package Vanilla\Site
  */
-class TranslationModel {
+class TranslationModel
+{
     /** @var TranslationProviderInterface[] $providers */
-    private $providers;
+    private $providers = [];
 
     /**
      * Register translation provider
      *
      * @param TranslationProviderInterface $provider
      */
-    public function addProvider(TranslationProviderInterface $provider) {
+    public function addProvider(TranslationProviderInterface $provider)
+    {
         $this->providers[] = $provider;
     }
 
@@ -31,7 +33,8 @@ class TranslationModel {
      *
      * @return TranslationProviderInterface|null
      */
-    public function getContentTranslationProvider(): ?TranslationProviderInterface {
+    public function getContentTranslationProvider(): ?TranslationProviderInterface
+    {
         foreach ($this->providers as $provider) {
             if ($provider->supportsContentTranslation()) {
                 return $provider;

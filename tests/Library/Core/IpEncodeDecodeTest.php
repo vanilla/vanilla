@@ -10,7 +10,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test some of the global functions that operate (or mostly operate) on arrays.
  */
-class IpEncodeDecodeTest extends TestCase {
+class IpEncodeDecodeTest extends TestCase
+{
     /**
      * Test encoding/decoding IPs in array.
      *
@@ -19,7 +20,8 @@ class IpEncodeDecodeTest extends TestCase {
      *
      * @dataProvider provideArrays
      */
-    public function testIpEncodeRecursiveArray(array $data, array $expected) {
+    public function testIpEncodeRecursiveArray(array $data, array $expected)
+    {
         $this->assertEquals($expected, ipEncodeRecursive($data));
     }
 
@@ -28,28 +30,26 @@ class IpEncodeDecodeTest extends TestCase {
      *
      * @return array
      */
-    public function provideArrays() {
+    public function provideArrays()
+    {
         return [
-            'array-w-junk' => [
-                ['a', 'b', 'c'],
-                ['a', 'b', 'c'],
+            "array-w-junk" => [["a", "b", "c"], ["a", "b", "c"]],
+            "array-w-ips" => [["12.22.23.34", "12.12.12.12"], ["12.22.23.34", "12.12.12.12"]],
+            "associative-array" => [
+                ["SomeIPAddress" => "12.22.23.34", "SomethingElse" => "255.255.255.255"],
+                ["SomeIPAddress" => ipencode("12.22.23.34"), "SomethingElse" => "255.255.255.255"],
             ],
-            'array-w-ips' => [
-                ['12.22.23.34', '12.12.12.12'],
-                ['12.22.23.34', '12.12.12.12'],
+            "nested-array" => [[["12.13.14.15"], ["13.13.13.13"]], [["12.13.14.15"], ["13.13.13.13"]]],
+            "nested-associative-array" => [
+                [
+                    "SomeIPAddress" => ["SomeIPAddress" => "12.13.14.15"],
+                    "SomethingElse" => ["SomethingElse" => "255.255.255.255"],
+                ],
+                [
+                    "SomeIPAddress" => ["SomeIPAddress" => ipencode("12.13.14.15")],
+                    "SomethingElse" => ["SomethingElse" => "255.255.255.255"],
+                ],
             ],
-            'associative-array' => [
-                ['SomeIPAddress' => '12.22.23.34', 'SomethingElse' => '255.255.255.255'],
-                ['SomeIPAddress' => ipencode('12.22.23.34'), 'SomethingElse' => '255.255.255.255'],
-            ],
-            'nested-array' => [
-                [['12.13.14.15'], ['13.13.13.13']],
-                [['12.13.14.15'], ['13.13.13.13']]
-            ],
-            'nested-associative-array' => [
-                ['SomeIPAddress' => ['SomeIPAddress' => '12.13.14.15'], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']],
-                ['SomeIPAddress' => ['SomeIPAddress' => ipencode('12.13.14.15')], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']]
-            ]
         ];
     }
     /**
@@ -60,7 +60,8 @@ class IpEncodeDecodeTest extends TestCase {
      *
      * @dataProvider provideArraysDecode
      */
-    public function testIpDecodeRecursiveArray(array $data, array $expected) {
+    public function testIpDecodeRecursiveArray(array $data, array $expected)
+    {
         $this->assertEquals($expected, ipDecodeRecursive($data));
     }
 
@@ -69,28 +70,26 @@ class IpEncodeDecodeTest extends TestCase {
      *
      * @return array
      */
-    public function provideArraysDecode() {
+    public function provideArraysDecode()
+    {
         return [
-            'array-w-junk' => [
-                ['a', 'b', 'c'],
-                ['a', 'b', 'c'],
+            "array-w-junk" => [["a", "b", "c"], ["a", "b", "c"]],
+            "array-w-ips" => [["12.22.23.34", "12.12.12.12"], ["12.22.23.34", "12.12.12.12"]],
+            "associative-array" => [
+                ["SomeIPAddress" => ipencode("12.22.23.34"), "SomethingElse" => "255.255.255.255"],
+                ["SomeIPAddress" => "12.22.23.34", "SomethingElse" => "255.255.255.255"],
             ],
-            'array-w-ips' => [
-                ['12.22.23.34', '12.12.12.12'],
-                ['12.22.23.34', '12.12.12.12'],
+            "nested-array" => [[["12.13.14.15"], ["13.13.13.13"]], [["12.13.14.15"], ["13.13.13.13"]]],
+            "nested-associative-array" => [
+                [
+                    "SomeIPAddress" => ["SomeIPAddress" => ipencode("12.13.14.15")],
+                    "SomethingElse" => ["SomethingElse" => "255.255.255.255"],
+                ],
+                [
+                    "SomeIPAddress" => ["SomeIPAddress" => "12.13.14.15"],
+                    "SomethingElse" => ["SomethingElse" => "255.255.255.255"],
+                ],
             ],
-            'associative-array' => [
-                ['SomeIPAddress' => ipencode('12.22.23.34'), 'SomethingElse' => '255.255.255.255'],
-                ['SomeIPAddress' => '12.22.23.34', 'SomethingElse' => '255.255.255.255'],
-            ],
-            'nested-array' => [
-                [['12.13.14.15'], ['13.13.13.13']],
-                [['12.13.14.15'], ['13.13.13.13']]
-            ],
-            'nested-associative-array' => [
-                ['SomeIPAddress' => ['SomeIPAddress' => ipencode('12.13.14.15')], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']],
-                ['SomeIPAddress' => ['SomeIPAddress' => '12.13.14.15'], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']]
-            ]
         ];
     }
 
@@ -102,7 +101,8 @@ class IpEncodeDecodeTest extends TestCase {
      *
      * @dataProvider provideObjects
      */
-    public function testIpEncodeRecursiveObject($data, $expected) {
+    public function testIpEncodeRecursiveObject($data, $expected)
+    {
         $this->assertEquals($expected, ipEncodeRecursive($data));
     }
 
@@ -111,28 +111,26 @@ class IpEncodeDecodeTest extends TestCase {
      *
      * @return array
      */
-    public function provideObjects() {
+    public function provideObjects()
+    {
         return [
-           'junk' => [
-               (object) ['a', 'b', 'c'],
-               (object) ['a', 'b', 'c'],
-           ],
-           'ips' => [
-               (object) ['12.22.23.34', '12.12.12.12'],
-               (object) ['12.22.23.34', '12.12.12.12'],
-           ],
-           'associative' => [
-               (object) ['SomeIPAddress' => '12.22.23.34', 'SomethingElse' => '255.255.255.255'],
-               (object) ['SomeIPAddress' => ipencode('12.22.23.34'), 'SomethingElse' => '255.255.255.255'],
-           ],
-           'nested' => [
-               (object) [['12.13.14.15'], ['13.13.13.13']],
-               (object) [['12.13.14.15'], ['13.13.13.13']]
-           ],
-           'nested-associative' => [
-               (object) ['SomeIPAddress' => ['SomeIPAddress' => '12.13.14.15'], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']],
-               (object) ['SomeIPAddress' => ['SomeIPAddress' => ipencode('12.13.14.15')], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']]
-           ]
+            "junk" => [(object) ["a", "b", "c"], (object) ["a", "b", "c"]],
+            "ips" => [(object) ["12.22.23.34", "12.12.12.12"], (object) ["12.22.23.34", "12.12.12.12"]],
+            "associative" => [
+                (object) ["SomeIPAddress" => "12.22.23.34", "SomethingElse" => "255.255.255.255"],
+                (object) ["SomeIPAddress" => ipencode("12.22.23.34"), "SomethingElse" => "255.255.255.255"],
+            ],
+            "nested" => [(object) [["12.13.14.15"], ["13.13.13.13"]], (object) [["12.13.14.15"], ["13.13.13.13"]]],
+            "nested-associative" => [
+                (object) [
+                    "SomeIPAddress" => ["SomeIPAddress" => "12.13.14.15"],
+                    "SomethingElse" => ["SomethingElse" => "255.255.255.255"],
+                ],
+                (object) [
+                    "SomeIPAddress" => ["SomeIPAddress" => ipencode("12.13.14.15")],
+                    "SomethingElse" => ["SomethingElse" => "255.255.255.255"],
+                ],
+            ],
         ];
     }
     /**
@@ -143,7 +141,8 @@ class IpEncodeDecodeTest extends TestCase {
      *
      * @dataProvider provideObjectsDecode
      */
-    public function testIpDecodeRecursiveObject($data, $expected) {
+    public function testIpDecodeRecursiveObject($data, $expected)
+    {
         $this->assertEquals($expected, ipDecodeRecursive($data));
     }
 
@@ -152,28 +151,26 @@ class IpEncodeDecodeTest extends TestCase {
      *
      * @return array
      */
-    public function provideObjectsDecode() {
+    public function provideObjectsDecode()
+    {
         return [
-            'junk' => [
-                (object) ['a', 'b', 'c'],
-                (object) ['a', 'b', 'c'],
+            "junk" => [(object) ["a", "b", "c"], (object) ["a", "b", "c"]],
+            "ips" => [(object) ["12.22.23.34", "12.12.12.12"], (object) ["12.22.23.34", "12.12.12.12"]],
+            "associative" => [
+                (object) ["SomeIPAddress" => ipencode("12.22.23.34"), "SomethingElse" => "255.255.255.255"],
+                (object) ["SomeIPAddress" => "12.22.23.34", "SomethingElse" => "255.255.255.255"],
             ],
-            'ips' => [
-                (object) ['12.22.23.34', '12.12.12.12'],
-                (object) ['12.22.23.34', '12.12.12.12'],
+            "nested" => [(object) [["12.13.14.15"], ["13.13.13.13"]], (object) [["12.13.14.15"], ["13.13.13.13"]]],
+            "nested-associative" => [
+                (object) [
+                    "SomeIPAddress" => ["SomeIPAddress" => ipencode("12.13.14.15")],
+                    "SomethingElse" => ["SomethingElse" => "255.255.255.255"],
+                ],
+                (object) [
+                    "SomeIPAddress" => ["SomeIPAddress" => "12.13.14.15"],
+                    "SomethingElse" => ["SomethingElse" => "255.255.255.255"],
+                ],
             ],
-            'associative' => [
-                (object) ['SomeIPAddress' => ipencode('12.22.23.34'), 'SomethingElse' => '255.255.255.255'],
-                (object) ['SomeIPAddress' => '12.22.23.34', 'SomethingElse' => '255.255.255.255'],
-            ],
-            'nested' => [
-                (object) [['12.13.14.15'], ['13.13.13.13']],
-                (object) [['12.13.14.15'], ['13.13.13.13']]
-            ],
-            'nested-associative' => [
-                (object) ['SomeIPAddress' => ['SomeIPAddress' => ipencode('12.13.14.15')], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']],
-                (object) ['SomeIPAddress' => ['SomeIPAddress' => '12.13.14.15'], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']]
-            ]
         ];
     }
 }

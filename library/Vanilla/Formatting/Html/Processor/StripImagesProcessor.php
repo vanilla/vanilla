@@ -14,22 +14,27 @@ use Vanilla\Formatting\Html\HtmlDocument;
 /**
  * Processor of DomUtils::stripImages()
  */
-class StripImagesProcessor extends HtmlProcessor {
-
+class StripImagesProcessor extends HtmlProcessor
+{
     /**
      * Process the HTML document.
      *
+     * @param HtmlDocument $document
      * @return HtmlDocument
      */
-    public function processDocument(): HtmlDocument {
-        $this->applyStripImages();
-        return $this->document;
+    public function processDocument(HtmlDocument $document): HtmlDocument
+    {
+        $this->applyStripImages($document);
+        return $document;
     }
 
     /**
      * Apply DomUtils::stripImages()
+     *
+     * @param HtmlDocument $document
      */
-    private function applyStripImages() {
-        DomUtils::stripImages($this->document->getDom());
+    private function applyStripImages(HtmlDocument $document)
+    {
+        DomUtils::stripImages($document->getDom());
     }
 }

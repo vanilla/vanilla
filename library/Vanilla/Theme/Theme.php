@@ -10,6 +10,7 @@ namespace Vanilla\Theme;
 use Garden\JsonFilterTrait;
 use Garden\Schema\Schema;
 use Vanilla\Addon;
+use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\SchemaFactory;
@@ -26,9 +27,12 @@ use Vanilla\Utility\InstanceValidatorSchema;
 /**
  * Data class for themes.
  */
-class Theme implements \JsonSerializable {
-
+class Theme implements \JsonSerializable
+{
     use JsonFilterTrait;
+
+    public const MERGE_OVER = "over";
+    public const MERGE_UNDER = "under";
 
     /** @var string */
     private $themeID;
@@ -87,22 +91,26 @@ class Theme implements \JsonSerializable {
     /**
      * @return Schema
      */
-    public static function getSchema(): Schema {
-        return SchemaFactory::parse([
-            'themeID:s',
-            'type:s?',
-            'name:s?',
-            'version:s?',
-            'revisionID:i?',
-            'revisionName:s?',
-            'insertUser:o?',
-            'dateInserted:dt?',
-            'current:b?',
-            'active:b?',
-            'parentTheme:s?',
-            'assets:o?',
-            'addon?' => new InstanceValidatorSchema(Addon::class),
-        ], 'Theme');
+    public static function getSchema(): Schema
+    {
+        return SchemaFactory::parse(
+            [
+                "themeID:s",
+                "type:s?",
+                "name:s?",
+                "version:s?",
+                "revisionID:i?",
+                "revisionName:s?",
+                "insertUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+                "dateInserted:dt?",
+                "current:b?",
+                "active:b?",
+                "parentTheme:s?",
+                "assets:o?",
+                "addon?" => new InstanceValidatorSchema(Addon::class),
+            ],
+            "Theme"
+        );
     }
 
     /**
@@ -111,13 +119,14 @@ class Theme implements \JsonSerializable {
      * @param Addon $addon
      * @return Theme
      */
-    public static function fromAddon(Addon $addon): Theme {
+    public static function fromAddon(Addon $addon): Theme
+    {
         $key = $addon->getKey();
-        $currentOptionKey = \Gdn::config('Garden.ThemeOptions.Styles.Value', '');
+        $currentOptionKey = \Gdn::config("Garden.ThemeOptions.Styles.Value", "");
 
         $assets = [];
-        $addonAssets = $addon->getInfoValue('assets', []);
-        $optionAssetRegex = "/${currentOptionKey}_(.*)/";
+        $addonAssets = $addon->getInfoValue("assets", []);
+        $optionAssetRegex = "/{$currentOptionKey}_(.*)/";
         // Trim off the active theme option key.
         foreach ($addonAssets as $addonAssetKey => $addonAsset) {
             preg_match($optionAssetRegex, $addonAssetKey, $matches);
@@ -129,8 +138,8 @@ class Theme implements \JsonSerializable {
         // Merge with the default assets.
         $mixedAssets = array_merge(ThemeAssetFactory::DEFAULT_ASSETS, $addonAssets);
         foreach ($mixedAssets as $mixedAssetKey => $mixedAsset) {
-            $file = $mixedAsset['file'] ?? null;
-            $type = $mixedAsset['type'] ?? 'unknown';
+            $file = $mixedAsset["file"] ?? null;
+            $type = $mixedAsset["type"] ?? "unknown";
             if (!$file || !$type) {
                 continue;
             }
@@ -139,7 +148,10 @@ class Theme implements \JsonSerializable {
             if (!file_exists($addonFile)) {
                 if (isset($addonAssets[$mixedAssetKey])) {
                     // If someone had explicitly set this path and it doesn't exist, it's a warning.
-                    trigger_error("Addon asset $file is specified in $key/addon.json but doesn't exist.", E_USER_WARNING);
+                    trigger_error(
+                        "Addon asset $file is specified in $key/addon.json but doesn't exist.",
+                        E_USER_WARNING
+                    );
                 }
                 continue;
             }
@@ -148,18 +160,19 @@ class Theme implements \JsonSerializable {
 
             // Fetch the data
             $assets[$mixedAssetKey] = [
-                'type' => $type,
-                'data' => file_get_contents($addonFile),
-                'url' => $fileUrl,
+                "type" => $type,
+                "data" => file_get_contents($addonFile),
+                "url" => $fileUrl,
             ];
         }
 
         $theme = new Theme([
-            'themeID' => $addon->getKey(),
-            'type' => 'themeFile',
-            'name' => $addon->getName(),
-            'version' => $addon->getVersion(),
-            'assets' => $assets,
+            "themeID" => $addon->getKey(),
+            "type" => "themeFile",
+            "name" => $addon->getName(),
+            "version" => $addon->getVersion(),
+            "assets" => $assets,
+            "parentTheme" => $addon->getInfoValue("parent", null),
         ]);
 
         $theme->setAddon($addon);
@@ -169,20 +182,20 @@ class Theme implements \JsonSerializable {
             $theme->getPreview()->setImageUrl(asset($icon));
         }
 
-        $description = $addon->getInfoValue('description', false);
+        $description = $addon->getInfoValue("description", false);
         if ($description) {
-            $theme->getPreview()->addInfo('description', 'Description', $description);
+            $theme->getPreview()->addInfo("description", "Description", $description);
         }
 
-        $authors = $addon->getInfoValue('authors', false);
+        $authors = $addon->getInfoValue("authors", false);
         if ($authors) {
-            $authorString = '';
+            $authorString = "";
             foreach ($authors as $author) {
-                $authorString .= empty($authorString) ? '' : ', ';
-                $authorString .= $author['name'] ?? '';
+                $authorString .= empty($authorString) ? "" : ", ";
+                $authorString .= $author["name"] ?? "";
             }
 
-            $theme->getPreview()->addInfo('string', 'Authors', $authorString);
+            $theme->getPreview()->addInfo("string", "Authors", $authorString);
         }
 
         return $theme;
@@ -193,52 +206,54 @@ class Theme implements \JsonSerializable {
      *
      * @param array $data
      */
-    public function __construct(array $data) {
+    public function __construct(array $data)
+    {
         $data = self::getSchema()->validate($data);
 
-        $this->themeID = $data['themeID'];
-        $this->type = $data['type'];
-        $this->name = $data['name'];
-        $this->version = $data['version'] ?? null;
-        $this->revisionID = $data['revisionID'] ?? null;
-        $this->revisionName = $data['revisionName'] ?? null;
-        $this->insertUser = $data['insertUser'] ?? null;
-        $this->dateInserted = $data['dateInserted'] ?? null;
-        $this->current = $data['current'] ?? false;
-        $this->parentTheme = $data['parentTheme'] ?? null;
-        $this->active = $data['active'] ?? true;
-        $this->initializeAssets($data['assets']);
+        $this->themeID = $data["themeID"];
+        $this->type = $data["type"];
+        $this->name = $data["name"];
+        $this->version = $data["version"] ?? null;
+        $this->revisionID = $data["revisionID"] ?? null;
+        $this->revisionName = $data["revisionName"] ?? null;
+        $this->insertUser = $data["insertUser"] ?? null;
+        $this->dateInserted = $data["dateInserted"] ?? null;
+        $this->current = $data["current"] ?? false;
+        $this->parentTheme = $data["parentTheme"] ?? null;
+        $this->active = $data["active"] ?? true;
+        $this->initializeAssets($data["assets"]);
         $this->preview = new ThemePreview();
-        $this->preview->addVariablePreview($this->assets['variables']);
     }
 
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->jsonFilter([
-            'themeID' => $this->themeID,
-            'type' => $this->type,
-            'name' => $this->name,
-            'version' => $this->version,
-            'revisionID' => $this->revisionID,
-            'revisionName' => $this->revisionName,
-            'insertUser' => $this->insertUser,
-            'dateInserted' => $this->dateInserted,
-            'current' => $this->current,
-            'active' => $this->active,
-            'parentTheme' => $this->parentTheme,
-            'assets' => $this->assets,
-            'preview' => $this->preview,
-            'features' => $this->getFeatures(),
-            'supportedSections' => $this->getSupportedSections(),
+            "themeID" => $this->themeID,
+            "type" => $this->type,
+            "name" => $this->name,
+            "version" => $this->version,
+            "revisionID" => $this->revisionID,
+            "revisionName" => $this->revisionName,
+            "insertUser" => $this->insertUser,
+            "dateInserted" => $this->dateInserted,
+            "current" => $this->current ? true : false,
+            "active" => $this->active ? true : false,
+            "parentTheme" => $this->parentTheme,
+            "assets" => $this->assets,
+            "preview" => $this->preview,
+            "features" => $this->getFeatures(),
+            "supportedSections" => $this->getSupportedSections(),
         ]);
     }
 
     /**
      * @return ThemeFeatures
      */
-    public function getFeatures(): ThemeFeatures {
+    public function getFeatures(): ThemeFeatures
+    {
         $features = new ThemeFeatures(\Gdn::config(), $this->getAddon());
         return $features;
     }
@@ -246,51 +261,140 @@ class Theme implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return $this->type;
     }
 
     /**
      * @param string $type
      */
-    public function setType(string $type): void {
+    public function setType(string $type): void
+    {
         $this->type = $type;
     }
 
     /**
      * @return string[]
      */
-    public function getSupportedSections(): array {
+    public function getSupportedSections(): array
+    {
         return $this->supportedSections;
     }
 
     /**
      * @param string[] $supportedSections
      */
-    public function setSupportedSections(array $supportedSections): void {
+    public function setSupportedSections(array $supportedSections): void
+    {
         $this->supportedSections = $supportedSections;
+    }
+
+    /**
+     * Merge in assets from parent themes.
+     *
+     * @param Theme[] $parentThemes Passed in descendant order. Eg. Great-GrandParent, GrandParent, Parent.
+     */
+    public function mergeParentAssets(Theme ...$parentThemes)
+    {
+        $assetsByName = [];
+
+        /** @var Theme[] $allThemesInOrder */
+        $allThemesInOrder = array_merge($parentThemes, [$this]);
+
+        // Bucket assets by their name from all of the themes.
+        foreach ($allThemesInOrder as $theme) {
+            foreach ($theme->getAssets() as $assetName => $asset) {
+                if (empty($assetsByName[$assetName])) {
+                    $assetsByName[$assetName] = [];
+                }
+                $assetsByName[$assetName][] = $asset;
+            }
+        }
+
+        // Create new merged assets.
+        $factory = ThemeAssetFactory::instance();
+        foreach ($assetsByName as $assetName => $assets) {
+            $merged = $factory->mergeAssets(...$assets);
+            $this->setAsset($assetName, $merged);
+        }
     }
 
     /**
      * Overlay a set of variables on the theme.
      *
      * @param array $variables The variables to overlay.
+     * @param array|null $defaults Default variable to apply under the theme variables.
      */
-    public function overlayVariables(array $variables) {
-        if (empty($variables)) {
+    public function overlayVariables(array $variables, ?array $defaults = null)
+    {
+        if (empty($variables) && empty($defaults)) {
             return;
         }
 
         // Get the base variables asset.
         $variablesAsset = $this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null;
         if ($variablesAsset instanceof JsonThemeAsset) {
-            // We want to fully replace arrays instead of merging them.
+            $result = $variablesAsset->getValue();
+            if ($defaults !== null) {
+                $result = ArrayUtils::mergeRecursive($defaults, $result, function ($arr1, $arr2) {
+                    return $arr2;
+                });
+            }
+
+            // We want to fully replace indexed arrays instead of merging them.
             // This mirrors our frontend variable handling.
-            $merged = ArrayUtils::mergeRecursive($variablesAsset->getValue(), $variables, function ($arr1, $arr2) {
+            $result = ArrayUtils::mergeRecursive($result, $variables, function ($arr1, $arr2) {
                 return $arr2;
             });
-            $newAsset = new JsonThemeAsset(json_encode($merged, JSON_UNESCAPED_UNICODE), $variablesAsset->getUrl());
+            $newAsset = new JsonThemeAsset(json_encode($result, JSON_UNESCAPED_UNICODE), $variablesAsset->getUrl());
             $this->assets[ThemeAssetFactory::ASSET_VARIABLES] = $newAsset;
+        }
+    }
+
+    /**
+     * Some of our arrays may have corrupted.
+     *
+     * Here we force them to be numeric arrays if they exist.
+     *
+     * @see https://github.com/vanilla/support/issues/4133
+     *
+     */
+    private function fixCorruptedVariables()
+    {
+        // Get the base variables asset.
+        $variablesAsset = $this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null;
+
+        $forcedNumericArraysPaths = [
+            "quickLinks.links",
+            "navigation.navigationItems",
+            "navigation.mobileOnlyNavigationItems",
+        ];
+
+        if ($variablesAsset instanceof JsonThemeAsset) {
+            $variableData = $variablesAsset->getValue();
+
+            $wasTouched = false;
+            // Cleanup some values.
+            foreach ($forcedNumericArraysPaths as $forcedNumericArrayPath) {
+                $found = ArrayUtils::getByPath($forcedNumericArrayPath, $variableData);
+                if ($found !== null && is_array($found) && !empty($found)) {
+                    // We have a non-empty array here.
+
+                    if (!ArrayUtils::serializesAsNumericArray($found)) {
+                        ArrayUtils::setByPath($forcedNumericArrayPath, $variableData, array_values($found));
+                        $wasTouched = true;
+                    }
+                }
+            }
+
+            if ($wasTouched) {
+                $newAsset = new JsonThemeAsset(
+                    json_encode($variableData, JSON_UNESCAPED_UNICODE),
+                    $variablesAsset->getUrl()
+                );
+                $this->assets[ThemeAssetFactory::ASSET_VARIABLES] = $newAsset;
+            }
         }
     }
 
@@ -299,7 +403,8 @@ class Theme implements \JsonSerializable {
      *
      * @param array $assets
      */
-    private function initializeAssets(array $assets) {
+    private function initializeAssets(array $assets)
+    {
         $factory = ThemeAssetFactory::instance();
 
         foreach ($assets as $assetName => $asset) {
@@ -312,8 +417,8 @@ class Theme implements \JsonSerializable {
                 $this->assets[$assetName] = $asset;
                 continue;
             }
-            $type = $asset['type'] ?? ThemeAssetFactory::DEFAULT_ASSETS[$assetName]['type'] ?? null;
-            $data = $asset['data'] ?? null;
+            $type = $asset["type"] ?? (ThemeAssetFactory::DEFAULT_ASSETS[$assetName]["type"] ?? null);
+            $data = $asset["data"] ?? null;
 
             if ($type === null || $data === null) {
                 continue;
@@ -325,126 +430,155 @@ class Theme implements \JsonSerializable {
             }
         }
 
+        // Mix in logo assets.
+        foreach (
+            $factory->getLogoAssets($this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null)
+            as $assetName => $logoAsset
+        ) {
+            $this->assets[$assetName] = $logoAsset;
+        }
+
+        $this->fixCorruptedVariables();
+    }
+
+    /**
+     * Ensure all default assets are created.
+     */
+    public function ensureDefaultAssets()
+    {
+        $factory = ThemeAssetFactory::instance();
+
         foreach (ThemeAssetFactory::DEFAULT_ASSETS as $assetName => $defaultAsset) {
             if (isset($this->assets[$assetName])) {
                 continue;
             }
 
             // Otherwise create the default.
-            $type = $defaultAsset['type'];
-            $data = $defaultAsset['default'];
+            $type = $defaultAsset["type"];
+            $data = $defaultAsset["default"];
             $asset = $factory->createAsset($this, $type, $assetName, $data);
             $this->assets[$assetName] = $asset;
         }
-
-        // Mix in logo assets.
-        foreach ($factory->getLogoAssets($this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null) as $assetName => $logoAsset) {
-            $this->assets[$assetName] = $logoAsset;
-        }
+        $this->preview->addVariablePreview($this->assets["variables"]);
     }
 
     /**
      * @return ThemePreview
      */
-    public function getPreview(): ThemePreview {
+    public function getPreview(): ThemePreview
+    {
         return $this->preview;
     }
 
     /**
      * @return Addon|null
      */
-    public function getAddon(): ?Addon {
+    public function getAddon(): ?Addon
+    {
         return $this->addon;
     }
 
     /**
      * @param Addon|null $addon
      */
-    public function setAddon(?Addon $addon): void {
+    public function setAddon(?Addon $addon): void
+    {
         $this->addon = $addon;
     }
 
     /**
      * @return string
      */
-    public function getThemeID(): string {
+    public function getThemeID(): string
+    {
         return $this->themeID;
     }
 
     /**
      * @return string
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->name;
     }
 
     /**
      * @return string|null
      */
-    public function getVersion(): ?string {
+    public function getVersion(): ?string
+    {
         return $this->version;
     }
 
     /**
      * @return int|null
      */
-    public function getRevisionID(): ?int {
+    public function getRevisionID(): ?int
+    {
         return $this->revisionID;
     }
 
     /**
      * @return string|null
      */
-    public function getRevisionName(): ?string {
+    public function getRevisionName(): ?string
+    {
         return $this->revisionName;
     }
 
     /**
      * @return string|null
      */
-    public function getParentTheme(): ?string {
+    public function getParentThemeKey(): ?string
+    {
         return $this->parentTheme;
     }
 
     /**
      * @return \DateTimeInterface|null
      */
-    public function getDateInserted(): ?\DateTimeInterface {
+    public function getDateInserted(): ?\DateTimeInterface
+    {
         return $this->dateInserted;
     }
 
     /**
      * @return array|null
      */
-    public function getInsertUser(): ?array {
+    public function getInsertUser(): ?array
+    {
         return $this->insertUser;
     }
 
     /**
      * @return bool
      */
-    public function isCurrent(): bool {
+    public function isCurrent(): bool
+    {
         return $this->current;
     }
 
     /**
      * @param bool $current
      */
-    public function setCurrent(bool $current): void {
+    public function setCurrent(bool $current): void
+    {
         $this->current = $current;
     }
 
     /**
      * @return ThemeAsset[]
      */
-    public function getAssets(): array {
+    public function getAssets(): array
+    {
         return $this->assets;
     }
 
     /**
      * @param array $assets
      */
-    public function setAssets(array $assets): void {
+    public function setAssets(array $assets): void
+    {
         $this->assets = $assets;
     }
 
@@ -455,8 +589,17 @@ class Theme implements \JsonSerializable {
      *
      * @return ThemeAsset|null
      */
-    public function getAsset(string $assetName): ?ThemeAsset {
+    public function getAsset(string $assetName): ?ThemeAsset
+    {
         return $this->assets[$assetName] ?? null;
+    }
+
+    /**
+     * @return JsonThemeAsset
+     */
+    public function getVariables(): JsonThemeAsset
+    {
+        return $this->assets["variables"];
     }
 
     /**
@@ -465,21 +608,24 @@ class Theme implements \JsonSerializable {
      * @param string $assetName
      * @param ThemeAsset $asset
      */
-    public function setAsset(string $assetName, ThemeAsset $asset): void {
+    public function setAsset(string $assetName, ThemeAsset $asset): void
+    {
         $this->assets[$assetName] = $asset;
     }
 
     /**
      * @return bool
      */
-    public function isCacheHit(): bool {
+    public function isCacheHit(): bool
+    {
         return $this->isCacheHit;
     }
 
     /**
      * @param bool $isCacheHit
      */
-    public function setIsCacheHit(bool $isCacheHit): void {
+    public function setIsCacheHit(bool $isCacheHit): void
+    {
         $this->isCacheHit = $isCacheHit;
     }
 }

@@ -1,9 +1,6 @@
 <img src="https://user-images.githubusercontent.com/1770056/51494323-414e8980-1d86-11e9-933c-e647b5ea49f4.png" alt="Vanilla Repo Logo" width=500/>
-
 [![](https://img.shields.io/github/license/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/blob/master/LICENSE)
 [![CircleCI](https://circleci.com/gh/vanilla/vanilla/tree/master.svg?style=svg)](https://circleci.com/gh/vanilla/vanilla/tree/master)
-[![codecov](https://codecov.io/gh/vanilla/vanilla/branch/master/graph/badge.svg)](https://codecov.io/gh/vanilla/vanilla)
-![](https://img.shields.io/github/commits-since/vanilla/vanilla/Vanilla_3.3.svg)
 
 ## Howdy, Stranger!
 
@@ -28,11 +25,17 @@ can build a custom-tailored environment that meets your community's particular n
 
 ## Installation
 
+The current version of Vanilla requires PHP 7.2+ and MySQL 5.7+. The following PHP extensions are also required: cURL, DOM, Fileinfo, GD, intl, JSON, libxml, PDO
+
 -   [Local Installation](https://github.com/vanilla/vanilla-docker)
 -   [Our Cloud Hosting Solution](https://vanillaforums.com/en/plans/)
 -   [The Basics of Self Hosting ](https://docs.vanillaforums.com/developer/installation/self-hosting/)
 
 _Upgrading from an earlier version of Vanilla? See [our upgrade notes](https://docs.vanillaforums.com/developer/installation/self-hosting/#upgrading)._
+
+## Changes to Fulltext Indexing
+
+Full-text index support has been disabled by default as of Vanilla 4. To enable full-text index support, add a `FullTextIndexing` key under the `Database` section of your site config and set its value to `true`. **Failure to add this config value will result in full-text indexes being removed from Vanilla's database tables.**
 
 ## Contributing
 
@@ -59,23 +62,6 @@ Please disclose security issues responsibly by emailing support@vanillaforums.co
 We'll work on releasing an updated version as quickly as possible.
 Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.
 
-## Releases & Branches
-
-The `master` branch is considered a stable branch capable of being released at any time. Reviewed, stable changes land against `master` via pull-request.
-
-Our open source release branches are named by version number, e.g. `release/3.3`. All open source releases (included pre-releases) are tagged.
-
-The `release/VERSION+BUILD` branches are production-ready branches for our cloud product but are not yet vetted for open source release (alternate platforms & configurations).
-
-|                     | Active Release  |
-| ------------------- | --------------- |
-| **Version**         | `3.3`           |
-| **Initial Release** | 28 October 2019 |
-| **Last Updated**    | 28 October 2019 |
-| **EOL**             | Next release    |
-
-Refer to the [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.
-
 ## Building Releases
 
 Vanilla releases are built using [Phing](https://www.phing.info/) to create a pre-built deploy-ready copies of Vanilla. To build these run the following in the root of the repository.
@@ -96,7 +82,7 @@ The following dependenies are all required for building a release.
 Vanilla is free, open source software distributed under the license `gpl-2.0-only`.
 We accept and encourage contributions from our community and sometimes give hugs in return.
 
-Copyright © 2009-2019 Vanilla Forums Inc.
+Copyright © 2009-2022 Vanilla Forums Inc.
 
 > Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 > as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.

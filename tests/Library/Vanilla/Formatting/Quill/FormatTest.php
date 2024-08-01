@@ -12,8 +12,8 @@ use Vanilla\Formatting\Quill\Formats\Bold;
 use Vanilla\Formatting\Quill\Formats\Italic;
 use Vanilla\Formatting\Quill\Formats\Link;
 
-class FormatTest extends SharedBootstrapTestCase {
-
+class FormatTest extends SharedBootstrapTestCase
+{
     private $boldOperation = [
         "insert" => "bold",
         "attributes" => [
@@ -48,11 +48,9 @@ class FormatTest extends SharedBootstrapTestCase {
     /**
      * Uses the BoldFormat as a implementation to test matches for all formats.
      */
-    public function testMatches() {
-        $this->assertTrue(
-            Bold::matches([$this->boldOperation]),
-            "Bold does not recognize a bold operation."
-        );
+    public function testMatches()
+    {
+        $this->assertTrue(Bold::matches([$this->boldOperation]), "Bold does not recognize a bold operation.");
         $this->assertTrue(
             Bold::matches([$this->boldItalicOperation]),
             "Bold does not recognize a bold, italic operation."
@@ -75,19 +73,16 @@ class FormatTest extends SharedBootstrapTestCase {
 
     private $italicOpeningTag = "<em>";
     private $italicClosingTag = "</em>";
-    private $boldClosingTag   = "</strong>";
-    private $linkOpeningTag   = "<a href=\"https://google.com\" rel=\"nofollow noreferrer ugc\">";
-    private $emptyTag         = "";
+    private $boldClosingTag = "</strong>";
+    private $linkOpeningTag = "<a href=\"https://google.com\" rel=\"nofollow noopener ugc\">";
+    private $emptyTag = "";
 
     /**
      * Uses the BoldFormat as a implementation to test renderOpeningTag for all formats.
      */
-    public function testGetOpeningAndClosingTags() {
-        $basicBoldBlot = new Bold(
-            $this->boldOperation,
-            $this->emptyOperation,
-            $this->emptyOperation
-        );
+    public function testGetOpeningAndClosingTags()
+    {
+        $basicBoldBlot = new Bold($this->boldOperation, $this->emptyOperation, $this->emptyOperation);
         $this->assertEquals(
             $this->boldOpeningTag,
             $basicBoldBlot->renderOpeningTag(),
@@ -99,11 +94,7 @@ class FormatTest extends SharedBootstrapTestCase {
             "Bold did not return a bold closing tag with a basic bold current operation."
         );
 
-        $boldCurrentAndBoldBeforeBlot = new Bold(
-            $this->boldOperation,
-            $this->boldOperation,
-            $this->emptyOperation
-        );
+        $boldCurrentAndBoldBeforeBlot = new Bold($this->boldOperation, $this->boldOperation, $this->emptyOperation);
         $this->assertEquals(
             $this->emptyTag,
             $boldCurrentAndBoldBeforeBlot->renderOpeningTag(),
@@ -115,11 +106,7 @@ class FormatTest extends SharedBootstrapTestCase {
             "Bold did not return a bold closing tag with a bold current operation and a bold previous operation."
         );
 
-        $boldCurrentAndBoldAfterBlot = new Bold(
-            $this->boldOperation,
-            $this->emptyOperation,
-            $this->boldOperation
-        );
+        $boldCurrentAndBoldAfterBlot = new Bold($this->boldOperation, $this->emptyOperation, $this->boldOperation);
 
         $this->assertEquals(
             $this->boldOpeningTag,
@@ -132,11 +119,7 @@ class FormatTest extends SharedBootstrapTestCase {
             "Bold returned a bold closing tag with a bold current operation and a bold after operation."
         );
 
-        $linkBlot = new Link(
-            $this->linkOperation,
-            $this->emptyOperation,
-            $this->emptyOperation
-        );
+        $linkBlot = new Link($this->linkOperation, $this->emptyOperation, $this->emptyOperation);
 
         $this->assertEquals(
             $this->linkOpeningTag,
@@ -148,12 +131,9 @@ class FormatTest extends SharedBootstrapTestCase {
     /**
      * Ensure that the format tags are nested in the correct order.
      */
-    public function testNestingPriorityTags() {
-        $boldThenBothBlot = new Bold(
-            $this->boldItalicOperation,
-            $this->boldOperation,
-            $this->italicOperation
-        );
+    public function testNestingPriorityTags()
+    {
+        $boldThenBothBlot = new Bold($this->boldItalicOperation, $this->boldOperation, $this->italicOperation);
 
         $this->assertEquals(
             $this->emptyTag,
@@ -161,11 +141,7 @@ class FormatTest extends SharedBootstrapTestCase {
             "Bold blot followed by bold/italic blot opening tag is not getting optimized away."
         );
 
-        $italicThenBothBlot = new Italic(
-            $this->boldItalicOperation,
-            $this->italicOperation,
-            $this->boldOperation
-        );
+        $italicThenBothBlot = new Italic($this->boldItalicOperation, $this->italicOperation, $this->boldOperation);
 
         $this->assertEquals(
             $this->italicOpeningTag,
@@ -173,11 +149,7 @@ class FormatTest extends SharedBootstrapTestCase {
             "Italic blot followed by bold/italic blot opening tag is not getting optimized away."
         );
 
-        $bothThenBoldBlot = new Bold(
-            $this->boldOperation,
-            $this->italicOperation,
-            $this->boldItalicOperation
-        );
+        $bothThenBoldBlot = new Bold($this->boldOperation, $this->italicOperation, $this->boldItalicOperation);
 
         $this->assertEquals(
             $this->emptyTag,
@@ -185,11 +157,7 @@ class FormatTest extends SharedBootstrapTestCase {
             "Bold blot followed by bold/italic blot closing tag is not getting optimized away."
         );
 
-        $italicThenBothBlot = new Italic(
-            $this->italicOperation,
-            $this->boldOperation,
-            $this->boldItalicOperation
-        );
+        $italicThenBothBlot = new Italic($this->italicOperation, $this->boldOperation, $this->boldItalicOperation);
 
         $this->assertEquals(
             $this->italicClosingTag,

@@ -6,9 +6,13 @@
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, allLinkStates, borders, margins, negative, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { absolutePosition, allLinkStates, negative } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent, px } from "csx";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -55,9 +59,13 @@ export const attachmentClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         alignItems: "flex-start",
         justifyContent: "space-between",
+        textAlign: "start",
         padding: vars.padding.default,
+        // Offset the padding on the bottom a little bit so that the bottom padding looks event with the top.
+        // The line-height causes them to look uneven without a little offset.
+        paddingBottom: vars.padding.default - 4,
         width: percent(100),
-        ...borders({
+        ...Mixins.border({
             color: globalVars.elementaryColors.transparent,
             width: 2,
             radius: 0,
@@ -66,8 +74,8 @@ export const attachmentClasses = useThemeCache(() => {
 
     const format = style("format", {
         flexBasis: px(globalVars.icon.sizes.small + vars.padding.default),
-        height: unit(globalVars.icon.sizes.small),
-        paddingRight: unit(vars.padding.default),
+        height: styleUnit(globalVars.icon.sizes.small),
+        paddingRight: styleUnit(vars.padding.default),
         flexShrink: 1,
     });
 
@@ -80,6 +88,7 @@ export const attachmentClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
+        ...lineHeightAdjustment(),
         fontSize: px(vars.text.fontSize),
         color: vars.title.color.toString(),
         fontWeight: globalVars.fonts.weights.semiBold,
@@ -87,16 +96,16 @@ export const attachmentClasses = useThemeCache(() => {
     });
 
     const metas = style("metas", {
-        ...margins({
-            left: unit(negative(vars.padding.default / 2)),
-            right: unit(negative(vars.padding.default / 2)),
+        ...Mixins.margin({
+            left: styleUnit(negative(vars.padding.default / 2)),
+            right: styleUnit(negative(vars.padding.default / 2)),
             bottom: 0,
         }),
         lineHeight: globalVars.lineHeights.condensed,
     });
 
     const close = style("close", {
-        ...margins({
+        ...Mixins.margin({
             top: px(-((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2)),
             right: px(-((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2)),
         }),
@@ -114,7 +123,7 @@ export const attachmentClasses = useThemeCache(() => {
     });
 
     const loadingContent = style("loadingContent", {
-        $nest: {
+        ...{
             [`.${format}`]: {
                 opacity: vars.loading.opacity,
             },

@@ -1,0 +1,27 @@
+{
+    "name": "vanilla/cli",
+    "description": "Setup & scripting utilities for Vanilla",
+    "type": "project",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Adam Charron",
+            "email": "adam@charrondev.com"
+        }
+    ],
+    "config": {
+        "platform": {
+            "php": "8.0.2"
+        }
+    },
+    "require": {
+        "symfony/process": "*",
+        "symfony/console": "^5.4",
+        "chrome-php/chrome": "^1.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vanilla\\Cli\\": "src"
+        }
+    }
+}

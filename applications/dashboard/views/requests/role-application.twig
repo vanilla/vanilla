@@ -1,0 +1,22 @@
+<div class="FormTitleWrapper AjaxForm">
+    <h1>{{ roleRequestMeta.name }}</h1>
+    {% if state == 'applicationNotFound' %}
+        <p>{{ t('Application not found.') }}</p>
+    {% elseif state == 'alreadyApplied' %}
+        <p>{{ t('You have already applied.') }} {{ t('You will receive a notification when you are accepted.') }}</p>
+    {% elseif state == 'hasRole' %}
+        <p>{{ t('You already have this role.') }}</p>
+    {% elseif state == 'success' %}
+        <p>{{ t('You have successfully applied.') }} {{ t('You will receive a notification when you are accepted.') }}</p>
+    {% else %}
+        <div class="roleRequestMeta-body">
+            {{ renderHtml(roleRequestMeta.body, roleRequestMeta.format) }}
+        </div>
+        {{ form.open()|raw }}
+        {{ form.errors()|raw }}
+
+        {{ form.renderSchema(roleRequestMeta.attributesSchema, {'nameFormat': 'attributes[%s]'})|raw }}
+
+        {{ form.close('Apply')|raw }}
+    {% endif %}
+</div>

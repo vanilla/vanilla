@@ -4,30 +4,36 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
-import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
-import { siteNavClasses } from "@library/navigation/siteNavStyles";
+import { INavigationTreeItem } from "@library/@types/api/core";
 import Heading from "@library/layout/Heading";
-import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
+import { useSection } from "@library/layout/LayoutContext";
+import { panelListClasses } from "@library/layout/panelListStyles";
+import { useSiteNavContext } from "@library/navigation/SiteNavContext";
+import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
+import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
+import { siteNavClasses } from "@library/navigation/siteNavStyles";
+import { useActiveNavRecord } from "@library/routing/routingUtils";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
-import { INavigationTreeItem } from "@library/@types/api/core";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { TabHandler } from "@vanilla/dom-utils";
-import { panelListClasses } from "@library/layout/panelListStyles";
+import classNames from "classnames";
+import React, { useEffect } from "react";
 
 interface IProps {
-    activeRecord: IActiveRecord;
+    activeRecord?: IActiveRecord;
     id?: string;
     className?: string;
     children: INavigationTreeItem[];
     collapsible: boolean;
     bottomCTA?: React.ReactNode;
+    onSelectItem?(item: INavigationTreeItem);
     onItemHover?(item: INavigationTreeItem);
     title?: string;
     hiddenTitle?: boolean;
     clickableCategoryLabels?: boolean;
+    siteNavNodeTypes?: SiteNavNodeTypes;
+    initialOpenDepth?: number;
+    initialOpenType?: string;
 }
 
 /**
@@ -39,10 +45,23 @@ export function SiteNav(props: IProps) {
 
     const titleID = id + "-title";
 
-    const { activeRecord, collapsible, onItemHover, children } = props;
+    const { activeRecord: _activeRecord, collapsible, onItemHover, onSelectItem, children, siteNavNodeTypes } = props;
+
+    const activeRecord = useActiveNavRecord(children, _activeRecord);
     const hasChildren = children && children.length > 0;
     const classes = siteNavClasses();
-    const classesPanelList = panelListClasses();
+    const classesPanelList = panelListClasses(useSection().mediaQueries);
+
+    const siteNavContext = useSiteNavContext();
+    useEffect(() => {
+        if (siteNavContext.initialOpenType == props.initialOpenType) {
+            // No need to do this twice.
+            return;
+        }
+
+        const initialRecords = gatherInitialRecords(props.children, props.initialOpenDepth ?? 0);
+        siteNavContext.setInitialOpenItems(props.initialOpenType ?? null, initialRecords);
+    }, [props.initialOpenType, props.initialOpenDepth, siteNavContext.initialOpenType]);
 
     const handleKeyDown = useKeyboardHandler();
     const content = hasChildren
@@ -51,12 +70,14 @@ export function SiteNav(props: IProps) {
                   <SiteNavNode
                       {...child}
                       collapsible={collapsible}
-                      activeRecord={activeRecord}
+                      activeRecord={activeRecord ?? undefined}
                       key={child.recordType + child.recordID}
                       titleID={titleID}
                       depth={0}
+                      onSelectItem={onSelectItem}
                       onItemHover={onItemHover}
                       clickableCategoryLabels={!!props.clickableCategoryLabels}
+                      siteNavNodeTypes={siteNavNodeTypes}
                   />
               );
           })
@@ -93,6 +114,21 @@ export function SiteNav(props: IProps) {
     } else {
         return <>{props.bottomCTA}</>;
     }
+}
+
+function gatherInitialRecords(records: INavigationTreeItem[], maxDepth: number): INavigationTreeItem[] {
+    const initialRecords: INavigationTreeItem[] = [];
+    let currentDepth = records;
+    let nextDepth: INavigationTreeItem[] = [];
+    for (let i = 0; i < maxDepth; i++) {
+        nextDepth = [];
+        currentDepth.forEach((item) => {
+            initialRecords.push(item);
+            nextDepth = [...nextDepth, ...(item.children ?? [])];
+        });
+        currentDepth = nextDepth;
+    }
+    return initialRecords;
 }
 
 function useKeyboardHandler() {

@@ -6,30 +6,34 @@
 
 namespace VanillaTests\APIv2;
 
-use Vanilla\Forum\Menu\UserCounterProvider;
+use Vanilla\Forum\Menu\ForumCounterProvider;
 use Vanilla\Menu\Counter;
 
 /**
  * Test the CounterProviders
  */
-class CounterProvidersTest extends AbstractAPIv2Test {
+class CounterProvidersTest extends AbstractAPIv2Test
+{
     /**
-    * {@inheritdoc}
-    */
-    public static function setupBeforeClass(): void {
+     * {@inheritdoc}
+     */
+    public static function setupBeforeClass(): void
+    {
         parent::setupBeforeClass();
     }
     /**
      * {@inheritdoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
     /**
      * Test ConversationCounterProvider.
      */
-    public function testConversationCounterProvider() {
+    public function testConversationCounterProvider()
+    {
         $session = self::container()->get(\Gdn_Session::class);
 
         $provider = new \ConversationCounterProvider($session);
@@ -42,16 +46,17 @@ class CounterProvidersTest extends AbstractAPIv2Test {
         $counter = $counters[0];
 
         $this->assertInstanceOf(Counter::class, $counter);
-        $this->assertEquals('Conversations', $counter->getName());
+        $this->assertEquals("Conversations", $counter->getName());
     }
 
     /**
      * Test UserCounterProvider.
      */
-    public function testUserCounterProvider() {
+    public function testUserCounterProvider()
+    {
         $session = self::container()->get(\Gdn_Session::class);
 
-        $provider = new UserCounterProvider($session);
+        $provider = new ForumCounterProvider($session);
 
         $counters = $provider->getMenuCounters();
 
@@ -60,14 +65,17 @@ class CounterProvidersTest extends AbstractAPIv2Test {
 
         foreach ($counters as $counter) {
             $this->assertInstanceOf(Counter::class, $counter);
-            $this->assertTrue(in_array($counter->getName(), ['Discussions', 'Bookmarks', 'UnreadDiscussions', 'Drafts']));
+            $this->assertTrue(
+                in_array($counter->getName(), ["Discussions", "Bookmarks", "UnreadDiscussions", "Drafts"])
+            );
         }
     }
 
     /**
      * Test RoleCounterProvider.
      */
-    public function testRoleCounterProvider() {
+    public function testRoleCounterProvider()
+    {
         $session = self::container()->get(\Gdn_Session::class);
 
         $provider = new \RoleCounterProvider(self::container()->get(\RoleModel::class), $session);
@@ -79,32 +87,14 @@ class CounterProvidersTest extends AbstractAPIv2Test {
 
         $counter = $counters[0];
         $this->assertInstanceOf(Counter::class, $counter);
-        $this->assertEquals('Applicants', $counter->getName());
-    }
-
-    /**
-     * Test LogCounterProvider.
-     */
-    public function testLogCounterProvider() {
-        $session = self::container()->get(\Gdn_Session::class);
-
-        $provider = new \LogCounterProvider(self::container()->get(\LogModel::class), $session);
-
-        $counters = $provider->getMenuCounters();
-
-        $this->assertTrue(is_array($counters));
-        $this->assertEquals(2, count($counters));
-
-        foreach ($counters as $counter) {
-            $this->assertInstanceOf(Counter::class, $counter);
-            $this->assertTrue(in_array($counter->getName(), ['SpamQueue', 'ModerationQueue']));
-        }
+        $this->assertEquals("Applicants", $counter->getName());
     }
 
     /**
      * Test ActivityCounterProvider.
      */
-    public function testActivityCounterProvider() {
+    public function testActivityCounterProvider()
+    {
         $session = self::container()->get(\Gdn_Session::class);
 
         $provider = new \ActivityCounterProvider(self::container()->get(\ActivityModel::class), $session);
@@ -116,6 +106,6 @@ class CounterProvidersTest extends AbstractAPIv2Test {
 
         $counter = $counters[0];
         $this->assertInstanceOf(Counter::class, $counter);
-        $this->assertEquals('UnreadNotifications', $counter->getName());
+        $this->assertEquals("UnreadNotifications", $counter->getName());
     }
 }

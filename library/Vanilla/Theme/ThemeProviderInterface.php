@@ -9,10 +9,10 @@ namespace Vanilla\Theme;
 use Garden\Web\Exception\NotFoundException;
 
 /**
-  * Interface for providing variables on a theme.
-  */
-interface ThemeProviderInterface {
-
+ * Interface for providing variables on a theme.
+ */
+interface ThemeProviderInterface
+{
     /**
      * Whether or not the provider handles themes of a certain type.
      *
@@ -79,4 +79,11 @@ interface ThemeProviderInterface {
      * @return bool
      */
     public function themeExists($themeKey): bool;
+
+    /**
+     * Set the theme service instance.
+     *
+     * @param ThemeService $themeService
+     */
+    public function setThemeService(ThemeService $themeService): void;
 }

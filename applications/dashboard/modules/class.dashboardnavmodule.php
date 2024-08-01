@@ -8,25 +8,25 @@
  * @since 2.0
  */
 
+use Vanilla\FeatureFlagHelper;
+
 /**
  * Renders the dashboard nav.
  *
  * Handles the manipulation of the Dashboard sections, which are the top-level nav items appearing in the dashboard nav bar.
- * Handles implementing the user preferences for the section landing page and the collapse state of the panel nav.
- *
  * Rendering this module will render only the side nav. The section menu needs to be rendered manually using the
  * `getSectionsInfo()` function.
  */
-class DashboardNavModule extends SiteNavModule {
-
+class DashboardNavModule extends SiteNavModule
+{
     /** @var string The active section if the theme section we're in doesn't match any section in the dashboard. */
-    const ACTIVE_SECTION_DEFAULT = 'Settings';
+    const ACTIVE_SECTION_DEFAULT = "Analytics";
 
     /** @var string The default section when adding items to the navigation. */
-    const SECTION_DEFAULT = 'Settings';
+    const SECTION_DEFAULT = "Settings";
 
     /**  @var string The view for the panel navigation. */
-    public $view = 'nav-dashboard';
+    public $view = "nav-dashboard";
 
     /** @var DashboardNavModule The dashboard nav instance. */
     private static $dashboardNav;
@@ -41,53 +41,54 @@ class DashboardNavModule extends SiteNavModule {
      * @var array
      */
     private static $sectionsInfo = [
-        'DashboardHome' => [
-            'permission' => [
-                'Garden.Settings.View',
-                'Garden.Settings.Manage',
-                'Garden.Community.Manage',
+        "Moderation" => [
+            "permission" => [
+                "Garden.Moderation.Manage",
+                "Vanilla.Posts.Manage",
+                "Garden.Community.Manage",
+                "Garden.Users.Add",
+                "Garden.Users.Edit",
+                "Garden.Users.Delete",
+                "Garden.Settings.Manage",
+                "Garden.Users.Approve",
             ],
-            'section' => 'DashboardHome',
-            'title' => 'Dashboard',
-            'description' => 'Site Overview',
-            'url' => '/dashboard/settings/home',
-            'empty' => true
-        ],
-        'Moderation' => [
-            'permission' => [
-                'Garden.Moderation.Manage',
-                'Moderation.ModerationQueue.Manage',
-                'Garden.Community.Manage',
-                'Garden.Users.Add',
-                'Garden.Users.Edit',
-                'Garden.Users.Delete',
-                'Garden.Settings.Manage',
-                'Garden.Users.Approve',
-            ],
-            'section' => 'Moderation',
-            'title' => 'Moderation',
-            'description' => 'Community Management',
-            'url' => [
-                'Garden.Moderation.Manage' => 'dashboard/log/moderation',
-                'Moderation.ModerationQueue.Manage' => 'dashboard/log/moderation',
-                'Garden.Community.Manage' => '/dashboard/message',
-                'Garden.Users.Add' => 'dashboard/user',
-                'Garden.Users.Edit' => 'dashboard/user',
-                'Garden.Users.Delete' => 'dashboard/user',
-                'Garden.Settings.Manage' => '/dashboard/settings/bans',
-                'Garden.Users.Approve' => '/dashboard/user/applicants',
+            "section" => "Moderation",
+            "title" => "Moderation",
+            "description" => "Community Management",
+            "url" => [
+                "Garden.Moderation.Manage" => "/dashboard/content/reports",
+                "Vanilla.Posts.Manage" => "/dashboard/content/reports",
+                "staff.allow" => "/dashboard/content/triage",
+                "Garden.Users.Add" => "/dashboard/user",
+                "Garden.Users.Edit" => "/dashboard/user",
+                "Garden.Users.Delete" => "/dashboard/user",
+                "Garden.Community.Manage" => "/dashboard/message",
+                "Garden.Settings.Manage" => "/dashboard/settings/bans",
+                "Garden.Users.Approve" => "/dashboard/user/applicants",
             ],
         ],
-        'Settings' => [
-            'permission' => [
-                'Garden.Settings.Manage',
-                'Garden.Community.Manage',
-            ],
-            'section' => 'Settings',
-            'title' => 'Settings',
-            'description' => 'Configuration & Addons',
-            'url' => '/dashboard/settings/branding'
-        ]
+        "Analytics" => [
+            "permission" => ["Garden.Settings.View", "Garden.Settings.Manage", "Garden.Community.Manage"],
+            "section" => "Analytics",
+            "title" => "Analytics",
+            "description" => "Visualize Your Community",
+            "url" => "/dashboard/settings/home",
+            "empty" => true,
+        ],
+        "Appearance" => [
+            "permission" => ["Garden.Settings.Manage"],
+            "section" => "Appearance",
+            "title" => "Appearance",
+            "description" => "Customize your community",
+            "url" => "/appearance",
+        ],
+        "Settings" => [
+            "permission" => ["Garden.Settings.Manage", "Garden.Community.Manage"],
+            "section" => "Settings",
+            "title" => "Settings",
+            "description" => "Configuration & Addons",
+            "url" => "/dashboard/role",
+        ],
     ];
 
     /**
@@ -95,7 +96,8 @@ class DashboardNavModule extends SiteNavModule {
      * @param string $cssClass The CSS class for the panel nav wrapper.
      * @param bool $useCssPrefix Whether to use CSS prefixes for the items in the panel nav.
      */
-    public function __construct($cssClass = '', $useCssPrefix = true) {
+    public function __construct($cssClass = "", $useCssPrefix = true)
+    {
         parent::__construct($cssClass, $useCssPrefix);
     }
 
@@ -104,7 +106,8 @@ class DashboardNavModule extends SiteNavModule {
      *
      * @return DashboardNavModule
      */
-    public static function getDashboardNav() {
+    public static function getDashboardNav()
+    {
         if (!isset(self::$dashboardNav)) {
             self::$dashboardNav = new DashboardNavModule();
         }
@@ -115,28 +118,32 @@ class DashboardNavModule extends SiteNavModule {
      * Compiles our section info and filters it according to a user's permissions. Info is properly sanitized
      * to be rendered in a view.
      *
+     * @param bool $handleLandingPreference Backwards compatibility, new components should not carry this feature moving forward.
      * @return array The sections to display in the main dashboard nav.
      * @throws Exception
      */
-    public function getSectionsInfo() {
+    public function getSectionsInfo($handleLandingPreference = true)
+    {
         if (!self::isInitStaticFired()) {
             self::setInitStaticFired(true);
-            $this->fireEvent('init');
+            $this->fireEvent("init");
         }
 
-        $this->handleUserPreferencesSectionLandingPage();
+        if ($handleLandingPreference) {
+            $this->handleUserPreferencesSectionLandingPage();
+        }
         $session = Gdn::session();
 
         $sections = self::$sectionsInfo;
 
         foreach ($sections as $key => &$section) {
-            if (val('permission', $section) && !$session->checkPermission(val('permission', $section), false)) {
+            if (val("permission", $section) && !$session->checkPermission(val("permission", $section), false)) {
                 unset($sections[$key]);
             } else {
-                $section['title'] = t($section['title']);
-                $section['description'] = t($section['description']);
-                $section['active'] = $this->isActiveSection($section['section']) ? 'active' : '';
-                $section['url'] = $this->getUrlForSection($key);
+                $section["title"] = t($section["title"]);
+                $section["description"] = t($section["description"]);
+                $section["active"] = $this->isActiveSection($section["section"]) ? "active" : "";
+                $section["url"] = $this->getUrlForSection($key);
             }
         }
         return $sections;
@@ -148,20 +155,33 @@ class DashboardNavModule extends SiteNavModule {
      * @param string $sectionKey The section to get the url for
      * @return string The url associated with the passed section key
      */
-    public function getUrlForSection($sectionKey) {
+    public function getUrlForSection($sectionKey)
+    {
         $section = self::$sectionsInfo[$sectionKey];
-        if (is_array(val('url', $section))) {
+        if (is_array(val("url", $section))) {
             // In array form, the url property is stored as 'Permission' => 'url'.
             // Sometimes a section won't have a landing page common to all the permissions it houses.
             // The url gets resolved to the first url the user has permission to see.
-            foreach($section['url'] as $permission => $url) {
+            foreach ($section["url"] as $permission => $url) {
                 if (Gdn::session()->checkPermission($permission)) {
+                    // Maybe we want this to more dynamic later?
+                    if ($sectionKey === "Moderation") {
+                        if (c("triage.enabled") && checkPermission("staff.allow")) {
+                            return "/dashboard/content/triage";
+                        }
+
+                        if (FeatureFlagHelper::featureEnabled("escalations")) {
+                            return "/dashboard/content/reports";
+                        } else {
+                            return "/dashboard/log/moderation";
+                        }
+                    }
                     return $url;
                 }
             }
         }
 
-        return val('url', $section, '/');
+        return val("url", $section, "/");
     }
 
     /**
@@ -170,8 +190,9 @@ class DashboardNavModule extends SiteNavModule {
      *
      * @return string The active section.
      */
-    private function getActiveSection() {
-        $currentSections = Gdn_Theme::section('', 'get');
+    public function getActiveSection()
+    {
+        $currentSections = Gdn_Theme::section("", "get");
         foreach ($currentSections as $currentSection) {
             if (array_key_exists($currentSection, self::$sectionsInfo)) {
                 return $currentSection;
@@ -186,13 +207,14 @@ class DashboardNavModule extends SiteNavModule {
      * @param string $section The section to check whether it's active.
      * @return bool Whether the section is the active section.
      */
-    private function isActiveSection($section) {
+    private function isActiveSection($section)
+    {
         $allSections = [];
         foreach (self::$sectionsInfo as $sectionInfo) {
-            $allSections[] = $sectionInfo['section'];
+            $allSections[] = $sectionInfo["section"];
         }
 
-        $currentSections = Gdn_Theme::section('', 'get');
+        $currentSections = Gdn_Theme::section("", "get");
         $found = false;
 
         foreach ($currentSections as $currentSection) {
@@ -217,24 +239,25 @@ class DashboardNavModule extends SiteNavModule {
      * Checks to see if any nav items have been collapsed by the user and adds data to collapse
      * those items in the nav view.
      */
-    private function handleUserPreferencesNav() {
+    private function handleUserPreferencesNav()
+    {
         if ($session = Gdn::session()) {
-            $collapsed = $session->getPreference('DashboardNav.Collapsed', []);
+            $collapsed = $session->getPreference("DashboardNav.Collapsed", []);
             $section = $this->getActiveSection();
             $items = $this->getItems();
-            foreach($items as &$item) {
-                if (array_key_exists(val('headerCssClass', $item), $collapsed)) {
-                    $item['collapsed'] = 'collapsed';
-                    $item['ariaExpanded'] = 'false';
-                    $item['collapsedList'] = '';
+            foreach ($items as &$item) {
+                if (array_key_exists(val("headerCssClass", $item), $collapsed)) {
+                    $item["collapsed"] = "collapsed";
+                    $item["ariaExpanded"] = "false";
+                    $item["collapsedList"] = "";
                 } else {
-                    $item['collapsed'] = '';
-                    $item['ariaExpanded'] = 'true';
-                    $item['collapsedList'] = 'in';
+                    $item["collapsed"] = "";
+                    $item["ariaExpanded"] = "true";
+                    $item["collapsedList"] = "in";
                 }
-                if (isset($item['items'])) {
-                    foreach($item['items'] as &$subitem) {
-                        $subitem['section'] = $section;
+                if (isset($item["items"])) {
+                    foreach ($item["items"] as &$subitem) {
+                        $subitem["section"] = $section;
                     }
                 }
             }
@@ -247,13 +270,14 @@ class DashboardNavModule extends SiteNavModule {
      * user clicks on a top-level nav item. Changes the url for the section items according to what is
      * set in user preferences.
      */
-    private function handleUserPreferencesSectionLandingPage() {
+    private function handleUserPreferencesSectionLandingPage()
+    {
         if ($session = Gdn::session()) {
-            $landingPages = $session->getPreference('DashboardNav.SectionLandingPages', []);
+            $landingPages = $session->getPreference("DashboardNav.SectionLandingPages", []);
 
             foreach (self::$sectionsInfo as $key => $section) {
                 if (array_key_exists($key, $landingPages)) {
-                    self::$sectionsInfo[$key]['url'] = $landingPages[$key];
+                    self::$sectionsInfo[$key]["url"] = $landingPages[$key];
                 }
             }
         }
@@ -264,8 +288,9 @@ class DashboardNavModule extends SiteNavModule {
      *
      * @param array $section An array that contains at least the following keys: 'title', 'description', 'url', 'section'.
      */
-    public function registerSection($section) {
-        $requiredArrayKeys = ['title', 'description', 'url', 'section'];
+    public function registerSection($section)
+    {
+        $requiredArrayKeys = ["title", "description", "url", "section"];
 
         // Make sure we have what we need.
         foreach ($requiredArrayKeys as $key) {
@@ -273,16 +298,17 @@ class DashboardNavModule extends SiteNavModule {
                 return;
             }
         }
-        self::$sectionsInfo[$section['section']] = $section;
+        self::$sectionsInfo[$section["section"]] = $section;
     }
 
     /**
      * Clear all items for sections that have declared themselves as 'empty'.
      */
-    public function handleEmpty() {
+    public function handleEmpty()
+    {
         $section = $this->getActiveSection();
         $section = val($section, self::$sectionsInfo);
-        if (val('empty', $section) === true) {
+        if (val("empty", $section) === true) {
             $this->setItems([]);
         }
     }
@@ -292,7 +318,8 @@ class DashboardNavModule extends SiteNavModule {
      *
      * @return bool Whether the panel nav is cleared for rendering.
      */
-    public function prepare() {
+    public function prepare()
+    {
         $prepared = parent::prepare();
         $this->handleEmpty();
         $this->handleUserPreferencesNav();
@@ -305,13 +332,14 @@ class DashboardNavModule extends SiteNavModule {
      * @return string The panel nav HTML.
      * @throws Exception
      */
-    public function toString() {
+    public function toString()
+    {
         if (!self::isInitStaticFired()) {
             self::setInitStaticFired(true);
-            $this->fireEvent('init');
+            $this->fireEvent("init");
         }
 
-        $this->fireAs(get_called_class())->fireEvent('render');
+        $this->fireAs(get_called_class())->fireEvent("render");
         return parent::toString();
     }
 
@@ -321,84 +349,85 @@ class DashboardNavModule extends SiteNavModule {
      * @return array Returns a nested array of menus.
      * @throws Exception Throws an exception if the module isn't configured properly.
      */
-    public function getMenus() {
+    public function getMenus()
+    {
         static $fetched = false;
 
         // The init event must be fired first in order to put things in their proper order.
         if (!self::isInitStaticFired()) {
             self::setInitStaticFired(true);
-            $this->fireEvent('init');
+            $this->fireEvent("init");
         }
 
         if (!$fetched) {
             $navAdapter = new NestedCollectionAdapter($this);
-            $this->EventArguments['SideMenu'] = $navAdapter;
-            $this->fireEvent('GetAppSettingsMenuItems');
+            $this->EventArguments["SideMenu"] = $navAdapter;
+            $this->fireEvent("GetAppSettingsMenuItems");
 
-            $this->fireAs(get_called_class())->fireEvent('render');
+            $this->fireAs(get_called_class())->fireEvent("render");
             $fetched = true;
         }
 
-        $rawSections = $this->getSectionsInfo();
+        $rawSections = $this->getSectionsInfo(false);
         $items = DashboardNavModule::getSectionItems();
 
         $menus = [];
         foreach ($rawSections as $s) {
             $menu = [
-                'name' => $s['title'],
-                'key' => $sectionID = strtolower($s['section']),
-                'description' => $s['description'],
+                "name" => $s["title"],
+                "id" => ($sectionID = strtolower($s["section"])),
+                "description" => $s["description"],
+                "url" => $s["url"],
             ];
-            if (!empty($s['empty'])) {
-                $menu['url'] = $s['url'];
-            }
 
             $groups = [];
             if (isset($items[$sectionID])) {
                 $rawSection = $items[$sectionID];
 
-                foreach ($rawSection['groups'] as $g) {
+                foreach ($rawSection["groups"] as $g) {
                     $section = [
-                        'key' => $g['key'],
-                        'name' => $g['text'] ?? '',
-                        'links' => [],
+                        "id" => $g["key"],
+                        "name" => $g["text"] ?? "",
+                        "links" => [],
                     ];
 
-                    $groups[$section['key']] = $section;
+                    $groups[$section["id"]] = $section;
                 }
 
-                $this->sortItems($rawSection['links']);
-                foreach ($rawSection['links'] as $k => $l) {
-                    list($groupID, $linkID) = explode('.', $k);
+                $links = $rawSection["links"] ?? [];
+                $this->sortItems($links);
+                foreach ($links as $k => $l) {
+                    [$groupID, $linkID] = explode(".", $k);
                     $link = [
-                        'name' => strip_tags($l['text']),
-                        'key' => $linkID,
-                        'url' => $l['url'],
-                        'react' => false,
+                        "name" => strip_tags($l["text"]),
+                        "id" => $linkID,
+                        "parentID" => $sectionID,
+                        "url" => $l["url"],
+                        "react" => false,
                     ];
 
-                    if (!empty($l['modifiers']['badge'])) {
-                        $link['badge'] = [
-                            'type' => 'text',
-                            'text' => $l['modifiers']['badge'],
+                    if (!empty($l["modifiers"]["badge"])) {
+                        $link["badge"] = [
+                            "type" => "text",
+                            "text" => $l["modifiers"]["badge"],
                         ];
-                    } elseif (!empty($l['modifiers']['popinRel'])) {
-                        $link['badge'] = [
-                            'type' => 'view',
-                            'url' => $l['modifiers']['popinRel'],
+                    } elseif (!empty($l["modifiers"]["popinRel"])) {
+                        $link["badge"] = [
+                            "type" => "view",
+                            "url" => $l["modifiers"]["popinRel"],
                         ];
                     }
 
-                    $groups[$groupID]['links'][] = $link;
+                    $groups[$groupID]["children"][] = $link;
                 }
 
                 // Remove sections with no links.
                 $groups = array_filter($groups, function ($s) {
-                    return !empty($s['links']);
+                    return !empty($s["children"]);
                 });
             }
-            if (!empty($groups) || !empty($menu['url'])) {
-                $menu['groups'] = array_values($groups);
+            if (!empty($groups) || !empty($menu["url"])) {
+                $menu["children"] = array_values($groups);
                 $menus[] = $menu;
             }
         }

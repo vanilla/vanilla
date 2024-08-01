@@ -1,54 +1,67 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
-import classNames from "classnames";
-import { searchResultsClasses } from "@library/features/search/searchResultsStyles";
 import Translate from "@library/content/Translate";
-import Result, { IResult } from "@library/result/Result";
 import Paragraph from "@library/layout/Paragraph";
 import { t } from "@vanilla/i18n/src";
+import { List } from "@library/lists/List";
+import { ListItemLayout } from "@library/lists/ListItem.variables";
+import { PageBox } from "@library/layout/PageBox";
+import Result from "@library/result/Result";
 
 interface IProps {
     className?: string;
     searchTerm?: string;
     results: any[];
-    result?: React.ComponentClass;
     emptyMessage?: string;
-    headingLevel?: 2 | 3;
+    ResultComponent?: React.ComponentType<any>;
+    ResultWrapper?: React.ComponentType<any>;
+    rel?: string;
 }
 
 /**
  * Generates a single search result. Note that this template is used in other contexts, such as the flat category list
  */
 export default function ResultList(props: IProps) {
-    const { className, searchTerm, results, result, emptyMessage = t("No results found."), headingLevel } = props;
+    const {
+        className,
+        searchTerm,
+        results,
+        emptyMessage = t("No results found."),
+        ResultComponent = Result,
+        ResultWrapper,
+    } = props;
 
     const hasResults = results && results.length > 0;
+
     let content;
-    const classes = searchResultsClasses();
 
     if (hasResults) {
-        const ResultComponent = result ?? Result;
         content = results.map((result, i) => {
-            return <ResultComponent {...result} key={i} headingLevel={headingLevel} />;
+            return <ResultComponent {...result} key={i} rel={props.rel} />;
         });
-    } else if (searchTerm === undefined || searchTerm === "") {
-        content = (
-            <Paragraph className={classNames("searchResults-noResults", classes.noResults)}>{emptyMessage}</Paragraph>
-        );
     } else {
         content = (
-            <Paragraph className={classNames("searchResults-noResults", "isEmpty", classes.noResults)}>
-                <Translate source="No results for '<0/>'." c0={searchTerm} />
-            </Paragraph>
+            <PageBox>
+                <Paragraph>
+                    {searchTerm ? <Translate source="No results for '<0/>'." c0={searchTerm} /> : emptyMessage}
+                </Paragraph>
+            </PageBox>
         );
     }
 
-    const Tag = hasResults ? `ul` : `div`;
-
-    return <Tag className={classNames("searchResults", classes.root, className)}>{content}</Tag>;
+    if (ResultWrapper) {
+        return <ResultWrapper>{content}</ResultWrapper>;
+    } else {
+        const tag = hasResults ? `ul` : `div`;
+        return (
+            <List as={tag} options={{ itemLayout: ListItemLayout.TITLE_METAS_DESCRIPTION }} className={className}>
+                {content}
+            </List>
+        );
+    }
 }

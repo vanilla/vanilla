@@ -5,16 +5,22 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, fonts, importantUnit, IStateSelectors, paddings, unit } from "@library/styles/styleHelpers";
+import { importantUnit, IStateSelectors } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { actionMixin } from "@library/flyouts/dropDownStyles";
+import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { actionMixin, dropDownVariables } from "@library/flyouts/dropDownStyles";
+import { Mixins } from "@library/styles/Mixins";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 
 export const flyoutCSS = () => {
     const globalVars = globalVariables();
+    const dropdownVars = dropDownVariables();
     const mainColors = globalVars.mainColors;
-    const fg = colorOut(mainColors.fg);
-    const bg = colorOut(mainColors.bg);
+    const fg = ColorsUtils.colorOut(mainColors.fg);
+    const bg = ColorsUtils.colorOut(mainColors.bg);
 
     // Dropdown hover/focus colors:
     mixinFlyoutItem(".MenuItems .Item a");
@@ -34,8 +40,8 @@ export const flyoutCSS = () => {
         `,
         {
             background: bg,
-            ...fonts({
-                size: globalVars.fonts.size.medium,
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("medium"),
             }),
         },
     );
@@ -43,16 +49,16 @@ export const flyoutCSS = () => {
     // Flip Checkbox in dropdown for consistency with KB
 
     cssOut(`.selectBox-item .dropdown-menu-link.selectBox-link`, {
-        ...paddings({
+        ...Mixins.padding({
             left: importantUnit(26),
             right: importantUnit(38),
         }),
     });
 
     cssOut(`.selectBox-item.isActive .dropdown-menu-link.selectBox-link`, {
-        backgroundColor: colorOut(globalVars.states.active.highlight, true),
-        $nest: {
-            "& .dropdown-menu-link.selectBox-link": {
+        backgroundColor: ColorsUtils.colorOut(globalVars.states.active.highlight),
+        ...{
+            ".dropdown-menu-link.selectBox-link": {
                 cursor: "pointer",
             },
         },
@@ -60,8 +66,8 @@ export const flyoutCSS = () => {
 
     cssOut(".selectBox-selectedIcon", {
         left: "auto",
-        right: unit(13),
-        color: colorOut(globalVars.mainColors.primaryContrast),
+        right: styleUnit(13),
+        color: ColorsUtils.colorOut(globalVars.mainColors.primaryContrast),
     });
 
     cssOut(
@@ -76,9 +82,19 @@ export const flyoutCSS = () => {
         .Flyout.Flyout .editor-action-separator
         `,
         {
-            borderBottomColor: colorOut(globalVars.separator.color),
+            borderBottomColor: ColorsUtils.colorOut(globalVars.separator.color),
         },
     );
+
+    cssOut(".MenuItems, .Flyout.Flyout", {
+        ...Mixins.border(globalVars.borderType.dropDowns),
+        ...shadowOrBorderBasedOnLightness(
+            dropdownVars.contents.bg,
+            Mixins.border(dropdownVars.contents.border),
+            shadowHelper().dropDown(),
+        ),
+        overflow: "hidden",
+    });
 };
 
 function mixinFlyoutItem(selector: string, classBasedStates?: IStateSelectors) {

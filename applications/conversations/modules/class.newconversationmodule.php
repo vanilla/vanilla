@@ -11,9 +11,10 @@
 /**
  * Renders the "New Conversation" button.
  */
-class NewConversationModule extends Gdn_Module {
-
-    public function assetTarget() {
-        return 'Panel';
+class NewConversationModule extends Gdn_Module
+{
+    public function assetTarget()
+    {
+        return "Panel";
     }
 }

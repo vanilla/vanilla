@@ -11,31 +11,34 @@ use Gdn;
 use Vanilla\AliasLoader;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
-use Vanilla\Models\SiteMeta;
+use Vanilla\Site\SiteSectionModel;
+use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
 
 /**
  * Banner Image Model.
  *
  * Previously this class was provided by the "Hero Image" plugin, but is now built in.
  */
-class BannerImageModel {
-
+class BannerImageModel
+{
     const DEFAULT_CONFIG_KEY = "Garden.BannerImage";
-
-    /** @var SiteMeta */
-    private $siteMeta;
 
     /** @var FormatService */
     private $formatService;
 
+    /** @var ImageSrcSetService */
+    private $imageSrcSetService;
+
     /**
      * BannerImageModel constructor.
      *
-     * @param SiteMeta $siteMeta
+     * @param FormatService $formatService
      */
-    public function __construct(SiteMeta $siteMeta, FormatService $formatService) {
-        $this->siteMeta = $siteMeta;
+    public function __construct(FormatService $formatService)
+    {
         $this->formatService = $formatService;
+        $this->imageSrcSetService = Gdn::getContainer()->get(ImageSrcSetService::class);
     }
 
     /**
@@ -45,41 +48,51 @@ class BannerImageModel {
      *
      * @return \Twig\Markup
      */
-    public function renderBanner(array $props = []): \Twig\Markup {
+    public function renderBanner(array $props = []): \Twig\Markup
+    {
         $controller = \Gdn::controller();
+        $iconImage = self::getCurrentBannerIconLink();
+        $backgroundImage = self::getCurrentBannerImageLink();
         $defaultProps = [
-            'description' => $controller->data(
-                'Category.Description',
-                $controller->description()
-            ),
-            'backgroundImage' => self::getCurrentBannerImageLink(),
+            "description" => $controller->contextualDescription(),
+            "backgroundImage" => $backgroundImage,
+            "iconImage" => $iconImage,
+            "iconUrlSrcSet" => $this->imageSrcSetService->getResizedSrcSet($iconImage),
+            "backgroundUrlSrcSet" => $this->imageSrcSetService->getResizedSrcSet($backgroundImage),
         ];
-        $title = $controller->data('Category.Name');
+        $title = $controller->contextualTitle();
 
         if ($title) {
-              $defaultProps['title'] = $this->formatService->renderPlainText($title, HtmlFormat::FORMAT_KEY);
+            $defaultProps["title"] = $this->formatService->renderPlainText($title, HtmlFormat::FORMAT_KEY);
         }
 
-        //filter description before passing on to the component
-        $defaultProps['description'] = $this->formatService->renderPlainText($defaultProps['description'], HtmlFormat::FORMAT_KEY);
+        //sanitize description before passing on to the component
+        /** @var $htmlSanitizer */
+        $htmlSanitizer = \Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
+        $defaultProps["description"] = $htmlSanitizer->filter($defaultProps["description"]);
 
         $props = array_merge($defaultProps, $props);
         $html = "";
-        $propsJson = htmlspecialchars(json_encode($props, JSON_UNESCAPED_UNICODE), ENT_QUOTES);
-        if (inSection(c("Theme.Banner.VisibleSections"))) {
-            $html = "<div data-react='community-banner' data-props='$propsJson'><div style=\"minHeight='500px'\"></div></div>";
-        } else {
-            $html = "<div data-react='community-content-banner' data-props='$propsJson'><div style=\"minHeight='500px'\"></div></div>";
+        $isRendered = false;
+        $contents = "<div style=\"min-height:'500px'\"></div>";
+        if (inSection(c("Theme.Banner.VisibleSections")) || $controller->data("isHomepage")) {
+            $isRendered = true;
+            $html = TwigStaticRenderer::renderReactModule("community-banner", $props, "", $contents);
+        } elseif (inSection(c("Theme.ContentBanner.VisibleSections"))) {
+            $isRendered = true;
+            $html = TwigStaticRenderer::renderReactModule("community-content-banner", $props, "", $contents);
         }
 
-        /** @var \Garden\EventManager $eventManager */
-        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-        $afterBanner = $eventManager->fire('AfterBanner', $this);
-        if (!empty($afterBanner)) {
-            $html .= implode("", $afterBanner);
+        if ($isRendered) {
+            /** @var \Garden\EventManager $eventManager */
+            $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+            $afterBanner = $eventManager->fire("AfterBanner", $this);
+            if (!empty($afterBanner)) {
+                $html .= implode("", $afterBanner);
+            }
         }
 
-        return new \Twig\Markup($html, 'utf-8');
+        return new \Twig\Markup($html, "utf-8");
     }
 
     /**
@@ -92,24 +105,28 @@ class BannerImageModel {
      *
      * @return string The category's slug on success, the default otherwise.
      */
-    public static function getBannerImageSlug($categoryID) {
-        $categoryID = filter_var($categoryID, FILTER_VALIDATE_INT);
-        if (!$categoryID || $categoryID < 1 || !class_exists(\CategoryModel::class)) {
-            return c(self::DEFAULT_CONFIG_KEY);
-        }
+    public static function getBannerImageSlug($categoryID)
+    {
+        return self::getCategoryField($categoryID, "BannerImage", c(self::DEFAULT_CONFIG_KEY));
+    }
 
-        $category = \CategoryModel::categories($categoryID);
-        $slug = $category['BannerImage'];
-
-        if (!$slug) {
-            $parentID = $category['ParentCategoryID'];
-            if ($parentID == $categoryID) {
-                $slug = c(self::DEFAULT_CONFIG_KEY);
-            } else {
-                $slug = self::getBannerImageSlug($parentID);
-            }
+    /**
+     * Get a category image field recursively.
+     *
+     * @param mixed $categoryID
+     * @param string $field
+     * @param ?string $default
+     *
+     * @return mixed
+     */
+    private static function getCategoryField($categoryID, string $field, $default = null)
+    {
+        if (!class_exists(\CategoryModel::class)) {
+            return $default;
         }
-        return $slug;
+        /** @var \CategoryModel $categoryModel */
+        $categoryModel = \Gdn::getContainer()->get(\CategoryModel::class);
+        return $categoryModel->getCategoryFieldRecursive($categoryID, $field, $default);
     }
 
     /**
@@ -117,16 +134,36 @@ class BannerImageModel {
      *
      * @return string The URL to the category image. Will be empty if no slug could be found.
      */
-    public static function getCurrentBannerImageLink(): string {
+    public static function getCurrentBannerImageLink(): string
+    {
         $controller = \Gdn::controller();
-        if (!$controller) {
-            $imageSlug = self::getBannerImageSlug(null);
-        } else {
-            $categoryID = $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'));
-            $imageSlug = self::getBannerImageSlug($categoryID);
-        }
+        /** @var SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
+        $currentSection = $siteSectionModel->getCurrentSiteSection();
+        $siteSectionBanner = $currentSection->getBannerImageLink();
+        $siteSectionCategory = $currentSection->getCategoryID();
+        // Use category ID from site section when there is no Category ID or ContextualCategoryID in the controller.
+        $categoryID = $controller
+            ? $controller->data("Category.CategoryID", $controller->data("ContextualCategoryID", $siteSectionCategory))
+            : $siteSectionCategory;
+        $defaultBanner = $siteSectionBanner ?: Gdn::config(BannerImageModel::DEFAULT_CONFIG_KEY);
+        $field = $categoryID ? self::getCategoryField($categoryID, "BannerImage", $defaultBanner) : $defaultBanner;
+        return $field ? \Gdn_Upload::url($field) : $field;
+    }
 
-        return $imageSlug ? \Gdn_Upload::url($imageSlug) : '';
+    /**
+     * Get a fully qualified BannerImage link for the current category.
+     *
+     * @return string The URL to the category image. Will be empty if no slug could be found.
+     */
+    public static function getCurrentBannerIconLink(): ?string
+    {
+        $controller = \Gdn::controller();
+        $categoryID = $controller
+            ? $controller->data("Category.CategoryID", $controller->data("ContextualCategoryID"))
+            : null;
+        $field = self::getCategoryField($categoryID, "Photo", null);
+        return $field ? \Gdn_Upload::url($field) : $field;
     }
 
     /**
@@ -135,8 +172,9 @@ class BannerImageModel {
      * @inheritdoc
      * @deprecated 4.0 getBannerImageSlug
      */
-    public static function getHeroImageSlug($categoryID) {
-        deprecated(__FUNCTION__, 'getBannerImageSlug');
+    public static function getHeroImageSlug($categoryID)
+    {
+        deprecated(__FUNCTION__, "getBannerImageSlug");
         return self::getBannerImageSlug($categoryID);
     }
 
@@ -146,8 +184,9 @@ class BannerImageModel {
      * @return string The URL to the category image. Will be empty if no slug could be found.
      * @deprecated 4.0 getCurrentBannerImageLink
      */
-    public static function getCurrentHeroImageLink() {
-        deprecated(__FUNCTION__, 'getCurrentBannerImageLink');
+    public static function getCurrentHeroImageLink()
+    {
+        deprecated(__FUNCTION__, "getCurrentBannerImageLink");
         return self::getCurrentBannerImageLink();
     }
 }

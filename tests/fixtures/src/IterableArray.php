@@ -10,12 +10,13 @@ namespace VanillaTests\Fixtures;
 /**
  * An array object that is also iterable.
  */
-class IterableArray extends DumbArray implements \IteratorAggregate {
-
+class IterableArray extends DumbArray implements \IteratorAggregate
+{
     /**
      * @inheritDoc
      */
-    public function getIterator() {
+    public function getIterator()
+    {
         return new \ArrayIterator($this->arr);
     }
 }

@@ -4,8 +4,6 @@
  * @license GPL-2.0-only
  */
 
-
-
 .Frame-content .SearchBox {
     .InputBox.BigInput,
     #Form_Search {
@@ -26,10 +24,14 @@
 .Herobanner .SearchBox {
     .InputBox.BigInput,
     #Form_Search {
-
         @include maxWidth {
             background-color: $global-color_bg;
             color: $global-color_white;
         }
     }
+}
+
+.SpSearch:before,
+.AdvancedSearch .Handle.Handle .Arrow:after {
+    color: $global-color_primary;
 }

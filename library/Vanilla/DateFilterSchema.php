@@ -9,61 +9,82 @@ namespace Vanilla;
 use DateTimeImmutable;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
+use Garden\Schema\Validation;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Schema\DateRangeExpression;
+use Vanilla\Schema\LegacyDateRangeExpression;
+use Vanilla\Schema\RangeExpression;
 
 /**
  * Validate and parse a date filter string into an easy-to-use array representation.
  */
-class DateFilterSchema extends Schema {
-
-    const DEFAULT_DESCRIPTION = "This filter receive a string that can take two forms."
-        ."\nA single date that matches '{Operator}{DateTime}' where {Operator} can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to =."
-        ."\nA date range that matches '{Opening}{DateTime},{DateTime}{Closing}' where {Opening} can be '[' or '(' and"
-        ." {Closing} can be ']' or ')'. '[]' are inclusive and '()' are exclusive."
-    ;
-
+class DateFilterSchema extends Schema
+{
+    const DEFAULT_DESCRIPTION =
+        "This filter receive a string that can take two forms." .
+        "\nA single date that matches '{Operator}{DateTime}' where {Operator} can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to =." .
+        "\nA date range that matches '{Opening}{DateTime},{DateTime}{Closing}' where {Opening} can be '[' or '(' and" .
+        " {Closing} can be ']' or ')'. '[]' are inclusive and '()' are exclusive.";
     /** @var array Valid characters for opening an interval-notation range. */
-    private $rangeOpen = ['(', '['];
+    private $rangeOpen = ["(", "["];
 
     /** @var array Valid characters for closing an interval-notation range. */
-    private $rangeClose = [')', ']'];
+    private $rangeClose = [")", "]"];
 
     /** @var array Valid operators for simple date comparisons. */
-    private $simpleOperators = ['=', '>', '<', '>=', '<='];
+    private $simpleOperators = ["=", ">", "<", ">=", "<="];
+
+    /**
+     * @var Schema
+     */
+    private $adapter;
 
     /**
      * Initialize an instance of a new DateFilterSchema class.
      *
      * @param array $extra Additional fields to set on the schema.
      */
-    public function __construct($extra = []) {
+    public function __construct($extra = [])
+    {
         // Use $schema->setDescription() to get rid of the default description.
-        if (isset($extra['description'])) {
-            $extra['description'] .= "\n".self::DEFAULT_DESCRIPTION;
+        if (isset($extra["description"])) {
+            $extra["description"] .= "\n" . self::DEFAULT_DESCRIPTION;
         } else {
-            $extra['description'] = self::DEFAULT_DESCRIPTION;
+            $extra["description"] = self::DEFAULT_DESCRIPTION;
         }
 
-        parent::__construct([
-            'type' => 'object',
-            'properties' => [
-                'operator' => [
-                    'type' => 'string',
-                    'default' => '=',
-                    'enum' => array_merge($this->simpleOperators, ['[]', '[)', '(]', '()'])
+        $this->adapter = LegacyDateRangeExpression::createSchema();
+
+        parent::__construct(
+            [
+                "type" => "object",
+                "properties" => [
+                    "operator" => [
+                        "type" => "string",
+                        "default" => "=",
+                        "enum" => array_merge($this->simpleOperators, ["[]", "[)", "(]", "()"]),
+                    ],
+                    "date" => [
+                        "type" => "array",
+                        "minItems" => 1,
+                        "maxItems" => 2,
+                        "items" => [
+                            "type" => "datetime",
+                        ],
+                    ],
+                    "inclusiveRange" => [
+                        "type" => "array",
+                        "minItems" => 2,
+                        "maxItems" => 2,
+                        "items" => [
+                            "type" => "datetime",
+                        ],
+                    ],
                 ],
-                'date' => [
-                    'type' => 'array',
-                    'minItems' => 1,
-                    'mixItems' => 2,
-                    'items' => [
-                        'type' => 'datetime',
-                    ]
-                ],
-            ],
-        ] + $extra);
+            ] + $extra
+        );
     }
 
     /**
@@ -71,11 +92,12 @@ class DateFilterSchema extends Schema {
      *
      * @return array Returns the schema array.
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
             "type" => "string",
             "format" => "date-filter",
-            "description" => $this->getDescription()
+            "description" => $this->getDescription(),
         ];
     }
 
@@ -88,20 +110,21 @@ class DateFilterSchema extends Schema {
      * @param ValidationField $field
      * @return array|string
      */
-    private function parseRange($dates, $open, $close, ValidationField $field) {
+    private function parseRange($dates, $open, $close, ValidationField $field)
+    {
         // Quick sanity check on the values...
         if (!in_array($open, $this->rangeOpen) || !in_array($close, $this->rangeClose)) {
-            $field->addError('invalid', ['messageCode' => 'Invalid range format in {field}.']);
+            $field->addError("invalid", ["messageCode" => "Invalid range format in {field}."]);
             return Invalid::value();
         } elseif (!is_string($dates)) {
-            $field->addTypeError('string');
+            $field->addTypeError("string");
             return Invalid::value();
         }
 
         // This notation only allows two dates, specifically.
-        $dateArray = explode(',', $dates);
+        $dateArray = explode(",", $dates);
         if (count($dateArray) != 2) {
-            $field->addError('invalid', ['messageCode' => '{field} date filter range must contain 2 datetime values.']);
+            $field->addError("invalid", ["messageCode" => "{field} date filter range must contain 2 datetime values."]);
             return Invalid::value();
         }
 
@@ -114,35 +137,36 @@ class DateFilterSchema extends Schema {
         $dateTimes[] = $this->validateDatetime($dateArray[1], $fakeField);
 
         if (Invalid::isInvalid($dateTimes[0]) || Invalid::isInvalid($dateTimes[1])) {
-            $field->addError('invalid', ['messageCode' => 'Both values in {field} must be datetime.']);
+            $field->addError("invalid", ["messageCode" => "Both values in {field} must be datetime."]);
             return Invalid::value();
         }
 
         // Make sure the ending date isn't greater-than or equal-to the beginning date.
         if ($dateTimes[0] >= $dateTimes[1]) {
-            $field->addError('invalid', ['messageCode' => 'End of {field} range must come after beginning.']);
+            $field->addError("invalid", ["messageCode" => "End of {field} range must come after beginning."]);
             return Invalid::value();
         }
 
         // Adjust the beginning of the range to account for exclusive specifications.
-        if ($open == '(') {
-            if (preg_match('/\d\d:\d\d:\d\d/', $dateArray[0])) {
-                $dateTimes[0] = $dateTimes[0]->modify('+1 second');
+        if ($open == "(") {
+            if (preg_match("/\d\d:\d\d:\d\d/", $dateArray[0])) {
+                $dateTimes[0] = $dateTimes[0]->modify("+1 second");
             } else {
-                $dateTimes[0] = $dateTimes[0]->modify('+1 day');
+                $dateTimes[0] = $dateTimes[0]->modify("+1 day");
             }
         }
 
         // Adjust the closing of the range to account for inclusive and exclusive specifications.
-        if ($close == ']' && !preg_match('/\d\d:\d\d:\d\d/', $dateArray[1])) {
-            $dateTimes[1] = $dateTimes[1]->modify('+1 day')->modify('-1 second');
-        } elseif ($close == ')') {
-            $dateTimes[1] = $dateTimes[1]->modify('-1 second');
+        if ($close == "]" && !preg_match("/\d\d:\d\d:\d\d/", $dateArray[1])) {
+            $dateTimes[1] = $dateTimes[1]->modify("+1 day")->modify("-1 second");
+        } elseif ($close == ")") {
+            $dateTimes[1] = $dateTimes[1]->modify("-1 second");
         }
 
         $result = [
-            'operator' => $open.$close,
-            'date' => $dateTimes,
+            "operator" => $open . $close,
+            "date" => $dateTimes,
+            "inclusiveRange" => $dateTimes,
         ];
         return $result;
     }
@@ -155,14 +179,15 @@ class DateFilterSchema extends Schema {
      * @param ValidationField $field
      * @return array|string
      */
-    private function parseSimple($date, $operator, ValidationField $field) {
-        if ($operator == '') {
-            $operator = '=';
+    private function parseSimple($date, $operator, ValidationField $field)
+    {
+        if ($operator == "") {
+            $operator = "=";
         }
 
         // Sanity check on the parameters...
         if (!is_string($date) || !in_array($operator, $this->simpleOperators)) {
-            $field->addError('invalid', ['messageCode' => 'Invalid operator in {field}.']);
+            $field->addError("invalid", ["messageCode" => "Invalid operator in {field}."]);
             return Invalid::value();
         }
 
@@ -171,30 +196,59 @@ class DateFilterSchema extends Schema {
         }
 
         try {
-            $dateTimes = [new DateTimeImmutable($date)];
+            $dateTime = new DateTimeImmutable($date);
         } catch (\Exception $e) {
-            $field->addTypeError('datetime');
+            $field->addTypeError("datetime");
             return Invalid::value();
         }
 
+        $dateTimes = [$dateTime];
+        $inclusiveRange = [];
+
         // If all we have is a date, give us a range in that date.
-        if (!preg_match('/\d\d:\d\d:\d\d/', $date)) {
+        if (!preg_match("/\d\d:\d\d:\d\d/", $date)) {
             switch ($operator) {
                 case "=":
-                    $dateTimes = [
-                        $dateTimes[0],
-                        $dateTimes[0]->modify('+1 day')->modify('-1 second'),
-                    ];
+                    $dateTimes = [$dateTimes[0], $dateTimes[0]->modify("+1 day")->modify("-1 second")];
+                    $inclusiveRange = $dateTimes;
                     break;
                 case "<=":
-                    $dateTimes = [$dateTimes[0]->modify('+1 day')->modify('-1 second')];
+                    $dateTimes = [self::currentDayEnd($dateTime)];
+                    $inclusiveRange = [self::farPastDate(), self::currentDayEnd($dateTime)];
                     break;
+                case "<":
+                    $inclusiveRange = [self::farPastDate(), self::prevDayEnd($dateTime)];
+                    break;
+                case ">=":
+                    $inclusiveRange = [self::currentDayStart($dateTime), self::farFutureDate()];
+                    break;
+                case ">":
+                    $inclusiveRange = [self::nextDayStart($dateTime), self::farFutureDate()];
+            }
+        } else {
+            switch ($operator) {
+                case "=":
+                    // Very super specific range here.
+                    $inclusiveRange = [$dateTime, $dateTime];
+                    break;
+                case "<=":
+                    $inclusiveRange = [self::farPastDate(), $dateTime];
+                    break;
+                case "<":
+                    $inclusiveRange = [self::farPastDate(), $dateTime->modify("-1 second")];
+                    break;
+                case ">=":
+                    $inclusiveRange = [$dateTime, self::farFutureDate()];
+                    break;
+                case ">":
+                    $inclusiveRange = [$dateTime->modify("+1 second"), self::farFutureDate()];
             }
         }
 
         $result = [
-            'operator' => $operator,
-            'date' => $dateTimes,
+            "operator" => $operator,
+            "date" => $dateTimes,
+            "inclusiveRange" => $inclusiveRange,
         ];
         return $result;
     }
@@ -202,9 +256,17 @@ class DateFilterSchema extends Schema {
     /**
      * {@inheritdoc}
      */
-    public function validate($data, $sparse = false) {
+    public function validate($data, $sparse = false)
+    {
+        if ($data instanceof DateRangeExpression) {
+            return $data;
+        } elseif (is_scalar($data) || is_null($data)) {
+            $valid = $this->adapter->validate($data, $sparse);
+            return $valid;
+        }
+
         $validation = $this->createValidation();
-        $field = new ValidationField($validation, $this->getSchemaArray(), '', $sparse);
+        $field = new ValidationField($validation, $this->getSchemaArray(), "", $sparse);
 
         if (is_string($data)) {
             $data = $this->stringToSchema($data, $field);
@@ -216,18 +278,19 @@ class DateFilterSchema extends Schema {
 
                 if (Invalid::isInvalid($clean) && $field->isValid()) {
                     // This really shouldn't happen, but we want to protect against seeing the invalid object.
-                    $field->addError('invalid', ['messageCode' => '{field} is invalid.', 'status' => 422]);
+                    $field->addError("invalid", ["messageCode" => "{field} is invalid.", "status" => 422]);
                 }
             } else {
-                $field->addError('invalid', ['messageCode' => '{field} is not a valid date filter.']);
+                $field->addError("invalid", ["messageCode" => "{field} is not a valid date filter."]);
             }
         }
 
         if (!$validation->isValid()) {
             throw new ValidationException($field->getValidation());
         }
-
-        return $clean;
+        // Convert the old-school range array into a RangeExpression
+        $r = LegacyDateRangeExpression::createFromLegacyArray($clean);
+        return $r;
     }
 
     /**
@@ -237,11 +300,12 @@ class DateFilterSchema extends Schema {
      * @param ValidationField $field The validation results to add.
      * @return string|false Returns the valid string or **null** if validation fails.
      */
-    private function stringToSchema($value, ValidationField $field) {
+    private function stringToSchema($value, ValidationField $field)
+    {
         $result = Invalid::value();
 
-        $escapedOpen = '['.implode('', array_map('preg_quote', $this->rangeOpen)).']';
-        $escapedClose = '['.implode('', array_map('preg_quote', $this->rangeClose)).']';
+        $escapedOpen = "[" . implode("", array_map("preg_quote", $this->rangeOpen)) . "]";
+        $escapedClose = "[" . implode("", array_map("preg_quote", $this->rangeClose)) . "]";
 
         // Sort the operators so that the matches occur on the longest operators first.
         $sortedSimpleOperators = $this->simpleOperators;
@@ -253,14 +317,16 @@ class DateFilterSchema extends Schema {
             }
             return 0;
         });
-        $simpleOperators = '(?<op>'.implode('|', array_map('preg_quote', $sortedSimpleOperators)).'|)';
+        $simpleOperators = "(?<op>" . implode("|", array_map("preg_quote", $sortedSimpleOperators)) . "|)";
 
-        if (preg_match('/^(?<open>'.$escapedOpen.')(?<date>.+?)(?<close>'.$escapedClose.')$/', $value, $matches)) {
-            $result = $this->parseRange($matches['date'], $matches['open'], $matches['close'], $field);
+        if (
+            preg_match("/^(?<open>" . $escapedOpen . ")(?<date>.+?)(?<close>" . $escapedClose . ')$/', $value, $matches)
+        ) {
+            $result = $this->parseRange($matches["date"], $matches["open"], $matches["close"], $field);
         } elseif (preg_match("/^(?!$escapedOpen)$simpleOperators(?<date>.+)/", $value, $matches)) {
-            $result = $this->parseSimple($matches['date'], $matches['op'], $field);
+            $result = $this->parseSimple($matches["date"], $matches["op"], $field);
         } else {
-            $field->addError('invalid', ['messageCode' => '{field} is not formatted as a valid date filter.']);
+            $field->addError("invalid", ["messageCode" => "{field} is not formatted as a valid date filter."]);
         }
 
         return $result;
@@ -269,33 +335,35 @@ class DateFilterSchema extends Schema {
     /**
      * If the parameter value is a valid date filter value, return an array of query conditions.
      *
-     * @throws Exception
      * @param string $field The name of the field in the filters.
      * @param mixed $dateData The decoded date data.
      * @return array
+     * @throws \InvalidArgumentException Throws an exception when the operator is invalid.
+     * @deprecated Use the `DateRangeExpression` class. It can be passed directly to queries.
      */
-    public static function dateFilterField($field, array $dateData) {
-        $validOperators = ['=', '>', '<', '>=', '<=', '[]', '()', '[)', '(]'];
+    public static function dateFilterField($field, $dateData)
+    {
+        $validOperators = ["=", ">", "<", ">=", "<=", "[]", "()", "[)", "(]"];
         $result = [];
 
-        if (array_key_exists('operator', $dateData) && array_key_exists('date', $dateData) && is_array($dateData['date'])) {
-            $op = $dateData['operator'];
-            $dates = $dateData['date'];
+        if (!empty($dateData["operator"]) && !empty($dateData["date"]) && is_array($dateData["date"])) {
+            $op = $dateData["operator"];
+            $dates = $dateData["date"];
 
             if (in_array($op, $validOperators)) {
                 switch ($op) {
-                    case '>':
-                    case '<':
-                    case '>=':
-                    case '<=':
+                    case ">":
+                    case "<":
+                    case ">=":
+                    case "<=":
                         if ($dates[0] instanceof DateTimeImmutable) {
                             $result = ["{$field} {$op}" => $dates[0]];
                         }
                         break;
-                    case '[]':
-                    case '()':
-                    case '[)':
-                    case '(]':
+                    case "[]":
+                    case "()":
+                    case "[)":
+                    case "(]":
                         // DateFilterSchema has already taken care of any inclusive/exclusive range adjustments
                         // so we can always use >= and <=
                         $result = [
@@ -303,7 +371,7 @@ class DateFilterSchema extends Schema {
                             "{$field} <=" => $dates[1],
                         ];
                         break;
-                    case '=':
+                    case "=":
                         if (count($dates) === 1) {
                             $result = ["{$field}" => $dates[0]];
                         } else {
@@ -316,9 +384,75 @@ class DateFilterSchema extends Schema {
                 }
             }
         } else {
-            throw new Exception('Invalid data supplied to dateFilterField');
+            throw new \InvalidArgumentException("Invalid data supplied to dateFilterField");
         }
 
         return $result;
+    }
+
+    // Some small utiltiies
+
+    /**
+     * Get the furthest possible future date PHP can contain.
+     *
+     * @return DateTimeImmutable
+     */
+    public static function farFutureDate(): DateTimeImmutable
+    {
+        return new DateTimeImmutable("Jan 1 2300");
+    }
+
+    /**
+     * Get the furthest possible past date PHP can contain.
+     *
+     * @return DateTimeImmutable
+     */
+    public static function farPastDate(): DateTimeImmutable
+    {
+        return new DateTimeImmutable("@0");
+    }
+
+    /**
+     * Adjust the date to the first second of the next day.
+     *
+     * @param DateTimeImmutable $date
+     * @return DateTimeImmutable
+     */
+    private static function nextDayStart(DateTimeImmutable $date): DateTimeImmutable
+    {
+        return self::currentDayStart($date)->modify("+1 day");
+    }
+
+    /**
+     * Adjust the date to the last second of the previous day.
+     *
+     * @param DateTimeImmutable $date
+     * @return DateTimeImmutable
+     */
+    private static function prevDayEnd(DateTimeImmutable $date): DateTimeImmutable
+    {
+        return self::currentDayEnd($date)->modify("-1 day");
+    }
+
+    /**
+     * Adjust the date to the first second of the day.
+     *
+     * @param DateTimeImmutable $date
+     * @return DateTimeImmutable
+     */
+    private static function currentDayStart(DateTimeImmutable $date): DateTimeImmutable
+    {
+        return $date->setTime(0, 0, 0);
+    }
+
+    /**
+     * Adjust the date to the last second of the day.
+     *
+     * @param DateTimeImmutable $date
+     * @return DateTimeImmutable
+     */
+    private static function currentDayEnd(DateTimeImmutable $date): DateTimeImmutable
+    {
+        return $date->setTime(23, 59, 59);
     }
 }

@@ -11,15 +11,16 @@
 /**
  * Renders a list of people in the specified conversation.
  */
-class InThisConversationModule extends Gdn_Module {
-
+class InThisConversationModule extends Gdn_Module
+{
     /**
      * Where to render by default.
      *
      * @return string
      */
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
     /**
@@ -27,12 +28,13 @@ class InThisConversationModule extends Gdn_Module {
      *
      * @return string HTML.
      */
-    public function toString() {
+    public function toString()
+    {
         // Verify any participants exist before outputting anything.
-        if (count($this->data('Participants'))) {
+        if (count($this->data("Participants"))) {
             return parent::toString();
         }
 
-        return '';
+        return "";
     }
 }

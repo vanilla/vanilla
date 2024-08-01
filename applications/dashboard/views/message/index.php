@@ -2,7 +2,7 @@
 $Session = Gdn::session();
 $desc = t('Messages can appear anywhere in your application.', 'Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.');
 helpAsset(sprintf(t('About %s'), t('Messages')), $desc);
-helpAsset(t('Need More Help?'), anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'));
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on managing appearance"), 'https://success.vanillaforums.com/kb/articles/465-moderation-messaging-video'));
 echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'js-modal btn btn-primary');
 ?>
 <?php if ($this->MessageData->numRows() > 0) { ?>
@@ -27,10 +27,10 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                     printf(
                         t('%1$s on %2$s'),
                         val($Message->AssetTarget, $this->_GetAssetData(), 'Custom Location'),
-                        val($Message->Location, $this->_GetLocationData(), 'Custom Page')
+                        $Message->LayoutViewType ?? 'Custom Page'
                     );
 
-                    if (val('CategoryID', $Message) && $Category = CategoryModel::categories($Message->CategoryID)) {
+                    if (val('RecordID', $Message) && $Category = CategoryModel::categories($Message->RecordID)) {
                         echo '<div>'.
                             anchor($Category['Name'], categoryUrl($Category));
 
@@ -51,18 +51,19 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                 </td>
                 <td class="message-type">
                     <?php
-                    $cssClass = val('CssClass', $Message);
-                    switch ($cssClass) {
-                        case 'CasualMessage':
+                    $messageType = val('Type', $Message) ?? 'casual';
+                    $Message->CssClass = ucfirst($messageType)."Message";
+                    switch ($messageType) {
+                        case 'casual':
                             $type =  t('Casual');
                             break;
-                        case 'InfoMessage':
+                        case 'info':
                             $type = t('Information');
                             break;
-                        case 'AlertMessage':
+                        case 'alert':
                             $type = t('Alert');
                             break;
-                        case 'WarningMessage':
+                        case 'warning':
                             $type = t('Warning');
                             break;
                         default:

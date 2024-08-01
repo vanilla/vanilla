@@ -8,16 +8,16 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
-use Vanilla\Adapters\SphinxClient;
-use Vanilla\Adapters\SphinxClient as SphinxAdapter;
+use Vanilla\ApiUtils;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
 use Vanilla\DateFilterSchema;
-use Vanilla\Sphinx\Search\SphinxSearchQuery;
+use Vanilla\Models\CrawlableRecordSchema;
 
 /**
  * Search type for global parameters.
  */
-class GlobalSearchType extends AbstractSearchType {
-
+class GlobalSearchType extends AbstractSearchType
+{
     /** @var \UserModel */
     private $userModel;
 
@@ -26,143 +26,157 @@ class GlobalSearchType extends AbstractSearchType {
      *
      * @param \UserModel $userModel
      */
-    public function __construct(\UserModel $userModel) {
+    public function __construct(\UserModel $userModel)
+    {
         $this->userModel = $userModel;
     }
 
     /**
      * @inheritdoc
      */
-    public function getKey(): string {
-        return 'global';
+    public function getKey(): string
+    {
+        return "global";
     }
 
     /**
      * @inheritdoc
      */
-    public function getSearchGroup(): string {
-        return 'global';
+    public function getRecordType(): string
+    {
+        return "global";
     }
 
     /**
      * @inheritdoc
      */
-    public function getType(): string {
-        return 'global';
+    public function getType(): string
+    {
+        return "global";
     }
 
     /**
      * @inheritdoc
      */
-    public function getResultItems(array $recordIDs): array {
+    public function getResultItems(array $recordIDs, SearchQuery $query): array
+    {
         return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function applyToQuery(SearchQuery $query) {
+    public function applyToQuery(SearchQuery $query)
+    {
         ///
         /// Prepare data from the query.
         ///
-        $allTextQuery = $query->getQueryParameter('query');
-        $name = $query->getQueryParameter('name');
-        $insertUserIDs = $query->getQueryParameter('insertUserIDs', false);
-        $insertUserNames = $query->getQueryParameter('insertUserNames', false);
+        $insertUserIDs = $query->getQueryParameter("insertUserIDs", false);
+        $insertUserNames = $query->getQueryParameter("insertUserNames", false);
         if (!$insertUserIDs && $insertUserNames) {
-            $users = $this->userModel->getWhere([
-                'name' => $insertUserNames,
-            ])->resultArray();
-            $insertUserIDs = array_column($users, 'UserID');
+            $users = $this->userModel
+                ->getWhere([
+                    "name" => $insertUserNames,
+                ])
+                ->resultArray();
+            $insertUserIDs = array_column($users, "UserID");
+            $insertUserIDs[] = 0;
         }
-        $dateInserted = $query->getQueryParameter('dateInserted');
-
-        /** @var $startDate \DateTimeImmutable|null */
-        $startDate = $dateInserted['date'][0] ?? null;
-
-        /** @var $endDate \DateTimeImmutable|null */
-        $endDate = $dateInserted['date'][1] ?? null;
-
-
-        $sort = $query->getQueryParameter('sort', 'relevance');
 
         ///
         /// Apply the query.
         ///
+        ///
 
-        if ($name) {
-            $query->whereText($name, ['name']);
+        // Global query
+        if ($dateInserted = $query->getQueryParameter("dateInserted")) {
+            $query->setDateFilterSchema("dateInserted", $dateInserted);
         }
 
-        if ($allTextQuery) {
-            $query->whereText($allTextQuery);
+        $locale = $query->getQueryParameter("locale");
+        if ($locale) {
+            $query->setFilter(
+                "locale",
+                [$locale, strtolower($locale), CrawlableRecordSchema::ALL_LOCALES],
+                false,
+                SearchQuery::FILTER_OP_OR,
+                false
+            );
         }
 
+        // Site specific query.
         if ($insertUserIDs) {
-            $query->setFilter('insertUserID', $insertUserIDs);
+            $query->setFilter("insertUserID", $insertUserIDs);
         }
 
-        if ($query instanceof SphinxSearchQuery) {
-            if ($startDate && $endDate) {
-                $query->setFilterRange('dateInserted', $startDate->getTimestamp(), $endDate->getTimestamp());
-            }
+        // Sorts
+        $sort = $query->getQueryParameter("sort", "relevance");
+        $sortField = ltrim($sort, "-");
 
-            // Sorts
-            $sortField = ltrim($sort, '-');
-
-            if ($sortField === SearchQuery::SORT_RELEVANCE) {
-                $query->setSort(SearchQuery::SORT_RELEVANCE);
-            } elseif ($sortField === $sort) {
-                $query->setSort(SphinxAdapter::SORT_ATTR_ASC, $sortField);
-            } else {
-                $query->setSort(SphinxAdapter::SORT_ATTR_DESC, $sortField);
-            }
+        if ($sortField === SearchQuery::SORT_RELEVANCE) {
+            $query->setSort(SearchQuery::SORT_RELEVANCE);
+        } elseif ($sortField === $sort) {
+            $query->setSort(SearchQuery::SORT_ASC, $sortField);
         } else {
-            // TODO implement for mysql.
+            $query->setSort(SearchQuery::SORT_DESC, $sortField);
         }
     }
 
     /**
      * @inheritdoc
      */
-    public function getSorts(): array {
+    public function getSorts(): array
+    {
         return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function getQuerySchema(): Schema {
+    public function getQuerySchema(): Schema
+    {
         return Schema::parse([
-            'query:s?' => [
-                'x-search-scope' => true,
+            "query:s?" => [
+                "x-search-scope" => true,
             ],
-            'name:s?' => [
-                'x-search-scope' => true,
+            "queryOperator:s?" => [
+                "x-search-filter" => true,
             ],
-            'insertUserIDs:a?' => [
-                'items' => [
-                    'type' => 'integer',
+            "siteSectionID:s?",
+            "name:s?" => [
+                "x-search-scope" => true,
+            ],
+            "categoryIDs:a?" => [
+                "items" => [
+                    "type" => "integer",
                 ],
-                'style' => 'form',
-                'x-search-filter' => true,
             ],
-            'insertUserNames:a?' => [
-                'items' => [
-                    'type' => 'string',
+            "insertUserIDs:a?" => [
+                "items" => [
+                    "type" => "integer",
                 ],
-                'style' => 'form',
-                'x-search-filter' => true,
+                "style" => "form",
+                "x-search-filter" => true,
             ],
-            'dateInserted?' => new DateFilterSchema([
-                'x-search-filter' => true,
+            "insertUserNames:a?" => [
+                "items" => [
+                    "type" => "string",
+                ],
+                "style" => "form",
+                "x-search-filter" => true,
+            ],
+            "dateInserted?" => new DateFilterSchema([
+                "x-search-filter" => true,
             ]),
+            "driver?" => [
+                "enum" => $this->searchService->getDriverNames(),
+            ],
             "sort:s?" => [
-                "enum" => [
-                    "relevance",
-                    "dateInserted",
-                    "-dateInserted",
-                ],
+                "enum" => ["relevance", "dateInserted", "-dateInserted"],
+            ],
+            "locale:s?" => [
+                "description" => "The locale articles are published in.",
+                "x-search-scope" => true,
             ],
         ]);
     }
@@ -170,7 +184,40 @@ class GlobalSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function validateQuery(SearchQuery $query): void {
+    public function validateQuery(SearchQuery $query): void
+    {
         return;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSingularLabel(): string
+    {
+        return "";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPluralLabel(): string
+    {
+        return "";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDTypes(): ?array
+    {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function guidToRecordID(int $guid): ?int
+    {
+        return null;
     }
 }

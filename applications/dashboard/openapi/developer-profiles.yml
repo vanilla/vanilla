@@ -1,0 +1,167 @@
+openapi: 3.0.2
+info:
+paths:
+    /developer-profiles:
+        x-hidden: true
+        get:
+            summary: List developer profiles.
+            tags:
+                - Developer Profiles
+            parameters:
+                - $ref: "./parameters.yml#/components/parameters/Page"
+                - description: |
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 500
+                      minimum: 1
+                - name: sort
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - dateRecorded
+                          - -dateRecorded
+                          - requestElapsedMs
+                          - - requestElapsedMs
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/DeveloperProfile"
+                "400":
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "./responses.yml#/components/schemas/BasicError"
+    /developer-profiles/{id}:
+        x-hidden: true
+        parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                  type: integer
+        get:
+            summary: Get a profile by its ID.
+            tags:
+                - Developer Profiles
+            responses:
+                "200":
+                    $ref: "#/components/responses/DeveloperProfileDetailsResponse"
+                "404":
+                    $ref: "./responses.yml#/components/responses/NotFound"
+        patch:
+            summary: Update a profile.
+            tags:
+                - Developer Profiles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DeveloperProfilePatch"
+            responses:
+                "200":
+                    $ref: "#/components/responses/DeveloperProfileDetailsResponse"
+                "403":
+                    $ref: "./responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "./responses.yml#/components/responses/NotFound"
+components:
+    responses:
+        DeveloperProfileDetailsResponse:
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/DeveloperProfileDetails"
+    schemas:
+        DeveloperProfile:
+            x-hidden: true
+            type: object
+            properties:
+                developerProfileID:
+                    description: Unique numeric ID of a profile.
+                    type: string
+                name:
+                    description: Name of profile
+                    type: string
+                isTracked:
+                    description: True if the profile is marked for tracking.
+                    type: boolean
+                    default: false
+                requestElapsedMs:
+                    description: Time elapsed in milliseconds for the request.
+                    type: integer
+                requestPath:
+                    description: Path of the request.
+                    type: string
+                requestMethod:
+                    description: Method of the request.
+                    type: string
+                requestQuery:
+                    description: Query of the request.
+                    type: object
+                requestID:
+                    description: Unique ID of the request. This will be a rayID in production.
+                    type: string
+        DeveloperProfileDetails:
+            x-hidden: true
+            type: object
+            properties:
+                developerProfileID:
+                    description: Unique numeric ID of a profile.
+                    type: string
+                name:
+                    description: Name of profile
+                    type: string
+                isTracked:
+                    description: True if the profile is marked for tracking.
+                    type: boolean
+                    default: false
+                requestElapsedMs:
+                    description: Time elapsed in milliseconds for the request.
+                    type: integer
+                requestPath:
+                    description: Path of the request.
+                    type: string
+                requestMethod:
+                    description: Method of the request.
+                    type: string
+                requestQuery:
+                    description: Query of the request.
+                    type: object
+                requestID:
+                    description: Unique ID of the request. This will be a rayID in production.
+                    type: string
+                timers:
+                    description: Aggregate timers for the profile.
+                    type: object
+                profile:
+                    description: Profile of the request.
+                    type: object
+                    properties:
+                        spans:
+                            description: Time Spans of the object keyed by ID.
+                            type: object
+                        rootSpanUUID:
+                            type: string
+        DeveloperProfilePatch:
+            x-hidden: true
+            type: object
+            properties:
+                name:
+                    description: Name of profile
+                    type: string
+                isTracked:
+                    description: True if the profile is marked for tracking.
+                    type: boolean
+                    default: false

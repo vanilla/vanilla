@@ -6,25 +6,41 @@
 
 namespace Vanilla\Database\Operation;
 
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\Operation;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Database operation processor for including current date fields.
  */
-class CurrentDateFieldProcessor implements Processor {
+class CurrentDateFieldProcessor implements Processor
+{
+    private array $insertFields;
+    private array $updateFields;
+    private bool $precise;
 
-    /** @var array */
-    private $insertFields = ["DateInserted"];
-
-    /** @var array */
-    private $updateFields = ["DateUpdated"];
+    /**
+     * @param array|string[] $insertFields
+     * @param array|string[] $updateFields
+     * @param bool $precise Use microsecond date precision.
+     */
+    public function __construct(
+        array $insertFields = ["DateInserted"],
+        array $updateFields = ["DateUpdated"],
+        bool $precise = false
+    ) {
+        $this->insertFields = $insertFields;
+        $this->updateFields = $updateFields;
+        $this->precise = $precise;
+    }
 
     /**
      * Get the list of fields to be populated with the current user ID when adding a new row.
      *
      * @return array
      */
-    public function getInsertFields(): array {
+    public function getInsertFields(): array
+    {
         return $this->insertFields;
     }
 
@@ -33,19 +49,33 @@ class CurrentDateFieldProcessor implements Processor {
      *
      * @return array
      */
-    public function getUpdateFields(): array {
+    public function getUpdateFields(): array
+    {
         return $this->updateFields;
+    }
+
+    /**
+     * Camel case the default fields.
+     *
+     * @return $this
+     */
+    public function camelCase(): self
+    {
+        $this->insertFields = array_map("lcfirst", $this->insertFields);
+        $this->updateFields = array_map("lcfirst", $this->updateFields);
+        return $this;
     }
 
     /**
      * Add current date to write operations.
      *
-     * @param Operation $databaseOperation
+     * @param Operation $operation
      * @param callable $stack
      * @return mixed
      */
-    public function handle(Operation $databaseOperation, callable $stack) {
-        switch ($databaseOperation->getType()) {
+    public function handle(Operation $operation, callable $stack)
+    {
+        switch ($operation->getType()) {
             case Operation::TYPE_INSERT:
                 $fields = $this->getInsertFields();
                 break;
@@ -54,25 +84,32 @@ class CurrentDateFieldProcessor implements Processor {
                 break;
             default:
                 // Nothing to do here. Shortcut return.
-                return $stack($databaseOperation);
+                return $stack($operation);
         }
 
         foreach ($fields as $field) {
-            $fieldExists = $databaseOperation->getCaller()->getWriteSchema()->getField("properties.{$field}");
+            $fieldExists = $operation
+                ->getCaller()
+                ->getWriteSchema()
+                ->getField("properties.{$field}");
             if ($fieldExists) {
-                $set = $databaseOperation->getSet();
-                if (empty($set[$field] ?? null) || $databaseOperation->getMode() === Operation::MODE_DEFAULT) {
-                    $set[$field] = date("Y-m-d H:i:s");
+                $set = $operation->getSet();
+                if (empty($set[$field] ?? null) || $operation->getMode() === Operation::MODE_DEFAULT) {
+                    $set[$field] = CurrentTimeStamp::getMySQL($this->precise);
                 } else {
                     if ($set[$field] instanceof \DateTimeImmutable) {
-                        $set[$field] = $set[$field]->format("Y-m-d H:i:s");
+                        $set[$field] = $set[$field]->format(
+                            $this->precise
+                                ? CurrentTimeStamp::MYSQL_DATE_FORMAT_PRECISE
+                                : CurrentTimeStamp::MYSQL_DATE_FORMAT
+                        );
                     }
                 }
-                $databaseOperation->setSet($set);
+                $operation->setSet($set);
             }
         }
 
-        return $stack($databaseOperation);
+        return $stack($operation);
     }
 
     /**
@@ -81,7 +118,8 @@ class CurrentDateFieldProcessor implements Processor {
      * @param array $insertFields
      * @return self
      */
-    public function setInsertFields(array $insertFields): self {
+    public function setInsertFields(array $insertFields): self
+    {
         $this->insertFields = $insertFields;
         return $this;
     }
@@ -92,7 +130,8 @@ class CurrentDateFieldProcessor implements Processor {
      * @param array $updateFields
      * @return self
      */
-    public function setUpdateFields(array $updateFields): self {
+    public function setUpdateFields(array $updateFields): self
+    {
         $this->updateFields = $updateFields;
         return $this;
     }

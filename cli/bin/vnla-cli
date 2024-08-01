@@ -1,0 +1,49 @@
+#!/usr/bin/env php
+<?php
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Vanilla\Cli\Cloud\VanillaCloudCli;
+use Vanilla\Cli\Utils\SimpleScriptLogger;
+use Vanilla\Cli\VanillaCli;
+
+umask(0);
+
+// Throw errors as exceptions.
+set_error_handler(static function(
+    int $code,
+    string $message,
+    string $filename = 'unknown',
+    int $line = -1
+) {
+    throw new ErrorException($message, $code, 1, $filename, $line);
+}, E_ALL);
+
+$originalCwd = getcwd();
+$root = realpath(__DIR__ . "/../../");
+
+    define('PATH_ROOT', $root);
+    $paths = [
+        __DIR__ . '/../../environment.php',
+    ];
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
+            require_once $path;
+            break;
+        }
+    }
+
+    $main = new VanillaCli();
+try {
+    $main->run();
+} catch (\Throwable $t) {
+    /** Restore the original CWD. */
+    system("cd {$originalCwd}");
+    $exitCode = $t->getCode() === 0 ? 1 : $t->getCode();
+    $main->renderThrowable($t, new ConsoleOutput());
+}
+

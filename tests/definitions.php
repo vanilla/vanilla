@@ -6,8 +6,9 @@
  */
 
 // Define some constants to help with testing.
-define('APPLICATION', 'Vanilla Tests');
-define('PATH_ROOT', realpath(__DIR__.'/..'));
-define('PATH_UPLOADS', PATH_ROOT . '/tests/cache/uploads');
-
+define("APPLICATION", "Vanilla Tests");
+define("PATH_ROOT", realpath(__DIR__ . "/.."));
+define("PATH_UPLOADS", PATH_ROOT . "/tests/cache/uploads");
 define("PATH_FIXTURES", PATH_ROOT . DIRECTORY_SEPARATOR . "tests" . DIRECTORY_SEPARATOR . "fixtures");
+define("PATH_TEST_CACHE", PATH_ROOT . "/tests/cache");
+define("PATH_CACHE", PATH_TEST_CACHE);

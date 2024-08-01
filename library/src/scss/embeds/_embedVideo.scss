@@ -3,6 +3,8 @@
  * @license GPL-2.0-only
  */
 
+@use "sass:math";
+
 $richEditor-videoPlayIcon_width: 80px !default;
 $embedVideo_width: $embed_width;
 
@@ -11,7 +13,7 @@ $embedVideo_width: $embed_width;
     .embedExternal-content {
         position: relative;
         display: block;
-        width: $embedVideo_width;
+        width: 100%;
         max-width: 100%;
         margin: auto;
 
@@ -24,7 +26,8 @@ $embedVideo_width: $embed_width;
     }
 }
 
-.richEditor { // No hover in edit mode
+.richEditor {
+    // No hover in edit mode
     .embedVideo {
         .embedExternal-content {
             &:focus,
@@ -47,14 +50,6 @@ $embedVideo_width: $embed_width;
     background-color: black;
 }
 
-.embedVideo-scrim {
-    $bg: rgba(#000, 0.4);
-    content: "";
-    display: block;
-    @include absolute-fullSizeOfParent;
-    background: linear-gradient(to bottom, $bg, $bg);
-}
-
 .embedVideo-ratio {
     position: relative;
     display: block;
@@ -65,18 +60,18 @@ $embedVideo_width: $embed_width;
         left: 0;
         right: 0;
         bottom: 0;
-    };
+    }
 
     &.is21by9 {
-        padding-top: #{(9/21*100%)};
+        padding-top: #{(math.div(9, 21) * 100%)};
     }
 
     &.is16by9 {
-        padding-top: #{(9/16*100%)};
+        padding-top: #{(math.div(9, 16) * 100%)};
     }
 
     &.is4by3 {
-        padding-top: #{(3/4*100%)};
+        padding-top: #{(3 * 0.25 * 100%)};
     }
 
     &.is1by1 {
@@ -91,7 +86,7 @@ $embedVideo_width: $embed_width;
     border: none;
 }
 
-.embedVideo-playIcon {
+.embedVideo-playIconWrap {
     position: absolute;
     top: 0;
     left: 0;
@@ -100,6 +95,13 @@ $embedVideo_width: $embed_width;
     margin: auto;
     width: $richEditor-videoPlayIcon_width;
     height: $richEditor-videoPlayIcon_width;
+    $bg: rgba(#000, 0.4);
+    display: block;
+    background: linear-gradient(to bottom, $bg, $bg);
+    border-radius: 50%;
+}
+
+.embedVideo-playIcon {
     color: white;
 }
 

@@ -1,22 +1,29 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 export interface IUserFragment {
     userID: number;
     name: string;
+    url?: string;
     photoUrl: string;
     dateLastActive: string | null;
-    label?: string | null;
+    label?: string;
+    title?: string;
+    banned?: number;
+    private?: boolean;
+    email?: string;
 }
 
 export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}
 
 export interface IMe extends IUserFragment {
-    permissions: string[];
     countUnreadNotifications: number;
-    isAdmin: boolean;
+    countUnreadConversations: number;
+    isAdmin?: boolean;
+    emailConfirmed?: boolean;
+    suggestAnswers?: boolean;
 }
 
 export interface ICount {
@@ -27,27 +34,49 @@ export interface ICount {
 export type IMeCounts = ICount[];
 
 export interface IUserRoles {
-    roles: [
-        {
-            roleID: number;
-            name: string;
-        },
-    ];
+    roles: Array<{
+        roleID: number;
+        name: string;
+    }>;
 }
 
 export interface IUser extends IUserFragment, IUserRoles {
-    email: string;
+    email?: string;
     emailConfirmed: boolean;
     showEmail: boolean;
     bypassSpam: boolean;
+    admin: number;
+    isAdmin: boolean;
+    isSysAdmin: boolean;
+    isSuperAdmin: boolean;
     banned: number;
     dateInserted: string;
-    dateUpdated: string | null;
+    dateUpdated?: string;
     hidden: boolean;
+    title?: string;
     rankID?: number | null;
     rank?: {
         rankID: number;
         name: string;
         userTitle: string;
     };
+    label?: string;
+    countDiscussions: number;
+    countComments: number;
+    countPosts: number;
+    private: boolean;
+    profileFields?: {};
+    hashMethod?: string;
+    lastIPAddress?: string;
+    insertIPAddress?: string;
+    points?: number;
+    suggestAnswers?: boolean;
+    pendingEmail?: string;
+}
+
+export interface IInvitees {
+    dateInserted?: string;
+    email?: string;
+    insertUserID?: number;
+    userID?: number;
 }

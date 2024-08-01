@@ -10,13 +10,12 @@ import Loader from "@library/loaders/Loader";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { useReduxActions } from "@library/redux/ReduxActions";
 import ThemeActions from "@library/theming/ThemeActions";
-import { prepareShadowRoot } from "@vanilla/dom-utils";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { loadThemeFonts } from "./loadThemeFonts";
 import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
 import { BrowserRouter } from "react-router-dom";
-import { useThemeCacheID } from "@library/styles/styleUtils";
+import { useThemeCacheID } from "@library/styles/themeCache";
+import { logError } from "@vanilla/utils";
 
 interface IProps {
     children: React.ReactNode;
@@ -48,27 +47,24 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
         }
 
         if (assets.status === LoadStatus.PENDING) {
-            void getAssets(themeKey, revisionID);
+            try {
+                if (process.env.NODE_ENV !== "test") {
+                    return;
+                }
+                void getAssets(themeKey, revisionID);
+            } catch (error) {
+                logError("Failed to load theme", error);
+            }
             return;
         }
 
         if (assets.data && !hasMounted) {
             hasMounted = true;
-            let themeHeader = document.getElementById("themeHeader");
-            const themeFooter = document.getElementById("themeFooter");
-
+            const themeHeader = document.getElementById("themeHeader");
             if (themeHeader) {
-                themeHeader = prepareShadowRoot(themeHeader, true);
-
                 // Apply the theme's header height to offset our panel layouts.
                 setTopOffset(themeHeader.getBoundingClientRect().height);
             }
-
-            if (themeFooter) {
-                prepareShadowRoot(themeFooter, true);
-            }
-
-            loadThemeFonts();
 
             if (variablesOnly) {
                 return;

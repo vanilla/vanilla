@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for concatSep().
  */
-class ConcatSepTest extends TestCase {
-
+class ConcatSepTest extends TestCase
+{
     /**
      * Test {@link concatSep()} against several scenarios.
      *
@@ -25,7 +25,8 @@ class ConcatSepTest extends TestCase {
      *  -$testStr2 can actually be an array. If it is a string, the function will look for further parameters.
      * @dataProvider provideConcatSepArrays
      */
-    public function testConcatSep(string $expected, string $testSep, ...$args) {
+    public function testConcatSep(string $expected, string $testSep, ...$args)
+    {
         $actual = concatSep($testSep, ...$args);
         $this->assertSame($expected, $actual);
     }
@@ -35,41 +36,14 @@ class ConcatSepTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideConcatSepArrays() {
+    public function provideConcatSepArrays()
+    {
         $r = [
-
-            'concatTwoStrings' => [
-                'str1+str2',
-                '+',
-                'str1',
-                'str2',
-            ],
-            'concatOneStrAndOneArray' => [
-                'str1+str2+str3',
-                '+',
-                'str1',
-                ['str2', 'str3'],
-            ],
-            'concatThreeStrings' => [
-                'str1+str2+str3',
-                '+',
-                'str1',
-                'str2',
-                'str3',
-            ],
-            'concatStringArrayString' => [
-                'str1+str2+str3',
-                '+',
-                'str1',
-                ['str2', 'str3'],
-                'str4',
-            ],
-            'oneEmptyString' => [
-                'str2',
-                '+',
-                '',
-                'str2',
-            ],
+            "concatTwoStrings" => ["str1+str2", "+", "str1", "str2"],
+            "concatOneStrAndOneArray" => ["str1+str2+str3", "+", "str1", ["str2", "str3"]],
+            "concatThreeStrings" => ["str1+str2+str3", "+", "str1", "str2", "str3"],
+            "concatStringArrayString" => ["str1+str2+str3", "+", "str1", ["str2", "str3"], "str4"],
+            "oneEmptyString" => ["str2", "+", "", "str2"],
         ];
 
         return $r;

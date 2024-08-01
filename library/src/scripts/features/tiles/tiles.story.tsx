@@ -3,14 +3,9 @@
  * @license GPL-2.0-only
  */
 
-import { StoryContent } from "@library/storybook/StoryContent";
-import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
-import React, { useState } from "react";
-import Tiles, { TileAlignment } from "./Tiles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import Container from "@library/layout/components/Container";
 import { storyWithConfig } from "@library/storybook/StoryContext";
+import { TileAlignment } from "./TileAlignment";
+import Tiles from "./Tiles";
 
 export default {
     title: "Widgets",
@@ -96,7 +91,7 @@ export const Tiles4Columns = storyWithConfig(
     },
 );
 
-export const Tiles4ColumnsLeftAligned = storyWithConfig(
+export const Tiles4ColumnLeftAligned = storyWithConfig(
     {
         themeVars: {
             tiles: {

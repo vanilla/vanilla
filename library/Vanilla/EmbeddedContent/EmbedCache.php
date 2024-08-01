@@ -11,8 +11,8 @@ use Gdn_Cache;
 /**
  * Cache management for embeds.
  */
-class EmbedCache {
-
+class EmbedCache
+{
     /** Page info caching expiry (24 hours). */
     const CACHE_EXPIRY = 24 * 60 * 60;
 
@@ -24,7 +24,8 @@ class EmbedCache {
      *
      * @param Gdn_Cache $cache
      */
-    public function __construct(Gdn_Cache $cache) {
+    public function __construct(Gdn_Cache $cache)
+    {
         $this->cache = $cache;
     }
 
@@ -33,7 +34,8 @@ class EmbedCache {
      *
      * @param AbstractEmbed $embed The embed instance.
      */
-    public function cacheEmbed(AbstractEmbed $embed) {
+    public function cacheEmbed(AbstractEmbed $embed)
+    {
         $cacheKey = $this->cacheKeyForUrl($embed->getUrl());
         $this->cache->store($cacheKey, $embed, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_EXPIRY]);
     }
@@ -45,8 +47,9 @@ class EmbedCache {
      *
      * @return AbstractEmbed|null
      */
-    public function getCachedEmbed(string $url): ?AbstractEmbed {
-        $cacheKey =  $this->cacheKeyForUrl($url);
+    public function getCachedEmbed(string $url): ?AbstractEmbed
+    {
+        $cacheKey = $this->cacheKeyForUrl($url);
         $cachedData = $this->cache->get($cacheKey);
         if ($cachedData instanceof AbstractEmbed) {
             return $cachedData;
@@ -61,7 +64,8 @@ class EmbedCache {
      * @param string $url
      * @return string
      */
-    private function cacheKeyForUrl(string $url): string {
-        return 'EmbedService.'.md5($url);
+    private function cacheKeyForUrl(string $url): string
+    {
+        return "EmbedService." . md5($url);
     }
 }

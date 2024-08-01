@@ -7,14 +7,31 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
+use Garden\Sites\Exceptions\SiteNotFoundException;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
+use Vanilla\InjectableInterface;
 
 /**
- *
+ * Base search driver class.
  */
-abstract class AbstractSearchDriver {
+abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, InjectableInterface
+{
+    /** @var AbstractSearchType[] */
+    protected $searchTypesByType = [];
 
     /** @var AbstractSearchType[] */
-    private $searchTypes = [];
+    protected $searchTypesByDtype = [];
+
+    /** @var VanillaSiteProvider */
+    private $siteProvider;
+
+    /**
+     * @param VanillaSiteProvider $siteProvider
+     */
+    public function setDependencies(VanillaSiteProvider $siteProvider)
+    {
+        $this->siteProvider = $siteProvider;
+    }
 
     /**
      * Perform a query.
@@ -27,35 +44,64 @@ abstract class AbstractSearchDriver {
     abstract public function search(array $queryData, SearchOptions $options): SearchResults;
 
     /**
+     * Get a displayable name for the driver.
+     *
+     * @return string
+     */
+    abstract public function getName(): string;
+
+    /**
+     * Determine if the driver supports siteIDs on records.
+     *
+     * @return bool
+     */
+    public function supportsForeignRecords(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Return short form of search driver name
+     *
+     * @return string
+     */
+    public function driver(): string
+    {
+        return "";
+    }
+
+    /**
      * Get the schema for a query.
      *
      * @return Schema
      */
-    public function buildQuerySchema(): Schema {
-        $querySchema = new Schema();
-        foreach ($this->searchTypes as $searchType) {
-            $querySchema = $querySchema->merge($searchType->getQuerySchema());
-        }
-        return $querySchema;
+    public function buildQuerySchema(): Schema
+    {
+        return SearchQuery::buildSchema($this->getSearchTypes());
     }
 
     /**
      * Take a set of records that were returned and convert them into result items.
      *
      * @param array[] $records An array of records to be converted. They MUST HAVE recordID and type (mapping to a SearchTypeInterface::getType()).
+     * @param SearchQuery $query The query being searched.
      *
      * @return SearchResultItem[]
      * @internal Exposed for testing only.
      */
-    public function convertRecordsToResultItems(array $records): array {
+    public function convertRecordsToResultItems(array $records, SearchQuery $query): array
+    {
         $recordsByType = [];
 
         foreach ($records as $record) {
-            $type = $record['type'] ?? null;
-            $id = $record['recordID'] ?? null;
+            $type = $record["type"] ?? null;
+            $id = $record["recordID"] ?? null;
 
             if (!is_string($type) || !is_numeric($id)) {
-                trigger_error('Search record missing a valid recordType or recordID. ' . json_encode($records), E_USER_NOTICE);
+                trigger_error(
+                    "Search record missing a valid recordType or recordID. " . json_encode($records),
+                    E_USER_NOTICE
+                );
                 continue;
             }
 
@@ -70,28 +116,46 @@ abstract class AbstractSearchDriver {
 
         // Convert to resultsItems.
         foreach ($recordsByType as $type => $recordSet) {
-            $searchType = $this->findSearchTypeByType($type);
-            if ($searchType === null) {
-                trigger_error('Could not find registered search type for type: ' . $searchType, E_USER_NOTICE);
-                continue;
-            }
-            $recordIDs = array_column($recordSet, 'recordID');
-            $resultItems = $searchType->getResultItems($recordIDs);
-            foreach ($resultItems as $resultItem) {
-                $id = $resultItem->getAltRecordID() ?? $resultItem->getRecordID();
-                $resultsItemsByTypeAndID[$resultItem->getType().$id] = $resultItem;
-            }
+            $resultsItemsByTypeAndID += $this->getKeyedResultItemsOfType($type, $recordSet, $query);
         }
 
         // Remap all records in their original order.
         /** @var SearchResultItem[] $orderedResultItems */
         $orderedResultItems = [];
         foreach ($records as $record) {
-            $type = $record['type'] ?? '';
-            $recordID = $record['recordID'] ?? '';
-            $key = $type.$recordID;
+            $siteID = $this->supportsForeignRecords() ? $record["siteID"] ?? "" : "";
+            $type = $record["type"] ?? "";
+            $recordID = $record["recordID"] ?? "";
+            $highlight = null;
+            foreach ($query->getHighlightTextFieldNames() as $fieldName) {
+                if (str_contains($fieldName, "name")) {
+                    // Exclude name fields. We don't have a way to visualize them yet.
+                    continue;
+                }
+                $highlight = $record["highlight"][$fieldName] ?? null;
+                if ($highlight) {
+                    break;
+                }
+            }
+
+            $key = $siteID . $type . $recordID;
             $resultItemForKey = $resultsItemsByTypeAndID[$key] ?? null;
             if ($resultItemForKey !== null) {
+                $siteID = $resultItemForKey->getSiteID();
+                if ($siteID !== null) {
+                    try {
+                        $site = $this->siteProvider->getSite($siteID);
+                    } catch (SiteNotFoundException $exception) {
+                        // Ignore these.
+                        continue;
+                    }
+                    $resultItemForKey->setSiteDomain($site->getWebUrl());
+                }
+                if ($highlight !== null) {
+                    $resultItemForKey->setHighlight($highlight);
+                }
+                $resultItemForKey->setSearchScore($record[SearchResultItem::FIELD_SCORE] ?? null);
+                $resultItemForKey->setSubqueryMatchCount($record[SearchResultItem::FIELD_SUBQUERY_COUNT] ?? null);
                 $orderedResultItems[] = $resultItemForKey;
             }
         }
@@ -100,27 +164,112 @@ abstract class AbstractSearchDriver {
     }
 
     /**
-     * Get a SearchType by a string name.
+     * Take records of a specific type and convert them into result items.
      *
-     * @param string $forType
+     * @param string $type The type of the records.
+     * @param array $recordSet The records.
+     * @param SearchQuery $query The query being searched.
      *
-     * @return AbstractSearchType|null
+     * @return SearchResultItem[]
      */
-    public function findSearchTypeByType(string $forType): ?AbstractSearchType {
-        foreach ($this->searchTypes as $searchType) {
-            if ($searchType->getType() === $forType) {
-                return $searchType;
+    protected function getKeyedResultItemsOfType(string $type, array $recordSet, SearchQuery $query): array
+    {
+        $resultsItemsByTypeAndID = [];
+        $searchType = $this->getSearchTypeByType($type);
+        if ($searchType === null) {
+            trigger_error("Could not find registered search type for type: " . $searchType, E_USER_NOTICE);
+            return [];
+        }
+
+        $ownSiteIDs = [];
+        $foreignRecords = [];
+
+        /** @var VanillaSiteProvider $siteProvider */
+        $siteProvider = \Gdn::getContainer()->get(VanillaSiteProvider::class);
+        $ownSiteID = $siteProvider->getOwnSite()->getSiteID();
+        foreach ($recordSet as $record) {
+            if (isset($record["siteID"]) && $record["siteID"] !== $ownSiteID && $this->supportsForeignRecords()) {
+                $foreignRecords[] = $record;
+            } else {
+                $ownSiteIDs[] = $record["recordID"];
             }
         }
 
-        return null;
+        // Handle the records from our own site.
+        if (count($ownSiteIDs) > 0) {
+            $ownSiteResultItems = $searchType->getResultItems($ownSiteIDs, $query);
+            foreach ($ownSiteResultItems as $resultItem) {
+                $id = $resultItem->getAltRecordID() ?? $resultItem->getRecordID();
+                $siteID = $this->supportsForeignRecords() ? $resultItem->getSiteID() : "";
+                $resultsItemsByTypeAndID[$siteID . $resultItem->getType() . $id] = $resultItem;
+            }
+        }
+
+        if ($this->supportsForeignRecords()) {
+            // Decorate the result items from other sites.
+            foreach ($foreignRecords as $foreignRecord) {
+                $item = $searchType->convertForeignSearchItem($foreignRecord);
+                $item->setIsForeign(true);
+                $id = $item->getRecordID();
+                $siteID = $item->getSiteID();
+                $resultsItemsByTypeAndID[$siteID . $item->getType() . $id] = $item;
+            }
+        }
+        return $resultsItemsByTypeAndID;
+    }
+
+    /**
+     * Get a SearchType by a string name.
+     *
+     * @param string $type
+     *
+     * @return AbstractSearchType|null
+     */
+    public function getSearchTypeByType(string $type): ?AbstractSearchType
+    {
+        return $this->searchTypesByType[$type] ?? null;
     }
 
     /**
      * @return AbstractSearchType[]
      */
-    public function getSearchTypes(): array {
-        return $this->searchTypes;
+    public function getSearchTypes(): array
+    {
+        return array_values($this->searchTypesByType);
+    }
+
+    /**
+     * @param SearchService $searchService
+     */
+    public function setSearchService(SearchService $searchService)
+    {
+        foreach ($this->getSearchTypes() as $searchType) {
+            $searchType->setSearchService($searchService);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function supportExtensions(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchTypeByDType(int $dType): ?AbstractSearchType
+    {
+        return $this->searchTypesByDtype[$dType] ?? null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAllWithDType(): array
+    {
+        return array_values($this->searchTypesByDtype);
     }
 
     /**
@@ -128,7 +277,19 @@ abstract class AbstractSearchDriver {
      *
      * @param AbstractSearchType $searchType
      */
-    public function registerSearchType(AbstractSearchType $searchType) {
-        $this->searchTypes[] = $searchType;
+    public function registerSearchType(AbstractSearchType $searchType)
+    {
+        foreach ($this->searchTypesByType as $existingSearchType) {
+            if (get_class($searchType) === get_class($existingSearchType)) {
+                // Bailout if we've already registered the type.
+                return;
+            }
+        }
+        $this->searchTypesByType[$searchType->getType()] = $searchType;
+        if ($searchType->getDTypes() !== null) {
+            foreach ($searchType->getDTypes() as $dtype) {
+                $this->searchTypesByDtype[$dtype] = $searchType;
+            }
+        }
     }
 }

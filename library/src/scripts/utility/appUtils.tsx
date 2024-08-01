@@ -6,13 +6,16 @@
  */
 
 import gdn from "@library/gdn";
-import { PromiseOrNormalCallback } from "@vanilla/utils";
-import isUrl from "validator/lib/isURL";
+import { globalValueRef, logError, PromiseOrNormalCallback, RecordID } from "@vanilla/utils";
 import { ensureScript } from "@vanilla/dom-utils";
 import { sprintf } from "sprintf-js";
+import { isLayoutRoute } from "@library/features/Layout/LayoutPage.paths";
 
 // Re-exported for backwards compatibility
 export { t, translate } from "@vanilla/i18n";
+
+// Absolute path pattern
+const ABSOLUTE_PATH_REGEX = /^\s*(mailto:|((https?:)?\/\/))/i;
 
 /**
  * Get a piece of metadata passed from the server.
@@ -65,6 +68,22 @@ export function setMeta(key: string, value: any) {
 }
 
 /**
+ * @see https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url#answer-5717133
+ * @param url
+ */
+export function isURL(url: string): boolean {
+    let constructed;
+
+    try {
+        constructed = new URL(url);
+    } catch (_) {
+        return false;
+    }
+
+    return constructed.protocol === "http:" || constructed.protocol === "https:";
+}
+
+/**
  * Determine if a string is an allowed URL.
  *
  * In the future this may be extended to check if we want to whitelist/blacklist various URLs.
@@ -72,20 +91,18 @@ export function setMeta(key: string, value: any) {
  * @param input - The string to check.
  */
 export function isAllowedUrl(input: string): boolean {
-    // Options https://github.com/chriso/validator.js#validators
-    const options = {
-        protocols: ["http", "https"],
-        require_tld: true,
-        require_protocol: true,
-        require_host: true,
-        require_valid_protocol: true,
-        allow_trailing_dot: false,
-        allow_protocol_relative_urls: false,
-    };
-    return isUrl(input, options);
+    return isURL(input);
 }
 
-interface ISiteSection {
+/**
+ * Normalize the URL with a prepended http if there isn't one.
+ */
+export function normalizeUrl(urlToNormalize: string) {
+    const result = urlToNormalize.match(/^https?:\/\//) ? urlToNormalize : "http://" + urlToNormalize;
+    return result;
+}
+
+export interface ISiteSection {
     basePath: string;
     contentLocale: string;
     sectionGroup: string;
@@ -102,6 +119,21 @@ export function getSiteSection(): ISiteSection {
     return getMeta("siteSection");
 }
 
+export function getDefaultSiteSection(): ISiteSection {
+    return getMeta("defaultSiteSection", getSiteSection());
+}
+
+export function hasMultipleSiteSections(): boolean {
+    return getMeta("siteSectionSlugs", []).length > 0;
+}
+
+/**
+ * Get the enabled post types
+ */
+export function getEnabledPostTypes(): string[] {
+    return getMeta("postTypes", ["discussion"]);
+}
+
 /**
  * Format a URL in the format passed from the controller.
  *
@@ -110,13 +142,17 @@ export function getSiteSection(): ISiteSection {
  * @returns Returns a URL that can be used in the APP.
  */
 export function formatUrl(path: string, withDomain: boolean = false): string {
-    if (path.indexOf("//") >= 0) {
-        return path;
-    } // this is an absolute path.
+    // Test if this is an absolute path
+    if (ABSOLUTE_PATH_REGEX.test(path)) {
+        // Attempt to inject a site section into the url if we can.
+        const absoluteUrl = tryInjectSiteSectionIntoAbsoluteUrl(path);
+        return absoluteUrl;
+    }
 
     // Subcommunity slug OR subcommunity
     let siteRoot = getMeta("context.basePath", "");
 
+    // Urls starting with a tilde, indicate that we should NOT be attaching a site section automatically.
     if (path.startsWith("~")) {
         path = path.replace(/^~/, "");
         siteRoot = getMeta("context.host", "");
@@ -130,14 +166,53 @@ export function formatUrl(path: string, withDomain: boolean = false): string {
 }
 
 /**
+ * Try to inject a site section slug into an absolute URL meeting the following criteria
+ *
+ * - The URL is on the same Vanilla site as us (not just domain, in a hub/node it must be our node).
+ * - The URL path does not already start with a site section already. (All site sections paths are injected from the backend).
+ * - The URL path has content (eg. not empty or just /).
+ *
+ * @param url A fully qualified URL.
+ * @returns Another fully qualified URL. This could be an original or a modification.
+ */
+function tryInjectSiteSectionIntoAbsoluteUrl(url: string): string {
+    // First see that it's one of our own urls.
+    const expectedHost = window.location.origin + getMeta("context.host", "");
+    if (!url.startsWith(expectedHost)) {
+        // Nothing to do. It's not our url.
+        return url;
+    }
+
+    // No trim off the host from the url.
+    const path = url.replace(expectedHost, "");
+    if (path.length <= 1) {
+        // Don't muck around with no path or just `/`.
+        return url;
+    }
+    const siteSectionSlugs = getMeta("siteSectionSlugs", []);
+
+    for (const siteSectionSlug of siteSectionSlugs) {
+        if (path.match(new RegExp(`^${siteSectionSlug}(/.*)?$`, "gi"))) {
+            // We have a site section slug.
+            return url;
+        }
+    }
+
+    // We don't have a site section slug.
+    // Take our stripped path, and make a url out of it.
+    return formatUrl(path, true);
+}
+
+/**
  * Generate a URL from the site's web root.
  *
  * No site section will be included.
  */
 export function siteUrl(path: string): string {
-    if (path.indexOf("//") >= 0) {
+    // Test if this is an absolute path
+    if (ABSOLUTE_PATH_REGEX.test(path)) {
         return path;
-    } // this is an absolute path.
+    }
 
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
@@ -171,10 +246,10 @@ export function getRelativeUrl(fullUrl: string): string {
  * @returns Returns a URL that can be used for a static asset.
  */
 export function assetUrl(path: string): string {
-    if (path.indexOf("//") >= 0) {
+    // Test if this is an absolute path
+    if (ABSOLUTE_PATH_REGEX.test(path)) {
         return path;
-    } // this is an absolute path.
-
+    }
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
@@ -195,11 +270,7 @@ export function themeAsset(path: string): string {
     return assetUrl(`/themes/${themeKey}/${path}`);
 }
 
-/**
- * @type {Array}
- * @private
- */
-const _readyHandlers: PromiseOrNormalCallback[] = [];
+const _readyHandlersRef = globalValueRef<PromiseOrNormalCallback[]>("readyHandlers", []);
 
 /**
  * Register a callback that executes when the document and the core libraries are ready to use.
@@ -207,7 +278,7 @@ const _readyHandlers: PromiseOrNormalCallback[] = [];
  * @param callback - The function to call. This can return a Promise but doesn't have to.
  */
 export function onReady(callback: PromiseOrNormalCallback) {
-    _readyHandlers.push(callback);
+    _readyHandlersRef.current().push(callback);
 }
 
 /**
@@ -215,11 +286,28 @@ export function onReady(callback: PromiseOrNormalCallback) {
  *
  * @returns A Promise when the events have all fired.
  */
-export function _executeReady(): Promise<any[]> {
-    return new Promise(resolve => {
-        const handlerPromises = _readyHandlers.map(handler => handler());
+export function _executeReady(before?: () => void | Promise<void>): Promise<any[]> {
+    return new Promise((resolve) => {
+        const handlerPromises = _readyHandlersRef.current().map((handler) => {
+            let result = handler();
+            if (result instanceof Promise) {
+                result.catch((err) => logError(err));
+            }
+            return result;
+        });
         const exec = () => {
-            return Promise.all(handlerPromises).then(resolve);
+            before?.();
+            return Promise.all(handlerPromises)
+                .then(resolve)
+                .finally(() => {
+                    const contentEvent = new CustomEvent("X-VanillaReady", { bubbles: true, cancelable: false });
+                    document.dispatchEvent(contentEvent);
+
+                    // we'll dispatch this event only on legacy pages, as for layout/knowledge pages we dispatch it from <AnalyticsData/>
+                    if (getMeta("trackLegacyPageViews", false)) {
+                        document.dispatchEvent(new CustomEvent("X-PageView", { bubbles: true, cancelable: false }));
+                    }
+                });
         };
 
         if (document.readyState !== "loading") {
@@ -250,11 +338,48 @@ export function removeOnContent(callback: (event: CustomEvent) => void) {
 }
 
 /**
+ * Encode a username the same way our backend does.
+ *
+ * Notably there is a long-standing issue where names certain characters that our dispatcher matches on need to be double encoded.
+ * @param username
+ */
+function encodeUserName(username?: string): string {
+    // Matching existing backend logic.
+    const specialEncoded = username?.replace("/", "%2f").replace("&", "%26") ?? "";
+    return encodeURIComponent(specialEncoded);
+}
+
+/**
  * Make a URL to a user's profile.
  */
-export function makeProfileUrl(username: string) {
-    const userPath = `/profile/${encodeURIComponent(username)}`;
+export function makeProfileUrl(userID?: RecordID, username?: string) {
+    let userPath = "/profile/";
+    if (userID) userPath += `${userID}/`;
+    if (username) userPath += `${encodeUserName(username)}`;
+
     return formatUrl(userPath, true);
+}
+
+/**
+ * Make a URL to a user's discussions.
+ */
+export function makeProfileDiscussionsUrl(userID?: RecordID, username?: string) {
+    let discussionsPath = "/profile/discussions/";
+    if (userID) discussionsPath += `${userID}/`;
+    if (username) discussionsPath += `${encodeUserName(username)}`;
+
+    return formatUrl(discussionsPath, true);
+}
+
+/**
+ * Make a URL to a user's comments.
+ */
+export function makeProfileCommentsUrl(userID?: RecordID, username?: string) {
+    let commentsPath = "/profile/comments/";
+    if (userID) commentsPath += `${userID}/`;
+    if (username) commentsPath += `${encodeUserName(username)}`;
+
+    return formatUrl(commentsPath, true);
 }
 
 interface IRecaptcha {
@@ -271,7 +396,7 @@ export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
     }
     await ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
 
-    return { execute: siteKey => window.grecaptcha.execute(siteKey) };
+    return { execute: (siteKey) => window.grecaptcha.execute(siteKey) };
 }
 
 /**
@@ -279,9 +404,62 @@ export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
  * @param template - the template for the string (must be translated ahead of time)
  * @param variable - the variable to insert in the template
  */
-export function accessibleLabel(template: string, variable?: string[]) {
-    if (!variable) {
-        return undefined;
-    }
+export function accessibleLabel(template: string, variable: string[]) {
     return sprintf(template, variable);
+}
+
+export type ImageSourceSet = Record<RecordID, string>;
+
+/**
+ * This function creates a source set value from an object where the key indicates the
+ * the width and the corresponding values are the image URL.
+ */
+export function createSourceSetValue(sourceSet: ImageSourceSet): string {
+    return (
+        Object.entries(sourceSet ?? {})
+            // Filter out any values which are empty
+            .filter(([_, value]) => value)
+            .map((source) => `${source.reverse().join(" ")}w`)
+            .join(",")
+    );
+}
+
+//https://stackoverflow.com/questions/15690706/recursively-looping-through-an-object-to-build-a-property-list/53620876#53620876
+export function getDeepPropertyListInDotNotation(obj: object): string[] {
+    const isObject = (val) => val && typeof val === "object" && !Array.isArray(val);
+
+    const addDelimiter = (a, b) => (a ? `${a}.${b}` : b);
+
+    const paths = (obj: any = {}, head = "") => {
+        return Object.entries(obj).reduce((product, [key, value]) => {
+            let fullPath = addDelimiter(head, key);
+            return isObject(value) ? product.concat(paths(value, fullPath)) : product.concat(fullPath);
+        }, []);
+    };
+
+    return paths(obj);
+}
+
+/**
+ * Wrapped JSON.stringify method so that is
+ * does not explode if JSON is malformed
+ */
+export function safelySerializeJSON(json: unknown) {
+    try {
+        return JSON.stringify(json);
+    } catch (error) {
+        logError(error);
+    }
+}
+
+/**
+ * Wrapped JSON.parse method so that is
+ * does not explode if JSON is malformed
+ */
+export function safelyParseJSON(string: string) {
+    try {
+        return JSON.parse(string);
+    } catch (error) {
+        logError(error);
+    }
 }

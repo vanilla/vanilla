@@ -1,62 +1,64 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { createRef, useContext, useEffect, useRef } from "react";
-import classNames from "classnames";
-import BackLink from "@library/routing/links/BackLink";
-import Heading from "@library/layout/Heading";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { useDevice, Devices } from "@library/layout/DeviceContext";
+import Heading from "@library/layout/Heading";
 import { pageHeadingClasses } from "@library/layout/pageHeadingStyles";
-import { IWithFontSize, useFontSizeCalculator } from "@library/layout/pageHeadingContext";
-import backLinkClasses from "@library/routing/links/backLinkStyles";
-import { iconClasses } from "@library/icons/iconStyles";
+import BackLink from "@library/routing/links/BackLink";
+import classNames from "classnames";
+import React from "react";
 
 interface IPageHeading {
-    title: React.ReactNode;
+    title?: React.ReactNode;
+    depth?: number;
+    renderDepth?: number;
     children?: React.ReactNode;
     className?: string;
     headingClassName?: string;
     actions?: React.ReactNode;
     includeBackLink?: boolean;
-    isCompactHeading?: boolean;
+    titleCount?: React.ReactNode;
 }
 
 /**
  * A component representing a top level page heading.
  * Can be configured with an options menu and a backlink.
  */
-// export class PageHeading extends React.Component<IPageHeading> {
-
 export function PageHeading(props: IPageHeading) {
-    const { includeBackLink = true, actions, children, headingClassName, title, className, isCompactHeading } = props;
-    const { fontSize } = useFontSizeCalculator();
+    const { includeBackLink = true, actions, children, headingClassName, title, className, titleCount } = props;
 
     const classes = pageHeadingClasses();
-    const linkClasses = backLinkClasses();
-
-    const backLink = isCompactHeading ? (
-        <BackLink
-            className={classNames(linkClasses.inHeading(fontSize), classes)}
-            chevronClass={iconClasses().chevronLeftSmallCompact}
-        />
-    ) : (
-        <BackLink className={classNames(linkClasses.inHeading(fontSize), classes)} />
-    );
+    const device = useDevice();
+    const isMobile = [Devices.MOBILE, Devices.XS].includes(device);
 
     return (
         <div className={classNames(classes.root, className)}>
             <div className={classes.main}>
-                {includeBackLink && backLink}
+                {includeBackLink && !isMobile && <BackLink />}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
-                    <Heading depth={1} title={title} className={headingClassName}>
+                    <Heading
+                        isLarge={props.depth === 1}
+                        renderAsDepth={props.renderDepth}
+                        depth={props.depth}
+                        title={title}
+                        className={headingClassName}
+                    >
                         {children}
                     </Heading>
                 </ConditionalWrap>
             </div>
-            {actions && <div className={classes.actions(fontSize)}>{actions}</div>}
+            {(actions || titleCount) && (
+                <div className={classes.actions}>
+                    {titleCount}
+                    {actions}
+                </div>
+            )}
         </div>
     );
 }
+
+export default PageHeading;

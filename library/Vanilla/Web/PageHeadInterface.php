@@ -8,13 +8,14 @@
 namespace Vanilla\Web;
 
 use Vanilla\Contracts\Web\AssetInterface;
+use Vanilla\Models\SiteMetaExtra;
 use Vanilla\Navigation\Breadcrumb;
 
 /**
  * Interface for all public page head methods.
  */
-interface PageHeadInterface {
-
+interface PageHeadInterface
+{
     /**
      * Set the section of the site we are serving assets for.
      *
@@ -32,6 +33,16 @@ interface PageHeadInterface {
      * @return $this For chaining.
      */
     public function addJsonLDItem(AbstractJsonLDItem $item);
+
+    /**
+     * Set Json-LD array object.
+     *
+     * @param array $setJsonLDItems
+     * @return mixed
+     */
+    public function setJsonLdItems(array $setJsonLDItems);
+
+    public function getJsonLdItems(): array;
 
     /**
      * Set the page title (in the browser tab).
@@ -106,12 +117,38 @@ interface PageHeadInterface {
     public function addInlineScript(string $script);
 
     /**
+     * Add an inline stylesheet.
+     *
+     * @param string $styles
+     *
+     * @return $this
+     */
+    public function addInlineStyles(string $styles);
+
+    /**
+     * Add an inline stylesheet from a local file path.
+     *
+     * @param string $url A url in the format of `https://mysite.com/path/to/thing.css` or `/path/to/thing.css`.
+     *
+     * @return string|null
+     */
+    public function getInlineStyleFromUrl(string $url): ?string;
+
+    /**
      * Add a script to the page head.
      *
      * @param AssetInterface $script
      * @return $this
      */
     public function addScript(AssetInterface $script);
+
+    /**
+     * Add an extra site meta item.
+     *
+     * @param SiteMetaExtra $extra
+     * @return $this
+     */
+    public function addSiteMetaExtra(SiteMetaExtra $extra);
 
     /**
      * @return string

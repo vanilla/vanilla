@@ -46,6 +46,7 @@ export interface IConversation {
     conversationID: number;
     name: string;
     body: string;
+    excerpt: string;
     url: string;
     dateInserted: string;
     insertUserID: number;

@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -44,7 +44,7 @@ export default function DocumentTitle(props: IProps) {
         document.title = headTitle;
     }, [headTitle]);
 
-    return <>{props.children ? props.children : <h1>{props.title}</h1>}</>;
+    return <>{props.children}</>;
 }
 
 interface IProps {

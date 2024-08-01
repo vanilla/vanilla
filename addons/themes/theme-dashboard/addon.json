@@ -1,0 +1,28 @@
+{
+    "key": "theme-dashboard",
+    "name": "Dashboard",
+    "description": "Vanilla dashboard theme.",
+    "version": "1.0.0",
+    "hidden": true,
+    "isResponsive": true,
+    "license": "GPL-2.0-only",
+    "sites": [],
+    "type": "theme",
+    "Features": {
+        "DataDrivenTheme": true
+    },
+    "assets": {
+        "variables": {
+            "type": "neon",
+            "file": "variables.neon"
+        },
+        "footer": {
+            "type": "html",
+            "file": "footer.html"
+        },
+        "header": {
+            "type": "html",
+            "file": "header.html"
+        }
+    }
+}

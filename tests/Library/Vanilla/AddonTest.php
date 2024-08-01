@@ -14,8 +14,8 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for the addon class.
  */
-class AddonTest extends MinimalContainerTestCase {
-
+class AddonTest extends MinimalContainerTestCase
+{
     /**
      * Test that the name of an addon is correct.
      *
@@ -24,30 +24,26 @@ class AddonTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideAddonNames
      */
-    public function testAddonName(Addon $addon, string $expectedName) {
+    public function testAddonName(Addon $addon, string $expectedName)
+    {
         $this->assertEquals($expectedName, $addon->getName());
     }
 
     /**
      * @return array
      */
-    public function provideAddonNames(): array {
+    public function provideAddonNames(): array
+    {
         return [
+            [new MockAddon("addon1", ["name" => "Addon 1"]), "Addon 1"],
             [
-                new MockAddon('addon1', [ 'name' => 'Addon 1' ]),
-                'Addon 1',
-            ],
-            [
-                new MockAddon('addon2', [
-                    'name' => 'Addon 2',
-                    'displayName' => 'Addon 2 Display Name',
+                new MockAddon("addon2", [
+                    "name" => "Addon 2",
+                    "displayName" => "Addon 2 Display Name",
                 ]),
-                'Addon 2 Display Name',
+                "Addon 2 Display Name",
             ],
-            [
-                new MockAddon('addon3'),
-                'addon3',
-            ]
+            [new MockAddon("addon3"), "addon3"],
         ];
     }
 }

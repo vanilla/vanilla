@@ -8,26 +8,31 @@
 namespace VanillaTests\Fixtures;
 
 use Garden\Http\HttpClient;
+use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 
 /**
  * Mock HTTP client for testing. Does send actual HTTP requests.
  */
-class MockHttpClient extends HttpClient {
-
+class MockHttpClient extends HttpClient
+{
     use MockResponseTrait;
+
+    /** @var HttpResponse */
+    private $currentResponse;
 
     /**
      * The default constructor adds request sending middleware. We don't want to do that.
      * We're going to use our own middleware instead.
      * @inheritdoc
      */
-    public function __construct(string $baseUrl = '') {
+    public function __construct(string $baseUrl = "")
+    {
         parent::__construct($baseUrl);
 
         // One big difference is the mock middleware starts with a response instead of a request.
-        $this->middleware = function (HttpResponse $response): HttpResponse {
-            return $response;
+        $this->middleware = function (): HttpResponse {
+            return $this->currentResponse;
         };
     }
 
@@ -37,16 +42,26 @@ class MockHttpClient extends HttpClient {
      * @overrid
      * @inheritdoc
      */
-    public function request(string $method, string $uri, $body, array $headers = [], array $options = []) {
-        $key = $this->makeMockResponseKey($uri, $method);
+    public function request(string $method, string $uri, $body, array $headers = [], array $options = [])
+    {
+        $key = $this->makeMockResponseKey($uri, $method, $body);
 
         // Lookup an existing mock response or send back a 404.
-        $response = $this->mockedResponses[$key] ?? new HttpResponse(404);
+        $this->currentResponse = $this->mockedResponses[$key] ?? new HttpResponse(404);
+        $this->addMiddleware(function (HttpRequest $request, callable $next): HttpResponse {
+            /** @var HttpResponse $response */
+            $response = $next($request);
 
-        // Call the chain of middleware on the request.
-        $response = call_user_func($this->middleware, $response);
+            // Make sure we attach the proper request to the response.
+            $response->setRequest($request);
 
-        if (!$response->isResponseClass('2xx')) {
+            return $response;
+        });
+
+        $request = $this->createRequest($method, $uri, $body, $headers, $options);
+        $response = call_user_func($this->middleware, $request);
+
+        if (!$response->isResponseClass("2xx")) {
             $this->handleErrorResponse($response, $options);
         }
 

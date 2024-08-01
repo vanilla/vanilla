@@ -15,8 +15,8 @@ use Vanilla\Formatting\Quill\Nesting\InvalidNestingException;
 /**
  * Value object representing a file uploaded through an HTTP request.
  */
-class UploadedFile {
-
+class UploadedFile
+{
     /** @var string */
     private $clientFileName;
 
@@ -80,7 +80,14 @@ class UploadedFile {
      * @param string|null $clientFileName
      * @param string|null $clientMediaType
      */
-    public function __construct(Gdn_Upload $uploadModel, $file, $size, $error, $clientFileName = null, $clientMediaType = null) {
+    public function __construct(
+        Gdn_Upload $uploadModel,
+        $file,
+        $size,
+        $error,
+        $clientFileName = null,
+        $clientMediaType = null
+    ) {
         $this->uploadModel = $uploadModel;
 
         $this->setSize($size);
@@ -102,13 +109,14 @@ class UploadedFile {
      * @return UploadedFile
      * @throws \Garden\SafeCurl\Exception\CurlException If that resource does not exist, does too many redirects, or points to a blacklisted IP.
      */
-    public static function fromRemoteResourceUrl(string $remoteUrl, array $requestHeaders = []): UploadedFile {
+    public static function fromRemoteResourceUrl(string $remoteUrl, array $requestHeaders = []): UploadedFile
+    {
+        // Normalize whitespace.
+        $remoteUrl = str_replace(" ", "%20", $remoteUrl);
         $curl = curl_init();
         // We don't want to load the body in memory. It could be quite large.
         curl_setopt($curl, CURLOPT_NOBODY, true);
-        $requestHeaders = array_merge([
-            'User-Agent: garden-http/2 (HttpRequest)'
-        ], $requestHeaders);
+        $requestHeaders = array_merge(["User-Agent: garden-http/2 (HttpRequest)"], $requestHeaders);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $requestHeaders);
 
         // Make sure we validating redirect URLs to be safe.
@@ -120,14 +128,14 @@ class UploadedFile {
 
         $curlStats = curl_getinfo($curl);
 
-        $contentType = $curlStats['content_type'] ?? null;
-        $downloadSize = $curlStats['download_content_length'] ?? null;
+        $contentType = $curlStats["content_type"] ?? null;
+        $downloadSize = $curlStats["download_content_length"] ?? null;
         if (is_float($downloadSize)) {
             $downloadSize = (int) $downloadSize;
         }
 
         if (!$contentType === null || $downloadSize === null) {
-            throw new \Exception('File missing content type or download size');
+            throw new \Exception("File missing content type or download size");
         }
 
         $name = self::extractNameFromUrl($remoteUrl);
@@ -142,26 +150,19 @@ class UploadedFile {
             "http" => [
                 "method" => "GET",
                 "header" => implode("\r\n", $requestHeaders),
-            ]
+            ],
         ];
 
         $streamContext = stream_context_create($streamOpts);
 
         // Open the file using the HTTP headers set above
-        $successful = file_put_contents($tmpFilePath, fopen($resolvedUrl, 'r', false, $streamContext));
+        $successful = file_put_contents($tmpFilePath, fopen($resolvedUrl, "r", false, $streamContext));
 
         if (!$successful) {
-            throw new \Exception('Failed to copy file locally');
+            throw new \Exception("Failed to copy file locally");
         }
 
-        $file = new UploadedFile(
-            new \Gdn_Upload(),
-            $tmpFilePath,
-            $downloadSize,
-            UPLOAD_ERR_OK,
-            $name,
-            $contentType
-        );
+        $file = new UploadedFile(new \Gdn_Upload(), $tmpFilePath, $downloadSize, UPLOAD_ERR_OK, $name, $contentType);
         $file->setForeignUrl($remoteUrl);
         $file->setResolvedForeignUrl($resolvedUrl);
         return $file;
@@ -173,9 +174,10 @@ class UploadedFile {
      * @param string $url
      * @return string|null
      */
-    private static function extractNameFromUrl(string $url): ?string {
+    private static function extractNameFromUrl(string $url): ?string
+    {
         $keys = parse_url($url); // parse the url
-        $path = explode("/", $keys['path'] ?? randomString(12)); // splitting the path
+        $path = explode("/", $keys["path"] ?? randomString(12)); // splitting the path
         $last = end($path) ?: null; // get the value of the last element
         $last = urldecode($last);
         return $last;
@@ -186,8 +188,9 @@ class UploadedFile {
      *
      * @throws RuntimeException Because it is not implemented yet.
      */
-    public function getStream() {
-        throw new RuntimeException(self::class.'::'.__FUNCTION__.' is not supported.');
+    public function getStream()
+    {
+        throw new RuntimeException(self::class . "::" . __FUNCTION__ . " is not supported.");
     }
 
     /**
@@ -197,16 +200,17 @@ class UploadedFile {
      * @param string $nameFormat
      * @return string
      */
-    public function generatePersistedUploadPath(string $persistSubDirectory = '', string $nameFormat = '%s'): string {
-        $persistDirectory = '';
+    public function generatePersistedUploadPath(string $persistSubDirectory = "", string $nameFormat = "%s"): string
+    {
+        $persistDirectory = "";
 
         if (!$persistSubDirectory && $this->foreignUrl !== null) {
-            $persistDirectory .= 'migrated';
+            $persistDirectory .= "migrated";
         } elseif ($persistSubDirectory) {
             $persistDirectory .= $persistSubDirectory;
         }
         $ext = strtolower(pathinfo($this->getClientFilename(), PATHINFO_EXTENSION));
-        $baseName = basename($this->getClientFilename(), ".${ext}");
+        $baseName = basename($this->getClientFilename(), ".{$ext}");
         $baseName = sprintf($nameFormat, $baseName);
         $baseName = \Gdn_Format::url(urlencode($baseName));
         $uploadPath = FileUtils::generateUniqueUploadPath($ext, true, $baseName, $persistDirectory);
@@ -214,26 +218,41 @@ class UploadedFile {
     }
 
     /**
-     * Save the uploaded file to a persistent location.
+     * Save the uploaded file to a persistent location with a random path to prevent filename clashes.
      *
      * @param bool $copy Whether or not to copy the file instead of moving it.
      * @param string $persistSubDirectory
      * @param string $nameFormat
      *
-     * @return $this For method chaining.
+     * @return $this
      */
-    public function persistUpload(bool $copy = false, string $persistSubDirectory = '', string $nameFormat = '%s'): UploadedFile {
-        $this->tryApplyImageProcessing();
-
+    public function persistUpload(
+        bool $copy = false,
+        string $persistSubDirectory = "",
+        string $nameFormat = "%s"
+    ): UploadedFile {
         $persistedPath = $this->generatePersistedUploadPath($persistSubDirectory, $nameFormat);
 
+        return $this->persistUploadToPath($copy, $persistedPath);
+    }
+
+    /**
+     * Save the uploaded file to a specific subpath.
+     *
+     * @param bool $copy Whether or not to copy the file instead of moving it.
+     * @param string $path The subpath to save to.
+     * @return $this
+     */
+    public function persistUploadToPath(bool $copy, string $path): UploadedFile
+    {
+        $this->tryApplyImageProcessing();
         $result = $this->uploadModel->saveAs(
             $this->getFile(),
-            $persistedPath,
+            $path,
             ["OriginalFilename" => $this->getClientFilename()],
             $copy
         );
-        $this->setPersistedPath($result['SaveName']);
+        $this->setPersistedPath($result["SaveName"]);
         return $this;
     }
 
@@ -241,7 +260,8 @@ class UploadedFile {
      * If the upload is an image, attempt to apply some processing to it.
      * This includes optional resizing and re-orienting, based on EXIF data.
      */
-    private function tryApplyImageProcessing(): void {
+    private function tryApplyImageProcessing(): void
+    {
         $file = $this->getFile();
         $size = getimagesize($file);
 
@@ -272,7 +292,9 @@ class UploadedFile {
 
         // Resize and re-orient the image as necessary.
         $resizer = new ImageResizer();
-        $resizer->resize($file, null, $options);
+        if ($resizer->canResize($file)) {
+            $resizer->resize($file, null, $options);
+        }
 
         // Get the new details, after resizing and re-orienting the image.
         [$width, $height] = getimagesize($file);
@@ -288,14 +310,15 @@ class UploadedFile {
      * @throws RuntimeException On any error during the move operation.
      * @throws RuntimeException On the second or subsequent call to the method.
      */
-    public function moveTo($targetPath) {
+    public function moveTo($targetPath)
+    {
         if ($this->moved) {
-            throw new RuntimeException('This upload has already been moved.');
+            throw new RuntimeException("This upload has already been moved.");
         }
 
         $directory = dirname($targetPath);
         if (!is_writable($directory)) {
-            throw new InvalidArgumentException('The specified path is not writable.');
+            throw new InvalidArgumentException("The specified path is not writable.");
         }
 
         if (!is_uploaded_file($this->file)) {
@@ -316,7 +339,8 @@ class UploadedFile {
      *
      * @return int
      */
-    public function getMaxImageHeight(): int {
+    public function getMaxImageHeight(): int
+    {
         return $this->maxImageHeight;
     }
 
@@ -325,7 +349,8 @@ class UploadedFile {
      *
      * @return int
      */
-    public function getMaxImageWidth(): int {
+    public function getMaxImageWidth(): int
+    {
         return $this->maxImageWidth;
     }
 
@@ -334,7 +359,8 @@ class UploadedFile {
      *
      * @return int|null The file size in bytes or null if unknown.
      */
-    public function getSize() {
+    public function getSize()
+    {
         return $this->size;
     }
 
@@ -343,7 +369,8 @@ class UploadedFile {
      *
      * @return int One of the UPLOAD_ERR_XXX constants.
      */
-    public function getError() {
+    public function getError()
+    {
         return $this->error;
     }
 
@@ -352,7 +379,8 @@ class UploadedFile {
      *
      * @return string
      */
-    public function getFile() {
+    public function getFile()
+    {
         return $this->file;
     }
 
@@ -361,7 +389,8 @@ class UploadedFile {
      *
      * @return string|null The filename sent by the client or null if none was provided.
      */
-    public function getClientFilename() {
+    public function getClientFilename()
+    {
         return $this->clientFileName;
     }
 
@@ -370,7 +399,8 @@ class UploadedFile {
      *
      * @return string|null The media type sent by the client or null if none was provided.
      */
-    public function getClientMediaType() {
+    public function getClientMediaType()
+    {
         return $this->clientMediaType;
     }
 
@@ -380,11 +410,12 @@ class UploadedFile {
      * @param string|null $clientFileName
      * @throws InvalidArgumentException If the value is invalid.
      */
-    private function setClientFileName($clientFileName) {
+    private function setClientFileName($clientFileName)
+    {
         if ($clientFileName === null || is_string($clientFileName)) {
             $this->clientFileName = $clientFileName;
         } else {
-            throw new InvalidArgumentException('Client file name must be a string or null.');
+            throw new InvalidArgumentException("Client file name must be a string or null.");
         }
     }
 
@@ -394,11 +425,12 @@ class UploadedFile {
      * @param string|null $clientMediaType
      * @throws InvalidArgumentException If the value is invalid.
      */
-    private function setClientMediaType($clientMediaType) {
+    private function setClientMediaType($clientMediaType)
+    {
         if ($clientMediaType === null || is_string($clientMediaType)) {
             $this->clientMediaType = $clientMediaType;
         } else {
-            throw new InvalidArgumentException('Client media type must be a string or null.');
+            throw new InvalidArgumentException("Client media type must be a string or null.");
         }
     }
 
@@ -408,7 +440,8 @@ class UploadedFile {
      * @param int $error An error flag. Must be one of the UPLOAD_ERR_* constants.
      * @throws InvalidArgumentException If the value is invalid.
      */
-    private function setError($error) {
+    private function setError($error)
+    {
         $validErrors = [
             UPLOAD_ERR_OK,
             UPLOAD_ERR_INI_SIZE,
@@ -417,13 +450,13 @@ class UploadedFile {
             UPLOAD_ERR_NO_FILE,
             UPLOAD_ERR_NO_TMP_DIR,
             UPLOAD_ERR_CANT_WRITE,
-            UPLOAD_ERR_EXTENSION
+            UPLOAD_ERR_EXTENSION,
         ];
 
         if (is_integer($error) && in_array($error, $validErrors)) {
             $this->error = $error;
         } else {
-            throw new InvalidArgumentException('Error must be one of the UPLOAD_ERR_* constants.');
+            throw new InvalidArgumentException("Error must be one of the UPLOAD_ERR_* constants.");
         }
     }
 
@@ -433,11 +466,12 @@ class UploadedFile {
      * @param string $file
      * @throws InvalidArgumentException If the value is invalid.
      */
-    private function setFile($file) {
+    private function setFile($file)
+    {
         if (is_string($file)) {
             $this->file = $file;
         } else {
-            throw new InvalidArgumentException('File name must be a string.');
+            throw new InvalidArgumentException("File name must be a string.");
         }
     }
 
@@ -447,39 +481,44 @@ class UploadedFile {
      * @param int $size The size of the file, in bytes.
      * @throws InvalidNestingException If the value is invalid.
      */
-    private function setSize($size) {
+    private function setSize($size)
+    {
         if (is_int($size)) {
             $this->size = $size;
         } else {
-            throw new InvalidArgumentException('Size must be an integer.');
+            throw new InvalidArgumentException("Size must be an integer.");
         }
     }
 
     /**
      * @return int|null
      */
-    public function getClientHeight(): ?int {
+    public function getClientHeight(): ?int
+    {
         return $this->clientHeight;
     }
 
     /**
      * @param int|null $clientHeight
      */
-    public function setClientHeight(?int $clientHeight): void {
+    public function setClientHeight(?int $clientHeight): void
+    {
         $this->clientHeight = $clientHeight;
     }
 
     /**
      * @return int|null
      */
-    public function getClientWidth(): ?int {
+    public function getClientWidth(): ?int
+    {
         return $this->clientWidth;
     }
 
     /**
      * @param int|null $clientWidth
      */
-    public function setClientWidth(?int $clientWidth): void {
+    public function setClientWidth(?int $clientWidth): void
+    {
         $this->clientWidth = $clientWidth;
     }
 
@@ -490,9 +529,10 @@ class UploadedFile {
      * @param int $maxImageHeight
      * @return UploadedFile
      */
-    public function setMaxImageHeight(int $maxImageHeight): self {
+    public function setMaxImageHeight(int $maxImageHeight): self
+    {
         if (is_int($maxImageHeight) && $maxImageHeight < 0) {
-            throw new InvalidArgumentException('height should be greater than or equal to 0.');
+            throw new InvalidArgumentException("height should be greater than or equal to 0.");
         }
         $this->maxImageHeight = $maxImageHeight;
         return $this;
@@ -505,9 +545,10 @@ class UploadedFile {
      * @param ?int $maxImageWidth
      * @return UploadedFile
      */
-    public function setMaxImageWidth(int $maxImageWidth): self {
+    public function setMaxImageWidth(int $maxImageWidth): self
+    {
         if ($maxImageWidth < 0) {
-            throw new InvalidArgumentException('width should be greater than or equal to 0.');
+            throw new InvalidArgumentException("width should be greater than or equal to 0.");
         }
         $this->maxImageWidth = $maxImageWidth;
         return $this;
@@ -516,14 +557,16 @@ class UploadedFile {
     /**
      * @return string|null
      */
-    public function getPersistedPath(): ?string {
+    public function getPersistedPath(): ?string
+    {
         return $this->persistedPath;
     }
 
     /**
      * @param string|null $persistedPath
      */
-    public function setPersistedPath(?string $persistedPath): void {
+    public function setPersistedPath(?string $persistedPath): void
+    {
         $this->persistedPath = $persistedPath;
     }
 
@@ -534,7 +577,8 @@ class UploadedFile {
      *
      * @return $this
      */
-    public function setImageConstraints(array $imageConstraints): UploadedFile {
+    public function setImageConstraints(array $imageConstraints): UploadedFile
+    {
         $this->imageConstraints = $imageConstraints;
         return $this;
     }
@@ -542,28 +586,32 @@ class UploadedFile {
     /**
      * @return string|null
      */
-    public function getForeignUrl(): ?string {
+    public function getForeignUrl(): ?string
+    {
         return $this->foreignUrl;
     }
 
     /**
      * @param string|null $foreignUrl
      */
-    public function setForeignUrl(?string $foreignUrl): void {
+    public function setForeignUrl(?string $foreignUrl): void
+    {
         $this->foreignUrl = $foreignUrl;
     }
 
     /**
      * @return string|null
      */
-    public function getResolvedForeignUrl(): ?string {
+    public function getResolvedForeignUrl(): ?string
+    {
         return $this->resolvedForeignUrl;
     }
 
     /**
      * @param string|null $resolvedForeignUrl
      */
-    public function setResolvedForeignUrl(?string $resolvedForeignUrl): void {
+    public function setResolvedForeignUrl(?string $resolvedForeignUrl): void
+    {
         $this->resolvedForeignUrl = $resolvedForeignUrl;
     }
 
@@ -573,9 +621,10 @@ class UploadedFile {
      * @return bool
      * @deprecated This method is subject to some refactoring. Please don't use it in new code.
      */
-    public function getSizeLimitsEnabled(): bool {
+    public function getSizeLimitsEnabled(): bool
+    {
         if ($this->sizeLimitsEnabled === null) {
-            return (bool)\Gdn::config("ImageUpload.Limits.Enabled", false);
+            return (bool) \Gdn::config("ImageUpload.Limits.Enabled", false);
         } else {
             return $this->sizeLimitsEnabled;
         }
@@ -588,7 +637,8 @@ class UploadedFile {
      * @return $this
      * @deprecated This method is subject to some refactoring. Please don't use it in new code.
      */
-    public function setSizeLimitsEnabled(?bool $sizeLimitsEnabled) {
+    public function setSizeLimitsEnabled(?bool $sizeLimitsEnabled)
+    {
         $this->sizeLimitsEnabled = $sizeLimitsEnabled;
         return $this;
     }

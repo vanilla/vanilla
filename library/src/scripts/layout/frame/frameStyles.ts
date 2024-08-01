@@ -5,16 +5,31 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent } from "csx";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { percent, viewHeight } from "csx";
+import { oneColumnVariables } from "@library/layout/Section.variables";
+import { css } from "@emotion/css";
 
 export const frameVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("frame");
 
+    /**
+     * @varGroup frame.colors
+     * @commonDescription Frame colors
+     */
     const colors = makeThemeVars("colors", {
-        bg: globalVars.mainColors.bg,
+        /**
+         * @var frame.colors.bg
+         * @title Frame Colors - Background
+         * @description Sets the background color
+         * @type string
+         * @format hex-color
+         */
+        bg: undefined,
         fg: globalVars.mainColors.fg,
     });
 
@@ -55,41 +70,44 @@ export const frameVariables = useThemeCache(() => {
 
 export const frameClasses = useThemeCache(() => {
     const vars = frameVariables();
-    const style = styleFactory("frame");
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
-    const headerWrap = style("headerWrap", {
-        background: colorOut(vars.colors.bg),
+    const headerWrap = css({
+        background: ColorsUtils.colorOut(vars.colors.bg),
         zIndex: 2,
         willChange: "height",
     });
-    const bodyWrap = style("bodyWrap", {
+    const bodyWrap = css({
         position: "relative",
-        background: colorOut(vars.colors.bg),
+        background: ColorsUtils.colorOut(vars.colors.bg),
         width: percent(100),
     });
-    const footerWrap = style("footerWrap", {
-        background: colorOut(vars.colors.bg),
+    const footerWrap = css({
+        background: ColorsUtils.colorOut(vars.colors.bg),
         zIndex: 2,
         willChange: "height",
     });
 
-    const root = style({
-        backgroundColor: colorOut(vars.colors.bg),
-        maxHeight: percent(100),
-        height: percent(100),
-        borderRadius: unit(vars.border.radius),
-        width: percent(100),
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        minHeight: 0, // https://bugs.chromium.org/p/chromium/issues/detail?id=927066
-        $nest: {
+    const root = css(
+        {
+            backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
+            maxHeight: viewHeight(80),
+            height: percent(100),
+            borderRadius: styleUnit(vars.border.radius),
+            width: percent(100),
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0, // https://bugs.chromium.org/p/chromium/issues/detail?id=927066
             [`.${bodyWrap}`]: {
                 flexGrow: 1,
                 overflowY: "auto",
             },
         },
-    });
+        mediaQueries.xs({
+            maxHeight: percent(100),
+        }),
+    );
 
     return {
         root,

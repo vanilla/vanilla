@@ -11,13 +11,13 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedUtils;
 use Vanilla\Web\Asset\AssetPreloader;
-use Vanilla\Web\Asset\ExternalAsset;
+use Vanilla\Web\Asset\WebAsset;
 
 /**
  * Embed data object for imgur.
  */
-class ImgurEmbed extends AbstractEmbed {
-
+class ImgurEmbed extends AbstractEmbed
+{
     const JS_SCRIPT = "https://s.imgur.com/min/embed.js";
     const TYPE = "imgur";
 
@@ -25,32 +25,35 @@ class ImgurEmbed extends AbstractEmbed {
      * Override to set a value in the PreloadAssetModel.
      * @inheritdoc
      */
-    public function __construct(array $data) {
+    public function __construct(array $data)
+    {
         parent::__construct($data);
 
         EmbedUtils::getPreloadModel()->addScript(
-            new ExternalAsset(self::JS_SCRIPT),
+            new WebAsset(self::JS_SCRIPT),
             AssetPreloader::REL_PRELOAD,
-            'imgur-embed-script-asset'
+            "imgur-embed-script-asset"
         );
     }
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $data = EmbedUtils::remapProperties($data, [
             "imgurID" => "attributes.postID",
         ]);
         if (array_key_exists("imgurID", $data) && ($data["attributes"]["isAlbum"] ?? false)) {
-            $data["imgurID"] = "a/{$data['imgurID']}";
+            $data["imgurID"] = "a/{$data["imgurID"]}";
         }
         $data = EmbedUtils::ensureDimensions($data);
         return $data;
@@ -59,11 +62,8 @@ class ImgurEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            "height:i",
-            "width:i",
-            "imgurID:s",
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["height:i", "width:i", "imgurID:s"]);
     }
 }

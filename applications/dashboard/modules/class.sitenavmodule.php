@@ -20,19 +20,19 @@
  *
  * TODO: Handle adding dropdown items to the SiteNavModule.
  */
-class SiteNavModule extends NavModule {
-
+class SiteNavModule extends NavModule
+{
     /** @var string The section for global items. Items in the global section will render everywhere. */
-    const SECTION_GLOBAL = 'globals';
+    const SECTION_GLOBAL = "globals";
 
     /** @var string The default section if none is supplied. */
-    const SECTION_DEFAULT = 'defaults';
+    const SECTION_DEFAULT = "defaults";
 
     /** @var string The key for storing links in the sectionItems array. */
-    const KEY_LINKS = 'links';
+    const KEY_LINKS = "links";
 
     /** @var string The key for storing groups in the sectionItems array. */
-    const KEY_GROUPS = 'groups';
+    const KEY_GROUPS = "groups";
 
     /**
      * All the nav items organized by section.
@@ -56,35 +56,40 @@ class SiteNavModule extends NavModule {
     /**
      * @return array The nav items organized by section.
      */
-    public static function getSectionItems() {
+    public static function getSectionItems()
+    {
         return self::$sectionItems;
     }
 
     /**
      * @param array $sectionItems The nav items organized by section.
      */
-    public static function setSectionItems($sectionItems) {
+    public static function setSectionItems($sectionItems)
+    {
         self::$sectionItems = $sectionItems;
     }
 
     /**
      * @return boolean Whether we've fired the init event yet.
      */
-    public static function isInitStaticFired() {
+    public static function isInitStaticFired()
+    {
         return self::$initStaticFired;
     }
 
     /**
      * @param boolean $initStaticFired Whether we've fired the init event yet.
      */
-    public static function setInitStaticFired($initStaticFired) {
+    public static function setInitStaticFired($initStaticFired)
+    {
         self::$initStaticFired = $initStaticFired;
     }
 
     /**
      * @return array The sections we should render navs for.
      */
-    public function getCurrentSections() {
+    public function getCurrentSections()
+    {
         return $this->currentSections;
     }
 
@@ -92,7 +97,8 @@ class SiteNavModule extends NavModule {
      * @param array $currentSections The sections we should render navs for.
      * @return SiteNavModule $this
      */
-    public function setCurrentSections($currentSections) {
+    public function setCurrentSections($currentSections)
+    {
         $this->currentSections = $currentSections;
         return $this;
     }
@@ -110,15 +116,24 @@ class SiteNavModule extends NavModule {
      * @param bool $disabled Whether to disable the link.
      * @return SiteNavModule $this
      */
-    public function addLinkToSection($section, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
+    public function addLinkToSection(
+        $section,
+        $text,
+        $url,
+        $key = "",
+        $cssClass = "",
+        $sort = [],
+        $modifiers = [],
+        $disabled = false
+    ) {
         $args = [
-            'text' => $text,
-            'url' => $url,
-            'key' => $key,
-            'cssClass' => $cssClass,
-            'sort' => $sort,
-            'modifiers' => $modifiers,
-            'disabled' => $disabled
+            "text" => $text,
+            "url" => $url,
+            "key" => $key,
+            "cssClass" => $cssClass,
+            "sort" => $sort,
+            "modifiers" => $modifiers,
+            "disabled" => $disabled,
         ];
 
         self::addToSectionItems($section, self::KEY_LINKS, $key, $args);
@@ -140,7 +155,17 @@ class SiteNavModule extends NavModule {
      * @param bool $disabled Whether to disable the link.
      * @return SiteNavModule $this
      */
-    public function addLinkToSectionIf($isAllowed, $section, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
+    public function addLinkToSectionIf(
+        $isAllowed,
+        $section,
+        $text,
+        $url,
+        $key = "",
+        $cssClass = "",
+        $sort = [],
+        $modifiers = [],
+        $disabled = false
+    ) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -159,13 +184,14 @@ class SiteNavModule extends NavModule {
      * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
      * @return SiteNavModule $this
      */
-    public function addGroupToSection($section, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
+    public function addGroupToSection($section, $text = "", $key = "", $cssClass = "", $sort = [], $modifiers = [])
+    {
         $args = [
-            'text' => $text,
-            'key' => $key,
-            'cssClass' => $cssClass,
-            'sort' => $sort,
-            'modifiers' => $modifiers
+            "text" => $text,
+            "key" => $key,
+            "cssClass" => $cssClass,
+            "sort" => $sort,
+            "modifiers" => $modifiers,
         ];
 
         self::addToSectionItems($section, self::KEY_GROUPS, $key, $args);
@@ -185,7 +211,15 @@ class SiteNavModule extends NavModule {
      * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
      * @return SiteNavModule $this
      */
-    public function addGroupToSectionIf($isAllowed, $section, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
+    public function addGroupToSectionIf(
+        $isAllowed,
+        $section,
+        $text = "",
+        $key = "",
+        $cssClass = "",
+        $sort = [],
+        $modifiers = []
+    ) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -201,7 +235,8 @@ class SiteNavModule extends NavModule {
      * @param string $itemKey The key for the item.
      * @param string $item The item to add to the section items array.
      */
-    private static function addToSectionItems($section, $typeKey, $itemKey, $item) {
+    private static function addToSectionItems($section, $typeKey, $itemKey, $item)
+    {
         self::$sectionItems[strtolower($section)][$typeKey][$itemKey] = $item;
     }
 
@@ -217,7 +252,8 @@ class SiteNavModule extends NavModule {
      * @param bool $disabled Whether to disable the link.
      * @return SiteNavModule $this
      */
-    public function addLink($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
+    public function addLink($text, $url, $key = "", $cssClass = "", $sort = [], $modifiers = [], $disabled = false)
+    {
         $this->addLinkToSection(static::SECTION_DEFAULT, $text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
         return $this;
     }
@@ -236,7 +272,16 @@ class SiteNavModule extends NavModule {
      * @param bool $disabled Whether to disable the link.
      * @return SiteNavModule $this
      */
-    public function addLinkIf($isAllowed, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
+    public function addLinkIf(
+        $isAllowed,
+        $text,
+        $url,
+        $key = "",
+        $cssClass = "",
+        $sort = [],
+        $modifiers = [],
+        $disabled = false
+    ) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -254,7 +299,8 @@ class SiteNavModule extends NavModule {
      * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
      * @return SiteNavModule $this
      */
-    public function addGroup($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
+    public function addGroup($text = "", $key = "", $cssClass = "", $sort = [], $modifiers = [])
+    {
         $this->addGroupToSection(static::SECTION_DEFAULT, $text, $key, $cssClass, $sort, $modifiers);
         return $this;
     }
@@ -271,7 +317,8 @@ class SiteNavModule extends NavModule {
      * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
      * @return SiteNavModule $this
      */
-    public function addGroupIf($isAllowed = true, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
+    public function addGroupIf($isAllowed = true, $text = "", $key = "", $cssClass = "", $sort = [], $modifiers = [])
+    {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -292,7 +339,15 @@ class SiteNavModule extends NavModule {
      * @param bool $disabled Whether to disable the link.
      * @return SiteNavModule $this
      */
-    public function addLinkToGlobals($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
+    public function addLinkToGlobals(
+        $text,
+        $url,
+        $key = "",
+        $cssClass = "",
+        $sort = [],
+        $modifiers = [],
+        $disabled = false
+    ) {
         $this->addLinkToSection(static::SECTION_GLOBAL, $text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
         return $this;
     }
@@ -312,7 +367,22 @@ class SiteNavModule extends NavModule {
      * @param bool $disabled Whether to disable the link.
      * @return SiteNavModule $this
      */
-    public function addLinkToGlobalsIf($isAllowed = true, $text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
+    public function addLinkToGlobalsIf(
+        $isAllowed = true,
+        $text = "",
+        $url = "",
+        $key = "",
+        $cssClass = "",
+        $sort = [],
+        $modifiers = [],
+        $disabled = false
+    ) {
+        if (empty($text)) {
+            throw new InvalidArgumentException("Text field shouldn't be empty");
+        }
+        if (empty($text)) {
+            throw new InvalidArgumentException("Url field shouldn't be empty");
+        }
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -331,7 +401,8 @@ class SiteNavModule extends NavModule {
      * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
      * @return SiteNavModule $this
      */
-    public function addGroupToGlobals($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
+    public function addGroupToGlobals($text = "", $key = "", $cssClass = "", $sort = [], $modifiers = [])
+    {
         $this->addGroupToSection(static::SECTION_GLOBAL, $text, $key, $cssClass, $sort, $modifiers);
         return $this;
     }
@@ -349,14 +420,14 @@ class SiteNavModule extends NavModule {
      * @param array $modifiers List of attribute => value, where the attribute is in $this->allowedItemModifiers.
      * @return SiteNavModule $this
      */
-    public function addGroupToGlobalsIf($isAllowed, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
+    public function addGroupToGlobalsIf($isAllowed, $text = "", $key = "", $cssClass = "", $sort = [], $modifiers = [])
+    {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
             return $this->addGroupToGlobals($text, $key, $cssClass, $sort, $modifiers);
         }
     }
-
 
     /**
      * If current sections is not set, try to find the section we're in and then add the groups and links
@@ -365,16 +436,16 @@ class SiteNavModule extends NavModule {
      * @return bool Whether we're given clearance to render the nav.
      * @throws Exception
      */
-    public function prepare() {
-
+    public function prepare()
+    {
         if (!self::isInitStaticFired()) {
             self::setInitStaticFired(true);
-            $this->fireEvent('init');
+            $this->fireEvent("init");
         }
 
         if (empty($this->currentSections)) {
-            $currentSections = Gdn_Theme::section('', 'get');
-            $currentSections = array_map('strtolower', $currentSections);
+            $currentSections = Gdn_Theme::section("", "get");
+            $currentSections = array_map("strtolower", $currentSections);
 
             $customNavKeys = array_intersect(array_keys(self::getSectionItems()), $currentSections);
             $hasCustomNav = !empty($customNavKeys);
@@ -387,7 +458,7 @@ class SiteNavModule extends NavModule {
             // Add global items
             $currentSections[] = static::SECTION_GLOBAL;
         } else {
-            $currentSections = array_map('strtolower', $this->currentSections);
+            $currentSections = array_map("strtolower", $this->currentSections);
         }
 
         foreach ($currentSections as $currentSection) {
@@ -403,15 +474,16 @@ class SiteNavModule extends NavModule {
      *
      * @param array $sectionItems The section items to render.
      */
-    public function addSectionItems($sectionItems) {
+    public function addSectionItems($sectionItems)
+    {
         if ($groups = val(self::KEY_GROUPS, $sectionItems)) {
             foreach ($groups as $group) {
                 parent::addGroup(
-                    $group['text'],
-                    $group['key'],
-                    $group['cssClass'],
-                    $group['sort'],
-                    $group['modifiers']
+                    $group["text"],
+                    $group["key"],
+                    $group["cssClass"],
+                    $group["sort"],
+                    $group["modifiers"]
                 );
             }
         }
@@ -419,13 +491,13 @@ class SiteNavModule extends NavModule {
         if ($links = val(self::KEY_LINKS, $sectionItems)) {
             foreach ($links as $link) {
                 parent::addLink(
-                    $link['text'],
-                    $link['url'],
-                    $link['key'],
-                    $link['cssClass'],
-                    $link['sort'],
-                    $link['modifiers'],
-                    $link['disabled']
+                    $link["text"],
+                    $link["url"],
+                    $link["key"],
+                    $link["cssClass"],
+                    $link["sort"],
+                    $link["modifiers"],
+                    $link["disabled"]
                 );
             }
         }
@@ -437,7 +509,8 @@ class SiteNavModule extends NavModule {
      * @param string $key The key of the item to remove, separated by dots.
      * @param string $typeKey
      */
-    public function removeItem($key, $typeKey = self::KEY_LINKS) {
+    public function removeItem($key, $typeKey = self::KEY_LINKS)
+    {
         foreach (self::$sectionItems as &$section) {
             unset($section[$typeKey][$key]);
         }

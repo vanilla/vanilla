@@ -1,16 +1,20 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
-import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
-import Permission from "@library/features/users/Permission";
-import { navigationVariables } from "@library/headers/navigationVariables";
+import { TitleBarNavItem } from "@library/headers/mebox/pieces/TitleBarNavItem";
+import { INavigationVariableItem, navigationVariables } from "@library/headers/navigationVariables";
 import FlexSpacer from "@library/layout/FlexSpacer";
+import { IMegaMenuHandle, TitleBarMegaMenu } from "@library/headers/TitleBarMegaMenu";
+import { formatUrl, siteUrl, t } from "@library/utility/appUtils";
+import { useLocation } from "react-router";
+import { useMeasure } from "@vanilla/react-utils";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 export interface ITitleBarNavProps {
     className?: string;
@@ -22,81 +26,177 @@ export interface ITitleBarNavProps {
     containerRef?: React.RefObject<HTMLElement | null>;
     isCentered?: boolean;
     afterNode?: React.ReactNode;
+    // For storybook.
+    forceOpen?: boolean;
 }
 
 /**
  * Implements Navigation component for header
  */
-export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
-    /**
-     * Add some extra class.
-     *
-     * @param componentClass A react component class/function
-     */
-    public static addNavItem(componentClass: React.ComponentType) {
-        TitleBarNav.extraNavItems.push(componentClass);
-    }
+export default function TitleBarNav(props: ITitleBarNavProps) {
+    const { navigationItems } = navigationVariables();
 
-    /**
-     * Addational items to render in the navigation.
-     */
-    private static extraNavItems: React.ComponentType[] = [];
+    const location = useLocation();
 
-    public render() {
-        const data = navigationVariables().getNavItemsForLocale();
+    const [menuItem, setMenuItem] = useState<HTMLElement>();
+    const [expanded, setExpanded] = useState<INavigationVariableItem>();
 
-        const classes = titleBarNavClasses();
-        const dataLength = data ? Object.keys(data!).length - 1 : 0;
-        const content = data
-            ? data.map((item, key) => {
-                  const component = (
-                      <TitleBarNavItem
-                          {...item}
-                          className={classNames({
-                              [classes.lastItem]: dataLength === key,
-                              [classes.firstItem]: key === 0,
-                          })}
-                          linkClassName={this.props.linkClassName}
-                          key={key}
-                      />
-                  );
+    const megaMenuRef = useRef<IMegaMenuHandle>(null);
+    const firstItemRef = useRef<HTMLAnchorElement | HTMLButtonElement>();
 
-                  if (item.permission) {
-                      return (
-                          <Permission key={key} permission={item.permission}>
-                              {component}
-                          </Permission>
-                      );
-                  } else {
-                      return component;
-                  }
-              })
-            : null;
+    const active = !!expanded && !!expanded.children?.length && expanded;
+
+    const firstItemDimensions = useMeasure(firstItemRef as any, false, true);
+    const { hasPermission } = usePermissionsContext();
+
+    const classes = titleBarNavClasses();
+    let haveActiveNavItem = false;
+    const filteredNavItems = navigationItems.filter((item) => {
+        if (item.isHidden) {
+            return false;
+        }
+        if (!item.permission) {
+            return true;
+        } else {
+            return hasPermission(item.permission);
+        }
+    });
+
+    const dataLength = Object.keys(filteredNavItems).length;
+
+    const content = filteredNavItems.map((item, key) => {
+        function onActive(element) {
+            setExpanded(item);
+            setMenuItem(element);
+        }
+
+        function onFocus(element) {
+            if (expanded !== item) setExpanded(undefined);
+        }
+
+        function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+            const target = event.target as HTMLElement;
+            const listItem = target.closest("li");
+            const nextSibling = listItem?.nextSibling as HTMLElement;
+            const previousSibling = listItem?.previousSibling as HTMLElement;
+            switch (event.key) {
+                case "Enter":
+                case " ":
+                    event.preventDefault();
+                    if (item.children && item.children.length > 0) {
+                        onActive(event.target);
+                        setTimeout(() => {
+                            megaMenuRef.current?.focusFirstItem();
+                        });
+                    } else {
+                        (event.target as HTMLElement).click();
+                    }
+                    break;
+                case "ArrowDown":
+                    event.preventDefault();
+                    onActive(event.target);
+                    setTimeout(() => {
+                        megaMenuRef.current?.focusFirstItem();
+                    });
+                    break;
+                case "ArrowUp":
+                    event.preventDefault();
+                    setExpanded(undefined);
+                    break;
+                case "ArrowRight":
+                    event.preventDefault();
+                    nextSibling?.querySelector<HTMLAnchorElement>("a")?.focus();
+                    break;
+                case "ArrowLeft":
+                    event.preventDefault();
+                    previousSibling?.querySelector<HTMLAnchorElement>("a")?.focus();
+                    break;
+            }
+        }
+
+        /**
+         * Checks if we're on the current page
+         * Note that won't work with non-canonical URLHeaderLogo.tsx
+         */
+        const isCurrentPage = (): boolean => {
+            if (location && location.pathname) {
+                return siteUrl(window.location.pathname) === formatUrl(item.url, true);
+            } else {
+                return false;
+            }
+        };
+
+        //if we already have active navItem, avoid duplicates (cases when same url for multiple items etc)
+        const navItemIsActive = (active ? active === item : isCurrentPage()) && !haveActiveNavItem;
+        if (navItemIsActive) {
+            haveActiveNavItem = true;
+        }
 
         return (
-            <>
-                {this.props.isCentered && <FlexSpacer actualSpacer />}
-                <div
-                    ref={this.props.containerRef as any}
-                    className={classNames(
-                        "headerNavigation",
-                        this.props.className,
-                        classes.navigation,
-                        this.props.isCentered && classes.navigationCentered,
-                    )}
-                >
-                    <ul className={classNames(this.props.listClassName, classes.items)}>
-                        {this.props.children ? this.props.children : content}
-                        <>
-                            {this.props.excludeExtraNavItems ??
-                                TitleBarNav.extraNavItems.map((ComponentClass, i) => {
-                                    return <ComponentClass key={i} />;
-                                })}
-                        </>
-                    </ul>
-                    {this.props.afterNode}
-                </div>
-            </>
+            <TitleBarNavItem
+                to={item.url}
+                ref={(ref) => {
+                    if (key === 0) firstItemRef.current = ref!;
+                }}
+                isActive={navItemIsActive}
+                className={classNames({
+                    [classes.lastItem]: dataLength === key,
+                    [classes.firstItem]: key === 0,
+                })}
+                onMouseEnter={(event) => onActive(event.target)}
+                onFocus={(event) => onFocus(event.target)}
+                onKeyDown={onKeyDown}
+                linkClassName={props.linkClassName}
+                key={key}
+                hasPopupMenu={item.children && !!item.children.length}
+            >
+                {t(item.name)}
+            </TitleBarNavItem>
         );
-    }
+    });
+
+    return (
+        <>
+            {props.isCentered && <FlexSpacer actualSpacer />}
+            <div
+                ref={props.containerRef as any}
+                className={classNames(
+                    "headerNavigation",
+                    props.className,
+                    classes.navigation,
+                    props.isCentered && classes.navigationCentered,
+                )}
+            >
+                <ul className={classNames(props.listClassName, classes.items)}>
+                    {props.children ? props.children : content}
+                    {props.excludeExtraNavItems ??
+                        TitleBarNav.extraNavItems.map((ComponentClass, i) => {
+                            return <ComponentClass key={i} />;
+                        })}
+                </ul>
+                {props.afterNode}
+            </div>
+            <TitleBarMegaMenu
+                ref={megaMenuRef}
+                leftOffset={firstItemDimensions.left}
+                menuItem={menuItem}
+                expanded={props.forceOpen ? filteredNavItems[0] : expanded}
+                onClose={props.forceOpen ? () => {} : () => setExpanded(undefined)}
+            />
+        </>
+    );
 }
+
+/**
+ * Additional items to render in the navigation.
+ */
+TitleBarNav.extraNavItems = [] as React.ComponentType[];
+
+/**
+ * Add some extra class.
+ *
+ * @param componentClass A react component class/function
+ */
+TitleBarNav.addNavItem = (componentClass: React.ComponentType) => {
+    TitleBarNav.extraNavItems.push(componentClass);
+};

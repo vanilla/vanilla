@@ -1,0 +1,35 @@
+{% autoescape false %}
+{{t(email.title)}}
+{% if email.introduction|default(false) %}
+{{ email.introduction }}
+{% endif %}
+
+{% for category in email.categories %}
+{{ category.name }} ({% if email.utmParams|default(false) %}{{ category.url ~ '?' ~ email.utmParams }}"{% else %}{{ category.url }}{% endif %})
+
+{% for discussion in category.discussions %}
+{{ discussion.name }} ({% if email.utmParams|default(false) %}{{ discussion.url ~ '?' ~ email.utmParams }}"{% else %}{{ discussion.url }}{% endif %})
+{{ discussion.excerpt }}
+{%-set metas %}
+{% if discussion.countViews|default(false) %}
+{{ discussion.countViews }} {{t("views")}} {% endif %}
+{% if discussion.countComments|default(false) %}
+{{ discussion.countComments }} {{t("comments")}} {% endif %}
+{% if discussion.score|default(false) %}
+{{ discussion.score }} {{t("reactions")}} {% endif %}
+{% endset %}
+{{ "\n" }}{{ metas|trim }}
+{% if discussion.insertUser|default(false) %}
+{{sprintf(t("Started by %s"), discussion.insertUser.name)}}
+{% endif %}
+
+{% endfor %}
+{% endfor %}
+
+{% if email.footer|default(false) %}
+{{ email.footer }}
+{% endif %}
+
+{{t("Unsubscribe")}} ({% if email.utmParams|default(false) %}{{ email.digestUnsubscribeLink ~ '?' ~ email.utmParams }}"{% else %}{{ email.digestUnsubscribeLink }}{% endif %}) {{t("from the email digest or")}}
+
+{{t("Manage")}} ({{ email.siteUrl }}/profile/preferences{% if email.utmParams|default(false) %}?{{ email.utmParams }} {% endif %}) {{t("your notification preferences")}}{% endautoescape %}

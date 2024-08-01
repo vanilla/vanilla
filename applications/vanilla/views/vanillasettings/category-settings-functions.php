@@ -3,6 +3,8 @@
  *
  */
 
+use Vanilla\Utility\HtmlUtils;
+
 /**
  * @param array $categories
  * @param int $indent
@@ -61,6 +63,7 @@ function categoryFilterBox(array $options = []) {
  */
 function writeCategoryItem($category, $allowSorting = true) {
     $categoryID = $category['CategoryID'];
+    $isFeatured = $category['Featured'];
     $parentCategoryID = $category['ParentCategoryID'];
     $handle = $allowSorting ? '<div class="js-nestable-handle nestable-handle"></div>' : '';
     $icon = $allowSorting ? '<div class="btn btn-icon plank-icon">'.symbol('handle', t('Drag')).'</div>' : '';
@@ -70,16 +73,25 @@ function writeCategoryItem($category, $allowSorting = true) {
         $url = '/vanilla/settings/categories?parent='.urlencode($category['UrlCode']);
         $categoryName = anchor($categoryName, $url);
     }
+    $classes = HtmlUtils::classNames(
+        "nestable-content plank",
+        $isFeatured ? 'plank-highlight' : ''
+    )
     ?>
     <li class="js-nestable-item js-category-item nestable-item" data-category-id="<?php echo $categoryID; ?>" data-parent-category-id="<?php echo $parentCategoryID; ?>">
         <?php echo $handle; ?>
-        <div class="nestable-content plank">
+        <div class="<?php echo $classes ?>">
             <?php echo $icon; ?>
             <div class="plank-title">
                 <?php echo $categoryName; ?>
             </div>
             <div class="plank-options">
-                <?php writeCategoryOptions($category); ?>
+                <?php
+                    if ($isFeatured) {
+                        echo "<span class='plank-star'>" . symbol("star-empty") . "</span>";
+                    }
+                    writeCategoryOptions($category);
+                ?>
             </div>
         </div>
         <?php

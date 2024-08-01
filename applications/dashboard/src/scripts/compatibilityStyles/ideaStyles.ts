@@ -5,9 +5,10 @@
  * @license GPL-2.0-only
  */
 
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 
 export const ideaCSS = () => {
     const globalVars = globalVariables();
@@ -17,7 +18,7 @@ export const ideaCSS = () => {
         .idea-counter-module .idea-counter-box
         `,
         {
-            backgroundColor: colorOut(globalVars.mixBgAndFg(0.1)),
+            backgroundColor: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.1)),
         },
     );
 
@@ -27,7 +28,7 @@ export const ideaCSS = () => {
         .idea-counter-module .arrow::after
     `,
         {
-            borderColor: colorOut(globalVars.mixBgAndFg(0.75)),
+            borderColor: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.75)),
         },
     );
 
@@ -37,20 +38,29 @@ export const ideaCSS = () => {
         .idea-counter-module .uservote .arrow::after
     `,
         {
-            borderColor: colorOut(globalVars.mixPrimaryAndBg(0.2)),
+            borderColor: ColorsUtils.colorOut(globalVars.mixPrimaryAndBg(0.2)),
         },
     );
 
     cssOut(`.idea-counter-module .score`, {
-        color: colorOut(globalVars.mainColors.fg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+    });
+
+    cssOut(`.idea-counter-module`, {
+        float: "none",
+        margin: 0,
     });
 
     cssOut(
         `
-        .Groups .DataTable.DiscussionsTable.DiscussionsTable .ItemIdea td.DiscussionName .Wrap,
-        .DataTable.DiscussionsTable.DiscussionsTable .ItemIdea td.DiscussionName .Wrap`,
+        .DataList .ItemIdea.ItemIdea.ItemIdea .idea-counter-module .idea-counter-box,
+        .DataList .ItemIdea.ItemIdea.ItemIdea .PhotoWrap.IndexPhoto,
+        .MessageList .ItemIdea.ItemIdea.ItemIdea .idea-counter-module .idea-counter-box,
+        .MessageList .ItemIdea.ItemIdea.ItemIdea .PhotoWrap.IndexPhoto
+    `,
         {
-            paddingLeft: unit(50),
+            width: styleUnit(40),
+            height: styleUnit(40),
         },
     );
 };

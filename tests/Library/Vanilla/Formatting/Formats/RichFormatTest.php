@@ -7,32 +7,39 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Contracts\Formatting\FormatParsedInterface;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\RichFormat;
-use Vanilla\Formatting\Quill\Parser;
+use Vanilla\Formatting\Formats\RichFormatParsed;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
+use VanillaTests\Library\Vanilla\Formatting\UserMentionTestTraits;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the RichFormat.
  */
-class RichFormatTest extends AbstractFormatTestCase {
-
+class RichFormatTest extends AbstractFormatTestCase
+{
     /**
      * @inheritDoc
      */
-    protected function prepareFormatter(): FormatInterface {
+    protected function prepareFormatter(): FormatInterface
+    {
         self::container()
             ->rule(EmbedService::class)
-            ->addCall('registerEmbed', [ImageEmbed::class, ImageEmbed::TYPE]);
+            ->addCall("registerEmbed", [ImageEmbed::class, ImageEmbed::TYPE]);
         return self::container()->get(RichFormat::class);
     }
 
     /**
      * @inheritDoc
      */
-    protected function prepareFixtures(): array {
-        return (new FormatFixtureFactory('rich'))->getAllFixtures();
+    protected function prepareFixtures(): array
+    {
+        return (new FormatFixtureFactory("rich"))->getAllFixtures();
     }
 }

@@ -8,7 +8,7 @@ import Emitter from "quill/core/emitter";
 import Quill, { RangeStatic, Blot, DeltaOperation } from "quill/core";
 import Delta from "quill-delta";
 import { matchAtMention } from "@vanilla/utils";
-import uniqueId from "lodash/uniqueId";
+import uniqueId from "lodash-es/uniqueId";
 import BlockBlot from "quill/blots/block";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import { logDebug } from "@vanilla/utils";
@@ -272,7 +272,7 @@ export function getBlotAtIndex<T extends Blot>(
     index: number,
     blotClass?: { new (value?: any): T },
 ): T | null {
-    const condition = blotClass ? blot => blot instanceof blotClass : blot => true;
+    const condition = blotClass ? (blot) => blot instanceof blotClass : (blot) => true;
     return quill.scroll.descendant(condition, index)[0] as T;
 }
 

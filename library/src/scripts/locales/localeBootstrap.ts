@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { fetchLocalesFromApi } from "@library/locales/localeActions";
+import { fetchLocalesFromApi } from "@library/locales/fetchLocalesFromApi";
 import { setCurrentLocale, loadLocales, loadTranslations } from "@vanilla/i18n";
 import { getMeta } from "@library/utility/appUtils";
 import gdn from "@library/gdn";

@@ -4,8 +4,8 @@
  */
 
 import { ensureScript } from "@vanilla/dom-utils";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import { twitterEmbedClasses } from "@library/embeddedContent/twitterEmbedStyles";
 import { visibility } from "@library/styles/styleHelpers";
 import classNames from "classnames";
@@ -54,14 +54,14 @@ export function TwitterEmbed(props: IProps): JSX.Element {
             <EmbedContent
                 type={props.embedType}
                 isSmall
-                className={twitterLoaded ? undefined : visibility().displayNone}
+                className={twitterLoaded ? undefined : visibility().visuallyHidden}
             >
                 <div
                     className={classNames("js-twitterCard", classes.card)}
                     data-tweeturl={props.url}
                     data-tweetid={props.statusID}
                 >
-                    <a href={props.url} className="tweet-url" rel="nofollow noreferrer ugc">
+                    <a href={props.url} className="tweet-url" rel="nofollow noopener ugc">
                         {props.url}
                     </a>
                 </div>
@@ -118,7 +118,7 @@ export async function convertTwitterEmbeds() {
     const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
     if (tweets.length > 0) {
         await ensureScript(TWITTER_SCRIPT);
-        const promises = tweets.map(contentElement => {
+        const promises = tweets.map((contentElement) => {
             return renderTweet(contentElement as HTMLElement);
         });
 

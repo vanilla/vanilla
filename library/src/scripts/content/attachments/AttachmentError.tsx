@@ -6,15 +6,16 @@
 
 import React from "react";
 import { IFileAttachment } from "@library/content/attachments/Attachment";
-import { FOCUS_CLASS } from "@library/embeddedContent/embedService";
+import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import { t } from "@library/utility/appUtils";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import CloseButton from "@library/navigation/CloseButton";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
-import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedContainerSize";
 import { ErrorIcon } from "@library/icons/common";
 
 interface IProps extends IFileAttachment {
@@ -40,9 +41,8 @@ export default class AttachmentError extends React.Component<IProps> {
 
         return (
             <EmbedContainer
-                className={classNames("hasError", FOCUS_CLASS)}
+                className={classNames("hasError", EMBED_FOCUS_CLASS)}
                 size={EmbedContainerSize.SMALL}
-                tabIndex={0}
                 aria-describedby={this.descrID}
                 aria-label={t("Error")}
                 role="alert"

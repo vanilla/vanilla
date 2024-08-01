@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+if (\Vanilla\FeatureFlagHelper::featureEnabled(\Vanilla\Dashboard\Models\ProfileFieldModel::FEATURE_FLAG)) redirectTo('/settings/home');
 $Fields = $this->data('ExtendedFields');
 echo heading(t('Custom Profile Fields'), t('Add Field'), '/settings/profilefieldaddedit/', 'js-modal btn btn-primary')
 ?>
@@ -28,8 +29,8 @@ echo heading(t('Custom Profile Fields'), t('Add Field'), '/settings/profilefield
                 <td class="options">
                     <div class="btn-group">
                     <?php
-                    echo anchor(dashboardSymbol('edit'), '/settings/profilefieldaddedit/'.$Name, 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                    echo anchor(dashboardSymbol('delete'), '/settings/profilefielddelete/'.$Name, 'js-modal btn btn-icon',
+                    echo anchor(dashboardSymbol('edit'), '/settings/profilefieldaddedit/'.$Field['Name'], 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
+                    echo anchor(dashboardSymbol('delete'), '/settings/profilefielddelete/'.$Field['Name'], 'js-modal btn btn-icon',
                         ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-css-class' => 'modal-sm modal-confirm']);
                     ?>
                     </div>

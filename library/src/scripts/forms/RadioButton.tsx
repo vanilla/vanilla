@@ -1,37 +1,41 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { t } from "@library/utility/appUtils";
 import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import classNames from "classnames";
-
+import { cx } from "@emotion/css";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { InformationIcon } from "@library/icons/common";
+import { Icon } from "@vanilla/icons";
+import { useRadioGroupContext } from "@library/forms/RadioGroupContext";
 interface IProps extends IOptionalComponentID {
     id?: string;
     className?: string;
     checked?: boolean;
     disabled?: boolean;
     onChange?: any;
-    label: string;
+    onChecked?: () => void;
+    label: string | ReactNode;
     name?: string;
     isHorizontal?: boolean;
     note?: string;
     defaultChecked?: boolean;
     fakeFocus?: boolean;
-}
-
-interface IState {
-    id: string;
+    value: string;
+    tooltip?: string;
 }
 
 /**
  * A styled, accessible checkbox component.
  */
-export default function RadioButton(props: IProps) {
+export function RadioButton(props: IProps) {
     const labelID = useUniqueID("radioButton-label");
     const classes = checkRadioClasses();
     const { isHorizontal, note } = props;
@@ -40,10 +44,15 @@ export default function RadioButton(props: IProps) {
 
     return (
         <>
-            <label className={classNames(classes.root, props.className, { isHorizontal })}>
+            <label className={cx(classes.root, { isHorizontal }, props.className)}>
                 <input
-                    className={classNames(classes.input, "exclude-icheck", props.fakeFocus && "focus-visible")}
-                    onChange={props.onChange}
+                    className={cx(classes.input, "exclude-icheck", { "focus-visible": props.fakeFocus })}
+                    onChange={(e) => {
+                        props.onChange?.(e);
+                        if (e.target.checked) {
+                            props.onChecked?.();
+                        }
+                    }}
                     aria-disabled={props.disabled}
                     name={props.name}
                     disabled={props.disabled}
@@ -52,6 +61,7 @@ export default function RadioButton(props: IProps) {
                     defaultChecked={props.defaultChecked}
                     tabIndex={0}
                     aria-describedby={note ? noteID : undefined}
+                    value={props.value}
                 />
                 <span aria-hidden={true} className={classNames(classes.iconContainer, classes.disk)}>
                     <svg className={classes.diskIcon}>
@@ -64,6 +74,11 @@ export default function RadioButton(props: IProps) {
                         {props.label}
                     </span>
                 )}
+                {props.tooltip && (
+                    <ToolTip label={t(props.tooltip)}>
+                        <span className={classes.tooltipPerOption}>{<InformationIcon />}</span>
+                    </ToolTip>
+                )}
             </label>
             {note && (
                 <div id={noteID} className={"info"}>
@@ -72,4 +87,22 @@ export default function RadioButton(props: IProps) {
             )}
         </>
     );
+}
+
+// this can be used either in admin forms or in frontend forms.
+// must be wrapped in a RadioGroupContext
+export default function RadioButtonInRadioGroup(
+    props: Omit<React.ComponentProps<typeof RadioButton>, "onChange" | "checked">,
+) {
+    const { onChange, value, isInline } = useRadioGroupContext();
+
+    const controlledProps =
+        onChange !== undefined
+            ? {
+                  onChange: () => onChange(props.value),
+                  checked: value === props.value,
+              }
+            : {};
+
+    return <RadioButton {...props} {...controlledProps} isHorizontal={isInline} />;
 }

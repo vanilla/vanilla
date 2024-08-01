@@ -4,7 +4,7 @@
  */
 
 import { Store, Reducer, AnyAction } from "redux";
-import isEqual from "lodash/isEqual";
+import isEqual from "lodash-es/isEqual";
 
 /**
  * Class for wrapping some backing redux store and making assertions about the dispatched actions.
@@ -58,7 +58,7 @@ export class MockStore<GState> implements Store<GState, any> {
      * @param type The type to check.
      */
     public getFirstActionOfType(type: string): AnyAction | null {
-        const foundActions = this.actions.filter(action => action.type === type);
+        const foundActions = this.actions.filter((action) => action.type === type);
         return foundActions.length > 0 ? foundActions[0] : null;
     }
 
@@ -68,7 +68,7 @@ export class MockStore<GState> implements Store<GState, any> {
      * @param type The type to check.
      */
     public isActionTypeDispatched(type: string): boolean {
-        const foundActions = this.actions.filter(action => action.type === type);
+        const foundActions = this.actions.filter((action) => action.type === type);
         return foundActions.length > 0;
     }
 
@@ -78,7 +78,7 @@ export class MockStore<GState> implements Store<GState, any> {
      * @param actionToCheck The action to check for. An exact match must be found.
      */
     public isActionDispatched(actionToCheck: AnyAction) {
-        const foundActions = this.actions.filter(action => isEqual(action, actionToCheck));
+        const foundActions = this.actions.filter((action) => isEqual(action, actionToCheck));
         return foundActions.length > 0;
     }
 

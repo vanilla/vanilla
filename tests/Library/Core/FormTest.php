@@ -15,7 +15,8 @@ use Gdn_Form;
 /**
  * Tests for Gdn_Form.
  */
-class FormTest extends MinimalContainerTestCase {
+class FormTest extends MinimalContainerTestCase
+{
     use HtmlNormalizeTrait;
 
     /**
@@ -26,31 +27,33 @@ class FormTest extends MinimalContainerTestCase {
     /**
      * Setup a dummy request because {@link Gdn_Form} needs it.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
+        Gdn::factoryInstall(Gdn::AliasRequest, "Gdn_Request", null, Gdn::FactoryRealSingleton, "Create");
         Gdn::request()->fromImport(\Gdn_Request::create());
 
-        $this->form = new \Gdn_Form('', 'bootstrap');
-        $this->form->ErrorClass = 'test-error';
+        $this->form = new \Gdn_Form("", "bootstrap");
+        $this->form->ErrorClass = "test-error";
         \Gdn_Form::resetIDs();
     }
 
     /**
      * Test that errors are properly escape in the output.
      */
-    public function testErrorEscaping() {
+    public function testErrorEscaping()
+    {
         $frm = $this->form;
-        $stringError = '<script>alert(document.cookie)</script>';
+        $stringError = "<script>alert(document.cookie)</script>";
         $exception = new \Exception($stringError);
-        $frm->addError($stringError, 'item1');
-        $frm->addError($exception, 'item1');
-        $frm->addError(new \Gdn_SanitizedUserException('<strong>Hello World</strong>'), 'item3');
+        $frm->addError($stringError, "item1");
+        $frm->addError($exception, "item1");
+        $frm->addError(new \Gdn_SanitizedUserException("<strong>Hello World</strong>"), "item3");
 
         $frm->setValidationResults([
-            'item1' => [$stringError],
-            'item2' => [$exception],
+            "item1" => [$stringError],
+            "item2" => [$exception],
         ]);
 
         // 3 fields have errors
@@ -58,7 +61,7 @@ class FormTest extends MinimalContainerTestCase {
 
         // Make sure we are escaped properly.
         $expectedHtml = <<<HTML
-<div class="Messages Errors">
+<div aria-label="Validation Failed" class="Messages Errors" role="alert">
 <ul>
 <li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>
 <li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>
@@ -69,9 +72,10 @@ class FormTest extends MinimalContainerTestCase {
 </div>
 HTML;
 
-        $expectedString = '&lt;script&gt;alert(document.cookie)&lt;/script&gt;. &lt;script&gt;alert(document.cookie)&lt;/script&gt;.'
-                        .' &lt;script&gt;alert(document.cookie)&lt;/script&gt;. <strong>Hello World</strong>.'
-                        . ' &lt;script&gt;alert(document.cookie)&lt;/script&gt;.';
+        $expectedString =
+            "&lt;script&gt;alert(document.cookie)&lt;/script&gt;. &lt;script&gt;alert(document.cookie)&lt;/script&gt;." .
+            " &lt;script&gt;alert(document.cookie)&lt;/script&gt;. <strong>Hello World</strong>." .
+            " &lt;script&gt;alert(document.cookie)&lt;/script&gt;.";
 
         $expectedInline = <<<HTML
 <p class=test-error>&lt;script&gt;alert(document.cookie)&lt;/script&gt; @&lt;script&gt;alert(document.cookie)&lt;/script&gt;
@@ -81,37 +85,41 @@ HTML;
 
         $this->assertHtmlStringEqualsHtmlString($expectedHtml, $frm->errors());
         $this->assertEquals($expectedString, $frm->errorString());
-        $this->assertHtmlStringEqualsHtmlString($expectedInline, $frm->inlineError('item1'));
+        $this->assertHtmlStringEqualsHtmlString($expectedInline, $frm->inlineError("item1"));
     }
 
     /**
      * Test a basic text box.
      */
-    public function testTextBox() {
-        $input = $this->form->textBox('foo');
+    public function testTextBox()
+    {
+        $input = $this->form->textBox("foo");
         $this->assertSame('<input type="text" id="Form_foo" name="foo" value="" class="form-control" />', $input);
     }
 
     /**
      * Test the react image upload component.
      */
-    public function testImageUploadReact() {
+    public function testImageUploadReact()
+    {
         $frm = $this->form;
 
-        $expected = "<div data-react='imageUploadGroup' data-props="
-            ."'{&quot;label&quot;:&quot;test label&quot;,&quot;description&quot;:&quot;test desc&quot;,"
-            ."&quot;initialValue&quot;:null,"
-            ."&quot;fieldName&quot;:&quot;test&quot;}'></div>";
-        $input = $frm->imageUploadReact('test', 'test label', 'test desc');
+        $expected =
+            "<div data-react='imageUploadGroup' data-props=" .
+            "'{&quot;label&quot;:&quot;test label&quot;,&quot;description&quot;:&quot;test desc&quot;," .
+            "&quot;initialValue&quot;:null," .
+            "&quot;fieldName&quot;:&quot;test&quot;}'></div>";
+        $input = $frm->imageUploadReact("test", "test label", "test desc");
         $this->assertHtmlStringEqualsHtmlString($expected, $input);
 
-        $frm->setData(['test' => '533ae319e87e04.jpg']);
-        $input = $frm->imageUploadReact('test', 'test label', 'test desc');
+        $frm->setData(["test" => "533ae319e87e04.jpg"]);
+        $input = $frm->imageUploadReact("test", "test label", "test desc");
 
-        $expected = "<div data-react='imageUploadGroup' data-props="
-        ."'{&quot;label&quot;:&quot;test label&quot;,&quot;description&quot;:&quot;test desc&quot;,"
-        ."&quot;initialValue&quot;:&quot;http:\/\/vanilla.test\/minimal-container-test\/uploads\/533ae319e87e04.jpg&quot;,"
-        ."&quot;fieldName&quot;:&quot;test&quot;}'></div>";
+        $expected =
+            "<div data-react='imageUploadGroup' data-props=" .
+            "'{&quot;label&quot;:&quot;test label&quot;,&quot;description&quot;:&quot;test desc&quot;," .
+            "&quot;initialValue&quot;:&quot;http:\/\/vanilla.test\/minimal-container-test\/uploads\/533ae319e87e04.jpg&quot;," .
+            "&quot;fieldName&quot;:&quot;test&quot;}'></div>";
 
         $this->assertHtmlStringEqualsHtmlString($expected, $input);
     }
@@ -119,8 +127,9 @@ HTML;
     /**
      * Test that placeholders can be applied to color inputs.
      */
-    public function testColorInputPlaceholder() {
-        $input = $this->form->color('test', ['placeholder' => 'My placeholder!']);
+    public function testColorInputPlaceholder()
+    {
+        $input = $this->form->color("test", ["placeholder" => "My placeholder!"]);
 
         $this->assertStringContainsString('placeholder="My placeholder!"', $input);
     }
@@ -128,10 +137,11 @@ HTML;
     /**
      * Test a custom class being set on an input.
      */
-    public function testTranslateClassesWithCustomClass() {
-        $frm = new Gdn_Form('', 'bootstrap');
+    public function testTranslateClassesWithCustomClass()
+    {
+        $frm = new Gdn_Form("", "bootstrap");
 
-        $input = $frm->input('DefaultAvatar', 'file', ['class' => 'js-new-avatar-upload Hidden']);
+        $input = $frm->input("DefaultAvatar", "file", ["class" => "js-new-avatar-upload Hidden"]);
         $this->assertSame(
             '<input type="file" id="Form_DefaultAvatar" name="DefaultAvatar" class="js-new-avatar-upload Hidden form-control-file" />',
             $input
@@ -141,51 +151,55 @@ HTML;
     /**
      * The `Gdn_Form::InputPrefix` property is deprecated.
      */
-    public function testInputPrefixDeprecation(): void {
+    public function testInputPrefixDeprecation(): void
+    {
         $this->expectDeprecation();
-        $this->form->InputPrefix = 'foo';
+        $this->form->InputPrefix = "foo";
 
-        @$this->form->InputPrefix = 'bar';
+        @$this->form->InputPrefix = "bar";
         $p = @$this->form->InputPrefix;
-        $this->assertSame('bar', $p);
+        $this->assertSame("bar", $p);
     }
 
     /**
      * Test `Gdn_Form::addErrorClass()`.
      */
-    public function testAddErrorClass(): void {
-        $attributes = ['class' => 'foo'];
+    public function testAddErrorClass(): void
+    {
+        $attributes = ["class" => "foo"];
         $this->form->addErrorClass($attributes);
-        $this->assertSame('foo test-error', $attributes['class']);
+        $this->assertSame("foo test-error", $attributes["class"]);
 
         $attributes = [];
         $this->form->addErrorClass($attributes);
-        $this->assertSame('test-error', $attributes['class']);
+        $this->assertSame("test-error", $attributes["class"]);
     }
 
     /**
      * Test `Gdn_Form::setStyles()` and `Gdn_Form::getStyles()`.
      */
-    public function testStyleAccessors(): void {
-        $this->form->setStyles('foo');
+    public function testStyleAccessors(): void
+    {
+        $this->form->setStyles("foo");
 
-        $this->assertSame('Button', $this->form->getStyle('button'));
-        $this->assertSame('bar', $this->form->getStyle('foo', 'bar'));
+        $this->assertSame("Button", $this->form->getStyle("button"));
+        $this->assertSame("bar", $this->form->getStyle("foo", "bar"));
 
-        $this->form->setStyles('bootstrap');
-        $this->assertSame('form-control', $this->form->getStyle('foo'));
+        $this->form->setStyles("bootstrap");
+        $this->assertSame("form-control", $this->form->getStyle("foo"));
     }
 
     /**
      * Test the default `Gdn_Form::bodyBox()`.
      */
-    public function testDefaultBodyBox(): void {
+    public function testDefaultBodyBox(): void
+    {
         $actual = $this->form->bodyBox();
         $expected = <<<EOT
 <div class="bodybox-wrap">
-    <input type="hidden" id="Form_Format" name="Format" value="rich" />
+    <input type="hidden" id="Form_Format" name="Format" value="rich2" />
     <div class="input-wrap">
-        <textarea id="Form_Body" name="Body" class="form-control js-bodybox" format="rich" rows="6" cols="100"></textarea>
+        <textarea id="Form_Body" name="Body" class="form-control js-bodybox" format="rich2" rows="6" cols="100"></textarea>
     </div>
 </div>
 EOT;
@@ -195,7 +209,8 @@ EOT;
     /**
      * Test the default `Gdn_Form::button()`.
      */
-    public function testDefaultButton(): void {
+    public function testDefaultButton(): void
+    {
         $actual = $this->form->button('fo>"');
         $expected = <<<EOT
 <button type="submit" id="Form_fo" name="fo&gt;&quot;" class="btn btn-primary" value="fo&gt;&quot;">fo&gt;&quot;</button>
@@ -207,8 +222,9 @@ EOT;
     /**
      * Test the default `Gdn_Form::linkButton()`.
      */
-    public function testDefaultLinkButton(): void {
-        $actual = $this->form->linkButton('f<b>o</b>"', 'http://example.com#>');
+    public function testDefaultLinkButton(): void
+    {
+        $actual = $this->form->linkButton('f<b>o</b>"', "http://example.com#>");
         $expected = <<<EOT
 <a href="http://example.com#&gt;" class="btn btn-primary">f<b>o</b>"</a>
 EOT;
@@ -218,7 +234,8 @@ EOT;
     /**
      * Test the default `Gdn_Form::toggle()`.
      */
-    public function testDefaultToggle(): void {
+    public function testDefaultToggle(): void
+    {
         $actual = $this->form->toggle('fo>"');
         $expected = <<<EOT
 <div class="toggle-wrap">
@@ -233,7 +250,8 @@ EOT;
     /**
      * Test the default `Gdn_Form::fileUpload()`.
      */
-    public function testDefaultFileUpload(): void {
+    public function testDefaultFileUpload(): void
+    {
         $actual = $this->form->fileUpload('fo>"');
         $expected = <<<EOT
 <label class="file-upload">
@@ -249,7 +267,8 @@ EOT;
     /**
      * Test the default `Gdn_Form::fileUploadWrap()`.
      */
-    public function testDefaultFileUploadWrap(): void {
+    public function testDefaultFileUploadWrap(): void
+    {
         $actual = $this->form->fileUploadWrap('fo>"');
         $expected = <<<EOT
 <div class="input-wrap">
@@ -266,8 +285,9 @@ EOT;
     /**
      * Test the default `Gdn_Form::imageUploadPreview()`.
      */
-    public function testDefaultImageUploadPreview(): void {
-        $actual = $this->form->imageUploadPreview('fo>"', 'b<b>a</b>', 'd<b>esc</b>');
+    public function testDefaultImageUploadPreview(): void
+    {
+        $actual = $this->form->imageUploadPreview('fo>"', "b<b>a</b>", "d<b>esc</b>");
         $expected = <<<EOT
 <li class="form-group js-image-preview-form-group">
     <div class="label-wrap">
@@ -300,7 +320,8 @@ EOT;
      * @param string $name
      * @dataProvider provideEscapeFieldNameTests
      */
-    public function testEscapeFieldName(string $name) {
+    public function testEscapeFieldName(string $name)
+    {
         $actual = $this->form->unescapeFieldName($this->form->escapeFieldName($name));
         $this->assertSame($name, $actual);
     }
@@ -310,19 +331,17 @@ EOT;
      *
      * @return array
      */
-    public function provideEscapeFieldNameTests(): array {
-        $r = [
-            ['a'],
-            ['a.b'],
-            ['a-dot-b']
-        ];
+    public function provideEscapeFieldNameTests(): array
+    {
+        $r = [["a"], ["a.b"], ["a-dot-b"]];
         return array_column($r, null, 0);
     }
 
     /**
      * Test the default `Gdn_Form::imageUpload()`.
      */
-    public function testDefaultImageUpload(): void {
+    public function testDefaultImageUpload(): void
+    {
         $actual = $this->form->imageUpload('fo>"');
         $expected = <<<EOT
 <div class="FileUpload ImageUpload">
@@ -339,7 +358,8 @@ EOT;
     /**
      * Test the default `Gdn_Form::inputWrap()`.
      */
-    public function testDefaultInputWrap(): void {
+    public function testDefaultInputWrap(): void
+    {
         $actual = $this->form->inputWrap('fo>"');
         $expected = <<<EOT
 <div class="input-wrap">
@@ -352,8 +372,9 @@ EOT;
     /**
      * Test the default `Gdn_Form::labelWrap()`.
      */
-    public function testDefaultLabelWrap(): void {
-        $actual = $this->form->labelWrap('<b>a</b>', 'fo>"');
+    public function testDefaultLabelWrap(): void
+    {
+        $actual = $this->form->labelWrap("<b>a</b>", 'fo>"');
         $expected = <<<EOT
 <div class="label-wrap">
     <label for="Form_fo"><b>a</b></label>
@@ -369,7 +390,8 @@ EOT;
      * @param string $expected
      * @dataProvider provideLabelCodeTests
      */
-    public function testLabelCode($code, string $expected): void {
+    public function testLabelCode($code, string $expected): void
+    {
         $actual = Gdn_Form::labelCode($code);
         $this->assertSame($expected, $actual);
     }
@@ -379,14 +401,15 @@ EOT;
      *
      * @return array
      */
-    public function provideLabelCodeTests(): array {
+    public function provideLabelCodeTests(): array
+    {
         $r = [
-            'CamelCase' => ['CamelCase', 'Camel Case'],
-            'insertID' => ['insertID', 'Insert ID'],
-            'User1' => ['User1', 'User 1'],
-            'User.Bar' => ['User.Bar', 'Bar'],
-            'array label code' => [['LabelCode' => 'user1'], 'user1'],
-            'array name' => [['Name' => 'user1'], 'User 1'],
+            "CamelCase" => ["CamelCase", "Camel Case"],
+            "insertID" => ["insertID", "Insert ID"],
+            "User1" => ["User1", "User 1"],
+            "User.Bar" => ["User.Bar", "Bar"],
+            "array label code" => [["LabelCode" => "user1"], "user1"],
+            "array name" => [["Name" => "user1"], "User 1"],
         ];
 
         return $r;
@@ -395,7 +418,8 @@ EOT;
     /**
      * Test the default `Gdn_Form::checkbox()`.
      */
-    public function testDefaultCheckbox(): void {
+    public function testDefaultCheckbox(): void
+    {
         $actual = $this->form->checkBox('fo>"');
         $expected = <<<EOT
 <div class="checkbox">
@@ -409,12 +433,11 @@ EOT;
     /**
      * Test the default `Gdn_Form::radio()`.
      */
-    public function testDefaultRadio(): void {
-        $actual = $this->form->radio('fo>"', 'bar', ['value' => '2']);
+    public function testDefaultRadio(): void
+    {
+        $actual = $this->form->radio('fo>"', "bar", ["value" => "2"]);
         $expected = <<<EOT
-<label>
-    <input id=Form_fo name=fo&gt;&quot; type=radio value=2> bar
-</label>
+<label><input id=Form_fo name=fo&gt;&quot; type=radio value=2> bar</label>
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
@@ -422,21 +445,16 @@ EOT;
     /**
      * Test the default `Gdn_Form::checkBoxList()`.
      */
-    public function testDefaultCheckboxList(): void {
-        $actual = $this->form->checkBoxList('foo', ['a' => 'b', 'c' => 'd']);
+    public function testDefaultCheckboxList(): void
+    {
+        $actual = $this->form->checkBoxList("foo", ["a" => "b", "c" => "d"]);
         $expected = <<<EOT
 <ul class="CheckBoxList">
     <li><div class="checkbox">
-        <label for="foo1">
-            <input type="hidden" name="Checkboxes[]" value="foo" />
-            <input type="checkbox" id="foo1" name="foo[]" value="b" class="" /> a
-        </label>
+        <label for="foo1"><input type="hidden" name="Checkboxes[]" value="foo" /><input type="checkbox" id="foo1" name="foo[]" value="b" class="" /> a</label>
     </div></li>
     <li><div class="checkbox">
-        <label for="foo2">
-            <input type="hidden" name="Checkboxes[]" value="foo" />
-            <input type="checkbox" id="foo2" name="foo[]" value="d" class="" /> c
-        </label>
+        <label for="foo2"><input type="hidden" name="Checkboxes[]" value="foo" /><input type="checkbox" id="foo2" name="foo[]" value="d" class="" /> c</label>
     </div></li>
 </ul>
 EOT;
@@ -446,18 +464,14 @@ EOT;
     /**
      * Test the default `Gdn_Form::radioList()`.
      */
-    public function testDefaultRadioList(): void {
-        $actual = $this->form->radioList('foo', ['a' => 'b', 'c' => 'd']);
+    public function testDefaultRadioList(): void
+    {
+        $actual = $this->form->radioList("foo", ["a" => "b", "c" => "d"]);
         $expected = <<<EOT
 <div class="radio">
-    <label>
-        <input type="radio" id="Form_foo" name="foo" value="a" class="" /> b
-    </label>
-</div>
+    <label><input type="radio" id="Form_foo" name="foo" value="a" class="" /> b</label></div>
 <div class="radio">
-    <label>
-        <input type="radio" id="Form_foo1" name="foo" value="c" class="" /> d
-    </label>
+    <label><input type="radio" id="Form_foo1" name="foo" value="c" class="" /> d</label>
 </div>
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
@@ -466,10 +480,11 @@ EOT;
     /**
      * Test the default `Gdn_Form::dropDown()`.
      */
-    public function testDefaultDropdown(): void {
-        $actual = $this->form->dropDown('foo', ['>' => 'b', '"' => 'd']);
+    public function testDefaultDropdown(): void
+    {
+        $actual = $this->form->dropDown("foo", [">" => "b", '"' => "d"]);
         $expected = <<<EOT
-<select id="Form_foo" name="foo" class="form-control">
+<select id="Form_foo" data-value="" name="foo" class="form-control">
 <option value="&gt;">b</option>
 <option value="&quot;">d</option>
 </select>
@@ -480,9 +495,9 @@ EOT;
     /**
      * Test the default `Gdn_Form::open()`.
      */
-    public function testDefaultOpen(): void {
-        $actual = $this->form->open(['action' => 'https://example.com']).
-            $this->form->close();
+    public function testDefaultOpen(): void
+    {
+        $actual = $this->form->open(["action" => "https://example.com"]) . $this->form->close();
         $expected = <<<EOT
 <form method="post" action="https://example.com" autocomplete="off" >
     <div>
@@ -496,11 +511,13 @@ EOT;
     /**
      * Test a form with a GET method and a query string.
      */
-    public function testOpenWithGetQuery(): void {
-        $actual = $this->form->open([
-            'action' => 'http://example.com?foo=bar',
-            'method' => 'GET',
-        ]).$this->form->close();
+    public function testOpenWithGetQuery(): void
+    {
+        $actual =
+            $this->form->open([
+                "action" => "http://example.com?foo=bar",
+                "method" => "GET",
+            ]) . $this->form->close();
 
         $expected = <<<EOT
 <form method="GET" action="http://example.com" autocomplete="off" >
@@ -516,10 +533,11 @@ EOT;
     /**
      * Test the default `Gdn_Form::date()`.
      */
-    public function testDefaultDate(): void {
-        $actual = $this->form->date('fo>"', ['YearRange' => '2019-2020']);
+    public function testDefaultDate(): void
+    {
+        $actual = $this->form->date('fo>"', ["YearRange" => "2019-2020"]);
         $expected = <<<EOT
-<select id="Form_fo_Month" name="fo&gt;&quot;_Month" class="Month">
+<select id="Form_fo_Month" data-value="" name="fo&gt;&quot;_Month" class="Month">
     <option value="0">Month</option>
     <option value="1">Jan</option>
     <option value="2">Feb</option>
@@ -534,7 +552,7 @@ EOT;
     <option value="11">Nov</option>
     <option value="12">Dec</option>
 </select>
-<select id="Form_fo_Day" name="fo&gt;&quot;_Day" class="Day">
+<select id="Form_fo_Day" data-value="" name="fo&gt;&quot;_Day" class="Day">
     <option value="0">Day</option>
     <option value="1">1</option>
     <option value="2">2</option>
@@ -568,7 +586,7 @@ EOT;
     <option value="30">30</option>
     <option value="31">31</option>
 </select>
-<select id="Form_fo_Year" name="fo&gt;&quot;_Year" class="Year">
+<select id="Form_fo_Year" data-value="" name="fo&gt;&quot;_Year" class="Year">
     <option value="0">Year</option>
     <option value="2019">2019</option>
     <option value="2020">2020</option>
@@ -576,5 +594,140 @@ EOT;
 <input type="hidden" name="DateFields[]" value="fo&gt;&quot;" />
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Make sure that `Gd_Form::getFormValue()` supports `"[]"` style form access.
+     *
+     * @param string $name
+     * @param string $expected
+     * @dataProvider provideNestedFormValueNames
+     */
+    public function testGetFormValueNesting(string $name, string $expected)
+    {
+        $this->form->formValues(["a" => "a", "b" => ["a" => "b", "b" => ["a" => "c"]]]);
+
+        $this->assertSame($expected, $this->form->getFormValue($name));
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function provideNestedFormValueNames(): array
+    {
+        $r = [["a", "a"], ["b[a]", "b"], ["b[b][a]", "c"]];
+        return array_column($r, null, 0);
+    }
+
+    /**
+     * Test Gdn_Form::verifyAdditionalPermissions()
+     *
+     * @param array $testPermissions
+     * @param array $testCategory
+     * @param bool $expected Expected result
+     * @dataProvider provideTestVerifyAdditionalPermissionsData
+     */
+    public function testVerifyAdditionalPermissions(array $testPermissions, array $testCategory, bool $expected)
+    {
+        $actual = Gdn_Form::verifyAdditionalPermissions($testPermissions, $testCategory);
+        $this->assertSame($actual, $expected);
+    }
+
+    /**
+     * Provide test data for testVerifyAdditionalPermissions.
+     *
+     * @return array
+     */
+    public function provideTestVerifyAdditionalPermissionsData()
+    {
+        $r = [
+            "hasPermission" => [
+                ["CanAdd"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => "Test",
+                    "CanAdd" => true,
+                ],
+                true,
+            ],
+            "doesntHavePermission" => [
+                ["CanAdd"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => "Test",
+                    "CanAdd" => false,
+                ],
+                false,
+            ],
+            "hasMultiple" => [
+                ["CanAdd", "CanEdit"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => "Test",
+                    "CanAdd" => true,
+                    "CanEdit" => true,
+                ],
+                true,
+            ],
+            "hasOneOfTwo" => [
+                ["CanAdd", "CanEdit"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => "Test",
+                    "CanAdd" => true,
+                    "CanEdit" => false,
+                ],
+                false,
+            ],
+            "hasNeither" => [
+                ["CanAdd", "CanEdit"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => "Test",
+                    "CanAdd" => false,
+                    "CanEdit" => false,
+                ],
+                false,
+            ],
+            "noCategoryKey" => [
+                ["CanAdd"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => "Test",
+                    "CanEdit" => false,
+                ],
+                false,
+            ],
+        ];
+
+        return $r;
+    }
+
+    /**
+     * Test to make sure the values of a checkBoxList form do not contain any XSS.
+     *
+     * @return void
+     */
+    public function testCheckBoxXSS(): void
+    {
+        $actual = $this->form->checkBoxList(
+            "foo",
+            [
+                [
+                    "id" => 0,
+                    "bar" => "<img src=x onVector=X-Vector onerror=alert(42)>",
+                ],
+            ],
+            null,
+            ["ValueField" => "CategoryID", "TextField" => "bar"]
+        );
+
+        $this->assertEquals(
+            '<ul class="CheckBoxList"><li><div class="checkbox"><label for="foo1"><input type="hidden" name="Checkboxes[]" value="foo" /><input type="checkbox" id="foo1" name="foo[]" value="" checked="checked" class="" /> &lt;img src=x onVector=X-Vector onerror=alert(42)&gt;</label></div></li>
+</ul>',
+            $actual
+        );
     }
 }

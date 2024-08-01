@@ -14,8 +14,8 @@ use Vanilla\EmbeddedContent\Embeds\WistiaEmbed;
 /**
  * Factory for WistiaEmbed.
  */
-class WistiaEmbedFactory extends AbstractEmbedFactory {
-
+class WistiaEmbedFactory extends AbstractEmbedFactory
+{
     const DOMAINS = ["wistia.com", "wi.st"];
 
     const OEMBED_URL_BASE = "https://fast.wistia.com/oembed.json";
@@ -28,21 +28,24 @@ class WistiaEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::DOMAINS;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         return "`^/?(medias|embed)/`";
     }
 
@@ -51,13 +54,11 @@ class WistiaEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $videoID = $this->videoIDFromUrl($url);
 
-        $response = $this->httpClient->get(
-            self::OEMBED_URL_BASE,
-            ["url" => $url]
-        );
+        $response = $this->httpClient->get(self::OEMBED_URL_BASE, ["url" => $url]);
 
         // Example Response JSON
         // phpcs:disable Generic.Files.LineLength
@@ -97,7 +98,10 @@ class WistiaEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return string|null
      */
-    private function videoIDFromUrl(string $url): ?string {
-        return preg_match("`^/?(medias|embed)/(?<videoID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches) ? $matches["videoID"] : null;
+    private function videoIDFromUrl(string $url): ?string
+    {
+        return preg_match("`^/?(medias|embed)/(?<videoID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches)
+            ? $matches["videoID"]
+            : null;
     }
 }

@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+
+_VANILLA_ROOT="$(dirname "$0")/../../"
+VANILLA_ROOT="$(realpath "$_VANILLA_ROOT")"
+
+case "$1" in
+    ssh)
+        # SSH into any given docker container.
+        docker exec -i -t $2 sh
+        ;;
+    composer | php)
+        # Execute php or composer using the proper PHP version.
+        docker exec -i -t php-fpm sh -c "cd /srv/vanilla-repositories/vanilla && $*"
+        ;;
+    build | storybook)
+        if [ "$2" = "--help" ]; then
+            sh -c "${0%/*}/vnla-cli $*"
+        else
+            BUILD_ARGS=$(sh -c "${0%/*}/vnla-cli $*")
+            sh -c "cd $VANILLA_ROOT && $BUILD_ARGS"
+        fi
+        ;;
+    *)
+        # These commands need to execute on the host.
+        "$VANILLA_ROOT/cli/bin/vnla-cli" "$@"
+        ;;
+esac

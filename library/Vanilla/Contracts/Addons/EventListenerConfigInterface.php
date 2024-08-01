@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Addons;
 /**
  * A collection of event listeners that can be configured by addons.
  */
-interface EventListenerConfigInterface {
+interface EventListenerConfigInterface
+{
     /**
      * Add a class method as an event listener.
      *

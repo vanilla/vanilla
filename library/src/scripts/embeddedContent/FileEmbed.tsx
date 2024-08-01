@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import Attachment from "@library/content/attachments/Attachment";
 import { mimeTypeToAttachmentType } from "@library/content/attachments/attachmentUtils";
 

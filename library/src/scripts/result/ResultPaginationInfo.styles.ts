@@ -3,18 +3,24 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { fonts } from "@library/styles/styleHelpers";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { Mixins } from "@library/styles/Mixins";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const resultPaginationInfoClasses = useThemeCache(() => {
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const style = styleFactory("resultPaginationInfo");
 
-    const root = style("pagination", {
-        marginLeft: "auto",
-        ...fonts(globalVars.meta.text),
+    const root = style({
+        ...Mixins.font(metasVars.font),
     });
 
-    return { root };
+    const alignRight = style("alignRight", {
+        marginLeft: "auto",
+    });
+
+    return { root, alignRight };
 });

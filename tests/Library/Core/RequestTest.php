@@ -1,13 +1,13 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Core;
 
-use League\Uri\Http;
 use Vanilla\Utility\UrlUtils;
+use Vanilla\Web\BotDetector;
 use VanillaTests\SharedBootstrapTestCase;
 use Gdn_Request;
 
@@ -16,27 +16,50 @@ use Gdn_Request;
  *
  * @backupGlobals enabled
  */
-class RequestTest extends SharedBootstrapTestCase {
-
+class RequestTest extends SharedBootstrapTestCase
+{
     /**
      * Take an array that matches `$_SERVER` and returns an array with just the keys necessary for building a request.
      *
      * @param array $server
      * @return array
      */
-    public static function stripServerGlobal(array $server): array {
+    public static function stripServerGlobal(array $server): array
+    {
         static $keys = [
-            "CONTENT_LENGTH", "CONTENT_TYPE", "DOCUMENT_ROOT", "DOCUMENT_URI", "HTTPS", "ORIG_SCRIPT_NAME",
-            'HTTP_AUTHORIZATION', 'HTTP_ACCEPT_LANGUAGE', 'HTTP_ACCEPT', 'HTTP_USER_AGENT', 'HTTP_HOST', "PATH_INFO",
-            "QUERY_STRING", "REDIRECT_STATUS", "REDIRECT_X_PATH_INFO", "REDIRECT_X_REWRITE", "REMOTE_ADDR", "REMOTE_PORT",
-            "REQUEST_METHOD", "REQUEST_URI", "SCRIPT_FILENAME", "SCRIPT_NAME", "SERVER_ADDR", "SERVER_NAME",
-            "SERVER_PORT", "SERVER_PROTOCOL", "USER", "X_PATH_INFO", "X_REWRITE",
+            "CONTENT_LENGTH",
+            "CONTENT_TYPE",
+            "DOCUMENT_ROOT",
+            "DOCUMENT_URI",
+            "HTTPS",
+            "ORIG_SCRIPT_NAME",
+            "HTTP_AUTHORIZATION",
+            "HTTP_ACCEPT_LANGUAGE",
+            "HTTP_ACCEPT",
+            "HTTP_USER_AGENT",
+            "HTTP_HOST",
+            "PATH_INFO",
+            "QUERY_STRING",
+            "REDIRECT_STATUS",
+            "REDIRECT_X_PATH_INFO",
+            "REMOTE_ADDR",
+            "REMOTE_PORT",
+            "REQUEST_METHOD",
+            "REQUEST_URI",
+            "SCRIPT_FILENAME",
+            "SCRIPT_NAME",
+            "SERVER_ADDR",
+            "SERVER_NAME",
+            "SERVER_PORT",
+            "SERVER_PROTOCOL",
+            "USER",
+            "X_PATH_INFO",
         ];
 
         // Grab all of the headers.
         $result = [];
         foreach ($server as $key => $value) {
-            if (str_starts_with($key, 'HTTP_') || in_array($key, $keys)) {
+            if (str_starts_with($key, "HTTP_") || in_array($key, $keys)) {
                 $result[$key] = $value;
             }
         }
@@ -47,82 +70,101 @@ class RequestTest extends SharedBootstrapTestCase {
     /**
      * Provide some test URLs and how they should expand.
      */
-    public function provideUrls() {
+    public function provideUrls()
+    {
         return [
             [
-                'http://localhost:8080/path/to/resource.json?foo=bar',
+                "http://localhost:8080/path/to/resource.json?foo=bar",
                 [
-                    'scheme' => 'http',
-                    'host' => 'localhost',
-                    'port' => 8080,
-                    'path' => '/path/to/resource',
-                    'extension' => '.json',
-                    'query' => ['foo' => 'bar']
-                ]
+                    "scheme" => "http",
+                    "host" => "localhost",
+                    "port" => 8080,
+                    "path" => "/path/to/resource",
+                    "extension" => ".json",
+                    "query" => ["foo" => "bar"],
+                ],
             ],
             [
-                'https://vanillaforums.com/en',
+                "https://vanillaforums.com/en",
                 [
-                    'scheme' => 'https',
-                    'host' => 'vanillaforums.com',
-                    'port' => 443,
-                    'path' => '/en',
-                    'extension' => '',
-                    'query' => []
-                ]
+                    "scheme" => "https",
+                    "host" => "vanillaforums.com",
+                    "port" => 443,
+                    "path" => "/en",
+                    "extension" => "",
+                    "query" => [],
+                ],
             ],
             [
-                'http://open.vanillaforums.com',
+                "http://open.vanillaforums.com",
                 [
-                    'scheme' => 'http',
-                    'host' => 'open.vanillaforums.com',
-                    'port' => 80,
-                    'path' => '/',
-                    'extension' => '',
-                    'query' => []
-                ]
-            ]
+                    "scheme" => "http",
+                    "host" => "open.vanillaforums.com",
+                    "port" => 80,
+                    "path" => "/",
+                    "extension" => "",
+                    "query" => [],
+                ],
+            ],
         ];
     }
 
     /**
      * The body should be the same as the POST.
      */
-    public function testBodyEquivalence() {
+    public function testBodyEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setBody(['foo' => 'bar']);
+        $req->setBody(["foo" => "bar"]);
         $this->assertSame($req->getBody(), $req->getRequestArguments(Gdn_Request::INPUT_POST));
 
-        $req->setRequestArguments(Gdn_Request::INPUT_POST, ['foo' => 'bar']);
+        $req->setRequestArguments(Gdn_Request::INPUT_POST, ["foo" => "bar"]);
         $this->assertSame($req->getBody(), $req->getRequestArguments(Gdn_Request::INPUT_POST));
+    }
+
+    /**
+     * Test Gdn_Request's decodePost() function.
+     * See issue https://higherlogic.atlassian.net/browse/VNLA-3055
+     */
+    public function testDecodePostFunction()
+    {
+        $req = new Gdn_Request();
+
+        $payloadFile = PATH_ROOT . "/tests/fixtures/json/decodePostPayload.json";
+        $decodedPayload = json_decode(file_get_contents($payloadFile), true);
+
+        $returnedValue = $req->decodePost([], ["CONTENT_TYPE" => "application/json"], $payloadFile, []);
+
+        $this->assertEquals($decodedPayload, $returnedValue);
     }
 
     /**
      * Test that submitted files are properly merged into the POST array.
      */
-    public function testFilesAsPost() {
+    public function testFilesAsPost()
+    {
         // Backup the superglobals.
         $post = $_POST;
         $files = $_FILES;
 
         $_FILES = [
-            'MyFile' => [
-                'error' => UPLOAD_ERR_OK,
-                'name' => 'MyFile.txt',
-                'size' => 10,
-                'tmp_name' => '/tmp/php/php123',
-                'type' => 'text/plain'
+            "MyFile" => [
+                "error" => UPLOAD_ERR_OK,
+                "name" => "MyFile.txt",
+                "size" => 10,
+                "tmp_name" => "/tmp/php/php123",
+                "type" => "text/plain",
             ],
-            'Foo' => [
-                'error' => UPLOAD_ERR_OK,
-                'name' => 'bar.jpg',
-                'size' => 1024,
-                'tmp_name' => '/tmp/php/php456',
-                'type' => 'image/jpeg'
-            ]
+            "Foo" => [
+                "error" => UPLOAD_ERR_OK,
+                "name" => "bar.jpg",
+                "size" => 1024,
+                "tmp_name" => "/tmp/php/php456",
+                "type" => "image/jpeg",
+            ],
         ];
-        $_POST = ['Foo' => 'Bar'];
+        $_POST = ["Foo" => "Bar"];
 
         $request = Gdn_Request::create()->fromEnvironment();
 
@@ -130,39 +172,45 @@ class RequestTest extends SharedBootstrapTestCase {
         $_POST = $post;
         $_FILES = $files;
 
-        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $request->post('MyFile'));
-        $this->assertNotInstanceOf(\Vanilla\UploadedFile::class, $request->post('Foo'), 'POST value overwritten by file.');
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $request->post("MyFile"));
+        $this->assertNotInstanceOf(
+            \Vanilla\UploadedFile::class,
+            $request->post("Foo"),
+            "POST value overwritten by file."
+        );
     }
 
     /**
      * Test `Gdn_Request::getUrl()`.
      */
-    public function testGetUrl() {
+    public function testGetUrl()
+    {
         $request = new Gdn_Request();
-        $request->setScheme('http');
-        $request->setHost('localhost');
+        $request->setScheme("http");
+        $request->setHost("localhost");
         $request->setPort(8080);
-        $request->setRoot('/root-dir');
-        $request->setPath('/path/to/resource');
-        $request->setExt('.json');
-        $request->setQuery(['foo' => 'bar']);
+        $request->setRoot("/root-dir");
+        $request->setPath("/path/to/resource");
+        $request->setExt(".json");
+        $request->setQuery(["foo" => "bar"]);
 
-        $this->assertSame('http://localhost:8080/root-dir/path/to/resource.json?foo=bar', $request->getUrl());
+        $this->assertSame("http://localhost:8080/root-dir/path/to/resource.json?foo=bar", $request->getUrl());
     }
 
     /**
      * Test request header accessors.
      */
-    public function testGetHeaders() {
+    public function testGetHeaders()
+    {
         $server = [
-            'CONTENT_TYPE' => 'application/json',
-            'HTTP_HOST' => 'localhost',
-            'HTTP_CACHE_CONTROL' => 'no-cache'
+            "CONTENT_TYPE" => "application/json",
+            "HTTP_HOST" => "localhost",
+            "HTTP_CACHE_CONTROL" => "no-cache",
         ];
         $expectedHeaders = [
-            'Content-Type' => 'application/json',
-            'Host' => 'localhost',
-            'Cache-Control' => 'no-cache'
+            "Content-Type" => "application/json",
+            "Host" => "localhost",
+            "Cache-Control" => "no-cache",
         ];
 
         $request = new Gdn_Request();
@@ -174,91 +222,96 @@ class RequestTest extends SharedBootstrapTestCase {
     /**
      * Test request header accessors.
      */
-    public function testGetHeader() {
+    public function testGetHeader()
+    {
         $server = [
-            'CONTENT_TYPE' => 'application/json',
-            'HTTP_CACHE_CONTROL' => 'no-cache',
+            "CONTENT_TYPE" => "application/json",
+            "HTTP_CACHE_CONTROL" => "no-cache",
         ];
 
         $request = new Gdn_Request();
         $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
 
-        $this->assertEquals('application/json', $request->getHeader('CONTENT_TYPE'));
-        $this->assertEquals('application/json', $request->getHeader('Content-Type'));
-        $this->assertEquals('application/json', $request->getHeader('content-type'));
+        $this->assertEquals("application/json", $request->getHeader("CONTENT_TYPE"));
+        $this->assertEquals("application/json", $request->getHeader("Content-Type"));
+        $this->assertEquals("application/json", $request->getHeader("content-type"));
 
-        $this->assertEquals('no-cache', $request->getHeader('HTTP_CACHE_CONTROL'));
-        $this->assertEquals('no-cache', $request->getHeader('CACHE_CONTROL'));
-        $this->assertEquals('no-cache', $request->getHeader('Cache-Control'));
-        $this->assertEquals('no-cache', $request->getHeader('cache-control'));
+        $this->assertEquals("no-cache", $request->getHeader("HTTP_CACHE_CONTROL"));
+        $this->assertEquals("no-cache", $request->getHeader("CACHE_CONTROL"));
+        $this->assertEquals("no-cache", $request->getHeader("Cache-Control"));
+        $this->assertEquals("no-cache", $request->getHeader("cache-control"));
     }
 
     /**
      * Test request header accessors.
      */
-    public function testGetHeaderLine() {
+    public function testGetHeaderLine()
+    {
         $server = [
-            'CONTENT_LENGTH' => '',
-            'CONTENT_TYPE' => 'application/json',
-            'HTTP_ACCEPT' => ['application/json', 'application/xml']
+            "CONTENT_LENGTH" => "",
+            "CONTENT_TYPE" => "application/json",
+            "HTTP_ACCEPT" => ["application/json", "application/xml"],
         ];
 
         $request = new Gdn_Request();
         $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
 
-        $this->assertEquals('', $request->getHeaderLine('Content-Length'));
-        $this->assertEquals('application/json', $request->getHeaderLine('Content-Type'));
-        $this->assertEquals('application/json,application/xml', $request->getHeaderLine('Accept'));
+        $this->assertEquals("", $request->getHeaderLine("Content-Length"));
+        $this->assertEquals("application/json", $request->getHeaderLine("Content-Type"));
+        $this->assertEquals("application/json,application/xml", $request->getHeaderLine("Accept"));
     }
 
     /**
      * Test request header accessors.
      */
-    public function testHasHeader() {
+    public function testHasHeader()
+    {
         $server = [
-            'CONTENT_TYPE' => 'application/json',
-            'HTTP_CACHE_CONTROL' => 'no-cache',
+            "CONTENT_TYPE" => "application/json",
+            "HTTP_CACHE_CONTROL" => "no-cache",
         ];
 
         $request = new Gdn_Request();
         $request->setRequestArguments(Gdn_Request::INPUT_SERVER, $server);
 
-        $this->assertTrue($request->hasHeader('CONTENT_TYPE'));
-        $this->assertTrue($request->hasHeader('Content-Type'));
-        $this->assertTrue($request->hasHeader('content-type'));
+        $this->assertTrue($request->hasHeader("CONTENT_TYPE"));
+        $this->assertTrue($request->hasHeader("Content-Type"));
+        $this->assertTrue($request->hasHeader("content-type"));
 
-        $this->assertTrue($request->hasHeader('HTTP_CACHE_CONTROL'));
-        $this->assertTrue($request->hasHeader('CACHE_CONTROL'));
-        $this->assertTrue($request->hasHeader('Cache-Control'));
-        $this->assertTrue($request->hasHeader('cache-control'));
+        $this->assertTrue($request->hasHeader("HTTP_CACHE_CONTROL"));
+        $this->assertTrue($request->hasHeader("CACHE_CONTROL"));
+        $this->assertTrue($request->hasHeader("Cache-Control"));
+        $this->assertTrue($request->hasHeader("cache-control"));
 
-        $this->assertFalse($request->hasHeader('Auth'));
+        $this->assertFalse($request->hasHeader("Auth"));
     }
 
     /**
      * Test compatibility between `Gdn_Request::getHost()` and `Gdn_Request::host()`.
      */
-    public function testHostEquivalence() {
+    public function testHostEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setHost('localhost');
+        $req->setHost("localhost");
         $this->assertSame($req->getHost(), $req->host());
 
-        $req->host('localhost');
+        $req->host("localhost");
         $this->assertSame($req->getHost(), $req->host());
     }
 
     /**
      * Test compatibility between `Gdn_Request::getHostAndPort()` and `Gdn_Request::hostAndPort()`.
      */
-    public function testHostAndPortEquivalence() {
+    public function testHostAndPortEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setHost('localhost');
+        $req->setHost("localhost");
         $req->setPort(8080);
         $this->assertSame($req->getHostAndPort(), $req->hostAndPort());
 
-        $req->host('localhost');
+        $req->host("localhost");
         $req->port(8080);
         $this->assertSame($req->getHostAndPort(), $req->hostAndPort());
     }
@@ -266,58 +319,64 @@ class RequestTest extends SharedBootstrapTestCase {
     /**
      * Test compatibility between `Gdn_Request::getIP()` and `Gdn_Request::ipAddress()`.
      */
-    public function testIPEquivalence() {
+    public function testIPEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setIP('127.0.0.1');
+        $req->setIP("127.0.0.1");
         $this->assertSame($req->getIP(), $req->ipAddress());
     }
 
     /**
      * Test `Gdn_Request::mergeQuery()`.
      */
-    public function testMergeQuery() {
+    public function testMergeQuery()
+    {
         $request = new Gdn_Request();
         $request->setQuery([
-            'One' => 'Alpha',
-            'Two' => 'Bravo'
+            "One" => "Alpha",
+            "Two" => "Bravo",
         ]);
         $request->mergeQuery([
-            'Two' => 'Beta',
-            'Three' => 'Charlie',
-            'Four' => 'Delta'
+            "Two" => "Beta",
+            "Three" => "Charlie",
+            "Four" => "Delta",
         ]);
 
-        $this->assertSame([
-            'One' => 'Alpha',
-            'Two' => 'Beta',
-            'Three' => 'Charlie',
-            'Four' => 'Delta'
-        ], $request->getQuery());
+        $this->assertSame(
+            [
+                "One" => "Alpha",
+                "Two" => "Beta",
+                "Three" => "Charlie",
+                "Four" => "Delta",
+            ],
+            $request->getQuery()
+        );
     }
 
     /**
      * Verify files with the UPLOAD_ERR_NO_FILE error are not added to the translated files array.
      */
-    public function testNoFileRemoval() {
+    public function testNoFileRemoval()
+    {
         $post = $_POST;
         $files = $_FILES;
 
         $_FILES = [
-            'MyFile' => [
-                'error' => UPLOAD_ERR_OK,
-                'name' => 'MyFile.txt',
-                'size' => 10,
-                'tmp_name' => '/tmp/php/php123',
-                'type' => 'text/plain'
+            "MyFile" => [
+                "error" => UPLOAD_ERR_OK,
+                "name" => "MyFile.txt",
+                "size" => 10,
+                "tmp_name" => "/tmp/php/php123",
+                "type" => "text/plain",
             ],
-            'NoFile' => [
-                'error' => UPLOAD_ERR_NO_FILE,
-                'name' => 'bar.jpg',
-                'size' => 1024,
-                'tmp_name' => '/tmp/php/php456',
-                'type' => 'image/jpeg'
-            ]
+            "NoFile" => [
+                "error" => UPLOAD_ERR_NO_FILE,
+                "name" => "bar.jpg",
+                "size" => 1024,
+                "tmp_name" => "/tmp/php/php456",
+                "type" => "image/jpeg",
+            ],
         ];
 
         $request = Gdn_Request::create()->fromEnvironment();
@@ -326,37 +385,40 @@ class RequestTest extends SharedBootstrapTestCase {
         $_POST = $post;
         $_FILES = $files;
 
-        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $request->post('MyFile'));
-        $this->assertFalse($request->post('NoFile', false), 'Nonexistent file was not removed.');
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $request->post("MyFile"));
+        $this->assertFalse($request->post("NoFile", false), "Nonexistent file was not removed.");
     }
 
     /**
      * The {@link Gdn_Request::path()} and {@link Gdn_Request::getPath()} methods should be compatible.
      */
-    public function testPathEquivalence() {
+    public function testPathEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setPath('/foo');
-        $this->assertSame($req->getPath(), '/'.$req->path());
+        $req->setPath("/foo");
+        $this->assertSame($req->getPath(), "/" . $req->path());
 
-        $req->path('/bar');
-        $this->assertSame($req->getPath(), '/'.$req->path());
+        $req->path("/bar");
+        $this->assertSame($req->getPath(), "/" . $req->path());
     }
 
     /**
      * Request paths should start with a slash and fix ones that don't.
      */
-    public function testPathFixing() {
+    public function testPathFixing()
+    {
         $req = new Gdn_Request();
 
-        $req->setPath('foo');
-        $this->assertSame('/foo', $req->getPath());
+        $req->setPath("foo");
+        $this->assertSame("/foo", $req->getPath());
     }
 
     /**
      * Test compatibility between `Gdn_Request::getPort()` and `Gdn_Request::port()`.
      */
-    public function testPortEquivalence() {
+    public function testPortEquivalence()
+    {
         $req = new Gdn_Request();
 
         $req->setPort(8080);
@@ -369,39 +431,40 @@ class RequestTest extends SharedBootstrapTestCase {
     /**
      * Test that the files array is normalized when merged into the POST array.
      */
-    public function testPostFileNormalization() {
+    public function testPostFileNormalization()
+    {
         // Backup the superglobals.
         $files = $_FILES;
 
         // This format represents what might come in from a form using input fields named "MyForm[Details][Avatars][]"
         $_FILES = [
-            'MyForm' => [
-                'tmp_name' => [
-                    'Details' => [
-                        'Avatar' => ['/tmp/php/abc123', '/tmp/php/xyz890']
-                    ]
+            "MyForm" => [
+                "tmp_name" => [
+                    "Details" => [
+                        "Avatar" => ["/tmp/php/abc123", "/tmp/php/xyz890"],
+                    ],
                 ],
-                'name' => [
-                    'Details' => [
-                        'Avatar' => ['AvatarOne', 'AvatarTwo']
-                    ]
+                "name" => [
+                    "Details" => [
+                        "Avatar" => ["AvatarOne", "AvatarTwo"],
+                    ],
                 ],
-                'size' => [
-                    'Details' => [
-                        'Avatar' => [100, 110]
-                    ]
+                "size" => [
+                    "Details" => [
+                        "Avatar" => [100, 110],
+                    ],
                 ],
-                'type' => [
-                    'Details' => [
-                        'Avatar' => ['image/jpeg', 'image/jpeg']
-                    ]
+                "type" => [
+                    "Details" => [
+                        "Avatar" => ["image/jpeg", "image/jpeg"],
+                    ],
                 ],
-                'error' => [
-                    'Details' => [
-                        'Avatar' => [UPLOAD_ERR_OK, UPLOAD_ERR_OK]
-                    ]
-                ]
-            ]
+                "error" => [
+                    "Details" => [
+                        "Avatar" => [UPLOAD_ERR_OK, UPLOAD_ERR_OK],
+                    ],
+                ],
+            ],
         ];
 
         $request = Gdn_Request::create()->fromEnvironment();
@@ -409,74 +472,79 @@ class RequestTest extends SharedBootstrapTestCase {
         // Put everything back like we found it.
         $_FILES = $files;
 
-        $formFiles = $request->post('MyForm');
-        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $formFiles['Details']['Avatar'][0]);
-        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $formFiles['Details']['Avatar'][1]);
+        $formFiles = $request->post("MyForm");
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $formFiles["Details"]["Avatar"][0]);
+        $this->assertInstanceOf(\Vanilla\UploadedFile::class, $formFiles["Details"]["Avatar"][1]);
     }
 
     /**
      * Test `Gdn_Request::getQuery()`.
      */
-    public function testQueryEquivalence() {
+    public function testQueryEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setQuery(['foo' => 'bar']);
+        $req->setQuery(["foo" => "bar"]);
         $this->assertSame($req->getQuery(), $req->getRequestArguments(Gdn_Request::INPUT_GET));
 
-        $req->setRequestArguments(Gdn_Request::INPUT_GET, ['foo' => 'bar']);
+        $req->setRequestArguments(Gdn_Request::INPUT_GET, ["foo" => "bar"]);
         $this->assertSame($req->getQuery(), $req->getRequestArguments(Gdn_Request::INPUT_GET));
     }
 
     /**
      * Test `Gdn_Request::getQueryItem()`.
      */
-    public function testQueryItemEquivalence() {
+    public function testQueryItemEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setQuery(['foo' => 'bar']);
-        $this->assertSame($req->getQueryItem('foo'), $req->getValueFrom(Gdn_Request::INPUT_GET, 'foo'));
+        $req->setQuery(["foo" => "bar"]);
+        $this->assertSame($req->getQueryItem("foo"), $req->getValueFrom(Gdn_Request::INPUT_GET, "foo"));
 
-        $req->setRequestArguments(Gdn_Request::INPUT_GET, ['foo' => 'bar']);
-        $this->assertSame($req->getQueryItem('foo'), $req->getValueFrom(Gdn_Request::INPUT_GET, 'foo'));
+        $req->setRequestArguments(Gdn_Request::INPUT_GET, ["foo" => "bar"]);
+        $this->assertSame($req->getQueryItem("foo"), $req->getValueFrom(Gdn_Request::INPUT_GET, "foo"));
     }
 
     /**
      * Test `Gdn_Request::setFullPath()`.
      */
-    public function testSetFullPath() {
+    public function testSetFullPath()
+    {
         $request = new Gdn_Request();
-        $request->setRoot('root-dir');
-        $request->setFullPath('/root-dir/path/to/resource.json');
+        $request->setRoot("root-dir");
+        $request->setFullPath("/root-dir/path/to/resource.json");
 
         //$this->assertSame('/root-dir', $request->getRoot());
-        $this->assertSame('/path/to/resource', $request->getPath());
-        $this->assertSame('.json', $request->getExt());
+        $this->assertSame("/path/to/resource", $request->getPath());
+        $this->assertSame(".json", $request->getExt());
     }
 
     /**
      * Test `Gdn_Request::setPathExt()`.
      */
-    public function testSetPathExt() {
+    public function testSetPathExt()
+    {
         $request = new Gdn_Request();
-        $request->setPathExt('path/to/resource.json');
+        $request->setPathExt("path/to/resource.json");
 
-        $this->assertSame('/path/to/resource', $request->getPath());
-        $this->assertSame('.json', $request->getExt());
+        $this->assertSame("/path/to/resource", $request->getPath());
+        $this->assertSame(".json", $request->getExt());
     }
 
     /**
      * Test `Gdn_Request::setQueryItem()`.
      */
-    public function testSetQueryItem() {
+    public function testSetQueryItem()
+    {
         $request = new Gdn_Request();
         $request->setQuery([
-            'One' => 'Alpha',
-            'Two' => 'Bravo',
-            'Three' => 'Charlie'
+            "One" => "Alpha",
+            "Two" => "Bravo",
+            "Three" => "Charlie",
         ]);
-        $request->setQueryItem('One', 'Delta');
+        $request->setQueryItem("One", "Delta");
 
-        $this->assertSame('Delta', $request->getQueryItem('One'));
+        $this->assertSame("Delta", $request->getQueryItem("One"));
     }
 
     /**
@@ -486,96 +554,99 @@ class RequestTest extends SharedBootstrapTestCase {
      * @param array $expected
      * @dataProvider provideUrls
      */
-    public function testSetUrl($url, $expected) {
+    public function testSetUrl($url, $expected)
+    {
         $request = new Gdn_Request();
         $request->setUrl($url);
 
-        $this->assertSame($expected['scheme'], $request->getScheme());
-        $this->assertSame($expected['host'], $request->getHost());
-        $this->assertSame($expected['port'], $request->getPort());
-        $this->assertSame($expected['path'], $request->getPath());
-        $this->assertSame($expected['extension'], $request->getExt());
-        $this->assertSame($expected['query'], $request->getQuery());
+        $this->assertSame($expected["scheme"], $request->getScheme());
+        $this->assertSame($expected["host"], $request->getHost());
+        $this->assertSame($expected["port"], $request->getPort());
+        $this->assertSame($expected["path"], $request->getPath());
+        $this->assertSame($expected["extension"], $request->getExt());
+        $this->assertSame($expected["query"], $request->getQuery());
     }
 
     /**
      * Test compatibility of `Gdn_Request::getRoot()` and `Gdn_Request::webRoot()`.
      */
-    public function testRootEquivalence() {
+    public function testRootEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setRoot('root-dir');
-        $this->assertSame($req->getRoot(), '/'.$req->webRoot());
+        $req->setRoot("root-dir");
+        $this->assertSame($req->getRoot(), "/" . $req->webRoot());
 
-        $req->webRoot('root-dir');
-        $this->assertSame($req->getRoot(), '/'.$req->webRoot());
+        $req->webRoot("root-dir");
+        $this->assertSame($req->getRoot(), "/" . $req->webRoot());
     }
 
     /**
      * Request root should start with a slash and fix ones that don't. Slash-only roots should be empty strings.
      */
-    public function testRootFixing() {
+    public function testRootFixing()
+    {
         $req = new Gdn_Request();
 
-        $req->setRoot('root-dir');
-        $this->assertSame('/root-dir', $req->getRoot());
+        $req->setRoot("root-dir");
+        $this->assertSame("/root-dir", $req->getRoot());
 
-        $req->setRoot('/');
-        $this->assertSame('', $req->getRoot());
+        $req->setRoot("/");
+        $this->assertSame("", $req->getRoot());
     }
 
     /**
      * Test compatibility between `Gdn_Request::getScheme()` and `Gdn_Request::scheme()`.
      */
-    public function testSchemeEquivalence() {
+    public function testSchemeEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setScheme('https');
+        $req->setScheme("https");
         $this->assertSame($req->getScheme(), $req->scheme());
 
-        $req->scheme('http');
+        $req->scheme("http");
         $this->assertSame($req->getScheme(), $req->scheme());
     }
 
     /**
      * Test compatibility between `Gdn_Request::getUrl()` and `Gdn_Request::url('', true)`.
      */
-    public function testUrlEquivalence() {
-        // Simulate that rewrite is ON
-        $_SERVER['X_REWRITE'] = 1;
-
+    public function testUrlEquivalence()
+    {
         $req = new Gdn_Request();
 
-        $req->setScheme('http');
-        $req->setHost('localhost');
+        $req->setScheme("http");
+        $req->setHost("localhost");
         $req->setPort(8080);
-        $req->setRoot('root-dir');
-        $req->setPath('path/to/resource.json');
-        $req->setQueryItem('foo', 'bar');
+        $req->setRoot("root-dir");
+        $req->setPath("path/to/resource.json");
+        $req->setQueryItem("foo", "bar");
 
-        $this->assertSame($req->getUrl(), $req->url('', true));
+        $this->assertSame($req->getUrl(), $req->url("", true));
 
-        $req->scheme('http');
-        $req->host('localhost');
+        $req->scheme("http");
+        $req->host("localhost");
         $req->port(8080);
-        $req->webRoot('root-dir');
-        $req->path('path/to/resource.json');
-        $req->setValueOn(Gdn_Request::INPUT_GET, 'foo', 'bar');
+        $req->webRoot("root-dir");
+        $req->path("path/to/resource.json");
+        $req->setValueOn(Gdn_Request::INPUT_GET, "foo", "bar");
 
-        $this->assertSame($req->getUrl(), $req->url('', true));
+        $this->assertSame($req->getUrl(), $req->url("", true));
     }
 
     /**
      * Test basic attribute accessors.
      */
-    public function testAttributeAccessors(): void {
+    public function testAttributeAccessors(): void
+    {
         $r = new Gdn_Request();
 
-        $this->assertNull($r->getAttribute('foo'));
-        $r->setAttribute('foo', 'bar');
-        $this->assertSame('bar', $r->getAttribute('foo'));
+        $this->assertNull($r->getAttribute("foo"));
+        $r->setAttribute("foo", "bar");
+        $this->assertSame("bar", $r->getAttribute("foo"));
 
-        $this->assertArrayHasKey('foo', $r->getAttributes());
+        $this->assertArrayHasKey("foo", $r->getAttributes());
     }
 
     /**
@@ -596,53 +667,53 @@ class RequestTest extends SharedBootstrapTestCase {
         array $files = []
     ): \Gdn_Request {
         if (is_string($serverOrPath)) {
-            $serverOrPath = ['PATH_INFO' => $serverOrPath];
+            $serverOrPath = ["PATH_INFO" => $serverOrPath];
         }
 
-        if (isset($serverOrPath['PATH_INFO'])) {
+        if (isset($serverOrPath["PATH_INFO"])) {
             $serverOrPath += [
-                'DOCUMENT_URI' => $serverOrPath['PATH_INFO'],
-                'REQUEST_URI' => UrlUtils::encodePath($serverOrPath['PATH_INFO']),
+                "DOCUMENT_URI" => $serverOrPath["PATH_INFO"],
+                "REQUEST_URI" => UrlUtils::encodePath($serverOrPath["PATH_INFO"]),
             ];
-        } elseif (isset($serverOrPath['REQUEST_URI'])) {
+        } elseif (isset($serverOrPath["REQUEST_URI"])) {
             $serverOrPath += [
-                'DOCUMENT_URI' => UrlUtils::decodePath($serverOrPath['REQUEST_URI']),
-                'PATH_INFO' => UrlUtils::decodePath($serverOrPath['REQUEST_URI']),
+                "DOCUMENT_URI" => UrlUtils::decodePath($serverOrPath["REQUEST_URI"]),
+                "PATH_INFO" => UrlUtils::decodePath($serverOrPath["REQUEST_URI"]),
             ];
         }
 
         $_SERVER = $serverOrPath + [
-            'PATH_INFO' => '/profile/Fran#k',
-            'DOCUMENT_URI' => '/profile/Fran#k',
-            'REQUEST_URI' => '/profile/Fran%23k',
-            'USER' => 'www-data',
-            'HTTP_ACCEPT_LANGUAGE' => 'en-GB,en;q=0.9,en-US;q=0.8',
-            'HTTP_ACCEPT_ENCODING' => 'gzip, deflate, br',
-            'HTTP_SEC_FETCH_DEST' => 'document',
-            'HTTP_SEC_FETCH_USER' => '?1',
-            'HTTP_SEC_FETCH_MODE' => 'navigate',
-            'HTTP_SEC_FETCH_SITE' => 'none',
-            'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko)',
-            'HTTP_UPGRADE_INSECURE_REQUESTS' => '1',
-            'HTTP_CACHE_CONTROL' => 'max-age=0',
-            'HTTP_CONNECTION' => 'keep-alive',
-            'HTTP_HOST' => 'dev.vanilla.localhost',
-            'X_REWRITE' => '1',
-            'SCRIPT_FILENAME' => '/srv/vanilla-repositories/vanilla/index.php',
-            'REDIRECT_STATUS' => '200',
-            'SERVER_NAME' => 'dev.vanilla.localhost',
-            'SERVER_PORT' => '80',
-            'SERVER_ADDR' => '172.18.0.7',
-            'REMOTE_PORT' => '38172',
-            'REMOTE_ADDR' => '172.18.0.1',
-            'SERVER_PROTOCOL' => 'HTTP/1.1',
-            'DOCUMENT_ROOT' => '/srv/vanilla-repositories/vanilla',
-            'SCRIPT_NAME' => '/index.php',
-            'CONTENT_LENGTH' => '',
-            'CONTENT_TYPE' => '',
-            'REQUEST_METHOD' => 'GET',
-            'QUERY_STRING' => '',
+            "PATH_INFO" => "/profile/Fran#k",
+            "DOCUMENT_URI" => "/profile/Fran#k",
+            "REQUEST_URI" => "/profile/Fran%23k",
+            "USER" => "www-data",
+            "HTTP_ACCEPT_LANGUAGE" => "en-GB,en;q=0.9,en-US;q=0.8",
+            "HTTP_ACCEPT_ENCODING" => "gzip, deflate, br",
+            "HTTP_SEC_FETCH_DEST" => "document",
+            "HTTP_SEC_FETCH_USER" => "?1",
+            "HTTP_SEC_FETCH_MODE" => "navigate",
+            "HTTP_SEC_FETCH_SITE" => "none",
+            "HTTP_ACCEPT" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+            "HTTP_USER_AGENT" =>
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko)",
+            "HTTP_UPGRADE_INSECURE_REQUESTS" => "1",
+            "HTTP_CACHE_CONTROL" => "max-age=0",
+            "HTTP_CONNECTION" => "keep-alive",
+            "HTTP_HOST" => "dev.vanilla.localhost",
+            "SCRIPT_FILENAME" => "/srv/vanilla-repositories/vanilla/index.php",
+            "REDIRECT_STATUS" => "200",
+            "SERVER_NAME" => "dev.vanilla.localhost",
+            "SERVER_PORT" => "80",
+            "SERVER_ADDR" => "172.18.0.7",
+            "REMOTE_PORT" => "38172",
+            "REMOTE_ADDR" => "172.18.0.1",
+            "SERVER_PROTOCOL" => "HTTP/1.1",
+            "DOCUMENT_ROOT" => "/srv/vanilla-repositories/vanilla",
+            "SCRIPT_NAME" => "/index.php",
+            "CONTENT_LENGTH" => "",
+            "CONTENT_TYPE" => "",
+            "REQUEST_METHOD" => "GET",
+            "QUERY_STRING" => "",
         ];
         $_GET = $get;
         $_POST = $post;
@@ -656,28 +727,31 @@ class RequestTest extends SharedBootstrapTestCase {
     /**
      * A path with an encoded character should URL encode properly when getting the URL.
      */
-    public function testEncodedPath(): void {
-        $request = self::createRequest('/profile/Fran#k.html');
-        $this->assertSame('http://dev.vanilla.localhost/profile/Fran%23k.html', $request->getUrl());
-        $this->assertSame($request->getUrl(), $request->url('', true));
-        $this->assertSame($request->getUrl(), (string)$request->getUri());
+    public function testEncodedPath(): void
+    {
+        $request = self::createRequest("/profile/Fran#k.html");
+        $this->assertSame("http://dev.vanilla.localhost/profile/Fran%23k.html", $request->getUrl());
+        $this->assertSame($request->getUrl(), $request->url("", true));
+        $this->assertSame($request->getUrl(), (string) $request->getUri());
     }
 
     /**
      * The path and query should be encoded because it's often used for redirects.
      */
-    public function testEncodedPathAndQuery(): void {
-        $request = self::createRequest('/profile/Fran#k.html');
-        $this->assertSame('profile/Fran%23k.html', $request->pathAndQuery());
+    public function testEncodedPathAndQuery(): void
+    {
+        $request = self::createRequest("/profile/Fran#k.html");
+        $this->assertSame("profile/Fran%23k.html", $request->pathAndQuery());
     }
 
     /**
      * Setting the path and query with an encoded path should work.
      */
-    public function testSetEncodedPathAndQuery(): void {
+    public function testSetEncodedPathAndQuery(): void
+    {
         $request = self::createRequest();
-        $request->pathAndQuery('profile/f%23o.html');
-        $this->assertSame('profile/f%23o.html', $request->pathAndQuery());
+        $request->pathAndQuery("profile/f%23o.html");
+        $this->assertSame("profile/f%23o.html", $request->pathAndQuery());
     }
 
     /**
@@ -688,7 +762,8 @@ class RequestTest extends SharedBootstrapTestCase {
      * @param string $expected
      * @dataProvider providePathAndQueryTests
      */
-    public function testPathAndQuery(string $path, array $get, string $expected): void {
+    public function testPathAndQuery(string $path, array $get, string $expected): void
+    {
         $request = self::createRequest($path, $get);
         $this->assertSame($expected, $request->pathAndQuery());
     }
@@ -698,10 +773,11 @@ class RequestTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function providePathAndQueryTests(): array {
+    public function providePathAndQueryTests(): array
+    {
         $r = [
-            'no query' => ['/foo', [], 'foo'],
-            'query' => ['/foo', ['bar' => 'baz'], 'foo?bar=baz'],
+            "no query" => ["/foo", [], "foo"],
+            "query" => ["/foo", ["bar" => "baz"], "foo?bar=baz"],
         ];
 
         return $r;
@@ -715,7 +791,8 @@ class RequestTest extends SharedBootstrapTestCase {
      * @param string $pathAndQuery
      * @dataProvider providePathAndQueryTests
      */
-    public function testSetPathAndQuery(string $path, array $get, string $pathAndQuery): void {
+    public function testSetPathAndQuery(string $path, array $get, string $pathAndQuery): void
+    {
         $request = self::createRequest();
         $request->pathAndQuery($pathAndQuery);
         $this->assertSame($path, $request->getPath());
@@ -725,37 +802,28 @@ class RequestTest extends SharedBootstrapTestCase {
     /**
      * Only the first IP of multiple IPs should be looked at.
      */
-    public function testIPCSV(): void {
-        $request = self::createRequest(['REMOTE_ADDR' => '1.2.3.4,5.6.7.8']);
-        $this->assertSame('1.2.3.4', $request->getIP());
+    public function testIPCSV(): void
+    {
+        $request = self::createRequest(["REMOTE_ADDR" => "1.2.3.4,5.6.7.8"]);
+        $this->assertSame("1.2.3.4", $request->getIP());
     }
 
     /**
      * Only the first IP of multiple IPs should be looked at.
      */
-    public function testIPv6CSV(): void {
-        $request = self::createRequest(['REMOTE_ADDR' => '2001:0db8:85a3:0000:0000:8a2e:0370:7334,foo']);
-        $this->assertSame('2001:0db8:85a3:0000:0000:8a2e:0370:7334', $request->getIP());
+    public function testIPv6CSV(): void
+    {
+        $request = self::createRequest(["REMOTE_ADDR" => "2001:0db8:85a3:0000:0000:8a2e:0370:7334,foo"]);
+        $this->assertSame("2001:0db8:85a3:0000:0000:8a2e:0370:7334", $request->getIP());
     }
 
     /**
      * Test various HTTPs schemes.
      */
-    public function testHttps(): void {
-        $request = self::createRequest(['HTTPS' => 'on']);
-        $this->assertSame('https', $request->getScheme());
-    }
-
-    /**
-     * Test paths when rewriting is off.
-     *
-     * @param array $get
-     * @param string $expected
-     * @dataProvider provideNonRewrittenPaths
-     */
-    public function testNonRewrittenPath(array $get, string $expected): void {
-        $request = self::createRequest(['X_REWRITE' => 0], $get);
-        $this->assertSame($expected, $request->getPath());
+    public function testHttps(): void
+    {
+        $request = self::createRequest(["HTTPS" => "on"]);
+        $this->assertSame("https", $request->getScheme());
     }
 
     /**
@@ -763,12 +831,107 @@ class RequestTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function provideNonRewrittenPaths(): array {
+    public function provideNonRewrittenPaths(): array
+    {
         $r = [
-            'p' => [['p' => 'foo'], '/foo'],
-            '_p' => [['_p' => 'foo'], '/foo'],
-            '_p over p' => [['p' => 'bar', '_p' => 'foo'], '/foo'],
+            "p" => [["p" => "foo"], "/foo"],
+            "_p" => [["_p" => "foo"], "/foo"],
+            "_p over p" => [["p" => "bar", "_p" => "foo"], "/foo"],
         ];
         return $r;
+    }
+
+    /**
+     * Test `Gdn_Request::anonymizeIP()`.
+     *
+     * @param string $ip
+     * @param bool $full
+     * @param string $expected
+     * @dataProvider provideAnonymizeIPs
+     */
+    public function testAnonymizeIP(string $ip, bool $full, string $expected): void
+    {
+        $request = self::createRequest();
+        $request->setIP($ip);
+
+        $actual = $request->anonymizeIP($full);
+        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $request->getIP());
+    }
+
+    /**
+     * Data provider for `testAnonymizeIP()`.
+     *
+     * @return array[]
+     */
+    public function provideAnonymizeIPs(): array
+    {
+        $r = [
+            "basic" => ["1.2.3.4", false, "1.2.3.0"],
+            "basic full" => ["1.2.3.4", true, "0.0.0.0"],
+        ];
+        return $r;
+    }
+
+    /**
+     * Run a repeatable test for our issues with request corruption when reparsing request variables.
+     *
+     * @param callable $test
+     */
+    public function runParseRequestTest(callable $test): void
+    {
+        $request = self::createRequest();
+        $request->setURI("/wrong/uri");
+        $request->setRoot("/root");
+        $request->setPath("/path");
+
+        $test($request);
+
+        $this->assertSame("/path", $request->getPath());
+        $this->assertSame("/root", $request->getRoot());
+    }
+
+    /**
+     * Setting the IP address should not wreck the path.
+     */
+    public function testSetIPCorruption(): void
+    {
+        $this->runParseRequestTest(function (Gdn_Request $request) {
+            $request->setIP("1.2.3.4");
+            $this->assertSame("1.2.3.4", $request->getIP());
+        });
+    }
+
+    /**
+     * Setting the method should not wreck the path.
+     */
+    public function testSetMethodCorruption(): void
+    {
+        $this->runParseRequestTest(function (Gdn_Request $request) {
+            $request->setMethod("PATCH");
+            $this->assertSame("PATCH", $request->getMethod());
+        });
+    }
+
+    /**
+     * @return void
+     */
+    public function testIsCrawler(): void
+    {
+        $botDetector = new BotDetector();
+        $request = $this->createRequest();
+        $request->setHeader("User-Agent", "Googlebot/2.1 (+http://www.google.com/bot.html)");
+        $this->assertTrue($botDetector->isBot($request));
+
+        // A normal user agent is not a bot
+        $request->setHeader(
+            "User-Agent",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        );
+        $this->assertFalse($botDetector->isBot($request));
+
+        // Alternatively our Edge network might identify the bot
+        $request->setHeader("X-Known-Bot", "1");
+        $this->assertTrue($botDetector->isBot($request));
     }
 }

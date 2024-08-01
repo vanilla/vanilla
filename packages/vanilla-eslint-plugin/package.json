@@ -1,0 +1,10 @@
+{
+    "name": "@vanilla/eslint-plugin",
+    "description": "Vanilla ESLint plugin",
+    "version": "3.0.1",
+    "main": "index.js",
+    "license": "MIT",
+    "peerDependencies": {
+        "eslint": "^7.10.0"
+    }
+}

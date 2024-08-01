@@ -1,16 +1,17 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssRule } from "typestyle";
-import { colorOut, modifyColorBasedOnLightness } from "@library/styles/styleHelpersColors";
+import { cssRule } from "@library/styles/styleShim";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { em, percent } from "csx";
-import { paddings } from "@vanilla/library/src/scripts/styles/styleHelpersSpacing";
-import { userContentVariables } from "@library/content/userContentStyles";
+import { userContentVariables } from "@library/content/UserContent.variables";
+import { Mixins } from "@library/styles/Mixins";
 
 export const codeBlockVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -51,7 +52,7 @@ export const codeBlockVariables = useThemeCache(() => {
             radius: borderRadius.default,
         },
         paddings: {
-            all: globalVars.userContent.font.sizes.default,
+            all: globalVars.fonts.size.medium,
         },
     });
 
@@ -67,7 +68,7 @@ export const codeBlockCSS = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = codeBlockVariables();
     cssRule(".userContent", {
-        $nest: {
+        ...{
             ".code": {
                 position: "relative",
                 display: "inline",
@@ -77,8 +78,8 @@ export const codeBlockCSS = useThemeCache(() => {
                 fontFamily: vars.fonts.families,
                 maxWidth: percent(100),
                 margin: 0,
-                color: colorOut(vars.inline.fg),
-                backgroundColor: colorOut(vars.inline.bg),
+                color: ColorsUtils.colorOut(vars.inline.fg),
+                backgroundColor: ColorsUtils.colorOut(vars.inline.bg),
                 border: 0,
                 overflowX: "auto",
                 flexShrink: 0,
@@ -86,20 +87,20 @@ export const codeBlockCSS = useThemeCache(() => {
             ".codeInline": {
                 display: "inline",
                 whiteSpace: "normal",
-                ...paddings(vars.inline.paddings),
+                ...Mixins.padding(vars.inline.paddings),
                 borderRadius: vars.inline.border.radius,
-                color: colorOut(vars.inline.fg),
-                backgroundColor: colorOut(vars.inline.bg),
+                color: ColorsUtils.colorOut(vars.inline.fg),
+                backgroundColor: ColorsUtils.colorOut(vars.inline.bg),
             },
             ".codeBlock": {
                 display: "block",
                 wordWrap: "normal",
                 lineHeight: globalVars.lineHeights.code,
                 whiteSpace: "pre",
-                ...paddings(vars.block.paddings),
+                ...Mixins.padding(vars.block.paddings),
                 borderRadius: vars.block.border.radius,
-                color: colorOut(vars.block.fg),
-                backgroundColor: colorOut(vars.block.bg),
+                color: ColorsUtils.colorOut(vars.block.fg),
+                backgroundColor: ColorsUtils.colorOut(vars.block.bg),
             },
         },
     });

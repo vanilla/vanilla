@@ -12,22 +12,33 @@ use Vanilla\Events\EventAction;
 /**
  * Use this trait if your resource is supposed to log its events.
  */
-trait AssertLoggingTrait {
-    protected $resourceName = 'n/a';
+trait AssertLoggingTrait
+{
+    /**
+     * @return void
+     */
+    public function setupAssertLoggingTrait(): void
+    {
+        \Gdn::config()->saveToConfig("auditLog.enabled", true);
+    }
+
+    protected $resourceName = "n/a";
 
     /**
      * @inheritDoc
      */
-    public function testDelete() {
+    public function testDelete()
+    {
         parent::testDelete();
-        $this->assertLog(['event' => EventAction::eventName($this->resourceName, EventAction::DELETE)]);
+        $this->assertLog(["event" => EventAction::eventName($this->resourceName, EventAction::DELETE)]);
     }
 
     /**
      * @inheritDoc
      */
-    public function testPatchFull() {
+    public function testPatchFull()
+    {
         parent::testPatchFull();
-        $this->assertLog(['event' => EventAction::eventName($this->resourceName, EventAction::UPDATE)]);
+        $this->assertLog(["event" => EventAction::eventName($this->resourceName, EventAction::UPDATE)]);
     }
 }

@@ -1,44 +1,28 @@
 <?php
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+use Smarty\Smarty;
 
 /**
  * Vanilla implementation of Smarty security policy.
  */
-class SmartySecurityVanilla extends Smarty_Security {
-
+class SmartySecurityVanilla extends \Smarty\Security
+{
     /**
-     * Check if PHP function is trusted.
+     * SmartySecurityVanilla constructor.
      *
-     * @param  string $function_name
-     * @param  object $compiler compiler object
-     *
-     * @return boolean                 true if function is trusted
-     * @throws SmartyCompilerException if php function is not trusted
+     * @param Smarty $smarty
      */
-    public function isTrustedPhpFunction($function_name, $compiler) {
-        if (isset($this->php_functions)) {
-            if (empty($this->php_functions) || in_array(strtolower($function_name), $this->php_functions)) {
-                return true;
-            }
-        }
-
-        $compiler->trigger_template_error("PHP function '{$function_name}' not allowed by security setting");
-
-        return false; // should not, but who knows what happens to the compiler in the future?
-    }
-
-    /**
-     * Set allowed PHP functions.  Normalize casing for comparison.
-     *
-     * @param array $php_functions PHP functions to allow.
-     *
-     * @return array
-     * @throws Gdn_UserException if $php_functions is not an array.
-     */
-    public function setPhpFunctions($php_functions) {
-        if (!is_array($php_functions)) {
-            throw new Gdn_UserException('$php_functions must be an array.');
-        }
-
-        $this->php_functions = array_map('strtolower', $php_functions);
+    public function __construct(Smarty $smarty)
+    {
+        parent::__construct($smarty);
+        $smarty->muteUndefinedOrNullWarnings();
+        $this->php_handling = [];
+        $this->disabled_tags = ["include_php", "insert"];
+        $this->static_classes = null;
+        $this->disabled_special_smarty_vars[] = "template_object";
     }
 }

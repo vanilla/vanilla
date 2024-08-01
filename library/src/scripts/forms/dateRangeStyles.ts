@@ -3,53 +3,46 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+import { css } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { percent, translateX } from "csx";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { containerVariables } from "@library/layout/components/containerStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const dateRangeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const style = styleFactory("dateRange");
-    const mediaQueries = layoutVariables().mediaQueries();
 
-    const mobileGutterSize =
-        panelWidgetVariables().spacing.padding + containerVariables().spacing.mobile.padding.horizontal;
-
-    const input = style("input", {
-        width: unit(136),
-        maxWidth: percent(100),
+    const input = css({
+        width: "150px",
+        maxWidth: "100%",
     });
 
-    const root = style({
+    const root = css({
         display: "block",
         position: "relative",
-        width: percent(100),
+        width: "100%",
     });
 
-    const boundary = style("boundary", {
+    const boundary = css({
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "space-between",
-        width: percent(100),
-        $nest: {
+        width: "100%",
+        ...{
             "& + &": {
-                marginTop: unit(12),
+                ...Mixins.margin({ top: 12 }),
             },
         },
     });
 
-    const label = style("label", {
+    const label = css({
         overflow: "hidden",
         fontWeight: globalVars.fonts.weights.semiBold,
         wordBreak: "break-word",
         textOverflow: "ellipsis",
-        maxWidth: percent(100),
-        paddingLeft: unit(8),
+        maxWidth: "100%",
+
+        ...Mixins.padding({ left: 8 }),
     });
 
     return {

@@ -7,7 +7,7 @@
 import React, { useState } from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { t } from "@vanilla/i18n/src";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import RadioInputAsButton, { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
@@ -16,15 +16,15 @@ import { radioInputAsTabClasses } from "@library/forms/radioAsButtons/radioInput
 import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 export default {
-    title: "Radio Inputs as Buttons",
+    title: "Components/Radio Input",
     parameters: {
         chromatic: {
-            viewports: [1450, layoutVariables().panelLayoutBreakPoints.xs],
+            viewports: [1450, oneColumnVariables().breakPoints.xs],
         },
     },
 };
 
-export function RadioInputsRenderedAsButtons(props: {
+function RadioInputsRenderedAsButtonsStory(props: {
     title?: string;
     accessibleTitle?: string;
     disabled?: boolean;
@@ -40,7 +40,7 @@ export function RadioInputsRenderedAsButtons(props: {
         classes = radioInputAsButtonsClasses(),
     } = props;
     const [activeItem, setActiveItem] = useState("going");
-    const setData = data => {
+    const setData = (data) => {
         setActiveItem(data);
     };
 
@@ -69,8 +69,12 @@ export function RadioInputsRenderedAsButtons(props: {
     );
 }
 
+export function RadioInputsRenderedAsButtons() {
+    return <RadioInputsRenderedAsButtonsStory />;
+}
+
 export const LookingLikeTabs = storyWithConfig({}, () => (
-    <RadioInputsRenderedAsButtons
+    <RadioInputsRenderedAsButtonsStory
         title="Tab Style Buttons"
         buttonClass={""}
         buttonActiveClass={""}
@@ -82,5 +86,5 @@ export const LookingLikeTabs = storyWithConfig({}, () => (
 ));
 
 export const Disabled = storyWithConfig({}, () => (
-    <RadioInputsRenderedAsButtons title="Disabled Buttons" disabled={true} />
+    <RadioInputsRenderedAsButtonsStory title="Disabled Buttons" disabled={true} />
 ));

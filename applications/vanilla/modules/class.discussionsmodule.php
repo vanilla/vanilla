@@ -11,16 +11,29 @@
 /**
  * Renders recently active discussions
  */
-class DiscussionsModule extends Gdn_Module {
-
+class DiscussionsModule extends Gdn_Module
+{
     /** @var int Display limit. */
     public $Limit = 10;
 
     /** @var string  */
-    public $Prefix = 'Discussion';
+    public $Prefix = "Discussion";
+
+    /** @var bool */
+    public $showTitle = true;
 
     /** @var bool Whether to show the discussion author avatar. */
     private $showPhotos = false;
+
+    /** @var string */
+    private $title = "Recent Discussions";
+
+    /**
+     * Render the full discussion item instead of the minimal module version.
+     *
+     * @var bool
+     */
+    private $fullView = false;
 
     /** @var array Limit the discussions to just this list of categories, checked for view permission. */
     protected $categoryIDs;
@@ -30,17 +43,19 @@ class DiscussionsModule extends Gdn_Module {
      *
      * @throws Exception
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'vanilla';
-        $this->fireEvent('Init');
+        $this->_ApplicationFolder = "vanilla";
+        $this->fireEvent("Init");
     }
 
     /**
      * @param $showPhotos Whether to show the discussion author avatar.
      * @return DiscussionsModule
      */
-    public function setShowPhotos($showPhotos) {
+    public function setShowPhotos($showPhotos)
+    {
         $this->showPhotos = $showPhotos;
         return $this;
     }
@@ -48,8 +63,41 @@ class DiscussionsModule extends Gdn_Module {
     /**
      * @return bool Whether to show the discussion author avatar.
      */
-    public function getShowPhotos() {
+    public function getShowPhotos()
+    {
         return $this->showPhotos;
+    }
+
+    /**
+     * @param bool $fullView
+     */
+    public function setFullView(bool $fullView): void
+    {
+        $this->fullView = $fullView;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle(string $title): void
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFullView(): bool
+    {
+        return $this->fullView;
     }
 
     /**
@@ -57,38 +105,39 @@ class DiscussionsModule extends Gdn_Module {
      *
      * @param int|bool $limit Override the number of discussions to display.
      */
-    public function getData($limit = false) {
+    public function getData($limit = false)
+    {
         if (!$limit) {
             $limit = $this->Limit;
         }
 
         $discussionModel = new DiscussionModel();
-
+        $where = [];
         $categoryIDs = $this->getCategoryIDs();
-        $where = ['Announce' => 'all'];
 
         if ($categoryIDs) {
-            $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
-        } else {
-            $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
-            if ($visibleCategoriesResult !== true) {
-                $where['d.CategoryID'] = $visibleCategoriesResult;
+            $visibleCategoryIDs = CategoryModel::instance()->getVisibleCategoryIDs(["filterHideDiscussions" => true]);
+            if ($visibleCategoryIDs !== true) {
+                $categoryIDs = array_intersect($visibleCategoryIDs, $categoryIDs);
             }
+            $where["d.CategoryID"] = $categoryIDs;
         }
 
-        $this->setData('Discussions', $discussionModel->get(0, $limit, $where));
+        $this->setData("Discussions", $discussionModel->getWhere($where, "", "", $limit));
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
-    public function toString() {
-        if (!$this->data('Discussions')) {
+    public function toString()
+    {
+        if (!$this->data("Discussions")) {
             $this->getData();
         }
 
-        require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
+        require_once Gdn::controller()->fetchViewLocation("helper_functions", "Discussions", "Vanilla");
 
         return parent::toString();
     }
@@ -97,8 +146,10 @@ class DiscussionsModule extends Gdn_Module {
      * Get a list of category IDs to limit.
      *
      * @return array
+     *
      */
-    public function getCategoryIDs() {
+    public function getCategoryIDs()
+    {
         return $this->categoryIDs;
     }
 
@@ -107,7 +158,8 @@ class DiscussionsModule extends Gdn_Module {
      *
      * @param array $categoryIDs
      */
-    public function setCategoryIDs($categoryIDs) {
+    public function setCategoryIDs($categoryIDs)
+    {
         $this->categoryIDs = $categoryIDs;
     }
 }

@@ -5,7 +5,7 @@
  * Confirm modals that don't ajax-in the content.
  *
  */
-var DashboardModal = (function() {
+window.DashboardModal = (function() {
 
     /**
      * The settings we can configure when starting the DashboardModal.
@@ -316,8 +316,8 @@ var DashboardModal = (function() {
                 formCloseTag = '</form>';
                 var formHtml = $form.prop('outerHTML');
                 formTag = formHtml.split('>')[0] += '>';
-                body = body.replace(formTag, '');
-                body = body.replace('</form>', '');
+                var formInner = $form.html();
+                body = body.replace(formHtml, formInner);
             }
 
             return {

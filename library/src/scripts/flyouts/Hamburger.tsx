@@ -4,25 +4,33 @@
  * @license GPL-2.0-only
  */
 
-import Permission from "@library/features/users/Permission";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
-import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import DropDownSection from "@library/flyouts/items/DropDownSection";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { navigationVariables } from "@library/headers/navigationVariables";
+import { INavigationVariableItem, navigationVariables } from "@library/headers/navigationVariables";
 import { CloseTinyIcon, HamburgerIcon } from "@library/icons/common";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { INavigationTreeItem } from "@library/@types/api/core";
+import { notEmpty } from "@vanilla/utils";
+import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
+import { IPanelNavItemsProps } from "@library/flyouts/panelNav/PanelNavItems";
+import MobileOnlyNavigation from "@library/headers/MobileOnlyNavigation";
+import { useHamburgerMenuContext } from "@library/contexts/HamburgerMenuContext";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { PermissionChecker } from "@library/features/users/Permission";
 
 interface IProps {
     className?: string;
     extraNavTop?: React.ReactNode;
     extraNavBottom?: React.ReactNode;
+    showCloseIcon?: boolean;
+    navigationItems?: INavigationVariableItem[];
+    forceHamburgerOpen?: boolean;
 }
 
 const extraNavGroups: React.ComponentType[] = [];
@@ -35,7 +43,7 @@ export function addHamburgerNavGroup(node: React.ComponentType) {
  * Creates a hamburger menu.
  */
 export default function Hamburger(props: IProps) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(props.forceHamburgerOpen || false);
     const classes = hamburgerClasses();
 
     const closeDrawer = () => {
@@ -46,12 +54,29 @@ export default function Hamburger(props: IProps) {
         setIsOpen(!isOpen);
     };
 
-    const navItems = navigationVariables().getNavItemsForLocale();
+    const { showCloseIcon = true } = props;
+
+    // Get all the widget components
+    const { dynamicComponents } = useHamburgerMenuContext();
+
+    // Create a single fragment containing all the widget components
+    const widgetComponents = useMemo(() => {
+        if (dynamicComponents) {
+            return (
+                <>
+                    {Object.values(dynamicComponents).map(({ component }, key) => (
+                        <React.Fragment key={key}>{component}</React.Fragment>
+                    ))}
+                </>
+            );
+        }
+        return <></>;
+    }, [dynamicComponents]);
 
     return (
         <>
             <Button
-                baseClass={ButtonTypes.ICON}
+                buttonType={ButtonTypes.ICON}
                 className={classNames(classes.root, props.className)}
                 onClick={toggleDrawer}
             >
@@ -61,25 +86,23 @@ export default function Hamburger(props: IProps) {
                 </>
             </Button>
             <Modal scrollable isVisible={isOpen} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT} exitHandler={closeDrawer}>
-                <Button
-                    className={classes.closeButton}
-                    baseClass={ButtonTypes.ICON_COMPACT}
-                    onClick={() => setIsOpen(false)}
-                >
-                    <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
-                    <CloseTinyIcon />
-                </Button>
+                {showCloseIcon && (
+                    <Button
+                        className={classes.closeButton}
+                        buttonType={ButtonTypes.ICON_COMPACT}
+                        onClick={() => {
+                            setIsOpen(false);
+                        }}
+                    >
+                        <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
+                        <CloseTinyIcon />
+                    </Button>
+                )}
                 <div className={classes.container}>
-                    <DropDownSection title={t("Site Navigation")}>
-                        {navItems.map((item, i) => {
-                            return (
-                                <Permission key={i} permission={item.permission}>
-                                    <DropDownItemLink to={item.to}>{item.children}</DropDownItemLink>
-                                </Permission>
-                            );
-                        })}
-                    </DropDownSection>
+                    <SiteNavigation onClose={() => setIsOpen(false)} navigationItems={props.navigationItems} />
+                    <MobileOnlyNavigation />
                     {props.extraNavTop}
+                    {widgetComponents}
                     {props.extraNavBottom}
                     {extraNavGroups.map((GroupComponent, i) => (
                         <GroupComponent key={i} />
@@ -87,5 +110,81 @@ export default function Hamburger(props: IProps) {
                 </div>
             </Modal>
         </>
+    );
+}
+
+interface ISiteNavigationProps {
+    onClose: () => void;
+    navigationItems?: INavigationVariableItem[];
+}
+
+export function varItemToNavTreeItem(
+    variableItem: INavigationVariableItem,
+    permissionChecker: PermissionChecker,
+    parentID: string = "root",
+): INavigationTreeItem | null {
+    const { permission, name, url, id, children, isHidden, badge } = variableItem;
+
+    if (permission && !permissionChecker(permission)) {
+        return null;
+    }
+
+    if (isHidden) {
+        return null;
+    }
+
+    const navTreeItem = {
+        name,
+        url,
+        recordID: id,
+        recordType: "customLink",
+        parentID: parentID,
+        children:
+            children?.map((child) => varItemToNavTreeItem(child, permissionChecker, parentID)).filter(notEmpty) ?? [],
+        sort: 0,
+    };
+
+    if (badge) {
+        navTreeItem["badge"] = badge;
+    }
+
+    return navTreeItem;
+}
+
+export function getActiveRecord(navTreeItems: INavigationTreeItem[]): IPanelNavItemsProps["activeRecord"] {
+    let currentItemID: string | null = null;
+
+    for (const item of navTreeItems) {
+        if (window.location.href.includes(item && item.url ? item.url.replace("~", "") : "")) {
+            currentItemID = `${item.recordID}`;
+        }
+    }
+    return {
+        recordID: currentItemID ?? "notspecified",
+        recordType: "customLink",
+    };
+}
+
+function SiteNavigation(props: ISiteNavigationProps) {
+    const { hasPermission } = usePermissionsContext();
+    const navigationItems =
+        props.navigationItems && props.navigationItems.length
+            ? props.navigationItems
+            : navigationVariables().navigationItems;
+
+    const [treeItems, activeRecord] = useMemo(() => {
+        const treeItems = navigationItems.map((item) => varItemToNavTreeItem(item, hasPermission)).filter(notEmpty);
+        const activeRecord = getActiveRecord(treeItems);
+        return [treeItems, activeRecord];
+    }, [navigationItems]);
+
+    return (
+        <DropDownPanelNav
+            onClose={props.onClose}
+            navItems={treeItems}
+            title={t("Site Navigation")}
+            isNestable
+            activeRecord={activeRecord}
+        />
     );
 }

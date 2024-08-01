@@ -11,18 +11,36 @@ use Vanilla\Contracts\Formatting\FormatInterface;
 /**
  * Extension of Format Service to all for more configurability.
  */
-class ExtendedContentFormatService extends FormatService {
+class ExtendedContentFormatService extends FormatService
+{
     /**
      * Overrides parent::registerFormat to allow for extended content.
      *
      * @param string $formatKey
-     * @param FormatInterface $format
+     * @param FormatInterface|string $format
      *
      * @return $this For method chaining.
      */
-    public function registerFormat(string $formatKey, FormatInterface $format): FormatService {
-        $format->setAllowExtendedContent(true);
+    public function registerFormat(string $formatKey, $format): FormatService
+    {
+        if ($format instanceof FormatInterface) {
+            $format->setAllowExtendedContent(true);
+        }
         parent::registerFormat($formatKey, $format);
         return $this;
+    }
+
+    /**
+     * Overridden to apply extended content configuration.
+     *
+     * @param string $formatClass
+     *
+     * @return FormatInterface
+     */
+    protected function constructFormat(string $formatClass): FormatInterface
+    {
+        $format = parent::constructFormat($formatClass);
+        $format->setAllowExtendedContent(true);
+        return $format;
     }
 }

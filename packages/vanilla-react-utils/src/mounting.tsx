@@ -1,17 +1,34 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { forceRenderStyles } from "typestyle";
 import { ReactElement } from "react";
+import { globalValueRef } from "@vanilla/utils";
 
 export interface IComponentMountOptions {
     overwrite?: boolean;
     clearContents?: boolean;
+    widgetResolver?: IWidgetResolver;
     bypassPortalManager?: boolean;
+    unmountBeforeRender?: boolean;
+}
+
+export interface IWidgetOptions {
+    $type?: string; // the component to get, optional because coming from API
+    children?: IWidgetOptions[]; // widgets to mount as children
+    [x: string]: any; // can take additional properties
+}
+
+/**
+ * Defines an interface for a function that will turn widget options into props that can be used to render a component.
+ */
+export interface IWidgetResolver {
+    (options: IWidgetOptions): {
+        [key: string]: any;
+    };
 }
 
 interface IPortal {
@@ -19,17 +36,21 @@ interface IPortal {
     component: React.ReactElement;
 }
 
-const portals: IPortal[] = [];
+let hasRendered = false;
+const portals = globalValueRef<IPortal[]>("portals", []);
 
 const PORTAL_MANAGER_ID = "vanillaPortalManager";
 type PortalContextType = React.FC<{ children?: React.ReactNode }>;
-let PortalContext: PortalContextType = props => {
+let portalContextRef = globalValueRef<PortalContextType>("PortalContext", (props) => {
     return <React.Fragment>{props.children}</React.Fragment>;
-};
+});
 
 export function applySharedPortalContext(context: PortalContextType) {
-    PortalContext = context;
-    renderPortals();
+    portalContextRef.set(context);
+    if (hasRendered) {
+        // Re-render the portals. We never want to be the first to initialize rendering though.
+        renderPortals();
+    }
 }
 
 /**
@@ -38,10 +59,11 @@ export function applySharedPortalContext(context: PortalContextType) {
  * This allows a shared context provider to be applied to parts of the site.
  */
 function PortalManager() {
+    const PortalContext = portalContextRef.current();
     return (
         <div>
             <PortalContext>
-                {portals.map((portal, i) => {
+                {portals.current().map((portal, i) => {
                     return (
                         <React.Fragment key={i}>
                             {ReactDOM.createPortal(portal.component, portal.target)}
@@ -53,19 +75,23 @@ function PortalManager() {
     );
 }
 
-function renderPortals(callback?: () => void) {
+export function renderPortals(callback?: () => void) {
+    hasRendered = true;
     // Ensure we have our modal container.
     let container = document.getElementById(PORTAL_MANAGER_ID);
     if (!container) {
         container = document.createElement("div");
         container.id = PORTAL_MANAGER_ID;
-        document.body.appendChild(container);
+        const profiler = document.querySelector("#profiler");
+        if (profiler) {
+            document.body.insertBefore(container, profiler);
+        } else {
+            document.body.appendChild(container);
+        }
     }
 
     ReactDOM.render(<PortalManager />, container, callback);
 }
-
-// Make a mount root in base of the document.
 
 /**
  * Mount a root component of a React tree.
@@ -85,10 +111,17 @@ export function mountReact(
     component: React.ReactElement,
     target: HTMLElement,
     callback?: () => void,
-    options?: IComponentMountOptions,
+    options?: IComponentMountOptions & { bypassPortalManager?: boolean },
 ) {
     if (options?.bypassPortalManager) {
-        ReactDOM.render(<PortalContext>{component}</PortalContext>, target, callback);
+        const PortalContext = portalContextRef.current();
+        const doRender = () => {
+            ReactDOM.render(<PortalContext>{component}</PortalContext>, target, callback);
+        };
+        if (options?.unmountBeforeRender) {
+            ReactDOM.unmountComponentAtNode(target);
+        }
+        setTimeout(doRender, 0);
         return;
     }
 
@@ -104,7 +137,7 @@ export function mountReact(
         target.parentElement!.insertBefore(container, target);
         mountPoint = container;
     }
-    portals.push({ target: mountPoint, component });
+    portals.current().push({ target: mountPoint, component });
 
     renderPortals(() => {
         if (cleanupContainer) {
@@ -115,7 +148,81 @@ export function mountReact(
                 target.remove();
             }
         }
-        forceRenderStyles();
+        callback && callback();
+    });
+}
+
+export interface IMountable {
+    target: HTMLElement;
+    component: React.ReactElement;
+    overwrite?: boolean;
+}
+
+export function mountReactMultiple(components: IMountable[], callback?: () => void, options?: IComponentMountOptions) {
+    if (!components.length) {
+        callback && callback();
+        return;
+    }
+
+    const elementIndexesToMove: Array<{ parent: Element; initialParentChildCount: number; target: Element }> = [];
+
+    components.forEach((mountable) => {
+        const { component, target } = mountable;
+        let mountPoint = target;
+        if (options?.clearContents) {
+            target.innerHTML = "";
+        }
+
+        if (options?.overwrite || mountable.overwrite) {
+            /**
+             * Default mounting behaviour
+             *
+             * <Parent>
+             *     <Target> // Events are bound here
+             *         <ReactElement />
+             *     <Target />
+             * </Parent>
+             *
+             * What we want with overwrite is:
+             *
+             * <Parent> // Events are bound here
+             *    <ReactElement />
+             * </Parent>
+             */
+
+            mountPoint = mountable.target.parentElement!;
+            elementIndexesToMove.push({
+                parent: mountPoint,
+                initialParentChildCount: mountPoint.children.length,
+                target,
+            });
+        }
+        portals.current().push({ target: mountPoint, component });
+    });
+
+    renderPortals(() => {
+        // Loop through the elements by parent.
+
+        elementIndexesToMove.forEach((movable) => {
+            // Relocate the nodes to their proper places on the page.
+            // Without this, widgets may not appear in their intended locations.
+            const nodeToMove = movable.parent.children.item(movable.initialParentChildCount);
+            if (!nodeToMove) {
+                return;
+            }
+
+            if (movable.target.parentElement !== movable.parent) {
+                console.warn("Movable parent does not container target", {
+                    parent: movable.parent.outerHTML,
+                    target: movable.target.outerHTML,
+                });
+                return;
+            }
+
+            movable.parent.insertBefore(nodeToMove, movable.target);
+            movable.target.remove();
+        });
+
         callback && callback();
     });
 }
@@ -142,6 +249,6 @@ export function mountPortal(element: ReactElement<any>, containerID: string, asR
     if (asRealPortal) {
         return ReactDOM.createPortal(element, container);
     } else {
-        return new Promise(resolve => mountReact(element, container!, () => resolve()));
+        return new Promise<void>((resolve) => mountReact(element, container!, () => resolve()));
     }
 }

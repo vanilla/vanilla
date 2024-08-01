@@ -4,14 +4,14 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { t } from "@vanilla/i18n";
 import { uploadFile } from "@library/apiv2";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
-import ButtonLoader from "@vanilla/library/src/scripts/loaders/ButtonLoader";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IProps {
@@ -55,7 +55,7 @@ export function DashboardImageUpload(props: IProps) {
                     id={inputID}
                     className={classes}
                     disabled={props.disabled}
-                    onChange={async event => {
+                    onChange={async (event) => {
                         const file = event.target.files && event.target.files[0];
                         if (!file) {
                             return;

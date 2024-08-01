@@ -1,12 +1,16 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit();
 require_once Gdn::controller()->fetchViewLocation('helper_functions', 'modules', 'vanilla');
 $Content = $this->data('Content');
 
 if (!empty($Content) || $this->getShowIfNoResults()) :
     ?>
     <div class="Box BoxPromoted">
-        <?php echo panelHeading(t('Promoted Content')); ?>
-        <div class="PanelInfo DataList">
+        <?php BoxThemeShim::startHeading(); ?>
+        <?php echo panelHeading($this->getTitle()); ?>
+        <?php BoxThemeShim::endHeading(); ?>
+        <div class="PanelInfo DataList <?php BoxThemeShim::activeHtml('pageBox'); ?>">
             <?php
             if ($Content):
                 if ($this->Group):

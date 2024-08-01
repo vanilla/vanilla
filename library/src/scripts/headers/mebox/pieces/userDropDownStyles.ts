@@ -1,13 +1,16 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
+import { css } from "@emotion/css";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { styleUnit } from "@library/styles/styleUnit";
+import { componentThemeVariables } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const userDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -33,7 +36,7 @@ export const userDropDownVariables = useThemeCache(() => {
         paddingRight: item.rightPadding,
         paddingLeft: item.leftPadding,
         fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: globalVars.fonts.size.large,
+        fontSize: globalVars.fonts.size.subTitle,
         lineHeight: globalVars.lineHeights.condensed,
         ...themeVars.subComponentStyles("userName"),
     };
@@ -49,40 +52,59 @@ export const userDropDownVariables = useThemeCache(() => {
 export const userDropDownClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = userDropDownVariables();
-    const style = styleFactory("userDropDown");
 
-    const userCard = style("userCard", {
+    const userCard = css({
         listStyle: "none",
+        ...Mixins.padding({
+            vertical: 4,
+            horizontal: 14,
+        }),
+        display: "flex",
+        justifyContent: "start",
+        alignItems: "center",
+        gap: 12,
     });
 
-    const userCardPhotoLink = style("userCardPhotoLink", {
+    const userCardPhotoLink = css({
         display: "block",
     });
 
-    const userCardPhoto = style("userCardPhoto", {
+    const userCardPhoto = css({
         border: `solid 1px ${globalVars.mixBgAndFg(0.3)}`,
-        marginTop: unit(vars.userCard.topMargin),
-        marginLeft: "auto",
-        marginRight: "auto",
+        // A little crazy that the difference between Medium(60) and Large(100) photos is 40px
+        "&&": {
+            width: 70,
+            height: "auto",
+            aspectRatio: "1/1",
+        },
     });
 
-    const userCardName = style("userCardName", {
-        display: "block",
+    const userCardName = css({
         color: "inherit",
         fontWeight: vars.userName.fontWeight,
-        fontSize: unit(vars.userName.fontSize),
+        fontSize: styleUnit(vars.userName.fontSize),
         lineHeight: vars.userName.lineHeight,
-        textAlign: "center",
-        marginTop: unit(vars.userName.topMargin),
-        marginRight: "auto",
-        marginBottom: unit(vars.userName.bottomMargin),
-        marginLeft: "auto",
-        paddingRight: unit(vars.userName.paddingRight),
-        paddingLeft: unit(vars.userName.paddingLeft),
+        textWrap: "pretty",
     });
 
-    const contents = style("contents", {
-        width: unit(vars.contents.width),
+    const contents = css({
+        width: styleUnit(vars.contents.width),
+    });
+
+    const userInfo = css({
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "start",
+    });
+
+    const email = css({
+        fontSize: styleUnit(globalVars.fonts.size.small),
+    });
+
+    const accountLinks = css({
+        fontSize: styleUnit(globalVars.fonts.size.medium),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.darkText),
+        ...Mixins.linkDecoration(),
     });
 
     return {
@@ -90,6 +112,9 @@ export const userDropDownClasses = useThemeCache(() => {
         userCardPhoto,
         userCardName,
         contents,
+        userInfo,
+        accountLinks,
+        email,
         userCard,
     };
 });

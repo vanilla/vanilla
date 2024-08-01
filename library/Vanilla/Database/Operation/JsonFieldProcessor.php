@@ -6,24 +6,30 @@
 
 namespace Vanilla\Database\Operation;
 
+use Vanilla\ApiUtils;
 use Vanilla\Database\Operation;
 use Vanilla\Logging\LoggerUtils;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Database operation processor for packing and unpacking JSON fields.
  */
-class JsonFieldProcessor implements Processor {
-
+class JsonFieldProcessor implements Processor
+{
     /** @var array */
     private $fields = [];
+
+    private int $jsonFlags;
 
     /**
      * JsonFieldProcessor constructor.
      *
      * @param array $fields
      */
-    public function __construct(array $fields = []) {
+    public function __construct(array $fields = [], int $jsonFlags = JSON_FORCE_OBJECT)
+    {
         $this->setFields($fields);
+        $this->jsonFlags = $jsonFlags;
     }
 
     /**
@@ -31,7 +37,8 @@ class JsonFieldProcessor implements Processor {
      *
      * @return array
      */
-    public function getFields(): array {
+    public function getFields(): array
+    {
         return $this->fields;
     }
 
@@ -42,7 +49,8 @@ class JsonFieldProcessor implements Processor {
      * @param callable $stack
      * @return mixed
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         if (in_array($operation->getType(), [Operation::TYPE_INSERT, Operation::TYPE_UPDATE])) {
             $this->packFields($operation);
             return $stack($operation);
@@ -60,15 +68,19 @@ class JsonFieldProcessor implements Processor {
      * @param Operation $operation
      * @throws \Exception If JSON field data is not valid JSON.
      */
-    private function packFields(Operation $operation) {
+    private function packFields(Operation $operation)
+    {
         $set = $operation->getSet();
         foreach ($this->getFields() as $field) {
             if (array_key_exists($field, $set)) {
                 $json = $set[$field];
-                $json = LoggerUtils::stringifyDates($json);
-                $json = json_encode($json, JSON_FORCE_OBJECT);
+                if (is_array($json)) {
+                    $json = LoggerUtils::stringifyDates($json);
+                    $json = ipEncodeRecursive($json);
+                }
+                $json = $json === null ? null : json_encode($json, $this->jsonFlags);
                 if ($json === false) {
-                    throw new \Exception("Unable to encode field as JSON.");
+                    throw new \InvalidArgumentException("Unable to encode field as JSON.", 400);
                 }
                 $set[$field] = $json;
             }
@@ -82,7 +94,8 @@ class JsonFieldProcessor implements Processor {
      * @param array $fields
      * @return self
      */
-    public function setFields(array $fields): self {
+    public function setFields(array $fields): self
+    {
         $this->fields = $fields;
         return $this;
     }
@@ -93,12 +106,16 @@ class JsonFieldProcessor implements Processor {
      * @param array $results
      * @return array
      */
-    private function unpackFields(array $results): array {
+    private function unpackFields(array $results): array
+    {
         $fields = $this->getFields();
         foreach ($results as &$row) {
             foreach ($fields as $field) {
                 if (array_key_exists($field, $row)) {
                     $row[$field] = json_decode($row[$field], true);
+                    if (is_array($row[$field])) {
+                        $row[$field] = ipDecodeRecursive($row[$field]);
+                    }
                 }
             }
         }

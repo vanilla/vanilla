@@ -6,14 +6,15 @@
 
 import { t } from "@library/utility/appUtils";
 import React, { Component } from "react";
-import moment from "moment";
 import { getJSLocaleKey } from "@vanilla/i18n";
 import { dateTimeClasses } from "@library/content/dateTimeStyles";
+import { DateElement, humanizedRelativeTime, isSameDate } from "@library/content/DateTimeHelpers";
 
 export enum DateFormats {
     DEFAULT = "default",
     EXTENDED = "extended",
     COMPACT = "compact",
+    TIME = "time",
 }
 
 interface IDateTimeProps {
@@ -26,6 +27,7 @@ interface IDateTimeProps {
     /** Display a fixed or relative visible time. */
     mode?: "relative" | "fixed";
     type?: DateFormats;
+    isSameYear?: boolean;
 }
 
 /**
@@ -76,20 +78,26 @@ export default class DateTime extends Component<IDateTimeProps> {
         });
     }
 
-    private get options() {
+    private get options(): Intl.DateTimeFormatOptions {
         switch (this.props.type) {
             case DateFormats.EXTENDED:
                 return {
-                    year: "numeric",
+                    ...(!this.props.isSameYear && { year: "numeric" }),
                     month: "short",
                     day: "numeric",
                     hour: "numeric",
                     minute: "numeric",
                     timeZone: this.props.timezone,
                 };
+            case DateFormats.TIME:
+                return {
+                    hour: "numeric",
+                    minute: "numeric",
+                    timeZone: this.props.timezone,
+                };
             default:
                 return {
-                    year: "numeric",
+                    ...(!this.props.isSameYear && { year: "numeric" }),
                     month: "short",
                     day: "numeric",
                     timeZone: this.props.timezone,
@@ -101,30 +109,43 @@ export default class DateTime extends Component<IDateTimeProps> {
      * Get a shorter human readable time for the time tag.
      */
     private get humanTime(): React.ReactNode {
-        const inputMoment = moment(this.props.timestamp);
+        const inputDateObject = new Date(this.props.timestamp);
+        const nowDate = new Date();
+
+        const localeKey = getJSLocaleKey();
 
         if (this.props.mode === "relative") {
-            const difference = moment.duration(moment().diff(inputMoment));
-            const seconds = difference.asSeconds();
+            const seconds = (nowDate.getTime() - inputDateObject.getTime()) / 1000;
             if (seconds >= 0 && seconds <= 5) {
                 return t("just now");
             }
-            return inputMoment.from(moment());
+            return humanizedRelativeTime(inputDateObject, nowDate);
         } else {
             if (this.props.type !== DateFormats.COMPACT) {
-                return inputMoment.toDate().toLocaleString(getJSLocaleKey(), this.options);
+                // If it's the same day, return the time.
+                if (isSameDate(inputDateObject, nowDate, DateElement.DAY)) {
+                    return inputDateObject
+                        .toLocaleString(localeKey, {
+                            hour: "numeric",
+                            minute: "numeric",
+                            timeZone: this.props.timezone,
+                        })
+                        .toLowerCase();
+                }
+                // Otherwise return the date.
+                return inputDateObject.toLocaleString(localeKey, this.options);
             } else {
                 const classes = dateTimeClasses();
                 return (
                     <span className={classes.compactRoot}>
                         <span className={classes.compactMonth} key={"month"}>
-                            {inputMoment.toDate().toLocaleString(getJSLocaleKey(), {
+                            {inputDateObject.toLocaleString(localeKey, {
                                 month: "short",
                                 timeZone: this.props.timezone,
                             })}
                         </span>
                         <span className={classes.compactDay} key={"day"}>
-                            {inputMoment.toDate().toLocaleString(getJSLocaleKey(), {
+                            {inputDateObject.toLocaleString(localeKey, {
                                 day: "numeric",
                                 timeZone: this.props.timezone,
                             })}

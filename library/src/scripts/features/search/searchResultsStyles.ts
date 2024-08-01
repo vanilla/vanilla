@@ -1,93 +1,145 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { metasVariables } from "@library/styles/metasStyles";
-import {
-    colorOut,
-    EMPTY_FONTS,
-    fonts,
-    margins,
-    negativeUnit,
-    objectFitWithFallback,
-    paddings,
-    singleBorder,
-    unit,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, percent, px } from "csx";
-import { media } from "typestyle";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import { BorderBottomProperty } from "csstype";
-import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { buttonVariables } from "@library/forms/buttonStyles";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { Variables } from "@library/styles/Variables";
+import { css } from "@emotion/css";
 
+/**
+ * @varGroup searchResults
+ * @commonTitle Search Results
+ * @description Controls search results
+ */
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("searchResults");
 
     const colors = makeThemeVars("colors", {
-        fg: globalVars.mainColors.primary,
+        /**
+         * @var searchResults.colors.fg
+         * @title Foreground Color
+         * @description Defaults to the globally set main foreground color.
+         * @type string
+         * @format hex-color
+         */
+        fg: globalVars.mainColors.fg,
     });
 
     const title = makeThemeVars("title", {
-        fonts: {
-            color: undefined,
-            size: globalVars.fonts.size.large,
-            weight: globalVars.fonts.weights.semiBold,
+        /**
+         * @varGroup searchResults.title.font
+         * @commonTitle Search Results Font
+         * @expand font
+         */
+        font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
+            color: colors.fg,
             lineHeight: globalVars.lineHeights.condensed,
-        },
+            textDecoration: "none",
+        }),
     });
 
     const excerpt = makeThemeVars("excerpt", {
+        /**
+         * @var searchResults.excerpt.fg
+         * @title Excerpt Color
+         * @description Excerpt foreground color. Defaults to the globally set foreground color.
+         * @type string
+         * @format hex-color
+         */
         fg: globalVars.mainColors.fg,
+        /**
+         * @var searchResults.excerpt.margin
+         * @title Excerpt Margin
+         * @description Sets the margin of the excerpt
+         * @type string
+         */
         margin: "0.7em",
     });
 
     const image = makeThemeVars("image", {
         border: {
+            /**
+             * @var searchResults.image.border.color
+             * @title Excerpt Image Border Color
+             * @description Sets the border color of the excerpt image
+             * @type string
+             * @format hex-color
+             */
             color: globalVars.mixBgAndFg(0.1),
         },
     });
 
+    /**
+     * @varGroup searchResults.icon
+     * @commonTitle  Icon
+     */
     const icon = makeThemeVars("icon", {
+        /**
+         * @var searchResults.icon.size
+         * @title Size
+         * @description Sets the size of the icon
+         * @type number
+         */
         size: 26,
-        bg: colorOut(globalVars.mixBgAndFg(0.1)),
+
+        /**
+         * @var searchResults.icon.bg
+         * @title Background Color
+         * @description Sets the background color of the icon
+         * @type string
+         * @format hex-color
+         */
+        bg: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.1)),
     });
 
-    const separator = makeThemeVars("separatort", {
+    /**
+     * @varGroup searchResults.separator
+     * @commonTitle  Separator
+     * @commonDescription Refers to the border of the result
+     */
+    const separator = makeThemeVars("separator", {
+        /**
+         * @var searchResults.separator.fg
+         * @title Foreground color
+         * @description Sets the foreground color of the separator
+         * @type string
+         * @format hex-color
+         */
         fg: globalVars.separator.color,
+        /**
+         * @var searchResults.separator.width
+         * @title Width
+         * @description Sets the width of the separator
+         * @type number
+         */
         width: globalVars.separator.size,
     });
 
     const spacing = makeThemeVars("spacing", {
-        padding: {
-            top: 15,
-            right: globalVars.gutter.half,
-            bottom: 16,
-            left: globalVars.gutter.half,
-        },
+        /**
+         * @varGroup searchResults.spacing.padding
+         * @commonTitle Spacing: Padding
+         * @expand spacing
+         */
+        padding: globalVars.itemList.padding,
     });
 
     const mediaElement = makeThemeVars("mediaElement", {
-        width: 115,
+        width: 190,
+        height: 106.875,
+        margin: 15,
+        compact: {
+            ratio: (9 / 16) * 100,
+        },
     });
-
-    const breakPoints = makeThemeVars("breakPoints", {
-        compact: 800,
-    });
-
-    const mediaQueries = () => {
-        const compact = styles => {
-            return media({ maxWidth: px(breakPoints.compact) }, styles);
-        };
-
-        return { compact };
-    };
 
     return {
         colors,
@@ -98,206 +150,34 @@ export const searchResultsVariables = useThemeCache(() => {
         spacing,
         icon,
         mediaElement,
-        breakPoints,
-        mediaQueries,
-    };
-});
-
-export const searchResultsClasses = useThemeCache(() => {
-    const vars = searchResultsVariables();
-    const globalVars = globalVariables();
-    const style = styleFactory("searchResults");
-    const mediaQueries = layoutVariables().mediaQueries();
-
-    const root = style(
-        {
-            display: "block",
-            position: "relative",
-            borderTop: singleBorder({
-                color: vars.separator.fg,
-                width: vars.separator.width,
-            }),
-            marginTop: negativeUnit(globalVars.gutter.half),
-        } as NestedCSSProperties,
-        mediaQueries.oneColumnDown({
-            borderTop: 0,
-        }),
-    );
-    const noResults = style("noResults", {
-        fontSize: globalVars.userContent.font.sizes.default,
-        ...paddings({
-            top: globalVars.spacer.size,
-            right: globalVars.gutter.half,
-            bottom: globalVars.spacer.size,
-            left: globalVars.gutter.half,
-        }),
-    });
-    const item = style("item", {
-        position: "relative",
-        display: "block",
-        userSelect: "none",
-        borderBottom: singleBorder({
-            color: vars.separator.fg,
-            width: vars.separator.width,
-        }) as BorderBottomProperty<TLength>,
-    });
-
-    const result = style("result", {
-        position: "relative",
-        display: "flex",
-        alignItems: "flex-start",
-        width: percent(100),
-    });
-
-    return {
-        root,
-        noResults,
-        item,
-        result,
     };
 });
 
 export const searchResultClasses = useThemeCache(() => {
     const vars = searchResultsVariables();
-    const globalVars = globalVariables();
-    const style = styleFactory("searchResult");
-    const mediaQueries = vars.mediaQueries();
-    const metaVars = metasVariables();
 
-    const title = style("title", {
-        display: "block",
-        ...fonts(vars.title.fonts),
-        overflow: "hidden",
-        flexGrow: 1,
-        margin: 0,
-        paddingRight: unit(24),
-    });
-
-    const root = style(
-        {
-            display: "flex",
-            alignItems: "stretch",
-            justifyContent: "space-between",
-            width: percent(100),
-            ...paddings(vars.spacing.padding),
-            cursor: "pointer",
-            color: colorOut(vars.title.fonts.color),
-        },
-        mediaQueries.compact({
-            flexWrap: "wrap",
-        }),
-    );
-
-    const mediaWidth = vars.mediaElement.width + vars.spacing.padding.left;
-    const iconWidth = vars.icon.size + vars.spacing.padding.left;
-
-    const main = style(
-        "main",
-        {
-            display: "block",
-            width: percent(100),
-            $nest: {
-                "&.hasMedia": {
-                    width: calc(`100% - ${unit(mediaWidth)}`),
-                },
-                "&.hasIcon": {
-                    width: calc(`100% - ${unit(iconWidth)}`),
-                },
-                "&.hasMedia.hasIcon": {
-                    width: calc(`100% - ${unit(mediaWidth + iconWidth)}`),
-                },
-            },
-        },
-        mediaQueries.compact({
-            $nest: {
-                "&.hasMedia": {
-                    width: percent(100),
-                },
-            },
-        }),
-    );
-
-    const mediaElement = style(
-        "mediaElement",
-        {
-            position: "relative",
-            width: unit(vars.mediaElement.width),
-            overflow: "hidden",
-        },
-        mediaQueries.compact({
-            width: percent(100),
-            $nest: {
-                "&.hasImage": {
-                    height: unit(vars.mediaElement.width),
-                },
-            },
-        }),
-    );
-
-    const image = style("image", {
-        ...objectFitWithFallback(),
-    });
-
-    const attachments = style(
-        "attachments",
-        {
-            display: "flex",
-            flexWrap: "nowrap",
-        },
-        mediaQueries.compact({
-            flexWrap: "wrap",
-            width: percent(100),
-            marginTop: unit(12),
-        }),
-    );
-
-    const metas = style("metas", {
-        marginTop: unit(2),
-        ...margins({
-            left: -metaVars.spacing.default,
-        }),
-        width: calc(`100% + ${unit(metaVars.spacing.default * 2)}`),
-    });
-
-    const excerpt = style("excerpt", {
-        marginTop: unit(vars.excerpt.margin),
-        color: colorOut(vars.excerpt.fg),
-        lineHeight: globalVars.lineHeights.excerpt,
-    });
-
-    const linkColors = clickableItemStates();
-    const link = style("link", {
-        color: colorOut(globalVars.mainColors.fg),
-        $nest: linkColors.$nest,
-    });
-
-    const afterExcerptLink = style("afterExcerptLink", {
-        ...fonts(globalVars.meta.text),
-        $nest: linkColors.$nest,
-    });
-
-    const iconWrap = style("iconWrap", {
+    const iconWrap = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: colorOut(vars.icon.bg),
+        backgroundColor: ColorsUtils.colorOut(vars.icon.bg),
         borderRadius: "50%",
-        width: unit(vars.icon.size),
-        height: unit(vars.icon.size),
-        marginRight: unit(vars.spacing.padding.left),
+        width: styleUnit(vars.icon.size),
+        height: styleUnit(vars.icon.size),
+        flexShrink: 0,
+        cursor: "pointer",
+    });
+
+    const highlight = css({
+        "b, strong, em, mark": {
+            fontStyle: "normal",
+            fontWeight: 700,
+            backgroundColor: "transparent",
+        },
     });
 
     return {
-        root,
-        main,
-        mediaElement,
-        image,
-        title,
-        attachments,
-        metas,
-        excerpt,
-        afterExcerptLink,
-        link,
         iconWrap,
+        highlight,
     };
 });

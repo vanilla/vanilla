@@ -1,90 +1,66 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
-import classNames from "classnames";
 import AttachmentIcons from "@library/content/attachments/AttachmentIcons";
 import { t } from "@library/utility/appUtils";
 import TruncatedText from "@library/content/TruncatedText";
-import SmartLink from "@library/routing/links/SmartLink";
-import { searchResultClasses, searchResultsClasses } from "@library/features/search/searchResultsStyles";
+import { searchResultClasses } from "@library/features/search/searchResultsStyles";
 import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
-import Paragraph from "@library/layout/Paragraph";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import { TypeQuestionIcon } from "@library/icons/searchIcons";
+import { ListItem } from "@library/lists/ListItem";
+import { ListItemMedia } from "@library/lists/ListItemMedia";
 
-export interface IResult {
-    name: string;
-    className?: string;
+export interface IResult extends Pick<React.ComponentProps<typeof ListItem>, "name" | "url" | "icon" | "className"> {
     meta?: React.ReactNode;
-    url: string;
     excerpt?: string;
+    highlight?: string;
     image?: string;
-    headingLevel?: 2 | 3;
+    imageSet?: string;
     attachments?: IAttachmentIcon[];
-    location: ICrumb[] | string[];
-    afterExcerpt?: React.ReactNode; // Likely SearchLink
-    icon?: React.ReactNode;
+    rel?: string;
 }
 
-/**
- * Generates search result list. Note that this template is used in other contexts, such as the flat category list
- */
-export default function Result(props: IResult) {
-    const { name, className, meta, url, excerpt, image, headingLevel = 2, attachments, afterExcerpt, icon } = props;
-
-    const hasAttachments = attachments && attachments.length > 0;
-    const showImage = image && !hasAttachments;
+function Result(props: IResult) {
+    const { name, className, meta, url, excerpt, image, imageSet, attachments, icon, highlight } = props;
+    const hasAttachments = !!(attachments && attachments.length > 0);
+    const showImage = (!!image || !!imageSet) && !hasAttachments;
     const hasMedia = hasAttachments || showImage;
-    const classesSearchResults = searchResultsClasses();
     const classes = searchResultClasses();
-    const imageComponent = showImage ? (
-        <img
-            src={image}
-            className={classNames("searchResult-image", classes.image)}
-            alt={t("Thumbnail for: " + name)}
-            aria-hidden={true}
-        />
-    ) : null;
-
-    let attachmentOutput;
-    if (hasAttachments && attachments) {
-        attachmentOutput = <AttachmentIcons attachments={attachments} />;
-    }
-    const HeadingTag = `h${headingLevel}` as "h1";
 
     const media = hasMedia ? (
-        <div className={classNames("searchResult-media", classes.mediaElement, { hasImage: showImage })}>
-            {showImage && imageComponent}
-            {attachmentOutput}
-        </div>
+        showImage ? (
+            <ListItemMedia src={image!} srcSet={imageSet} alt={name ? t("Thumbnail for: " + name) : t("Thumbnail")} />
+        ) : hasAttachments ? (
+            <AttachmentIcons attachments={attachments!} />
+        ) : null
     ) : null;
 
+    const highlightElement = highlight ? (
+        <TruncatedText className={classes.highlight} maxCharCount={160} lines={2}>
+            <span dangerouslySetInnerHTML={{ __html: highlight }}></span>
+        </TruncatedText>
+    ) : null;
+
+    const excerptElement = excerpt && excerpt?.length > 0 ? excerpt : null;
+
     return (
-        <li className={classNames(classesSearchResults.item, className)}>
-            <article className={classNames(classesSearchResults.result)}>
-                <div className={classNames(classes.root, { hasIcon: !!icon })}>
-                    {icon && <div className={classes.iconWrap}>{icon}</div>}
-                    <div className={classNames(classes.main, { hasMedia: !!media })}>
-                        <SmartLink to={url} tabIndex={0} className={classes.link}>
-                            <HeadingTag className={classes.title}>{name}</HeadingTag>
-                        </SmartLink>
-                        {meta && <div className={classes.metas}>{meta}</div>}
-                        {!!excerpt && (
-                            <Paragraph className={classes.excerpt}>
-                                <>
-                                    <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
-                                    {afterExcerpt}
-                                </>
-                            </Paragraph>
-                        )}
-                    </div>
-                    {media}
-                </div>
-            </article>
-        </li>
+        <ListItem
+            className={className}
+            url={url}
+            name={name}
+            icon={icon}
+            iconWrapperClass={classes.iconWrap}
+            description={highlightElement ?? excerptElement}
+            truncateDescription={!highlightElement}
+            descriptionMaxCharCount={160}
+            metas={meta}
+            mediaItem={media}
+        />
     );
 }
+
+export default Result;

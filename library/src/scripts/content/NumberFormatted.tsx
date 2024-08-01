@@ -6,13 +6,14 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import numeral from "numeral";
 import { numberFormattedClasses } from "@library/content/NumberFormatted.styles";
 
 interface IProps {
     value: number;
     className?: string;
     title?: string;
+    showFullValue?: boolean;
+    fallbackTag?: string;
 }
 /**
  * Strip trailing 0s from a string.
@@ -28,22 +29,50 @@ function stripTrailingZeros(value: string): string {
 }
 
 /**
+ * Convert number to human readable value.
+ *
+ * @param value
+ * @param precision
+ * @returns string
+ */
+export function humanReadableNumber(value: number, precision: number = 1): string {
+    const valueAbs = Math.abs(value);
+    const negativeValue = value < 0 ? "-" : "";
+    if (valueAbs < 1e3) return negativeValue + valueAbs.toFixed(precision);
+    if (valueAbs >= 1e3 && valueAbs < 1e6) return negativeValue + (valueAbs / 1e3).toFixed(precision) + "k";
+    if (valueAbs >= 1e6 && valueAbs < 1e9) return negativeValue + (valueAbs / 1e6).toFixed(precision) + "m";
+    if (valueAbs >= 1e9 && valueAbs < 1e12) return negativeValue + (valueAbs / 1e9).toFixed(precision) + "b";
+    return negativeValue + (valueAbs / 1e12).toFixed(precision) + "t";
+}
+/**
+ * Convert number to string with commas
+ *
+ * @param value
+ * @param precision
+ * @returns
+ */
+export function numberWithCommas(value: number, precision: number = 0): string {
+    return value.toFixed(precision).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+/**
  * Format a compact value of a number.
  *
  * @param props
  */
-export function formatNumberText(props: { value: number }) {
+export function formatNumberText(props: IProps) {
     const { value } = props;
-    numeral.localeData("en");
-    const initialValue = numeral(value);
-    const compactValue = stripTrailingZeros(initialValue.format("0a.0"));
-    const fullValue = initialValue.format();
-    const isModified = fullValue.toString() !== initialValue.value().toString();
+    let compactValue = stripTrailingZeros(humanReadableNumber(value));
+    const fullValue = numberWithCommas(value);
+    if (props.showFullValue) {
+        compactValue = fullValue;
+    }
+    const isAbbreviated = !props.showFullValue && fullValue !== value.toString();
 
     return {
         compactValue,
         fullValue,
-        isModified,
+        isAbbreviated,
     };
 }
 
@@ -51,9 +80,9 @@ export function formatNumberText(props: { value: number }) {
  * If you're building a translated stirng, it can be helpful to get the same data as "NumberFormatted" but decomposed
  */
 export function decomposedNumberFormatted(props: IProps) {
-    const formattedNumber = formatNumberText({ value: props.value });
-    const { fullValue, isModified } = formattedNumber;
-    const Tag = (isModified ? `abbr` : `span`) as "span";
+    const formattedNumber = formatNumberText(props);
+    const { fullValue, isAbbreviated } = formattedNumber;
+    const Tag = (isAbbreviated ? `abbr` : props.fallbackTag ?? `span`) as "span";
     const className = classNames("number", props.className, numberFormattedClasses().root);
     const title = props.title || fullValue;
 

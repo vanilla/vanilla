@@ -1,36 +1,70 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { LoadStatus } from "@library/@types/api/core";
-import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { IResult } from "@library/result/Result";
 import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { SearchPageResultsLoader } from "@library/search/SearchPageResultsLoader";
 import { SearchPagination } from "@library/search/SearchPagination";
 import { ISearchResult } from "@library/search/searchTypes";
-import { SearchFormContextProvider, useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import { useLastValue } from "@vanilla/react-utils";
-import { hashString } from "@vanilla/utils";
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useLayoutEffect, useMemo } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
+import { makeSearchUrl } from "@library/search/SearchPageRoute";
+import { formatUrl, t } from "@library/utility/appUtils";
+import qs from "qs";
+import { sprintf } from "sprintf-js";
+import { MetaLink } from "@library/metas/Metas";
+import QueryString from "qs";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { ALL_CONTENT_DOMAIN_KEY } from "./searchConstants";
 
-interface IProps {}
+export function SearchPageResults() {
+    const { updateForm, response, currentDomain, domains, form } = useSearchForm<{}>();
 
-export function SearchPageResults(props: IProps) {
-    const { search, updateForm, results, form } = useSearchForm<{}>();
+    const getDomainForResultType = (resultType: string) => {
+        const specificDomains = domains.filter(({ key }) => key !== ALL_CONTENT_DOMAIN_KEY);
+        return (
+            specificDomains.find(({ recordTypes }) => recordTypes.includes(resultType)) ??
+            specificDomains.find(({ subTypes }) => subTypes.map((subType) => subType.type).includes(resultType))!
+        );
+    };
 
-    const page = form.page ?? 1;
-    const lastPage = useLastValue(page);
-    useEffect(() => {
-        if (results.data && page !== lastPage) {
-            search();
+    /**
+     * Map a result from the search API response into what the <ResultList /> component is expecting.
+     *
+     * @param searchResult The API search result to map.
+     */
+    function mapResult(searchResult: ISearchResult): IResult {
+        const resultDomain = getDomainForResultType(searchResult.type ?? searchResult.recordType) ?? currentDomain;
+        const crumbs = resultDomain.getSpecificRecordID?.(form)
+            ? currentDomain.showSpecificRecordCrumbs
+                ? searchResult.breadcrumbs
+                : []
+            : searchResult.breadcrumbs;
+
+        const mappedResult = resultDomain.mapResultToProps(searchResult);
+
+        return {
+            ...mappedResult,
+            meta: (
+                <MetaFactory MetaComponent={resultDomain.MetaComponent} crumbs={crumbs} searchResult={searchResult} />
+            ),
+        };
+    }
+
+    const results = useMemo<IResult[]>(() => {
+        if (response?.data?.results) {
+            return response.data.results.map((result) => mapResult(result));
         }
-    }, [lastPage, page, search, results]);
+        return [];
+    }, [response]);
 
-    const status = results.status;
+    const status = response.status;
     const lastStatus = useLastValue(status);
     useLayoutEffect(() => {
         if (lastStatus === LoadStatus.SUCCESS && status === LoadStatus.LOADING) {
@@ -38,64 +72,143 @@ export function SearchPageResults(props: IProps) {
         }
     }, [status, lastStatus]);
 
-    switch (results.status) {
+    let content = <></>;
+    switch (response.status) {
         case LoadStatus.PENDING:
         case LoadStatus.LOADING:
-            return <SearchPageResultsLoader count={10} />;
+            content = <SearchPageResultsLoader count={3} />;
+            break;
         case LoadStatus.ERROR:
-            return <CoreErrorMessages error={results.error} />;
+            content = <CoreErrorMessages error={response.error} />;
+            const { message } = response.error ?? { message: "" };
+            if (message === "canceled") {
+                content = <SearchPageResultsLoader count={3} />;
+            }
+            break;
+
         case LoadStatus.SUCCESS:
-            const { next, prev } = results.data!.pagination;
+            const { next, prev, nextURL, prevURL, currentPage } = response.data!.pagination;
             let paginationNextClick: React.MouseEventHandler | undefined;
             let paginationPreviousClick: React.MouseEventHandler | undefined;
 
             if (next) {
-                paginationNextClick = e => {
+                paginationNextClick = (e) => {
                     updateForm({ page: next });
                 };
+            } else {
+                if (nextURL) {
+                    paginationNextClick = (e) => {
+                        const params = QueryString.parse(nextURL.split("?")?.[1] ?? "");
+                        updateForm({
+                            pageURL: nextURL,
+                            ...(params["offset"] && { offset: parseInt(`${params.offset}`) }),
+                        });
+                    };
+                }
             }
             if (prev) {
-                paginationPreviousClick = e => {
+                paginationPreviousClick = (e) => {
                     updateForm({ page: prev });
                 };
+            } else {
+                if (prevURL) {
+                    paginationPreviousClick = (e) => {
+                        const params = QueryString.parse(prevURL.split("?")?.[1] ?? "");
+                        updateForm({
+                            pageURL: prevURL,
+                            ...(params["offset"] && { offset: parseInt(`${params.offset}`) }),
+                        });
+                    };
+                }
             }
-            return (
+
+            content = (
                 <>
-                    <AnalyticsData uniqueKey={hashString(form.query + JSON.stringify(results.data!.pagination))} />
-                    <ResultList results={results.data!.results.map(mapResult)} />
-                    <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
+                    <ResultList
+                        results={results}
+                        ResultComponent={currentDomain.ResultComponent}
+                        ResultWrapper={currentDomain.ResultWrapper}
+                        rel={"noindex nofollow"}
+                    />
+                    {results.length > 0 && (
+                        <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
+                    )}
+
+                    {/* New edge case for Salesforce */}
+                    {results.length === 0 && (currentPage ?? 0) > 1 && (
+                        <SearchPagination onPreviousClick={paginationPreviousClick} />
+                    )}
                 </>
             );
+            break;
     }
+
+    return content;
 }
 
-/**
- * Map a search API response into what the <SearchResults /> component is expecting.
- *
- * @param searchResult The API search result to map.
- */
-function mapResult(searchResult: ISearchResult): IResult {
-    const crumbs = searchResult.breadcrumbs || [];
+export function MetaFactory(props: {
+    searchResult: ISearchResult;
+    MetaComponent?: React.ComponentType<any>;
+    crumbs?: ICrumb[];
+}) {
+    const { searchResult, MetaComponent, crumbs } = props;
+    const {
+        subqueryExtraParams,
+        subqueryMatchCount,
+        siteDomain,
+        status,
+        recordType,
+        insertUser,
+        dateUpdated,
+        dateInserted,
+        labelCodes,
+        isForeign,
+        tags,
+    } = searchResult;
 
-    const icon = SearchFormContextProvider.getSubType(searchResult.type)?.icon;
+    const { form } = useSearchForm();
 
-    return {
-        name: searchResult.name,
-        excerpt: searchResult.body,
-        icon,
-        meta: (
-            <>
-                <ResultMeta
-                    status={searchResult.status}
-                    type={searchResult.recordType}
-                    updateUser={searchResult.insertUser!}
-                    dateUpdated={searchResult.dateInserted}
-                    crumbs={crumbs}
-                />
-            </>
-        ),
-        image: searchResult.image?.url,
-        url: searchResult.url,
-        location: crumbs,
-    };
+    let extraResults: React.ReactNode = null;
+    if (subqueryExtraParams && subqueryMatchCount && subqueryMatchCount > 1) {
+        // We have "extra" results that can be drilled into.
+        // Mix the subquery with the existing form.
+        const query = {
+            ...form,
+            ...subqueryExtraParams,
+            page: 1, // start from the first page in the extra results
+        };
+        let root = siteDomain ?? "";
+        if (root && window.location.href.startsWith(root)) {
+            root = formatUrl("", true);
+        }
+        const searchPath = makeSearchUrl();
+        const queryString = qs.stringify(query);
+
+        const url = `${root}${searchPath}?${queryString}`;
+        const text = sprintf(t("%s results"), subqueryMatchCount);
+
+        extraResults = (
+            <MetaLink to={url} style={{ fontWeight: "bold" }}>
+                {text}
+            </MetaLink>
+        );
+    }
+
+    if (MetaComponent) {
+        return <MetaComponent searchResult={searchResult} />;
+    } else {
+        return (
+            <ResultMeta
+                status={status}
+                type={recordType}
+                updateUser={insertUser}
+                dateUpdated={dateUpdated ?? dateInserted}
+                labels={labelCodes}
+                tags={tags}
+                crumbs={crumbs}
+                isForeign={isForeign}
+                extra={extraResults}
+            />
+        );
+    }
 }

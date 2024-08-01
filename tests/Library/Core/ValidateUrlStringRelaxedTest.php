@@ -13,13 +13,14 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateUrlStringRelaxed().
  */
 
-class ValidateUrlStringRelaxedTest extends TestCase {
-
+class ValidateUrlStringRelaxedTest extends TestCase
+{
     /**
      * Test with valid string.
      */
-    public function testWithValidString() {
-        $actual = validateUrlStringRelaxed('valid-string');
+    public function testWithValidString()
+    {
+        $actual = validateUrlStringRelaxed("valid-string");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -27,8 +28,9 @@ class ValidateUrlStringRelaxedTest extends TestCase {
     /**
      * Test with invalid string.
      */
-    public function testWithInvalidString() {
-        $actual = validateUrlStringRelaxed('not>a/valid\string');
+    public function testWithInvalidString()
+    {
+        $actual = validateUrlStringRelaxed("not>a/valid\string");
         $expected = false;
         $this->assertSame($expected, $actual);
     }

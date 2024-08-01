@@ -4,8 +4,8 @@
  */
 
 import { ensureScript } from "@vanilla/dom-utils";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import React, { useLayoutEffect } from "react";
 import { useThrowError } from "@vanilla/react-utils";
 

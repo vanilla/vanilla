@@ -13,13 +13,13 @@
 {% endif %}
 
 {% for script in inlineScripts -%}
-    <script nonce="{{ nonce }}">
+    <script type="module" nonce="{{ nonce }}">
         {{- script|raw -}}
     </script>
 {% endfor %}
 
 {% for script in scripts -%}
-    <script nonce="{{ nonce }}" defer src="{{ script.getWebPath() }}"></script>
+    <script {{ script.isScriptModule() ? "type=\"module\""|raw : "defer" }} crossorigin nonce="{{ nonce }}" src="{{ script.getWebPath() }}"></script>
 {% endfor %}
 
 {%- if jsonLD -%}
@@ -28,8 +28,18 @@
     </script>
 {%- endif -%}
 
+{%- for inlineStyle in inlineStyles -%}
+    <style>
+        {{- inlineStyle|raw -}}
+    </style>
+{%- endfor -%}
+
+<meta name="vanilla-styles" />
+
 {% for stylesheet in styles -%}
+    {% if stylesheet.isNoScript|default(false) %}<noscript>{% endif %}
     <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />
+    {% if stylesheet.isNoScript|default(false) %}</noscript>{% endif %}
 {% endfor -%}
 
 {{ preloadModel.renderHtml()|raw }}

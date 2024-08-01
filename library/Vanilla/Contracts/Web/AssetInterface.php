@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Web;
 /**
  * A web asset interface.
  */
-interface AssetInterface {
+interface AssetInterface
+{
     /**
      * It tells if the asset is static or not
      * Static means that the asset is inmutable during the build's lifecycle
@@ -26,4 +27,19 @@ interface AssetInterface {
      * @return string
      */
     public function getWebPath(): string;
+
+    /**
+     * @return bool
+     */
+    public function isScript(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isStyleSheet(): bool;
+
+    /**
+     * @return string
+     */
+    public function isScriptModule(): string;
 }

@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -12,7 +12,6 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import CloseButton from "@library/navigation/CloseButton";
 import classNames from "classnames";
-import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { LeftChevronIcon } from "@library/icons/common";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {
@@ -44,7 +43,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                 <Button
                     title={backTitle}
                     aria-label={backTitle}
-                    baseClass={ButtonTypes.ICON_COMPACT}
+                    buttonType={ButtonTypes.ICON_COMPACT}
                     onClick={this.props.onBackClick}
                     className={classNames("frameHeader-backButton", classes.backButton)}
                 >
@@ -78,6 +77,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                     className={classNames("frameHeader-heading", classes.heading, this.props.titleClass, {
                         "sr-only": this.props.srOnlyTitle,
                     })}
+                    tabIndex={0}
                 >
                     {backLink}
                     {this.props.title}

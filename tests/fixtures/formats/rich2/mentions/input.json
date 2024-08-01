@@ -1,0 +1,85 @@
+[
+  {
+    "type": "rich_embed_card",
+    "dataSourceType": "url",
+    "url": "https://dev.vanilla.localhost/discussion/comment/668#Comment_668",
+    "embedData": {
+      "recordID": 668,
+      "recordType": "comment",
+      "body": "<a href=\"http://vanilla.test/minimal-container-test/profile/AtMentionedUserInsideOfQuoteBlock\" rel=\"nofollow\">@AtMentionUserInQuoteBlock</a> test",
+      "bodyRaw": "@AtMentionedUserInsideOfQuoteBlock test",
+      "format": "html",
+      "dateInserted": "2023-01-31T08:52:06+00:00",
+      "insertUser": {
+        "userID": 16,
+        "name": "QuoteBlockAuthor",
+        "url": "https://dev.vanilla.localhost/profile/QuoteBlockAuthor",
+        "photoUrl": "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+        "dateLastActive": "2023-01-31T08:51:29+00:00",
+        "banned": 0,
+        "punished": 0,
+        "private": false,
+        "label": "SSO Test"
+      },
+      "displayOptions": {
+        "showUserLabel": false,
+        "showCompactUserInfo": true,
+        "showDiscussionLink": false,
+        "showPostLink": false,
+        "showCategoryLink": false,
+        "renderFullContent": false,
+        "expandByDefault": false
+      },
+      "url": "https://dev.vanilla.localhost/discussion/comment/668#Comment_668",
+      "embedType": "quote"
+    },
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      { "text": "" },
+      {
+        "type": "@",
+        "children": [{ "text": "" }],
+        "userID": 7,
+        "name": "AtMentionedUserOutsideOfQuoteBlock",
+        "url": "https://dev.vanilla.localhost/profile/AtMentionedUserOutsideOfQuoteBlock",
+        "photoUrl": "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+        "dateLastActive": "2022-12-20T17:41:59+00:00",
+        "banned": 0,
+        "private": false,
+        "domID": "mentionSuggestion7",
+        "value": ""
+      },
+      {
+        "type": "@",
+        "children": [{ "text": "" }],
+        "userID": 8,
+        "name": "mention/slashes"
+      },
+      { "text": "" }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "type": "a",
+        "url": "http://vanilla.test/minimal-container-test/profile/Profile%20URL%20With%20Spaces",
+        "target": "_self",
+        "children": [{ "text": "This sentence is a link" }]
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      { "text": "plain text url http://vanilla.test/minimal-container-test/profile/Plain%20Text%20Profile%20URL" }
+    ]
+  }
+]

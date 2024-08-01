@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,12 +10,12 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
-import { useUniqueID } from "@library/utility/idUtils";
-import classNames from "classnames";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { forceRenderStyles } from "typestyle";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { cx } from "@emotion/css";
+import classNames from "classnames";
+import { TabHandler } from "@vanilla/dom-utils";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
@@ -24,6 +24,7 @@ export interface IFlyoutToggleChildParameters {
     closeMenuHandler(event?: React.SyntheticEvent<any>);
     renderAbove?: boolean;
     renderLeft?: boolean;
+    buttonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 interface IProps {
@@ -31,25 +32,30 @@ interface IProps {
     name?: string;
     contentID: string;
     className?: string;
+    buttonProps?: React.ComponentProps<typeof Button>;
     buttonContents: React.ReactNode;
     disabled?: boolean;
     children: (props: IFlyoutToggleChildParameters) => JSX.Element;
     onClose?: () => void;
-    buttonBaseClass: ButtonTypes;
+    buttonType?: ButtonTypes;
     buttonClassName?: string;
     isVisible?: boolean;
+    forceVisible?: boolean;
     onVisibilityChange?: (isVisible: boolean) => void;
     renderAbove?: boolean;
     renderLeft?: boolean;
-    toggleButtonClassName?: string;
     buttonRef?: React.RefObject<HTMLButtonElement>;
     openAsModal: boolean;
+    modalSize?: ModalSizes;
     initialFocusElement?: HTMLElement | null;
     tag?: string;
+    alwaysRender?: boolean;
+    preventFocusOnVisible?: boolean; //in some cases focus will be handled through parent components, so we'll prevent the responsibility here
 }
 
 export default function FlyoutToggle(props: IProps) {
-    const { initialFocusElement, onVisibilityChange, onClose, id, contentID } = props;
+    const { initialFocusElement, preventFocusOnVisible, onVisibilityChange, onClose, id, contentID, buttonType } =
+        props;
 
     // Focus management & visibility
     const ownButtonRef = useRef<HTMLButtonElement>(null);
@@ -57,14 +63,14 @@ export default function FlyoutToggle(props: IProps) {
 
     const controllerRef = useRef<HTMLDivElement>(null);
     const [ownIsVisible, ownSetVisibility] = useState(false);
-    const isVisible = props.isVisible !== undefined ? props.isVisible : ownIsVisible;
+    const isVisible = props.forceVisible ? true : props.isVisible !== undefined ? props.isVisible : ownIsVisible;
     const setVisibility = useCallback(
         (visibility: boolean) => {
             ownSetVisibility(visibility);
             onVisibilityChange && onVisibilityChange(visibility);
 
             // Kludge for interaction with old flyout system.
-            if (visibility === true && window.closeAllFlyouts) {
+            if (visibility && window.closeAllFlyouts) {
                 window.closeAllFlyouts();
             }
         },
@@ -72,21 +78,31 @@ export default function FlyoutToggle(props: IProps) {
     );
 
     useEffect(() => {
-        if (isVisible && initialFocusElement) {
+        if (isVisible && !preventFocusOnVisible) {
             // Focus the inital focusable element when we gain visibility.
             if (initialFocusElement) {
                 initialFocusElement.focus();
+            } else {
+                // Try to find it ourselves
+                const tabRoot = document.getElementById(contentID);
+                if (!tabRoot) {
+                    return;
+                }
+
+                const tabber = new TabHandler(tabRoot);
+                tabber.getInitial()?.focus();
             }
         }
-    }, [isVisible, initialFocusElement]);
+    }, [isVisible, initialFocusElement, contentID, preventFocusOnVisible]);
 
     /**
      * Toggle Menu menu
      */
     const buttonClickHandler = useCallback(
-        (e: MouseEvent) => {
+        (e) => {
             e.stopPropagation();
             setVisibility(!isVisible);
+            e.toElement?.focus();
         },
         [isVisible, setVisibility],
     );
@@ -96,7 +112,6 @@ export default function FlyoutToggle(props: IProps) {
         if (!buttonElement) {
             return;
         }
-
         buttonElement.addEventListener("click", buttonClickHandler);
         return () => {
             buttonElement.removeEventListener("click", buttonClickHandler);
@@ -104,7 +119,7 @@ export default function FlyoutToggle(props: IProps) {
     }, [buttonRef, buttonClickHandler]);
 
     const closeMenuHandler = useCallback(
-        event => {
+        (event) => {
             event.stopPropagation();
             event.preventDefault();
 
@@ -125,6 +140,13 @@ export default function FlyoutToggle(props: IProps) {
         [onClose, controllerRef, buttonRef, setVisibility],
     );
 
+    const onKeyPress = (event: React.KeyboardEvent<any>) => {
+        switch (event.key) {
+            case "Escape":
+                closeMenuHandler(event);
+        }
+    };
+
     /**
      * Stop click propagation outside the flyout
      */
@@ -132,11 +154,14 @@ export default function FlyoutToggle(props: IProps) {
         e.stopPropagation();
     }, []);
 
-    const handleFocusChange = (hasFocus: boolean) => {
-        if (!hasFocus) {
-            setVisibility(false);
-        }
-    };
+    const handleFocusChange = useCallback(
+        (hasFocus: boolean) => {
+            if (!hasFocus) {
+                setVisibility(false);
+            }
+        },
+        [setVisibility],
+    );
 
     // Focus handling
     useFocusWatcher(controllerRef, handleFocusChange, props.openAsModal);
@@ -147,13 +172,9 @@ export default function FlyoutToggle(props: IProps) {
     });
 
     const classes = dropDownClasses();
-    const buttonClasses = classNames(props.buttonClassName, props.toggleButtonClassName, {
+    const buttonClasses = cx(props.buttonClassName, {
         isOpen: isVisible,
     });
-    useEffect(() => {
-        // Prevent flashing on the first render
-        forceRenderStyles();
-    }, []);
 
     const childrenData: IFlyoutToggleChildParameters = {
         id: contentID,
@@ -162,9 +183,10 @@ export default function FlyoutToggle(props: IProps) {
         closeMenuHandler,
         renderAbove: props.renderAbove,
         renderLeft: props.renderLeft,
+        buttonRef,
     };
 
-    const classesDropDown = !props.openAsModal ? classNames("flyouts", classes.root) : null;
+    const classesDropDown = !props.openAsModal ? cx("flyouts", classes.root) : null;
     const Tag = (props.tag ?? `div`) as "div";
 
     const isContentVisible = !props.disabled && isVisible;
@@ -177,6 +199,7 @@ export default function FlyoutToggle(props: IProps) {
             onClick={handleBlockEventPropagation}
         >
             <Button
+                {...props.buttonProps}
                 id={id}
                 className={buttonClasses}
                 title={props.name}
@@ -185,7 +208,7 @@ export default function FlyoutToggle(props: IProps) {
                 aria-expanded={isVisible}
                 aria-haspopup="true"
                 disabled={props.disabled}
-                baseClass={props.buttonBaseClass}
+                buttonType={buttonType}
                 buttonRef={buttonRef}
             >
                 {props.name && <ScreenReaderContent>{props.name}</ScreenReaderContent>}
@@ -195,16 +218,18 @@ export default function FlyoutToggle(props: IProps) {
             <React.Fragment>
                 {props.openAsModal ? (
                     <Modal
+                        id={contentID}
                         label={t("title")}
-                        size={ModalSizes.SMALL}
+                        size={props.modalSize ?? ModalSizes.SMALL}
                         exitHandler={closeMenuHandler}
                         elementToFocusOnExit={buttonRef.current!}
                         isVisible={isContentVisible}
+                        onKeyPress={onKeyPress}
                     >
                         {props.children(childrenData)}
                     </Modal>
                 ) : (
-                    isContentVisible && props.children(childrenData)
+                    (isContentVisible || props.alwaysRender) && props.children(childrenData)
                 )}
             </React.Fragment>
         </Tag>

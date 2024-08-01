@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { RefObject, useState, useLayoutEffect } from "react";
-import ResizeObserver from "resize-observer-polyfill";
-import debounce from "lodash/debounce";
+import { RefObject, useState, useLayoutEffect, MutableRefObject } from "react";
+import debounce from "lodash-es/debounce";
+import { stableObjectHash } from "@vanilla/utils";
 
 // DOMRectReadOnly.fromRect()
-const EMPTY_RECT: DOMRect = {
+export const EMPTY_RECT: DOMRect = {
     x: 0,
     y: 0,
     width: 0,
@@ -23,16 +23,25 @@ const EMPTY_RECT: DOMRect = {
 /**
  * Utility hook for measuring a dom element.
  * Will return back measurements as a bounding rectangle for the element contained in a ref.
+ *
+ * @param ref The ref to measure.
+ * @param adjustForScrollOffset If set, y values will be adjusted for the current scroll offset.
+ * @param watchRef Used to trigger a remeasure if the ref changes.
  */
-export function useMeasure(ref: RefObject<HTMLElement | null>, adjustForScrollOffset: boolean = false) {
+export function useMeasure(
+    ref: RefObject<HTMLElement | null> | MutableRefObject<HTMLElement | null | undefined>,
+    adjustForScrollOffset: boolean = false,
+    watchRef: boolean = false,
+) {
     const [bounds, setContentRect] = useState<DOMRect>(EMPTY_RECT);
-
+    const refWatch = watchRef ? ref.current : ref;
     useLayoutEffect(() => {
         let animationFrameId: number | null = null;
 
         const measure = () => {
             animationFrameId = window.requestAnimationFrame(() => {
                 if (!ref.current) {
+                    setContentRect(EMPTY_RECT);
                     return;
                 }
                 let rect = ref.current.getBoundingClientRect();
@@ -50,6 +59,18 @@ export function useMeasure(ref: RefObject<HTMLElement | null>, adjustForScrollOf
                     };
                 }
 
+                rect.toJSON = () => {
+                    return JSON.stringify({
+                        y: rect.y,
+                        top: rect.top,
+                        bottom: rect.bottom,
+                        width: rect.width,
+                        height: rect.height,
+                        right: rect.right,
+                        left: rect.left,
+                    });
+                };
+
                 setContentRect(rect);
             });
         };
@@ -62,6 +83,10 @@ export function useMeasure(ref: RefObject<HTMLElement | null>, adjustForScrollOf
         const ro = new ResizeObserver(measure);
         if (ref.current) {
             ro.observe(ref.current);
+            // Do the initial undebounced measure.
+            measure();
+        } else {
+            setContentRect(EMPTY_RECT);
         }
 
         return () => {
@@ -69,8 +94,9 @@ export function useMeasure(ref: RefObject<HTMLElement | null>, adjustForScrollOf
             ro.disconnect();
             resizeListener.cancel();
             window.removeEventListener("resize", resizeListener);
+            setContentRect(EMPTY_RECT);
         };
-    }, [adjustForScrollOffset, ref]);
+    }, [adjustForScrollOffset, refWatch, ref]);
 
     return bounds;
 }

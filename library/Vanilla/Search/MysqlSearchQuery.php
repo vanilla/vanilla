@@ -11,7 +11,8 @@ use Garden\Schema\Schema;
 /**
  * Mysql version of a search query.
  */
-class MysqlSearchQuery extends SearchQuery {
+class MysqlSearchQuery extends SearchQuery
+{
     /** @var \Gdn_SQLDriver $db */
     private $db;
 
@@ -25,30 +26,23 @@ class MysqlSearchQuery extends SearchQuery {
      * @param array $queryData
      * @param \Gdn_Database $db
      */
-    public function __construct(array $searchTypes, array $queryData, \Gdn_Database $db) {
+    public function __construct(array $searchTypes, array $queryData, \Gdn_Database $db)
+    {
         $this->db = $db->sql();
         parent::__construct($searchTypes, $queryData);
     }
 
     /**
-     * Implement abstract method
-     *
-     * @param string $text
-     * @param array $fieldNames
-     * @return $this
+     * @inheritdoc
      */
-    public function whereText(string $text, array $fieldNames = []): self {
+    public function whereText(string $text, array $fieldNames, string $matchMode): self
+    {
+        // Unsupported.
         return $this;
     }
 
     /**
-     * Implement abstract method
-     *
-     * @param string $attribute
-     * @param array $values
-     * @param bool $exclude
-     * @param string $filterOp
-     * @return $this
+     * @inheritdoc
      */
     public function setFilter(
         string $attribute,
@@ -62,24 +56,39 @@ class MysqlSearchQuery extends SearchQuery {
     /**
      * Generate sql union query
      */
-    public function getSql() {
-        $sql = '';
+    public function getSql()
+    {
+        $sql = "";
         if (empty($this->sql)) {
-            ;
         } elseif (count($this->sql) < 2) {
             $sql = reset($this->sql);
         } else {
             foreach ($this->sql as $subQuery) {
-                $sql .= empty($sql) ? '' : ' union all ';
-                $sql .= ' ( '.$subQuery.' ) ';
+                $sql .= empty($sql) ? "" : " union all ";
+                $sql .= " ( " . $subQuery . " ) ";
             }
-            $sql .= ' ORDER BY DateInserted DESC '.PHP_EOL;
-            $limit = $this->getQueryParameter('limit', 100);
-            $offset = $this->getQueryParameter('offset', 0);
-            $sql .= ' LIMIT '.$limit;
-            $sql .= ($offset > 0) ? ', '.$offset : '';
+
+            $sql .= $this->getOrderBy();
+            $limit = $this->getQueryParameter("limit", 100);
+            $offset = $this->getQueryParameter("offset", 0);
+            $sql .= " LIMIT " . $limit;
+            $sql .= $offset > 0 ? ", " . $offset : "";
         }
         return $sql;
+    }
+
+    /**
+     * @return string
+     */
+    private function getOrderBy(): string
+    {
+        $sort = $this->getQueryParameter("sort", SearchQuery::SORT_RELEVANCE);
+        $sortField = ltrim($sort, "-");
+        $direction = $sortField === $sort ? "DESC" : "ASC";
+        if ($sortField === SearchQuery::SORT_RELEVANCE) {
+            $sortField = "Score";
+        }
+        return "ORDER BY " . $this->getDB()->quote($sortField) . " " . $direction . PHP_EOL;
     }
 
     /**
@@ -87,8 +96,11 @@ class MysqlSearchQuery extends SearchQuery {
      *
      * @return \Gdn_SQLDriver
      */
-    public function getDB() {
-        return $this->db;
+    public function getDB()
+    {
+        $sql = clone $this->db;
+        $sql->reset();
+        return $sql;
     }
 
     /**
@@ -98,7 +110,8 @@ class MysqlSearchQuery extends SearchQuery {
      * @param null $default
      * @return mixed|null
      */
-    public function get(string $param, $default = null) {
+    public function get(string $param, $default = null)
+    {
         return $this->getQueryParameter($param, $default);
     }
 
@@ -107,7 +120,8 @@ class MysqlSearchQuery extends SearchQuery {
      *
      * @param string $sql
      */
-    public function addSql(string $sql) {
+    public function addSql(string $sql)
+    {
         if (!empty($sql)) {
             $this->sql[] = $sql;
         }

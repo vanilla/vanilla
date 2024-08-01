@@ -2,6 +2,7 @@
 if (!defined('APPLICATION')) exit();
 
 use Vanilla\Utility\HtmlUtils;
+use Vanilla\Theme\BoxThemeShim;
 
 if (!function_exists('WriteModuleDiscussion')):
     function writeModuleDiscussion($discussion, $px = 'Bookmark', $showPhotos = false) {
@@ -9,7 +10,9 @@ if (!function_exists('WriteModuleDiscussion')):
         $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
 
         ?>
-        <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>" class="<?php echo cssClass($discussion); ?>">
+        <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>"
+            class="<?php echo cssClass($discussion);?>  <?php BoxThemeShim::activeHtml("pageBox"); ?>">
+
             <?php if ($showPhotos) :
                 $firstUser = userBuilder($discussion, 'First');
                 echo userPhoto($firstUser, ['LinkClass' => 'IndexPhoto']);
@@ -46,6 +49,7 @@ if (!function_exists('WriteModuleDiscussion')):
     }
 endif;
 
+
 if (!function_exists('WritePromotedContent')):
     /**
      * Generates html output of $content array
@@ -65,7 +69,7 @@ if (!function_exists('WritePromotedContent')):
         $sender->EventArguments['Content'] = &$content;
         $sender->EventArguments['ContentUrl'] = &$contentURL;
         ?>
-        <div id="<?php echo "Promoted_{$contentType}_{$contentID}"; ?>" class="<?php echo cssClass($content); ?>">
+        <div id="<?php echo "Promoted_{$contentType}_{$contentID}"; ?>" class="<?php echo cssClass($content); ?> <?php BoxThemeShim::activeHtml('pageBox'); ?>">
             <div class="AuthorWrap">
          <span class="Author">
             <?php
@@ -79,11 +83,12 @@ if (!function_exists('WritePromotedContent')):
             $sender->fireEvent('AuthorPhoto');
             ?>
          </span>
+
          <span class="AuthorInfo">
             <?php
-            echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
-            echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
-            $sender->fireEvent('AuthorInfo');
+                echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
+                echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+                $sender->fireEvent('AuthorInfo');
             ?>
          </span>
             </div>
@@ -209,7 +214,7 @@ if (!function_exists('writePromotedContentRow')):
                             <?php
                                 $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [$username]);
                             ?>
-                            <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo $userPhoto; ?>" alt="<?php echo $accessibleLabel; ?>">
+                            <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo $userPhoto; ?>" alt="<?php echo $accessibleLabel; ?>" loading="lazy" />
                         </a>
                         <a class="UserLink BlockTitle" href="<?php echo $userUrl; ?>"><?php echo $username; ?></a>
 

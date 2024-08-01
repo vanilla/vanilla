@@ -28,8 +28,8 @@
  * setting the key of a new item to 'key2.newItemKey'.
  * The sort property can also be an integer, indicating the item's position in the menu.
  */
-class NavModule extends Gdn_Module {
-
+class NavModule extends Gdn_Module
+{
     use NestedCollection;
 
     /**
@@ -37,11 +37,10 @@ class NavModule extends Gdn_Module {
      */
     private $cssClass;
 
-
     /**
      * @var string CSS prefix for a dropdown item.
      */
-    private $dropdownCssClassPrefix = 'nav-dropdown';
+    private $dropdownCssClassPrefix = "nav-dropdown";
 
     /**
      *
@@ -49,7 +48,8 @@ class NavModule extends Gdn_Module {
      * @param string $cssClass A potential CSS class of the dropdown menu wrapper container.
      * @param bool $useCssPrefix Whether to use CSS prefixes on the nav items.
      */
-    public function __construct($cssClass = '', $useCssPrefix = true) {
+    public function __construct($cssClass = "", $useCssPrefix = true)
+    {
         parent::__construct();
 
         $this->setFlatten(false);
@@ -57,16 +57,17 @@ class NavModule extends Gdn_Module {
         $this->cssClass = $cssClass;
 
         if ($useCssPrefix) {
-            $this->setHeaderCssClassPrefix('nav-header');
-            $this->setLinkCssClassPrefix('nav-link');
-            $this->setDividerCssClassPrefix('divider');
+            $this->setHeaderCssClassPrefix("nav-header");
+            $this->setLinkCssClassPrefix("nav-link");
+            $this->setDividerCssClassPrefix("divider");
         }
     }
 
     /**
      * @return string CSS prefix for a dropdown item.
      */
-    public function getDropdownCssClassPrefix() {
+    public function getDropdownCssClassPrefix()
+    {
         return $this->dropdownCssClassPrefix;
     }
 
@@ -74,7 +75,8 @@ class NavModule extends Gdn_Module {
      * @param string $dropdownCssClassPrefix CSS prefix for a dropdown item.
      * @return NavModule $this The calling object.
      */
-    public function setDropdownCssClassPrefix($dropdownCssClassPrefix) {
+    public function setDropdownCssClassPrefix($dropdownCssClassPrefix)
+    {
         $this->dropdownCssClassPrefix = $dropdownCssClassPrefix;
         return $this;
     }
@@ -82,7 +84,8 @@ class NavModule extends Gdn_Module {
     /**
      * @return string CSS class for the nav wrapper container.
      */
-    public function getCssClass() {
+    public function getCssClass()
+    {
         return $this->cssClass;
     }
 
@@ -90,7 +93,8 @@ class NavModule extends Gdn_Module {
      * @param string $cssClass CSS class for the nav wrapper container.
      * @return NavModule $this The calling object.
      */
-    public function setCssClass($cssClass) {
+    public function setCssClass($cssClass)
+    {
         $this->cssClass = $cssClass;
         return $this;
     }
@@ -106,7 +110,8 @@ class NavModule extends Gdn_Module {
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @return NavModule $this The calling object.
      */
-    public function addDropdownIf($isAllowed = true, $dropdown, $key = '', $cssClass = '', $sort = []) {
+    public function addDropdownIf($isAllowed = true, $dropdown = null, $key = "", $cssClass = "", $sort = [])
+    {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -124,20 +129,22 @@ class NavModule extends Gdn_Module {
      * @return NavModule $this The calling object.
      * @throws Exception
      */
-    public function addDropdown($dropdown, $key = '', $cssClass = '', $sort = []) {
-        if (is_a($dropdown, 'DropdownModule')) {
-            $dropdown->setTag('li');
+    public function addDropdown($dropdown, $key = "", $cssClass = "", $sort = [])
+    {
+        if (is_a($dropdown, "DropdownModule")) {
+            $dropdown->setTag("li");
             $dropdown->prepare();
-            $dropdownItem = ['type' => 'dropdown'];
+            $dropdownItem = ["type" => "dropdown"];
             if ($key) {
-                $dropdownItem['key'] = $key;
+                $dropdownItem["key"] = $key;
             }
             if ($sort) {
-                $dropdownItem['sort'] = $sort;
+                $dropdownItem["sort"] = $sort;
             }
-            $dropdownItem['dropdownmenu'] = $dropdown;
-            $dropdownItem['cssClass'] = $cssClass.' '.$this->buildCssClass($this->dropdownCssClassPrefix, $dropdownItem);
-            $this->addItem('dropdown', $dropdownItem);
+            $dropdownItem["dropdownmenu"] = $dropdown;
+            $dropdownItem["cssClass"] =
+                $cssClass . " " . $this->buildCssClass($this->dropdownCssClassPrefix, $dropdownItem);
+            $this->addItem("dropdown", $dropdownItem);
         }
         return $this;
     }
@@ -146,8 +153,9 @@ class NavModule extends Gdn_Module {
      * @return string
      * @throws Exception
      */
-    public function toString() {
-        $this->fireAs(get_called_class())->fireEvent('render');
+    public function toString()
+    {
+        $this->fireAs(get_called_class())->fireEvent("render");
         return parent::toString();
     }
 
@@ -157,11 +165,12 @@ class NavModule extends Gdn_Module {
      * @param $text
      * @return string
      */
-    public static function textToKey($text) {
+    public static function textToKey($text)
+    {
         $text = strip_tags($text);
         $text = strtolower(trim($text));
-        $text = str_replace(' ', '-', $text);
-        $text = preg_replace('/-+/', '-', $text);
+        $text = str_replace(" ", "-", $text);
+        $text = preg_replace("/-+/", "-", $text);
         return $text;
     }
 }

@@ -10,8 +10,8 @@ namespace Vanilla\Utility;
 /**
  * Trait offering some simple HTML parsing methods.
  */
-trait HtmlParserTrait {
-
+trait HtmlParserTrait
+{
     /**
      * Get all attributes of the first matching HTML tag.
      *
@@ -20,9 +20,10 @@ trait HtmlParserTrait {
      *
      * @return array|null An array of all attributes if applicable.
      */
-    protected function parseSimpleAttrs(string $html, string $tagName): ?array {
+    protected function parseSimpleAttrs(string $html, string $tagName): ?array
+    {
         $dom = new \DOMDocument();
-        $dom->loadHTML($html);
+        @$dom->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING);
         $tags = $dom->getElementsByTagName($tagName);
         if (count($tags) > 0) {
             $attrs = [];

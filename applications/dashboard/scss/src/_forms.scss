@@ -4,6 +4,8 @@
 //
 // Styleguide 5.
 
+@use "sass:math";
+
 form {
     ul,
     ol {
@@ -108,8 +110,7 @@ form {
     padding-top: 16px;
     padding-bottom: 16px;
     margin-bottom: 0;
-    border-bottom: $border-width dotted #e7e8e9;
-    width: 100%;
+    border-bottom: $border-width solid #d8d8d8;
 
     > .no-grid {
         padding-left: $padding-row;
@@ -117,9 +118,8 @@ form {
     }
 
     > .input-wrap {
-        @extend .col-sm-14;
+        @extend .col-sm-10;
         @extend .col-xs-24;
-        max-width: (7 / 12 * 100%);
 
         &.no-label {
             @extend .col-sm-offset-10;
@@ -128,7 +128,7 @@ form {
     }
 
     > .label-wrap {
-        @extend .col-sm-10;
+        @extend .col-sm-14;
         @extend .col-xs-24;
     }
 
@@ -136,6 +136,10 @@ form {
         @extend .col-sm-10;
         @extend .col-xs-12;
         flex-grow: 1;
+
+        & .info {
+            max-width: 80ch;
+        }
     }
 
     .input-wrap-right {
@@ -146,9 +150,30 @@ form {
     @include media-breakpoint-down(xs) {
         flex-wrap: wrap;
         .input-wrap {
-            margin-top: $spacer / 4;
+            margin-top: $spacer * 0.25;
             max-width: 100%;
         }
+    }
+
+    .dashboard-main & {
+        margin-bottom: 0;
+    }
+
+    &.formGroup-checkBox .input-wrap {
+        @extend .col-sm-14;
+        @extend .col-xs-24;
+    }
+
+    &.formGroup-upload {
+        align-items: center;
+
+        & img {
+            max-width: 100%;
+        }
+    }
+
+    &.formGroup-richeditor {
+        display: block;
     }
 }
 
@@ -184,14 +209,25 @@ label,
 }
 
 .input-wrap {
+    input,
+    .SelectOne__single-value,
+    .SelectOne__placeholder {
+        font-size: 14px;
+
+        @media (max-width: 600px) {
+            font-size: 16px;
+        }
+    }
+
     &:not(.inline) label {
         display: block;
     }
     &.inline {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         label {
-            margin-right: $spacer / 4;
+            margin-right: $spacer * 0.25;
         }
     }
     &.grid {
@@ -206,14 +242,14 @@ label,
 
             @include media-breakpoint-down(xs) {
                 flex-basis: 100%;
-                margin-top: $spacer / 2;
+                margin-top: $spacer * 0.5;
             }
         }
         label:nth-child(n + 3) {
-            margin-top: $spacer / 2;
+            margin-top: $spacer * 0.5;
         }
         label:nth-child(odd) {
-            padding-right: $spacer / 2;
+            padding-right: $spacer * 0.5;
 
             @include media-breakpoint-down(xs) {
                 padding-right: initial;
@@ -227,8 +263,8 @@ label,
 
 .form-control {
     line-height: 1.5;
-    padding-top: ($control-height - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
-    padding-bottom: ($control-height - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+    padding-top: ($control-height - ($border-width * 2) - ($font-size-base * $line-height)) * 0.5;
+    padding-bottom: ($control-height - ($border-width * 2) - ($font-size-base * $line-height)) * 0.5;
     border: $border-width solid #ccc;
 }
 
@@ -300,28 +336,28 @@ label,
     display: flex;
 
     > *:not(:first-child) {
-        margin-left: $spacer / 2;
+        margin-left: $spacer * 0.5;
     }
 
     // Handles case where you want the first element to take 1/3 and the other 2/3
     &.input-wrap-1_3 {
         > * {
-            width: #{(100% * 2) / 3};
+            width: #{math.div(100% * 2, 3)};
         }
 
         > *:first-child {
-            width: #{(100% / 3)};
+            width: #{math.div(100%, 3)};
         }
     }
 
     // Handles case where you want the first element to take 2/3 and the other 1/3
     &.input-wrap-2_3 {
         > * {
-            width: #{(100% / 3)};
+            width: #{math.div(100%, 3)};
         }
 
         > *:first-child {
-            width: #{(100% * 2) / 3};
+            width: #{math.div(100% * 2, 3)};
         }
     }
 }
@@ -444,10 +480,10 @@ label,
 
 .color-picker-preview {
     position: absolute;
-    top: $spacer / 4;
-    right: ($spacer / 4) + $border-width;
+    top: $spacer * 0.25;
+    right: ($spacer * 0.25) + $border-width;
     width: 28px;
-    height: 32px - ($spacer / 4);
+    height: 32px - ($spacer * 0.25);
     background: $black;
     border: $border-width solid $border-color;
     cursor: pointer;
@@ -490,10 +526,12 @@ label,
     top: 0;
     right: 0;
     left: 0;
-    padding: $control-padding-y $spacer * 3 / 4;
+    padding: $control-padding-y $spacer * 3 * 0.25;
     color: $input-color;
     border: $input-btn-border-width solid $input-border-color;
     border-radius: $border-radius;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .file-upload-browse {
@@ -566,7 +604,7 @@ select.form-control {
 }
 
 select + select {
-    margin-left: $spacer / 2;
+    margin-left: $spacer * 0.5;
 }
 
 // Label Selectors
@@ -626,7 +664,7 @@ select + select {
 .label-selector {
     @extend .row;
     @include list-reset;
-    margin-bottom: $spacer / 2;
+    margin-bottom: $spacer * 0.5;
 
     label {
         padding-left: 0;
@@ -685,7 +723,7 @@ select + select {
     .image-wrap {
         position: relative;
         display: block;
-        margin-bottom: $spacer / 2;
+        margin-bottom: $spacer * 0.5;
         @include image-wrap-border(0);
 
         &:hover .overlay {
@@ -727,13 +765,13 @@ select + select {
         flex-wrap: wrap;
         margin-left: 0;
         margin-right: 0;
-        padding: $spacer / 2;
+        padding: $spacer * 0.5;
         align-items: center;
         justify-content: center;
 
         > .btn {
             display: block;
-            margin: ($spacer / 6) ($spacer / 4);
+            margin: math.div($spacer, 6) ($spacer * 0.25);
             max-height: $line-height * $font-size-base + ($btn-padding-y * 2) + ($border-width * 2);
             min-width: 96px;
         }
@@ -747,8 +785,8 @@ select + select {
         position: absolute;
         display: block;
         width: 16px;
-        top: $spacer / 2;
-        right: $spacer / 2;
+        top: $spacer * 0.5;
+        right: $spacer * 0.5;
 
         svg {
             display: block;
@@ -769,7 +807,7 @@ select + select {
 
 .theme-wrap {
     position: relative;
-    margin-bottom: $spacer / 2;
+    margin-bottom: $spacer * 0.5;
 
     .image-wrap {
         position: absolute;
@@ -796,7 +834,7 @@ select + select {
 .mobile-theme-wrap {
     position: relative;
     overflow: hidden;
-    margin-bottom: $spacer / 2;
+    margin-bottom: $spacer * 0.5;
     color: rgba(85, 90, 98, 0.27);
 
     .mobile-frame {
@@ -831,7 +869,7 @@ select + select {
 
 .label-selector-item {
     @include grid-item();
-    padding: $spacer $spacer ($spacer / 2);
+    padding: $spacer $spacer ($spacer * 0.5);
 }
 
 .btn-overlay {
@@ -905,7 +943,7 @@ select + select {
     }
 
     .search-info {
-        margin-top: $spacer / 4;
+        margin-top: $spacer * 0.25;
         font-style: italic;
     }
 }
@@ -950,8 +988,8 @@ select + select {
         top: 0;
         right: 0;
         height: $control-height;
-        padding-top: ($control-height - $font-size-sm) / 2;
-        padding-right: $spacer / 2;
+        padding-top: ($control-height - $font-size-sm) * 0.5;
+        padding-right: $spacer * 0.5;
         font-size: $font-size-sm;
         line-height: 1;
         color: $grey;
@@ -995,7 +1033,7 @@ select + select {
     .label-wrap {
         flex-shrink: 0;
         display: block;
-        margin-right: $spacer / 2;
+        margin-right: $spacer * 0.5;
 
         label {
             line-height: 1;
@@ -1041,7 +1079,7 @@ select + select {
     display: inline-block;
     width: $spacer;
     height: $spacer;
-    margin-right: $spacer / 4;
+    margin-right: $spacer * 0.25;
     vertical-align: middle;
     border: $border-width solid $border-color;
 }
@@ -1069,7 +1107,7 @@ select + select {
 
     &::before {
         display: block;
-        margin-top: ($spacer - $font-size-sm) / 2 - $border-width;
+        margin-top: ($spacer - $font-size-sm) * 0.5 - $border-width;
         color: $white;
         @include char-content($icon-ok);
     }
@@ -1128,7 +1166,7 @@ select + select {
 }
 
 .iradio {
-    border-radius: $spacer / 2;
+    border-radius: $spacer * 0.5;
 
     &.checked::before {
         position: absolute;
@@ -1138,7 +1176,7 @@ select + select {
         width: $spacer;
         height: $spacer;
         border: $border-width * 4 solid $brand-primary;
-        border-radius: $spacer / 2;
+        border-radius: $spacer * 0.5;
         background-color: $white;
         content: "";
     }
@@ -1223,12 +1261,12 @@ label[id^="iCheck"] {
 
 .radio-painted-wrapper {
     label {
-        border-radius: $spacer / 2;
+        border-radius: $spacer * 0.5;
     }
 
     input:checked + label {
         border: $border-width * 4 solid $brand-primary;
-        border-radius: $spacer / 2;
+        border-radius: $spacer * 0.5;
         background-color: $white;
     }
 }

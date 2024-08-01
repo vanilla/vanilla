@@ -1,0 +1,612 @@
+openapi: 3.0.2
+info:
+    title: Automation Rules
+    description: Automation Rules
+    version: 1.0.0
+paths:
+    /automation-rules:
+        x-hidden: true
+        post:
+            summary: Create a new recipe.
+            tags:
+                - Automation Rules
+            requestBody:
+                $ref: "#/components/requestBodies/AutomationRecipe"
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AutomationRecipe"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+        patch:
+            summary: Update an existing recipe.
+            tags:
+                - Automation Rules
+            parameters:
+                - name: automationRuleId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                $ref: "#/components/requestBodies/AutomationRecipe"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AutomationRecipe"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+    /automation-rules/catalog:
+        x-hidden: true
+        get:
+            summary: Get automation rules catalog.
+            tags:
+                - Automation Rules
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    triggers:
+                                        type: object
+                                    actions:
+                                        type: object
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+    /automation-rules/recipes:
+        x-hidden: true
+        get:
+            summary: Get a list of automation recipes.
+            tags:
+                - Automation Rules
+            parameters:
+                - name: automationRuleId
+                  description: Filter by automation rule id
+                  in: query
+                  schema:
+                      $ref: "#/components/schemas/RangeExpression"
+                - name: status
+                  in: query
+                  description: Filter by automation rule status
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - active
+                              - inactive
+                              - deleted
+                          default:
+                              - active
+                              - inactive
+                - name: sort
+                  in: query
+                  description: Sort the results by the given fields
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - status
+                              - dateInserted
+                              - dateUpdated
+                              - dateLastRun
+                          default: [status, dateLastRun]
+                - name: limit
+                  in: query
+                  description: Limit the number of results
+                  schema:
+                      type: integer
+                      default: 150
+                      maximum: 150
+                      minimum: 1
+                - $ref: "#/components/parameters/AutomationRecipeExpand"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/AutomationRecipe"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+    /automation-rules/{automationRuleId}/status:
+        x-hidden: true
+        put:
+            summary: Update the status of an automation rule.
+            tags:
+                - Automation Rules
+            parameters:
+                - name: automationRuleId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                status:
+                                    type: string
+                                    enum:
+                                        - active
+                                        - inactive
+                                        - deleted
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AutomationRecipe"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+    /automation-rules/{automationRuleId}/recipe/:
+        x-hidden: true
+        get:
+            summary: Get a single automation recipe.
+            tags:
+                - Automation Rules
+            parameters:
+                - name: automationRuleId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                - $ref: "#/components/parameters/AutomationRecipeExpand"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AutomationRecipe"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+    /automation-rules/dispatches:
+        x-hidden: false
+        get:
+            summary: Get automation rule execution history.
+            tags:
+                - Automation Rules
+            parameters:
+                - name: automationRuleID
+                  description: |
+                      The automation Rule ID.
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                - name: automationRuleDispatchUUID
+                  description: Filter by automationRuleDispatchUUID.
+                  in: query
+                  schema:
+                      type: string
+                - name: actionType
+                  description: Filter by actionType
+                  in: query
+                  schema:
+                      type: string
+                - name: dispatchStatus[]
+                  description: Filter by automation rule dispatch status.
+                  in: query
+                  schema:
+                      items:
+                          enum:
+                              - queued
+                              - running
+                              - success
+                              - warning
+                              - failed
+                          type: string
+                      type: array
+                  style: form
+                - name: dateUpdated
+                  description: Filter by dateUpdated. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+                  in: query
+                  schema:
+                      format: date-filter
+                      type: string
+                - name: dateLastRun
+                  description: Filter by dateLastRun. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+                  in: query
+                  schema:
+                      format: date-filter
+                      type: string
+                - name: dateFinished
+                  description: Filter by dateFinished. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+                  in: query
+                  schema:
+                      format: date-filter
+                      type: string
+                - $ref: "#/components/parameters/Page"
+                - name: limit
+                  in: query
+                  description: Desired number of items per page.
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 100
+                      minimum: 1
+                - name: expand[]
+                  description: Expand fields on the result.
+                  in: query
+                  schema:
+                      items:
+                          enum:
+                              - insertUser
+                              - updateUser
+                              - all
+                          type: string
+                      type: array
+                  style: form
+                - name: sort[]
+                  description: The results' sort order.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          example: -dateDispatched
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/AutomationDispatch"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+    /automation-rules/{automationRuleID}/dispatches:
+        x-hidden: false
+        get:
+            summary: Get automation rule execution history.
+            tags:
+                - Automation Rules
+            parameters:
+                - name: automationRuleID
+                  description: |
+                      The automation Rule ID.
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                - name: automationRuleDispatchUUID
+                  description: Filter by automationRuleDispatchUUID
+                  in: query
+                  schema:
+                      type: string
+                - name: actionType
+                  description: Filter by actionType
+                  in: query
+                  schema:
+                      type: string
+                - name: dispatchStatus[]
+                  description: Filter by automation rule dispatch status.
+                  in: query
+                  schema:
+                      items:
+                          enum:
+                              - queued
+                              - running
+                              - success
+                              - warning
+                              - failed
+                          type: string
+                      type: array
+                  style: form
+                - name: dateUpdated
+                  description: Filter by dateUpdated. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+                  in: query
+                  schema:
+                      format: date-filter
+                      type: string
+                - name: dateLastRun
+                  description: Filter by dateLastRun. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+                  in: query
+                  schema:
+                      format: date-filter
+                      type: string
+                - $ref: "#/components/parameters/Page"
+                - name: limit
+                  in: query
+                  description: Desired number of items per page.
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 100
+                      minimum: 1
+                - name: expand[]
+                  description: Expand fields on the result.
+                  in: query
+                  schema:
+                      items:
+                          enum:
+                              - insertUser
+                              - updateUser
+                              - all
+                          type: string
+                      type: array
+                  style: form
+                - name: sort[]
+                  description: The results' sort order.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          example: -dateDispatched
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/AutomationDispatch"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+    "/automation-rules/{automationRuleID}/dispatches/{ruleDispatchID}":
+        get:
+            parameters:
+                - name: automationRuleID
+                  in: path
+                  description: The Automation Rule ID.
+                  required: true
+                  schema:
+                      type: integer
+                - name: ruleDispatchID
+                  in: path
+                  description: Unique dispatch ID.
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AutomationDispatch"
+            summary: Get a specific dispatch execution record.
+            tags:
+                - Automation Rules
+    /automation-rules/{automationRuleID}/trigger/:
+        x-hidden: true
+        post:
+            summary: Trigger an automation recipe run for long runner trigger.
+            tags:
+                - Automation Rules
+            parameters:
+                - name: automationRuleID
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AutomationRecipe"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+components:
+    schemas:
+        AutomationRecipe:
+            description: >
+                Provides details of a single recipe. The recipe is a combination of trigger and action.
+            type: object
+            properties:
+                automationRuleId:
+                    type: integer
+                    description: The id of the automation rule
+                automationRuleRevisionId:
+                    type: integer
+                    description: The id of the automation rule revision
+                dateInserted:
+                    type: string
+                    format: date-time
+                    description: The date the automation rule was created
+                dateUpdated:
+                    type: string
+                    format: date-time
+                    description: The date the automation rule was last updated
+                dateLastRun:
+                    type: string
+                    format: date-time
+                    description: The date the automation rule was last run
+                dateFinished:
+                    type: string
+                    format: date-time
+                    description: The date the automation rule finished running
+                insertUserId:
+                    type: integer
+                    description: The id of the user who created the automation rule
+                updateUserId:
+                    type: integer
+                    description: The id of the user who last updated the automation rule
+                status:
+                    type: string
+                    description: The status of the automation rule
+                trigger:
+                    $ref: "#/components/schemas/Trigger"
+                action:
+                    $ref: "#/components/schemas/Action"
+        Trigger:
+            description: >
+                The trigger for the recipe
+            type: object
+            properties:
+                triggerType:
+                    type: string
+                    description: The type of the trigger or action
+                triggerName:
+                    type: string
+                    description: The name/label of the trigger or action
+                triggerValue:
+                    type: object
+                    description: The value of the trigger or action
+        Action:
+            description: >
+                The action for the recipe
+            type: object
+            properties:
+                actionType:
+                    type: string
+                    description: The type of the trigger or action
+                actionName:
+                    type: string
+                    description: The name/label of the trigger or action
+                actionValue:
+                    type: object
+                    description: The value of the trigger or action
+        AutomationDispatch:
+            description: >
+                provides the list of automation recipes that has been created by the user
+            type: object
+            properties:
+                automationRuleDispatchUUID:
+                    type: string
+                    description: The unique id of the automation rule run
+                automationRuleId:
+                    type: integer
+                    description: The id of the automation rule
+                automationRuleRevisionId:
+                    type: integer
+                    description: The id of the automation rule revision
+                name:
+                    type: string
+                    description: The automation rule's name
+                dateInserted:
+                    type: string
+                    format: date-time
+                    description: The date the automation rule was created
+                dateUpdated:
+                    type: string
+                    format: date-time
+                    description: The date the automation rule was updated
+                dateDispatched:
+                    type: string
+                    format: date-time
+                    description: The date the automation rule ran
+                status:
+                    type: string
+                    description: The status of the automation rule run
+                queuedJobStatus:
+                    type: string
+                    description: The status of the queued Job run
+                trigger:
+                    type: object
+                    description: The trigger of the automation rule
+                    items:
+                        $ref: "#/components/schemas/TriggerAction"
+                action:
+                    type: object
+                    description: The actions of the automation rule
+                    items:
+                        $ref: "#/components/schemas/TriggerAction"
+        TriggerAction:
+            type: object
+            properties:
+                trigger:
+                    type: object
+                    description: The trigger for the automation rule
+                    properties:
+                        triggerType:
+                            type: string
+                            description: The name of the trigger type
+                        triggerName:
+                            type: string
+                            description: The name/label of the trigger or action
+                        triggerValue:
+                            type: object
+                            description: The value of the trigger
+                action:
+                    type: object
+                    description: The action for the automation rule
+                    properties:
+                        actionType:
+                            type: string
+                            description: The name of the action type
+                        actionName:
+                            type: string
+                            description: The name/label of the trigger or action
+                        actionValue:
+                            type: object
+                            description: The value of the action
+        AutomationRule:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: The name of the automation rule
+                trigger:
+                    type: object
+                    description: The trigger for the automation rule
+                    properties:
+                        triggerType:
+                            type: string
+                            description: The name of the trigger type
+                        triggerValue:
+                            type: object
+                            description: The value of the trigger
+                action:
+                    type: object
+                    description: The action for the automation rule
+                    properties:
+                        actionType:
+                            type: string
+                            description: The name of the action type
+                        actionValue:
+                            type: object
+                            description: The value of the action
+
+    parameters:
+        AutomationRecipeExpand:
+            name: expand[]
+            in: query
+            description: >
+                <p>Expand associated records using one or more valid field names. A
+                value of "all" will expand all expandable fields.</p>
+            schema:
+                type: array
+                items:
+                    type: string
+                    enum:
+                        - all
+                        - insertUser
+                        - updateUser
+                        - dispatchStatus
+    requestBodies:
+        AutomationRecipe:
+            description: >
+                Provide the parameters to be sent as part of the request to create a new recipe.
+            required: true
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/AutomationRule"

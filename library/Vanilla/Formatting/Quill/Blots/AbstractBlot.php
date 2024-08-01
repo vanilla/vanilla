@@ -10,6 +10,7 @@ namespace Vanilla\Formatting\Quill\Blots;
 use Vanilla\Formatting\Quill\BlotGroup;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\Quill\Nesting\NestableItemInterface;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * All blots extend AbstractBlot. Even formats. Blots map lightly to quill blots.
@@ -17,8 +18,8 @@ use Vanilla\Formatting\Quill\Nesting\NestableItemInterface;
  * This is pretty bare-bones so you likely want to extend TextBlot or AbstractFormat instead.
  * See https://github.com/quilljs/parchment#blots for an explanation of the JS implementation of quill (parchment) blots.
  */
-abstract class AbstractBlot implements NestableItemInterface {
-
+abstract class AbstractBlot implements NestableItemInterface
+{
     /** @var string */
     protected $parseMode;
 
@@ -74,7 +75,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return string
      */
-    public function renderQuote(): string {
+    public function renderQuote(): string
+    {
         return $this->render();
     }
 
@@ -85,7 +87,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return bool
      */
-    public function hasConsumedNextOp(): bool {
+    public function hasConsumedNextOp(): bool
+    {
         return $this::matches([$this->nextOperation]) && !$this::matches([$this->currentOperation]);
     }
 
@@ -94,7 +97,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return bool
      */
-    public function isOwnGroup(): bool {
+    public function isOwnGroup(): bool
+    {
         return false;
     }
 
@@ -103,7 +107,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return string
      */
-    public function getGroupOpeningTag(): string {
+    public function getGroupOpeningTag(): string
+    {
         return "<p>";
     }
 
@@ -112,7 +117,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return string
      */
-    public function getGroupClosingTag(): string {
+    public function getGroupClosingTag(): string
+    {
         return "</p>";
     }
 
@@ -123,7 +129,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return bool
      */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool
+    {
         return $this->isOwnGroup();
     }
 
@@ -132,14 +139,16 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return string
      */
-    public function getContent(): string {
+    public function getContent(): string
+    {
         return $this->content;
     }
 
     /**
      * @inheritdoc
      */
-    public function getNestingDepth(): int {
+    public function getNestingDepth(): int
+    {
         return 0;
     }
 
@@ -161,5 +170,52 @@ abstract class AbstractBlot implements NestableItemInterface {
         $this->currentOperation = $currentOperation;
         $this->nextOperation = $nextOperation;
         $this->parseMode = $parseMode;
+    }
+
+    /**
+     * Get the operation that corresponds to this blot.
+     *
+     * @return array
+     */
+    public function getCurrentOperation(): array
+    {
+        return $this->currentOperation;
+    }
+
+    /**
+     * Set a field on the current operation.
+     *
+     * @param string $path
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getCurrentOperationField(string $path, $default = null)
+    {
+        return ArrayUtils::getByPath($path, $this->currentOperation, $default);
+    }
+
+    /**
+     * Get a field on the current operation.
+     *
+     * @param string $path
+     * @param mixed $value
+     * @return $this
+     */
+    public function setCurrentOperationField(string $path, $value): self
+    {
+        ArrayUtils::setByPath($path, $this->currentOperation, $value);
+        return $this;
+    }
+
+    /**
+     * For internal use only.
+     *
+     * @param array $previous
+     * @param array $next
+     */
+    public function setPreviousNextOperations(array $previous, array $next): void
+    {
+        $this->previousOperation = $previous;
+        $this->nextOperation = $next;
     }
 }

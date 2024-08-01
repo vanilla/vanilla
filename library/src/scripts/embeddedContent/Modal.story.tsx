@@ -5,7 +5,6 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
@@ -13,9 +12,11 @@ import { StoryExampleModal } from "@library/embeddedContent/StoryExampleModal";
 import { StoryExampleModalConfirm } from "@library/embeddedContent/StoryExampleModalConfirm";
 import { StoryContent } from "@library/storybook/StoryContent";
 
-const story = storiesOf("Components", module);
+export default {
+    title: "Components",
+};
 
-story.add("Modals", () => {
+export const Modals = () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Modal Examples</StoryHeading>
@@ -29,4 +30,4 @@ story.add("Modals", () => {
             </StoryTiles>
         </StoryContent>
     );
-});
+};

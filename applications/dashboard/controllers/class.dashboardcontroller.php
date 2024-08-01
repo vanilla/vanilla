@@ -8,13 +8,19 @@
  * @since 2.0
  */
 
+use Vanilla\Dashboard\Events\DashboardAccessEvent;
+use Vanilla\Dashboard\Events\DashboardApiAccessEvent;
+use Vanilla\Logging\AuditLogger;
+
 /**
  * Root class for the Dashboard's controllers.
  */
-class DashboardController extends Gdn_Controller {
-
+class DashboardController extends Gdn_Controller
+{
     /** @var bool Custom theming is not allowed in the dashboard. */
     protected $allowCustomTheming = false;
+
+    protected bool $auditLogEnabled = true;
 
     /**
      * Set PageName.
@@ -22,9 +28,10 @@ class DashboardController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->PageName = 'dashboard';
+        $this->_PageName = "dashboard";
     }
 
     /**
@@ -35,28 +42,84 @@ class DashboardController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function initialize() {
+    public function initialize()
+    {
         $this->Head = new HeadModule($this);
-        $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.form.js');
-        $this->addJsFile('jquery.popin.js');
-        $this->addJsFile('jquery.popup.js');
-        $this->addJsFile('jquery.gardenhandleajaxform.js');
-        $this->addJsFile('magnific-popup.min.js');
-        $this->addJsFile('jquery.autosize.min.js');
-        $this->addJsFile('global.js');
+        $this->addJsFile("jquery.js");
+        $this->addJsFile("jquery.form.js");
+        $this->addJsFile("jquery.popin.js");
+        $this->addJsFile("jquery.popup.js");
+        $this->addJsFile("jquery.gardenhandleajaxform.js");
+        $this->addJsFile("magnific-popup.min.js");
+        $this->addJsFile("jquery.autosize.min.js");
+        $this->addJsFile("global.js");
 
-        if (in_array($this->ControllerName, ['profilecontroller', 'activitycontroller'])) {
-            $this->addCssFile('style.css');
-            $this->addCssFile('vanillicon.css', 'static');
+        if (in_array($this->ControllerName, ["profilecontroller", "activitycontroller"])) {
+            $this->addCssFile("style.css");
+            $this->addCssFile("vanillicon.css", "static");
         } else {
-            $this->addCssFile('admin.css');
-            $this->addCssFile('magnific-popup.css', 'dashboard');
+            $this->addCssFile("admin.css");
+            $this->addCssFile("magnific-popup.css", "dashboard");
         }
 
-        $this->MasterView = 'admin';
-        Gdn_Theme::section('Dashboard');
+        $this->MasterView = "admin";
+        Gdn_Theme::section("Dashboard");
+
         parent::initialize();
+    }
+
+    /**
+     * Override for audit logging.
+     *
+     * @param $view
+     * @param $controllerName
+     * @param $applicationFolder
+     * @param $assetName
+     */
+    public function xRender(
+        $view = "",
+        $controllerName = false,
+        $applicationFolder = false,
+        $assetName = "Content"
+    ): void {
+        $this->trackAuditLog();
+        parent::xRender($view, $controllerName, $applicationFolder, $assetName);
+    }
+
+    /**
+     * Track the current request and parent request if available as an audit log.
+     *
+     * @return void
+     */
+    public function trackAuditLog(): void
+    {
+        if (!$this->auditLogEnabled) {
+            return;
+        }
+
+        $request = \Gdn::request();
+
+        if ($request->getMethod() !== "GET") {
+            // We only handle GET requests here.
+            // Post requests that actually change things will be audit logged through explicit access.
+            return;
+        }
+
+        // This is a full request.
+        if ($this->isRenderingMasterView()) {
+            // This handles full page loads and injects a tag into the pages so we can differentiate between
+            // full page requests and modals.
+            $accessEvent = new DashboardAccessEvent();
+            $this->addDefinition("auditLog", $accessEvent->asPageMeta());
+            AuditLogger::log($accessEvent);
+            return;
+        }
+
+        // Try to construct a parent audit log event.
+        $apiEvent = DashboardApiAccessEvent::tryFromHeaders($request);
+        if ($apiEvent !== null) {
+            AuditLogger::log($apiEvent);
+        }
     }
 
     /**
@@ -65,29 +128,30 @@ class DashboardController extends Gdn_Controller {
      *
      * @throws Gdn_UserException
      */
-    public function userPreferenceCollapse() {
+    public function userPreferenceCollapse()
+    {
         if (Gdn::request()->isAuthenticatedPostBack(true)) {
-            $key = Gdn::request()->getValue('key');
-            $collapsed = Gdn::request()->getValue('collapsed');
+            $key = Gdn::request()->getValue("key");
+            $collapsed = Gdn::request()->getValue("collapsed");
 
             if ($key && $collapsed) {
-                $collapsed = ($collapsed === 'true');
+                $collapsed = $collapsed === "true";
                 $session = Gdn::session();
-                $collapsedGroups = $session->getPreference('DashboardNav.Collapsed');
+                $collapsedGroups = $session->getPreference("DashboardNav.Collapsed");
                 if (!$collapsedGroups) {
                     $collapsedGroups = [];
                 }
 
                 if ($collapsed) {
                     $collapsedGroups[$key] = $key;
-                } elseif(isset($collapsedGroups[$key])) {
+                } elseif (isset($collapsedGroups[$key])) {
                     unset($collapsedGroups[$key]);
                 }
 
-                $session->setPreference('DashboardNav.Collapsed', $collapsedGroups);
+                $session->setPreference("DashboardNav.Collapsed", $collapsedGroups);
             }
 
-            $this->render('blank', 'utility', 'dashboard');
+            $this->render("blank", "utility", "dashboard");
         }
     }
 
@@ -97,22 +161,23 @@ class DashboardController extends Gdn_Controller {
      *
      * @throws Gdn_UserException
      */
-    public function userPreferenceSectionLandingPage() {
+    public function userPreferenceSectionLandingPage()
+    {
         if (Gdn::request()->isAuthenticatedPostBack(true)) {
-            $url = Gdn::request()->getValue('url');
-            $section = Gdn::request()->getValue('section');
+            $url = Gdn::request()->getValue("url");
+            $section = Gdn::request()->getValue("section");
 
             if ($url && $section) {
                 $session = Gdn::session();
-                $landingPages = $session->getPreference('DashboardNav.SectionLandingPages');
+                $landingPages = $session->getPreference("DashboardNav.SectionLandingPages");
                 if (!$landingPages) {
                     $landingPages = [];
                 }
 
                 $landingPages[$section] = $url;
-                $session->setPreference('DashboardNav.SectionLandingPages', $landingPages);
+                $session->setPreference("DashboardNav.SectionLandingPages", $landingPages);
             }
-            $this->render('blank', 'utility', 'dashboard');
+            $this->render("blank", "utility", "dashboard");
         }
     }
 
@@ -122,22 +187,24 @@ class DashboardController extends Gdn_Controller {
      *
      * @throws Gdn_UserException
      */
-    public function userPreferenceDashboardLandingPage() {
+    public function userPreferenceDashboardLandingPage()
+    {
         if (Gdn::request()->isAuthenticatedPostBack(true)) {
-            $section = Gdn::request()->getValue('section');
+            $section = Gdn::request()->getValue("section");
             if ($section && array_key_exists($section, DashboardNavModule::getDashboardNav()->getSectionsInfo())) {
                 $session = Gdn::session();
-                $session->setPreference('DashboardNav.DashboardLandingPage', $section);
+                $session->setPreference("DashboardNav.DashboardLandingPage", $section);
             }
 
-            $this->render('blank', 'utility', 'dashboard');
+            $this->render("blank", "utility", "dashboard");
         }
     }
 
     /**
      * @param string $currentUrl
      */
-    public function setHighlightRoute($currentUrl = '') {
+    public function setHighlightRoute($currentUrl = "")
+    {
         if ($currentUrl) {
             DashboardNavModule::getDashboardNav()->setHighlightRoute($currentUrl);
         }
@@ -146,8 +213,9 @@ class DashboardController extends Gdn_Controller {
     /**
      * @param string $currentUrl
      */
-    public function addSideMenu($currentUrl = '') {
-        deprecated('addSideMenu', 'setHighlightRoute');
+    public function addSideMenu($currentUrl = "")
+    {
+        deprecated("addSideMenu", "setHighlightRoute");
         $this->setHighlightRoute($currentUrl);
     }
 }

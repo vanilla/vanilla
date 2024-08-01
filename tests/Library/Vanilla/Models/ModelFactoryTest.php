@@ -8,20 +8,18 @@
 namespace VanillaTests\Library\Vanilla\Models;
 
 use Garden\Container\NotFoundException;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Vanilla\Models\Model;
 use Vanilla\Models\ModelFactory;
-use VanillaTests\BootstrapTrait;
+use VanillaTests\BootstrapTestCase;
 
 /**
  * Tests for the `ModelFactory` class.
  */
-class ModelFactoryTest extends TestCase {
-    use BootstrapTrait;
-
-    const RECORD_TYPE = 'test';
-    const ALIAS = 't';
+class ModelFactoryTest extends BootstrapTestCase
+{
+    const RECORD_TYPE = "test";
+    const ALIAS = "t";
 
     /**
      * @var ModelFactory
@@ -31,10 +29,9 @@ class ModelFactoryTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->setupBoostrapTrait();
-        $this->initializeDatabase();
 
         $this->factory = ModelFactory::fromContainer($this->container());
         $this->factory->addModel(self::RECORD_TYPE, TestModel::class, self::ALIAS);
@@ -43,7 +40,8 @@ class ModelFactoryTest extends TestCase {
     /**
      * The factory should have its models' record types and aliases.
      */
-    public function testHas(): void {
+    public function testHas(): void
+    {
         $this->assertTrue($this->factory->has(self::RECORD_TYPE));
         $this->assertTrue($this->factory->has(self::ALIAS));
     }
@@ -51,15 +49,17 @@ class ModelFactoryTest extends TestCase {
     /**
      * You should be able to add multiple aliases to record types.
      */
-    public function testAddAlias(): void {
-        $this->factory->addAlias(self::RECORD_TYPE, 'tt');
-        $this->assertTrue($this->factory->has('tt'));
+    public function testAddAlias(): void
+    {
+        $this->factory->addAlias(self::RECORD_TYPE, "tt");
+        $this->assertTrue($this->factory->has("tt"));
     }
 
     /**
      * You should be able to create a model from its record type.
      */
-    public function testModelCreation(): void {
+    public function testModelCreation(): void
+    {
         $model = $this->factory->get(self::RECORD_TYPE);
         $this->assertInstanceOf(TestModel::class, $model);
     }
@@ -67,7 +67,8 @@ class ModelFactoryTest extends TestCase {
     /**
      * You should be able to create a model from its alias.
      */
-    public function testModelCreationAlias(): void {
+    public function testModelCreationAlias(): void
+    {
         $model = $this->factory->get(self::ALIAS);
         $this->assertInstanceOf(TestModel::class, $model);
     }
@@ -75,7 +76,8 @@ class ModelFactoryTest extends TestCase {
     /**
      * Record types and aliases should be case insensitive.
      */
-    public function testModelCreationCaseInsensitive(): void {
+    public function testModelCreationCaseInsensitive(): void
+    {
         $recordType = strtoupper(self::RECORD_TYPE);
         $this->assertNotSame($recordType, self::RECORD_TYPE);
         $model = $this->factory->get($recordType);
@@ -93,7 +95,8 @@ class ModelFactoryTest extends TestCase {
      * @param string $ref
      * @dataProvider provideValidRefs
      */
-    public function testGetRecordType(string $ref): void {
+    public function testGetRecordType(string $ref): void
+    {
         $this->assertSame(self::RECORD_TYPE, $this->factory->getRecordType($ref));
     }
 
@@ -102,13 +105,9 @@ class ModelFactoryTest extends TestCase {
      *
      * @return array
      */
-    public function provideValidRefs(): array {
-        $r = [
-            [self::ALIAS],
-            [self::RECORD_TYPE],
-            [strtoupper(self::RECORD_TYPE)],
-            [TestModel::class],
-        ];
+    public function provideValidRefs(): array
+    {
+        $r = [[self::ALIAS], [self::RECORD_TYPE], [strtoupper(self::RECORD_TYPE)], [TestModel::class]];
 
         return array_column($r, null, 0);
     }
@@ -116,23 +115,26 @@ class ModelFactoryTest extends TestCase {
     /**
      * An invalid record type ref should be an exception.
      */
-    public function testInvalidRecordTypeRef(): void {
+    public function testInvalidRecordTypeRef(): void
+    {
         $this->expectException(NotFoundException::class);
-        $this->factory->getRecordType('foo');
+        $this->factory->getRecordType("foo");
     }
 
     /**
      * Adding an alias to an invalid record type should be an exception.
      */
-    public function testInvalidAlias(): void {
+    public function testInvalidAlias(): void
+    {
         $this->expectException(NotFoundException::class);
-        $this->factory->addAlias('foo', 'bar');
+        $this->factory->addAlias("foo", "bar");
     }
 
     /**
      * Smoke test `getAll()`.
      */
-    public function testGetAll(): void {
+    public function testGetAll(): void
+    {
         $r = $this->factory->getAll();
         $this->assertArrayHasKey(self::RECORD_TYPE, $r);
         $this->assertInstanceOf(TestModel::class, $r[self::RECORD_TYPE]);
@@ -141,7 +143,8 @@ class ModelFactoryTest extends TestCase {
     /**
      * Smoke test `getAllByInterface()`.
      */
-    public function testGetAllByInterface(): void {
+    public function testGetAllByInterface(): void
+    {
         $r = $this->factory->getAllByInterface(LoggerInterface::class);
         $this->assertEmpty($r);
 

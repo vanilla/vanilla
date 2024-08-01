@@ -1,20 +1,26 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Forum\Modules\FoundationDiscussionsShim;
+use Vanilla\Theme\BoxThemeShim;if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 $isDataDrivenTheme = Gdn::themeFeatures()->useDataDrivenTheme();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
 include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
 $checkMark = !$isDataDrivenTheme ? adminCheck(NULL, ['', ' ']) : '';
+echo '<section class="headerBoxLayout">';
+BoxThemeShim::startHeading();
 echo '<h1 class="H HomepageTitle">'.
     $checkMark.
     $this->data('Title').
-    followButton($this->data('Category.CategoryID')).
     '</h1>';
-
-$Description = $this->data('Category.Description', $this->description());
-echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);
-
+/** @var $htmlSanitizer */
+$htmlSanitizer = Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
+$Description = $htmlSanitizer->filter($this->data('Category.Description', $this->description()));
+echo wrapIf($Description, 'div', ['class' => 'P PageDescription']);
 $this->fireEvent('AfterPageTitle');
+BoxThemeShim::endHeading();
+echo followButton($this->data('Category.CategoryID')).'</section>';
+
+
 
 $subtreeView = $this->fetchViewLocation('subtree', 'categories', 'vanilla', false);
 if ($subtreeView) {
@@ -52,9 +58,18 @@ echo '</div>';
 if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->numRows() > 0)) {
     ?>
     <h2 class="sr-only"><?php echo t('Discussion List'); ?></h2>
-    <ul class="DataList Discussions">
-        <?php include($this->fetchViewLocation('discussions', 'Discussions', 'Vanilla')); ?>
-    </ul>
+    <?php
+    if (!FoundationDiscussionsShim::isEnabled()) {
+        echo '<ul class="DataList Discussions pageBox">';
+    }
+    $isMainContent = true;
+    include($this->fetchViewLocation('discussions', 'Discussions', 'Vanilla'));
+    if (!FoundationDiscussionsShim::isEnabled()) {
+        echo '</ul>';
+
+    }
+    ?>
+    <?php $this->fireEvent('AfterDiscussionsList'); ?>
     <?php
 
     echo '<div class="PageControls Bottom">';
@@ -64,6 +79,9 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
 
 } else {
     ?>
+    <?php BoxThemeShim::startBox(); ?>
     <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
+    <?php BoxThemeShim::endBox(); ?>
+    <?php $this->fireEvent('AfterDiscussionsList'); ?>
 <?php
 }

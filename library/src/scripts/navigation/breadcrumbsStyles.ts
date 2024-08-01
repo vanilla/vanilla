@@ -4,55 +4,79 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { px, em } from "csx";
-import {
-    colorOut,
-    margins,
-    singleLineEllipsis,
-    unit,
-    userSelect,
-    EMPTY_FONTS,
-    fonts,
-    ensureColorHelper,
-} from "@library/styles/styleHelpers";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { em } from "csx";
+import { singleLineEllipsis, userSelect, ensureColorHelper } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
+import { LinkDecorationType } from "@library/styles/cssUtilsTypes";
 
 export const breadcrumbsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const makeVariables = variableFactory("breadcrumbs");
 
-    const sizing = makeVariables("sizing", {
+    /**
+     * @varGroup breadcrumbs
+     * @description Variables to style breadcrumbs
+     */
+    const makeThemeVars = variableFactory("breadcrumbs");
+
+    /**
+     * @varGroup breadcrumbs.sizing
+     * @description Set the size of the breadcrumbs
+     */
+    const sizing = makeThemeVars("sizing", {
+        /**
+         * @var breadcrumbs.sizing.minHeight
+         * @type string | number
+         */
         minHeight: 16,
     });
 
-    const linkColors = clickableItemStates();
-    const link = makeVariables("link", {
-        textTransform: "uppercase",
-        font: {
-            ...EMPTY_FONTS,
-            color: ensureColorHelper(linkColors.color as string),
-            size: globalVars.fonts.size.small,
+    const link = makeThemeVars("link", {
+        /**
+         * @varGroup breadcrumbs.link.font
+         * @description Font variables for links (scumb labels)
+         * @expand font
+         */
+        font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("small"),
+            color: ensureColorHelper(globalVars.links.colors.default),
             lineHeight: globalVars.lineHeights.condensed,
-        },
+            transform: "uppercase",
+            textDecoration: globalVars.links.linkDecorationType === LinkDecorationType.ALWAYS ? "underline" : "none",
+        }),
+    });
+    const separator = makeThemeVars("separator", {
+        /**
+         * @var breadcrumbs.separator.spacing
+         * @description Controls the spacing between the breadcrumb labels
+         * @type number | string
+         */
+        spacing: em(0.2),
+        /**
+         * @varGroup breadcrumbs.separator.font
+         * @description Font variables for the separator (crumb) element
+         * @expand font
+         */
+        font: Variables.font({}),
     });
 
-    return { sizing, link };
+    return { sizing, link, separator };
 });
 
 export const breadcrumbsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = breadcrumbsVariables();
     const style = styleFactory("breadcrumbs");
-    const linkColors = clickableItemStates();
+    const linkColors = Mixins.clickable.itemState();
     const link = style("link", {
         ...singleLineEllipsis(),
         display: "inline-flex",
-        ...fonts(vars.link.font),
-        textTransform: vars.link.textTransform as any,
-        $nest: linkColors.$nest,
+        ...Mixins.font(vars.link.font),
+        ...linkColors,
     });
 
     const root = style({
@@ -60,19 +84,27 @@ export const breadcrumbsClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "flex-start",
         flexWrap: "wrap",
-        $nest: {
-            [`& a.${link}`]: {
-                color: colorOut(globalVars.mainColors.primary),
-                textDecoration: "underline",
-            },
+        /**
+         * When breadcrumbs are placed in a single column layout,
+         * they need some separation from the proceeding  widgets.
+         *
+         * In all other cases, the breadcrumbs are placed in their
+         * own container without siblings
+         */
+        "& + div": {
+            ...Mixins.margin({
+                top: globalVars.spacer.pageComponentCompact,
+            }),
         },
     });
 
     const crumb = style("crumb", {
         ...singleLineEllipsis(),
         display: "inline-flex",
-        fontSize: unit(globalVars.fonts.size.small),
-        lineHeight: globalVars.lineHeights.condensed,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small"),
+            lineHeight: globalVars.lineHeights.condensed,
+        }),
         overflow: "hidden",
     });
 
@@ -82,15 +114,16 @@ export const breadcrumbsClasses = useThemeCache(() => {
         flexDirection: "row",
         justifyContent: "flex-start",
         flexWrap: "wrap",
-        minHeight: unit(vars.sizing.minHeight),
+        minHeight: styleUnit(vars.sizing.minHeight),
     });
 
     const separator = style("separator", {
         ...userSelect(),
-        ...margins({
-            vertical: 0,
-            horizontal: em(0.2),
-        }),
+        marginTop: 0,
+        marginBottom: 0,
+        marginLeft: vars.separator.spacing,
+        marginRight: vars.separator.spacing,
+        ...Mixins.font(vars.separator.font),
     });
 
     const separatorIcon = style("separatorIcon", {
@@ -107,7 +140,7 @@ export const breadcrumbsClasses = useThemeCache(() => {
     const breadcrumb = style("breadcrumb", {
         display: "inline-flex",
         lineHeight: 1,
-        minHeight: unit(vars.sizing.minHeight),
+        minHeight: styleUnit(vars.sizing.minHeight),
     });
 
     const current = style("current", {

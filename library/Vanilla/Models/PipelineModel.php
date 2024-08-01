@@ -1,22 +1,29 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Models;
 
 use Exception;
-use Garden\Schema\Schema;
 use Vanilla\Database\Operation;
+use Vanilla\Database\Operation\CurrentDateFieldProcessor;
+use Vanilla\Database\Operation\CurrentIPAddressProcessor;
+use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\Pipeline;
 use Vanilla\Database\Operation\Processor;
 use Vanilla\InjectableInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * Basic model class with database operation pipeline support.
  */
-class PipelineModel extends Model implements InjectableInterface {
+class PipelineModel extends Model implements InjectableInterface
+{
+    public const OPT_CALLBACK = "callback";
+
+    public const OPT_RUN_PIPELINE = "runPipeline";
 
     /** @var Pipeline */
     protected $pipeline;
@@ -26,9 +33,47 @@ class PipelineModel extends Model implements InjectableInterface {
      *
      * @param string $table Database table associated with this resource.
      */
-    public function __construct(string $table) {
+    public function __construct(string $table)
+    {
         parent::__construct($table);
-        $this->pipeline = new Pipeline();
+        $this->pipeline = new Pipeline(function (Operation $op) {
+            return $this->handleInnerOperation($op);
+        });
+    }
+
+    /**
+     * @param bool $includeUpdate
+     * @param bool $includeIPAddress
+     * @param bool $preciseDates
+     */
+    public function addInsertUpdateProcessors(
+        bool $includeUpdate = true,
+        bool $includeIPAddress = false,
+        bool $preciseDates = false
+    ): void {
+        $request = \Gdn::request();
+        $session = \Gdn::session();
+        $userProcessor = new CurrentUserFieldProcessor($session);
+        $userProcessor->camelCase();
+
+        $dateProcessor = new CurrentDateFieldProcessor(["dateInserted"], ["dateUpdated"], $preciseDates);
+
+        $this->addPipelineProcessor($userProcessor);
+        $this->addPipelineProcessor($dateProcessor);
+
+        if (!$includeUpdate) {
+            $userProcessor->setUpdateFields([]);
+            $dateProcessor->setUpdateFields([]);
+        }
+
+        if ($includeIPAddress) {
+            $ipProcessor = new CurrentIPAddressProcessor($request);
+            $ipProcessor->camelCase();
+            if (!$includeUpdate) {
+                $ipProcessor->setUpdateFields([]);
+            }
+            $this->addPipelineProcessor($ipProcessor);
+        }
     }
 
     /**
@@ -36,7 +81,8 @@ class PipelineModel extends Model implements InjectableInterface {
      *
      * @param Processor $processor
      */
-    public function addPipelineProcessor(Processor $processor) {
+    public function addPipelineProcessor(Processor $processor)
+    {
         $this->pipeline->addProcessor($processor);
     }
 
@@ -44,8 +90,10 @@ class PipelineModel extends Model implements InjectableInterface {
      * Add a database operations processor to the pipeline.
      *
      * @param Processor $processor
+     * @deprecated Avoid using post-processors.
      */
-    public function addPipelinePostProcessor(Processor $processor) {
+    public function addPipelinePostProcessor(Processor $processor)
+    {
         $this->pipeline->addPostProcessor($processor);
     }
 
@@ -60,18 +108,14 @@ class PipelineModel extends Model implements InjectableInterface {
      *    - offset (int): Row offset before capturing the result.
      * @return array Rows matching the conditions and within the parameters specified in the options.
      */
-    public function get(array $where = [], array $options = []): array {
-        $databaseOperation = new Operation();
-        $databaseOperation->setType(Operation::TYPE_SELECT);
-        $databaseOperation->setCaller($this);
-        $databaseOperation->setWhere($where);
-        $databaseOperation->setOptions($options);
-        $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
-            return parent::get(
-                $databaseOperation->getWhere(),
-                $databaseOperation->getOptions()
-            );
-        });
+    public function select(array $where = [], array $options = []): array
+    {
+        $operation = new Operation();
+        $operation->setType(Operation::TYPE_SELECT);
+        $operation->setCaller($this);
+        $operation->setWhere($where);
+        $operation->setOptions($options);
+        $result = $this->performOperation($operation, $options[self::OPT_RUN_PIPELINE] ?? true);
         return $result;
     }
 
@@ -79,19 +123,26 @@ class PipelineModel extends Model implements InjectableInterface {
      * Add a resource row.
      *
      * @param array $set Field values to set.
-     * @param string $mode Operation mode (force || default).
+     * @param array $options Operation mode (force || default).
      * @return mixed ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
-        $databaseOperation = new Operation();
-        $databaseOperation->setType(Operation::TYPE_INSERT);
-        $databaseOperation->setCaller($this);
-        $databaseOperation->setSet($set);
-        $databaseOperation->setMode($mode);
-        $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
-            return parent::insert($databaseOperation->getSet());
-        });
+    public function insert(array $set, array $options = [])
+    {
+        if (is_string($options)) {
+            trigger_error("String options are deprecated in PipelineModel::insert().", E_USER_DEPRECATED);
+            $options = [self::OPT_MODE => $options];
+        }
+        $options += [
+            self::OPT_MODE => Operation::MODE_DEFAULT,
+        ];
+
+        $operation = new Operation();
+        $operation->setType(Operation::TYPE_INSERT);
+        $operation->setCaller($this);
+        $operation->setSet($set);
+        $operation->setOptions($options);
+        $result = $this->performOperation($operation, $options[self::OPT_RUN_PIPELINE] ?? true);
         return $result;
     }
 
@@ -100,23 +151,38 @@ class PipelineModel extends Model implements InjectableInterface {
      *
      * @param array $set Field values to set.
      * @param array $where Conditions to restrict the update.
-     * @param string $mode Operation mode (force || default).
+     * @param array $options Update options.
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
-        $databaseOperation = new Operation();
-        $databaseOperation->setType(Operation::TYPE_UPDATE);
-        $databaseOperation->setCaller($this);
-        $databaseOperation->setSet($set);
-        $databaseOperation->setWhere($where);
-        $databaseOperation->setMode($mode);
-        $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
-            return parent::update(
-                $databaseOperation->getSet(),
-                $databaseOperation->getWhere()
-            );
-        });
+    public function update(array $set, array $where, array $options = []): bool
+    {
+        if (is_string($options)) {
+            trigger_error("String options are deprecated in PipelineModel::update().", E_USER_DEPRECATED);
+            $options = [self::OPT_MODE => $options];
+        }
+        $options += [
+            self::OPT_MODE => Operation::MODE_DEFAULT,
+        ];
+
+        $operation = new Operation();
+        $operation->setType(Operation::TYPE_UPDATE);
+        $operation->setCaller($this);
+        $operation->setOptions($options);
+        $operation->setSet($set);
+        $operation->setWhere($where);
+
+        $metaInformation = $options[self::OPT_META] ?? null;
+
+        if ($metaInformation) {
+            if (is_array($metaInformation)) {
+                foreach ($metaInformation as $key => $meta) {
+                    $operation->setMeta($key, $meta);
+                }
+            }
+        }
+
+        $result = $this->performOperation($operation, $options[self::OPT_RUN_PIPELINE] ?? true);
         return $result;
     }
 
@@ -129,18 +195,52 @@ class PipelineModel extends Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function delete(array $where, array $options = []): bool {
-        $databaseOperation = new Operation();
-        $databaseOperation->setType(Operation::TYPE_DELETE);
-        $databaseOperation->setCaller($this);
-        $databaseOperation->setWhere($where);
-        $databaseOperation->setOptions($options);
-        $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
-            return parent::delete(
-                $databaseOperation->getWhere(),
-                $databaseOperation->getOptions()
-            );
-        });
+    public function delete(array $where, array $options = []): bool
+    {
+        $operation = new Operation();
+        $operation->setType(Operation::TYPE_DELETE);
+        $operation->setCaller($this);
+        $operation->setWhere($where);
+        $operation->setOptions($options);
+        $result = $this->performOperation($operation, $options[self::OPT_RUN_PIPELINE] ?? true);
         return $result;
+    }
+
+    /**
+     * Handle a database operation.
+     *
+     * @param Operation $op
+     * @return mixed
+     */
+    protected function handleInnerOperation(Operation $op)
+    {
+        $callback = $op->getOptionItem(self::OPT_CALLBACK);
+        if ($callback !== null) {
+            Assert::isCallable($callback);
+            return $callback($op);
+        }
+
+        return match ($op->getType()) {
+            Operation::TYPE_INSERT => parent::insert($op->getSet(), $op->getOptions()),
+            Operation::TYPE_UPDATE => parent::update($op->getSet(), $op->getWhere(), $op->getOptions()),
+            Operation::TYPE_DELETE => parent::delete($op->getWhere(), $op->getOptions()),
+            Operation::TYPE_SELECT => parent::select($op->getWhere(), $op->getOptions()),
+            default => throw new \InvalidArgumentException("Invalid operation: " . $op->getType()),
+        };
+    }
+
+    /**
+     * Execute a database operation.
+     *
+     * @param Operation $op
+     * @param bool $runPipeline
+     * @return mixed
+     */
+    private function performOperation(Operation $op, bool $runPipeline = true)
+    {
+        if ($runPipeline === false) {
+            return $this->handleInnerOperation($op);
+        }
+        return $this->pipeline->processOperation($op);
     }
 }

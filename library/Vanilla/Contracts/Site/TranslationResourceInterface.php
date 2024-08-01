@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Site;
 /**
  * Interface TranslationResourceInterface
  */
-interface TranslationResourceInterface {
+interface TranslationResourceInterface
+{
     /**
      * Returns translation resource key (url-code)
      *
@@ -24,4 +25,11 @@ interface TranslationResourceInterface {
      * @return array
      */
     public function resourceRecord(): array;
+
+    /**
+     * Notify resource model about translation happened
+     *
+     * @param TranslationItem $translationItem
+     */
+    public function notify(TranslationItem $translationItem);
 }

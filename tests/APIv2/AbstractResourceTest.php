@@ -1,29 +1,41 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\APIv2;
 
+use Garden\Http\HttpResponse;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Formatting\FormatCompatibilityService;
+use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Formatting\Formats\WysiwygFormat;
 
-abstract class AbstractResourceTest extends AbstractAPIv2Test {
-
+/**
+ * A base test class for testing any API v2 RESTful resource.
+ */
+abstract class AbstractResourceTest extends AbstractAPIv2Test
+{
     /**
      * The number of rows create when testing index endpoints.
      */
     const INDEX_ROWS = 4;
 
+    /** @var int The limit used for the index test. */
+    protected int $indexLimit = 100;
+
     /**
      * @var string The resource route.
      */
-    protected $baseUrl = '/resources';
+    protected $baseUrl = "/resources";
 
     /** @var array Fields to be checked with get/<id>/edit */
-    protected $editFields = ['name', 'body', 'format'];
+    protected $editFields = ["name", "body", "format"];
+
+    /** @var array image fields that have a corresponding srcset. */
+    protected $imageFields = [];
 
     /** @var bool Whether to check if paging works or not in the index. */
     protected $testPagingOnIndex = true;
@@ -31,12 +43,12 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     /**
      * @var string The singular name of the resource.
      */
-    protected $singular = '';
+    protected $singular = "";
 
     /**
      * @var array A record that can be posted to the endpoint.
      */
-    protected $record = ['body' => 'Hello world!', 'format' => 'markdown'];
+    protected $record = ["body" => "Hello world!", "format" => "markdown"];
 
     /**
      * @var string[] An array of field names that are okay to send to patch endpoints.
@@ -46,7 +58,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     /**
      * @var string The name of the primary key of the resource.
      */
-    protected $pk = '';
+    protected $pk = "";
 
     /**
      * AbstractResourceTest constructor.
@@ -57,14 +69,15 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      * @param array $data Required by PHPUnit.
      * @param string $dataName Required by PHPUnit.
      */
-    public function __construct($name = null, array $data = [], $dataName = '') {
+    public function __construct($name = null, array $data = [], $dataName = "")
+    {
         parent::__construct($name, $data, $dataName);
 
         if (empty($this->singluar)) {
-            $this->singular = rtrim(ltrim($this->baseUrl, '/'), 's');
+            $this->singular = rtrim(ltrim($this->baseUrl, "/"), "s");
         }
         if (empty($this->pk)) {
-            $this->pk = $this->singular.'ID';
+            $this->pk = $this->singular . "ID";
         }
 
         if ($this->patchFields === null) {
@@ -73,17 +86,34 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Call `GET /:id/edit`
+     *
+     * @param mixed $rowOrID The PK value or a row.
+     * @return \Garden\Http\HttpResponse
+     */
+    protected function getEdit($rowOrID): HttpResponse
+    {
+        if (is_array($rowOrID)) {
+            $id = $rowOrID[$this->pk];
+        } else {
+            $id = $rowOrID;
+        }
+
+        $r = $this->api()->get("{$this->baseUrl}/$id/edit");
+        return $r;
+    }
+
+    /**
      * Test GET /resource/<id>.
      */
-    public function testGet() {
+    public function testGet()
+    {
         $row = $this->testPost();
 
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$row[$this->pk]}"
-        );
+        $r = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}");
 
         $this->assertEquals(200, $r->getStatusCode());
-        $this->assertRowsEqual($row, $r->getBody());
+        $this->assertRowsEqual($this->modifyGetExpected($row), $r->getBody());
         $this->assertCamelCase($r->getBody());
 
         return $r->getBody();
@@ -96,36 +126,33 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      * @param array $extra Additional fields to send along with the POST request.
      * @return array Returns the new record.
      */
-    public function testPost($record = null, array $extra = []) {
+    public function testPost($record = null, array $extra = [])
+    {
         $record = $record === null ? $this->record() : $record;
         $post = $record + $extra;
-        $result = $this->api()->post(
-            $this->baseUrl,
-            $post
-        );
+        $result = $this->api()->post($this->baseUrl, $post);
 
         $this->assertEquals(201, $result->getStatusCode());
 
         $body = $result->getBody();
         $this->assertTrue(is_int($body[$this->pk]));
         $this->assertTrue($body[$this->pk] > 0);
-
         $this->assertRowsEqual($record, $body);
-
         return $body;
     }
 
     /**
      * You shouldn't be allowed to post with a bad format.
      */
-    public function testPostBadFormat(): void {
+    public function testPostBadFormat(): void
+    {
         $record = $this->record();
-        if (!array_key_exists('format', $record)) {
+        if (!array_key_exists("format", $record)) {
             // The test doesn't apply to this resource so just arbitrarily pass.
             $this->assertTrue(true);
             return;
         }
-        $record['format'] = 'invalid';
+        $record["format"] = "invalid";
 
         $this->expectException(ClientException::class);
         $this->expectExceptionCode(422);
@@ -135,14 +162,12 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     /**
      * Test PATCH /resource/<id> with a full record overwrite.
      */
-    public function testPatchFull() {
+    public function testPatchFull()
+    {
         $row = $this->testGetEdit();
         $newRow = $this->modifyRow($row);
 
-        $r = $this->api()->patch(
-            "{$this->baseUrl}/{$row[$this->pk]}",
-            $newRow
-        );
+        $r = $this->api()->patch("{$this->baseUrl}/{$row[$this->pk]}", $newRow);
 
         $this->assertEquals(200, $r->getStatusCode());
 
@@ -156,13 +181,14 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      *
      * @depends testGetEdit
      */
-    public function testPatchInvalidFormat(): void {
+    public function testPatchInvalidFormat(): void
+    {
         $row = $this->testGetEdit();
-        if (!array_key_exists('format', $row)) {
+        if (!array_key_exists("format", $row)) {
             $this->assertTrue(true);
             return;
         }
-        $row['format'] = 'invalid';
+        $row["format"] = "invalid";
 
         $this->expectException(ClientException::class);
         $this->expectExceptionCode(422);
@@ -175,7 +201,8 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      * @param array|null $record A record to use for comparison.
      * @return array
      */
-    public function testGetEdit($record = null) {
+    public function testGetEdit($record = null)
+    {
         if ($record === null) {
             $record = $this->record();
             $row = $this->testPost($record);
@@ -183,9 +210,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
             $row = $record;
         }
 
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$row[$this->pk]}/edit"
-        );
+        $r = $this->getEdit($row);
 
         $this->assertEquals(200, $r->getStatusCode());
         $this->assertRowsEqual(arrayTranslate($record, $this->editFields), $r->getBody());
@@ -195,38 +220,86 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test image fields srcset existence.
+     *
+     * @return void
+     */
+    public function testImageFields()
+    {
+        if (empty($this->imageFields)) {
+            $this->markTestSkipped("No image fields defined");
+            return;
+        }
+        $record = $this->record();
+        foreach ($this->imageFields as $imageField) {
+            $record[$imageField] = "https://my-image.com";
+        }
+
+        $result = $this->testPost($record);
+        // Fetch again because srcSets aren't editable fields.
+        $result = $this->api()->get("{$this->baseUrl}/{$result[$this->pk]}");
+
+        foreach ($this->imageFields as $imageField) {
+            $this->assertArrayHasKey($imageField . "SrcSet", $result);
+        }
+    }
+
+    /**
+     * Test that items with a format extract their main image.
+     */
+    public function testMainImageField()
+    {
+        if (!in_array("format", $this->patchFields) || in_array("image", $this->patchFields)) {
+            $this->markTestSkipped("Only occurs for endpoints with a format");
+        }
+
+        $record = $this->record();
+        $record["body"] = '<img alt="My Alt" src="https://site.com/myimg.png" />';
+        $record["format"] = WysiwygFormat::FORMAT_KEY;
+
+        $result = $this->testPost($record);
+        // Fetch again because srcSets aren't editable fields.
+        $result = $this->api()->get("{$this->baseUrl}/{$result[$this->pk]}");
+
+        $this->assertEquals("My Alt", $result["image"]["alt"]);
+        $this->assertEquals("https://site.com/myimg.png", $result["image"]["url"]);
+        $this->assertArrayHasKey("urlSrcSet", $result["image"]);
+    }
+
+    /**
      * Test that the edit endpoints apply format compatibility where possible.
      *
      * @param string $editSuffix Set this to change the GET request suffix.
      */
-    public function testEditFormatCompat(string $editSuffix = "/edit") {
+    public function testEditFormatCompat(string $editSuffix = "/edit")
+    {
         $record = $this->record();
 
         // Only check anything if we've got a format and body field.
-        if (!isset($record['body']) || !isset($record['format'])) {
+        if (!isset($record["body"]) || !isset($record["format"])) {
+            $this->assertTrue(true);
+            return;
+        }
+
+        if (strtolower($record["format"]) !== RichFormat::FORMAT_KEY) {
             $this->assertTrue(true);
             return;
         }
 
         $row = $this->testPost($record);
 
-        $expectedBody = 'Converted!!';
+        $expectedBody = "Converted!!";
 
         // Create a stub for the compatService class.
         $actualCompatService = static::container()->get(FormatCompatibilityService::class);
         $mockCompatService = $this->createMock(FormatCompatibilityService::class);
-        $mockCompatService->method('convert')
-            ->willReturn($expectedBody);
-        static::container()
-            ->setInstance(FormatCompatibilityService::class, $mockCompatService);
-
+        $mockCompatService->method("convert")->willReturn($expectedBody);
+        static::container()->setInstance(FormatCompatibilityService::class, $mockCompatService);
 
         // Get the actual record and assert our value was set.
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$row[$this->pk]}$editSuffix"
-        );
+        $r = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}$editSuffix");
 
-        $actualBody = $r['body'];
+        $actualBody = $r["body"];
         $this->assertEquals(
             $expectedBody,
             $actualBody,
@@ -234,8 +307,21 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         );
 
         // Restore back the actual format compat service.
-        static::container()
-            ->setInstance(FormatCompatibilityService::class, $actualCompatService);
+        static::container()->setInstance(FormatCompatibilityService::class, $actualCompatService);
+    }
+
+    /**
+     * Allows subclasses to modify the contents of the POST /api/v2/<resource> body output that is expected
+     * when testing for the presence of properties returned by the GET /api/v2/<resource>/:id.
+     * Useful when the output of non-idempotent endpoints, i.e. POST and/or PATCH differs
+     * from the output of idempotent methods, i.e. GET
+     *
+     * @param array $row
+     * @return array
+     */
+    protected function modifyGetExpected(array $row): array
+    {
+        return $row; // by default not modified
     }
 
     /**
@@ -244,20 +330,21 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      * @param array $row The row to modify.
      * @return array Returns the modified row.
      */
-    protected function modifyRow(array $row) {
+    protected function modifyRow(array $row)
+    {
         $newRow = [];
 
         $dt = new \DateTimeImmutable();
         foreach ($this->patchFields as $key) {
             $value = $row[$key];
-            if (in_array($key, ['name', 'body', 'description'])) {
-                $value .= ' '.$dt->format(\DateTime::RSS);
-            } elseif (stripos($key, 'id') === strlen($key) - 2) {
+            if (in_array($key, ["name", "body", "description"])) {
+                $value .= " " . $dt->format(\DateTime::RSS);
+            } elseif (stripos($key, "id") === strlen($key) - 2) {
                 $value++;
             } else {
                 switch ($key) {
-                    case 'format':
-                        $value = $value === 'markdown' ? 'text' : 'markdown';
+                    case "format":
+                        $value = $value === "markdown" ? "text" : "markdown";
                         break;
                 }
             }
@@ -273,7 +360,8 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      *
      * @return array
      */
-    public function record() {
+    public function record()
+    {
         return $this->record;
     }
 
@@ -282,7 +370,8 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      *
      * This test helps to ensure that fields are added to the test as the endpoint is updated.
      */
-    public function testGetEditFields() {
+    public function testGetEditFields()
+    {
         $row = $this->testGetEdit();
 
         unset($row[$this->pk]);
@@ -296,32 +385,31 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test PATCH /resource/<id> with a a single field update.
+     * Test PATCH /resource/<id> with a single field update.
      *
      * Patch endpoints should be able to update every field on its own.
      *
      * @param string $field The name of the field to patch.
      * @dataProvider providePatchFields
      */
-    public function testPatchSparse($field) {
+    public function testPatchSparse($field)
+    {
         $row = $this->testGetEdit();
         $patchRow = $this->modifyRow($row);
 
-        $r = $this->api()->patch(
-            "{$this->baseUrl}/{$row[$this->pk]}",
-            [$field => $patchRow[$field]]
-        );
+        $r = $this->api()->patch("{$this->baseUrl}/{$row[$this->pk]}", [$field => $patchRow[$field]]);
 
         $this->assertEquals(200, $r->getStatusCode());
 
-        $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/edit");
+        $newRow = $this->getEdit($row);
         $this->assertSame($patchRow[$field], $newRow[$field]);
     }
 
     /**
      * Test DELETE /resource/<id>.
      */
-    public function testDelete() {
+    public function testDelete()
+    {
         $row = $this->testPost();
 
         // GardenHTTP does not allow a call to its delete method with a body. This long form is required for delete requests with a body.
@@ -333,7 +421,10 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
             $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}");
             $this->fail("The {$this->singular} did not get deleted.");
         } catch (\Exception $ex) {
-            $this->assertEquals(404, $ex->getCode());
+            $this->assertTrue(
+                in_array($ex->getCode(), [404, 410]),
+                "Expected discussion to be deleted but instead got a {$ex->getCode()} error." . $ex->getMessage()
+            );
             return;
         }
         $this->fail("Something odd happened while deleting a {$this->singular}.");
@@ -347,14 +438,15 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      *
      * @return array Returns the fetched data.
      */
-    public function testIndex() {
+    public function testIndex()
+    {
         $indexUrl = $this->indexUrl();
-        $originalIndex = $this->api()->get($indexUrl, ['limit' => 100]);
+        $originalIndex = $this->api()->get($indexUrl, ["limit" => $this->indexLimit]);
         $this->assertEquals(200, $originalIndex->getStatusCode());
 
         $originalRows = $originalIndex->getBody();
         $rows = $this->generateIndexRows();
-        $newIndex = $this->api()->get($indexUrl, ['limit' => count($originalRows) + count($rows) + 1]);
+        $newIndex = $this->api()->get($indexUrl, ["limit" => count($originalRows) + count($rows) + 1]);
 
         $newRows = $newIndex->getBody();
         $this->assertEquals(count($originalRows) + count($rows), count($newRows));
@@ -378,7 +470,8 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      *
      * @return array
      */
-    protected function generateIndexRows() {
+    protected function generateIndexRows()
+    {
         $rows = [];
 
         // Insert a few rows.
@@ -394,7 +487,8 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      *
      * @return string
      */
-    public function indexUrl() {
+    public function indexUrl()
+    {
         return $this->baseUrl;
     }
 
@@ -403,7 +497,8 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      *
      * @return array Returns a data provider array.
      */
-    public function providePatchFields() {
+    public function providePatchFields()
+    {
         $r = [];
         foreach ($this->patchFields as $field) {
             $r[$field] = [$field];

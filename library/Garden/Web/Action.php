@@ -15,7 +15,8 @@ use Garden\MetaTrait;
  * This class is invokable which means that it can be thought about as a callback for simple dispatchers or inspected
  * to infer additional information for more complex dispatchers.
  */
-class Action {
+class Action
+{
     use MetaTrait;
 
     private $callback;
@@ -28,7 +29,8 @@ class Action {
      * @param callable $callback The callback that will be invoked for the action.
      * @param array $args The arguments passed to the action.
      */
-    public function __construct(callable $callback, array $args = []) {
+    public function __construct(callable $callback, array $args = [])
+    {
         $this->callback = $callback;
         $this->args = $args;
     }
@@ -38,7 +40,8 @@ class Action {
      *
      * @return mixed Returns the callback.
      */
-    public function getCallback() {
+    public function getCallback()
+    {
         return $this->callback;
     }
 
@@ -48,7 +51,8 @@ class Action {
      * @param callable $callback The new callback.
      * @return $this
      */
-    public function setCallback(callable $callback) {
+    public function setCallback(callable $callback)
+    {
         $this->callback = $callback;
         return $this;
     }
@@ -58,7 +62,8 @@ class Action {
      *
      * @return array Returns the arguments.
      */
-    public function getArgs() {
+    public function getArgs()
+    {
         return $this->args;
     }
 
@@ -68,7 +73,8 @@ class Action {
      * @param array $args The new arguments.
      * @return $this
      */
-    public function setArgs(array $args) {
+    public function setArgs(array $args)
+    {
         $this->args = $args;
         return $this;
     }
@@ -76,7 +82,8 @@ class Action {
     /**
      * Call the callback with the arguments.
      */
-    public function __invoke() {
+    public function __invoke()
+    {
         $result = call_user_func_array($this->callback, $this->args);
         return $result;
     }
@@ -84,13 +91,14 @@ class Action {
     /**
      * Replace any argument that has been mapped to the request with another request.
      *
-     * Since middleware may spawn an entirely new request object it is necessary to check before the the action is called.
+     * Since middleware may spawn an entirely new request object it is necessary to check before the action is called.
      *
      * @param RequestInterface $request The request to replace.
      */
-    public function replaceRequest(RequestInterface $request) {
+    public function replaceRequest(RequestInterface $request)
+    {
         foreach ($this->args as $key => $value) {
-            if ($value instanceof  RequestInterface && $value !== $request) {
+            if ($value instanceof RequestInterface && $value !== $request) {
                 $this->args[$key] = $request;
             }
         }

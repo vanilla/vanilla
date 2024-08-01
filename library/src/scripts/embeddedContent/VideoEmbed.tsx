@@ -3,15 +3,15 @@
  * @license GPL-2.0-only
  */
 
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import { t } from "@library/utility/appUtils";
 import { simplifyFraction } from "@vanilla/utils";
 import classNames from "classnames";
 import React, { useCallback, useState } from "react";
-import { style } from "typestyle";
 import { percent } from "csx";
+import { css } from "@emotion/css";
 
 interface IProps extends IBaseEmbedProps {
     height: number;
@@ -46,8 +46,8 @@ export function VideoEmbed(props: IProps) {
             ratioClass = "is16by9";
             break;
         default:
-            ratioClass = style({
-                $debugName: "isCustomRatio",
+            ratioClass = css({
+                label: "isCustomRatio",
                 paddingTop: percent(((height || 3) / (width || 4)) * 100),
             });
     }
@@ -70,9 +70,10 @@ export function VideoEmbed(props: IProps) {
 function VideoThumbnail(props: { name?: string; onClick: React.MouseEventHandler; photoUrl: string }) {
     return (
         <button type="button" aria-label={props.name} className="embedVideo-playButton" onClick={props.onClick}>
-            <img src={props.photoUrl} role="presentation" className="embedVideo-thumbnail" />
-            <span className="embedVideo-scrim" />
-            <PlayIcon />
+            <img src={props.photoUrl} role="presentation" className="embedVideo-thumbnail" loading="lazy" />
+            <span className="embedVideo-playIconWrap">
+                <PlayIcon />
+            </span>
         </button>
     );
 }
@@ -95,11 +96,6 @@ function PlayIcon() {
     return (
         <svg className="embedVideo-playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 24 24">
             <title>{t("Play Video")}</title>
-            <path
-                className="embedVideo-playIconPath embedVideo-playIconPath-circle"
-                style={cssStyle}
-                d="M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0Zm0,20.308A9.308,9.308,0,1,1,20.308,11,9.308,9.308,0,0,1,11,20.308Z"
-            />
             <polygon
                 className="embedVideo-playIconPath embedVideo-playIconPath-triangle"
                 style={cssStyle}

@@ -16,8 +16,8 @@ use Vanilla\Formatting\Quill\Nesting\NestingParentRendererInterface;
 /**
  * A blot to represent a list line terminator.
  */
-class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements NestingParentRendererInterface {
-
+class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements NestingParentRendererInterface
+{
     const LIST_TYPE_BULLET = "bullet";
     const LIST_TYPE_ORDERED = "ordered";
     const LIST_TYPE_UNRECOGNIZED = "unrecognized list value";
@@ -29,9 +29,10 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
     /**
      * @inheritdoc
      */
-    public static function matches(array $operation): bool {
+    public static function matches(array $operation): bool
+    {
         $value = self::normalizeValue($operation ?? []);
-        return in_array($value['type'], self::LIST_TYPES, true);
+        return in_array($value["type"], self::LIST_TYPES, true);
     }
 
     /**
@@ -41,7 +42,8 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
      *
      * @return array
      */
-    private static function normalizeValue(array $operation): array {
+    private static function normalizeValue(array $operation): array
+    {
         $blotValue = $operation["attributes"]["list"] ?? self::LIST_TYPE_UNRECOGNIZED;
         if (is_array($blotValue) && array_key_exists("depth", $blotValue) && array_key_exists("type", $blotValue)) {
             return $blotValue;
@@ -49,22 +51,23 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
 
         if (!is_string($blotValue)) {
             return [
-                'type' => self::LIST_TYPE_UNRECOGNIZED,
-                'depth' => 0,
+                "type" => self::LIST_TYPE_UNRECOGNIZED,
+                "depth" => 0,
             ];
         }
 
         return [
-            'type' => $blotValue,
-            'depth' => 0,
+            "type" => $blotValue,
+            "depth" => 0,
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function renderNestedGroups(): string {
-        $result = '';
+    public function renderNestedGroups(): string
+    {
+        $result = "";
 
         // Prepend our nested groups before the terminators.
         foreach ($this->nestedGroups as $group) {
@@ -81,24 +84,24 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
      *
      * @return NestingParentInterface
      */
-    private function getTargetNestingParent(NestableItemInterface $nestable): ?NestingParentInterface {
-        if ($nestable->getNestingDepth() === $this->getNestingDepth() + 1) {
+    private function getTargetNestingParent(NestableItemInterface $nestable): ?NestingParentInterface
+    {
+        $lastIndex = count($this->nestedGroups) - 1;
+        $lastNestedItem = $this->nestedGroups[$lastIndex] ?? null;
+        if ($lastNestedItem !== null && $nestable->getNestingDepth() > $lastNestedItem->getNestingDepth()) {
+            return $lastNestedItem;
+        } elseif ($nestable->getNestingDepth() > $this->getNestingDepth()) {
             return $this;
         } else {
-            $lastIndex = count($this->nestedGroups) - 1;
-            $lastNestedItem = $this->nestedGroups[$lastIndex] ?? null;
-            if ($lastNestedItem !== null && $nestable->getNestingDepth() === $lastNestedItem->getNestingDepth() + 1) {
-                return $lastNestedItem;
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 
     /**
      * @inheritdoc
      */
-    public function nestGroup(BlotGroup $blotGroup): void {
+    public function nestGroup(BlotGroup $blotGroup): void
+    {
         if (!$this->canNest($blotGroup)) {
             throw new InvalidNestingException();
         }
@@ -126,29 +129,31 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
     /**
      * @inheritdoc
      */
-    public function canNest(BlotGroup $blotGroup): bool {
+    public function canNest(BlotGroup $blotGroup): bool
+    {
         $mainBlot = $blotGroup->getMainBlot();
         $targetNestingParent = $this->getTargetNestingParent($blotGroup);
-        return $targetNestingParent && $targetNestingParent->getNestingDepth() + 1 === $mainBlot->getNestingDepth();
+        return $targetNestingParent && $targetNestingParent->getNestingDepth() < $mainBlot->getNestingDepth();
     }
 
     /**
      * @inheritdoc
      */
-    public function getNestedGroups(): array {
+    public function getNestedGroups(): array
+    {
         return $this->nestedGroups;
     }
 
     /**
      * @inheritdoc
      */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool
+    {
         $surroundingBlot = $group->getMainBlot();
         if ($surroundingBlot instanceof ListLineTerminatorBlot) {
             // If the list types are different we need to clear the block.
-            return
-                $surroundingBlot->getListType() !== $this->getListType()
-                || $surroundingBlot->getListDepth() !== $this->getListDepth();
+            return $surroundingBlot->getListType() !== $this->getListType() ||
+                $surroundingBlot->getListDepth() !== $this->getListDepth();
         } else {
             return parent::shouldClearCurrentGroup($group);
         }
@@ -156,21 +161,24 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
     /**
      * @inheritdoc
      */
-    public function renderLineStart(): string {
+    public function renderLineStart(): string
+    {
         return "<li>";
     }
 
     /**
      * @inheritdoc
      */
-    public function renderLineEnd(): string {
+    public function renderLineEnd(): string
+    {
         return "</li>";
     }
 
     /**
      * @inheritDoc
      */
-    public function getGroupOpeningTag(): string {
+    public function getGroupOpeningTag(): string
+    {
         switch ($this->getListType()) {
             case static::LIST_TYPE_BULLET:
                 return "<ul>";
@@ -184,7 +192,8 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
     /**
      * @inheritDoc
      */
-    public function getGroupClosingTag(): string {
+    public function getGroupClosingTag(): string
+    {
         switch ($this->getListType()) {
             case static::LIST_TYPE_BULLET:
                 return "</ul>";
@@ -200,7 +209,8 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
      *
      * @return array
      */
-    private function getNormalizedValue(): array {
+    private function getNormalizedValue(): array
+    {
         return self::normalizeValue($this->currentOperation);
     }
 
@@ -209,15 +219,17 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
      *
      * @return string
      */
-    private function getListType(): string {
-        $listType = $this->getNormalizedValue()['type'];
+    private function getListType(): string
+    {
+        $listType = $this->getNormalizedValue()["type"];
         return !in_array($listType, static::LIST_TYPES) ? static::LIST_TYPE_UNRECOGNIZED : $listType;
     }
 
     /**
      * @inheritdoc
      */
-    public function getNestingDepth(): int {
+    public function getNestingDepth(): int
+    {
         return $this->getListDepth();
     }
 
@@ -226,7 +238,8 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
      *
      * @return int
      */
-    private function getListDepth(): int {
-        return $this->getNormalizedValue()['depth'];
+    private function getListDepth(): int
+    {
+        return $this->getNormalizedValue()["depth"];
     }
 }

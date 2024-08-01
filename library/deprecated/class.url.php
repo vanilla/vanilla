@@ -13,8 +13,8 @@
  * Handles analyzing and returning various parts of the current url.
  * @deprecated
  */
-class Gdn_Url {
-
+class Gdn_Url
+{
     /**
      * Returns the path to the application's dispatcher. Optionally with the domain prepended.
      *  ie. http://domain.com/[web_root]/index.php?/request
@@ -22,11 +22,12 @@ class Gdn_Url {
      * @param boolean $withDomain Should it include the domain with the WebRoot? Default is FALSE.
      * @return string
      */
-    public static function webRoot($withDomain = false) {
+    public static function webRoot($withDomain = false)
+    {
         $webRoot = Gdn::request()->webRoot();
 
         if ($withDomain) {
-            $result = Gdn::request()->domain().'/'.$webRoot;
+            $result = Gdn::request()->domain() . "/" . $webRoot;
         } else {
             $result = $webRoot;
         }
@@ -40,7 +41,8 @@ class Gdn_Url {
      *
      * @return string
      */
-    public static function domain() {
+    public static function domain()
+    {
         // Attempt to get the domain from the configuration array
         return Gdn::request()->domain();
     }
@@ -51,7 +53,8 @@ class Gdn_Url {
      *
      * @return string
      */
-    public static function host() {
+    public static function host()
+    {
         return Gdn::request()->requestHost();
     }
 
@@ -61,7 +64,8 @@ class Gdn_Url {
      *
      * @return string
      */
-    public static function queryString() {
+    public static function queryString()
+    {
         return http_build_query(Gdn::request()->getRequestArguments(Gdn_Request::INPUT_GET));
     }
 
@@ -74,10 +78,11 @@ class Gdn_Url {
      * @param boolean $removeSyndication
      * @return string
      */
-    public static function request($withWebRoot = false, $withDomain = false, $removeSyndication = false) {
+    public static function request($withWebRoot = false, $withDomain = false, $removeSyndication = false)
+    {
         $result = Gdn::request()->path();
         if ($withWebRoot) {
-            $result = self::webRoot($withDomain).'/'.$result;
+            $result = self::webRoot($withDomain) . "/" . $result;
         }
         return $result;
     }

@@ -13,38 +13,43 @@ use Vanilla\Navigation\Breadcrumb;
 /**
  * JSON-LD item to represent breadcrumbs.
  */
-final class BreadcrumbJsonLD extends AbstractJsonLDItem {
-
-    /** @var Breadcrumb[] */
+final class BreadcrumbJsonLD extends AbstractJsonLDItem
+{
+    /** @var array<Breadcrumb|array{name: string, url: string}> */
     private $crumbData;
 
     /**
      * Constructor.
-     * @param Breadcrumb[] $crumbData
+     * @param array<Breadcrumb|array{name: string, url: string}> $crumbData
      */
-    public function __construct(array $crumbData) {
+    public function __construct(array $crumbData)
+    {
         $this->crumbData = $crumbData;
     }
-
 
     /**
      * Convert an array of breadcrumbs into JSON-LD.
      */
-    public function calculateValue(): Data {
+    public function calculateValue(): Data
+    {
         $crumbList = [];
         foreach ($this->crumbData as $index => $crumb) {
+            if ($crumb instanceof Breadcrumb) {
+                $crumb = $crumb->asArray();
+            }
+
             $crumbList[] = [
-                '@type' => 'ListItem',
-                'position' => $index,
-                'name' => $crumb->getName(),
-                'item' => $crumb->getUrl(),
+                "@type" => "ListItem",
+                "position" => $index,
+                "name" => $crumb["name"],
+                "item" => $crumb["url"],
             ];
         }
 
         return new Data([
-            '@context' => 'http://schema.org',
-            '@type' => 'BreadcrumbList',
-            'itemListElement' => $crumbList,
+            "@context" => "http://schema.org",
+            "@type" => "BreadcrumbList",
+            "itemListElement" => $crumbList,
         ]);
     }
 }

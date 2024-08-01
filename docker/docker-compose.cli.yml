@@ -1,0 +1,29 @@
+name: "vanilla"
+services:
+    cli:
+        build:
+            context: ./images/cli
+        container_name: "cli"
+        volumes:
+            - "./images/nginx/certs:/usr/local/share/ca-certificates" # Mount self-signed certificates
+
+            # Link our parents so other useful minimal repos like our sso stubs and embed stubs can work.
+            # Also needed so relatively symlinked customer repositories work.
+            - "../../:/srv/vanilla-repositories"
+
+            # Needed in case our current directory is not named vanilla
+            - "../:/srv/vanilla-repositories/vanilla"
+
+            # Not cached for consistency.
+            - "../conf:/srv/vanilla-repositories/conf"
+            - "../.git:/srv/vanilla-repositories/vanilla/.git"
+
+            # Specifically excluded because it runs in its own container.
+            - /srv/vanilla-repositories/vanilla-queue-service
+            - /srv/vanilla-repositories/vanilla-search-service
+
+networks:
+    vanilla-network:
+        external: true
+        driver: "bridge"
+        name: "vanilla-network"

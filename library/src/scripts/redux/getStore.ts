@@ -21,9 +21,10 @@ const actionSanitizer = (action: AnyAction) =>
           }
         : action;
 // Browser may have redux dev tools installed, if so integrate with it.
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ actionSanitizer })
-    : compose;
+const composeEnhancers =
+    "__REDUX_DEVTOOLS_EXTENSION_COMPOSE__" in window
+        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ actionSanitizer, trace: true, serialize: false })
+        : compose;
 const enhancer = composeEnhancers(applyMiddleware(...middleware));
 
 // Build the store, add devtools extension support if it's available.
@@ -40,7 +41,7 @@ export const resetActionAC = (newState: ICoreStoreState) => {
     };
 };
 
-function createRootReducer() {
+export function createRootReducer() {
     const appReducer = combineReducers(getReducers());
 
     return (state, action) => {
@@ -52,11 +53,15 @@ function createRootReducer() {
     };
 }
 
+export function hasStore(): boolean {
+    return store != null;
+}
+
 export default function getStore<S = ICoreStoreState>(initialState?: DeepPartial<S>, force?: boolean): Store<S, any> {
     if (store === undefined || force) {
         // Get our reducers.
         const reducer = createRootReducer();
-        store = createStore(reducer, initialState || {}, enhancer);
+        store = createStore(reducer, initialState || ({} as any), enhancer);
 
         // Dispatch initial actions returned from the server.
         initialActions.forEach(store.dispatch);

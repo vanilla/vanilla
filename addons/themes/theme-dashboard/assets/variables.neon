@@ -1,0 +1,12 @@
+{
+    global: {
+        middleColumn: {
+            width: 1000
+        }
+    },
+    userContent: {
+        fonts: {
+            size: 14
+        }
+    }
+}

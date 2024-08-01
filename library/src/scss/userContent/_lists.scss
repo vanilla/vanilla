@@ -8,7 +8,6 @@
 
 $nestedList-margin: 0 0 0 1em;
 
-
 .userContent ul,
 .userContent ol {
     margin: 1em 0 1em 2em;
@@ -16,25 +15,25 @@ $nestedList-margin: 0 0 0 1em;
 
 .userContent {
     ol {
-        li {
+        > li {
             list-style: decimal !important;
         }
-        ol li {
+        ol > li {
             list-style: lower-alpha !important;
         }
-        ol ol li {
+        ol ol > li {
             list-style: lower-roman !important;
         }
-        ol ol ol li {
+        ol ol ol > li {
             list-style: decimal !important;
         }
-        ol ol ol ol li {
+        ol ol ol ol > li {
             list-style: lower-alpha !important;
         }
-        ol ol ol ol ol li {
+        ol ol ol ol ol > li {
             list-style: lower-roman !important;
         }
-        ol ol ol ol ol ol li {
+        ol ol ol ol ol ol > li {
             list-style: decimal !important;
         }
         ol,
@@ -42,21 +41,7 @@ $nestedList-margin: 0 0 0 1em;
             margin: $nestedList-margin;
         }
     }
-}
-
-.userContent {
     ul {
-        li {
-            list-style: none !important;
-            position: relative;
-
-            &::before {
-                content: "•";
-                font-family: 'Arial', serif !important;
-                position: absolute;
-                left: -1em;
-            }
-        }
         ol,
         ul {
             margin: $nestedList-margin;
@@ -67,5 +52,5 @@ $nestedList-margin: 0 0 0 1em;
 // Too overcome bootstrap 3's hideous selector "form ul:not(.List) li"
 .userContent li,
 .userContent.userContent ul li {
-  margin: 5px 0;
+    margin: 0;
 }

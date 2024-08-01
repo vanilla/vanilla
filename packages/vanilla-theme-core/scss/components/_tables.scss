@@ -37,7 +37,8 @@
 .DataTable {
     margin: 0 0 $utility-baseUnitTriple;
     table-layout: fixed;
-    width: 100%;
+    width: calc(100% + #{$component-horizontal_padding * 2});
+    margin-left: -$component-horizontal_padding;
 
     .Item {
         @include TableItem;
@@ -74,14 +75,30 @@
         font-size: $global-medium_fontSize;
     }
 
+    td .Wrap {
+        padding: {
+            top: $component-vertical_padding;
+            bottom: $component-vertical_padding;
+            left: calc(#{$component-horizontal_padding} / 2);
+            right: calc(#{$component-horizontal_padding} / 2);
+        }
+    }
+
+    td:first-child .Wrap {
+        padding-left: $component-horizontal_padding;
+    }
+
+    td:last-child .Wrap {
+        padding-right: $component-horizontal_padding;
+    }
+
     h2,
     h3,
     .Title.Title {
         font-size: $component-title_fontSize;
         font-weight: $component-title_fontWeight;
-        line-height: #{$theme-photo_size / 2};
+        line-height: #{$theme-photo_size * 0.5};
         display: block;
-        margin-bottom: $utility-baseUnit;
 
         @if $staticVariables {
             color: $component-title_color;
@@ -112,7 +129,7 @@
         font-weight: $component-base_fontWeight;
         line-height: $component-base_lineHeight;
         color: $component-base_color;
-        margin: 0 0 $utility-baseUnit;
+        margin: $utility-baseUnit 0 0;
     }
 
     .Excerpt:empty,
@@ -120,8 +137,10 @@
         display: none;
     }
 
-    .ItemContent.Discussion .Excerpt {
-        margin-top: $utility-baseUnit;
+    @if $staticVariables {
+        .ItemContent.Discussion .Excerpt {
+            margin-top: $utility-baseUnit;
+        }
     }
 
     .Options {
@@ -151,14 +170,13 @@
             line-height: $component-meta_lineHeight;
             color: $component-meta_color;
         }
-    }
+        .MItem.Category {
+            @include ellipsis;
+            display: inline;
 
-    .MItem.Category {
-        @include ellipsis;
-        display: inline;
-
-        @include maxWidth {
-            max-width: calc(100% - 21px);
+            @include maxWidth {
+                max-width: calc(100% - 21px);
+            }
         }
     }
 
@@ -232,7 +250,7 @@
     .UserLink.BlockTitle,
     .BigCount .Meta,
     .Block.Wrap .Meta {
-         margin-left: $utility-baseUnitDouble;
+        margin-left: calc(#{$theme-photo_size} + #{$utility-baseUnit} + (#{$component-horizontal_padding} / 2));
     }
 
     @if ($staticVariables) {
@@ -245,14 +263,26 @@
                 color: $component-meta-link-hover_color;
             }
         }
+
+        .MItem.Category {
+            margin-top: $utility-baseUnit;
+
+            @include maxWidth {
+                margin-top: $utility-baseUnitDouble;
+            }
+        }
     }
 
-    .Meta,
-    .MItem.Category {
+    .Meta {
+        margin-top: $utility-baseUnit;
 
         @include maxWidth {
             margin-top: $utility-baseUnitDouble;
         }
+    }
+
+    .Meta:empty {
+        display: none;
     }
 
     .MItem.RSS {
@@ -265,6 +295,7 @@
 
     td.BigCount {
         width: 110px;
+        padding: 0;
     }
 
     td.LatestPost,
@@ -279,8 +310,9 @@
     }
 
     tbody .Options {
-        top: 3px;
-        bottom: auto;
+        position: absolute;
+        top: $component-vertical_padding;
+        right: $component-horizontal_padding;
     }
 
     tbody {
@@ -308,14 +340,10 @@
                 font-size: inherit;
             }
 
-            .Wrap {
-                padding-left: $theme-photo_size;
-            }
-
             .PhotoWrap {
                 @if ($staticVariables) {
                     position: absolute;
-                    left: 0;
+                    left: calc(#{$formElement_paddingHorizontal} / 2);
                 }
                 width: $theme-photo_size;
                 height: $theme-photo_size;
@@ -342,17 +370,12 @@
         }
 
         tbody {
-
             .Options {
                 top: auto;
             }
 
             td.CategoryName {
                 margin-bottom: 0;
-
-                .Wrap {
-                    padding-left: 0;
-                }
 
                 .PhotoWrap {
                     margin: 0 $utility-baseUnitDouble 0 0;
@@ -431,7 +454,6 @@
         }
 
         @include maxWidth($theme-breakpoint_base) {
-
             td.CountComments,
             td.LatestPost {
                 display: none;
@@ -452,6 +474,10 @@
         table-layout: fixed;
 
         @include discussionsTableItem;
+
+        .userCardWrapper-link {
+            margin-left: calc(#{$theme-photo_size} + #{$utility-baseUnit} + (#{$component-horizontal_padding} / 2));
+        }
 
         .MiniPager {
             margin: 0;
@@ -486,37 +512,42 @@
 
         td.CheckBoxColumn {
             width: 35px;
-
-            .Wrap {
-                padding: $utility-baseUnitHalf 0;
-            }
         }
 
         td.DiscussionName {
             width: 100%;
-            padding-right: $utility-baseUnit;
 
-            @if $component_lateralBorder == true {
-                padding-left: $component-base_padding;
-            } @else {
-                padding-left: 0;
+            .Title {
+                width: calc(100% - 52px);
             }
-
         }
 
         //ideation styles
         .ItemIdea {
             td.DiscussionName {
-                position: relative;
-
-                .idea-counter-module {
-                    position: absolute;
-                    left: 0;
-                    margin: 0;
+                .Wrap {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
                 }
 
-                .Wrap {
-                    padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
+                .Options {
+                    position: absolute;
+                    top: $component-vertical_padding;
+                    right: calc(#{$component-vertical_padding} / 2);
+                }
+
+                .Title {
+                    flex-basis: calc(100% - (#{$component-vertical_padding} / 2 + #{$theme-photo_size} + 50px));
+                }
+
+                .idea-counter-module {
+                    margin-right: calc(#{$component-vertical_padding} / 2);
+                }
+
+                .Meta {
+                    margin-left: calc(#{$component-vertical_padding} / 2 + #{$theme-photo_size});
+                    flex-basis: calc(100% - (#{$component-vertical_padding} / 2 + #{$theme-photo_size} + 50px));
                 }
             }
         }
@@ -571,7 +602,6 @@ body.UserLoggedOut .DiscussionsTable tbody td.DiscussionName .Wrap {
 body.Section-DiscussionList.mine,
 body.Categories.Section-DiscussionList,
 body.Section-Group {
-
     .DataTable.DiscussionsTable {
         width: 100%;
     }
@@ -615,7 +645,6 @@ body.Section-Group {
     }
 
     .Invitation {
-
         @if ($staticVariables) {
             .MItem {
                 color: $component-meta_color;
@@ -628,7 +657,6 @@ body.Section-Group {
         }
 
         .UserName {
-
             @include maxWidth {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
@@ -640,7 +668,6 @@ body.Section-Group {
         }
 
         .BlockColumn-Buttons {
-
             @include maxWidth {
                 min-width: 105px;
             }
@@ -648,16 +675,14 @@ body.Section-Group {
     }
 
     .Event {
-
         .EventTitle .Wrap {
-
             @include maxWidth {
                 display: flex;
                 flex-wrap: wrap;
 
                 .DateTile {
                     position: absolute;
-                    top: 0;
+                    top: $component-vertical_padding;
                     bottom: 0;
                     margin-top: 0;
                     height: $theme-photo_size;
@@ -666,7 +691,7 @@ body.Section-Group {
 
                 .OptionsMenu {
                     position: absolute;
-                    top: 0;
+                    top: $component-vertical_padding;
                     right: 0;
                     width: auto;
                 }
@@ -709,7 +734,6 @@ body.Section-Group {
     }
 
     .Group-Name {
-
         .Title-Wrapper,
         .Wrap {
             padding-left: 0;
@@ -718,10 +742,6 @@ body.Section-Group {
 
         .PhotoWrap {
             margin-right: $utility-baseUnitDouble;
-
-            @include maxWidth {
-                display: none;
-            }
         }
 
         .Buttons .Button:nth-child(2) {
@@ -738,27 +758,13 @@ body.Section-Group {
         }
 
         @include maxWidth {
-
             .Wrap {
                 display: flex;
                 flex-wrap: wrap;
             }
 
-            .Options {
-                order: 2;
-                margin-left: auto;
-                margin-right: 0;
-            }
-
-            .GroupDescription,
-            .Options {
+            .GroupDescription {
                 margin-top: $utility-baseUnitDouble;
-            }
-
-            .OptionsMenu {
-                position: absolute;
-                top: 0;
-                right: 0;
             }
 
             .Title-Wrapper {
@@ -766,12 +772,6 @@ body.Section-Group {
             }
         }
     }
-
-    .Options {
-        position: static;
-        align-items: flex-start;
-    }
-
 
     .EventLocation {
         .Text {
@@ -782,7 +782,6 @@ body.Section-Group {
 
     //Applicants & Invitations table
     @include maxWidth {
-
         tr.Invitation {
             td.UserName {
                 border-right: none;
@@ -810,7 +809,6 @@ body.Section-Group {
     }
 
     @include maxWidth {
-
         td.CountMembers,
         td.EventDate {
             display: none;
@@ -823,7 +821,6 @@ body.Section-Group {
 }
 
 .MemberList .DataTable {
-
     td.UserName {
         width: 70%;
 
@@ -842,7 +839,6 @@ body.Section-Group {
     }
 
     td.BlockColumn-Buttons {
-
         @include maxWidth {
             width: 160px;
 
@@ -859,7 +855,6 @@ body.Section-Group {
     }
 
     td.JoinDate {
-
         @include maxWidth {
             display: none;
         }
@@ -881,20 +876,12 @@ body.Section-Group {
 
 //.Section-Groups DiscussionsList
 .Group-Box .DiscussionsTable {
-
     td.DiscussionName.DiscussionName .Wrap {
         display: block;
         padding-left: 0;
     }
 
-    .Options {
-        position: static;
-        margin: 0;
-        float: right;
-    }
-
     .DiscussionName {
-
         .Title.Title {
             padding-right: 0;
 
@@ -905,11 +892,13 @@ body.Section-Group {
     }
 }
 
-
 // Reactions Log
 .DataTable-ReactionsLog {
     border-radius: 4px;
     overflow: hidden;
+    width: 100%;
+    margin: 0 !important;
+    border-collapse: collapse;
 
     tbody {
         border-spacing: 0 $component-item_spacing;
@@ -928,16 +917,21 @@ body.Section-Group {
     .Item {
         background-color: $component_bg;
 
+        &:not(:last-of-type) {
+            border-bottom: 1px solid $global-color_whitesmoke;
+        }
+
         td {
             border: 0 !important;
             border-radius: 0 !important;
-            background-color: $theme-hover_color;
-            vert-align: middle;
+            vertical-align: middle;
+            padding: 4px 0 !important;
         }
     }
 
     .ReactionsLog-Date {
         width: 16ex;
+        text-indent: 4px;
     }
 
     .ReactionsLog-User {
@@ -945,6 +939,7 @@ body.Section-Group {
 
         a {
             @include ellipsis;
+            display: inline;
             color: $component-meta-link_color;
 
             &:focus,

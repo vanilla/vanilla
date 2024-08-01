@@ -22,7 +22,7 @@ export function FrameHeaderMinimal(props: IProps) {
         <header className={classNames(classes.root, classes.rootMinimal)}>
             <h2 className={classNames(classes.centred, classes.headingMinimal)}>{props.children}</h2>
             {props.onClose && (
-                <Button baseClass={ButtonTypes.ICON_COMPACT} onClick={props.onClose} className={classes.closeMinimal}>
+                <Button buttonType={ButtonTypes.ICON_COMPACT} onClick={props.onClose} className={classes.closeMinimal}>
                     <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
                     <CloseTinyIcon aria-hidden="true" />
                 </Button>

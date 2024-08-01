@@ -12,10 +12,16 @@ use Vanilla\Theme\ThemePreloadProvider;
 /**
  * A Web\Page that makes use of custom theme data from the theming API.
  */
-abstract class ThemedPage extends Page {
-
+abstract class ThemedPage extends Page
+{
     /** @var ThemePreloadProvider */
-    private $themeProvider;
+    protected $themeProvider;
+
+    /** @var string|null */
+    protected $forcedThemeKey = null;
+
+    /** @var string|null */
+    protected $forcedThemeRevisionID = null;
 
     /**
      * @inheritdoc
@@ -26,17 +32,37 @@ abstract class ThemedPage extends Page {
         \Gdn_Session $session,
         PageHead $pageHead,
         MasterViewRenderer $masterViewRenderer,
-        ThemePreloadProvider $themeProvider = null // Default required to conform to interface
+        ThemePreloadProvider $themeProvider = null
     ) {
+        // Default required to conform to interface
         parent::setDependencies($siteMeta, $request, $session, $pageHead, $masterViewRenderer);
         $this->themeProvider = $themeProvider;
+        if ($this->forcedThemeKey !== null) {
+            $this->themeProvider->setForcedThemeKey($this->forcedThemeKey);
+            if ($this->forcedThemeRevisionID !== null) {
+                $this->themeProvider->setForcedRevisionID($this->forcedThemeRevisionID);
+            }
+        }
         $this->initAssets();
+    }
+
+    /**
+     * @param string $themeKey
+     * @param int|null $revisionID
+     * @return $this
+     */
+    public function withForcedTheme(string $themeKey, ?int $revisionID = null): ThemedPage
+    {
+        $this->forcedThemeKey = $themeKey;
+        $this->forcedThemeRevisionID = $revisionID;
+        return $this;
     }
 
     /**
      * Initialize data that is shared among all of the controllers.
      */
-    protected function initAssets() {
+    protected function initAssets()
+    {
         // Preload for frontend
         $this->registerReduxActionProvider($this->themeProvider);
 

@@ -3,12 +3,10 @@
  * @license GPL-2.0-only
  */
 
+import { resetThemeCache } from "@library/styles/themeCache";
+import { IComponentMountOptions, IMountable, mountReact, mountReactMultiple } from "@vanilla/react-utils";
+import { globalValueRef, logDebug, logError, logWarning } from "@vanilla/utils";
 import React from "react";
-import { ComponentClass } from "react";
-import { logWarning, logError } from "@vanilla/utils";
-import { mountReact, IComponentMountOptions } from "@vanilla/react-utils";
-import { AppContext } from "@library/AppContext";
-import { resetThemeCache } from "@library/styles/styleUtils";
 
 let useTheme = true;
 
@@ -41,11 +39,12 @@ export interface IRegisteredComponent {
  * The currently registered Components.
  * @private
  */
-const _components: {
+const _componentsRef = globalValueRef<{
     [key: string]: IRegisteredComponent;
-} = {};
+}>("components", {});
 
-let _pageComponent: React.ComponentType<any> | null = null;
+let _pageComponentRef = globalValueRef<React.ComponentType<any> | null>("pageComponent", null);
+let _mountedPageRef = globalValueRef("mountedPage", false);
 
 /**
  * Register a component in the Components registry.
@@ -54,10 +53,37 @@ let _pageComponent: React.ComponentType<any> | null = null;
  * @param component The component to register.
  */
 export function addComponent(name: string, Component: React.ComponentType<any>, mountOptions?: IComponentMountOptions) {
-    _components[name.toLowerCase()] = {
+    _componentsRef.current()[name.toLowerCase()] = {
         Component,
         mountOptions,
     };
+}
+
+type IWidget = React.ComponentType<any>;
+type ILoadableWidget = () => Promise<{ default: IWidget }>;
+
+export function registerWidgets(widgets: Record<string, IWidget>) {
+    for (const [widgetName, widget] of Object.entries(widgets)) {
+        addComponent(widgetName, widget);
+    }
+}
+
+const _widgetLoadersRef = globalValueRef<Record<string, ILoadableWidget>>("widgetLoaders", {});
+
+export function registerLoadableWidgets(widgets: Record<string, ILoadableWidget>) {
+    for (const [widgetName, widget] of Object.entries(widgets)) {
+        _widgetLoadersRef.current()[widgetName] = widget;
+        addComponent(widgetName, React.lazy(widget));
+    }
+}
+
+export async function preloadWidgets(widgetNames: string[]): Promise<void> {
+    const loaderPromises = Object.entries(_widgetLoadersRef.current())
+        .filter(([widgetName, widgetLoader]) => {
+            return widgetNames.includes(widgetName);
+        })
+        .map(([widgetName, widgetLoader]) => widgetLoader());
+    await Promise.all(loaderPromises);
 }
 
 /**
@@ -67,7 +93,7 @@ export function addComponent(name: string, Component: React.ComponentType<any>, 
  * @param component The component to register.
  */
 export function addPageComponent(Component: React.ComponentType<any>) {
-    _pageComponent = Component;
+    _pageComponentRef.set(Component);
 }
 
 /**
@@ -77,7 +103,7 @@ export function addPageComponent(Component: React.ComponentType<any>) {
  * @returns Returns **true** if the component has been registered or **false** otherwise.
  */
 export function componentExists(name: string): boolean {
-    return _components[name.toLowerCase()] !== undefined;
+    return _componentsRef.current()[name.toLowerCase()] !== undefined;
 }
 
 /**
@@ -86,8 +112,8 @@ export function componentExists(name: string): boolean {
  * @param name The name of the component.
  * @returns Returns the component or **undefined** if there is no registered component.
  */
-export function getComponent(name: string): IRegisteredComponent | undefined {
-    return _components[name.toLowerCase()];
+export function getComponent(name: string): IRegisteredComponent | null {
+    return _componentsRef.current()[name.toLowerCase()] ?? null;
 }
 
 /**
@@ -97,13 +123,26 @@ export function getComponent(name: string): IRegisteredComponent | undefined {
  *
  * @param parent - The parent element to search. This element is not included in the search.
  */
-export function _mountComponents(parent: Element) {
+export async function _mountComponents(parent: Element) {
+    logDebug("Mounting react components");
+    const awaiting: Array<Promise<any>> = [];
     const parentPage = parent.querySelector("#app");
-    if (parentPage instanceof HTMLElement && _pageComponent !== null) {
-        mountReact(<_pageComponent />, parentPage);
+    let mountables: IMountable[] = [];
+
+    let PageComponentToMount = _pageComponentRef.current();
+
+    if (parentPage instanceof HTMLElement && PageComponentToMount !== null && !_mountedPageRef.current()) {
+        _mountedPageRef.set(true);
+        logDebug("Found page component to mount", _pageComponentRef.current());
+        mountables.push({
+            target: parentPage,
+            component: <PageComponentToMount />,
+        });
     }
 
-    parent.querySelectorAll("[data-react]").forEach(node => {
+    let elementsToUnhide: Element[] = [];
+
+    parent.querySelectorAll("[data-react]").forEach((node) => {
         if (!(node instanceof HTMLElement)) {
             logWarning("Attempting to mount a data-react component on an invalid element", node);
             return;
@@ -112,26 +151,62 @@ export function _mountComponents(parent: Element) {
         const name = node.getAttribute("data-react") || "";
         let props = node.getAttribute("data-props") || {};
         if (typeof props === "string") {
-            props = JSON.parse(props);
+            try {
+                props = JSON.parse(props);
+            } catch (err) {
+                logError(err, { node, name, props });
+                return;
+            }
+        }
+        const registeredComponent = getComponent(name);
+
+        if (!registeredComponent) {
+            return;
         }
         const children = node.innerHTML;
         node.innerHTML = "";
 
-        const registeredComponent = getComponent(name);
+        node.removeAttribute("data-react");
+        node.removeAttribute("data-props");
 
-        if (registeredComponent) {
-            mountReact(
-                <registeredComponent.Component {...props} contents={children} />,
-                node,
-                () => {
-                    if (node.getAttribute("data-unhide") === "true") {
-                        node.removeAttribute("style");
-                    }
-                },
-                registeredComponent.mountOptions,
+        if (node.getAttribute("data-unhide") === "true") {
+            elementsToUnhide.push(node);
+        }
+
+        const reactNode = <registeredComponent.Component {...props} contents={children} />;
+
+        if (registeredComponent.mountOptions?.bypassPortalManager) {
+            awaiting.push(
+                new Promise<void>((resolve) => {
+                    mountReact(
+                        reactNode,
+                        node,
+                        () => {
+                            resolve();
+                        },
+                        registeredComponent.mountOptions,
+                    );
+                }),
             );
         } else {
-            logError("Could not find component %s.", name);
+            mountables.push({
+                component: reactNode,
+                target: node,
+                overwrite: registeredComponent.mountOptions?.overwrite ?? false,
+            });
         }
     });
+
+    awaiting.push(
+        new Promise<void>((resolve) => {
+            mountReactMultiple(mountables, () => {
+                elementsToUnhide.forEach((element) => {
+                    element.removeAttribute("style");
+                });
+                resolve();
+            });
+        }),
+    );
+
+    await Promise.all(awaiting);
 }

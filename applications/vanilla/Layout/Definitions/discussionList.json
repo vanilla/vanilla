@@ -1,0 +1,103 @@
+{
+    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=discussionList&cacheBuster=5",
+    "dateInserted": "2022-01-01T00:00:00Z",
+    "layoutViewType": "discussionList",
+    "layoutID": "discussionList",
+    "name": "Discussions Template",
+    "layout": [
+        {
+            "$hydrate": "react.section.full-width",
+            "children": [
+                {
+                    "$hydrate": "react.app-banner",
+                    "showDescription": false,
+                    "showSearch": true,
+                    "background": {
+                        "useOverlay": true,
+                        "image": ""
+                    },
+                    "title": "Community Discussions",
+                    "titleType": "static",
+                    "alignment": "left",
+                    "description": "The most recent content from our members.",
+                    "descriptionType": "static",
+                    "searchPlacement": "middle",
+                    "textColor": "#FFFFFF"
+                }
+            ]
+        },
+        {
+            "$hydrate": "react.section.2-columns",
+            "breadcrumbs": [
+                {
+                    "$hydrate": "react.breadcrumbs"
+                }
+            ],
+            "mainBottom": [
+                {
+                    "$hydrate": "react.asset.discussionList",
+                    "apiParams": {
+                        "includeChildCategories": true,
+                        "sort": "-dateLastComment",
+                        "slotType": "a",
+                        "limit": 10
+                    },
+                    "discussionOptions": {
+                        "excerpt": {
+                            "display": true
+                        },
+                        "metas": {
+                            "display": {
+                                "category": true,
+                                "commentCount": true,
+                                "lastCommentDate": true,
+                                "lastUser": true,
+                                "score": true,
+                                "startedByUser": true,
+                                "unreadCount": true,
+                                "userTags": true,
+                                "viewCount": true
+                            }
+                        }
+                    },
+                    "title": "Recent Discussions",
+                    "titleType": "static",
+                    "descriptionType": "none",
+                    "isAsset": true
+                }
+            ],
+            "secondaryBottom": [
+                {
+                    "$hydrate": "react.guest-cta",
+                    "title": "Welcome!",
+                    "description": "It looks like you're new here. Sign in or register to get started.",
+                    "titleType": "static",
+                    "descriptionType": "static",
+                    "secondButton": {
+                        "title": "Register",
+                        "type": "standard"
+                    },
+                    "button": {
+                        "title": "Sign In",
+                        "type": "primary"
+                    },
+                    "background": {
+                        "useOverlay": true
+                    },
+                    "alignment": "left"
+                },
+                {
+                    "$hydrate": "react.newpost",
+                    "asOwnButtons": [],
+                    "excludedButtons": [],
+                    "postableDiscussionTypes": ["discussion", "question", "poll"]
+                },
+                {
+                    "$hydrate": "react.quick-links",
+                    "title": "Quick Links",
+                    "titleType": "static"
+                }
+            ]
+        }
+    ]
+}

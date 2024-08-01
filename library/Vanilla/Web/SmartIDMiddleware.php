@@ -17,7 +17,8 @@ use Garden\Web\RequestInterface;
  *
  * This middleware replaces smart ID expressions in the request with their IDs and passes on the middleware.
  */
-class SmartIDMiddleware {
+class SmartIDMiddleware
+{
     use BasePathTrait;
 
     const SMART = '$';
@@ -55,15 +56,21 @@ class SmartIDMiddleware {
     private $fullSuffixesRegex;
 
     /**
+     * @var array Header to set for the response.
+     */
+    private $responseHeaders = [];
+
+    /**
      * SmartIDMiddleware constructor.
      *
-     * @param string $basePath The base path to match in order to apply the middleware.
      * @param \Gdn_SQLDriver $sql Used to look up smart IDs.
+     * @param string $basePath The base path to match in order to apply the middleware.
      */
-    public function __construct(string $basePath = '/', \Gdn_SQLDriver $sql) {
+    public function __construct(\Gdn_SQLDriver $sql, string $basePath = "/")
+    {
         $this->setBasePath($basePath);
         $this->sql = clone $sql;
-        $this->addFullSuffix('ID');
+        $this->addFullSuffix("ID");
     }
 
     /**
@@ -84,8 +91,9 @@ class SmartIDMiddleware {
      * @param string|array $columns Either an array of valid lookup columns or "*" for any column.
      * @param string|callable $resolver Either a table name or a callback that will resolve the smart ID.
      */
-    public function addSmartID(string $pk, string $resource, $columns, $resolver) {
-        if ($columns !== '*' && !is_array($columns)) {
+    public function addSmartID(string $pk, string $resource, $columns, $resolver)
+    {
+        if ($columns !== "*" && !is_array($columns)) {
             throw new \InvalidArgumentException('The $columns argument must be an array or "*".', 500);
         }
         if (!is_string($resolver) && !is_callable($resolver)) {
@@ -93,7 +101,7 @@ class SmartIDMiddleware {
         }
 
         if (is_array($columns)) {
-            $columns = array_map('strtolower', $columns);
+            $columns = array_map("strtolower", $columns);
         }
 
         $this->pks[strtolower($pk)] = [$pk, $columns, $resolver];
@@ -110,13 +118,17 @@ class SmartIDMiddleware {
      * @param array $where An array of where statements.
      * @return mixed Returns the value of the smart ID or **0** if it was not found.
      */
-    public function fetchValue(string $table, string $pk, array $where) {
+    public function fetchValue(string $table, string $pk, array $where)
+    {
         $data = $this->sql->select($pk)->getWhere($table, $where);
 
-        if ((int)$data->count() === 0) {
+        if ((int) $data->count() === 0) {
             throw new NotFoundException("Smart ID not found.");
         } elseif ($data->count() > 1) {
-            throw new ClientException('More than one record matches smart ID: '.implodeAssoc(': ', ', ', $where), 409);
+            throw new ClientException(
+                "More than one record matches smart ID: " . implodeAssoc(": ", ", ", $where),
+                409
+            );
         }
 
         return $data->value($pk, 0);
@@ -128,15 +140,17 @@ class SmartIDMiddleware {
      * @param RequestInterface $request The incoming request.
      * @param callable $next The next middleware.
      * @return mixed Returns the response of the inner middleware.
+     * @throws ClientException
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         if ($this->inBasePath($request->getPath())) {
             $this->replaceQuery($request);
             $this->replaceBody($request);
             $this->replacePath($request);
         }
-
         $response = $next($request);
+        $response = $this->setResponseHeader(\Garden\Web\Data::box($response));
         return $response;
     }
 
@@ -144,13 +158,15 @@ class SmartIDMiddleware {
      * Replace the smart IDs in a request path.
      *
      * @param RequestInterface $request The request to process.
+     * @throws ClientException
      */
-    private function replacePath(RequestInterface $request) {
-        $parts = explode('/', $request->getPath());
-        $prev = '';
+    private function replacePath(RequestInterface $request)
+    {
+        $parts = explode("/", $request->getPath());
+        $prev = "";
         foreach ($parts as &$part) {
             if ($part && $part[0] === static::SMART) {
-                if (substr($part, 1, 6) === 'query:') {
+                if (substr($part, 1, 6) === "query:") {
                     // This is a special query string substitution.
                     $field = substr($part, 7);
                     if (!isset($request->getQuery()[$field])) {
@@ -169,7 +185,7 @@ class SmartIDMiddleware {
 
             $prev = strtolower($part);
         }
-        $request->setPath(implode('/', $parts));
+        $request->setPath(implode("/", $parts));
     }
 
     /**
@@ -177,7 +193,8 @@ class SmartIDMiddleware {
      *
      * @param RequestInterface $request The request to process.
      */
-    private function replaceQuery(RequestInterface $request) {
+    private function replaceQuery(RequestInterface $request)
+    {
         $query = $this->replaceArray($request->getQuery());
         if ($query !== false) {
             $request->setQuery($query);
@@ -189,8 +206,9 @@ class SmartIDMiddleware {
      *
      * @param RequestInterface $request The request to process.
      */
-    private function replaceBody(RequestInterface $request) {
-        if (in_array($request->getMethod(), ['GET', 'OPTIONS'])) {
+    private function replaceBody(RequestInterface $request)
+    {
+        if (in_array($request->getMethod(), ["GET", "OPTIONS"])) {
             return;
         }
 
@@ -205,9 +223,10 @@ class SmartIDMiddleware {
      *
      * @return string Returns a regular expression string.
      */
-    private function getPKsRegex(): string {
+    private function getPKsRegex(): string
+    {
         if (!$this->pksRegex) {
-            $this->pksRegex = '`('.implode('|', array_keys($this->pks)).')$`i';
+            $this->pksRegex = "`(" . implode("|", array_keys($this->pks)) . ')$`i';
         }
         return $this->pksRegex;
     }
@@ -217,12 +236,13 @@ class SmartIDMiddleware {
      *
      * @return string
      */
-    private function getFullRegex(): string {
+    private function getFullRegex(): string
+    {
         if (!$this->fullSuffixesRegex) {
             if (empty($this->fullSuffixes)) {
                 $this->fullSuffixesRegex = '`^$`';
             } else {
-                $this->fullSuffixesRegex = '`(' . implode('|', array_keys($this->fullSuffixes)) . ')$`';
+                $this->fullSuffixesRegex = "`(" . implode("|", array_keys($this->fullSuffixes)) . ')$`';
             }
         }
         return $this->fullSuffixesRegex;
@@ -234,8 +254,9 @@ class SmartIDMiddleware {
      * @param array $arr The array to replace.
      * @return array|false Returns the replaced array of **false** if no replacements were made.
      */
-    private function replaceArray($arr) {
-        if (empty($arr)) {
+    private function replaceArray($arr)
+    {
+        if (empty($arr) || !is_array($arr)) {
             return false;
         }
 
@@ -249,7 +270,7 @@ class SmartIDMiddleware {
                     $value = $this->replaceSmartID($m[1], $value);
                     $changed = true;
                 } elseif (preg_match($fullRegex, $key) && preg_match(self::FULL_SMART_REGEX, $value, $m)) {
-                    $value = $this->replaceSmartID($m[1], self::SMART.$m[2]);
+                    $value = $this->replaceSmartID($m[1], self::SMART . $m[2]);
                     $changed = true;
                 }
             }
@@ -269,11 +290,18 @@ class SmartIDMiddleware {
      * @param string $smartID The smart ID to lookup.
      * @return mixed Returns the resulting value of the smart ID.
      */
-    private function replaceSmartID(string $pk, string $smartID) {
-        list($column, $value) = explode(':', ltrim($smartID, static::SMART)) + ['', ''];
-        list($pk, $columns, $resolver) = $this->pks[strtolower($pk)];
+    public function replaceSmartID(string $pk, string $smartID)
+    {
+        [$column, $value] = explode(":", ltrim($smartID, static::SMART)) + ["", ""];
+        [$pk, $columns, $resolver] = $this->pks[strtolower($pk)];
 
-        if ($columns !== '*' && !in_array(strtolower($column), $columns)) {
+        if ($smartID == '$me') {
+            $this->responseHeaders = [
+                CacheControlConstantsInterface::HEADER_CACHE_CONTROL => CacheControlConstantsInterface::NO_CACHE,
+            ];
+        }
+
+        if ($columns !== "*" && !in_array(strtolower($column), $columns)) {
             throw new ClientException("Unknown column in smart ID expression: $column.", 400);
         }
         if (is_string($resolver)) {
@@ -292,9 +320,10 @@ class SmartIDMiddleware {
      * @param string $suffix
      * @return $this
      */
-    public function addFullSuffix(string $suffix) {
+    public function addFullSuffix(string $suffix)
+    {
         $this->fullSuffixes[$suffix] = true;
-        $this->fullSuffixesRegex = '';
+        $this->fullSuffixesRegex = "";
         return $this;
     }
 
@@ -304,9 +333,10 @@ class SmartIDMiddleware {
      * @param string $suffix
      * @return $this
      */
-    public function removeFullSuffix(string $suffix) {
+    public function removeFullSuffix(string $suffix)
+    {
         unset($this->fullSuffixes[$suffix]);
-        $this->fullSuffixesRegex = '';
+        $this->fullSuffixesRegex = "";
         return $this;
     }
 
@@ -316,7 +346,32 @@ class SmartIDMiddleware {
      * @param string $suffix
      * @return bool
      */
-    public function hasFullSuffix(string $suffix): bool {
+    public function hasFullSuffix(string $suffix): bool
+    {
         return isset($this->fullSuffixes[$suffix]);
+    }
+
+    /**
+     * Basic validation of whether or not a value meets the basic smart ID format.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function valueIsSmartID(string $value): bool
+    {
+        return !empty($value) && $value[0] === self::SMART;
+    }
+
+    /**
+     * Overwrite the response header.
+     *
+     * @param mixed $response
+     */
+    private function setResponseHeader(\Garden\Web\Data $response)
+    {
+        foreach ($this->responseHeaders as $headerName => $headerValue) {
+            $response->setHeader($headerName, $headerValue);
+        }
+        return $response;
     }
 }

@@ -3,6 +3,8 @@
  * @license GPL-2.0-only
  */
 
+import { globalValueRef } from "@vanilla/utils";
+
 export interface ILocale {
     localeID: string;
     localeKey: string;
@@ -10,17 +12,18 @@ export interface ILocale {
     displayNames: {
         [localeKey: string]: string;
     };
+    translationService: string | null;
 }
 
-let currentLocale = "en";
-let localeStore: ILocale[] = [];
-let callbacks: Array<() => void> = [];
+let currentLocaleRef = globalValueRef("currentLocale", "en");
+let localeStoreRef = globalValueRef<ILocale[]>("localStore", []);
+let callbacksRef = globalValueRef<Array<() => void>>("localStoreCallbacks", []);
 
 /**
  * Get the available locales.
  */
 export function getLocales(): ILocale[] {
-    return localeStore;
+    return localeStoreRef.current();
 }
 
 /**
@@ -28,22 +31,22 @@ export function getLocales(): ILocale[] {
  * @param callback
  */
 export function onLocaleChange(callback: () => void) {
-    callbacks.push(callback);
+    callbacksRef.current().push(callback);
 }
 
 /**
  * Set the current locale.
  */
 export function setCurrentLocale(localeKey: string) {
-    currentLocale = localeKey;
-    callbacks.forEach(callback => callback());
+    currentLocaleRef.set(localeKey);
+    callbacksRef.current().forEach((callback) => callback());
 }
 
 /**
  * Get the current locale.
  */
 export function getCurrentLocale() {
-    return currentLocale;
+    return currentLocaleRef.current();
 }
 
 /**
@@ -53,21 +56,21 @@ export function getCurrentLocale() {
  * Javascript uses `-`.
  */
 export function getJSLocaleKey() {
-    return currentLocale.replace("_", "-");
+    return currentLocaleRef.current().replace("_", "-");
 }
 
 /**
  * Load a group of locales.
  */
 export function loadLocales(locales: ILocale[]) {
-    localeStore = [...localeStore, ...locales];
-    callbacks.forEach(callback => callback());
+    localeStoreRef.set([...localeStoreRef.current(), ...locales]);
+    callbacksRef.current().forEach((callback) => callback());
 }
 
 /**
  * Clear the loaded locales.
  */
 export function clearLocales() {
-    localeStore = [];
-    callbacks.forEach(callback => callback());
+    localeStoreRef.set([]);
+    callbacksRef.current().forEach((callback) => callback());
 }

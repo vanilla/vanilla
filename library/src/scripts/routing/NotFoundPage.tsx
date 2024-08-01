@@ -3,39 +3,45 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { t } from "@library/utility/appUtils";
+import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
+import { PageHeadingBox } from "@library/layout/PageHeadingBox";
+import { SectionOneColumn } from "@library/layout/SectionOneColumn";
+import { Widget } from "@library/layout/Widget";
+import { WidgetLayout } from "@library/layout/WidgetLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
+import { t } from "@library/utility/appUtils";
+import React from "react";
 import { sprintf } from "sprintf-js";
 
-export default class NotFoundPage extends React.PureComponent<IProps> {
-    public static defaultProps = {
-        type: "Page",
-    };
-
-    public render() {
-        return (
-            <div className="Center SplashInfo">
-                <DocumentTitle title={this.title} />
-                <div>{this.message}</div>
-            </div>
-        );
-    }
-
-    private get title() {
-        return this.props.title || sprintf(t("%s Not Found"), t(this.props.type));
-    }
-
-    private get message() {
-        return (
-            this.props.message ||
-            sprintf(t("The %s you were looking for could not be found."), t(this.props.type.toLowerCase()))
-        );
-    }
-}
-
 interface IProps {
-    type: string;
+    type?: string;
     title?: string;
     message?: string;
+}
+
+export default function NotFoundPage(props: IProps) {
+    const type = props.type ?? "Page";
+    const title = props.title || sprintf(t("%s Not Found"), t(type));
+    return (
+        <div className="Center SplashInfo">
+            <WidgetLayout>
+                <SectionOneColumn isNarrow>
+                    <Widget>
+                        <PageBoxDepthContextProvider depth={0}>
+                            <PageHeadingBox
+                                options={{
+                                    alignment: "center",
+                                }}
+                                title={<DocumentTitle title={title}>{title}</DocumentTitle>}
+                                description={
+                                    props.message ||
+                                    sprintf(t("The %s you were looking for could not be found."), t(type.toLowerCase()))
+                                }
+                            ></PageHeadingBox>
+                        </PageBoxDepthContextProvider>
+                    </Widget>
+                </SectionOneColumn>
+            </WidgetLayout>
+        </div>
+    );
 }

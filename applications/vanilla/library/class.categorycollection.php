@@ -5,29 +5,40 @@
  * @license GPL-2.0-only
  */
 
+use Garden\EventManager;
+use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\ModelCache;
+use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\TreeBuilder;
+
 /**
  * Manages categories as a whole.
  *
  * This is a bridge class to aid in refactoring. This functionality will be rolled into the {@link CategoryModel}.
  */
-class CategoryCollection {
+class CategoryCollection
+{
+    use \Vanilla\Events\DirtyRecordTrait;
 
     /**
      * @var string The cache key prefix that stores categories by ID.
      */
-    private static $CACHE_CATEGORY = '/cat/';
+    private const CACHE_CATEGORY = "/cat/";
 
     /**
      * @var string The cache key prefix that stores category IDs by slug (URL code).
      */
-    private static $CACHE_CATEGORY_SLUG = '/catslug/';
+    private const CACHE_CATEGORY_SLUG = "/catslug/";
 
     /**
      * @var string The cache key prefix that stores category descendant IDs by slug (URL code).
      */
-    private static $CACHE_CATEGORY_DESCENDANTS = '/catdescendants/';
+    private const CACHE_CATEGORY_DESCENDANTS = "/catdescendants/";
 
     /**
+     * @var string The cache key prefix that stores category descendant IDs by slug (URL code).
+     */
+    private const CACHE_CATEGORY_CHILD_IDS = "/cat_child_ids/";
 
     /**
      * @var int The absolute select limit of the categories.
@@ -38,6 +49,9 @@ class CategoryCollection {
      * @var Gdn_Cache The cache dependency.
      */
     private $cache;
+
+    /** @var ModelCache */
+    private $modelCache;
 
     /** @var bool */
     private $cacheReadOnly = false;
@@ -88,22 +102,34 @@ class CategoryCollection {
      * @param Gdn_SQLDriver|null $sql The database layer dependency.
      * @param Gdn_Cache|null $cache The cache layer dependency.
      */
-    public function __construct(Gdn_SQLDriver $sql = null, Gdn_Cache $cache = null) {
-        $this->absoluteLimit = c('Vanilla.Categories.QueryLimit', 300);
+    public function __construct(Gdn_SQLDriver $sql = null, Gdn_Cache $cache = null)
+    {
+        $this->absoluteLimit = c("Vanilla.Categories.QueryLimit", 300);
 
         if ($sql === null) {
             $sql = Gdn::sql();
         }
         $this->sql = $sql;
 
-        if ($cache === null) {
-            $cache = Gdn::cache();
-        }
-        $this->cache = $cache;
-        $this->setStaticCalculator([$this, 'defaultCalculator']);
+        $this->cache = $cache ?? (Gdn::cache() ?? new Gdn_Dirtycache());
+        $this->modelCache = new ModelCache("catcollection", $this->cache);
+
+        $this->setStaticCalculator([$this, "defaultCalculator"]);
         $this->setUserCalculator(function (&$category) {
             // do nothing
         });
+    }
+
+    /**
+     * Get a clean SQL driver instance.
+     *
+     * @return \Gdn_SQLDriver
+     */
+    protected function createSql(): \Gdn_SQLDriver
+    {
+        $sql = clone $this->sql;
+        $sql->reset();
+        return $sql;
     }
 
     /**
@@ -111,7 +137,8 @@ class CategoryCollection {
      *
      * @return callable Returns the calculator.
      */
-    public function getStaticCalculator() {
+    public function getStaticCalculator()
+    {
         return $this->staticCalculator;
     }
 
@@ -121,19 +148,33 @@ class CategoryCollection {
      * @param callable $staticCalculator The new calculator.
      * @return CategoryCollection Returns `$this` for fluent calls.
      */
-    public function setStaticCalculator(callable $staticCalculator) {
+    public function setStaticCalculator(callable $staticCalculator)
+    {
         $this->staticCalculator = $staticCalculator;
         return $this;
     }
 
     /**
-     * Flush the entire category cache.
+     * Flush our local in memory caches.
      */
-    public function flushCache() {
+    public function flushLocalCache()
+    {
         $this->categories = [];
         $this->categorySlugs = [];
-        $this->cache->increment(self::$CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
+    }
+
+    /**
+     * Flush the entire category cache.
+     */
+    public function flushCache()
+    {
+        $this->flushLocalCache();
+        $this->modelCache->invalidateAll();
+        $this->cache->increment(self::CACHE_CATEGORY . "inc", 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
         $this->cacheInc = null;
+        /** @var EventManager $eventManager */
+        $eventManager = \Gdn::getContainer()->get(EventManager::class);
+        $eventManager->fire("flushCategoryCache");
     }
 
     /**
@@ -141,7 +182,8 @@ class CategoryCollection {
      *
      * @return Gdn_Configuration Returns the config.
      */
-    public function getConfig() {
+    public function getConfig()
+    {
         return $this->config;
     }
 
@@ -151,7 +193,8 @@ class CategoryCollection {
      * @param Gdn_Configuration $config The config.
      * @return CategoryCollection Returns `$this` for fluent calls.
      */
-    public function setConfig($config) {
+    public function setConfig($config)
+    {
         $this->config = $config;
         return $this;
     }
@@ -162,67 +205,65 @@ class CategoryCollection {
      * @param string $code The URL slug of the category.
      * @return array|null Returns a category or **null** if one isn't found.
      */
-    public function getByUrlCode($code) {
+    public function getByUrlCode($code)
+    {
         return $this->get($code);
     }
 
     /**
      * Lookup a category by either ID or slug.
      *
-     * @param int $categoryID The category ID to get.
+     * @param int|string $categoryID The category ID to get.
      * @return array|null Returns a category or **null** if one isn't found.
      */
-    public function get($categoryID) {
+    public function get($categoryID): ?array
+    {
         // Figure out the ID.
         if (empty($categoryID)) {
             return null;
         } elseif (is_int($categoryID)) {
             $id = $categoryID;
-        } elseif (isset($this->categorySlugs[strtolower($categoryID)])) {
+        } elseif (!empty($this->categorySlugs[strtolower($categoryID)])) {
             $id = $this->categorySlugs[strtolower($categoryID)];
         } else {
             // The ID still might not be found here.
-            $id = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_SLUG, $categoryID));
+            $id = $this->cache->get($this->cacheKey(self::CACHE_CATEGORY_SLUG, $categoryID));
         }
 
         if ($id) {
-            $id = (int)$id;
+            $id = (int) $id;
 
             if (isset($this->categories[$id])) {
-                return $this->categories[$id];
+                return $this->categories[$id] ?: null;
             } else {
-                $cacheKey = $this->cacheKey(self::$CACHE_CATEGORY, $id);
+                $cacheKey = $this->cacheKey(self::CACHE_CATEGORY, $id);
                 $category = $this->cache->get($cacheKey);
 
                 if (!empty($category)) {
                     $this->calculateDynamic($category);
                     $this->categories[$id] = $category;
-                    $this->categorySlugs[strtolower($category['UrlCode'])] = $id;
+                    $this->categorySlugs[strtolower($category["UrlCode"])] = $id;
                     return $category;
                 }
 
-                $category = $this->sql->getWhere('Category', ['CategoryID' => $id])->firstRow(DATASET_TYPE_ARRAY);
+                $category = $this->sql->getWhere("Category", ["CategoryID" => $id])->firstRow(DATASET_TYPE_ARRAY);
             }
         } else {
-            $category = $this->sql->getWhere('Category', ['UrlCode' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
+            $category = $this->sql->getWhere("Category", ["UrlCode" => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
         }
 
         if (!empty($category)) {
             // This category came from the database, so must be calculated.
             $this->calculateStatic($category);
 
+            $this->cacheStore($this->cacheKey(self::CACHE_CATEGORY, $category["CategoryID"]), $category);
             $this->cacheStore(
-                $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
-                $category
-            );
-            $this->cacheStore(
-                $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
-                (int)$category['CategoryID']
+                $this->cacheKey(self::CACHE_CATEGORY_SLUG, $category["UrlCode"]),
+                (int) $category["CategoryID"]
             );
 
             $this->calculateDynamic($category);
-            $this->categories[(int)$category['CategoryID']] = $category;
-            $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
+            $this->setLocal($category);
 
             return $category;
         } else {
@@ -239,26 +280,44 @@ class CategoryCollection {
     }
 
     /**
+     * Set a category in the local cache.
+     *
+     * @param array $category
+     */
+    public function setLocal(array $category): void
+    {
+        $this->categories[(int) $category["CategoryID"]] = $category;
+        $this->categorySlugs[strtolower($category["UrlCode"])] = (int) $category["CategoryID"];
+    }
+
+    /**
+     * Check whether or not the local cache has a category.
+     *
+     * @param int $id The ID of the category.
+     * @return bool
+     */
+    public function hasLocal($id): bool
+    {
+        return isset($this->categories[$id]);
+    }
+
+    /**
      * Generate a full cache key.
      *
      * All cache keys should be generated using this function to support cache increments.
      *
      * @param string $type One of the **$CACHE_*** pseudo-constants.
-     * @param string|int $id The identifier in the cache.
+     * @param string|int|array $id The identifier in the cache.
      * @return string Returns the cache key.
      */
-    private function cacheKey($type, $id) {
-        switch ($type) {
-            case self::$CACHE_CATEGORY:
-            case self::$CACHE_CATEGORY_DESCENDANTS:
-                $r = $this->getCacheInc().$type.$id;
-                return $r;
-            case self::$CACHE_CATEGORY_SLUG;
-                $r = $this->getCacheInc().$type.strtolower($id);
-                return $r;
-            default:
-                throw new \InvalidArgumentException("Cache type '$type' is invalid.'", 500);
+    private function cacheKey(string $type, $id): string
+    {
+        if (is_string($id)) {
+            $id = strtolower($id);
+        } elseif (is_array($id)) {
+            $id = strtolower(implode($id));
         }
+        return $this->getCacheInc() . $type . $id;
     }
 
     /**
@@ -266,9 +325,10 @@ class CategoryCollection {
      *
      * The cache is flushed after major operations by incrementing a scoped key.
      */
-    private function getCacheInc() {
+    private function getCacheInc(): int
+    {
         if ($this->cacheInc === null) {
-            $this->cacheInc = (int)$this->cache->get(self::$CACHE_CATEGORY.'inc');
+            $this->cacheInc = (int) $this->cache->get(self::CACHE_CATEGORY . "inc");
         }
         return $this->cacheInc;
     }
@@ -278,8 +338,9 @@ class CategoryCollection {
      *
      * @param array &$category The category to calculate.
      */
-    private function calculateStatic(&$category) {
-        if ($category['CategoryID'] > 0) {
+    private function calculateStatic(&$category)
+    {
+        if ($category["CategoryID"] > 0) {
             call_user_func_array($this->staticCalculator, [&$category]);
         }
     }
@@ -289,8 +350,9 @@ class CategoryCollection {
      *
      * @param array &$category The category to calculate.
      */
-    private function calculateDynamic(&$category) {
-        if ($category['CategoryID'] > 0) {
+    private function calculateDynamic(&$category)
+    {
+        if ($category["CategoryID"] > 0) {
             call_user_func_array($this->userCalculator, [&$category]);
         }
     }
@@ -301,7 +363,8 @@ class CategoryCollection {
      * @param int $categoryID The category to get the children for.
      * @return array Returns an array of categories.
      */
-    public function getChildren($categoryID) {
+    public function getChildren($categoryID)
+    {
         $categories = $this->getChildrenByParents([$categoryID]);
         return $categories;
     }
@@ -313,31 +376,32 @@ class CategoryCollection {
      * @param bool $includeHeadings Whether or not to include heading categories.
      * @return array
      */
-    public function getAncestors($categoryID, $includeHeadings = false) {
+    public function getAncestors($categoryID, $includeHeadings = false)
+    {
         $result = [];
 
         $category = $this->get($categoryID);
 
-        if ($category === null) {
+        if (!$category) {
             return $result;
         }
 
         // Build up the ancestor array by tracing back through parents.
         $result[] = $category;
         $max = 20;
-        while ($category = $this->get($category['ParentCategoryID'])) {
+        while ($category = $this->get($category["ParentCategoryID"])) {
             // Check for an infinite loop.
             if ($max <= 0) {
                 break;
             }
             $max--;
 
-            if ($category['CategoryID'] == -1) {
-                break;
+            if ($includeHeadings || $category["DisplayAs"] !== "Heading") {
+                $result[] = $category;
             }
 
-            if ($includeHeadings || $category['DisplayAs'] !== 'Heading') {
-                $result[] = $category;
+            if ($category["CategoryID"] == -1) {
+                break;
             }
         }
         $result = array_reverse($result);
@@ -350,7 +414,8 @@ class CategoryCollection {
      * @param array $categoryIDs An array of category IDs.
      * @return array Returns an array of categories, indexed by ID.
      */
-    public function getMulti(array $categoryIDs) {
+    public function getMulti(array $categoryIDs)
+    {
         $categories = array_fill_keys($categoryIDs, null);
 
         // Look in our internal cache.
@@ -360,17 +425,17 @@ class CategoryCollection {
         // Look in the global cache.
         $keys = [];
         foreach (array_diff_key($categories, $internalCategories) as $id => $null) {
-            $keys[] = $this->cacheKey(self::$CACHE_CATEGORY, $id);
+            $keys[] = $this->cacheKey(self::CACHE_CATEGORY, $id);
         }
         if (!empty($keys)) {
             $cacheCategories = $this->cache->get($keys);
             if (!empty($cacheCategories)) {
                 foreach ($cacheCategories as $key => $category) {
                     $this->calculateDynamic($category);
-                    $this->categories[(int)$category['CategoryID']] = $category;
-                    $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
+                    $this->categories[(int) $category["CategoryID"]] = $category;
+                    $this->categorySlugs[strtolower($category["UrlCode"])] = (int) $category["CategoryID"];
 
-                    $categories[(int)$category['CategoryID']] = $category;
+                    $categories[(int) $category["CategoryID"]] = $category;
                 }
             }
         }
@@ -383,24 +448,21 @@ class CategoryCollection {
             }
         }
         if (!empty($dbCategoryIDs)) {
-            $dbCategories = $this->sql->getWhere('Category', ['CategoryID' => $dbCategoryIDs])->resultArray();
+            $dbCategories = $this->sql->getWhere("Category", ["CategoryID" => $dbCategoryIDs])->resultArray();
             foreach ($dbCategories as &$category) {
                 $this->calculateStatic($category);
 
+                $this->cacheStore($this->cacheKey(self::CACHE_CATEGORY, $category["CategoryID"]), $category);
                 $this->cacheStore(
-                    $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
-                    $category
-                );
-                $this->cacheStore(
-                    $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
-                    (int)$category['CategoryID']
+                    $this->cacheKey(self::CACHE_CATEGORY_SLUG, $category["UrlCode"]),
+                    (int) $category["CategoryID"]
                 );
 
                 $this->calculateDynamic($category);
-                $this->categories[(int)$category['CategoryID']] = $category;
-                $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
+                $this->categories[(int) $category["CategoryID"]] = $category;
+                $this->categorySlugs[strtolower($category["UrlCode"])] = (int) $category["CategoryID"];
 
-                $categories[(int)$category['CategoryID']] = $category;
+                $categories[(int) $category["CategoryID"]] = $category;
             }
         }
 
@@ -418,22 +480,26 @@ class CategoryCollection {
      * - permission: The permission to use when looking at the tree.
      * @return array
      */
-    public function getTree($parentID = -1, $options = []) {
+    public function getTree($parentID = -1, $options = [])
+    {
         $tree = [];
         $categories = [];
         $parentID = $parentID ?: -1;
         $defaultOptions = [
-            'maxdepth' => 3,
-            'collapsecategories' => false,
-            'permission' => 'PermsDiscussionsView'
+            "maxdepth" => 3,
+            "collapsecategories" => false,
+            "permission" => "PermsDiscussionsView",
         ];
+        $dirtyRecords = $options[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
         $options = array_change_key_case($options) ?: [];
-        $options = $options + $defaultOptions ;
+        $options = $options + $defaultOptions;
 
         $currentDepth = 1;
         $parents = [$parentID];
-        for ($i = 0; $i < $options['maxdepth']; $i++) {
-            $children = $this->getChildrenByParents($parents, $options['permission']);
+        for ($i = 0; $i < $options["maxdepth"]; $i++) {
+            $children = $this->getChildrenByParents($parents, $options["permission"], [
+                DirtyRecordModel::DIRTY_RECORD_OPT => $dirtyRecords,
+            ]);
             if (empty($children)) {
                 break;
             }
@@ -442,24 +508,24 @@ class CategoryCollection {
             $parents = [];
             foreach ($children as $child) {
                 $category = $child;
-                $category['Children'] = [];
+                $category["Children"] = [];
 
                 // Skip the fake root.
-                if ($category['CategoryID'] == -1) {
+                if ($category["CategoryID"] == -1) {
                     continue;
                 }
 
-                $category['Depth'] = $currentDepth;
+                $category["Depth"] = $currentDepth;
 
-                $categories[$category['CategoryID']] = $category;
-                if (!isset($categories[$category['ParentCategoryID']])) {
-                    $tree[] = &$categories[$category['CategoryID']];
+                $categories[$category["CategoryID"]] = $category;
+                if (!isset($categories[$category["ParentCategoryID"]])) {
+                    $tree[] = &$categories[$category["CategoryID"]];
                 } else {
-                    $categories[$category['ParentCategoryID']]['Children'][] = &$categories[$category['CategoryID']];
+                    $categories[$category["ParentCategoryID"]]["Children"][] = &$categories[$category["CategoryID"]];
                 }
 
-                if (!$options['collapsecategories'] || !in_array($child['DisplayAs'], ['Categories', 'Flat'])) {
-                    $parents[] = $child['CategoryID'];
+                if (!$options["collapsecategories"] || !in_array($child["DisplayAs"], ["Categories", "Flat"])) {
+                    $parents[] = $child["CategoryID"];
                 }
             }
 
@@ -474,47 +540,90 @@ class CategoryCollection {
      * Get the id's of a category's descendants.
      *
      * @param int $parentID
-     * @param array $options
      *
      * @return array
      */
-    public function getDescendantIDs(int $parentID = -1, array $options = []): array {
-        $cachedIDs = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID)) ?? [];
-        $parentIDs = [$parentID];
-        $defaultOptions = [
-            'maxDepth' => 3,
-            'permission' => 'PermsDiscussionsView'
-        ];
-        $options = $options + $defaultOptions;
-
-        $ids = [];
-        if (!$cachedIDs) {
-            for ($i = 0; $i < $options['maxDepth']; $i++) {
-                $childCategories = $this->getChildrenByParents($parentIDs, $options['permission']);
-                if (empty($childCategories)) {
-                    break;
-                }
-                if (count($childCategories) === 1) {
-                    $childCategories = reset($childCategories);
-                    $childCategoryID = [$childCategories['CategoryID']]?? [];
-                    $ids = array_merge($ids, $childCategoryID);
-                    $parentIDs = $childCategoryID;
-                } else {
-                    $childCategoriesIDs = array_column($childCategories, 'CategoryID');
-                    $ids = array_merge($ids, $childCategoriesIDs) ;
-                    $parentIDs = $childCategoriesIDs;
-                }
-            }
-        } else {
-            $ids = $cachedIDs;
+    public function getDescendantIDs(int $parentID = -1): array
+    {
+        $cacheKey = $this->cacheKey(self::CACHE_CATEGORY_DESCENDANTS, $parentID);
+        $cachedIDs = $this->cache->get($this->cacheKey(self::CACHE_CATEGORY_DESCENDANTS, $parentID));
+        if ($cachedIDs !== Gdn_Cache::CACHEOP_FAILURE) {
+            return $cachedIDs;
         }
 
-        $this->cacheStore(
-            $this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID),
-            $ids
-        );
+        $resultIDs = [];
+        $seenParentIDs = [];
 
-        return $ids;
+        $sql = $this->createSql();
+        $allIDs = $sql
+            ->select("CategoryID, ParentCategoryID")
+            ->get("Category")
+            ->resultArray();
+        $categoryIDByParentID = ArrayUtils::arrayColumnArrays($allIDs, "CategoryID", "ParentCategoryID");
+
+        $getChildren = function (int $categoryID) use (
+            &$resultIDs,
+            &$seenParentIDs,
+            &$categoryIDByParentID,
+            &$getChildren
+        ) {
+            if (in_array($categoryID, $seenParentIDs)) {
+                return;
+            } else {
+                $seenParentIDs[] = $categoryID;
+            }
+
+            $children = $categoryIDByParentID[$categoryID] ?? [];
+            foreach ($children as $childID) {
+                $resultIDs[] = $childID;
+
+                $getChildren($childID);
+            }
+        };
+
+        $getChildren($parentID);
+
+        $this->cacheStore($cacheKey, $resultIDs);
+        return $resultIDs;
+    }
+
+    /**
+     * Build a SQL query to select childCategories. Defaults to only selecting IDs.
+     *
+     * @param int[] $parentIDs
+     * @param string $selects Set specific selects for the query.
+     *
+     * @return Gdn_SQLDriver
+     */
+    private function makeGetChildQuery(array $parentIDs, string $selects = "*"): Gdn_SQLDriver
+    {
+        return $this->createSql()
+            ->from("Category")
+            ->select($selects)
+            ->where("ParentCategoryID", $parentIDs)
+            ->where("CategoryID >", 0)
+            ->limit($this->absoluteLimit)
+            ->orderBy("ParentCategoryID, Sort");
+    }
+
+    /**
+     * Get child IDs of some parents.
+     *
+     * @param int[] $parentIDs
+     *
+     * @return int[]
+     */
+    public function getChildIDs(array $parentIDs): array
+    {
+        return $this->modelCache->getCachedOrHydrate(
+            ["getChildIDs" => true, "parentIDs" => $parentIDs],
+            function () use ($parentIDs) {
+                $rows = $this->makeGetChildQuery($parentIDs, "CategoryID")
+                    ->get()
+                    ->resultArray();
+                return array_column($rows, "CategoryID");
+            }
+        );
     }
 
     /**
@@ -522,41 +631,35 @@ class CategoryCollection {
      *
      * @param int[] $parentIDs The IDs of the parent categories.
      * @param string $permission The name of the permission to check.
+     * @param array $options
      * @return array Returns an array of child categories.
      */
-    private function getChildrenByParents(array $parentIDs, $permission = 'PermsDiscussionsView') {
-        if (!$this->cache instanceof Gdn_Dirtycache) {
-            $select = 'CategoryID';
-        } else {
-            $select = '*';
-        }
+    private function getChildrenByParents(
+        array $parentIDs,
+        $permission = "PermsDiscussionsView",
+        array $options = []
+    ): array {
+        $needsDirtyJoin = $options[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
 
-        $data = $this
-            ->sql
-            ->select($select)
-            ->from('Category')
-            ->where('ParentCategoryID', $parentIDs)
-            ->where('CategoryID >', 0)
-            ->limit($this->absoluteLimit)
-            ->orderBy('ParentCategoryID, Sort')
-            ->get()->resultArray();
-
-        if (!$this->cache instanceof Gdn_Dirtycache) {
-            $ids = array_column($data, 'CategoryID');
-            $data = $this->getMulti($ids);
+        if ($needsDirtyJoin) {
+            $sql = $this->makeGetChildQuery($parentIDs);
+            $this->joinDirtyRecordTable($sql, "CategoryID", "category");
+            $children = $sql->get()->resultArray();
+            array_walk($children, [$this, "calculateStatic"]);
+            array_walk($children, [$this, "calculateDynamic"]);
         } else {
-            array_walk($data, [$this, 'calculateStatic']);
-            array_walk($data, [$this, 'calculateDynamic']);
+            $childIDs = $this->getChildIDs($parentIDs);
+            $children = $this->getMulti($childIDs);
         }
 
         // Remove categories without permission.
         if ($permission) {
-            $data = array_filter($data, function ($category) use ($permission) {
-                return (bool)val($permission, $category);
+            $children = array_filter($children, function ($category) use ($permission) {
+                return (bool) val($permission, $category);
             });
         }
 
-        return $data;
+        return $children;
     }
 
     /**
@@ -565,13 +668,27 @@ class CategoryCollection {
      * @param array $categories The array of root categories.
      * @return array Returns an array of categories.
      */
-    public function flattenTree(array $categories) {
-        $result = [];
-
-        foreach ($categories as $category) {
-            $this->flattenTreeInternal($category, $result);
-        }
+    public function flattenTree(array $categories)
+    {
+        $result = self::treeBuilder()->flattenTree($categories);
         return $result;
+    }
+
+    /**
+     * Get a tree builder instance for categories.
+     *
+     * @return TreeBuilder
+     */
+    public static function treeBuilder(): TreeBuilder
+    {
+        $builder = TreeBuilder::create("CategoryID", "ParentCategoryID")
+            ->setAllowUnreachableNodes(true)
+            ->setRootID(-1)
+            ->setChildrenFieldName("Children")
+            ->setSorter(function (array $catA, array $catB) {
+                return ($catA["Sort"] ?? 0) <=> ($catB["Sort"] ?? 0);
+            });
+        return $builder;
     }
 
     /**
@@ -580,45 +697,42 @@ class CategoryCollection {
      * @param array $category The category to update.
      * @return bool Returns **true** if the category updated or **false** otherwise.
      */
-    public function update(array $category) {
-        if (empty($category['CategoryID'])) {
+    public function update(array $category)
+    {
+        if (empty($category["CategoryID"])) {
             throw new Gdn_UserException("Category ID is required.");
         }
 
         $category += [
-            'DateUpdated' => Gdn_Format::toDateTime(),
-            'UpdateUserID' => 1,
+            "DateUpdated" => Gdn_Format::toDateTime(),
+            "UpdateUserID" => 1,
         ];
 
         // Get the current category.
-        $oldCategory = $this->get($category['CategoryID']);
+        $oldCategory = $this->get($category["CategoryID"]);
 
         if (!$oldCategory) {
             $inserted = $this->insert($category);
             if ($inserted) {
-                return $category['CategoryID'];
+                return $category["CategoryID"];
             } else {
                 return false;
             }
         } else {
-            $this->sql->put('Category', $category, ['CategoryID' => $category['CategoryID']]);
-            $this->refreshCache($category['CategoryID']);
+            $this->sql->put("Category", $category, ["CategoryID" => $category["CategoryID"]]);
+            $this->refreshCache($category["CategoryID"]);
 
             // Did my parent change?
-            if ((int)$oldCategory['ParentCategoryID'] !== (int)$category['ParentCategoryID']) {
+            if ((int) $oldCategory["ParentCategoryID"] !== (int) $category["ParentCategoryID"]) {
                 // Increment the new parent and decrement the old parent.
                 $this->sql->put(
-                    'Category',
-                    ['CountCategories-' => 1],
-                    ['CategoryID' => $oldCategory['ParentCategoryID']]
+                    "Category",
+                    ["CountCategories-" => 1],
+                    ["CategoryID" => $oldCategory["ParentCategoryID"]]
                 );
-                $this->sql->put(
-                    'Category',
-                    ['CountCategories+' => 1],
-                    ['CategoryID' => $category['ParentCategoryID']]
-                );
-                $this->refreshCache($oldCategory['ParentCategoryID']);
-                $this->refreshCache($category['ParentCategoryID']);
+                $this->sql->put("Category", ["CountCategories+" => 1], ["CategoryID" => $category["ParentCategoryID"]]);
+                $this->refreshCache($oldCategory["ParentCategoryID"]);
+                $this->refreshCache($category["ParentCategoryID"]);
             }
             return true;
         }
@@ -631,23 +745,24 @@ class CategoryCollection {
      *
      * @param array $category The new category.
      */
-    public function insert(array $category) {
+    public function insert(array $category)
+    {
         $category += [
-            'DateInserted' => Gdn_Format::toDateTime(),
-            'InsertUserID' => 1,
-            'ParentCategoryID' => -1,
+            "DateInserted" => Gdn_Format::toDateTime(),
+            "InsertUserID" => 1,
+            "ParentCategoryID" => -1,
         ];
 
         // Filter out fields that aren't in the table.
         $category = array_intersect_key($category, $this->getSchema()->fields());
-        $categoryID = $this->sql->insert('Category', $category);
+        $categoryID = $this->sql->insert("Category", $category);
 
         if ($categoryID) {
             // Update my parent's count.
-            $this->sql->put('Category', ['CountCategories+' => 1], ['CategoryID' => $category['ParentCategoryID']]);
+            $this->sql->put("Category", ["CountCategories+" => 1], ["CategoryID" => $category["ParentCategoryID"]]);
 
-            $this->refreshCache($category['CategoryID']);
-            $this->refreshCache($category['ParentCategoryID']);
+            $this->refreshCache($category["CategoryID"]);
+            $this->refreshCache($category["ParentCategoryID"]);
         }
 
         return $categoryID;
@@ -658,9 +773,10 @@ class CategoryCollection {
      *
      * @return Gdn_Schema Returns the schema.
      */
-    private function getSchema() {
+    private function getSchema()
+    {
         if ($this->schema === null) {
-            $this->schema = new Gdn_Schema('Category', $this->sql->Database);
+            $this->schema = new Gdn_Schema("Category", $this->sql->Database);
         }
         return $this->schema;
     }
@@ -672,26 +788,24 @@ class CategoryCollection {
      * will be privatized.
      *
      * @param int $categoryID The category to refresh.
-     * @return bool Returns **true** if the category was refreshed or **false** otherwise.
+     * @return array The refreshed row.
      */
-    public function refreshCache($categoryID) {
-        $category = $this->sql->getWhere('Category', ['CategoryID' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
+    public function refreshCache($categoryID): array
+    {
+        $category = $this->sql->getWhere("Category", ["CategoryID" => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
         if ($category) {
             $this->calculateStatic($category);
+            $this->cacheStore($this->cacheKey(self::CACHE_CATEGORY, $category["CategoryID"]), $category);
             $this->cacheStore(
-                $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
-                $category
+                $this->cacheKey(self::CACHE_CATEGORY_SLUG, $category["UrlCode"]),
+                (int) $category["CategoryID"]
             );
-            $this->cacheStore(
-                $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
-                (int)$category['CategoryID']
-            );
-
-            $this->categories[(int)$category['CategoryID']] = $category;
-            $this->categorySlugs[strtolower($category['UrlCode'])] = (int)$category['CategoryID'];
-            return true;
+            $this->calculateDynamic($category);
+            $this->categories[(int) $category["CategoryID"]] = $category;
+            $this->categorySlugs[strtolower($category["UrlCode"])] = (int) $category["CategoryID"];
+            return $category;
         } else {
-            return false;
+            return [];
         }
     }
 
@@ -700,7 +814,8 @@ class CategoryCollection {
      *
      * @return callable Returns the dynamicCalculator.
      */
-    public function getUserCalculator() {
+    public function getUserCalculator()
+    {
         return $this->userCalculator;
     }
 
@@ -710,9 +825,19 @@ class CategoryCollection {
      * @param callable $userCalculator The new dynamic calculator.
      * @return CategoryCollection Returns `$this` for fluent calls.
      */
-    public function setUserCalculator($userCalculator) {
+    public function setUserCalculator($userCalculator)
+    {
         $this->userCalculator = $userCalculator;
         return $this;
+    }
+
+    /**
+     * Reset the local cache.
+     */
+    public function reset(): void
+    {
+        $this->categorySlugs = [];
+        $this->categories = [];
     }
 
     /**
@@ -722,23 +847,24 @@ class CategoryCollection {
      *
      * @param array &$category The category to calculate.
      */
-    private function defaultCalculator(&$category) {
-//        $category['Url'] = self::categoryUrl($category, false, '/');
-        $category['ChildIDs'] = [];
-//        if (val('Photo', $category)) {
-//            $category['PhotoUrl'] = Gdn_Upload::url($category['Photo']);
-//        } else {
-//            $category['PhotoUrl'] = '';
-//        }
+    private function defaultCalculator(&$category)
+    {
+        //        $category['Url'] = self::categoryUrl($category, false, '/');
+        $category["ChildIDs"] = [];
+        //        if (val('Photo', $category)) {
+        //            $category['PhotoUrl'] = Gdn_Upload::url($category['Photo']);
+        //        } else {
+        //            $category['PhotoUrl'] = '';
+        //        }
 
         CategoryModel::calculateDisplayAs($category);
 
-        if (!val('CssClass', $category)) {
-            $category['CssClass'] = 'Category-'.$category['UrlCode'];
+        if (!val("CssClass", $category)) {
+            $category["CssClass"] = "Category-" . $category["UrlCode"];
         }
 
-        if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
-            $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
+        if (isset($category["AllowedDiscussionTypes"]) && is_string($category["AllowedDiscussionTypes"])) {
+            $category["AllowedDiscussionTypes"] = dbdecode($category["AllowedDiscussionTypes"]);
         }
     }
 
@@ -749,27 +875,12 @@ class CategoryCollection {
      * @param mixed $default The default to return if the config isn't found.
      * @return mixed Returns the config value or {@link $default} if it isn't found.
      */
-    private function config($key, $default = null) {
+    private function config($key, $default = null)
+    {
         if ($this->config !== null) {
             return $this->config->get($key, $default);
         } else {
             return $default;
-        }
-    }
-
-    /**
-     * Internal implementation support for {@link CategoryCollection::flattenTree()}.
-     *
-     * @param array $category The current category being examined.
-     * @param array &$result The working result.
-     */
-    private function flattenTreeInternal(array $category, array &$result) {
-        $children = $category['Children'] ?? [];
-        $category['Children'] = [];
-        $result[] = $category;
-
-        foreach ($children as $child) {
-            $this->flattenTreeInternal($child, $result);
         }
     }
 
@@ -781,7 +892,8 @@ class CategoryCollection {
      * @param array $options
      * @return void
      */
-    private function cacheStore($key, $value, $options = []): void {
+    private function cacheStore($key, $value, $options = []): void
+    {
         if ($this->cacheReadOnly) {
             return;
         }
@@ -794,7 +906,8 @@ class CategoryCollection {
      *
      * @return boolean
      */
-    public function isCacheReadOnly(): bool {
+    public function isCacheReadOnly(): bool
+    {
         return $this->cacheReadOnly;
     }
 
@@ -804,7 +917,8 @@ class CategoryCollection {
      * @param boolean $cacheReadOnly
      * @return void
      */
-    public function setCacheReadOnly(bool $cacheReadOnly): void {
+    public function setCacheReadOnly(bool $cacheReadOnly): void
+    {
         $this->cacheReadOnly = $cacheReadOnly;
     }
 }

@@ -5,10 +5,9 @@
  */
 
 import { Optionalize } from "@library/@types/utils";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import throttle from "lodash/throttle";
+import throttle from "lodash-es/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 
 export enum TitleBarDevices {
     COMPACT = "compact",
@@ -69,9 +68,9 @@ export function withTitleBarDevice<T extends ITitleBarDeviceProps = ITitleBarDev
     const ComponentWithDevice = (props: Optionalize<T, ITitleBarDeviceProps>) => {
         return (
             <TitleBarDeviceContext.Consumer>
-                {context => {
+                {(context) => {
                     // https://github.com/Microsoft/TypeScript/issues/28938
-                    return <WrappedComponent device={context} {...(props as T)} />;
+                    return <WrappedComponent device={context} {...(props as any)} />;
                 }}
             </TitleBarDeviceContext.Consumer>
         );

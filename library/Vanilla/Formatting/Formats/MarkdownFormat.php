@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Formats;
 
 use Vanilla\Formatting\FormatConfig;
+use Vanilla\Formatting\FormatRegexReplacements;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
@@ -15,8 +16,8 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
 /**
  * Class for rendering content of the markdown format.
  */
-class MarkdownFormat extends HtmlFormat {
-
+class MarkdownFormat extends HtmlFormat
+{
     const FORMAT_KEY = "markdown";
 
     /** @var \MarkdownVanilla */
@@ -38,7 +39,7 @@ class MarkdownFormat extends HtmlFormat {
         HtmlPlainTextConverter $plainTextConverter,
         FormatConfig $formatConfig
     ) {
-        // The markdown parser already encodes code blocks.
+        // The Markdown parser already encodes code blocks.
         $htmlSanitizer->setShouldEncodeCodeBlocks(false);
         parent::__construct($htmlSanitizer, $htmlEnhancer, $plainTextConverter, false);
         $this->markdownParser = $markdownParser;
@@ -52,24 +53,48 @@ class MarkdownFormat extends HtmlFormat {
      *
      * @inheritdoc
      */
-    protected function legacySpoilers(string $html): string {
+    protected function legacySpoilers(string $html): string
+    {
         return $html;
     }
 
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $value, bool $enhance = true): string {
-        $value = parent::legacySpoilers($value);
-        $markdownParsed = $this->markdownParser->transform($value);
-        return parent::renderHtml($markdownParsed, $enhance);
+    public function renderHtml($content, bool $enhance = true): string
+    {
+        if ($content instanceof HtmlFormatParsed) {
+            $processed = $content->getProcessedHtml();
+            return $processed;
+        } else {
+            $content = parent::legacySpoilers($content);
+            $processed = $this->markdownParser->transform($content);
+        }
+
+        return parent::renderHtml($processed, $enhance);
     }
 
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $value): string {
-        $markdownParsed = $this->markdownParser->transform($value);
-        return parent::renderQuote($markdownParsed);
+    public function renderQuote($content): string
+    {
+        if ($content instanceof HtmlFormatParsed) {
+            $processed = $content->getProcessedHtml();
+        } else {
+            $processed = $this->markdownParser->transform($content);
+        }
+        return parent::renderQuote($processed);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string
+    {
+        $regex = new FormatRegexReplacements();
+        $regex->addReplacement(...$this->getNonRichAtMentionReplacePattern($username, $this->anonymizeUsername));
+        $regex->addReplacement(...$this->getUrlReplacementPattern($username, $this->anonymizeUrl));
+        return $regex->replace($body);
     }
 }

@@ -1,43 +1,70 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Models;
 
-use PHPUnit\Framework\TestCase;
+use CategoriesApiController;
+use CategoryModel;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\NotFoundException;
+use Gdn;
+use Vanilla\Database\SetLiterals\Increment;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
-use VanillaTests\SiteTestTrait;
+use Vanilla\Utility\ModelUtils;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\SiteTestCase;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Class CategoryModelTest
  *
  * @package VanillaTests\Models
  */
-class CategoryModelTest extends TestCase {
-
-    use SiteTestTrait;
+class CategoryModelTest extends SiteTestCase
+{
+    use CommunityApiTestTrait;
+    use TestCategoryModelTrait;
     use ModelTestTrait;
+    use UsersAndRolesApiTestTrait;
 
-    /**
-     * @var \CategoryModel
-     */
-    private $model;
+    /** @var array */
+    private $category;
+
+    /** @var int */
+    private $categoryID;
+
+    public static $addons = ["qna", "polls"];
 
     /**
      * Set up a category model for testing.
      *
      * @throws \Garden\Container\ContainerException Throws container exception.
      */
-    public function setUp(): void {
-        $this->setupSiteTestTrait();
-        $this->container()->call(function (
-            \CategoryModel $categoryModel
-        ) {
-            $this->model = $categoryModel;
-        });
+    public function setUp(): void
+    {
+        $this->enableCaching();
+        parent::setUp();
+
+        $this->category = $this->insertCategories(1)[0];
+        $this->categoryID = $this->category["CategoryID"];
+    }
+
+    /**
+     * Test that setExpressions work with caching.
+     */
+    public function testSetFieldWithSetExpression()
+    {
+        $this->categoryModel->setField($this->categoryID, ["CountComments" => 100]);
+        $this->assertEquals(100, CategoryModel::categories($this->categoryID)["CountComments"]);
+
+        $this->categoryModel->setField($this->categoryID, ["CountComments" => new Increment(50)]);
+        $this->assertEquals(150, CategoryModel::categories($this->categoryID)["CountComments"]);
     }
 
     /**
@@ -45,54 +72,59 @@ class CategoryModelTest extends TestCase {
      *
      * @param array $categories Array of categories.
      */
-    public function sortFlatCategories(&$categories): void {
+    public function sortFlatCategories(&$categories): void
+    {
         $fn = function (&$categories) {
             $this->sortFlatCategories($categories);
         };
-        $sort = $fn->bindTo($this->model, $this->model);
+        $sort = $fn->bindTo($this->categoryModel, $this->categoryModel);
         $sort($categories);
     }
 
     /**
      * Test sortFlatCategories() for ordering alphabetically.
      */
-    public function testSortFlatCategoriesOrdersCorrectly(): void {
+    public function testSortFlatCategoriesOrdersCorrectly(): void
+    {
         $categories = [
-                10 =>
-                    [
-                        'CategoryID' => 10,
-                        'TreeLeft' => 1,
-                        'TreeRight' => 27,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'parent',
-                        'DisplayAs' => 'Flat',
-                    ],
-                1 =>
-                    [
-                        'CategoryID' => 1,
-                        'TreeLeft' => 2,
-                        'TreeRight' => 3,
-                        'ParentCategoryID' => 10,
-                        'Name' => 'foo',
-                        'DisplayAs' => 'Discussions',
-                    ],
-                6 =>
-                    [
-                        'CategoryID' => 6,
-                        'TreeLeft' => 2,
-                        'TreeRight' => 3,
-                        'ParentCategoryID' => 10,
-                        'Name' => 'bar',
-                        'DisplayAs' => 'Discussions',
-                    ],
+            10 => [
+                "CategoryID" => 10,
+                "TreeLeft" => 1,
+                "TreeRight" => 27,
+                "ParentCategoryID" => -1,
+                "Name" => "parent",
+                "DisplayAs" => "Flat",
+            ],
+            1 => [
+                "CategoryID" => 1,
+                "TreeLeft" => 2,
+                "TreeRight" => 3,
+                "ParentCategoryID" => 10,
+                "Name" => "foo",
+                "DisplayAs" => "Discussions",
+            ],
+            6 => [
+                "CategoryID" => 6,
+                "TreeLeft" => 2,
+                "TreeRight" => 3,
+                "ParentCategoryID" => 10,
+                "Name" => "bar",
+                "DisplayAs" => "Discussions",
+            ],
         ];
         $unsortedCategories = $categories;
         $sortedCategories = $categories;
         $this->sortFlatCategories($unsortedCategories);
 
         // Have the 'foo' and 'bar' categories been switched?
-        $this->assertSame(array_search(1, array_keys($unsortedCategories)), array_search(6, array_keys($sortedCategories)));
-        $this->assertSame(array_search(6, array_keys($unsortedCategories)), array_search(1, array_keys($sortedCategories)));
+        $this->assertSame(
+            array_search(1, array_keys($unsortedCategories)),
+            array_search(6, array_keys($sortedCategories))
+        );
+        $this->assertSame(
+            array_search(6, array_keys($unsortedCategories)),
+            array_search(1, array_keys($sortedCategories))
+        );
     }
 
     /**
@@ -101,7 +133,8 @@ class CategoryModelTest extends TestCase {
      * @param array $categories Array of categories to test.
      * @dataProvider provideTestCategories
      */
-    public function testSortFlatLargeSets($categories): void {
+    public function testSortFlatLargeSets($categories): void
+    {
         $unsortedCategories = $categories;
         $sortedCategories = $categories;
         $this->sortFlatCategories($sortedCategories);
@@ -114,489 +147,441 @@ class CategoryModelTest extends TestCase {
      *
      * @return array Returns an array of category data.
      */
-    public function provideTestCategories(): array {
+    public function provideTestCategories(): array
+    {
         $r = [
-            'localHostData' => [[
-                -1 =>
-                    [
-                        'CategoryID' => -1,
-                        'TreeLeft' => 1,
-                        'TreeRight' => 40,
-                        'ParentCategoryID' => null,
-                        'Name' => 'Root',
-                        'DisplayAs' => 'Categories',
+            "localHostData" => [
+                [
+                    -1 => [
+                        "CategoryID" => -1,
+                        "TreeLeft" => 1,
+                        "TreeRight" => 40,
+                        "ParentCategoryID" => null,
+                        "Name" => "Root",
+                        "DisplayAs" => "Categories",
                     ],
-                1 =>
-                    [
-                        'CategoryID' => 1,
-                        'TreeLeft' => 2,
-                        'TreeRight' => 3,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'General',
-                        'DisplayAs' => 'Discussions',
+                    1 => [
+                        "CategoryID" => 1,
+                        "TreeLeft" => 2,
+                        "TreeRight" => 3,
+                        "ParentCategoryID" => -1,
+                        "Name" => "General",
+                        "DisplayAs" => "Discussions",
                     ],
-                18 =>
-                    [
-                        'CategoryID' => 18,
-                        'TreeLeft' => 4,
-                        'TreeRight' => 9,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'German',
-                        'DisplayAs' => 'Discussions',
+                    18 => [
+                        "CategoryID" => 18,
+                        "TreeLeft" => 4,
+                        "TreeRight" => 9,
+                        "ParentCategoryID" => -1,
+                        "Name" => "German",
+                        "DisplayAs" => "Discussions",
                     ],
-                19 =>
-                    [
-                        'CategoryID' => 19,
-                        'TreeLeft' => 5,
-                        'TreeRight' => 8,
-                        'ParentCategoryID' => 18,
-                        'Name' => 'German-Sub',
-                        'DisplayAs' => 'Discussions',
+                    19 => [
+                        "CategoryID" => 19,
+                        "TreeLeft" => 5,
+                        "TreeRight" => 8,
+                        "ParentCategoryID" => 18,
+                        "Name" => "German-Sub",
+                        "DisplayAs" => "Discussions",
                     ],
-                20 =>
-                    [
-                        'CategoryID' => 20,
-                        'TreeLeft' => 6,
-                        'TreeRight' => 7,
-                        'ParentCategoryID' => 19,
-                        'Name' => 'German-Sub-Sub',
-                        'DisplayAs' => 'Discussions',
+                    20 => [
+                        "CategoryID" => 20,
+                        "TreeLeft" => 6,
+                        "TreeRight" => 7,
+                        "ParentCategoryID" => 19,
+                        "Name" => "German-Sub-Sub",
+                        "DisplayAs" => "Discussions",
                     ],
-                15 =>
-                    [
-                        'CategoryID' => 15,
-                        'TreeLeft' => 10,
-                        'TreeRight' => 11,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'Sub-recordGroup',
-                        'DisplayAs' => 'Discussions',
+                    15 => [
+                        "CategoryID" => 15,
+                        "TreeLeft" => 10,
+                        "TreeRight" => 11,
+                        "ParentCategoryID" => -1,
+                        "Name" => "Sub-recordGroup",
+                        "DisplayAs" => "Discussions",
                     ],
-                12 =>
-                    [
-                        'CategoryID' => 12,
-                        'TreeLeft' => 12,
-                        'TreeRight' => 17,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'Big Category',
-                        'DisplayAs' => 'Discussions',
+                    12 => [
+                        "CategoryID" => 12,
+                        "TreeLeft" => 12,
+                        "TreeRight" => 17,
+                        "ParentCategoryID" => -1,
+                        "Name" => "Big Category",
+                        "DisplayAs" => "Discussions",
                     ],
-                13 =>
-                    [
-                        'CategoryID' => 13,
-                        'TreeLeft' => 13,
-                        'TreeRight' => 16,
-                        'ParentCategoryID' => 12,
-                        'Name' => 'Inner Category',
-                        'DisplayAs' => 'Categories',
+                    13 => [
+                        "CategoryID" => 13,
+                        "TreeLeft" => 13,
+                        "TreeRight" => 16,
+                        "ParentCategoryID" => 12,
+                        "Name" => "Inner Category",
+                        "DisplayAs" => "Categories",
                     ],
-                14 =>
-                    [
-                        'CategoryID' => 14,
-                        'TreeLeft' => 14,
-                        'TreeRight' => 15,
-                        'ParentCategoryID' => 13,
-                        'Name' => 'Innermost Category',
-                        'DisplayAs' => 'Discussions',
+                    14 => [
+                        "CategoryID" => 14,
+                        "TreeLeft" => 14,
+                        "TreeRight" => 15,
+                        "ParentCategoryID" => 13,
+                        "Name" => "Innermost Category",
+                        "DisplayAs" => "Discussions",
                     ],
-                11 =>
-                    [
-                        'CategoryID' => 11,
-                        'TreeLeft' => 18,
-                        'TreeRight' => 19,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'Reported Posts',
-                        'DisplayAs' => 'Discussions',
+                    11 => [
+                        "CategoryID" => 11,
+                        "TreeLeft" => 18,
+                        "TreeRight" => 19,
+                        "ParentCategoryID" => -1,
+                        "Name" => "Reported Posts",
+                        "DisplayAs" => "Discussions",
                     ],
-                10 =>
-                    [
-                        'CategoryID' => 10,
-                        'TreeLeft' => 20,
-                        'TreeRight' => 25,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'Social Groups',
-                        'DisplayAs' => 'Flat',
+                    10 => [
+                        "CategoryID" => 10,
+                        "TreeLeft" => 20,
+                        "TreeRight" => 25,
+                        "ParentCategoryID" => -1,
+                        "Name" => "Social Groups",
+                        "DisplayAs" => "Flat",
                     ],
-                16 =>
-                    [
-                        'CategoryID' => 16,
-                        'TreeLeft' => 21,
-                        'TreeRight' => 22,
-                        'ParentCategoryID' => 10,
-                        'Name' => 'Soul Records',
-                        'DisplayAs' => 'Discussions',
+                    16 => [
+                        "CategoryID" => 16,
+                        "TreeLeft" => 21,
+                        "TreeRight" => 22,
+                        "ParentCategoryID" => 10,
+                        "Name" => "Soul Records",
+                        "DisplayAs" => "Discussions",
                     ],
-                17 =>
-                    [
-                        'CategoryID' => 17,
-                        'TreeLeft' => 23,
-                        'TreeRight' => 24,
-                        'ParentCategoryID' => 10,
-                        'Name' => 'Metal Records',
-                        'DisplayAs' => 'Discussions',
+                    17 => [
+                        "CategoryID" => 17,
+                        "TreeLeft" => 23,
+                        "TreeRight" => 24,
+                        "ParentCategoryID" => 10,
+                        "Name" => "Metal Records",
+                        "DisplayAs" => "Discussions",
                     ],
-                9 =>
-                    [
-                        'CategoryID' => 9,
-                        'TreeLeft' => 26,
-                        'TreeRight' => 27,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'Great New Ideas',
-                        'DisplayAs' => 'Discussions',
+                    9 => [
+                        "CategoryID" => 9,
+                        "TreeLeft" => 26,
+                        "TreeRight" => 27,
+                        "ParentCategoryID" => -1,
+                        "Name" => "Great New Ideas",
+                        "DisplayAs" => "Discussions",
                     ],
-                8 =>
-                    [
-                        'CategoryID' => 8,
-                        'TreeLeft' => 28,
-                        'TreeRight' => 29,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'Top Secret Category',
-                        'DisplayAs' => 'Discussions',
+                    8 => [
+                        "CategoryID" => 8,
+                        "TreeLeft" => 28,
+                        "TreeRight" => 29,
+                        "ParentCategoryID" => -1,
+                        "Name" => "Top Secret Category",
+                        "DisplayAs" => "Discussions",
                     ],
-                2 =>
-                    [
-                        'CategoryID' => 2,
-                        'TreeLeft' => 30,
-                        'TreeRight' => 39,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'Category with Categories',
-                        'DisplayAs' => 'Flat',
+                    2 => [
+                        "CategoryID" => 2,
+                        "TreeLeft" => 30,
+                        "TreeRight" => 39,
+                        "ParentCategoryID" => -1,
+                        "Name" => "Category with Categories",
+                        "DisplayAs" => "Flat",
                     ],
-                21 =>
-                    [
-                        'CategoryID' => 21,
-                        'TreeLeft' => 31,
-                        'TreeRight' => 32,
-                        'ParentCategoryID' => 2,
-                        'Name' => 'Another Subcategory',
-                        'DisplayAs' => 'Discussions',
+                    21 => [
+                        "CategoryID" => 21,
+                        "TreeLeft" => 31,
+                        "TreeRight" => 32,
+                        "ParentCategoryID" => 2,
+                        "Name" => "Another Subcategory",
+                        "DisplayAs" => "Discussions",
                     ],
-                7 =>
-                    [
-                        'CategoryID' => 7,
-                        'TreeLeft' => 33,
-                        'TreeRight' => 34,
-                        'ParentCategoryID' => 2,
-                        'Name' => 'Subcategory3',
-                        'DisplayAs' => 'Discussions',
+                    7 => [
+                        "CategoryID" => 7,
+                        "TreeLeft" => 33,
+                        "TreeRight" => 34,
+                        "ParentCategoryID" => 2,
+                        "Name" => "Subcategory3",
+                        "DisplayAs" => "Discussions",
                     ],
-                6 =>
-                    [
-                        'CategoryID' => 6,
-                        'TreeLeft' => 35,
-                        'TreeRight' => 36,
-                        'ParentCategoryID' => 2,
-                        'Name' => 'Subcategory2',
-                        'DisplayAs' => 'Discussions',
+                    6 => [
+                        "CategoryID" => 6,
+                        "TreeLeft" => 35,
+                        "TreeRight" => 36,
+                        "ParentCategoryID" => 2,
+                        "Name" => "Subcategory2",
+                        "DisplayAs" => "Discussions",
                     ],
-                3 =>
-                    [
-                        'CategoryID' => 3,
-                        'TreeLeft' => 37,
-                        'TreeRight' => 38,
-                        'ParentCategoryID' => 2,
-                        'Name' => 'Subcategory1',
-                        'DisplayAs' => 'Discussions',
+                    3 => [
+                        "CategoryID" => 3,
+                        "TreeLeft" => 37,
+                        "TreeRight" => 38,
+                        "ParentCategoryID" => 2,
+                        "Name" => "Subcategory1",
+                        "DisplayAs" => "Discussions",
                     ],
-            ]],
-            'testCategoryData' => [[
-                -1 =>
-                    [
-                        'CategoryID' => -1,
-                        'TreeLeft' => 1,
-                        'TreeRight' => 66,
-                        'ParentCategoryID' => null,
-                        'Name' => 'Root',
-                        'DisplayAs' => 'Categories',
+                ],
+            ],
+            "testCategoryData" => [
+                [
+                    -1 => [
+                        "CategoryID" => -1,
+                        "TreeLeft" => 1,
+                        "TreeRight" => 66,
+                        "ParentCategoryID" => null,
+                        "Name" => "Root",
+                        "DisplayAs" => "Categories",
                     ],
-                5 =>
-                    [
-                        'CategoryID' => 5,
-                        'TreeLeft' => 2,
-                        'TreeRight' => 5,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'Test Parent Category',
-                        'DisplayAs' => 'Discussions',
+                    5 => [
+                        "CategoryID" => 5,
+                        "TreeLeft" => 2,
+                        "TreeRight" => 5,
+                        "ParentCategoryID" => -1,
+                        "Name" => "Test Parent Category",
+                        "DisplayAs" => "Discussions",
                     ],
-                6 =>
-                    [
-                        'CategoryID' => 6,
-                        'TreeLeft' => 3,
-                        'TreeRight' => 4,
-                        'ParentCategoryID' => 5,
-                        'Name' => 'Test Child Category',
-                        'DisplayAs' => 'Discussions',
+                    6 => [
+                        "CategoryID" => 6,
+                        "TreeLeft" => 3,
+                        "TreeRight" => 4,
+                        "ParentCategoryID" => 5,
+                        "Name" => "Test Child Category",
+                        "DisplayAs" => "Discussions",
                     ],
-                1 =>
-                    [
-                        'CategoryID' => 1,
-                        'TreeLeft' => 6,
-                        'TreeRight' => 65,
-                        'ParentCategoryID' => -1,
-                        'Name' => 'General',
-                        'DisplayAs' => 'Discussions',
+                    1 => [
+                        "CategoryID" => 1,
+                        "TreeLeft" => 6,
+                        "TreeRight" => 65,
+                        "ParentCategoryID" => -1,
+                        "Name" => "General",
+                        "DisplayAs" => "Discussions",
                     ],
-                33 =>
-                    [
-                        'CategoryID' => 33,
-                        'TreeLeft' => 7,
-                        'TreeRight' => 8,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 28',
-                        'DisplayAs' => 'Flat',
+                    33 => [
+                        "CategoryID" => 33,
+                        "TreeLeft" => 7,
+                        "TreeRight" => 8,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 28",
+                        "DisplayAs" => "Flat",
                     ],
-                32 =>
-                    [
-                        'CategoryID' => 32,
-                        'TreeLeft' => 9,
-                        'TreeRight' => 10,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 27',
-                        'DisplayAs' => 'Flat',
+                    32 => [
+                        "CategoryID" => 32,
+                        "TreeLeft" => 9,
+                        "TreeRight" => 10,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 27",
+                        "DisplayAs" => "Flat",
                     ],
-                31 =>
-                    [
-                        'CategoryID' => 31,
-                        'TreeLeft' => 11,
-                        'TreeRight' => 12,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 26',
-                        'DisplayAs' => 'Flat',
+                    31 => [
+                        "CategoryID" => 31,
+                        "TreeLeft" => 11,
+                        "TreeRight" => 12,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 26",
+                        "DisplayAs" => "Flat",
                     ],
-                30 =>
-                    [
-                        'CategoryID' => 30,
-                        'TreeLeft' => 13,
-                        'TreeRight' => 14,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 25',
-                        'DisplayAs' => 'Flat',
+                    30 => [
+                        "CategoryID" => 30,
+                        "TreeLeft" => 13,
+                        "TreeRight" => 14,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 25",
+                        "DisplayAs" => "Flat",
                     ],
-                29 =>
-                    [
-                        'CategoryID' => 29,
-                        'TreeLeft' => 15,
-                        'TreeRight' => 16,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 24',
-                        'DisplayAs' => 'Flat',
+                    29 => [
+                        "CategoryID" => 29,
+                        "TreeLeft" => 15,
+                        "TreeRight" => 16,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 24",
+                        "DisplayAs" => "Flat",
                     ],
-                28 =>
-                    [
-                        'CategoryID' => 28,
-                        'TreeLeft' => 17,
-                        'TreeRight' => 18,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 23',
-                        'DisplayAs' => 'Flat',
+                    28 => [
+                        "CategoryID" => 28,
+                        "TreeLeft" => 17,
+                        "TreeRight" => 18,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 23",
+                        "DisplayAs" => "Flat",
                     ],
-                27 =>
-                    [
-                        'CategoryID' => 27,
-                        'TreeLeft' => 19,
-                        'TreeRight' => 20,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 22',
-                        'DisplayAs' => 'Flat',
+                    27 => [
+                        "CategoryID" => 27,
+                        "TreeLeft" => 19,
+                        "TreeRight" => 20,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 22",
+                        "DisplayAs" => "Flat",
                     ],
-                26 =>
-                    [
-                        'CategoryID' => 26,
-                        'TreeLeft' => 21,
-                        'TreeRight' => 22,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 21',
-                        'DisplayAs' => 'Flat',
+                    26 => [
+                        "CategoryID" => 26,
+                        "TreeLeft" => 21,
+                        "TreeRight" => 22,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 21",
+                        "DisplayAs" => "Flat",
                     ],
-                24 =>
-                    [
-                        'CategoryID' => 24,
-                        'TreeLeft' => 23,
-                        'TreeRight' => 24,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 19',
-                        'DisplayAs' => 'Categories',
+                    24 => [
+                        "CategoryID" => 24,
+                        "TreeLeft" => 23,
+                        "TreeRight" => 24,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 19",
+                        "DisplayAs" => "Categories",
                     ],
-                23 =>
-                    [
-                        'CategoryID' => 23,
-                        'TreeLeft' => 25,
-                        'TreeRight' => 26,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 18',
-                        'DisplayAs' => 'Flat',
+                    23 => [
+                        "CategoryID" => 23,
+                        "TreeLeft" => 25,
+                        "TreeRight" => 26,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 18",
+                        "DisplayAs" => "Flat",
                     ],
-                21 =>
-                    [
-                        'CategoryID' => 21,
-                        'TreeLeft' => 27,
-                        'TreeRight' => 28,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 16 Tue, 09 Jun 2020 21:45:14 +0000',
-                        'DisplayAs' => 'Flat',
+                    21 => [
+                        "CategoryID" => 21,
+                        "TreeLeft" => 27,
+                        "TreeRight" => 28,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 16 Tue, 09 Jun 2020 21:45:14 +0000",
+                        "DisplayAs" => "Flat",
                     ],
-                20 =>
-                    [
-                        'CategoryID' => 20,
-                        'TreeLeft' => 29,
-                        'TreeRight' => 30,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 15',
-                        'DisplayAs' => 'Flat',
+                    20 => [
+                        "CategoryID" => 20,
+                        "TreeLeft" => 29,
+                        "TreeRight" => 30,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 15",
+                        "DisplayAs" => "Flat",
                     ],
-                19 =>
-                    [
-                        'CategoryID' => 19,
-                        'TreeLeft' => 31,
-                        'TreeRight' => 32,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 14',
-                        'DisplayAs' => 'Flat',
+                    19 => [
+                        "CategoryID" => 19,
+                        "TreeLeft" => 31,
+                        "TreeRight" => 32,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 14",
+                        "DisplayAs" => "Flat",
                     ],
-                18 =>
-                    [
-                        'CategoryID' => 18,
-                        'TreeLeft' => 33,
-                        'TreeRight' => 34,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 12',
-                        'DisplayAs' => 'Flat',
+                    18 => [
+                        "CategoryID" => 18,
+                        "TreeLeft" => 33,
+                        "TreeRight" => 34,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 12",
+                        "DisplayAs" => "Flat",
                     ],
-                17 =>
-                    [
-                        'CategoryID' => 17,
-                        'TreeLeft' => 35,
-                        'TreeRight' => 36,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 11',
-                        'DisplayAs' => 'Flat',
+                    17 => [
+                        "CategoryID" => 17,
+                        "TreeLeft" => 35,
+                        "TreeRight" => 36,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 11",
+                        "DisplayAs" => "Flat",
                     ],
-                15 =>
-                    [
-                        'CategoryID' => 15,
-                        'TreeLeft' => 37,
-                        'TreeRight' => 38,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 8',
-                        'DisplayAs' => 'Flat',
+                    15 => [
+                        "CategoryID" => 15,
+                        "TreeLeft" => 37,
+                        "TreeRight" => 38,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 8",
+                        "DisplayAs" => "Flat",
                     ],
-                14 =>
-                    [
-                        'CategoryID' => 14,
-                        'TreeLeft' => 39,
-                        'TreeRight' => 40,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 7',
-                        'DisplayAs' => 'Flat',
+                    14 => [
+                        "CategoryID" => 14,
+                        "TreeLeft" => 39,
+                        "TreeRight" => 40,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 7",
+                        "DisplayAs" => "Flat",
                     ],
-                13 =>
-                    [
-                        'CategoryID' => 13,
-                        'TreeLeft' => 41,
-                        'TreeRight' => 42,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 6',
-                        'DisplayAs' => 'Categories',
+                    13 => [
+                        "CategoryID" => 13,
+                        "TreeLeft" => 41,
+                        "TreeRight" => 42,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 6",
+                        "DisplayAs" => "Categories",
                     ],
-                12 =>
-                    [
-                        'CategoryID' => 12,
-                        'TreeLeft' => 43,
-                        'TreeRight' => 44,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 5',
-                        'DisplayAs' => 'Flat',
+                    12 => [
+                        "CategoryID" => 12,
+                        "TreeLeft" => 43,
+                        "TreeRight" => 44,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 5",
+                        "DisplayAs" => "Flat",
                     ],
-                11 =>
-                    [
-                        'CategoryID' => 11,
-                        'TreeLeft' => 45,
-                        'TreeRight' => 46,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 4',
-                        'DisplayAs' => 'Flat',
+                    11 => [
+                        "CategoryID" => 11,
+                        "TreeLeft" => 45,
+                        "TreeRight" => 46,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 4",
+                        "DisplayAs" => "Flat",
                     ],
-                9 =>
-                    [
-                        'CategoryID' => 9,
-                        'TreeLeft' => 47,
-                        'TreeRight' => 50,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Parent as Child',
-                        'DisplayAs' => 'Discussions',
+                    9 => [
+                        "CategoryID" => 9,
+                        "TreeLeft" => 47,
+                        "TreeRight" => 50,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Parent as Child",
+                        "DisplayAs" => "Discussions",
                     ],
-                10 =>
-                    [
-                        'CategoryID' => 10,
-                        'TreeLeft' => 48,
-                        'TreeRight' => 49,
-                        'ParentCategoryID' => 9,
-                        'Name' => 'Test Child as Parent',
-                        'DisplayAs' => 'Discussions',
+                    10 => [
+                        "CategoryID" => 10,
+                        "TreeLeft" => 48,
+                        "TreeRight" => 49,
+                        "ParentCategoryID" => 9,
+                        "Name" => "Test Child as Parent",
+                        "DisplayAs" => "Discussions",
                     ],
-                8 =>
-                    [
-                        'CategoryID' => 8,
-                        'TreeLeft' => 51,
-                        'TreeRight' => 52,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Child Parent',
-                        'DisplayAs' => 'Discussions',
+                    8 => [
+                        "CategoryID" => 8,
+                        "TreeLeft" => 51,
+                        "TreeRight" => 52,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Child Parent",
+                        "DisplayAs" => "Discussions",
                     ],
-                7 =>
-                    [
-                        'CategoryID' => 7,
-                        'TreeLeft' => 53,
-                        'TreeRight' => 54,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Bad Parent',
-                        'DisplayAs' => 'Discussions',
+                    7 => [
+                        "CategoryID" => 7,
+                        "TreeLeft" => 53,
+                        "TreeRight" => 54,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Bad Parent",
+                        "DisplayAs" => "Discussions",
                     ],
-                4 =>
-                    [
-                        'CategoryID' => 4,
-                        'TreeLeft' => 55,
-                        'TreeRight' => 56,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 3',
-                        'DisplayAs' => 'Discussions',
+                    4 => [
+                        "CategoryID" => 4,
+                        "TreeLeft" => 55,
+                        "TreeRight" => 56,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 3",
+                        "DisplayAs" => "Discussions",
                     ],
-                3 =>
-                    [
-                        'CategoryID' => 3,
-                        'TreeLeft' => 57,
-                        'TreeRight' => 58,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 2',
-                        'DisplayAs' => 'Flat',
+                    3 => [
+                        "CategoryID" => 3,
+                        "TreeLeft" => 57,
+                        "TreeRight" => 58,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 2",
+                        "DisplayAs" => "Flat",
                     ],
-                2 =>
-                    [
-                        'CategoryID' => 2,
-                        'TreeLeft' => 59,
-                        'TreeRight' => 64,
-                        'ParentCategoryID' => 1,
-                        'Name' => 'Test Category 1',
-                        'DisplayAs' => 'Flat',
+                    2 => [
+                        "CategoryID" => 2,
+                        "TreeLeft" => 59,
+                        "TreeRight" => 64,
+                        "ParentCategoryID" => 1,
+                        "Name" => "Test Category 1",
+                        "DisplayAs" => "Flat",
                     ],
-                22 =>
-                    [
-                        'CategoryID' => 22,
-                        'TreeLeft' => 60,
-                        'TreeRight' => 61,
-                        'ParentCategoryID' => 2,
-                        'Name' => 'Test Category 17',
-                        'DisplayAs' => 'Flat',
+                    22 => [
+                        "CategoryID" => 22,
+                        "TreeLeft" => 60,
+                        "TreeRight" => 61,
+                        "ParentCategoryID" => 2,
+                        "Name" => "Test Category 17",
+                        "DisplayAs" => "Flat",
                     ],
-                16 =>
-                    [
-                        'CategoryID' => 16,
-                        'TreeLeft' => 62,
-                        'TreeRight' => 63,
-                        'ParentCategoryID' => 2,
-                        'Name' => 'Test Category 10 Tue, 09 Jun 2020 21:45:13 +0000',
-                        'DisplayAs' => 'Categories',
+                    16 => [
+                        "CategoryID" => 16,
+                        "TreeLeft" => 62,
+                        "TreeRight" => 63,
+                        "ParentCategoryID" => 2,
+                        "Name" => "Test Category 10 Tue, 09 Jun 2020 21:45:13 +0000",
+                        "DisplayAs" => "Categories",
                     ],
-            ]],
+                ],
+            ],
         ];
         return $r;
     }
@@ -608,112 +593,1403 @@ class CategoryModelTest extends TestCase {
      * @param array $categories
      * @param array $sorted
      */
-    private function assertSortedCategories(array $categories, array $sorted): void {
-        $this->assertSame(count($categories), count($sorted), 'The sorted categories has a different count from the original.');
+    private function assertSortedCategories(array $categories, array $sorted): void
+    {
+        $this->assertSame(
+            count($categories),
+            count($sorted),
+            "The sorted categories has a different count from the original."
+        );
 
-        $categories = array_column($categories, null, 'CategoryID');
-        $sorted = array_column($sorted, null, 'CategoryID');
+        $categories = array_column($categories, null, "CategoryID");
+        $sorted = array_column($sorted, null, "CategoryID");
 
         // Look for items in categories that are not in sorted.
         $notInSorted = array_diff_key($categories, $sorted);
         if (!empty($notInSorted)) {
-            $this->fail("The following categories are missing from sorted: ".implode(', ', array_column($notInSorted, 'Name')));
+            $this->fail(
+                "The following categories are missing from sorted: " . implode(", ", array_column($notInSorted, "Name"))
+            );
         }
 
         $notInSorted = array_diff_key($sorted, $categories);
         if (!empty($notInSorted)) {
-            $this->fail("The following categories are missing from original: ".implode(', ', array_column($notInSorted, 'Name')));
+            $this->fail(
+                "The following categories are missing from original: " .
+                    implode(", ", array_column($notInSorted, "Name"))
+            );
         }
     }
 
     /**
      * Test searching of categories.
      */
-    public function testSearchCategories() {
-        \Gdn::sql()->truncate('Category');
-        /** @var \CategoryModel $categoryModel */
-        $categoryModel = self::container()->get(\CategoryModel::class);
+    public function testSearchCategories()
+    {
+        \Gdn::sql()->truncate("Category");
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
 
         $cat1 = $categoryModel->save([
-            'ParentCategoryID' => -1,
-            'Name' => 'Category 1',
-            'UrlCode' => 'cat1',
-            'DisplayAs' => 'Categories',
+            "ParentCategoryID" => -1,
+            "Name" => "Category 1",
+            "UrlCode" => "cat1",
+            "DisplayAs" => "Categories",
         ]);
 
         $cat1_1 = $categoryModel->save([
-            'ParentCategoryID' => $cat1,
-            'Name' => 'Category 1.1',
-            'UrlCode' => 'cat1_1',
-            'DisplayAs' => 'Categories',
+            "ParentCategoryID" => $cat1,
+            "Name" => "Category 1.1",
+            "UrlCode" => "cat1_1",
+            "DisplayAs" => "Categories",
         ]);
 
         $cat1_1_1 = $categoryModel->save([
-            'ParentCategoryID' => $cat1_1,
-            'Name' => 'Category 1.1.1',
-            'UrlCode' => 'cat1_1_1',
-            'DisplayAs' => 'Categories',
+            "ParentCategoryID" => $cat1_1,
+            "Name" => "Category 1.1.1",
+            "UrlCode" => "cat1_1_1",
+            "DisplayAs" => "Categories",
         ]);
 
         $cat2 = $categoryModel->save([
-            'ParentCategoryID' => -1,
-            'Name' => 'Category 2',
-            'UrlCode' => 'cat2',
-            'DisplayAs' => 'Categories',
+            "ParentCategoryID" => -1,
+            "Name" => "Category 2",
+            "UrlCode" => "cat2",
+            "DisplayAs" => "Categories",
         ]);
 
         $cat2_1_followed = $categoryModel->save([
-            'ParentCategoryID' => $cat2,
-            'Name' => 'Category 2.1 followed',
-            'UrlCode' => 'cat2_1',
-            'DisplayAs' => 'Discussions',
+            "ParentCategoryID" => $cat2,
+            "Name" => "Category 2.1 followed",
+            "UrlCode" => "cat2_1",
+            "DisplayAs" => "Discussions",
         ]);
 
         $cat2_2_archived = $categoryModel->save([
-            'ParentCategoryID' => $cat2,
-            'Name' => 'Category 2.2 archived',
-            'UrlCode' => 'cat2_2',
-            'DisplayAs' => 'Categories',
-            'Archived' => 1
+            "ParentCategoryID" => $cat2,
+            "Name" => "Category 2.2 archived",
+            "UrlCode" => "cat2_2",
+            "DisplayAs" => "Categories",
+            "Archived" => 1,
         ]);
 
         $categoryModel->follow(\Gdn::session()->UserID, $cat2_1_followed, true);
 
-        $this->assertIDsEqual([
-            0,
-            $cat1,
-            $cat1_1,
-            $cat1_1_1,
-            $cat2,
-            $cat2_1_followed,
-            // Archived not included.
-        ], $categoryModel->getSearchCategoryIDs());
+        $this->assertIDsEqual(
+            [
+                -1,
+                0,
+                $cat1,
+                $cat1_1,
+                $cat1_1_1,
+                $cat2,
+                $cat2_1_followed,
+                // Archived not included.
+            ],
+            $categoryModel->getSearchCategoryIDs()
+        );
 
-        $this->assertIDsEqual([
-            0,
-            $cat2_1_followed,
-            // Archived not included.
-        ], $categoryModel->getSearchCategoryIDs(null, true));
+        $this->assertIDsEqual(
+            [
+                0,
+                $cat2_1_followed,
+                // Archived not included.
+            ],
+            $categoryModel->getSearchCategoryIDs(null, true)
+        );
 
-        $this->assertIDsEqual([
-            0,
-            $cat1,
-            $cat1_1,
-            $cat1_1_1,
-            $cat2,
-            $cat2_1_followed,
-            $cat2_2_archived
-            // Archived not included.
-        ], $categoryModel->getSearchCategoryIDs(null, null, null, true));
+        $this->assertIDsEqual(
+            [
+                -1,
+                0,
+                $cat1,
+                $cat1_1,
+                $cat1_1_1,
+                $cat2,
+                $cat2_1_followed,
+                $cat2_2_archived,
+                // Archived not included.
+            ],
+            $categoryModel->getSearchCategoryIDs(null, null, null, true)
+        );
 
-        $this->assertIDsEqual([
-            0,
-            $cat1,
-            $cat1_1,
-            $cat1_1_1,
-            // Archived not included.
-        ], $categoryModel->getSearchCategoryIDs($cat1, null, true));
+        $this->assertIDsEqual(
+            [
+                0,
+                $cat1,
+                $cat1_1,
+                $cat1_1_1,
+                // Archived not included.
+            ],
+            $categoryModel->getSearchCategoryIDs($cat1, null, true)
+        );
 
-        $this->assertIDsEqual([], $categoryModel->getSearchCategoryIDs(50000));
+        $this->assertIDsEqual([0], $categoryModel->getSearchCategoryIDs(50000));
+    }
+
+    /**
+     * Test CategoryModel::getCategoryDescendantIDs.
+     */
+    public function testGetCategoriesDescendantIDs(): void
+    {
+        \Gdn::sql()->truncate("Category");
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
+
+        $cat1 = $categoryModel->save([
+            "ParentCategoryID" => -1,
+            "Name" => "Category 1",
+            "UrlCode" => "cat1",
+            "DisplayAs" => "Categories",
+        ]);
+
+        $cat2 = $categoryModel->save([
+            "ParentCategoryID" => $cat1,
+            "Name" => "Category 2",
+            "UrlCode" => "cat1_2",
+            "DisplayAs" => "Categories",
+        ]);
+        $cat3 = $categoryModel->save([
+            "ParentCategoryID" => $cat2,
+            "Name" => "Category 3",
+            "UrlCode" => "cat1_3",
+            "DisplayAs" => "Categories",
+        ]);
+        $result = $categoryModel->getCategoriesDescendantIDs([$cat2, $cat1]);
+        $this->assertEqualsCanonicalizing([$cat1, $cat2, $cat3], $result);
+    }
+
+    /**
+     * Test that caching works for getDescandants.
+     */
+    public function testGetDescendantsCache()
+    {
+        $this->resetTable("Category");
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
+        $category1 = $categoryModel->save([
+            "ParentCategoryID" => -1,
+            "Name" => "cat1",
+            "UrlCode" => "cat1",
+            "DisplayAs" => "Categories",
+        ]);
+        $category1_1 = $categoryModel->save([
+            "ParentCategoryID" => $category1,
+            "Name" => "cat1_1",
+            "UrlCode" => "cat1_1",
+            "DisplayAs" => "Categories",
+        ]);
+
+        $this->assertIDsEqual([$category1_1], $categoryModel->getCategoryDescendantIDs($category1));
+
+        // Delete the category
+        $this->api()->delete("/categories/{$category1_1}");
+        $this->assertIDsEqual([], $categoryModel->getCategoryDescendantIDs($category1));
+    }
+
+    /**
+     * Test that we don't infinitely recurse when fetching IDs.
+     */
+    public function testDescendantRecursionGaurd()
+    {
+        $this->resetTable("Category");
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
+        $category1 = $categoryModel->save([
+            "ParentCategoryID" => -1,
+            "Name" => "cat1",
+            "UrlCode" => "cat1",
+            "DisplayAs" => "Categories",
+        ]);
+        $category1_1 = $categoryModel->save([
+            "ParentCategoryID" => $category1,
+            "Name" => "cat1_1",
+            "UrlCode" => "cat1_1",
+            "DisplayAs" => "Categories",
+        ]);
+        $categoryModel->setField($category1, "ParentCategoryID", $category1_1);
+
+        $this->assertIDsEqual([$category1_1, $category1], $categoryModel->getCategoryDescendantIDs($category1));
+    }
+
+    /**
+     * Test getting multiple items from the collection.
+     */
+    public function testCollectionGetMulti()
+    {
+        \Gdn::sql()->truncate("Category");
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
+
+        $simpleGet = $categoryModel->save([
+            "ParentCategoryID" => -1,
+            "Name" => "simple",
+            "UrlCode" => "simple",
+            "DisplayAs" => "Categories",
+        ]);
+
+        $refreshCache = $categoryModel->save([
+            "ParentCategoryID" => -1,
+            "Name" => "refreshCache",
+            "UrlCode" => "refreshCache",
+            "DisplayAs" => "Categories",
+        ]);
+
+        $alreadyGetMulti = $categoryModel->save([
+            "ParentCategoryID" => -1,
+            "Name" => "alreadyGetMulti",
+            "UrlCode" => "alreadyGetMulti",
+            "DisplayAs" => "Categories",
+        ]);
+
+        $fresh = $categoryModel->save([
+            "ParentCategoryID" => -1,
+            "Name" => "fresh",
+            "UrlCode" => "fresh",
+            "DisplayAs" => "Categories",
+        ]);
+
+        // Try and hydrate the in memory cache a bit.
+        $collection = $categoryModel->getCollection();
+        $this->assertCalculated($collection->get((int) $simpleGet));
+
+        $collection->refreshCache($refreshCache);
+        $this->assertCalculated($collection->get((int) $refreshCache));
+
+        // Load a mulit of it's own.
+        $this->assertCalculated($collection->getMulti([$alreadyGetMulti]));
+
+        // All together now.
+        $this->assertCalculated($collection->getMulti([$simpleGet, $refreshCache, $alreadyGetMulti, $fresh]));
+    }
+
+    /**
+     * Assert some categories have been calculated.
+     *
+     * @param array $categoryOrCategories
+     */
+    public function assertCalculated(array $categoryOrCategories)
+    {
+        $categories = $categoryOrCategories;
+        if (ArrayUtils::isAssociative($categories)) {
+            $categories = [$categories];
+        }
+
+        foreach ($categories as $category) {
+            $this->assertNotNull($category["PermsDiscussionsView"] ?? null);
+            $this->assertNotNull($category["Url"] ?? null);
+            $this->assertNotNull($category["CssClass"] ?? null);
+        }
+    }
+
+    /**
+     * Verify backwards-compatible behavior of resetting a category's permissions when updating.
+     */
+    public function testSaveResetPermissions(): void
+    {
+        $this->createRole(["name" => __FUNCTION__]);
+        $this->createPermissionedCategory(["parentCategoryID" => CategoryModel::ROOT_ID], [$this->lastRoleID]);
+
+        // Confirm the category is setup for custom permissions.
+        $original = $this->categoryModel->getID($this->lastInsertedCategoryID, DATASET_TYPE_ARRAY);
+        $this->assertSame($this->lastInsertedCategoryID, $original["PermissionCategoryID"]);
+
+        // Category was root-level, so should fall back to default category permissions.
+        $this->categoryModel->save([
+            "CategoryID" => $this->lastInsertedCategoryID,
+            "Name" => sha1(mt_rand()),
+            "Permissions" => null,
+        ]);
+        $result = $this->categoryModel->getID($this->lastInsertedCategoryID, DATASET_TYPE_ARRAY);
+        $this->assertSame(CategoryModel::ROOT_ID, $result["PermissionCategoryID"]);
+    }
+
+    /**
+     * Verify sparse updating an existing category won't unduly update its permissions.
+     */
+    public function testSavePermissionsUpdate(): void
+    {
+        $this->createRole(["name" => __FUNCTION__]);
+        $this->createPermissionedCategory(["parentCategoryID" => CategoryModel::ROOT_ID], [$this->lastRoleID]);
+
+        // Confirm the category is setup for custom permissions.
+        $original = $this->categoryModel->getID($this->lastInsertedCategoryID, DATASET_TYPE_ARRAY);
+        $this->assertSame($this->lastInsertedCategoryID, $original["PermissionCategoryID"]);
+
+        // Not modifying any permission fields, so the custom-permission status should be unchanged.
+        $this->categoryModel->save([
+            "CategoryID" => $this->lastInsertedCategoryID,
+            "Name" => sha1(mt_rand()),
+        ]);
+        $result = $this->categoryModel->getID($this->lastInsertedCategoryID, DATASET_TYPE_ARRAY);
+        $this->assertSame($this->lastInsertedCategoryID, $result["PermissionCategoryID"]);
+    }
+
+    /**
+     * Tests for sorting an array of categories as a tree.
+     */
+    public function testSortCategoriesAsTree()
+    {
+        $root = [
+            "Name" => "Root",
+            "CategoryID" => -1,
+            "ParentCategoryID" => null,
+        ];
+        $cat1 = [
+            "Name" => "1",
+            "CategoryID" => 1,
+            "ParentCategoryID" => -1,
+            "Sort" => 1,
+        ];
+        $cat1_1 = [
+            "Name" => "1.1",
+            "CategoryID" => 2,
+            "ParentCategoryID" => 1,
+            "Sort" => 1,
+        ];
+        $cat1_2 = [
+            "Name" => "1.2",
+            "CategoryID" => 3,
+            "ParentCategoryID" => 1,
+            "Sort" => 2,
+        ];
+        $cat2 = [
+            "Name" => "2",
+            "CategoryID" => 4,
+            "ParentCategoryID" => -1,
+            "Sort" => 2,
+        ];
+        $catNowhere = [
+            "Name" => "nowhere",
+            "CategoryID" => 1000,
+            "ParentCategoryID" => 1342,
+            "Sort" => -40,
+        ];
+
+        $expected = [$root, $cat1, $cat1_1, $cat1_2, $cat2, $catNowhere];
+
+        $in = [$cat2, $cat1_1, $cat1_2, $root, $catNowhere, $cat1];
+
+        $this->assertSame($expected, CategoryModel::sortCategoriesAsTree($in));
+
+        // Test when a broken tree is passed.
+        $expected = [$cat2, $catNowhere, $cat1_1, $cat1_2];
+
+        $in = [$cat2, $cat1_1, $cat1_2, $catNowhere];
+
+        $this->assertSame($expected, CategoryModel::sortCategoriesAsTree($in));
+    }
+
+    /**
+     * Test setting the local field of a category and making sure it's reflected.
+     */
+    public function testSetLocalNotFetched(): void
+    {
+        $this->assertNull(CategoryModel::$Categories);
+        CategoryModel::setLocalField($this->categoryID, "Name", __FUNCTION__);
+
+        $c1 = CategoryModel::categories($this->categoryID);
+        $this->assertSame(__FUNCTION__, $c1["Name"]);
+
+        // All categories should not have been fetched just to look at one.
+        $this->assertNull(CategoryModel::$Categories);
+
+        // If all categories are fetched then the change should be represented.
+        $this->assertSame(__FUNCTION__, CategoryModel::categories()[$this->categoryID]["Name"]);
+    }
+
+    /**
+     * Test setting the local field of a category and making sure it's reflected with a different fetch order
+     */
+    public function testSetLocalNotFetched2(): void
+    {
+        $this->assertNull(CategoryModel::$Categories);
+        CategoryModel::setLocalField($this->categoryID, "Name", __FUNCTION__);
+
+        // If all categories are fetched then the change should be represented.
+        $this->assertSame(__FUNCTION__, CategoryModel::categories()[$this->categoryID]["Name"]);
+
+        $this->assertSame(
+            __FUNCTION__,
+            CategoryModel::instance()
+                ->getCollection()
+                ->get($this->categoryID)["Name"]
+        );
+    }
+
+    /**
+     * Test setting the local field of a category and making sure it's reflected with a different fetch order
+     */
+    public function testSetLocalFetchedGlobally(): void
+    {
+        CategoryModel::categories();
+        CategoryModel::instance()
+            ->getCollection()
+            ->get($this->categoryID);
+        $this->assertNotNull(CategoryModel::$Categories);
+        CategoryModel::setLocalField($this->categoryID, "Name", __FUNCTION__);
+
+        // If all categories are fetched then the change should be represented.
+        $this->assertSame(__FUNCTION__, CategoryModel::categories($this->categoryID)["Name"]);
+
+        $this->assertSame(
+            __FUNCTION__,
+            CategoryModel::instance()
+                ->getCollection()
+                ->get($this->categoryID)["Name"]
+        );
+    }
+
+    /**
+     * This test is to protect against a brain fart in calculation logic.
+     */
+    public function testDontCorruptOtherCategoriesWithSetLocalField(): void
+    {
+        $id = $this->insertCategories(1)[0]["CategoryID"];
+        CategoryModel::setLocalField($this->categoryID, "Name", __FUNCTION__);
+
+        $this->assertNotSame(CategoryModel::categories($id)["Name"], __FUNCTION__);
+        $this->assertNotSame(CategoryModel::categories()[$id]["Name"], __FUNCTION__);
+    }
+
+    /**
+     * Verify basic behavior of deleteIDIterator method when deleting a category's contents.
+     */
+    public function testDeleteIDIteratorDelete(): void
+    {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $discussions = [
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+        ];
+
+        $iterator = $this->categoryModel->deleteIDIterable($categoryID);
+        ModelUtils::consumeGenerator($iterator);
+        foreach ($discussions as $discussion) {
+            try {
+                $discussionID = $discussion["discussionID"];
+                $this->api()->get("discussions/{$discussionID}");
+                $this->fail("Discussion not deleted: {$discussionID}");
+            } catch (ClientException $e) {
+                $this->assertStringStartsWith("Discussion has been deleted.", $e->getMessage());
+            }
+        }
+
+        $this->expectExceptionCode(404);
+        $this->expectExceptionMessage("Category not found.");
+        $this->api()->get("categories/{$categoryID}");
+    }
+
+    /**
+     * Verify basic behavior of deleteIDIterator method when moving a category's contents.
+     */
+    public function testDeleteIDIteratorMove(): void
+    {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newCategory = $this->createCategory();
+        $newCategoryID = $newCategory["categoryID"];
+
+        $discussions = [
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+        ];
+
+        $iterator = $this->categoryModel->deleteIDIterable($categoryID, ["newCategoryID" => $newCategoryID]);
+        ModelUtils::consumeGenerator($iterator);
+
+        foreach ($discussions as $discussion) {
+            $discussionID = $discussion["discussionID"];
+            $updatedDiscussion = $this->api()->get("discussions/{$discussionID}");
+            $this->assertSame($newCategoryID, $updatedDiscussion["categoryID"]);
+        }
+
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage("Category not found.");
+        $this->api()->get("categories/{$categoryID}");
+    }
+
+    /**
+     * Test fetching fields recursively.
+     */
+    public function testGetCategoryFieldRecursive()
+    {
+        $recursesOnSelfID = $this->categoryModel->save($this->newCategory([]));
+        $this->categoryModel->setField($recursesOnSelfID, "ParentCategoryID", $recursesOnSelfID);
+
+        $parentPhoto = "https://hello.com/parent.png";
+        $childPhoto = "https://hello.com/child.png";
+        $parentID = $this->categoryModel->save(
+            $this->newCategory([
+                "Photo" => $parentPhoto,
+            ])
+        );
+        $childWithPhotoID = $this->categoryModel->save(
+            $this->newCategory([
+                "ParentCategoryID" => $parentID,
+                "Photo" => $childPhoto,
+            ])
+        );
+        $childNoPhotoID = $this->categoryModel->save(
+            $this->newCategory([
+                "ParentCategoryID" => $parentID,
+            ])
+        );
+
+        $this->assertEquals(null, $this->categoryModel->getCategoryFieldRecursive($recursesOnSelfID, "Photo"));
+        $this->assertEquals($parentPhoto, $this->categoryModel->getCategoryFieldRecursive($parentID, "Photo"));
+        $this->assertEquals($parentPhoto, $this->categoryModel->getCategoryFieldRecursive($childNoPhotoID, "Photo"));
+        $this->assertEquals($childPhoto, $this->categoryModel->getCategoryFieldRecursive($childWithPhotoID, "Photo"));
+        $this->assertEquals(null, $this->categoryModel->getCategoryFieldRecursive(null, "Photo"));
+
+        // Different ways of querying.
+        $parentCat = $this->categoryModel->getID($parentID);
+        // With obj.
+        $this->assertEquals($parentPhoto, $this->categoryModel->getCategoryFieldRecursive($parentCat, "Photo"));
+        // With slug
+        $this->assertEquals(
+            $parentPhoto,
+            $this->categoryModel->getCategoryFieldRecursive($parentCat->UrlCode, "Photo")
+        );
+        // With array
+        $this->assertEquals($parentPhoto, $this->categoryModel->getCategoryFieldRecursive((array) $parentCat, "Photo"));
+
+        // Invalid parents
+        $nullParentID = $this->categoryModel->save(
+            $this->newCategory([
+                "ParentCategoryID" => null,
+            ])
+        );
+        $unknownParentID = $this->categoryModel->save(
+            $this->newCategory([
+                "ParentCategoryID" => 10000,
+            ])
+        );
+        $this->assertEquals(null, $this->categoryModel->getCategoryFieldRecursive($nullParentID, "Photo"));
+        $this->assertEquals(null, $this->categoryModel->getCategoryFieldRecursive($unknownParentID, "Photo"));
+
+        // Getting a default value out.
+        $this->assertEquals(
+            "mydefault",
+            $this->categoryModel->getCategoryFieldRecursive($unknownParentID, "Photo", "mydefault")
+        );
+    }
+
+    /**
+     * Verify discussions are moved when deleteAndReplace includes a new categoryID.
+     */
+    public function testDeleteAndReplaceMoveDiscussions(): void
+    {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newCategory = $this->createCategory();
+        $newCategoryID = $newCategory["categoryID"];
+
+        $discussions = [
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+        ];
+
+        $this->categoryModel->deleteAndReplace($categoryID, $newCategoryID);
+
+        foreach ($discussions as $discussion) {
+            $discussionID = $discussion["discussionID"];
+            $updatedDiscussion = $this->api()->get("discussions/{$discussionID}");
+            $this->assertSame($newCategoryID, $updatedDiscussion["categoryID"]);
+        }
+
+        $deletedRow = $this->categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
+        $this->assertFalse($deletedRow);
+    }
+
+    /**
+     * Test that the autogenerated CSS class name is never longer than 50 characters.
+     */
+    public function testAutoGeneratedCssClass(): void
+    {
+        $category = $this->createCategory([
+            "urlCode" => "AreallylongurlCode--longerthan50characterssowecantesttheautogeneratedcssClass",
+        ]);
+
+        $categoryFromTree = $this->categoryModel->getTreeAsFlat(-1)[$category["categoryID"]];
+        $this->assertEquals(50, strlen($categoryFromTree["CssClass"]));
+    }
+
+    /**
+     * Test that two truncated CssClass names generated from similar category urlCodes aren't identical.
+     */
+    public function testTruncatedCssClassNotDuplicated(): void
+    {
+        $categoryOne = $this->createCategory([
+            "urlCode" => "AReallyVeryLongUrlCodeThatWillCauseTheCssClassNameToGetTruncatedOne",
+            "parentCategoryID" => -1,
+        ]);
+        $categoryTwo = $this->createCategory([
+            "urlCode" => "AReallyVeryLongUrlCodeThatWillCauseTheCssClassNameToGetTruncatedTwo",
+            "parentCategoryID" => -1,
+        ]);
+
+        $categoryOneFromTree = $this->categoryModel->getTreeAsFlat(-1)[$categoryOne["categoryID"]];
+        $categoryTwoFromTree = $this->categoryModel->getTreeAsFlat(-1)[$categoryTwo["categoryID"]];
+
+        $this->assertNotEquals($categoryOneFromTree["CssClass"], $categoryTwoFromTree["CssClass"]);
+    }
+
+    /**
+     * Test `categoryModel->getVisibleCategoryIDs()`'s `filterHideDiscussions` option.
+     */
+    public function testGetVisibleCategoryIDsFilterHideDiscussions(): void
+    {
+        // Create 2 Categories. The second one has `HideAllDiscussions` set to 1.
+        $category1 = $this->createCategory();
+        $category2 = $this->createCategory();
+        $this->categoryModel->setField($category2["categoryID"], "HideAllDiscussions", 1);
+
+        // Obtain an unfiltered list of visible category IDs.
+        $unfilteredVisibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs(["forceArrayReturn" => true]);
+        // Assert that both categories exists within the list of IDs.
+        $this->assertTrue(in_array($category1["categoryID"], $unfilteredVisibleCategoryIDs));
+        $this->assertTrue(in_array($category2["categoryID"], $unfilteredVisibleCategoryIDs));
+
+        // Get a filtered list of visible category IDs where categories with `HideAllDiscussions`set to 1 are ignored.
+        $filteredVisibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs([
+            "forceArrayReturn" => true,
+            "filterHideDiscussions" => true,
+        ]);
+
+        // Assert that $category2 is left out of the list of IDs.
+        $this->assertTrue(in_array($category1["categoryID"], $filteredVisibleCategoryIDs));
+        $this->assertFalse(in_array($category2["categoryID"], $filteredVisibleCategoryIDs));
+    }
+
+    /**
+     * Test `categoryModel->getVisibleCategories()`'s `filterNonDiscussionCategories` option.
+     *
+     * @return void
+     */
+    public function testVisibleCategoryfilterNonDiscussionCategories(): void
+    {
+        //create two categories
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newCategory = $this->createCategory();
+        $newCategoryID = $newCategory["categoryID"];
+
+        //Add Discussions to the first one
+        $discussions = [
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+        ];
+        $filteredCategories = $this->categoryModel->getVisibleCategories(["filterNonDiscussionCategories" => true]);
+        $filteredCategoryIDs = array_column($filteredCategories, "CategoryID");
+        $this->assertContains($categoryID, $filteredCategoryIDs);
+        $this->assertNotContains($newCategoryID, $filteredCategoryIDs);
+    }
+
+    /**
+     * Test that when a child category is deleted, the CountCategories field of its parent is updated.
+     */
+    public function testCountCategoriesUpdated(): void
+    {
+        // Create a category.
+        $parentCategory = $this->createCategory();
+        $parentID = $parentCategory["categoryID"];
+
+        // Add some children
+        $childCatOne = $this->createCategory(["parentCategoryID" => $parentID]);
+        $childCatTwo = $this->createCategory(["parentCategoryID" => $parentID]);
+
+        // Test that CountCategories reflects the added children.
+        $updatedParentCategory = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
+        $this->assertSame($updatedParentCategory["CountCategories"], 2);
+
+        // Test that CountCategories reflects change when children are deleted.
+        $this->categoryModel->deleteID($childCatOne["categoryID"]);
+        $parentCategoryOneChildDeleted = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
+        $this->assertSame($parentCategoryOneChildDeleted["CountCategories"], 1);
+
+        $this->categoryModel->deleteID($childCatTwo["categoryID"]);
+        $parentCategoryTwoChildrenDeleted = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
+        $this->assertSame($parentCategoryTwoChildrenDeleted["CountCategories"], 0);
+    }
+
+    /**
+     * Test that there is no cache pollution in category fetching with range expressions.
+     */
+    public function testCachePollutionRangeExpression()
+    {
+        // Make sure we have an actual cache.
+        $this->enableCaching();
+        $this->container()->setInstance(CategoryModel::class, null);
+        $categoryModel = $this->container()->get(CategoryModel::class);
+        $cat1 = $this->createCategory();
+        $cat2 = $this->createCategory();
+
+        $rangeExpression = new RangeExpression(">", 0);
+        $rangeExpression = $rangeExpression->withFilteredValue("=", [$cat1["categoryID"]]);
+        $result = $categoryModel->selectCachedIDs([
+            "CategoryID" => $rangeExpression,
+        ]);
+        $this->assertEquals([$cat1["categoryID"]], $result);
+
+        $rangeExpression = new RangeExpression(">", 0);
+        $rangeExpression = $rangeExpression->withFilteredValue("=", [$cat2["categoryID"]]);
+        $result = $categoryModel->selectCachedIDs([
+            "CategoryID" => $rangeExpression,
+        ]);
+        $this->assertEquals([$cat2["categoryID"]], $result);
+    }
+
+    /**
+     * Test that canPostInCategory method returns true for the root category.
+     */
+    public function testCanPostInCategoryRoot()
+    {
+        $canPost = CategoryModel::doesCategoryAllowPosts(-1);
+        $this->assertTrue($canPost);
+    }
+
+    /**
+     * Test that canPostInCategory returns true for discussion-type category.
+     */
+    public function testCanPostInCategoryTrue()
+    {
+        $discussionCat = $this->createCategory(["displayAs" => "discussions"]);
+        $canPost = CategoryModel::doesCategoryAllowPosts($discussionCat["categoryID"]);
+        $this->assertTrue($canPost);
+    }
+
+    /**
+     * Test that canPostInCategory returns false for a non-discussion-type category.
+     */
+    public function testCanPostInCategoryFalse()
+    {
+        $headingCat = $this->createCategory(["displayAs" => "heading"]);
+        $canPost = CategoryModel::doesCategoryAllowPosts($headingCat);
+        $this->assertFalse($canPost);
+    }
+
+    /**
+     * Test that an error if thrown when calling canPostInCategory on a non-existent category.
+     */
+    public function testCanPostInCategoryPhantomCategory()
+    {
+        $this->expectException(NotFoundException::class);
+        CategoryModel::doesCategoryAllowPosts(11111);
+    }
+
+    /**
+     * Test that a ForbiddenException is thrown when calling checkCategoryAllowsPost on a non-discussion-type category.
+     */
+    public function testCheckCategoryAllowsPostError()
+    {
+        $headingCat = $this->createCategory(["displayAs" => "heading"]);
+        $this->expectException(ForbiddenException::class);
+        CategoryModel::checkCategoryAllowsPosts($headingCat);
+    }
+
+    /**
+     * Test a specific set of circumstances that would _previously_ trigger a validation error upon categoryModel's normalizeRow().
+     */
+    public function testWeirdlyOrderedAllowedDiscussionTypes()
+    {
+        // Create a category that's going to be the permissionCategory for the other category.
+        $parentCategory = $this->createCategory();
+        // Create a category that's going to use our previously created category as it's permissionCategory.
+        $childrenCategory = $this->createCategory();
+        // Set the parentCategory's allowedDiscussionTypes to Discussion/Question/Poll.
+        $this->categoryModel->setField(
+            $parentCategory["categoryID"],
+            "allowedDiscussionTypes",
+            '["Discussion","Question","Poll"]'
+        );
+        // Set the childrenCategory's permissionCategoryID to our parentCategory.
+        $this->categoryModel->setField(
+            $childrenCategory["categoryID"],
+            "permissionCategoryID",
+            $parentCategory["categoryID"]
+        );
+        // Set the childrenCategory's allowedDiscussionTypes to Idea/Poll.
+        $this->categoryModel->setField($childrenCategory["categoryID"], "allowedDiscussionTypes", '["Idea","Poll"]');
+
+        // If the allowedDiscussionTypes combination was problematic to categoryModel's normalizeRow() function, it would throw a 422 exception.
+        $apiCallValues = $this->api()
+            ->get("/categories", ["categoryID" => $childrenCategory["categoryID"]])
+            ->getBody();
+        // Assert that we got some data.
+        $this->assertTrue(is_array($apiCallValues));
+    }
+
+    /**
+     * Test return of getPostableDiscussionTypes, that it would return ignores translated string.
+     */
+    public function testGetPostableDiscussionTypes()
+    {
+        $translations = [
+            "New Poll" => "Funny Poll",
+        ];
+        $locale = self::container()->get(\Gdn_Locale::class);
+        $locale->LocaleContainer->loadArray($translations, "ClientLocale", "Definition", true);
+        $postableDiscussionTypes = $this->categoryModel->getPostableDiscussionTypes();
+
+        $this->assertCount(3, $postableDiscussionTypes);
+        $this->assertContains("poll", $postableDiscussionTypes);
+        $this->assertContains("discussion", $postableDiscussionTypes);
+    }
+
+    /**
+     * Test the user followed Category counts
+     *
+     * @return void
+     */
+    public function testFollowedCount(): void
+    {
+        //create category
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        //create a user
+        $user = $this->createUser();
+        $userID = $user["userID"];
+
+        //make the user follow the category
+        $this->categoryModel->setPreferences($userID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+        ]);
+
+        $this->assertTrue($this->categoryModel->isFollowed($userID, $categoryID));
+
+        // test that the count is now 1 for the category
+
+        $this->assertEquals(1, $this->categoryModel->getTotalFollowedCount($categoryID));
+
+        $newUser = $this->createUser();
+        $newUserID = $newUser["userID"];
+
+        $this->categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+        ]);
+
+        // make sure  the count is now 2
+        $this->assertEquals(2, $this->categoryModel->getTotalFollowedCount($categoryID));
+
+        //make the user update their preferences
+
+        $this->categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP) => true,
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_APP) => true,
+        ]);
+
+        // the count should still be 2
+        $this->assertEquals(2, $this->categoryModel->getTotalFollowedCount($categoryID));
+
+        // make the user unfollow the category
+
+        $this->categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => false,
+        ]);
+
+        // the count should drop back to 1
+        $this->assertEquals(1, $this->categoryModel->getTotalFollowedCount($categoryID));
+
+        //Test invalid category ID
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Category not found.");
+
+        $this->categoryModel->getTotalFollowedCount(999);
+    }
+
+    /**
+     * Test that a user has followed categories
+     *
+     * @return void
+     */
+    public function testHasFollowed(): void
+    {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newUser = $this->createUser();
+        $newUserID = $newUser["userID"];
+
+        $this->assertFalse($this->categoryModel->hasFollowed($newUserID));
+
+        $this->categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP) => true,
+        ]);
+
+        $this->assertTrue($this->categoryModel->hasFollowed($newUserID));
+    }
+
+    /**
+     * Test that the function provides valid categories having digest enabled
+     *
+     * @return void
+     */
+    public function testGetDigestEnabledCategories(): void
+    {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newUser = $this->createUser();
+        $newUserID = $newUser["userID"];
+        $this->assertEmpty($this->categoryModel->getDigestEnabledCategories($newUserID));
+        $this->runWithConfig(["Garden.Digest.Enabled" => true], function () use ($newUserID, $categoryID) {
+            $this->categoryModel->setPreferences($newUserID, $categoryID, [
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP) => true,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DIGEST_EMAIL) => true,
+            ]);
+            $this->assertEquals([$categoryID], $this->categoryModel->getDigestEnabledCategories($newUserID));
+        });
+    }
+
+    /**
+     * Test for unfollowed Categories
+     *
+     * @return void
+     */
+    public function testUnfollowedData(): void
+    {
+        // create 3 categories
+        $categoryIds = [];
+
+        for ($i = 1; $i <= 3; $i++) {
+            $categoryIds[] = $this->createCategory()["categoryID"];
+        }
+
+        //make the current session user unfollow one of the category
+        $userID = $this->getSession()->UserID;
+        $this->categoryModel->setPreferences($userID, $categoryIds[0], [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => false,
+        ]);
+
+        //assert that unfollowed call returns the unfollowed category data
+        $unFollowedCategory = $this->categoryModel->getUnfollowedData($userID, $categoryIds[0]);
+        $this->assertCount(1, $unFollowedCategory);
+
+        $this->assertArrayHasKey($categoryIds[0], $unFollowedCategory);
+        // make the user unfollow the rest of the categories
+
+        for ($i = 1; $i < 3; $i++) {
+            $this->categoryModel->setPreferences($userID, $categoryIds[$i], [
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => false,
+            ]);
+        }
+
+        $unFollowedCategory = $this->categoryModel->getUnfollowedData($userID);
+        $this->assertCount(3, $unFollowedCategory);
+
+        //passing invalid userID returns empty array
+
+        $unFollowedCategory = $this->categoryModel->getUnfollowedData(999);
+        $this->assertEmpty($unFollowedCategory);
+    }
+
+    /**
+     * Test that user has any unfollowed categories
+     *
+     * @depends testUnfollowedData
+     * @return void
+     */
+    public function testHasUnfollowed(): void
+    {
+        $userID = $this->getSession()->UserID;
+        $this->assertTrue($this->categoryModel->hasUnfollowed($userID));
+        $this->assertFalse($this->categoryModel->hasUnfollowed(999));
+    }
+
+    /**
+     * Test for default category preference
+     *
+     * @return void
+     */
+    public function testDefaultCategoryFollowedAddsLogsOrThrowsErrors(): void
+    {
+        $user = $this->createUser(["name" => "newUser"]);
+        $category = $this->createCategory(["name" => "Followed Category"]);
+        $flatCategory = $this->createCategory(["displayAs" => "flat"]);
+        $config = \Gdn::config();
+        $config->set("Preferences.CategoryFollowed.Defaults", "123");
+        $this->categoryModel->setDefaultCategoryPreferences($user["userID"]);
+        //Test Invalid format for configuration gets logged
+        $this->assertLog([
+            "level" => "notice",
+            "message" => "Invalid format received for the category default configuration.",
+            "event" => "configuration",
+        ]);
+
+        //create a permission category and verify that it's not getting assigned
+        $permissionCategory = $this->createPermissionedCategory(
+            ["parentCategoryID" => CategoryModel::ROOT_ID],
+            [\RoleModel::ADMIN_ID]
+        );
+
+        $this->api()->setUserID($user["userID"]);
+        $defaultCategoryPreferences = [
+            [
+                "categoryID" => $category["categoryID"],
+                "preferences" => [
+                    "preferences.followed" => true,
+                    "preferences.email.comments" => false,
+                    "preferences.email.posts" => false,
+                    "preferences.popup.comments" => true,
+                    "preferences.popup.posts" => true,
+                ],
+            ],
+            [
+                "categoryID" => $permissionCategory["categoryID"],
+                "preferences" => [
+                    "preferences.followed" => true,
+                    "preferences.email.comments" => false,
+                    "preferences.email.posts" => false,
+                    "preferences.popup.comments" => true,
+                    "preferences.popup.posts" => true,
+                ],
+            ],
+            [
+                "categoryID" => $flatCategory["categoryID"],
+                "preferences" => [
+                    "preferences.followed" => true,
+                    "preferences.email.comments" => true,
+                    "preferences.email.posts" => true,
+                    "preferences.popup.comments" => true,
+                    "preferences.popup.posts" => true,
+                ],
+            ],
+        ];
+        $config->set("Preferences.CategoryFollowed.Defaults", json_encode($defaultCategoryPreferences));
+
+        $this->categoryModel->setDefaultCategoryPreferences($user["userID"]);
+        $this->assertTrue($this->categoryModel->isFollowed($user["userID"], $category["categoryID"]));
+        $this->assertFalse($this->categoryModel->isFollowed($user["userID"], $permissionCategory["categoryID"]));
+        $this->assertFalse($this->categoryModel->isFollowed($user["userID"], $flatCategory["categoryID"]));
+    }
+
+    /**
+     * Data provider for testConvertOldPreferencesToNew()
+     *
+     * @return array
+     * @todo: Remove me after 2023.014 release.
+     */
+    public function provideDefaultCategorySettings(): array
+    {
+        return [
+            [
+                [
+                    [
+                        "categoryID" => 1,
+                        "name" => "Test Cat 1",
+                        "useEmailNotifications" => false,
+                        "postNotifications" => "follow",
+                    ],
+                ],
+                [
+                    "categoryID" => 1,
+                    "preferences" => [
+                        CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW => true,
+                        CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => false,
+                        CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL => false,
+                    ],
+                ],
+            ],
+            [
+                [
+                    [
+                        "categoryID" => 2,
+                        "name" => "Test Cat 2",
+                        "useEmailNotifications" => true,
+                        "postNotifications" => "discussions",
+                    ],
+                ],
+                [
+                    "categoryID" => 2,
+                    "preferences" => [
+                        CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW => true,
+                        CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_APP => true,
+                        CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => true,
+                        CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL => true,
+                    ],
+                ],
+            ],
+            [
+                [
+                    [
+                        "categoryID" => 3,
+                        "name" => "Test Cat 3",
+                        "useEmailNotifications" => true,
+                        "postNotifications" => "all",
+                    ],
+                ],
+                [
+                    "categoryID" => 3,
+                    "preferences" => [
+                        CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW => true,
+                        CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_APP => true,
+                        CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_APP => true,
+                        CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => true,
+                        CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL => true,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Test that a deleted category preferences doesn't get assigned to user on login.
+     *
+     * @return void
+     */
+    public function testDefaultCategoryIsNotSetIfTheCategoryNotExist(): void
+    {
+        $this->createUser(["name" => "testDefaultUser"]);
+        $userID = $this->lastUserID;
+        $this->createCategory();
+        $categoryID = $this->lastInsertedCategoryID;
+        $dafaultCategories = [
+            [
+                "categoryID" => $categoryID,
+                "preferences" => [
+                    CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW => true,
+                    CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => true,
+                    CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL => true,
+                ],
+            ],
+            [
+                "categoryID" => 999,
+                "preferences" => [
+                    CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW => true,
+                    CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => false,
+                    CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL => false,
+                ],
+            ],
+        ];
+        $config = \Gdn::config();
+        $config->set("Preferences.CategoryFollowed.Defaults", json_encode($dafaultCategories));
+
+        $this->categoryModel->setDefaultCategoryPreferences($userID);
+        $this->assertTrue($this->categoryModel->isFollowed($userID, $categoryID));
+        $this->assertFalse($this->categoryModel->isFollowed($userID, 999));
+    }
+
+    /**
+     * Test that when a category is deleted, it is removed from the default category preferences, if it exists.
+     *
+     * @return void
+     */
+    public function testDefaultCategoryIsRemovedFromConfigWhenACategoryIsDeleted()
+    {
+        $this->createCategory();
+        $categoryID = $this->lastInsertedCategoryID;
+        $this->createCategory();
+        $categoryID2 = $this->lastInsertedCategoryID;
+        $this->createCategory(["parentCategoryID" => -1]);
+        $categoryID3 = $this->lastInsertedCategoryID;
+        $preferences = [
+            CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW => true,
+            CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => true,
+            CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL => true,
+        ];
+        $defaultCategories = [
+            [
+                "categoryID" => $categoryID,
+                "preferences" => $preferences,
+            ],
+            [
+                "categoryID" => $categoryID2,
+                "preferences" => $preferences,
+            ],
+            [
+                "categoryID" => $categoryID3,
+                "preferences" => $preferences,
+            ],
+        ];
+        $config = \Gdn::config();
+        $config->set("Preferences.CategoryFollowed.Defaults", json_encode($defaultCategories));
+
+        $this->categoryModel->deleteID($categoryID);
+
+        $this->assertEmpty($this->categoryModel->getID($categoryID));
+
+        $defaultCategoryPreferences = json_decode($config->get("Preferences.CategoryFollowed.Defaults"), true);
+        $this->assertCount(1, $defaultCategoryPreferences);
+        $this->assertEquals($categoryID3, $defaultCategoryPreferences[0]["categoryID"]);
+    }
+
+    /**
+     *  Test conversion of old default preferences to the new preference structure
+     *
+     * @dataProvider provideDefaultCategorySettings
+     * @toDo : Remove me after 2023.014 release.
+     */
+
+    public function testConvertOldPreferencesToNew($oldConfiguration, $expectedConfiguration)
+    {
+        $newConfiguration = $this->categoryModel->convertOldPreferencesToNew($oldConfiguration);
+        $newConfiguration = reset($newConfiguration);
+        $this->assertEquals($expectedConfiguration, $newConfiguration);
+    }
+
+    /**
+     * Smoke test of `CategoryModel::getPreferences()`.
+     * This tests that there is no exception if there is no corresponding UserCategory row for the user.
+     */
+    public function testGetPreferences()
+    {
+        $category = $this->createCategory();
+        $user = $this->createUser();
+        \Gdn::getContainer()
+            ->get(\UserMetaModel::class)
+            ->setUserMeta(
+                $user["userID"],
+                sprintf(CategoryModel::PREFERENCE_COMMENT_EMAIL, $category["categoryID"]),
+                true
+            );
+
+        $preferences = $this->categoryModel->getPreferences($user["userID"]);
+        $this->assertArrayHasKey($category["categoryID"], $preferences);
+    }
+
+    /**
+     * Test Total digest enabled users for a category
+     */
+    public function testDigestEnabledUserCountForCategories(): void
+    {
+        $digestCategory = $this->createCategory([
+            "name" => "Digest Category",
+        ]);
+        $this->assertEquals(
+            0,
+            $this->categoryModel->getDigestEnabledUserCountForCategory($digestCategory["categoryID"])
+        );
+        $digestUser = $this->createUser(["name" => "Digest User"]);
+        $userID = $digestUser["userID"];
+        $categoryID = $digestCategory["categoryID"];
+        //make the user follow the category
+        $this->runWithConfig(["Garden.Digest.Enabled" => true], function () use ($userID, $categoryID) {
+            $this->categoryModel->setPreferences($userID, $categoryID, [
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DIGEST_EMAIL) => true,
+            ]);
+        });
+
+        $this->assertEquals(
+            0,
+            $this->categoryModel->getDigestEnabledUserCountForCategory($digestCategory["categoryID"])
+        );
+
+        \Gdn::getContainer()
+            ->get(\UserMetaModel::class)
+            ->setUserMeta($userID, "Preferences.Email.DigestEnabled", true);
+
+        $this->assertEquals(
+            1,
+            $this->categoryModel->getDigestEnabledUserCountForCategory($digestCategory["categoryID"])
+        );
+    }
+
+    /**
+     * Test Followed categories count for deleted categories.
+     */
+    public function testGetFollowedDeleteCategories()
+    {
+        $userID = Gdn::session()->UserID;
+
+        // Create a few root categories
+        $categoryA = $this->createCategory(["parentCategoryID" => -1]);
+        $categoryB = $this->createCategory(["parentCategoryID" => -1]);
+        $categoryC = $this->createCategory(["parentCategoryID" => -1]);
+
+        // Get the original count of followed categories for the current user.
+        $originalFollowedCount = count($this->categoryModel->getFollowed($userID));
+
+        // Follow 2 of the 3 categories.
+        $this->categoryModel->follow($userID, $categoryA["categoryID"]);
+        $this->categoryModel->follow($userID, $categoryB["categoryID"]);
+
+        // Get the new count of followed categories for the current user.
+        $newFollowedCount = count($this->categoryModel->getFollowed($userID));
+        $this->assertEquals(2, $newFollowedCount - $originalFollowedCount);
+
+        // Delete one of the two followed categories.
+        $this->categoryModel->deleteID($categoryA["categoryID"]);
+
+        // Get the final count of followed categories for the current user.
+        $finalFollowedCount = count($this->categoryModel->getFollowed($userID));
+        $this->assertEquals(1, $finalFollowedCount - $originalFollowedCount);
+    }
+
+    /**
+     * Test to validate that the ensureCategoryID method will always return an
+     * integer for categoryID regardless of UrlCode
+     */
+    public function testEnsureCategoryID(): void
+    {
+        $categories = [
+            [
+                "name" => "Category 1",
+                "UrlCode" => "1",
+            ],
+            [
+                "name" => "Category 2",
+                "UrlCode" => "category-two",
+            ],
+            [
+                "name" => "Category Ampersand",
+                "UrlCode" => "category-&-ampersand",
+            ],
+            [
+                "name" => "Category Colon",
+                "UrlCode" => "category-:-colon",
+            ],
+            [
+                "name" => "Category Dollar",
+                "UrlCode" => "category-$-dollar",
+            ],
+            [
+                "name" => "Category Hash",
+                "UrlCode" => "category-#-hash",
+            ],
+        ];
+
+        foreach ($categories as $category) {
+            $this->createCategory(
+                [
+                    "name" => $category["name"],
+                ],
+                [
+                    "UrlCode" => $category["UrlCode"],
+                ]
+            );
+        }
+
+        foreach ($categories as $expected) {
+            $encodedSlug = urlencode($expected["UrlCode"]);
+            $categoryID = $this->categoryModel->ensureCategoryID($encodedSlug);
+            $this->assertIsInt($categoryID);
+        }
+    }
+
+    /**
+     * Test that the root get properly incremented when a new post is made.
+     *
+     * @return void
+     */
+    public function testCategoryIncrement(): void
+    {
+        $before = $this->categoryModel->getID(-1, DATASET_TYPE_ARRAY);
+        $this->createDiscussion();
+        $after = $this->categoryModel->getID(-1, DATASET_TYPE_ARRAY);
+        $this->assertEquals($before["CountAllDiscussions"] + 1, $after["CountAllDiscussions"]);
     }
 }

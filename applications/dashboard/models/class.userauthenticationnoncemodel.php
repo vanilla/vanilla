@@ -8,8 +8,8 @@
 /**
  * Handles user data and issuing and consuming nonces.
  */
-class UserAuthenticationNonceModel extends Gdn_Model {
-
+class UserAuthenticationNonceModel extends Gdn_Model
+{
     use \Vanilla\PrunableTrait;
     use \Vanilla\TokenSigningTrait;
 
@@ -23,24 +23,26 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      *
      * @param string $secret The secret used to sign access tokens for the client.
      */
-    public function __construct($secret = null) {
-        parent::__construct('UserAuthenticationNonce');
-        $this->setPruneField('Timestamp');
-        $this->setPruneAfter('45 minutes');
-        $secret = $secret ?: c('Garden.Cookie.Salt');
+    public function __construct($secret = null)
+    {
+        parent::__construct("UserAuthenticationNonce");
+        $this->setPruneField("Timestamp");
+        $this->setPruneAfter("45 minutes");
+        $secret = $secret ?: c("Garden.Cookie.Salt");
         $this->setSecret($secret);
-        $this->PrimaryKey = 'Nonce';
-        $this->tokenIdentifier ='nonce';
+        $this->PrimaryKey = "Nonce";
+        $this->tokenIdentifier = "nonce";
     }
 
     /**
      * @inheritdoc
      */
-    public function insert($fields) {
+    public function insert($fields)
+    {
         $this->prune();
 
-        if (!isset($fields['Timestamp'])) {
-            $fields['Timestamp'] = date(MYSQL_DATE_FORMAT);
+        if (!isset($fields["Timestamp"])) {
+            $fields["Timestamp"] = date(MYSQL_DATE_FORMAT);
         }
         $result = parent::insert($fields);
 
@@ -55,15 +57,16 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      * @return string $nonce The signed nonce.
      * @throws Gdn_UserException Unable to generate a signed nonce.
      */
-    public function issue($expires = '5 minutes', $type = 'system'): string {
+    public function issue($expires = "5 minutes", $type = "system"): string
+    {
         $token = $this->randomToken();
         $nonce = $this->signToken($token, $expires);
         $expireDate = Gdn_Format::toDateTime($this->toTimestamp($expires));
 
         $result = $this->insert([
-            'Nonce' => $nonce,
-            'Token' => $type,
-            'Timestamp' => $expireDate,
+            "Nonce" => $nonce,
+            "Token" => $type,
+            "Timestamp" => $expireDate,
         ]);
 
         if ($result === false) {
@@ -78,14 +81,12 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      * @param string $nonce The nonce to be consumed.
      * @throws Exception if unable to find nonce.
      */
-    public function consume(string $nonce) {
+    public function consume(string $nonce)
+    {
         $row = $this->getID($nonce, DATASET_TYPE_ARRAY);
         if ($row) {
             // Timestamp cannot be null or zero. Use a constant date for consumed nonces.
-            $this->update(
-                ['Timestamp' => self::CONSUMED_TIMESTAMP],
-                ['Nonce' => $nonce]
-            );
+            $this->update(["Timestamp" => self::CONSUMED_TIMESTAMP], ["Nonce" => $nonce]);
         } else {
             throw new \Exception("Unable to find nonce", 500);
         }
@@ -99,7 +100,8 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      * @param bool $throw Whether or not to throw an exception on a verification error.
      * @return bool If the nonce is verified it returns true, false if otherwise.
      */
-    public function verify(string $nonce = '', bool $consume = true, bool $throw = false): bool {
+    public function verify(string $nonce = "", bool $consume = true, bool $throw = false): bool
+    {
         // First verify the token without going to the database.
         if (!$this->verifyTokenSignature($nonce, $throw)) {
             return false;
@@ -107,15 +109,15 @@ class UserAuthenticationNonceModel extends Gdn_Model {
 
         $row = $this->getID($nonce, DATASET_TYPE_ARRAY);
         if (!$row) {
-            return $this->tokenError('The nonce was not found in the database.', 401, $throw);
+            return $this->tokenError("The nonce was not found in the database.", 401, $throw);
         }
 
         // Check the expiry date from the database.
-        $dbExpires = $this->toTimestamp($row['Timestamp']);
+        $dbExpires = $this->toTimestamp($row["Timestamp"]);
         if ($dbExpires === $this->toTimestamp(self::CONSUMED_TIMESTAMP)) {
-            return $this->tokenError('Nonce was already used.', 401, $throw);
+            return $this->tokenError("Nonce was already used.", 401, $throw);
         } elseif ($dbExpires < time()) {
-            return $this->tokenError('Nonce has expired.', 401, $throw);
+            return $this->tokenError("Nonce has expired.", 401, $throw);
         }
 
         if ($consume) {

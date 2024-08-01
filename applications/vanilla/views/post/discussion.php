@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
+use Vanilla\Web\TwigStaticRenderer;
+
 $CancelUrl = $this->data('_CancelUrl');
 if (!$CancelUrl) {
     $CancelUrl = '/discussions';
@@ -19,8 +21,15 @@ if (!$CancelUrl) {
 
     $this->fireEvent('BeforeFormInputs');
 
+    $newCategoryDropdown = Gdn::themeFeatures()->get("NewCategoryDropdown");
+
     if ($this->ShowCategorySelector === true) {
-        $options = ['Value' => val('CategoryID', $this->Category), 'IncludeNull' => true];
+        $includeNull = true;
+        if ($this->Category && $this->CategoryID > 0 && $this->Category->DisplayAs === CategoryModel::DISPLAY_DISCUSSIONS) {
+            $includeNull = [$this->Category->CategoryID, $this->Category->Name];
+        }
+        $options = ['Value' => val('CategoryID', $this->Category), "IncludeNull" => $includeNull, 'AdditionalPermissions' => ['PermsDiscussionsAdd']];
+
         if ($this->Context) {
             $options['Context'] = $this->Context;
         }
@@ -31,13 +40,21 @@ if (!$CancelUrl) {
         if (property_exists($this, 'Draft') && is_object($this->Draft)) {
             $options['DraftID'] = $this->Draft->DraftID;
         }
+        if ($newCategoryDropdown) {
+            echo $this->Form->categoryDropDown('CategoryID', $options);
+        } else {
+            echo '<div class="P">';
+            echo '<div class="Category">';
+            echo $this->Form->label('Category', 'CategoryID'), ' ';
+            echo $this->Form->categoryDropDown('CategoryID', $options);
+            echo '</div>';
+            echo '</div>';
+        }
+    } elseif ($newCategoryDropdown && isset($this->Category)) {
+        $category = (array) $this->Category;
+        $props = $this->Form->getSingleCategoryInfoProps( $category);
 
-        echo '<div class="P">';
-        echo '<div class="Category">';
-        echo $this->Form->label('Category', 'CategoryID'), ' ';
-        echo $this->Form->categoryDropDown('CategoryID', $options);
-        echo '</div>';
-        echo '</div>';
+        echo TwigStaticRenderer::renderReactModule('CategoryPicker', $props);
     }
 
     echo '<div class="P">';
@@ -48,7 +65,7 @@ if (!$CancelUrl) {
     $this->fireEvent('BeforeBodyInput');
 
     echo '<div class="P">';
-    echo $this->Form->bodyBox('Body', ['Table' => 'Discussion', 'FileUpload' => true, 'placeholder' => t('Type your message'), 'title' => t('Type your message')]);
+    echo $this->Form->bodyBox('Body', ['Table' => 'Discussion', 'FileUpload' => Gdn::session()->checkPermission('Garden.Uploads.Add'), 'placeholder' => t('Type your message'), 'title' => t('Type your message')]);
     echo '</div>';
 
     $Options = '';

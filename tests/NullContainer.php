@@ -7,23 +7,35 @@
 
 namespace VanillaTests;
 
-class NullContainer extends \Garden\Container\Container {
+class NullContainer extends \Garden\Container\Container
+{
     /**
      * NullContainer constructor.
      */
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     /**
      * Make sure that we fail!
+     * @inheritDoc
      */
-    public function rule($id) {
-        throw new \Exception('NullContainer is being called which means that the bootstrapping process failed somewhere.');
+    public function rule($id)
+    {
+        trigger_error(
+            "NullContainer is being called which means that the bootstrapping process failed somewhere.",
+            E_USER_ERROR
+        );
+        return $this;
     }
 
     /**
      * Make sure that we fail!
      */
-    public function getArgs($id, array $args = []) {
-        throw new \Exception('NullContainer is being called which means that the bootstrapping process failed somewhere.');
+    public function getArgs($id, array $args = [])
+    {
+        throw new \Exception(
+            "NullContainer is being called which means that the bootstrapping process failed somewhere."
+        );
     }
 }

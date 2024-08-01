@@ -7,343 +7,308 @@
 
 namespace Vanilla\Models;
 
+use Garden\Container\Container;
 use Garden\Web\RequestInterface;
-use Gdn;
 use Gdn_Session;
+use UserModel;
+use Vanilla\Addon;
+use Vanilla\AddonManager;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Web\RoleTokenFactory;
 
 /**
  * A class for gathering particular data about the site.
  */
-class SiteMeta implements \JsonSerializable {
-
-    /** @var string */
-    private $host;
-
-    /** @var string */
-    private $basePath;
-
-    /** @var string */
-    private $assetPath;
-
-    /** @var bool */
-    private $debugModeEnabled;
-
-    /** @var bool */
-    private $translationDebugModeEnabled;
-
-    /** @var string */
-    private $siteTitle;
-
-    /** @var string[] */
-    private $allowedExtensions;
-
-    /** @var int */
-    private $maxUploadSize;
-
-    /** @var int */
-    private $maxUploads;
-
-    /** @var string */
-    private $localeKey;
-
-
-    /** @var ThemeService */
-    private $themeService;
-
-    /** @var string */
-    private $activeThemeKey;
-
-    /** @var int $activeThemeRevisionID */
-    private $activeThemeRevisionID;
-
-    /** @var string */
-    private $mobileThemeKey;
-
-    /** @var string */
-    private $desktopThemeKey;
-
-    /** @var string */
-    private $activeThemeViewPath;
-
-    /** @var ThemeFeatures */
-    private $themeFeatures;
-
-    /** @var array $themePreview */
-    private $themePreview;
-
-    /** @var string */
-    private $favIcon;
-
-    /** @var string */
-    private $mobileAddressBarColor;
-
-    /** @var string|null */
-    private $shareImage;
-
-    /** @var string|null */
-    private $bannerImage;
-
-    /** @var array */
-    private $featureFlags;
-
-    /** @var Contracts\Site\SiteSectionInterface */
-    private $currentSiteSection;
-
-    /** @var string */
-    private $logo;
-
-    /** @var string */
-    private $orgName;
-
-    /** @var string */
-    private $cacheBuster;
-
-    /** @var string */
-    private $staticPathFolder = '';
-
-    /** @var string */
-    private $dynamicPathFolder = '';
-
-    /** @var Gdn_Session */
-    private $session;
-
-    /** @var string */
-    private $reCaptchaKey = '';
-
-    /** @var FormatService */
-    private $formatService;
+class SiteMeta implements \JsonSerializable
+{
+    /** @var SiteMetaExtra[] */
+    private $extraMetas = [];
 
     /**
      * SiteMeta constructor.
-     *
-     * @param RequestInterface $request The request to gather data from.
-     * @param Contracts\ConfigurationInterface $config The configuration object.
-     * @param SiteSectionModel $siteSectionModel
-     * @param DeploymentCacheBuster $deploymentCacheBuster
-     * @param ThemeFeatures $themeFeatures
-     * @param ThemeService $themeService
-     * @param Gdn_Session $session
-     * @param FormatService $formatService
      */
     public function __construct(
-        RequestInterface $request,
-        Contracts\ConfigurationInterface $config,
-        SiteSectionModel $siteSectionModel,
-        DeploymentCacheBuster $deploymentCacheBuster,
-        ThemeFeatures $themeFeatures,
-        ThemeService $themeService,
-        Gdn_Session $session,
-        FormatService $formatService
+        private Container $container,
+        private RequestInterface $request,
+        private Contracts\ConfigurationInterface $config,
+        private Gdn_Session $session,
+        private AddonManager $addonManager,
+        private OwnSite $site,
+        private SiteSectionModel $siteSectionModel,
+        private ThemeService $themeService,
+        private FormatService $formatService,
+        private UserModel $userModel
     ) {
-        $this->host = $request->getHost();
+    }
 
-        $this->formatService = $formatService;
-
-        // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
-        // But never with a trailing slash.
-        $this->basePath = rtrim('/'.trim($request->getRoot(), '/'), '/');
-        $this->assetPath = rtrim('/'.trim($request->getAssetRoot(), '/'), '/');
-        $this->debugModeEnabled = $config->get('Debug');
-        $this->translationDebugModeEnabled  = $config->get('TranslationDebug');
-
-        $this->featureFlags = $config->get('Feature', []);
-        $this->themeFeatures = $themeFeatures;
-
-        $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
-
-        // Get some ui metadata
-        // This title may become knowledge base specific or may come down in a different way in the future.
-        // For now it needs to come from some where, so I'm putting it here.
-        $this->siteTitle = $this->formatService->renderPlainText($config->get('Garden.Title', ""), HtmlFormat::FORMAT_KEY);
-
-        $this->orgName = $config->get('Garden.OrgName') ?: $this->siteTitle;
-
-        // Fetch Uploading metadata.
-        $this->allowedExtensions = $config->get('Garden.Upload.AllowedFileExtensions', []);
-        $maxSize = $config->get('Garden.Upload.MaxFileSize', ini_get('upload_max_filesize'));
-        $this->maxUploadSize = \Gdn_Upload::unformatFileSize($maxSize);
-        $this->maxUploads = (int)$config->get('Garden.Upload.maxFileUploads', ini_get('max_file_uploads'));
-
-        // localization
-        $this->localeKey = $this->currentSiteSection->getContentLocale();
-
-        // DeploymentCacheBuster
-        $this->cacheBuster = $deploymentCacheBuster->value();
-
-        $this->session = $session;
-
-        //Sign Out URL
-        $this->signOutUrl = $session->isValid() ? signOutUrl() : null;
-
-        // Theming
-        $currentTheme = $themeService->getCurrentTheme();
-        $currentThemeAddon = $themeService->getCurrentThemeAddon();
-
-        $this->activeThemeKey = $currentTheme->getThemeID();
-        $this->activeThemeRevisionID = $currentTheme->getRevisionID() ?? null;
-        $this->activeThemeViewPath = $currentThemeAddon->path('/views/');
-        $this->mobileThemeKey = $config->get('Garden.MobileTheme', 'Garden.Theme');
-        $this->desktopThemeKey = $config->get('Garden.Theme', ThemeService::FALLBACK_THEME_KEY);
-        $this->themePreview =  $themeService->getPreviewTheme();
-
-        if ($favIcon = $config->get("Garden.FavIcon")) {
-            $this->favIcon = \Gdn_Upload::url($favIcon);
+    private function getRoleTokenEncoded(): string
+    {
+        if ($this->session->isValid()) {
+            $roleIDs = $this->userModel->getRoleIDs($this->session->UserID);
+            if (!empty($roleIDs)) {
+                $factory = $this->container->get(RoleTokenFactory::class);
+                $roleToken = $factory->forEncoding($roleIDs);
+                return $roleToken->encode();
+            }
         }
+        return "";
+    }
 
-        if ($logo = $config->get("Garden.Logo")) {
-            $this->logo = \Gdn_Upload::url($logo);
-        }
-
-        if ($shareImage = $config->get("Garden.ShareImage")) {
-            $this->shareImage = \Gdn_Upload::url($shareImage);
-        }
-
-        $this->bannerImage = BannerImageModel::getCurrentBannerImageLink() ?: null;
-
-        $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
-
-        $this->reCaptchaKey = $config->get("RecaptchaV3.PublicKey", '');
+    /**
+     * Add an extra meta to the site meta.
+     *
+     * Notably `SiteMeta` is often used as a singleton, so extas given here will apply everywhere.
+     * if you want a localized instance use the `$localizedExtraMetas` param when fetching the value.
+     *
+     * @param SiteMetaExtra $extra
+     */
+    public function addExtra(SiteMetaExtra $extra)
+    {
+        $this->extraMetas[] = $extra;
     }
 
     /**
      * Return array for json serialization.
      */
-    public function jsonSerialize(): array {
+    public function jsonSerialize(): array
+    {
         return $this->value();
     }
 
     /**
+     * Make a method call and catch any throwables it provides.
+     *
+     * @param callable $fn
+     * @param mixed $fallback
+     *
+     * @return mixed
+     */
+    private function tryWithFallback(callable $fn, $fallback)
+    {
+        try {
+            return call_user_func($fn);
+        } catch (\Throwable $t) {
+            logException($t);
+            return $fallback;
+        }
+    }
+
+    /**
+     * Get the value of the site meta.
+     *
+     * @param SiteMetaExtra[] $localizedExtraMetas Extra metas for this one specific fetch of the value.
+     * Since `SiteMeta` is often used as a singleton, `SiteMeta::addExtra` will apply globally.
+     * By passing extra metas here they can be used for one specific instance.
+     *
      * @return array
      */
-    public function value(): array {
-        return [
-            'context' => [
-                'host' => $this->assetPath,
-                'basePath' => $this->basePath,
-                'assetPath' => $this->assetPath,
-                'debug' => $this->debugModeEnabled,
-                'translationDebug' => $this->translationDebugModeEnabled,
-                'cacheBuster' => $this->cacheBuster,
-                'staticPathFolder' => $this->staticPathFolder,
-                'dynamicPathFolder' => $this->dynamicPathFolder,
+    public function value(array $localizedExtraMetas = []): array
+    {
+        $extras = array_map(function (SiteMetaExtra $extra) {
+            try {
+                return $extra->getValue();
+            } catch (\Throwable $throwable) {
+                ErrorLogger::error(
+                    "Failed to load site meta   value for class " . get_class($extra),
+                    ["siteMeta"],
+                    [
+                        "exception" => $throwable,
+                    ]
+                );
+                return [];
+            }
+        }, array_merge($this->extraMetas, $localizedExtraMetas));
+
+        $embedAllowValue = $this->config->get("Garden.Embed.Allow", false);
+        $hasNewEmbed = FeatureFlagHelper::featureEnabled("newEmbedSystem");
+
+        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
+
+        $siteSectionSlugs = [];
+        foreach ($this->siteSectionModel->getAll() as $siteSection) {
+            if ($basePath = $siteSection->getBasePath()) {
+                $siteSectionSlugs[] = $basePath;
+            }
+        }
+
+        $defaultSiteSection = $this->siteSectionModel->getDefaultSiteSection();
+
+        // Deferred for performance reasons.
+        $themeFeatures = \Gdn::getContainer()->get(ThemeFeatures::class);
+        $activeSearchDriver = $this->config->get("Vanilla.Search.Driver", "MySQL");
+
+        $currentTheme = $this->themeService->getCurrentTheme();
+        $activeThemeKey = $currentTheme->getThemeID();
+        $mobileThemeKey = $this->config->get("Garden.MobileTheme", "Garden.Theme");
+        $desktopThemeKey = $this->config->get("Garden.Theme", ThemeService::FALLBACK_THEME_KEY);
+        $themePreview = $this->themeService->getPreviewTheme();
+
+        return array_replace_recursive(
+            [
+                "context" => [
+                    "requestID" => $this->request->getMeta("requestID"),
+                    "host" => $this->getAssetPath(), // Notably not the actual host.
+                    "basePath" => $this->getBasePath(),
+                    "assetPath" => $this->getAssetPath(),
+                    "debug" => $this->getDebugModeEnabled(),
+                    "translationDebug" => $this->config->get("TranslationDebug"),
+                    "conversationsEnabled" => $this->addonManager->isEnabled("conversations", Addon::TYPE_ADDON),
+                    "cacheBuster" => $this->container->get(DeploymentCacheBuster::class)->value(),
+                    "siteID" => $this->site->getSiteID(),
+                ],
+                "embed" => [
+                    "enabled" => (bool) $embedAllowValue,
+                    "isAdvancedEmbed" => !$hasNewEmbed && $embedAllowValue === 2,
+                    "isModernEmbed" => $hasNewEmbed,
+                    "forceModernEmbed" => (bool) $this->config->get("Garden.Embed.ForceModernEmbed", false),
+                    "remoteUrl" => $this->config->get("Garden.Embed.RemoteUrl", null),
+                ],
+                "ui" => [
+                    "siteName" => $this->getSiteTitle(),
+                    "orgName" => $this->getOrgName(),
+                    "localeKey" => $this->getLocaleKey(),
+                    "themeKey" => $activeThemeKey,
+                    "mobileThemeKey" => $mobileThemeKey,
+                    "desktopThemeKey" => $desktopThemeKey,
+                    "logo" => $this->getLogo(),
+                    "favIcon" => $this->getFavIcon(),
+                    "shareImage" => $this->getShareImage(),
+                    "bannerImage" => BannerImageModel::getCurrentBannerImageLink() ?: null,
+                    "mobileAddressBarColor" => $this->getMobileAddressBarColor(),
+                    "fallbackAvatar" => UserModel::getDefaultAvatarUrl(),
+                    "currentUser" => $this->userModel->currentFragment(),
+                    "editContentTimeout" => intval($this->config->get("Garden.EditContentTimeout")),
+                    "bannedPrivateProfile" => $this->config->get("Vanilla.BannedUsers.PrivateProfiles", false),
+                    "useAdminCheckboxes" => boolval($this->config->get("Vanilla.AdminCheckboxes.Use", false)),
+                    "autoOffsetComments" => boolval($this->config->get("Vanilla.Comments.AutoOffset", true)),
+                    "allowSelfDelete" => boolval($this->config->get("Vanilla.Comments.AllowSelfDelete", false)),
+                    "isDirectionRTL" => $this->getDirectionRTL(),
+                ],
+                "search" => [
+                    "defaultScope" => $this->config->get("Search.DefaultScope", "site"),
+                    "supportsScope" =>
+                        (bool) $this->config->get("Search.SupportsScope", false) &&
+                        $activeSearchDriver === "ElasticSearch",
+                    "activeDriver" => $activeSearchDriver,
+                    "externalSearch" => [
+                        "query" => $this->config->get("Garden.ExternalSearch.Query", false),
+                        "resultsInNewTab" => $this->config->get("Garden.ExternalSearch.ResultsInNewTab", false),
+                    ],
+                ],
+                "upload" => [
+                    "maxSize" => $this->getMaxUploadSize(),
+                    "maxUploads" => (int) $this->config->get(
+                        "Garden.Upload.maxFileUploads",
+                        ini_get("max_file_uploads")
+                    ),
+                    "allowedExtensions" => $this->getAllowedExtensions(),
+                ],
+
+                // In case there is a some failure here we don't want the site to crash.
+                "registrationUrl" => $this->tryWithFallback("registerUrl", ""),
+                "signInUrl" => $this->tryWithFallback("signInUrl", ""),
+                "signOutUrl" => $this->tryWithFallback("signOutUrl", ""),
+                "featureFlags" => $this->config->get("Feature", []),
+                "themeFeatures" => $themeFeatures->allFeatures(),
+                "addonFeatures" => $themeFeatures->allAddonFeatures(),
+                "defaultSiteSection" => $defaultSiteSection->jsonSerialize(),
+                "siteSection" => $currentSiteSection->jsonSerialize(),
+                "siteSectionSlugs" => $siteSectionSlugs,
+                "themePreview" => $themePreview,
+                "reCaptchaKey" => $this->config->get("RecaptchaV3.PublicKey", ""),
+                "TransientKey" => $this->session->transientKey(),
+                "roleToken" => $this->getRoleTokenEncoded(),
             ],
-            'ui' => [
-                'siteName' => $this->siteTitle,
-                'orgName' => $this->orgName,
-                'localeKey' => $this->localeKey,
-                'themeKey' => $this->activeThemeKey,
-                'mobileThemeKey' => $this->mobileThemeKey,
-                'desktopThemeKey' => $this->desktopThemeKey,
-                'logo' => $this->logo,
-                'favIcon' => $this->favIcon,
-                'shareImage' => $this->shareImage,
-                'bannerImage' => $this->bannerImage,
-                'mobileAddressBarColor' => $this->mobileAddressBarColor,
-            ],
-            'upload' => [
-                'maxSize' => $this->maxUploadSize,
-                'maxUploads' => $this->maxUploads,
-                'allowedExtensions' => $this->allowedExtensions,
-            ],
-            'signOutUrl' => $this->signOutUrl,
-            'featureFlags' => $this->featureFlags,
-            'themeFeatures' => $this->themeFeatures->allFeatures(),
-            'siteSection' => $this->currentSiteSection,
-            'themePreview' => $this->themePreview,
-            'reCaptchaKey' => $this->reCaptchaKey,
-        ];
+            ...$extras
+        );
     }
 
     /**
      * @return string
      */
-    public function getSiteTitle(): string {
-        return $this->siteTitle;
+    public function getSiteTitle(): string
+    {
+        return $this->formatService->renderPlainText($this->config->get("Garden.Title", ""), HtmlFormat::FORMAT_KEY);
     }
 
     /**
      * @return string
      */
-    public function getOrgName(): string {
-        return $this->orgName;
+    public function getOrgName(): string
+    {
+        return $this->config->get("Garden.OrgName") ?: $this->getSiteTitle();
     }
 
     /**
      * @return string
      */
-    public function getHost(): string {
-        return $this->host;
+    public function getHost(): string
+    {
+        return $this->request->getHost();
     }
 
     /**
      * @return string
      */
-    public function getBasePath(): string {
-        return $this->basePath;
+    public function getBasePath(): string
+    {
+        return rtrim("/" . trim($this->request->getRoot(), "/"), "/");
     }
 
     /**
      * @return string
      */
-    public function getAssetPath(): string {
-        return $this->assetPath;
+    public function getAssetPath(): string
+    {
+        return rtrim("/" . trim($this->request->getAssetRoot(), "/"), "/");
     }
 
     /**
      * @return bool
      */
-    public function getDebugModeEnabled(): bool {
-        return $this->debugModeEnabled;
+    public function getDebugModeEnabled(): bool
+    {
+        return $this->config->get("Debug");
     }
 
     /**
      * @return string[]
      */
-    public function getAllowedExtensions(): array {
-        return $this->allowedExtensions;
+    public function getAllowedExtensions(): array
+    {
+        $extensions = $this->config->get("Garden.Upload.AllowedFileExtensions", []);
+        if ($this->session->getPermissions()->has("Garden.Community.Manage")) {
+            $extensions = array_merge($extensions, \MediaApiController::UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS);
+        }
+        return $extensions;
     }
 
     /**
      * @return int
      */
-    public function getMaxUploadSize(): int {
-        return $this->maxUploadSize;
+    private function getMaxUploadSize(): int
+    {
+        // Fetch Uploading metadata.
+        $maxSize = $this->config->get("Garden.Upload.MaxFileSize", ini_get("upload_max_filesize"));
+        return \Gdn_Upload::unformatFileSize($maxSize);
     }
 
     /**
      * @return string
      */
-    public function getLocaleKey(): string {
-        return $this->localeKey;
-    }
-
-    /**
-     * @return string
-     */
-    public function getActiveThemeKey(): string {
-        return $this->activeThemeKey;
-    }
-
-    /**
-     * @return int
-     */
-    public function getActiveThemeRevisionID(): ?int {
-        return $this->activeThemeRevisionID;
-    }
-
-    /**
-     * @return string
-     */
-    public function getActiveThemeViewPath(): string {
-        return $this->activeThemeViewPath;
+    public function getLocaleKey(): string
+    {
+        return $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
     }
 
     /**
@@ -351,8 +316,12 @@ class SiteMeta implements \JsonSerializable {
      *
      * @return string|null
      */
-    public function getFavIcon(): ?string {
-        return $this->favIcon;
+    public function getFavIcon(): ?string
+    {
+        if ($favIcon = $this->config->get("Garden.FavIcon")) {
+            return \Gdn_Upload::url($favIcon);
+        }
+        return null;
     }
 
     /**
@@ -360,15 +329,25 @@ class SiteMeta implements \JsonSerializable {
      *
      * @return string|null
      */
-    public function getShareImage(): ?string {
-        return $this->shareImage;
+    public function getShareImage(): ?string
+    {
+        $shareImage = $this->config->get("Garden.ShareImage");
+        if (!empty($shareImage)) {
+            return \Gdn_Upload::url($shareImage);
+        }
+
+        return null;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getLogo(): ?string {
-        return $this->logo;
+    public function getLogo(): ?string
+    {
+        if ($logo = $this->config->get("Garden.Logo")) {
+            return \Gdn_Upload::url($logo);
+        }
+        return null;
     }
 
     /**
@@ -376,21 +355,17 @@ class SiteMeta implements \JsonSerializable {
      *
      * @return string|null
      */
-    public function getMobileAddressBarColor(): ?string {
-        return $this->mobileAddressBarColor;
+    public function getMobileAddressBarColor(): ?string
+    {
+        return $this->config->get("Garden.MobileAddressBarColor", null);
     }
 
     /**
-     * @param string $staticPathFolder
+     * @return bool
      */
-    public function setStaticPathFolder(string $staticPathFolder) {
-        $this->staticPathFolder = $staticPathFolder;
-    }
-
-    /**
-     * @param string $dynamicPathFolder
-     */
-    public function setDynamicPathFolder(string $dynamicPathFolder) {
-        $this->dynamicPathFolder = $dynamicPathFolder;
+    public function getDirectionRTL(): bool
+    {
+        return in_array($this->getLocaleKey(), \LocaleModel::getRTLLocales()) &&
+            in_array($this->getLocaleKey(), $this->config->get("Garden.RTLLocales", []));
     }
 }

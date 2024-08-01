@@ -15,3 +15,12 @@ Mixed 2
 Mixed 2.1 (indented 1)
 Mixed 2.2 (indented 1)
 Mixed 3
+
+(exp 1) First item
+(exp a) First indented item
+(exp 2) Second item
+(exp 3) Third item
+(exp a) First indented item
+(exp i) Second indented item
+(exp ii) Third indented item
+(exp 4) Fourth item

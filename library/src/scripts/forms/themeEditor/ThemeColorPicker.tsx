@@ -15,7 +15,7 @@ import { stringIsValidColor } from "@library/styles/styleUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
 import Pickr from "@simonwep/pickr";
@@ -28,15 +28,19 @@ interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "
     disabled?: boolean;
 }
 
+/**
+ * FIXME: [VNLA-1019] Refactor this component to consume @library/components/ColorPicker instead
+ */
+
 export function ThemeColorPicker(_props: IProps) {
     const { variableKey, inputClass, disabled, ...inputProps } = _props;
     const { inputID, labelID } = useThemeBlock();
 
     // The field
-    const { generatedValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField(variableKey);
+    const { generatedValue, rawValue, defaultValue, setValue, error, setError } =
+        useThemeVariableField<string>(variableKey);
 
     const classes = colorPickerClasses();
-    const colorInput = useRef<HTMLInputElement>(null);
     const textInput = useRef<HTMLInputElement>(null);
     const builderClasses = themeBuilderClasses();
 
@@ -44,15 +48,21 @@ export function ThemeColorPicker(_props: IProps) {
 
     // Track whether we have a valid color.
     // If the color is not set, we don't really care.
-    const [textInputValue, setTextFieldValue] = useState<string | null>(rawValue);
+    const [textInputValue, setTextFieldValue] = useState<string | null>(rawValue ?? null);
     const [lastValidColor, setLastValidColor] = useState<string | null>(rawValue ?? null);
-
-    useEffect(() => {
-        setTextFieldValue(rawValue);
-    }, [rawValue, setTextFieldValue]);
 
     // If we have no color selected we are displaying the default and are definitely valid.
     const isValidColor = textInputValue ? stringIsValidColor(textInputValue) : true;
+
+    useEffect(() => {
+        setTextFieldValue(rawValue ?? null);
+        if (stringIsValidColor(rawValue)) {
+            setLastValidColor(rawValue ?? null);
+        }
+        if (rawValue == null) {
+            setLastValidColor(null);
+        }
+    }, [rawValue, setTextFieldValue]);
 
     // Do initial load validation of the color.
     useEffect(() => {
@@ -67,7 +77,7 @@ export function ThemeColorPicker(_props: IProps) {
         if (colorString === "") {
             // we are clearing our color to the default.
             setValue(colorString);
-            setLastValidColor(defaultValue);
+            setLastValidColor(defaultValue ?? null);
         } else if (stringIsValidColor(colorString)) {
             setValue(colorString); // Only set valid color if passes validation
             setLastValidColor(colorString);
@@ -77,7 +87,7 @@ export function ThemeColorPicker(_props: IProps) {
     };
 
     // Handle updates from the text field.
-    const onTextChange = e => {
+    const onTextChange = (e) => {
         const colorString = e.target.value;
         handleColorChange(colorString);
     };
@@ -108,7 +118,7 @@ export function ThemeColorPicker(_props: IProps) {
         }
     };
 
-    const defaultColorString = ensureColorHelper(generatedValue).toHexString();
+    const defaultColorString = generatedValue ? ensureColorHelper(generatedValue).toHexString() : "#fff";
     const validColorString = lastValidColor ? ensureColorHelper(lastValidColor).toHexString() : defaultColorString;
 
     return (
@@ -127,7 +137,7 @@ export function ThemeColorPicker(_props: IProps) {
                     placeholder={defaultColorString}
                     value={textInputValue ?? ""} // Null is not an allowed value for an input.
                     onChange={onTextChange}
-                    auto-correct="false"
+                    autoCorrect="false"
                     disabled={disabled}
                     aria-disabled={disabled}
                 />
@@ -241,7 +251,7 @@ function Picker(props: { onChange: (newColor: string) => void; validColorString:
             aria-hidden={true}
             className={classes.swatch}
             tabIndex={-1}
-            baseClass={ButtonTypes.CUSTOM}
+            buttonType={ButtonTypes.CUSTOM}
         >
             <ScreenReaderContent>{props.validColorString}</ScreenReaderContent>
         </Button>

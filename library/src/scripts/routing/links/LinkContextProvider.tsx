@@ -4,26 +4,31 @@
  * @license GPL-2.0-only
  */
 
-import React, { useContext } from "react";
+import React, { useContext, useCallback } from "react";
 import { formatUrl } from "@library/utility/appUtils";
 import { createPath, LocationDescriptor, LocationDescriptorObject } from "history";
-import { RouteComponentProps, withRouter } from "react-router";
-import { useContentTranslator } from "@vanilla/i18n";
+import { useHistory, useRouteMatch } from "react-router";
+import { isLayoutRoute } from "@library/features/Layout/LayoutPage.paths";
 
 export interface IWithLinkContext {
     linkContexts: string[];
     pushSmartLocation(location: LocationDescriptor);
     isDynamicNavigation(location: LocationDescriptor): boolean;
     makeHref(location: LocationDescriptor): string;
+    areLinksDisabled: boolean;
 }
 
 const defaultMakeHref = (location: LocationDescriptor) => {
+    if (!location) {
+        return "";
+    }
     const stringUrl = typeof location === "string" ? location : createPath(location);
     return formatUrl(stringUrl, true);
 };
-export const LinkContext = React.createContext<IWithLinkContext>({
+
+export const LINK_CONTEXT_DEFAULTS: IWithLinkContext = {
     linkContexts: [formatUrl("/")],
-    pushSmartLocation: location => {
+    pushSmartLocation: (location) => {
         const href = defaultMakeHref(location);
         window.location.href = href;
     },
@@ -31,22 +36,31 @@ export const LinkContext = React.createContext<IWithLinkContext>({
         return false;
     },
     makeHref: defaultMakeHref,
-});
+    areLinksDisabled: false,
+};
 
-interface IProps extends RouteComponentProps<any> {
+export const LinkContext = React.createContext<IWithLinkContext>(LINK_CONTEXT_DEFAULTS);
+
+interface IProps {
     linkContexts: string[];
     children: React.ReactNode;
     urlFormatter?: (url: string, withDomain?: boolean) => string;
+    useLayoutRouting?: boolean;
 }
 
-export const LinkContextProvider = withRouter((props: IProps) => {
-    const makeHref = (location: LocationDescriptor): string => {
-        const { urlFormatter } = props;
-        const finalUrlFormatter = urlFormatter ? urlFormatter : formatUrl;
-        const stringUrl = typeof location === "string" ? location : createPath(location);
-        const href = finalUrlFormatter(stringUrl, true);
-        return href;
-    };
+export const LinkContextProvider = (props: IProps) => {
+    const history = useHistory();
+    const { urlFormatter, linkContexts, useLayoutRouting } = props;
+
+    const makeHref = useCallback(
+        (location: LocationDescriptor): string => {
+            const finalUrlFormatter = urlFormatter ? urlFormatter : formatUrl;
+            const stringUrl = typeof location === "string" ? location : createPath(location);
+            const href = finalUrlFormatter(stringUrl, true);
+            return href;
+        },
+        [urlFormatter],
+    );
 
     /**
      * Determine if the URL is one that we are able to navigate to dynamically.
@@ -56,29 +70,42 @@ export const LinkContextProvider = withRouter((props: IProps) => {
      *
      * @param href The URL to check.
      */
-    const isDynamicNavigation = (href: string): boolean => {
-        const link = new URL(href, window.location.href);
-        const isCurrentPage = link.pathname === window.location.pathname;
+    const isDynamicNavigation = useCallback(
+        (href: string): boolean => {
+            const link = new URL(href, window.location.href);
+            const isCurrentPage = link.pathname === window.location.pathname && link.search === window.location.search;
 
-        let matchesContext = false;
-        for (const context of props.linkContexts) {
-            if (href.startsWith(context)) {
-                matchesContext = true;
-                break;
+            if (isCurrentPage) {
+                return false;
             }
-        }
+            if (useLayoutRouting) {
+                return isLayoutRoute(href);
+            }
 
-        return matchesContext && !isCurrentPage;
-    };
+            let matchesContext = false;
+            for (const context of linkContexts) {
+                if (href.startsWith(context)) {
+                    matchesContext = true;
+                    break;
+                }
+            }
 
-    const pushSmartLocation = (location: LocationDescriptor) => {
-        const href = makeHref(location);
-        if (isDynamicNavigation(href)) {
-            props.history.push(makeLocationDescriptorObject(location, href));
-        } else {
-            window.location.href = href;
-        }
-    };
+            return matchesContext;
+        },
+        [linkContexts, useLayoutRouting],
+    );
+
+    const pushSmartLocation = useCallback(
+        (location: LocationDescriptor) => {
+            const href = makeHref(location);
+            if (isDynamicNavigation(href)) {
+                history.push(makeLocationDescriptorObject(location, href));
+            } else {
+                window.location.href = href;
+            }
+        },
+        [makeHref, isDynamicNavigation, history],
+    );
 
     return (
         <LinkContext.Provider
@@ -87,12 +114,13 @@ export const LinkContextProvider = withRouter((props: IProps) => {
                 pushSmartLocation,
                 isDynamicNavigation,
                 makeHref,
+                areLinksDisabled: false,
             }}
         >
             {props.children}
         </LinkContext.Provider>
     );
-});
+};
 
 export function useLinkContext() {
     return useContext(LinkContext);

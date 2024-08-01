@@ -14,32 +14,31 @@ use Vanilla\FeatureFlagHelper;
 /**
  * A utility class for format schemas.
  */
-class FormatSchema extends Schema {
+class FormatSchema extends Schema
+{
     /**
      * FormatSchema constructor.
      *
      * @param bool $deprecated Include deprecated formats.
      */
-    public function __construct(bool $deprecated = false) {
-        if (FeatureFlagHelper::featureEnabled('legacyFormats')) {
+    public function __construct(bool $deprecated = false)
+    {
+        if (FeatureFlagHelper::featureEnabled("legacyFormats")) {
             // We can flip this feature flag if a site's data is really dirty.
             parent::__construct([
-                'type' => 'string',
+                "type" => "string",
             ]);
         } else {
-            $formats = ['rich', 'markdown', 'text', 'textex', 'wysiwyg', 'bbcode'];
+            $formats = ["rich", "markdown", "text", "textex", "wysiwyg", "bbcode", "rich2"];
             if ($deprecated) {
-                $formats = array_merge($formats, [
-                    'html',
-                    'ipb',
-                ]);
+                $formats = array_merge($formats, ["html", "ipb"]);
             }
 
             parent::__construct([
-                'type' => 'string',
-                'enum' => $formats,
+                "type" => "string",
+                "enum" => $formats,
             ]);
-            $this->addFilter('', function ($value, ValidationField $field) {
+            $this->addFilter("", function ($value, ValidationField $field) {
                 if (is_string($value)) {
                     return strtolower($value);
                 }

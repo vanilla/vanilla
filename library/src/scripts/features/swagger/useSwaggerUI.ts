@@ -36,7 +36,11 @@ export function useSwaggerUI(_options: { url?: string; spec?: object; [key: stri
     }, [tryIt]);
 
     useEffect(() => {
-        importSwagger().then(SwaggerUIConstructor => {
+        if (process.env.NODE_ENV === "test") {
+            // Swagger doesn't run properly in vitest.
+            return;
+        }
+        importSwagger().then((SwaggerUIConstructor) => {
             replaceDeepLinkScrolling(SwaggerUIConstructor);
             if (swaggerRef.current) {
                 setIsLoading(false);
@@ -50,7 +54,7 @@ export function useSwaggerUI(_options: { url?: string; spec?: object; [key: stri
                     onComplete: () => {
                         const opblocks = swaggerRef.current!.querySelectorAll(".opblock-tag, .opblock");
                         const headings = Array.from(opblocks)
-                            .map(blockNode => {
+                            .map((blockNode) => {
                                 if (blockNode.classList.contains("opblock-tag")) {
                                     const text = blockNode.getAttribute("data-tag");
                                     const ref = blockNode.querySelector(`[${DEEP_LINK_ATTR}]`)?.getAttribute("data-id");

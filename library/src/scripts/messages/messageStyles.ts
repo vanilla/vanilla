@@ -4,30 +4,21 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    unit,
-    userSelect,
-    colorOut,
-    paddings,
-    borders,
-    fonts,
-    allButtonStates,
-    margins,
-    absolutePosition,
-    negative,
-    allLinkStates,
-    negativeUnit,
-} from "@library/styles/styleHelpers";
-import { percent, translate, translateX, translateY, viewWidth, em } from "csx";
-import { FontWeightProperty } from "csstype";
+import { userSelect, allButtonStates, allLinkStates, negativeUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
+import { percent, translate, em, color } from "csx";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { relative } from "path";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { css } from "@emotion/css";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -42,7 +33,7 @@ export const messagesVariables = useThemeCache(() => {
     const spacing = themeVars("spacing", {
         padding: {
             vertical: 8,
-            withIcon: 44,
+            withIcon: 40,
             withoutIcon: 18,
         },
     });
@@ -53,6 +44,15 @@ export const messagesVariables = useThemeCache(() => {
         states: {
             fg: globalVars.messageColors.warning.state,
         },
+        error: {
+            bg: color("#FBE8E8"),
+        },
+        neutral: {
+            bg: color("#EEEEEF"),
+        },
+        info: {
+            bg: color("#EFF2F5"),
+        },
     });
     const title = themeVars("title", {
         margin: {
@@ -61,12 +61,11 @@ export const messagesVariables = useThemeCache(() => {
     });
 
     const text = themeVars("text", {
-        font: {
+        font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "normal"),
             color: colors.fg,
-            size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.normal as FontWeightProperty,
             lineHeight: globalVars.lineHeights.condensed,
-        },
+        }),
     });
 
     const actionButton = themeVars("actionButton", {
@@ -79,11 +78,10 @@ export const messagesVariables = useThemeCache(() => {
         margin: {
             left: spacing.padding.withoutIcon / 2,
         },
-        font: {
-            size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
+        font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
             color: globalVars.mainColors.fg,
-        },
+        }),
         minHeight: formElVars.sizing.height,
     });
 
@@ -100,207 +98,222 @@ export const messagesVariables = useThemeCache(() => {
 export const messagesClasses = useThemeCache(() => {
     const vars = messagesVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("messages");
     const titleBarVars = titleBarVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const shadows = shadowHelper();
 
-    const hasIcon = style("hasIcon", {});
-
-    const wrap = style("wrap", {
+    const wrap = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
         flexWrap: "nowrap",
-        minHeight: unit(vars.sizing.minHeight),
+        minHeight: styleUnit(vars.sizing.minHeight),
         width: percent(100),
         margin: "auto",
-        color: colorOut(vars.colors.fg),
-        ...paddings({
+        color: ColorsUtils.colorOut(vars.colors.fg),
+        ...Mixins.padding({
             vertical: vars.spacing.padding.vertical,
             left: vars.spacing.padding.withoutIcon * 1.5,
             right: vars.spacing.padding.withoutIcon,
         }),
-        $nest: {
-            [`&.${hasIcon}`]: {
-                paddingLeft: vars.spacing.padding.withIcon,
-            },
-        },
     });
 
-    const message = style("message", {
-        ...userSelect(),
-        ...fonts(vars.text.font),
+    const wrapWithIcon = css({
+        paddingLeft: vars.spacing.padding.withIcon,
+    });
+
+    const message = css({
+        ...Mixins.font(vars.text.font),
         width: percent(100),
         flex: 1,
         position: "relative",
-        ...paddings({
+        ...Mixins.padding({
             vertical: 6,
         }),
     });
 
     // Fixed wrapper
-    const fixed = style(
-        "fixed",
+    const fixed = css(
         {
             position: "fixed",
             left: 0,
-            top: unit(titleBarVars.sizing.height + 1),
-            minHeight: unit(vars.sizing.minHeight),
+            top: styleUnit(titleBarVars.sizing.height + 1),
+            minHeight: styleUnit(vars.sizing.minHeight),
             maxWidth: percent(100),
             zIndex: 20,
-
-            $nest: {
-                [`& .${wrap}`]: {
-                    maxWidth: percent(100),
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "auto",
-                },
-                [`& .${message}`]: {
-                    width: "auto",
-                },
+            [`& .${wrap}`]: {
+                maxWidth: percent(100),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "auto",
+            },
+            [`& .${message}`]: {
+                width: "auto",
             },
         },
         mediaQueries.oneColumnDown({
-            top: unit(titleBarVars.sizing.mobile.height + 1),
+            top: styleUnit(titleBarVars.sizing.mobile.height + 1),
         }),
     );
-    const messageWrapper = style("messageWrapper", {
+    const messageWrapper = css({
         position: "relative",
         display: "flex",
         paddingLeft: 30,
         alignItems: "center",
         flexDirection: "row",
         margin: "0 auto",
-        paddingTop: unit(vars.spacing.padding.vertical),
-        paddingBottom: unit(vars.spacing.padding.vertical),
+        paddingTop: styleUnit(vars.spacing.padding.vertical),
+        paddingBottom: styleUnit(vars.spacing.padding.vertical),
     });
 
-    const root = style({
+    const root = css({
         width: percent(100),
-        backgroundColor: colorOut(vars.colors.bg),
+        textAlign: "start",
+        backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
         ...shadowOrBorderBasedOnLightness(
             globalVars.body.backgroundImage.color,
-            borders({
+            Mixins.border({
                 color: globalVars.mainColors.fg,
             }),
             shadows.embed(),
         ),
-        ...margins({ horizontal: "auto" }),
-        $nest: {
-            "& + &": {
-                marginTop: unit(globalVars.spacer.size / 2),
+        ...Mixins.margin({ horizontal: "auto" }),
+        ...{
+            "* + &": {
+                marginTop: styleUnit(globalVars.spacer.size / 2),
             },
         },
     });
 
-    const setWidth = style("setWidth", {
-        width: unit(vars.sizing.width),
+    const error = css({
+        backgroundColor: ColorsUtils.colorOut(vars.colors.error.bg),
+    });
+
+    const neutral = css({
+        backgroundColor: ColorsUtils.colorOut(vars.colors.neutral.bg),
+    });
+
+    const info = css({
+        backgroundColor: ColorsUtils.colorOut(vars.colors.info.bg),
+    });
+
+    const setWidth = css({
+        width: styleUnit(vars.sizing.width),
         maxWidth: percent(100),
     });
 
-    const actionButtonPrimary = style("actionButtonPrimary", {});
+    const actionButtonPrimary = css({});
 
-    const actionButton = style("actionButton", {
-        $nest: {
-            "&&": {
-                position: "relative",
-                ...paddings(vars.actionButton.padding),
-                marginLeft: vars.actionButton.padding.left,
-                minHeight: unit(vars.actionButton.minHeight),
-                whiteSpace: "nowrap",
-                ...fonts(vars.actionButton.font),
-                ...allButtonStates({
-                    noState: {
-                        color: colorOut(vars.colors.fg),
-                    },
-                    allStates: {
-                        color: colorOut(vars.colors.states.fg),
-                    },
-                    clickFocus: {
-                        outline: 0,
-                    },
-                }),
-                [`&.${actionButtonPrimary}`]: {
-                    fontWeight: globalVars.fonts.weights.bold,
+    const actionButton = css({
+        "&&": {
+            position: "relative",
+            ...Mixins.padding(vars.actionButton.padding),
+            marginLeft: vars.actionButton.padding.left,
+            whiteSpace: "nowrap",
+            ...Mixins.font(vars.actionButton.font),
+            ...allButtonStates({
+                noState: {
+                    color: ColorsUtils.colorOut(vars.colors.fg),
                 },
+                allStates: {
+                    color: ColorsUtils.colorOut(vars.colors.states.fg),
+                },
+                clickFocus: {
+                    outline: 0,
+                },
+            }),
+            [`&.${actionButtonPrimary}`]: {
+                fontWeight: globalVars.fonts.weights.bold,
             },
         },
     });
 
-    const iconPosition = style("iconPosition", {
+    const iconPosition = css({
         position: "absolute",
         left: 0,
-        top: 0,
+        top: "50%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         height: percent(100),
         maxHeight: em(2),
-        transform: translate(negativeUnit(vars.spacing.padding.withIcon)),
-        width: unit(vars.spacing.padding.withIcon),
+        transform: translate(negativeUnit(vars.spacing.padding.withIcon), "-50%"),
+        width: styleUnit(vars.spacing.padding.withIcon),
     });
 
-    const icon = style("icon", {
-        // top: unit(vars.spacing.padding.vertical),
-    });
+    const icon = css({});
 
-    const errorIcon = style("errorIcon", {
-        $nest: {
-            "&&": {
-                color: colorOut(globalVars.mainColors.fg),
-            },
+    const errorIcon = css({
+        "&&": {
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         },
     });
-    const content = style("content", {
+    const content = css({
         width: percent(100),
         position: "relative",
-        $nest: {
-            a: allLinkStates({
-                noState: {
-                    color: colorOut(vars.colors.fg),
-                    textDecoration: "underline",
-                },
-                allStates: {
-                    color: colorOut(vars.colors.states.fg),
-                    textDecoration: "underline",
+        "& a": allLinkStates({
+            noState: {
+                color: ColorsUtils.colorOut(vars.colors.fg),
+                textDecoration: "underline",
+            },
+            allStates: {
+                color: ColorsUtils.colorOut(vars.colors.states.fg),
+                textDecoration: "underline",
+            },
+        }),
+    });
+
+    const inlineBlock = css({
+        display: "inline-block",
+    });
+
+    const confirm = css({});
+
+    const main = css({});
+
+    const text = css({
+        ...Mixins.font(vars.text.font),
+    });
+    const titleContent = css({
+        display: "flex",
+        justifyContent: "start",
+        position: "relative",
+        [`& + .${text}`]: {
+            marginTop: styleUnit(vars.title.margin.top),
+        },
+        [`& .${iconPosition}`]: {
+            transform: translate(negativeUnit(vars.spacing.padding.withIcon), "calc(-50% - 2px)"),
+        },
+    });
+
+    const paragraphContent = css({
+        position: "relative",
+        [`& + .${text}`]: {
+            marginTop: styleUnit(vars.title.margin.top),
+        },
+    });
+
+    const title = css({
+        "&&": {
+            ...Mixins.font(vars.text.font),
+            fontWeight: globalVars.fonts.weights.bold,
+            ...Mixins.margin({ all: 0 }),
+            ...lineHeightAdjustment({
+                [`& + .${text}`]: {
+                    marginTop: styleUnit(vars.title.margin.top),
                 },
             }),
         },
     });
 
-    const confirm = style("confirm", {});
-
-    const main = style("main", {});
-
-    const text = style("text", {
-        ...fonts(vars.text.font),
-    });
-    const titleContent = style("titleContent", {
-        display: "flex",
-        justifyContent: "start",
-        position: "relative",
-        $nest: {
-            [`& + .${text}`]: {
-                marginTop: unit(vars.title.margin.top),
-            },
-        },
-    });
-    const title = style("title", {
-        ...fonts(vars.text.font),
-        fontWeight: globalVars.fonts.weights.bold,
-        $nest: lineHeightAdjustment({
-            [`& + .${text}`]: {
-                marginTop: unit(vars.title.margin.top),
-            },
-        }),
-    });
-
     return {
         root,
+        error,
+        neutral,
+        info,
         wrap,
+        wrapWithIcon,
         actionButton,
         actionButtonPrimary,
         message,
@@ -308,13 +321,14 @@ export const messagesClasses = useThemeCache(() => {
         setWidth,
         iconPosition,
         titleContent,
+        paragraphContent,
         content,
+        inlineBlock,
         confirm,
         errorIcon,
         messageWrapper,
         main,
         text,
-        hasIcon,
         icon,
         title,
     };

@@ -7,6 +7,8 @@
     "icon": "rich_editor.png",
     "key": "rich-editor",
     "type": "addon",
+    "x-priority-note": "Make sure this runs before the 'editor' addon.",
+    "priority": 101,
     "authors": [
         {
             "name": "Adam Charron",

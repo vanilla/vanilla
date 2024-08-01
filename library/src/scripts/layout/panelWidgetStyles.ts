@@ -4,55 +4,59 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent } from "csx";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { percent } from "csx";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { paddings } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
+import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
-export const panelWidgetVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("panelWidget");
-
-    const spacing = makeThemeVars("spacing", {
-        padding: 8,
-    });
-
-    return { spacing };
-});
-
-export const panelWidgetClasses = useThemeCache(() => {
+export const panelWidgetClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
-    const style = styleFactory("panelWidget");
-    const vars = panelWidgetVariables();
 
-    const root = style(
-        {
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-            width: percent(100),
-            ...paddings({
-                all: globalVars.gutter.half,
-            }),
-            $nest: {
-                "&.hasNoVerticalPadding": {
-                    ...paddings({ vertical: 0 }),
-                },
-                "&.hasNoHorizontalPadding": {
-                    ...paddings({ horizontal: 0 }),
-                },
-                "&.isSelfPadded": {
-                    ...paddings({ all: 0 }),
+    const root = css({
+        clear: "both",
+        position: "relative",
+        width: percent(100),
+        ...Mixins.padding({
+            all: globalVars.widget.padding,
+        }),
+        ":first-child > &": {
+            paddingTop: 0,
+        },
+        ":last-child > &": {
+            paddingBottom: 0,
+        },
+        "&.hasNoVerticalPadding": {
+            ...Mixins.padding({ vertical: 0 }),
+        },
+        "&.hasNoHorizontalPadding": {
+            ...Mixins.padding({ horizontal: 0 }),
+        },
+        "&.isSelfPadded": {
+            ...Mixins.padding({ all: 0 }),
+        },
+        "&:empty": {
+            ...Mixins.padding({ all: 0 }),
+        },
+        ...mediaQueries({
+            [SectionTypes.TWO_COLUMNS]: {
+                oneColumnDown: {
+                    ...Mixins.padding({
+                        all: globalVars.widget.padding,
+                    }),
                 },
             },
-        },
-        mediaQueries.oneColumnDown({
-            ...paddings({
-                all: vars.spacing.padding,
-            }),
+            [SectionTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    ...Mixins.padding({
+                        all: globalVars.widget.padding,
+                    }),
+                },
+            },
         }),
-    );
+    });
 
-    return { root };
+    return { root: root + " panelWidget" };
 });

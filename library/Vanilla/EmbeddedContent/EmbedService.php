@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,13 +9,19 @@ namespace Vanilla\EmbeddedContent;
 use Garden\Container;
 use Garden\Schema\ValidationException;
 use League\Uri\Http;
+use Vanilla\EmbeddedContent\Embeds\BrightcoveEmbed;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
+use Vanilla\EmbeddedContent\Embeds\IFrameEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
+use Vanilla\EmbeddedContent\Embeds\MuralEmbed;
+use Vanilla\EmbeddedContent\Embeds\TwitchEmbedFilter;
+use Vanilla\EmbeddedContent\Factories\BrightcoveEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\MuralEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\PanoptoEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
@@ -28,6 +34,8 @@ use Vanilla\EmbeddedContent\Factories\TwitchEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
 use Vanilla\EmbeddedContent\Factories\YouTubeEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\YouTubeEmbed;
+use Vanilla\EmbeddedContent\Factories\KalturaEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\KalturaEmbed;
 use Vanilla\EmbeddedContent\Factories\WistiaEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\WistiaEmbed;
 use Vanilla\EmbeddedContent\Factories\VimeoEmbedFactory;
@@ -40,14 +48,15 @@ use Vanilla\EmbeddedContent\Factories\InstagramEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
 use Vanilla\EmbeddedContent\Factories\GettyImagesEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\GettyImagesEmbed;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\RequestValidator;
 
 /**
  * Manage scraping embed data and generating markup.
  */
-class EmbedService implements EmbedCreatorInterface {
-
+class EmbedService implements EmbedCreatorInterface
+{
     /** @var int High embed prioritization. */
     const PRIORITY_HIGH = 100;
 
@@ -81,7 +90,8 @@ class EmbedService implements EmbedCreatorInterface {
      * @param EmbedCache $cache
      * @param RequestValidator $requestValidator
      */
-    public function __construct(EmbedCache $cache, RequestValidator $requestValidator) {
+    public function __construct(EmbedCache $cache, RequestValidator $requestValidator)
+    {
         $this->cache = $cache;
         $this->requestValidator = $requestValidator;
     }
@@ -94,7 +104,8 @@ class EmbedService implements EmbedCreatorInterface {
      *
      * @return $this
      */
-    public function registerFilter(EmbedFilterInterface $embedFilter): EmbedService {
+    public function registerFilter(EmbedFilterInterface $embedFilter): EmbedService
+    {
         $this->registeredFilters[] = $embedFilter;
         return $this;
     }
@@ -109,7 +120,8 @@ class EmbedService implements EmbedCreatorInterface {
      * @return $this
      * @throws \Exception If the class being extended isn't a correct a subclass of AbstractEmbed.
      */
-    public function registerEmbed(string $embedClass, string $embedType): EmbedService {
+    public function registerEmbed(string $embedClass, string $embedType): EmbedService
+    {
         if (!is_subclass_of($embedClass, AbstractEmbed::class)) {
             throw new \Exception("Only classes extending " . AbstractEmbed::class . " may be registered.");
         }
@@ -124,16 +136,20 @@ class EmbedService implements EmbedCreatorInterface {
      * @param int $priority
      * @return $this
      */
-    public function registerFactory(AbstractEmbedFactory $embedFactory, int $priority = self::PRIORITY_NORMAL) {
+    public function registerFactory(AbstractEmbedFactory $embedFactory, int $priority = self::PRIORITY_NORMAL)
+    {
         if ($embedFactory instanceof FallbackEmbedFactory) {
-            trigger_error("A fallback embed was registerred as a normal embed. See EmbedService::setFallbackFactory", E_USER_WARNING);
+            trigger_error(
+                "A fallback embed was registerred as a normal embed. See EmbedService::setFallbackFactory",
+                E_USER_WARNING
+            );
         }
         $this->registeredFactories[] = [
-            'priority' => $priority,
-            'factory' => $embedFactory
+            "priority" => $priority,
+            "factory" => $embedFactory,
         ];
         uasort($this->registeredFactories, function (array $valA, array $valB) {
-            return $valB['priority'] <=> $valA['priority'];
+            return $valB["priority"] <=> $valA["priority"];
         });
         return $this;
     }
@@ -144,7 +160,8 @@ class EmbedService implements EmbedCreatorInterface {
      * @throws Container\ContainerException If there is an issue initializing the container.
      * @throws \Exception If there is some incorrect class registration.
      */
-    public function addCoreEmbeds() {
+    public function addCoreEmbeds()
+    {
         $dic = \Gdn::getContainer();
         $this
             // Getty Images
@@ -169,6 +186,7 @@ class EmbedService implements EmbedCreatorInterface {
             // Twitch
             ->registerFactory($dic->get(TwitchEmbedFactory::class))
             ->registerEmbed(TwitchEmbed::class, TwitchEmbed::TYPE)
+            ->registerFilter($dic->get(TwitchEmbedFilter::class))
             // Twitter
             ->registerFactory($dic->get(TwitterEmbedFactory::class))
             ->registerEmbed(TwitterEmbed::class, TwitterEmbed::TYPE)
@@ -181,19 +199,31 @@ class EmbedService implements EmbedCreatorInterface {
             // YouTube
             ->registerFactory($dic->get(YouTubeEmbedFactory::class))
             ->registerEmbed(YouTubeEmbed::class, YouTubeEmbed::TYPE)
+            // Kaltura
+            ->registerFactory($dic->get(KalturaEmbedFactory::class))
+            ->registerEmbed(KalturaEmbed::class, KalturaEmbed::TYPE)
             // Panopto
             ->registerFactory($dic->get(PanoptoEmbedFactory::class))
             ->registerEmbed(PanoptoEmbed::class, PanoptoEmbed::TYPE)
+            // Mural
+            ->registerFactory($dic->get(MuralEmbedFactory::class))
+            ->registerEmbed(MuralEmbed::class, MuralEmbed::TYPE)
             // Scrape-able Embeds
             ->setFallbackFactory($dic->get(ScrapeEmbedFactory::class))
             ->registerEmbed(ImageEmbed::class, ImageEmbed::TYPE)
             ->registerEmbed(LinkEmbed::class, LinkEmbed::TYPE)
             // Files - No factory for the file embed. Only comes from media endpoint.
             ->registerEmbed(FileEmbed::class, FileEmbed::TYPE)
+            // This one is extended but still gets registered
+            ->registerEmbed(IFrameEmbed::class, IFrameEmbed::TYPE)
+
             // Internal Vanilla quote embed.
             ->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE)
             ->registerFilter($dic->get(QuoteEmbedFilter::class))
-        ;
+
+            // BrightCove
+            ->registerFactory($dic->get(BrightcoveEmbedFactory::class))
+            ->registerEmbed(BrightcoveEmbed::class, BrightcoveEmbed::TYPE);
     }
 
     /**
@@ -203,12 +233,14 @@ class EmbedService implements EmbedCreatorInterface {
      *
      * @return array The filtered data.
      */
-    public function filterEmbedData(array $data): array {
-        $type = $data['embedType'] ?? $data['type'] ?? null;
+    public function filterEmbedData(array $data): array
+    {
+        $type = $data["embedType"] ?? ($data["type"] ?? null);
 
         if (!$type) {
             trigger_error(
-                "Attempted to filter embed data, but a type could not be found\n" . json_encode($data, JSON_PRETTY_PRINT),
+                "Attempted to filter embed data, but a type could not be found\n" .
+                    json_encode($data, JSON_PRETTY_PRINT),
                 E_USER_NOTICE
             );
         }
@@ -225,8 +257,9 @@ class EmbedService implements EmbedCreatorInterface {
      * @param AbstractEmbed $embed
      * @return AbstractEmbed
      */
-    private function filterEmbed(AbstractEmbed $embed): AbstractEmbed {
-        $type = $embed->getData()['embedType'];
+    private function filterEmbed(AbstractEmbed $embed): AbstractEmbed
+    {
+        $type = $embed->getData()["embedType"];
         foreach ($this->registeredFilters as $filter) {
             if ($filter->canHandleEmbedType($type)) {
                 $embed = $filter->filterEmbed($embed);
@@ -240,16 +273,17 @@ class EmbedService implements EmbedCreatorInterface {
      * Implements URL based caching.
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url, bool $force = false): AbstractEmbed {
+    public function createEmbedForUrl(string $url, bool $force = false): AbstractEmbed
+    {
         // Ensure that this function is never called during a GET request.
         // This function makes some potentially very expensive calls
         // It can also be used to force the site into an infinite loop (eg. GET page hits the scraper which hits the same page again).
         // @see https://github.com/vanilla/dev-inter-ops/issues/23
         // We've had some situations where the site gets in an infinite loop requesting itself.
-        $this->requestValidator->blockRequestType('GET', __METHOD__ . ' may not be called during a GET request.');
+        $this->requestValidator->blockRequestType("GET", __METHOD__ . " may not be called during a GET request.");
 
         // Normalize the encoding on the URL.
-        $url = (string)UrlUtils::normalizeEncoding(Http::createFromString($url));
+        $url = (string) UrlUtils::normalizeEncoding(Http::createFromString($url));
 
         // Check the cache first.
         if (!$force) {
@@ -262,36 +296,49 @@ class EmbedService implements EmbedCreatorInterface {
         $factory = $this->getFactoryForUrl($url);
         $embed = $factory->createEmbedForUrl($url);
         $embed = $this->filterEmbed($embed);
-        $this->cache->cacheEmbed($embed);
+        if ($embed->isCacheable()) {
+            $this->cache->cacheEmbed($embed);
+        }
         return $embed;
     }
-
 
     /**
      * Create an embed class from already fetched data.
      * Implementations should be fast and capable of running in loop on every page load.
      *
      * @param array $data
+     * @param bool $allowExtendedContent Whether our not we allowed extended content.
+     * Notable iframe embeds are considered extended content.
+     *
      * @return AbstractEmbed
      */
-    public function createEmbedFromData(array $data): AbstractEmbed {
+    public function createEmbedFromData(array $data, bool $allowExtendedContent = false): AbstractEmbed
+    {
         // Fallback in case we have bad data (will fallback to fallback embed).
-        $type = $data['embedType'] ?? $data['type'] ?? null;
+        $type = $data["embedType"] ?? ($data["type"] ?? null);
         try {
             $embedClass = $this->registeredEmbeds[$type] ?? null;
             if ($embedClass === null) {
                 return new ErrorEmbed(new \Exception("Embed class for type $type not found."), $data);
             }
+            if ($embedClass::isExtendedContent() && !$allowExtendedContent) {
+                return new ErrorEmbed(
+                    new \Exception("Embed type $type is considered extended content and not allowed in this context."),
+                    $data
+                );
+            }
             $embed = new $embedClass($data);
             $embed = $this->filterEmbed($embed);
             return $embed;
         } catch (ValidationException $e) {
-            trigger_error(
-                "Validation error while instantiating embed type $type with class $embedClass and data \n"
-                . json_encode($data, JSON_PRETTY_PRINT) . "\n"
-                . json_encode($e->jsonSerialize(), JSON_PRETTY_PRINT),
-                E_USER_WARNING
+            ErrorLogger::notice(
+                "Validation error while instantiating embed type $type with class $embedClass",
+                ["post", "embed"],
+                [
+                    "exception" => $e,
+                ]
             );
+
             return new ErrorEmbed($e, $data);
         }
     }
@@ -302,10 +349,11 @@ class EmbedService implements EmbedCreatorInterface {
      * @param string $url
      * @return AbstractEmbedFactory
      */
-    private function getFactoryForUrl(string $url): AbstractEmbedFactory {
+    private function getFactoryForUrl(string $url): AbstractEmbedFactory
+    {
         foreach ($this->registeredFactories as $registered) {
             /** @var AbstractEmbedFactory $factory */
-            $factory = $registered['factory'];
+            $factory = $registered["factory"];
             if ($factory->canHandleUrl($url)) {
                 return $factory;
             }
@@ -320,7 +368,8 @@ class EmbedService implements EmbedCreatorInterface {
      * @param AbstractEmbedFactory $fallbackFactory
      * @return $this
      */
-    public function setFallbackFactory(AbstractEmbedFactory $fallbackFactory) {
+    public function setFallbackFactory(AbstractEmbedFactory $fallbackFactory)
+    {
         $this->fallbackFactory = $fallbackFactory;
         return $this;
     }
@@ -330,7 +379,8 @@ class EmbedService implements EmbedCreatorInterface {
      *
      * @return AbstractEmbedFactory Returns the fallbackFactory.
      */
-    public function getFallbackFactory() {
+    public function getFallbackFactory()
+    {
         return $this->fallbackFactory;
     }
 }

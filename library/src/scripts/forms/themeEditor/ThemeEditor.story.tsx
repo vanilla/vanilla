@@ -1,9 +1,9 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { BannerAlignment } from "@library/banner/bannerStyles";
+import { BannerAlignment } from "@library/banner/Banner.variables";
 import { ThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { ThemeBuilderCheckBox } from "@library/forms/themeEditor/ThemeBuilderCheckBox";
 import { ThemeBuilderContextProvider } from "@library/forms/themeEditor/ThemeBuilderContext";
@@ -18,20 +18,23 @@ import { t } from "@vanilla/i18n";
 import React, { useState } from "react";
 import { ThemeToggle } from "@library/forms/themeEditor/ThemeToggle";
 import { ThemeBuilderBreakpoints, BreakpointViewType } from "@library/forms/themeEditor/ThemeBuilderBreakpoints";
-
-export default {
-    title: "Forms",
-};
-import { ThemeInputText } from "@library/forms/themeEditor/ThemeInputText";
 import { ThemeBuilderFontBlock } from "@library/forms/themeEditor/ThemeBuilderFontBlock";
 
+export default {
+    title: "Forms/Deprecated Form Fields",
+};
+
 export function ThemeEditor() {
+    return <ThemeEditorStoryImpl />;
+}
+
+function ThemeEditorStoryImpl() {
     const [vars, setVars] = useState({});
     return (
         <div style={{ maxWidth: 400, margin: "0 auto" }}>
             <ThemeBuilderContextProvider
                 rawThemeVariables={vars}
-                onChange={vars => {
+                onChange={(vars) => {
                     action("Variable Change");
                     setVars(vars);
                 }}

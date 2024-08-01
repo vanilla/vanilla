@@ -5,9 +5,9 @@
  * @license GPL-2.0-only
  */
 
-import { media } from "typestyle";
-import { unit } from "@library/styles/styleHelpers";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { media } from "@library/styles/styleShim";
+import { styleUnit } from "@library/styles/styleUnit";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 
 export const socialConnectCSS = () => {
     cssOut(`.DataList-Connections .Connection-Header`, {
@@ -16,13 +16,13 @@ export const socialConnectCSS = () => {
 
     cssOut(`.DataList-Connections .Gloss`, {
         minHeight: "42px",
-        marginTop: unit(5),
-        minWidth: unit(200),
+        marginTop: styleUnit(5),
+        minWidth: styleUnit(200),
     });
 
     cssOut(`.ActivateSlider`, {
-        minWidth: unit(200),
-        marginLeft: unit(16),
+        minWidth: styleUnit(200),
+        marginLeft: styleUnit(16),
     });
 
     const breakPointConnections = 768;
@@ -39,7 +39,7 @@ export const socialConnectCSS = () => {
     );
     cssOut(
         `.Connection-Name`,
-        { minHeight: unit(42) },
+        { minHeight: styleUnit(42) },
         media(
             { maxWidth: breakPointConnections },
             {
@@ -61,7 +61,7 @@ export const socialConnectCSS = () => {
         media(
             { maxWidth: breakPointConnections },
             {
-                minWidth: unit(200),
+                minWidth: styleUnit(200),
                 marginLeft: 0,
             },
         ),

@@ -1,34 +1,55 @@
 <?php
 /**
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Scheduler\Job;
 
+use JsonSerializable;
+
 /**
  * Job Status
  */
-class JobExecutionStatus {
+class JobExecutionStatus implements JsonSerializable, \Stringable
+{
     /**
      * @var string
      */
     protected $myStatus;
 
     /**
-     * HandledJobStatus constructor.
+     * JobExecutionStatus constructor
      *
      * @param string $status
      */
-    protected function __construct(string $status) {
+    protected function __construct(string $status)
+    {
         $this->myStatus = $status;
     }
 
     /**
      * @return string
      */
-    public function getStatus(): string {
+    public function getStatus(): string
+    {
+        return $this->myStatus;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return $this->myStatus;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function __toString()
+    {
         return $this->myStatus;
     }
 
@@ -38,92 +59,123 @@ class JobExecutionStatus {
      * @param JobExecutionStatus $jes
      * @return bool
      */
-    public function is(JobExecutionStatus $jes): bool {
+    public function is(JobExecutionStatus $jes): bool
+    {
         return $this->myStatus == $jes->getStatus();
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function abandoned() {
-        return new JobExecutionStatus('abandoned');
+    public static function abandoned()
+    {
+        return new JobExecutionStatus("abandoned");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function complete() {
-        return new JobExecutionStatus('complete');
+    public static function complete()
+    {
+        return new JobExecutionStatus("complete");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function error() {
-        return new JobExecutionStatus('error');
+    public static function success()
+    {
+        return new JobExecutionStatus("success");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function failed() {
-        return new JobExecutionStatus('failed');
+    public static function error()
+    {
+        return new JobExecutionStatus("error");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function invalid() {
-        return new JobExecutionStatus('invalid');
+    public static function failed()
+    {
+        return new JobExecutionStatus("failed");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function mismatch() {
-        return new JobExecutionStatus('mismatch');
+    public static function invalid()
+    {
+        return new JobExecutionStatus("invalid");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function progress() {
-        return new JobExecutionStatus('progress');
+    public static function mismatch()
+    {
+        return new JobExecutionStatus("mismatch");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function received() {
-        return new JobExecutionStatus('received');
+    public static function progress()
+    {
+        return new JobExecutionStatus("progress");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function retry() {
-        return new JobExecutionStatus('retry');
+    public static function received()
+    {
+        return new JobExecutionStatus("received");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function stackExecutionError() {
-        return new JobExecutionStatus('stackError');
+    public static function retry()
+    {
+        return new JobExecutionStatus("retry");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function intended() {
-        return new JobExecutionStatus('intended');
+    public static function stackExecutionError()
+    {
+        return new JobExecutionStatus("stackError");
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public static function unknown() {
-        return new JobExecutionStatus('unknown');
+    public static function intended()
+    {
+        return new JobExecutionStatus("intended");
+    }
+
+    /**
+     * @return JobExecutionStatus
+     */
+    public static function unknown()
+    {
+        return new JobExecutionStatus("unknown");
+    }
+
+    /**
+     * Get a list of incomplete statuses.
+     *
+     * @return string[]
+     */
+    public static function incompleteStatuses(): array
+    {
+        return [self::received()->getStatus(), self::progress()->getStatus(), self::intended()->getStatus()];
     }
 
     /**
@@ -132,7 +184,8 @@ class JobExecutionStatus {
      * @param string $status
      * @return JobExecutionStatus
      */
-    public static function looseStatus(string $status) {
+    public static function looseStatus(string $status)
+    {
         return new JobExecutionStatus($status);
     }
 }

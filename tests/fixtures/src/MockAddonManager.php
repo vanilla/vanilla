@@ -15,18 +15,24 @@ use Vanilla\AddonManager;
  *
  * @see MockAddon
  */
-class MockAddonManager extends AddonManager {
-
-    /** @var array MockAddon[] */
-    private $addons = [];
+class MockAddonManager extends AddonManager
+{
+    /** @var MockAddon[] */
+    private array $addons = [];
 
     /**
      * MockAddonManager Constructor.
      *
      * @param array $addons Addons to initialize with.
      */
-    public function __construct(array $addons = []) {
-        $this->addons = $addons;
+    public function __construct(array $addons = [])
+    {
+        // Check if first argument is array of `MockAddon`s because parent constructor has different signature
+        foreach ($addons as $addon) {
+            if ($addon instanceof MockAddon) {
+                $this->pushAddon($addon);
+            }
+        }
     }
 
     /**
@@ -36,7 +42,8 @@ class MockAddonManager extends AddonManager {
      *
      * @return $this For fluent chaining.
      */
-    public function pushAddon(MockAddon $addon) {
+    public function pushAddon(MockAddon $addon)
+    {
         $this->addons[] = $addon;
         return $this;
     }
@@ -44,21 +51,23 @@ class MockAddonManager extends AddonManager {
     /**
      * @return array Get the addons.
      */
-    public function getEnabled(): array {
+    public function getEnabled(): array
+    {
         return $this->addons;
     }
 
     /**
      * Get theme addon by key
      *
-     * @param int|string $themeKey Theme key or ID
+     * @param int|string $themeDirName Theme key or ID
      * @return Addon|null Get theme addon.
      */
-    public function lookupTheme($themeKey) {
+    public function lookupTheme($themeDirName)
+    {
         $addon = null;
         /** @var MockAddon $addon */
         foreach ($this->addons as $iterAddon) {
-            if ($iterAddon->getKey() === $themeKey) {
+            if ($iterAddon->getKey() === $themeDirName) {
                 $addon = $iterAddon;
                 break;
             }

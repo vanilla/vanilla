@@ -1,7 +1,8 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+import { DiscussionCheckboxProvider } from "@library/features/discussions/DiscussionCheckboxContext";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { FontSizeCalculatorProvider } from "@library/layout/pageHeadingContext";
 import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
@@ -9,19 +10,27 @@ import getStore from "@library/redux/getStore";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import { getMeta } from "@library/utility/appUtils";
-import React, { useMemo } from "react";
+import React, { ComponentType, useMemo } from "react";
 import { LiveAnnouncer } from "react-aria-live";
 import { Provider } from "react-redux";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import classNames from "classnames";
-import { style } from "typestyle";
 import { percent } from "csx";
 import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import { BannerContextProvider, BannerContextProviderNoHistory } from "@library/banner/BannerContext";
-import { SearchFormContextProvider } from "@library/search/SearchFormContext";
+import { BannerContextProvider } from "@library/banner/BannerContext";
+import { EntryLinkContextProvider } from "@library/contexts/EntryLinkContext";
+import { css } from "@emotion/css";
+import { ApiV2Context } from "@library/apiv2";
+import { ToastProvider } from "@library/features/toaster/ToastContext";
+import { PermissionsContextProvider } from "@library/features/users/PermissionsContext";
+import { ReactQueryContext } from "@library/ReactQueryContext";
+import { SiteSectionContextProvider } from "./utility/SiteSectionContext";
+import { ReduxCurrentUserContextProvider } from "./features/users/userHooks";
+import { ReduxThemeContextProvider } from "./theming/Theme.context";
+import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 
 interface IProps {
     children: React.ReactNode;
@@ -31,46 +40,66 @@ interface IProps {
     errorComponent?: React.ReactNode;
 }
 
+type Composable = ComponentType | [ComponentType, { [key: string]: any }];
+
+let ExtraContextProviders: Composable[] = [];
+
+export function registerContextProvider(provider: Composable) {
+    ExtraContextProviders.unshift(provider);
+}
+
+function composeProviders(providers: Composable[], children) {
+    return providers.reverse().reduce((acc, cur) => {
+        const [Provider, props] = Array.isArray(cur) ? [cur[0], cur[1]] : [cur, {}];
+        return <Provider {...props}>{acc}</Provider>;
+    }, children);
+}
+
 /**
  * Core provider set for running most Vanilla components.
  */
 export function AppContext(props: IProps) {
     const store = useMemo(() => getStore<ICoreStoreState>(), []);
 
-    const rootStyle = style({
-        $debugName: "appContext",
+    const rootStyle = css({
+        label: "appContext",
         width: percent(100),
     });
 
-    const content = (
-        <Provider store={store}>
-            <LocaleProvider>
-                <SearchContextProvider>
-                    <ContentTranslationProvider>
-                        <LiveAnnouncer>
-                            <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                                <ThemeProvider
-                                    disabled={props.noTheme}
-                                    errorComponent={<ErrorPage />}
-                                    themeKey={getMeta("ui.themeKey", "keystone")}
-                                    variablesOnly={props.variablesOnly}
-                                >
-                                    <FontSizeCalculatorProvider>
-                                        <SearchFormContextProvider>
-                                            <TitleBarDeviceProvider>
-                                                <BannerContextProviderNoHistory>
-                                                    <DeviceProvider>{props.children}</DeviceProvider>
-                                                </BannerContextProviderNoHistory>
-                                            </TitleBarDeviceProvider>
-                                        </SearchFormContextProvider>
-                                    </FontSizeCalculatorProvider>
-                                </ThemeProvider>
-                            </ScrollOffsetProvider>
-                        </LiveAnnouncer>
-                    </ContentTranslationProvider>
-                </SearchContextProvider>
-            </LocaleProvider>
-        </Provider>
+    const content = composeProviders(
+        [
+            ReactQueryContext,
+            [Provider, { store }],
+            ReduxCurrentUserContextProvider,
+            ApiV2Context,
+            SiteSectionContextProvider,
+            PermissionsContextProvider,
+            LocaleProvider,
+            SearchContextProvider,
+            ContentTranslationProvider,
+            LiveAnnouncer,
+            [ScrollOffsetProvider, { scrollWatchingEnabled: false }],
+            [
+                ThemeProvider,
+                {
+                    disabled: props.noTheme,
+                    errorComponent: <ErrorPage />,
+                    themeKey: getMeta("ui.themeKey", "keystone"),
+                    variablesOnly: props.variablesOnly,
+                },
+            ],
+            ReduxThemeContextProvider,
+            FontSizeCalculatorProvider,
+            ...ExtraContextProviders,
+            TitleBarDeviceProvider,
+            BannerContextProvider,
+            EntryLinkContextProvider,
+            DeviceProvider,
+            ToastProvider,
+            DiscussionCheckboxProvider,
+            AttachmentIntegrationsContextProvider,
+        ],
+        props.children,
     );
 
     if (props.noWrap) {

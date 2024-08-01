@@ -1,0 +1,876 @@
+openapi: 3.0.2
+info:
+    description: API access to your community.
+    title: Vanilla API
+    version: "2.0"
+servers:
+    - url: /api/v2
+paths:
+    /config:
+        get:
+            summary: Get the site's config.
+            tags:
+                - Config
+            parameters:
+                - name: select
+                  in: query
+                  description: |
+                      A CSV of config key names to select a sparse set of items. Use * as a wildcard to match multiple keys.
+                  style: form
+                  schema:
+                      type: array
+                      items:
+                          type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Config"
+                    description: Success
+        patch:
+            summary: Update one or more config settings.
+            tags:
+                - Config
+            requestBody:
+                content:
+                    "application/json":
+                        schema:
+                            $ref: "#/components/schemas/Config"
+            responses:
+                204:
+                    description: Success
+components:
+    schemas:
+        Config:
+            type: object
+            properties:
+                "branding.addressBarColor":
+                    description: |
+                        Some browsers support a color for the address bar.
+                    type: string
+                    default: ""
+                    example: "#C0FFEE"
+                    maxLength: 9
+                    x-key: Garden.MobileAddressBarColor
+                    x-read: public
+                    x-write: community.manage
+                "branding.bannerImage":
+                    description: |
+                        The default banner image across the site. This can be overridden on a per category basis.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.BannerImage
+                    x-read: public
+                    x-write: community.manage
+                    x-upload: true
+                "branding.favicon":
+                    description: |
+                        Your site's favicon appears in your browser's title bar. It will be scaled down appropriately.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.FavIcon
+                    x-read: public
+                    x-write: community.manage
+                    x-upload: true
+                "branding.logo":
+                    description: |
+                        The banner logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.Logo
+                    x-read: public
+                    x-write: community.manage
+                    x-upload: true
+                "branding.mobileLogo":
+                    description: |
+                        The mobile banner logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.MobileLogo
+                    x-read: public
+                    x-write: community.manage
+                    x-upload: true
+                "branding.shareImage":
+                    description: >-
+                        When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50×50, but we recommend 200×200.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.ShareImage
+                    x-read: public
+                    x-write: community.manage
+                    x-upload: true
+                "branding.touchIcon":
+                    description: |
+                        The touch icon appears when you bookmark a website on the homescreen of a mobile device. These are usually 152 pixels.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.TouchIcon
+                    x-read: public
+                    x-write: community.manage
+                    x-upload: true
+                "forum.disabled":
+                    description: |
+                        Remove discussion and categories links from menus. Set discussion and category related pages to return not found page 404.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Vanilla.Forum.Disabled
+                    x-read: public
+                    x-write: community.manage
+                "garden.cookie.name":
+                    description: The prefix for cookie names
+                    type: string
+                    default: "Vanilla"
+                    x-key: Garden.Cookie.Name
+                    x-read: public
+                "garden.cookie.path":
+                    description: The path to cookie names
+                    type: string
+                    default: "Vanilla"
+                    x-key: Garden.Cookie.Path
+                    x-read: public
+                "garden.description":
+                    description: |
+                        The site description usually appears in search engines. You should try having a description that is 100-150
+                        characters long.
+                    type: string
+                    default: ""
+                    maxLength: 350
+                    x-key: Garden.Description
+                    x-read: public
+                    x-write: community.manage
+                "garden.externalUrlFormat":
+                    description: |
+                        The format used to generate URLs to pages from external sources, typically emails. Set this config setting
+                        your site is embedded or uses a reverse proxy. Place a "%s" in the URL and it will be replaced with the path
+                        being generated.
+                    type: string
+                    default: ""
+                    example: https://example.com/community/%s
+                    pattern: (^$)|(^https?://.+%s)
+                    x-key: Garden.ExternalUrlFormat
+                    x-read: community.manage
+                "garden.homepageTitle":
+                    description: |
+                        The homepage title is displayed on your home page. Pick a title that you would want to see appear in search
+                        engines.
+                    type: string
+                    default: ""
+                    example: Welcome To Our Support Community
+                    maxLength: 100
+                    x-key: Garden.HomepageTitle
+                    x-read: public
+                    x-write: community.manage
+                "garden.locale":
+                    description: |
+                        The default locale for your site. This will be the source language for your community.
+                    type: string
+                    default: "en"
+                    maxLength: 100
+                    x-key: Garden.Locale
+                    x-read: public
+                    x-write: site.manage
+                "garden.orgName":
+                    description: |
+                        Your organization name is used for SEO microdata and JSON+LD.
+                    type: string
+                    default: ""
+                    maxLength: 50
+                    x-key: Garden.OrgName
+                    x-read: public
+                    x-write: community.manage
+                "garden.privacy.ips":
+                    description: >-
+                        Anonymize IP addresses on users so they aren't tracked. You can specify "partial" to remove the last octet or
+                        full to anonymize the entire IP address.
+                    type: string
+                    default: ""
+                    enum:
+                        - ""
+                        - partial
+                        - full
+                    x-key: Garden.Privacy.IPs
+                    x-read: community.manage
+                "garden.title":
+                    description: |
+                        The banner title appears on your site's banner and in your browser's title bar.
+                    type: string
+                    default: "Vanilla"
+                    example: Support Community
+                    minLength: 1
+                    x-key: Garden.Title
+                    x-read: public
+                    x-write: community.manage
+                "labs.layoutEditor":
+                    description: Create and manage layouts for your community through the layout editor.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.layoutEditor.Enabled
+                    x-read: public
+                    x-write: community.manage
+                "layoutEditor.home":
+                    description: Should the layout editor be displayed for the home page.
+                    type: boolean
+                    default: true
+                    example: true
+                    x-key: Feature.layoutEditor.home.Enabled
+                    x-read: site.manage
+                    x-write: site.manage
+                "layoutEditor.discussionList":
+                    description: Should the layout editor be displayed for the discussionList page.
+                    type: boolean
+                    default: true
+                    example: true
+                    x-key: Feature.layoutEditor.discussionList.Enabled
+                    x-read: site.manage
+                    x-write: site.manage
+                "layoutEditor.discussionThread":
+                    description: Should the layout editor be displayed for the discussionThread page.
+                    type: boolean
+                    default: true
+                    example: true
+                    x-key: Feature.layoutEditor.discussionThread.Enabled
+                    x-read: site.manage
+                    x-write: site.manage
+                "layoutEditor.categoryList":
+                    description: Should the layout editor be displayed for the categoryList page.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.layoutEditor.categoryList.Enabled
+                    x-read: site.manage
+                    x-write: site.manage
+                "layoutEditor.discussionCategoryPage":
+                    description: Should the layout editor be displayed for the discussionCategoryPage page.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.layoutEditor.discussionCategoryPage.Enabled
+                    x-feature: Feature.layoutEditor.categoryList.Enabled
+                    x-read: site.manage
+                    x-write: site.manage
+                "layoutEditor.nestedCategoryList":
+                    description: Should the layout editor be displayed for the nestedCategoryList page.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.layoutEditor.nestedCategoryList.Enabled
+                    x-feature: Feature.layoutEditor.categoryList.Enabled
+                    x-read: site.manage
+                    x-write: site.manage
+                "customLayout.home":
+                    description: Should custom layouts be rendered on the home page.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.customLayout.home.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "customLayout.discussionList":
+                    description: Should custom layouts be rendered on the discussionList page.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.customLayout.discussionList.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "customLayout.discussionThread":
+                    description: Should custom layouts be rendered on the discussionThread page.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.customLayout.discussionThread.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "customLayout.categoryList":
+                    description: Should custom layouts be rendered on the categoryList page.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.customLayout.categoryList.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "customLayout.nestedCategoryList":
+                    description: Should custom layouts be rendered on the nestedCategoryList page.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.customLayout.nestedCategoryList.Enabled
+                    x-feature: Feature.layoutEditor.categoryList.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "customLayout.discussionCategoryPage":
+                    description: Should custom layouts be rendered on the discussionCategoryPage page.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.customLayout.categoryList.Enabled
+                    x-feature: Feature.layoutEditor.categoryList.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.deferredLegacyScripts":
+                    description: >-
+                        This setting loads the page before executing Javascript which can improve your SEO.
+                        Warning: Enabling this feature may cause Javascript errors on your site.
+                        See https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature for more information.
+                    type: boolean
+                    default: true
+                    example: true
+                    x-key: Feature.DeferredLegacyScripts.Enabled
+                    x-read: public
+                    x-write: community.manage
+                "labs.newAnalytics":
+                    description: |
+                        Enable new analytics.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewAnalytics.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.userCards":
+                    description: |
+                        Enable user cards on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.UserCards.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.useCustomLayout":
+                    description: |
+                        Enable use custom layout.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.UseCustomLayout.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.newSearchPage":
+                    description: |
+                        Enable the new search UI on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.useNewSearchPage.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.newQuickLinks":
+                    description: |
+                        Enable the new quick links UI on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewQuickLinks.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.newPostMenu":
+                    description: |
+                        Enable the new post menu UI on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewPostMenu.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.newUserManagement":
+                    description: |
+                        Enable the new user management page with new table and control buttons.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewUserManagement.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.newEmbedSystem":
+                    description: |
+                        Enable the new embed system beta.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.newEmbedSystem.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.customProfileFields":
+                    description: |
+                        Enable custom profile fields.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.CustomProfileFields.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "embed.enabled":
+                    description: |
+                        Allow the site to be embedded at the embed.remoteUrl.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Garden.Embed.Allow
+                    x-write: site.manage
+                    x-read: site.manage
+                "embed.remoteUrl":
+                    description: |
+                        Configure the remote embed URL for the site.
+                    type: string
+                    default: ""
+                    example: "https://my-site.com/forum"
+                    x-key: Garden.Embed.RemoteUrl
+                    x-write: site.manage
+                    x-read: site.manage
+                "embed.forceEmbed":
+                    description: |
+                        Redirect users from the non-embedded site to the embedded site.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Garden.Embed.ForceModernEmbed
+                    x-write: site.manage
+                    x-read: site.manage
+                "discussions.layout":
+                    description: |
+                        Choose the preferred layout for lists of discussions.
+                    type: string
+                    default: "foundation"
+                    enum:
+                        - "modern"
+                        - "table"
+                        - "foundation"
+                    x-key: Vanilla.Discussions.Layout
+                    x-read: public
+                    x-write: site.manage
+                "discussionThread.layout":
+                    description: |
+                        Choose the preferred layout for discussion threads.
+                    type: string
+                    default: "foundation"
+                    enum:
+                        - "foundation"
+                    x-key: Vanilla.DiscussionThreads.Layout
+                    x-read: public
+                    x-write: site.manage
+                "categories.layout":
+                    description: |
+                        Choose the preferred layout for lists of categories.
+                    type: string
+                    default: "modern"
+                    enum:
+                        - "modern"
+                        - "table"
+                        - "mixed"
+                        - "foundation"
+                    x-key: Vanilla.Categories.Layout
+                    x-read: public
+                    x-write: site.manage
+                "routes.defaultController":
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    items:
+                        type: string
+                    description: >-
+                        Define the routing rule for the home page.
+                        The first item is the URL or route to send the home page to.
+                        The second item is the type of redirect to perform. It must be one of "Internal", "Temporary" and "Permanent"
+                    x-key: Routes.DefaultController
+                    x-read: public
+                    x-write: site.manage
+                "vanilla.siteID":
+                    description: |
+                        The community siteID.
+                    type: number
+                    default: 0
+                    x-key: Vanilla.SiteID
+                    x-read: public
+                "redirectURL.profile":
+                    description: |
+                        Custom URL to redirect the user instead of rendering Vanilla's "Profile" page.
+                    type: string
+                    default: ""
+                    x-key: "Garden.Profile.RedirectUrl"
+                    x-read: public
+                    x-write: site.manage
+                "redirectURL.message":
+                    description: |
+                        Custom URL to redirect the user instead of rendering Vanilla's "New Message" page.
+                    type: string
+                    default: ""
+                    x-key: "Garden.Messages.Add.RedirectUrl"
+                    x-read: public
+                    x-write: site.manage
+                "password.minLength":
+                    description: |
+                        The minimum number of characters a members password can be.
+                    type: string
+                    default: ""
+                    x-key: "Garden.Password.MinLength"
+                    x-read: public
+                    x-write: site.manage
+                "registration.method":
+                    description: |
+                        How members are able to register to the community.
+                    type: string
+                    enum:
+                        - "Basic"
+                        - "Approval"
+                        - "Invitation"
+                        - "Connect"
+                        - "Captcha"
+                    default: "Captcha"
+                    x-key: "Garden.Registration.Method"
+                    x-read: public
+                    x-write: site.manage
+                "profile.editEmails":
+                    description: |
+                        Responsible to allow users viewing own account, be able to edit their email.
+                    type: boolean
+                    default: true
+                    x-key: "Garden.Profile.EditEmails"
+                    x-read: public
+                    x-write: site.manage
+                "seo.metaHtml":
+                    description: |
+                        HTML <meta> tags for SEO purposes. This content is strictly validated to only contain meta tags `name` and `content` properties.
+                    type: string
+                    default: ""
+                    minLength: 0
+                    x-read: community.manage
+                    x-write: community.manage
+                    x-allowHtml: true
+                "debug":
+                    description: |
+                        Enable debug mode across the whole site for all requests. Only to be used for development purposes. DO NOT call set this on production sites. It is recommend to turn this on only when needed even on development sites because it slows performance and exposes server paths in stack traces.
+
+                         Debug mode causes errors to show stack traces, disables various caches, and causes certaining warnings to turn into exceptions.
+                    type: boolean
+                    default: false
+                    x-key: "Debug"
+                    x-read: public
+                    x-write: site.manage
+                "plugins.qna":
+                    description: Questions plugin enabled
+                    type: boolean
+                    default: false
+                    x-key: "EnabledPlugins.QnA"
+                    x-read: public
+                "plugins.ideation":
+                    description: Ideation plugin enabled
+                    type: boolean
+                    default: false
+                    x-key: "EnabledPlugins.ideation"
+                    x-read: public
+                "plugins.polls":
+                    description: Polls plugin enabled
+                    type: boolean
+                    default: false
+                    x-key: "EnabledPlugins.Polls"
+                    x-read: public
+                "plugins.resolved":
+                    description: Resolved plugin enabled
+                    type: boolean
+                    default: false
+                    x-key: "EnabledPlugins.resolved2"
+                    x-read: public
+                "preferences.categoryFollowed.defaults":
+                    description: |
+                        This is where we store the default followed categories
+                    type: string
+                    default: "[]"
+                    x-key: "Preferences.CategoryFollowed.Defaults"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.format":
+                    description: |
+                        Enable HTML emails
+                    type: string
+                    default: "html"
+                    enum:
+                        - "html"
+                        - "text"
+                    x-key: "Garden.Email.Format"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.image":
+                    description: |
+                        HTML email image
+                    type: string
+                    default: ""
+                    x-key: "Garden.EmailTemplate.Image"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.textColor":
+                    description: |
+                        HTML email text color
+                    type: string
+                    default: "#333333"
+                    x-key: "Garden.EmailTemplate.TextColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.backgroundColor":
+                    description: |
+                        HTML email background color
+                    type: string
+                    default: "#eeeeee"
+                    x-key: "Garden.EmailTemplate.BackgroundColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.containerBackgroundColor":
+                    description: |
+                        HTML email page color
+                    type: string
+                    default: "#ffffff"
+                    x-key: "Garden.EmailTemplate.ContainerBackgroundColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.buttonTextColor":
+                    description: |
+                        HTML email button text color
+                    type: string
+                    default: "#ffffff"
+                    x-key: "Garden.EmailTemplate.ButtonTextColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.buttonBackgroundColor":
+                    description: |
+                        HTML email button background text color
+                    type: string
+                    default: "#38abe3"
+                    x-key: "Garden.EmailTemplate.ButtonBackgroundColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "outgoingEmails.supportName":
+                    description: |
+                        Email sent from the application will be addressed from this name
+                    type: string
+                    default: ""
+                    x-key: "Garden.Email.SupportName"
+                    x-read: community.manage
+                    x-write: community.manage
+                "outgoingEmails.supportAddress":
+                    description: |
+                        Email sent from the application will be addressed from this email address
+                    type: string
+                    default: ""
+                    x-key: "Garden.Email.SupportAddress"
+                    x-read: community.manage
+                    x-write: community.manage
+                "outgoingEmails.footer":
+                    description: |
+                        This may be used to include content such as organization name and address in all outgoing emails.
+                    type: string
+                    default: '[{"children":[{"text":""}],"type":"p"}]'
+                    x-key: "Garden.Email.Footer"
+                    x-read: community.manage
+                    x-write: community.manage
+                    x-allowHtml: true
+                "emailNotifications.disabled":
+                    description: |
+                        When enabled, users may choose to receive notifications from the community
+                    type: boolean
+                    default: false
+                    x-key: "Garden.Email.Disabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailNotifications.fullPost":
+                    description: |
+                        Include full post in email notifications
+                    type: boolean
+                    default: true
+                    x-key: "Vanilla.Email.FullPost"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.enabled":
+                    description: |
+                        Use weekly community email digest
+                    type: boolean
+                    default: false
+                    x-key: "Garden.Digest.Enabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.logo":
+                    description: |
+                        Digest logo
+                    type: string
+                    default: ""
+                    x-key: "Garden.Digest.Logo"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.dayOfWeek":
+                    description: |
+                        Email digests will be sent on the selected day every week.
+                        1 - Monday
+                        2 - Tuesday
+                        3 - Wednesday
+                        4 - Thursday
+                        5 - Friday
+                        6 - Saturday
+                        7 - Sunday
+                    type: integer
+                    default: 1
+                    x-key: "Garden.Digest.DayOfWeek"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.postCount":
+                    description: |
+                        Maximum number of posts that should appear in the email digest
+                    type: integer
+                    default: 5
+                    minimum: 3
+                    maximum: 20
+                    x-key: "Garden.Digest.PostCount"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.title":
+                    description: |
+                        Title appearing in the subject of email digest
+                    type: string
+                    default: ""
+                    x-key: "Garden.Digest.Title"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.includeCommunityName":
+                    description: |
+                        Include community name in the subject
+                    type: boolean
+                    default: true
+                    x-key: "Garden.Digest.IncludeCommunityName"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.introduction":
+                    description: |
+                        Appears before main content in email digest
+                    type: string
+                    default: '[{"children":[{"text":""}],"type":"p"}]'
+                    x-key: "Garden.Digest.Introduction"
+                    x-read: community.manage
+                    x-write: community.manage
+                    x-allowHtml: true
+                "emailDigest.footer":
+                    description: |
+                        This may be used to include content such as organization name and address in email digest
+                    type: string
+                    default: '[{"children":[{"text":""}],"type":"p"}]'
+                    x-key: "Garden.Digest.Footer"
+                    x-read: community.manage
+                    x-write: community.manage
+                    x-allowHtml: true
+                "emailDigest.imageEnabled":
+                    description: |
+                        Include featured images with posts in email digest
+                    type: boolean
+                    default: false
+                    x-key: "Garden.Digest.ImageEnabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.authorEnabled":
+                    description: |
+                        Include author with posts in email digest
+                    type: boolean
+                    default: true
+                    x-key: "Garden.Digest.AuthorEnabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.viewCountEnabled":
+                    description: |
+                        Include view count with posts in email digest
+                    type: boolean
+                    default: true
+                    x-key: "Garden.Digest.ViewCountEnabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.commentCountEnabled":
+                    description: |
+                        Include comment count with posts in email digest
+                    type: boolean
+                    default: true
+                    x-key: "Garden.Digest.CommentCountEnabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.scoreCountEnabled":
+                    description: |
+                        Include comment count with posts in email digest
+                    type: boolean
+                    default: true
+                    x-key: "Garden.Digest.ScoreCountEnabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "externalSearch.query":
+                    description: |
+                        Query for external search
+                    type: string
+                    default: ""
+                    x-key: "Garden.ExternalSearch.Query"
+                    x-read: community.manage
+                    x-write: community.manage
+                "externalSearch.resultsInNewTab":
+                    description: |
+                        To open the results page in a new tab or within community
+                    type: boolean
+                    default: false
+                    x-key: "Garden.ExternalSearch.ResultsInNewTab"
+                    x-read: community.manage
+                    x-write: community.manage
+                "escalations.enabled":
+                    description: |
+                        Enable the new escalations system and disable intake into legacy reporting systems.
+                    type: boolean
+                    default: false
+                    x-key: "Feature.escalations.Enabled"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "triage.enabled":
+                    description: |
+                        Enable the triage system
+                    type: boolean
+                    default: false
+                    x-key: "triage.enabled"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.categoryIDs":
+                    description: |
+                        Categories that require premoderation
+                    type: array
+                    items:
+                        type: integer
+                    default: []
+                    x-key: "premoderation.categoryIDs"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.discussions":
+                    description: |
+                        Should discussions require premoderation.
+                    type: boolean
+                    default: false
+                    x-key: "premoderation.discussions"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.comments":
+                    description: |
+                        Should comments require premoderation.
+                    type: boolean
+                    default: false
+                    x-key: "premoderation.comments"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.keywords":
+                    description: |
+                        Keywords that require premoderation. This should be a semicolon separated list of keywords.
+                    type: string
+                    default: ""
+                    x-key: "premoderation.keywords"
+                    x-read: community.moderate
+                    x-write: community.moderate

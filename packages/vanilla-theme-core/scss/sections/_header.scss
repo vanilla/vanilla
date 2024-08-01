@@ -40,7 +40,6 @@
             color: $headerMebutton-hover_fg;
             background-color: $headerMebutton-hover_bg;
 
-
             .Alert {
                 color: $headerMeBoxAlert_fg;
                 background-color: $headerMeBoxAlert_bg;
@@ -101,7 +100,6 @@
 .Header-desktopNav {
     display: flex;
     align-items: center;
-
 
     @include maxWidth {
         display: none;

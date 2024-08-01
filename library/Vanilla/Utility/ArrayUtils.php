@@ -8,12 +8,13 @@
 namespace Vanilla\Utility;
 
 use ArrayAccess;
+use function Vanilla\Web;
 
 /**
  * Utility functions that operate on arrays or array-like objects.
  */
-final class ArrayUtils {
-
+final class ArrayUtils
+{
     private const PATH_SEPARATOR = ".";
 
     /**
@@ -22,8 +23,22 @@ final class ArrayUtils {
      * @param mixed $input The input to test.
      * @param string $message
      */
-    private static function assertArray($input, string $message): void {
+    public static function assertArray($input, string $message): void
+    {
         if (!self::isArray($input)) {
+            throw new \InvalidArgumentException($message, 400);
+        }
+    }
+
+    /**
+     * Ensure the input is iterable.
+     *
+     * @param mixed $input The input to test.
+     * @param string $message The error message for the exception if the input is not iterable.
+     */
+    private static function assertIterable($input, string $message)
+    {
+        if (!is_iterable($input)) {
             throw new \InvalidArgumentException($message, 400);
         }
     }
@@ -34,28 +49,10 @@ final class ArrayUtils {
      * @param string $key
      * @return string
      */
-    public static function escapeKey(string $key): string {
-        $result = str_replace(
-            self::PATH_SEPARATOR,
-            "\\".self::PATH_SEPARATOR,
-            $key
-        );
+    public static function escapeKey(string $key): string
+    {
+        $result = str_replace(self::PATH_SEPARATOR, "\\" . self::PATH_SEPARATOR, $key);
 
-        return $result;
-    }
-
-    /**
-     * Break a path up into its individual associative keys.
-     *
-     * @param string $path
-     * @return array
-     */
-    private static function explodePath(string $path): array {
-        $explodePattern = "#(?<!\\\\)\\".self::PATH_SEPARATOR."#";
-        $result = preg_split($explodePattern, $path);
-        array_walk($result, function (&$value) {
-            $value = self::unescapeKey($value);
-        });
         return $result;
     }
 
@@ -66,9 +63,10 @@ final class ArrayUtils {
      * @param string $string The input string.
      * @return array Returns the exploded string as an array.
      */
-    public static function explodeTrim(string $delimiter, string $string): array {
+    public static function explodeTrim(string $delimiter, string $string): array
+    {
         $arr = explode($delimiter, $string);
-        $arr = array_map('trim', $arr);
+        $arr = array_map("trim", $arr);
         $arr = array_filter($arr);
         return $arr;
     }
@@ -81,20 +79,21 @@ final class ArrayUtils {
      * @param null $default
      * @return mixed
      */
-    public static function getByPath(string $path, $array, $default = null) {
-        self::assertArray($array, __METHOD__."() expects argument 2 to be an array or array-like object.");
+    public static function getByPath(string $path, $array, $default = null, string $separator = self::PATH_SEPARATOR)
+    {
+        self::assertArray($array, __METHOD__ . "() expects argument 2 to be an array or array-like object.");
 
-        $keys = self::explodePath($path);
+        $keys = explode($separator, $path);
 
         $search = function ($array, array $keys) use ($default, &$search) {
             self::assertArray($array, "Unexpected argument type. Expected an array or array-like object.");
 
             $currentKey = reset($keys);
-            if (array_key_exists($currentKey, $array)) {
+            if (self::arrayKeyExists($currentKey, $array)) {
                 $value = $array[$currentKey];
                 $nextKeys = array_slice($keys, 1);
                 if (count($nextKeys) > 0) {
-                    return is_array($value) ? $search($value, $nextKeys) : $default;
+                    return self::isArray($value) ? $search($value, $nextKeys) : $default;
                 } else {
                     return $value;
                 }
@@ -108,12 +107,30 @@ final class ArrayUtils {
     }
 
     /**
+     * An object safe version of `array_key_exists()`
+     *
+     * @param string|int $key The key to lookup.
+     * @param array|ArrayAccess $array The array or object to look at.
+     * @return bool Returns **true** if the key exists or **false** otherwise.
+     */
+    public static function arrayKeyExists($key, $array)
+    {
+        if (is_array($array)) {
+            return array_key_exists($key, $array);
+        } elseif ($array instanceof ArrayAccess) {
+            return $array->offsetExists($key);
+        }
+        return false;
+    }
+
+    /**
      * Test whether or not an input object is an array or accessible as an array.
      *
      * @param mixed $input The input to test.
      * @return bool
      */
-    public static function isArray($input): bool {
+    public static function isArray($input): bool
+    {
         return is_array($input) || $input instanceof ArrayAccess;
     }
 
@@ -123,8 +140,11 @@ final class ArrayUtils {
      * @param array|ArrayAccess $array
      * @return bool
      */
-    public static function isAssociative($array): bool {
-        self::assertArray($array, __METHOD__ . "() expects argument 1 to be an array or array-like object.");
+    public static function isAssociative($array): bool
+    {
+        if (!self::isArray($array)) {
+            return false;
+        }
         $result = false;
 
         if (is_array($array)) {
@@ -144,6 +164,35 @@ final class ArrayUtils {
     }
 
     /**
+     * Check if something will serialize as a numeric array.
+     *
+     * - All keys are numeric.
+     * - Keys are in order.
+     * - There are no holes.
+     *
+     * @param mixed $array
+     *
+     * @return bool
+     */
+    public static function serializesAsNumericArray($array): bool
+    {
+        if (!is_array($array)) {
+            return false;
+        }
+
+        reset($array);
+        $expectedIndex = 0;
+        foreach ($array as $key => $value) {
+            if ($key !== $expectedIndex) {
+                return false;
+            }
+            $expectedIndex++;
+        }
+
+        return true;
+    }
+
+    /**
      * Get the keys of an array or array like object.
      *
      * This method is similar to `array_keys()`, but works on objects that act like arrays.
@@ -151,7 +200,8 @@ final class ArrayUtils {
      * @param mixed $array An array or array like object.
      * @return array
      */
-    public static function keys($array): array {
+    public static function keys($array): array
+    {
         if (is_array($array)) {
             return array_keys($array);
         } elseif ($array instanceof \ArrayObject) {
@@ -164,7 +214,7 @@ final class ArrayUtils {
             return $r;
         } else {
             throw new \InvalidArgumentException(
-                __METHOD__."() expects argument 1 to be an array or array-like object.",
+                __METHOD__ . "() expects argument 1 to be an array or array-like object.",
                 400
             );
         }
@@ -173,30 +223,33 @@ final class ArrayUtils {
     /**
      * Set a value in an associative array by its full key path, creating new segments as necessary.
      *
-     * @param mixed $value
      * @param string $path
      * @param array|ArrayAccess $array
+     * @param mixed $value
      * @return mixed
      */
-    public static function setByPath($value, string $path, $array) {
+    public static function setByPath(string $path, &$array, $value, string $separator = self::PATH_SEPARATOR)
+    {
         self::assertArray($array, __METHOD__ . "() expects argument 2 to be an array or array-like object.");
 
-        $keys = self::explodePath($path);
+        $keys = explode($separator, $path);
         $search = function ($array, array $keys) use ($value, &$search) {
             $currentKey = reset($keys);
-            if (array_key_exists($currentKey, $array) && !self::isArray($array[$currentKey])) {
-                throw new \InvalidArgumentException(
-                    "Unexpected type in path. Expected an array or array-like object."
-                );
+            $isLastKey = count($keys) === 1;
+            if (self::arrayKeyExists($currentKey, $array) && !self::isArray($array[$currentKey]) && !$isLastKey) {
+                throw new \InvalidArgumentException("Unexpected type in path. Expected an array or array-like object.");
             }
 
-            if (!array_key_exists($currentKey, $array)) {
+            if (!self::arrayKeyExists($currentKey, $array)) {
                 $array[$currentKey] = [];
             }
 
             $nextKeys = array_slice($keys, 1);
-            if (count($nextKeys) > 0) {
+            if (count($nextKeys) > 1) {
                 $array[$currentKey] = $search($array[$currentKey], $nextKeys);
+            } elseif (count($nextKeys) === 1) {
+                $nextKey = reset($nextKeys);
+                $array[$currentKey][$nextKey] = $value;
             } else {
                 $array[$currentKey] = $value;
             }
@@ -209,19 +262,32 @@ final class ArrayUtils {
     }
 
     /**
-     * Unescape reserved characters in an escaped associative array key.
+     * Remove a value by a dot notation string path.
      *
-     * @param string $key
-     * @return string
+     * @param string $path
+     * @param array|ArrayAccess $array
      */
-    private static function unescapeKey(string $key): string {
-        $result = str_replace(
-            "\\".self::PATH_SEPARATOR,
-            self::PATH_SEPARATOR,
-            $key
-        );
+    public static function unsetByPath(string $path, &$array): void
+    {
+        self::assertArray($array, __METHOD__ . "() expects argument 2 to be an array or array-like object.");
+        $arr = &$array;
+        $pieces = explode(self::PATH_SEPARATOR, $path);
+        foreach ($pieces as $i => $piece) {
+            if (!self::arrayKeyExists($piece, $arr)) {
+                // Nothing to unset.
+                return;
+            }
 
-        return $result;
+            $isLastKey = $i === count($pieces) - 1;
+
+            if ($isLastKey) {
+                unset($arr[$piece]);
+            } elseif (!self::isArray($arr[$piece])) {
+                throw new \InvalidArgumentException("Unexpected type in path. Expected an array or array-like object.");
+            } else {
+                $arr = &$arr[$piece];
+            }
+        }
     }
 
     /**
@@ -232,14 +298,16 @@ final class ArrayUtils {
      * @param array|ArrayAccess $array
      * @param callable $callback
      */
-    public static function walkRecursiveArray(&$array, callable $callback): void {
+    public static function walkRecursiveArray(&$array, callable $callback): void
+    {
         $m = function (&$array, array $path) use ($callback, &$m): void {
             if (is_iterable($array)) {
                 $keys = static::keys($array);
                 $callback($array, $path);
 
                 foreach ($keys as $key) {
-                    if (static::isArray($array[$key])) {
+                    // Make sure we check existence because it could have been deleted.
+                    if (isset($array[$key]) && static::isArray($array[$key])) {
                         $currentPath = array_merge($path, [$key]);
                         $m($array[$key], $currentPath);
                     }
@@ -249,8 +317,61 @@ final class ArrayUtils {
             }
         };
 
-        self::assertArray($array, __METHOD__.'() expects argument 1 to be an array or array-like object.');
+        self::assertArray($array, __METHOD__ . "() expects argument 1 to be an array or array-like object.");
         $m($array, []);
+    }
+
+    /**
+     * Recursively walk a nested array and filter sub-arrays based on a filter callback.
+     *
+     * This function is similar to `array_filter()`, but it will walk the array recursively and filter based on sub-arrays
+     * and not each value.
+     *
+     * @param array|ArrayAccess $array The nested array to filter.
+     * @param callable $filter The filter function.
+     * @param bool $includeRoot Whether or not to include the root array.
+     * @return array|null Returns the filtered array or null if the root array is filtered out.
+     */
+    public static function filterRecursiveArray($array, callable $filter, bool $includeRoot = false)
+    {
+        $m = function (&$array, array $path) use ($filter, &$m) {
+            $r = [];
+            $isSimpleArray = ArrayUtils::isArray($array) && !ArrayUtils::isAssociative($array);
+            foreach ($array as $key => $value) {
+                if (static::isArray($value)) {
+                    $subpath = array_merge($path, [$key]);
+                    $include = $filter($value, $subpath);
+
+                    if ($include) {
+                        if (is_iterable($value)) {
+                            $r[$key] = $m($value, $subpath);
+                        } else {
+                            $r[$key] = $value;
+                        }
+                    }
+                } else {
+                    $r[$key] = $value;
+                }
+            }
+
+            if ($isSimpleArray) {
+                $r = array_values($r);
+            }
+
+            return $r;
+        };
+
+        self::assertArray($array, __METHOD__ . "() expects argument 1 to be an array or array-like object.");
+        self::assertIterable($array, __METHOD__ . "() expects argument 1 to be iterable.");
+
+        if ($includeRoot) {
+            $include = $filter($array, []);
+            if (!$include) {
+                return null;
+            }
+        }
+
+        return $m($array, []);
     }
 
     /**
@@ -267,7 +388,8 @@ final class ArrayUtils {
      * look at the default definition at the top of the method.
      * @return array
      */
-    public static function mergeRecursive(array $arr1, array $arr2, callable $numeric = null): array {
+    public static function mergeRecursive(array $arr1, array $arr2, callable $numeric = null): array
+    {
         if ($numeric === null) {
             $numeric = function (array $arr1, array $arr2, string $key): array {
                 return array_values(array_unique(array_merge($arr1, $arr2)));
@@ -305,6 +427,45 @@ final class ArrayUtils {
     }
 
     /**
+     * Recursively flatten a nested array into a single-dimension array.
+     *
+     * @param string $separator The string used to separate keys.
+     * @param array $array The array to flatten.
+     * @param bool $stopOnSequentialArrayValues Stop flattening when a sequential array value is met, or not.
+     * @return array Returns the flattened array.
+     */
+    public static function flattenArray(
+        string $separator,
+        array $array,
+        bool $stopOnSequentialArrayValues = false
+    ): array {
+        $result = [];
+
+        $fn = function ($array, $previousLevel = null) use ($separator, &$fn, &$result, $stopOnSequentialArrayValues) {
+            foreach ($array as $key => $value) {
+                $currentLevel = $previousLevel ? "{$previousLevel}{$separator}{$key}" : $key;
+
+                if (is_object($value)) {
+                    $value = (array) $value;
+                }
+                if (is_array($value)) {
+                    if ($stopOnSequentialArrayValues && !self::isAssociative($value)) {
+                        $result[$currentLevel] = $value;
+                    } else {
+                        $fn($value, $currentLevel);
+                    }
+                } else {
+                    $result[$currentLevel] = $value;
+                }
+            }
+        };
+
+        $fn($array);
+
+        return $result;
+    }
+
+    /**
      * Return a function that can be used to sort a dataset by one or more keys.
      *
      * Consider a dataset that looks something like this:
@@ -324,13 +485,14 @@ final class ArrayUtils {
      *
      * Note that string comparisons are case-insensitive to emulate common database collations.
      *
-     * @param string $keys The keys to sort by.
+     * @param string[] $keys The keys to sort by.
      * @return callable Returns a function that can be passed to `usort`.
      */
-    public static function sortCallback(string ...$keys): callable {
+    public static function sortCallback(string ...$keys): callable
+    {
         $sortKeys = [];
         foreach ($keys as $key) {
-            if ($key[0] === '-') {
+            if ($key[0] === "-") {
                 $sortKeys[substr($key, 1)] = -1;
             } else {
                 $sortKeys[$key] = 1;
@@ -358,13 +520,61 @@ final class ArrayUtils {
     }
 
     /**
+     * Make a filte function based on a simple where like filter array.
+     *
+     * @param array $where The filter array.
+     * @param bool $strict Whether or not to use strict comparisons.
+     * @return callable Returns a function suitable to be used with `array_filter` or on its own.
+     */
+    public static function filterCallback(array $where, bool $strict = false): callable
+    {
+        return function ($row) use ($where, $strict) {
+            foreach ($where as $key => $value) {
+                if (!array_key_exists($key, $row)) {
+                    return false;
+                } elseif ($strict && $row[$key] !== $value) {
+                    return false;
+                } elseif ($row[$key] != $value) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
+
+    /**
+     * Like `array_column` except values the values ar always an array of values.
+     * If there are multiple matching the same index key, then the multiple will be in that array.
+     *
+     * @param array $input The input array.
+     * @param string|null $valueKey The key to pull out or null for the full value.
+     * @param string $indexKey The key to index under. Unlike array_column this is required.
+     *
+     * @return array The indexed array.
+     */
+    public static function arrayColumnArrays(array $input, ?string $valueKey, string $indexKey): array
+    {
+        $result = [];
+        foreach ($input as $inputRow) {
+            $rowKey = $inputRow[$indexKey] ?? "";
+            $rowValue = $inputRow;
+            if ($valueKey !== null) {
+                $rowValue = $inputRow[$valueKey] ?? null;
+            }
+            $result[$rowKey][] = $rowValue;
+        }
+        return $result;
+    }
+
+    /**
      * Remap one data key into another if it doesn't exist.
      *
      * @param array $data The data to modify.
      * @param array $modifications The mapping of 'newName' => 'oldName'.
      * @return array
      */
-    public static function remapProperties(array $data, array $modifications): array {
+    public static function remapProperties(array $data, array $modifications): array
+    {
         foreach ($modifications as $newName => $oldName) {
             $hasExistingNewValue = valr($newName, $data, null);
             if ($hasExistingNewValue !== null) {
@@ -377,5 +587,196 @@ final class ArrayUtils {
             }
         }
         return $data;
+    }
+
+    /**
+     * Pluck a set of keys from an array.
+     *
+     * @param mixed $arr
+     * @param string[] $keys
+     * @return array
+     * @todo Add tests.
+     */
+    public static function pluck($arr, array $keys): array
+    {
+        self::assertArray($arr, __METHOD__ . "() expects argument 1 to be an array or array-like object.");
+
+        $keys = array_fill_keys($keys, true);
+        $result = array_intersect_key($arr, $keys);
+
+        return $result;
+    }
+
+    /**
+     * Convert an array's key from pascal case to camel case.
+     *
+     * @param array $arr
+     * @return array
+     */
+    public static function camelCase(array $arr): array
+    {
+        $result = [];
+        foreach ($arr as $key => $value) {
+            if (is_array($value)) {
+                $result[lcfirst($key)] = self::camelCase($value);
+            } else {
+                $result[lcfirst($key)] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Convert an array's key from camel case to pascal case.
+     *
+     * @param array $arr
+     * @return array
+     */
+    public static function pascalCase(array $arr): array
+    {
+        $result = [];
+        foreach ($arr as $key => $value) {
+            if (is_array($value)) {
+                $result[ucfirst($key)] = self::pascalCase($value);
+            } else {
+                $result[ucfirst($key)] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Box a mixed variable into an array by exploding a string or returning the array.
+     *
+     * This method is meant to handle legacy functionality where we allow array variables to also be strings.
+     *
+     * @param string $glue The glue used to explode.
+     * @param mixed $array The arrayish variable to work on.
+     * @return array Returns an exploded string.
+     */
+    public static function explodeMixed(string $glue, $array): array
+    {
+        if (empty($array)) {
+            return [];
+        } elseif (is_string($array)) {
+            return self::explodeTrim($glue, $array);
+        } else {
+            return (array) $array;
+        }
+    }
+
+    /**
+     * Given an object, attempt to convert it to an associative array.
+     *
+     * @param object $object
+     * @return array
+     */
+    public static function objToArrayRecursive(object $object): array
+    {
+        return json_decode(json_encode($object), true);
+    }
+
+    /**
+     * Given an object, attempt to convert it to an associative array.
+     *
+     * @param array $arr
+     * @return array
+     */
+    public static function jsonNormalizeArray(array $arr): array
+    {
+        return json_decode(json_encode($arr), true);
+    }
+
+    /**
+     * Recursively apply `json_decode()` to a provided array's values.
+     *
+     * @param array $array
+     * @return array
+     */
+    public static function jsonDecodeArray(array $array): array
+    {
+        $returnValues = [];
+
+        foreach ($array as $arrayKey => $arrayValue) {
+            $returnValues[$arrayKey] = $arrayValue;
+
+            if (is_array($arrayValue)) {
+                $returnValues[$arrayKey] = ArrayUtils::jsonDecodeArray($arrayValue);
+            }
+
+            if (is_string($arrayValue)) {
+                $decodedArrayValue = json_decode($arrayValue, true);
+                if (is_array($decodedArrayValue)) {
+                    $returnValues[$arrayKey] = $decodedArrayValue;
+                }
+            }
+        }
+
+        return $returnValues;
+    }
+
+    /**
+     * Trim a prefix from all keys of an array.
+     *
+     * @param array $array
+     * @param string $prefix
+     *
+     * @return array
+     */
+    public static function trimKeyPrefix(array $array, string $prefix): array
+    {
+        if (empty($prefix)) {
+            return $array;
+        }
+
+        $result = [];
+        foreach ($array as $key => $val) {
+            if (str_starts_with($key, $prefix)) {
+                $result[str_replace($prefix, "", $key)] = $val;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Convert dot notation formatted flat array to multidimensional array
+     *
+     * @param array $dotNotation
+     * @return array
+     */
+    public static function dotNotationToArray(array $dotNotation): array
+    {
+        $res = [];
+        foreach ($dotNotation as $path => $value) {
+            ArrayUtils::setByPath($path, $res, $value);
+        }
+
+        return $res;
+    }
+
+    /**
+     * Convert multidimensional array to dot notation flat array
+     *
+     * @param array $arr
+     * @return array
+     */
+    public static function arrayToDotNotation(array $arr): array
+    {
+        $dotFlatten = function (array $input, array $resultArray, string $currentPrefix) use (&$dotFlatten): array {
+            foreach ($input as $key => $value) {
+                $newKey = $currentPrefix . $key;
+
+                // check if it's associative array 99% good
+                if (is_array($value) && ArrayUtils::isAssociative($value)) {
+                    $resultArray = array_merge($resultArray, $dotFlatten($value, $resultArray, $newKey . "."));
+                } else {
+                    $resultArray[$newKey] = $value;
+                }
+            }
+
+            return $resultArray;
+        };
+
+        return $dotFlatten($arr, [], "");
     }
 }

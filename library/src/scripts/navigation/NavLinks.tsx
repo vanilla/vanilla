@@ -11,25 +11,28 @@ import { t } from "@library/utility/appUtils";
 import { INavigationItem } from "@library/@types/api/core";
 import SmartLink from "@library/routing/links/SmartLink";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { navLinksClasses } from "@library/navigation/navLinksStyles";
+import { navLinksVariables, navLinksClasses } from "@library/navigation/navLinksStyles";
 import Translate from "@library/content/Translate";
 import { useUniqueID } from "@library/utility/idUtils";
+import { RecordID } from "@vanilla/utils";
+import { ArrowIcon } from "@library/icons/common";
 
 interface IProps {
     classNames?: string;
     title: string;
     items: INavigationItem[];
     url?: string;
-    recordID?: number;
+    recordID?: RecordID;
     recordType?: string;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     accessibleViewAllMessage?: string;
     NoItemsComponent?: INavLinkNoItemComponent;
+    hasIcon?: boolean;
 }
 
 export interface INavLinkNoItemComponentProps {
     className?: string;
-    recordID?: number;
+    recordID?: RecordID;
     recordType?: string;
 }
 export type INavLinkNoItemComponent = React.ComponentType<INavLinkNoItemComponentProps>;
@@ -42,12 +45,13 @@ export default function NavLinks(props: IProps) {
 
     const viewAll = t("View All");
     const classes = navLinksClasses();
+    const navLinkVars = navLinksVariables();
     const contents =
         items.length > 0
             ? items.map((item, i) => {
                   return (
                       <li className={classes.item} key={i}>
-                          <SmartLink to={item.url} className={classes.link} title={item.name}>
+                          <SmartLink to={item.url || ""} className={classes.link} title={item.name}>
                               {item.name}
                           </SmartLink>
                       </li>
@@ -77,6 +81,7 @@ export default function NavLinks(props: IProps) {
                     <li className={classNames(classes.viewAllItem)}>
                         <SmartLink to={props.url} className={classNames(classes.viewAll)}>
                             <span aria-hidden={true}>{viewAll}</span>
+                            {navLinkVars.viewAll.icon && <ArrowIcon />}
                             <ScreenReaderContent>
                                 <Translate source={props.accessibleViewAllMessage} c0={props.title} />
                             </ScreenReaderContent>

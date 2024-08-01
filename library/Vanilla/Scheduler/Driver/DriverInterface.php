@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -13,8 +13,8 @@ use Vanilla\Scheduler\Job\JobInterface;
 /**
  * Interface DriverInterface
  */
-interface DriverInterface {
-
+interface DriverInterface
+{
     /**
      * Receive a Job
      *
@@ -27,7 +27,6 @@ interface DriverInterface {
      * Execute a Driver job
      *
      * @param DriverSlipInterface $driverSlip
-     *
      * @return JobExecutionStatus
      */
     public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus;
@@ -39,4 +38,11 @@ interface DriverInterface {
      * @return array
      */
     public function getSupportedInterfaces(): array;
+
+    /**
+     * Use this method to have your driver perform any necessary cleanup after all jobs have been executed.
+     *
+     * @return void
+     */
+    public function cleanupAfterDispatch(): void;
 }

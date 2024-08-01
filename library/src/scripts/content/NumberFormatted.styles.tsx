@@ -3,7 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const numberFormattedClasses = useThemeCache(() => {
     const style = styleFactory("numberFormatter");

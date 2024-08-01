@@ -1,101 +1,103 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { unit, colorOut } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { margins } from "@library/styles/styleHelpers";
-import { em, percent, px } from "csx";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { oneColumnVariables } from "@library/layout/Section.variables";
+import { percent, px } from "csx";
+import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const actionBarClasses = useThemeCache(() => {
-    const style = styleFactory("actionBar");
     const titleBarVars = titleBarVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const globalVars = globalVariables();
 
-    const items = style(
-        "items",
+    const items = css(
         {
             display: "flex",
             flexWrap: "nowrap",
             justifyContent: "flex-end",
             alignItems: "center",
             width: percent(100),
-            height: unit(titleBarVars.sizing.height),
+            height: styleUnit(titleBarVars.sizing.height),
             listStyle: "none",
             margin: 0,
         },
         mediaQueries.oneColumnDown({
-            height: unit(titleBarVars.sizing.mobile.height),
+            height: styleUnit(titleBarVars.sizing.mobile.height),
         }),
     );
 
-    const item = style("item", {
+    const item = css({
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        $nest: {
+        ...{
             "&.isPullLeft": {
-                ...margins({
+                ...Mixins.margin({
                     left: 0,
                     right: "auto",
                 }),
                 justifyContent: "flex-start",
             },
             "&.isPullRight": {
-                ...margins({
+                ...Mixins.margin({
                     left: "auto",
                     right: 0,
                 }),
                 justifyContent: "flex-end",
-
-                $nest: {
+                ...{
                     "& button": {
-                        fontSize: globalVars.fonts.size.medium,
+                        ...Mixins.font({
+                            ...globalVars.fontSizeAndWeightVars("medium"),
+                        }),
                     },
                 },
             },
         },
     });
 
-    const itemMarginLeft = style("itemMarginLeft", {
-        marginLeft: unit(globalVars.gutter.half),
-        $nest: {
+    const itemMarginLeft = css({
+        marginLeft: styleUnit(globalVars.gutter.half),
+        ...{
             "& button": {
-                fontSize: globalVars.fonts.size.medium,
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("medium"),
+                }),
             },
         },
     });
 
-    const centreColumn = style("centreColumn", {
+    const centreColumn = css({
         flexGrow: 1,
-        ...margins({
-            horizontal: unit(globalVars.spacer.size),
+        ...Mixins.margin({
+            horizontal: styleUnit(globalVars.spacer.size),
         }),
     });
 
-    const callToAction = style("callToAction", {
-        color: colorOut(globalVars.mainColors.primary),
+    const callToAction = css({
+        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
         fontWeight: globalVars.fonts.weights.semiBold,
         whiteSpace: "nowrap",
     });
 
-    const split = style("split", {
+    const split = css({
         flexGrow: 1,
         height: px(1),
     });
 
-    const backLink = style("backLink", {
-        $nest: {
+    const backLink = css({
+        ...{
             "&&": {
                 marginRight: "auto",
-
-                $nest: {
+                ...{
                     "& a": {
                         textDecoration: "none",
                     },
@@ -104,12 +106,12 @@ export const actionBarClasses = useThemeCache(() => {
         },
     });
 
-    const backSpacer = style("backSpacer", {
+    const backSpacer = css({
         position: "relative",
         visibility: "hidden",
     });
 
-    const fullWidth = style("fullWidth", {
+    const fullWidth = css({
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
@@ -121,8 +123,8 @@ export const actionBarClasses = useThemeCache(() => {
         width: "100%",
     });
 
-    const anotherCallToAction = style("anotherCallToAction", {
-        paddingRight: unit(10),
+    const anotherCallToAction = css({
+        paddingRight: styleUnit(10),
     });
 
     return {

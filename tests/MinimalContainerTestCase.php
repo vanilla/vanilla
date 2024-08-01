@@ -8,10 +8,14 @@
 namespace VanillaTests;
 
 use Garden\Container\Container;
+use Garden\Container\Reference;
+use Garden\EventManager;
 use Garden\Http\HttpClient;
+use Garden\Http\Mocks\MockHttpHandler;
 use Garden\Web\RequestInterface;
 use Gdn;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\AddonManager;
@@ -19,7 +23,6 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
-use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Web\TwigEnhancer;
 use VanillaTests\Fixtures\MockUASniffer;
@@ -30,10 +33,10 @@ use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\MockConfig;
-use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\Fixtures\MockLocale;
 use VanillaTests\Fixtures\Models\MockUserProvider;
 use VanillaTests\Fixtures\NullCache;
+use VanillaTests\Fixtures\SpyingEventManager;
 
 /**
  * A very minimal PHPUnit test case using Garden\Container.
@@ -49,23 +52,51 @@ use VanillaTests\Fixtures\NullCache;
  * - No addon manager.
  * - No cache.
  */
-class MinimalContainerTestCase extends TestCase {
+class MinimalContainerTestCase extends TestCase
+{
+    protected $baseUrl = "https://vanilla.test/minimal-container-test/";
 
-    protected $baseUrl = 'http://vanilla.test/minimal-container-test/';
+    /**
+     * @return string
+     */
+    public static function getBaseUrl()
+    {
+        return "https://vanilla.test/minimal-container-test";
+    }
+
+    /**
+     * Whether or not we should apply the common bootstrap.
+     *
+     * @return bool
+     */
+    protected static function useCommonBootstrap(): bool
+    {
+        return true;
+    }
 
     /**
      * Setup the container.
      */
-    protected function configureContainer() {
-        \Gdn::setContainer(new Container());
+    protected function configureContainer()
+    {
+        $container = new Container();
 
-        self::container()
+        if (static::useCommonBootstrap()) {
+            \Vanilla\Bootstrap::configureContainer($container);
+        }
+
+        $container
+            ->rule(\Gdn_Session::class)
+            ->setShared(true)
+            ->rule(Container::class)
+            ->addAlias(ContainerInterface::class)
+            ->setInstance(Container::class, $container)
             ->rule(FormatService::class)
             ->setShared(true)
-            ->addCall('registerBuiltInFormats', [self::container()])
+            ->addCall("registerBuiltInFormats")
 
             ->rule(Parser::class)
-            ->addCall('addCoreBlotsAndFormats')
+            ->addCall("addCoreBlotsAndFormats")
 
             // Site sections
             ->rule(\Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
@@ -73,7 +104,7 @@ class MinimalContainerTestCase extends TestCase {
             ->setShared(true)
 
             ->rule(TwigEnhancer::class)
-            ->setConstructorArgs(['bannerImageModel' => null])
+            ->setConstructorArgs(["bannerImageModel" => null])
 
             // Mocks of interfaces.
             // Addons
@@ -102,15 +133,22 @@ class MinimalContainerTestCase extends TestCase {
             ->setAliasOf(LocaleInterface::class)
             ->setShared(true)
 
+            ->setInstance("@baseUrl", $this->baseUrl)
+
             ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
             ->setShared(true)
             ->setConstructorArgs([
-                'deploymentTime' => null,
+                "deploymentTime" => null,
             ])
 
             // Prevent real HTTP requests.
             ->rule(HttpClient::class)
-            ->setClass(MockHttpClient::class)
+            ->addCall("setHandler", [new Reference(MockHttpHandler::class)])
+
+            // Prevent real HTTP requests.
+            ->rule(EventManager::class)
+            ->setClass(SpyingEventManager::class)
+            ->setShared(true)
 
             ->rule(UASnifferInterface::class)
             ->setClass(MockUASniffer::class)
@@ -126,7 +164,7 @@ class MinimalContainerTestCase extends TestCase {
             ->addAlias(LoggerInterface::class)
 
             ->rule(LoggerAwareInterface::class)
-            ->addCall('setLogger')
+            ->addCall("setLogger")
 
             ->rule(\Gdn_Cache::class)
             ->setAliasOf(NullCache::class)
@@ -134,7 +172,7 @@ class MinimalContainerTestCase extends TestCase {
             ->setInstance(NullCache::class, new NullCache())
 
             ->rule(InjectableInterface::class)
-            ->addCall('setDependencies')
+            ->addCall("setDependencies")
 
             ->rule(\Gdn_Request::class)
             ->setShared(true)
@@ -146,35 +184,36 @@ class MinimalContainerTestCase extends TestCase {
             ->setShared(true)
 
             ->rule(ThemeFeatures::class)
-            ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
+            ->setConstructorArgs(["theme" => ContainerUtils::currentTheme()])
 
             ->rule(\Gdn_PluginManager::class)
             ->addAlias(\Gdn::AliasPluginManager)
 
-            ->setInstance(\Gdn_PluginManager::class, $this->createMock(\Gdn_PluginManager::class))
-        ;
+            ->setInstance(\Gdn_PluginManager::class, $this->createMock(\Gdn_PluginManager::class));
+
+        \Gdn::setContainer($container);
     }
 
     /**
      * Set information about the current user in the session.
      * @param array $info The user information to set.
      */
-    public function setUserInfo(array $info) {
-        $session = new \Gdn_Session();
+    public function setUserInfo(array $info)
+    {
+        $session = $this->container()->get(\Gdn_Session::class);
 
         foreach ($info as $key => $value) {
-            if ($key === 'UserID') {
+            if ($key === "UserID") {
                 $session->UserID = $value;
             }
 
-            if ($key === 'Admin' && $value > 0) {
+            if ($key === "Admin" && $value > 0) {
                 $session->getPermissions()->setAdmin(true);
             }
 
             $session->User = new \stdClass();
             $session->User->{$key} = $value;
         }
-        self::container()->setInstance(\Gdn_Session::class, $session);
     }
 
     /**
@@ -183,7 +222,8 @@ class MinimalContainerTestCase extends TestCase {
      * @param string $key The config key.
      * @param mixed $value The value to set.
      */
-    public static function setConfig(string $key, $value) {
+    public static function setConfig(string $key, $value)
+    {
         self::getConfig()->set($key, $value);
     }
 
@@ -192,14 +232,16 @@ class MinimalContainerTestCase extends TestCase {
      *
      * @param array $configs An array of $configKey => $value
      */
-    public static function setConfigs(array $configs) {
+    public static function setConfigs(array $configs)
+    {
         self::getConfig()->loadData($configs);
     }
 
     /**
      * Get the config object.
      */
-    public static function getConfig(): ConfigurationInterface {
+    public static function getConfig(): ConfigurationInterface
+    {
         return self::container()->get(ConfigurationInterface::class);
     }
 
@@ -209,7 +251,8 @@ class MinimalContainerTestCase extends TestCase {
      * @param string $key The translation key.
      * @param mixed $value The value to set.
      */
-    public static function setTranslation(string $key, $value) {
+    public static function setTranslation(string $key, $value)
+    {
         /** @var MockConfig $config */
         $config = self::container()->get(MockLocale::class);
         $config->set($key, $value);
@@ -220,7 +263,8 @@ class MinimalContainerTestCase extends TestCase {
      *
      * @param array $configs An array of $translationKey => $value
      */
-    public static function setTranslations(array $configs) {
+    public static function setTranslations(array $configs)
+    {
         /** @var MockConfig $config */
         $config = self::container()->get(MockLocale::class);
         $config->loadData($configs);
@@ -229,45 +273,52 @@ class MinimalContainerTestCase extends TestCase {
     /**
      * Do some pre-test setup.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->setGlobals();
         $this->configureContainer();
+        $this->setConfigs([
+            "Garden.Html.AllowedUrlSchemes" => ["http", "https"],
+        ]);
     }
 
     /**
      * Set the global variables that have dependencies.
      */
-    private function setGlobals() {
+    private function setGlobals()
+    {
         // Set some server globals.
         $baseUrl = $this->baseUrl;
-        $_SERVER['X_REWRITE'] = true;
-        $_SERVER['REMOTE_ADDR'] = '::1'; // Simulate requests from local IPv6 address.
-        $_SERVER['HTTP_HOST'] = parse_url($baseUrl, PHP_URL_HOST);
-        $_SERVER['SERVER_PORT'] = parse_url($baseUrl, PHP_URL_PORT) ?: null;
-        $_SERVER['SCRIPT_NAME'] = parse_url($baseUrl, PHP_URL_PATH);
-        $_SERVER['PATH_INFO'] = '';
-        $_SERVER['HTTPS'] = parse_url($baseUrl, PHP_URL_SCHEME) === 'https';
+        $_SERVER["REMOTE_ADDR"] = "::1"; // Simulate requests from local IPv6 address.
+        $_SERVER["HTTP_HOST"] = parse_url($baseUrl, PHP_URL_HOST);
+        $_SERVER["SERVER_PORT"] = parse_url($baseUrl, PHP_URL_PORT) ?: null;
+        $_SERVER["SCRIPT_NAME"] = parse_url($baseUrl, PHP_URL_PATH);
+        $_SERVER["PATH_INFO"] = "";
+        $_SERVER["HTTPS"] = parse_url($baseUrl, PHP_URL_SCHEME) === "https";
     }
 
     /**
      * @return MockUserProvider
      */
-    protected function getMockUserProvider(): MockUserProvider {
+    protected function getMockUserProvider(): MockUserProvider
+    {
         return self::container()->get(UserProviderInterface::class);
     }
 
     /**
      * Reset the container.
      */
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         \Gdn::setContainer(new NullContainer());
     }
 
     /**
      * @return Container
      */
-    protected static function container(): Container {
+    protected static function container(): Container
+    {
         return \Gdn::getContainer();
     }
 }

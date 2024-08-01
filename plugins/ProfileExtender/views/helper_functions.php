@@ -11,7 +11,17 @@ if (!function_exists('extendedProfileFields')) {
     function extendedProfileFields($profileFields, $allFields, $magicLabels = []) {
         foreach ($profileFields as $name => $value) {
             // Skip empty and hidden fields.
-            if (!$value || !($allFields[$name]['OnProfile'] ?? false)) {
+            $showOnProfile = false;
+            $fieldLabel = null;
+            foreach($allFields as $field){
+                if(isset($field['Name']) && $name === $field['Name']){
+                    if($field['OnProfile']){
+                        $showOnProfile = true;
+                        $fieldLabel = $field['Label'];
+                    }
+                }
+            }
+            if (!$value || !$showOnProfile) {
                 continue;
             }
 
@@ -21,7 +31,7 @@ if (!function_exists('extendedProfileFields')) {
             }
 
             $class = 'Profile'.Gdn_Format::alphaNumeric($name);
-            $label = Gdn_Format::text(Gdn::translate($allFields[$name]['Label']));
+            $label = Gdn_Format::text(Gdn::translate($fieldLabel));
             $filteredVal = Gdn_Format::htmlFilter($value);
 
             echo " <dt class=\"ProfileExtend {$class}\">{$label}</dt> ";

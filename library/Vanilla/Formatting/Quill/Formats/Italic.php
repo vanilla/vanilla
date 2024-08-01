@@ -7,30 +7,29 @@
 
 namespace Vanilla\Formatting\Quill\Formats;
 
-class Italic extends AbstractFormat {
-
+class Italic extends AbstractFormat
+{
     /**
      * @inheritDoc
      */
-    protected static function getAttributeLookupKey(): string {
+    protected static function getAttributeLookupKey(): string
+    {
         return "italic";
     }
 
     /**
      * @inheritDoc
      */
-    protected function getBlackListedNestedFormats(): array {
-        return [
-            Bold::class,
-            Link::class,
-            Code::class,
-        ];
+    protected function getBlackListedNestedFormats(): array
+    {
+        return [Bold::class, Link::class, Code::class];
     }
 
     /**
      * @inheritDoc
      */
-    protected function getTagName(): string {
+    protected function getTagName(): string
+    {
         return "em";
     }
 }

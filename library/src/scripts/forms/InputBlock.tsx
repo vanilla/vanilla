@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,6 +11,13 @@ import classNames from "classnames";
 import Paragraph from "@library/layout/Paragraph";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { IError } from "@library/errorPages/CoreErrorMessages";
+import { css, cx } from "@emotion/css";
+import { t } from "@vanilla/i18n";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import { Icon, IconType } from "@vanilla/icons";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { Mixins } from "@library/styles/Mixins";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",
@@ -26,21 +33,24 @@ type CallbackChildren = (props: ICallbackProps) => React.ReactNode;
 
 export interface IInputBlockProps extends IOptionalComponentID {
     label?: ReactNode;
-    legend?: boolean;
+    legend?: ReactNode;
     children: React.ReactNode | CallbackChildren;
     className?: string;
     wrapClassName?: string;
     labelClassName?: string;
-    noteAfterInput?: string;
-    labelNote?: string;
+    noteAfterInput?: string | ReactNode;
+    labelNote?: ReactNode;
     labelID?: string;
-    descriptionID?: string;
     errors?: IError[];
     baseClass?: InputTextBlockBaseClass;
     legacyMode?: boolean;
     noMargin?: boolean;
     grid?: boolean;
     tight?: boolean;
+    extendErrorMessage?: boolean;
+    required?: boolean;
+    tooltip?: string;
+    tooltipIcon?: IconType;
 }
 
 interface IState {
@@ -61,7 +71,14 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
     }
 
     public render() {
-        const { label, legend } = this.props;
+        const { label, legend, required, tooltip, tooltipIcon = "data-information" } = this.props;
+        const OuterTag = legend ? "div" : label ? "label" : "div";
+        const role = legend ? "group" : undefined;
+
+        const LegendOrSpanTag = legend ? "div" : "span";
+
+        const hasLegendOrLabel = !!this.props.legend || !!this.props.label;
+
         const classesInputBlock = inputBlockClasses();
         const componentClasses = classNames(
             this.props.baseClass === InputTextBlockBaseClass.STANDARD ? classesInputBlock.root : "",
@@ -78,16 +95,35 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
             children = this.props.children;
         }
 
-        const OuterTag = label ? (legend ? "fieldset" : "label") : "div";
-        const LabelTag = label && legend ? "legend" : "span";
-
         return (
-            <OuterTag className={componentClasses}>
-                {this.props.label && (
-                    <span id={this.labelID} className={classesInputBlock.labelAndDescription}>
-                        <LabelTag className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
-                            {this.props.label}
-                        </LabelTag>
+            <OuterTag
+                className={componentClasses}
+                role={role}
+                aria-labelledby={role === "group" ? this.labelID : undefined}
+            >
+                {hasLegendOrLabel && (
+                    <span className={classesInputBlock.labelAndDescription}>
+                        <LegendOrSpanTag
+                            id={this.labelID}
+                            className={classNames(classesInputBlock.labelText, this.props.labelClassName)}
+                        >
+                            {required && (
+                                <span aria-label={t("required")} className={classesInputBlock.labelRequired}>
+                                    *
+                                </span>
+                            )}
+                            {this.props.legend ?? this.props.label!}
+
+                            {tooltip && (
+                                <ToolTip label={tooltip}>
+                                    <ToolTipIcon>
+                                        <span className={classesInputBlock.tooltipIconContainer}>
+                                            <Icon className={classesInputBlock.tooltipIcon} icon={tooltipIcon} />
+                                        </span>
+                                    </ToolTipIcon>
+                                </ToolTip>
+                            )}
+                        </LegendOrSpanTag>
                         <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
                     </span>
                 )}
@@ -95,8 +131,8 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                 <span
                     className={classNames(
                         classesInputBlock.inputWrap,
-                        this.props.wrapClassName,
                         [classesInputBlock.fieldsetGroup],
+                        this.props.wrapClassName,
                         { [classesInputBlock.grid]: this.props.grid },
                         { [classesInputBlock.tight]: this.props.tight },
                         { noMargin: this.props.noMargin },
@@ -104,8 +140,13 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                 >
                     {children}
                 </span>
-                <Paragraph className={classesInputBlock.labelNote}>{this.props.noteAfterInput}</Paragraph>
-                <ErrorMessages id={this.errorID} errors={this.props.errors} padded />
+                <Paragraph className={classesInputBlock.noteAfterInput}>{this.props.noteAfterInput}</Paragraph>
+                <ErrorMessages
+                    id={this.errorID}
+                    errors={this.props.errors}
+                    className={cx({ [classesInputBlock.extendErrorPadding]: this.props.extendErrorMessage })}
+                    padded
+                />
             </OuterTag>
         );
     }

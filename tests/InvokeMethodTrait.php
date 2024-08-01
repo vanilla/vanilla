@@ -7,11 +7,13 @@
 
 namespace VanillaTests;
 
-
 /**
  * Trait InvokeMethodTrait.
+ *
+ * @deprecated Use `VanillaTestCase::invokeMethod()` and `VanillaTestCase::callOn()` instead.
  */
-trait InvokeMethodTrait {
+trait InvokeMethodTrait
+{
     /**
      * Call protected/private method of a class.
      *
@@ -22,27 +24,22 @@ trait InvokeMethodTrait {
      * @param array $parameters Array of parameters to pass into method.
      *
      * @return mixed Method return.
-     * @throws \ReflectionException
      */
-    protected function invokeMethod($target, $methodName, array $parameters = []) {
-        $reflection = new \ReflectionClass($target);
+    public static function invokeMethod($target, $methodName, array $parameters = [])
+    {
+        return VanillaTestCase::invokeMethod($target, $methodName, $parameters);
+    }
 
-        if (is_object($target)) {
-            $instance = $target;
-        } else {
-            $instance = null;
-        }
-
-        $method = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
-
-        if ($method->isStatic()) {
-            return $method->invokeArgs(null, $parameters);
-        } else {
-            if (!isset($instance)) {
-                throw new \Exception('Cannot call an instance method on a class.');
-            }
-            return $method->invokeArgs($target, $parameters);
-        }
+    /**
+     * Call a closure on a target object with private member access.
+     *
+     * @param object $on
+     * @param \Closure $callable
+     * @param mixed $args
+     * @return mixed
+     */
+    protected static function callOn(object $on, \Closure $callable, ...$args)
+    {
+        return VanillaTestCase::callOn($on, $callable, ...$args);
     }
 }

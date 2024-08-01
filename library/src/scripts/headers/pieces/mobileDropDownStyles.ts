@@ -4,23 +4,18 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    absolutePosition,
-    borders,
-    colorOut,
-    flexHelper,
-    paddings,
-    singleBorder,
-    unit,
-    userSelect,
-    fonts,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { border, calc, percent, px, translateX } from "csx";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { flexHelper, singleBorder, userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { calc, percent, px, translateX } from "csx";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const mobileDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -65,22 +60,21 @@ export const mobileDropDownClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const frameVars = frameVariables();
     const titleBarVars = titleBarVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const flex = flexHelper();
-    const style = styleFactory("mobileDropDown");
 
-    const root = style({
+    const root = css({
         ...flex.middle(),
         position: "relative",
         flexGrow: 1,
     });
 
-    const modal = style("modal", {
+    const modal = css({
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "flex-start",
-        $nest: {
+        ...{
             ".siteNav": {
                 paddingLeft: px(globalVars.gutter.half),
             },
@@ -91,14 +85,13 @@ export const mobileDropDownClasses = useThemeCache(() => {
         },
     });
 
-    const panel = style("panel", {
+    const panel = css({
         position: "relative",
         maxHeight: percent(100),
         padding: px(0),
     });
 
-    const toggleButton = style(
-        "toggleButton",
+    const toggleButton = css(
         {
             ...flex.middle(),
             ...userSelect(),
@@ -115,36 +108,33 @@ export const mobileDropDownClasses = useThemeCache(() => {
         }),
     );
 
-    const buttonContents = style("buttonContents", {
-        display: "inline-block",
+    const buttonContents = css({
+        display: "flex",
         position: "relative",
-        paddingRight: vars.chevron.width * 2,
         lineHeight: 1.5,
         overflow: "hidden",
         textOverflow: "ellipsis",
         maxWidth: percent(100),
     });
 
-    const title = style(
-        "title",
+    const title = css(
         {
-            display: "inline",
+            display: "inline-flex",
             letterSpacing: vars.title.letterSpacing,
             fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
             lineHeight: vars.title.lineHeight,
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            overflow: "hidden",
         },
         mediaQueries.xs({
-            textAlign: "left",
+            textAlign: "start",
         }),
     );
 
-    const icon = style("icon", {
-        position: "absolute",
-        display: "block",
-        top: 0,
-        right: 0,
-        bottom: 0,
+    const icon = css({
+        display: "inline-flex",
         maxHeight: percent(100),
         maxWidth: percent(100),
         margin: `auto 0`,
@@ -152,32 +142,32 @@ export const mobileDropDownClasses = useThemeCache(() => {
         width: vars.chevron.width,
     });
 
-    const closeModalIcon = style("closeModalIcon", {
+    const closeModalIcon = css({
         padding: px(0),
         margin: "auto",
         color: vars.chevron.color.toString(),
-        $nest: {
+        ...{
             "&:hover": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
             },
-            "&:active": { color: colorOut(globalVars.mainColors.primary) },
-            "&:focus": { color: colorOut(globalVars.mainColors.primary) },
+            "&:active": { color: ColorsUtils.colorOut(globalVars.mainColors.primary) },
+            "&:focus": { color: ColorsUtils.colorOut(globalVars.mainColors.primary) },
         },
     });
 
-    const closeModal = style("closeModal", {
+    const closeModal = css({
         width: percent(100),
         height: percent(100),
     });
 
     const headerSizing = {
-        height: unit(vars.header.minHeight.height),
+        height: styleUnit(vars.header.minHeight.height),
         width: percent(100),
     };
 
-    const header = style("header", {
+    const header = css({
         ...shadowHelper().embed(),
-        background: colorOut(frameVars.colors.bg),
+        background: ColorsUtils.colorOut(frameVars.colors.bg),
         position: "fixed",
         top: 0,
         left: 0,
@@ -185,48 +175,47 @@ export const mobileDropDownClasses = useThemeCache(() => {
         zIndex: 10000,
     });
 
-    const headerContent = style("headerContent", {
+    const headerContent = css({
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
         margin: "auto",
-        height: unit(vars.header.minHeight.height),
+        height: styleUnit(vars.header.minHeight.height),
     });
 
-    const headerSpacer = style("headerSpacer", {
+    const headerSpacer = css({
         ...headerSizing,
     });
 
     const closeWidth =
         Math.floor(globalVars.icon.sizes.xSmall) + 2 * (globalVars.gutter.half + globalVars.gutter.quarter);
-    const closeButton = style("closeButton", {
-        ...absolutePosition.middleLeftOfParent(),
-        height: unit(closeWidth),
-        width: unit(closeWidth),
-        minWidth: unit(closeWidth),
+    const closeButton = css({
+        ...Mixins.absolute.middleLeftOfParent(),
+        height: styleUnit(closeWidth),
+        width: styleUnit(closeWidth),
+        minWidth: styleUnit(closeWidth),
         padding: 0,
         transform: translateX("-50%"),
     });
 
-    const subTitle = style("subTitle", {
+    const subTitle = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         textTransform: "uppercase",
-        minHeight: unit(titleBarVars.sizing.height - 4),
-        fontSize: unit(globalVars.fonts.size.small),
+        minHeight: styleUnit(titleBarVars.sizing.height - 4),
         textOverflow: "ellipsis",
-        ...paddings({
-            vertical: unit(4),
+        ...Mixins.padding({
+            vertical: styleUnit(4),
         }),
-        ...fonts({
-            size: globalVars.fonts.size.small,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small"),
             transform: "uppercase",
             color: globalVars.mixBgAndFg(0.6),
         }),
     });
 
-    const listContainer = style("listContainer", {
+    const listContainer = css({
         borderBottom: singleBorder(),
     });
 

@@ -1,27 +1,23 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { promisify } from "util";
-import * as fs from "fs";
+import fse from "fs-extra";
 import * as path from "path";
+import { Alias } from "vite";
 import {
-    VANILLA_APPS,
-    VANILLA_PLUGINS,
-    PUBLIC_PATH_SOURCE_FILE,
-    BOOTSTRAP_SOURCE_FILE,
+    DYNAMIC_ENTRY_DIR_PATH,
     LIBRARY_SRC_DIRECTORY,
     PACKAGES_DIRECTORY,
+    VANILLA_ADDONS,
+    VANILLA_APPS,
+    VANILLA_PLUGINS,
     VANILLA_ROOT,
     VANILLA_THEMES,
-    VANILLA_ADDONS,
     VANILLA_THEMES_LEGACY,
 } from "../env";
-import { BuildMode, IBuildOptions } from "../buildOptions";
-const readDir = promisify(fs.readdir);
-const fileExists = promisify(fs.exists);
 
 interface IEntry {
     entryPath: string;
@@ -29,7 +25,7 @@ interface IEntry {
 }
 
 interface IWebpackEntries {
-    [outputName: string]: string | string[];
+    [outputName: string]: string;
 }
 
 interface IAddon {
@@ -63,123 +59,152 @@ export default class EntryModel {
     /** Directories containing entrypoints. */
     private entryDirs: string[] = [];
 
-    /** Directories of all packages */
-    public packageDirs: string[] = [];
-
-    /**
-     * Construct the EntryModel. Be sure to run the async init() method after constructing.
-     */
-    constructor(private options: IBuildOptions) {}
-
     /**
      * Trigger directory lookups to parse all of the files in the project.
      * This is where ALL files lookups should be started from.
      */
-    public async init() {
-        await Promise.all([
-            this.initAddons(VANILLA_APPS),
-            this.initAddons(VANILLA_PLUGINS),
-            this.initAddons(VANILLA_ADDONS),
-            this.initAddons(VANILLA_THEMES),
-            this.initAddons(VANILLA_THEMES_LEGACY),
-            this.initPackages(),
-        ]);
-        await this.initEntries();
+    public constructor() {
+        this.initAddons(VANILLA_APPS);
+        this.initAddons(VANILLA_PLUGINS);
+        this.initAddons(VANILLA_ADDONS);
+        this.initAddons(VANILLA_THEMES);
+        this.initAddons(VANILLA_THEMES_LEGACY);
+        this.initEntries();
     }
 
     /**
+     * Get the production entries.
+     *
+     * We put all of the addons into a "virtual" entry that's constructed here.
+     * This is so the addon chunks can be conditionally applied based off of the runtime.
      *
      * @param section The section to get entries for. These sections are dynamically generated.
-     * @see getSections()
      */
-    public async getProdEntries(section: string): Promise<IWebpackEntries> {
-        const entries: IWebpackEntries = {};
+    public synthesizeHtmlEntry(outFile: string, sections: string[]) {
+        const entryJsFiles: string[] = [];
 
-        for (const entryDir of this.entryDirs) {
-            const commonEntry = await this.lookupEntry(entryDir, "common");
-            if (commonEntry !== null) {
-                const addonName = path.basename(commonEntry.addonPath).toLowerCase();
-                entries[`addons/${addonName}-common`] = [PUBLIC_PATH_SOURCE_FILE, commonEntry.entryPath];
-            }
-
-            const entry = await this.lookupEntry(entryDir, section);
-            if (entry !== null) {
-                const addonName = path.basename(entry.addonPath).toLowerCase();
-                entries[`addons/${addonName}`] = [PUBLIC_PATH_SOURCE_FILE, entry.entryPath];
-            }
+        for (const section of sections) {
+            const entryFile = this.synthesizeJSEntryForSection(section);
+            entryJsFiles.push(entryFile);
         }
 
-        entries.bootstrap = [PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE];
-        return entries;
+        const entryJsScriptHtml = entryJsFiles
+            .map((file) => {
+                return `<script type="module" src="${file}"></script>`;
+            })
+            .join("\n");
+
+        const synthesizedHtml = `
+        <!doctype html>
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Vite + TS</title>
+          </head>
+          <body>
+            <div id="app"></div>
+            ${entryJsScriptHtml}
+          </body>
+        </html>
+`;
+        fse.writeFileSync(outFile, synthesizedHtml);
     }
 
-    /**
-     * Get entries for the development build.
-     *
-     * Compared to the prod build there is 1 multi-entry instead of multiple.
-     * Eg. 1 output bundle per section.
-     *
-     * @param section - The section to get entries for.
-     */
-    public async getDevEntries(section: string): Promise<string[]> {
-        const entries: string[] = [];
+    private synthesizeJSEntryForSection(section: string): string {
+        // A mapping `import()` strings by addon.
+        let dynamicImportStringsByAddonKey: Record<string, string[]> = {};
+        let constantImportStrings: string[] = [];
 
+        const constantImportAddons = ["library", "dashboard", "vanilla"];
+
+        // Loop through the addons
         for (const entryDir of this.entryDirs) {
-            const commonEntry = await this.lookupEntry(entryDir, "common");
+            let importStrings: string[] = [];
+            let addonName: string | null = null;
+            let constantImportStringsForAddon: string[] = [];
+
+            // The common entry is one shared between sections.
+            // An addon may or may not have one.
+            const commonEntry = this.lookupEntry(entryDir, "common");
             if (commonEntry !== null) {
-                entries.push(commonEntry.entryPath);
+                addonName = path.basename(commonEntry.addonPath).toLowerCase();
+                importStrings.push(
+                    `import(
+                        /* webpackChunkName: "addons_${addonName}" */
+                        "${commonEntry.entryPath}"
+                    ).catch(e => console.error("Error loading javascript for addon '${addonName}'", e))`,
+                );
+                constantImportStringsForAddon.push(`import "${commonEntry.entryPath}";`);
             }
 
-            const entry = await this.lookupEntry(entryDir, section);
+            // The main entry for the section.
+            const entry = this.lookupEntry(entryDir, section);
             if (entry !== null) {
-                entries.push(entry.entryPath);
+                addonName = path.basename(entry.addonPath).toLowerCase();
+                importStrings.push(
+                    `import(
+                        /* webpackChunkName: "addons_${addonName}" */
+                        "${entry.entryPath}"
+                    ).catch(e => console.error("Error loading javascript for addon '${addonName}'", e))`,
+                );
+                constantImportStringsForAddon.push(`import "${entry.entryPath}";`);
+            }
+
+            // If we have entries for the addon, stash them.
+            if (constantImportAddons.includes(addonName ?? "")) {
+                constantImportStrings = [...constantImportStrings, ...constantImportStringsForAddon];
+            } else if (importStrings.length > 0 && addonName) {
+                dynamicImportStringsByAddonKey[addonName] = importStrings;
             }
         }
 
-        entries.push(BOOTSTRAP_SOURCE_FILE);
-        return entries;
-    }
+        let synthesizedFile = `
+import { bootstrapVanilla } from "@library/bootstrap";
+${constantImportStrings.join("\n")}
 
-    /**
-     * Gather all the sections across every addon. Sections are determined by having
-     * an entrypoint in /src/scripts/entries. The filename is the section name without its extension.
-     */
-    public async getSections(): Promise<string[]> {
-        let names: string[] = [];
-        for (const dir of this.entryDirs) {
-            const resolvedPath = path.resolve(dir);
-            const dirExists = await fileExists(resolvedPath);
-            if (!dirExists) {
-                continue;
-            }
 
-            const entryNameList = await readDir(resolvedPath);
-            names.push(...entryNameList);
+if (import.meta.hot) {
+    import.meta.hot.accept((newModule) => {
+        console.log("accepting hot module", newModule);
+      })
+}
+
+const enabledAddonKeys = window.__VANILLA_ENABLED_ADDON_KEYS__;
+let addonPromises = [];
+
+${Object.entries(dynamicImportStringsByAddonKey)
+    .map(([addonKey, entries]) => {
+        return `
+if (enabledAddonKeys.includes("${addonKey}")) {
+    ${entries.map((entryImport) => `addonPromises.push(${entryImport});`).join("\n")}
+}`;
+    })
+    .join("\n")}
+
+Promise.all(addonPromises).then((resolved) => {
+    console.log("addon dependencies loaded", resolved.length);
+    bootstrapVanilla();
+});
+        `;
+
+        // Create the dynamic entry directory if it doesn't exist.
+        if (!fse.existsSync(DYNAMIC_ENTRY_DIR_PATH)) {
+            fse.mkdirSync(DYNAMIC_ENTRY_DIR_PATH);
         }
 
-        names = names
-            .filter(name => name.match(EntryModel.TS_REGEX))
-            .map(name => name.replace(EntryModel.TS_REGEX, ""))
-            // Filter out unwanted sections (special cases).
-            .filter(name => !this.excludedSections.includes(name));
-
-        names = Array.from(new Set(names));
-
-        return names;
+        // Write out the dynamic bootstrap file.
+        const dynamicBootstrap = path.join(DYNAMIC_ENTRY_DIR_PATH, `${section}.js`);
+        fse.writeFileSync(dynamicBootstrap, synthesizedFile);
+        return dynamicBootstrap;
     }
 
     /**
      * Get the directories of all addons being built.
      */
-    public get addonDirs(): string[] {
-        return Object.values(this.buildAddons!).map(addon => addon.addonDir);
-    }
-
-    /**
-     * Get all of the src directories in the project.
-     */
-    public get srcDirs(): string[] {
-        return Object.values(this.buildAddons!).map(addon => addon.srcDir);
+    private get addonDirs(): string[] {
+        return Object.values(this.buildAddons!).map((addon) => addon.addonDir);
     }
 
     /**
@@ -189,29 +214,24 @@ export default class EntryModel {
      * One is generated for every addon being built.
      */
     public get aliases() {
-        const result: IWebpackEntries = {};
+        const result: Alias[] = [];
         for (const addonPath of this.addonDirs) {
             let key = "@" + path.basename(addonPath);
             if (key === "@vanilla") {
                 // @vanilla is actually our npm organization so there was a conflict here.
                 key = "@vanilla/addon-vanilla";
             }
-            result[key] = path.resolve(addonPath, "src/scripts");
+            result.push({
+                find: key,
+                replacement: path.resolve(addonPath, "src/scripts"),
+            });
         }
 
-        result["@library"] = LIBRARY_SRC_DIRECTORY;
+        result.push({
+            find: "@library",
+            replacement: LIBRARY_SRC_DIRECTORY,
+        });
         return result;
-    }
-
-    /**
-     * Initialize lookups for all file-system modules.
-     */
-    private async initPackages() {
-        const dirNames = await readDir(PACKAGES_DIRECTORY);
-        this.packageDirs = [
-            ...dirNames.map(name => path.resolve(PACKAGES_DIRECTORY, name)),
-            path.resolve(VANILLA_ROOT, "library"),
-        ];
     }
 
     /**
@@ -221,34 +241,19 @@ export default class EntryModel {
      *
      * @param rootDir The directory to find addons in.
      */
-    private async initAddons(rootDir: string) {
-        const dirExists = await fileExists(path.resolve(rootDir));
+    private initAddons(rootDir: string) {
+        const dirExists = fse.existsSync(path.resolve(rootDir));
         if (!dirExists) {
             return;
         }
-        let addonKeyList = await readDir(path.resolve(rootDir));
-
-        // Filter only the enabled addons for a development build.
-        if (this.options.mode === BuildMode.DEVELOPMENT) {
-            addonKeyList = addonKeyList.filter(addonPath => {
-                const addonKey = path.basename(addonPath).toLowerCase();
-
-                // Check if we have a case-insensitive addon key match.
-                return this.options.enabledAddonKeys.some(val => {
-                    if (val.toLowerCase() === addonKey) {
-                        return true;
-                    }
-                    return false;
-                });
-            });
-        }
+        let addonKeyList = fse.readdirSync(path.resolve(rootDir));
 
         // Go through all of the addons with a `src/scripts` directory and gather data on them.
         for (const addonKey of addonKeyList) {
             const addonPath = path.resolve(rootDir, addonKey);
             const srcPath = path.join(addonPath, "src/scripts");
             const entriesPath = path.join(srcPath, "entries");
-            const hasSrcFiles = await fileExists(srcPath);
+            const hasSrcFiles = fse.existsSync(srcPath);
             if (hasSrcFiles) {
                 this.buildAddons[addonKey] = {
                     srcDir: srcPath,
@@ -262,9 +267,10 @@ export default class EntryModel {
     /**
      * Look up all of the entry directories. This is quite expensive in terms of IO so don't run it more than once.
      */
-    private async initEntries() {
+    private initEntries() {
+        this.entryDirs.push(path.join(LIBRARY_SRC_DIRECTORY, "/entries"));
         for (const addon of Object.values(this.buildAddons)) {
-            const entriesExists = await fileExists(addon.entriesDir);
+            const entriesExists = fse.existsSync(addon.entriesDir);
             if (entriesExists) {
                 this.entryDirs.push(addon.entriesDir);
             }
@@ -279,10 +285,10 @@ export default class EntryModel {
      *
      * @returns An entry if one was found.
      */
-    private async lookupEntry(entryDir: string, section: string): Promise<IEntry | null> {
+    private lookupEntry(entryDir: string, section: string): IEntry | null {
         const addonPath = entryDir.replace("/src/scripts/entries", "");
         const tsPath = path.resolve(entryDir, `${section}.ts`);
-        const tsPathExists = await fileExists(tsPath);
+        const tsPathExists = fse.existsSync(tsPath);
 
         // Entries can be of .ts or .tsx extensions.
         if (tsPathExists) {
@@ -292,7 +298,7 @@ export default class EntryModel {
             };
         } else {
             const tsxPath = path.resolve(entryDir, `${section}.tsx`);
-            const tsxPathExists = await fileExists(tsxPath);
+            const tsxPathExists = fse.existsSync(tsxPath);
             if (tsxPathExists) {
                 return {
                     addonPath,

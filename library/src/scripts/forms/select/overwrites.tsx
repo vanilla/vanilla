@@ -20,6 +20,9 @@ import { components } from "react-select";
 import { CloseTinyIcon, CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
+import { GroupProps } from "react-select/lib/components/Group";
+import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
+import { cx } from "@emotion/css";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -52,7 +55,7 @@ export function Menu(props: MenuProps<any>) {
     return (
         <components.Menu
             {...props}
-            className={classNames("suggestedTextInput-menu", "dropDown-contents", "isParentWidth", classes.contents)}
+            className={classNames("suggestedTextInput-menu", "dropDown-contents", classes.contents)}
         />
     );
 }
@@ -63,6 +66,7 @@ export function Menu(props: MenuProps<any>) {
  */
 export function MenuList(props: MenuListComponentProps<any>) {
     const { ...rest } = props;
+
     return (
         <components.MenuList {...rest}>
             <ul className="suggestedTextInput-menuItems">{props.children}</ul>
@@ -79,7 +83,7 @@ export function MultiValueRemove(props: MultiValueRemoveProps<any>) {
     const classesTokens = tokensClasses();
 
     // We need to bind the function to the props for that component
-    const handleKeyDown = event => {
+    const handleKeyDown = (event) => {
         switch (event.key) {
             case "Enter":
             case "Spacebar":
@@ -134,7 +138,6 @@ type ISelectOptionOverwrite = OptionProps<any> & IComboBoxOption;
  */
 export function SelectOption(props: ISelectOptionOverwrite) {
     const { isSelected, isFocused, selectProps, value } = props;
-    const placeholder = {};
 
     return (
         <li className="suggestedTextInput-item">
@@ -147,7 +150,7 @@ export function SelectOption(props: ISelectOptionOverwrite) {
                 })}
             >
                 <span className="suggestedTextInput-head">
-                    <span className="suggestedTextInput-title">
+                    <span className={cx("suggestedTextInput-title", selectBoxClasses().selectOptionLabel)}>
                         {props.children}
                         {props.data?.data?.parentLabel && (
                             <span
@@ -161,6 +164,20 @@ export function SelectOption(props: ISelectOptionOverwrite) {
                 </span>
             </button>
         </li>
+    );
+}
+
+/**
+ * Overwrite for the Group component in React Select
+ */
+export function Group(props: GroupProps<ISelectOptionOverwrite>) {
+    return (
+        <>
+            <li className="suggestedTextInput-item">
+                <span className="suggestedTextInput-groupHeading">{props.label}</span>
+            </li>
+            {props.children}
+        </>
     );
 }
 

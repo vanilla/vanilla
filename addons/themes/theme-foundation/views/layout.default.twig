@@ -6,15 +6,14 @@
                 <div class="Container">
                     <div class="Frame-contentWrap">
                         <div class="Frame-details">
-                            {% if not isHomepage %}
+                            {% if not isHomepage|default(false) %}
                                 <div class="Frame-row">
                                     <nav class="BreadcrumbsBox" aria-label={{ t("Breadcrumb") }}>
                                         {{ renderBreadcrumbs() }}
                                     </nav>
                                 </div>
                             {% endif %}
-                            <div
-                                class="Frame-row">
+                            <div class="Frame-row">
 
                                 <!-- Main Content -->
                                 <section class="Content MainContent">
@@ -29,10 +28,12 @@
                                 <!-- Main Panel END -->
 
                             </div>
+                            {{ renderControllerAsset("AfterBody") }}
                         </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+    {{ renderControllerAsset('Foot') }}
 </div>

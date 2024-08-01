@@ -5,17 +5,25 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, paddings, unit, userSelect } from "@library/styles/styleHelpers";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { componentThemeVariables, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px } from "csx";
+import { metasVariables } from "@library/metas/Metas.variables";
+import { css } from "@emotion/css";
+import { inputMixin } from "@library/forms/inputStyles";
 
 export const tokensVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const themeVars = componentThemeVariables("tokens");
 
     const token = {
-        fontSize: globalVars.meta.text.size,
+        fontSize: metasVars.font.size,
         bg: globalVars.mixBgAndFg(0.1),
         textShadow: `${globalVars.mainColors.bg} 0 0 1px`,
         minHeight: 26,
@@ -39,26 +47,26 @@ export const tokensClasses = useThemeCache(() => {
     const style = styleFactory("tokens");
 
     const root = style({
-        $nest: {
-            "& .tokens__value-container": {
+        ...{
+            ".tokens__value-container": {
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
                 justifyContent: "flexStart",
-                minHeight: unit(formElVars.sizing.height),
+                minHeight: styleUnit(formElVars.sizing.height),
                 paddingTop: 0,
                 paddingRight: px(12),
                 paddingBottom: 0,
                 paddingLeft: px(12),
-                ...borders(globalVars.borderType.formElements.default),
-                $nest: {
+                ...Mixins.border(globalVars.borderType.formElements.default),
+                ...{
                     "&.tokens__value-container--has-value": {
-                        ...paddings({
+                        ...Mixins.padding({
                             horizontal: 4,
                             vertical: 0,
                         }),
                     },
-                    "& .tokens__multi-value + div:not(.tokens__multi-value)": {
+                    ".tokens__multi-value + div:not(.tokens__multi-value)": {
                         display: "flex",
                         flexWrap: "wrap",
                         alignItems: "center",
@@ -70,56 +78,93 @@ export const tokensClasses = useThemeCache(() => {
                         display: important("inline-flex"),
                         alignItems: "center",
                         justifyContent: "stretch",
-                        ...margins({
+                        ...Mixins.margin({
                             vertical: 0,
                         }),
-                        minHeight: unit(vars.token.minHeight),
+                        minHeight: styleUnit(vars.token.minHeight),
+                        "@media(max-width: 600px)": {
+                            fontSize: 16,
+                        },
                     },
                     input: {
                         width: percent(100),
-                        minWidth: unit(45),
+                        minWidth: styleUnit(45),
                         minHeight: 0,
                     },
                 },
             },
-            "& .tokens__multi-value": {
+            ".tokens__multi-value": {
                 display: "flex",
                 alignItems: "center",
                 flexWrap: "nowrap",
-                fontSize: unit(vars.token.fontSize),
+                fontSize: styleUnit(vars.token.fontSize),
                 fontWeight: globalVars.fonts.weights.bold,
                 textShadow: vars.token.textShadow,
                 margin: px((formElVars.sizing.height - vars.token.minHeight) / 2 - formElVars.border.width),
-                backgroundColor: colorOut(vars.token.bg),
-                minHeight: unit(vars.token.minHeight),
+                backgroundColor: ColorsUtils.colorOut(vars.token.bg),
+                minHeight: styleUnit(vars.token.minHeight),
                 borderRadius: px(2),
                 ...userSelect(),
             },
-            "& .tokens__multi-value__label": {
+            ".tokens__multi-value__label": {
                 paddingLeft: px(6),
-                fontWeight: globalVars.fonts.weights.normal,
-                fontSize: globalVars.fonts.size.small,
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("small", "normal"),
+                }),
             },
-            "& .tokens--is-disabled": {
+            ".tokens--is-disabled": {
                 opacity: formElVars.disabled.opacity,
             },
-            "& .tokens-clear": {
-                height: unit(globalVars.icon.sizes.default),
-                width: unit(globalVars.icon.sizes.default),
+            ".tokens-clear": {
+                background: 0,
+                border: 0,
+                height: styleUnit(globalVars.icon.sizes.default),
+                width: styleUnit(globalVars.icon.sizes.default),
                 padding: 0,
-                $nest: {
+                ...{
                     "&:hover, &:focus": {
                         color: globalVars.mainColors.primary.toString(),
                     },
                 },
             },
+            ".tokens__group": {
+                ...Mixins.padding({ vertical: 8 }),
+                ...Mixins.border({
+                    width: 0,
+                    top: {
+                        width: 1,
+                        radius: 0,
+                    },
+                }),
+                "&:first-of-type": {
+                    border: 0,
+                },
+                ".tokens__group-heading": {
+                    width: "100%",
+                    textAlign: "center",
+                    fontSize: "0.875em",
+                    color: "inherit",
+                    opacity: 0.75,
+                },
+            },
+            ".suggestedTextInput-option": {
+                ...Mixins.padding({ all: 8 }),
+                width: "100%",
+                "& > .suggestedTextInput-head": {
+                    display: "flex",
+                    justifyContent: "space-between",
+                },
+                "&:hover": {
+                    background: globalVars.states.hover.highlight.toString(),
+                },
+            },
         },
     });
 
-    const inputWrap = style("inputWrarp", {
-        $nest: {
+    const inputWrap = style("inputWrap", {
+        ...{
             "&.hasFocus .inputBlock-inputText": {
-                ...borders({
+                ...Mixins.border({
                     ...globalVars.borderType.formElements.default,
                     color: globalVars.mainColors.primary,
                 }),
@@ -128,21 +173,29 @@ export const tokensClasses = useThemeCache(() => {
     });
 
     const removeIcon = style("removeIcon", {
-        $nest: {
+        ...{
             "&.icon": {
-                width: unit(vars.clearIcon.width),
-                height: unit(vars.clearIcon.width),
+                width: styleUnit(vars.clearIcon.width),
+                height: styleUnit(vars.clearIcon.width),
             },
         },
     });
 
-    const withIndicator = style("withIndicator", {
-        $nest: {
-            "& .inputText.inputText": {
-                fontSize: "inherit",
-            },
+    const withIndicator = style("withIndicator", {});
+
+    const containerLegacyForm = css({
+        "& label > span": {
+            fontWeight: 700,
+            marginBottom: 0,
+        },
+        "& label > p": {
+            color: "#666",
+            opacity: "unset",
+            fontSize: "80%",
+            marginTop: 3,
+            marginBottom: -4,
         },
     });
 
-    return { root, removeIcon, inputWrap, withIndicator };
+    return { root, removeIcon, inputWrap, withIndicator, containerLegacyForm };
 });

@@ -3,16 +3,11 @@
  * @license GPL-2.0-only
  */
 
-$richEditor_horizontalPadding                     : 36px !default;
-$richEditor_verticalPadding                       : 12px !default;
-$richEditor_innerPadding                          : 12px !default;
-
-body {
-    visibility: hidden; // To prevent FOUC
-}
+$richEditor_horizontalPadding: 36px !default;
+$richEditor_verticalPadding: 12px !default;
+$richEditor_innerPadding: 12px !default;
 
 .richEditor {
-
     blockquote {
         display: block;
         margin: 0;
@@ -22,7 +17,8 @@ body {
         left: 0;
     }
 
-    &.isDisabled { // Before React has replaced initial HTML
+    &.isDisabled {
+        // Before React has replaced initial HTML
         &,
         .richEditor-button {
             cursor: progress !important;
@@ -48,6 +44,14 @@ body {
 
     &.Message {
         margin-top: $global-medium_fontSize;
+        // Target the last paragraph which is adjacent to the image and add a clear fix
+        & > .embedImage ~ p:last-child {
+            @include clearfix();
+        }
+        // If the image is floated and its the only content, add a clearfix
+        & > .embedImage:first-child:last-child {
+            @include clearfix();
+        }
     }
 
     @if ($staticVariables) {
@@ -68,8 +72,28 @@ body {
         }
 
         &:first-child:not(br):not(.embedExternal) {
-            margin-top: #{(1 - $global-base_lineHeight) * .5em} !important;
+            margin-top: #{(1 - $global-base_lineHeight) * 0.5em} !important;
         }
+    }
+
+    .embedResponsive {
+        margin-bottom: 0 !important;
+    }
+
+    .float-left,
+    .float-right {
+        // Remove margin of the containing div and instead add margin to the floating element.
+        margin: 0 !important;
+        border: 0 !important;
+        box-shadow: none !important;
+
+        .embedExternal-content {
+            margin-bottom: $global-block_margin;
+        }
+    }
+
+    .embedExternal {
+        margin-bottom: $global-block_margin;
     }
 
     &,
@@ -84,8 +108,7 @@ body {
     td,
     th,
     a,
-    p
-    {
+    p {
         word-break: break-word;
         text-overflow: ellipsis;
     }
@@ -157,7 +180,7 @@ body {
 // Styles that only take affect when the rich editor is enabled.
 body.hasRichEditor {
     .richEditor ~ .TextBoxWrapper,
-    .CommentForm .PreviewButton,
+    .PreviewButton,
     #Form_Preview {
         // The text box wrapper can have $.show() called on it which adds an inline `display: block`.
         display: none !important;
@@ -178,13 +201,12 @@ body.hasRichEditor {
 }
 
 .Popup.hasRichEditor {
-
     .Border {
         box-sizing: border-box;
     }
 
     .richEditor ~ .TextBoxWrapper,
-    .CommentForm .PreviewButton,
+    .PreviewButton,
     #Form_Preview {
         // The text box wrapper can have $.show() called on it which adds an inline `display: block`.
         display: none !important;
@@ -193,7 +215,6 @@ body.hasRichEditor {
 
 @include mediaQuery-richEditor_mobile {
     .Popup.hasRichEditor {
-
         .Border {
             width: 100%;
         }
@@ -242,7 +263,6 @@ body.hasRichEditor {
                 padding: {
                     left: $richEditor_horizontalPadding;
                     right: $richEditor_horizontalPadding;
-
                 }
 
                 .richEditor {
@@ -253,6 +273,24 @@ body.hasRichEditor {
 
             .Buttons {
                 padding-right: $richEditor_horizontalPadding;
+            }
+        }
+
+        .Activities ul.DataList {
+            margin-left: $richEditor_horizontalPadding;
+        }
+
+        .ActivityComment + .CommentForm {
+            margin-top: $richEditor_verticalPadding;
+            .richEditor {
+                padding: {
+                    left: 0;
+                    right: 0;
+                }
+            }
+
+            .Buttons.Buttons {
+                padding-right: 0;
             }
         }
 
@@ -285,7 +323,7 @@ body.hasRichEditor {
 
                 .Activity {
                     .Buttons {
-                        padding-left: $richEditor_horizontalPadding
+                        padding-left: $richEditor_horizontalPadding;
                     }
                 }
             }
@@ -339,7 +377,6 @@ body.hasRichEditor {
         }
     }
 }
-
 
 .richEditor-text {
     overflow: visible;

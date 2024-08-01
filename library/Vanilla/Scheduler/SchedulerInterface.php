@@ -1,19 +1,21 @@
 <?php
 /**
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Scheduler;
 
+use Vanilla\Scheduler\Descriptor\JobDescriptorInterface;
+use Vanilla\Scheduler\Job\JobExecutionType;
 use Vanilla\Scheduler\Job\JobPriority;
 
 /**
  * Scheduler Interface
  */
-interface SchedulerInterface {
-
+interface SchedulerInterface
+{
     /**
      * Add driver
      *
@@ -30,36 +32,6 @@ interface SchedulerInterface {
     public function getDrivers(): array;
 
     /**
-     * Set dispatch event name
-     *
-     * @param string $eventName
-     * @return bool
-     */
-    public function setDispatchEventName(string $eventName): bool;
-
-    /**
-     * Get dispatch event name
-     *
-     * @return string
-     */
-    public function getDispatchEventName(): string;
-
-    /**
-     * Set dispatched event name
-     *
-     * @param string $eventName
-     * @return bool
-     */
-    public function setDispatchedEventName(string $eventName): bool;
-
-    /**
-     * Get dispatched event name
-     *
-     * @return string
-     */
-    public function getDispatchedEventName(): string;
-
-    /**
      * Add a job to be scheduled
      *
      * @param string $jobType
@@ -68,6 +40,28 @@ interface SchedulerInterface {
      * @param int|null $delay
      *
      * @return TrackingSlipInterface
+     * @deprecated Please use `addJobDescriptor`
+     *
      */
-    public function addJob(string $jobType, $message = [], JobPriority $jobPriority = null, int $delay = null): TrackingSlipInterface;
+    public function addJob(
+        string $jobType,
+        $message = [],
+        JobPriority $jobPriority = null,
+        int $delay = null
+    ): TrackingSlipInterface;
+
+    /**
+     * Add a job to be scheduled using a Job Descriptor
+     *
+     * @param JobDescriptorInterface $jobDescriptor
+     * @return TrackingSlipInterface
+     */
+    public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface;
+
+    /**
+     * Set the Execution Type
+     *
+     * @param JobExecutionType $executionType
+     */
+    public function setExecutionType(JobExecutionType $executionType): void;
 }

@@ -1,58 +1,72 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { color, em, percent } from "csx";
-import { margins, paddings, unit } from "@library/styles/styleHelpers";
-import { containerVariables } from "@library/layout/components/containerStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { em } from "csx";
+import { styleUnit } from "@library/styles/styleUnit";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { css, CSSObject } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
 
 export const typographyClasses = useThemeCache(() => {
-    const style = styleFactory("typography");
     const globalVars = globalVariables();
-    const vars = containerVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
-    const largeTitle = style("largeTitle", {
-        width: percent(100),
-    });
+    const sharedTitleStyle: CSSObject = {
+        color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
+    };
 
-    const pageTitle = style(
-        "pageTitle",
+    const pageTitle = css(
         {
-            fontSize: unit(globalVars.fonts.size.title),
-            lineHeight: globalVars.lineHeights.condensed,
+            ...sharedTitleStyle,
+            width: "100%",
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("title"),
+                lineHeight: globalVars.lineHeights.condensed,
+            }),
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontalOffset)})`,
             margin: 0,
-            $nest: {
-                ...lineHeightAdjustment(),
-                [`&.${largeTitle}`]: {
-                    fontSize: unit(globalVars.fonts.size.largeTitle),
-                },
-            },
-        } as NestedCSSProperties,
+            ...lineHeightAdjustment(),
+        },
         mediaQueries.oneColumnDown({
-            fontSize: unit(globalVars.fonts.mobile.size.title),
-            $nest: {
-                [`&.${largeTitle}`]: {
-                    fontSize: unit(globalVars.fonts.mobile.size.title),
-                },
-            },
+            fontSize: styleUnit(globalVars.fonts.mobile.size.title),
         }),
     );
 
-    const subTitle = style("subTitle", {
-        fontSize: unit(globalVars.fonts.size.subTitle),
+    const largeTitle = css(
+        {
+            ...sharedTitleStyle,
+            width: "100%",
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("largeTitle"),
+            }),
+        },
+        mediaQueries.oneColumnDown({
+            fontSize: styleUnit(globalVars.fonts.mobile.size.largeTitle),
+        }),
+    );
+
+    const subTitle = css({
+        ...sharedTitleStyle,
+        width: "100%",
+        // fontSize: styleUnit(globalVars.fonts.size.title),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("title"), // FIXME: check if this is a mistake (seems that font size should be subtitle)
+        }),
     });
 
-    const componentSubTitle = style("componentSubTitle", {
-        fontSize: unit(globalVars.fonts.size.large),
+    const componentSubTitle = css({
+        ...sharedTitleStyle,
+        width: "100%",
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("subTitle"),
+        }),
     });
 
     return {

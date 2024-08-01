@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for chr_utf8().
  */
 
-class ChrUtf8Test extends TestCase {
-
+class ChrUtf8Test extends TestCase
+{
     /**
      * Test {@link chr_utf8()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class ChrUtf8Test extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideChrUtf8Arrays
      */
-    public function testChrUtf8($testNum, $expected) {
+    public function testChrUtf8($testNum, $expected)
+    {
         $actual = chr_utf8($testNum);
         $this->assertSame($expected, $actual);
     }
@@ -32,32 +33,15 @@ class ChrUtf8Test extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideChrUtf8Arrays() {
+    public function provideChrUtf8Arrays()
+    {
         $r = [
-            'lessThan128' => [
-                37,
-                '%',
-            ],
-            'lessThan128Hex' => [
-                0x25,
-                '%',
-            ],
-            'lessThan2048' => [
-                169,
-                '©',
-            ],
-            'lessThan65536' => [
-                2972,
-                'ஜ',
-            ],
-            'lessThan2097152' => [
-                524288,
-                '򀀀',
-            ],
-            'badInputNum' => [
-                30000000,
-                '',
-            ]
+            "lessThan128" => [37, "%"],
+            "lessThan128Hex" => [0x25, "%"],
+            "lessThan2048" => [169, "©"],
+            "lessThan65536" => [2972, "ஜ"],
+            "lessThan2097152" => [524288, "򀀀"],
+            "badInputNum" => [30000000, ""],
         ];
 
         return $r;

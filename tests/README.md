@@ -27,15 +27,25 @@ The `Library` testsuite is actual unit testing. For more thorough results, you m
 1. All of the developer dependencies are installed with `composer install`.
 
 1. Your localhost MySQL server must have a user named `circleci` with a blank password and permission to
-create and drop databases. The only database that the tests use is `vanilla_test`.
+   create and drop databases. The only database that the tests use is `vanilla_test`.
 
 1. Your copy of Vanilla must respond to `http://vanilla.test:8080`.
+
     - You can use the nginx template in `.circleci/scripts/templates/nginx/sites-enabled/default-site.tpl.conf` as a guideline.
-    - Pay particular attention to the `/cgi-bin` mapping
     - If you are on Apache, the default `.htaccess` file should work for you.
 
 1. You must put `.circleci/scripts/templates/vanilla/conf/bootstrap.before.php` in your `conf/` folder.
     - This will ensure that the unit tests use their own config and cache path.
+
+### Memcached Requirements
+
+In order to run tests with memcached installed you will need the following environment variable set.
+
+```bash
+export TEST_MEMCACHED_HOST="memcached:11211"
+```
+
+You will need to replace the actual host with the one you have set up.
 
 ### Running
 
@@ -52,18 +62,17 @@ and bypass the web server requirements below.
 Vanilla's JS tests are written in typescript and live directly next to the source files that they test.
 Any file matching the following pattern is considered a unit test and will be run:
 
-- `applications/*/src/scripts/**/*.(ts|tsx)`
-- `plugins/*/src/scripts/**/*.(ts|tsx)`
+-   `applications/*/src/scripts/**/*.(ts|tsx)`
+-   `plugins/*/src/scripts/**/*.(ts|tsx)`
 
 ### Requirements
 
 In order to run the tests node_modules must be installed in root directory of vanilla.
 
-```sh
+````sh
 # Modules are installed with --pure-lockfile for 100% consistent builds.
 cd </PATH/TO/VANILLA>
-yarn install --pure-lockfile
-```
+yarn install --immutable
 
 If you have additional plugins symlinked into vanilla that have their own tests (such as [rich-editor](https://github.com/vanilla/rich-editor)), then you will also need to install the node_modules for that plugin.
 
@@ -108,7 +117,7 @@ The `sourceMapPathOverrides` is optional, but is necessary if you wish to debug 
         }
     ]
 }
-```
+````
 
 #### In Browser Debugging
 
@@ -120,7 +129,7 @@ To debug directory in the browser:
 
 1. Click the `Debug` button, located in the top right hand corner of the test browser.
 1. Open the [Chrome Dev Tools](https://developers.google.com/web/tools/chrome-devtools/). This can be done by right clicking the
- contents of the page and clicking `inspect` or by navigating the menu `View -> Developer -> View -> Developer Tools`.
+   contents of the page and clicking `inspect` or by navigating the menu `View -> Developer -> View -> Developer Tools`.
 1. Navigate to the `Sources` tab in the developer tools.
 1. Locate the file you wish to debug in the file tree in the left panel.
 1. Place a breakpoint.

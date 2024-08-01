@@ -9,24 +9,16 @@ namespace VanillaTests\Library\Vanilla;
 
 use Garden\EventManager;
 use Garden\SafeCurl\Exception\InvalidURLException;
-use PHPUnit\Framework\TestCase;
 use Vanilla\UploadedFile;
-use VanillaTests\BootstrapTrait;
+use VanillaTests\BootstrapTestCase;
+use VanillaTests\Fixtures\TestUploader;
 
 /**
  * Tests for uploaded files.
  */
-class UploadedFileTest extends TestCase {
-
-    use BootstrapTrait;
-
-    /**
-     * @inheritDoc
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->setupBoostrapTrait();
-    }
+class UploadedFileTest extends BootstrapTestCase
+{
+    public const TEST_REMOTE_FILE_URL = "https://us.v-cdn.net/6030677/uploads/userpics/47G7RW9EZD7R/nKM8SF66BM6V4.png";
 
     /**
      * Test that various internal IPs cannot be redirected too.
@@ -35,7 +27,8 @@ class UploadedFileTest extends TestCase {
      *
      * @dataProvider blacklistProvider
      */
-    public function testCreateFromRemoteBlacklist(string $blacklistedAddress) {
+    public function testCreateFromRemoteBlacklist(string $blacklistedAddress)
+    {
         $this->expectException(InvalidURLException::class);
         UploadedFile::fromRemoteResourceUrl($blacklistedAddress);
     }
@@ -43,22 +36,19 @@ class UploadedFileTest extends TestCase {
     /**
      * @return array
      */
-    public function blacklistProvider(): array {
-        return [
-            ['0.0.0.0/8'],
-            ["file:///etc/passwd"],
-            ["gopher://localhost"],
-            ["telnet://localhost:25"],
-        ];
+    public function blacklistProvider(): array
+    {
+        return [["0.0.0.0/8"], ["file:///etc/passwd"], ["gopher://localhost"], ["telnet://localhost:25"]];
     }
 
     /**
      * Test that redirects are followed.
      */
-    public function testSavesRemoteUrls() {
-        $file = UploadedFile::fromRemoteResourceUrl('http://vanillaforums.com');
-        $this->assertEquals('http://vanillaforums.com', $file->getForeignUrl());
-        $this->assertEquals('https://vanillaforums.com/en/', $file->getResolvedForeignUrl());
+    public function testSavesRemoteUrls()
+    {
+        $file = UploadedFile::fromRemoteResourceUrl("http://vanilla.higherlogic.com");
+        $this->assertEquals("http://vanilla.higherlogic.com", $file->getForeignUrl());
+        $this->assertEquals("https://vanilla.higherlogic.com/", $file->getResolvedForeignUrl());
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertTrue(file_exists($file->getFile()));
@@ -67,20 +57,29 @@ class UploadedFileTest extends TestCase {
     /**
      * Test file persistence.
      */
-    public function testPersistFile() {
+    public function testPersistFile()
+    {
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertFileExists($file->getFile());
 
         // Save the upload.
         $file->persistUpload();
-        $this->assertFileNotExists($file->getFile(), 'The original upload is moved and cleaned up.');
-        $this->assertFileExists(PATH_UPLOADS.'/'.$file->getPersistedPath(), 'Final upload file is persisted');
+        $this->assertFileDoesNotExist($file->getFile(), "The original upload is moved and cleaned up.");
+        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
 
-        $this->assertStringContainsString('migrated/', $file->getPersistedPath(), 'Persisted remote files should contain "/migrated/"');
-        $this->assertStringContainsString($file->getClientFilename(), $file->getPersistedPath(), 'Persisted remote files should the real name.');
+        $this->assertStringContainsString(
+            "migrated/",
+            $file->getPersistedPath(),
+            'Persisted remote files should contain "/migrated/"'
+        );
+        $this->assertStringContainsString(
+            strtolower($file->getClientFilename()),
+            $file->getPersistedPath(),
+            "Persisted remote files should the real name."
+        );
     }
 
     /**
@@ -90,14 +89,15 @@ class UploadedFileTest extends TestCase {
      *
      * @dataProvider provideImagesWithSpaces
      */
-    public function testPersistFileWithSpaces(string $name) {
+    public function testPersistFileWithSpaces(string $name)
+    {
         // Perform some tests related to saving uploads.
         $file = UploadedFile::fromRemoteResourceUrl($name);
 
         // Save the upload.
         $file->persistUpload();
-        $this->assertFileExists(PATH_UPLOADS.'/'.$file->getPersistedPath(), 'Final upload file is persisted');
-        $this->assertStringContainsString('image-with-spaces.jpg', $file->getPersistedPath());
+        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
+        $this->assertStringContainsString("image-with-spaces.jpg", $file->getPersistedPath());
     }
 
     /**
@@ -107,81 +107,89 @@ class UploadedFileTest extends TestCase {
      *
      * @dataProvider provideImagesEncodedChars
      */
-    public function testPersistFileEncodedChars(string $name) {
+    public function testPersistFileEncodedChars(string $name)
+    {
         // Perform some tests related to saving uploads.
         $file = UploadedFile::fromRemoteResourceUrl($name);
 
         // Save the upload.
         $file->persistUpload();
-        $this->assertFileExists(PATH_UPLOADS.'/'.$file->getPersistedPath(), 'Final upload file is persisted');
-        $this->assertStringContainsString('my-25e5-259c-2596-25e7-2589-2587.png', $file->getPersistedPath());
+        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
+        $this->assertStringContainsString("my-25e5-259c-2596-25e7-2589-2587.png", $file->getPersistedPath());
     }
 
     /**
      * @return string[][]
      */
-    public function provideImagesWithSpaces(): array {
+    public function provideImagesWithSpaces(): array
+    {
         return [
-            'no url encoding' => ['https://us.v-cdn.net/6032207/uploads/770/Image with spaces.jpg'],
-            'with url encoding' => ['https://us.v-cdn.net/6032207/uploads/770/Image%20with%20spaces.jpg'],
+            "no url encoding" => ["https://us.v-cdn.net/6032207/uploads/770/Image with spaces.jpg"],
+            "with url encoding" => ["https://us.v-cdn.net/6032207/uploads/770/Image%20with%20spaces.jpg"],
         ];
     }
 
     /**
      * @return string[][]
      */
-    public function provideImagesEncodedChars(): array {
+    public function provideImagesEncodedChars(): array
+    {
         return [
-            'with url encoding chinese chars' => ['https://us.v-cdn.net/5022541/uploads/320EG16UF3D6/my-%25E5%259C%2596%25E7%2589%2587.png'],
+            "with url encoding chinese chars" => [
+                "https://us.v-cdn.net/5022541/uploads/320EG16UF3D6/my-%25E5%259C%2596%25E7%2589%2587.png",
+            ],
         ];
     }
 
     /**
      * Test that custom paths can be persisted.
      */
-    public function testCustomPersistedPath() {
+    public function testCustomPersistedPath()
+    {
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertFileExists($file->getFile());
 
         // Save the upload.
-        $file->persistUpload(false, 'subdir', 'prefix-%s');
-        $this->assertFileExists(PATH_UPLOADS.'/'.$file->getPersistedPath(), 'Final upload file is persisted');
-        $this->assertStringMatchesFormat('subdir/%s/prefix-logo.svg', $file->getPersistedPath());
+        $file->persistUpload(false, "subdir", "prefix-%s");
+        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
+        $this->assertStringMatchesFormat("subdir/%s/prefix-nkm8sf66bm6v4.png", $file->getPersistedPath());
     }
 
     /**
      * Test copying of a file.
      */
-    public function testCopying() {
+    public function testCopying()
+    {
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertFileExists($file->getFile());
 
         // Save the upload.
-        $file->persistUpload(true, 'copied');
-        $this->assertFileExists(PATH_UPLOADS.'/'.$file->getPersistedPath(), 'Final upload file is persisted');
-        $this->assertFileExists($file->getFile(), 'Original file is not deleted');
+        $file->persistUpload(true, "copied");
+        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
+        $this->assertFileExists($file->getFile(), "Original file is not deleted");
     }
 
     /**
      * Test that an event handler can completely handle the persistance.
      */
-    public function testPersistEventHandling() {
+    public function testPersistEventHandling()
+    {
         /** @var EventManager $eventManager */
         $eventManager = self::container()->get(EventManager::class);
-        $expectedSaveName = 'custom/save/name.result';
+        $expectedSaveName = "custom/save/name.result";
 
-        $eventManager->bind('gdn_upload_saveAs', function ($upload, $args) use ($expectedSaveName) {
-            $args['Handled'] = true;
-            $args['Parsed']['SaveName'] = $expectedSaveName;
+        $eventManager->bind("gdn_upload_saveAs", function ($upload, $args) use ($expectedSaveName) {
+            $args["Handled"] = true;
+            $args["Parsed"]["SaveName"] = $expectedSaveName;
         });
 
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
         $file->persistUpload();
 
         // Standard cleanup/moving procedures did not occur.
@@ -194,13 +202,14 @@ class UploadedFileTest extends TestCase {
      *
      * @return array
      */
-    public function provideDimensionsData(): array {
+    public function provideDimensionsData(): array
+    {
         $r = [
-            'test int positive' => [10, 10],
-            'test int greater than max' => [3000, 4000],
-            'test string positive' => [10, '10'],
-            'test 0 int' => [0, 0],
-            'test 0 string' => [0, '0'],
+            "test int positive" => [10, 10],
+            "test int greater than max" => [3000, 4000],
+            "test string positive" => [10, "10"],
+            "test 0 int" => [0, 0],
+            "test 0 string" => [0, "0"],
         ];
 
         return $r;
@@ -212,12 +221,13 @@ class UploadedFileTest extends TestCase {
      * @param mixed $actual
      * @dataProvider provideBadDimensionsData
      */
-    public function testBadGetMaxImageHeight($actual) {
+    public function testBadGetMaxImageHeight($actual)
+    {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('height should be greater than or equal to 0.');
+        $this->expectExceptionMessage("height should be greater than or equal to 0.");
 
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
         $file->setMaxImageHeight($actual);
     }
 
@@ -227,12 +237,13 @@ class UploadedFileTest extends TestCase {
      * @param mixed $actual
      * @dataProvider provideBadDimensionsData
      */
-    public function testBadGetMaxImageWidth($actual) {
+    public function testBadGetMaxImageWidth($actual)
+    {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('width should be greater than or equal to 0.');
+        $this->expectExceptionMessage("width should be greater than or equal to 0.");
 
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
         $file->setMaxImageWidth($actual);
     }
 
@@ -241,12 +252,23 @@ class UploadedFileTest extends TestCase {
      *
      * @return array
      */
-    public function provideBadDimensionsData(): array {
+    public function provideBadDimensionsData(): array
+    {
         $r = [
-            'test int negative' => [-1],
-            'test string negative' => ['-1']
+            "test int negative" => [-1],
+            "test string negative" => ["-1"],
         ];
 
         return $r;
+    }
+
+    /**
+     * Test that errors caused by uploading non-resizeable images are ignored.
+     */
+    public function testUploadNonResizeableImage()
+    {
+        $this->expectNotToPerformAssertions();
+        $file = TestUploader::uploadFile("ico", PATH_ROOT . "/tests/fixtures/apple.ico");
+        $file->persistUpload();
     }
 }

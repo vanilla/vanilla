@@ -1,16 +1,22 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
+import { variableFactory, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { negative, unit, colorOut, allLinkStates } from "@library/styles/styleHelpers";
+import { oneColumnVariables } from "@library/layout/Section.variables";
+import { negative, allLinkStates } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { percent, px, calc } from "csx";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { cssOut, nestedWorkaround, trimTrailingCommas } from "@dashboard/compatibilityStyles";
+import { css, CSSObject, cx } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
+import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { SiteNavNodeTypes } from "./SiteNavNodeTypes";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -29,8 +35,7 @@ export const siteNavVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        fontSize: globalVars.fonts.size.large,
-        fontWeight: globalVars.fonts.weights.bold,
+        ...globalVars.fontSizeAndWeightVars("large", "bold"),
     });
 
     const nodeToggle = makeThemeVars("nodeToggle", {
@@ -40,7 +45,7 @@ export const siteNavVariables = useThemeCache(() => {
     });
 
     const spacer = makeThemeVars("spacer", {
-        default: 7,
+        default: 12,
     });
 
     return { node, title, nodeToggle, spacer };
@@ -49,25 +54,27 @@ export const siteNavVariables = useThemeCache(() => {
 export const siteNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const style = styleFactory("siteNav");
 
+    const offset = vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default;
     const root = style(
         {
             position: "relative",
             display: "block",
             zIndex: 1,
-            marginTop: unit(negative(vars.nodeToggle.height / 2 - vars.node.fontSize / 2)),
         },
         mediaQueries.noBleedDown({
-            marginLeft: unit(vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default),
+            marginLeft: offset,
+            width: `calc(100% - ${offset}px)`,
         }),
     );
 
     const title = style("title", {
-        fontSize: unit(globalVars.fonts.size.large),
-        fontWeight: globalVars.fonts.weights.bold,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("large", "bold"),
+        }),
     });
 
     const children = style("children", {
@@ -78,31 +85,64 @@ export const siteNavClasses = useThemeCache(() => {
     return { root, title, children };
 });
 
-export const siteNavNodeClasses = useThemeCache(() => {
+export const linkMixin = (base?: CSSObject, useTextColor?: boolean, selector?: string): CSSObject => {
+    const globalVars = globalVariables();
+    const baseStyles: CSSObject = { ...base };
+
+    const nestedStyles = {
+        ...allLinkStates({
+            noState: {
+                color: ColorsUtils.colorOut(useTextColor ? globalVars.mainColors.fg : globalVars.links.colors.default),
+            },
+            hover: {
+                color: ColorsUtils.colorOut(globalVars.links.colors.hover),
+            },
+            keyboardFocus: {
+                color: ColorsUtils.colorOut(globalVars.links.colors.keyboardFocus),
+                outline: "none",
+                "& > *": {
+                    outline: "auto 2px -webkit-focus-ring-color",
+                },
+            },
+            active: {
+                color: ColorsUtils.colorOut(globalVars.links.colors.active),
+            },
+        }),
+        "&:not(.focus-visible):active": {
+            outline: 0,
+        },
+    } as any;
+
+    if (selector) {
+        const selectors = selector.split(",");
+        if (selectors.length && selectors.length > 0) {
+            selectors.map((s) => {
+                cssOut(trimTrailingCommas(s), nestedStyles);
+            });
+        } else {
+            cssOut(trimTrailingCommas(selector), nestedStyles);
+        }
+    }
+
+    if (selector) {
+        if (useTextColor) {
+            baseStyles["color"] = ColorsUtils.colorOut(globalVars.mainColors.fg);
+        }
+        return baseStyles;
+    } else {
+        return {
+            ...baseStyles,
+            ...nestedStyles,
+        };
+    }
+};
+
+export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = false, hasChildren = false) => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const style = styleFactory("siteNavNode");
-
-    const label = style(
-        "label",
-        {
-            position: "relative",
-            display: "block",
-            width: calc(`100% + ${unit(vars.nodeToggle.width)}`),
-            marginLeft: unit(-vars.nodeToggle.width),
-            textAlign: "left",
-            border: `solid transparent ${unit(vars.node.borderWidth)}`,
-            paddingTop: unit(vars.node.padding + vars.node.borderWidth),
-            paddingRight: unit(vars.node.padding),
-            paddingBottom: unit(vars.node.padding + vars.node.borderWidth),
-            paddingLeft: unit(vars.nodeToggle.width - vars.node.borderWidth),
-        },
-        mediaQueries.oneColumnDown({
-            fontSize: unit(globalVars.fonts.size.large),
-        }),
-    );
 
     const root = style({
         position: "relative",
@@ -110,107 +150,64 @@ export const siteNavNodeClasses = useThemeCache(() => {
         alignItems: "flex-start",
         justifyContent: "flex-start",
         flexWrap: "nowrap",
-        fontSize: unit(vars.node.fontSize),
+        fontSize: styleUnit(vars.node.fontSize),
         color: vars.node.fg.toString(),
-        $nest: {
-            [`&.isCurrent .${label}`]: {
-                color: vars.node.active.fg.toString(),
-            },
-        },
     });
 
     const children = style("children", {
-        marginLeft: unit(vars.spacer.default),
+        marginLeft: styleUnit(vars.spacer.default),
     });
 
-    const contents = style("contents", {
-        display: "block",
-        width: percent(100),
-        $nest: {
-            ".siteNavNode-buttonOffset": {
-                top: unit(15.5),
+    const link = css({
+        ...(isFirstLevel
+            ? Mixins.font({
+                  ...globalVars.fontSizeAndWeightVars("large", "normal"),
+              })
+            : {}),
+        ...linkMixin(
+            {
+                display: "block",
+                flexGrow: 1,
+                lineHeight: vars.node.lineHeight,
+                minHeight: px(30),
+                padding: 0,
+                width: percent(100),
             },
+            true,
+        ),
+    });
+
+    const label = css(
+        {
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            width: calc(`100% + ${styleUnit(vars.nodeToggle.width)}`),
+            marginLeft: styleUnit(-vars.nodeToggle.width),
+            textAlign: "start",
+            border: `solid transparent ${styleUnit(vars.node.borderWidth)}`,
+            paddingTop: styleUnit(vars.node.padding + vars.node.borderWidth),
+            paddingRight: styleUnit(vars.node.padding),
+            paddingBottom: styleUnit(vars.node.padding + vars.node.borderWidth),
+            paddingLeft: styleUnit(vars.nodeToggle.width - vars.node.borderWidth),
+            ...(active ? { color: vars.node.active.fg.toString() } : {}),
+            ...(hasChildren ? { fontWeight: globalVars.fonts.weights.bold } : {}),
         },
+        mediaQueries.oneColumnDown({
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("large"),
+            }),
+        }),
+    );
+
+    const labelText = css({
+        flex: 1,
     });
-
-    const linkMixin = (useTextColor?: boolean, selector?: string): NestedCSSProperties => {
-        const $nest = {
-            ...allLinkStates({
-                noState: {
-                    color: colorOut(useTextColor ? globalVars.mainColors.fg : globalVars.links.colors.default),
-                },
-                hover: {
-                    color: colorOut(globalVars.links.colors.hover),
-                },
-                focus: {
-                    color: colorOut(globalVars.links.colors.focus),
-                },
-                keyboardFocus: {
-                    color: colorOut(globalVars.links.colors.keyboardFocus),
-                },
-                active: {
-                    color: colorOut(globalVars.links.colors.active),
-                },
-            }).$nest,
-            "&:not(.focus-visible):active": {
-                outline: 0,
-            },
-            "&:focus": {
-                outline: 0,
-            },
-            "&.hasChildren": {
-                $nest: {
-                    [`& .${label}`]: {
-                        fontWeight: globalVars.fonts.weights.bold,
-                    },
-                    "&.isFirstLevel": {
-                        fontSize: unit(globalVars.fonts.size.large),
-                        fontWeight: globalVars.fonts.weights.normal,
-                    },
-                },
-            },
-        } as any;
-
-        if (selector) {
-            const selectors = selector.split(",");
-            if (selectors.length && selectors.length > 0) {
-                selectors.map(s => {
-                    nestedWorkaround(trimTrailingCommas(s), $nest);
-                });
-            } else {
-                nestedWorkaround(trimTrailingCommas(selector), $nest);
-            }
-        }
-
-        const baseStyles = {
-            display: "block",
-            flexGrow: 1,
-            lineHeight: vars.node.lineHeight,
-            minHeight: px(30),
-            outline: 0,
-            padding: 0,
-            width: percent(100),
-        };
-
-        if (selector) {
-            if (useTextColor) {
-                baseStyles["color"] = colorOut(globalVars.mainColors.fg);
-            }
-            return baseStyles;
-        } else {
-            return {
-                ...baseStyles,
-                $nest: $nest,
-            };
-        }
-    };
-
-    const link = style("link", linkMixin(true));
 
     const spacer = style("spacer", {
         display: "block",
-        height: unit(vars.nodeToggle.height),
-        width: unit(vars.spacer.default),
+        height: styleUnit(vars.nodeToggle.height),
+        width: styleUnit(vars.spacer.default),
         margin: `6px 0`,
     });
 
@@ -222,35 +219,164 @@ export const siteNavNodeClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         outline: 0,
-        height: unit(vars.nodeToggle.height),
-        width: unit(vars.nodeToggle.width),
+        height: styleUnit(vars.nodeToggle.height),
+        width: styleUnit(vars.nodeToggle.width),
+        lineHeight: 0,
     });
 
     const buttonOffset = style("buttonOffset", {
         position: "relative",
         display: "flex",
         justifyContent: "flex-end",
-        width: unit(vars.nodeToggle.width),
-        marginLeft: unit(-vars.nodeToggle.width),
+        width: styleUnit(vars.nodeToggle.width),
+        marginLeft: styleUnit(-vars.nodeToggle.width),
         top: px(16),
         transform: `translateY(-50%)`,
     });
 
+    const contents = style("contents", {
+        display: "block",
+        width: percent(100),
+        ...{
+            [`.${buttonOffset}`]: {
+                top: styleUnit(15.5),
+            },
+        },
+    });
+
     const activeLink = style("active", {
         fontWeight: globalVars.fonts.weights.semiBold,
-        color: colorOut(globalVars.links.colors.active),
+        color: ColorsUtils.colorOut(globalVars.links.colors.active),
     });
+
+    const icon = css({
+        height: 18,
+        width: 18,
+        position: "relative",
+        transform: "scale(1.25)",
+        ...Mixins.margin({ left: 4, right: 8 }),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        ["&.disabled"]: {
+            opacity: 0.5,
+        },
+    });
+
+    const iconGroup = css({
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+
+        marginRight: 8,
+        "& *": {
+            margin: 0,
+        },
+    });
+
+    const checkMark = cx(
+        icon,
+        css({
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+            ...Mixins.margin({ left: 4, right: 8 }),
+        }),
+    );
+
+    const badge = css({});
 
     return {
         root,
         children,
         contents,
         link,
-        linkMixin,
         label,
+        labelText,
         spacer,
         toggle,
         buttonOffset,
         activeLink,
+        iconGroup,
+        icon,
+        checkMark,
+        badge,
     };
 });
+
+export const siteNavNodeDashboardClasses = useThemeCache(
+    (active = false, isFirstLevel = false, hasChildren = false) => {
+        const globalVars = globalVariables();
+        const vars = siteNavVariables();
+
+        const style = styleFactory(SiteNavNodeTypes.DASHBOARD);
+
+        const link = css({
+            ...(isFirstLevel
+                ? Mixins.font({
+                      size: styleUnit(globalVars.fonts.size.medium),
+                      weight: globalVars.fonts.weights.semiBold,
+                      transform: "uppercase",
+                  })
+                : {}),
+            ...linkMixin(
+                {
+                    display: "block",
+                    flexGrow: 1,
+                    lineHeight: vars.node.lineHeight,
+                    minHeight: px(30),
+                    padding: 0,
+                    width: percent(100),
+                },
+                true,
+            ),
+            overflow: "visible !important",
+        });
+
+        const label = css({
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            width: calc(`100% + ${styleUnit(vars.nodeToggle.width)}`),
+            marginLeft: styleUnit(-vars.nodeToggle.width),
+            textAlign: "start",
+            border: `solid transparent ${styleUnit(vars.node.borderWidth)}`,
+            paddingTop: styleUnit(vars.node.padding + vars.node.borderWidth),
+            paddingRight: styleUnit(vars.node.padding),
+            paddingBottom: styleUnit(vars.node.padding + vars.node.borderWidth),
+            paddingLeft: styleUnit(vars.nodeToggle.width - vars.node.borderWidth),
+            fontSize: styleUnit(globalVars.fonts.size.medium),
+            "& > svg": {
+                height: 18,
+                width: 18,
+            },
+            ...(active
+                ? {
+                      borderTopLeftRadius: 6,
+                      borderBottomLeftRadius: 6,
+                      backgroundColor: "#e8ecf2",
+                  }
+                : {}),
+            ...(hasChildren
+                ? {
+                      fontWeight: globalVars.fonts.weights.semiBold,
+                  }
+                : {}),
+        });
+
+        const badge = css({
+            fontSize: 11,
+            display: "inline",
+            padding: "0px 4px",
+            position: "relative",
+            top: -1,
+            marginLeft: 6,
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+            verticalAlign: "text-bottom",
+            border: `1px solid ${ColorsUtils.colorOut(globalVars.mainColors.primary)}`,
+            borderRadius: 4,
+        });
+
+        return {
+            link,
+            label,
+            badge,
+        };
+    },
+);

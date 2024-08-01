@@ -11,7 +11,8 @@
 /**
  * Master application controller for Vanilla, extended by all others except Settings.
  */
-class VanillaController extends Gdn_Controller {
+class VanillaController extends Gdn_Controller
+{
     /**
      * Include JS, CSS, and modules used by all methods.
      *
@@ -20,23 +21,24 @@ class VanillaController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function initialize() {
+    public function initialize()
+    {
         // Set up head
         $this->Head = new HeadModule($this);
-        $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.form.js');
-        $this->addJsFile('jquery.popup.js');
-        $this->addJsFile('jquery.popin.js');
-        $this->addJsFile('jquery.gardenhandleajaxform.js');
-        $this->addJsFile('jquery.atwho.js');
-        $this->addJsFile('global.js');
-        $this->addCssFile('style.css');
-        $this->addCssFile('vanillicon.css', 'static');
+        $this->addJsFile("jquery.js");
+        $this->addJsFile("jquery.form.js");
+        $this->addJsFile("jquery.popup.js");
+        $this->addJsFile("jquery.popin.js");
+        $this->addJsFile("jquery.gardenhandleajaxform.js");
+        $this->addJsFile("jquery.atwho.js");
+        $this->addJsFile("global.js");
+        $this->addCssFile("style.css");
+        $this->addCssFile("vanillicon.css", "static");
 
         // Add modules
-//      $this->addModule('MeModule');
-        $this->addModule('GuestModule');
-        $this->addModule('SignedInModule');
+        //      $this->addModule('MeModule');
+        $this->addModule("GuestModule");
+        $this->addModule("SignedInModule");
 
         parent::initialize();
     }
@@ -48,25 +50,27 @@ class VanillaController extends Gdn_Controller {
      * @param string|array $permission The permission(s) to check.
      * @param bool $fullMatch Whether or not several permissions should be a full match.
      */
-    protected function categoryPermission($category, $permission, $fullMatch = true) {
+    protected function categoryPermission($category, $permission, $fullMatch = true)
+    {
         if (!CategoryModel::checkPermission($category, $permission, $fullMatch)) {
-            $categoryID = is_numeric($category) ? $category : val('CategoryID', $category);
+            $categoryID = is_numeric($category) ? $category : val("CategoryID", $category);
 
-            $this->permission($permission, $fullMatch, 'Category', $categoryID);
+            $this->permission($permission, $fullMatch, "Category", $categoryID);
         }
     }
 
     /**
-     * Check to see if we've gone off the end of the page.
+     * Get current site section locale
      *
-     * @param int $offset The offset requested.
-     * @param int $totalCount The total count of records.
-     * @throws Exception Throws an exception if the offset is past the last page.
+     * @return string
      */
-    protected function checkPageRange(int $offset, int $totalCount) {
-        if ($offset > 0 && $offset >= $totalCount) {
-            throw notFoundException();
-        }
+    protected function getContentLocale(): string
+    {
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        /** @var \Vanilla\Contracts\Site\SiteSectionInterface $siteSection */
+        $siteSection = $siteSectionModel->getCurrentSiteSection();
+        return $siteSection->getContentLocale();
     }
 
     /**
@@ -75,7 +79,8 @@ class VanillaController extends Gdn_Controller {
      *
      * @return bool
      */
-    public function disabled(): bool {
+    public function disabled(): bool
+    {
         $enabled = true;
         /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
         $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);

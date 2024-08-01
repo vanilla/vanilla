@@ -34,9 +34,7 @@ export function setupTestQuill(htmlBody?: string): Quill {
  *
  * @param initialValue The initial text area value to use.
  */
-export function setupLegacyEditor(
-    initialValue: DeltaOperation[],
-): Promise<{
+export function setupLegacyEditor(initialValue: DeltaOperation[]): Promise<{
     quill: Quill;
     textarea: HTMLTextAreaElement;
 }> {
@@ -45,7 +43,7 @@ export function setupLegacyEditor(
     const textarea = document.getElementById("textarea") as HTMLTextAreaElement;
     textarea.value = JSON.stringify(initialValue);
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         mountReact(
             <Editor isPrimaryEditor={true} isLoading={false} legacyMode={true} allowUpload={true}>
                 <EditorContent legacyTextArea={textarea} />

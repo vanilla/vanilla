@@ -9,6 +9,6 @@
     { "insert": "\n\nText after line breaks." },
     { "attributes": { "strike": true }, "insert": "strike" },
     { "insert": "\n\n\n\n" },
-    { "attributes": { "strike": true }, "insert": "Mutliple more breaks." },
+    { "attributes": { "strike": true }, "insert": "Multiple more breaks." },
     { "insert": "\n" }
 ]

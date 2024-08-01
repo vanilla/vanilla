@@ -9,12 +9,12 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { BottomChevronIcon } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { useMeasure } from "@vanilla/react-utils";
+import { useDomNodeAttachment, useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
-import { nextTick } from "q";
 import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { animated, useSpring } from "react-spring";
 import ReactDOM from "react-dom";
+import { ColorHelper } from "csx";
 
 interface IProps {
     /** The maximum collapsed height of the collapser. */
@@ -42,6 +42,10 @@ interface IProps {
 
     /** An array of DOM nodes to apply as children instead of react contents. See autoWrapCollapsableContent. */
     domNodesToAttach?: Node[];
+
+    bgColor?: ColorHelper;
+
+    gradientClasses?: string;
 }
 
 /**
@@ -56,24 +60,18 @@ export function CollapsableContent(props: IProps) {
 
     const heightLimit = containerMaxHeight + containerOvershoot;
 
-    const ref = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
-    const measurements = useMeasure(ref);
 
     // When we mount for the first time copy domNodes over
     // For usage with autoWrapCollapsableContent()
-    useLayoutEffect(() => {
-        if (domNodesToAttach && ref.current) {
-            domNodesToAttach.forEach(node => {
-                ref.current?.appendChild(node);
-            });
-        }
-    }, [domNodesToAttach]); // eslint-ignore-line
+
+    const ref = useDomNodeAttachment(domNodesToAttach);
+    const measurements = useMeasure(ref);
 
     useLayoutEffect(() => {
-        nextTick(() => {
-            scrollRef.current!.scrollTo({ top: 0 });
-        });
+        setTimeout(() => {
+            scrollRef.current?.scrollTo?.({ top: 0 });
+        }, 0);
     });
 
     const toggleCollapse = () => {
@@ -93,7 +91,9 @@ export function CollapsableContent(props: IProps) {
         }
     };
 
-    const maxCollapsedHeight = measurements.height < heightLimit ? measurements.height : containerMaxHeight;
+    const hasMeasuredHeight = measurements.height > 0;
+    const hasSmallMeasuredHeight = measurements.height < heightLimit;
+    const maxCollapsedHeight = hasMeasuredHeight && hasSmallMeasuredHeight ? measurements.height : containerMaxHeight;
     const targetHeight = isExpanded ? measurements.height : maxCollapsedHeight;
     const maxHeight = maxCollapsedHeight > measurements.height ? measurements.height : maxCollapsedHeight;
 
@@ -105,7 +105,7 @@ export function CollapsableContent(props: IProps) {
         opacity: isExpanded ? 0 : 1,
     });
 
-    const classes = collapsableContentClasses();
+    const classes = collapsableContentClasses({ bgColor: props.bgColor });
 
     const hasOverflow = measurements.height > heightLimit;
 
@@ -137,6 +137,7 @@ export function CollapsableContent(props: IProps) {
                         style={gradientProps}
                         className={classNames(
                             classes.gradient,
+                            props.gradientClasses,
                             props.allowsCssOverrides && "collapsableContent-gradient",
                         )}
                     />
@@ -144,7 +145,7 @@ export function CollapsableContent(props: IProps) {
                         id={toggleID}
                         title={title}
                         className={classes.collapser}
-                        baseClass={ButtonTypes.CUSTOM}
+                        buttonType={ButtonTypes.CUSTOM}
                         onClick={toggleCollapse}
                         controls={contentID}
                     >
@@ -168,7 +169,7 @@ export async function autoWrapCollapsableContent() {
 
     return await Promise.all(
         Array.from(jsCollapsables).map((element: HTMLElement) => {
-            return new Promise(resolve => {
+            return new Promise<void>((resolve) => {
                 const nodes = Array.from(element.childNodes);
                 const className = element.getAttribute("data-className") || undefined;
 

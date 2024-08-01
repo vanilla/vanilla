@@ -9,21 +9,33 @@ namespace Vanilla\Models;
 use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
+use Garden\Schema\ValidationField;
+use Vanilla\Database\SetLiterals\RawExpression;
+use Vanilla\Database\SetLiterals\SetLiteral;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\InjectableInterface;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\InstanceValidatorSchema;
+use Webmozart\Assert\Assert;
 
 /**
  * Basic model class.
  */
-class Model implements InjectableInterface {
-    const OPT_LIMIT = "limit";
-    const OPT_OFFSET = "offset";
-    const OPT_SELECT = "select";
-    const OPT_ORDER = 'order';
+class Model implements InjectableInterface
+{
+    public const OPT_LIMIT = "limit";
+    public const OPT_OFFSET = "offset";
+    public const OPT_SELECT = "select";
+    public const OPT_ORDER = "order";
+    public const OPT_DIRECTION = "orderDirection";
+    public const OPT_MODE = "mode";
+    public const OPT_REPLACE = "replace";
+    public const OPT_IGNORE = "ignore";
+    public const OPT_META = "meta";
+    public const OPT_JOINS = "joins";
 
     /** @var \Gdn_Database */
-    private $database;
+    protected $database;
 
     /** @var Schema */
     protected $readSchema;
@@ -49,9 +61,20 @@ class Model implements InjectableInterface {
      *
      * @param string $table Database table associated with this resource.
      */
-    public function __construct(string $table) {
+    public function __construct(string $table)
+    {
         $this->table = $table;
-        $this->setPrimaryKey($table.'ID');
+        $this->setPrimaryKey($table . "ID");
+    }
+
+    /**
+     * Get the name of the table.
+     *
+     * @return string
+     */
+    public function getTableName(): string
+    {
+        return $this->table;
     }
 
     /**
@@ -60,7 +83,8 @@ class Model implements InjectableInterface {
      * @param Schema $schema Schema representing the resource's database table.
      * @return Schema Currently configured read schema.
      */
-    protected function configureReadSchema(Schema $schema): Schema {
+    protected function configureReadSchema(Schema $schema): Schema
+    {
         // Child classes can make adjustments as necessary.
         return $schema;
     }
@@ -70,9 +94,10 @@ class Model implements InjectableInterface {
      *
      * @return Schema
      */
-    public function getReadSchema(): Schema {
+    public function getReadSchema(): Schema
+    {
         if ($this->readSchema === null) {
-            $schema = $this->getDatabaseSchema();
+            $schema = clone $this->getDatabaseSchema();
             $this->configureReadSchema($schema);
             $this->readSchema = $schema;
         }
@@ -84,10 +109,12 @@ class Model implements InjectableInterface {
      *
      * @return Schema
      */
-    public function getWriteSchema(): Schema {
+    public function getWriteSchema(): Schema
+    {
         if ($this->writeSchema === null) {
-            $schema = $this->getDatabaseSchema();
+            $schema = clone $this->getDatabaseSchema();
             $this->configureWriteSchema($schema);
+
             $this->writeSchema = $schema;
         }
         return $this->writeSchema;
@@ -99,7 +126,8 @@ class Model implements InjectableInterface {
      * @param Schema $schema Schema representing the resource's database table.
      * @return Schema Currently configured write schema.
      */
-    protected function configureWriteSchema(Schema $schema): Schema {
+    protected function configureWriteSchema(Schema $schema): Schema
+    {
         // Child classes can make adjustments as necessary.
         return $schema;
     }
@@ -113,7 +141,8 @@ class Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function delete(array $where, array $options = []): bool {
+    public function delete(array $where, array $options = []): bool
+    {
         $limit = $options[self::OPT_LIMIT] ?? false;
 
         $this->createSql()->delete($this->table, $where, $limit);
@@ -127,9 +156,36 @@ class Model implements InjectableInterface {
      * @deprecated Use `getReadSchema()` and `getWriteSchema()` instead.
      * @codeCoverageIgnore
      */
-    protected function ensureSchemas() {
+    protected function ensureSchemas()
+    {
         $this->getReadSchema();
         $this->getWriteSchema();
+    }
+
+    /**
+     * Select a paging count.
+     *
+     * @param array $where
+     * @param int|null $limit
+     * @return int
+     */
+    public function selectPagingCount(array $where, int $limit = null): int
+    {
+        $sql = $this->createSql();
+        $limit = $limit ?? \Gdn::config("Vanilla.APIv2.MaxCount", 10000);
+        $innerQuery = $this->createSql()
+            ->from($this->getTable())
+            ->select($this->getPrimaryKey())
+            ->where($where)
+            ->getSelect(true);
+
+        $countQuery = <<<SQL
+SELECT COUNT(*) as count FROM ({$innerQuery}) iq
+SQL;
+
+        $result = $this->createSql()->query($countQuery);
+
+        return $result->firstRow(DATASET_TYPE_ARRAY)["count"];
     }
 
     /**
@@ -143,37 +199,66 @@ class Model implements InjectableInterface {
      *    - offset (int): Row offset before capturing the result.
      * @return array Rows matching the conditions and within the parameters specified in the options.
      * @throws ValidationException If a row fails to validate against the schema.
+     * @todo Document support for the "order" option.
+     * @todo Add support for a "page" option to set the limit.
      */
-    public function select(array $where = [], array $options = []): array {
-        $orderFields = $options[self::OPT_ORDER] ?? ($options["orderFields"] ?? []);
-        $orderDirection = $options["orderDirection"] ?? "asc";
-        $limit = $options[self::OPT_LIMIT] ?? false;
-        $offset = $options[self::OPT_OFFSET] ?? 0;
-        $selects =  $options[self::OPT_SELECT] ?? [];
+    public function select(array $where = [], array $options = []): array
+    {
+        $query = $this->createSql()
+            ->from($this->table)
+            ->where($where);
 
-        $sqlDriver = $this->createSql();
+        $query = $query->applyModelOptions($options, $this->getReadSchema());
+        $result = $query->get()->resultArray();
 
-        if (!empty($selects)) {
-            if (is_string($selects)) {
-                $selects = ArrayUtils::explodeTrim(',', $selects);
-            }
-            $selects = $this->translateSelects($selects);
-
-            $sqlDriver->select($selects);
-        }
-        $result = $sqlDriver->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
-            ->resultArray();
-
-        if (empty($selects)) {
-            $schema = Schema::parse([":a" => $this->getReadSchema()]);
-        } else {
-            $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->getReadSchema())]);
-        }
-        // What if a processor goes here?
-
-        $result = $schema->validate($result);
-
+        $result = $this->validateOutputRows($result, $options);
         return $result;
+    }
+
+    /**
+     * Validate output rows from a select.
+     *
+     * @param array $rows
+     * @param array $options
+     * @return array
+     */
+    protected function validateOutputRows(array $rows, array $options)
+    {
+        $selects = $options[self::OPT_SELECT] ?? [];
+        if (is_string($selects)) {
+            $selects = ArrayUtils::explodeTrim(",", $selects);
+        }
+        $selects = \Gdn_SQLDriver::translateSelects($selects, $this->getReadSchema());
+        if (empty($selects)) {
+            $schema = $this->getReadSchema();
+        } else {
+            $selectExpressions = $this->createSql()->parseSelectExpression($selects);
+            $selectFinalFieldNames = [];
+            foreach ($selectExpressions as $selectExpression) {
+                $selectFinalFieldNames[] = $selectExpression["Alias"] ?: $selectExpression["Field"];
+            }
+
+            $schema = Schema::parse($selectFinalFieldNames)->add($this->getReadSchema());
+        }
+        foreach ($rows as &$row) {
+            $row = $schema->validate($row);
+        }
+        return $rows;
+    }
+
+    /**
+     * Apply options to a query.
+     *
+     * @param \Gdn_SQLDriver $query
+     * @param array $options
+     *
+     * @return \Gdn_SQLDriver
+     *
+     * @deprecated Use {@link \Gdn_SQLDriver::applyModelOptions()} instead.
+     */
+    protected function applyOptionsToQuery(\Gdn_SQLDriver $query, array $options = []): \Gdn_SQLDriver
+    {
+        return $query->applyModelOptions($options, $this->getReadSchema());
     }
 
     /**
@@ -182,8 +267,10 @@ class Model implements InjectableInterface {
      * @param array $where
      * @param array $options
      * @return array
+     * @deprecated Use Model::select
      */
-    public function get(array $where = [], array $options = []): array {
+    public function get(array $where = [], array $options = []): array
+    {
         return $this->select($where, $options);
     }
 
@@ -192,7 +279,8 @@ class Model implements InjectableInterface {
      *
      * @return string
      */
-    public function getTable(): string {
+    public function getTable(): string
+    {
         return $this->table;
     }
 
@@ -201,7 +289,8 @@ class Model implements InjectableInterface {
      *
      * @return array
      */
-    public function getPrimaryKey(): array {
+    public function getPrimaryKey(): array
+    {
         return $this->primaryKey;
     }
 
@@ -210,7 +299,8 @@ class Model implements InjectableInterface {
      *
      * @param string $columns
      */
-    protected function setPrimaryKey(string ...$columns): void {
+    protected function setPrimaryKey(string ...$columns): void
+    {
         $this->primaryKey = $columns;
     }
 
@@ -221,11 +311,27 @@ class Model implements InjectableInterface {
      * @param mixed $ids
      * @return array
      */
-    public function primaryWhere($id, ...$ids): array {
+    public function primaryWhere($id, ...$ids): array
+    {
         $values = array_merge([$id], $ids);
         $where = [];
         foreach ($this->getPrimaryKey() as $i => $column) {
             $where[$column] = $values[$i] ?? null;
+        }
+        return $where;
+    }
+
+    /**
+     * Extract the primary key out of a row.
+     *
+     * @param array $row The row to pluck.
+     * @return array Returns an array suitable to pass as a where parameter.
+     */
+    public function pluckPrimaryWhere(array $row): array
+    {
+        $where = [];
+        foreach ($this->getPrimaryKey() as $column) {
+            $where[$column] = $row[$column];
         }
         return $where;
     }
@@ -243,9 +349,10 @@ class Model implements InjectableInterface {
      * @throws ValidationException If a row fails to validate against the schema.
      * @throws NoResultsException If no rows could be found.
      */
-    public function selectSingle(array $where = [], array $options = []): array {
+    public function selectSingle(array $where = [], array $options = []): array
+    {
         $options[self::OPT_LIMIT] = 1;
-        $rows = $this->get($where, $options);
+        $rows = $this->select($where, $options);
         if (empty($rows)) {
             throw new NoResultsException("No rows matched the provided criteria.");
         }
@@ -257,12 +364,26 @@ class Model implements InjectableInterface {
      * Add a resource row.
      *
      * @param array $set Field values to set.
+     * @param array $options An array of options to affect the insert.
      * @return int|true ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set) {
+    public function insert(array $set, array $options = [])
+    {
+        $options += [
+            self::OPT_REPLACE => false,
+            self::OPT_IGNORE => false,
+        ];
+
         $set = $this->getWriteSchema()->validate($set);
-        $result = $this->createSql()->insert($this->table, $set);
+
+        $sql = $this->createSql();
+        if ($options[self::OPT_REPLACE]) {
+            $sql->options("Replace", true);
+        } elseif ($options[self::OPT_IGNORE]) {
+            $sql->options("Ignore", true);
+        }
+        $result = $sql->insert($this->table, $set);
         if ($result === false) {
             // @codeCoverageIgnoreStart
             throw new Exception("An unknown error was encountered while inserting the row.");
@@ -270,7 +391,7 @@ class Model implements InjectableInterface {
         }
         // This is a bit of a kludge, but we want a true integer because we are otherwise string with schemas.
         if (is_numeric($result)) {
-            $result = (int)$result;
+            $result = (int) $result;
         }
         return $result;
     }
@@ -278,7 +399,8 @@ class Model implements InjectableInterface {
     /**
      * @param \Gdn_Database $database
      */
-    public function setDependencies(\Gdn_Database $database) {
+    public function setDependencies(\Gdn_Database $database)
+    {
         $this->database = $database;
     }
 
@@ -287,10 +409,9 @@ class Model implements InjectableInterface {
      *
      * @return \Gdn_SQLDriver
      */
-    protected function createSql(): \Gdn_SQLDriver {
-        $sql = clone $this->database->sql();
-        $sql->reset();
-        return $sql;
+    protected function createSql(): \Gdn_SQLDriver
+    {
+        return $this->database->createSql();
     }
 
     /**
@@ -300,7 +421,8 @@ class Model implements InjectableInterface {
      * @deprecated
      * @codeCoverageIgnore
      */
-    protected function sql(): \Gdn_SQLDriver {
+    protected function sql(): \Gdn_SQLDriver
+    {
         return $this->createSql();
     }
 
@@ -309,10 +431,12 @@ class Model implements InjectableInterface {
      *
      * @param array $set Field values to set.
      * @param array $where Conditions to restrict the update.
+     * @param array $options Options to control the update.
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where): bool {
+    public function update(array $set, array $where, array $options = []): bool
+    {
         $set = $this->getWriteSchema()->validate($set, true);
         $this->createSql()->put($this->table, $set, $where);
         // If fully executed without an exception bubbling up, consider this a success.
@@ -320,35 +444,36 @@ class Model implements InjectableInterface {
     }
 
     /**
-     * Translate selects with some additional support.
-     *
-     * @param array $selects
-     * @return array
-     */
-    private function translateSelects(array $selects): array {
-        $negatives = [];
-        foreach ($selects as $select) {
-            if ($select[0] === '-') {
-                $negatives[] = substr($select, 1);
-            }
-        }
-
-        if (!empty($negatives)) {
-            $columns = array_keys($this->getReadSchema()->getField('properties'));
-            $selects = array_values(array_diff($columns, $negatives));
-        }
-        return $selects;
-    }
-
-    /**
      * Get or generate the schema returned by the database.
      *
      * @return Schema
      */
-    private function getDatabaseSchema(): Schema {
+    private function getDatabaseSchema(): Schema
+    {
         if ($this->databaseSchema === null) {
             $this->databaseSchema = $this->database->simpleSchema($this->getTable());
         }
         return $this->databaseSchema;
+    }
+
+    /**
+     * Filter a list of recordIDs to only ones that currently exist.
+     *
+     * @param int[] $recordIDs The incoming recordIDs.
+     *
+     * @return array The filtered recordIDs.
+     */
+    public function filterExistingRecordIDs(array $recordIDs): array
+    {
+        $primaryKey = $this->getPrimaryKey();
+        Assert::count($primaryKey, 1, "filterExistingRecordIDs() only works on simple primary keys.");
+        $primaryKey = $primaryKey[0];
+        $existing = $this->createSql()
+            ->select($primaryKey)
+            ->from($this->table)
+            ->where($primaryKey, $recordIDs)
+            ->get()
+            ->column($primaryKey);
+        return $existing;
     }
 }

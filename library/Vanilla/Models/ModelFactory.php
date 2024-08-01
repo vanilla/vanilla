@@ -17,8 +17,9 @@ use Vanilla\AddonManager;
  * Class ModelFactory
  * @package Vanilla\Models
  */
-class ModelFactory implements ContainerInterface {
-    private const KEY_INDEX = '@models.index';
+class ModelFactory implements ContainerInterface
+{
+    private const KEY_INDEX = "@models.index";
 
     /**
      * @var Container
@@ -30,9 +31,8 @@ class ModelFactory implements ContainerInterface {
      *
      * @param Container $container
      */
-    public function __construct(
-        Container $container
-    ) {
+    public function __construct(Container $container)
+    {
         $this->container = $container;
     }
 
@@ -44,18 +44,20 @@ class ModelFactory implements ContainerInterface {
      * @param ContainerInterface $container
      * @return ModelFactory
      */
-    public static function fromContainer(ContainerInterface $container): self {
+    public static function fromContainer(ContainerInterface $container): self
+    {
         return $container->get(static::class);
     }
 
     /**
      * Get the model associated with a record type.
      *
-     * @param string $recordType The record type or alias to lookup.
+     * @param string $id The record type or alias to lookup.
      * @return \Gdn_Model|Model
      */
-    public function get($recordType) {
-        $r = $this->container->get(self::key($recordType));
+    public function get(string $id)
+    {
+        $r = $this->container->get(self::key($id));
         return $r;
     }
 
@@ -67,14 +69,11 @@ class ModelFactory implements ContainerInterface {
      * @param string $alias
      * @return self
      */
-    public function addModel(string $recordType, string $className, string $alias = ''): self {
-        $this
-            ->container
-            ->rule($className)
-            ->addAlias(self::key($recordType));
+    public function addModel(string $recordType, string $className, string $alias = ""): self
+    {
+        $this->container->rule($className)->addAlias(self::key($recordType));
 
-
-        if ($alias !== '') {
+        if ($alias !== "") {
             $this->container->addAlias(self::key($alias));
         }
 
@@ -88,9 +87,10 @@ class ModelFactory implements ContainerInterface {
      *
      * @param string $ref On of the following: The record type (case insensitive), an alias, or the model class name.
      * @return string Returns the name of the record type.
-     * @throws NotFoundExceptionInterface Throws an exception when the ref isn't found.
+     * @throws NotFoundException Throws an exception when the ref isn't found.
      */
-    public function getRecordType(string $ref): string {
+    public function getRecordType(string $ref): string
+    {
         $r = $this->getRecordTypes()[$ref] ?? null;
         if ($r !== null) {
             return $r;
@@ -115,7 +115,8 @@ class ModelFactory implements ContainerInterface {
      * @param string $alias
      * @return $this
      */
-    public function addAlias(string $recordType, string $alias): self {
+    public function addAlias(string $recordType, string $alias): self
+    {
         $key = self::key($recordType);
 
         if ($this->container->hasRule($key)) {
@@ -134,18 +135,20 @@ class ModelFactory implements ContainerInterface {
      * @param string $key
      * @return string
      */
-    private static function key(string $key): string {
-        return '@models.'.strtolower($key);
+    private static function key(string $key): string
+    {
+        return "@models." . strtolower($key);
     }
 
     /**
      * Check whether or not the record type is recognized.
      *
-     * @param string $recordType
+     * @param string $id
      * @return bool
      */
-    public function has($recordType) {
-        return $this->container->has(self::key($recordType));
+    public function has($id)
+    {
+        return $this->container->has(self::key($id));
     }
 
     /**
@@ -153,7 +156,8 @@ class ModelFactory implements ContainerInterface {
      *
      * @return \ArrayObject
      */
-    private function getRecordTypes(): \ArrayObject {
+    private function getRecordTypes(): \ArrayObject
+    {
         if ($this->container->has(self::KEY_INDEX)) {
             return $this->container->get(self::KEY_INDEX);
         } else {
@@ -168,7 +172,8 @@ class ModelFactory implements ContainerInterface {
      *
      * @return array
      */
-    public function getAll(): array {
+    public function getAll(): array
+    {
         $index = $this->getRecordTypes();
 
         $result = [];
@@ -185,7 +190,8 @@ class ModelFactory implements ContainerInterface {
      * @param bool $include Whether to include (true) or exclude (false) models that implement the interface.
      * @return array
      */
-    public function getAllByInterface(string $interface, bool $include = true): array {
+    public function getAllByInterface(string $interface, bool $include = true): array
+    {
         $index = $this->getRecordTypes();
 
         $result = [];

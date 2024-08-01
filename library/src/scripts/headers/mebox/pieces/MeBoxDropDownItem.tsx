@@ -10,11 +10,13 @@ import { t } from "@library/utility/appUtils";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import SmartLink from "@library/routing/links/SmartLink";
 import { meBoxMessageClasses } from "@library/headers/mebox/pieces/meBoxMessageStyles";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import Translate from "@library/content/Translate";
-import DateTime from "@library/content/DateTime";
 import classNames from "classnames";
 import { NoUserPhotoIcon } from "@library/icons/titleBar";
+import { userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
+import DateTime from "@library/content/DateTime";
+import StatusLight from "@library/statusLight/StatusLight";
 
 export enum MeBoxItemType {
     NOTIFICATION = "notification",
@@ -25,6 +27,7 @@ export enum MeBoxItemType {
 export interface IMeBoxItem {
     className?: string;
     message: string;
+    messageHtml?: string;
     photo: string | null;
     photoAlt: string;
     activityName?: string;
@@ -51,23 +54,28 @@ type IProps = IMeBoxMessageItem | IMeBoxNotificationItem;
  */
 export default class MeBoxDropDownItem extends React.Component<IProps> {
     public render() {
-        const { unread, message, timestamp, to, photoAlt, photo } = this.props;
+        const { unread, message, messageHtml, timestamp, to, photoAlt, photo } = this.props;
         const classesMeBoxMessage = meBoxMessageClasses();
         const classesMetas = metasClasses();
 
-        let authors: JSX.Element[];
+        let authorList: JSX.Element[];
 
         if (this.props.type === MeBoxItemType.MESSAGE) {
             // Message
+            const { authors } = this.props;
             const authorCount = this.props.authors.length;
-            if ("authors" in this.props && authorCount > 0) {
-                authors = this.props.authors!.map((user, index) => {
-                    return (
-                        <React.Fragment key={`meBoxAuthor-${index}`}>
-                            <strong>{user.name}</strong>
-                            {`${index < authorCount - 1 ? `, ` : ""}`}
-                        </React.Fragment>
-                    );
+            if (authors && authorCount > 0) {
+                authorList = authors.map((user, index) => {
+                    if (user) {
+                        return (
+                            <React.Fragment key={`meBoxAuthor-${index}`}>
+                                <strong>{user.name}</strong>
+                                {`${index < authorCount - 1 ? `, ` : ""}`}
+                            </React.Fragment>
+                        );
+                    } else {
+                        return <React.Fragment key={`meBoxAuthor-${index}`} />;
+                    }
                 });
             }
         }
@@ -75,24 +83,30 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
         return (
             <li className={classNames("meBoxMessage", this.props.className, classesMeBoxMessage.root)}>
                 <SmartLink to={to} className={classNames("meBoxMessage-link", classesMeBoxMessage.link)} tabIndex={0}>
-                    <div className={classesMeBoxMessage.imageContainer}>
+                    <div className={classNames(classesMeBoxMessage.imageContainer, userPhotoClasses().root)}>
                         {photo ? (
-                            <img className={classesMeBoxMessage.image} src={photo} alt={photoAlt} />
+                            <img className={classesMeBoxMessage.image} src={photo} alt={photoAlt} loading="lazy" />
                         ) : (
                             <NoUserPhotoIcon className={classesMeBoxMessage.image} photoAlt={photoAlt} />
                         )}
                     </div>
                     <div className={classNames("meBoxMessage-contents", classesMeBoxMessage.contents)}>
-                        {!!authors! && (
+                        {!!authorList! && (
                             <div className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}>
-                                {authors!}
+                                {authorList!}
                             </div>
                         )}
-                        {/* Current notifications API returns HTML-formatted messages. Should be updated to return something aside from raw HTML. */}
-                        <div
-                            className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}
-                            dangerouslySetInnerHTML={{ __html: message }}
-                        />
+                        {messageHtml ? (
+                            <div
+                                className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}
+                                dangerouslySetInnerHTML={{ __html: message }}
+                            />
+                        ) : (
+                            <div className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}>
+                                {message}
+                            </div>
+                        )}
+
                         <div className={classNames("meBoxMessage-metas", classesMetas.root, "isFlexed")}>
                             {timestamp && <DateTime timestamp={timestamp} className={classesMetas.meta} />}
                             {this.props.type === MeBoxItemType.MESSAGE && (
@@ -105,23 +119,14 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                             )}
                         </div>
                     </div>
-                    {!unread && (
-                        <FlexSpacer
-                            className={classNames("meBoxMessage-status", "isRead", classesMeBoxMessage.status)}
-                        />
-                    )}
-                    {unread && (
-                        <div
+
+                    {unread ? (
+                        <StatusLight
                             title={t("Unread")}
-                            className={classNames(
-                                "u-flexSpacer",
-                                "meBoxMessage-status",
-                                "isUnread",
-                                classesMeBoxMessage.status,
-                            )}
-                        >
-                            <span className="sr-only">{t("Unread")}</span>
-                        </div>
+                            className={classNames(classesMeBoxMessage.status, "isUnread")}
+                        />
+                    ) : (
+                        <FlexSpacer className={classesMeBoxMessage.status} />
                     )}
                 </SmartLink>
             </li>

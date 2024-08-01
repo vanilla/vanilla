@@ -9,15 +9,16 @@ import { HumanFileSize } from "@library/utility/fileUtils";
 import { GetAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import Translate from "@library/content/Translate";
-import DateTime from "@library/content/DateTime";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
-import { EmbedContainer, EmbedContainerSize } from "@library/embeddedContent/EmbedContainer";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { FOCUS_CLASS, useEmbedContext } from "@library/embeddedContent/embedService";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedContainerSize";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
+import { useEmbedContext } from "@library/embeddedContent/IEmbedContext";
+import DateTime from "@library/content/DateTime";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -33,7 +34,7 @@ interface IProps extends IFileAttachment {
     url: string;
 }
 
-export default function Attachment(props) {
+export default function Attachment(props: IProps) {
     const { title, name, url, dateUploaded, type, mimeType, size } = props;
     const label = title || name;
     const classes = attachmentClasses();
@@ -43,7 +44,10 @@ export default function Attachment(props) {
 
     return (
         <EmbedContainer size={EmbedContainerSize.SMALL}>
-            <EmbedContent type={props.type}>
+            <EmbedContent
+                type={props.type}
+                embedActions={<></>} //empty fragment is passed just to make the delete button show up
+            >
                 <SmartLink
                     to={url}
                     className={classNames(classes.link, classes.box)}

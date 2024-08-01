@@ -5,12 +5,13 @@
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { IThemePreview, ThemeType } from "@library/theming/themeReducer";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import CurrentThemeInfo from "./CurrentThemeInfo";
 import ThemePreviewCard from "./ThemePreviewCard";
 
-const story = storiesOf("Theme", module);
+export default {
+    title: "Theme UI",
+};
 
 const preview: IThemePreview = {
     variables: {
@@ -23,22 +24,21 @@ const preview: IThemePreview = {
     info: {
         Description: {
             type: "string",
-            value:
-                "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options.",
+            value: "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options.",
         },
         Authors: { type: "string", value: "Author1, Author2, Author3" },
     },
     imageUrl: null,
 };
 
-story.add("Current Theme", () => {
+export const CurrentTheme = () => {
     return (
         <>
             <StoryHeading depth={1}>Current Theme</StoryHeading>
 
             <div style={{ display: "flex" }}>
                 <div style={{ width: 400 }}>
-                    <ThemePreviewCard preview={preview} isActiveTheme={true} />
+                    <ThemePreviewCard preview={preview} />
                 </div>
                 <CurrentThemeInfo
                     theme={{
@@ -57,4 +57,4 @@ story.add("Current Theme", () => {
             </div>
         </>
     );
-});
+};

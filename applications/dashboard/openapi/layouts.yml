@@ -1,0 +1,775 @@
+openapi: 3.0.3
+info:
+paths:
+    /layouts:
+        x-hidden: true
+        get:
+            parameters:
+                - description: >
+                      Expand associated records using one or more valid field names. A
+                      value of "all" will expand all expandable fields.
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - layoutViews
+                              - all
+                          type: string
+                      type: array
+                  style: form
+            summary: Get all defined layouts
+            tags:
+                - Layout
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/LayoutMetadata"
+                                type: array
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+        post:
+            summary: Create a layout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/LayoutPostSchema"
+            tags:
+                - Layout
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/LayoutSchema"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /layouts/{id}:
+        x-hidden: true
+        parameters:
+            - description: The layout ID.
+              in: path
+              name: id
+              required: true
+              schema:
+                  oneOf:
+                      - type: integer
+                      - type: string
+        get:
+            parameters:
+                - description: >
+                      Expand associated records using one or more valid field names. A
+                      value of "all" will expand all expandable fields.
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - layoutViews
+                              - all
+                          type: string
+                      type: array
+                  style: form
+            summary: Get a specific layout by ID
+            tags:
+                - Layout
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/LayoutMetadata"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+        patch:
+            summary: Update a layout
+            tags:
+                - Layout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/LayoutPatchSchema"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/LayoutSchema"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+                "422":
+                    $ref: "#/components/responses/CannotMutateImmutableLayoutResponse"
+        delete:
+            summary: Delete a layout
+            tags:
+                - Layout
+            responses:
+                "204":
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+                "422":
+                    $ref: "#/components/responses/CannotMutateImmutableLayoutResponse"
+    /layouts/{id}/edit:
+        x-hidden: true
+        parameters:
+            - description: The layout ID.
+              in: path
+              name: id
+              required: true
+              schema:
+                  oneOf:
+                      - type: integer
+                      - type: string
+        get:
+            summary: Get the editable body of a layout.
+            tags:
+                - Layout
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/LayoutSchema"
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+                "422":
+                    $ref: "#/components/responses/CannotMutateImmutableLayoutResponse"
+    /layouts/{id}/hydrate:
+        x-hidden: true
+        parameters:
+            - name: id
+              description: The layout ID.
+              in: path
+              required: true
+              schema:
+                  oneOf:
+                      - type: integer
+                      - type: string
+        get:
+            summary: Hydrate an existing layout.
+            tags:
+                - Layout
+            parameters:
+                - name: params
+                  in: query
+                  required: true
+                  description: Parameters defined for the layout's layoutViewType.
+                  schema:
+                      type: object
+            responses:
+                "200":
+                    $ref: "#/components/responses/HydratedLayout"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+    /layouts/lookup-hydrate:
+        x-hidden: true
+        get:
+            summary: Retrieve layoutID based on layout type, recordID and record type, and hydrate with parameters.
+            tags:
+                - Layout
+            parameters:
+                - name: layoutViewType
+                  in: query
+                  required: true
+                  description: Type of layout.
+                  schema:
+                      type: string
+                - name: recordID
+                  in: query
+                  required: true
+                  description: ID of the resource associated with this layout.
+                  schema:
+                      type: string
+                - name: recordType
+                  in: query
+                  required: true
+                  description: Type of resource to which this layout applies.
+                  schema:
+                      type: string
+                - name: params
+                  in: query
+                  required: true
+                  description: Parameters defined for the layout's layoutViewType.
+                  schema:
+                      type: object
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - $ref: "#/components/schemas/HydratedLayoutResponseSchema"
+                                    - $ref: "#/components/schemas/LayoutRedirectResponseSchema"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+    /layouts/{id}/hydrate-assets:
+        x-hidden: true
+        parameters:
+            - name: id
+              description: The layout ID.
+              in: path
+              required: true
+              schema:
+                  oneOf:
+                      - type: integer
+                      - type: string
+        get:
+            summary: Getting assets of an existing layout without hydrating data.
+            tags:
+                - Layout
+            parameters:
+                - name: params
+                  in: query
+                  required: true
+                  description: Parameters defined for the layout's layoutViewType.
+                  schema:
+                      type: object
+            responses:
+                "200":
+                    $ref: "#/components/responses/HydratedLayout"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+    /layouts/lookup-hydrate-assets:
+        x-hidden: true
+        get:
+            summary: Getting assets of an existing layout without hydrating data, based on layout type, recordID and record type.
+            tags:
+                - Layout
+            parameters:
+                - name: layoutViewType
+                  in: query
+                  required: true
+                  description: Type of layout.
+                  schema:
+                      type: string
+
+                - name: recordID
+                  in: query
+                  required: true
+                  description: ID of the resource associated with this layout.
+                  schema:
+                      type: integer
+
+                - name: recordType
+                  in: query
+                  required: true
+                  description: Type of resource to which this layout applies.
+                  schema:
+                      type: string
+                - name: params
+                  in: query
+                  required: true
+                  description: Parameters defined for the layout's layoutViewType.
+                  schema:
+                      type: object
+            responses:
+                "200":
+                    $ref: "#/components/responses/HydratedLayout"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+    /layouts/hydrate:
+        x-hidden: true
+        post:
+            summary: Hydrate an arbitrary layout
+            tags:
+                - Layout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                layoutViewType:
+                                    $ref: "#/components/schemas/LayoutViewType"
+                                layout:
+                                    $ref: "#/components/schemas/LayoutDefinition"
+                                params:
+                                    description: Parameters defined for the specific layoutViewType.
+                                    type: object
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - $ref: "#/components/schemas/HydratedLayoutResponseSchema"
+                                    - $ref: "#/components/schemas/LayoutRedirectResponseSchema"
+
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /layouts/catalog:
+        x-hidden: true
+        get:
+            summary: Get a catalog of the items available in a layout.
+            tags:
+                - Layout
+            parameters:
+                - in: query
+                  name: layoutViewType
+                  schema:
+                      $ref: "#/components/schemas/LayoutViewType"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    layoutViewType:
+                                        $ref: "#/components/schemas/LayoutViewType"
+                                    layoutParams:
+                                        description: A mapping of all available layout hydration params to their schemas.
+                                        type: object
+                                        example:
+                                            locale:
+                                                schema:
+                                                    type: string
+                                                    description: "The locale used to render the layout"
+                                            category/categoryID:
+                                                schema:
+                                                    type: integer
+                                    widgets:
+                                        description: A mapping of widgetType to widget schema for all available widgets.
+                                        type: object
+                                        additionalProperties: true
+                                        example:
+                                            "react.discussions.list":
+                                                $reactComponent: "DiscussionsList"
+                                                schema:
+                                                    type: "object"
+                                                    properties: {}
+                                    assets:
+                                        description: A mapping of widgetType to widget schema for all available assets.
+                                        type: object
+                                        additionalProperties: true
+                                        example:
+                                            "react.assets.breadcrumbs":
+                                                $reactComponent: "Breadcrumbs"
+                                                schema:
+                                                    type: "object"
+                                                    properties: {}
+                                    sections:
+                                        description: A mapping of widgetType to widget schema for all available sections.
+                                        type: object
+                                        additionalProperties: true
+                                        example:
+                                            "react.sections.2-columns":
+                                                $reactComponent: SectionTwoColumns
+                                                schema:
+                                                    type: "object"
+                                                    properties: {}
+                                    middlewares:
+                                        description: A mapping of middlewareType to middleware scheam for all available middlewares.
+                                        type: object
+                                        example:
+                                            "role-filter":
+                                                schema:
+                                                    type: "object"
+                                                    properties: {}
+    /layouts/schema:
+        x-hidden: true
+        get:
+            summary: Get the JSON schema representing layout contents.
+            tags:
+                - Layout
+            parameters:
+                - in: query
+                  name: layoutViewType
+                  schema:
+                      $ref: "#/components/schemas/LayoutViewType"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/JsonSchema"
+    /layouts/{id}/views:
+        x-hidden: true
+        parameters:
+            - description: The layout ID.
+              in: path
+              name: id
+              required: true
+              schema:
+                  oneOf:
+                      - type: string
+                      - type: integer
+        get:
+            parameters:
+                - description: >
+                      Expand associated records using one or more valid field names. A
+                      value of "all" will expand all expandable fields.
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - record
+                              - all
+                          type: string
+                      type: array
+                  style: form
+
+            summary: Get a list of layout views by layout ID
+            tags:
+                - Layout
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/LayoutViewSchema"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+        put:
+            summary: Add a view to a layout
+            tags:
+                - Layout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    recordID:
+                                        type: integer
+                                        description: Record Id to add.
+                                    recordType:
+                                        type: string
+                                        description: Record type.
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/LayoutViewSchema"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+        delete:
+            summary: Delete a layout View mapping
+            parameters:
+                - description: List of LayoutView Ids to delete.
+                  in: query
+                  name: layoutViewIDs
+                  required: true
+                  schema:
+                      type: array
+                      items:
+                          type: integer
+            tags:
+                - Layout
+            responses:
+                "204":
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "404":
+                    $ref: "responses.yml#/components/responses/NotFound"
+components:
+    responses:
+        CannotMutateImmutableLayoutResponse:
+            description: Cannot mutate an immutable layout
+            content:
+                application/json:
+                    schema:
+                        $ref: "responses.yml#/components/schemas/BasicError"
+        HydratedLayout:
+            description: Success
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/HydratedLayoutResponseSchema"
+        LayoutAssets:
+            description: Success
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            js:
+                                type: array
+                                description: List of JS files.
+                                items:
+                                    type: string
+                                default: []
+                                readOnly: true
+                            css:
+                                type: array
+                                description: List of CSS files.
+                                items:
+                                    type: string
+                                default: []
+                                readOnly: true
+        LayoutRedirectResponse:
+            description: Success
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/LayoutRedirectResponseSchema"
+    schemas:
+        HydratedLayoutResponseSchema:
+            type: object
+            properties:
+                layoutViewType:
+                    $ref: "#/components/schemas/LayoutViewType"
+                layout:
+                    $ref: "#/components/schemas/LayoutDefinitionHydrated"
+        JsonSchema:
+            type: object
+            example:
+                $schema: "https://json-schema.org/draft-07/schema#"
+                type: "object"
+                properties: {}
+        LayoutRedirectResponseSchema:
+            type: object
+            properties:
+                redirectTo:
+                    type: string
+                    description: URL to redirect to
+                status:
+                    type: integer
+                    description: HTTP status code
+        LayoutViewType:
+            description: Type of resource to which this layout applies
+            type: string
+            enum:
+                - home
+        LayoutDefinition:
+            x-hidden: true
+            type: array
+            description: Layout as defined by the /api/v2/layouts/schema.
+            items:
+                type: object
+            example:
+                - "$hydrate": section.one-column
+                  "children":
+                      - "$hydrate": "assets.react.breadcrumbs"
+                        recordType: "category"
+                        recordID:
+                            "$hydrate": "param"
+                            "ref": "category/categoryID"
+                      - "$hydrate": "react.discussions"
+                        "apiParams":
+                            categoryID:
+                                "$hydrate": "param"
+                                "ref": "category/categoryID"
+        LayoutDefinitionHydrated:
+            x-hidden: true
+            type: array
+            description: Layout as defined by the /api/v2/layouts/schema.
+            items:
+                type: object
+            example:
+                - "$reactComponent": "SectionOneColumn"
+                  "$reactProps":
+                      children:
+                          - "$reactComponent": "Breadcrumbs"
+                            "$reactProps":
+                                crumbs:
+                                    - name: Home
+                                      url: "https://mysite.com"
+                                    - name: My Category
+                                      url: "https://mysite.com/categories/my-category"
+                          - "$reactComponent": "Discussions"
+                            "$reactProps":
+                                discussions: []
+        LayoutSchema:
+            x-hidden: true
+            type: object
+            description: Layout definition with its metadata
+            properties:
+                layoutID:
+                    type: integer
+                    description: The layout's identifier.
+                    readOnly: true
+                name:
+                    type: string
+                    description: User-friendly name.
+                layout:
+                    $ref: "#/components/schemas/LayoutDefinition"
+                isDefault:
+                    type: boolean
+                    description: Indicates whether this is the default layout for the resource type specified in layoutType
+                    default: false
+                    readOnly: true
+                isActive:
+                    type: boolean
+                    description: Indicates whether this layout is applied to any layout views
+                    default: false
+                    readOnly: true
+                dateInserted:
+                    type: string
+                    description: The date/time that the layout was created.
+                    format: date-time
+                    readOnly: true
+                insertUserID:
+                    type: integer
+                    description: The user that created the layout.
+                    readOnly: true
+                dateUpdated:
+                    type: string
+                    description: The date/time that the layout was last updated.
+                    format: date-time
+                    nullable: true
+                    readOnly: true
+                updateUserID:
+                    type: integer
+                    description: The user that last updated the layout.
+                    nullable: true
+                    readOnly: true
+                layoutViews:
+                    items:
+                        $ref: "#/components/schemas/LayoutViewSchema"
+                    type: array
+        LayoutMetadata:
+            x-hidden: true
+            type: object
+            description: Metadata associated with a layout
+            properties:
+                layoutID:
+                    type: integer
+                    description: The layout's identifier.
+                    readOnly: true
+                name:
+                    type: string
+                    description: User-friendly name.
+                layoutType:
+                    $ref: "#/components/schemas/LayoutViewType"
+                isDefault:
+                    type: boolean
+                    description: Indicates whether this is the default layout for the resource type specified in layoutType
+                    default: false
+                    readOnly: true
+                isActive:
+                    type: boolean
+                    description: Indicates whether this layout is applied to any layout views
+                    default: false
+                    readOnly: true
+                dateInserted:
+                    type: string
+                    description: The date/time that the layout was created.
+                    format: date-time
+                    readOnly: true
+                insertUserID:
+                    type: integer
+                    description: The user that created the layout.
+                    readOnly: true
+                dateUpdated:
+                    type: string
+                    description: The date/time that the layout was last updated.
+                    format: date-time
+                    nullable: true
+                    readOnly: true
+                updateUserID:
+                    type: integer
+                    description: The user that last updated the layout.
+                    nullable: true
+                    readOnly: true
+        LayoutPatchSchema:
+            x-hidden: true
+            type: object
+            description: Set of properties available to update after layout has been created
+            properties:
+                name:
+                    type: string
+                    maxLength: 100
+                    description: User-friendly name.
+                layout:
+                    $ref: "#/components/schemas/LayoutDefinition"
+        LayoutPostSchema:
+            x-hidden: true
+            type: object
+            description: Set of properties used to define a new layout
+            properties:
+                name:
+                    type: string
+                    maxLength: 100
+                    description: User-friendly name.
+                layout:
+                    $ref: "#/components/schemas/LayoutDefinition"
+                layoutType:
+                    $ref: "#/components/schemas/LayoutViewType"
+        LayoutViewSchema:
+            x-hidden: true
+            type: object
+            properties:
+                layoutViewID:
+                    type: integer
+                    description: The layout view's identifier.
+                    readOnly: true
+                layoutID:
+                    type: integer
+                    description: The layout's identifier.
+                    readOnly: true
+                recordID:
+                    type: integer
+                    description: The record's identifier.
+                recordType:
+                    type: string
+                    description: Record type name
+                layoutViewType:
+                    $ref: "#/components/schemas/LayoutViewType"
+                dateInserted:
+                    type: string
+                    description: The date/time that the layout view was created.
+                    format: date-time
+                    readOnly: true
+                insertUserID:
+                    type: integer
+                    description: The user that created the layout view.
+                    readOnly: true
+                record:
+                    description: >-
+                        Location where layoutView is used
+                    properties:
+                        name:
+                            description: Name of the page
+                            minLength: 1
+                            type: string
+                        url:
+                            description: URL pof the page
+                            minLength: 1
+                            type: string
+                    type: object
+        LayoutViewPostSchema:
+            x-hidden: true
+            type: object
+            description: Set of properties used to define a new layout view
+            properties:
+                recordID:
+                    type: integer
+                    description: Record view ID.
+                recordType:
+                    type: string
+                    description: View Record Type

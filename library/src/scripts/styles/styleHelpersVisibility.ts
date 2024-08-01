@@ -4,48 +4,32 @@
  * @license GPL-2.0-only
  */
 
-import { important, px } from "csx";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-
+import { css } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { important } from "csx";
 export type areaHiddenType = "true" | "false" | boolean | undefined;
 
-export function srOnly() {
-    return {
-        position: important("absolute"),
-        display: important("block"),
-        width: important(px(1).toString()),
-        height: important(px(1).toString()),
-        padding: important(px(0).toString()),
-        margin: important(px(-1).toString()),
-        overflow: important("hidden"),
-        clip: important(`rect(0, 0, 0, 0)`),
-        border: important(px(0).toString()),
-    };
-}
-
 export const visibility = useThemeCache(() => {
-    const style = styleFactory("visibility");
     const onEmpty = (nest?: object) => {
-        return style("onEmpty", {
-            $nest: {
-                "&:empty": {
-                    display: "none",
-                },
-                ...nest,
+        return css({
+            "&:empty": {
+                display: "none",
             },
+            ...nest,
         });
     };
 
-    const visuallyHidden = style("srOnly", srOnly());
+    const visuallyHidden = css(Mixins.absolute.srOnly());
 
-    const displayNone = style("displayNone", {
+    const displayNone = css({
         display: important("none"),
     });
 
     return {
         onEmpty,
         displayNone,
-        srOnly: visuallyHidden,
         visuallyHidden,
     };
 });

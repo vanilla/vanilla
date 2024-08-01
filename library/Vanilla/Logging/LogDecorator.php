@@ -7,16 +7,29 @@
 
 namespace Vanilla\Logging;
 
+use Garden\Container\Container;
+use GPBMetadata\Google\Api\Log;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Ramsey\Uuid\Uuid;
 use Vanilla\Logger;
+use Vanilla\Site\OwnSite;
+use Vanilla\Utility\ContainerUtils;
+use Vanilla\Utility\DebugUtils;
+use Vanilla\Web\BotDetector;
 
 /**
  * A decorator for the log that adds default context attributes based on the current request.
  */
-class LogDecorator implements LoggerInterface {
+class LogDecorator implements LoggerInterface
+{
     use LoggerTrait;
+
+    public const SCHEMA_VERSION = "v2";
+    public const FIELD_SCHEMA = "_schema";
+    public const FIELD_DATA = "data";
+    public const TAG_LOG_FAILURE_DECORATOR = "logFailure-decorator";
 
     /**
      * @var \Gdn_Session
@@ -38,64 +51,147 @@ class LogDecorator implements LoggerInterface {
      */
     private $staticContextDefaults = [];
 
-    /**
-     * @var \UserModel
-     */
-    private $userModel;
+    /** @var OwnSite */
+    private $ownSite;
+    private BotDetector $botDetector;
 
     /**
      * @var array
      */
-    private $obscureKeys = [
-        'access_token',
-        'authorization',
-        '*password',
-        '*secret',
-    ];
+    private $obscureKeys = ["access_token", "authorization", "*password", "*secret"];
+
+    /**
+     * Decorate a log context and transform it into the standard structure.
+     *
+     * This will transform the context significantly, even if the decorator fails to load.
+     * If it does fail to decorate a tag will be added with information about the error.
+     *
+     * @param array $context
+     * @return array
+     */
+    public static function applyLogDecorator(array $context): array
+    {
+        $schema = $context[self::FIELD_SCHEMA] ?? null;
+        if ($schema === self::SCHEMA_VERSION) {
+            // We are already decorated.
+            return $context;
+        }
+
+        try {
+            $logDecorator = \Gdn::getContainer()->get(LogDecorator::class);
+            $context = $logDecorator->decorateContext($context);
+            $logDecorator->obscureContext($context);
+        } catch (\Throwable $throwable) {
+            $context = Logger::hoistLoggerFields($context);
+            $context[Logger::FIELD_TAGS][] = self::TAG_LOG_FAILURE_DECORATOR;
+            $context["data"][self::TAG_LOG_FAILURE_DECORATOR] = [
+                "message" => $throwable->getMessage(),
+                "stacktrace" => DebugUtils::stackTraceString($throwable->getTrace()),
+            ];
+        }
+
+        return $context;
+    }
 
     /**
      * LogDecorator constructor.
      *
-     * @param LoggerInterface $logger
-     * @param \Gdn_Request $request
-     * @param \Gdn_Session $session
-     * @param \UserModel $userModel
+     * NOTE: This gets instantiated very early in the request.
+     * Do not add any other direct dependencies in here if possible.
      */
-    public function __construct(LoggerInterface $logger, \Gdn_Request $request, \Gdn_Session $session, \UserModel $userModel) {
+    public function __construct(
+        LoggerInterface $logger,
+        \Gdn_Request $request,
+        \Gdn_Session $session,
+        OwnSite $ownSite,
+        BotDetector $botDetector
+    ) {
         $this->session = $session;
         $this->request = $request;
         $this->logger = $logger;
-        $this->userModel = $userModel;
+        $this->ownSite = $ownSite;
+        $this->botDetector = $botDetector;
+    }
 
-        if (empty($request->getAttribute('requestID'))) {
-            try {
-                $request->setAttribute('requestID', Uuid::uuid1()->toString());
-            } catch (\Exception $ex) {
-                trigger_error("LogDecorator::__construct(): ".$ex->getMessage(), E_USER_WARNING);
-            }
-        }
+    /**
+     * @param \Gdn_Request $request
+     */
+    public function setRequest(\Gdn_Request $request): void
+    {
+        $this->request = $request;
+    }
+
+    /**
+     * @param OwnSite $ownSite
+     */
+    public function setOwnSite(OwnSite $ownSite): void
+    {
+        $this->ownSite = $ownSite;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function log($level, $message, array $context = array()) {
-        $context += $this->staticContextDefaults + [
-            Logger::FIELD_USERID => $this->session->UserID,
-            'ip' => $this->request->getIP(),
-            'timestamp' => time(),
-            'method' => $this->request->requestMethod(),
-            'domain' => rtrim($this->request->url('/', true), '/'),
-            'path' => $this->request->getPath(),
-            'requestID' => $this->request->getAttribute('requestID', null),
-        ];
-
-        $this->addUsername(Logger::FIELD_USERID, Logger::FIELD_USERNAME, $context);
-        $this->addUsername(Logger::FIELD_TARGET_USERID, Logger::FIELD_TARGET_USERNAME, $context);
-
+    public function log($level, $message, array $context = [])
+    {
+        $context = $this->decorateContext($context);
         $this->obscureContext($context);
 
         $this->logger->log($level, $message, $context);
+    }
+
+    /**
+     * Decorate logger context with common fields.
+     *
+     * @param array $context
+     * @return array
+     */
+    public function decorateContext(array $context = []): array
+    {
+        $coreFields = Logger::hoistLoggerFields($context);
+
+        $coreContext = [
+            self::FIELD_SCHEMA => self::SCHEMA_VERSION,
+            "service" => "vanilla_app",
+            // Vanilla App Info
+            "site" => [
+                "version" => APPLICATION_VERSION,
+                "siteID" => $this->ownSite->getSiteID(),
+                "accountID" => $this->ownSite->getAccountID(),
+            ],
+            // Info about the current request.
+            "request" => [
+                "hostname" => $this->request->getHost(),
+                "method" => $this->request->getMethod(),
+                "path" => $this->request->getPath(),
+                "protocol" => $this->request->getScheme(),
+                "url" => $this->request->getUrl(),
+                "clientIP" => $this->request->getIP(),
+                "requestID" => $this->request->getAttribute("requestID", Uuid::uuid1()->toString()),
+                // Kludge until the new logging has rolled out everywhere.
+                // Once it has, go update this
+                // https://github.com/vanilla/vanillainfrastructure/blob/ab00d6463814ea7aac9c100c98c5c59b185ae921/plugins/vfshared/class.vfshared.plugin.php#L91-L105
+                // And remove this line.
+                "country" =>
+                    $this->staticContextDefaults["request"]["country"] ??
+                    ($this->staticContextDefaults["requestCountry"] ?? null),
+                "isBot" => $this->botDetector->isBot($this->request),
+            ],
+        ];
+
+        $userData = [
+            // User info
+            Logger::FIELD_USERID => $context[Logger::FIELD_USERID] ?? $this->session->UserID,
+            Logger::FIELD_TARGET_USERID => $context[Logger::FIELD_TARGET_USERID] ?? null,
+        ];
+
+        $this->addUsername(Logger::FIELD_USERID, Logger::FIELD_USERNAME, $userData);
+        $this->addUsername(Logger::FIELD_TARGET_USERID, Logger::FIELD_TARGET_USERNAME, $userData);
+
+        $context = array_replace_recursive($coreFields, $coreContext, $userData, $this->staticContextDefaults);
+        unset($context["requestCountry"]);
+
+        return $context;
     }
 
     /**
@@ -105,20 +201,25 @@ class LogDecorator implements LoggerInterface {
      * @param string $nameField
      * @param array $context
      */
-    private function addUsername(string $idField, string $nameField, array &$context): void {
+    private function addUsername(string $idField, string $nameField, array &$context): void
+    {
         if (!array_key_exists($idField, $context) || array_key_exists($nameField, $context)) {
             return;
         }
 
         if (empty($context[$idField])) {
-            $context[$nameField] = 'anonymous';
+            $context[$nameField] = "anonymous";
         } else {
-            $user = $this->userModel->getID($context[$idField], DATASET_TYPE_OBJECT);
-
-            if ($user === false) {
-                $context[$nameField] = 'unknown';
-            } else {
-                $context[$nameField] = $user->Name;
+            try {
+                $userModel = \Gdn::getContainer()->get(\UserModel::class);
+                $user = $userModel->getID($context[$idField], DATASET_TYPE_OBJECT);
+                if ($user === false) {
+                    $context[$nameField] = "unknown";
+                } else {
+                    $context[$nameField] = $user->Name;
+                }
+            } catch (\Throwable $e) {
+                $context[$nameField] = "failed to load";
             }
         }
     }
@@ -128,7 +229,8 @@ class LogDecorator implements LoggerInterface {
      *
      * @param array $defaults
      */
-    public function addStaticContextDefaults(array $defaults) {
+    public function addStaticContextDefaults(array $defaults)
+    {
         $this->staticContextDefaults = array_replace($this->staticContextDefaults, $defaults);
     }
 
@@ -137,7 +239,8 @@ class LogDecorator implements LoggerInterface {
      *
      * @param string $pattern
      */
-    public function addObscureKey(string $pattern): void {
+    public function addObscureKey(string $pattern): void
+    {
         $this->obscureKeys[] = strtolower($pattern);
     }
 
@@ -146,7 +249,8 @@ class LogDecorator implements LoggerInterface {
      *
      * @return array
      */
-    public function getContextOverrides(): array {
+    public function getContextOverrides(): array
+    {
         return $this->staticContextDefaults;
     }
 
@@ -155,7 +259,8 @@ class LogDecorator implements LoggerInterface {
      *
      * @param array $staticContextDefaults
      */
-    public function setContextOverrides(array $staticContextDefaults): void {
+    public function setContextOverrides(array $staticContextDefaults): void
+    {
         $this->staticContextDefaults = $staticContextDefaults;
     }
 
@@ -164,11 +269,12 @@ class LogDecorator implements LoggerInterface {
      *
      * @param array $context The context to clean.
      */
-    private function obscureContext(array &$context): void {
+    public function obscureContext(array &$context): void
+    {
         array_walk_recursive($context, function (&$value, $key) {
             foreach ($this->obscureKeys as $pattern) {
                 if (fnmatch($pattern, strtolower($key))) {
-                    $value = '***';
+                    $value = "***";
                 }
             }
         });

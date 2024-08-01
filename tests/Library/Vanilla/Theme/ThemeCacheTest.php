@@ -14,32 +14,27 @@ use VanillaTests\Fixtures\MockAddon;
 /**
  * Tests for the theme cache.
  */
-class ThemeCacheTest extends MockThemeTestCase {
-
-    const MOCK_THEME_ID = 'mock-theme-id';
+class ThemeCacheTest extends MockThemeTestCase
+{
+    const MOCK_THEME_ID = "mock-theme-id";
 
     /** @var ThemeService */
     private $service;
 
     /**
-     * Configure the container.
-     */
-    public function setUp(): void {
-        parent::setUp();
-
-        self::container()->setInstance(\Gdn_Cache::class, new \Gdn_Dirtycache());
-    }
-
-    /**
      * Test simple caching.
      */
-    public function testCacheSuccess() {
+    public function testCacheSuccess()
+    {
         $addon = new MockAddon(self::MOCK_THEME_ID);
         $this->addonManager->pushAddon($addon);
 
-        $this->mockThemeProvider->addTheme([
-            'themeID' => self::MOCK_THEME_ID,
-        ], $addon);
+        $this->mockThemeProvider->addTheme(
+            [
+                "themeID" => self::MOCK_THEME_ID,
+            ],
+            $addon
+        );
 
         $this->service = $service = $this->themeService();
         $theme = $service->getTheme(self::MOCK_THEME_ID);
@@ -56,19 +51,23 @@ class ThemeCacheTest extends MockThemeTestCase {
     /**
      * Test simple caching.
      */
-    public function testCacheInvalidate() {
+    public function testCacheInvalidate()
+    {
         $addon = new MockAddon(self::MOCK_THEME_ID);
         $this->addonManager->pushAddon($addon);
 
-        $this->mockThemeProvider->addTheme([
-            'themeID' => self::MOCK_THEME_ID,
-            'assets' => [
-                'variables' => [
-                    'type' => 'json',
-                    'data' => '{}',
+        $this->mockThemeProvider->addTheme(
+            [
+                "themeID" => self::MOCK_THEME_ID,
+                "assets" => [
+                    "variables" => [
+                        "type" => "json",
+                        "data" => "{}",
+                    ],
                 ],
             ],
-        ], $addon);
+            $addon
+        );
 
         $this->service = $this->themeService();
 
@@ -81,18 +80,18 @@ class ThemeCacheTest extends MockThemeTestCase {
         });
 
         $this->assertInvalidatesCache(function () {
-            $this->service->setAsset(self::MOCK_THEME_ID, 'variables', '{ "hello": "world"}');
+            $this->service->setAsset(self::MOCK_THEME_ID, "variables", '{ "hello": "world"}');
         });
 
         $this->assertInvalidatesCache(function () {
-            $this->service->sparseUpdateAsset(self::MOCK_THEME_ID, 'variables', '{ "hello": "world"}');
+            $this->service->sparseUpdateAsset(self::MOCK_THEME_ID, "variables", '{ "hello": "world"}');
         });
 
         $this->assertInvalidatesCache(function () {
-            $this->service->deleteAsset(self::MOCK_THEME_ID, 'variables');
+            $this->service->deleteAsset(self::MOCK_THEME_ID, "variables");
         });
 
-        $newTheme = $this->mockThemeProvider->addTheme(['themeID' => 'mock-new-theme'], $addon);
+        $newTheme = $this->mockThemeProvider->addTheme(["themeID" => "mock-new-theme"], $addon);
         $this->assertInvalidatesCache(function () use ($newTheme) {
             $this->service->deleteTheme($newTheme->getThemeID());
         });
@@ -102,7 +101,8 @@ class ThemeCacheTest extends MockThemeTestCase {
      * Test that some action invalidates the theme cache.
      * @param callable $action
      */
-    private function assertInvalidatesCache(callable $action) {
+    private function assertInvalidatesCache(callable $action)
+    {
         // Prime the cache.
         $theme = $this->service->getTheme(self::MOCK_THEME_ID);
         // Fetch again make sure we're cached.
@@ -116,19 +116,23 @@ class ThemeCacheTest extends MockThemeTestCase {
     /**
      * Test caching of a theme with an error asset.
      */
-    public function testCacheErrorAsset() {
+    public function testCacheErrorAsset()
+    {
         $addon = new MockAddon(self::MOCK_THEME_ID);
         $this->addonManager->pushAddon($addon);
 
-        $this->mockThemeProvider->addTheme([
-            'themeID' => self::MOCK_THEME_ID,
-            'assets' => [
-                'variables' => [
-                    'type' => 'json',
-                    'data' => '{asdfasdf',
+        $this->mockThemeProvider->addTheme(
+            [
+                "themeID" => self::MOCK_THEME_ID,
+                "assets" => [
+                    "variables" => [
+                        "type" => "json",
+                        "data" => "{asdfasdf",
+                    ],
                 ],
             ],
-        ], $addon);
+            $addon
+        );
 
         $this->service = $this->themeService();
         $this->service->getTheme(self::MOCK_THEME_ID);

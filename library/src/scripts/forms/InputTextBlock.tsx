@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { InputHTMLAttributes } from "react";
 import { inputClasses } from "@library/forms/inputStyles";
 import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
 import { getRequiredID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { OverflowProperty, ResizeProperty } from "csstype";
+import { Property } from "csstype";
 import { TextareaAutosize } from "react-autosize-textarea/lib/TextareaAutosize";
 
 export enum InputTextBlockBaseClass {
@@ -19,7 +19,7 @@ export enum InputTextBlockBaseClass {
 }
 
 export interface IInputProps {
-    value?: string;
+    value?: string | number;
     onFocus?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onBlur?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
@@ -33,20 +33,29 @@ export interface IInputProps {
     disabled?: boolean;
     inputRef?: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
     multiline?: boolean;
+    minLength?: number;
     maxLength?: number;
     className?: string;
     autoComplete?: boolean;
+    "aria-label"?: string;
+    "aria-describedby"?: string;
+    // these are for number inputs
+    min?: number;
+    max?: number;
+    step?: number;
+    inputmode?: string;
+    pattern?: string;
 }
 
-export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
+export interface IInputTextProps extends Omit<IInputBlockProps, "children" | "legend"> {
     inputProps?: IInputProps;
     multiLineProps?: {
         onResize?: (event) => {};
         rows?: number;
         maxRows?: number;
         async?: boolean;
-        resize?: ResizeProperty; // for textarea only
-        overflow?: OverflowProperty; // for textarea only
+        resize?: Property.Resize; // for textarea only
+        overflow?: Property.Overflow; // for textarea only
         className?: string;
     };
 }
@@ -84,59 +93,54 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
 
         return (
             <InputBlock {...blockProps} className={classNames(classesInputBlock.root, this.props.className)}>
-                {blockParams => {
-                    const { labelID, errorID, hasErrors } = blockParams;
-                    let describedBy;
+                {(blockParams) => {
+                    const { errorID, hasErrors } = blockParams;
+                    let describedBy = inputProps["aria-describedby"];
                     if (hasErrors) {
                         describedBy = errorID;
                     }
 
+                    const commonProps = {
+                        id: this.id,
+                        defaultValue: inputProps.defaultValue,
+                        value: inputProps.value,
+                        type: inputProps.type,
+                        disabled: inputProps.disabled,
+                        required: inputProps.required,
+                        placeholder: inputProps.placeholder,
+                        maxLength: inputProps.maxLength,
+                        min: inputProps.min,
+                        max: inputProps.max,
+                        step: inputProps.step,
+                        onChange: this.onChange,
+                        onFocus: this.onFocus,
+                        onBlur: this.onBlur,
+                        ref: this.inputRef as any, // Typescripts ref checking a little ridiculous. Distinction without a difference
+                        onKeyPress: inputProps.onKeyPress,
+                        "aria-invalid": hasErrors,
+                        "aria-describedby": describedBy,
+                        "aria-label": inputProps["aria-label"],
+                        inputMode: inputProps.inputmode,
+                        pattern: inputProps.pattern,
+                    };
+
                     return !inputProps.multiline ? (
                         <input
-                            id={this.id}
+                            {...(commonProps as InputHTMLAttributes<HTMLInputElement>)}
                             className={classNames(classes, inputProps.className)}
-                            defaultValue={inputProps.defaultValue}
-                            value={inputProps.value}
-                            type={inputProps.type}
-                            disabled={inputProps.disabled}
-                            required={inputProps.required}
-                            placeholder={inputProps.placeholder}
-                            aria-invalid={hasErrors}
-                            aria-describedby={describedBy}
-                            aria-labelledby={labelID}
-                            maxLength={inputProps.maxLength}
-                            onChange={this.onChange}
-                            onFocus={this.onFocus}
-                            onBlur={this.onBlur}
-                            ref={this.inputRef as any} // Typescripts ref checking a little ridiculous. Distinction without a difference.
-                            onKeyPress={inputProps.onKeyPress}
                             autoComplete={inputProps.autoComplete ? "on" : "off"}
                         />
                     ) : (
                         <TextareaAutosize
+                            {...(commonProps as InputHTMLAttributes<HTMLTextAreaElement>)}
                             {...multiLineProps}
-                            id={this.id}
+                            async
                             className={classNames(classes, multiLineProps.className, {
                                 [classesInputBlock.multiLine(
                                     multiLineProps.resize ? multiLineProps.resize : "none",
                                     multiLineProps.overflow,
                                 )]: inputProps.multiline,
                             })}
-                            defaultValue={inputProps.defaultValue}
-                            value={inputProps.value}
-                            type={inputProps.type}
-                            disabled={inputProps.disabled}
-                            required={inputProps.required}
-                            placeholder={inputProps.placeholder}
-                            aria-invalid={hasErrors}
-                            aria-describedby={describedBy}
-                            aria-labelledby={labelID}
-                            maxLength={inputProps.maxLength}
-                            onChange={this.onChange}
-                            onFocus={this.onFocus}
-                            onBlur={this.onBlur}
-                            ref={this.inputRef as any} // Typescripts ref checking a little ridiculous. Distinction without a difference.
-                            onKeyPress={inputProps.onKeyPress}
                         />
                     );
                 }}
@@ -178,21 +182,21 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         this.inputRef.current!.select();
     }
 
-    private onChange = event => {
+    private onChange = (event) => {
         const { inputProps = {} } = this.props;
         if (inputProps.onChange) {
             inputProps.onChange(event);
         }
     };
 
-    private onBlur = event => {
+    private onBlur = (event) => {
         const { inputProps = {} } = this.props;
         if (inputProps.onBlur) {
             inputProps.onBlur(event);
         }
     };
 
-    private onFocus = event => {
+    private onFocus = (event) => {
         const { inputProps = {} } = this.props;
         if (inputProps.onFocus) {
             inputProps.onFocus(event);

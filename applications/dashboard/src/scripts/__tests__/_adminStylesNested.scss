@@ -3,7 +3,8 @@ body {
     width: 100%;
     height: 100%;
 }
-.storybookDashboardStyles {
+
+:where(.storybookDashboardStyles) {
     $staticVariables: true;
     @import "../../../scss/admin.scss";
 
@@ -12,4 +13,11 @@ body {
     font-size: $font-size-base;
     line-height: $line-height;
     color: $body-color;
+
+    //our inputs have border radius coming from inputStyles(), applied to react components,
+    //but because of extra .storybookDashboardStyles selector we are losing these, so re-applying here
+    input,
+    textarea {
+        border-radius: $border-radius;
+    }
 }

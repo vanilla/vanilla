@@ -4,20 +4,25 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import Toast from "@library/features/toaster/Toast";
+import { Toast } from "@library/features/toaster/Toast";
 import { getMeta } from "@library/utility/appUtils";
 import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeActions";
 import { useThemePreviewToasterState } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { t } from "@vanilla/i18n/src";
+import { RecordID } from "@vanilla/utils";
+import Button from "@library/forms/Button";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import { themePreviewToastClasses } from "@library/features/toaster/themePreview/ThemePreviewToast.style";
+import { useToast } from "@library/features/toaster/ToastContext";
 
 interface IThemePreview {
     name: string;
     redirect: string;
-    themeID: string | number;
+    themeID: RecordID;
     revisionID?: number;
 }
 
@@ -30,6 +35,11 @@ export function ThemePreviewToast() {
     const [revisionRestored, setRevisionRestored] = useState(false);
 
     const isRevisionPreview = themePreview?.revisionID ?? false;
+
+    const classes = themePreviewToastClasses();
+
+    const { addToast, updateToast } = useToast();
+
     const handleApply = async () => {
         if (!themePreview) {
             return;
@@ -55,6 +65,20 @@ export function ThemePreviewToast() {
         putPreviewTheme({ themeID: "", type: PreviewStatusType.CANCEL });
     };
 
+    const isCancelLoading = useMemo(() => {
+        return cancelStatus.status === LoadStatus.LOADING || cancelStatus.status === LoadStatus.SUCCESS;
+    }, [cancelStatus]);
+
+    const isApplyLoading = useMemo(() => {
+        return (
+            applyStatus.status === LoadStatus.LOADING || applyStatus.status === LoadStatus.SUCCESS || restoringRevision
+        );
+    }, [applyStatus, restoringRevision]);
+
+    const applyButtonLabel = useMemo(() => {
+        return isRevisionPreview ? t("Restore") : t("Apply");
+    }, [isRevisionPreview]);
+
     useEffect(() => {
         if (!themePreview) {
             return;
@@ -65,40 +89,50 @@ export function ThemePreviewToast() {
             revisionRestored
         ) {
             window.location.href = isRevisionPreview
-                ? `/theme/theme-settings/${themePreview.themeID}/revisions`
+                ? `/appearance/style-guides/${themePreview.themeID}/revisions`
                 : themePreview.redirect;
         }
     });
 
-    if (!themePreview) {
-        return null;
-    }
+    // Keep track of any toasts this component creates
+    const [toastID, setToastID] = useState<string>();
 
-    return (
-        <Toast
-            links={[
-                {
-                    name: isRevisionPreview ? t("Restore") : t("Apply"),
-                    type: ButtonTypes.TEXT,
-                    onClick: handleApply,
-                    isLoading:
-                        applyStatus.status === LoadStatus.LOADING ||
-                        applyStatus.status === LoadStatus.SUCCESS ||
-                        restoringRevision,
-                },
-                {
-                    name: t("Cancel"),
-                    type: ButtonTypes.TEXT_PRIMARY,
-                    onClick: handleCancel,
-                    isLoading: cancelStatus.status === LoadStatus.LOADING || cancelStatus.status === LoadStatus.SUCCESS,
-                },
-            ]}
-            message={
+    // Create a body of the toast
+    const toastBody = useMemo(() => {
+        if (themePreview) {
+            return (
                 <>
-                    You are previewing the <b>{themePreview.name}</b> theme.
+                    You are previewing the <b>{themePreview && themePreview.name}</b> theme.
                     {applyStatus.error && <ErrorMessages errors={[applyStatus.error]} />}
+                    <div className={classes.toastActions}>
+                        <Button onClick={handleApply} buttonType={ButtonTypes.TEXT}>
+                            {isApplyLoading ? <ButtonLoader buttonType={ButtonTypes.TEXT} /> : <>{applyButtonLabel}</>}
+                        </Button>
+                        <Button onClick={handleCancel} buttonType={ButtonTypes.TEXT_PRIMARY}>
+                            {isCancelLoading ? <ButtonLoader buttonType={ButtonTypes.TEXT_PRIMARY} /> : t("Cancel")}
+                        </Button>
+                    </div>
                 </>
-            }
-        />
-    );
+            );
+        } else {
+            return null;
+        }
+    }, [applyButtonLabel, applyStatus.error, isApplyLoading, isCancelLoading, themePreview]);
+
+    useEffect(() => {
+        // If there is no created toast, add one
+        if (toastBody && !toastID) {
+            const newID = addToast({
+                persistent: true,
+                body: toastBody,
+            });
+            setToastID(newID);
+        }
+        // Otherwise update the toast based using the ID
+        if (toastBody && toastID) {
+            updateToast(toastID, { body: toastBody });
+        }
+    }, [toastBody]);
+
+    return null;
 }

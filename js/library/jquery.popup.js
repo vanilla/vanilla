@@ -126,11 +126,6 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       var pagesize = $.popup.getPageSize();
       $('div.Overlay').css({height: pagesize[1]});
 
-      var pagePos = $.popup.getPagePosition();
-      $('#'+settings.popupId).css({
-         top: pagePos.top,
-         left: pagePos.left
-      });
       $('#'+settings.popupId).show();
 
       $('#'+settings.popupId+' .Body').css({
@@ -188,6 +183,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
 
 	   var target = $.popup.findTarget(settings);
+       var element = $('#'+settings.popupId).get(0);
        if (settings.confirm) {
           // Bind to the "Okay" button click
           $('#'+settings.popupId+' .Okay').focus().click(function() {
@@ -214,7 +210,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
                       $.popup.close(settings);
                       settings.afterConfirm(json, settings.sender);
                       gdn.inform(json);
-                      gdn.processTargets(json.Targets);
+                      gdn.processTargets(json.Targets, element);
 
                       if (json.RedirectUrl)
                          setTimeout(function() { document.location.replace(json.RedirectUrl); }, 300);
@@ -252,7 +248,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
    $.popup.reveal = function(settings, data) {
       // First see if we've retrieved json or something else
       var json = false;
-      if (data instanceof Array) {
+      var element = $('#'+settings.popupId).get(0);
+
+       if (data instanceof Array) {
          json = false;
       } else if (data !== null && typeof(data) == 'object') {
          json = data;
@@ -304,7 +302,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
             },
             success: function(json) {
                gdn.inform(json);
-               gdn.processTargets(json.Targets);
+               gdn.processTargets(json.Targets, element);
 
                if (json.FormSaved == true) {
                   if (json.RedirectUrl)

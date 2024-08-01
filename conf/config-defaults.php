@@ -3,6 +3,11 @@
 // This is the global application configuration file that sets up default values for configuration settings.
 $Configuration = [];
 
+$Configuration["auditLog"]["enabled"] = true;
+
+// Community Management
+$Configuration["communityManagement"]["triage"]["enabled"] = true;
+
 // Auto-enable some addons.
 $Configuration['EnabledPlugins']['stubcontent'] = true;
 $Configuration['EnabledPlugins']['swagger-ui'] = true;
@@ -16,9 +21,9 @@ $Configuration['ImageUpload']['Limits']['Height'] = '1400';
 
 // Database defaults.
 $Configuration['Database']['Engine'] = 'MySQL';
-$Configuration['Database']['Host'] = 'dbhost';
-$Configuration['Database']['Name'] = 'dbname';
-$Configuration['Database']['User'] = 'dbuser';
+$Configuration['Database']['Host'] = 'database';
+$Configuration['Database']['Name'] = 'vanilla_dev';
+$Configuration['Database']['User'] = 'root';
 $Configuration['Database']['Password']  = '';
 $Configuration['Database']['CharacterEncoding'] = 'utf8mb4';
 $Configuration['Database']['DatabasePrefix'] = 'GDN_';
@@ -27,6 +32,10 @@ $Configuration['Database']['ConnectionOptions'] = [
     12 => false, // PDO::ATTR_PERSISTENT
     1000 => true, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY (missing in some PHP installations)
 ];
+
+
+//Configuration for Dba Counts
+$Configuration['Dba']['Limit'] = 1000;
 
 // Use a dirty cache by default. Try Vanilla with memcached!
 $Configuration['Cache']['Enabled'] = true;
@@ -37,18 +46,21 @@ $Configuration['Cache']['Filecache']['Store']  = PATH_CACHE.'/Filecache';
 $Configuration['Garden']['ContentType'] = 'text/html';
 $Configuration['Garden']['Locale'] = 'en';
 $Configuration['Garden']['LocaleCodeset'] = 'UTF8';
+$Configuration['Garden']['RTLLocales'] = ['ar', 'fa', 'he', 'ku', 'ps', 'sd', 'ug', 'ur', 'yi'];
 
 $Configuration['HotReload']['IP'] = '127.0.0.1';
 
 $Configuration['ContentSecurityPolicy']['ScriptSrc']['AllowedDomains'] = [];
 
+$Configuration['ContentSecurityPolicy']['StrictDynamic'] = false;
+
 // Site specifics.
 $Configuration['Garden']['Installed'] = false; // Has Garden been installed yet? This blocks setup when true.
 $Configuration['Garden']['Title'] = 'Vanilla';
 $Configuration['Garden']['Domain'] = '';
-$Configuration['Garden']['WebRoot'] = false; // You can set this value if you are using htaccess to direct into the application, but the correct webroot isn't being recognized.
 $Configuration['Garden']['StripWebRoot'] = false;
 $Configuration['Garden']['AllowSSL'] = true;
+$Configuration['Garden']['ForceSSL'] = true;
 $Configuration['Garden']['PrivateCommunity'] = false;
 $Configuration['Garden']['Forms']['HoneypotName'] = 'hpt';
 $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -65,28 +77,28 @@ $Configuration['Garden']['Cookie']['Name'] = 'Vanilla';
 $Configuration['Garden']['Cookie']['Path']  = '/';
 $Configuration['Garden']['Cookie']['Domain'] = '';
 $Configuration['Garden']['Cookie']['HashMethod'] = 'md5'; // md5 or sha1
+$Configuration['Garden']['Cookie']['PersistExpiry'] = '30 days';
 $Configuration['Garden']['Authenticator']['DefaultScheme'] = 'password'; // Types include 'Password', 'Handshake', 'Openid'
 $Configuration['Garden']['Authenticator']['RegisterUrl'] = '/entry/register?Target=%2$s';
 $Configuration['Garden']['Authenticator']['SignInUrl'] = '/entry/signin?Target=%2$s';
 $Configuration['Garden']['Authenticator']['SignOutUrl'] = '/entry/signout/{Session_TransientKey}?Target=%2$s';
 $Configuration['Garden']['Authenticator']['EnabledSchemes'] = ['password'];
-$Configuration['Garden']['Authenticator']['SyncScreen'] = "smart";
 $Configuration['Garden']['Authenticators']['password']['Name'] = "Password";
 $Configuration['Garden']['UserAccount']['AllowEdit'] = true; // Allow users to edit their account information? (SSO requires accounts be edited in external system).
 $Configuration['Garden']['Registration']['Method'] = 'Captcha'; // Options are: Basic, Captcha, Approval, Invitation
 $Configuration['Garden']['Registration']['InviteExpiration'] = '1 week'; // When invitations expire. This will be plugged into strtotime().
 $Configuration['Garden']['Registration']['InviteRoles'] = 'FALSE';
 $Configuration['Garden']['Registration']['ConfirmEmail'] = false;
-$Configuration['Garden']['Registration']['MinPasswordLength'] = 6;
 $Configuration['Garden']['Registration']['NameUnique'] = true;
 $Configuration['Garden']['TermsOfService'] = '/home/termsofservice'; // The url to the terms of service.
-$Configuration['Garden']['Password']['MinLength'] = 6;
+$Configuration['Garden']['Password']['MinLength'] = 12;
+$Configuration['Garden']['Password']['BulkImportResetTime'] = '1 week';
 $Configuration['Garden']['Roles']['Manage'] = true; // @deprecated
 
 // Garden security features
 $Configuration['Garden']['Security']['Hsts']['IncludeSubDomains'] = false;
 $Configuration['Garden']['Security']['Hsts']['Preload'] = false;
-$Configuration['Garden']['Security']['Hsts']['MaxAge'] = 604800;
+$Configuration['Garden']['Security']['Hsts']['MaxAge'] = 15768000;
 
 // Outgoing email.
 $Configuration['Garden']['Email']['UseSmtp'] = false;
@@ -108,7 +120,8 @@ $Configuration['Garden']['VanillaUrl'] = 'https://open.vanillaforums.com';
 $Configuration['Garden']['CanProcessImages'] = false;
 $Configuration['Garden']['Upload']['MaxFileSize'] = '50M';
 $Configuration['Garden']['Upload']['AllowedFileExtensions'] = [
-    'txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'pptx', 'log', 'rar', '7z'
+    'txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'pdf', 'doc',
+    'xls', 'ppt', 'docx', 'xlsx', 'pptx', 'log', 'rar', '7z',
 ];
 $Configuration['Garden']['Profile']['MaxHeight'] = 560;
 $Configuration['Garden']['Profile']['MaxWidth'] = 560;
@@ -126,7 +139,7 @@ $Configuration['Garden']['Profile']['Public']= true;
 $Configuration['Garden']['Profile']['ShowAbout'] = true;
 $Configuration['Garden']['Profile']['EditPhotos'] = true; // false to disable user photo editing
 $Configuration['Garden']['Profile']['EditUsernames'] = false;
-$Configuration['Garden']['BannedPhoto'] = 'https://images.v-cdn.net/banned_large.png';
+$Configuration['Garden']['BannedPhoto'] = '/applications/dashboard/design/images/banned.png';
 
 // Embedding forum & comments.
 $Configuration['Garden']['Embed']['CommentsPerPage'] = 50;
@@ -135,8 +148,8 @@ $Configuration['Garden']['Embed']['PageToForum'] = true;
 $Configuration['Garden']['SignIn']['Popup'] = true; // Should the sign-in link pop up or go to it's own page? (SSO requires going to it's own external page)
 
 // User experience & formatting.
-$Configuration['Garden']['InputFormatter'] = 'Rich'; // Html, BBCode, Markdown, Text, Rich
-$Configuration['Garden']['MobileInputFormatter'] = 'Rich';
+$Configuration['Garden']['InputFormatter'] = 'Rich2'; // Html, BBCode, Markdown, Text, Rich
+$Configuration['Garden']['MobileInputFormatter'] = 'Rich2';
 $Configuration['Garden']['Html']['AllowedElements'] = "a, abbr, acronym, address, area, audio, b, bdi, bdo, big, blockquote, br, caption, center, cite, code, col, colgroup, dd, del, details, dfn, div, dl, dt, em, figure, figcaption, font, h1, h2, h3, h4, h5, h6, hgroup, hr, i, img, ins, kbd, li, map, mark, menu, meter, ol, p, pre, q, s, samp, small, span, strike, strong, sub, sup, summary, table, tbody, td, tfoot, th, thead, time, tr, tt, u, ul, var, video, wbr";
 $Configuration['Garden']['Html']['AllowedUrlSchemes'] = [
     'aim', 'feed', 'file', 'ftp', 'gopher', 'http', 'https', 'irc', 'mailto', 'news', 'nntp', 'rapidminer', 'sftp', 'ssh', 'telnet'
@@ -164,6 +177,7 @@ $Configuration['Preferences']['Popup']['WallComment'] = '1';
 $Configuration['Preferences']['Popup']['ActivityComment'] = '1';
 $Configuration['Preferences']['Popup']['DiscussionComment'] = '1';
 $Configuration['Preferences']['Popup']['Mention'] = '1';
+$Configuration['Preferences']['Popup']['AiSuggestions'] = '1';
 
 // Module visibility and sorting.
 $Configuration['Garden']['Modules']['ShowGuestModule'] = true;
@@ -179,9 +193,10 @@ $Configuration['Modules']['Conversations']['Content'] = ['MessageModule', 'MeMod
 // Routes.
 $Configuration['Routes']['DefaultController'] = 'discussions';
 $Configuration['Routes']['DefaultForumRoot'] = 'discussions';
-$Configuration['Routes']['Default404'] = ['dashboard/home/filenotfound', 'NotFound'];
-$Configuration['Routes']['DefaultPermission'] = ['dashboard/home/unauthorized', 'NotAuthorized'];
-$Configuration['Routes']['UpdateMode'] = 'dashboard/home/updatemode';
+$Configuration['Routes']['Default404'] = ['home/filenotfound', 'NotFound'];
+$Configuration['Routes']['DefaultPermission'] = ['home/unauthorized', 'NotAuthorized'];
+$Configuration['Routes']['UpdateMode'] = 'home/updatemode';
 
 // Themes
 $Configuration['Theme']['Banner']['VisibleSections'] = ["DiscussionList", "CategoryDiscussionList", "CategoryList", "NewEventList"];
+$Configuration['Theme']['ContentBanner']['VisibleSections'] = ["Discussion", 'Drafts', 'Profile', 'PostDiscussion'];

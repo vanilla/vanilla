@@ -17,7 +17,8 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import { Blot, RangeStatic } from "quill/core";
 import Embed from "quill/blots/embed";
-import { ListItem, ListValue, ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { ListLineBlot } from "@rich-editor/quill/blots/lists/ListLineBlot";
+import { ListValue, ListType } from "@rich-editor/quill/blots/lists/ListUtils";
 
 export default class Formatter {
     public static INLINE_FORMAT_NAMES = [
@@ -33,7 +34,7 @@ export default class Formatter {
         BlockquoteLineBlot.blotName,
         SpoilerLineBlot.blotName,
         HeadingBlot.blotName,
-        ListItem.blotName,
+        ListLineBlot.blotName,
     ];
 
     constructor(private quill: Quill, private range: RangeStatic) {}
@@ -88,7 +89,7 @@ export default class Formatter {
      * Apply the paragraph line format to all lines in the range.
      */
     public paragraph = () => {
-        Formatter.BLOCK_FORMAT_NAMES.forEach(name => {
+        Formatter.BLOCK_FORMAT_NAMES.forEach((name) => {
             this.quill.formatLine(this.range.index, this.range.length, name, false, Quill.sources.API);
         });
         this.quill.update(Quill.sources.USER);
@@ -139,7 +140,7 @@ export default class Formatter {
             index: start,
             length,
         };
-        Formatter.INLINE_FORMAT_NAMES.forEach(name => {
+        Formatter.INLINE_FORMAT_NAMES.forEach((name) => {
             this.quill.formatText(start, length, name, false, Quill.sources.SILENT);
         });
         const difference = this.replaceInlineEmbeds(fullRange);
@@ -169,25 +170,29 @@ export default class Formatter {
     public bulletedList = () => {
         const value: ListValue = {
             type: ListType.BULLETED,
-            depth: 0,
+            depth: this.getCurrentListDepth(),
         };
-        this.quill.formatLine(this.range.index, this.range.length, ListItem.blotName, value, Quill.sources.USER);
+        this.quill.formatLine(this.range.index, this.range.length, ListLineBlot.blotName, value, Quill.sources.USER);
     };
 
     public orderedList = () => {
         const value: ListValue = {
             type: ListType.ORDERED,
-            depth: 0,
+            depth: this.getCurrentListDepth(),
         };
-        this.quill.formatLine(this.range.index, this.range.length, ListItem.blotName, value, Quill.sources.USER);
+        this.quill.formatLine(this.range.index, this.range.length, ListLineBlot.blotName, value, Quill.sources.USER);
     };
 
-    public getListItems = (): ListItem[] => {
+    private getCurrentListDepth() {
+        return this.getListItems()[0]?.getValue().depth ?? 0;
+    }
+
+    public getListItems = (): ListLineBlot[] => {
         if (this.range.length === 0) {
             const descendant = this.quill.scroll.descendant(
-                (blot: Blot) => blot instanceof ListItem,
+                (blot: Blot) => blot instanceof ListLineBlot,
                 this.range.index,
-            )[0] as ListItem;
+            )[0] as ListLineBlot;
             if (descendant) {
                 return [descendant];
             } else {
@@ -195,10 +200,10 @@ export default class Formatter {
             }
         } else {
             return this.quill.scroll.descendants(
-                (blot: Blot) => blot instanceof ListItem,
+                (blot: Blot) => blot instanceof ListLineBlot,
                 this.range.index,
                 this.range.length,
-            ) as ListItem[];
+            ) as ListLineBlot[];
         }
     };
 
@@ -206,7 +211,7 @@ export default class Formatter {
         const listBlots = this.getListItems();
         const selectionBefore = this.quill.getSelection();
         this.quill.history.cutoff();
-        listBlots.forEach(blot => {
+        listBlots.forEach((blot) => {
             blot.indent();
             this.quill.update(Quill.sources.USER);
         });
@@ -218,7 +223,7 @@ export default class Formatter {
         const listBlots = this.getListItems();
         const selectionBefore = this.quill.getSelection();
         this.quill.history.cutoff();
-        listBlots.forEach(blot => {
+        listBlots.forEach((blot) => {
             blot.outdent();
             this.quill.update(Quill.sources.USER);
         });
@@ -245,7 +250,7 @@ export default class Formatter {
     private replaceInlineEmbeds(range: RangeStatic): number {
         const embeds = this.quill.scroll.descendants(Embed as any, range.index, range.length);
         let lengthDifference = 0;
-        embeds.forEach(embed => {
+        embeds.forEach((embed) => {
             let text = (embed.domNode as HTMLElement).innerText || "";
             // Strip 0-width whitespace.
             text = text.replace(/[\u200B-\u200D\uFEFF]/g, "");

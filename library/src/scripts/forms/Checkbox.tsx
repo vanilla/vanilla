@@ -5,12 +5,17 @@
  */
 
 import { visibility } from "@library/styles/styleHelpers";
-import { ToolTip } from "@library/toolTip/ToolTip";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { t } from "@library/utility/appUtils";
 import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React from "react";
 import { checkRadioClasses } from "./checkRadioStyles";
+import { InformationIcon } from "@library/icons/common";
+import { Icon, IconType } from "@vanilla/icons";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { Mixins } from "@library/styles/Mixins";
+import { css, cx } from "@emotion/css";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
@@ -18,19 +23,53 @@ interface IProps extends IOptionalComponentID {
     checked?: boolean;
     disabled?: boolean;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    label: React.ReactNode;
+    onBlur?: React.InputHTMLAttributes<HTMLInputElement>["onBlur"];
+    label?: React.ReactNode;
+    "aria-labelledby"?: string;
+    "aria-describedby"?: string;
+    labelBold?: boolean;
+    hideLabel?: boolean;
     isHorizontal?: boolean;
     fakeFocus?: boolean;
     defaultChecked?: boolean;
     tooltipLabel?: boolean;
     excludeFromICheck?: boolean;
+    fullWidth?: boolean;
+
+    tooltip?: string;
+    tooltipIcon?: IconType;
+
+    name?: string;
 }
 
 export default function CheckBox(props: IProps) {
-    const labelID = useUniqueID("checkbox_label");
+    const ownInputID = useUniqueID("checkbox");
+    const inputID = props.id ?? ownInputID;
+    const ownLabelID = useUniqueID("checkbox_label");
+    const labelID = props["aria-labelledby"] ?? ownLabelID;
     const classes = checkRadioClasses();
 
-    const { isHorizontal } = props;
+    const {
+        isHorizontal,
+        fullWidth,
+        labelBold = true,
+        onChange,
+        onBlur,
+        checked,
+        disabled,
+        className,
+        fakeFocus,
+        excludeFromICheck,
+        defaultChecked,
+        tooltipLabel,
+        label,
+        hideLabel,
+
+        tooltip,
+        tooltipIcon = "data-information",
+
+        name,
+    } = props;
 
     const icon = (
         <span className={classes.iconContainer} aria-hidden="true">
@@ -45,27 +84,44 @@ export default function CheckBox(props: IProps) {
     );
 
     return (
-        <label className={classNames(props.className, classes.root, { isHorizontal })}>
+        <label className={classNames(className, classes.root, { isHorizontal }, fullWidth && classes.fullWidth)}>
             <input
-                className={classNames(classes.input, props.fakeFocus && "focus-visible", {
-                    "exclude-icheck": props.excludeFromICheck,
+                className={classNames(classes.input, fakeFocus && "focus-visible", {
+                    "exclude-icheck": excludeFromICheck,
                 })}
                 aria-labelledby={labelID}
+                aria-describedby={props["aria-describedby"]}
                 type="checkbox"
-                onChange={props.onChange}
-                checked={props.checked}
-                defaultChecked={props.defaultChecked}
-                disabled={props.disabled}
+                onChange={onChange}
+                onBlur={onBlur}
+                checked={checked}
+                defaultChecked={defaultChecked}
+                disabled={disabled}
                 tabIndex={0}
+                name={name}
+                id={inputID}
             />
-            {props.tooltipLabel && props.label ? <ToolTip label={props.label}>{icon}</ToolTip> : icon}
-            {props.label && (
+            {tooltipLabel && label ? <ToolTip label={label}>{icon}</ToolTip> : icon}
+            {!!label && (
                 <span
                     id={labelID}
-                    className={classNames(classes.label, props.tooltipLabel && visibility().visuallyHidden)}
+                    className={classNames(classes.label, {
+                        [classes.labelBold]: labelBold,
+                        [visibility().visuallyHidden]: tooltipLabel || hideLabel,
+                    })}
                 >
-                    {props.label}
+                    {label}
                 </span>
+            )}
+
+            {tooltip && (
+                <ToolTip label={tooltip}>
+                    <ToolTipIcon>
+                        <span className={classes.tooltipIconContainer}>
+                            <Icon icon={tooltipIcon} className={classes.tooltipIcon} />
+                        </span>
+                    </ToolTipIcon>
+                </ToolTip>
             )}
         </label>
     );

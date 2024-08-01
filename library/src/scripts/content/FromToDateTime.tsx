@@ -5,7 +5,9 @@
  */
 
 import React from "react";
-import DateTime, { DateFormats } from "@library/content/DateTime";
+import { DateFormats } from "@library/content/DateTime";
+import DateTime from "@library/content/DateTime";
+import { isSameDate, DateElement } from "@library/content/DateTimeHelpers";
 
 export interface IProps {
     dateStarts: string;
@@ -16,9 +18,17 @@ export interface IProps {
  * Component for displaying a block of time.
  */
 export function FromToDateTime(props: IProps) {
-    // Note that we plan to have more advanced checks here to not repeat duplicate date/time information in the end time in a future iteration.
-    const startDate = <DateTime timestamp={props.dateStarts} type={DateFormats.EXTENDED} />;
-    const endDate = <DateTime timestamp={props.dateEnds} type={DateFormats.EXTENDED} />;
+    const { dateStarts, dateEnds } = props;
+    const startSameYear = isSameDate(new Date(dateStarts), new Date(), DateElement.YEAR);
+    const endSameYear = dateEnds ? isSameDate(new Date(dateEnds), new Date(), DateElement.YEAR) : false;
+    const isSameDay = dateEnds ? isSameDate(new Date(dateStarts), new Date(dateEnds), DateElement.DAY) : false;
+    const secondFormat = isSameDay ? DateFormats.TIME : DateFormats.EXTENDED;
+
+    const startDate = <DateTime timestamp={props.dateStarts} type={DateFormats.EXTENDED} isSameYear={startSameYear} />;
+    const endDate = props.dateEnds ? (
+        <DateTime timestamp={props.dateEnds} type={secondFormat} isSameYear={endSameYear} />
+    ) : undefined;
+
     return (
         <>
             {startDate}

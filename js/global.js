@@ -67,6 +67,22 @@
         return decodeURIComponent(escape(string));
     };
 
+    var auditLog = gdn.meta.auditLog;
+    if (auditLog) {
+        var auditLog = gdn.meta.auditLog;
+        if (auditLog) {
+            $.ajaxPrefilter(function (options) {
+                if (!options.headers) {
+                    options.headers = {};
+                }
+                options.headers["X-Parent-Audit-Log-Id"] = auditLog.auditLogID;
+                options.headers["X-Parent-Audit-Log-Request-Path"] = auditLog.requestPath;
+                options.headers["X-Parent-Audit-Log-Request-Method"] = auditLog.requestMethod;
+                options.headers["X-Parent-Audit-Log-Request-Query"] = JSON.stringify(auditLog.requestQuery);
+            });
+        }
+    }
+
     $.extend({
         // private property
         keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
@@ -247,11 +263,6 @@
 
         // A vanilla JS event wrapper for the contentLoad event so that the new framework can handle it.
         $(document).on("contentLoad", function(e) {
-            // Don't fire on initial document ready.
-            if (e.target === document) {
-                return;
-            }
-
             var event = document.createEvent('CustomEvent');
             event.initCustomEvent('X-DOMContentReady', true, false, {});
             e.target.dispatchEvent(event);
@@ -578,6 +589,15 @@ jQuery(document).ready(function($) {
         return string;
     };
 
+    // A simple, fast method of hashing a string. Similar to Java's hash function.
+    // import { hashString } from "@vanilla/utils";
+    gdn.hashString = function(str) {
+        function hashReduce(prevHash, currVal) {
+            return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
+        }
+        return str.split("").reduce(hashReduce, 0);
+    }
+
     // Combine two paths and make sure that there is only a single directory concatenator
     gdn.combinePaths = function(path1, path2) {
         if (path1.substr(-1, 1) == '/')
@@ -620,9 +640,31 @@ jQuery(document).ready(function($) {
                     $target.addClass(item.Data);
                     break;
                 case 'Ajax':
+                    if (typeof item.Data === 'string') {
+                        ajax = {
+                            url: item.Data,
+                            reprocess: false,
+                            data: {}
+                        };
+                    } else {
+                        ajax = item.Data;
+                    }
+
                     $.ajax({
                         type: "POST",
-                        url: item.Data
+                        url: ajax.url,
+                        data: ajax.data,
+                        success: function (json) {
+                            if (!ajax.reprocess) {
+                                return;
+                            }
+                            if (json === null) {
+                                json = {};
+                            }
+
+                            var informed = gdn.inform(json);
+                            gdn.processTargets(json.Targets, $elem, $parent);
+                        }
                     });
                     break;
                 case 'Append':
@@ -656,7 +698,20 @@ jQuery(document).ready(function($) {
                     $target.replaceWithTrigger(item.Data);
                     break;
                 case 'SlideUp':
-                    $target.slideUp('fast');
+                    var removeTarget = false;
+                    if ((typeof item.Data === "object" && item.Data !== null) && item.Data.remove !== "undefined") {
+                        removeTarget = !!item.Data.remove;
+                    }
+
+                    var slideUpComplete = (function (remove) {
+                        return function () {
+                            if (remove) {
+                                $(this).remove();
+                            }
+                        }
+                    })(removeTarget);
+
+                    $target.slideUp('fast', slideUpComplete);
                     break;
                 case 'SlideDown':
                     $target.slideDown('fast');
@@ -673,9 +728,55 @@ jQuery(document).ready(function($) {
                 case 'Callback':
                     jQuery.proxy(window[item.Data], $target)();
                     break;
+                case "closePopup":
+                    if (typeof $.popup === "function" && typeof $.popup.close === "function") {
+                        var popupID = $target.attr("id");
+                        if (popupID) {
+                            $.popup.close({
+                                popupId: popupID,
+                                sender: $("body").get(0)
+                            })
+                        }
+                    }
+                    break;
+                case "runJob":
+                    gdn.runJob(item.Data);
             }
         }
     };
+
+    gdn.runJob = function(body) {
+        var date = new Date();
+        console.log("Processing... (" + date.toLocaleString() + ")");
+
+        $.ajax({
+            contentType: "application/system+jwt",
+            data: body,
+            timeout: 60000,
+            type: "POST",
+            url: gdn.url("/api/v2/calls/run"),
+            success: function (data, textStatus, jqXHR) {
+                if ((typeof data) === "object" && data.statusType) {
+                    switch (data.statusType) {
+                        case "complete":
+                            gdn.informMessage("Job complete.");
+                            break;
+                        case "incomplete":
+                            if ((typeof data.body) === "string") {
+                                gdn.runJob(data.body);
+                            } else {
+                                gdn.informError("Invalid job response.");
+                            }
+                    }
+                } else {
+                    gdn.informError("Invalid job response.");
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                gdn.informError("An error occurred while performing the job.");
+            }
+        });
+    }
 
     gdn.requires = function(Library) {
         if (!(Library instanceof Array))
@@ -774,7 +875,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    $elem.html($.parseHTML(data + '')).trigger('contentLoad');
+                    $elem.html($.parseHTML(data.trim() + '')).trigger('contentLoad');
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');
@@ -820,39 +921,6 @@ jQuery(document).ready(function($) {
             }
         }
     }
-
-    gdn.stats = function() {
-        var StatsURL = gdn.url('settings/analyticstick.json');
-        var SendData = {
-            'TransientKey': gdn.definition('TransientKey'),
-            'Path': gdn.definition('Path'),
-            'Args': gdn.definition('Args'),
-            'ResolvedPath': gdn.definition('ResolvedPath'),
-            'ResolvedArgs': gdn.definition('ResolvedArgs')
-        };
-
-        if (gdn.definition('TickExtra', null) !== null)
-            SendData.TickExtra = gdn.definition('TickExtra');
-
-        jQuery.ajax({
-            dataType: 'json',
-            type: 'post',
-            url: StatsURL,
-            data: SendData,
-            success: function(json) {
-                gdn.inform(json);
-            },
-            complete: function(jqXHR, textStatus) {
-                jQuery(document).triggerHandler('analyticsTick', [SendData, jqXHR, textStatus]);
-            }
-        });
-    };
-
-    // Ping back to the deployment server to track views, and trigger
-    // conditional stats tasks
-    var AnalyticsTask = gdn.definition('AnalyticsTask', false);
-    if (AnalyticsTask == 'tick')
-        gdn.stats();
 
     // If a dismissable InformMessage close button is clicked, hide it.
     $(document).delegate('div.InformWrapper.Dismissable a.Close, div.InformWrapper .js-inform-close', 'click', function() {
@@ -936,9 +1004,10 @@ jQuery(document).ready(function($) {
 
             try {
                 var message = response.InformMessages[i].Message;
+                var messageID = gdn.hashString(message);
                 var emptyMessage = message === '';
 
-                message = '<span class="InformMessageBody">' + message + '</span>';
+                message = '<span aria-label="polite" class="InformMessageBody">' + message + '</span>';
 
                 // Is there a sprite?
                 if (sprite !== '')
@@ -948,7 +1017,8 @@ jQuery(document).ready(function($) {
                 if (css.indexOf('Dismissable') > 0)
                     message = '<a href="#" onclick="return false;" tabindex="0" class="Close"><span>&times;</span></a>' + message;
 
-                message = '<div class="InformMessage">' + message + '</div>';
+                message = '<div role="alert" class="InformMessage" id="'+messageID+'">' + message + '</div>';
+
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
                 message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
                 if (gdn.getMeta('SelfUrl')) {
@@ -960,7 +1030,7 @@ jQuery(document).ready(function($) {
                 }
                 var skip = false;
                 for (var j = 0; j < wrappers.length; j++) {
-                    if ($(wrappers[j]).text() == $(message).text()) {
+                    if ($(wrappers[j]).children().attr('id') === $(message).attr('id')) {
                         skip = true;
                     }
                 }
@@ -1081,7 +1151,7 @@ jQuery(document).ready(function($) {
 
         $.ajax({
             type: "POST",
-            url: gdn.getMeta('context')["dynamicPathFolder"] + gdn.url('/notifications/inform'),
+            url: gdn.url('/notifications/inform'),
             data: {
                 'TransientKey': gdn.definition('TransientKey'),
                 'Path': gdn.definition('Path'),

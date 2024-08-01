@@ -4,11 +4,11 @@
  */
 
 import { ensureScript } from "@vanilla/dom-utils";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import React, { useLayoutEffect } from "react";
 import { useThrowError } from "@vanilla/react-utils";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 
 interface IProps extends IBaseEmbedProps {
     sessionId: string;
@@ -24,11 +24,7 @@ const EMBED_LOADED_CLASS: string = "isLoaded";
  */
 export function PanoptoEmbed(props: IProps): JSX.Element {
     const throwError = useThrowError();
-    const playerId =
-        "player-" +
-        Math.random()
-            .toString(36)
-            .substr(2, 9);
+    const playerId = "player-" + Math.random().toString(36).substr(2, 9);
 
     useLayoutEffect(() => {
         void convertPanoptoEmbeds().catch(throwError);
@@ -61,7 +57,7 @@ async function convertPanoptoEmbeds() {
 
     if (panoptoEmbeds.length > 0) {
         await ensureScript(PANOPTO_SCRIPT);
-        panoptoEmbeds.map(contentElement => {
+        panoptoEmbeds.map((contentElement) => {
             // Only render the embed if its not loaded yet.
             if (!contentElement.classList.contains(EMBED_LOADED_CLASS)) {
                 renderPanoptoEmbed(contentElement as HTMLElement);

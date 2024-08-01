@@ -1,0 +1,282 @@
+openapi: 3.0.3
+info:
+paths:
+    /ai-suggestions/settings:
+        x-hidden: true
+        get:
+            summary: Get settings for AI Suggestions.
+            tags:
+                - AI Suggestions
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AISuggestionsSettingsResponse"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+
+        patch:
+            summary: Save settings for AI Suggestions.
+            tags:
+                - AI Suggestions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AISuggestionsSettingsRequest"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AISuggestionsSettingsResponse"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+                "422":
+                    description: Validation Failed
+    /ai-suggestions/dismiss:
+        x-hidden: true
+        post:
+            summary: Dismiss suggestions for a given discussion.
+            tags:
+                - AI Suggestions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                discussionID:
+                                    type: integer
+                                suggestionIDs:
+                                    type: array
+                                    items:
+                                        type: integer
+                                    description: Array of suggestion indices to dismiss
+                            required:
+                                - discussionID
+                                - suggestionIDs
+            responses:
+                "204":
+                    description: Success
+                "403":
+                    description: Forbidden
+                "422":
+                    description: Validation Failed
+    /ai-suggestions/restore:
+        x-hidden: true
+        post:
+            summary: Restore suggestions for a given discussion.
+            tags:
+                - AI Suggestions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                discussionID:
+                                    type: integer
+                            required:
+                                - discussionID
+            responses:
+                "204":
+                    description: Success
+                "403":
+                    description: Forbidden
+                "422":
+                    description: Validation Failed
+
+    /ai-suggestions/suggestions-visibility:
+        x-hidden: true
+        post:
+            summary: Change the visibility of all suggestions for a given discussion.
+            tags:
+                - AI Suggestions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                discussionID:
+                                    type: integer
+                                visible:
+                                    type: boolean
+                            required:
+                                - discussionID
+                                - visible
+            responses:
+                "204":
+                    description: Success
+                "403":
+                    description: Forbidden
+                "422":
+                    description: Validation Failed
+    /ai-suggestions/accept-suggestion:
+        x-hidden: true
+        post:
+            summary: Accept a suggestion.
+            tags:
+                - AI Suggestions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                discussionID:
+                                    type: integer
+                                allSuggestions:
+                                    type: boolean
+                                suggestionIDs:
+                                    type: array
+                                    items:
+                                        type: integer
+                            required:
+                                - discussionID
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "../../vanilla/openapi/comments.yml#/components/schemas/Comment"
+                                type: array
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /ai-suggestions/remove-accept-suggestion:
+        x-hidden: true
+        post:
+            summary: Remove Accept a suggestion.
+            tags:
+                - AI Suggestions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                discussionID:
+                                    type: integer
+                                allSuggestions:
+                                    type: boolean
+                                suggestionIDs:
+                                    type: array
+                                    items:
+                                        type: integer
+                            required:
+                                - discussionID
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                properties:
+                                    removed:
+                                        description: Status of removal of comments.
+                                        type: boolean
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /ai-suggestions/generate:
+        x-hidden: true
+        put:
+            summary: Regenerate suggestions on a discussion
+            tags:
+                - AI Suggestions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                discussionID:
+                                    type: integer
+                            required:
+                                - discussionID
+            responses:
+                200:
+                    $ref: "./responses.yml#/components/responses/LongRunnerResponse"
+
+components:
+    schemas:
+        AISuggestionsSettingsRequest:
+            type: object
+            properties:
+                enabled:
+                    type: boolean
+                name:
+                    type: string
+                icon:
+                    type: string
+                toneOfVoice:
+                    type: string
+                    enum:
+                        - friendly
+                        - professional
+                        - technical
+                levelOfTech:
+                    type: string
+                    enum:
+                        - layman
+                        - intermediate
+                        - balanced
+                        - advanced
+                        - technical
+                useBritishEnglish:
+                    type: boolean
+                sources:
+                    $ref: "#/components/schemas/SuggestionSources"
+            required:
+                - enabled
+                - name
+                - toneOfVoice
+                - levelOfTech
+                - sources
+
+        AISuggestionsSettingsResponse:
+            type: object
+            properties:
+                enabled:
+                    type: boolean
+                name:
+                    type: string
+                icon:
+                    type: string
+                toneOfVoice:
+                    type: string
+                    enum:
+                        - friendly
+                        - professional
+                        - technical
+                levelOfTech:
+                    type: string
+                    enum:
+                        - layman
+                        - intermediate
+                        - balanced
+                        - advanced
+                        - technical
+                useBritishEnglish:
+                    type: boolean
+                sources:
+                    $ref: "#/components/schemas/SuggestionSources"
+        SuggestionSources:
+            type: object
+            properties:
+                category:
+                    $ref: "#/components/schemas/SuggestionSourceSettings"
+        SuggestionSourceSettings:
+            type: object
+            properties:
+                enabled:
+                    type: boolean
+                exclusionIDs:
+                    type: array
+                    items:
+                        type: integer

@@ -131,7 +131,7 @@
         var categoryTemplate = ' \
         <li class="plank js-category-item" data-id="{CategoryID}"> \
             <div class="plank-title"> \
-                {escapeHTML(NameHTML)} \
+                {NameHTML} \
             </div> \
             '+ categoryOptions + '\
         </li>';
@@ -148,10 +148,10 @@
                     // Wrap in an anchor
                     category['NameHTML'] = ' \
                         <a href="' + gdn.url('vanilla/settings/categories?parent=' + category['UrlCode']) + '"> \
-                        ' + category["Name"] + ' \
+                        ' + window.escapeHTML(category["Name"]) + ' \
                         </a>';
                 } else {
-                    category['NameHTML'] = category['Name'];
+                    category['NameHTML'] = window.escapeHTML(category['Name']);
                 }
                 html += renderTemplate(category, categoryTemplate, replacements);
             });

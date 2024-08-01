@@ -1,0 +1,48 @@
+{
+    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=discussionThread&cacheBuster=5",
+    "dateInserted": "2022-01-01T00:00:00Z",
+    "layoutViewType": "discussionThread",
+    "layoutID": "discussionThread",
+    "name": "Discussion Thread Template",
+    "layout": [
+        {
+            "$hydrate": "react.section.2-columns",
+            "mainBottom": [
+                {
+                    "$hydrate": "react.asset.discussionOriginalPostAsset"
+                },
+                {
+                    "$hydrate": "react.asset.discussionTagsAsset",
+                    "titleType": "static",
+                    "title": "Find more posts tagged with"
+                },
+                {
+                    "$hydrate": "react.asset.discussionAttachments"
+                },
+                {
+                    "$hydrate": "react.asset.discussionComments"
+                },
+                {
+                    "$hydrate": "react.asset.comment-editor"
+                }
+            ],
+            "secondaryBottom": [
+                {
+                    "$hydrate": "react.newpost",
+                    "asOwnButtons": [],
+                    "excludedButtons": [],
+                    "postableDiscussionTypes": ["discussion", "question", "poll"]
+                },
+                {
+                    "$hydrate": "react.quick-links",
+                    "title": "Quick Links"
+                }
+            ],
+            "breadcrumbs": [
+                {
+                    "$hydrate": "react.breadcrumbs"
+                }
+            ]
+        }
+    ]
+}

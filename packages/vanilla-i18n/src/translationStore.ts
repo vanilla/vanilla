@@ -1,4 +1,4 @@
-import { logError } from "@vanilla/utils";
+import { globalValueRef, logError, logWarning } from "@vanilla/utils";
 
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
@@ -9,7 +9,7 @@ interface ITranslations {
     [key: string]: string;
 }
 
-let translationStore: ITranslations | null = null;
+let translationStoreRef = globalValueRef<ITranslations | null>("translationStore", null);
 
 let internalTranslationDebugValue = false;
 
@@ -31,14 +31,14 @@ export function translationDebug(newValue?: boolean): boolean {
  * Load a set of key value pairs as translation resources.
  */
 export function loadTranslations(translations: ITranslations) {
-    translationStore = { ...translations };
+    translationStoreRef.set({ ...translations });
 }
 
 /**
  * Clear all translation resources.
  */
 export function clearTranslations() {
-    translationStore = {};
+    translationStoreRef.set(null);
 }
 
 /**
@@ -57,9 +57,19 @@ export function translate(str: string, defaultTranslation?: string): string {
 
     const fallback = defaultTranslation !== undefined ? defaultTranslation : str;
 
+    const translationStore = translationStoreRef.current();
     if (!translationStore) {
-        if (process.env.NODE_ENV !== "test") {
-            logError("Attempted to translate a value before the translation store was initialized");
+        // Test environment allows top level static initialization.
+        const message = `Attempted to translate a value '${str}' before the translation store was initialized.`;
+        switch (process.env.NODE_ENV) {
+            case "production":
+                logWarning(message);
+                break;
+            case "development":
+                throw new Error(message + " Don't use t() in the top level of a file or a static property.");
+            case "test":
+                // Tests (like storybook and unit testing) don't need to actually bootstrap a full translation store all the time.
+                break;
         }
         return fallback;
     }

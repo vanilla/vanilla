@@ -1,20 +1,17 @@
-/**
- * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { EmbedRenderError } from "@library/embeddedContent/EmbedRenderError";
+import { EmbedRenderError } from "@library/embeddedContent/components/EmbedRenderError";
 import AttachmentError from "@library/content/attachments/AttachmentError";
 import StandardEmbedError from "@rich-editor/quill/blots/embeds/StandardEmbedError";
 import AttachmentLoading from "@library/content/attachments/AttachmentLoading";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 
-storiesOf("User Content", module).add("Errors", () => {
+export default {
+    title: "User Content",
+};
+
+export const Errors = () => {
     const now = new Date();
     const doNothing = () => {
         return;
@@ -27,9 +24,7 @@ storiesOf("User Content", module).add("Errors", () => {
             <StoryHeading>Attachment Error</StoryHeading>
             <AttachmentError message={"Sample message"} name={"Name of Error"} dateUploaded={now.toISOString()} />
             <StoryHeading>Embed Error</StoryHeading>
-            <StandardEmbedError id={"error123"} onDismissClick={doNothing}>
-                Standard Error
-            </StandardEmbedError>
+            <StandardEmbedError id={"error123"} onDismissClick={doNothing} error={{ message: "Standard Error" }} />
             <StoryHeading>Loading State</StoryHeading>
             <AttachmentLoading
                 type={AttachmentType.WORD}
@@ -39,4 +34,4 @@ storiesOf("User Content", module).add("Errors", () => {
             />
         </StoryContent>
     );
-});
+};

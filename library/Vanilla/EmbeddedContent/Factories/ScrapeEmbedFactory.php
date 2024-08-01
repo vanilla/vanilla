@@ -8,6 +8,7 @@ namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Http\HttpClient;
 use Vanilla\EmbeddedContent\AbstractEmbed;
+use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\FallbackEmbedFactory;
@@ -18,8 +19,8 @@ use Vanilla\PageScraper;
  *
  * It actually matches on any URL so is meant to be used exclusively as a fallback.
  */
-class ScrapeEmbedFactory extends FallbackEmbedFactory {
-
+class ScrapeEmbedFactory extends FallbackEmbedFactory
+{
     /** @var PageScraper */
     private $pageScraper;
 
@@ -32,7 +33,8 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
      * @param PageScraper $pageScraper
      * @param HttpClient $httpClient
      */
-    public function __construct(PageScraper $pageScraper, HttpClient $httpClient) {
+    public function __construct(PageScraper $pageScraper, HttpClient $httpClient)
+    {
         $this->pageScraper = $pageScraper;
         $this->httpClient = $httpClient;
     }
@@ -43,9 +45,10 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
      * @inheritdoc
      * @throws \Exception If the scrape fails.
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $contentType = $this->getContentType($url);
-        $isImage = $contentType && substr($contentType, 0, 6) === 'image/';
+        $isImage = $contentType && substr($contentType, 0, 6) === "image/";
 
         if ($isImage) {
             return $this->scrapeImage($url, $contentType);
@@ -63,7 +66,8 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
      *
      * @throws \Garden\Schema\ValidationException If there's not enough / incorrect data to make an embed.
      */
-    private function scrapeImage(string $url, string $contentType): ImageEmbed {
+    private function scrapeImage(string $url, string $contentType): ImageEmbed
+    {
         // Dimensions
         $result = getimagesize($url);
         $height = null;
@@ -72,12 +76,12 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
             [$width, $height] = $result;
         }
         $data = [
-            'url' => $url,
-            'type' => $contentType,
-            'embedType' => ImageEmbed::TYPE,
-            'name' => t('Untitled Image'),
-            'height' => $height,
-            'width' => $width,
+            "url" => $url,
+            "type" => $contentType,
+            "embedType" => ImageEmbed::TYPE,
+            "name" => t("Untitled Image"),
+            "height" => $height,
+            "width" => $width,
         ];
 
         return new ImageEmbed($data);
@@ -92,18 +96,23 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
      * @throws \Garden\Schema\ValidationException If there's not enough / incorrect data to make an embed.
      * @throws \Exception If the scrape fails.
      */
-    private function scrapeHtml(string $url): LinkEmbed {
+    private function scrapeHtml(string $url): LinkEmbed
+    {
         $scraped = $this->pageScraper->pageInfo($url);
 
-        $images = $scraped['Images'] ?? [];
+        $images = $scraped["Images"] ?? [];
         $data = [
-            'embedType' => LinkEmbed::TYPE,
-            'url' => $url,
-            'name' =>  $scraped['Title'] ?? null,
-            'body' => $scraped['Description'] ?? null,
-            'photoUrl' => !empty($images) ? $images[0] : null,
+            "embedType" => LinkEmbed::TYPE,
+            "url" => $url,
+            "name" => $scraped["Title"] ?? null,
+            "body" => $scraped["Description"] ?? null,
+            "faviconUrl" => $scraped["Favicon"] ?? null,
+            "photoUrl" => !empty($images) ? $images[0] : null,
         ];
-        return new LinkEmbed($data);
+        $linkEmbed = new LinkEmbed($data);
+        $linkEmbed->setCacheable(!empty($scraped["isCacheable"]));
+
+        return $linkEmbed;
     }
 
     /**
@@ -112,12 +121,13 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
      * @param string $url
      * @return string|null
      */
-    private function getContentType(string $url): ?string {
+    private function getContentType(string $url): ?string
+    {
         // Get information about the request with a HEAD request.
         $response = $this->httpClient->head($url);
 
         // Let's do some super inconsistent validation of what file types are allowed.
-        $contentType = $response->getHeaderLines('content-type');
+        $contentType = $response->getHeaderLines("content-type");
         // Actually an array, we want the first item.
         $contentType = reset($contentType);
         return $contentType;

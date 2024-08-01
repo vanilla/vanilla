@@ -4,27 +4,25 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import {
-    colorOut,
-    unit,
-    paddings,
-    negative,
-    sticky,
-    extendItemContainer,
-    flexHelper,
-    modifyColorBasedOnLightness,
-    margins,
-    singleBorder,
-} from "@library/styles/styleHelpers";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { negative, sticky, extendItemContainer, flexHelper, singleBorder } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { userSelect } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { oneColumnVariables } from "@library/layout/Section.variables";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, viewHeight, calc, quote } from "csx";
+import { percent, viewHeight, calc, quote, color } from "csx";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { css, CSSObject } from "@emotion/css";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
+
+interface IListOptions {
+    includeBorder?: boolean;
+    isLegacy?: boolean;
+}
 
 export const tabsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -76,7 +74,7 @@ export const tabsVariables = useThemeCache(() => {
 export const tabStandardClasses = useThemeCache(() => {
     const vars = tabsVariables();
     const style = styleFactory(TabsTypes.STANDARD);
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
@@ -87,10 +85,10 @@ export const tabStandardClasses = useThemeCache(() => {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "stretch",
-                height: calc(`100% - ${unit(vars.navHeight.height)}`),
+                height: calc(`100% - ${styleUnit(vars.navHeight.height)}`),
             },
             mediaQueries.oneColumnDown({
-                height: calc(`100% - ${unit(titleBarVars.sizing.mobile.height)}`),
+                height: calc(`100% - ${styleUnit(titleBarVars.sizing.mobile.height)}`),
             }),
         ),
     );
@@ -104,17 +102,17 @@ export const tabStandardClasses = useThemeCache(() => {
         width: "100%",
     });
 
-    const tabList = useThemeCache(() =>
+    const tabList = useThemeCache((options?: IListOptions) =>
         style("tabList", {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "stretch",
-            background: colorOut(vars.colors.bg),
+            background: ColorsUtils.colorOut(vars.colors.bg),
             ...sticky(),
             top: 0,
             zIndex: 1,
             // Offset for the outer borders.
-            $nest: {
+            ...{
                 "button:first-child": {
                     borderLeft: 0,
                 },
@@ -122,10 +120,16 @@ export const tabStandardClasses = useThemeCache(() => {
                     borderRight: 0,
                 },
             },
+            ...(options?.isLegacy
+                ? {
+                      width: `calc(100% + 36px)`,
+                      marginLeft: "-18px",
+                  }
+                : undefined),
         }),
     );
 
-    const tab = useThemeCache(() =>
+    const tab = useThemeCache((largeTabs?: boolean, legacyButton?: boolean) =>
         style(
             "tab",
             {
@@ -134,24 +138,29 @@ export const tabStandardClasses = useThemeCache(() => {
                 flex: 1,
                 fontWeight: globalVars.fonts.weights.semiBold,
                 textAlign: "center",
-                border: "1px solid #bfcbd8",
+                border: singleBorder({ color: color("#bfcbd8") }),
+                borderTop: legacyButton ? "none" : undefined,
                 padding: "2px 0",
-                color: colorOut(vars.colors.fg),
-                backgroundColor: colorOut(vars.colors.bg),
-                minHeight: unit(28),
-                fontSize: unit(13),
+                color: ColorsUtils.colorOut(vars.colors.fg),
+                backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
+                minHeight: styleUnit(28),
+                fontSize: styleUnit(13),
                 transition: "color 0.3s ease",
                 ...flexHelper().middle(),
-                $nest: {
+                ...{
                     "& > *": {
-                        ...paddings({ horizontal: globalVars.gutter.half }),
+                        ...Mixins.padding({ horizontal: globalVars.gutter.half }),
                     },
                     "& + &": {
-                        marginLeft: unit(negative(vars.border.width)),
+                        marginLeft: styleUnit(negative(vars.border.width)),
+                    },
+                    "&[data-selected]": {
+                        background: ColorsUtils.colorOut(globalVars.elementaryColors.white),
                     },
                     "&:hover, &:focus, &:active": {
-                        border: "1px solid #bfcbd8",
-                        color: colorOut(globalVars.mainColors.primary),
+                        border: singleBorder({ color: color("#bfcbd8") }),
+                        borderTop: legacyButton ? "none" : undefined,
+                        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
                         zIndex: 1,
                     },
                     "&&:not(.focus-visible)": {
@@ -159,17 +168,17 @@ export const tabStandardClasses = useThemeCache(() => {
                     },
                     "&[disabled]": {
                         pointerEvents: "initial",
-                        color: colorOut(vars.colors.fg),
-                        backgroundColor: colorOut(vars.colors.bg),
+                        color: ColorsUtils.colorOut(vars.colors.fg),
+                        backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
                     },
                 },
             },
 
             mediaQueries.oneColumnDown({
-                $nest: {
+                ...{
                     label: {
-                        minHeight: unit(formElementVariables.sizing.height),
-                        lineHeight: unit(formElementVariables.sizing.height),
+                        minHeight: styleUnit(formElementVariables.sizing.height),
+                        lineHeight: styleUnit(formElementVariables.sizing.height),
                     },
                 },
             }),
@@ -192,8 +201,8 @@ export const tabStandardClasses = useThemeCache(() => {
     );
 
     const isActive = style("isActive", {
-        backgroundColor: colorOut(
-            modifyColorBasedOnLightness({
+        backgroundColor: ColorsUtils.colorOut(
+            ColorsUtils.modifyColorBasedOnLightness({
                 color: vars.colors.bg,
                 weight: 0.65,
                 inverse: true,
@@ -220,22 +229,22 @@ export const tabBrowseClasses = useThemeCache(() => {
     const vars = tabsVariables();
     const globalVars = globalVariables();
     const style = styleFactory(TabsTypes.BROWSE);
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const horizontalPadding = 12;
     const verticalPadding = globalVars.gutter.size / 2;
-    const activeStyles = {
-        "&::before": {
+    const activeStyles: CSSObject = {
+        "::before": {
             content: quote(""),
             display: "block",
             position: "absolute",
             bottom: 0,
-            ...margins({
+            ...Mixins.margin({
                 vertical: 0,
                 horizontal: "auto",
             }),
             height: vars.activeIndicator.height,
-            backgroundColor: colorOut(vars.activeIndicator.color),
+            backgroundColor: ColorsUtils.colorOut(vars.activeIndicator.color),
             width: calc(`${percent(100)} - ${horizontalPadding * 2}px`),
         },
     };
@@ -247,40 +256,49 @@ export const tabBrowseClasses = useThemeCache(() => {
     );
     const tabPanels = style("tabPanels", {});
 
-    const tabList = useThemeCache((options?: { includeBorder?: boolean }) =>
-        style("tabList", {
-            display: "flex",
-            flexWrap: "wrap",
-            borderBottom: options?.includeBorder
-                ? singleBorder({ color: globalVars.separator.color, width: globalVars.separator.size })
-                : undefined,
-        }),
+    const tabList = useThemeCache((options?: IListOptions) =>
+        style(
+            "tabList",
+            {
+                display: "flex",
+                flexWrap: "nowrap",
+                alignItems: "center",
+                borderBottom: options?.includeBorder
+                    ? singleBorder({ color: globalVars.separator.color, width: globalVars.separator.size })
+                    : undefined,
+            },
+
+            mediaQueries.oneColumnDown({
+                flexWrap: "wrap",
+            }),
+        ),
     );
 
-    const tab = useThemeCache((largeTabs?: boolean) =>
+    const tab = useThemeCache((largeTabs?: boolean, legacyButton?: boolean) =>
         style("tab", {
-            ...buttonResetMixin(),
-            textTransform: largeTabs ? "inherit" : "uppercase",
-            fontSize: largeTabs ? globalVars.fonts.size.large : globalVars.fonts.size.small,
-            fontWeight: globalVars.fonts.weights.bold,
             position: "relative",
-            ...paddings({
+            ...buttonResetMixin(),
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars(largeTabs ? "large" : "small", "bold"),
+                transform: largeTabs ? "inherit" : "uppercase",
+            }),
+            ...Mixins.padding({
                 vertical: verticalPadding,
                 horizontal: horizontalPadding,
             }),
-            ...margins({
+            ...Mixins.margin({
                 right: horizontalPadding,
                 bottom: "-1px",
             }),
-            $nest: {
-                "&:active": activeStyles as NestedCSSProperties,
+            ...{
+                "&:active": activeStyles,
             },
         }),
     );
 
     const panel = useThemeCache((options?: { includeVerticalPadding?: boolean }) =>
         style("panel", {
-            ...paddings({
+            ...Mixins.padding({
                 vertical: options?.includeVerticalPadding ? "24px" : 0,
                 horizontal: horizontalPadding,
             }),
@@ -290,8 +308,10 @@ export const tabBrowseClasses = useThemeCache(() => {
     const extraButtons = style(
         "extraButtons",
         {
-            ...paddings({ horizontal: horizontalPadding / 2, vertical: verticalPadding }),
-            flex: 1,
+            ...Mixins.padding({
+                horizontal: horizontalPadding / 2,
+            }),
+            flex: "1 0 auto",
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
@@ -301,20 +321,182 @@ export const tabBrowseClasses = useThemeCache(() => {
             width: "100%",
             flex: "1 0 auto",
             justifyContent: "flex-start",
-            ...paddings({
-                top: globalVars.gutter.size * 2, // For extra spacing from the mockup.
+            ...Mixins.padding({
+                vertical: verticalPadding,
                 horizontal: horizontalPadding, // For proper alignment.
             }),
         }),
     );
 
-    const isActive = style("isActive", activeStyles as NestedCSSProperties);
+    const isActive = style("isActive", activeStyles);
 
     return {
         root,
         tab,
         tabPanels,
         tabList,
+        panel,
+        isActive,
+        extraButtons,
+    };
+});
+
+export const tabGroupClasses = useThemeCache(() => {
+    const vars = tabsVariables();
+    const style = styleFactory(TabsTypes.GROUP);
+    const mediaQueries = oneColumnVariables().mediaQueries();
+    const formElementVariables = formElementsVariables();
+    const globalVars = globalVariables();
+    const titleBarVars = titleBarVariables();
+
+    const root = useThemeCache(() =>
+        style(
+            {
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "stretch",
+                height: calc(`100% - ${styleUnit(vars.navHeight.height)}`),
+            },
+            mediaQueries.oneColumnDown({
+                height: calc(`100% - ${styleUnit(titleBarVars.sizing.mobile.height)}`),
+            }),
+        ),
+    );
+
+    const tabsHandles = style("tabsHandles", {
+        display: "flex",
+        position: "relative",
+        flexWrap: "nowrap",
+        alignItems: "center",
+        justifyContent: "stretch",
+        width: "100%",
+    });
+
+    const tabList = useThemeCache((options?: IListOptions) =>
+        style("tabList", {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "stretch",
+            background: ColorsUtils.colorOut(vars.colors.bg),
+            ...sticky(),
+            top: 0,
+            zIndex: 1,
+            // Rounded corners for the outer borders.
+            ...{
+                "button:first-child": {
+                    borderTopLeftRadius: globalVars.border.radius,
+                    borderBottomLeftRadius: globalVars.border.radius,
+                },
+                "button:last-child": {
+                    borderTopRightRadius: globalVars.border.radius,
+                    borderBottomRightRadius: globalVars.border.radius,
+                },
+            },
+            ...(options?.isLegacy
+                ? {
+                      width: `calc(100% + 36px)`,
+                      marginLeft: "-18px",
+                  }
+                : undefined),
+        }),
+    );
+
+    const tab = useThemeCache((largeTabs?: boolean, legacyButton?: boolean) =>
+        style(
+            "tab",
+            {
+                ...userSelect(),
+                position: "relative",
+                cursor: "pointer",
+                flex: 1,
+                fontWeight: globalVars.fonts.weights.semiBold,
+                textAlign: "center",
+                border: singleBorder({ color: globalVars.mixBgAndFg(0.35).saturate(0.1) }),
+                borderTop: legacyButton ? "none" : undefined,
+                padding: "2px 0",
+                color: ColorsUtils.colorOut(vars.colors.fg),
+                backgroundColor: ColorsUtils.colorOut(globalVars.elementaryColors.white),
+                minHeight: styleUnit(28),
+                fontSize: styleUnit(13),
+                transition: "color 0.3s ease",
+                ...flexHelper().middle(),
+                ...{
+                    "& > *": {
+                        ...Mixins.padding({ horizontal: globalVars.gutter.half }),
+                    },
+                    "& + &": {
+                        marginLeft: styleUnit(negative(vars.border.width)),
+                    },
+                    "&[data-selected]": {
+                        background: ColorsUtils.colorOut(globalVars.elementaryColors.white),
+                        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                        borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                    },
+                    "&[data-selected] + *": {
+                        borderLeftColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                    },
+                    "&:hover:not(&[data-selected]), &:focus:not(&[data-selected]), &:active:not(&[data-selected])": {
+                        border: singleBorder({ color: color("#bfcbd8") }),
+                        borderTop: legacyButton ? "none" : undefined,
+                        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                        zIndex: 1,
+                    },
+                    "&&:not(.focus-visible)": {
+                        outline: 0,
+                    },
+                    "&[disabled]": {
+                        pointerEvents: "initial",
+                        color: ColorsUtils.colorOut(vars.colors.fg),
+                        backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
+                    },
+                },
+            },
+
+            mediaQueries.oneColumnDown({
+                ...{
+                    label: {
+                        minHeight: styleUnit(formElementVariables.sizing.height),
+                        lineHeight: styleUnit(formElementVariables.sizing.height),
+                    },
+                },
+            }),
+        ),
+    );
+
+    const tabPanels = style("tabPanels", {
+        flexGrow: 1,
+        height: percent(100),
+        flexDirection: "column",
+        position: "relative",
+    });
+
+    const panel = useThemeCache(() =>
+        style("panel", {
+            flexGrow: 1,
+            height: percent(100),
+            flexDirection: "column",
+        }),
+    );
+
+    const isActive = style("isActive", {
+        backgroundColor: ColorsUtils.colorOut(
+            ColorsUtils.modifyColorBasedOnLightness({
+                color: vars.colors.bg,
+                weight: 0.65,
+                inverse: true,
+                flipWeightForDark: true,
+            }),
+        ),
+    });
+
+    const extraButtons = style("extraButtons", {});
+
+    return {
+        root,
+        tabsHandles,
+        tabList,
+        tab,
+        tabPanels,
         panel,
         isActive,
         extraButtons,

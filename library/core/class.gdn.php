@@ -11,8 +11,15 @@
  * @since 2.0
  */
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Garden\EventManager;
+use Vanilla\Bootstrap;
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Utility\Timers;
 
 /**
  * Framework superobject.
@@ -20,51 +27,51 @@ use Vanilla\Theme\ThemeFeatures;
  * Static object that provides an anchor and namespace for many framework
  * Components, such as Controller, Dispatcher, Config, Database, etc.
  */
-class Gdn {
+class Gdn
+{
+    const AliasAuthenticator = "Authenticator";
 
-    const AliasAuthenticator = 'Authenticator';
+    const AliasAddonManager = "AddonManager";
 
-    const AliasAddonManager = 'AddonManager';
+    const AliasCache = "Cache";
 
-    const AliasCache = 'Cache';
+    const AliasConfig = "Config";
 
-    const AliasConfig = 'Config';
+    const AliasDatabase = "Database";
 
-    const AliasDatabase = 'Database';
+    const AliasDatabaseStructure = "DatabaseStructure";
 
-    const AliasDatabaseStructure = 'DatabaseStructure';
+    const AliasDispatcher = "Dispatcher";
 
-    const AliasDispatcher = 'Dispatcher';
+    const AliasLocale = "Locale";
 
-    const AliasLocale = 'Locale';
+    const AliasPermissionModel = "PermissionModel";
 
-    const AliasPermissionModel = 'PermissionModel';
+    const AliasRequest = "Request";
 
-    const AliasRequest = 'Request';
+    const AliasRouter = "Router";
 
-    const AliasRouter = 'Router';
+    const AliasSession = "Session";
 
-    const AliasSession = 'Session';
+    const AliasSqlDriver = "SqlDriver";
 
-    const AliasSqlDriver = 'SqlDriver';
+    const AliasUserMetaModel = "UserMetaModel";
 
-    const AliasUserMetaModel = 'UserMetaModel';
+    const AliasUserModel = "UserModel";
 
-    const AliasUserModel = 'UserModel';
+    const AliasApplicationManager = "ApplicationManager";
 
-    const AliasApplicationManager = 'ApplicationManager';
+    const AliasPluginManager = "PluginManager";
 
-    const AliasPluginManager = 'PluginManager';
+    const AliasThemeManager = "ThemeManager";
 
-    const AliasThemeManager = 'ThemeManager';
+    const FactoryInstance = "Instance";
 
-    const FactoryInstance = 'Instance';
+    const FactoryPrototype = "Prototype";
 
-    const FactoryPrototype = 'Prototype';
+    const FactorySingleton = "Singleton";
 
-    const FactorySingleton = 'Singleton';
-
-    const FactoryRealSingleton = 'RealSingleton';
+    const FactoryRealSingleton = "RealSingleton";
 
     /**
      * @var \Garden\Container\Container
@@ -87,12 +94,38 @@ class Gdn {
     protected static $_Session = null;
 
     /**
+     * @var Gdn_Controller|null
+     */
+    protected static $controller = null;
+
+    /**
      * Get the addon manager.
      *
      * @return \Vanilla\AddonManager
      */
-    public static function addonManager() {
+    public static function addonManager()
+    {
         return self::factory(self::AliasAddonManager);
+    }
+
+    /**
+     * Get the addon manager.
+     *
+     * @return SchedulerInterface
+     */
+    public static function scheduler(): SchedulerInterface
+    {
+        return self::getContainer()->get(SchedulerInterface::class);
+    }
+
+    /**
+     * Get the event manager.
+     *
+     * @return EventManager
+     */
+    public static function eventManager(): EventManager
+    {
+        return self::getContainer()->get(EventManager::class);
     }
 
     /**
@@ -100,7 +133,8 @@ class Gdn {
      *
      * @return FormatService
      */
-    public static function formatService(): FormatService {
+    public static function formatService(): FormatService
+    {
         return self::getContainer()->get(FormatService::class);
     }
 
@@ -110,7 +144,8 @@ class Gdn {
      * @return Gdn_ApplicationManager
      * @deprecated 3.0 - Use Vanilla\AddonManager.
      */
-    public static function applicationManager() {
+    public static function applicationManager()
+    {
         return self::factory(self::AliasApplicationManager);
     }
 
@@ -119,7 +154,8 @@ class Gdn {
      *
      * @return Gdn_Auth
      */
-    public static function authenticator() {
+    public static function authenticator()
+    {
         return self::factory(self::AliasAuthenticator);
     }
 
@@ -128,18 +164,20 @@ class Gdn {
      *
      * @return Gdn_Cache
      */
-    public static function cache() {
+    public static function cache()
+    {
         return self::factory(self::AliasCache);
     }
 
     /**
      * Get a configuration setting for the application.
      *
-     * @param string $name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
+     * @param string|false $name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
      * @param mixed $default The result to return if the configuration setting is not found.
      * @return Gdn_Configuration|mixed The configuration setting.
      */
-    public static function config($name = false, $default = false) {
+    public static function config($name = false, $default = false)
+    {
         $config = static::getContainer()->get(self::AliasConfig);
 
         if ($name === false) {
@@ -157,14 +195,23 @@ class Gdn {
      * @param Gdn_Controller $value
      * @return Gdn_Controller
      */
-    public static function controller($value = null) {
-        static $controller = null;
-
-        if ($value !== null) {
-            $controller = $value;
+    public static function controller($value = null): ?Gdn_Controller
+    {
+        if ($value instanceof Gdn_Controller) {
+            self::$controller = $value;
         }
 
-        return $controller;
+        return self::$controller;
+    }
+
+    /**
+     * Set the controller to an explicit value.
+     *
+     * @param Gdn_Controller|null $controller
+     */
+    public static function setController(?Gdn_Controller $controller)
+    {
+        self::$controller = $controller;
     }
 
     /**
@@ -172,7 +219,8 @@ class Gdn {
      *
      * @return Gdn_Dispatcher
      */
-    public static function dispatcher() {
+    public static function dispatcher()
+    {
         return self::factory(self::AliasDispatcher);
     }
 
@@ -181,8 +229,17 @@ class Gdn {
      *
      * @return Gdn_Database
      */
-    public static function database() {
+    public static function database()
+    {
         return self::factory(self::AliasDatabase);
+    }
+
+    /**
+     * @return DateTimeFormatter
+     */
+    public static function dateTimeFormatter(): DateTimeFormatter
+    {
+        return self::getContainer()->get(DateTimeFormatter::class);
     }
 
     /**
@@ -192,7 +249,8 @@ class Gdn {
      *
      * @return mixed|null Either the requested class instance or null.
      */
-    public static function factory($alias = null) {
+    public static function factory($alias = null)
+    {
         if (!$alias) {
             return null;
         }
@@ -207,9 +265,9 @@ class Gdn {
                 $alias = "Gdn_$alias";
             }
 
-            $result = $dic->getArgs($alias, (array)$args);
+            $result = $dic->getArgs($alias, (array) $args);
             return $result;
-        } catch (\Garden\Container\NotFoundException $ex) {
+        } catch (NotFoundException $ex) {
             return null;
         }
     }
@@ -221,7 +279,8 @@ class Gdn {
      *
      * @return boolean Whether or not a container rule exists.
      */
-    public static function factoryExists($alias) {
+    public static function factoryExists($alias)
+    {
         return static::getContainer()->hasRule($alias);
     }
 
@@ -234,7 +293,13 @@ class Gdn {
      * @param string $factoryType The way objects will be instantiated for the class. One of the Gdn::Factory* constants.
      * @param mixed $data Additional data for the installation.
      */
-    public static function factoryInstall($alias, $className, $path = '', $factoryType = self::FactorySingleton, $data = null) {
+    public static function factoryInstall(
+        $alias,
+        $className,
+        $path = "",
+        $factoryType = self::FactorySingleton,
+        $data = null
+    ) {
         // Don't overwrite an existing definition.
         if (self::$_FactoryOverwrite === false && self::factoryExists($alias)) {
             return;
@@ -255,13 +320,14 @@ class Gdn {
                 break;
             case Gdn::FactoryPrototype:
                 if (is_null($data)) {
-                    throw new Exception('You must supply a prototype object when installing an object of type Prototype.');
+                    throw new Exception(
+                        "You must supply a prototype object when installing an object of type Prototype."
+                    );
                 }
-                $dic->setShared(false)
-                    ->setFactory(function () use ($data) {
-                        $r = clone $data;
-                        return $r;
-                    });
+                $dic->setShared(false)->setFactory(function () use ($data) {
+                    $r = clone $data;
+                    return $r;
+                });
                 break;
             case Gdn::FactorySingleton:
                 $dic->setShared(true);
@@ -272,8 +338,7 @@ class Gdn {
                 }
                 break;
             case Gdn::FactoryRealSingleton:
-                $dic->setShared(true)
-                    ->setFactory([$className, $data]);
+                $dic->setShared(true)->setFactory([$className, $data]);
                 break;
             default:
                 throw new \Exception("Unknown factory type '$factoryType'.", 500);
@@ -287,8 +352,9 @@ class Gdn {
      * @return int
      * @deprecated
      */
-    public static function factoryOverwrite($value = null) {
-        $result = (self::$_FactoryOverwrite & 1 > 0);
+    public static function factoryOverwrite($value = null)
+    {
+        $result = self::$_FactoryOverwrite & (1 > 0);
 
         if (!is_null($value)) {
             self::$_FactoryOverwrite = $value;
@@ -298,12 +364,13 @@ class Gdn {
     }
 
     /**
-     * Uninstall an class from the factory.
+     * Uninstall a class from the factory.
      *
      * @deprecated
      */
-    public static function factoryUninstall() {
-        deprecated('Gdn::factoryUninstall()');
+    public static function factoryUninstall()
+    {
+        deprecated("Gdn::factoryUninstall()");
     }
 
     /**
@@ -311,8 +378,9 @@ class Gdn {
      *
      * @deprecated
      */
-    public static function factoryUninstallDependency() {
-        deprecated('Gdn::factoryUninstallDependency()');
+    public static function factoryUninstallDependency()
+    {
+        deprecated("Gdn::factoryUninstallDependency()");
     }
 
     /**
@@ -321,20 +389,23 @@ class Gdn {
      * @staticvar string $installationID
      * @param string $setInstallationID
      * @return string Installation ID or NULL
+     *
+     * @deprecated Don't use installationID  for new things.
      */
-    public static function installationID($setInstallationID = null) {
+    public static function installationID($setInstallationID = null)
+    {
         static $installationID = false;
         if (!is_null($setInstallationID)) {
             if ($setInstallationID !== false) {
-                saveToConfig('Garden.InstallationID', $setInstallationID);
+                saveToConfig("Garden.InstallationID", $setInstallationID);
             } else {
-                removeFromConfig('Garden.InstallationID');
+                removeFromConfig("Garden.InstallationID");
             }
             $installationID = $setInstallationID;
         }
 
         if ($installationID === false) {
-            $installationID = c('Garden.InstallationID', null);
+            $installationID = c("Garden.InstallationID", null);
         }
 
         return $installationID;
@@ -346,20 +417,23 @@ class Gdn {
      * @staticvar string $installationSecret
      * @param string $setInstallationSecret
      * @return string Installation Secret or NULL
+     *
+     * @deprecated Don't use installationSecret for new things.
      */
-    public static function installationSecret($setInstallationSecret = null) {
+    public static function installationSecret($setInstallationSecret = null)
+    {
         static $installationSecret = false;
         if (!is_null($setInstallationSecret)) {
             if ($setInstallationSecret !== false) {
-                saveToConfig('Garden.InstallationSecret', $setInstallationSecret);
+                saveToConfig("Garden.InstallationSecret", $setInstallationSecret);
             } else {
-                removeFromConfig('Garden.InstallationSecret');
+                removeFromConfig("Garden.InstallationSecret");
             }
             $installationSecret = $setInstallationSecret;
         }
 
         if ($installationSecret === false) {
-            $installationSecret = c('Garden.InstallationSecret', null);
+            $installationSecret = c("Garden.InstallationSecret", null);
         }
 
         return $installationSecret;
@@ -370,7 +444,8 @@ class Gdn {
      *
      * @return Gdn_Locale
      */
-    public static function locale() {
+    public static function locale()
+    {
         if (is_null(self::$_Locale)) {
             self::$_Locale = self::factory(self::AliasLocale);
         }
@@ -383,7 +458,8 @@ class Gdn {
      *
      * @return PermissionModel
      */
-    public static function permissionModel() {
+    public static function permissionModel()
+    {
         return self::factory(self::AliasPermissionModel);
     }
 
@@ -391,9 +467,12 @@ class Gdn {
      * Get the plugin manager for the application.
      *
      * @return Gdn_PluginManager
+     * @throws NotFoundException
+     * @throws ContainerException
      * @deprecated 3.0 - Use Garden\EventManager or Vanilla\AddonManager.
      */
-    public static function pluginManager() {
+    public static function pluginManager()
+    {
         if (self::$_PluginManager === null) {
             self::$_PluginManager = static::getContainer()->get(self::AliasPluginManager);
         }
@@ -404,8 +483,9 @@ class Gdn {
     /**
      * @return Gdn_Regarding
      */
-    public static function regarding() {
-        return self::factory('Regarding');
+    public static function regarding()
+    {
+        return self::factory("Regarding");
     }
 
     /**
@@ -414,7 +494,8 @@ class Gdn {
      * @param Gdn_Request $newRequest The new request or null to just get the request.
      * @return Gdn_Request
      */
-    public static function request($newRequest = null) {
+    public static function request($newRequest = null)
+    {
         if (self::$_Request === null) {
             self::$_Request = static::getContainer()->get(self::AliasRequest);
         }
@@ -423,8 +504,9 @@ class Gdn {
         if (!is_null($newRequest)) {
             if (is_string($newRequest)) {
                 $request->setURI($newRequest);
-            } elseif (is_object($newRequest))
+            } elseif (is_object($newRequest)) {
                 $request->fromImport($newRequest);
+            }
         }
 
         return $request;
@@ -435,7 +517,8 @@ class Gdn {
      *
      * @return Gdn_Router
      */
-    public static function router() {
+    public static function router()
+    {
         return self::factory(self::AliasRouter);
     }
 
@@ -444,18 +527,36 @@ class Gdn {
      *
      * @return Gdn_Session
      */
-    public static function session() {
+    public static function session()
+    {
         if (is_null(self::$_Session)) {
             self::$_Session = self::factory(self::AliasSession);
         }
         return self::$_Session;
     }
 
-    public static function set($key, $value = null) {
+    /**
+     * Set a usermeta item for user 0.
+     *
+     * @param string $key
+     * @param null $value
+     * @deprecated Use UserMetaModel
+     */
+    public static function set($key, $value = null)
+    {
         return Gdn::userMetaModel()->setUserMeta(0, $key, $value);
     }
 
-    public static function get($key, $default = null) {
+    /**
+     * Get a usermeta item for user 0.
+     *
+     * @param string $key
+     * @param null $default
+     * @return false|mixed|null
+     * @deprecated Use UserMetaModel.
+     */
+    public static function get($key, $default = null)
+    {
         $response = Gdn::userMetaModel()->getUserMeta(0, $key, $default);
         if (sizeof($response) == 1) {
             return val($key, $response, $default);
@@ -469,7 +570,8 @@ class Gdn {
      * @return Gdn_SQLDriver
      * @see Gdn_Database::sql()
      */
-    public static function sql() {
+    public static function sql()
+    {
         $database = self::database();
         $result = $database->sql();
         return $result;
@@ -480,8 +582,9 @@ class Gdn {
      *
      * @return Gdn_Statistics
      */
-    public static function statistics() {
-        return self::factory('Statistics');
+    public static function statistics()
+    {
+        return self::factory("Statistics");
     }
 
     /**
@@ -489,7 +592,8 @@ class Gdn {
      *
      * @return Gdn_DatabaseStructure
      */
-    public static function structure() {
+    public static function structure()
+    {
         $database = self::database();
         $result = $database->structure();
         return $result;
@@ -501,14 +605,16 @@ class Gdn {
      * @return Gdn_ThemeManager
      * @deprecated 3.0 - Use Vanilla\AddonManager.
      */
-    public static function themeManager() {
+    public static function themeManager()
+    {
         return self::factory(self::AliasThemeManager);
     }
 
     /**
      * Get the theme features instance.
      */
-    public static function themeFeatures(): ThemeFeatures {
+    public static function themeFeatures(): ThemeFeatures
+    {
         return self::getContainer()->get(ThemeFeatures::class);
     }
 
@@ -516,10 +622,11 @@ class Gdn {
      * Translates a code into the selected locale's definition.
      *
      * @param string $code The code related to the language-specific definition.
-     * @param string $default The default value to be displayed if the translation code is not found.
+     * @param string|false $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      */
-    public static function translate($code, $default = false) {
+    public static function translate($code, $default = false)
+    {
         $locale = Gdn::locale();
         if ($locale) {
             return $locale->translate($code, $default);
@@ -533,7 +640,8 @@ class Gdn {
      *
      * @return UserModel
      */
-    public static function userModel() {
+    public static function userModel()
+    {
         return self::factory(self::AliasUserModel);
     }
 
@@ -542,7 +650,8 @@ class Gdn {
      *
      * @return UserMetaModel
      */
-    public static function userMetaModel() {
+    public static function userMetaModel()
+    {
         static $userMetaModel = null;
         if (is_null($userMetaModel)) {
             $userMetaModel = new UserMetaModel();
@@ -555,7 +664,8 @@ class Gdn {
      *
      * @return \Garden\Container\Container Returns the container.
      */
-    public static function getContainer() {
+    public static function getContainer()
+    {
         if (self::$container === null) {
             $dic = new Garden\Container\Container();
 
@@ -563,8 +673,7 @@ class Gdn {
                 ->setInstance(\Psr\Container\ContainerInterface::class, $dic)
 
                 ->rule(\Interop\Container\ContainerInterface::class)
-                ->setClass(\Vanilla\InteropContainer::class)
-            ;
+                ->setClass(\Vanilla\InteropContainer::class);
 
             self::$container = $dic;
         }
@@ -579,16 +688,41 @@ class Gdn {
      *
      * @param \Garden\Container\Container $container
      */
-    public static function setContainer(\Garden\Container\Container $container = null) {
+    public static function setContainer(\Garden\Container\Container $container = null)
+    {
         self::$container = $container;
 
         /**
-         * Reset all of the cached objects that are fetched from the container.
+         * Reset all the cached objects that are fetched from the container.
          */
         self::$_FactoryOverwrite = true;
         self::$_Locale = null;
         self::$_Request = null;
         self::$_PluginManager = null;
         self::$_Session = null;
+    }
+
+    /**
+     * GetTimers
+     *
+     * @return Timers
+     */
+    public static function getTimers(): Timers
+    {
+        try {
+            return self::getContainer()->get(Timers::class);
+        } catch (Throwable $e) {
+            throw new RuntimeException("error instantiating Timers");
+        }
+    }
+
+    /**
+     * GetScheduler
+     *
+     * @return SchedulerInterface
+     */
+    public static function getScheduler(): SchedulerInterface
+    {
+        return self::getContainer()->get(SchedulerInterface::class);
     }
 }

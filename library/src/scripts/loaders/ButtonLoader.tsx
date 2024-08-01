@@ -6,11 +6,11 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import { buttonLoaderClasses } from "@library/forms/buttonStyles";
+import { buttonLoaderClasses } from "@library/forms/Button.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { LoaderIcon } from "@library/icons/common";
-import classNames from "classnames";
+import { cx } from "@emotion/css";
 
 interface IProps {
     className?: string;
@@ -25,9 +25,10 @@ export default function ButtonLoader(props: IProps) {
     const classes = buttonLoaderClasses();
     return (
         <span
-            className={classNames(
+            className={cx(
                 classes.root(props.alignLeft ? "left" : "center"),
                 props.buttonType?.startsWith("dashboard") && classes.reducedPadding,
+                props.className,
             )}
         >
             <LoaderIcon className={classes.svg} />

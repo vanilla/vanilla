@@ -1,28 +1,32 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { percent, px, calc, quote, rgba } from "csx";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import {
-    absolutePosition,
-    colorOut,
-    flexHelper,
-    negative,
-    paddings,
-    unit,
-    userSelect,
-    isLightColor,
-} from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { flexHelper, negative, userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { LogoAlignment } from "@library/headers/TitleBar";
+import { LogoAlignment } from "@library/headers/LogoAlignment";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
+import { LocalVariableMapping } from "@library/styles/VariableMapping";
+import { css } from "@emotion/css";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("titleBarNavigation");
+    const makeThemeVars = variableFactory(
+        "titleBarNavigation",
+        undefined,
+        new LocalVariableMapping({
+            "navLinks.font.size": "navLinks.fontSize",
+        }),
+    );
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
     const titleBarVars = titleBarVariables();
@@ -47,8 +51,24 @@ export const titleBarNavigationVariables = useThemeCache(() => {
         maxWidth: 40,
     });
 
+    /**
+     * @varGroup titleBarNavigation.navLinks
+     * @description Variables for styling titlebar navigation links
+     */
     const navLinks = makeThemeVars("navLinks", {
-        fontSize: 14,
+        /**
+         * @varGroup titleBarNavigation.navLinks.font
+         * @expand font
+         */
+        font: Variables.font({
+            size: 14,
+            color: titleBarVars.colors.fg,
+            textDecoration: "auto",
+        }),
+        /**
+         * @varGroup titleBarNavigation.navLinks.padding
+         * @expand spacing
+         */
         padding: {
             left: 8,
             right: 8,
@@ -75,41 +95,41 @@ const titleBarNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
     const vars = titleBarNavigationVariables();
+
     const mediaQueries = titleBarVars.mediaQueries();
     const flex = flexHelper();
-    const style = styleFactory("titleBarNav");
 
-    const root = style(
+    const root = css(
         {
             ...flex.middleLeft(),
             position: "relative",
-            height: unit(titleBarVars.sizing.height),
+            height: styleUnit(titleBarVars.sizing.height),
         },
         mediaQueries.compact({
-            height: unit(titleBarVars.sizing.mobile.height),
+            height: styleUnit(titleBarVars.sizing.mobile.height),
         }),
     );
 
-    const navigation = style(
-        "navigation",
-        titleBarVars.logo.doubleLogoStrategy === "hidden" || titleBarVars.logo.justifyContent === LogoAlignment.CENTER
+    const navigation = css(
+        titleBarVars.logo.doubleLogoStrategy === "hidden" ||
+            titleBarVars.logo.doubleLogoStrategy === "mobile-only" ||
+            titleBarVars.logo.justifyContent === LogoAlignment.CENTER
             ? {
-                  marginLeft: unit(-(vars.padding.horizontal + vars.navLinks.padding.left)),
+                  marginLeft: styleUnit(-(vars.padding.horizontal * 2 + vars.navLinks.padding.left)),
               }
             : {},
     );
 
-    const navigationCentered = style("navigationCentered", {
-        ...absolutePosition.middleOfParent(true),
+    const navigationCentered = css({
+        ...Mixins.absolute.middleOfParent(true),
         display: "inline-flex",
     });
 
-    const items = style(
-        "items",
+    const items = css(
         {
             ...flex.middleLeft(),
-            height: unit(titleBarVars.sizing.height),
-            ...paddings(vars.padding),
+            height: styleUnit(titleBarVars.sizing.height),
+            ...Mixins.padding(vars.padding),
         },
         mediaQueries.compact({
             height: px(titleBarVars.sizing.mobile.height),
@@ -118,67 +138,70 @@ const titleBarNavClasses = useThemeCache(() => {
         }),
     );
 
-    const link = style("link", {
+    const link = css({
         ...userSelect(),
-        color: colorOut(titleBarVars.colors.fg),
         whiteSpace: "nowrap",
         lineHeight: globalVars.lineHeights.condensed,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: unit(vars.item.size),
-        textDecoration: "none",
+        minHeight: styleUnit(vars.item.size),
         alignSelf: "center",
-        paddingLeft: unit(vars.navLinks.padding.left),
-        paddingRight: unit(vars.navLinks.padding.right),
-        fontSize: unit(vars.navLinks.fontSize),
-        $nest: {
+        paddingLeft: styleUnit(vars.navLinks.padding.left),
+        paddingRight: styleUnit(vars.navLinks.padding.right),
+        ...Mixins.font(vars.navLinks.font),
+        ...{
             "&.focus-visible": {
-                color: colorOut(titleBarVars.colors.state.fg),
-                backgroundColor: colorOut(titleBarVars.colors.state.bg),
+                color: ColorsUtils.colorOut(titleBarVars.colors.state.fg),
+                backgroundColor: ColorsUtils.colorOut(titleBarVars.colors.state.bg),
             },
             "&:focus": {
-                color: colorOut(titleBarVars.colors.state.fg),
-                backgroundColor: colorOut(titleBarVars.colors.state.bg),
+                color: ColorsUtils.colorOut(titleBarVars.colors.state.fg),
+                backgroundColor: ColorsUtils.colorOut(titleBarVars.colors.state.bg),
             },
             "&:hover": {
-                color: colorOut(titleBarVars.colors.state.fg),
-                backgroundColor: colorOut(titleBarVars.colors.state.bg),
+                color: ColorsUtils.colorOut(titleBarVars.colors.state.fg),
+                backgroundColor: ColorsUtils.colorOut(titleBarVars.colors.state.bg),
             },
         },
     });
 
     const offsetWidth = vars.linkActive.offset * 2;
 
-    const linkActive = style("linkActive", {
-        $nest: {
+    const linkActive = css({
+        ...{
             "&:after": {
-                ...absolutePosition.topLeft(
-                    `calc(50% - ${unit(vars.linkActive.height + vars.linkActive.bottomSpace)})`,
+                ...Mixins.absolute.topLeft(
+                    `calc(50% - ${styleUnit(vars.linkActive.height + vars.linkActive.bottomSpace)})`,
                 ),
-                maxWidth: unit(vars.linkActive.maxWidth),
+                maxWidth: styleUnit(vars.linkActive.maxWidth),
                 content: quote(""),
-                height: unit(vars.linkActive.height),
+                height: styleUnit(vars.linkActive.height),
                 left: percent(50),
-                marginLeft: unit(negative(vars.linkActive.offset)),
-                width: offsetWidth === 0 ? percent(100) : calc(`100% + ${unit(offsetWidth)}`),
-                backgroundColor: colorOut(vars.linkActive.bg),
-                transform: `translate(-50%, ${unit(titleBarVars.sizing.height / 2)})`,
+                marginLeft: styleUnit(negative(vars.linkActive.offset)),
+                width: offsetWidth === 0 ? percent(100) : calc(`100% + ${styleUnit(offsetWidth)}`),
+                transform: `translate(-50%, ${styleUnit(titleBarVars.sizing.height / 2)})`,
+                backgroundColor: ColorsUtils.colorOut(vars.linkActive.bg),
             },
         },
     });
 
-    const firstItem = style("lastItem", {
+    const firstItem = css({
         zIndex: 2,
     });
 
-    const lastItem = style("lastItem", {
+    const lastItem = css({
         zIndex: 2,
     });
-    const navContiner = style("navContiner", {
-        paddingBottom: unit(vars.navPadding.padding.bottom),
+    const navContiner = css({
+        paddingBottom: styleUnit(vars.navPadding.padding.bottom),
     });
-    const navLinks = style("navLinks", {});
+
+    const navLinks = css({});
+
+    const navLinkAsButton = css({
+        ...Mixins.font({ weight: 400 }),
+    });
 
     return {
         root,
@@ -187,11 +210,11 @@ const titleBarNavClasses = useThemeCache(() => {
         items,
         link,
         linkActive,
-        // linkContent,
         lastItem,
         firstItem,
         navLinks,
         navContiner,
+        navLinkAsButton,
     };
 });
 

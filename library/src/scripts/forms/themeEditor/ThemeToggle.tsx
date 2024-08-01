@@ -17,10 +17,10 @@ interface IProps {
 
 export function ThemeToggle(props: IProps) {
     const { variableKey, forcedValue, afterChange, disabled } = props;
-    const { generatedValue, setValue } = useThemeVariableField(variableKey);
+    const { generatedValue, setValue, rawValue } = useThemeVariableField(variableKey);
     const { inputID, labelID } = useThemeBlock();
 
-    const value = forcedValue ?? !!generatedValue;
+    const value = !!(forcedValue ?? rawValue ?? generatedValue);
 
     return (
         <FormToggle
@@ -29,7 +29,7 @@ export function ThemeToggle(props: IProps) {
             slim
             enabled={value}
             disabled={disabled}
-            onChange={newValue => {
+            onChange={(newValue) => {
                 setValue(newValue);
                 afterChange?.(newValue);
             }}

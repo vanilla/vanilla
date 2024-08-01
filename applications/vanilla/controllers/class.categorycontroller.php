@@ -1,8 +1,8 @@
 <?php
 /**
- * Discussion controller
+ * Category controller
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0.17.9
@@ -11,12 +11,13 @@
 /**
  * Handles the /category endpoint.
  */
-class CategoryController extends VanillaController {
-
-    /** @var Gdn_CategoryModel */
+class CategoryController extends VanillaController
+{
+    /** @var CategoryModel */
     public $CategoryModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->CategoryModel = new CategoryModel();
     }
@@ -30,15 +31,16 @@ class CategoryController extends VanillaController {
      * @param $value
      * @param $tKey
      */
-    public function follow($categoryID, $value, $tKey) {
-        deprecated(__METHOD__, __CLASS__.'::followed');
+    public function follow($categoryID, $value, $tKey)
+    {
+        deprecated(__METHOD__, __CLASS__ . "::followed");
 
         if (Gdn::session()->validateTransientKey($tKey)) {
-            $this->CategoryModel->saveUserTree($categoryID, ['Unfollow' => (int)(!(bool)$value)]);
+            $this->CategoryModel->saveUserTree($categoryID, ["Unfollow" => (int) !(bool) $value]);
         }
 
-        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirectTo('/categories');
+        if ($this->isRenderingMasterView()) {
+            redirectTo("/categories");
         }
 
         $this->render();
@@ -47,16 +49,19 @@ class CategoryController extends VanillaController {
     /**
      * Allows user to follow or unfollow a category.
      *
-     * @param int $DiscussionID Unique discussion ID.
+     * @param ?int $categoryID // Category if to be followed
+     * @param ?string $tKey // transient key
+     * @param ?int $value // follow / unfollow flag
      */
-    public function followed($categoryID = null, $tKey = null) {
+    public function followed(?int $categoryID = null, ?string $tKey = null, ?int $value = null)
+    {
         // Make sure we are posting back.
         if (!$this->Request->isAuthenticatedPostBack() && !Gdn::session()->validateTransientKey($tKey)) {
-            throw permissionException('Javascript');
+            throw permissionException("Javascript");
         }
 
         if (!Gdn::session()->isValid()) {
-            throw permissionException('SignedIn');
+            throw permissionException("SignedIn");
         }
 
         $userID = Gdn::session()->UserID;
@@ -64,49 +69,55 @@ class CategoryController extends VanillaController {
         $categoryModel = new CategoryModel();
         $category = CategoryModel::categories($categoryID);
         if (!$category) {
-            throw notFoundException('Category');
+            throw notFoundException("Category");
         }
 
         // Check the form to see if the data was posted.
         $form = new Gdn_Form();
-        $categoryID = $form->getFormValue('CategoryID', $categoryID);
-        $followed = $form->getFormValue('Followed', null);
-        $hasPermission = $categoryModel::checkPermission($categoryID, 'Vanilla.Discussions.View');
+        $categoryID = $form->getFormValue("CategoryID", $categoryID);
+        $followed = (bool) $form->getFormValue("Followed", $value);
+        $hasPermission = $categoryModel::checkPermission($categoryID, "Vanilla.Discussions.View");
         if (!$hasPermission) {
-            throw permissionException('Vanilla.Discussion.View');
+            throw permissionException("Vanilla.Discussion.View");
         }
-        $result = $categoryModel->follow($userID, $categoryID, $followed);
+        try {
+            $prefsToSet = $this->getPrefsToSet($followed, $userID);
+            $this->CategoryModel->setPreferences($userID, $categoryID, $prefsToSet);
+        } catch (Exception $e) {
+            throw new \Gdn_UserException($e->getMessage(), 403, $e);
+        }
 
         // Set the new value for api calls and json targets.
         $this->setData([
-            'UserID' => $userID,
-            'CategoryID' => $categoryID,
-            'Followed' => $result
+            "UserID" => $userID,
+            "CategoryID" => $categoryID,
+            "Followed" => $this->CategoryModel->isFollowed($userID, $categoryID),
         ]);
 
         $parentCategory = false;
-        if ($category['ParentCategoryID'] > 0) {
-            $parentCategory = $categoryModel::categories($category['ParentCategoryID'])['UrlCode'];
+        if ($category["ParentCategoryID"] > 0) {
+            $parentCategory = $categoryModel::categories($category["ParentCategoryID"])["UrlCode"];
         }
 
         switch ($this->deliveryType()) {
             case DELIVERY_TYPE_DATA:
-                $this->render('Blank', 'Utility', 'Dashboard');
+                $this->render("Blank", "Utility", "Dashboard");
                 return;
             case DELIVERY_TYPE_ALL:
                 // If this is a subcategories, redirect to parent category. Otherwise, redirect to categories page.
-                $parentCategory ? redirectTo('/categories/'.$parentCategory) : redirectTo('/categories');
+                $parentCategory ? redirectTo("/categories/" . $parentCategory) : redirectTo("/categories");
         }
 
         // Return the appropriate bookmark.
-        require_once $this->fetchViewLocation('helper_functions', 'Categories');
+        require_once $this->fetchViewLocation("helper_functions", "Categories");
         $markup = followButton($categoryID);
-        $this->jsonTarget("!element", $markup, 'ReplaceWith');
+        $this->jsonTarget("!element", $markup, "ReplaceWith");
 
-        $this->render('Blank', 'Utility', 'Dashboard');
+        $this->render("Blank", "Utility", "Dashboard");
     }
 
-    public function initialize() {
+    public function initialize()
+    {
         parent::initialize();
 
         /**
@@ -115,18 +126,75 @@ class CategoryController extends VanillaController {
          * header is added, but this value includes the no-store specifier.
          */
         if (Gdn::session()->isValid()) {
-            $this->setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
+            $this->setHeader("Cache-Control", "private, no-cache, no-store, max-age=0, must-revalidate");
         }
     }
 
-    public function markRead($categoryID, $tKey) {
+    public function markRead($categoryID, $tKey)
+    {
         if (Gdn::session()->validateTransientKey($tKey)) {
-            $this->CategoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
+            $this->CategoryModel->saveUserTree($categoryID, ["DateMarkedRead" => Gdn_Format::toDateTime()]);
         }
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirectTo('/categories');
+            $category = $this->CategoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
+
+            if ($category["ParentCategoryID"] > 0) {
+                $parentCategory = $this->CategoryModel->getID($category["ParentCategoryID"], DATASET_TYPE_ARRAY);
+                // If this is a subcategory, redirect to parent category.
+                redirectTo("/categories/" . $parentCategory["UrlCode"]);
+            }
+            // Otherwise, redirect to categories page.
+            redirectTo("/categories");
         }
 
         $this->render();
+    }
+
+    /**
+     * Get the array of preferences to set when following/unfollowing a category. When the user is following, we rely on their selected
+     * notification preference selections, falling back to the site-wide defaults.
+     *
+     * @param bool $followed
+     * @param int $userID
+     * @return array
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    private function getPrefsToSet(bool $followed, int $userID): array
+    {
+        if (!$followed) {
+            $prefsToSet = [
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => $followed,
+            ];
+        } else {
+            $userPreferencesModel = Gdn::getContainer()->get(
+                \Vanilla\Dashboard\Models\UserNotificationPreferencesModel::class
+            );
+            $userPreferences = $userPreferencesModel->getUserPrefs($userID);
+            // Prepend "Preferences." to the keys to match CategoryModel's preference keys.
+            $values = [];
+            foreach ($userPreferences as $key => $val) {
+                $values["Preferences." . $key] = $val;
+            }
+            $prefsToSet = [
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => $followed,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP) =>
+                    $values[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP)] ??
+                    false,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_EMAIL) =>
+                    $values[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_EMAIL)] ??
+                    false,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_APP) =>
+                    $values[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_APP)] ?? false,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_EMAIL) =>
+                    $values[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_EMAIL)] ??
+                    false,
+            ];
+            if (CategoryModel::isDigestEnabled()) {
+                $prefsToSet[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DIGEST_EMAIL)] =
+                    $values["Preferences.Email.DigestEnabled"] ?? false;
+            }
+        }
+        return $prefsToSet;
     }
 }

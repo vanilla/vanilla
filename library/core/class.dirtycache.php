@@ -14,80 +14,191 @@
  *
  * This is a cache implementation that caches values in memory only for the time of the request.
  */
-class Gdn_Dirtycache extends Gdn_Cache {
+class Gdn_Dirtycache extends Gdn_Cache
+{
+    /** @var array Track all get keys. */
+    protected $countGets = [];
+
+    /** @var array Track all set keys. */
+    protected $countSets = [];
 
     /** @var array  */
     protected $cache = [];
 
     /**
-     *
+     * Class constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->cacheType = Gdn_Cache::CACHE_TYPE_NULL;
     }
 
-    public function addContainer($options) {
+    /**
+     * {@inheritDoc}
+     */
+    public function addContainer($options)
+    {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function add($key, $value, $options = []) {
+    /**
+     * {@inheritDoc}
+     */
+    public function add($key, $value, $options = [])
+    {
+        if (isset($this->cache[$key])) {
+            // Add should fail if the item already exists.
+            return Gdn_Cache::CACHEOP_FAILURE;
+        }
         return $this->store($key, $value, $options);
     }
 
-    public function store($key, $value, $options = []) {
+    /**
+     * {@inheritDoc}
+     */
+    public function store($key, $value, $options = [])
+    {
+        if (is_string($key)) {
+            $this->trackSet($key);
+        }
+        if (is_object($value)) {
+            // Objects should store in the cache as separate copies.
+            $value = clone $value;
+        }
         $this->cache[$key] = $value;
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function exists($key) {
-        return Gdn_Cache::CACHEOP_FAILURE;
+    /**
+     * {@inheritDoc}
+     */
+    public function exists($key)
+    {
+        return array_key_exists($key, $this->cache);
     }
 
-    public function get($key, $options = []) {
+    /**
+     * {@inheritDoc}
+     */
+    public function get($key, $options = [])
+    {
+        if ($hasDefault = array_key_exists(self::FEATURE_DEFAULT, $options ?? [])) {
+            $default = $options[self::FEATURE_DEFAULT];
+        } else {
+            $default = self::CACHEOP_FAILURE;
+        }
+
         if (is_array($key)) {
             $result = [];
+            $found = false;
             foreach ($key as $k) {
                 if (isset($this->cache[$k])) {
                     $result[$k] = $this->cache[$k];
+                    $found = true;
+                } elseif ($hasDefault) {
+                    $result[$k] = $default;
                 }
             }
             return $result;
         } else {
             if (array_key_exists($key, $this->cache)) {
+                $this->trackGet($key);
                 return $this->cache[$key];
             } else {
-                return Gdn_Cache::CACHEOP_FAILURE;
+                return $default;
             }
         }
     }
 
-    public function remove($key, $options = []) {
+    /**
+     * {@inheritDoc}
+     */
+    public function remove($key, $options = [])
+    {
         unset($this->cache[$key]);
-
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function replace($key, $value, $options = []) {
+    /**
+     * {@inheritDoc}
+     */
+    public function replace($key, $value, $options = [])
+    {
         $this->cache[$key] = $value;
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function increment($key, $amount = 1, $options = []) {
-        $value = array_key_exists($key, $this->cache) ? intval($this->cache[$key]) : 0;
-        $value += $amount;
-        $this->cache[$key] = $value;
-        return Gdn_Cache::CACHEOP_SUCCESS;
+    /**
+     * {@inheritDoc}
+     */
+    public function increment($key, $amount = 1, $options = [])
+    {
+        $options += [
+            self::FEATURE_INITIAL => 0,
+        ];
+
+        if (array_key_exists($key, $this->cache)) {
+            $result = $this->cache[$key] += $amount;
+        } elseif ($options[self::FEATURE_INITIAL] != 0) {
+            $result = $this->cache[$key] = $options[self::FEATURE_INITIAL];
+        } else {
+            $result = self::CACHEOP_FAILURE;
+        }
+        return $result;
     }
 
-    public function decrement($key, $amount = 1, $options = []) {
-        $value = array_key_exists($key, $this->cache) ? intval($this->cache[$key]) : 0;
-        $value -= $amount;
-        $this->cache[$key] = $value;
-        return Gdn_Cache::CACHEOP_SUCCESS;
+    /**
+     * {@inheritDoc}
+     */
+    public function decrement($key, $amount = 1, $options = [])
+    {
+        $options += [
+            self::FEATURE_INITIAL => 0,
+        ];
+
+        if (array_key_exists($key, $this->cache)) {
+            $result = $this->cache[$key] -= $amount;
+        } elseif ($options[self::FEATURE_INITIAL] != 0) {
+            $result = $this->cache[$key] = $options[self::FEATURE_INITIAL];
+        } else {
+            $result = self::CACHEOP_FAILURE;
+        }
+        return $result;
     }
 
-    public function flush() {
+    /**
+     * {@inheritDoc}
+     */
+    public function flush()
+    {
+        $this->cache = [];
+        $this->countGets = [];
+        $this->countSets = [];
         return true;
+    }
+
+    /**
+     * @param string $key
+     */
+    private function trackSet(string $key)
+    {
+        if (!isset($this->countSets[$key])) {
+            $this->countSets[$key] = 1;
+        } else {
+            $this->countSets[$key]++;
+        }
+    }
+
+    /**
+     * @param string $key
+     */
+    private function trackGet(string $key)
+    {
+        if (!isset($this->countGets[$key])) {
+            $this->countGets[$key] = 1;
+        } else {
+            $this->countGets[$key]++;
+        }
     }
 }

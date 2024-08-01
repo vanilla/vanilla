@@ -38,7 +38,6 @@
 
     ?>
 
-
     <?php
     echo '<div class="Buttons P">', $this->Form->button(t('Ban.Action', 'Ban')), '</div>';
     echo $this->Form->close();

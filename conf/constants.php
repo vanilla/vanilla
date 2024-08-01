@@ -17,6 +17,11 @@ if (!defined('PATH_UPLOADS')) {
 }
 
 // You should not change these paths.
+// The dist directory is no longer purely "/dist" because some way of invalidating all assets is required.
+// /dist assets rely on a content hash to invalidate, but there are situations where an item is cached incorrectly
+// And the we need to bulk invalidate without
+define('PATH_DIST_NAME', 'dist/v2');
+define('PATH_DIST', PATH_ROOT.'/'.PATH_DIST_NAME);
 define('PATH_ADDONS_THEMES', PATH_ROOT.'/addons/themes');
 define('PATH_ADDONS_ADDONS', PATH_ROOT.'/addons/addons');
 define('PATH_APPLICATIONS', PATH_ROOT.'/applications');
@@ -30,6 +35,7 @@ define('DELIVERY_TYPE_ALL', 'ALL'); // Deliver an entire page
 define('DELIVERY_TYPE_ASSET', 'ASSET'); // Deliver all content for the requested asset
 define('DELIVERY_TYPE_VIEW', 'VIEW'); // Deliver only the view
 define('DELIVERY_TYPE_BOOL', 'BOOL'); // Deliver only the success status (or error) of the request
+/**  @deprecated - Use dashboard\views\utility\raw.twig */
 define('DELIVERY_TYPE_NONE', 'NONE'); // Deliver nothing
 define('DELIVERY_TYPE_MESSAGE', 'MESSAGE'); // Just deliver messages.
 define('DELIVERY_TYPE_DATA', 'DATA'); // Just deliver the data.
@@ -62,10 +68,10 @@ define('SYNDICATION_RSS', 'RSS');
 define('SYNDICATION_ATOM', 'ATOM');
 
 // Debug error types.
-define('TRACE_INFO', 'Info');
-define('TRACE_ERROR', 'Error');
-define('TRACE_WARNING', 'Warning');
-define('TRACE_NOTICE', 'Notice');
+define('TRACE_INFO', 'info');
+define('TRACE_ERROR', 'error');
+define('TRACE_WARNING', 'warning');
+define('TRACE_NOTICE', 'notice');
 
 if (!defined('E_USER_DEPRECATED')) {
     define('E_USER_DEPRECATED', E_USER_WARNING);
@@ -86,3 +92,16 @@ const MYSQL_DATE_FORMAT = 'Y-m-d H:i:s';
 
 // Signal we did all this ^.
 define('VANILLA_CONSTANTS', true);
+
+// Defines for the http_build_url function.
+define("HTTP_URL_REPLACE", 1); // Replace every part of the first URL when there's one of the second URL
+define("HTTP_URL_JOIN_PATH", 2); // Join relative paths
+define("HTTP_URL_JOIN_QUERY", 4); // Join query strings
+define("HTTP_URL_STRIP_USER", 8); // Strip any user authentication information
+define("HTTP_URL_STRIP_PASS", 16); // Strip any password authentication information
+define("HTTP_URL_STRIP_AUTH", 32); // Strip any authentication information
+define("HTTP_URL_STRIP_PORT", 64); // Strip explicit port numbers
+define("HTTP_URL_STRIP_PATH", 128); // Strip complete path
+define("HTTP_URL_STRIP_QUERY", 256); // Strip query string
+define("HTTP_URL_STRIP_FRAGMENT", 512); // Strip any fragments (#identifier)
+define("HTTP_URL_STRIP_ALL", 1024); // Strip anything but scheme and host

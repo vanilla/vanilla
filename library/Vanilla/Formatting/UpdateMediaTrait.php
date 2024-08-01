@@ -9,8 +9,8 @@ namespace Vanilla\Formatting;
 use MediaModel;
 use Gdn_Session as SessionInterface;
 
-trait UpdateMediaTrait {
-
+trait UpdateMediaTrait
+{
     /** @var FormatService */
     private $formatterService;
 
@@ -30,7 +30,8 @@ trait UpdateMediaTrait {
      * @param string $rawBody
      * @param string $bodyFormat
      */
-    private function flagInactiveMedia(int $foreignID, string $rawBody, string $bodyFormat) {
+    private function flagInactiveMedia(int $foreignID, string $rawBody, string $bodyFormat)
+    {
         $attachments = $this->getFormatterService()->parseAttachments($rawBody, $bodyFormat);
         $currentMediaIDs = array_column($attachments, "mediaID");
         $foreignTable = $this->getMediaForeignTable();
@@ -52,7 +53,8 @@ trait UpdateMediaTrait {
      * @return FormatService
      * @throws \Exception If no FormatService instance has been configured.
      */
-    private function getFormatterService(): FormatService {
+    private function getFormatterService(): FormatService
+    {
         if (!isset($this->formatterService) || !($this->formatterService instanceof FormatService)) {
             throw new \Exception("FormatService has not been configured.");
         }
@@ -65,7 +67,8 @@ trait UpdateMediaTrait {
      *
      * @return string
      */
-    private function getMediaForeignTable(): string {
+    private function getMediaForeignTable(): string
+    {
         if (!isset($this->mediaForeignTable)) {
             throw new \Exception("mediaForeignTable has not been configured.");
         }
@@ -78,7 +81,8 @@ trait UpdateMediaTrait {
      * @return MediaModel
      * @throws \Exception If no MediaModel instance has been configured.
      */
-    private function getMediaModel(): MediaModel {
+    private function getMediaModel(): MediaModel
+    {
         if (!isset($this->mediaModel) || !($this->mediaModel instanceof MediaModel)) {
             throw new \Exception("MediaModel has not been configured.");
         }
@@ -91,7 +95,8 @@ trait UpdateMediaTrait {
      *
      * @return SessionInterface
      */
-    private function getSessionInterface(): SessionInterface {
+    private function getSessionInterface(): SessionInterface
+    {
         if (!isset($this->sessionInterface) || !($this->sessionInterface instanceof SessionInterface)) {
             throw new \Exception("SessionInterface has not been configured.");
         }
@@ -106,7 +111,8 @@ trait UpdateMediaTrait {
      * @param string $rawBody
      * @param string $bodyFormat
      */
-    private function refreshMediaAttachments(int $foreignID, string $rawBody, string $bodyFormat) {
+    private function refreshMediaAttachments(int $foreignID, string $rawBody, string $bodyFormat)
+    {
         $attachments = $this->getFormatterService()->parseAttachments($rawBody, $bodyFormat);
         $currentMediaIDs = array_column($attachments, "mediaID");
         $mediaModel = $this->getMediaModel();
@@ -134,7 +140,8 @@ trait UpdateMediaTrait {
      *
      * @param FormatService $formatterService
      */
-    private function setFormatterService(FormatService $formatterService) {
+    private function setFormatterService(FormatService $formatterService)
+    {
         $this->formatterService = $formatterService;
     }
 
@@ -143,7 +150,8 @@ trait UpdateMediaTrait {
      *
      * @param string $mediaForeignTable
      */
-    private function setMediaForeignTable(string $mediaForeignTable) {
+    private function setMediaForeignTable(string $mediaForeignTable)
+    {
         $this->mediaForeignTable = $mediaForeignTable;
     }
 
@@ -152,7 +160,8 @@ trait UpdateMediaTrait {
      *
      * @param MediaModel $mediaModel
      */
-    private function setMediaModel(MediaModel $mediaModel) {
+    private function setMediaModel(MediaModel $mediaModel)
+    {
         $this->mediaModel = $mediaModel;
     }
 
@@ -161,7 +170,8 @@ trait UpdateMediaTrait {
      *
      * @param SessionInterface $sessionInterface
      */
-    private function setSessionInterface(SessionInterface $sessionInterface) {
+    private function setSessionInterface(SessionInterface $sessionInterface)
+    {
         $this->sessionInterface = $sessionInterface;
     }
 }

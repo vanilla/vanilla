@@ -24,6 +24,7 @@ interface IProps {
 
     // Common props.
     label: string;
+    tooltip?: string;
     description?: React.ReactNode;
     imageUploader?: typeof uploadFile;
     disabled?: boolean;
@@ -47,15 +48,27 @@ export function DashboardImageUploadGroup(props: IProps) {
     return (
         <>
             <DashboardFormGroup
+                inputType="upload"
                 label={props.label}
+                tooltip={props.tooltip}
                 description={props.description}
-                afterDescription={
-                    imagePreviewSrc && (
+            >
+                {props.fieldName && <input type="hidden" value={value || ""} name={props.fieldName} />}
+                <div className="input-wrap">
+                    <DashboardImageUpload
+                        value={value}
+                        onChange={onChange}
+                        onImagePreview={setPreviewUrl}
+                        imageUploader={props.imageUploader}
+                        disabled={props.disabled}
+                        errors={props.errors}
+                    />
+                    {imagePreviewSrc && (
                         <>
-                            <div>{<img src={imagePreviewSrc} />}</div>
+                            <div>{<img src={imagePreviewSrc} loading="lazy" />}</div>
                             <div>
                                 <Button
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                                    buttonType={ButtonTypes.TEXT_PRIMARY}
                                     onClick={() => {
                                         setPreviewUrl(null);
                                         if (isStillOriginalValue) {
@@ -70,18 +83,8 @@ export function DashboardImageUploadGroup(props: IProps) {
                                 </Button>
                             </div>
                         </>
-                    )
-                }
-            >
-                {props.fieldName && <input type="hidden" value={value || ""} name={props.fieldName} />}
-                <DashboardImageUpload
-                    value={value}
-                    onChange={onChange}
-                    onImagePreview={setPreviewUrl}
-                    imageUploader={props.imageUploader}
-                    disabled={props.disabled}
-                    errors={props.errors}
-                />
+                    )}
+                </div>
             </DashboardFormGroup>
             <ModalConfirm
                 isVisible={wantsDelete}

@@ -6,13 +6,13 @@
 
 namespace Vanilla\Theme\Asset;
 
- use Mimey\MimeTypes;
+use Vanilla\Web\MimeTypeDetector;
 
- /**
-  * Image theme asset.
-  */
-class ImageThemeAsset extends ThemeAsset {
-
+/**
+ * Image theme asset.
+ */
+class ImageThemeAsset extends ThemeAsset
+{
     /** @var string Type of asset. */
     protected $type = "image";
 
@@ -21,26 +21,29 @@ class ImageThemeAsset extends ThemeAsset {
      *
      * @param string $url Absolute URL to the image asset.
      */
-    public function __construct(string $url) {
+    public function __construct(string $url)
+    {
         $this->url = asset($url, true, true);
     }
 
     /**
      * @inheritdoc
      */
-    public function getDefaultType(): string {
+    public function getDefaultType(): string
+    {
         return $this->type;
     }
 
     /**
      * @inheritdoc
      */
-    public function getContentType(): string {
-        $mimeTypes = new MimeTypes();
-        $path = parse_url($mimeTypes, PHP_URL_PATH);
+    public function getContentType(): string
+    {
+        $path = parse_url($this->getUrl(), PHP_URL_PATH);
         $ext = pathinfo($path, PATHINFO_EXTENSION);
 
-        return $mimeTypes->getMimeType($ext);
+        $mimeType = MimeTypeDetector::getMimesForExtension($ext);
+        return $mimeType[0];
     }
 
     /**
@@ -48,24 +51,27 @@ class ImageThemeAsset extends ThemeAsset {
      *
      * @return array
      */
-    public function asArray(): array {
+    public function asArray(): array
+    {
         return [
-            'url' => $this->getValue(),
-            'type' => $this->getDefaultType(),
+            "url" => $this->getValue(),
+            "type" => $this->getDefaultType(),
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function getValue() {
+    public function getValue()
+    {
         return $this->url;
     }
 
     /**
      * @inheritdoc
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return $this->url;
     }
 }

@@ -8,12 +8,11 @@ import React from "react";
 import classNames from "classnames";
 import { iconClasses } from "@library/icons/iconStyles";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
-import { SearchIcon } from "./titleBar";
 import { t } from "@vanilla/i18n/src";
+import { Icon } from "@vanilla/icons";
 
-export function TypeAllIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; centred?: boolean }) {
-    const classes = iconClasses();
-    return <SearchIcon {...props} className={classNames(classes.typeAll, props.className)} />;
+export function TypeAllIcon() {
+    return <Icon size="compact" icon="search-search" />;
 }
 
 export function TypeDiscussionsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
@@ -65,24 +64,34 @@ export function TypeCategoriesAndGroupsIcon(props: {
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             className={classNames(classes.typeCategoriesAndGroups, props.className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 15.122 16.416"
+            viewBox="0 0 16 16"
         >
             <title>{props.title ?? t("Categories & Groups")}</title>
-            <path
-                d="M3.283,13.983l7.534,4.073L18.2,13.725l-3.218-1.77c-.687.34-1.727.9-2.578,1.362a15.322,15.322,0,0,1-1.664.813c-.1,0-3-1.457-4.217-2.164Z"
-                transform="translate(-3.078 -1.64)"
-                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.833px" }}
-            />
-            <path
-                d="M14.653,7.952S10.844,10,10.749,10L6.811,7.974c-.886.487-3.548,1.989-3.733,2.076l7.739,4.186L18.2,9.9Z"
-                transform="translate(-3.078 -1.64)"
-                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.833px" }}
-            />
-            <path
-                d="M10.687,1.64,3.3,5.973l7.385,4.06L18.2,5.7Z"
-                transform="translate(-3.078 -1.64)"
-                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.833px" }}
-            />
+            <defs>
+                <filter id="2etungn3ea">
+                    <feColorMatrix in="SourceGraphic" values="currentColor" />
+                </filter>
+            </defs>
+            <g style={{ fill: "none", fillRule: "evenodd" }}>
+                <g filter="url(#2etungn3ea)" transform="translate(-120 -263)">
+                    <g>
+                        <g style={{ stroke: "currentColor", strokeWidth: ".667px" }}>
+                            <path
+                                d="M10.654 8.896l2.574 1.417L7.47 13.69l-6.328-3.265c.136-.062.325-.138.472-.229.665-.414 1.606-.935 2.262-1.296.653.384 1.95 1.066 2.692 1.44.57.242 2.371-.575 3.611-1.205.173-.088.333-.169.475-.239h0z"
+                                transform="translate(120 263) translate(1.333 .667)"
+                            />
+                            <path
+                                d="M10.389 5.695l2.84 1.562-5.759 3.377-6.33-3.266c.15-.068.366-.157.537-.262.717-.442 1.73-1.003 2.438-1.393 1.007.713 3.073 1.62 3.15 1.62.052 0 .924-.386 1.852-.895.614-.344.987-.562 1.272-.743h0z"
+                                transform="translate(120 263) translate(1.333 .667)"
+                            />
+                            <path
+                                d="M7.066.734l6.146 3.171L7.47 7.273 1.324 4.102 7.066.734z"
+                                transform="translate(120 263) translate(1.333 .667)"
+                            />
+                        </g>
+                    </g>
+                </g>
+            </g>
         </svg>
     );
 }
@@ -221,6 +230,152 @@ export function TypeQuestionIcon(props: { className?: string; "aria-hidden"?: ar
                 r="8.667"
                 style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.083px" }}
             />
+        </svg>
+    );
+}
+
+export function TypeFlagIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            className={classNames(classes.typeFlag, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+        >
+            <title>{t("Flag")}</title>
+            <path
+                strokeLinecap="round"
+                d="M0.595 0.417L0.595 14.5"
+                transform="translate(5) rotate(-11 12.731 -4.133)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: ".833px" }}
+            />
+            <path
+                d="M2.305 1.25L7.916 1.25 5.63 3.847 7.916 6.445 0.643 6.445 0.643 1.25z"
+                transform="translate(5) rotate(-11 12.731 -4.133)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: ".833px" }}
+            />
+            <ellipse
+                cx="4.286"
+                cy="16.429"
+                rx="4.286"
+                ry="1.429"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: ".833px" }}
+                transform="translate(5)"
+            />
+        </svg>
+    );
+}
+
+export function TypePlacesIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; title?: string }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            className={classNames(classes.typePlaces, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 15.122 16.416"
+        >
+            <title>{props.title ?? t("Places")}</title>
+            <defs>
+                <filter id="2etungn3ea">
+                    <feColorMatrix in="SourceGraphic" values="currentColor" />
+                </filter>
+            </defs>
+            <g style={{ fill: "none", fillRule: "evenodd" }}>
+                <g filter="url(#2etungn3ea)" transform="translate(-120 -263)">
+                    <g>
+                        <g style={{ stroke: "currentColor", strokeWidth: ".667px" }}>
+                            <path
+                                d="M10.654 8.896l2.574 1.417L7.47 13.69l-6.328-3.265c.136-.062.325-.138.472-.229.665-.414 1.606-.935 2.262-1.296.653.384 1.95 1.066 2.692 1.44.57.242 2.371-.575 3.611-1.205.173-.088.333-.169.475-.239h0z"
+                                transform="translate(120 263) translate(1.333 .667)"
+                            />
+                            <path
+                                d="M10.389 5.695l2.84 1.562-5.759 3.377-6.33-3.266c.15-.068.366-.157.537-.262.717-.442 1.73-1.003 2.438-1.393 1.007.713 3.073 1.62 3.15 1.62.052 0 .924-.386 1.852-.895.614-.344.987-.562 1.272-.743h0z"
+                                transform="translate(120 263) translate(1.333 .667)"
+                            />
+                            <path
+                                d="M7.066.734l6.146 3.171L7.47 7.273 1.324 4.102 7.066.734z"
+                                transform="translate(120 263) translate(1.333 .667)"
+                            />
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    );
+}
+
+export function TypeGroupsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            className={classNames(classes.typeGroups, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 17 16"
+        >
+            <title>{t("Groups")}</title>
+            <g style={{ fill: "none", stroke: "currentColor", strokeWidth: ".867px", fillRule: "evenodd" }}>
+                <g style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.0.64px", fillRule: "nonzero" }}>
+                    <g>
+                        <g>
+                            <path
+                                d="M5.182 4.218l.028.006c.674.185 1.298.65 1.873 1.395.053.092.057 1.33-.015 1.414-.072.085-.193.135-.325.135h0H.61c-.132 0-.253-.05-.325-.135C.214 6.95.238 5.711.291 5.62c.374-.558.998-1.022 1.873-1.395.026-.01.059-.008.083.006.34.197.865.553 1.43.553s1.11-.356 1.45-.553c.024-.014.056-.016.083-.006zM3.687 0c.85 0 1.538.46 1.538 1.969 0 1.087-.689 1.969-1.538 1.969-.85 0-1.538-.882-1.538-1.97C2.15.462 2.838 0 3.687 0z"
+                                transform="translate(-625 -263) translate(625 263) translate(8.533 4.8)"
+                            />
+                        </g>
+                        <g>
+                            <path
+                                d="M5.182 4.218l.028.006c.674.185 1.298.65 1.873 1.395.053.092.057 1.33-.015 1.414-.072.085-.193.135-.325.135h0H.61c-.132 0-.253-.05-.325-.135C.214 6.95.238 5.711.291 5.62c.374-.558.998-1.022 1.873-1.395.026-.01.059-.008.083.006.34.197.865.553 1.43.553s1.11-.356 1.45-.553c.024-.014.056-.016.083-.006zM3.687 0c.85 0 1.538.46 1.538 1.969 0 1.087-.689 1.969-1.538 1.969-.85 0-1.538-.882-1.538-1.97C2.15.462 2.838 0 3.687 0z"
+                                transform="translate(-625 -263) translate(625 263) translate(0 4.8)"
+                            />
+                        </g>
+                        <g fill="#FFF">
+                            <path
+                                d="M7.403 6.026l.04.009c.962.264 1.854.928 2.675 1.992.076.132.082 1.9-.02 2.02-.103.121-.277.193-.465.193h0-8.76c-.188 0-.362-.072-.464-.193-.103-.12-.07-1.888.007-2.02.533-.796 1.425-1.46 2.675-1.992.038-.015.084-.012.118.008.487.28 1.237.79 2.044.79.807 0 1.585-.51 2.072-.79.034-.02.08-.023.118-.008zM5.267 0C6.48 0 7.464.658 7.464 2.813c0 1.553-.984 2.812-2.197 2.812S3.07 4.365 3.07 2.813C3.07.658 4.054 0 5.267 0z"
+                                transform="translate(-625 -263) translate(625 263) translate(2.667 2.667)"
+                            />
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    );
+}
+
+export function TypeKnowledgeBaseIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            className={classNames(classes.typeKnowledgeBase, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+        >
+            <title>{t("Knowledge Base")}</title>
+            <g style={{ fill: "none", fillRule: "evenodd" }}>
+                <g style={{ stroke: "currentColor" }}>
+                    <g>
+                        <g transform="translate(-243 -263) translate(243 263) translate(3 2)">
+                            <path style={{ strokeWidth: "0.64px" }} d="M1.75 0L1.75 8.565" />
+                            <rect style={{ strokeWidth: "0.64px" }} width="9.1" height="10.541" x=".35" rx=".8" />
+                            <path
+                                style={{ strokeWidth: "0.64px" }}
+                                d="M.35 9.882s0-1.317 1.4-1.317h6.3c.933 0 1.4-.44 1.4-1.318"
+                            />
+                            <path
+                                style={{ strokeWidth: "0.72px", strokeLinecap: "round" }}
+                                d="M3.5 2.965L7 2.965M3.5 4.282L7 4.282"
+                            />
+                            <path
+                                style={{ fill: "currentColor", strokeWidth: "0.64px" }}
+                                d="M2.45 8.565L2.45 11.765 3.15 11.125 3.85 11.765 3.85 8.565z"
+                            />
+                        </g>
+                    </g>
+                </g>
+            </g>
         </svg>
     );
 }

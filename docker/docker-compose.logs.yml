@@ -1,0 +1,52 @@
+name: "vanilla"
+services:
+    kibana:
+        depends_on:
+            elasticsearch:
+                condition: service_healthy
+        container_name: "kibana"
+        image: docker.elastic.co/kibana/kibana:${ES_STACK_VERSION}
+        ports:
+            - 5601:5601
+        mem_limit: 1024m
+        volumes:
+            - kibana-data:/usr/share/kibana/data
+        environment:
+            ELASTICSEARCH_URL: http://elasticsearch:9200
+            ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+            SERVER_PUBLICBASEURL: https://kibana.vanilla.localhost
+            XPACK_APM_SERVICEMAPENABLED: "true"
+            XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
+        networks:
+            vanilla-network:
+    logstash:
+        container_name: logstash
+        build:
+            context: "./images/logstash"
+            args:
+                ES_STACK_VERSION: ${ES_STACK_VERSION}
+        expose:
+            - 10514
+        volumes:
+            - ./logs/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+            - ./logs/logstash/:/usr/share/logstash/pipeline/:ro
+            - logs-nginx:/var/log/nginx:ro
+        mem_limit: 1g
+        environment:
+            - "LS_JAVA_OPTS=-Xmx512m -Xms512m"
+        depends_on:
+            elasticsearch:
+                condition: service_healthy
+            kibana:
+                condition: service_started
+        networks:
+            vanilla-network:
+
+volumes:
+    kibana-data:
+    logs-nginx:
+networks:
+    vanilla-network:
+        external: true
+        driver: "bridge"
+        name: "vanilla-network"

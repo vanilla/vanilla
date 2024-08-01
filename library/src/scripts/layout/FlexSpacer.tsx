@@ -4,20 +4,19 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ElementType } from "react";
 import classNames from "classnames";
-import { flexHelper } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { css } from "@emotion/css";
 
 interface IProps {
     className?: string;
     children?: React.ReactNode;
-    tag?: keyof JSX.IntrinsicElements;
+    tag?: ElementType;
     actualSpacer?: boolean;
 }
 
-const flexSpacer = style({
-    $debugName: "flexSpacer",
+const flexSpacer = css({
+    label: "flexSpacer",
     flex: 1,
 });
 

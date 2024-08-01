@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,16 +9,25 @@ import SearchContext from "@library/contexts/SearchContext";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color, linearGradient } from "csx";
-import Banner from "@library/banner/Banner";
+import Banner, { IBannerProps } from "@library/banner/Banner";
+import { BannerAlignment, SearchPlacement } from "@library/banner/Banner.variables";
+import { SearchBarPresets } from "@library/banner/SearchBarPresets";
+import { oneColumnVariables } from "@library/layout/Section.variables";
+import { ButtonPreset } from "@library/forms/ButtonPreset";
+import { STORY_LOGO_BLACK, STORY_LOGO_WHITE } from "@library/storybook/storyData";
+import { SectionProvider } from "@library/layout/LayoutContext";
+import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
+import { StoryParagraph } from "@library/storybook/StoryParagraph";
+import { StoryContent } from "@library/storybook/StoryContent";
+import { StoryHeading } from "@library/storybook/StoryHeading";
+import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { BannerAlignment, SearchBarPresets, SearchPlacement } from "@library/banner/bannerStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { ButtonPreset } from "@library/forms/buttonStyles";
-import { STORY_LOGO_WHITE, STORY_LOGO_BLACK } from "@library/storybook/storyData";
+
+const globalVars = globalVariables();
 
 export default {
-    title: "Banner",
+    title: "Widgets/Banner",
     parameters: {
         chromatic: {
             viewports: [1400, 400],
@@ -26,28 +35,148 @@ export default {
     },
 };
 
-function StoryBanner(props: { title: string; forceSearchOpen?: boolean; isContentBanner?: boolean }) {
+interface IStoryBannerProps extends IBannerProps {
+    message?: string;
+    bannerProps?: IBannerProps;
+    onlyOne?: boolean;
+}
+
+function StoryBanner(props: IStoryBannerProps) {
+    const { bannerProps = {}, message } = props;
+    // Allow either passing props through "bannerProps", or overwriting them individually
+    const mergedProps: IBannerProps = {
+        action: props.action ?? bannerProps.action,
+        title: props.title ?? bannerProps.title,
+        description:
+            props.description ??
+            bannerProps.description ??
+            `Sample description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.`,
+        className: props.className ?? bannerProps.className,
+        backgroundImage: props.backgroundImage ?? bannerProps.backgroundImage,
+        contentImage: props.contentImage ?? bannerProps.contentImage,
+        logoImage: props.logoImage ?? bannerProps.logoImage,
+        searchBarNoTopMargin: props.searchBarNoTopMargin ?? bannerProps.searchBarNoTopMargin,
+        forceSearchOpen: props.forceSearchOpen ?? bannerProps.forceSearchOpen,
+        isContentBanner: props.isContentBanner ?? bannerProps.isContentBanner,
+        scope: props.scope ?? bannerProps.scope,
+        initialQuery: props.initialQuery ?? bannerProps.initialQuery,
+    };
+
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
-                <DeviceProvider>
-                    <Banner
-                        forceSearchOpen={props.forceSearchOpen}
-                        isContentBanner={props.isContentBanner}
-                        title={props.title}
-                        description="This is a description. They're pretty great, you should try one sometime."
-                    />
-                </DeviceProvider>
+                <SectionProvider type={SectionTypes.THREE_COLUMNS}>
+                    <Banner {...mergedProps} />
+                </SectionProvider>
             </SearchContext.Provider>
+            <StoryContent>
+                {message && (
+                    <>
+                        <StoryHeading>Note:</StoryHeading>
+                        <StoryParagraph>{message}</StoryParagraph>
+                    </>
+                )}
+            </StoryContent>
         </MemoryRouter>
     );
 }
 
-export const Standard = storyWithConfig({ useWrappers: false }, () => <StoryBanner title="Standard" />);
+function StoryBannerWithScope(props: IStoryBannerProps) {
+    const { onlyOne = false } = props;
+    const optionsItems: ISelectBoxItem[] = [
+        {
+            name: "scope1",
+            value: "scope1",
+        },
+        {
+            name: "scope2",
+            value: "scope2",
+        },
+        {
+            name: "Everywhere",
+            value: "every-where",
+        },
+    ];
 
-export const SearchOpen = storyWithConfig({ useWrappers: false }, () => (
-    <StoryBanner title="Search Open" forceSearchOpen />
-));
+    const value = {
+        name: "Everywhere",
+        value: "every-where",
+    };
+
+    const scope = {
+        optionsItems,
+        value,
+    };
+
+    return (
+        <DeviceProvider>
+            {/* Fix z-index in storybook */}
+            <style>{`#root > div { z-index: inherit; }`}</style>
+            <style>{`#root { min-height: 100%; }`}</style>
+
+            {!onlyOne && (
+                <>
+                    <StoryContent>
+                        <StoryHeading>{`Banner - Search with no button`}</StoryHeading>
+                    </StoryContent>
+                </>
+            )}
+            <StoryBanner {...props} scope={scope} />
+
+            {!onlyOne && (
+                <>
+                    <StoryContent>
+                        <StoryHeading>{`Title bar search with button`}</StoryHeading>
+                    </StoryContent>
+                    <StoryBanner
+                        {...props}
+                        initialQuery={
+                            "This is an example queryThis is an example queryThis is an example queryThis is an example queryThis is an example queryThis is an example query"
+                        }
+                    />
+                    <StoryContent>
+                        <StoryHeading>{`Title bar search with scope`}</StoryHeading>
+                    </StoryContent>
+                    <StoryBanner
+                        {...props}
+                        scope={scope}
+                        initialQuery={"This is an example queryThis is an example queryThis is an example query"}
+                    />
+                </>
+            )}
+        </DeviceProvider>
+    );
+}
+
+export const Default = storyWithConfig({ useWrappers: false }, () => <StoryBannerWithScope title="Standard" />);
+
+export const SquareRadius = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                border: {
+                    radius: 0,
+                },
+            },
+        },
+    },
+    () => <StoryBannerWithScope title="Standard" />,
+);
+
+export const RoundRadius = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                border: {
+                    radius: 20,
+                },
+            },
+        },
+    },
+    () => <StoryBannerWithScope title="Search Open" forceSearchOpen />,
+);
 
 export const NoDescription = storyWithConfig(
     {
@@ -63,7 +192,11 @@ export const NoDescription = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="No Description" />,
+    () => (
+        <>
+            <StoryBannerWithScope title="No Description" />
+        </>
+    ),
 );
 
 export const NoSearch = storyWithConfig(
@@ -77,34 +210,32 @@ export const NoSearch = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="No Search" />,
+    () => <StoryBannerWithScope title="No Search" onlyOne={true} />,
 );
 
-export const NoBackground = storyWithConfig(
+export const NoBackgroundImage = storyWithConfig(
     {
         useWrappers: false,
         themeVars: {
             banner: {
-                colors: {
-                    primary: color("#9279a8"),
-                    bg: color("#a98ac1"),
-                    fg: color("#fff"),
-                },
                 backgrounds: {
                     useOverlay: false,
                 },
                 outerBackground: {
-                    image: "none",
+                    unsetBackground: true,
                 },
                 presets: {
                     button: {
-                        preset: ButtonPreset.SOLID,
+                        preset: ButtonPreset.TRANSPARENT,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
                     },
                 },
             },
         },
     },
-    () => <StoryBanner title="No Background" />,
+    () => <StoryBannerWithScope title="No Background image" />,
 );
 
 export const LeftAligned = storyWithConfig(
@@ -118,7 +249,7 @@ export const LeftAligned = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Left Aligned" />,
+    () => <StoryBannerWithScope title="Left Aligned" />,
 );
 
 export const BackgroundImage = storyWithConfig(
@@ -140,7 +271,7 @@ export const BackgroundImage = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="With a background image" />,
+    () => <StoryBannerWithScope title="With a background image" />,
 );
 
 export const CustomOverlay = storyWithConfig(
@@ -158,7 +289,7 @@ export const CustomOverlay = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="With a background image (and colored overlay)" />,
+    () => <StoryBannerWithScope title="With a background image (and colored overlay)" />,
 );
 
 export const ImageAsElement = storyWithConfig(
@@ -166,10 +297,6 @@ export const ImageAsElement = storyWithConfig(
         useWrappers: false,
         themeVars: {
             global: {
-                mainColors: {
-                    primary: color("#111111"),
-                    primaryContrast: color("#fff"),
-                },
                 body: {
                     backgroundImage: {
                         color: color("#efefef"),
@@ -180,28 +307,25 @@ export const ImageAsElement = storyWithConfig(
                 options: {
                     alignment: BannerAlignment.LEFT,
                 },
-                colors: {
-                    bg: "#fff",
-                    primaryContrast: "#111111",
+                font: {
+                    color: color("#111111"),
+                    shadow: undefined,
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
-                        color: "#323232",
+                        color: color("#323232"),
                     },
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
                 presets: {
                     button: {
@@ -214,7 +338,7 @@ export const ImageAsElement = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
+    () => <StoryBannerWithScope title="Image as Element - (With Left Alignment)" />,
 );
 
 export const LogoLarge = storyWithConfig(
@@ -247,7 +371,7 @@ export const LogoLarge = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
@@ -258,16 +382,14 @@ export const LogoLarge = storyWithConfig(
                     image: "https://us.v-cdn.net/5022541/uploads/594/57SO4ULTV3HP.png",
                     width: "50%",
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
             },
         },
     },
-    () => <StoryBanner title="Logo - Huge (shrunk with CSS)" />,
+    () => <StoryBannerWithScope title="Logo - Huge (shrunk with CSS)" />,
 );
 
 export const LogoSmall = storyWithConfig(
@@ -300,7 +422,7 @@ export const LogoSmall = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
@@ -311,16 +433,14 @@ export const LogoSmall = storyWithConfig(
                     width: 150,
                     image: STORY_LOGO_BLACK,
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
             },
         },
     },
-    () => <StoryBanner title="Logo - Small" />,
+    () => <StoryBannerWithScope title="Logo - Small" />,
 );
 export const LogoAndRightImage = storyWithConfig(
     {
@@ -352,7 +472,7 @@ export const LogoAndRightImage = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
@@ -360,30 +480,25 @@ export const LogoAndRightImage = storyWithConfig(
                     },
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 logo: {
                     width: 150,
                     image: STORY_LOGO_BLACK,
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
             },
         },
     },
-    () => <StoryBanner title="Image-o-rama!" />,
+    () => <StoryBannerWithScope title="Image-o-rama!" />,
 );
 
-(ImageAsElement as any).story = {
-    parameters: {
-        chromatic: {
-            viewports: [1400, globalVariables().content.width, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
-        },
+ImageAsElement.parameters = {
+    chromatic: {
+        viewports: [1400, oneColumnVariables().contentWidth, oneColumnVariables().breakPoints.oneColumn, 400],
     },
 };
 
@@ -392,29 +507,26 @@ export const ImageAsElementWide = storyWithConfig(
         useWrappers: false,
         themeVars: {
             global: {
-                mainColors: {
-                    primary: color("#111111"),
-                },
                 body: {
                     backgroundImage: {
                         color: color("#efefef"),
                     },
                 },
-                content: {
-                    width: 1350,
+                middleColumn: {
+                    width: 1050,
                 },
             },
             banner: {
                 options: {
                     alignment: BannerAlignment.LEFT,
                 },
-                colors: {
-                    bg: "#fff",
-                    primaryContrast: "#111111",
+                font: {
+                    color: color("#111111"),
+                    shadow: undefined,
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
@@ -422,14 +534,11 @@ export const ImageAsElementWide = storyWithConfig(
                     },
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
                 presets: {
                     button: {
@@ -442,7 +551,7 @@ export const ImageAsElementWide = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
+    () => <StoryBannerWithScope title="Image as Element - (With Left Alignment)" />,
 );
 
 export const Shadowed = storyWithConfig(
@@ -458,7 +567,7 @@ export const Shadowed = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Search with shadow" />,
+    () => <StoryBannerWithScope title="Search with shadow" />,
 );
 
 export const SearchShadowNoSearchButton = storyWithConfig(
@@ -485,15 +594,11 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                     alignment: BannerAlignment.LEFT,
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
                 presets: {
                     button: {
@@ -506,7 +611,7 @@ export const SearchShadowNoSearchButton = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Image as Element - (With Left Alignment)" />,
+    () => <StoryBannerWithScope title="Image as Element - (With Left Alignment)" />,
 );
 
 export const searchPositionBottom = storyWithConfig(
@@ -529,7 +634,7 @@ export const searchPositionBottom = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Search on bottom" />,
+    () => <StoryBannerWithScope title="Search on bottom" />,
 );
 export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
     {
@@ -539,6 +644,9 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
                 presets: {
                     input: {
                         preset: SearchBarPresets.BORDER,
+                    },
+                    button: {
+                        preset: ButtonPreset.TRANSPARENT,
                     },
                 },
                 options: {
@@ -587,7 +695,7 @@ export const searchPositionBottomWithOverlayAndOffset = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Search on bottom with negative offset" />,
+    () => <StoryBannerWithScope title="Search on bottom with negative offset" />,
 );
 
 export const searchBarNoImage = storyWithConfig(
@@ -618,7 +726,7 @@ export const searchBarNoImage = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Only search bar, no image" />,
+    () => <StoryBannerWithScope title="Only search bar, no image" onlyOne={true} />,
 );
 
 export const bannerImageOnly = storyWithConfig(
@@ -659,34 +767,12 @@ export const bannerImageOnly = storyWithConfig(
             },
         },
     },
-    () => <StoryBanner title="Banner Image Only" />,
+    () => <StoryBannerWithScope title="Banner Image Only" onlyOne={true} />,
 );
 
-// Only works with button
-export const unifiedBorder = storyWithConfig(
-    {
-        useWrappers: false,
-        themeVars: {
-            banner: {
-                outerBackground: {
-                    image: "https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg",
-                },
-                presets: {
-                    input: {
-                        preset: SearchBarPresets.UNIFIED_BORDER,
-                    },
-                },
-            },
-        },
-    },
-    () => <StoryBanner title="Unified Border" />,
-);
-
-(ImageAsElementWide as any).story = {
-    parameters: {
-        chromatic: {
-            viewports: [1450, 1350, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
-        },
+ImageAsElementWide.parameters = {
+    chromatic: {
+        viewports: [1450, 1350, oneColumnVariables().breakPoints.oneColumn, 400],
     },
 };
 
@@ -702,7 +788,7 @@ export const ContentBannerNoLogo = storyWithConfig(
         },
     },
     () => {
-        return <StoryBanner title="Should not appear" isContentBanner />;
+        return <StoryBannerWithScope title="Should not appear" isContentBanner onlyOne={true} />;
     },
 );
 
@@ -722,6 +808,203 @@ export const ContentBannerLogo = storyWithConfig(
         },
     },
     () => {
-        return <StoryBanner title="Should not appear" isContentBanner />;
+        return <StoryBannerWithScope title="Should not appear" isContentBanner onlyOne={true} />;
     },
+);
+
+export const ContentBannerIcon = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            contentBanner: {
+                options: {
+                    alignment: "left",
+                    enabled: true,
+                    hideIcon: false,
+                    hideTitle: false,
+                    hideDescription: false,
+                },
+                spacing: {
+                    padding: {
+                        top: 30,
+                        bottom: 30,
+                    },
+                },
+                outerBackground: {
+                    unsetBackground: true,
+                },
+                icon: {
+                    image: "https://us.v-cdn.net/5022541/uploads/341/G35SLM2LBY4G.png",
+                },
+            },
+        },
+    },
+    () => <StoryBannerWithScope title="Content Banner with Icon" isContentBanner onlyOne />,
+);
+
+export const UnifiedBorder = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                presets: {
+                    input: {
+                        preset: SearchBarPresets.UNIFIED_BORDER,
+                    },
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
+                outerBackground: {
+                    color: color("#d4d4d4"),
+                    unsetBackground: true,
+                },
+            },
+        },
+    },
+    () => <StoryBannerWithScope title="Standard" />,
+);
+
+export const UnifiedBorderSquare = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                presets: {
+                    input: {
+                        preset: SearchBarPresets.UNIFIED_BORDER,
+                    },
+                },
+                border: {
+                    radius: 0,
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
+                outerBackground: {
+                    color: color("#d4d4d4"),
+                    unsetBackground: true,
+                },
+            },
+        },
+    },
+    () => <StoryBannerWithScope title="Standard" />,
+);
+
+export const UnifiedBorderRound = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                presets: {
+                    input: {
+                        preset: SearchBarPresets.UNIFIED_BORDER,
+                    },
+                },
+                border: {
+                    radius: 20,
+                },
+                backgrounds: {
+                    useOverlay: true,
+                },
+                outerBackground: {
+                    color: color("#d4d4d4"),
+                    unsetBackground: true,
+                },
+            },
+        },
+    },
+    () => <StoryBannerWithScope title="Standard" />,
+);
+
+export const SearchOnBgColor = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                colors: {
+                    bg: globalVars.mainColors.bg,
+                    fg: globalVars.mainColors.fg,
+                },
+                font: {
+                    color: globalVars.mainColors.fg,
+                    shadow: "none",
+                },
+                backgrounds: {
+                    useOverlay: false,
+                },
+                outerBackground: {
+                    color: globalVars.mainColors.bg,
+                    unsetBackground: true,
+                },
+                presets: {
+                    button: {
+                        preset: ButtonPreset.SOLID,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
+                },
+            },
+        },
+    },
+    () => (
+        <>
+            <StoryBannerWithScope
+                title="Search on bg color"
+                description={`Note that this isn't really "banner" related, but since the other variations for the search are here, it makes sense to have them side by side.`}
+            />
+        </>
+    ),
+);
+
+export const SearchOnBgColorRound = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            banner: {
+                colors: {
+                    bg: globalVars.mainColors.bg,
+                    fg: globalVars.mainColors.fg,
+                },
+                font: {
+                    color: globalVars.mainColors.fg,
+                    shadow: "none",
+                },
+                backgrounds: {
+                    useOverlay: false,
+                },
+                outerBackground: {
+                    color: globalVars.mainColors.bg,
+                    unsetBackground: true,
+                },
+                presets: {
+                    button: {
+                        preset: ButtonPreset.SOLID,
+                    },
+                    input: {
+                        preset: SearchBarPresets.BORDER,
+                    },
+                },
+                border: {
+                    radius: 20,
+                },
+            },
+        },
+    },
+    () => (
+        <>
+            <StoryBannerWithScope
+                title="Search on bg color"
+                description={`Note that this isn't really "banner" related, but since the other variations for the search are here, it makes sense to have them side by side.`}
+            />
+        </>
+    ),
 );

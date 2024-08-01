@@ -1,141 +1,180 @@
 openapi: 3.0.2
 info:
+x-resourceEvents:
+    notification:
+        x-addon: "dashboard"
+        name: "Notification"
+        type: "notification"
 paths:
-  /notifications:
-    get:
-      parameters:
-      - description: |
-          Desired number of items per page.
-        in: query
-        name: limit
-        schema:
-          type: integer
-          default: 30
-          maximum: 100
-          minimum: 1
-      - $ref: '#/components/parameters/Page'
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/NotificationSchema'
-                type: array
-          description: Success
-      tags:
-      - Notifications
-      summary: List notifications for the current user.
-    patch:
-      summary: Mark all notifications read.
-      tags:
-      - Notifications
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NotificationPatchSchema'
-        required: true
-      responses:
-        '204':
-          description: Success
-  '/notifications/{id}':
-    get:
-      parameters:
-      - description: |
-          The notification ID.
-        in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotificationSchema'
-          description: Success
-      tags:
-      - Notifications
-      summary: Get a single notification.
-    patch:
-      summary: Mark a notification read.
-      tags:
-        - Notifications
-      parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NotificationPatchSchema'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotificationSchema'
-          description: Success
+    /notifications:
+        get:
+            parameters:
+                - description: |
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 100
+                      minimum: 1
+                - name: shouldBatch
+                  in: query
+                  description: |
+                      Whether to batch notifications.
+                  schema:
+                      type: boolean
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/NotificationSchema"
+                                type: array
+                    description: Success
+            tags:
+                - Notifications
+            summary: List notifications for the current user.
+        patch:
+            summary: Mark all notifications read.
+            tags:
+                - Notifications
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/NotificationPatchSchema"
+                required: true
+            responses:
+                "204":
+                    description: Success
+    "/notifications/{id}":
+        get:
+            parameters:
+                - description: |
+                      The notification ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/NotificationSchema"
+                    description: Success
+            tags:
+                - Notifications
+            summary: Get a single notification.
+        patch:
+            summary: Mark a notification read.
+            tags:
+                - Notifications
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/NotificationPatchSchema"
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/NotificationSchema"
+                    description: Success
+    "/notifications/{id}/read":
+        put:
+            summary: Mark a notification read.
+            tags:
+                - Notifications
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/NotificationSchema"
+                    description: Success
 components:
-  requestBodies:
-    NotificationSchema:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotificationSchema'
-      required: true
-  schemas:
-    NotificationSchema:
-      properties:
-        body:
-          description: 'The notification text. This contains some HTML, but only <b> tags.'
-          type: string
-        dateInserted:
-          description: When the notification was first made.
-          format: date-time
-          type: string
-        dateUpdated:
-          description: >-
-            When the notification was last updated.
+    requestBodies:
+        NotificationSchema:
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/NotificationSchema"
+            required: true
+    schemas:
+        NotificationSchema:
+            properties:
+                body:
+                    description: "The notification text. This contains some HTML, but only <b> tags."
+                    type: string
+                dateInserted:
+                    description: When the notification was first made.
+                    format: date-time
+                    type: string
+                dateUpdated:
+                    description: >-
+                        When the notification was last updated.
 
 
-            Notifications on the same record will group together into a single
-            notification, updating just the dateUpdated property.
-          format: date-time
-          type: string
-        notificationID:
-          description: A unique ID to identify the notification.
-          type: integer
-        photoUrl:
-          description: An avatar or thumbnail associated with the notification.
-          nullable: true
-          type: string
-        read:
-          description: Whether or not the notification has been seen.
-          type: boolean
-        url:
-          description: The target of the notification.
-          type: string
-      required:
-      - notificationID
-      - body
-      - photoUrl
-      - url
-      - dateInserted
-      - dateUpdated
-      - read
-      type: object
-    NotificationPatchSchema:
-      description: Fields for patching a notification.
-      type: object
-      properties:
-        read:
-          type: boolean
-          enum:
-            - true
+                        Notifications on the same record will group together into a single
+                        notification, updating just the dateUpdated property.
+                    format: date-time
+                    type: string
+                notificationID:
+                    description: A unique ID to identify the notification.
+                    type: integer
+                activityType:
+                    description: The type of activity that generated the notification.
+                    type: string
+                reason:
+                    description: The reason the user is receiving this notification.
+                    type: string
+                photoUrl:
+                    description: An avatar or thumbnail associated with the notification.
+                    nullable: true
+                    type: string
+                read:
+                    description: Whether or not the notification has been seen.
+                    type: boolean
+                url:
+                    description: The target of the notification.
+                    type: string
+                readUrl:
+                    description: Url to read the notification.
+                    type: string
+            required:
+                - notificationID
+                - body
+                - photoUrl
+                - url
+                - dateInserted
+                - dateUpdated
+                - read
+            type: object
+
+        NotificationPatchSchema:
+            description: Fields for patching a notification.
+            type: object
+            properties:
+                read:
+                    type: boolean
+                    enum:
+                        - true

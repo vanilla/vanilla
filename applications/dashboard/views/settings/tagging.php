@@ -2,6 +2,7 @@
 <?php
 $tagType = $this->data('_TagType'); // The tag page we're on.
 $tagTypes = $this->data('_TagTypes');
+$canAddTags = $this->data('_CanAddTags');
 
 /** @var Gdn_Form $form */
 $form = $this->Form;
@@ -9,9 +10,9 @@ $form = $this->Form;
 $desc = t('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.');
 helpAsset(sprintf(t('About %s'), t('Tagging')), $desc);
 
-if (strtolower($tagType) == 'all' || strtolower($tagType) == 'tags') {
+if ($canAddTags) {
     // Only show add button if filter type supports adding new tags.
-    echo heading(t($this->data('Title')), t('Add Tag'), '/settings/tags/add?type=Tag', 'js-modal btn btn-primary');
+    echo heading(t($this->data('Title')), t('Add Tag'), '/settings/tags/add?type='.$tagType, 'js-modal btn btn-primary');
 } else {
     echo heading(t($this->data('Title')));
 }
@@ -78,9 +79,10 @@ $enabled = c('Tagging.Discussions.Enabled');
         <?php foreach ($tags as $tag) :
             $count = val('CountDiscussions', $tag, 0);
             $displayName = tagFullName($tag);
+            $allowedTypes = Gdn::config('Tagging.Discussions.AllowedTypes', ['']);
             $dropdown = '';
 
-            if ((val('Type', $tag, '') == '')) {
+            if (in_array(val('Type', $tag, ''), $allowedTypes)) {
                 // add dropdown
                 $dropdown = new DropdownModule('dropdown', '', '', 'dropdown-menu-right');
                 $dropdown->setView('dropdown-twbs')

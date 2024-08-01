@@ -14,5 +14,6 @@
  * These constants have been moved to the Logger class and will be removed shortly.
  * @deprecated
  */
-class LogLevel extends \Psr\Log\LogLevel {
+class LogLevel extends \Psr\Log\LogLevel
+{
 }

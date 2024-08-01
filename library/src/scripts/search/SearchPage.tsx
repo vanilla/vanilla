@@ -1,161 +1,250 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { LoadStatus } from "@library/@types/api/core";
 import SearchBar from "@library/features/search/SearchBar";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { searchBarClasses } from "@library/features/search/SearchBar.styles";
 import SearchOption from "@library/features/search/SearchOption";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
-import { pageTitleClasses } from "@library/layout/pageTitleStyles";
-import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import QueryString from "@library/routing/QueryString";
 import { SearchInFilter } from "@library/search/SearchInFilter";
 import { SearchPageResults } from "@library/search/SearchPageResults";
 import { SortAndPaginationInfo } from "@library/search/SortAndPaginationInfo";
-import { typographyClasses } from "@library/styles/typographyStyles";
 // This new page must have our base reset in place.
 import "@library/theming/reset";
-import { t } from "@library/utility/appUtils";
-import Banner from "@vanilla/library/src/scripts/banner/Banner";
-import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { t, formatUrl } from "@library/utility/appUtils";
+import Banner from "@library/banner/Banner";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import { useLastValue } from "@vanilla/react-utils";
-import classNames from "classnames";
-import debounce from "lodash/debounce";
 import qs from "qs";
-import React from "react";
-import { useCallback, useEffect } from "react";
-import { useLocation } from "react-router";
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
+import { useLocation, useHistory } from "react-router";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
+import { SectionProvider, useSection } from "@library/layout/LayoutContext";
+import PanelWidget from "@library/layout/components/PanelWidget";
+import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
+import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
+import {
+    EmptySearchScopeProvider,
+    SEARCH_SCOPE_LOCAL,
+    useSearchScope,
+} from "@library/features/search/SearchScopeContext";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { SearchBarPresets } from "@library/banner/SearchBarPresets";
+import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
+import History from "history";
+import { Backgrounds } from "@library/layout/Backgrounds";
+import { Tabs } from "@library/sectioning/Tabs";
+import { TabsTypes } from "@library/sectioning/TabsTypes";
+import { useSearchSources } from "@library/search/SearchSourcesContext";
+import { ALL_CONTENT_DOMAIN_KEY } from "./searchConstants";
+import PlacesSearchListing from "./PlacesSearchListing";
+import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
+import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
 
-interface IProps {
-    placeholder?: string;
-}
-
-function SearchPage(props: IProps) {
+export function SearchPageContent() {
     const {
         form,
         updateForm,
         search,
-        results,
-        getDomains,
-        getCurrentDomain,
-        getDefaultFormValues,
+        response,
+        domainSearchResponse,
+        handleSourceChange,
+        domains,
+        currentDomain,
+        currentSource,
     } = useSearchForm<{}>();
-    const device = useDevice();
-    const isMobile = device === Devices.MOBILE || device === Devices.XS;
-    const classes = pageTitleClasses();
-    useInitialQueryParamSync();
 
-    const debouncedSearch = useCallback(
-        debounce(() => {
-            search();
-        }, 800),
-        [search],
-    );
+    const { isCompact } = useSection();
+    const { sources } = useSearchSources();
 
-    const { domain } = form;
-    const lastDomain = useLastValue(form.domain);
+    let scope = useSearchScope().value?.value ?? SEARCH_SCOPE_LOCAL;
+    if (currentDomain.isIsolatedType) {
+        scope = SEARCH_SCOPE_LOCAL;
+    }
+    const lastScope = useLastValue(scope);
+
+    const hasSpecificRecord = currentDomain.getSpecificRecordID?.(form) ?? false;
+    const specificRecordID = hasSpecificRecord ? currentDomain.getSpecificRecordID?.(form) : undefined;
+
+    const SpecificRecordFilter = hasSpecificRecord ? currentDomain.SpecificRecordPanelComponent ?? null : null;
+    const SpecificRecordComponent = hasSpecificRecord ? currentDomain.SpecificRecordComponent ?? null : null;
+
+    const rightTopContent: ReactElement | undefined = SpecificRecordFilter ? (
+        <SpecificRecordFilter />
+    ) : currentDomain.PanelComponent ? (
+        form.initialized ? (
+            <currentDomain.PanelComponent />
+        ) : undefined
+    ) : undefined;
+    const { needsResearch } = form;
     useEffect(() => {
-        if (lastDomain && domain !== lastDomain) {
+        if (needsResearch || (lastScope && lastScope !== scope)) {
             search();
         }
-    }, [lastDomain, domain, search]);
+    });
 
-    const currentDomain = getCurrentDomain();
-    let currentFilter = <currentDomain.PanelComponent />;
+    const sortAndPaginationContent = useMemo(() => {
+        return (
+            <SortAndPaginationInfo
+                pages={response.data?.pagination}
+                sortValue={form.sort}
+                onSortChange={(newSort) => updateForm({ sort: newSort })}
+                sortOptions={currentDomain?.sortValues ?? currentSource?.sortOptions ?? []}
+            />
+        );
+    }, [currentDomain, form.sort, response, updateForm, currentSource]);
+
+    const sortedNonIsolatedDomains = domains.filter((domain) => !domain.isIsolatedType).sort((a, b) => a.sort - b.sort);
+    const availableDomainKeys = domains.map(({ key }) => key);
+
+    const hasPlacesDomain = availableDomainKeys.includes(PLACES_SEARCH_DOMAIN.key);
+
+    const extraHeadingContent = (
+        <>
+            {!hasSpecificRecord && domains.length > 1 && (
+                <SearchInFilter
+                    setData={(newDomain) => {
+                        updateForm({ domain: newDomain, page: undefined });
+                    }}
+                    activeItem={form.domain}
+                    filters={sortedNonIsolatedDomains.map((domain) => {
+                        return {
+                            label: domain.name,
+                            icon: domain.icon,
+                            data: domain.key,
+                        };
+                    })}
+                    endFilters={domains
+                        .filter((domain) => domain.isIsolatedType)
+                        .map((domain) => {
+                            return {
+                                label: domain.name,
+                                icon: domain.icon,
+                                data: domain.key,
+                            };
+                        })}
+                />
+            )}
+
+            {currentDomain.key === ALL_CONTENT_DOMAIN_KEY && hasPlacesDomain ? (
+                <PlacesSearchListing domainSearchResponse={domainSearchResponse} />
+            ) : undefined}
+        </>
+    );
+
+    const searchPageResultsContent = (
+        <>
+            {extraHeadingContent}
+            {isCompact && !!rightTopContent && (
+                <PanelWidgetHorizontalPadding>
+                    <Drawer title={t("Filter Results")}>{rightTopContent}</Drawer>
+                </PanelWidgetHorizontalPadding>
+            )}
+            {sources.length <= 1 && sortAndPaginationContent}
+            <SearchPageResults />
+        </>
+    );
 
     return (
-        <DocumentTitle title={form.query ? form.query : t("Search Results")}>
-            <TitleBar title={t("Search")} />
-            <Banner isContentBanner />
-            <Container>
-                <QueryString value={{ ...form, initialized: undefined }} defaults={getDefaultFormValues()} />
-                <TwoColumnLayout
-                    className="hasLargePadding"
-                    middleTop={
-                        <>
-                            <PanelWidget>
-                                <PageHeading
-                                    className={classNames(
-                                        "searchBar-heading",
-                                        searchBarClasses().heading,
-                                        classes.smallBackLink,
-                                    )}
-                                    headingClassName={classNames(typographyClasses().pageTitle)}
-                                    title={"Search"}
-                                    includeBackLink={true}
-                                    isCompactHeading={true}
-                                />
-                                <SearchBar
-                                    placeholder={props.placeholder}
-                                    onChange={newQuery => updateForm({ query: newQuery })}
-                                    value={form.query}
-                                    onSearch={debouncedSearch}
-                                    isLoading={results.status === LoadStatus.LOADING}
-                                    optionComponent={SearchOption}
-                                    triggerSearchOnClear={true}
-                                    titleAsComponent={t("Search")}
-                                    handleOnKeyDown={event => {
-                                        if (event.key === "Enter") {
-                                            debouncedSearch();
-                                        }
-                                    }}
-                                    disableAutocomplete={true}
-                                    buttonBaseClass={ButtonTypes.PRIMARY}
-                                    needsPageTitle={false}
-                                />
-                                <SearchInFilter
-                                    setData={newDomain => {
-                                        updateForm({ domain: newDomain });
-                                    }}
-                                    activeItem={form.domain}
-                                    filters={getDomains().map(domain => {
-                                        return {
-                                            label: domain.name,
-                                            icon: domain.icon,
-                                            data: domain.key,
-                                        };
-                                    })}
-                                />
-                            </PanelWidget>
-                            <PanelWidgetHorizontalPadding>
-                                <SortAndPaginationInfo
-                                    pages={results.data?.pagination}
-                                    sortValue={form.sort}
-                                    onSortChange={newSort => updateForm({ sort: newSort })}
-                                    sortOptions={[]}
-                                />
-                            </PanelWidgetHorizontalPadding>
-                            {isMobile && (
-                                <PanelWidgetHorizontalPadding>
-                                    <Drawer title={t("Filter Results")}>{currentFilter}</Drawer>
-                                </PanelWidgetHorizontalPadding>
-                            )}
-                        </>
-                    }
-                    middleBottom={<SearchPageResults />}
-                    rightTop={!isMobile && <PanelWidget>{currentFilter}</PanelWidget>}
-                />
-            </Container>
-        </DocumentTitle>
+        <Container>
+            <SectionTwoColumns
+                className="hasLargePadding"
+                mainTop={
+                    <>
+                        <PanelWidget>
+                            <PageHeading title={t("Search")} includeBackLink={true} />
+                            <ConditionalWrap
+                                condition={currentDomain.isIsolatedType}
+                                component={EmptySearchScopeProvider}
+                            >
+                                <div className={searchBarClasses({}).standardContainer}>
+                                    <SearchBar
+                                        onChange={(newQuery) => updateForm({ query: newQuery })}
+                                        value={`${form.query}`}
+                                        onSearch={search}
+                                        isLoading={response.status === LoadStatus.LOADING}
+                                        optionComponent={SearchOption}
+                                        triggerSearchOnClear={true}
+                                        titleAsComponent={t("Search")}
+                                        disableAutocomplete={true}
+                                        buttonType={ButtonTypes.PRIMARY}
+                                        overwriteSearchBar={{
+                                            preset: SearchBarPresets.BORDER,
+                                        }}
+                                    />
+                                </div>
+                                {!!SpecificRecordComponent && (
+                                    <SpecificRecordComponent discussionID={specificRecordID} />
+                                )}
+                            </ConditionalWrap>
+                        </PanelWidget>
+                    </>
+                }
+                mainBottom={
+                    <PanelWidgetHorizontalPadding>
+                        {sources.length > 1 ? (
+                            <Tabs
+                                defaultTabIndex={
+                                    currentSource ? sources.map(({ key }) => key).indexOf(currentSource.key) : 0
+                                }
+                                includeVerticalPadding={false}
+                                includeBorder
+                                largeTabs
+                                tabType={TabsTypes.BROWSE}
+                                data={sources.map((source) => ({
+                                    tabID: source.key,
+                                    label: source.label,
+                                    contents: searchPageResultsContent,
+                                }))}
+                                onChange={async ({ tabID: newSourceKey }) => {
+                                    await handleSourceChange(`${newSourceKey!}`);
+                                }}
+                                extraButtons={sortAndPaginationContent}
+                            />
+                        ) : (
+                            <>{searchPageResultsContent}</>
+                        )}
+                    </PanelWidgetHorizontalPadding>
+                }
+                secondaryTop={!isCompact && !!rightTopContent && <PanelWidget>{rightTopContent}</PanelWidget>}
+            />
+        </Container>
     );
 }
 
 function useInitialQueryParamSync() {
-    const { updateForm, form, search } = useSearchForm();
+    const { updateForm, resetForm, form } = useSearchForm<{}>();
+    const history = useHistory();
     const location = useLocation();
+    const searchScope = useSearchScope();
+
+    const { initialized } = form;
 
     useEffect(() => {
+        const unregisterListener = history.listen((location: History.Location<any>, action: History.Action) => {
+            // Whenever the history object is updated, we will reinitialize the form.
+            if (action === "POP" || action === "PUSH") {
+                resetForm();
+            }
+        });
+        return unregisterListener;
+    }, []);
+
+    useEffect(() => {
+        if (initialized) {
+            // We're already initialized.
+            return;
+        }
+
         const { search: browserQuery } = location;
-        const queryForm = qs.parse(browserQuery.replace(/^\?/, ""));
+        const queryForm: any = qs.parse(browserQuery, { ignoreQueryPrefix: true });
 
         for (const [key, value] of Object.entries(queryForm)) {
             if (value === "true") {
@@ -166,9 +255,37 @@ function useInitialQueryParamSync() {
                 queryForm[key] = false;
             }
 
-            if (typeof value === "string" && Number.isInteger(parseInt(value, 10))) {
-                queryForm[key] = parseInt(value, 10);
+            if (
+                // turn pure integer values into numbers.
+                typeof value === "string" &&
+                value.match(/^[\d]*$/) &&
+                !value.match(/^0/)
+            ) {
+                let intVal = parseInt(value, 10);
+                if (!Number.isNaN(intVal)) {
+                    queryForm[key] = intVal;
+                }
             }
+
+            if (key.toLocaleLowerCase() === "search") {
+                queryForm["query"] = queryForm[key];
+            }
+
+            if (key === "discussionID") {
+                queryForm.domain = "discussions";
+            }
+        }
+
+        // fixme
+        const blockedKeys = ["needsResearch", "initialized", "pageURL", "offset"];
+        blockedKeys.forEach((key) => {
+            if (queryForm[key] !== undefined) {
+                delete queryForm[key];
+            }
+        });
+
+        if (typeof queryForm.scope === "string") {
+            searchScope.setValue?.(queryForm.scope);
         }
 
         queryForm.initialized = true;
@@ -176,15 +293,41 @@ function useInitialQueryParamSync() {
         updateForm(queryForm);
         // Only for first initialization.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const { initialized } = form;
-    const lastinitialized = useLastValue(form.initialized);
-    useEffect(() => {
-        if (!lastinitialized && initialized) {
-            search();
-        }
-    }, [search, lastinitialized, initialized]);
+    }, [initialized]);
 }
 
-export default SearchPage;
+export function SearchPage() {
+    useInitialQueryParamSync();
+    const { form } = useSearchForm<{}>();
+
+    return (
+        <SectionProvider type={SectionTypes.TWO_COLUMNS}>
+            <Backgrounds />
+            {/* Add a context provider so that smartlinks within search use dynamic navigation. */}
+            <LinkContextProvider linkContexts={[formatUrl("/search", true)]}>
+                <DocumentTitle title={form.query ? `${form.query}` : t("Search Results")}>
+                    <TitleBar title={t("Search")} />
+                    <Banner isContentBanner />
+                    <SearchPageContent />
+                </DocumentTitle>
+            </LinkContextProvider>
+        </SectionProvider>
+    );
+}
+
+export default function SearchPageWithContext() {
+    const location = useLocation();
+
+    const queryString: any = qs.parse(location.search, { ignoreQueryPrefix: true });
+    const initialSourceKey = typeof queryString.source === "string" ? (queryString.source as string) : undefined;
+    const initialDomainKey = typeof queryString.domain === "string" ? (queryString.domain as string) : undefined;
+
+    return (
+        <SearchFormContextProvider
+            initialSourceKey={initialSourceKey}
+            initialFormState={initialDomainKey ? { domain: initialDomainKey } : undefined}
+        >
+            <SearchPage />
+        </SearchFormContextProvider>
+    );
+}

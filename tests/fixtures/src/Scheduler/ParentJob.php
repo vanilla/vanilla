@@ -8,16 +8,16 @@
 namespace VanillaTests\Fixtures\Scheduler;
 
 use Psr\Log\LoggerInterface;
+use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
-use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
 use Vanilla\Scheduler\SchedulerInterface;
 
 /**
  * Class ParentJob.
  */
-class ParentJob implements LocalJobInterface {
-
+class ParentJob implements LocalJobInterface
+{
     /** @var LoggerInterface */
     protected $logger;
 
@@ -33,7 +33,8 @@ class ParentJob implements LocalJobInterface {
      * @param LoggerInterface $logger
      * @param SchedulerInterface $scheduler
      */
-    public function __construct(LoggerInterface $logger, SchedulerInterface $scheduler) {
+    public function __construct(LoggerInterface $logger, SchedulerInterface $scheduler)
+    {
         $this->logger = $logger;
         $this->scheduler = $scheduler;
     }
@@ -43,7 +44,8 @@ class ParentJob implements LocalJobInterface {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $this->message = $message;
     }
 
@@ -52,27 +54,11 @@ class ParentJob implements LocalJobInterface {
      *
      * @return JobExecutionStatus
      */
-    public function run(): JobExecutionStatus {
-        $this->logger->info(get_class($this)." :: Creating ChildJob");
-        $this->scheduler->addJob(\VanillaTests\Fixtures\Scheduler\EchoJob::class);
+    public function run(): JobExecutionStatus
+    {
+        $this->logger->info(get_class($this) . " :: Creating ChildJob");
+        $this->scheduler->addJobDescriptor(new NormalJobDescriptor(EchoJob::class));
+
         return JobExecutionStatus::complete();
-    }
-
-    /**
-     * Set the priority.
-     *
-     * @param JobPriority $priority
-     */
-    public function setPriority(JobPriority $priority) {
-        // void method. It doesn't make any sense set a priority for a LocalJob
-    }
-
-    /**
-     * Set the delay.
-     *
-     * @param integer $seconds
-     */
-    public function setDelay(int $seconds) {
-        // void method. It doesn't make any sense set a delay for a LocalJob
     }
 }

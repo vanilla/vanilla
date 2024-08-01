@@ -18,7 +18,7 @@ import {
     isEmbedSelected,
 } from "@rich-editor/quill/utility";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
-import { isEditorWalledEvent } from "@rich-editor/editor/pieces/EditorEventWall";
+import { isEditorWalledEvent } from "@library/editor/pieces/EditorEventWall";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,
@@ -46,7 +46,7 @@ export default class EmbedSelectionModule extends Module {
 
     public static clearEmbedSelections(quill: Quill) {
         const domNodes = quill.root.querySelectorAll("." + SelectableEmbedBlot.SELECTED_CLASS);
-        domNodes.forEach(node => {
+        domNodes.forEach((node) => {
             const blot = Quill.find(node);
             if (blot instanceof SelectableEmbedBlot) {
                 blot.clearSelection();

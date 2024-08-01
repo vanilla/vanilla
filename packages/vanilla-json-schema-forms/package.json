@@ -1,0 +1,21 @@
+{
+    "name": "@vanilla/json-schema-forms",
+    "main": "./src/index.ts",
+    "module": "./src/index.ts",
+    "version": "1.0.0",
+    "license": "MIT",
+    "dependencies": {
+        "@cfworker/json-schema": "^1.12.7",
+        "@vanilla/ui": "*"
+    },
+    "devDependencies": {
+        "@vanilla/tsconfig": "^3.0.1"
+    },
+    "peerDependencies": {
+        "react": "*",
+        "react-dom": "*"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

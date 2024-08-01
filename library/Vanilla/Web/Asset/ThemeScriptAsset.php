@@ -8,12 +8,15 @@
 namespace Vanilla\Web\Asset;
 
 use Vanilla\Contracts\Web\AssetInterface;
+use Vanilla\Contracts\Web\AssetTrait;
 use Vanilla\Theme\Asset\JavascriptThemeAsset;
 
 /**
  * An asset representing a script containing data for a particular locale.
  */
-class ThemeScriptAsset implements AssetInterface {
+class ThemeScriptAsset implements AssetInterface
+{
+    use AssetTrait;
 
     /** @var JavascriptThemeAsset */
     private $asset;
@@ -23,21 +26,24 @@ class ThemeScriptAsset implements AssetInterface {
      *
      * @param JavascriptThemeAsset $asset
      */
-    public function __construct(JavascriptThemeAsset $asset) {
+    public function __construct(JavascriptThemeAsset $asset)
+    {
         $this->asset = $asset;
     }
 
     /**
      * @inheritdoc
      */
-    public function getWebPath(): string {
+    public function getWebPath(): string
+    {
         return $this->asset->getUrl();
     }
 
     /**
      * @inheritdoc
      */
-    public function isStatic(): bool {
+    public function isStatic(): bool
+    {
         return true;
     }
 }

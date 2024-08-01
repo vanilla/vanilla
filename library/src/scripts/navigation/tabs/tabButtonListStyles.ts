@@ -5,8 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { colorOut, defaultTransition } from "@library/styles/styleHelpers";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { defaultTransition } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { countClasses } from "@library/content/countStyles";
 import { compactMeBoxVariables } from "@library/headers/mebox/pieces/compactMeBoxStyles";
 
@@ -24,25 +26,25 @@ export const tabButtonListClasses = useThemeCache(() => {
 
     const button = style("button", {
         flexGrow: 1,
-        color: colorOut(globalVars.mainColors.fg),
-        $nest: {
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        ...{
             ".icon": {
                 ...defaultTransition("opacity"),
                 opacity: 0.8,
             },
             "&:hover": {
-                color: colorOut(globalVars.mainColors.primary),
-                $nest: {
+                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                ...{
                     ".icon": {
                         opacity: 1,
                     },
                 },
             },
             "&:focus, &:active, &.focus-visible": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
             },
-            [`& .${classesCount.text}`]: {
-                color: colorOut(compactMeBoxVars.colors.bg),
+            [`.${classesCount.text}`]: {
+                color: ColorsUtils.colorOut(compactMeBoxVars.colors.bg),
             },
         },
     });

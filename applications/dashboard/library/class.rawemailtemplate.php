@@ -14,31 +14,34 @@
  * @package Core
  * @since 2.2
  */
-class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
-
+class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate
+{
     /**
      * Delimiter for plaintext email.
      */
-    const PLAINTEXT_START = '<!-- //TEXT VERSION FOLLOWS//';
+    const PLAINTEXT_START = "<!-- //TEXT VERSION FOLLOWS//";
 
     /**
      * @return bool Whether to render in plaintext.
      */
-    public function isPlaintext() {
+    public function isPlaintext()
+    {
         return $this->plaintext;
     }
 
     /**
      * @param bool $plainText Whether to render in plaintext.
      */
-    public function setPlaintext($plainText) {
+    public function setPlaintext($plainText)
+    {
         $this->plaintext = $plainText;
     }
 
     /**
      * @return string The HTML formatted email message (the body of the email).
      */
-    public function getMessage() {
+    public function getMessage()
+    {
         return $this->message;
     }
 
@@ -48,7 +51,8 @@ class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      * @param bool $filter Whether to filter HTML or not.
      * @return EmailTemplate $this The calling object.
      */
-    public function setMessage($message, $convertNewlines = false, $filter = false) {
+    public function setMessage($message, $convertNewlines = false, $filter = false)
+    {
         $this->message = $this->formatContent($message, $convertNewlines, $filter);
         return $this;
     }
@@ -61,13 +65,14 @@ class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      * @param bool $filter Whether to filter HTML or not.
      * @return string The filtered HTML string.
      */
-    protected function formatContent($html, $convertNewlines = false, $filter = false) {
+    protected function formatContent($html, $convertNewlines = false, $filter = false)
+    {
         $str = $html;
         if ($filter) {
             $str = Gdn_Format::htmlFilter($str);
         }
         if ($convertNewlines) {
-            $str = preg_replace('/(\015\012)|(\015)|(\012)/', '<br>', $str);
+            $str = preg_replace('/(\015\012)|(\015)|(\012)/', "<br>", $str);
         }
         // $str = strip_tags($str, ['b', 'i', 'p', 'strong', 'em', 'br']);
         return $str;
@@ -78,7 +83,8 @@ class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      *
      * @return string A plaintext email.
      */
-    protected function plainTextEmail() {
+    protected function plainTextEmail()
+    {
         return Gdn_Format::plainText(Gdn_Format::text($this->getMessage()));
     }
 
@@ -87,7 +93,8 @@ class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      *
      * @return string The rendered email.
      */
-    public function toString() {
+    public function toString()
+    {
         if ($this->isPlaintext()) {
             return $this->plainTextEmail();
         }
@@ -96,7 +103,7 @@ class RawEmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
         $message = $this->getMessage();
 
         // Append plaintext version
-        $message .= self::PLAINTEXT_START.$this->plainTextEmail();
+        $message .= self::PLAINTEXT_START . $this->plainTextEmail();
         return $message;
     }
 }

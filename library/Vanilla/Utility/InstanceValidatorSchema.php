@@ -7,13 +7,17 @@
 
 namespace Vanilla\Utility;
 
+use Garden\MetaInterface;
+use Garden\MetaTrait;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 
 /**
  * Utility class for generating validators that item(s) are an instance of something.
  */
-class InstanceValidatorSchema extends Schema {
+class InstanceValidatorSchema extends Schema implements MetaInterface
+{
+    use MetaTrait;
 
     /** @var string */
     private $classNames;
@@ -21,10 +25,11 @@ class InstanceValidatorSchema extends Schema {
     /**
      * @param string|array $className
      */
-    public function __construct($className) {
+    public function __construct($className)
+    {
         parent::__construct();
         $this->classNames = is_array($className) ? $className : [$className];
-        $this->addValidator("", [$this, 'validator']);
+        $this->addValidator("", [$this, "validator"]);
     }
 
     /**
@@ -35,7 +40,8 @@ class InstanceValidatorSchema extends Schema {
      *
      * @return bool
      */
-    public function validator($value, ValidationField $field) {
+    public function validator($value, ValidationField $field)
+    {
         $matches = false;
         foreach ($this->classNames as $className) {
             if ($value instanceof $className) {
@@ -45,7 +51,7 @@ class InstanceValidatorSchema extends Schema {
         }
 
         if (!$matches) {
-            $field->addError(get_class($value) . ' is not an instanceof oneof ' . implode(", ", $this->classNames));
+            $field->addError(get_class($value) . " is not an instanceof oneof " . implode(", ", $this->classNames));
 
             return false;
         }

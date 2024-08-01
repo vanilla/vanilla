@@ -24,9 +24,9 @@ import BlockBlot from "quill/blots/block";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import { ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { ListLineBlot } from "@rich-editor/quill/blots/lists/ListLineBlot";
 import Formatter from "@rich-editor/quill/Formatter";
-import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import LinkBlot from "quill/formats/link";
 import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
 
 export default class KeyboardBindings {
@@ -34,7 +34,7 @@ export default class KeyboardBindings {
         SpoilerLineBlot.blotName,
         BlockquoteLineBlot.blotName,
         CodeBlockBlot.blotName,
-        ListItem.blotName,
+        ListLineBlot.blotName,
     ];
     public bindings: {
         [key: string]: BindingObject;
@@ -43,6 +43,7 @@ export default class KeyboardBindings {
     constructor(private quill: Quill) {
         // Keyboard behaviours
         this.resetDefaultBindings();
+        this.addFormatEscapeHandlers();
         this.addBlockNewLineHandlers();
         this.addBlockArrowKeyHandlers();
         this.addBlockBackspaceHandlers();
@@ -51,7 +52,7 @@ export default class KeyboardBindings {
     }
 
     /**
-     * Special handling for the ENTER key for Mutliline Blots.
+     * Special handling for the ENTER key for Multiline Blots.
      *
      * @if
      * If there is 1 trailing newline line after the first line,
@@ -294,10 +295,81 @@ export default class KeyboardBindings {
     }
 
     /**
+     * Add keyboard bindings for removing the current formatting when switching lines.
+     *
+     * Expected scenarios are explained here:
+     * @see https://github.com/vanilla/vanilla-cloud/pull/1293
+     */
+    private addFormatEscapeHandlers() {
+        // Exit a link form if you type space.
+        // https://github.com/vanilla/support/issues/1440
+        this.bindings["Link Space"] = {
+            key: 32, // Space
+            collapsed: true,
+            format: ["link"],
+            handler: (range: RangeStatic) => {
+                const [linkBlot, linkOffset] = this.quill.scroll.descendant(
+                    (blot: Blot) => blot instanceof LinkBlot,
+                    range.index - 1, // Account for the inserted space.
+                );
+
+                if (linkBlot && linkOffset === linkBlot.length() - 1) {
+                    // If our cursor is at the end of the link.
+                    this.quill.format("link", false);
+                }
+                return true;
+            },
+        };
+
+        // Prevent you from being stuck in an infinitely continuing inline code.
+        // Eg.
+        this.bindings["Inline Code End of Line Right"] = {
+            key: KeyboardModule.keys.RIGHT,
+            collapsed: true,
+            format: [CodeBlot.blotName],
+            handler: (range: RangeStatic) => {
+                const [line, lineOffset] = this.quill.getLine(range.index);
+                if (lineOffset === line.length() - 1) {
+                    this.quill.format(CodeBlot.blotName, false);
+                    this.quill.insertText(range.index, " ", Quill.sources.USER);
+                    this.quill.setSelection(range.index + 1, 0);
+                    return false; // Prevent default action.
+                }
+                return true;
+            },
+        };
+
+        // Prevent an inline code from extending from one line to another.
+        this.bindings["Inline Format End of Line Enter"] = {
+            key: KeyboardModule.keys.ENTER,
+            collapsed: true,
+            format: Formatter.INLINE_FORMAT_NAMES,
+            handler: (range: RangeStatic) => {
+                const [blot, blotOffset] = this.quill.scroll.descendant(
+                    (blot: Blot) => Formatter.INLINE_FORMAT_NAMES.includes(blot.statics.blotName),
+                    range.index - 1, // Account for the inserted newline.
+                );
+
+                if (blot && blotOffset === blot.length() - 1) {
+                    // We're at the end of line. Don't allow inline formats to pass onto the next line.
+
+                    setTimeout(() => {
+                        // Set Immediate needed to run after quill's built-in enter handler.
+                        Formatter.INLINE_FORMAT_NAMES.forEach((formatName) => {
+                            this.quill.format(formatName, false, Quill.sources.API);
+                        });
+                    }, 0);
+                }
+                return true;
+            },
+        };
+    }
+
+    /**
      * Add keyboard options.bindings that allow the user to
      */
     private addBlockNewLineHandlers() {
-        this.bindings["MutliLine Enter"] = {
+        this.bindings["MultiLine Enter"] = {
             key: KeyboardModule.keys.ENTER,
             collapsed: true,
             format: ["spoiler-line", "blockquote-line"],
@@ -314,22 +386,26 @@ export default class KeyboardBindings {
         this.bindings["List Enter"] = {
             key: KeyboardModule.keys.ENTER,
             collapsed: true,
-            format: [ListItem.blotName],
+            format: [ListLineBlot.blotName],
             handler: (range: RangeStatic) => {
                 const formatter = new Formatter(this.quill, range);
                 const listItems = formatter.getListItems();
 
                 let handled = false;
-                listItems.forEach(item => {
+                listItems.forEach((item) => {
                     if (item.domNode.textContent === "") {
-                        item.outdent();
+                        if (item.getValue().depth > 0) {
+                            item.outdent();
+                        } else {
+                            item.replaceWith("block", "");
+                        }
                         handled = true;
                     }
                 });
 
                 if (handled) {
-                    this.quill.update(Quill.sources.USER);
-                    this.quill.setSelection(range, Quill.sources.API);
+                    this.quill.update(Quill.sources.SILENT);
+                    this.quill.setSelection(range, Quill.sources.USER);
                     return false;
                 } else {
                     return true;
@@ -412,8 +488,19 @@ export default class KeyboardBindings {
         const handleListBackspace = (range: RangeStatic) => {
             const formatter = new Formatter(this.quill, range);
             const listItem = formatter.getListItems()[0];
-            listItem.replaceWith("block", "");
-            this.quill.setSelection(range, Quill.sources.SILENT);
+            if (listItem instanceof ListLineBlot && !listItem.domNode.textContent) {
+                // We have an empty list item and we are at the start of it.
+                if (listItem.hasNestedList()) {
+                    listItem.outdent(true);
+                    this.quill.update(Quill.sources.USER);
+                }
+                this.quill.deleteText(listItem.offset(this.quill.scroll), listItem.length());
+                const newPosition = range.index - 1;
+                if (newPosition > 0) {
+                    this.quill.setSelection({ index: newPosition, length: 0 }, Quill.sources.USER);
+                }
+                return false;
+            }
             return true;
         };
 
@@ -421,7 +508,7 @@ export default class KeyboardBindings {
             key: KeyboardModule.keys.BACKSPACE,
             offset: 0,
             collapsed: true,
-            format: [ListItem.blotName],
+            format: [ListLineBlot.blotName],
             handler: handleListBackspace,
         };
         this.bindings["Block Backspace With Selection"] = {

@@ -7,24 +7,56 @@
 import React from "react";
 import { makeProfileUrl } from "../utility/appUtils";
 import classNames from "classnames";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import { UserCardPopup, useUserCardTrigger } from "@library/features/userCard/UserCard";
+import { IUserFragment } from "@library/@types/api/users";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps {
-    username: string;
+    userFragment: Partial<IUserFragment> & Pick<IUserFragment, "userID">;
     className?: string;
     children?: React.ReactNode;
+    isUserCard?: boolean;
+    buttonType?: ButtonTypes;
 }
 
 /**
  * Class representing a link to a users profile. This will do a full page refresh.
  */
-export default class ProfileLink extends React.Component<IProps> {
-    public render() {
-        const { username } = this.props;
-        const children = this.props.children || username;
-        return (
-            <a href={makeProfileUrl(username)} className={classNames(this.props.className)}>
-                {children}
-            </a>
-        );
+export default function ProfileLink(props: IProps) {
+    const { userFragment, isUserCard = true } = props;
+
+    const link = <InnerLink {...props} />;
+
+    if (!isUserCard) {
+        return link;
     }
+
+    return (
+        <UserCardPopup userID={userFragment.userID} userFragment={userFragment}>
+            {link}
+        </UserCardPopup>
+    );
+}
+
+/**
+ * Class representing a link to a users profile. This will do a full page refresh.
+ */
+function InnerLink(props: IProps) {
+    const { userFragment, isUserCard = true } = props;
+    const children = props.children || userFragment.name || "Deleted User";
+    const profileURL = makeProfileUrl(userFragment.userID, userFragment.name);
+    const context = useUserCardTrigger();
+
+    return (
+        <SmartLink
+            {...context.props}
+            ref={context.triggerRef as any}
+            to={profileURL}
+            className={classNames(props.className)}
+        >
+            {children}
+            {context.contents}
+        </SmartLink>
+    );
 }

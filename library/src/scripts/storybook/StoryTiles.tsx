@@ -6,7 +6,7 @@
 
 import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { margins, singleBorder, unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 
 interface IProps {

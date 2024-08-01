@@ -4,14 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { EMPTY_FONTS, IFont } from "@library/styles/styleHelpersTypography";
-import { paddings } from "@library/styles/styleHelpersSpacing";
-import { TextAlignLastProperty, TextAlignProperty } from "csstype";
-import { percent } from "csx";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { Property } from "csstype";
+import { oneColumnVariables } from "@library/layout/Section.variables";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
+import { css } from "@emotion/css";
 
 export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("dataList", forcedVars);
@@ -24,21 +25,19 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const key = makeThemeVars("key", {
-        textAlignment: "left" as TextAlignProperty,
+        textAlignment: "left" as Property.TextAlign,
         padding: {
             vertical: spacing.padding.vertical,
             right: globalVars.spacer.size,
         },
-        font: {
-            ...EMPTY_FONTS,
-            size: globalVars.fonts.size.small,
-            weight: globalVars.fonts.weights.bold,
+        font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("small", "bold"),
             lineHeight: globalVars.lineHeights.condensed,
-        } as IFont,
+        }),
     });
 
     const value = makeThemeVars("value", {
-        textAlignment: "left" as TextAlignProperty,
+        textAlignment: "left" as "left" | "center",
         padding: {
             vertical: spacing.padding.vertical,
         },
@@ -52,46 +51,67 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 });
 
 export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) => {
-    const style = styleFactory("dataList");
     const vars = dataListVariables();
     const globalVars = globalVariables();
-    const mediaQueries = layoutMediaQueries ?? layoutVariables().mediaQueries();
+    const mediaQueries = layoutMediaQueries ?? oneColumnVariables().mediaQueries();
 
-    const root = style({});
+    const root = css({
+        width: "100%",
+    });
 
-    const table = style(
-        "table",
-        {},
-        mediaQueries.xs({
-            $nest: {
-                "&&": {
-                    display: "block",
-                },
-            },
-        }),
-    );
+    const table = css({
+        width: "100%",
+        "&&": {
+            ...mediaQueries.xs({
+                display: "inline-table",
+            }),
+        },
+    });
 
-    const key = style("key", {
+    const title = css({
+        // Fighting with the _profile styles
+        "&&&&": {
+            ...Mixins.margin({
+                bottom: globalVars.spacer.headingBox,
+            }),
+        },
+    });
+
+    const key = css({
         textAlign: vars.key.textAlignment,
         verticalAlign: "top",
-        whiteSpace: "nowrap",
         fontWeight: globalVars.fonts.weights.bold,
-        ...paddings(vars.key.padding),
+        ...Mixins.padding(vars.key.padding),
     });
 
-    const value = style("value", {
+    const value = css({
         textAlign: vars.key.textAlignment,
         verticalAlign: "top",
-        ...paddings(vars.value.padding),
+        ...Mixins.padding(vars.value.padding),
+        whiteSpace: "pre-line",
     });
 
-    const row = style("row", {});
+    const tokenGap = css({
+        display: "flex",
+        flexWrap: "wrap",
+        gap: globalVars.fonts.size.small,
+    });
+
+    const checkBoxAlignment = css({
+        /**
+         * This is fighting with old classNames and since this instance
+         * is unique its the one that gets the !important
+         */
+        padding: "2px 0 0!important",
+    });
 
     return {
         root,
+        title,
         table,
-        row,
         key,
         value,
+        tokenGap,
+        checkBoxAlignment,
     };
 });

@@ -5,27 +5,31 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpersColors";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { allLinkStates, fonts, margins, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { allLinkStates, singleBorder } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/SearchBar.styles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
-import { percent } from "csx";
-import { metaContainerStyles, metaItemStyle } from "@vanilla/library/src/scripts/styles/metasStyles";
-import { important } from "csx";
+import { important, percent } from "csx";
+import { metasVariables } from "@library/metas/Metas.variables";
+import { metaItemStyle } from "@library/metas/Metas.styles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { SearchBarPresets } from "@library/banner/SearchBarPresets";
+import { CSSObject } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
 
 export const searchPageCSS = () => {
     const globalVars = globalVariables();
     const layoutVars = forumLayoutVariables();
-    const formElementVars = formElementsVariables();
+    const metasVars = metasVariables();
 
     cssOut(`.DataList.DataList-Search .Item.Item-Search .Img.PhotoWrap`, {
-        top: unit(layoutVars.cell.paddings.vertical),
-        left: unit(layoutVars.cell.paddings.horizontal),
+        top: styleUnit(layoutVars.cell.paddings.vertical),
+        left: styleUnit(layoutVars.cell.paddings.horizontal),
     });
 
     cssOut(
@@ -42,8 +46,8 @@ export const searchPageCSS = () => {
         `,
         {
             textDecoration: "none",
-            color: colorOut(globalVars.meta.text.color),
-            fontSize: unit(globalVars.meta.text.size),
+            color: ColorsUtils.colorOut(metasVars.font.color),
+            fontSize: styleUnit(metasVars.font.size),
         },
     );
 
@@ -52,28 +56,27 @@ export const searchPageCSS = () => {
           .DataList.DataList-Search#search-results .Item.Item-Search h3 a,
       `,
         {
-            textDecoration: "none",
-            ...fonts({
+            ...Mixins.font({
                 color: globalVars.mainColors.fg,
-                size: globalVars.fonts.size.large,
-                weight: globalVars.fonts.weights.semiBold,
+                ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
                 lineHeight: globalVars.lineHeights.condensed,
+                textDecoration: "none",
             }),
             ...allLinkStates({
                 hover: {
-                    color: colorOut(globalVars.links.colors.hover),
+                    color: ColorsUtils.colorOut(globalVars.links.colors.hover),
                 },
                 keyboardFocus: {
-                    color: colorOut(globalVars.links.colors.keyboardFocus),
+                    color: ColorsUtils.colorOut(globalVars.links.colors.keyboardFocus),
                 },
                 focus: {
-                    color: colorOut(globalVars.links.colors.focus),
+                    color: ColorsUtils.colorOut(globalVars.links.colors.focus),
                 },
                 active: {
-                    color: colorOut(globalVars.links.colors.active),
+                    color: ColorsUtils.colorOut(globalVars.links.colors.active),
                 },
                 visited: {
-                    color: colorOut(globalVars.links.colors.visited),
+                    color: ColorsUtils.colorOut(globalVars.links.colors.visited),
                 },
             }),
         },
@@ -81,10 +84,6 @@ export const searchPageCSS = () => {
 
     cssOut(`.Item.Item-Search .Meta .Bullet`, {
         display: important("none"),
-    });
-
-    cssOut(`#search-results.DataList.DataList-Search .Item.Item-Search .Media-Body .Meta`, {
-        ...metaContainerStyles(),
     });
 
     cssOut(`#search-results.DataList.DataList-Search .Item.Item-Search .Media-Body .Bullet`, {
@@ -103,14 +102,13 @@ export const searchPageCSS = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-
-        $nest: {
-            "& .Gloss": {
+        ...{
+            ".Gloss": {
                 margin: 0,
                 minHeight: 0,
                 minWidth: 0,
             },
-            "& .Pager": {
+            ".Pager": {
                 float: "none",
                 marginRight: "auto",
             },
@@ -118,7 +116,7 @@ export const searchPageCSS = () => {
     });
 
     cssOut(`#search-results .DataList.DataList-Search .Crumb`, {
-        ...margins({
+        ...Mixins.margin({
             right: -6,
             left: -6,
         }),
@@ -151,11 +149,10 @@ export const searchPageCSS = () => {
         textTransform: "none",
     });
 
-    cssOut(`#search-results .Item-Body .Meta`, metaContainerStyles());
     cssOut(`#search-results .Item-Body .Meta > *`, metaItemStyle());
 
     cssOut(`#search-results .Meta-Body.Meta .Breadcrumbs a`, {
-        fontSize: unit(globalVars.meta.text.size),
+        fontSize: styleUnit(metasVars.font.size),
         textTransform: "initial",
     });
 
@@ -166,12 +163,14 @@ export const searchPageCSS = () => {
     });
 
     // Search result styles
-    const searchResultsStyles = searchBarClasses().searchResultsStyles;
+    const searchResultsStyles = searchBarClasses({
+        preset: SearchBarPresets.BORDER,
+    } as ISearchBarOverwrites).searchResultsStyles;
     const searchResultsVars = searchResultsVariables();
 
     cssOut(`body.Section-SearchResults .MenuItems.MenuItems-Input.ui-autocomplete`, {
         position: "relative",
-        ...paddings({
+        ...Mixins.padding({
             vertical: 0,
         }),
     });
@@ -181,7 +180,7 @@ export const searchPageCSS = () => {
         position: "relative",
         padding: 0,
         margin: 0,
-        $nest: {
+        ...{
             "& + .ui-menu-item": {
                 borderTop: singleBorder({
                     color: searchResultsVars.separator.fg,
@@ -198,24 +197,24 @@ export const searchPageCSS = () => {
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "flex-start",
-        $nest: {
-            "& .Title": {
+        ...{
+            ".Title": {
                 ...searchResultsStyles.title,
                 ...lineHeightAdjustment(),
                 display: "block",
                 width: percent(100),
                 marginBottom: ".15em",
             },
-            "& .Aside": {
+            ".Aside": {
                 display: "inline-block",
                 float: "none",
                 ...searchResultsStyles.meta,
             },
-            "& .Aside .Date": {
+            ".Aside .Date": {
                 display: "inline",
                 ...searchResultsStyles.meta,
             },
-            "& .Gloss": {
+            ".Gloss": {
                 ...searchResultsStyles.excerpt,
                 display: "block",
                 paddingLeft: 0,
@@ -223,7 +222,7 @@ export const searchPageCSS = () => {
                 width: percent(100),
             },
         },
-    });
+    } as CSSObject);
 
     cssOut(`.Item-Search .Media .ImgExt`, {
         display: "flex",
@@ -232,19 +231,19 @@ export const searchPageCSS = () => {
     });
 
     cssOut(`.Item-Search .Summary`, {
-        marginTop: unit(searchResultsVars.excerpt.margin),
+        marginTop: styleUnit(searchResultsVars.excerpt.margin),
     });
 
     const buttonWidth = 46;
 
     cssOut(`body.Section-SearchResults .AdvancedSearch .InputAndButton .Handle.Handle `, {
-        right: unit(buttonWidth),
+        right: styleUnit(buttonWidth),
     });
     cssOut(`body.Section-SearchResults .AdvancedSearch .InputAndButton .bwrap.bwrap`, {
-        minWidth: unit(buttonWidth),
+        minWidth: styleUnit(buttonWidth),
     });
 
     cssOut(`body.Section-SearchResults .AdvancedSearch .KeywordsWrap.InputAndButton .InputBox.InputBox`, {
-        paddingRight: unit(buttonWidth * 2 - 10),
+        paddingRight: styleUnit(buttonWidth * 2 - 10),
     });
 };

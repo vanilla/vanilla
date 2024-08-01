@@ -9,14 +9,15 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Embeds;
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\LinkSanitizeTrait;
 
-class CodePenSanitizeTest extends SanitizeTest {
-
-//    use LinkSanitizeTrait;
+class CodePenSanitizeTest extends SanitizeTest
+{
+    //    use LinkSanitizeTrait;
 
     /**
      * @inheritdoc
      */
-    protected function cssOperations(string $string): array {
+    protected function cssOperations(string $string): array
+    {
         $operations = [
             [
                 "insert" => [
@@ -31,9 +32,9 @@ class CodePenSanitizeTest extends SanitizeTest {
                         "attributes" => [
                             "id" => "example",
                             "embedUrl" => "http://codepen.io/example/embed/preview",
-                            'style' => [
-                                'width' => $string,
-                                'overflow' => $string,
+                            "style" => [
+                                "width" => $string,
+                                "overflow" => $string,
                             ],
                         ],
                     ],
@@ -48,7 +49,8 @@ class CodePenSanitizeTest extends SanitizeTest {
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             [
                 "insert" => [
@@ -61,11 +63,11 @@ class CodePenSanitizeTest extends SanitizeTest {
                         "height" => $content,
                         "width" => $content,
                         "attributes" => [
-                            'id' => $content,
-                            'embedUrl' => $content,
-                            'style' => [
-                                'width' => $content,
-                                'overflow' => $content,
+                            "id" => $content,
+                            "embedUrl" => $content,
+                            "style" => [
+                                "width" => $content,
+                                "overflow" => $content,
                             ],
                         ],
                     ],

@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+*/.sass-cache/*
+*.scssc
+*.sassc
+*.kpf
+*.swp
+_notes
+~*
+.project
+.settings
+.buildpath
+.idea

@@ -3,15 +3,15 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
+import React, { ElementType } from "react";
 import { smartAlignClasses } from "@library/layout/smartAlignStyles";
+import { cx } from "@emotion/css";
 
 interface IProps {
     className?: string;
     children: React.ReactNode;
-    outerTag?: keyof JSX.IntrinsicElements;
-    innerTag?: keyof JSX.IntrinsicElements;
+    outerTag?: ElementType;
+    innerTag?: ElementType;
 }
 
 export default class SmartAlign extends React.Component<IProps> {
@@ -20,8 +20,8 @@ export default class SmartAlign extends React.Component<IProps> {
         const Inner = this.props.outerTag || "div";
         const classes = smartAlignClasses();
         return (
-            <Outer className={classNames("smartAlign-outer", this.props.className, classes.root)}>
-                <Inner className={classNames("smartAlign-inner", classes.inner)}>{this.props.children}</Inner>
+            <Outer className={cx(classes.root, this.props.className)}>
+                <Inner className={cx(classes.inner)}>{this.props.children}</Inner>
             </Outer>
         );
     }

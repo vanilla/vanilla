@@ -9,29 +9,26 @@ namespace Vanilla\Setup;
 
 use Composer\Script\Event;
 use Composer\Factory;
+use Vanilla\AddonManager;
 
 /**
  * Contains helper methods for Vanilla's composer integration.
  */
-class ComposerHelper {
-
+class ComposerHelper
+{
     const NODE_ARGS_ENV = "VANILLA_BUILD_NODE_ARGS";
     const DISABLE_VALIDATION_ENV = "VANILLA_BUILD_DISABLE_CODE_VALIDATION";
     const LOW_MEMORY_ENV = "VANILLA_BUILD_LOW_MEMORY";
     const DISABLE_AUTO_BUILD = "VANILLA_BUILD_DISABLE_AUTO_BUILD";
 
     /**
-     * Clear the addon manager cache.
+     * Clear cached php files.
      */
-    private static function clearAddonManagerCache() {
-        $cacheDir = realpath(__DIR__.'/../../cache');
+    public static function clearPhpCache()
+    {
+        $cacheDir = realpath(__DIR__ . "/../../cache");
 
-        $paths = array_merge(
-            [$cacheDir.'/addon.php', $cacheDir.'/openapi.php'],
-            glob($cacheDir.'/locale/*.php'),
-            glob($cacheDir.'/theme/*.php'),
-            glob($cacheDir.'/*-index.php')
-        );
+        $paths = array_merge(glob($cacheDir . "/**/*.php"), glob($cacheDir . "/*.php"));
         foreach ($paths as $path) {
             if (file_exists($path)) {
                 unlink($path);
@@ -42,11 +39,12 @@ class ComposerHelper {
     /**
      * Clear the twig cache.
      */
-    private static function clearTwigCache() {
-        $cacheDir = realpath(__DIR__.'/../../cache');
+    public static function clearTwigCache()
+    {
+        $cacheDir = realpath(__DIR__ . "/../../cache");
 
         // Clear twig cache if it exists.
-        $twigCache = $cacheDir . '/twig';
+        $twigCache = $cacheDir . "/twig";
         if (file_exists($twigCache)) {
             self::deleteRecursively($twigCache);
         }
@@ -58,18 +56,33 @@ class ComposerHelper {
     }
 
     /**
+     * Clear the js deps cache.
+     */
+    public static function clearJSDepsCache()
+    {
+        $cacheDir = realpath(__DIR__ . "/../../build/.cache");
+
+        // Clear deps cache if it exists.
+        $depsCache = $cacheDir . "/deps";
+        if (file_exists($depsCache)) {
+            self::deleteRecursively($depsCache);
+        }
+    }
+
+    /**
      * Recursively delete a directory.
      *
      * @param string $root
      */
-    private static function deleteRecursively(string $root) {
+    private static function deleteRecursively(string $root)
+    {
         $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($root, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
 
         foreach ($files as $fileinfo) {
-            $deleteFunction = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+            $deleteFunction = $fileinfo->isDir() ? "rmdir" : "unlink";
             $deleteFunction($fileinfo->getRealPath());
         }
 
@@ -91,62 +104,58 @@ class ComposerHelper {
      * reduces memory usage.
      * - VANILLA_BUILD_DISABLE_AUTO_BUILD - Prevent the build from running on composer install.
      */
-    public static function postUpdate() {
-        $vanillaRoot = realpath(__DIR__ . "/../../");
-        $skipBuild = getenv(self::DISABLE_AUTO_BUILD) === 'true';
+    public static function postUpdate()
+    {
+        require_once __DIR__ . "/../../environment.php";
+        printf("\nBuilding addon cache");
+        $addonManager = new AddonManager(AddonManager::getDefaultScanDirectories(), PATH_CACHE);
+        $addonManager->ensureMultiCache();
+        printf("\nAddon cache built");
+
+        $skipBuild = getenv(self::DISABLE_AUTO_BUILD) === "true";
         if ($skipBuild) {
-            printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set to \"true\".\n");
+            printf(
+                "\nSkipping automatic JS build because " .
+                    self::DISABLE_AUTO_BUILD .
+                    " env variable is set to \"true\".\n"
+            );
             return;
         }
 
         printf("\nInstalling core node_modules\n");
 
-        // --ignore-engines is used until https://github.com/vanilla/dev-inter-ops/issues/38 is resolved.
-        // Node 10.11.0 is run there and our linter has an engine requirement of 10.13.0
-        // We don't even run the linter as part of this process.
-        // It even technically works but many packages that support node 10 only want to support the LTS version (10.13.x).
-        passthru('yarn install --pure-lockfile --ignore-engines', $installReturn);
-
-        // Generate our vendor license file.
-        $distDir = $vanillaRoot . '/dist';
-        $licensePath = $distDir . '/VENDOR_LICENSES.txt';
-        if (!file_exists($distDir)) {
-            mkdir($distDir);
-        }
-        printf("\nGererating Vendor Licenses for build\n");
-        passthru("yarn licenses generate-disclaimer --prod --ignore-engines > $licensePath");
-
+        passthru("yarn install", $installReturn);
         if ($installReturn !== 0) {
             printf("Installing core node_modules failed\n");
             exit($installReturn);
         }
-
-        $buildScript = realpath($vanillaRoot . "/build/scripts/build.ts");
-        $tsNodeRegister = realpath($vanillaRoot . "/node_modules/ts-node/register");
-        $tsConfig = realpath($vanillaRoot . "/build/tsconfig.json");
-
-        // Build bootstrap can be used to configure this build if env variables are not available.
-        $buildBootstrap = realpath($vanillaRoot . "/conf/build-bootstrap.php");
-        if (file_exists($buildBootstrap)) {
-            include $buildBootstrap;
-        }
-
-        $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
-
-        // The disable validation flag was used to enable low memory optimizations.
-        // The build no longer does any validation, however, so a new env variable has been added.
-        // So, we check for both.
-        $lowMemoryFlag = getenv(self::DISABLE_VALIDATION_ENV) || getenv(self::LOW_MEMORY_ENV) ? "--low-memory" : "";
-        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $lowMemoryFlag";
-
+        // Run build
+        $buildCommand = "node -r esbuild-register ./build/vite.buildProd.ts 2>&1";
         printf("\nBuilding frontend assets\n");
         printf("\n$buildCommand\n");
         system($buildCommand, $buildResult);
-
         if ($buildResult !== 0) {
             printf("The build failed with code $buildResult");
             exit($buildResult);
         }
+
+        $buildCommand = "node -r esbuild-register ./build/scripts/variables/buildVariableDocs.ts 2>&1";
+        printf("\nBuilding variable documentation\n");
+        printf("\n$buildCommand\n");
+        system($buildCommand, $buildResult);
+        if ($buildResult !== 0) {
+            printf("The build failed with code $buildResult");
+            exit($buildResult);
+        }
+
+        // Generate our vendor license file.
+        $distDir = PATH_DIST;
+        $licensePath = $distDir . "/VENDOR_LICENSES.txt";
+        if (!file_exists($distDir)) {
+            mkdir($distDir);
+        }
+        printf("\nGererating Vendor Licenses for build\n");
+        passthru("yarn licenses generate-disclaimer --production > $licensePath");
     }
 
     /**
@@ -157,12 +166,13 @@ class ComposerHelper {
      *
      * @param Event $event The event being fired.
      */
-    public static function preUpdate(Event $event) {
-        self::clearAddonManagerCache();
+    public static function preUpdate(Event $event)
+    {
+        self::clearPhpCache();
         self::clearTwigCache();
 
         // Check for a composer-local.json.
-        $composerLocalPath = './composer-local.json';
+        $composerLocalPath = "./composer-local.json";
 
         if (!file_exists($composerLocalPath)) {
             return;
@@ -171,26 +181,20 @@ class ComposerHelper {
         $composer = $event->getComposer();
         $factory = new Factory();
 
-        $localComposer = $factory->createComposer(
-            $event->getIO(),
-            $composerLocalPath,
-            true,
-            null,
-            false
-        );
+        $localComposer = $factory->createComposer($event->getIO(), $composerLocalPath, true, null, false);
 
         // Merge repositories.
         $localRepositories = $localComposer->getRepositoryManager()->getRepositories();
         foreach ($localRepositories as $repository) {
             /* @var \Composer\Repository\RepositoryInterface $repository */
 
-            if (method_exists($repository, 'getRepoConfig')) {
+            if (method_exists($repository, "getRepoConfig")) {
                 $config = $repository->getRepoConfig();
             } else {
-                $config = ['url' => ''];
+                $config = ["url" => ""];
             }
             // Skip the packagist repo.
-            if (strpos($config['url'], 'packagist.org') !== false) {
+            if (strpos($config["url"], "packagist.org") !== false) {
                 continue;
             }
             $composer->getRepositoryManager()->addRepository($repository);
@@ -200,7 +204,10 @@ class ComposerHelper {
         $requires = array_merge($composer->getPackage()->getRequires(), $localComposer->getPackage()->getRequires());
         $composer->getPackage()->setRequires($requires);
 
-        $devRequires = array_merge($composer->getPackage()->getDevRequires(), $localComposer->getPackage()->getDevRequires());
+        $devRequires = array_merge(
+            $composer->getPackage()->getDevRequires(),
+            $localComposer->getPackage()->getDevRequires()
+        );
         $composer->getPackage()->setDevRequires($devRequires);
     }
 }

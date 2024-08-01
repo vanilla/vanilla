@@ -6,14 +6,15 @@
 import { t } from "@vanilla/i18n";
 import React from "react";
 import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
-import { RadioGroup } from "@vanilla/library/src/scripts/forms/radioAsButtons/RadioGroup";
+import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
 import { searchInFilterClasses } from "@library/search/searchInFilter.styles";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/Button.styles";
 
 export interface ISearchInButton {
     label: string;
     icon: React.ReactNode;
     data: string;
+    disabled?: boolean;
 }
 
 interface IProps {
@@ -27,10 +28,9 @@ interface IProps {
  * Implements filters for search page
  */
 export function SearchInFilter(props: IProps) {
-    const { filters = [], setData, endFilters = [], activeItem } = props;
-    if (filters.length + endFilters.length <= 1) {
-        return null; // no filters, or only 1 is not helpful
-    }
+    let { filters = [], setData, endFilters = [], activeItem } = props;
+    const shouldRenderSeparator = filters.length > 0;
+
     const classes = searchInFilterClasses();
     const buttonClass = buttonClasses().radio;
     return (
@@ -44,13 +44,13 @@ export function SearchInFilter(props: IProps) {
         >
             <>
                 {filters.map((filter, i) => {
-                    return <RadioInputAsButton key={i} {...filter} />;
+                    return <RadioInputAsButton buttonAutoMinWidth={true} key={i} {...filter} />;
                 })}
                 {endFilters.length > 0 && (
                     <>
-                        <span className={classes.separator} role="separator" />
+                        {shouldRenderSeparator && <span className={classes.separator} role="separator" />}
                         {endFilters.map((filter, i) => {
-                            return <RadioInputAsButton key={i} {...filter} />;
+                            return <RadioInputAsButton buttonAutoMinWidth={true} key={i} {...filter} />;
                         })}
                     </>
                 )}

@@ -11,8 +11,8 @@
 /**
  * An interface for in-page modules.
  */
-interface Gdn_IModule {
-
+interface Gdn_IModule
+{
     /**
      * Returns the name of the asset where this component should be rendered.
      */
@@ -26,10 +26,10 @@ interface Gdn_IModule {
     /**
      * Returns the location of the view for this module in the filesystem.
      *
-     * @param string $View The name of the view to lookup.
-     * @param string $ApplicationFolder The name of the application folder that contains the view.
+     * @param string $view The name of the view to lookup.
+     * @param string $applicationFolder The name of the application folder that contains the view.
      */
-    public function fetchViewLocation($View = '', $ApplicationFolder = '');
+    public function fetchViewLocation($view = "", $applicationFolder = "");
 
     /**
      * Returns the name of the module.

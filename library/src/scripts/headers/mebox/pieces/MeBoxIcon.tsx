@@ -25,7 +25,7 @@ export function MeBoxIcon(props: IProps) {
             )}
         >
             {children}
-            {count != null && countLabel && count > 0 && <Count label={countLabel} count={count} />}
+            {count != null && countLabel && count >= 0 && <Count label={countLabel} count={count} />}
         </div>
     );
 }

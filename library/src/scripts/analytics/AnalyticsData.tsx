@@ -3,21 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, FC } from "react";
+import { useEffect, FC } from "react";
+import { ViewType } from "@library/analytics/tracking";
 
 interface IProps {
-    data?: object;
+    data?: Record<string, any>;
     uniqueKey: string | number; // A new analytics event is only fired when this changes.
-}
-
-let legacyAnalyticsTickEnabled = false;
-
-export function enableLegacyAnalyticsTick(newValue: boolean) {
-    legacyAnalyticsTickEnabled = newValue;
-}
-
-export function isLegacyAnalyticsTickEnabled() {
-    return legacyAnalyticsTickEnabled;
 }
 
 /**
@@ -27,7 +18,20 @@ export const AnalyticsData: FC<IProps> = (props: IProps) => {
     const { data, uniqueKey } = props;
 
     useEffect(() => {
-        document.dispatchEvent(new CustomEvent("pageViewWithContext", { detail: data }));
+        let detail = data?.layoutViewType ? null : data;
+
+        if (data?.layoutViewType === "discussionThread") {
+            detail = {
+                type: ViewType.DISCUSSION,
+                discussionID: data.recordID,
+            };
+        }
+
+        document.dispatchEvent(new CustomEvent("pageViewWithContext", { detail }));
+
+        // this one is for soft page loads/navigation, also dispatched on hard page loads for legacy pages in appUtils -> exec()
+        document.dispatchEvent(new CustomEvent("X-PageView", { bubbles: true, cancelable: false }));
+
         // Setting data here will cause the analytics event to fired far to often.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [uniqueKey]);

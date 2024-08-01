@@ -7,29 +7,47 @@
 
 namespace Garden\Web;
 
+use Garden\EventManager;
+use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\ResponseException;
 use Gdn;
-use Gdn_Locale;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Dashboard\Events\AccessDeniedEvent;
+use Vanilla\Exception\PermissionException;
+use Vanilla\Logger;
+use Vanilla\Logging\AuditLogger;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
+use Vanilla\ReflectionHelper;
+use Vanilla\Utility\DebugUtils;
+use Vanilla\Utility\StringUtils;
+use Vanilla\Utility\Timers;
 
 /**
  * Dispatches requests and receives responses.
  */
-class Dispatcher {
+class Dispatcher implements LoggerAwareInterface
+{
+    use LoggerAwareTrait;
     use MiddlewareAwareTrait;
 
-    /** @var Gdn_Locale */
+    /** @var LocaleInterface */
     private $locale;
 
     /**
-     * @var array
+     * @var Route[]
      */
-    private $routes;
+    private $routes = [];
 
     /**
      * @var string|array|callable
@@ -41,18 +59,27 @@ class Dispatcher {
      */
     private $container;
 
+    /** @var EventManager */
+    private $eventManager;
+
+    private Timers $timers;
+
     /**
-     * Dispatcher constructor.
-     *
-     * @param Gdn_Locale $locale
-     * @param ContainerInterface $container The container is used to fetch view handlers.
+     * Constructor
      */
-    public function __construct(Gdn_Locale $locale = null, ContainerInterface $container = null) {
+    public function __construct(
+        LocaleInterface $locale = null,
+        ContainerInterface $container = null,
+        EventManager $eventManager = null,
+        Timers $timers = null
+    ) {
         $this->middleware = function (RequestInterface $request): Data {
             return $this->dispatchInternal($request);
         };
         $this->locale = $locale;
         $this->container = $container;
+        $this->eventManager = $eventManager ?? new EventManager();
+        $this->timers = $timers ?? new Timers();
     }
 
     /**
@@ -62,17 +89,17 @@ class Dispatcher {
      * @param string $key An optional key of the route. If set you can modify the route later.
      * @return $this
      */
-    public function addRoute(Route $route, $key = '') {
-        if (!$route->isEnabled()) {
-            // Return early. Route may have been disabled by some configuration.
-            return $this;
-        }
-
-        if ($key !== '') {
+    public function addRoute(Route $route, $key = "")
+    {
+        if ($key !== "") {
             $this->routes[$key] = $route;
         } else {
             $this->routes[] = $route;
         }
+        uasort($this->routes, function (Route $routeA, Route $routeB) {
+            // Inverted priority sort.
+            return -($routeA->getPriority() <=> $routeB->getPriority());
+        });
         return $this;
     }
 
@@ -82,7 +109,8 @@ class Dispatcher {
      * @param string|int $key The key of the route to remove.
      * @return $this
      */
-    public function removeRoute($key) {
+    public function removeRoute($key)
+    {
         unset($this->routes[$key]);
         return $this;
     }
@@ -93,7 +121,8 @@ class Dispatcher {
      * @param string|int $key The route to get.
      * @return Route|null Returns a {@link Route} or **null** if no route exists with the given key.
      */
-    public function getRoute($key) {
+    public function getRoute($key)
+    {
         return isset($this->routes[$key]) ? $this->routes[$key] : null;
     }
 
@@ -105,12 +134,19 @@ class Dispatcher {
      * @param RequestInterface $request The request to handle.
      * @return Data Returns the response as a data object.
      */
-    public function dispatch(RequestInterface $request) {
+    public function dispatch(RequestInterface $request)
+    {
+        $span = $this->timers->startRequest($request);
         try {
-            $result = $this->callMiddleware($request);
-        } catch (\Exception $ex) {
-            $result = $this->makeResponse($ex);
+            try {
+                $result = $this->callMiddleware($request);
+            } catch (\Throwable $ex) {
+                $result = $this->makeResponse($ex);
+            }
+        } catch (ResponseException $responseEx) {
+            $result = $responseEx->getResponse();
         }
+        $span->finish($result ? $result->asHttpResponse() : null);
         return $result;
     }
 
@@ -122,8 +158,10 @@ class Dispatcher {
      *
      * @param RequestInterface $request The request to handle.
      * @return Data Returns the response as a data object.
+     * @throws ResponseException
      */
-    protected function dispatchInternal(RequestInterface $request) {
+    protected function dispatchInternal(RequestInterface $request)
+    {
         $ex = null;
 
         foreach ($this->routes as $route) {
@@ -135,34 +173,41 @@ class Dispatcher {
                 } elseif ($action !== null) {
                     // KLUDGE: Check for CSRF here because we can only do a global check for new dispatches.
                     // Once we can test properly then a route can be added that checks for CSRF on all requests.
-                    if ($request->getMethod() === 'POST' && $request instanceof \Gdn_Request) {
+                    if ($request->getMethod() === "POST" && $request instanceof \Gdn_Request) {
                         /* @var \Gdn_Request $request */
                         try {
                             $request->isAuthenticatedPostBack(true);
                         } catch (\Exception $ex) {
-                            Gdn::session()->getPermissions()->addBan(
-                                Permissions::BAN_CSRF,
-                                [
-                                    'msg' => $this->locale->translate('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'),
-                                    'code' => 403
-                                ]
-                            );
+                            Gdn::session()
+                                ->getPermissions()
+                                ->addBan(Permissions::BAN_CSRF, [
+                                    "msg" => $this->locale->translate(
+                                        "Invalid CSRF token.",
+                                        "Invalid CSRF token. Please try again."
+                                    ),
+                                    "code" => 403,
+                                ]);
                         }
                     }
 
                     $fn = function (RequestInterface $request) use ($route, $action): Data {
-                        if (is_object($action) && method_exists($action, 'replaceRequest')) {
+                        if (is_object($action) && method_exists($action, "replaceRequest")) {
                             $action->replaceRequest($request);
                         }
 
                         try {
+                            if ($action instanceof Action) {
+                                $this->eventManager->dispatch(
+                                    new ControllerDispatchedEvent($action->getCallback(), $request)
+                                );
+                            }
                             ob_start();
                             $actionResponse = $action();
                         } finally {
                             $ob = ob_get_clean();
                         }
                         $response = $this->makeResponse($actionResponse, $ob);
-                        if (is_object($action) && method_exists($action, 'getMetaArray')) {
+                        if (is_object($action) && method_exists($action, "getMetaArray")) {
                             $this->mergeMeta($response, $action->getMetaArray());
                         }
                         $this->mergeMeta($response, $route->getMetaArray());
@@ -178,6 +223,27 @@ class Dispatcher {
                 // Pass to the next route.
                 continue;
             } catch (\Throwable $dispatchEx) {
+                // Expected Exception when user tries to access private community while not logged in.  No need to log it.
+                if (
+                    $dispatchEx instanceof ForbiddenException &&
+                    ($dispatchEx->getContext()["type"] ?? "") == "!private"
+                ) {
+                } elseif ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
+                    $this->logger->notice($dispatchEx->getMessage(), [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+                        Logger::FIELD_TAGS => ["api_error", "dispatcher-caught"],
+                        "responseCode" => $dispatchEx->getCode(),
+                    ]);
+                } else {
+                    ErrorLogger::error(
+                        $dispatchEx,
+                        ["api_error", "dispatcher-caught"],
+                        ["responseCode" => $dispatchEx->getCode()]
+                    );
+                }
+
+                AccessDeniedEvent::tryLog($dispatchEx);
+
                 $response = null;
                 if (is_object($action ?? null) && $action instanceof Action) {
                     $obj = $action->getCallback()[0] ?? false;
@@ -201,20 +267,20 @@ class Dispatcher {
             } else {
                 $response = $this->makeResponse(new NotFoundException($request->getPath()));
                 // This is temporary. Only use internally.
-                $response->setMeta('noMatch', true);
+                $response->setMeta("noMatch", true);
             }
         } else {
-            if ($response->getMeta('status', null) === null) {
+            if ($response->getMeta("status", null) === null) {
                 switch ($request->getMethod()) {
-                    case 'GET':
-                    case 'PATCH':
-                    case 'PUT':
+                    case "GET":
+                    case "PATCH":
+                    case "PUT":
                         $response->setStatus(200);
                         break;
-                    case 'POST':
+                    case "POST":
                         $response->setStatus(201);
                         break;
-                    case 'DELETE':
+                    case "DELETE":
                         $response->setStatus(204);
                         break;
                 }
@@ -242,7 +308,8 @@ class Dispatcher {
      * @param array|null $meta The meta to merge.
      * @param bool $replace Whether to replace existing items or not.
      */
-    private function mergeMeta(Data $data, array $meta = null, $replace = false) {
+    private function mergeMeta(Data $data, array $meta = null, $replace = false)
+    {
         if (empty($meta)) {
             return;
         }
@@ -261,8 +328,11 @@ class Dispatcher {
      * This method dispatches the request to an appropriate callback depending on the available routes and renders the contents.
      *
      * @param RequestInterface $request The request to handle.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function handle(RequestInterface $request) {
+    public function handle(RequestInterface $request)
+    {
         $response = $this->dispatch($request);
 
         $this->render($request, $response);
@@ -274,19 +344,18 @@ class Dispatcher {
      * @param mixed $raw The raw response.
      * @param string $ob The contents of the output buffer, if any.
      * @return Data Returns the data response.
+     * @throws ResponseException
      */
-    private function makeResponse($raw, $ob = '') {
-        if ($raw instanceof Data) {
+    private function makeResponse($raw, $ob = "")
+    {
+        if ($raw instanceof ResponseException) {
+            throw $raw;
+        } elseif ($raw instanceof Data) {
             $result = $raw;
         } elseif (is_array($raw) || is_string($raw)) {
             // This is an array of response data.
             $result = new Data($raw);
         } elseif ($raw instanceof \Throwable) {
-            // Let's not mask errors when in debug mode!
-            if ($raw instanceof \Error && debug()) {
-                throw $raw;
-            }
-
             // Make sure that there's a "proper" conversion from non-HTTP to HTTP exceptions since
             // errors in the 2xx ranges are treated as success.
             // ValidationException status code are compatible with HTTP codes.
@@ -295,20 +364,32 @@ class Dispatcher {
                 $errorCode = 500;
             }
 
-            $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage()];
+            $data =
+                $raw instanceof \JsonSerializable
+                    ? $raw->jsonSerialize()
+                    : [
+                        "type" => get_class($raw),
+                        "message" => $raw->getMessage(),
+                        "code" => $raw->getCode(),
+                    ];
+            if (debug() && is_array($data)) {
+                $data["trace"] = explode("\n", DebugUtils::stackTraceString($raw->getTrace()));
+            } else {
+                $data["message"] = StringUtils::sanitizeExceptionMessage($data["message"] ?? "");
+            }
             $result = new Data($data, $errorCode);
             // Provide stack trace as meta information.
-            $result->setMeta('exception', $raw);
+            $result->setMeta("exception", $raw);
 
-            $this->mergeMeta($result, ['template' => 'error-page']);
+            $this->mergeMeta($result, ["template" => "error-page"]);
         } elseif ($raw instanceof \JsonSerializable) {
-            $result = new Data((array)$raw->jsonSerialize());
+            $result = new Data((array) $raw->jsonSerialize());
         } elseif (!empty($ob)) {
             $result = new Data($ob);
         } elseif ($raw === null) {
             $result = new Data(null);
         } else {
-            $result = new Data(['message' => 'Could not encode the response.', 'status' => 500], 500);
+            $result = new Data(["message" => "Could not encode the response.", "status" => 500], 500);
         }
 
         return $result;
@@ -320,18 +401,19 @@ class Dispatcher {
      * @param Data $response The current response being dispatched.
      * @param RequestInterface $request The current request.
      */
-    private function addAccessControl(Data $response, RequestInterface $request) {
-        if (!$response->hasHeader('Access-Control-Allow-Origin') && $allowOrigin = $this->allowOrigin($request)) {
-            $response->setHeader('Access-Control-Allow-Origin', $allowOrigin);
+    private function addAccessControl(Data $response, RequestInterface $request)
+    {
+        if (!$response->hasHeader("Access-Control-Allow-Origin") && ($allowOrigin = $this->allowOrigin($request))) {
+            $response->setHeader("Access-Control-Allow-Origin", $allowOrigin);
 
-            if ($request->hasHeader('Access-Control-Request-Method')) {
-                $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+            if ($request->hasHeader("Access-Control-Request-Method")) {
+                $response->setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
             }
-            if ($request->hasHeader('Access-Control-Request-Headers')) {
-                $response->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+            if ($request->hasHeader("Access-Control-Request-Headers")) {
+                $response->setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
             }
 
-            $response->setHeader('Access-Control-Max-Age', strtotime('1 hour'));
+            $response->setHeader("Access-Control-Max-Age", strtotime("1 hour"));
         }
     }
 
@@ -341,28 +423,32 @@ class Dispatcher {
      * @param RequestInterface $request The request to check.
      * @return string Returns a value valid for a **Access-Control-Allow-Origin** header or an empty string if the origin isn't allowed.
      */
-    private function allowOrigin(RequestInterface $request) {
-        $origin = $request->getHeader('Origin');
+    private function allowOrigin(RequestInterface $request)
+    {
+        $origin = $request->getHeader("Origin");
         if (empty($origin)) {
-            return '';
+            return "";
         }
         $host = parse_url($origin, PHP_URL_HOST);
         if (strcasecmp($host, $request->getHost()) === 0) {
             // Same origin, no need for header.
-            return '';
+            return "";
         }
-        $hostAndScheme = parse_url($origin, PHP_URL_SCHEME).'://'.$host;
+        $hostAndScheme = parse_url($origin, PHP_URL_SCHEME) . "://" . $host;
 
-        if ($this->allowedOrigins === '*') {
-            return '*';
+        if ($this->allowedOrigins === "*") {
+            return "*";
         } elseif (is_callable($this->allowedOrigins) && call_user_func($this->allowedOrigins, $origin)) {
             return $origin;
         } elseif (is_string($this->allowedOrigins) && in_array($this->allowedOrigins, [$host, $hostAndScheme], true)) {
             return $origin;
-        } elseif (is_array($this->allowedOrigins) && (in_array($host, $this->allowedOrigins) || in_array($hostAndScheme, $this->allowedOrigins))) {
+        } elseif (
+            is_array($this->allowedOrigins) &&
+            (in_array($host, $this->allowedOrigins) || in_array($hostAndScheme, $this->allowedOrigins))
+        ) {
             return $origin;
         }
-        return '';
+        return "";
     }
 
     /**
@@ -370,7 +456,8 @@ class Dispatcher {
      *
      * @return array|callable|string Returns the allowedOrigins.
      */
-    public function getAllowedOrigins() {
+    public function getAllowedOrigins()
+    {
         return $this->allowedOrigins;
     }
 
@@ -386,7 +473,8 @@ class Dispatcher {
      * @param array|callable|string $origins The allowed origins.
      * @return $this
      */
-    public function setAllowedOrigins($origins) {
+    public function setAllowedOrigins($origins)
+    {
         $this->allowedOrigins = $origins;
         return $this;
     }
@@ -401,7 +489,8 @@ class Dispatcher {
      * @param callable $core The core request handler (inner middleware).
      * @return Data Returns the response from the core handler passed through the middleware.
      */
-    public static function callMiddlewares(RequestInterface $request, array $middlewares, callable $core): Data {
+    public static function callMiddlewares(RequestInterface $request, array $middlewares, callable $core): Data
+    {
         $makeNext = function (array $middlewares, callable $core, int $index) use (&$makeNext): callable {
             if ($index >= count($middlewares)) {
                 return $core;
@@ -427,13 +516,16 @@ class Dispatcher {
      *
      * @param RequestInterface $request The initial request.
      * @param Data $response The response data.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function render(RequestInterface $request, Data $response) {
-        $contentType = $response->getHeader('Content-Type', $request->getHeader('Accept'));
-        if (preg_match('`([a-z]+/[a-z0-9.-]+)`i', $contentType, $m)) {
+    public function render(RequestInterface $request, Data $response)
+    {
+        $contentType = $response->getHeader("Content-Type", $request->getHeader("Accept"));
+        if (preg_match("`([a-z]+/[a-z0-9.-]+)`i", $contentType, $m)) {
             $contentType = strtolower($m[1]);
         } else {
-            $contentType = 'application/json';
+            $contentType = "application/json";
         }
 
         // Check to see if there is a view handler.
@@ -446,7 +538,7 @@ class Dispatcher {
             $view->render($response);
         } else {
             // The default is JSON which may need to change.
-            $response->render();
+            $response->renderJson();
         }
     }
 
@@ -473,18 +565,18 @@ class Dispatcher {
             /* @var \ReflectionParameter $param */
             $lname = strtolower($param->getName());
 
-            if ($param->getClass() !== null) {
-                $className = $param->getClass()->getName();
+            if (ReflectionHelper::getClass($param) !== null) {
+                $className = ReflectionHelper::getClass($param)->getName();
 
                 if (isset($largs[$lname]) && is_a($largs[$lname], $className)) {
                     $value = $largs[$lname];
                 } elseif (isset($largs[$index]) && is_a($largs[$index], $className)) {
                     $value = $largs[$index];
                 } elseif ($container->has($className)) {
-                    $value = $container->get($param->getClass()->getName());
+                    $value = $container->get(ReflectionHelper::getClass($param)->getName());
                 } else {
                     $value = null;
-                    $missing[$lname] = '$'.$param->getName();
+                    $missing[$lname] = '$' . $param->getName();
                 }
             } elseif (isset($largs[$lname])) {
                 $value = $largs[$lname];
@@ -494,19 +586,22 @@ class Dispatcher {
                 $value = $param->getDefaultValue();
             } else {
                 $value = null;
-                $missing[$lname] = '$'.$param->getName();
+                $missing[$lname] = '$' . $param->getName();
             }
             $result[$param->getName()] = $value;
         }
 
         if ($throw && !empty($missing)) {
             if ($function instanceof \ReflectionMethod) {
-                $name = $function->getDeclaringClass()->getName().'::'.$function->getName();
+                $name = $function->getDeclaringClass()->getName() . "::" . $function->getName();
             } else {
                 $name = $function->getName();
             }
 
-            throw new \ReflectionException("$name() expects the following parameters: ".implode(', ', $missing).'.', 400);
+            throw new \ReflectionException(
+                "$name() expects the following parameters: " . implode(", ", $missing) . ".",
+                400
+            );
         }
 
         return $result;

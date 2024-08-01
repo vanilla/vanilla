@@ -8,7 +8,7 @@ import Quill from "quill/core";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import { CodeToken } from "quill/modules/syntax";
 import Module from "quill/core/module";
-import throttle from "lodash/throttle";
+import throttle from "lodash-es/throttle";
 
 /**
  * Module that triggers syntax highlighting in code blocks.
@@ -75,17 +75,17 @@ export default class SyntaxModule extends Module {
             }
             this.quill.update(Quill.sources.USER);
             const selection = this.quill.getSelection();
-            const codeBlocks = (this.quill.scroll.descendants(
-                blot => blot instanceof CodeBlockBlot,
+            const codeBlocks = this.quill.scroll.descendants(
+                (blot) => blot instanceof CodeBlockBlot,
                 0,
                 this.quill.scroll.length() - 1,
-            ) as any) as CodeBlockBlot[];
+            ) as any as CodeBlockBlot[];
 
             if (codeBlocks.length === 0) {
                 return; // Nothing to do here.
             }
 
-            codeBlocks.forEach(code => {
+            codeBlocks.forEach((code) => {
                 code.highlight();
             });
             this.quill.update(Quill.sources.SILENT);

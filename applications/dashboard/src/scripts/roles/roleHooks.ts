@@ -7,11 +7,12 @@ import { useRoleActions } from "@dashboard/roles/RoleActions";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { IRoleStoreState } from "@dashboard/roles/roleReducer";
-import { LoadStatus, ILoadable } from "@vanilla/library/src/scripts/@types/api/core";
-import { IComboBoxOption } from "@vanilla/library/src/scripts/features/search/SearchBar";
+import { LoadStatus, ILoadable } from "@library/@types/api/core";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 export function useRoles() {
     const { getAllRoles } = useRoleActions();
+
     const rolesByID = useSelector((state: IRoleStoreState) => state.roles.rolesByID);
 
     useEffect(() => {
@@ -29,7 +30,7 @@ export function useRoleSelectOptions(): ILoadable<IComboBoxOption[]> {
     if (roles.data) {
         return {
             ...roles,
-            data: Object.values(roles.data).map(role => {
+            data: Object.values(roles.data).map((role) => {
                 return {
                     value: role.roleID,
                     label: role.name,

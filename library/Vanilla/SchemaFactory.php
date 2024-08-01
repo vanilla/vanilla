@@ -10,18 +10,13 @@ use Garden\EventManager;
 use Garden\Schema\Schema;
 use Gdn;
 use Psr\Container\ContainerInterface;
+use Vanilla\Utility\TracedSchema;
 
 /**
  * Factory for schema objects.
  */
-final class SchemaFactory {
-
-    /** @var ContainerInterface */
-    private static $container;
-
-    /** @var EventManager */
-    private static $eventManager;
-
+final class SchemaFactory
+{
     /**
      * Get an instance of a schema object by its class name.
      *
@@ -29,9 +24,10 @@ final class SchemaFactory {
      * @param string|null $id
      * @return Schema
      */
-    public static function get(string $schema, ?string $id = null): Schema {
+    public static function get(string $schema, ?string $id = null): Schema
+    {
         /** @var Schema */
-        $schema = self::getContainer()->get($schema);
+        $schema = Gdn::getContainer()->get($schema);
         if ($id) {
             $schema->setID($id);
         }
@@ -43,26 +39,22 @@ final class SchemaFactory {
      * Get the configured container.
      *
      * @return ContainerInterface
+     * @deprecated
      */
-    public static function getContainer(): ContainerInterface {
-        if (!isset(self::$container)) {
-            self::$container = Gdn::getContainer();
-        }
-        return self::$container;
+    public static function getContainer(): ContainerInterface
+    {
+        return Gdn::getContainer();
     }
 
     /**
      * Get the configured event manager instance.
      *
      * @return EventManager
+     * @deprecated
      */
-    public static function getEventManager(): EventManager {
-        if (!isset(self::$eventManager)) {
-            /** @var EventManager */
-            $eventManager = self::getContainer()->get(EventManager::class);
-            self::setEventManager($eventManager);
-        }
-        return self::$eventManager;
+    public static function getEventManager(): EventManager
+    {
+        return Gdn::getContainer()->get(EventManager::class);
     }
 
     /**
@@ -72,7 +64,8 @@ final class SchemaFactory {
      * @param string|null $id
      * @return Schema
      */
-    public static function parse(array $schema, ?string $id = null): Schema {
+    public static function parse(array $schema, ?string $id = null): Schema
+    {
         $result = Schema::parse($schema);
         if ($id) {
             $result->setID($id);
@@ -89,7 +82,8 @@ final class SchemaFactory {
      * @return Schema
      * @internal This method should only be used in this class. The weaker visibility is a BC kludge.
      */
-    public static function prepare(Schema $schema, ?string $id = null): Schema {
+    public static function prepare(Schema $schema, ?string $id = null): Schema
+    {
         $result = clone $schema;
 
         // Allow the schema ID to be set or overwritten.
@@ -101,7 +95,19 @@ final class SchemaFactory {
 
         if ($id) {
             // Fire an event for schema modification.
-            self::getEventManager()->fire("{$id}Schema_init", $result);
+            Gdn::getContainer()
+                ->get(EventManager::class)
+                ->fire("{$id}Schema_init", $result);
+        }
+
+        // Wrap the schema in a traced schema.
+        // We can only really do this for generic schemas though.
+        // Otherwise something might be expecting a more specific schema to come out of this.
+        if (get_class($schema) === Schema::class) {
+            $result = new TracedSchema($result);
+            if (!empty($id)) {
+                $result->setID($id);
+            }
         }
 
         return $result;
@@ -112,9 +118,11 @@ final class SchemaFactory {
      *
      * @param ContainerInterface $container
      * @return void
+     * @deprecated
      */
-    public static function setContainer(?ContainerInterface $container): void {
-        self::$container = $container;
+    public static function setContainer(?ContainerInterface $container): void
+    {
+        return; // noop
     }
 
     /**
@@ -122,8 +130,10 @@ final class SchemaFactory {
      *
      * @param EventManager $eventManager
      * @return void
+     * @deprecated
      */
-    public static function setEventManager(?EventManager $eventManager): void {
-        self::$eventManager = $eventManager;
+    public static function setEventManager(?EventManager $eventManager): void
+    {
+        return; // noop
     }
 }

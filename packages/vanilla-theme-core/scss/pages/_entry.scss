@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 body.Section-Entry {
-
     @include noPanel;
 
     .SearchBox {
@@ -17,7 +16,6 @@ body.Section-Entry {
     }
 
     .Methods {
-
         b {
             margin: 10px 0 3px;
             display: inline-block;
@@ -28,7 +26,7 @@ body.Section-Entry {
         margin-left: $utility-baseUnit;
     }
 
-    @if($staticVariables) {
+    @if ($staticVariables) {
         .ForgotPassword,
         .CreateAccount a {
             color: $link-default_color;
@@ -62,9 +60,8 @@ body.Section-Entry {
     }
 
     @include maxWidth {
-
         .g-recaptcha {
-            transform: scale(.8);
+            transform: scale(0.8);
         }
 
         .MainForm,
@@ -103,16 +100,23 @@ body.Section-Entry {
     width: 100%;
 }
 
-.MultipleEntryMethods {
+.SignInPopup li.Buttons,
+body.Entry li.Buttons {
+    @include maxWidth($theme-breakpoint_mobile) {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+}
 
+.MultipleEntryMethods {
     .Methods {
         margin-left: 0;
         padding: 0;
         float: left;
 
         @include maxWidth {
-            float: none;
-
             b {
                 display: inline-block;
                 margin: $utility-baseUnitTriple 0 0;

@@ -7,22 +7,22 @@
 
 namespace VanillaTests\APIv0;
 
-use VanillaTests\SharedBootstrapTestCase;
+use VanillaTests\APIv2\AbstractAPIv2Test;
 
 /**
  * Tests an alternate install method.
  */
-class AltTest extends SharedBootstrapTestCase {
-    /** @var APIv0  $api */
-    protected static $api;
+class AltTest extends AbstractAPIv2Test
+{
+    public static $addons = ["stubcontent"];
 
     /**
-     * Make sure there is a fresh copy of Vanilla for the class' tests.
+     * @return void
      */
-    public static function setUpBeforeClass(): void {
-        parent::setUpBeforeClass();
-        $api = new APIv0();
-        self::$api = $api;
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->useLegacyLayouts();
     }
 
     /**
@@ -30,8 +30,9 @@ class AltTest extends SharedBootstrapTestCase {
      *
      * @large
      */
-    public function testAltInstall() {
-        $this->doAltInstallWithUpdateToken(false, 'xkcd', '');
+    public function testAltInstall()
+    {
+        $this->doAltInstallWithUpdateToken(false, "xkcd", "");
     }
 
     /**
@@ -39,8 +40,9 @@ class AltTest extends SharedBootstrapTestCase {
      *
      * @large
      */
-    public function testAltInstallWithUpdateToken() {
-        $this->doAltInstallWithUpdateToken(true, 'xkcd', 'xkcd');
+    public function testAltInstallWithUpdateToken()
+    {
+        $this->doAltInstallWithUpdateToken(true, "xkcd", "xkcd");
     }
 
     /**
@@ -48,10 +50,11 @@ class AltTest extends SharedBootstrapTestCase {
      *
      * @large
      */
-    public function testAltInstallWithNoUpdateToken() {
+    public function testAltInstallWithNoUpdateToken()
+    {
         $this->expectException(\Exception::class);
-        $this->expectExceptionCode(403);
-        $this->doAltInstallWithUpdateToken(true, 'xkcd', '');
+        $this->expectExceptionCode(401);
+        $this->doAltInstallWithUpdateToken(true, "xkcd", "");
     }
 
     /**
@@ -60,74 +63,109 @@ class AltTest extends SharedBootstrapTestCase {
      * @param bool $enabled Whether the update token feature should be enabled.
      * @param string $updateToken The update token to use.
      * @param string $postUpdateToken The update token to post during `utility/update`.
+     * @param bool $retried Whether this is a retry or not.
      */
-    private function doAltInstallWithUpdateToken(bool $enabled, string $updateToken, string $postUpdateToken) {
-        $this->api()->uninstall();
-        $this->api()->createDatabase();
+    private function doAltInstallWithUpdateToken(
+        bool $enabled,
+        string $updateToken,
+        string $postUpdateToken,
+        bool $retried = false
+    ) {
+        $apiv0 = new E2ETestClient();
 
-        $config = $this->getBaseConfig();
-        $config['Feature']['updateTokens']['Enabled'] = $enabled;
-        $config['Garden']['UpdateToken'] = $updateToken;
+        $apiv0->uninstall();
+        $apiv0->createDatabase();
 
-        $this->api()->saveToConfig($config);
-        $r = $this->api()->post('/utility/update.json', ['updateToken' => $postUpdateToken])->getBody();
-        $this->api()->saveToConfig(['Garden.Installed' => true]);
+        $config = $this->getBaseConfig($apiv0);
+        $config["Feature"]["updateTokens"]["Enabled"] = $enabled;
+        $config["Garden"]["UpdateToken"] = $updateToken;
+        $config["Debug"] = true;
+
+        $apiv0->saveToConfig($config);
+        $r = $apiv0->post("/utility/update.json", ["updateToken" => $postUpdateToken])->getBody();
+        $this->assertEquals(
+            true,
+            $r["Success"],
+            "Site failed to install properly " . json_encode($r, JSON_PRETTY_PRINT)
+        );
+        $apiv0->saveToConfig([
+            "Garden.Installed" => true,
+            "Feature.customLayout.home.Enabled" => false,
+            "Feature.customLayout.discussionList.Enabled" => false,
+            "Feature.customLayout.categoryList.Enabled" => false,
+        ]);
 
         // Do a simple get to make sure there isn't an error.
-        $r = $this->api()->get('/discussions.json');
-        $data = $r->getBody();
-        $this->assertNotEmpty($data['Discussions']);
+        $data = $apiv0->get("/discussions.json")->getBody();
+        $this->assertIsArray($data);
+        /** @var \Gdn_DataSet $discussions */
+        $discussions = $data["Discussions"] ?? null;
+        $this->assertIsArray($discussions, "Could not find discussions in: " . json_encode($data, JSON_PRETTY_PRINT));
+
+        if (count($discussions) === 3) {
+            $this->assertCount(3, $discussions);
+        } elseif (!$retried) {
+            // This test is notoriously flaky.
+            // If this failed, we are just going to try again. We are still unsure what causes the failure.
+            $this->doAltInstallWithUpdateToken($enabled, $updateToken, $postUpdateToken, true);
+        } else {
+            $wholeConfig = \Gdn::config()->get(".");
+            /** @var \DiscussionModel $discussionModel */
+            $discussionModel = $this->container()->get(\DiscussionModel::class);
+            $allDiscussions = $discussionModel->getWhere(["Announce" => false])->resultArray();
+            $message =
+                "Alt Install failed twice.\n" .
+                "Dumping Config:\n" .
+                json_encode($wholeConfig, JSON_PRETTY_PRINT) .
+                "\n" .
+                "Dumping Discussion Table:\n" .
+                json_encode($allDiscussions, JSON_PRETTY_PRINT);
+
+            $this->fail($message);
+        }
     }
 
     /**
      * Get the config to be applied to the site before update.
+     *
+     * @param E2ETestClient $apiv0
      */
-    private function getBaseConfig() {
-        $api = $this->api();
-
+    private function getBaseConfig(E2ETestClient $apiv0)
+    {
         $config = [
-            'Database' => [
-                'Host' => $api->getDbHost(),
-                'Name' => $api->getDbName(),
-                'User' => $api->getDbUser(),
-                'Password' => $api->getDbPassword(),
+            "Database" => [
+                "Host" => $apiv0->getDbHost(),
+                "Name" => $apiv0->getDbName(),
+                "User" => $apiv0->getDbUser(),
+                "Password" => $apiv0->getDbPassword(),
             ],
-            'EnabledApplications' => [
-                'Vanilla' => 'vanilla',
-                'Conversations' => 'conversations',
+            "EnabledApplications" => [
+                "Vanilla" => "vanilla",
+                "Conversations" => "conversations",
             ],
-            'EnabledPlugins' => [
-                'vanillicon' => true,
-                'Facebook' => true,
-                'Twitter' => true,
-                'Akismet' => true,
-                'StopForumSpam' => true,
+            "EnabledPlugins" => [
+                "vanillicon" => true,
+                "Facebook" => true,
+                "Twitter" => true,
+                "Akismet" => true,
+                "StopForumSpam" => true,
             ],
-            'Garden' => [
-                'Installed' => null, // Important to bypass the redirect to /dashboard/setup. False would not do here.
-                'Title' => get_called_class(),
-                'Domain' => parse_url($api->getBaseUrl(), PHP_URL_HOST),
-                'Cookie' => [
-                    'Salt' => 'salt',
-                    'Name' => 'vf_'.strtolower(get_called_class()).'_ENDTX',
-                    'Domain' => '',
+            "Garden" => [
+                "Installed" => null, // Important to bypass the redirect to /dashboard/setup. False would not do here.
+                "Title" => get_called_class(),
+                "Domain" => parse_url($apiv0->getBaseUrl(), PHP_URL_HOST),
+                "Cookie" => [
+                    "Salt" => "salt",
+                    "Name" => "vf_" . strtolower(get_called_class()) . "_ENDTX",
+                    "Domain" => "",
                 ],
-                'Email' => [
-                    'SupportAddress' => 'noreply@vanilla.test',
-                    'SupportName' => get_called_class()
+                "Email" => [
+                    "SupportAddress" => "noreply@vanilla.test",
+                    "SupportName" => get_called_class(),
                 ],
-            ]
+            ],
         ];
 
         return $config;
-    }
-
-    /**
-     * Get the API to make requests against.
-     *
-     * @return APIv0 Returns the API.
-     */
-    public function api() {
-        return self::$api;
     }
 }

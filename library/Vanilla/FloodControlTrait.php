@@ -7,11 +7,14 @@
 
 namespace Vanilla;
 
+use Psr\SimpleCache\CacheInterface;
+
 /**
  * Utility methods for models that want to implement flood control.
  *
  */
-trait FloodControlTrait {
+trait FloodControlTrait
+{
     /**
      * @var int Amount of post that can be created before the flood control kicks in.
      */
@@ -45,15 +48,19 @@ trait FloodControlTrait {
     /**
      * @return int
      */
-    public function getPostCountThreshold() {
+    public function getPostCountThreshold()
+    {
         return $this->postCountThreshold;
     }
 
     /**
+     * Set the post count threshold.
+     *
      * @param int $postCountThreshold
-     * @return FloodControlTrait
+     * @return $this
      */
-    public function setPostCountThreshold($postCountThreshold) {
+    public function setPostCountThreshold($postCountThreshold)
+    {
         $this->postCountThreshold = $this->normalizeInput(__METHOD__, $postCountThreshold, 1);
         return $this;
     }
@@ -61,15 +68,19 @@ trait FloodControlTrait {
     /**
      * @return int
      */
-    public function getTimeSpan() {
+    public function getTimeSpan()
+    {
         return $this->timeSpan;
     }
 
     /**
+     * Set the timespan.
+     *
      * @param int $timeSpan >= 30
-     * @return FloodControlTrait
+     * @return $this
      */
-    public function setTimeSpan($timeSpan) {
+    public function setTimeSpan($timeSpan)
+    {
         $this->timeSpan = $this->normalizeInput(__METHOD__, $timeSpan, 30);
         return $this;
     }
@@ -77,15 +88,19 @@ trait FloodControlTrait {
     /**
      * @return int
      */
-    public function getLockTime() {
+    public function getLockTime()
+    {
         return $this->lockTime;
     }
 
     /**
+     * Set the lock time.
+     *
      * @param int $lockTime
-     * @return FloodControlTrait
+     * @return $this
      */
-    public function setLockTime($lockTime) {
+    public function setLockTime($lockTime)
+    {
         $this->lockTime = $this->normalizeInput(__METHOD__, $lockTime, 60);
         return $this;
     }
@@ -93,22 +108,27 @@ trait FloodControlTrait {
     /**
      * @return string
      */
-    public function getKeyCurrentPostCount() {
+    public function getKeyCurrentPostCount()
+    {
         return $this->keyCurrentPostCount ?: $this->getDefaultKeyCurrentPostCount();
     }
 
     /**
      * @return string
      */
-    public function getDefaultKeyCurrentPostCount() {
-        return 'floodcontrol.%s.%s.currentpostcount';
+    public function getDefaultKeyCurrentPostCount()
+    {
+        return "floodcontrol.%s.%s.currentpostcount";
     }
 
     /**
+     * Set the cache key of the post count.
+     *
      * @param string $keyCurrentPostCount
-     * @return FloodControlTrait
+     * @return $this
      */
-    public function setKeyCurrentPostCount($keyCurrentPostCount) {
+    public function setKeyCurrentPostCount($keyCurrentPostCount)
+    {
         $this->keyCurrentPostCount = $keyCurrentPostCount;
         return $this;
     }
@@ -116,22 +136,27 @@ trait FloodControlTrait {
     /**
      * @return string
      */
-    public function getKeyLastDateChecked() {
-        return $this->keyLastDateChecked ?: $this->getDefaultKeyLastDateChecked;
+    public function getKeyLastDateChecked()
+    {
+        return $this->keyLastDateChecked ?: $this->getDefaultKeyLastDateChecked();
     }
 
     /**
      * @return string
      */
-    public function getDefaultKeyLastDateChecked() {
-        return 'floodcontrol.%s.%s.lastdatechecked';
+    public function getDefaultKeyLastDateChecked()
+    {
+        return "floodcontrol.%s.%s.lastdatechecked";
     }
 
     /**
+     * Set the cache key of the date last checked.
+     *
      * @param string $keyLastDateChecked
-     * @return FloodControlTrait
+     * @return $this
      */
-    public function setKeyLastDateChecked($keyLastDateChecked) {
+    public function setKeyLastDateChecked($keyLastDateChecked)
+    {
         $this->keyLastDateChecked = $keyLastDateChecked;
         return $this;
     }
@@ -139,15 +164,19 @@ trait FloodControlTrait {
     /**
      * @return bool
      */
-    public function isFloodControlEnabled() {
+    public function isFloodControlEnabled()
+    {
         return $this->floodControlEnabled;
     }
 
     /**
+     * Enable/disable the flood control.
+     *
      * @param bool $floodControlEnabled
-     * @return FloodControlTrait
+     * @return $this
      */
-    public function setFloodControlEnabled($floodControlEnabled) {
+    public function setFloodControlEnabled($floodControlEnabled)
+    {
         $this->floodControlEnabled = $floodControlEnabled;
         return $this;
     }
@@ -159,7 +188,8 @@ trait FloodControlTrait {
      * @param CacheInterface $storageObject object in which we will store the floodcontrol data.
      * @return bool True if the user is spamming, false otherwise.
      */
-    public function checkUserSpamming($userID, CacheInterface $storageObject) {
+    public function checkUserSpamming($userID, CacheInterface $storageObject)
+    {
         if (!$this->isFloodControlEnabled()) {
             return false;
         }
@@ -170,18 +200,22 @@ trait FloodControlTrait {
         $isSpamming = false;
         $countSpamCheck = $storageObject->get($userPostCountKey, 0);
         $dateSpamCheck = $storageObject->get($userLastDateCheckedKey, null);
-        $secondsSinceSpamCheck = time() - (int)strtotime($dateSpamCheck);
+        $secondsSinceSpamCheck = time() - (int) strtotime($dateSpamCheck);
 
         // Apply a spam lock if necessary
         $attributes = [];
-        if ($dateSpamCheck !== null && $secondsSinceSpamCheck < $this->lockTime && $countSpamCheck >= $this->postCountThreshold) {
+        if (
+            $dateSpamCheck !== null &&
+            $secondsSinceSpamCheck < $this->lockTime &&
+            $countSpamCheck >= $this->postCountThreshold
+        ) {
             $isSpamming = true;
             // Update the 'waiting period' every time they try to post again
-            $attributes[$userLastDateCheckedKey] = date('Y-m-d H:i:s');
+            $attributes[$userLastDateCheckedKey] = date("Y-m-d H:i:s");
         } else {
             if ($secondsSinceSpamCheck > $this->timeSpan) {
                 $attributes[$userPostCountKey] = 1;
-                $attributes[$userLastDateCheckedKey] = date('Y-m-d H:i:s');
+                $attributes[$userLastDateCheckedKey] = date("Y-m-d H:i:s");
             } else {
                 $attributes[$userPostCountKey] = $countSpamCheck + 1;
             }
@@ -189,11 +223,8 @@ trait FloodControlTrait {
 
         $storageObject->setMultiple($attributes);
 
-        if ($isSpamming && property_exists($this, 'Validation') && is_a($this->Validation, 'Gdn_Validation')) {
-            $this->Validation->addValidationResult(
-                'Body',
-                '@'.$this->getFloodControlWarningMessage()
-            );
+        if ($isSpamming && property_exists($this, "Validation") && is_a($this->Validation, "Gdn_Validation")) {
+            $this->Validation->addValidationResult("Body", "@" . $this->getFloodControlWarningMessage());
         }
 
         return $isSpamming;
@@ -204,13 +235,17 @@ trait FloodControlTrait {
      *
      * @return string The formatted warning message
      */
-    protected function getFloodControlWarningMessage() {
+    protected function getFloodControlWarningMessage()
+    {
         return sprintf(
-                t('You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'),
-                $this->postCountThreshold,
-                $this->timeSpan,
-                $this->lockTime
-            );
+            t(
+                'You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. ' .
+                    'You must wait at least %3$s seconds before attempting to post again.'
+            ),
+            $this->postCountThreshold,
+            $this->timeSpan,
+            $this->lockTime
+        );
     }
 
     /**
@@ -221,12 +256,13 @@ trait FloodControlTrait {
      * @param int $minimum
      * @return int
      */
-    private function normalizeInput($caller, $value, $minimum) {
-        if (!ctype_digit((string)$value) || $minimum < 1) {
+    private function normalizeInput($caller, $value, $minimum)
+    {
+        if (!ctype_digit((string) $value) || $minimum < 1) {
             trigger_error("$caller value '$value' was normalized to '$minimum' because it was invalid.", E_USER_NOTICE);
             $value = $minimum;
         }
 
-        return (int)$value;
+        return (int) $value;
     }
 }

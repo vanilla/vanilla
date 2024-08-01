@@ -15,7 +15,7 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import ListBlot from "quill/formats/list";
 import { StringMap, DeltaStatic, DeltaOperation } from "quill/core";
-import { ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { ListType } from "@rich-editor/quill/blots/lists/ListUtils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 
 /**
@@ -75,8 +75,25 @@ export default class OpUtils {
         });
     }
 
-    public static image(url: string, alt: string | null = null) {
+    public static image(
+        url: string,
+        alt: string | null = null,
+        height: string | null = null,
+        width: string | null = null,
+        displaySize: "small" | "medium" | "large" | "" | undefined | null = null,
+        float: "left" | "right" | "none" | "" | undefined | null = null,
+    ) {
         alt = alt || "";
+        height = height || "";
+        width = width || "";
+
+        const vanillaDisplayProps = { displaySize, float };
+
+        // Filter falsy values from object because they are optional
+        for (let key in vanillaDisplayProps) {
+            !vanillaDisplayProps[key] && delete vanillaDisplayProps[key];
+        }
+
         const imageData: IEmbedValue = {
             loaderData: {
                 type: "image",
@@ -85,6 +102,9 @@ export default class OpUtils {
                 embedType: "image",
                 url,
                 name: alt,
+                height,
+                width,
+                ...vanillaDisplayProps,
             },
         };
         return OpUtils.op({

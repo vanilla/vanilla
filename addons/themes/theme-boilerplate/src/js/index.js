@@ -11,5 +11,15 @@ $(() => {
     if (!window.gdn.getMeta("featureFlags.DataDrivenTitleBar.Enabled", false)) {
         setupMobileNavigation();
     }
-    $("select").wrap('<div class="SelectWrapper"></div>');
+
+    //if its NewCategoryDropdown, we don't need to wrap, styles already come from react component
+    if (!window.gdn.meta.themeFeatures.NewCategoryDropdown) {
+        $("select").wrap('<div class="SelectWrapper"></div>');
+    } else {
+        $("select").each(function() {
+            if ($(this).attr("name") && $(this).attr("name") !== "CategoryID") {
+                $(this).wrap('<div class="SelectWrapper"></div>');
+            }
+        });
+    }
 });

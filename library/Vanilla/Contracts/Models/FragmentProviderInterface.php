@@ -10,15 +10,16 @@ namespace Vanilla\Contracts\Models;
 /**
  * Interface representing a generic fragment provider.
  */
-interface FragmentProviderInterface {
+interface FragmentProviderInterface
+{
     /**
      * Get a single fragment by it's ID.
      *
      * @param int $id The ID to lookup.
      * @param bool $useUnknownFallback Whether or not to use the unknown fragment as a fallback.
-     * @return array
+     * @return array|object
      */
-    public function getFragmentByID(int $id, bool $useUnknownFallback = false): array;
+    public function getFragmentByID(int $id, bool $useUnknownFallback = false);
 
     /**
      * Return an array of keys that can be used to generate some record.
@@ -32,7 +33,7 @@ interface FragmentProviderInterface {
      *
      * @param string $key A key representing some generated record.
      *
-     * @return array
+     * @return array|object
      */
-    public function getGeneratedFragment(string $key): array;
+    public function getGeneratedFragment(string $key);
 }

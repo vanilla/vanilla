@@ -1,72 +1,123 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Models;
 
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\Psr16Adapter;
+use Symfony\Contracts\Cache\ItemInterface;
+use Vanilla\Cache\CacheCacheAdapter;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
-use Vanilla\InjectableInterface;
+use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
+use Vanilla\Scheduler\Job\CallbackJob;
+use Vanilla\Scheduler\SchedulerInterface;
 
 /**
  * Cache for records out of various models.
  *
- * Particularly good support for PipelineModel.
+ * Features:
+ * - Can give an invalidation processor for the pipeline model.
+ * - Uses symfony cache contracts:
+ *   - A lock is acquired when calculating a cache value to prevent instances contending for resources to generate the same value.
+ *   - Values may be recalculated early on random requests to prevent the value from expiring.
  */
-class ModelCache implements InjectableInterface {
-
-    /** @var int When we hit this size of incrementing key, we reset from 0. */
-    const MAX_INCREMENTING_KEY = 1000000;
-
+class ModelCache
+{
     /** @var string */
-    const INCREMENTING_KEY_NAMESPACE = 'vanillaIncrementingKey';
+    const INCREMENTING_KEY_NAMESPACE = "vanillaIncrementingKey";
 
     const GLOBAL_DEFAULT_OPTIONS = [
         \Gdn_Cache::FEATURE_EXPIRY => 600,
     ];
 
+    /** @var int Amount of time to allow a scheduled hydration to wait before deleting the cache key. */
+    const RESCHEDULE_THRESHOLD = 30;
+
     const DISABLE_FEATURE_FLAG = "DisableNewModelCaching";
+
+    public const OPT_TTL = \Gdn_Cache::FEATURE_EXPIRY;
+    public const OPT_DEFAULT = \Gdn_Cache::FEATURE_DEFAULT;
+    public const OPT_SCHEDULER = "scheduler";
 
     /** @var string */
     private $cacheNameSpace;
 
-    /** @var number */
+    /** @var array */
     private $defaultCacheOptions;
 
-    /** @var int */
-    private $incrementingKey;
+    /** @var \Psr\SimpleCache\CacheInterface */
+    private \Psr\SimpleCache\CacheInterface $simpleCache;
 
-    /** @var \Gdn_Cache */
-    private $cache;
+    /** @var \Symfony\Contracts\Cache\CacheInterface */
+    private $cacheContract;
 
     /** @var bool */
     private $isFeatureDisabled;
+
+    /** @var callable */
+    private $onInvalidate;
 
     /**
      * Constructor.
      *
      * @param string $cacheNameSpace Namespace to use in the cache.
-     * @param \Gdn_Cache $cache The cache instance.
+     * @param \Gdn_Cache|\Psr\SimpleCache\CacheInterface $cache The cache instance.
      * @param array $defaultCacheOptions Default options to apply for storing cache values.
      */
-    public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, array $defaultCacheOptions = []) {
-        $this->setCache($cache);
+    public function __construct(string $cacheNameSpace, $cache, array $defaultCacheOptions = [])
+    {
+        $this->simpleCache = $cache instanceof \Gdn_Cache ? new CacheCacheAdapter($cache) : $cache;
+        $this->cacheContract =
+            $this->simpleCache instanceof \Symfony\Contracts\Cache\CacheInterface
+                ? $this->simpleCache
+                : new Psr16Adapter($this->simpleCache, $cacheNameSpace);
+
+        // By default symfony has a wrapped that takes locks to prevent concurrent calculation of a cache key.
+        // Unfortunately we've had extensive deadlocking issues on infrastrucutre and increased latency with this.
+        // As a result we've decided to disable this feature altogether. https://higher-logic-llc.slack.com/archives/G010E9CKJ1H/p1648759680021669
+        // We attempted multiple iterations with:
+        // - The built-in lockstore
+        // - A lock store using `symfony/lock` and the `FlockStore`
+        // - A lock store using `symfony/lock` and the `MemcachedStore`.
+        //
+        // We have other mechanisms for prevent concurrent computation.
+        // Things that need a lock (like siteTotal computation) can use deferred hydration and their own lock.
+        $this->cacheContract->setCallbackWrapper(null);
+
         $this->cacheNameSpace = $cacheNameSpace;
         $this->defaultCacheOptions = array_merge(self::GLOBAL_DEFAULT_OPTIONS, $defaultCacheOptions ?? []);
         $this->isFeatureDisabled = FeatureFlagHelper::featureEnabled(self::DISABLE_FEATURE_FLAG);
     }
 
     /**
+     * @param callable $onInvalidate
+     */
+    public function setOnInvalidate(callable $onInvalidate): void
+    {
+        $this->onInvalidate = $onInvalidate;
+    }
+
+    /**
      * Create a cache key for some parameters.
      *
      * @param array $keyArgs Some arguments to generate the cache key from.
+     * @param bool $excludeNamespace Set this to true to remove the namespace from the generated key.
      *
      * @return string
      */
-    public function createCacheKey(array $keyArgs): string {
-        $key = $this->cacheNameSpace . '-' . $this->getIncrementingKey() . '-' . sha1(json_encode($keyArgs));
+    public function createCacheKey(array $keyArgs, bool $excludeNamespace = false): string
+    {
+        $jsonEncoded = json_encode($keyArgs);
+        $key = $this->getIncrementingKey() . "-" . sha1($jsonEncoded);
+        if (!$excludeNamespace) {
+            // Make the key in the same why the symfony cache contract does.
+            $key = $this->cacheNameSpace . "_" . $key;
+        }
         return $key;
     }
 
@@ -75,36 +126,99 @@ class ModelCache implements InjectableInterface {
      *
      * If the record can't be found, we hydrate it with the $hydrate callable and return it.
      *
-     * @param array $keyArgs The arguments to build the cache key.
+     * @param array $args The arguments to build the cache key.
      * @param callable $hydrate A callable to hydrate the cache.
      * @param array $cacheOptions Options for the cache storage.
      *
      * @return mixed
      */
-    public function getCachedOrHydrate(array $keyArgs, callable $hydrate, array $cacheOptions = []) {
+    public function getCachedOrHydrate(array $args, callable $hydrate, array $cacheOptions = [])
+    {
         if ($this->isFeatureDisabled) {
-            return $hydrate();
+            if (empty($args)) {
+                return $hydrate();
+            } else {
+                return call_user_func_array($hydrate, $args);
+            }
         }
 
-        $key = $this->createCacheKey($keyArgs);
-        $result = $this->cache->get($key);
+        $ttl = $cacheOptions[self::OPT_TTL] ?? $this->defaultCacheOptions[self::OPT_TTL];
+        $contractKey = $this->createCacheKey($args, true);
+        $result = $this->cacheContract->get($contractKey, function (ItemInterface $item) use (
+            $args,
+            $hydrate,
+            $ttl,
+            $cacheOptions
+        ) {
+            $item->expiresAfter($ttl);
 
-        if ($result === \Gdn_Cache::CACHEOP_FAILURE) {
-            $result = $hydrate();
-            $options = array_merge($this->defaultCacheOptions, $cacheOptions);
-            $this->cache->store($key, serialize($result), $options);
-        } else {
-            $result = unserialize($result);
-        }
-
+            $scheduler =
+                $cacheOptions[self::OPT_SCHEDULER] ?? ($this->defaultCacheOptions[self::OPT_SCHEDULER] ?? null);
+            $default = $cacheOptions[self::OPT_DEFAULT] ?? null;
+            if ($scheduler instanceof SchedulerInterface) {
+                // Defer hydration.
+                $fullKey = $this->createCacheKey($args);
+                $this->scheduleHydration($scheduler, $fullKey, $ttl, $hydrate, array_values($args));
+                // Return the default for now.
+                return serialize($default);
+            } else {
+                // Hydrate immediately.
+                $result = call_user_func_array($hydrate, array_values($args));
+                $result = serialize($result);
+                return $result;
+            }
+        });
+        $result = unserialize($result);
         return $result;
+    }
+
+    /**
+     * Hydrate a cached value after the request completes.
+     *
+     * @param SchedulerInterface $scheduler
+     * @param string $cacheKey
+     * @param int $ttl
+     * @param callable $hydrate
+     * @param array $args
+     * @return void
+     */
+    private function scheduleHydration(
+        SchedulerInterface $scheduler,
+        string $cacheKey,
+        int $ttl,
+        callable $hydrate,
+        array $args
+    ) {
+        $time = CurrentTimeStamp::get();
+
+        $scheduler->addJobDescriptor(
+            new NormalJobDescriptor(CallbackJob::class, [
+                "callback" => function () use ($cacheKey, $hydrate, $ttl, $args, $time) {
+                    // If the threshold has been reached, we delete the cache key and the hydration
+                    // will run on the next request.
+                    $newTime = CurrentTimeStamp::get();
+                    if ($newTime - $time > self::RESCHEDULE_THRESHOLD) {
+                        $this->simpleCache->delete($cacheKey);
+                        return;
+                    }
+
+                    $result = call_user_func_array($hydrate, $args);
+                    $result = serialize($result);
+                    $this->simpleCache->set($cacheKey, $result, $ttl);
+                },
+            ])
+        );
     }
 
     /**
      * Invalidate all cached results for this cache.
      */
-    public function invalidateAll() {
+    public function invalidateAll()
+    {
         $this->rolloverIncrementingKey();
+        if (is_callable($this->onInvalidate)) {
+            call_user_func($this->onInvalidate);
+        }
     }
 
     /**
@@ -112,15 +226,9 @@ class ModelCache implements InjectableInterface {
      *
      * @return ModelCacheInvalidationProcessor
      */
-    public function createInvalidationProcessor(): ModelCacheInvalidationProcessor {
+    public function createInvalidationProcessor(): ModelCacheInvalidationProcessor
+    {
         return new ModelCacheInvalidationProcessor($this);
-    }
-
-    /**
-     * @param \Gdn_Cache $cache
-     */
-    public function setCache(\Gdn_Cache $cache): void {
-        $this->cache = $cache;
     }
 
     /**
@@ -128,43 +236,59 @@ class ModelCache implements InjectableInterface {
      *
      * @return int
      */
-    private function getIncrementingKey(): int {
+    private function getIncrementingKey(): int
+    {
         if ($this->isFeatureDisabled) {
             return 0;
         }
 
-        if ($this->incrementingKey === null) {
-            $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
-            $result = $this->cache->get($incrementKeyCacheKey);
-
-            if ($result === \Gdn_Cache::CACHEOP_FAILURE) {
-                $result = 0;
-            }
-            $this->incrementingKey = $result;
-
-            $this->cache->store($incrementKeyCacheKey, $this->incrementingKey);
+        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . "-" . $this->cacheNameSpace;
+        $result = $this->simpleCache->get($incrementKeyCacheKey);
+        if ($result === null) {
+            $result = $time = CurrentTimeStamp::get();
+            $this->simpleCache->set($incrementKeyCacheKey, $time);
         }
-
-        return $this->incrementingKey;
+        return $result;
     }
 
     /**
      * Update the incrementing key.
      */
-    private function rolloverIncrementingKey(): void {
+    private function rolloverIncrementingKey(): void
+    {
         if ($this->isFeatureDisabled) {
             return;
         }
-        $key = $this->getIncrementingKey();
 
-        $newKey = $key + 1;
-        if ($newKey > self::MAX_INCREMENTING_KEY) {
-            // Restart from 0.
-            $newKey = 0;
+        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . "-" . $this->cacheNameSpace;
+
+        $this->incrementCacheKey($incrementKeyCacheKey, 1, CurrentTimeStamp::get());
+    }
+
+    /**
+     * Increment a cache key.
+     *
+     * @param string $key
+     * @param int $by
+     * @param int $initial
+     */
+    private function incrementCacheKey(string $key, int $by, int $initial)
+    {
+        if ($this->simpleCache instanceof CacheCacheAdapter) {
+            // If we have a native increment operator use it.
+            $this->simpleCache->getCache()->increment($key, $by, [\Gdn_Cache::FEATURE_INITIAL => $initial]);
+        } else {
+            // We don't have a native increment operator so use a lock to perform the incrementation.
+            $lockService = \Gdn::getContainer()->get(LockService::class);
+            $lock = $lockService->createLock("incremenet-$key", 5);
+            if (!$lock->acquire()) {
+                try {
+                    $existing = $this->simpleCache->get($key, $initial);
+                    $this->simpleCache->set($key, $existing + $by);
+                } finally {
+                    $lock->release();
+                }
+            }
         }
-
-        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
-        $this->incrementingKey = $newKey;
-        $this->cache->store($incrementKeyCacheKey, $newKey);
     }
 }

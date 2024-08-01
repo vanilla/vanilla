@@ -1,19 +1,20 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import NotificationsContents, { INotificationsProps } from "@library/headers/mebox/pieces/NotificationsContents";
+import NotificationsContents from "@library/headers/mebox/pieces/NotificationsContents";
+import type NotificationsContentsImpl from "@library/headers/mebox/pieces/NotificationsContentsImpl";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { t } from "@library/utility/appUtils";
+import { getMeta } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
+import { sprintf } from "sprintf-js";
 
-interface IProps extends INotificationsProps {
+interface IProps extends React.ComponentProps<typeof NotificationsContentsImpl> {
     countUnread: number;
     userSlug: string;
 }
@@ -40,16 +41,19 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
     public render() {
         const { userSlug } = this.props;
         const classesHeader = titleBarClasses();
+
         return (
             <DropDown
-                id={this.id}
-                name={t("Notifications")}
-                renderLeft={true}
+                contentID={this.id + "-content"}
+                handleID={this.id + "-handle"}
+                name={sprintf("Notifications: %s", this.props.countUnread)}
+                renderLeft={!getMeta("ui.isDirectionRTL", false)}
                 buttonClassName={classesHeader.button}
                 contentsClassName={classesHeader.dropDownContents}
                 buttonContents={<NotificationsCount open={this.state.open} compact={false} />}
                 onVisibilityChange={this.setOpen}
                 flyoutType={FlyoutType.FRAME}
+                onHover={NotificationsContents.preload}
             >
                 <NotificationsContents userSlug={userSlug} />
             </DropDown>
@@ -61,7 +65,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
      *
      * @param open Is this menu open and visible?
      */
-    private setOpen = open => {
+    private setOpen = (open) => {
         this.setState({
             open,
         });

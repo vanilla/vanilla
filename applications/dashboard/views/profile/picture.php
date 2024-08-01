@@ -1,10 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit();
 // Check that we have the necessary tools to allow image uploading
 $allowImages = Gdn_UploadImage::canUploadImages();
 echo '<div class="change-picture">';
+BoxThemeShim::startHeading();
 echo '<h1 class="H">'.$this->title().'</h1>';
+BoxThemeShim::endHeading();
 echo $this->Form->open(['enctype' => 'multipart/form-data', 'class' => 'js-change-picture-form']);
 echo $this->Form->errors();
+BoxThemeShim::startBox();
 if ($this->data('crop') && $allowImages) {
     echo $this->data('crop');
 } else { ?>
@@ -23,6 +28,7 @@ if ($this->data('crop')) {
 }
 ?>
 <?php
+BoxThemeShim::endBox();
 echo $this->Form->close();
 echo '</div>';
 ?>

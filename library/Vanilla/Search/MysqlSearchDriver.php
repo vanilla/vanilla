@@ -6,18 +6,12 @@
 
 namespace Vanilla\Search;
 
-use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
-
 /**
  * Mysql search driver.
  */
-class MysqlSearchDriver extends AbstractSearchDriver {
-
+class MysqlSearchDriver extends AbstractSearchDriver
+{
     const MAX_RESULTS = 1000;
-
-    /** @var SearchRecordTypeProviderInterface */
-    private $searchTypeRecordProvider;
 
     /** @var \Gdn_Database $mysql */
     private $db;
@@ -25,12 +19,11 @@ class MysqlSearchDriver extends AbstractSearchDriver {
     /**
      * DI.
      *
-     * @param SearchRecordTypeProviderInterface $searchRecordProvider
      * @param \Gdn_Database $db
      */
-    public function __construct(SearchRecordTypeProviderInterface $searchRecordProvider, \Gdn_Database $db) {
-        $this->searchTypeRecordProvider = $searchRecordProvider;
-        $this->db  = $db;
+    public function __construct(\Gdn_Database $db)
+    {
+        $this->db = $db;
     }
 
     /**
@@ -41,7 +34,8 @@ class MysqlSearchDriver extends AbstractSearchDriver {
      *
      * @return SearchResults
      */
-    public function search(array $queryData, SearchOptions $options): SearchResults {
+    public function search(array $queryData, SearchOptions $options): SearchResults
+    {
         $query = new MysqlSearchQuery($this->getSearchTypes(), $queryData, $this->db);
 
         $sql = $query->getSql();
@@ -51,12 +45,22 @@ class MysqlSearchDriver extends AbstractSearchDriver {
             $search = $this->db->query($sql)->resultArray();
         }
 
-        $search = $this->convertRecordsToResultItems($search);
-        return new SearchResults(
-            $search,
-            count($search),
-            $options->getOffset(),
-            $options->getLimit()
-        );
+        $search = $this->convertRecordsToResultItems($search, $query);
+        return new SearchResults($search, count($search), $options->getOffset(), $options->getLimit());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName(): string
+    {
+        return "MySQL";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createIndexes()
+    {
     }
 }

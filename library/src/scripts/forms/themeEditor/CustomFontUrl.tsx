@@ -22,7 +22,7 @@ export function CustomFontUrl(props: IProps) {
             varKey={"global.fonts.customFont.url"}
             debounceTime={10}
             forceError={props.forceError}
-            validation={newValue => {
+            validation={(newValue) => {
                 if (props.forceError) {
                     return false;
                 } else {

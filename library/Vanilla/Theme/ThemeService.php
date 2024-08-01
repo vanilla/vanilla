@@ -6,28 +6,40 @@
 
 namespace Vanilla\Theme;
 
+use Garden\Events\ResourceEvent;
+use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Events\ThemeApplyEvent;
+use Vanilla\Dashboard\Events\ThemeEvent;
+use Vanilla\Events\EventAction;
+use Vanilla\Logging\AuditLogger;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Models\ModelCache;
 use Vanilla\Site\SiteSectionModel;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\Asset\ThemeAsset;
+use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
+use VanillaTests\Fixtures\QuickLinks\MockQuickLinksVariableProvider;
 
 /**
  * Handle custom themes.
  */
-class ThemeService {
+class ThemeService
+{
+    private const MAX_PARENT_DEPTH = 3;
 
     /**
      * When fetching the current theme, accurate assets will be prioritized. CurrentTheme > MobileTheme
      */
-    const GET_THEME_MODE_PRIORITIZE_ASSETS = 'prioritizeAssets';
+    const GET_THEME_MODE_PRIORITIZE_ASSETS = "prioritizeAssets";
 
     /**
      * When fetching the current theme, an accurate addon will be prioritized. MobileTheme > CurrentTheme
      */
-    const GET_THEME_MODE_PRIORITIZE_ADDON = 'prioritizeAddon';
+    const GET_THEME_MODE_PRIORITIZE_ADDON = "prioritizeAddon";
 
     const FOUNDATION_THEME_KEY = "theme-foundation";
     const FALLBACK_THEME_KEY = self::FOUNDATION_THEME_KEY;
@@ -37,6 +49,9 @@ class ThemeService {
 
     /** @var VariablesProviderInterface[] */
     private $variableProviders = [];
+
+    /** @var VariableDefaultsProviderInterface[] */
+    private $variableDefaultsProviders = [];
 
     /** @var ConfigurationInterface $config */
     private $config;
@@ -57,13 +72,13 @@ class ThemeService {
     private $themeSections;
 
     /** @var string $themeManagePageUrl */
-    private $themeManagePageUrl = '/dashboard/settings/themes';
+    private $themeManagePageUrl = "/dashboard/settings/themes";
 
     /** @var FsThemeProvider */
     private $fallbackThemeProvider;
 
-    /** @var ThemeCache */
-    private $cache;
+    /** @var ModelCache */
+    private $modelCache;
 
     /**
      * ThemeService constructor.
@@ -75,7 +90,7 @@ class ThemeService {
      * @param ThemeSectionModel $themeSections
      * @param SiteSectionModel $siteSectionModel
      * @param FsThemeProvider $fallbackThemeProvider
-     * @param ThemeCache $cache
+     * @param \Gdn_Cache $cache
      */
     public function __construct(
         ConfigurationInterface $config,
@@ -85,7 +100,7 @@ class ThemeService {
         ThemeSectionModel $themeSections,
         SiteSectionModel $siteSectionModel,
         FsThemeProvider $fallbackThemeProvider,
-        ThemeCache $cache
+        \Gdn_Cache $cache
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -94,7 +109,24 @@ class ThemeService {
         $this->themeSections = $themeSections;
         $this->siteSectionModel = $siteSectionModel;
         $this->fallbackThemeProvider = $fallbackThemeProvider;
-        $this->cache = $cache;
+
+        // When developers are working locally, this config key is enabled.
+        // In that situation always use an in-memory cache instead of allowing memcached.
+        // Otherwise developers working on fs-based theme will be looking at stale cached assets.
+        $isHotReloadEnabled = $config->get("HotReload.Enabled", true);
+        if ($isHotReloadEnabled) {
+            $cache = new \Gdn_Dirtycache();
+        }
+
+        $this->modelCache = new ModelCache("themeService", $cache);
+    }
+
+    /**
+     * Invalidate all cache entries.
+     */
+    public function invalidateCache()
+    {
+        $this->modelCache->invalidateAll();
     }
 
     /**
@@ -102,14 +134,19 @@ class ThemeService {
      *
      * @param VariablesProviderInterface $provider
      */
-    public function addVariableProvider(VariablesProviderInterface $provider) {
+    public function addVariableProvider(VariablesProviderInterface $provider): void
+    {
         $this->variableProviders[] = $provider;
+        if ($provider instanceof VariableDefaultsProviderInterface) {
+            $this->variableDefaultsProviders[] = $provider;
+        }
     }
 
     /**
      * Clear all variable providers.
      */
-    public function clearVariableProviders() {
+    public function clearVariableProviders(): void
+    {
         $this->variableProviders = [];
     }
 
@@ -118,8 +155,17 @@ class ThemeService {
      *
      * @return array
      */
-    public function getVariableProviders(): array {
+    public function getVariableProviders(): array
+    {
         return $this->variableProviders;
+    }
+
+    /**
+     * @return void
+     */
+    public function clearThemeProviders(): void
+    {
+        $this->themeProviders = [];
     }
 
     /**
@@ -127,7 +173,9 @@ class ThemeService {
      *
      * @param ThemeProviderInterface $provider
      */
-    public function addThemeProvider(ThemeProviderInterface $provider) {
+    public function addThemeProvider(ThemeProviderInterface $provider)
+    {
+        $provider->setThemeService($this);
         $this->themeProviders[] = $provider;
     }
 
@@ -138,18 +186,73 @@ class ThemeService {
      * @param array $query Request query arguments
      * @return Theme
      */
-    public function getTheme($themeKey, array $query = []): Theme {
-        $cacheKey = $this->cache->cacheKey($themeKey, $query);
-        $result = $this->cache->get($cacheKey);
-        if ($result instanceof Theme) {
-            return $this->normalizeTheme($result);
+    public function getTheme($themeKey, array $query = []): Theme
+    {
+        $didFetch = false;
+        /** @var Theme $theme */
+        $theme = $this->modelCache->getCachedOrHydrate(
+            [
+                "getTheme" => true,
+                "themeKey" => $themeKey,
+                "query" => $query,
+            ],
+            function () use ($themeKey, $query, &$didFetch) {
+                $theme = $this->lookupTheme($themeKey, $query);
+                $parentThemes = $this->lookupParentThemes($theme);
+
+                if (!empty($parentThemes)) {
+                    $theme->mergeParentAssets(...$parentThemes);
+                }
+                $didFetch = true;
+                return $theme;
+            }
+        );
+        if (!$didFetch) {
+            $theme->setIsCacheHit(true);
         }
 
+        $theme = $this->normalizeTheme($theme);
+        return $theme;
+    }
+
+    /**
+     * Lookup a theme with the correct provider.
+     *
+     * @param string $themeKey
+     * @param array $query
+     *
+     * @return Theme
+     */
+    private function lookupTheme(string $themeKey, array $query = []): Theme
+    {
         $provider = $this->getThemeProvider($themeKey);
         $theme = $provider->getTheme($themeKey, $query);
-        $theme = $this->normalizeTheme($theme);
-        $this->cache->set($cacheKey, $theme);
         return $theme;
+    }
+
+    /**
+     * Find all parent themes of the current theme to our max depth.
+     *
+     * @param Theme $theme
+     * @return Theme[]
+     */
+    private function lookupParentThemes(Theme $theme): array
+    {
+        $parents = [];
+
+        $currentChild = $theme;
+        $depth = 1;
+        while ($parentKey = $currentChild->getParentThemeKey()) {
+            if ($depth >= self::MAX_PARENT_DEPTH) {
+                break;
+            }
+
+            $newParent = $this->lookupTheme($parentKey);
+            $parents[] = $newParent;
+            $currentChild = $newParent;
+            $depth++;
+        }
+        return array_reverse($parents);
     }
 
     /**
@@ -157,7 +260,8 @@ class ThemeService {
      *
      * @return Theme[]
      */
-    public function getThemes(): array {
+    public function getThemes(): array
+    {
         $allThemes = [];
         foreach ($this->themeProviders as $themeProvider) {
             $themes = $themeProvider->getAllThemes();
@@ -176,14 +280,18 @@ class ThemeService {
      *        fields: name (required)
      * @return Theme
      */
-    public function postTheme(array $body): Theme {
+    public function postTheme(array $body): Theme
+    {
         $provider = $this->getWritableThemeProvider();
         $theme = $provider->postTheme($body);
 
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
 
-        $theme = $this->normalizeTheme($theme);
+        $auditEvent = new ThemeEvent(EventAction::ADD, $theme);
+        AuditLogger::log($auditEvent);
+
+        $theme = $this->getTheme($theme->getThemeID());
         return $theme;
     }
 
@@ -195,12 +303,15 @@ class ThemeService {
      *        fields: name (required)
      * @return Theme
      */
-    public function patchTheme($themeID, array $body): Theme {
+    public function patchTheme($themeID, array $body): Theme
+    {
         $provider = $this->getWritableThemeProvider($themeID);
         $theme = $provider->patchTheme($themeID, $body);
 
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
+        $auditEvent = new ThemeEvent(EventAction::UPDATE, $theme);
+        AuditLogger::log($auditEvent);
 
         $theme = $this->normalizeTheme($theme);
         return $theme;
@@ -211,11 +322,17 @@ class ThemeService {
      *
      * @param string|int $themeID Theme ID
      */
-    public function deleteTheme($themeID) {
+    public function deleteTheme($themeID)
+    {
         $provider = $this->getWritableThemeProvider($themeID);
+        $theme = $provider->getTheme($themeID);
+
         $provider->deleteTheme($themeID);
+        $auditEvent = new ThemeEvent(EventAction::DELETE, $theme);
+        AuditLogger::log($auditEvent);
+
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
     }
 
     /**
@@ -224,7 +341,8 @@ class ThemeService {
      * @param int $themeID Theme ID to set current.
      * @return Theme
      */
-    public function setCurrentTheme($themeID): Theme {
+    public function setCurrentTheme($themeID): Theme
+    {
         $previousTheme = $this->getCurrentTheme();
         $previousProvider = $this->getThemeProvider($previousTheme->getThemeID());
         $newProvider = $this->getThemeProvider($themeID);
@@ -234,9 +352,11 @@ class ThemeService {
             $previousProvider->afterCurrentProviderChange();
         }
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
 
         $newTheme = $this->normalizeTheme($newTheme);
+        AuditLogger::log(new ThemeApplyEvent($newTheme));
+
         return $newTheme;
     }
 
@@ -248,7 +368,8 @@ class ThemeService {
      * @param int $revisionID Theme revision ID.
      * @return Theme
      */
-    public function setPreviewTheme($themeID, ?int $revisionID = null): Theme {
+    public function setPreviewTheme($themeID, ?int $revisionID = null): Theme
+    {
         if (empty($themeID)) {
             $theme = $this->getCurrentTheme();
             $this->themeHelper->cancelSessionPreviewTheme();
@@ -268,14 +389,15 @@ class ThemeService {
      *
      * @return array
      */
-    public function getPreviewTheme(): ?array {
+    public function getPreviewTheme(): ?array
+    {
         $previewTheme = null;
-        if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
-            $previewTheme['themeID'] = $previewThemeKey;
+        if ($previewThemeKey = $this->session->getPreference("PreviewThemeKey")) {
+            $previewTheme["themeID"] = $previewThemeKey;
             $theme = $this->getThemeProvider($previewThemeKey)->getTheme($previewThemeKey);
-            $previewTheme['name'] = $theme->getName();
-            $previewTheme['redirect'] = $this->getThemeManagePageUrl();
-            $previewTheme['revisionID'] = $this->session->getPreference('PreviewThemeRevisionID');
+            $previewTheme["name"] = $theme->getName();
+            $previewTheme["redirect"] = $this->getThemeManagePageUrl();
+            $previewTheme["revisionID"] = $this->session->getPreference("PreviewThemeRevisionID");
         }
         return $previewTheme;
     }
@@ -285,7 +407,8 @@ class ThemeService {
      *
      * @param string $url
      */
-    public function setThemeManagePageUrl(string $url) {
+    public function setThemeManagePageUrl(string $url)
+    {
         $this->themeManagePageUrl = $url;
     }
 
@@ -294,7 +417,8 @@ class ThemeService {
      *
      * @return string
      */
-    private function getThemeManagePageUrl() {
+    private function getThemeManagePageUrl()
+    {
         return $this->themeManagePageUrl;
     }
 
@@ -304,7 +428,8 @@ class ThemeService {
      * @param int|string $themeKey
      * @return string
      */
-    public function getMasterThemeKey($themeKey): string {
+    public function getMasterThemeKey($themeKey): string
+    {
         $provider = $this->getThemeProvider($themeKey);
         return $provider->getMasterThemeKey($themeKey);
     }
@@ -314,7 +439,8 @@ class ThemeService {
      *
      * @return Addon
      */
-    public function getCurrentThemeAddon(): Addon {
+    public function getCurrentThemeAddon(): Addon
+    {
         $currentTheme = $this->getCurrentTheme(self::GET_THEME_MODE_PRIORITIZE_ADDON);
         return $currentTheme->getAddon();
     }
@@ -325,10 +451,9 @@ class ThemeService {
      * @param string $themeKey
      * @return Addon
      */
-    public function getThemeAddon(string $themeKey = ''): Addon {
-        return $this->addonManager->lookupTheme(
-            $this->getMasterThemeKey($themeKey)
-        );
+    public function getThemeAddon(string $themeKey = ""): Addon
+    {
+        return $this->addonManager->lookupTheme($this->getMasterThemeKey($themeKey));
     }
 
     /**
@@ -337,7 +462,8 @@ class ThemeService {
      * @param string|int $themeKey
      * @return bool
      */
-    public function verifyThemeIdentifierIsValid($themeKey) {
+    public function verifyThemeIdentifierIsValid($themeKey)
+    {
         $provider = $this->getThemeProvider($themeKey);
         return $provider->themeExists($themeKey);
     }
@@ -349,7 +475,8 @@ class ThemeService {
      *
      * @return Theme The current theme or the fallback if it fails to load.
      */
-    public function getCurrentTheme(string $mode = self::GET_THEME_MODE_PRIORITIZE_ASSETS): Theme {
+    public function getCurrentTheme(string $mode = self::GET_THEME_MODE_PRIORITIZE_ASSETS): Theme
+    {
         $current = null;
 
         try {
@@ -376,7 +503,7 @@ class ThemeService {
                 $current->setAssets($assetOverlayTheme->getAssets());
             }
 
-            $sectionThemeID =  $this->siteSectionModel->getCurrentSiteSection()->getSectionThemeID();
+            $sectionThemeID = $this->siteSectionModel->getCurrentSiteSection()->getSectionThemeID();
             if ($sectionThemeID !== null) {
                 // Check if the theme actually exists.
                 $sectionTheme = $this->getTheme($sectionThemeID);
@@ -385,21 +512,22 @@ class ThemeService {
                 }
             }
 
-            $previewThemeKey = $this->session->getPreference('PreviewThemeKey');
-            if ($previewThemeKey) { // May be stuck to empty string so falsy check is required.
-                $previewThemeRevisionID = $this->session->getPreference('PreviewThemeRevisionID');
+            $previewThemeKey = $this->session->getPreference("PreviewThemeKey");
+            if ($previewThemeKey) {
+                // May be stuck to empty string so falsy check is required.
+                $previewThemeRevisionID = $this->session->getPreference("PreviewThemeRevisionID");
                 $args = [];
 
                 if (!empty($previewThemeRevisionID)) {
-                    $args['revisionID'] = $previewThemeRevisionID;
+                    $args["revisionID"] = $previewThemeRevisionID;
                 }
 
-                $previewTheme = $this->getTheme($previewThemeKey, $args);
-                if ($previewTheme === null) {
-                    // if we stored wrong preview key store in session, lets reset it.
-                    $this->themeHelper->cancelSessionPreviewTheme();
-                } else {
+                try {
+                    $previewTheme = $this->getTheme($previewThemeKey, $args);
                     $current = $previewTheme;
+                } catch (NotFoundException $e) {
+                    // Theme might have been deleted.
+                    $this->themeHelper->cancelSessionPreviewTheme();
                 }
             }
 
@@ -408,9 +536,17 @@ class ThemeService {
                 $this->getTheme(self::FALLBACK_THEME_KEY);
             }
         } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
+            ErrorLogger::error(
+                "Failed to load theme",
+                ["themeService", "currentTheme"],
+                [
+                    "exception" => $e,
+                ]
+            );
+            // if we stored wrong preview key store in session, lets reset it.
+            $this->themeHelper->cancelSessionPreviewTheme();
             // If we had some exception during this, fallback to the default.
-            $this->getTheme(self::FALLBACK_THEME_KEY);
+            $current = $this->getTheme(self::FALLBACK_THEME_KEY);
         }
 
         $current = $this->normalizeTheme($current);
@@ -426,10 +562,11 @@ class ThemeService {
      *
      * @return ThemeAsset
      */
-    public function setAsset($themeID, string $assetKey, string $data): ThemeAsset {
+    public function setAsset($themeID, string $assetKey, string $data): ThemeAsset
+    {
         $provider = $this->getWritableThemeProvider($themeID);
         $asset = $provider->setAsset($themeID, $assetKey, $data);
-        $this->cache->clear();
+        $this->invalidateCache();
         return $asset;
     }
 
@@ -443,11 +580,12 @@ class ThemeService {
      *
      * @return ThemeAsset
      */
-    public function sparseUpdateAsset($themeID, string $assetKey, string $data): ThemeAsset {
+    public function sparseUpdateAsset($themeID, string $assetKey, string $data): ThemeAsset
+    {
         $provider = $this->getWritableThemeProvider($themeID);
         $asset = $provider->sparseUpdateAsset($themeID, $assetKey, $data);
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
         return $asset;
     }
 
@@ -458,14 +596,15 @@ class ThemeService {
      * @return ThemeProviderInterface
      * @throws ClientException Throws an exception if no suitable theme provider found.
      */
-    private function getThemeProvider($themeID): ThemeProviderInterface {
+    private function getThemeProvider($themeID): ThemeProviderInterface
+    {
         foreach ($this->themeProviders as $provider) {
             if ($provider->handlesThemeID($themeID)) {
                 return $provider;
             }
         }
 
-        trigger_error('No custom theme provider found!', E_USER_WARNING);
+        trigger_error("No custom theme provider found!", E_USER_WARNING);
         // It is never acceptable to throw an exception in the theming system.
         return $this->fallbackThemeProvider;
     }
@@ -476,9 +615,13 @@ class ThemeService {
      * @return ThemeProviderWriteInterface
      * @throws ServerException Throws an exception if no writable theme provider found.
      */
-    private function getWritableThemeProvider($themeID = null): ThemeProviderWriteInterface {
+    private function getWritableThemeProvider($themeID = null): ThemeProviderWriteInterface
+    {
         foreach ($this->themeProviders as $provider) {
-            if ($provider instanceof ThemeProviderWriteInterface && ($themeID === null || $provider->handlesThemeID($themeID))) {
+            if (
+                $provider instanceof ThemeProviderWriteInterface &&
+                ($themeID === null || $provider->handlesThemeID($themeID))
+            ) {
                 return $provider;
             }
         }
@@ -494,11 +637,12 @@ class ThemeService {
      *
      * @return ThemeAsset|null A theme asset.
      */
-    public function getAsset(string $themeID, string $assetKey): ?ThemeAsset {
+    public function getAsset(string $themeID, string $assetKey): ?ThemeAsset
+    {
         $provider = $this->getThemeProvider($themeID);
         $theme = $provider->getTheme($themeID);
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
         return $theme->getAssets()[$assetKey] ?? null;
     }
 
@@ -508,11 +652,12 @@ class ThemeService {
      * @param string|int $themeKey The unique theme key or ID.
      * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
      */
-    public function deleteAsset($themeKey, string $assetKey) {
+    public function deleteAsset($themeKey, string $assetKey)
+    {
         $provider = $this->getWritableThemeProvider($themeKey);
         $provider->deleteAsset($themeKey, $assetKey);
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
     }
 
     /**
@@ -521,7 +666,8 @@ class ThemeService {
      * @param string $themeKey
      * @return array
      */
-    public function getThemeRevisions(string $themeKey): array {
+    public function getThemeRevisions(string $themeKey): array
+    {
         $provider = $this->getThemeProvider($themeKey);
         $revisions = $provider->getThemeRevisions($themeKey);
         foreach ($revisions as &$revision) {
@@ -536,7 +682,9 @@ class ThemeService {
      * @param Theme $theme The theme data.
      * @return Theme Updated theme data.
      */
-    private function normalizeTheme(Theme $theme): Theme {
+    private function normalizeTheme(Theme $theme): Theme
+    {
+        $theme->ensureDefaultAssets();
         // Apply supported sections.
         $supportedSections = $this->themeSections->getModernSections();
         if ($theme->getFeatures()->useDataDrivenTheme()) {
@@ -546,8 +694,8 @@ class ThemeService {
 
         // Fix current theme.
         $currentThemeID =
-            $this->config->get(ThemeServiceHelper::CONFIG_CURRENT_THEME)
-            ?: $this->config->get(ThemeServiceHelper::CONFIG_DESKTOP_THEME);
+            $this->config->get(ThemeServiceHelper::CONFIG_CURRENT_THEME) ?:
+            $this->config->get(ThemeServiceHelper::CONFIG_DESKTOP_THEME);
         $isCurrent = $currentThemeID == $theme->getThemeID();
         $theme->setCurrent($isCurrent);
 
@@ -561,17 +709,24 @@ class ThemeService {
      *
      * @param Theme $theme Variables json theme asset string.
      */
-    private function overlayAddonVariables(Theme $theme) {
-        $features = new ThemeFeatures($this->config, $theme->getAddon());
+    private function overlayAddonVariables(Theme $theme)
+    {
         // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
         $additionalVariables = [];
         foreach ($this->variableProviders as $variableProvider) {
-            if ($features->disableKludgedVars() && $variableProvider instanceof KludgedVariablesProviderInterface) {
-                continue;
+            try {
+                $variables = $variableProvider->getVariables();
+                $additionalVariables = array_replace_recursive($additionalVariables, $variables);
+            } catch (\Exception $ex) {
+                trigger_error($ex->getMessage(), E_USER_WARNING);
             }
-            $additionalVariables = array_replace_recursive($additionalVariables, $variableProvider->getVariables());
         }
 
-        $theme->overlayVariables($additionalVariables);
+        $defaults = [];
+        foreach ($this->variableDefaultsProviders as $defaultsProvider) {
+            $defaults = array_replace_recursive($defaults, $defaultsProvider->getVariableDefaults());
+        }
+
+        $theme->overlayVariables($additionalVariables, !empty($defaults) ? $defaults : null);
     }
 }

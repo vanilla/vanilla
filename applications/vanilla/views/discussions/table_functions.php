@@ -1,5 +1,7 @@
 <?php
 if (!defined('APPLICATION')) exit();
+
+use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Utility\HtmlUtils;
 
 
@@ -97,8 +99,11 @@ if (!function_exists('writeDiscussionRow')) :
                 <div class="Wrap">
          <span class="Options">
             <?php
-            echo optionsList($discussion);
-            echo bookmarkButton($discussion);
+                // render legacy options
+                if (!Gdn::themeFeatures()->get('EnhancedAccessibility')) {
+                    echo optionsList($discussion);
+                    echo bookmarkButton($discussion);
+                }
             ?>
          </span>
                     <?php
@@ -107,18 +112,36 @@ if (!function_exists('writeDiscussionRow')) :
                     $sender->fireEvent('AfterDiscussionTitle');
 
                     writeMiniPager($discussion);
-                    echo newComments($discussion);
+
+                    $additionalMetas = newComments($discussion);
+
                     if ($sender->data('_ShowCategoryLink', true) && CategoryModel::checkPermission(val('CategoryID', $discussion), 'Vanilla.Discussions.View')) {
-                        echo categoryLink($discussion, ' '.t('in').' ');
+                        $additionalMetas .= categoryLink($discussion, ' '.t('in').' ');
                     }
+
+                    if (!BoxThemeShim::isActive()) {
+                        echo $additionalMetas;
+                    }
+
                     // Other stuff that was in the standard view that you may want to display:
                     echo '<div class="Meta Meta-Discussion">';
-                    writeTags($discussion);
+                        writeTags($discussion);
+                        if (BoxThemeShim::isActive()) {
+                            echo $additionalMetas;
+                        }
                     echo '</div>';
 
                     //			if ($Source = val('Source', $Discussion))
                     //				echo ' '.sprintf(t('via %s'), t($Source.' Source', $Source));
                     //
+
+                    // render enhanced accessibility options
+                    if (Gdn::themeFeatures()->get('EnhancedAccessibility')) {
+                        echo '<span class="Options">';
+                        echo bookmarkButton($discussion);
+                        echo optionsList($discussion);
+                        echo '</span>';
+                    }
                     ?>
                 </div>
             </td>

@@ -8,18 +8,22 @@
 namespace VanillaTests\Library\Garden;
 
 use Garden\EventManager;
+use Garden\PsrEventHandlersInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use VanillaTests\BootstrapTrait;
+use VanillaTests\Fixtures\Events\TestPsrEventHandler;
+use VanillaTests\Fixtures\Events\TestResourceEvent;
 use VanillaTests\Fixtures\TestEvent;
 use VanillaTests\Fixtures\TestEventChild;
 
 /**
  * Tests for the event manager's PSR integration.
  */
-class EventManagerPsrTest extends TestCase {
+class EventManagerPsrTest extends TestCase
+{
     use BootstrapTrait;
 
     /**
@@ -51,7 +55,8 @@ class EventManagerPsrTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->container()->setInstance(self::class, $this);
@@ -67,9 +72,10 @@ class EventManagerPsrTest extends TestCase {
     /**
      * Test a basic dispatch.
      */
-    public function testConfigDispatch() {
-        $this->config->addListenerMethod(self::class, 'incEvent');
-        $this->config->addListenerMethod(self::class, 'incEvent');
+    public function testConfigDispatch()
+    {
+        $this->config->addListenerMethod(self::class, "incEvent");
+        $this->config->addListenerMethod(self::class, "incEvent");
 
         $this->events->dispatch($this->testEvent);
         $this->assertSame(2, $this->testEvent->getNum());
@@ -78,9 +84,10 @@ class EventManagerPsrTest extends TestCase {
     /**
      * Events should be able to stop propagation.
      */
-    public function testStopPropagation() {
-        $this->config->addListenerMethod(self::class, 'incEventStop');
-        $this->config->addListenerMethod(self::class, 'incEvent');
+    public function testStopPropagation()
+    {
+        $this->config->addListenerMethod(self::class, "incEventStop");
+        $this->config->addListenerMethod(self::class, "incEvent");
 
         $this->events->dispatch($this->testEvent);
         $this->assertSame(1, $this->testEvent->getNum());
@@ -89,9 +96,10 @@ class EventManagerPsrTest extends TestCase {
     /**
      * A child event should be handled by it's parent listener too.
      */
-    public function testEventInheritance() {
-        $this->config->addListenerMethod(self::class, 'incEvent');
-        $this->config->addListenerMethod(self::class, 'incEventChild');
+    public function testEventInheritance()
+    {
+        $this->config->addListenerMethod(self::class, "incEvent");
+        $this->config->addListenerMethod(self::class, "incEventChild");
 
         $this->events->dispatch($this->testEventChild);
         $this->assertSame(3, $this->testEventChild->getNum());
@@ -100,15 +108,17 @@ class EventManagerPsrTest extends TestCase {
     /**
      * An event handler without a type hint should fail.
      */
-    public function testBadEventHandler() {
+    public function testBadEventHandler()
+    {
         $this->expectException(\InvalidArgumentException::class);
-        $this->config->addListenerMethod(self::class, 'badListener');
+        $this->config->addListenerMethod(self::class, "badListener");
     }
 
     /**
      * A bad event listener.
      */
-    public function badListener() {
+    public function badListener()
+    {
         //
     }
 
@@ -118,7 +128,8 @@ class EventManagerPsrTest extends TestCase {
      * @param TestEvent $e
      * @return TestEvent
      */
-    public function incEvent(TestEvent $e): TestEvent {
+    public function incEvent(TestEvent $e): TestEvent
+    {
         $e->incNum();
         return $e;
     }
@@ -129,7 +140,8 @@ class EventManagerPsrTest extends TestCase {
      * @param TestEventChild $e
      * @return TestEventChild
      */
-    public function incEventChild(TestEventChild $e): TestEventChild {
+    public function incEventChild(TestEventChild $e): TestEventChild
+    {
         $e->incNum();
         $e->incNum();
         return $e;
@@ -141,9 +153,27 @@ class EventManagerPsrTest extends TestCase {
      * @param TestEvent $e
      * @return TestEvent
      */
-    public function incEventStop(TestEvent $e): TestEvent {
+    public function incEventStop(TestEvent $e): TestEvent
+    {
         $e->incNum();
         $e->stopPropagation();
         return $e;
+    }
+
+    /**
+     * Test that we bind PsrEventHandlerInterface and unbind it.
+     */
+    public function testBindUnbindPsrEventHandler()
+    {
+        $this->eventManager->bindClass(TestPsrEventHandler::class);
+        $event = new TestResourceEvent("test", []);
+        $this->eventManager->dispatch($event);
+        $this->assertTrue($event->wasHandled);
+
+        // Unbind
+        $this->eventManager->unbindClass(TestPsrEventHandler::class);
+        $event = new TestResourceEvent("test", []);
+        $this->eventManager->dispatch($event);
+        $this->assertFalse($event->wasHandled);
     }
 }

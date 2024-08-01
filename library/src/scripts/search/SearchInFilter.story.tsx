@@ -15,9 +15,8 @@ import {
 } from "@library/icons/searchIcons";
 import { t } from "@vanilla/i18n/src";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
-import SearchContext, { SearchContextProvider } from "@library/contexts/SearchContext";
+import SearchContext from "@library/contexts/SearchContext";
 import { MemoryRouter } from "react-router";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
 
@@ -30,7 +29,7 @@ interface IProps {
 
 const dummmyFilters: ISearchInButton[] = [
     {
-        label: t("All Content"),
+        label: t("All"),
         icon: <TypeAllIcon />,
         data: "all",
     },
@@ -63,7 +62,7 @@ export default {
     title: "Search/Filters",
     parameters: {
         chromatic: {
-            viewports: layoutVariables().panelLayoutBreakPoints.twoColumn,
+            viewports: [1400, 500],
         },
     },
 };
@@ -71,7 +70,7 @@ export default {
 /**
  * Implements the search bar component
  */
-export function SearchFilter(props: IProps) {
+function SearchFilterStory(props: IProps) {
     const { activeItem = "all", filters = dummmyFilters, endFilters = dummmyEndFilters, message } = props;
     const [data, setData] = useState(activeItem);
 
@@ -85,9 +84,9 @@ export function SearchFilter(props: IProps) {
     );
 }
 
-export const NoMembers = storyWithConfig({}, () => <SearchFilter activeItem={"Groups"} endFilters={[]} />);
+export const NoMembers = storyWithConfig({}, () => <SearchFilterStory activeItem={"Groups"} endFilters={[]} />);
 export const NotRendered = storyWithConfig({}, () => (
-    <SearchFilter
+    <SearchFilterStory
         message={
             "This page should stay empty, we don't want to render the component unless there are more than 1 filters."
         }
@@ -95,3 +94,7 @@ export const NotRendered = storyWithConfig({}, () => (
         endFilters={[]}
     />
 ));
+
+export function SearchFilter() {
+    return <SearchFilterStory />;
+}

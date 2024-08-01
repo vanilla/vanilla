@@ -2,37 +2,45 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
 namespace VanillaTests\APIv0;
 
-
 use Garden\Http\HttpResponse;
 use VanillaTests\SharedBootstrapTestCase;
 
-abstract class BaseTest extends SharedBootstrapTestCase {
-    /** @var APIv0  $api */
+/**
+ * Best test for old-school cURL tests.
+ */
+abstract class BaseTest extends SharedBootstrapTestCase
+{
+    /** @var E2ETestClient  $api */
     protected static $api;
 
     /**
      * Make sure there is a fresh copy of Vanilla for the class' tests.
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setUpBeforeClass();
-        $api = new APIv0();
+        $api = new E2ETestClient();
 
         $api->uninstall();
         $api->install(get_called_class());
         self::$api = $api;
 
         self::$api->saveToConfig([
-            'Vanilla.Discussion.SpamCount' => 100,
+            "Vanilla.Discussion.SpamCount" => 1000,
+            "Vanilla.Comment.SpamCount" => 1000,
+            "Feature.customLayout.home.Enabled" => false,
+            "Feature.customLayout.discussionList.Enabled" => false,
+            "Feature.customLayout.categoryList.Enabled" => false,
         ]);
 
-        $r = $api->get('/discussions.json');
+        $r = $api->get("/discussions.json");
         $data = $r->getBody();
-        if (empty($data['Discussions'])) {
+        if (empty($data["Discussions"])) {
             throw new \Exception("The discussion stub content is missing.", 500);
         }
     }
@@ -40,8 +48,8 @@ abstract class BaseTest extends SharedBootstrapTestCase {
     /**
      * @inheritDoc
      */
-    public static function tearDownAfterClass(): void {
-        self::$api->uninstall();
+    public static function tearDownAfterClass(): void
+    {
         self::$api->terminate();
         parent::tearDownAfterClass();
     }
@@ -49,9 +57,10 @@ abstract class BaseTest extends SharedBootstrapTestCase {
     /**
      * Get the API to make requests against.
      *
-     * @return APIv0 Returns the API.
+     * @return E2ETestClient Returns the API.
      */
-    public function api() {
+    public function api()
+    {
         return self::$api;
     }
 
@@ -60,7 +69,8 @@ abstract class BaseTest extends SharedBootstrapTestCase {
      *
      * @param HttpResponse $response The response to test.
      */
-    public function assertResponseSuccess(HttpResponse $response) {
+    public function assertResponseSuccess(HttpResponse $response)
+    {
         $this->assertNotNull($response);
         $this->assertTrue($response->isSuccessful());
     }

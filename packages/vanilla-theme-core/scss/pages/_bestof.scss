@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 body.Section-BestOf {
-
     @include noPanel;
 
     .SearchBox {
@@ -43,14 +42,12 @@ body.Section-BestOf {
         }
 
         .BestOfEverything {
-
             .ReactSprite {
                 display: none;
             }
         }
 
         li.Active {
-
             a {
                 background-color: $button-basic-hover_bg;
                 border-color: $button-basic-hover_border;
@@ -114,7 +111,7 @@ body.Section-BestOf {
             margin-right: -#{$component-base_padding};
             margin-bottom: -#{$component-base_padding};
             padding: $component-base_padding;
-            min-height: calc(#{$theme-photo_size} + #{$component-base_padding} * 2);
+            min-height: calc(#{$theme-photo_size} + #{$component-vertical_padding} * 2);
             background-color: $component-header_bg;
 
             @if ($component_borderRadius == 0) {
@@ -132,7 +129,7 @@ body.Section-BestOf {
             background: none;
             font-size: $component-title_fontSize;
             font-weight: $component-title_fontWeight;
-            line-height: #{$theme-photo_size / 2};
+            line-height: #{$theme-photo_size * 0.5};
             color: $component-title_color;
             margin-bottom: $utility-baseUnit;
 
@@ -182,7 +179,6 @@ body.Section-BestOf {
 
     .Tile,
     .Item {
-
         .Item-Header,
         .Item-BodyWrap {
             margin-bottom: $utility-baseUnit;
@@ -196,16 +192,18 @@ body.Section-BestOf {
         .Author {
             display: block;
 
-            a {
-                line-height: inherit;
-                color: $component-meta-link_color;
-                font-size: $component-meta_fontSize;
-                font-weight: $component-meta_fontWeight;
+            @if ($staticVariables) {
+                a {
+                    line-height: inherit;
+                    color: $component-meta-link_color;
+                    font-size: $component-meta_fontSize;
+                    font-weight: $component-meta_fontWeight;
 
-                &:hover,
-                &:focus,
-                &:active {
-                    color: $component-meta-link-hover_color;
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        color: $component-meta-link-hover_color;
+                    }
                 }
             }
 
@@ -251,7 +249,6 @@ body.Section-BestOf {
     }
 
     &.UserLoggedOut {
-
         .Author {
             display: flex;
             align-items: center;
@@ -264,7 +261,6 @@ body.Section-BestOf {
     }
 
     @include maxWidth {
-
         .ImageWrap {
             width: 100%;
         }

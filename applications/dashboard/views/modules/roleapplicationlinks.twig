@@ -1,0 +1,12 @@
+{% if metas is not empty %}
+<div class="Box Box-roleApplications">
+    <h4 aria-level="2">{{ t('Role Applications') }}</h4>
+    <ul class="PanelInfo DataList">
+    {% for meta in metas %}
+        <li class="Item">
+            <a href="{{ meta.url }}">{{ meta.attributes.link.name ?? t("Apply to %s"|format(meta.role.name), t("Apply to %s")|format(meta.role.name)) }}</a>
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}

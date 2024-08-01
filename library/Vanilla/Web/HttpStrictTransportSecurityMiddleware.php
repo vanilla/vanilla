@@ -8,12 +8,12 @@ namespace Vanilla\Web;
 
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
-use Vanilla\Web\HttpStrictTransportSecurityModel;
 
 /**
  * Dispatcher middleware for handling HSTS header.
  */
-class HttpStrictTransportSecurityMiddleware {
+class HttpStrictTransportSecurityMiddleware
+{
     /**
      * @var HttpStrictTransportSecurityModel
      */
@@ -23,7 +23,8 @@ class HttpStrictTransportSecurityMiddleware {
      * HttpStrictTransportSecurityMiddleware constructor.
      * @param HttpStrictTransportSecurityModel $hstsModel
      */
-    public function __construct(HttpStrictTransportSecurityModel $hstsModel) {
+    public function __construct(HttpStrictTransportSecurityModel $hstsModel)
+    {
         $this->hstsModel = $hstsModel;
     }
 
@@ -34,14 +35,17 @@ class HttpStrictTransportSecurityMiddleware {
      * @param callable $next The next middleware.
      * @return mixed Returns the response of the inner middleware.
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         $response = Data::box($next($request));
 
-        $response->setHeader(
-            HttpStrictTransportSecurityModel::HSTS_HEADER,
-            $this->hstsModel->getHsts()
-        );
+        $response->setHeader(HttpStrictTransportSecurityModel::HSTS_HEADER, $this->hstsModel->getHsts());
 
+        //get additional security headers added in HttpStrictTransportSecurityModel::class
+        foreach ($this->hstsModel->getAdditionalSecurityHeaders() as $header) {
+            [$name, $value] = $this->hstsModel->getSecurityHeaderEntry($header);
+            $response->setHeader($name, $value);
+        }
         return $response;
     }
 }

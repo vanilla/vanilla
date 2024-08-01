@@ -6,4 +6,4 @@
  */
 // phpcs:ignoreFile
 
-$Definition['Split %s to new discussion'] = 'You have chosen to split %s into a new discussion.';
+$Definition["Split %s to new discussion"] = "You have chosen to split %s into a new discussion.";

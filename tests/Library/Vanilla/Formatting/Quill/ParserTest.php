@@ -25,8 +25,8 @@ use Vanilla\Formatting\Quill\Parser;
 /**
  * Tests for the Quill parser.
  */
-class ParserTest extends SharedBootstrapTestCase {
-
+class ParserTest extends SharedBootstrapTestCase
+{
     /**
      * Utility to make a single line in a paragraph's parsed representation.
      *
@@ -34,7 +34,8 @@ class ParserTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    private function makeParagraphLine(int $count = 1) {
+    private function makeParagraphLine(int $count = 1)
+    {
         $content = str_repeat("\n", $count);
         return ["class" => ParagraphLineTerminatorBlot::class, "content" => $content];
     }
@@ -45,7 +46,8 @@ class ParserTest extends SharedBootstrapTestCase {
      * @param array $ops The actual operations.
      * @param array $expected The expected parse results.
      */
-    public function assertParseResults(array $ops, array $expected) {
+    public function assertParseResults(array $ops, array $expected)
+    {
         $error = "The parser failed to instantiate through the container";
         try {
             $parser = self::container()->get(Parser::class);
@@ -70,7 +72,8 @@ class ParserTest extends SharedBootstrapTestCase {
      *
      * @dataProvider provideJsonToOps
      */
-    public function testJsonToOperations(string $input, array $expectedOps, ?string $expectedExceptionClass = null) {
+    public function testJsonToOperations(string $input, array $expectedOps, ?string $expectedExceptionClass = null)
+    {
         if ($expectedExceptionClass) {
             $this->expectException($expectedExceptionClass);
         }
@@ -81,56 +84,39 @@ class ParserTest extends SharedBootstrapTestCase {
     /**
      * @return array
      */
-    public function provideJsonToOps(): array {
+    public function provideJsonToOps(): array
+    {
         return [
-            'empty' => [
-                '',
-                Parser::SINGLE_NEWLINE_CONTENTS,
-            ],
-            'empty array' => [
-                '[]',
-                Parser::SINGLE_NEWLINE_CONTENTS,
-            ],
-            'mangled content' => [
-                '[asdf%$}}}}',
-                [],
-                FormattingException::class
-            ],
-            'good content' => [
-                json_encode(Parser::SINGLE_NEWLINE_CONTENTS),
-                Parser::SINGLE_NEWLINE_CONTENTS,
-            ],
-            'not an array' => [
-                '{ "insert": "\n" }',
-                [],
-                FormattingException::class,
-            ],
-            'not an array 2' => [
-                'false',
-                [],
-                FormattingException::class,
-            ],
+            "empty" => ["", Parser::SINGLE_NEWLINE_CONTENTS],
+            "empty array" => ["[]", Parser::SINGLE_NEWLINE_CONTENTS],
+            "mangled content" => ['[asdf%$}}}}', [], FormattingException::class],
+            "good content" => [json_encode(Parser::SINGLE_NEWLINE_CONTENTS), Parser::SINGLE_NEWLINE_CONTENTS],
+            "not an array" => ['{ "insert": "\n" }', [], FormattingException::class],
+            "not an array 2" => ["false", [], FormattingException::class],
         ];
     }
 
     /**
      * Test parsing of an external blot.
      */
-    public function testParseExternalBlot() {
-        $ops = [[
-            "insert" => [
-                "embed-external" => [
-                    "url" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
-                    "type" => "image",
-                    "name" => null,
-                    "body" => null,
-                    "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
-                    "height" => 630,
-                    "width" => 1200,
-                    "attributes" => [],
+    public function testParseExternalBlot()
+    {
+        $ops = [
+            [
+                "insert" => [
+                    "embed-external" => [
+                        "url" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                        "type" => "image",
+                        "name" => null,
+                        "body" => null,
+                        "photoUrl" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                        "height" => 630,
+                        "width" => 1200,
+                        "attributes" => [],
+                    ],
                 ],
             ],
-        ]];
+        ];
 
         $results = [[["class" => ExternalBlot::class, "content" => ""]]];
         $this->assertParseResults($ops, $results);
@@ -141,53 +127,49 @@ class ParserTest extends SharedBootstrapTestCase {
      *
      * A plain newline represents the editor's default empty state.
      */
-    public function testSingleNewline() {
+    public function testSingleNewline()
+    {
         $ops = [["insert" => "\n"]];
-        $result = [[[
-            'class' => 'Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot',
-            'content' => "\n",
-        ]]];
+        $result = [
+            [
+                [
+                    "class" => "Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot",
+                    "content" => "\n",
+                ],
+            ],
+        ];
         $this->assertParseResults($ops, $result);
     }
 
     /**
      * Test the parsing of normal text.
      */
-    public function testTrailingNewlines() {
+    public function testTrailingNewlines()
+    {
         $ops = [["insert" => "SomeText\n\n\n\n"]];
-        $result = [[
-            ["class" => TextBlot::class, "content" => "SomeText"],
-            $this->makeParagraphLine(),
-        ]];
+        $result = [[["class" => TextBlot::class, "content" => "SomeText"], $this->makeParagraphLine()]];
         $this->assertParseResults($ops, $result);
     }
 
     /**
      * Test the parsing of normal text.
      */
-    public function testNormalText() {
+    public function testNormalText()
+    {
         $ops = [["insert" => "SomeText\n"]];
-        $result = [[
-            ["class" => TextBlot::class, "content" => "SomeText"],
-            $this->makeParagraphLine(),
-        ]];
+        $result = [[["class" => TextBlot::class, "content" => "SomeText"], $this->makeParagraphLine()]];
         $this->assertParseResults($ops, $result);
     }
 
     /**
      * Test the parsing of newlines.
      */
-    public function testNewlineParsing() {
+    public function testNewlineParsing()
+    {
         $ops = [["insert" => "Sometext\n\n\nAfter3lines\n\n"]];
         $result = [
-            [
-                ["class" => TextBlot::class, "content" => "Sometext"],
-                $this->makeParagraphLine(3),
-            ],
-            [
-                ["class" => TextBlot::class, "content" => "After3lines"],
-                $this->makeParagraphLine(1),
-            ],
+            [["class" => TextBlot::class, "content" => "Sometext"], $this->makeParagraphLine(3)],
+            [["class" => TextBlot::class, "content" => "After3lines"], $this->makeParagraphLine(1)],
         ];
         $this->assertParseResults($ops, $result);
     }
@@ -195,7 +177,8 @@ class ParserTest extends SharedBootstrapTestCase {
     /**
      * Test the parsing of block level blots. Lines, headings, etc.
      */
-    public function testBlockBlotNewlines() {
+    public function testBlockBlotNewlines()
+    {
         $this->assertCorrectLineBlotParsing("list", "bullet", ListLineTerminatorBlot::class);
         $this->assertCorrectLineBlotParsing("list", "ordered", ListLineTerminatorBlot::class);
         $this->assertCorrectLineBlotParsing("spoiler-line", true, SpoilerLineTerminatorBlot::class);
@@ -211,7 +194,8 @@ class ParserTest extends SharedBootstrapTestCase {
      * @param $attrValue The attribute value for the operation.
      * @param string $className The Name of the line blot class.
      */
-    private function assertCorrectLineBlotParsing(string $attrKey, $attrValue, string $className) {
+    private function assertCorrectLineBlotParsing(string $attrKey, $attrValue, string $className)
+    {
         $ops = [
             ["insert" => "Line 1"],
             ["attributes" => [$attrKey => $attrValue], "insert" => "\n\n"],
@@ -230,14 +214,8 @@ class ParserTest extends SharedBootstrapTestCase {
                 ["class" => TextBlot::class, "content" => "Line 7"],
                 ["class" => $className, "content" => "\n"],
             ],
-            [
-                ["class" => TextBlot::class, "content" => "Normal Text"],
-                $this->makeParagraphLine(),
-            ],
-            [
-                ["class" => TextBlot::class, "content" => "Some other text"],
-                $this->makeParagraphLine(),
-            ],
+            [["class" => TextBlot::class, "content" => "Normal Text"], $this->makeParagraphLine()],
+            [["class" => TextBlot::class, "content" => "Some other text"], $this->makeParagraphLine()],
         ];
         $this->assertParseResults($ops, $result);
 
@@ -249,10 +227,7 @@ class ParserTest extends SharedBootstrapTestCase {
             ["insert" => "\n"],
         ];
         $result = [
-            [
-                ["class" => TextBlot::class, "content" => "Line Group 2 - 1"],
-                ["class" => $className, "content" => "\n"],
-            ],
+            [["class" => TextBlot::class, "content" => "Line Group 2 - 1"], ["class" => $className, "content" => "\n"]],
             [
                 ["class" => TextBlot::class, "content" => "After Line"],
                 ["class" => TextBlot::class, "content" => "Bold"],
@@ -271,7 +246,8 @@ class ParserTest extends SharedBootstrapTestCase {
      * @param $attrValue The attribute value for the operation.
      * @param string $className The Name of the line blot class.
      */
-    private function assertCorrectNonLineBlockBlockParsing(string $attrKey, $attrValue, string $className) {
+    private function assertCorrectNonLineBlockBlockParsing(string $attrKey, $attrValue, string $className)
+    {
         $ops = [
             ["insert" => "Line 1"],
             ["attributes" => [$attrKey => $attrValue], "insert" => "\n\n"],
@@ -282,26 +258,11 @@ class ParserTest extends SharedBootstrapTestCase {
             ["insert" => "Normal Text\nSome other text\n"],
         ];
         $result = [
-            [
-                ["class" => TextBlot::class, "content" => "Line 1"],
-                ["class" => $className, "content" => "\n\n"],
-            ],
-            [
-                ["class" => TextBlot::class, "content" => "Line 3"],
-                ["class" => $className, "content" => "\n\n\n\n"],
-            ],
-            [
-                ["class" => TextBlot::class, "content" => "Line 7"],
-                ["class" => $className, "content" => "\n"],
-            ],
-            [
-                ["class" => TextBlot::class, "content" => "Normal Text"],
-                $this->makeParagraphLine(),
-            ],
-            [
-                ["class" => TextBlot::class, "content" => "Some other text"],
-                $this->makeParagraphLine(),
-            ],
+            [["class" => TextBlot::class, "content" => "Line 1"], ["class" => $className, "content" => "\n\n"]],
+            [["class" => TextBlot::class, "content" => "Line 3"], ["class" => $className, "content" => "\n\n\n\n"]],
+            [["class" => TextBlot::class, "content" => "Line 7"], ["class" => $className, "content" => "\n"]],
+            [["class" => TextBlot::class, "content" => "Normal Text"], $this->makeParagraphLine()],
+            [["class" => TextBlot::class, "content" => "Some other text"], $this->makeParagraphLine()],
         ];
         $this->assertParseResults($ops, $result);
     }
@@ -309,30 +270,25 @@ class ParserTest extends SharedBootstrapTestCase {
     /**
      * Test that line breaks with a lot of mixed in formatting parses correctly.
      */
-    public function testFormattingWithLineBreaks() {
+    public function testFormattingWithLineBreaks()
+    {
         $ops = [
             ["attributes" => ["link" => "https =>//google.com"], "insert" => "ogl"],
             ["insert" => "\n\nText after line breaks."],
             ["attributes" => ["strike" => true], "insert" => "strike"],
             ["insert" => "\n\n\n\n"],
-            ["attributes" => ["strike" => true], "insert" => "Mutliple more breaks."],
+            ["attributes" => ["strike" => true], "insert" => "Multiple more breaks."],
             ["insert" => "\n"],
         ];
 
         $result = [
-            [
-                ["class" => TextBlot::class, "content" => "ogl"],
-                $this->makeParagraphLine(2),
-            ],
+            [["class" => TextBlot::class, "content" => "ogl"], $this->makeParagraphLine(2)],
             [
                 ["class" => TextBlot::class, "content" => "Text after line breaks."],
                 ["class" => TextBlot::class, "content" => "strike"],
                 $this->makeParagraphLine(4),
             ],
-            [
-                ["class" => TextBlot::class, "content" => "Mutliple more breaks."],
-                $this->makeParagraphLine()
-            ],
+            [["class" => TextBlot::class, "content" => "Multiple more breaks."], $this->makeParagraphLine()],
         ];
 
         $this->assertParseResults($ops, $result);
@@ -342,7 +298,8 @@ class ParserTest extends SharedBootstrapTestCase {
      * Ensure that line blots clear the groups from different lines blots.
      * https://github.com/vanilla/vanilla/issues/7522
      */
-    public function testLineBlotClearing() {
+    public function testLineBlotClearing()
+    {
         $ops = [
             ["insert" => "Quote"],
             ["attributes" => ["blockquote-line" => true], "insert" => "\n"],
@@ -375,7 +332,8 @@ class ParserTest extends SharedBootstrapTestCase {
      * Verify rendering of empty heading blots.
      * https://github.com/vanilla/vanilla/issues/7522
      */
-    public function testEmptyHeadingBlots() {
+    public function testEmptyHeadingBlots()
+    {
         $ops = [["attributes" => ["header" => 2], "content" => "\n"]];
         $result = [[["class" => HeadingTerminatorBlot::class, "content" => ""]]];
         $this->assertParseResults($ops, $result);
@@ -388,7 +346,8 @@ class ParserTest extends SharedBootstrapTestCase {
     /**
      * Ensure that a single heading can properly render when it contains multiple inline formats.
      */
-    public function testInlineFormattedHeadings() {
+    public function testInlineFormattedHeadings()
+    {
         $ops = [
             ["attributes" => ["bold" => true], "insert" => "bold "],
             ["attributes" => ["italic" => true, "bold" => true], "insert" => "italic "],
@@ -396,12 +355,14 @@ class ParserTest extends SharedBootstrapTestCase {
             ["attributes" => ["header" => 2], "insert" => "\n"],
         ];
 
-        $result = [[
-            ["class" => TextBlot::class, "content" => "bold "],
-            ["class" => TextBlot::class, "content" => "italic "],
-            ["class" => TextBlot::class, "content" => "strike"],
-            ["class" => HeadingTerminatorBlot::class, "content" => "\n"],
-        ]];
+        $result = [
+            [
+                ["class" => TextBlot::class, "content" => "bold "],
+                ["class" => TextBlot::class, "content" => "italic "],
+                ["class" => TextBlot::class, "content" => "strike"],
+                ["class" => HeadingTerminatorBlot::class, "content" => "\n"],
+            ],
+        ];
 
         $this->assertParseResults($ops, $result);
     }
@@ -410,7 +371,8 @@ class ParserTest extends SharedBootstrapTestCase {
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      */
-    public function testParseMentions() {
+    public function testParseMentions()
+    {
         $ops = [
             ["insert" => "\n\n@totoallyNotAMention asdf @notAMention"],
             $this->makeMention("realMention"),
@@ -436,7 +398,7 @@ class ParserTest extends SharedBootstrapTestCase {
             "realMention$$.asdf Number 2",
             "discussionUser",
             "commentUser",
-            "duplicate"
+            "duplicate",
         ];
 
         // Make sure the quote embed is registered.
@@ -456,11 +418,14 @@ class ParserTest extends SharedBootstrapTestCase {
      * @param string $name
      * @return array
      */
-    private function makeMention(string $name) {
-        return ["insert" => [
-            "mention" => [
-                "name" => $name,
+    private function makeMention(string $name)
+    {
+        return [
+            "insert" => [
+                "mention" => [
+                    "name" => $name,
+                ],
             ],
-        ]];
+        ];
     }
 }

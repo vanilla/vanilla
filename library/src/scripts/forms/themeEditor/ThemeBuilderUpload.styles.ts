@@ -5,18 +5,14 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
-import {
-    fonts,
-    flexHelper,
-    borders,
-    colorOut,
-    absolutePosition,
-    importantColorOut,
-    importantUnit,
-} from "@library/styles/styleHelpers";
+import { flexHelper, importantUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
 import { inputMixin } from "@library/forms/inputStyles";
+import { css } from "@emotion/css";
 
 export const themeBuilderUploadClasses = useThemeCache(() => {
     const themeBuilderVars = themeBuilderVariables();
@@ -34,39 +30,43 @@ export const themeBuilderUploadClasses = useThemeCache(() => {
         ...inputMixin(),
         ...flexHelper().middleLeft(),
         minHeight: 0,
-        ...borders(themeBuilderVars.border),
+        ...Mixins.border(themeBuilderVars.border),
         height: themeBuilderVars.input.height,
-        ...fonts(themeBuilderVars.input.fonts),
+        ...Mixins.font(themeBuilderVars.input.fonts),
+        borderRadius: "3px !important",
         cursor: "pointer",
-        $nest: {
-            "&:hover, &:focus, &:active": {
-                ...borders({ ...themeBuilderVars.border, color: globalVars.mainColors.primary }),
-            },
+        "&:hover, &:focus, &:active": {
+            ...Mixins.border({
+                ...themeBuilderVars.border,
+                color: globalVars.mainColors.primary,
+            }),
         },
     });
 
     const optionContainer = style("optionContainer", {
-        ...borders(themeBuilderVars.border),
-        background: colorOut(globalVars.elementaryColors.white),
+        ...Mixins.border(themeBuilderVars.border),
+        background: ColorsUtils.colorOut(globalVars.elementaryColors.white),
         marginLeft: 4,
         position: "relative",
         width: 36,
-        backgroundColor: colorOut(themeBuilderVars.border.color),
-        color: colorOut(globalVars.elementaryColors.white),
+        backgroundColor: ColorsUtils.colorOut(themeBuilderVars.border.color),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
     });
     const optionButton = style("optionButton", {
         height: importantUnit(themeBuilderVars.input.height - 2),
-        color: colorOut(globalVars.elementaryColors.white),
-        $nest: {
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
+        ...{
             "&:hover, &:active, &:focus": {
-                color: importantColorOut(globalVars.elementaryColors.white),
+                color: ColorsUtils.colorOut(globalVars.elementaryColors.white, {
+                    makeImportant: true,
+                }),
                 opacity: 0.9,
             },
         },
     });
 
     const optionDropdown = style("optionDropdown", {
-        $nest: {
+        ...{
             "&&": {
                 width: themeBuilderVars.input.width,
                 minWidth: 0,
@@ -86,11 +86,17 @@ export const themeBuilderUploadClasses = useThemeCache(() => {
         borderRadius: themeBuilderVars.border.radius,
     });
     const imagePreview = style("imagePreview", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         filter: "brightness(0.7)",
         objectFit: "cover",
         objectPosition: "center",
     });
 
-    return { root, button, optionContainer, optionButton, optionDropdown, imagePreviewContainer, imagePreview };
+    const choose = css({
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+    });
+
+    return { root, button, optionContainer, optionButton, optionDropdown, imagePreviewContainer, choose, imagePreview };
 });

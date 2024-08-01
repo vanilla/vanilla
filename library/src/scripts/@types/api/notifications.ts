@@ -20,4 +20,5 @@ interface INotificationServerManaged {
     url: string;
     dateInserted: string;
     dateUpdated: string;
+    readUrl?: string;
 }

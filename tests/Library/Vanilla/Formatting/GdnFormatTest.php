@@ -1,20 +1,19 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Vanilla\Formatting;
 
 use VanillaTests\MinimalContainerTestCase;
-use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 
 /**
  * Unit tests for the Gdn_Format class.
  */
-class GdnFormatTest extends MinimalContainerTestCase {
-
+class GdnFormatTest extends MinimalContainerTestCase
+{
     use AssertsFixtureRenderingTrait;
 
     /**
@@ -24,8 +23,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideBBCode
      */
-    public function testBBCode(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'bbcode');
+    public function testBBCode(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "bbcode");
     }
 
     /**
@@ -35,8 +35,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideMarkdown
      */
-    public function testMarkdown(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'markdown');
+    public function testMarkdown(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "markdown");
     }
 
     /**
@@ -46,8 +47,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideText
      */
-    public function testText(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'text');
+    public function testText(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "text");
     }
 
     /**
@@ -57,8 +59,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideTextEx
      */
-    public function testTextEx(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'textex');
+    public function testTextEx(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "textex");
     }
 
     /**
@@ -68,8 +71,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideHtml
      */
-    public function testHtml(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'html');
+    public function testHtml(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "html");
     }
 
     /**
@@ -79,8 +83,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideWysiwyg
      */
-    public function testWysiwyg(string $fixtureDir) {
-        list($input, $expectedOutput) = $this->getFixture($fixtureDir);
+    public function testWysiwyg(string $fixtureDir)
+    {
+        [$input, $expectedOutput] = $this->getFixture($fixtureDir);
         $output = \Gdn_Format::wysiwyg($input);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput, // Needed so code blocks are equivalently decoded
@@ -97,7 +102,8 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider groupInputModesProvider
      */
-    public function testGroupInputModes(array $fixtureDirs, callable $formatMethod) {
+    public function testGroupInputModes(array $fixtureDirs, callable $formatMethod)
+    {
         $this->assertAllFixturesAsArray($fixtureDirs, $formatMethod);
         $this->assertAllFixturesAsObject($fixtureDirs, $formatMethod);
     }
@@ -105,57 +111,64 @@ class GdnFormatTest extends MinimalContainerTestCase {
     /**
      * @return array
      */
-    public function groupInputModesProvider(): array {
+    public function groupInputModesProvider(): array
+    {
         return [
-            [$this->provideHtml(), [\Gdn_Format::class, 'html']],
-            [$this->provideWysiwyg(), [\Gdn_Format::class, 'wysiwyg']],
-            [$this->provideText(), [\Gdn_Format::class, 'text']],
-            [$this->provideMarkdown(), [\Gdn_Format::class, 'markdown']],
-            [$this->provideBBCode(), [\Gdn_Format::class, 'bbcode']],
-            [$this->provideTextEx(), [\Gdn_Format::class, 'textex']],
+            [$this->provideHtml(), [\Gdn_Format::class, "html"]],
+            [$this->provideWysiwyg(), [\Gdn_Format::class, "wysiwyg"]],
+            [$this->provideText(), [\Gdn_Format::class, "text"]],
+            [$this->provideMarkdown(), [\Gdn_Format::class, "markdown"]],
+            [$this->provideBBCode(), [\Gdn_Format::class, "bbcode"]],
+            [$this->provideTextEx(), [\Gdn_Format::class, "textex"]],
         ];
     }
 
     /**
      * @return array
      */
-    public function provideHtml(): array {
-        return $this->createFixtureDataProvider('/formats/html');
+    public function provideHtml(): array
+    {
+        return $this->createFixtureDataProvider("/formats/html");
     }
 
     /**
      * @return array
      */
-    public function provideBBCode(): array {
-        return $this->createFixtureDataProvider('/formats/bbcode');
+    public function provideBBCode(): array
+    {
+        return $this->createFixtureDataProvider("/formats/bbcode");
     }
 
     /**
      * @return array
      */
-    public function provideMarkdown(): array {
-        return $this->createFixtureDataProvider('/formats/markdown');
+    public function provideMarkdown(): array
+    {
+        return $this->createFixtureDataProvider("/formats/markdown");
     }
 
     /**
      * @return array
      */
-    public function provideText(): array {
-        return $this->createFixtureDataProvider('/formats/text');
+    public function provideText(): array
+    {
+        return $this->createFixtureDataProvider("/formats/text");
     }
 
     /**
      * @return array
      */
-    public function provideTextEx(): array {
-        return $this->createFixtureDataProvider('/formats/textex');
+    public function provideTextEx(): array
+    {
+        return $this->createFixtureDataProvider("/formats/textex");
     }
 
     /**
      * @return array
      */
-    public function provideWysiwyg(): array {
-        return $this->createFixtureDataProvider('/formats/wysiwyg');
+    public function provideWysiwyg(): array
+    {
+        return $this->createFixtureDataProvider("/formats/wysiwyg");
     }
 
     /**
@@ -164,8 +177,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      * @param string $fixtureDir
      * @param string $format
      */
-    public function assertFixturePassesForFormat(string $fixtureDir, string $format) {
-        list($input, $expectedHtml, $expectedText) = $this->getFixture($fixtureDir);
+    public function assertFixturePassesForFormat(string $fixtureDir, string $format)
+    {
+        [$input, $expectedHtml, $expectedText] = $this->getFixture($fixtureDir);
         $outputHtml = \Gdn_Format::to($input, $format);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedHtml,
@@ -190,12 +204,13 @@ class GdnFormatTest extends MinimalContainerTestCase {
      * @param array $fixtureDirs
      * @param callable $formatMethod
      */
-    private function assertAllFixturesAsArray(array $fixtureDirs, callable $formatMethod) {
+    private function assertAllFixturesAsArray(array $fixtureDirs, callable $formatMethod)
+    {
         $allInputs = [];
         $expectedOutputs = [];
 
         foreach ($fixtureDirs as $fixtureDir) {
-            list($input, $expectedOutput) = $this->getFixture($fixtureDir[0]);
+            [$input, $expectedOutput] = $this->getFixture($fixtureDir[0]);
             $allInputs[] = $input;
             $expectedOutputs[] = $expectedOutput;
         }
@@ -213,12 +228,13 @@ class GdnFormatTest extends MinimalContainerTestCase {
      * @param array $fixtureDirs
      * @param callable $formatMethod
      */
-    private function assertAllFixturesAsObject(array $fixtureDirs, callable $formatMethod) {
+    private function assertAllFixturesAsObject(array $fixtureDirs, callable $formatMethod)
+    {
         $allInputs = new \stdClass();
         $expectedOutputs = [];
 
         foreach ($fixtureDirs as $i => $fixtureDir) {
-            list($input, $expectedOutput) = $this->getFixture($fixtureDir[0]);
+            [$input, $expectedOutput] = $this->getFixture($fixtureDir[0]);
             $allInputs->$i = $input;
             $expectedOutputs[] = $expectedOutput;
         }
@@ -228,5 +244,49 @@ class GdnFormatTest extends MinimalContainerTestCase {
         foreach ($expectedOutputs as $i => $expectedOutput) {
             $this->assertHtmlStringEqualsHtmlString($expectedOutput, $allOutputs->$i);
         }
+    }
+
+    /**
+     * Test various cases that cause us not to format mentions.
+     */
+    public function testMentionCharBailout()
+    {
+        $invalidFirstChars = '@{ hello @}asdf  @"{hello}';
+
+        // With quotes any character is allowed.
+        $expected =
+            '@{ hello @}asdf  <a href="http://vanilla.test/minimal-container-test/profile/%7Bhello%7D" rel="nofollow">@{hello}</a>';
+        $this->assertEquals($expected, \Gdn_Format::mentions($invalidFirstChars));
+    }
+
+    /**
+     * Test various cases that cause us not to format mentions.
+     */
+    public function testTooManyBailout()
+    {
+        $tooManyAlphas = "";
+        for ($i = 0; $i < 60; $i++) {
+            $tooManyAlphas .= "@someone ";
+        }
+        $this->assertEquals($tooManyAlphas, \Gdn_Format::mentions($tooManyAlphas));
+    }
+    /**
+     * @link https://higherlogic.atlassian.net/browse/VNLA-6276
+     *
+     * @return void
+     */
+    public function testYoutubeEmbedNoMinutes(): void
+    {
+        $markdown = <<<MD
+Why are we discussing superbowls  in a baseball thread?  Anyway  here is the definitive answer on this topic\r\n\r\nhttps://www.youtube.com/watch?v=GXtXE2-MaUYt=41s
+MD;
+
+        $actual = \Gdn_Format::markdown($markdown);
+        $expected = <<<HTML
+<p>Why are we discussing superbowls  in a baseball thread?  Anyway  here is the definitive answer on this topic</p>
+<p><span class="VideoWrap"><span class="Video YouTube" data-youtube="youtube-GXtXE2-MaUY?autoplay=1&amp;start=41"><span class="VideoPreview"><a href="https://www.youtube.com/watch?v=GXtXE2-MaUY"><img src="https://img.youtube.com/vi/GXtXE2-MaUY/0.jpg" width="640" height="385" border="0" class="embedImage-img importedEmbed-img"></img>https://www.youtube.com/watch?v=GXtXE2-MaUYt=41s</a></span><span class="VideoPlayer"></span></span></span></p>
+HTML;
+
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
 }

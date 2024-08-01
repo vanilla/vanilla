@@ -1,4 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit();
+
+if (!$this->data('activityBoxIsSet')) {
+    BoxThemeShim::startBox();
+}
 echo '<ul class="DataList Activities">';
 if (count($this->data('Activities')) > 0) {
     include($this->fetchViewLocation('activities', 'activity', 'dashboard'));
@@ -10,6 +16,10 @@ if (count($this->data('Activities')) > 0) {
 <?php
 }
 echo '</ul>';
+if (!$this->data('activityBoxIsSet')) {
+    BoxThemeShim::endBox();
+}
 
-if (count($this->data('Activities')) > 0)
+if (count($this->data('Activities')) > 0) {
     PagerModule::write(['CurrentRecords' => count($this->data('Activities'))]);
+}

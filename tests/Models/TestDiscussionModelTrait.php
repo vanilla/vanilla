@@ -8,22 +8,32 @@
 namespace VanillaTests\Models;
 
 use DiscussionModel;
+use Garden\Web\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Forum\Models\DiscussionMergeModel;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Useful methods for testing a discussion model.
  */
-trait TestDiscussionModelTrait {
+trait TestDiscussionModelTrait
+{
     /**
      * @var \DiscussionModel
      */
-    private $discussionModel;
+    protected $discussionModel;
+
+    /** @var DiscussionMergeModel */
+    protected $mergeModel;
 
     /**
      * Instantiate a fresh model for each
      */
-    protected function setupTestDiscussionModel() {
+    protected function setupTestDiscussionModel()
+    {
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
+        $this->mergeModel = $this->container()->get(DiscussionMergeModel::class);
+        DiscussionModel::cleanForTests();
     }
 
     /**
@@ -33,16 +43,18 @@ trait TestDiscussionModelTrait {
      *
      * @return array
      */
-    public function newDiscussion(array $override): array {
-        static $i = 1;
-
-        $r = $override + [
-                'Name' => "How do I test $i?",
-                'CategoryID' => 1,
-                'Body' => "Foo $i.",
-                'Format' => 'Text',
-                'DateInserted' => TestDate::mySqlDate(),
-            ];
+    public function newDiscussion(array $override): array
+    {
+        $r = VanillaTestCase::sprintfCounter(
+            $override + [
+                "Name" => "How do I test %s?",
+                "CategoryID" => 1,
+                "Body" => "Foo %s.",
+                "Format" => "Text",
+                "DateInserted" => TestDate::mySqlDate(),
+            ],
+            __FUNCTION__
+        );
 
         return $r;
     }
@@ -54,14 +66,77 @@ trait TestDiscussionModelTrait {
      * @param array $overrides An array of row overrides.
      * @return array
      */
-    private function insertDiscussions(int $count, array $overrides = []): array {
+    protected function insertDiscussions(int $count, array $overrides = []): array
+    {
+        $announce = $overrides["Announce"] ?? false;
         $ids = [];
         for ($i = 0; $i < $count; $i++) {
             $ids[] = $this->discussionModel->save($this->newDiscussion($overrides));
         }
-        $rows = $this->discussionModel->getWhere(['DiscussionID' => $ids, 'Announce' => 'All'])->resultArray();
+        $rows = $this->discussionModel->getWhere(["DiscussionID" => $ids, "Announce" => $announce])->resultArray();
         TestCase::assertCount($count, $rows, "Not enough test discussions were inserted.");
 
         return $rows;
+    }
+
+    /**
+     * Assert that a count matches the database.
+     *
+     * @param int[]|true $categoryIDs The categories to check or true for all categories.
+     * @param int $actualCount The count to assert against.
+     */
+    protected function assertDiscussionCountsFromDb($categoryIDs, int $actualCount): void
+    {
+        $this->categoryModel->SQL->select("CountDiscussions", "sum")->from("Category");
+        if (is_array($categoryIDs)) {
+            $this->categoryModel->SQL->whereIn("CategoryID", $categoryIDs);
+        }
+        $expectedCounts = (int) $this->categoryModel->SQL->get()->value("CountDiscussions", null);
+        $this->assertSame($expectedCounts, $actualCount);
+    }
+
+    /**
+     * Assert that all of the cached aggregate data on the discussion table is correct.
+     *
+     * @param int $discussionID
+     */
+    public function assertDiscussionCounts(int $discussionID): void
+    {
+        $sql = \Gdn::database()->createSql();
+        $discussion = $sql->getWhere("Discussion", ["DiscussionID" => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
+        if (!$discussion) {
+            throw new NotFoundException("Discussion", ["discussionID" => $discussionID]);
+        }
+        $countComments = $sql->getCount("Comment", ["DiscussionID" => $discussionID]);
+
+        $expected = [
+            "CountComments" => $countComments,
+        ];
+
+        // Get the last comment by date then ID.
+        $firstComment = $sql
+            ->orderBy(["DateInserted", "CommentID"])
+            ->limit(1)
+            ->getWhere("Comment", ["DiscussionID" => $discussionID])
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        $lastComment = $sql
+            ->orderBy(["-DateInserted", "-CommentID"])
+            ->limit(1)
+            ->getWhere("Comment", ["DiscussionID" => $discussionID])
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        $expected += [
+            "DateLastComment" => $lastComment["DateInserted"] ?? $discussion["DateInserted"],
+            "FirstCommentID" => $firstComment["CommentID"] ?? null,
+            "LastCommentID" => $lastComment["CommentID"] ?? null,
+            "LastCommentUserID" => $lastComment["InsertUserID"] ?? null,
+        ];
+
+        VanillaTestCase::assertDataLike(
+            $expected,
+            $discussion,
+            "discussionID: {$discussionID}, name: {$discussion["Name"]}"
+        );
     }
 }

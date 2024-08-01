@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Formats;
 
+use Vanilla\Formatting\FormatRegexReplacements;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
@@ -14,8 +15,8 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
 /**
  * Class for rendering content with the source format BBCode.
  */
-class BBCodeFormat extends HtmlFormat {
-
+class BBCodeFormat extends HtmlFormat
+{
     const FORMAT_KEY = "bbcode";
 
     /** @var \BBCode */
@@ -45,16 +46,58 @@ class BBCodeFormat extends HtmlFormat {
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $value, bool $enhance = true): string {
-        $renderedBBCode = $this->bbcodeParser->format($value);
-        return parent::renderHtml($renderedBBCode, $enhance);
+    public function renderHtml($content, bool $enhance = true): string
+    {
+        if ($content instanceof HtmlFormatParsed) {
+            return $content->getProcessedHtml();
+        } else {
+            $rendered = $this->bbcodeParser->format($content);
+        }
+        return parent::renderHtml($rendered, $enhance);
     }
 
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $value): string {
-        $renderedBBCode = $this->bbcodeParser->format($value);
-        return parent::renderQuote($renderedBBCode);
+    public function renderQuote($content): string
+    {
+        if ($content instanceof HtmlFormatParsed) {
+            $rendered = $content->getProcessedHtml();
+        } else {
+            $rendered = $this->bbcodeParser->format($content);
+        }
+        return parent::renderQuote($rendered);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string
+    {
+        $regex = new FormatRegexReplacements();
+        $regex->addReplacement(...$this->getNonRichAtMentionReplacePattern($username, $this->anonymizeUsername));
+        $regex->addReplacement(...$this->getUrlReplacementPattern($username, $this->anonymizeUrl));
+
+        // Quote with double quotes.
+        $regex->addReplacement(
+            sprintf('~\[(quote|QUOTE)="%s;~', preg_quote($username)),
+            sprintf('[quote="%s;', $this->anonymizeUsername)
+        );
+
+        // Quote without double quotes.
+        $regex->addReplacement(
+            sprintf("~\[(quote|QUOTE)=%s;~", preg_quote($username)),
+            sprintf("[quote=%s;", $this->anonymizeUsername)
+        );
+
+        return $regex->replace($body);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function parseAllMentions($body): array
+    {
+        return $this->getNonRichMentions($body, ['\[(?:quote|QUOTE)="?(.+?);']);
     }
 }

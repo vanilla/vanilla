@@ -15,11 +15,16 @@ export function importAll(r: any) {
     r.keys().forEach(r);
 }
 
+let mock: MockAdapter | null = null;
+
 /**
  * Wrap an API endoint with a mock wrapper.
  */
-export function mockAPI() {
-    const mock = new MockAdapter(apiv2, {});
+export function mockAPI(options?: any) {
+    if (mock !== null) {
+        mock.restore();
+    }
+    mock = new MockAdapter(apiv2, { ...options });
     return mock;
 }
 
@@ -29,7 +34,7 @@ export function mockAPI() {
  * @param adapter
  */
 export function applyAnyFallbackError(adapter: MockAdapter) {
-    adapter.onAny().reply(config => {
+    adapter.onAny().reply((config) => {
         const query = config.paramsSerializer!(config.params);
         throw new Error(
             "No matching found for " + config.method!.toUpperCase() + " " + config.url + (query ? "?" + query : ""),

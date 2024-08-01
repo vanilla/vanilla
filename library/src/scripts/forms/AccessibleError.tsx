@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,7 +8,6 @@ import React from "react";
 import classNames from "classnames";
 import { LiveMessage } from "react-aria-live";
 import { accessibleErrorClasses } from "@library/forms/formElementStyles";
-import { userContentClasses } from "@library/content/userContentStyles";
 
 interface IProps {
     id: string;
@@ -27,7 +26,6 @@ export default class AccessibleError extends React.PureComponent<IProps> {
     public render() {
         const { error, id } = this.props;
         const classes = accessibleErrorClasses();
-        const classesUserContent = userContentClasses();
         return (
             <>
                 <LiveMessage clearOnUnmount={true} message={error} aria-live="assertive" />

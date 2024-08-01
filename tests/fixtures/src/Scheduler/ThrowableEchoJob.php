@@ -9,14 +9,13 @@ namespace VanillaTests\Fixtures\Scheduler;
 
 use Psr\Log\LoggerInterface;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
-use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
  * Class ThrowableEchoJob
  */
-class ThrowableEchoJob implements LocalJobInterface {
-
+class ThrowableEchoJob implements LocalJobInterface
+{
     /** @var LoggerInterface */
     protected $logger;
 
@@ -28,7 +27,8 @@ class ThrowableEchoJob implements LocalJobInterface {
      *
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 
@@ -37,7 +37,8 @@ class ThrowableEchoJob implements LocalJobInterface {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $this->message = $message;
     }
 
@@ -46,25 +47,10 @@ class ThrowableEchoJob implements LocalJobInterface {
      *
      * @return JobExecutionStatus
      */
-    public function run(): JobExecutionStatus {
-        nonExistentFunction();
-    }
-
-    /**
-     * Set the priority.
-     *
-     * @param JobPriority $priority
-     */
-    public function setPriority(JobPriority $priority) {
-        // void method. It doesn't make any sense set a priority for a LocalJob
-    }
-
-    /**
-     * Set the delay.
-     *
-     * @param integer $seconds
-     */
-    public function setDelay(int $seconds) {
-        // void method. It doesn't make any sense set a delay for a LocalJob
+    public function run(): JobExecutionStatus
+    {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        /** @psalm-suppress UndefinedFunction */
+        return nonExistentFunction();
     }
 }

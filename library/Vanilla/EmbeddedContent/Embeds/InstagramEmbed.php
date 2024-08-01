@@ -10,13 +10,13 @@ use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedUtils;
 use Vanilla\Web\Asset\AssetPreloader;
-use Vanilla\Web\Asset\ExternalAsset;
+use Vanilla\Web\Asset\WebAsset;
 
 /**
  * Embed data object for Instagram.
  */
-class InstagramEmbed extends AbstractEmbed {
-
+class InstagramEmbed extends AbstractEmbed
+{
     const JS_SCRIPT = "https://platform.instagram.com/en_US/embeds.js";
     const TYPE = "instagram";
 
@@ -24,27 +24,30 @@ class InstagramEmbed extends AbstractEmbed {
      * Override to set a value in the PreloadAssetModel.
      * @inheritdoc
      */
-    public function __construct(array $data) {
+    public function __construct(array $data)
+    {
         parent::__construct($data);
 
         EmbedUtils::getPreloadModel()->addScript(
-            new ExternalAsset(self::JS_SCRIPT),
+            new WebAsset(self::JS_SCRIPT),
             AssetPreloader::REL_PRELOAD,
-            'instagram-embed-script-asset'
+            "instagram-embed-script-asset"
         );
     }
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $data = EmbedUtils::remapProperties($data, [
             "version" => "attributes.versionNumber",
         ]);
@@ -59,14 +62,9 @@ class InstagramEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            "height:i?",
-            "width:i?",
-            "photoUrl:s?",
-            "postID:s",
-            "version:i",
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["postID:s"]);
     }
 
     /**
@@ -75,7 +73,10 @@ class InstagramEmbed extends AbstractEmbed {
      * @param string $url
      * @return string|null
      */
-    private function urlToID(string $url): ?string {
-        return preg_match("`/?p/(?<postID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches) ? $matches["postID"] : null;
+    private function urlToID(string $url): ?string
+    {
+        return preg_match("`/?p/(?<postID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches)
+            ? $matches["postID"]
+            : null;
     }
 }

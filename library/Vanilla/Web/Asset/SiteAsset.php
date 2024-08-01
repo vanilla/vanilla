@@ -13,13 +13,15 @@ use Vanilla\Contracts;
 /**
  * Class representing an asset from the current site.
  */
-abstract class SiteAsset implements Contracts\Web\AssetInterface {
+abstract class SiteAsset implements Contracts\Web\AssetInterface
+{
+    use Contracts\Web\AssetTrait;
 
     /** @var RequestInterface */
     protected $request;
 
     /** @var string */
-    protected $cacheBusterKey = '';
+    protected $cacheBusterKey = "";
 
     /**
      * SiteAsset constructor.
@@ -27,7 +29,8 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      * @param RequestInterface $request The current request.
      * @param string $cacheBusterKey A cache busting string.
      */
-    public function __construct(RequestInterface $request, $cacheBusterKey = "") {
+    public function __construct(RequestInterface $request, $cacheBusterKey = "")
+    {
         $this->request = $request;
         $this->cacheBusterKey = $cacheBusterKey;
     }
@@ -43,12 +46,9 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      * @param string[] $pieces The pieces of the web path.
      * @return string The relative web path.
      */
-    protected function makeAssetPath(string ...$pieces): string {
-        $path = self::joinWebPath(
-            $this->request->urlDomain(),
-            $this->request->getAssetRoot(),
-            ...$pieces
-        );
+    protected function makeAssetPath(string ...$pieces): string
+    {
+        $path = self::joinWebPath($this->request->urlDomain(), $this->request->getAssetRoot(), ...$pieces);
 
         return $this->addCacheBuster($path);
     }
@@ -60,7 +60,8 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      *
      * @return string The new URL.
      */
-    private function addCacheBuster(string $url): string {
+    private function addCacheBuster(string $url): string
+    {
         if ($this->cacheBusterKey !== "") {
             $url .= "?h=" . $this->cacheBusterKey;
         }
@@ -73,8 +74,9 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      * @param string[] $pieces The pieces of the url.
      * @return string A joined version of the pieces with no duplicate `/`s
      */
-    public static function joinWebPath(string ...$pieces): string {
-        return self::joinPieces('/', ...$pieces);
+    public static function joinWebPath(string ...$pieces): string
+    {
+        return self::joinPieces("/", ...$pieces);
     }
 
     /**
@@ -85,7 +87,8 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      * @param string[] $pieces The pieces of the path to join together.
      * @return string A joined version of the pieces with no duplicate separators.
      */
-    public static function joinFilePath(string ...$pieces): string {
+    public static function joinFilePath(string ...$pieces): string
+    {
         return self::joinPieces(DS, ...$pieces);
     }
 
@@ -98,10 +101,11 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      *
      * @return string The normalized path.
      */
-    private static function joinPieces(string $joiner, string ...$pieces): string {
+    private static function joinPieces(string $joiner, string ...$pieces): string
+    {
         $path = "";
         foreach ($pieces as $index => $piece) {
-            if ($piece !== '') {
+            if ($piece !== "") {
                 $trimmedPiece = $index === 0 ? rtrim($piece, $joiner) : trim($piece, $joiner);
                 $path .= $trimmedPiece . $joiner;
             }
@@ -117,7 +121,8 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      *
      * @return bool
      */
-    public function isStatic(): bool {
+    public function isStatic(): bool
+    {
         return false;
     }
 }

@@ -7,6 +7,7 @@
 namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Http\HttpClient;
+use Garden\Web\Exception\ClientException;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\AbstractEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\SoundCloudEmbed;
@@ -15,8 +16,8 @@ use Vanilla\Utility\HtmlParserTrait;
 /**
  * Factory for SoundCloudEmbed.
  */
-class SoundCloudEmbedFactory extends AbstractEmbedFactory {
-
+class SoundCloudEmbedFactory extends AbstractEmbedFactory
+{
     use HtmlParserTrait;
 
     const DOMAINS = ["soundcloud.com"];
@@ -31,7 +32,8 @@ class SoundCloudEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
@@ -41,7 +43,8 @@ class SoundCloudEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return array|null
      */
-    private function apiUrlToID(string $url): array {
+    private function apiUrlToID(string $url): array
+    {
         if (parse_url($url, PHP_URL_HOST) !== SoundCloudEmbed::API_HOST) {
             return [];
         }
@@ -61,14 +64,16 @@ class SoundCloudEmbedFactory extends AbstractEmbedFactory {
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::DOMAINS;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         // Rely on oEmbed to do it all.
         return "`.*`";
     }
@@ -78,14 +83,12 @@ class SoundCloudEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
-        $response = $this->httpClient->get(
-            self::OEMBED_URL_BASE,
-            [
-                "format" => "json",
-                "url" => $url,
-            ]
-        );
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
+        $response = $this->httpClient->get(self::OEMBED_URL_BASE, [
+            "format" => "json",
+            "url" => $url,
+        ]);
 
         // Example Response JSON
         // {
@@ -103,15 +106,30 @@ class SoundCloudEmbedFactory extends AbstractEmbedFactory {
         //     "author_url": "https://soundcloud.com/secret-service-862007284"
         // }
 
-        $frameAttributes = $this->parseSimpleAttrs($response["html"] ?? "", "iframe") ?? [];
-        $config = $this->urlToConfig($frameAttributes["src"]);
+        $data = [];
+        $responseStatusCode = $response->getStatusCode();
+        switch ($responseStatusCode) {
+            case 200:
+                if (!isset($response["html"])) {
+                    // Got an unexpected response.
+                    throw new ClientException("URL did not yield an appropriate response.", 406);
+                }
+                $frameAttributes = $this->parseSimpleAttrs($response["html"] ?? "", "iframe") ?? [];
+                $config = $this->urlToConfig($frameAttributes["src"]);
 
-        $data = [
-            "embedType" => SoundCloudEmbed::TYPE,
-            "url" => $url,
-            "name" => $response["title"] ?? null,
-        ];
-        $data = array_merge($data, $config);
+                $data = [
+                    "embedType" => SoundCloudEmbed::TYPE,
+                    "url" => $url,
+                    "name" => $response["title"] ?? null,
+                ];
+                $data = array_merge($data, $config);
+                break;
+            default:
+                $message = $response->getReasonPhrase();
+                // Default thrown exception for any other unhandled error.
+                throw new ClientException('Client exception: "' . $message . '".', $responseStatusCode);
+                break;
+        }
 
         return new SoundCloudEmbed($data);
     }
@@ -122,7 +140,8 @@ class SoundCloudEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return array
      */
-    private function urlToConfig(string $url): array {
+    private function urlToConfig(string $url): array
+    {
         $config = [];
 
         $parameters = [];

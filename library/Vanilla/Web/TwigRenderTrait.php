@@ -10,8 +10,8 @@ namespace Vanilla\Web;
 /**
  * Class for rendering twig views with the vanilla environment configured.
  */
-trait TwigRenderTrait {
-
+trait TwigRenderTrait
+{
     /** @var string The path to look for twig views in. */
     protected static $twigDefaultFolder = PATH_ROOT;
 
@@ -23,31 +23,9 @@ trait TwigRenderTrait {
     /**
      * Initialize the twig environment.
      */
-    private function prepareTwig(): \Twig\Environment {
-        /** @var TwigEnhancer $enhancer */
-        $enhancer = \Gdn::getContainer()->get(TwigEnhancer::class);
-
-        $loader = new \Twig\Loader\FilesystemLoader(self::$twigDefaultFolder);
-
-        $isDebug = \Gdn::config('Debug') === true;
-        $envArgs = [
-            'cache' => $isDebug ? false : $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
-            'debug' => $isDebug,
-            // Automatically controlled by the debug value.
-            // This causes twig to check the FS timestamp before going to cache.
-            // It will rebuild that file's cache if an update had occured.
-            // 'auto_reload' => $isDebug
-            'strict_variables' => $isDebug, // Surface template errors in debug mode.
-        ];
-        $environment = new \Twig\Environment($loader, $envArgs);
-
-        if ($isDebug) {
-            $environment->addExtension(new \Twig\Extension\DebugExtension());
-        }
-
-        $enhancer->enhanceEnvironment($environment);
-        $enhancer->enhanceFileSystem($loader);
-        return $environment;
+    private function prepareTwig(): \Twig\Environment
+    {
+        return \Gdn::getContainer()->get(TwigRenderer::class);
     }
 
     /**
@@ -58,12 +36,13 @@ trait TwigRenderTrait {
      *
      * @return string Rendered HTML.
      */
-    public function renderTwig(string $path, array $data): string {
+    public function renderTwig(string $path, array $data): string
+    {
         if (!$this->twig) {
             $this->twig = $this->prepareTwig();
         }
         // Ensure that we don't duplicate our root path in the path view.
-        $path = str_replace(PATH_ROOT, '', $path);
+        $path = str_replace(PATH_ROOT, "", $path);
         return $this->twig->render($path, $data);
     }
 
@@ -74,12 +53,67 @@ trait TwigRenderTrait {
      * @param array $data
      * @return string
      */
-    public function renderTwigFromString(string $templateString, array $data): string {
+    public function renderTwigFromString(string $templateString, array $data): string
+    {
         if (!$this->twig) {
             $this->twig = $this->prepareTwig();
         }
 
         $template = $this->twig->createTemplate($templateString);
         return $template->render($data);
+    }
+
+    /**
+     * Render a twig template of a list of links.
+     *
+     * @param array<array{name: string, url: string}|\ArrayAccess> $links
+     *
+     * @return string
+     */
+    public function renderSeoLinkList($links): string
+    {
+        foreach ($links as &$link) {
+            // Normalize certain widget items.
+            $link["url"] = $link["url"] ?? ($link["Url"] ?? ($link["to"] ?? ""));
+            $link["name"] = $link["name"] ?? ($link["Name"] ?? ($link["label"] ?? ($link["title"] ?? null)));
+            $link["excerpt"] = $link["excerpt"] ?? ($link["description"] ?? null);
+        }
+        $tpl = <<<TWIG
+<ul class="linkList">
+{% for link in links %}
+{% if link.url|default(false) and link.name|default(false) %}
+<li>
+<a href="{{ link.url }}">{{- link.name -}}</a>
+{% if link.excerpt|default(false) %}
+<p>{{ link.excerpt }}</p>
+{% endif %}
+</li>
+{% endif %}
+{% endfor %}
+</ul>
+TWIG;
+
+        $result = $this->renderTwigFromString($tpl, ["links" => $links]);
+        return $result;
+    }
+
+    /**
+     * Render a user for SEO content.
+     *
+     * @param array|\ArrayAccess $user
+     *
+     * @return string
+     */
+    public function renderSeoUser($user): string
+    {
+        $tpl = <<<TWIG
+<a href="{{ user.url }}" class="seoUser">
+<img height="24px" width="24px" src="{{ user.photoUrl }}" alt="Photo of {{ user.name }}" />
+<span class="seoUserName">{{ user.name }}</span>
+</a>
+TWIG;
+
+        $result = $this->renderTwigFromString($tpl, ["user" => $user]);
+        return $result;
     }
 }

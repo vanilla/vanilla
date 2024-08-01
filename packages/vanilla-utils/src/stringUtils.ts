@@ -5,6 +5,9 @@
  * @license GPL-2.0-only
  */
 
+import isPlainObject from "lodash-es/isPlainObject";
+import mergeWith from "lodash-es/mergeWith";
+
 /**
  * A simple, fast method of hashing a string. Similar to Java's hash function.
  * https://stackoverflow.com/a/7616484/1486603
@@ -15,24 +18,64 @@
  */
 export function hashString(str: string): number {
     function hashReduce(prevHash, currVal) {
-        // tslint:disable-next-line:no-bitwise
         return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
     }
     return str.split("").reduce(hashReduce, 0);
 }
 
 /**
+ * Generate a RFC4122 compliant uuid. NOTE!!! Not cryptographically secure.
+ *
+ * This does not use a true random source (Eg. using Math.random()).
+ * To use a better source would require dropping IE in order to use the crypto module.
+ */
+export function uuidv4() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0,
+            v = c == "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+
+/**
+ * Convert a camel case variable to a title case label.
+ *
+ * @param str - The string to labelize.
+ * @returns Returns a new string suitable for a label.
+ */
+export function labelize(str: string): string {
+    /**
+     * $labelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $labelCode);
+     * $labelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $labelCode);
+     * $labelCode = preg_replace('`\s+`', ' ', $labelCode);
+     * $labelCode = ucfirst(trim($labelCode));
+     */
+    let label = str.replace(/([^A-Z0-9])([A-Z0-9])/g, "$1 $2");
+    label = label.replace(/([A-Z0-9])(?=[a-z])/g, " $1");
+    label = label.replace(/[_-]/g, " ");
+    label = label.replace(/\./g, " ");
+    label = label.replace(/\s+/g, " ");
+    let parts = label.split(" ");
+    label = parts.map((s) => s.charAt(0).toLocaleUpperCase() + s.slice(1)).join(" ");
+    return label.trim();
+}
+
+/**
  * Hash an object into a short key, that is stable no matter what order the parameters are.
  */
 export function stableObjectHash<T extends object>(obj: T): number {
-    // Sort the object first.
-    const ordered: any = {};
-    Object.keys(obj)
-        .sort()
-        .forEach(function(key) {
-            ordered[key] = obj[key];
-        });
-    return hashString(JSON.stringify(ordered));
+    return hashString(
+        JSON.stringify(obj, (_, val) =>
+            isPlainObject(val)
+                ? Object.keys(val)
+                      .sort()
+                      .reduce((result, key) => {
+                          result[key] = val[key];
+                          return result;
+                      }, {} as any)
+                : val,
+        ),
+    );
 }
 
 type CompareReturn = -1 | 0 | 1;
@@ -98,14 +141,14 @@ export function splitStringLoosely(toSplit: string, splitWith: string): string[]
     const normalizedPieces = normalizedName.split(new RegExp(`(${normalizedSplitTerm})`, "i"));
 
     let charactersUsed = 0;
-    return normalizedPieces.map(piece => {
+    return normalizedPieces.map((piece) => {
         const start = charactersUsed;
         charactersUsed += piece.length;
         return toSplit.substring(start, charactersUsed);
     });
 }
 
-interface IMentionMatch {
+export interface IMentionMatch {
     match: string;
     rawMatch: string;
 }
@@ -182,7 +225,7 @@ export function matchAtMention(
     return null;
 }
 
-const SAFE_PROTOCOL_REGEX = /^(http:\/\/|https:\/\/|tel:|mailto:\/\/|\/|#)/;
+const SAFE_PROTOCOL_REGEX = /^(http:\/\/|https:\/\/|tel:|mailto:|\/|#)/;
 
 /**
  * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
@@ -219,7 +262,47 @@ export function capitalizeFirstLetter(str: string): string {
  * @param duration The amount of time to wait.
  */
 export function promiseTimeout(duration: number): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         setTimeout(resolve, duration);
+    });
+}
+
+function mergeCustomizer(into: any, source: any) {
+    if (Array.isArray(into) || Array.isArray(source)) {
+        return source;
+    }
+}
+
+/**
+ * Merge 2 objects, but replace arrays instead of merging them.
+ */
+export function mergeAndReplaceArrays(item1: Record<any, any>, item2: Record<any, any>) {
+    return mergeWith({}, item1, item2, mergeCustomizer);
+}
+
+export function isNumeric(value: any): value is number | string {
+    if (typeof value === "number") {
+        return true;
+    }
+    if (typeof value === "string") {
+        return /^[+-]?([0-9]*[.])?[0-9]+$/.test(value);
+    }
+    return false;
+}
+
+/**
+ * Test if a given string matches a ruleset which could contain a wildcard selector (*)
+ *
+ * Example: Given string "vanillaforums" should match rule set "vanilla*"
+ */
+export function matchWithWildcard(target: string, matchers: string): boolean | null {
+    const escapeForRegex = (string: string) => string.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
+
+    if (!matchers || !target) {
+        return null;
+    }
+
+    return matchers.split("\n").some((match) => {
+        return new RegExp("^" + match.replace(/\//gi, "").split("*").map(escapeForRegex).join(".*") + "$").test(target);
     });
 }

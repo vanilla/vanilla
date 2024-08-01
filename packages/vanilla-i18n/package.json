@@ -3,11 +3,10 @@
     "main": "./src/index.ts",
     "module": "./src/index.ts",
     "version": "3.0.1",
-    "license": "gpl-2.0-only",
-    "dependencies": {},
+    "license": "MIT",
     "peerDependencies": {
-        "react": "^16.0.0",
-        "@vanilla/utils": "^3.0.1"
+        "@vanilla/utils": "^3.0.1",
+        "react": "^17.0.0"
     },
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"

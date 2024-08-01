@@ -8,7 +8,7 @@ import { ITheme } from "@library/theming/themeReducer";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { InformationIcon } from "@library/icons/common";
-import themeCardClasses from "@library/theming/themePreviewCardStyles";
+import previewCardClasses from "@library/theming/PreviewCard.styles";
 
 interface IProps {
     theme: ITheme;
@@ -16,14 +16,14 @@ interface IProps {
 
 export function ThemePreviewTitle(props: IProps) {
     const { name, supportedSections } = props.theme;
-    const classes = themeCardClasses();
+    const classes = previewCardClasses();
     return supportedSections && supportedSections.length > 0 ? (
         <ToolTip
             label={
                 <>
                     {t("Edits to this theme apply to:")}{" "}
                     <ul>
-                        {supportedSections.map(section => {
+                        {supportedSections.map((section) => {
                             return (
                                 <li key={section}>
                                     <span style={{ fontWeight: 600 }}>{t(section)}</span>

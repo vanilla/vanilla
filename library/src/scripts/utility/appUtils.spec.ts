@@ -37,13 +37,53 @@ describe("metaDataFunctions", () => {
     });
 });
 
-describe("formatUrl", () => {
-    it("passes absolute URLs through directly", () => {
-        const paths = ["https://test.com", "//test.com", "http://test.com"];
+function stubLocation(url: string) {
+    // @ts-ignore
+    delete window.location;
+    window.location = new URL("https://mysite.com") as any;
+}
 
-        paths.forEach(path => {
+describe("formatUrl", () => {
+    let location = window.location;
+
+    afterEach(() => {
+        window.location = location;
+    });
+
+    it("passes absolute URLs from other domains through directly", () => {
+        stubLocation("https://other.com");
+        const paths = ["https://test.com", "//test.com", "http://test.com", "   http://test.com", " https://test.com"];
+
+        paths.forEach((path) => {
             expect(application.formatUrl(path)).toEqual(path);
         });
+    });
+
+    it("handles complicated site section injection", () => {
+        stubLocation("https://mysite.com");
+
+        application.setMeta("context.host", "");
+        application.setMeta("siteSectionSlugs", ["/sub1", "/sub2"]);
+        application.setMeta("context.basePath", "/sub1");
+
+        // Injects site section where it can.
+        expect(application.formatUrl("https://mysite.com/somepath/otherpath")).toBe(
+            "https://mysite.com/sub1/somepath/otherpath",
+        );
+        expect(application.formatUrl("https://mysite.com/somepath/sub1")).toBe("https://mysite.com/sub1/somepath/sub1");
+
+        // Empty paths are left alone (so that any explicit navigation to the top level still works).
+        expect(application.formatUrl("https://mysite.com/")).toBe("https://mysite.com/");
+        expect(application.formatUrl("https://mysite.com")).toBe("https://mysite.com");
+
+        // Does not inject site section if there already is one.
+        expect(application.formatUrl("https://mysite.com/sub2")).toBe("https://mysite.com/sub2");
+        expect(application.formatUrl("https://mysite.com/sub2/other-path")).toBe("https://mysite.com/sub2/other-path");
+
+        // If we aren't in a site section don't do anything.
+        application.setMeta("context.basePath", "");
+        expect(application.formatUrl("https://mysite.com/sub2/other-path")).toBe("https://mysite.com/sub2/other-path");
+        expect(application.formatUrl("https://mysite.com/profile/user")).toBe("https://mysite.com/profile/user");
     });
 
     it("follows the given format", () => {
@@ -57,5 +97,92 @@ describe("formatUrl", () => {
         application.setMeta("context.host", "/community");
         expect(application.formatUrl("/discussions")).toEqual("/community/subcommunity/discussions");
         expect(application.formatUrl("~/discussions")).toEqual("/community/discussions");
+    });
+});
+
+describe("isUrl", () => {
+    const urls = [
+        "https://example.com",
+        "http://some-other-site.thing/place/place////more?otherThing%22&otherThing=true&query=[]1",
+    ];
+    for (const url of urls) {
+        it(`"${url} is a URL"`, () => {
+            expect(application.isURL(url)).toBe(true);
+        });
+    }
+
+    const notUrls = [
+        "www.thing.com", // No protocol.
+        "./relative/path.html", // No TLD.
+        "/absolute/path.html", // No TLD.
+        "javascript:alert('hello')", // Bad protocol,
+        "ftp://ftp.somePlace.com", // Bad protocol.
+    ];
+
+    for (const notUrl of notUrls) {
+        it(`"${notUrl} is not a URL"`, () => {
+            expect(application.isURL(notUrl)).toBe(false);
+        });
+    }
+});
+
+describe("makeProfileUrl", () => {
+    beforeEach(() => {
+        stubLocation("https://mysite.com");
+        application.setMeta("context.basePath", "/test");
+    });
+    it("can make a simple url", () => {
+        expect(application.makeProfileUrl(6, "hello")).toBe("https://mysite.com/test/profile/6/hello");
+    });
+
+    it("can encoded various url characters", () => {
+        expect(application.makeProfileUrl(6, "hello-$%^^*()")).toBe(
+            "https://mysite.com/test/profile/6/hello-%24%25%5E%5E*()",
+        );
+    });
+
+    it("can has special encoding for / and & characters", () => {
+        // These are double encoded for compatibility with quirks in our backed router.
+        // The backend also encodes these characters this way in user urls (see \userUrl() and UserModel::getProfileUrl())
+        expect(application.makeProfileUrl(6, "he&llo/user")).toBe(
+            "https://mysite.com/test/profile/6/he%2526llo%252fuser",
+        );
+    });
+});
+
+describe("createSourceSetValue", () => {
+    it("generates a source string", () => {
+        const mock = {
+            100: "test-100",
+            200: "test-200",
+        };
+        const expected = "test-100 100w,test-200 200w";
+        const actual = application.createSourceSetValue(mock);
+        expect(actual).toEqual(expected);
+    });
+    it("omits empty values source string", () => {
+        const mock = {
+            100: "test-100",
+            200: "",
+            300: "test-300",
+        };
+        const expected = "test-100 100w,test-300 300w";
+        const actual = application.createSourceSetValue(mock);
+        expect(actual).toEqual(expected);
+    });
+    it("returns empty source string for an object with empty values", () => {
+        const mock = {
+            100: "",
+            200: "",
+        };
+        const expected = "";
+        const actual = application.createSourceSetValue(mock);
+        expect(actual).toEqual(expected);
+    });
+    it("returns empty source string for an empty object", () => {
+        const mock = {};
+        const expected = "";
+        const actual = application.createSourceSetValue(mock);
+        expect(actual).toEqual(expected);
     });
 });

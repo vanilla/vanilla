@@ -4,19 +4,23 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, colorOut, defaultTransition, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { linearGradient, percent, px, translateY } from "csx";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { absolutePosition, defaultTransition } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { ColorHelper, linearGradient, percent, px, translateY } from "csx";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 
-export const collapsableContentClasses = useThemeCache(() => {
+export const collapsableContentClasses = useThemeCache((options?: { bgColor?: ColorHelper }) => {
     const globalVars = globalVariables();
     const style = styleFactory("collapsableContent");
 
     const paddingAdjustment = style("paddingAdjustment", {});
+    const bgColor = options?.bgColor ?? globalVars.mainColors.bg;
 
     const root = style({
-        background: colorOut(globalVars.mainColors.bg),
+        background: ColorsUtils.colorOut(bgColor),
         position: "relative",
     });
 
@@ -27,12 +31,12 @@ export const collapsableContentClasses = useThemeCache(() => {
     });
 
     const collapser = style("collapser", {
-        $nest: {
+        ...{
             "&&": {
                 ...buttonResetMixin(),
                 borderRadius: 0,
                 width: percent(100),
-                height: unit(globalVars.icon.sizes.default),
+                height: styleUnit(globalVars.icon.sizes.default),
                 padding: 0,
                 margin: 0,
             },
@@ -41,22 +45,21 @@ export const collapsableContentClasses = useThemeCache(() => {
 
     const footer = style("footer", {
         position: "relative",
-        height: unit(globalVars.icon.sizes.default),
+        height: styleUnit(globalVars.icon.sizes.default),
     });
 
     const collapserIcon = style("collapserIcon", {
         ...defaultTransition("transform"),
+        margin: "auto",
+        height: styleUnit(globalVars.icon.sizes.default),
+        display: "block",
     });
 
     const gradient = style("gradient", {
         ...absolutePosition.topLeft(),
         width: percent(100),
         height: 75,
-        background: linearGradient(
-            "to bottom",
-            colorOut(globalVars.mainColors.bg.fade(0))!,
-            colorOut(globalVars.mainColors.bg)!,
-        ),
+        background: linearGradient("to bottom", ColorsUtils.colorOut(bgColor.fade(0))!, ColorsUtils.colorOut(bgColor)!),
         transform: `translateY(-100%)`,
     });
 

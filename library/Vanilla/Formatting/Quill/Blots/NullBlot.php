@@ -13,13 +13,14 @@ use Vanilla\Formatting\Quill\BlotGroup;
  * A blot for non-matching operations. This is to prevent crashes when bad input is introduced. It renders nothing
  * and acts as if it doesn't exist.
  */
-class NullBlot extends AbstractBlot {
-
+class NullBlot extends AbstractBlot
+{
     /**
      * The NullBlot is the ultimate fallback blot. It matches anything so always return true.
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
+    public static function matches(array $operation): bool
+    {
         return true;
     }
 
@@ -27,7 +28,8 @@ class NullBlot extends AbstractBlot {
      * The null blot always has empty content.
      * @inheritDoc
      */
-    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation) {
+    public function __construct(array $currentOperation, array $previousOperation, array $nextOperation)
+    {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
         $this->content = "";
     }
@@ -35,7 +37,8 @@ class NullBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function render(): string {
+    public function render(): string
+    {
         return $this->content;
     }
 
@@ -43,7 +46,8 @@ class NullBlot extends AbstractBlot {
      * A null blot should not have any affect on anything around it.
      * @inheritDoc
      */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool
+    {
         return false;
     }
 
@@ -51,7 +55,8 @@ class NullBlot extends AbstractBlot {
      * The null blot only ever consumes it's own non-matching operation.
      * @inheritDoc
      */
-    public function hasConsumedNextOp(): bool {
+    public function hasConsumedNextOp(): bool
+    {
         return false;
     }
 }

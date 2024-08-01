@@ -4,45 +4,50 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
-import { fonts, unit, margins } from "@library/styles/styleHelpers";
-
-export const searchMiscellaneousComponentsVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("searchComponents");
-    return {};
-});
+import { metasVariables } from "@library/metas/Metas.variables";
+import { useThemeCache } from "@library/styles/themeCache";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
-    const style = styleFactory("searchMiscellaneousComponents");
     const globalVars = globalVariables();
-    const vars = searchMiscellaneousComponentsVariables();
+    const metasVars = metasVariables();
 
-    const sortAndPagination = style("sortAndPagination", {
+    const root = css({
         display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
+        alignItems: "baseline",
+        justifyContent: "flex-end",
     });
 
-    const sort = style("sort", {
+    const sort = css({
         display: "flex",
-        ...margins({
+        flexWrap: "wrap",
+        ...Mixins.margin({
             all: 0,
-            right: globalVars.gutter.size,
         }),
-        flexGrow: 1,
+        marginInlineEnd: 8,
     });
 
-    const sortLabel = style("sortLabel", {
+    const sortLabel = css({
         alignSelf: "center",
-        marginRight: unit(6),
-        ...fonts({
-            color: globalVars.meta.text.color,
+        marginRight: styleUnit(6),
+        ...Mixins.font({
+            color: metasVars.font.color,
+            weight: globalVars.fonts.weights.normal,
+        }),
+    });
+
+    const pages = css({
+        ...Mixins.margin({
+            left: globalVars.gutter.size,
         }),
     });
 
     return {
-        sortAndPagination,
+        root,
         sort,
         sortLabel,
+        pages,
     };
 });

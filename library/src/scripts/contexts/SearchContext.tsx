@@ -8,22 +8,30 @@ import React, { useContext } from "react";
 import { Optionalize } from "@library/@types/utils";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import { formatUrl } from "@library/utility/appUtils";
+import { formatUrl, getMeta } from "@library/utility/appUtils";
+import { makeSearchUrl } from "@library/search/SearchUtils";
 
 const defaultOptionProvider: ISearchOptionProvider = {
     supportsAutoComplete: false,
     autocomplete: () => Promise.resolve([]),
-    makeSearchUrl: query => formatUrl(`/search?search=${query}`),
+    makeSearchUrl: (query: string, options: Record<string, any>, externalSearchQuery?: string) =>
+        makeSearchUrl(query, options, externalSearchQuery),
 };
 
 const SearchContext = React.createContext<IWithSearchProps>({
     searchOptionProvider: defaultOptionProvider,
+    externalSearch: undefined,
 });
 export default SearchContext;
 
 export function SearchContextProvider({ children }) {
     return (
-        <SearchContext.Provider value={{ searchOptionProvider: SearchContextProvider.optionProvider }}>
+        <SearchContext.Provider
+            value={{
+                searchOptionProvider: SearchContextProvider.optionProvider,
+                externalSearch: getMeta("search.externalSearch", false), // check if we have external search query, no autocomplete and pointing into external search in this case
+            }}
+        >
             {children}
         </SearchContext.Provider>
     );
@@ -36,12 +44,16 @@ SearchContextProvider.setOptionProvider = (provider: ISearchOptionProvider) => {
 
 export interface ISearchOptionProvider {
     supportsAutoComplete?: boolean;
-    autocomplete(query: string, options?: { [key: string]: any }): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
-    makeSearchUrl(query: string): string;
+    autocomplete(query: string, options?: Record<string, any>): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
+    makeSearchUrl(query: string, options?: Record<string, any>, externalSearchQuery?: string): string;
 }
 
 export interface IWithSearchProps {
     searchOptionProvider: ISearchOptionProvider;
+    externalSearch?: {
+        query: string;
+        resultsInNewTab: boolean;
+    };
 }
 
 export function useSearch() {
@@ -60,7 +72,7 @@ export function withSearch<T extends IWithSearchProps = IWithSearchProps>(Wrappe
         public render() {
             return (
                 <SearchContext.Consumer>
-                    {context => {
+                    {(context) => {
                         // https://github.com/Microsoft/TypeScript/issues/28938
                         return <WrappedComponent {...context} {...(this.props as T)} />;
                     }}

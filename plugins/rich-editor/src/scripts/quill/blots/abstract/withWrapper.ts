@@ -23,7 +23,7 @@ export interface IWrappable extends Container {
  */
 export default function withWrapper(blotConstructor: typeof Block) {
     class BlotWithWrapper extends blotConstructor {
-        public parent: WrapperBlot;
+        declare parent: WrapperBlot;
         protected useWrapperReplacement = true;
 
         public constructor(domNode) {
@@ -105,7 +105,7 @@ export default function withWrapper(blotConstructor: typeof Block) {
                 const topLevelWrapper = this.getWrapper(true);
                 const immediateWrapper = this.parent;
 
-                immediateWrapper.children.forEach(child => {
+                immediateWrapper.children.forEach((child) => {
                     if (child === this) {
                         (child as any).replaceWithIntoScroll(name, value, topLevelWrapper);
                     } else {

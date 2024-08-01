@@ -1,0 +1,219 @@
+// This file is a kludge of select form styles to be used **ONLY** on the
+// admin-new section and should be promptly replaced with JSS.
+// This kludge exists, because importing all of admin.css into this new section
+// create many bugs in shared section, chiefly analytics.
+
+@import "src/admin_variables";
+@import "maps/bootstrapVariables";
+@import "maps/bootstrapMixins";
+@import "src/mixins";
+@import "maps/vanillicon";
+@import "maps/vendorSubset";
+@import "new-components/imageUpload";
+
+$staticVariables: false;
+@import "../../../packages/vanilla-theme-core/scss/base/variables";
+
+#app {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+// Copied from applications/dashboard/scss/src/_buttons.scss L114
+
+.heading {
+    // Clear out defaults
+    margin: 0;
+}
+
+.btn-secondary {
+    min-width: $btn-min-width;
+    @include button-variant(
+        $btn-secondary-color,
+        $btn-secondary-bg,
+        $btn-secondary-border,
+        $btn-primary-bg,
+        $btn-primary-color,
+        $btn-primary-color,
+        $btn-secondary-color,
+        lighten($brand-primary, 50%),
+        $btn-secondary-border
+    );
+}
+
+// Copied from applications/dashboard/scss/new-components/_formElements.scss L104
+
+$lineHeight-base: 1.428571429;
+$fontSize-large: 16px !default;
+$fontSize-default: 14px !default;
+$fontSize-small: 12px !default;
+$utility-baseUnit: 6px;
+$formElement_height: $utility-baseUnit * 6 !default;
+$global-button_minWidth: 16 * $utility-baseUnit !default;
+$global_borderRadius: 6px;
+$global-button_radius: $global_borderRadius;
+
+.file-upload {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    width: 100%;
+    font-weight: "normal";
+    min-height: $formElement_height;
+    cursor: pointer;
+    margin-bottom: 0;
+
+    input {
+        padding: 0;
+        margin: 0;
+        filter: alpha(opacity = 0);
+        opacity: 0;
+        width: 0;
+
+        &:disabled,
+        &.disabled {
+            opacity: 0;
+        }
+    }
+}
+
+.file-upload-browse {
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    touch-action: manipulation;
+    min-width: $global-button_minWidth;
+    line-height: $formElement_height;
+    height: $formElement_height;
+    font-weight: normal;
+    user-select: none;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: $global-color_white;
+    color: $button-basic_fg;
+    border: {
+        width: $formElement_borderWidth;
+        radius: $global-button_radius;
+        style: solid;
+        color: $button-basic_border;
+    }
+    order: -1;
+}
+
+.file-upload-choose {
+    line-height: $formElement_height;
+    height: $formElement_height;
+    font-size: $global-medium_fontSize;
+    font-weight: "normal";
+    font-family: $global-body_fontFamily;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+}
+
+.row,
+.col,
+.col,
+.col,
+.col,
+.col,
+.col,
+.col,
+.col,
+.padded,
+.toggle,
+.toggle,
+.toggle,
+.toggle,
+.input,
+.btn,
+.btn,
+.active,
+.active,
+.row,
+.btn,
+.btn-icon {
+}
+
+@import "src/_forms.scss";
+
+// Copied from applications/dashboard/scss/legacy/_style.scss L838
+.info {
+    display: block;
+    font-size: 12px;
+    line-height: 1.3333333333;
+    color: #949aa2;
+}
+
+// Copied from applications/dashboard/scss/src/_forms.scss L466
+
+.file-upload {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    font-weight: normal;
+    cursor: pointer;
+
+    input {
+        margin: 0;
+        filter: alpha(opacity = 0);
+        opacity: 0;
+
+        &:disabled,
+        &.disabled {
+            opacity: 0;
+        }
+    }
+}
+
+.file-upload-choose {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    padding: $control-padding-y $spacer * 3 * 0.25;
+    color: $input-color;
+    border: $input-btn-border-width solid $input-border-color;
+    border-radius: $border-radius;
+}
+
+.file-upload-browse {
+    position: absolute;
+    top: 0;
+    right: 0;
+    @extend .btn !optional;
+    @extend .btn-secondary !optional;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+// Focus state
+.file-upload input:focus,
+.file-upload input:hover {
+    ~ .file-upload-choose,
+    ~ .file-upload-browse {
+        border-color: #66afe9;
+        outline: none;
+        @extend .active !optional;
+    }
+}
+
+//Disabled state
+.file-upload input:disabled,
+.file-upload input.disabled {
+    ~ .file-upload-choose {
+        background-color: $grey-lighter;
+    }
+}
+
+ul {
+    margin-bottom: 0;
+}
+
+a:focus,
+a:hover {
+    text-decoration: none;
+}

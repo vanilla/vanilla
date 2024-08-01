@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 body.Section-Profile {
-
     .Profile h2,
     .BadgeGrid h4 {
         font-size: $global-subTitle_fontSize;
@@ -25,7 +24,6 @@ body.Section-Profile {
     }
 
     .Profile > .User {
-        background-color: $content_bg;
         border-radius: $content_borderRadius;
         border: $content_border;
         position: relative;
@@ -54,6 +52,10 @@ body.Section-Profile {
         padding: $utility-baseUnitHalf;
         display: inline-flex;
         border-radius: $tag_borderRadius;
+
+        > * {
+            padding: 0 3px;
+        }
     }
 
     .H .Gloss {
@@ -66,7 +68,6 @@ body.Section-Profile {
     }
 
     .MainContent {
-
         > .FormTitleWrapper {
             padding: 0;
         }
@@ -98,7 +99,6 @@ body.Section-Profile {
     }
 
     .Profile-name {
-
         @include maxWidth($theme-breakpoint_tablet) {
             width: 100%;
             text-align: center;
@@ -154,12 +154,12 @@ body.Section-Profile {
         @if ($staticVariables) {
             .Button-EditProfile {
                 @include Button(
-                        $button-primary_bg,
-                        $button-primary_fg,
-                        $button-primary_border,
-                        $button-primary-hover_bg,
-                        $button-primary-hover_fg,
-                        $button-primary-hover_border
+                    $button-primary_bg,
+                    $button-primary_fg,
+                    $button-primary_border,
+                    $button-primary-hover_bg,
+                    $button-primary-hover_fg,
+                    $button-primary-hover_border
                 );
             }
         }
@@ -189,13 +189,13 @@ body.Section-Profile {
             margin-left: 0;
             margin-bottom: $utility-baseUnitTriple;
             width: 100%;
-            justify-content: center;
             flex-wrap: wrap;
+            gap: 16px;
 
             .MemberButtons,
             .Button-EditProfile,
             .ButtonGroup {
-                width: inherit;
+                width: initial;
             }
 
             .MemberButtons,
@@ -210,7 +210,6 @@ body.Section-Profile {
     }
 
     .Panel-main {
-
         .PhotoWrapLarge {
             margin-bottom: $utility-baseUnitTriple;
         }
@@ -236,21 +235,26 @@ body.Section-Profile {
         border: none;
     }
 
-    .About.P .About,
-    .FormTitleWrapper,
-    .change-picture,
-    &.quotes .Frame-content form {
-        padding: $utility-baseUnitDouble;
-        margin-bottom: $utility-baseUnitTriple;
+    @if $staticVariables {
+        .About.P .About,
+        .FormTitleWrapper,
+        .change-picture,
+        &.quotes .Frame-content form {
+            padding: $utility-baseUnitDouble;
+            margin-bottom: $utility-baseUnitTriple;
 
-        @include maxWidth {
-            padding: 0;
+            @include maxWidth {
+                padding: 0;
+            }
         }
     }
 
     .Content .BadgeGrid .PhotoGrid,
     .DataCounts {
         @include tilesContainer(5);
+        @if $staticVariables {
+            margin-top: -$utility-baseUnitTriple;
+        }
 
         @include maxWidth {
             @include tilesContainer(4);
@@ -284,7 +288,6 @@ body.Section-Profile {
     }
 
     .CountItemWrap {
-
         .TextColor {
             width: 100%;
             display: flex;
@@ -315,12 +318,16 @@ body.Section-Profile {
         }
     }
 
+    .About .Value {
+        width: 100%;
+        padding-left: 0;
+    }
+
     .Content .Box.BadgeGrid {
         margin: 0;
     }
 
     .Profile {
-
         dl {
             @include clearfix;
             width: 100%;
@@ -365,7 +372,6 @@ body.Section-Profile {
     }
 
     @include maxWidth($theme-breakpoint_tablet) {
-
         .Button-EditProfile {
             .Hidden {
                 display: inline;
@@ -379,20 +385,20 @@ body.Section-Profile {
 }
 
 body.Section-EditProfile {
-
     // titles have different classes depending on the page
-    &.signature,
-    &.preferences {
+    @if $staticVariables {
+        &.signature,
+        &.preferences {
+            h2 {
+                font-size: $global-large_fontSize;
+                font-weight: $global-heading_fontWeight;
+                margin-top: $component-item_spacing;
+                margin-bottom: $utility-baseUnitHalf;
+                border-bottom: $component_border;
 
-        h2 {
-            font-size: $global-large_fontSize;
-            font-weight: $global-heading_fontWeight;
-            margin-top: $component-item_spacing;
-            margin-bottom: $utility-baseUnitHalf;
-            border-bottom: $component_border;
-
-            @include maxWidth {
-                font-size: $global-subTitle_fontSize;
+                @include maxWidth {
+                    font-size: $global-subTitle_fontSize;
+                }
             }
         }
     }
@@ -402,7 +408,6 @@ body.Section-EditProfile {
     }
 
     .ProfileButtons-BackToProfile {
-
         @include maxWidth {
             width: 100%;
             text-align: center;
@@ -410,7 +415,9 @@ body.Section-EditProfile {
     }
 
     .FormTitleWrapper form {
-        background: none !important;
+        @if $staticVariables {
+            background: none !important;
+        }
 
         li {
             @include clearfix;
@@ -467,6 +474,11 @@ body.Section-EditProfile {
         * {
             line-height: $formElement_height;
         }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
     }
 
     .Preferences .Buttons .Button {
@@ -474,7 +486,6 @@ body.Section-EditProfile {
     }
 
     @include maxWidth {
-
         .Buttons {
             .Button {
                 width: 100%;
@@ -483,7 +494,6 @@ body.Section-EditProfile {
         }
 
         &.tokens {
-
             .Button.Action {
                 width: 100%;
                 text-align: center;

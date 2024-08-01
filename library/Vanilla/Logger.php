@@ -10,28 +10,51 @@ namespace Vanilla;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Logging\LogDecorator;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * A logger that can contain many loggers.
  *
  * Class Logger
+ *
  * @package Vanilla
  */
-class Logger implements LoggerInterface {
+class Logger implements LoggerInterface
+{
     use LoggerTrait;
 
-    public const FIELD_EVENT = 'event';
-    public const FIELD_CHANNEL = 'channel';
-    public const FIELD_TARGET_USERID = 'targetUserID';
-    public const FIELD_TARGET_USERNAME = 'targetName';
-    public const FIELD_USERID = 'userid';
-    public const FIELD_USERNAME = 'username';
+    public const FIELD_TAGS = "tags";
+    public const FIELD_EVENT = "event";
+    public const FIELD_CHANNEL = "channel";
+    public const FIELD_TARGET_USERID = "targetUserID";
+    public const FIELD_TARGET_USERNAME = "targetName";
+    public const FIELD_USERID = "userID";
+    public const FIELD_USERNAME = "username";
+    public const FIELD_TARGET_EVENTID = "targetEventId";
+    public const FIELD_ATTENDING = "attending";
+    public const FIELD_TIMERS = "timers";
+    public const FIELD_SERVICE = "service";
 
-    public const CHANNEL_ADMIN = 'admin';
-    public const CHANNEL_APPLICATION = 'application';
-    public const CHANNEL_MODERATION = 'moderation';
-    public const CHANNEL_SECURITY = 'security';
-    public const CHANNEL_SYSTEM = 'system';
+    public const FIELDS = [
+        self::FIELD_TAGS,
+        self::FIELD_EVENT,
+        self::FIELD_CHANNEL,
+        self::FIELD_TARGET_USERID,
+        self::FIELD_TARGET_USERNAME,
+        self::FIELD_USERID,
+        self::FIELD_USERNAME,
+        self::FIELD_TIMERS,
+        self::FIELD_SERVICE,
+    ];
+
+    public const CHANNEL_AUDIT = "audit";
+    public const CHANNEL_ADMIN = "admin";
+    public const CHANNEL_APPLICATION = "application";
+    public const CHANNEL_MODERATION = "moderation";
+    public const CHANNEL_SECURITY = "security";
+    public const CHANNEL_SYSTEM = "system";
     public const CHANNEL_DEFAULT = self::CHANNEL_APPLICATION;
 
     public const CHANNELS = [
@@ -72,6 +95,37 @@ class Logger implements LoggerInterface {
     private $loggers = [];
 
     /**
+     * Extract core logger fields to the top level of a context and stick the rest in data.
+     *
+     * @param array $context The context.
+     *
+     * @return array The hoisted data.
+     */
+    public static function hoistLoggerFields(array $context): array
+    {
+        $extracted = [];
+        foreach (self::FIELDS as $FIELD) {
+            $extracted[$FIELD] = $context[$FIELD] ?? null;
+            unset($context[$FIELD]);
+        }
+
+        if ($extracted[self::FIELD_TAGS] === null) {
+            $extracted[self::FIELD_TAGS] = [];
+        }
+
+        $event = $extracted[Logger::FIELD_EVENT] ?? null;
+        if ($event !== null) {
+            $eventTokens = explode("_", $extracted[Logger::FIELD_EVENT]);
+            if ($eventTokens !== false) {
+                $extracted[self::FIELD_TAGS] = array_merge($eventTokens, $extracted[self::FIELD_TAGS]);
+            }
+        }
+        $extracted["data"] = $context;
+
+        return $extracted;
+    }
+
+    /**
      * Get the numeric priority for a log level.
      *
      * The priorities are set to the LOG_* constants from the {@link syslog()} function.
@@ -80,7 +134,8 @@ class Logger implements LoggerInterface {
      * @param string|int $level The string log level or an actual priority.
      * @return int Returns the numeric log level or `8` if the level is invalid.
      */
-    public static function levelPriority($level) {
+    public static function levelPriority($level)
+    {
         static $priorities = [
             self::DEBUG => LOG_DEBUG,
             self::INFO => LOG_INFO,
@@ -89,7 +144,7 @@ class Logger implements LoggerInterface {
             self::ERROR => LOG_ERR,
             self::CRITICAL => LOG_CRIT,
             self::ALERT => LOG_ALERT,
-            self::EMERGENCY => LOG_EMERG
+            self::EMERGENCY => LOG_EMERG,
         ];
 
         if (isset($priorities[$level])) {
@@ -100,20 +155,23 @@ class Logger implements LoggerInterface {
     }
 
     /**
-     * Add a new logger to observe messages.
+     * AddLogger
      *
-     * @param LoggerInterface $logger The logger to add.
-     * @param string $level One of the **LogLevel::*** constants.
+     * @param LoggerInterface $logger
+     * @param string|null $level
+     * @param callable $filter Signature: (int $level, string $message, array $context)
      * @return Logger Returns $this for fluent calls.
      */
-    public function addLogger(LoggerInterface $logger, $level = null) {
+    public function addLogger(LoggerInterface $logger, $level = null, callable $filter = null)
+    {
         // Make a small attempt to prevent infinite cycles by disallowing all logger chaining.
         if ($logger instanceof Logger) {
             throw new \InvalidArgumentException("You cannot add a Logger instance to a Logger.", 500);
         }
 
         $level = $level ?: self::DEBUG;
-        $this->loggers[] = [$logger, static::levelPriority($level)];
+        $this->loggers[] = [$logger, static::levelPriority($level), $filter];
+
         return $this;
     }
 
@@ -124,10 +182,12 @@ class Logger implements LoggerInterface {
      * @param bool $trigger Whether or not to trigger a notice if the logger isn't found.
      * @return $this Returns $this for fluent calls.
      */
-    public function removeLogger(LoggerInterface $logger, $trigger = true) {
+    public function removeLogger(LoggerInterface $logger, $trigger = true)
+    {
         foreach ($this->loggers as $i => $addedLogger) {
             if ($addedLogger[0] === $logger) {
                 unset($this->loggers[$i]);
+
                 return $this;
             }
         }
@@ -135,6 +195,7 @@ class Logger implements LoggerInterface {
             $class = get_class($logger);
             trigger_error("Logger $class was removed without being added.");
         }
+
         return $this;
     }
 
@@ -146,8 +207,9 @@ class Logger implements LoggerInterface {
      * @param string $message The message to log. Put fields in {braces} to replace with context values.
      * @param array $context The context to format the message with.
      */
-    public function event($event, $level, $message, $context = []) {
-        $context['event'] = $event;
+    public function event($event, $level, $message, $context = [])
+    {
+        $context["event"] = $event;
         $this->log($level, $message, $context);
     }
 
@@ -158,7 +220,8 @@ class Logger implements LoggerInterface {
      * @param string $message The message to log. Put fields in {braces} to replace with context values.
      * @param array $context The context to format the message with.
      */
-    public function log($level, $message, array $context = []) {
+    public function log($level, $message, array $context = [])
+    {
         $levelPriority = self::levelPriority($level);
         if ($levelPriority > LOG_DEBUG) {
             throw new \Psr\Log\InvalidArgumentException("Invalid log level: $level.");
@@ -171,18 +234,47 @@ class Logger implements LoggerInterface {
         }
         $inCall = true;
 
+        $rawContext = $context;
+        // Try to decorate the context.
+        $context = LogDecorator::applyLogDecorator($context);
+
+        try {
+            $messageContext = $rawContext + ($rawContext["data"] ?? []);
+            $messageContext = ArrayUtils::flattenArray(".", $messageContext, true);
+
+            foreach ($messageContext as $key => $val) {
+                if (is_string($val) || is_numeric($val)) {
+                    $message = str_replace("{{$key}}", (string) $val, $message);
+                }
+            }
+        } catch (\Throwable $e) {
+            ErrorLogger::warning(
+                "Error formatting string for logging.",
+                ["logger"],
+                [
+                    "exception" => $e,
+                ]
+            );
+        }
+
         foreach ($this->loggers as $row) {
             /* @var LoggerInterface $logger */
-            list($logger, $loggerPriority) = $row;
-
+            [$logger, $loggerPriority, $filter] = $row;
             if ($loggerPriority >= $levelPriority) {
                 try {
-                    $logger->log($level, $message, $context);
+                    if ($filter === null || call_user_func($filter, $level, $message, $context)) {
+                        $logger->log($level, $message, $context);
+                    }
                 } catch (\Exception $ex) {
                     $inCall = false;
                     throw $ex;
                 }
             }
+        }
+
+        // Go the error logger as well if this is an error.
+        if (LOG_WARNING >= $levelPriority) {
+            ErrorLogger::log($level, $message, [], $context);
         }
 
         $inCall = false;

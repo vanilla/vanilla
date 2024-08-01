@@ -4,10 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { LoadingRectange } from "@library/loaders/LoadingRectangle";
+import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { breadcrumbsClasses } from "@library/navigation/breadcrumbsStyles";
 import { t } from "@library/utility/appUtils";
 import React from "react";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 export interface IProps {
     crumbCount?: number;
@@ -47,7 +48,8 @@ function LoadingCrumb() {
     return (
         <li className={classes.breadcrumb}>
             <span className={classes.link}>
-                <LoadingRectange height={12} width={100} />
+                <ScreenReaderContent>{t("Loading")}</ScreenReaderContent>
+                <LoadingRectangle height={12} width={100} />
             </span>
         </li>
     );

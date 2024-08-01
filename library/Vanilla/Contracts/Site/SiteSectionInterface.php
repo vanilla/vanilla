@@ -7,14 +7,17 @@
 
 namespace Vanilla\Contracts\Site;
 
+use Vanilla\Layout\Asset\LayoutQuery;
+
 /**
  * Interface representing a section of a site.
  *
  * Through this mechanism content across the site may be separated and filtered.
  */
-interface SiteSectionInterface extends \JsonSerializable {
-    const APP_FORUM = 'forum';
-    const APP_KB = 'knowledgeBase';
+interface SiteSectionInterface extends \JsonSerializable
+{
+    const APP_FORUM = "forum";
+    const APP_KB = "knowledgeBase";
     /**
      * Get the base path for the section of the site.
      *
@@ -41,6 +44,13 @@ interface SiteSectionInterface extends \JsonSerializable {
      * @return string
      */
     public function getSectionName(): string;
+
+    /**
+     * Get the description for the section.
+     *
+     * @return string|null
+     */
+    public function getSectionDescription(): ?string;
 
     /**
      * Get the uniqueID representing the section.
@@ -88,7 +98,7 @@ interface SiteSectionInterface extends \JsonSerializable {
     public function setApplication(string $app, bool $enable);
 
     /**
-     * Get attributes assosciated with the site section.
+     * Get attributes associated with the site section.
      *
      * @return array
      */
@@ -100,4 +110,35 @@ interface SiteSectionInterface extends \JsonSerializable {
      * @return int|string|null
      */
     public function getSectionThemeID();
+
+    /**
+     * Get categoryID associated to site-section.
+     *
+     * @return int|null
+     */
+    public function getCategoryID();
+
+    /**
+     * Get banner image link associated to site-section.
+     *
+     * @return string
+     */
+    public function getBannerImageLink(): string;
+
+    /**
+     * @return string
+     */
+    public function getLayoutRecordType(): string;
+
+    /**
+     * @return string|int
+     */
+    public function getLayoutRecordID();
+
+    /**
+     * Get a payload to apply to tracking events. This will be merged with an event payload.
+     *
+     * @return array
+     */
+    public function getTrackablePayload(): array;
 }

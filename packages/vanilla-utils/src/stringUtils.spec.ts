@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { hashString, splitStringLoosely, matchAtMention } from "./stringUtils";
+import { hashString, splitStringLoosely, matchAtMention, labelize, isNumeric, matchWithWildcard } from "./stringUtils";
 
 describe("hashString()", () => {
     it("the same string always results in the same value", () => {
@@ -109,5 +109,87 @@ describe("matching @mentions", () => {
 
         testSubjectsAndMatches(goodSubjects);
         testSubjectsAndMatches(badSubjects);
+    });
+});
+
+describe("labelize()", () => {
+    const tests = [
+        ["fooBar", "Foo Bar"],
+        ["foo  bar", "Foo Bar"],
+        ["fooID", "Foo ID"],
+        ["fooURL", "Foo URL"],
+        ["foo_bar", "Foo Bar"],
+        ["foo-bar", "Foo Bar"],
+        ["foo-bar-baz", "Foo Bar Baz"],
+        ["foo bar   baz", "Foo Bar Baz"],
+        [
+            `foo bar
+        baz`,
+            "Foo Bar Baz",
+        ],
+        ["Garden.Registration.ManageCaptcha", "Garden Registration Manage Captcha"],
+    ];
+    tests.forEach(([str, expected]) => {
+        it(str, () => {
+            expect(labelize(str)).toBe(expected);
+        });
+    });
+});
+
+describe("isNumeric()", () => {
+    const numeric = [10100, 100.4131, "1000", "0", "1", "-141", "+3141", "-311.131", "0.0000"];
+    const notNumeric = ["a123123", "12313a", "--00000", {}, [], undefined, null];
+
+    numeric.forEach((val) => {
+        it(`is numeric - '${val}'`, () => {
+            expect(isNumeric(val)).toBe(true);
+        });
+    });
+    notNumeric.forEach((val) => {
+        it(`is not numeric - '${val}'`, () => {
+            expect(isNumeric(val)).toBe(false);
+        });
+    });
+});
+
+describe("matchWithWildcard", () => {
+    it("Matches partial string", () => {
+        const string = "vanillaforums";
+        const rules = "vanilla*";
+        expect(matchWithWildcard(string, rules)).toBe(true);
+    });
+    it("Does not match unrelated strings", () => {
+        const string = "higherlogic";
+        const rules = "vanilla*";
+        expect(matchWithWildcard(string, rules)).toBe(false);
+    });
+    it("Does not match rule without wildcard", () => {
+        const string = "vanillaforums";
+        const rules = "vanilla";
+        expect(matchWithWildcard(string, rules)).toBe(false);
+    });
+    it("Match with preceding wildcard", () => {
+        const string = "vanillaforums";
+        const rules = "*forums";
+        expect(matchWithWildcard(string, rules)).toBe(true);
+    });
+    it("Match with ruleset delimited with new lines", () => {
+        const string = "vanillaforums";
+        const rules = "something\nelse\n*forums";
+        expect(matchWithWildcard(string, rules)).toBe(true);
+    });
+    it("Undefined matcher returns null", () => {
+        const string = "vanillaforums";
+        expect(matchWithWildcard(string, undefined as unknown as string)).toBeNull();
+    });
+    it("Matches without wildcard", () => {
+        const string = "vanillaforums";
+        const rules = "vanillaforums\nhigherlogic";
+        expect(matchWithWildcard(string, rules)).toBe(true);
+    });
+    it("Matches with wildcard and slashes", () => {
+        const string = "vanillaforums.com";
+        const rules = "vanillaforums.com/*";
+        expect(matchWithWildcard(string, rules)).toBe(true);
     });
 });

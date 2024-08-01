@@ -4,13 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
-import React from "react";
 import SiteNav from "@library/navigation/SiteNav";
-import SiteNavProvider from "@library/navigation/SiteNavContext";
 import { STORY_SITE_NAV_ACTIVE_RECORD, STORY_SITE_NAV_ITEMS } from "@library/navigation/siteNav.storyData";
+import SiteNavProvider from "@library/navigation/SiteNavContext";
 import { StoryContent } from "@library/storybook/StoryContent";
+import { StoryHeading } from "@library/storybook/StoryHeading";
 
 export default {
     title: "Navigation",

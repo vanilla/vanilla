@@ -1,0 +1,215 @@
+openapi: 3.0.3
+info:
+paths:
+    /attachments:
+        x-hidden: true
+        get:
+            summary: List attachments
+            description: |
+                List attachments.
+            tags:
+                - Attachments
+            parameters:
+                - in: query
+                  name: recordType
+                  required: true
+                  schema:
+                      type: string
+                      enum:
+                          - discussion
+                          - comment
+                          - user
+                      description: |
+                          The record type of the attachment.
+                - in: query
+                  name: recordID
+                  required: true
+                  schema:
+                      type: string
+                      description: |
+                          The record ID of the attachment.
+
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Attachment"
+        post:
+            summary: Create attachment
+            description: |
+                Create attachment.
+            tags:
+                - Attachments
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AttachmentPost"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Attachment"
+    /attachments/refresh:
+        x-hidden: true
+        post:
+            summary: Sync selected attachments.
+            description: |
+                Sync selected attachments with the external issue provider. Can only sync up to 10 at a time.
+            tags:
+                - Attachments
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                onlyStale:
+                                    description: Only refresh attachments that are stale.
+                                    type: boolean
+                                    default: true
+                                attachmentIDs:
+                                    type: array
+                                    items:
+                                        type: integer
+                                        description: Attachment ID of the attachment to sync.
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Attachment"
+                "400":
+                    description: Bad Request, e.g. trying to sync more than 10 attachments
+
+components:
+    schemas:
+        Attachment:
+            type: object
+            properties:
+                attachmentID:
+                    type: integer
+                    description: |
+                        The ID of the attachment.
+                recordType:
+                    type: string
+                    description: |
+                        The record type of the attachment.
+                recordID:
+                    type: string
+                    description: |
+                        The record ID of the attachment.
+                type:
+                    type: string
+                    description: |
+                        The attachment type.
+                foreignUserID:
+                    type: integer
+                    description: |
+                        The ID of the user associated with the attachment.
+                source:
+                    type: string
+                    description: |
+                        The external source associated with the attachment.
+                sourceID:
+                    type: integer
+                    description: |
+                        The external ID associated with the attachment.
+                sourceUrl:
+                    type: string
+                    format: uri
+                    description: |
+                        The source url.
+                status:
+                    type: string
+                    description: |
+                        The status associated with the attachment.
+                insertUserID:
+                    type: integer
+                    description: |
+                        The ID of the user who created the attachment.
+                dateUpdated:
+                    type: string
+                    format: date-time
+                    description: |
+                        The date the attachment was last updated.
+                lastModifiedDate:
+                    type: string
+                    format: date-time
+                    description: |
+                        The date the external source associated with the attachement was last modified.
+                updateUserID:
+                    type: integer
+                    description: |
+                        The ID of the user who last updated the attachment.
+                metadata:
+                    type: array
+                    description: |
+                        The metadata associated with the attachment.
+                    items:
+                        $ref: "#/components/schemas/AttachmentMetadata"
+            required:
+                - attachmentID
+                - recordType
+                - recordID
+                - type
+                - foreignUserID
+                - source
+                - status
+                - insertUserID
+        AttachmentPost:
+            type: object
+            properties:
+                recordType:
+                    type: string
+                    description: |
+                        The record type of the attachment.
+                recordID:
+                    type: integer
+                    description: |
+                        The record ID of the attachment.
+                type:
+                    type: string
+                    description: |
+                        The attachment type.
+                source:
+                    type: string
+                    description: |
+                        The external source associated with the attachment.
+                metadata:
+                    type: array
+                    description: |
+                        The metadata associated with the attachment.
+                    items:
+                        $ref: "#/components/schemas/AttachmentMetadata"
+        AttachmentMetadata:
+            type: object
+            properties:
+                labelCode:
+                    type: string
+                    description: |
+                        The translation code of the label of the metadatum.
+                value:
+                    type: string
+                    description: |
+                        The value of the metadatum.
+                url:
+                    type: string
+                    description: URL for the metadatum.
+                format:
+                    type: string
+                    description: Format information about the metadata
+                    enum:
+                        - html
+            required:
+                - labelCode
+                - value

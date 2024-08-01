@@ -1,0 +1,6 @@
+{
+    "extends": "@vanilla/tsconfig/base",
+    "compilerOptions": {
+        "stripInternal": true
+    }
+}

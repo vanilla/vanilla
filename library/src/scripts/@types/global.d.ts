@@ -38,10 +38,19 @@ declare namespace JSX {
 
     interface IntrinsicElements {
         iframe: React.DetailedHTMLProps<ExtendIFrameAttributes, HTMLIFrameElement>;
+        "video-js": React.DetailedHTMLProps<
+            React.HTMLAttributes<HTMLElement>,
+            React.ClassAttributes<HTMLElement>,
+            HTMLElement
+        >;
     }
 }
 
+declare module "*.svg";
+declare module "*.png";
 declare module "*.json";
 declare module "*.html";
 declare module "twemoji";
 declare module "tabbable";
+
+/// <reference types="vite/client" />

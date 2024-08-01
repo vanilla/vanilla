@@ -1,52 +1,62 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, negativeUnit, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { negativeUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
-import { OverflowProperty, ResizeProperty } from "csstype";
+import { Property } from "csstype";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { css } from "@emotion/css";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
+import { Mixins } from "@library/styles/Mixins";
 
 export const inputBlockClasses = useThemeCache(() => {
-    const style = styleFactory("inputBlock");
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
 
-    const inputText = style("inputText", {
+    const inputText = css({
         display: "block",
     });
 
-    const inputWrap = style("inputWrap", {
+    const inputWrap = css({
         display: "block",
     });
 
-    const labelAndDescription = style("labelAndDescription", {
+    const labelAndDescription = css({
         display: "block",
         width: percent(100),
+        color: ColorsUtils.colorOut(formElementVars.colors.fg),
+        marginBottom: 4,
     });
 
-    const root = style({
+    const labelRequired = css({
+        color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+        marginRight: 4,
+    });
+
+    const root = css({
         display: "block",
         width: percent(100),
-        $nest: {
+        margin: 0,
+        ...{
             [`& + &`]: {
-                marginTop: unit(formElementVars.spacing.margin),
+                marginTop: styleUnit(formElementVars.spacing.margin),
             },
             [`&.isLast`]: {
-                marginBottom: unit(formElementVars.spacing.margin),
+                marginBottom: styleUnit(formElementVars.spacing.margin),
             },
             [`&.hasError .${inputText}`]: {
-                borderColor: colorOut(globalVars.messageColors.error.fg),
-                backgroundColor: colorOut(globalVars.messageColors.error.fg),
-                color: colorOut(globalVars.messageColors.error.fg),
+                borderColor: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+                backgroundColor: ColorsUtils.colorOut(globalVars.messageColors.error.bg),
+                color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
             },
             "&.isHorizontal": {
                 display: "flex",
@@ -63,7 +73,7 @@ export const inputBlockClasses = useThemeCache(() => {
                 flexGrow: 1,
             },
             [`&.${tokensClasses().withIndicator} .tokens__value-container`]: {
-                paddingRight: unit(inputVariables().sizing.height),
+                paddingRight: styleUnit(inputVariables().sizing.height),
             },
             [`&.${tokensClasses().withIndicator} .tokens__indicators`]: {
                 position: "absolute",
@@ -74,77 +84,109 @@ export const inputBlockClasses = useThemeCache(() => {
         },
     });
 
-    const errors = style("errors", {
-        display: "block",
-        fontSize: unit(globalVars.fonts.size.small),
+    const tooltipIcon = css({
+        ...Mixins.verticallyAlignInContainer(24, globalVars.lineHeights.base),
+    });
+    const tooltipIconContainer = css({
+        display: "inline-block",
+        marginLeft: 4,
+        maxHeight: `calc(1em * ${globalVars.lineHeights.base})`,
     });
 
-    const errorsPadding = style("errorsPadding", inputClasses().inputPaddingMixin);
-
-    const error = style("error", {
+    const errors = css({
         display: "block",
-        color: colorOut(globalVars.messageColors.error.fg),
-        $nest: {
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small"),
+        }),
+    });
+
+    const errorsPadding = css(inputClasses().inputPaddingMixin);
+
+    const extendErrorPadding = css({
+        ...Mixins.padding({
+            horizontal: 0,
+        }),
+    });
+
+    const error = css({
+        display: "block",
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small", "normal"),
+        }),
+        color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+        ...{
             "& + &": {
-                marginTop: unit(6),
+                marginTop: styleUnit(6),
             },
         },
     });
-    const labelNote = style("labelNote", {
+    const labelNote = css({
         display: "block",
-        fontSize: unit(globalVars.fonts.size.small),
-        fontWeight: globalVars.fonts.weights.normal,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small", "normal"),
+        }),
         opacity: 0.6,
     });
 
-    const labelText = style("labelText", {
+    const noteAfterInput = css({
         display: "block",
-        fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: unit(globalVars.fonts.size.medium),
-        marginBottom: unit(formElementVars.spacing.margin),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small", "normal"),
+        }),
+        marginTop: 4, // This magic number to match the labels margin bottom
+        opacity: 0.6,
     });
 
-    const sectionTitle = style("sectionTitle", {
+    const labelText = css({
+        display: "block",
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+        }),
+    });
+
+    const sectionTitle = css({
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.base,
     });
 
-    const fieldsetGroup = style("fieldsetGroup", {
-        marginTop: unit(formElementVars.spacing.margin),
-        $nest: {
+    const fieldsetGroup = css({
+        marginTop: 4,
+        ...{
             "&.noMargin": {
-                marginTop: unit(0),
+                marginTop: styleUnit(0),
             },
         },
     });
 
-    const multiLine = (resize?: ResizeProperty, overflow?: OverflowProperty) => {
-        return style("multiLine", {
-            resize: (resize ? resize : "vertical") as ResizeProperty,
-            overflow: (overflow ? overflow : "auto") as OverflowProperty,
+    const multiLine = (resize?: Property.Resize, overflow?: Property.Overflow) => {
+        return css({
+            height: "auto",
+            ...Mixins.padding({ vertical: 9 }),
+            resize: (resize ? resize : "vertical") as Property.Resize,
+            overflow: (overflow ? overflow : "auto") as Property.Overflow,
         });
     };
 
-    const related = style("related", {
-        marginTop: unit(globalVars.gutter.size),
+    const related = css({
+        marginTop: styleUnit(globalVars.gutter.size),
     });
 
-    const grid = style("grid", {
+    const grid = css({
         display: "flex",
         flexWrap: "wrap",
-        $nest: {
-            [`& .${checkRadioClasses().root}`]: {
+        ...{
+            [`.${checkRadioClasses().root}`]: {
                 width: percent(50),
                 alignItems: "flex-start",
             },
             [`&.${fieldsetGroup}`]: {
-                marginTop: unit(9),
+                marginTop: styleUnit(9),
             },
         },
-    } as NestedCSSProperties);
+    });
 
-    const tight = style("tight", {
-        $nest: {
+    const tight = css({
+        ...{
             [`&&&`]: {
                 marginTop: negativeUnit(9),
             },
@@ -154,6 +196,8 @@ export const inputBlockClasses = useThemeCache(() => {
     return {
         root,
         inputText,
+        tooltipIcon,
+        tooltipIconContainer,
         errors,
         errorsPadding,
         error,
@@ -161,11 +205,14 @@ export const inputBlockClasses = useThemeCache(() => {
         labelText,
         inputWrap,
         labelAndDescription,
+        labelRequired,
         sectionTitle,
         fieldsetGroup,
         multiLine,
         related,
         grid,
         tight,
+        noteAfterInput,
+        extendErrorPadding,
     };
 });

@@ -12,12 +12,13 @@ import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownS
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { t } from "@library/utility/appUtils";
+import { getMeta, t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
+import { UserIconTypes } from "@library/icons/titleBar";
 
 /**
  * Implements User Drop down for header
@@ -43,16 +44,17 @@ export function UserDropDown(props: IProps) {
 
     return (
         <DropDown
-            id={ID}
+            handleID={ID + "-handle"}
+            contentID={ID + "-content"}
             name={t("My Account")}
             buttonClassName={classNames(classesHeader.button)}
             contentsClassName={classNames(classes.contents, classesHeader.dropDownContents)}
-            renderLeft={true}
+            renderLeft={!getMeta("ui.isDirectionRTL", false)}
             buttonContents={
                 <MeBoxIcon compact={false}>
                     <UserPhoto
                         userInfo={userInfo}
-                        open={isOpen}
+                        styleType={UserIconTypes.SELECTED_ACTIVE}
                         className="headerDropDown-user meBox-user"
                         size={UserPhotoSize.SMALL}
                     />
@@ -60,6 +62,7 @@ export function UserDropDown(props: IProps) {
             }
             flyoutType={FlyoutType.FRAME}
             onVisibilityChange={setOpen}
+            onHover={UserDropDownContents.preload}
         >
             <UserDropDownContents />
         </DropDown>

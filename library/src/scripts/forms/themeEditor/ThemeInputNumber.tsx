@@ -38,17 +38,17 @@ export function ThemeInputNumber(_props: IProps) {
     const builderClasses = themeBuilderClasses();
     const { step = 1, min = 0, max, variableKey, ...inputProps } = _props;
 
-    const { rawValue, generatedValue, error, setError, setValue } = useThemeVariableField(variableKey);
+    const { rawValue, generatedValue, error, setError, setValue } = useThemeVariableField<number | string>(variableKey);
 
     const ensureInteger = (val: number | string) => {
-        return parseInt(val.toString());
+        return parseInt(val?.toString());
     };
     /**
      * Check if is valid number, respecting parameters.
      * @param number
      */
     const isValidValue = (numberVal: number | string, shouldThrow: boolean = false) => {
-        const intVal = ensureInteger(numberVal);
+        const intVal = ensureInteger(numberVal ?? "");
         if (numberVal !== undefined && Number.isInteger(intVal)) {
             const validStep = intVal % step === 0;
             const overMin = intVal >= min;
@@ -94,7 +94,7 @@ export function ThemeInputNumber(_props: IProps) {
                 return value;
             }
         }
-    }, rawValue ?? generatedValue ?? 0);
+    }, ensureInteger(rawValue ?? generatedValue ?? 0));
 
     const stepUp = useCallback(() => dispatch(StepAction.INCR), []);
     const stepDown = useCallback(() => dispatch(StepAction.DECR), []);
@@ -132,10 +132,10 @@ export function ThemeInputNumber(_props: IProps) {
                     className={classNames(classes.textInput, {
                         [builderClasses.invalidField]: !!error,
                     })}
-                    placeholder={generatedValue}
+                    placeholder={String(generatedValue)}
                     value={rawValue ?? ""}
                     onChange={handleTextChange}
-                    auto-correct="false"
+                    autoCorrect="false"
                     step={step}
                     min={min}
                     max={max}
@@ -147,18 +147,20 @@ export function ThemeInputNumber(_props: IProps) {
                         <Button
                             onClick={stepUp}
                             {...stepUpIntervalProps}
-                            disabled={inputProps.disabled || (max != undefined && generatedValue >= max)}
+                            disabled={
+                                inputProps.disabled || (max != undefined && ensureInteger(generatedValue!) >= max)
+                            }
                             className={classes.stepUp}
-                            baseClass={ButtonTypes.CUSTOM}
+                            buttonType={ButtonTypes.CUSTOM}
                         >
                             +
                         </Button>
                         <Button
                             onClick={stepDown}
                             {...stepDownIntervalProps}
-                            disabled={inputProps.disabled || generatedValue <= min}
+                            disabled={inputProps.disabled || ensureInteger(generatedValue!) <= min}
                             className={classes.stepDown}
-                            baseClass={ButtonTypes.CUSTOM}
+                            buttonType={ButtonTypes.CUSTOM}
                         >
                             -
                         </Button>

@@ -266,6 +266,14 @@ var Modal = (function ($) {
           if (FOCUS_TRAP_WHITELIST_ID_ELEMENT.contains(event.target)) {
             return;
           }
+
+          // Add exception for reach UI.
+          const isReachComboxBox = (event.target instanceof Element) &&
+            (event.target.matches("[data-reach-popover]") || event.target.closest("[data-reach-popover]"));
+          if (isReachComboxBox) {
+            return;
+          }
+
           if (_this3._element !== event.target && !$(_this3._element).has(event.target).length) {
             _this3._element.focus();
           }

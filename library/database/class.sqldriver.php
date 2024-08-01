@@ -15,10 +15,22 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
+use Vanilla\CurrentTimeStamp;
+use Vanilla\Database\CallbackWhereExpression;
+use Vanilla\Database\Select;
+use Vanilla\Database\SetLiterals\RawExpression;
+use Vanilla\Models\Model;
+use Vanilla\Utility\ArrayUtils;
+
 /**
  * Class Gdn_SQLDriver
  */
-abstract class Gdn_SQLDriver {
+abstract class Gdn_SQLDriver
+{
+    public const LIKE_LEFT = "left";
+    public const LIKE_RIGHT = "right";
+    public const LIKE_BOTH = "both";
 
     /** @const 2^31 is the max signed int range. */
     const MAX_SIGNED_INT = 2147483648;
@@ -74,14 +86,6 @@ abstract class Gdn_SQLDriver {
      */
     protected $_NamedParameters = [];
 
-    /**
-     * @var int Whether or not to reset the properties when a query is executed.
-     *   0 = The object will reset after query execution.
-     *   1 = The object will not reset after the <b>NEXT</b> query execution.
-     *   2 = The object will not reset after <b>ALL</b> query executions.
-     */
-    protected $_NoReset = false;
-
     /** @var int The offset from which data should be returned. FALSE by default. */
     protected $_Offset;
 
@@ -121,30 +125,91 @@ abstract class Gdn_SQLDriver {
     /**
      *
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->ClassName = get_class($this);
         $this->reset();
     }
 
     /**
-     * Removes table aliases from an array of JOIN ($this->_Joins) and GROUP BY
-     * ($this->_GroupBys) strings. Returns the $Statements array with prefixes
-     * removed.
+     * Apply an option array.
      *
-     * @param array $Statements The string specification of the table. ie.
-     * "tbl_User as u" or "user u".
-     * @return array the array of filtered statements.
+     * @param array $options Keys should be constants from {@link Model::OPT_*}
+     * @param Schema|null $readSchema Required for negative selects to work.
+     *
+     * @return $this
      */
-    //protected function _FilterTableAliases($Statements) {
-    //   foreach ($Statements as $k => $v) {
-    //      foreach ($this->_AliasMap as $Alias => $Table) {
-    //         $Statement = preg_replace('/(\w+\.\w+)/', $this->escapeIdentifier('$0'), $v); // Makes `table.field`
-    //         $Statement = str_replace(array($this->Database->DatabasePrefix.$Table, '.'), array($Table, $this->escapeSql('.')), $Statement);
-    //      }
-    //      $Statements[$k] = $Statement;
-    //   }
-    //   return $Statements;
-    //}
+    public function applyModelOptions(array $options, ?Schema $readSchema = null)
+    {
+        $selects = $options[Model::OPT_SELECT] ?? [];
+        $orderFields = $options[Model::OPT_ORDER] ?? ($options["orderFields"] ?? []);
+        $orderDirection = $options[Model::OPT_DIRECTION] ?? "asc";
+        $limit = $options[Model::OPT_LIMIT] ?? false;
+        $offset = $options[Model::OPT_OFFSET] ?? 0;
+
+        $joins = $options[Model::OPT_JOINS] ?? false;
+        if ($joins) {
+            $this->applyJoins($joins);
+        }
+
+        if (!empty($selects)) {
+            if (is_string($selects)) {
+                $selects = ArrayUtils::explodeTrim(",", $selects);
+            }
+            if ($readSchema) {
+                $selects = $this->translateSelects($selects, $readSchema);
+            }
+
+            $this->select($selects);
+        }
+
+        $this->orderBy($orderFields, $orderDirection);
+        $this->limit($limit, $offset);
+
+        return $this;
+    }
+
+    /**
+     * Translate selects with some additional support.
+     *
+     * Notably support for negative selects. If you pass a negative select, all properties from the schema except for the negative select will be applied.
+     *
+     * @param array $selects
+     * @param Schema $readSchema
+     *
+     * @return array
+     */
+    public static function translateSelects(array $selects, Schema $readSchema): array
+    {
+        $negatives = [];
+        foreach ($selects as $select) {
+            if ($select[0] === "-") {
+                $negatives[] = substr($select, 1);
+            }
+        }
+
+        if (!empty($negatives)) {
+            $columns = array_keys($readSchema->getField("properties"));
+            $selects = array_values(array_diff($columns, $negatives));
+        }
+        return $selects;
+    }
+
+    /**
+     * Apply joins to sql query.
+     *
+     * @param array $joins
+     */
+    public function applyJoins(array $joins): void
+    {
+        foreach ($joins as $join) {
+            $tableName = $join["tableName"] ?? "";
+            $on = $join["on"] ?? "";
+            $joinType = $join["joinType"] ?? "";
+
+            $this->join($tableName, $on, $joinType);
+        }
+    }
 
     /**
      * Concat the next where expression with an 'and' operator.
@@ -152,27 +217,29 @@ abstract class Gdn_SQLDriver {
      * unless Gdn_DatabaseDriver::or(FALSE) has previously been called.
      *
      * @param boolean $setDefault Whether or not the 'and' is one time or sets the default operator.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      * @see Gdn_DatabaseDriver::orOp()
      */
-    public function andOp($setDefault = false) {
-        $this->_WhereConcat = 'and';
+    public function andOp($setDefault = false)
+    {
+        $this->_WhereConcat = "and";
         if ($setDefault) {
-            $this->_WhereConcatDefault = 'and';
-            $this->_WhereGroupConcatDefault = 'and';
+            $this->_WhereConcatDefault = "and";
+            $this->_WhereGroupConcatDefault = "and";
         }
 
         return $this;
     }
 
     /**
+     * Replace placeholder parameters with their values.
      *
-     *
-     * @param $sql
-     * @param null $parameters
-     * @return mixed
+     * @param string $sql A SQL statement with parameter placeholders.
+     * @param array<string, mixed>|null $parameters An array of parameter names to values.
+     * @return string
      */
-    public function applyParameters($sql, $parameters = null) {
+    public function applyParameters($sql, $parameters = null)
+    {
         if (!is_array($parameters)) {
             $parameters = $this->_NamedParameters;
         }
@@ -181,7 +248,7 @@ abstract class Gdn_SQLDriver {
         krsort($parameters);
         foreach ($parameters as $key => $value) {
             if (is_null($value)) {
-                $qValue = 'null';
+                $qValue = "null";
             } else {
                 $qValue = $this->Database->connection()->quote($value);
             }
@@ -191,20 +258,23 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * A convenience method that calls Gdn_DatabaseDriver::BeginWhereGroup with concatenated with an 'or.'
-     * @See Gdn_DatabaseDriver::beginWhereGroup()
-     * @return Gdn_SQLDriver $this
+     * A convenience method that calls `Gdn_SQLDriver::beginWhereGroup()` with concatenated with an 'or.'
+     *
+     * @return $this
+     * @see Gdn_SQLDriver::beginWhereGroup()
      */
-    public function orBeginWhereGroup() {
+    public function orBeginWhereGroup()
+    {
         return $this->orOp()->beginWhereGroup();
     }
 
     /**
      * Begin bracketed group in the where clause to group logical expressions together.
      *
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function beginWhereGroup() {
+    public function beginWhereGroup()
+    {
         $this->_WhereGroupConcat = $this->_WhereConcat;
         $this->_WhereGroupCount++;
         $this->_OpenWhereGroupCount++;
@@ -230,30 +300,37 @@ abstract class Gdn_SQLDriver {
      *   - <b>$field</b> - The argument is a column reference.
      *   - <b>$value</b> - The argument will become a named parameter.
      * </li></ul>
+     * @param bool $escapeFieldSql Whether or not to escape the `$field` parameter.
+     * @param bool $escapeValueSql Whether or not to escape the `$value` parameter.
      * @return string The single expression.
      */
-    public function conditionExpr($field, $value, $escapeFieldSql = true, $escapeValueSql = true) {
+    public function conditionExpr($field, $value, $escapeFieldSql = true, $escapeValueSql = true)
+    {
         // Change some variables from the old parameter style to the new one.
         // THIS PART OF THE FUNCTION SHOULD EVENTUALLY BE REMOVED.
         if ($escapeFieldSql === false) {
-            $field = '@'.$field;
+            $field = "@" . $field;
+        }
+        if ($escapeFieldSql === 0) {
+            $escapeFieldSql = false;
         }
 
         if (is_array($value)) {
-            throw new Exception('Gdn_SQL->ConditionExpr(VALUE, ARRAY) is not supported.', 500);
+            throw new Exception("Gdn_SQL->ConditionExpr(VALUE, ARRAY) is not supported.", 500);
         } elseif (!$escapeValueSql && !is_null($value)) {
-            $value = '@'.$value;
+            $value = "@" . $value;
         }
 
         // Check for a straight literal field expression.
         if (!$escapeFieldSql && !$escapeValueSql && is_null($value)) {
             return substr($field, 1); // warning: might not be portable across different drivers
         }
-        $expr = ''; // final expression which is built up
-        $op = ''; // logical operator
+        $expr = ""; // final expression which is built up
+        $op = ""; // logical operator
 
         // Try and split an operator out of $Field.
-        $fieldOpRegex = "/(?:\s*(=|<>|>|<|>=|<=)\s*$)|\s+(like|not\s+like)\s*$|\s+(?:(is)\s+(null)|(is\s+not)\s+(null))\s*$/i";
+        $fieldOpRegex =
+            "/(?:\s*(=|<>|>|<|>=|<=)\s*$)|\s+(in|not\s+in)\s*$|\s+(like|not\s+like)\s*$|\s+(?:(is)\s+(null)|(is\s+not)\s+(null))\s*$/i";
         $split = preg_split($fieldOpRegex, $field, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         if (count($split) > 1) {
             $field = $split[0];
@@ -262,13 +339,13 @@ abstract class Gdn_SQLDriver {
                 $value = null;
             }
         } else {
-            $op = '=';
+            $op = "=";
         }
 
-        if ($op == '=' && is_null($value)) {
+        if ($op == "=" && is_null($value)) {
             // This is a special case where the value SQL is checking for an is null operation.
-            $op = 'is';
-            $value = '@null';
+            $op = "is";
+            $value = "@null";
             $escapeValueSql = false;
         }
 
@@ -276,10 +353,10 @@ abstract class Gdn_SQLDriver {
         $expr .= $this->_parseExpr($field, null, $escapeFieldSql);
 
         // Add the expression operator.
-        $expr .= ' '.$op.' ';
+        $expr .= " " . $op . " ";
 
-        if ($op == 'is' || $op == 'is not' && is_null($value)) {
-            $expr .= 'null';
+        if ($op == "is" || ($op == "is not" && is_null($value))) {
+            $expr .= "null";
         } else {
             // Add the right side of the expression.
             $expr .= $this->_parseExpr($value, $field, $escapeValueSql);
@@ -294,9 +371,10 @@ abstract class Gdn_SQLDriver {
      * @param string|array $key The cache key (or array of keys) that this query will save into.
      * @param string $operation The cache operation as a hint to the db.
      * @param array $options The cache options as passed into Gdn_Cache::store().
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function cache($key, $operation = null, $options = null) {
+    public function cache($key, $operation = null, $options = null)
+    {
         if (!$key) {
             $this->_CacheKey = null;
             $this->_CacheOperation = null;
@@ -321,8 +399,9 @@ abstract class Gdn_SQLDriver {
     /**
      * Returns the name of the database currently connected to.
      */
-    public function databaseName() {
-        return $this->information('DatabaseName');
+    public function databaseName()
+    {
+        return $this->information("DatabaseName");
     }
 
     /**
@@ -334,8 +413,9 @@ abstract class Gdn_SQLDriver {
      * @param int|false $limit The number of records to limit the query to.
      * @return int|false Returns the number of rows deleted or **false** on failure.
      */
-    public function delete($table = '', $where = '', $limit = false) {
-        if ($table == '') {
+    public function delete($table = "", $where = "", $limit = false)
+    {
+        if ($table == "") {
             if (!isset($this->_Froms[0])) {
                 return false;
             }
@@ -347,10 +427,10 @@ abstract class Gdn_SQLDriver {
             }
             return;
         } else {
-            $table = $this->escapeIdentifier($this->Database->DatabasePrefix.$table);
+            $table = $this->escapeIdentifier($this->Database->DatabasePrefix . $table);
         }
 
-        if ($where != '') {
+        if ($where != "") {
             $this->where($where);
         }
 
@@ -364,7 +444,7 @@ abstract class Gdn_SQLDriver {
 
         $sql = $this->getDelete($table, $this->_Wheres, $this->_Limit);
 
-        return $this->query($sql, 'delete');
+        return $this->query($sql, "delete");
     }
 
     /**
@@ -372,10 +452,11 @@ abstract class Gdn_SQLDriver {
      * columns are grouped together. Returns this object for chaining purposes.
      *
      * @param boolean $bool A boolean value indicating if the query should be distinct or not.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function distinct($bool = true) {
-        $this->_Distinct = (is_bool($bool)) ? $bool : true;
+    public function distinct($bool = true)
+    {
+        $this->_Distinct = is_bool($bool) ? $bool : true;
         return $this;
     }
 
@@ -384,28 +465,29 @@ abstract class Gdn_SQLDriver {
      *
      * @param string $table The table to empty.
      */
-    public function emptyTable($table = '') {
-        if ($table == '') {
+    public function emptyTable($table = "")
+    {
+        if ($table == "") {
             if (!isset($this->_Froms[0])) {
                 return false;
             }
 
             $table = $this->_Froms[0];
         } else {
-            $table = $this->escapeIdentifier($this->Database->DatabasePrefix.$table);
+            $table = $this->escapeIdentifier($this->Database->DatabasePrefix . $table);
         }
-
 
         $sql = $this->getDelete($table);
 
-        return $this->query($sql, 'delete');
+        return $this->query($sql, "delete");
     }
 
     /**
      * Closes off any open elements in the query before execution.
      * Ideally, the programmer should have everything closed off so this method will do nothing.
      */
-    protected function _endQuery() {
+    protected function _endQuery()
+    {
         // Close the where groups.
         while ($this->_WhereGroupCount > 0) {
             $this->endWhereGroup();
@@ -414,18 +496,19 @@ abstract class Gdn_SQLDriver {
 
     /**
      * End a bracketed group in the where clause.
-     * <b>Note</b>: If no items where added to the group then no barackets will appear in the final statement.
+     * <b>Note</b>: If no items where added to the group then no brackets will appear in the final statement.
      *
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function endWhereGroup() {
+    public function endWhereGroup()
+    {
         if ($this->_WhereGroupCount > 0) {
             $whereCount = count($this->_Wheres);
 
             if ($this->_OpenWhereGroupCount >= $this->_WhereGroupCount) {
                 $this->_OpenWhereGroupCount--;
             } elseif ($whereCount > 0) {
-                $this->_Wheres[$whereCount - 1] .= ')';
+                $this->_Wheres[$whereCount - 1] .= ")";
             }
 
             $this->_WhereGroupCount--;
@@ -441,28 +524,43 @@ abstract class Gdn_SQLDriver {
      *   The reference should be in the form of alias.column.
      * @return string Returns the escaped string.
      */
-    public function escapeIdentifier($refExpr) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'EscapeSql'), E_USER_ERROR);
+    public function escapeIdentifier($refExpr)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "EscapeSql"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
      * Escape the identifiers in a field reference expression.
      *
-     * @param string $refExpr The field reference expression.
-     * @paran bool $check Check to see if the field is already quoted.
+     * @param string|RawExpression $refExpr The field reference expression.
+     * @param bool $check Check to see if the field is already quoted.
      * @return string Returns an escaped expression.
      */
-    protected function escapeFieldReference(string $refExpr, bool $check = true): string {
+    protected function escapeFieldReference($refExpr, bool $check = true): string
+    {
+        if ($refExpr instanceof RawExpression) {
+            return $refExpr->getExpression();
+        }
         if ($check && preg_match('/^`[^`]+`$/', $refExpr)) {
             return $refExpr;
         }
 
-        return implode('.', array_map(function ($part) {
-            if ($part === '*') {
-                return $part;
-            }
-            return $this->escapeIdentifier($part);
-        }, explode('.', $refExpr, 2)));
+        return implode(
+            ".",
+            array_map(function ($part) {
+                if ($part === "*") {
+                    return $part;
+                }
+                return $this->escapeIdentifier($part);
+            }, explode(".", $refExpr, 2))
+        );
     }
 
     /**
@@ -472,7 +570,8 @@ abstract class Gdn_SQLDriver {
      * @param array $arr The array to escape.
      * @return array
      */
-    protected function escapeKeys(callable $callback, array $arr) {
+    protected function escapeKeys(callable $callback, array $arr)
+    {
         $result = [];
         foreach ($arr as $key => $value) {
             $result[$callback($key)] = $value;
@@ -488,45 +587,76 @@ abstract class Gdn_SQLDriver {
      * @param boolean $firstWordOnly A boolean value indicating if the first word should be escaped only.
      * @deprecated
      */
-    protected function escapeSql($string, $firstWordOnly = false) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'EscapeSql'), E_USER_ERROR);
+    protected function escapeSql($string, $firstWordOnly = false)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "EscapeSql"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
      * Returns a platform-specific query to fetch column data from $table.
      *
      * @param string $table The name of the table to fetch column data from.
+     * @return string
      */
-    public function fetchColumnSql($table) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'FetchColumnSql'), E_USER_ERROR);
+    public function fetchColumnSql($table)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "FetchColumnSql"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
      * Returns a platform-specific query to fetch table names.
-     * @param mixed $limitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
-     *  - <b>TRUE</b>: The search will be limited to the database prefix.
-     *  - <b>FALSE</b>: All tables will be fetched. Default.
+     *
+     * @param string|bool $limitToPrefix Whether or not to limit the search to tables with the database prefix or a
+     * specific table name. The following types can be given for this parameter:
+     *  - <b>true</b>: The search will be limited to the database prefix.
+     *  - <b>false</b>: All tables will be fetched. Default.
      *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
+     * @return string
      */
-    public function fetchTableSql($limitToPrefix = false) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'FetchTableSql'), E_USER_ERROR);
+    public function fetchTableSql($limitToPrefix = false)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "FetchTableSql"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
-     * Returns an array containing table names in the database.
-     * @param mixed $limitToPrefix Whether or not to limit the search to tables with the database prefix or a specific table name. The following types can be given for this parameter:
-     *  - <b>TRUE</b>: The search will be limited to the database prefix.
-     *  - <b>FALSE</b>: All tables will be fetched. Default.
+     * Returns an array containing table names in the database
+     *
+     * @param string|bool $limitToPrefix Whether or not to limit the search to tables with the database prefix or a
+     * specific table name. The following types can be given for this parameter:
+     *  - <b>true</b>: The search will be limited to the database prefix.
+     *  - <b>false</b>: All tables will be fetched. Default.
      *  - <b>string</b>: The search will be limited to a like clause. The ':_' will be replaced with the database prefix.
      * @return array
      */
-    public function fetchTables($limitToPrefix = false) {
+    public function fetchTables($limitToPrefix = false)
+    {
         $sql = $this->fetchTableSql($limitToPrefix);
         $data = $this->query($sql);
         $return = [];
         foreach ($data->resultArray() as $row) {
-            if (isset($row['TABLE_NAME'])) {
-                $return[] = $row['TABLE_NAME'];
+            if (isset($row["TABLE_NAME"])) {
+                $return[] = $row["TABLE_NAME"];
             } else {
                 $return[] = array_shift($row);
             }
@@ -541,17 +671,35 @@ abstract class Gdn_SQLDriver {
      * Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
      *
      * @param string $table The name of the table to get schema data for.
+     * @return array
      */
-    public function fetchTableSchema($table) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'FetchTableSchema'), E_USER_ERROR);
+    public function fetchTableSchema($table)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "FetchTableSchema"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
-     * Returns a string of SQL that retrieves the database engine version in the
-     * fieldname "version".
+     * Returns a string of SQL that retrieves the database engine version in the fieldname "version".
+     *
+     * @return string
      */
-    public function fetchVersionSql() {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'FetchVersionSql'), E_USER_ERROR);
+    public function fetchVersionSql()
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "FetchVersionSql"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
@@ -559,13 +707,14 @@ abstract class Gdn_SQLDriver {
      *
      * @param string $table The name of the table to fetch column data from.
      */
-    public function fetchColumns($table) {
+    public function fetchColumns($table)
+    {
         $sql = $this->fetchColumnSql($table);
         $data = $this->query($sql);
         $return = [];
         foreach ($data->resultArray() as $row) {
-            if (isset($row['COLUMN_NAME'])) {
-                $return[] = $row['COLUMN_NAME'];
+            if (isset($row["COLUMN_NAME"])) {
+                $return[] = $row["COLUMN_NAME"];
             } else {
                 $return[] = current($row);
             }
@@ -579,9 +728,18 @@ abstract class Gdn_SQLDriver {
      * engine.
      *
      * @param string $table The name of the table name to format.
+     * @return string
      */
-    public function formatTableName($table) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'FormatTableName'), E_USER_ERROR);
+    public function formatTableName($table)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "FormatTableName"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
@@ -595,15 +753,20 @@ abstract class Gdn_SQLDriver {
      *    array("user u", "user u2", "role")
      * @param boolean $escape Whether or not the from query should be escaped.
      *
-     * @return Gdn_SQLDriver $this
+     * @return $this
      **/
-    public function from($from, $escape = true) {
+    public function from($from, $escape = true)
+    {
         if (!is_array($from)) {
             $from = [$from];
         }
 
         foreach ($from as $part) {
-            $this->_Froms[] = $this->mapAliases($part, $escape);
+            if ($part[0] !== "(") {
+                $this->_Froms[] = $this->mapAliases($part, $escape);
+            } else {
+                $this->_Froms[] = $part;
+            }
         }
 
         return $this;
@@ -618,7 +781,8 @@ abstract class Gdn_SQLDriver {
      * @param Gdn_SQLDriver $sql The query to merge the parameters from.
      * @return $this
      */
-    public function mergeParameters(Gdn_SQLDriver $sql) {
+    public function mergeParameters(Gdn_SQLDriver $sql)
+    {
         $this->_NamedParameters = array_replace($this->_NamedParameters, $sql->_NamedParameters);
         return $this;
     }
@@ -626,11 +790,12 @@ abstract class Gdn_SQLDriver {
     /**
      * Returns a string of comma delimited table names to select from.
      *
-     * @param mixed $tables The name of a table (or an array of table names) to be added in the from
-     * clause of a query.
+     * @param mixed $tables The name of a table (or an array of table names) to be added in the from clause of a query.
+     * @return string
      */
-    protected function _fromTables($tables) {
-        return is_array($tables) ? implode(', ', $tables) : $tables;
+    protected function _fromTables($tables)
+    {
+        return is_array($tables) ? implode(", ", $tables) : $tables;
     }
 
     /**
@@ -639,17 +804,19 @@ abstract class Gdn_SQLDriver {
      * @param string $table The table from which to select data. Adds to the $this->_Froms collection.
      * @param string $orderFields A string of fields to be ordered.
      * @param string $orderDirection The direction of the sort.
-     * @param int $limit Adds a limit to the query.
-     * @param int $pageNumber The page of data to retrieve.
+     * @param int|false $limit Adds a limit to the query.
+     * @param int|false $pageNumber The page of data to retrieve.
      * @return Gdn_DataSet
+     * @throws Exception
      */
-    public function get($table = '', $orderFields = '', $orderDirection = 'asc', $limit = false, $pageNumber = false) {
-        if ($table != '') {
+    public function get($table = "", $orderFields = "", $orderDirection = "asc", $limit = false, $pageNumber = false)
+    {
+        if ($table != "") {
             //$this->mapAliases($Table);
             $this->from($table);
         }
 
-        if ($orderFields != '') {
+        if ($orderFields != "") {
             $this->orderBy($orderFields, $orderDirection);
         }
 
@@ -668,23 +835,48 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
+     * Get a limited pagination count for the current query.
+     *
+     * @param string $primaryKeyField
+     *
+     * @return int
+     */
+    public function getPagingCount(string $primaryKeyField, ?int $limit = null): int
+    {
+        $limit = $limit ?? Gdn::config("Vanilla.APIv2.MaxCount", 10000);
+        $countQuery = $this->resetSelects()
+            ->select($primaryKeyField)
+            ->limit($limit)
+            ->offset(0)
+            ->getSelect();
+        $countQuery = <<<SQL
+SELECT COUNT(*) as count FROM ({$countQuery}) cq
+SQL;
+
+        $result = $this->query($countQuery);
+
+        return $result->firstRow()->count;
+    }
+
+    /**
      * A helper function for escaping sql identifiers.
      *
-     * @param string The sql containing identifiers to escape in a different language.
+     * @param string $sql The sql containing identifiers to escape in a different language.
      *   All identifiers requiring escaping should be enclosed in back ticks (`).
-     * @return array All of the tokens in the sql. The tokens that require escaping will still have back ticks.
+     * @return string[] All of the tokens in the sql. The tokens that require escaping will still have back ticks.
      */
-    protected function _getIdentifierTokens($sql) {
-        $tokens = preg_split('/`/', $sql, -1, PREG_SPLIT_DELIM_CAPTURE);
+    protected function _getIdentifierTokens($sql)
+    {
+        $tokens = preg_split("/`/", $sql, -1, PREG_SPLIT_DELIM_CAPTURE);
         $result = [];
 
         $inIdent = false;
-        $currentToken = '';
+        $currentToken = "";
         for ($i = 0; $i < count($tokens); $i++) {
-            $token = $tokens[i];
+            $token = $tokens[$i];
             $result .= $token;
-            if ($token == '`') {
-                if ($inIdent && $i < count($tokens) - 1 && $tokens[$i + 1] == '`') {
+            if ($token == "`") {
+                if ($inIdent && $i < count($tokens) - 1 && $tokens[$i + 1] == "`") {
                     // This is an escaped back tick.
                     $i++; // skip next token
                 } elseif ($inIdent) {
@@ -696,7 +888,7 @@ abstract class Gdn_SQLDriver {
                 }
             } elseif (!$inIdent) {
                 $result[] = $currentToken;
-                $currentToken = '';
+                $currentToken = "";
             }
         }
 
@@ -709,8 +901,9 @@ abstract class Gdn_SQLDriver {
      * @param string $table The table from which to count rows of data.
      * @param mixed $where Adds to the $this->_Wheres collection using $this->where();
      */
-    public function getCount($table = '', $where = false) {
-        if ($table != '') {
+    public function getCount($table = "", $where = false)
+    {
+        if ($table != "") {
             //$this->mapAliases($Table);
             $this->from($table);
         }
@@ -719,7 +912,7 @@ abstract class Gdn_SQLDriver {
             $this->where($where);
         }
 
-        $this->select('*', 'count', 'RowCount'); // count * slow on innodb
+        $this->select("*", "count", "RowCount"); // count * slow on innodb
         $sql = $this->getSelect();
         $result = $this->query($sql);
 
@@ -733,8 +926,9 @@ abstract class Gdn_SQLDriver {
      * @param string $table The table from which to count rows of data.
      * @param mixed $like Adds to the $this->_Wheres collection using $this->like();
      */
-    public function getCountLike($table = '', $like = false) {
-        if ($table != '') {
+    public function getCountLike($table = "", $like = false)
+    {
+        if ($table != "") {
             $this->mapAliases($table);
             $this->from($table);
         }
@@ -743,7 +937,7 @@ abstract class Gdn_SQLDriver {
             $this->like($like);
         }
 
-        $this->select('*', 'count', 'RowCount');
+        $this->select("*", "count", "RowCount");
         $result = $this->query($this->getSelect());
 
         $countData = $result->firstRow();
@@ -759,8 +953,16 @@ abstract class Gdn_SQLDriver {
      * @param int $limit Limit the number of records to delete.
      * @return string Returns an DML statement.
      */
-    public function getDelete($tableName, $wheres = [], $limit = 0) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetDelete'), E_USER_ERROR);
+    public function getDelete($tableName, $wheres = [], $limit = 0)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "GetDelete"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
@@ -770,8 +972,16 @@ abstract class Gdn_SQLDriver {
      * @param string $data An associative array of FieldName => Value pairs that should be inserted
      * $table.
      */
-    public function getInsert($table, $data) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetInsert'), E_USER_ERROR);
+    public function getInsert($table, $data)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "GetInsert"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
@@ -781,58 +991,70 @@ abstract class Gdn_SQLDriver {
      * @param int $limit The number of records to limit the query to.
      * @param int $offset The number of records to offset the query from.
      */
-    public function getLimit($query, $limit, $offset) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetLimit'), E_USER_ERROR);
+    public function getLimit($query, $limit, $offset)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "GetLimit"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
-     * Builds the select statement based on the various collections in this
-     * object. This method should not be called directly; it is called by
-     * $this->get() and $this->getWhere().
+     * Builds the select statement based on the various collections in this object.
+     *
+     * This method should not be called directly; it is called by `$this->get()` and `$this->getWhere()`.
+     *
+     * @param bool $prepared Whether or not to apply the parameters directly to the returned SQL.
+     * @return string
      */
-    public function getSelect(bool $prepared = false) {
+    public function getSelect(bool $prepared = false)
+    {
         // Close off any open query elements.
         $this->_endQuery();
 
-        $sql = (!$this->_Distinct) ? 'select ' : 'select distinct ';
+        $sql = !$this->_Distinct ? "select " : "select distinct ";
 
         // Don't escape the field if it is numeric or an asterisk (all columns)
         $selects = [];
         foreach ($this->_Selects as $key => $expr) {
-            $field = $expr['Field'];
-            $function = $expr['Function'];
-            $alias = $expr['Alias'];
-            $caseOptions = val('CaseOptions', $expr);
+            $field = $expr["Field"];
+            $function = $expr["Function"];
+            $alias = $expr["Alias"];
+            $caseOptions = val("CaseOptions", $expr);
 
-            if ($alias == '' && $function != '') {
+            if ($alias == "" && $function != "") {
                 $alias = $field;
             }
 
             // if (in_array(strtolower($Function), array('max', 'min', 'avg', 'sum', 'count')))
-            if ($function != '') {
-                if (strpos($function, '%s') !== false) {
+            if ($function != "") {
+                if (strpos($function, "%s") !== false) {
                     $field = sprintf($function, $field);
                 } else {
-                    $field = $function.'('.$field.')';
+                    $field = $function . "(" . $field . ")";
                 }
             }
 
             if ($caseOptions !== false) {
-                $field = 'case '.$field.$caseOptions.' end';
+                $field = "case " . $field . $caseOptions . " end";
             }
 
-            if ($alias != '') {
-                $field .= ' as '.$this->escapeIdentifier($alias);
+            if ($alias != "") {
+                $field .= " as " . $this->escapeIdentifier($alias);
             }
 
-            if ($field != '') {
+            if ($field != "") {
                 $selects[] = $field;
             }
         }
-        $sql .= (count($selects) == 0) ? '*' : implode(', ', $selects);
+        $sql .= count($selects) == 0 ? "*" : implode(", ", $selects);
 
         if (count($this->_Froms) > 0) {
-            $sql .= "\nfrom ".$this->_fromTables($this->_Froms);
+            $sql .= "\nfrom " . $this->_fromTables($this->_Froms);
         }
 
         if (count($this->_Joins) > 0) {
@@ -848,7 +1070,7 @@ abstract class Gdn_SQLDriver {
 
         // Close any where groups that were left open.
         for ($i = 0; $i < $this->_OpenWhereGroupCount; ++$i) {
-            $sql .= ')';
+            $sql .= ")";
         }
         $this->_OpenWhereGroupCount = 0;
 
@@ -857,18 +1079,18 @@ abstract class Gdn_SQLDriver {
 
             // special consideration for table aliases
             if (count($this->_AliasMap) > 0 && $this->Database->DatabasePrefix) {
-                $sql .= implode(', ', $this->_filterTableAliases($this->_GroupBys));
+                $sql .= implode(", ", $this->_filterTableAliases($this->_GroupBys));
             } else {
-                $sql .= implode(', ', $this->_GroupBys);
+                $sql .= implode(", ", $this->_GroupBys);
             }
         }
 
         if (count($this->_Havings) > 0) {
-            $sql .= "\nhaving ".implode("\n", $this->_Havings);
+            $sql .= "\nhaving " . implode("\n", $this->_Havings);
         }
 
         if (count($this->_OrderBys) > 0) {
-            $sql .= "\norder by ".implode(', ', $this->_OrderBys);
+            $sql .= "\norder by " . implode(", ", $this->_OrderBys);
         }
 
         if (is_numeric($this->_Limit)) {
@@ -887,9 +1109,18 @@ abstract class Gdn_SQLDriver {
      * Returns a truncate statement for this database engine.
      *
      * @param string $table The name of the table to updated data in.
+     * @return string
      */
-    public function getTruncate($table) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetTruncate'), E_USER_ERROR);
+    public function getTruncate($table)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "GetTruncate"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
@@ -905,8 +1136,16 @@ abstract class Gdn_SQLDriver {
      * to the where portion of the update statement.
      * @return string
      */
-    public function getUpdate($tables, $data, $where, $orderBy = null, $limit = null) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetUpdate'), E_USER_ERROR);
+    public function getUpdate($tables, $data, $where, $orderBy = null, $limit = null)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "GetUpdate"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
@@ -915,14 +1154,22 @@ abstract class Gdn_SQLDriver {
      *
      * @param string $table The table from which to select data. Adds to the $this->_Froms collection.
      * @param mixed $where Adds to the $this->_Wheres collection using $this->where();
-     * @param string $orderFields A string of fields to be ordered.
+     * @param string|array $orderFields A string of fields to be ordered.
      * @param string $orderDirection The direction of the sort.
-     * @param int $limit The number of records to limit the query to.
+     * @param int|false $limit The number of records to limit the query to.
      * @param int $offset The offset where the query results should begin.
      * @return Gdn_DataSet The data returned by the query.
+     * @throws Exception
      */
-    public function getWhere($table = '', $where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = 0) {
-        if ($table != '') {
+    public function getWhere(
+        $table = "",
+        $where = false,
+        $orderFields = "",
+        $orderDirection = "asc",
+        $limit = false,
+        $offset = 0
+    ) {
+        if ($table != "") {
             //$this->mapAliases($Table);
             $this->from($table);
         }
@@ -931,7 +1178,7 @@ abstract class Gdn_SQLDriver {
             $this->where($where);
         }
 
-        if ($orderFields != '') {
+        if ($orderFields != "") {
             $this->orderBy($orderFields, $orderDirection);
         }
 
@@ -939,7 +1186,8 @@ abstract class Gdn_SQLDriver {
             $this->limit($limit, $offset);
         }
 
-        $result = $this->query($this->getSelect());
+        $sql = $this->getSelect();
+        $result = $this->query($sql);
 
         return $result;
     }
@@ -952,11 +1200,19 @@ abstract class Gdn_SQLDriver {
      * @param mixed $like Adds to the $this->_Wheres collection using $this->like();
      * @param string $orderFields A string of fields to be ordered.
      * @param string $orderDirection The direction of the sort.
-     * @param int $limit The number of records to limit the query to.
-     * @param int $pageNumber The offset where the query results should begin.
+     * @param int|false $limit The number of records to limit the query to.
+     * @param int|false $pageNumber The offset where the query results should begin.
+     * @return Gdn_DataSet
      */
-    public function getWhereLike($table = '', $like = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $pageNumber = false) {
-        if ($table != '') {
+    public function getWhereLike(
+        $table = "",
+        $like = false,
+        $orderFields = "",
+        $orderDirection = "asc",
+        $limit = false,
+        $pageNumber = false
+    ) {
+        if ($table != "") {
             $this->mapAliases($table);
             $this->from($table);
         }
@@ -965,7 +1221,7 @@ abstract class Gdn_SQLDriver {
             $this->like($like);
         }
 
-        if ($orderFields != '') {
+        if ($orderFields != "") {
             $this->orderBy($orderFields, $orderDirection);
         }
 
@@ -988,27 +1244,28 @@ abstract class Gdn_SQLDriver {
      *
      * @param mixed $fields An array of field names (or a comma-delimited list of field names) to be
      * grouped by.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function groupBy($fields = null) {
+    public function groupBy($fields = null)
+    {
         if (is_null($fields)) {
             // Group by every item in the select that isn't a function.
             foreach ($this->_Selects as $alias => $select) {
-                if (val('Function', $select) == '') {
-                    $this->_GroupBys[] = $select['Field'];
+                if (val("Function", $select) == "") {
+                    $this->_GroupBys[] = $select["Field"];
                 }
             }
             return $this;
         }
 
         if (is_string($fields)) {
-            $fields = explode(',', $fields);
+            $fields = explode(",", $fields);
         }
 
         foreach ($fields as $field) {
             $field = trim($field);
 
-            if ($field != '') {
+            if ($field != "") {
                 $this->_GroupBys[] = $this->escapeFieldReference($field);
             }
         }
@@ -1022,20 +1279,21 @@ abstract class Gdn_SQLDriver {
      * It should be used only in conjunction with methods that properly escape the sql.
      *
      * @param string $sql The condition to add.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    protected function _having($sql) {
+    protected function _having($sql)
+    {
         // Figure out the concatenation operator.
-        $concat = '';
+        $concat = "";
 
         if (count($this->_Havings) > 0) {
-            $concat = ' '.$this->_WhereConcat.' ';
+            $concat = " " . $this->_WhereConcat . " ";
         }
 
         // Revert the concat back to 'and'.
         $this->_WhereConcat = $this->_WhereConcatDefault;
 
-        $this->_Havings[] = $concat.$sql;
+        $this->_Havings[] = $concat . $sql;
 
         return $this;
     }
@@ -1044,15 +1302,14 @@ abstract class Gdn_SQLDriver {
      * Adds to the $this->_Havings collection. Called by $this->having() and
      * $this->orHaving().
      *
-     * @param mixed $field The name of the field (or array of field names) in the having clause.
+     * @param string|array $field The name of the field (or array of field names) in the having clause.
      * @param string $value The string on the right side of the having comparison.
-     * @param boolean $EscapeSql A boolean value indicating if $this->EscapeSql method should be called
-     * on $field.
-     * @param boolean $EscapeString A boolean value indicating if $this->EscapeString method should be called
-     * on $value.
-     * @return Gdn_SQLDriver $this
+     * @param bool $escapeField Whether or not the `$field` parameter should be escaped.
+     * @param bool $escapeValue Whether or not the `$value` parameter should be escaped.
+     * @return $this
      */
-    function having($field, $value = '', $escapeField = true, $escapeValue = true) {
+    public function having($field, $value = "", $escapeField = true, $escapeValue = true)
+    {
         if (!is_array($field)) {
             $field = [$field => $value];
         }
@@ -1066,16 +1323,22 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * @return Gdn_SQLDriver $this
+     * Set the date inserted and date updated fields to the current date.
+     *
+     * @param bool $updateFields Add the date updated.
+     * @param bool $insertFields Add the date inserted.
+     * @return $this
+     * @deprecated
      */
-    public function history($updateFields = true, $insertFields = false) {
-        $userID = valr('User.UserID', Gdn::session(), Gdn::session()->UserID);
+    public function history(bool $updateFields = true, bool $insertFields = false)
+    {
+        $userID = valr("User.UserID", Gdn::session(), Gdn::session()->UserID);
 
         if ($insertFields) {
-            $this->set('DateInserted', Gdn_Format::toDateTime())->set('InsertUserID', $userID);
+            $this->set("DateInserted", CurrentTimeStamp::getMySQL())->set("InsertUserID", $userID);
         }
         if ($updateFields) {
-            $this->set('DateUpdated', Gdn_Format::toDateTime())->set('UpdateUserID', $userID);
+            $this->set("DateUpdated", CurrentTimeStamp::getMySQL())->set("UpdateUserID", $userID);
         }
         return $this;
     }
@@ -1083,7 +1346,8 @@ abstract class Gdn_SQLDriver {
     /**
      * Returns the last identity to be inserted into the database at $this->_Connection.
      */
-    public function identity() {
+    public function identity()
+    {
         return $this->connection()->lastInsertId();
     }
 
@@ -1093,19 +1357,20 @@ abstract class Gdn_SQLDriver {
      * @param string $request The piece of information being requested. Accepted values are: Engine,
      * Version, and DatabaseName.
      */
-    public function information($request) {
+    public function information($request)
+    {
         if (array_key_exists($request, $this->_DatabaseInfo) === false) {
-            if ($request == 'Version') {
-                $this->_DatabaseInfo['Version'] = $this->version();
+            if ($request == "Version") {
+                $this->_DatabaseInfo["Version"] = $this->version();
             } else {
-                $this->_DatabaseInfo['HostName'] = Gdn::config('Database.Host', '');
-                $this->_DatabaseInfo['DatabaseName'] = Gdn::config('Database.Name', '');
+                $this->_DatabaseInfo["HostName"] = Gdn::config("Database.Host", "");
+                $this->_DatabaseInfo["DatabaseName"] = Gdn::config("Database.Name", "");
             }
         }
         if (array_key_exists($request, $this->_DatabaseInfo) === true) {
             return $this->_DatabaseInfo[$request];
         } else {
-            return '';
+            return "";
         }
     }
 
@@ -1119,17 +1384,18 @@ abstract class Gdn_SQLDriver {
      * inserted from $select.
      * @param string $select A select query that will fill the FieldNames specified in $set.
      */
-    public function insert($table = '', $set = null, $select = '') {
+    public function insert($table = "", $set = null, $select = "")
+    {
         if (count($set) == 0 && count($this->_Sets) == 0) {
             return false;
         }
 
-        if (!is_null($set) && $select == '' && !array_key_exists(0, $set)) {
+        if (!is_null($set) && $select == "" && !array_key_exists(0, $set)) {
             $this->set($set);
             $set = $this->_Sets;
         }
 
-        if ($table == '') {
+        if ($table == "") {
             if (!isset($this->_Froms[0])) {
                 return false;
             }
@@ -1137,8 +1403,8 @@ abstract class Gdn_SQLDriver {
             $table = $this->_Froms[0];
         }
 
-        $sql = $this->getInsert($this->escapeIdentifier($this->Database->DatabasePrefix.$table), $set, $select);
-        $result = $this->query($sql, 'insert');
+        $sql = $this->getInsert($this->escapeIdentifier($this->Database->DatabasePrefix . $table), $set, $select);
+        $result = $this->query($sql, "insert");
 
         return $result;
     }
@@ -1149,10 +1415,13 @@ abstract class Gdn_SQLDriver {
      * @param string $table The name of the table to insert/update.
      * @param array $set The columns to update.
      * @param array $where The columns to find the row to update.
+     * @param bool $checkExisting If true then the table will be queried first to look for existing rows and only update
+     * if they differ from `$set`.
      * If a row is not found then one is inserted and the items in this array are merged with $set.
      */
-    public function replace($table = '', $set = null, $where, $checkExisting = false) {
-        $set = $this->escapeKeys([$this, 'escapeFieldReference'], $set);
+    public function replace($table = "", $set = null, $where = [], $checkExisting = false)
+    {
+        $set = $this->escapeKeys([$this, "escapeFieldReference"], $set);
 
         if (count($this->_Sets) > 0) {
             foreach ($this->_Sets as $key => $value) {
@@ -1181,10 +1450,9 @@ abstract class Gdn_SQLDriver {
                         continue;
                     }
 
-                    if (in_array($key, ['DateInserted', 'InsertUserID', 'DateUpdated', 'UpdateUserID'])) {
+                    if (in_array($key, ["DateInserted", "InsertUserID", "DateUpdated", "UpdateUserID"])) {
                         continue;
                     }
-
 
                     // We are assuming here that if the existing record doesn't contain the column then it's just been added.
                     if (preg_match('/^`(.+)`$/', $value, $matches)) {
@@ -1194,7 +1462,6 @@ abstract class Gdn_SQLDriver {
                     } elseif (!array_key_exists($key, $row) || $row[$key] != $value) {
                         $this->set($this->escapeIdentifier($key), $value);
                     }
-
                 }
                 if (count($this->_Sets) === 0) {
                     $this->reset();
@@ -1211,7 +1478,7 @@ abstract class Gdn_SQLDriver {
             $this->put($table, $set, $where);
         } else {
             // Insert the table.
-            $set = array_merge($set, $this->escapeKeys([$this, 'escapeFieldReference'], $where));
+            $set = array_merge($set, $this->escapeKeys([$this, "escapeFieldReference"], $where));
             $this->insert($table, $set);
         }
     }
@@ -1225,20 +1492,21 @@ abstract class Gdn_SQLDriver {
      * ie. "user.role_id = role.id"
      * @param string $join The type of join to be made. Accepted values are:
      * 'inner', 'outer', 'left', 'right', 'left outer', and 'right outer'.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function join($tableName, $on, $join = '') {
+    public function join($tableName, $on, $join = "")
+    {
         $join = strtolower(trim($join));
-        if ($join != '' && !in_array($join, ['inner', 'outer', 'left', 'right', 'left outer', 'right outer'], true)) {
-            $join = '';
+        if ($join != "" && !in_array($join, ["inner", "outer", "left", "right", "left outer", "right outer"], true)) {
+            $join = "";
         }
 
         // Add the table prefix to any table specifications in the clause
         // echo '<div>'.$TableName.' ---> '.$this->escapeSql($this->Database->DatabasePrefix.$TableName, TRUE).'</div>';
-        if ($this->Database->DatabasePrefix && $tableName[0] !== '(') {
+        if ($this->Database->DatabasePrefix && $tableName[0] !== "(") {
             $tableName = $this->mapAliases($tableName);
         }
-        $joinClause = ltrim($join.' join ')."$tableName on $on";
+        $joinClause = ltrim($join . " join ") . "$tableName on $on";
         $this->_Joins[] = $joinClause;
 
         return $this;
@@ -1246,10 +1514,15 @@ abstract class Gdn_SQLDriver {
 
     /**
      * A convenience method for Gdn_DatabaseDriver::Join that makes the join type 'left.'
-     * @see Gdn_DatabaseDriver::join()
+     *
+     * @param string $tableName
+     * @param string $on
+     * @return $this
+     * @see Gdn_SQLDriver::join()
      */
-    public function leftJoin($tableName, $on) {
-        return $this->join($tableName, $on, 'left');
+    public function leftJoin($tableName, $on)
+    {
+        return $this->join($tableName, $on, "left");
     }
 
     /**
@@ -1259,32 +1532,31 @@ abstract class Gdn_SQLDriver {
      * @param mixed $field The field name (or array of field name => match values) to search in for
      * a like $match.
      * @param string $match The value to try to match using a like statement in $field.
-     * @param string $Concat The concatenation operator for the items being added to the like in
-     * clause.
      * @param string $side A string indicating which side of the match to place asterisk operators.
      * Accepted values are left, right, both, none. Default is both.
      * @param string $op Either 'like' or 'not like' clause.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function like($field, $match = '', $side = 'both', $op = 'like') {
+    public function like($field, $match = "", $side = "both", $op = "like")
+    {
         if (!is_array($field)) {
             $field = [$field => $match];
         }
 
         foreach ($field as $subField => $subValue) {
-            $subField .= ' '.$op.' ';
+            $subField .= " " . $op . " ";
             switch ($side) {
-                case 'left':
-                    $subValue = '%'.$subValue;
+                case self::LIKE_LEFT:
+                    $subValue = "%" . $subValue;
                     break;
-                case 'right':
-                    $subValue .= '%';
+                case self::LIKE_RIGHT:
+                    $subValue .= "%";
                     break;
-                case 'both':
+                case self::LIKE_BOTH:
                     if (strlen($match) == 0) {
-                        $subValue = '%';
+                        $subValue = "%";
                     } else {
-                        $subValue = '%'.$subValue.'%';
+                        $subValue = "%" . $subValue . "%";
                     }
                     break;
             }
@@ -1298,13 +1570,14 @@ abstract class Gdn_SQLDriver {
      * Sets the limit (and offset optionally) for the query.
      *
      * @param int $limit The number of records to limit the query to.
-     * @param int $offset The offset where the query results should begin.
-     * @return Gdn_SQLDriver $this
+     * @param int|false $offset The offset where the query results should begin.
+     * @return $this
      */
-    public function limit($limit, $offset = false) {
+    public function limit($limit, $offset = false)
+    {
         // SQL chokes on ints over 2^31
         if ($limit > self::MAX_SIGNED_INT) {
-            throw new Exception(t('Invalid limit.'), 400);
+            throw new Exception(t("Invalid limit."), 400);
         }
 
         $this->_Limit = $limit;
@@ -1325,46 +1598,55 @@ abstract class Gdn_SQLDriver {
      * @param boolean $escape Whether or not to escape the tables and aliases.
      * @return string
      */
-    public function mapAliases($tableString, $escape = true) {
+    public function mapAliases($tableString, $escape = true)
+    {
         if (preg_match('`^([^\s]+?)(?:\s+(?:as\s+)?([a-z_][a-z0-9_]*))?$`i', trim($tableString), $m)) {
             $tableName = $m[1];
             $alias = $m[2] ?? $tableName;
 
-            $fullTableName = $this->Database->DatabasePrefix.$tableName;
+            $fullTableName = $this->Database->DatabasePrefix . $tableName;
             $escapedTableName = $escape ? $this->escapeIdentifier($fullTableName) : $fullTableName;
             $escapedAlias = $escape ? $this->escapeIdentifier($alias) : $alias;
 
-            return $escapedTableName.' '.$escapedAlias;
+            return $escapedTableName . " " . $escapedAlias;
         } else {
             throw new \InvalidArgumentException("Unknown table expression: $tableString", 500);
         }
     }
 
     /**
-     * A convenience method for Gdn_DatabaseDriver::Like that changes the operator to 'not like.'
-     * @see Gdn_DatabaseDriver::like()
+     * A convenience method for `Gdn_SQLDriver::like()` that changes the operator to 'not like.'
+     *
+     * @param string $field
+     * @param string $match
+     * @param string $side
+     * @return $this
+     * @see Gdn_SQLDriver::like()
      */
-    public function notLike($field, $match = '', $side = 'both') {
-        return $this->like($field, $match, $side, 'not like');
+    public function notLike($field, $match = "", $side = self::LIKE_BOTH)
+    {
+        return $this->like($field, $match, $side, "not like");
     }
 
     /**
-     * Takes a parameter name and makes sure it is cleaned up to be used as a
-     * named parameter in a pdo prepared statement.
-     * @param string $name The name of the parameter to cleanup
-     * @param boolean $createNew Wether or not this is a new or existing parameter.
+     * Takes a parameter name and makes sure it is cleaned up to be used as a named parameter in a pdo prepared statement.
+     *
+     * @param string $name The name of the parameter to cleanup.
+     * @param bool $createNew Whether or not this is a new or existing parameter.
+     * @param mixed $value Specify the value for the parameter.
      * @return string The cleaned up named parameter name.
      */
-    public function namedParameter($name, $createNew = false, $value = null) {
+    public function namedParameter($name, $createNew = false, $value = null)
+    {
         // Format the parameter name so it is safe for sql
-        $niceName = ':'.preg_replace('/([^\w])/', '', $name); // Removes everything from the string except letters, numbers and underscores
+        $niceName = ":" . preg_replace("/([^\w])/", "", $name); // Removes everything from the string except letters, numbers and underscores
 
         if ($createNew) {
             // Make sure that the new name doesn't already exist.
             $numberedName = $niceName;
             $i = 0;
             while (array_key_exists($numberedName, $this->_NamedParameters)) {
-                $numberedName = $niceName.$i;
+                $numberedName = $niceName . $i;
                 ++$i;
             }
             $niceName = $numberedName;
@@ -1377,35 +1659,32 @@ abstract class Gdn_SQLDriver {
         return $niceName;
     }
 
-    public function &namedParameters($newValue = null) {
+    /**
+     * Get/set a reference to the current named parameters.
+     *
+     * @param array|null $newValue
+     * @return array
+     */
+    public function &namedParameters($newValue = null)
+    {
         if ($newValue !== null) {
             $this->_NamedParameters = $newValue;
         }
-        $result =& $this->_NamedParameters;
+        $result = &$this->_NamedParameters;
         return $result;
-    }
-
-    /**
-     * Allows a query to be called without resetting the object.
-     * @param boolean $Reset Whether or not to reset this object when the next query executes.
-     * @param boolean $oneTime Whether or not this will apply for only the next query or for all subsequent queries.
-     * @return Gdn_SQLDriver $this
-     */
-    public function noReset($noReset = true, $oneTime = true) {
-        $_NoReset = $noReset ? ($oneTime ? 1 : 2) : 0;
-        return $this;
     }
 
     /**
      * Sets the offset for the query.
      *
      * @param int $offset The offset where the query results should begin.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function offset($offset) {
-        // SQL chokes on ints over 2^31
+    public function offset($offset)
+    {
+        // SQL chokes on integers over 2^31.
         if ($offset > self::MAX_SIGNED_INT) {
-            throw new Exception(t('Invalid offset.'), 400);
+            throw new Exception(t("Invalid offset."), 400);
         }
 
         $this->_Offset = $offset;
@@ -1419,7 +1698,8 @@ abstract class Gdn_SQLDriver {
      * @param mixed $value The value of the option or not specified just to get the current value.
      * @return mixed The value of the option or $this if $value is specified.
      */
-    public function options($key, $value = null) {
+    public function options($key, $value = null)
+    {
         if (is_array($key)) {
             foreach ($key as $k => $v) {
                 $this->_Options[$k] = $v;
@@ -1458,10 +1738,11 @@ abstract class Gdn_SQLDriver {
      *
      * @param string|array|null $fields A string of fields to be ordered.
      * @param string $direction The direction of the sort.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function orderBy($fields, $direction = 'asc') {
-        $r = $this->orderByPrefix('', $fields, $direction);
+    public function orderBy($fields, $direction = "asc")
+    {
+        $r = $this->orderByPrefix("", $fields, $direction);
         return $r;
     }
 
@@ -1469,33 +1750,37 @@ abstract class Gdn_SQLDriver {
      * Order by a field or fields, adding a prefix to each fields.
      *
      * @param string $px
-     * @param string|array|null $fields
+     * @param string|array|RawExpression|null $fields
      * @param string $direction
      * @return $this
      * @see Gdn_SQLDriver::orderBy()
      */
-    public function orderByPrefix(string $px, $fields, $direction = 'asc') {
+    public function orderByPrefix(string $px, $fields, $direction = "asc")
+    {
         if (!$fields) {
             return $this;
         }
 
-        if (!is_array($fields)) {
-            $fields = explode(',', "$fields $direction");
+        if (is_string($fields)) {
+            $fields = explode(",", "$fields $direction");
+        } elseif ($fields instanceof RawExpression) {
+            $this->_OrderBys[] = $fields->getExpression();
+            return $this;
         }
 
         foreach ($fields as $key => $parts) {
-            if (!is_numeric($key) && in_array($parts, ['asc', 'desc'], true)) {
+            if (!is_numeric($key) && in_array($parts, ["asc", "desc"], true)) {
                 // This is in the form: column => direction
-                $this->_OrderBys[] = $this->escapeFieldReference($key).' '.$parts;
+                $this->_OrderBys[] = $this->escapeFieldReference($key) . " " . $parts;
             } elseif (preg_match('`^(-)?([^\s]+?)(?:\s+?(asc|desc))?$`i', trim($parts), $m)) {
-                $field = $px.$m[2];
+                $field = $px . $m[2];
                 if (!empty($m[1])) {
-                    $direction = 'desc';
+                    $direction = "desc";
                 } else {
-                    $direction = $m[3] ?? 'asc';
+                    $direction = $m[3] ?? "asc";
                 }
 
-                $this->_OrderBys[] = $this->escapeFieldReference($field).' '.$direction;
+                $this->_OrderBys[] = $this->escapeFieldReference($field) . " " . $direction;
             } else {
                 trigger_error("Invalid order by expression: $parts");
             }
@@ -1509,23 +1794,28 @@ abstract class Gdn_SQLDriver {
      *
      * @param mixed $field The name of the field (or array of field names) in the having clause.
      * @param string $value The string on the right side of the having comparison.
-     * @param boolean $escapeField A boolean value indicating if $this->EscapeSql method should be called
-     * on $field.
-     * @param boolean $escapeValue A boolean value indicating if $this->EscapeString method should be called
-     * on $value.
-     * @return Gdn_SQLDriver $this
+     * @param boolean $escapeField A boolean value indicating if $this->EscapeSql method should be called on `$field`.
+     * @param boolean $escapeValue A boolean value indicating if $this->EscapeString method should be called on `$value`.
+     * @return $this
      * @see Gdn_DatabaseDriver::having()
      */
-    function orHaving($field, $value = '', $escapeField = true, $escapeValue = true) {
+    public function orHaving($field, $value = "", $escapeField = true, $escapeValue = true)
+    {
         return $this->orOp()->having($field, $value, $escapeField, $escapeValue);
     }
 
     /**
-     * A convenience method that calls Gdn_DatabaseDriver::Like with concatenated with an 'or.'
-     * @See Gdn_DatabaseDriver::like()
-     * @return Gdn_SQLDriver $this
+     * A convenience method that calls `Gdn_SqlDriver::Like()` concatenated with an 'or.'
+     *
+     * @param string|array $field
+     * @param string $match
+     * @param string $side
+     * @param string $op
+     * @return $this
+     * @see Gdn_DatabaseDriver::like()
      */
-    public function orLike($field, $match = '', $side = 'both', $op = 'like') {
+    public function orLike($field, $match = "", $side = self::LIKE_BOTH, $op = "like")
+    {
         if (!is_array($field)) {
             $field = [$field => $match];
         }
@@ -1534,75 +1824,106 @@ abstract class Gdn_SQLDriver {
             $this->orOp()->like($f, $v, $side, $op);
         }
         return $this;
-
-//       return $this->orOp()->like($Field, $Match, $Side, $Op);
     }
 
-    /** A convenience method for Gdn_DatabaseDriver::Like that changes the operator to 'not like,'
-     *    and is concatenated with an 'or.'
-     * @see Gdn_DatabaseDriver::notLike()
+    /**
+     * A convenience method for `Gdn_SqlDriver::like()` that changes the operator to 'not like' and is concatenated with an 'or.'
+     *
+     * @param string $field
+     * @param string $match
+     * @param string $side
+     * @return $this
+     * @see Gdn_SqlDriver::notLike()
      * @see GenricDriver::like()
      */
-    public function orNotLike($field, $match = '', $side = 'both') {
-        return $this->orLike($field, $match, $side, 'not like');
+    public function orNotLike($field, $match = "", $side = self::LIKE_BOTH)
+    {
+        return $this->orLike($field, $match, $side, "not like");
     }
 
     /**
      * Concat the next where expression with an 'or' operator.
      *
-     * @param boolean $setDefault Whether or not the 'or' is one time, or will revert.
-     * @return Gdn_SQLDriver $this
+     * @param bool $setDefault Whether or not the 'or' is one time, or will revert.
+     * @return $this
      * @see Gdn_DatabaseDriver::andOp()
      */
-    public function orOp($setDefault = false) {
-        $this->_WhereConcat = 'or';
+    public function orOp($setDefault = false)
+    {
+        $this->_WhereConcat = "or";
         if ($setDefault) {
-            $this->_WhereConcatDefault = 'or';
-            $this->_WhereGroupConcatDefault = 'or';
+            $this->_WhereConcatDefault = "or";
+            $this->_WhereGroupConcatDefault = "or";
         }
 
         return $this;
     }
 
     /**
+     * Add some where statements concatenated with an "or".
+     *
+     * @param string|array<string, mixed> $field
+     * @param mixed $value
+     * @param bool $escapeFieldSql
+     * @param bool $escapeValueSql
+     * @return $this
      * @link Gdn_DatabaseDriver::where()
      */
-    public function orWhere($field, $value = null, $escapeFieldSql = true, $escapeValueSql = true) {
+    public function orWhere($field, $value = null, $escapeFieldSql = true, $escapeValueSql = true)
+    {
         return $this->orOp()->where($field, $value, $escapeFieldSql, $escapeValueSql);
     }
 
     /**
-     * A convienience method for Gdn_DatabaseDriver::whereExists() concatenates with an 'or.'
-     * @see Gdn_DatabaseDriver::whereExists()
+     * A convenience method for `Gdn_SQLDriver::whereExists()` concatenates with an 'or.'
+     *
+     * @param Gdn_SQLDriver $sqlDriver
+     * @param string $op
+     * @return $this
+     * @see Gdn_SQLDriver::whereExists()
      */
-    public function orWhereExists($sqlDriver, $op = 'exists') {
+    public function orWhereExists($sqlDriver, $op = "exists")
+    {
         return $this->orOp()->whereExists($sqlDriver, $op);
     }
 
     /**
-     * @ling Gdn_DatabaseDriver::whereIn()
+     * A convenience method for `Gdn_SQLDriver::whereIn()` concatenates with an 'or.'
+     *
+     * @param string $field
+     * @param array $values
+     * @return $this
+     * @see Gdn_SQLDriver::whereIn()
      */
-    public function orWhereIn($field, $values) {
+    public function orWhereIn($field, $values)
+    {
         return $this->orOp()->whereIn($field, $values);
     }
 
     /**
-     * A convienience method for Gdn_DatabaseDriver::whereExists() that changes the operator to 'not exists,'
-     *   and concatenates with an 'or.'
-     * @see Gdn_DatabaseDriver::whereExists()
-     * @see Gdn_DatabaseDriver::whereNotExists()
+     * A convenience method for `Gdn_SQLDriver::whereExists()` that changes the operator to 'not exists,' and concatenates with an 'or.'
+     *
+     * @param Gdn_SQLDriver $sqlDriver
+     * @return $this
+     * @see Gdn_SQLDriver::whereExists()
+     * @see Gdn_SQLDriver::whereNotExists()
      */
-    public function orWhereNotExists($sqlDriver) {
-        return $this->orWhereExists($sqlDriver, 'not exists');
+    public function orWhereNotExists($sqlDriver)
+    {
+        return $this->orWhereExists($sqlDriver, "not exists");
     }
 
     /**
-     * A convenience method for Gdn_DatabaseDriver::whereIn() that changes the operator to 'not in,'
-     *   and concatenates with an 'or.'
+     * A convenience method for `Gdn_SQLDriver::whereIn()` that changes the operator to 'not in,' and concatenates with an 'or.'
+     *
+     * @param string $field
+     * @param array $values
+     * @return $this
      * @see Gdn_DatabaseDriver::whereIn()
      * @see Gdn_DatabaseDriver::whereNotIn()
      */
-    public function orWhereNotIn($field, $values) {
+    public function orWhereNotIn($field, $values)
+    {
         return $this->orOp()->whereNotIn($field, $values);
     }
 
@@ -1611,25 +1932,27 @@ abstract class Gdn_SQLDriver {
      *
      * @param string $expr The expression to parse.
      * @param string $name A name to give the parameter if $expr becomes a named parameter.
+     * @param bool $escapeExpr
      * @return string The parsed expression.
      */
-    protected function _parseExpr($expr, $name = null, $escapeExpr = false) {
-        $c = is_string($expr) ? substr($expr, 0, 1) : '';
+    protected function _parseExpr($expr, $name = null, $escapeExpr = false)
+    {
+        $c = is_string($expr) ? substr($expr, 0, 1) : "";
 
-        if ($c === '=' && $escapeExpr === false) {
+        if ($c === "=" && $escapeExpr === false) {
             // This is a function call. Each parameter has to be parsed.
-            $functionArray = preg_split('/(\[[^\]]+\])/', substr($expr, 1), -1, PREG_SPLIT_DELIM_CAPTURE);
+            $functionArray = preg_split("/(\[[^\]]+\])/", substr($expr, 1), -1, PREG_SPLIT_DELIM_CAPTURE);
             for ($i = 0; $i < count($functionArray); $i++) {
                 $part = $functionArray[$i];
-                if (substr($part, 1) == '[') {
+                if (substr($part, 1) == "[") {
                     // Translate the part of the function call.
                     $part = $this->_fieldExpr(substr($part, 1, strlen($part) - 2), $name);
                     $functionArray[$i] = $part;
                 }
             }
             // Combine the array back to the original function call.
-            $result = join('', $functionArray);
-        } elseif ($c === '@' && $escapeExpr === false) {
+            $result = join("", $functionArray);
+        } elseif ($c === "@" && $escapeExpr === false) {
             // This is a literal. Don't do anything.
             $result = substr($expr, 1);
         } else {
@@ -1640,9 +1963,9 @@ abstract class Gdn_SQLDriver {
                 // This is a named parameter.
 
                 // Check to see if the named parameter is valid.
-                if (in_array($c, ['=', '@'])) {
+                if (in_array($c, ["=", "@"])) {
                     // The parameter has to be a default name.
-                    $result = $this->namedParameter('Param', true);
+                    $result = $this->namedParameter("Param", true);
                 } else {
                     $result = $this->namedParameter($name, true);
                 }
@@ -1661,11 +1984,19 @@ abstract class Gdn_SQLDriver {
      * @param string $foreignColumn The primary key column name of $junctionTable (ie. CategoryID).
      * @param string $junctionTable
      * @param string $junctionColumn
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function permission($permission, $foreignAlias, $foreignColumn, $junctionTable = '', $junctionColumn = '') {
+    public function permission($permission, $foreignAlias, $foreignColumn, $junctionTable = "", $junctionColumn = "")
+    {
         $permissionModel = Gdn::permissionModel();
-        $permissionModel->sqlPermission($this, $permission, $foreignAlias, $foreignColumn, $junctionTable, $junctionColumn);
+        $permissionModel->sqlPermission(
+            $this,
+            $permission,
+            $foreignAlias,
+            $foreignColumn,
+            $junctionTable,
+            $junctionColumn
+        );
 
         return $this;
     }
@@ -1674,12 +2005,14 @@ abstract class Gdn_SQLDriver {
      * Prefixes a table with the database prefix if it is not already there.
      *
      * @param string $table The table name to prefix.
+     * @return string
      */
-    public function prefixTable($table) {
+    public function prefixTable($table)
+    {
         $prefix = $this->Database->DatabasePrefix;
 
-        if ($prefix != '' && substr($table, 0, strlen($prefix)) != $prefix) {
-            $table = $prefix.$table;
+        if ($prefix != "" && substr($table, 0, strlen($prefix)) != $prefix) {
+            $table = $prefix . $table;
         }
 
         return $table;
@@ -1691,10 +2024,12 @@ abstract class Gdn_SQLDriver {
      * @param string $table The table to which data should be updated.
      * @param mixed $set An array of $FieldName => $Value pairs, or an object of $DataSet->Field
      * properties containing one rowset.
-     * @param string $where Adds to the $this->_Wheres collection using $this->where();
-     * @param int $limit Adds a limit to the query.
+     * @param string|false $where Adds to the $this->_Wheres collection using $this->where();
+     * @param int|false $limit Adds a limit to the query.
+     * @return bool Returns the result of the update.
      */
-    public function put($table = '', $set = null, $where = false, $limit = false) {
+    public function put($table = "", $set = null, $where = false, $limit = false)
+    {
         $this->update($table, $set, $where, $limit);
 
         if (count($this->_Sets) == 0 || !isset($this->_Froms[0])) {
@@ -1703,45 +2038,72 @@ abstract class Gdn_SQLDriver {
         }
 
         $sql = $this->getUpdate($this->_Froms, $this->_Sets, $this->_Wheres, $this->_OrderBys, $this->_Limit);
-        $result = $this->query($sql, 'update');
+        $result = $this->query($sql, "update");
 
         return $result;
     }
 
-    public function query($sql, $type = 'select') {
-        $queryOptions = ['Type' => $type, 'Slave' => val('Slave', $this->_Options, null)];
+    /**
+     * Generate the UPDATE statement for this object.
+     *
+     * @return string
+     * @throws Exception Throws an exception when the SET OR FROM data is empty.
+     */
+    public function getUpdateSql(): string
+    {
+        if (count($this->_Sets) == 0 || !isset($this->_Froms[0])) {
+            throw new Exception("Cannot generate UPDATE statement with missing clauses.", 400);
+        }
+
+        $sql = $this->getUpdate($this->_Froms, $this->_Sets, $this->_Wheres, $this->_OrderBys, $this->_Limit);
+        return $sql;
+    }
+
+    /**
+     * Perform a query on the database connection.
+     *
+     * @param string $sql
+     * @param string $type
+     * @return bool|Gdn_DataSet|object|string
+     * @throws Exception Throws an exception if the query has an error.
+     */
+    public function query($sql, $type = "select")
+    {
+        $queryOptions = $this->_Options;
+        $queryOptions["Type"] = $type;
+        $queryOptions["Slave"] = val("Slave", $queryOptions, null);
 
         switch ($type) {
-            case 'insert':
-                $returnType = 'ID';
+            case "insert":
+                $returnType = "ID";
                 break;
-            case 'update':
-            case 'delete':
-                $returnType = '';
+            case "update":
+            case "delete":
+                $returnType = "";
                 break;
             default:
-                $returnType = 'DataSet';
+                $returnType = "DataSet";
                 break;
         }
 
-        $queryOptions['ReturnType'] = $returnType;
+        $queryOptions["ReturnType"] = $returnType;
         if (!is_null($this->_CacheKey)) {
-            $queryOptions['Cache'] = $this->_CacheKey;
+            $queryOptions["Cache"] = $this->_CacheKey;
         }
 
         if (!is_null($this->_CacheKey)) {
-            $queryOptions['CacheOperation'] = $this->_CacheOperation;
+            $queryOptions["CacheOperation"] = $this->_CacheOperation;
         }
 
         if (!is_null($this->_CacheOptions)) {
-            $queryOptions['CacheOptions'] = $this->_CacheOptions;
+            $queryOptions["CacheOptions"] = $this->_CacheOptions;
         }
 
         $parameters = $this->calculateParameters($this->_NamedParameters);
 
         try {
-            if ($this->CaptureModifications && strtolower($type) != 'select') {
-                if (!property_exists($this->Database, 'CapturedSql')) {
+            if ($this->CaptureModifications && strtolower($type) != "select") {
+                if (!property_exists($this->Database, "CapturedSql")) {
                     $this->Database->CapturedSql = [];
                 }
                 $sql2 = $this->applyParameters($sql, $parameters);
@@ -1767,17 +2129,18 @@ abstract class Gdn_SQLDriver {
      * @param array $parameters The parameters to calculate.
      * @return array New parameters
      */
-    protected function calculateParameters($parameters) {
-        $dtZone = new DateTimeZone('UTC');
+    protected function calculateParameters($parameters)
+    {
+        $dtZone = new DateTimeZone("UTC");
 
         $result = [];
         foreach ($parameters as $key => $value) {
             if ($value instanceof \DateTimeInterface) {
-                $dt = new DateTime('@'.$value->getTimestamp());
+                $dt = new DateTime("@" . $value->getTimestamp());
                 $dt->setTimezone($dtZone);
-                $value = $dt->format(MYSQL_DATE_FORMAT);
+                $value = $dt->format(CurrentTimeStamp::MYSQL_DATE_FORMAT_PRECISE);
             } elseif (is_bool($value)) {
-                $value = (int)$value;
+                $value = (int) $value;
             }
 
             $result[$key] = $value;
@@ -1793,8 +2156,14 @@ abstract class Gdn_SQLDriver {
      * @param int $type One of the `PDO::PARAM_*` constants.
      * @return string
      */
-    public function quote($value, $type = PDO::PARAM_STR): string {
-        return $this->Database->connection()->quote($value, $type);
+    public function quote($value, $type = PDO::PARAM_STR): string
+    {
+        if ($value instanceof \DateTimeInterface) {
+            $value = gmdate(CurrentTimeStamp::MYSQL_DATE_FORMAT_PRECISE, $value->getTimestamp());
+        }
+        $r = $this->Database->connection()->quote($value, $type);
+
+        return $r;
     }
 
     /**
@@ -1804,8 +2173,9 @@ abstract class Gdn_SQLDriver {
      * @return string Returns a quoted string.
      * @deprecated
      */
-    public function quoteIdentifier($string) {
-        deprecated('Gdn_SQLDriver::quoteIdentifier()', 'Gdn_SQLDriver::escapeIdentifier()');
+    public function quoteIdentifier($string)
+    {
+        deprecated("Gdn_SQLDriver::quoteIdentifier()", "Gdn_SQLDriver::escapeIdentifier()");
         return $this->escapeIdentifier($string);
     }
 
@@ -1815,35 +2185,33 @@ abstract class Gdn_SQLDriver {
      * @param string $string The quoted identifier.
      * @return string Returns the unquoted identifer.
      */
-    public function unescapeIdentifier(string $string): string {
-        return preg_replace_callback('/(`+)/', function ($m) {
-            return str_repeat('`', intdiv(strlen($m[1]), 2));
-        }, $string);
+    public function unescapeIdentifier(string $string): string
+    {
+        return preg_replace_callback(
+            "/(`+)/",
+            function ($m) {
+                return str_repeat("`", intdiv(strlen($m[1]), 2));
+            },
+            $string
+        );
     }
 
     /**
      * Resets properties of this object that relate to building a select
      * statement back to their default values. Called by $this->get() and
      * $this->getWhere().
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function reset() {
-        // Check the _NoReset flag.
-        switch ($this->_NoReset) {
-            case 1:
-                $this->_NoReset = 0;
-                return;
-            case 2:
-                return;
-        }
+    public function reset()
+    {
         $this->_Selects = [];
         $this->_Froms = [];
         $this->_Joins = [];
         $this->_Wheres = [];
-        $this->_WhereConcat = 'and';
-        $this->_WhereConcatDefault = 'and';
-        $this->_WhereGroupConcat = 'and';
-        $this->_WhereGroupConcatDefault = 'and';
+        $this->_WhereConcat = "and";
+        $this->_WhereConcatDefault = "and";
+        $this->_WhereGroupConcat = "and";
+        $this->_WhereGroupConcatDefault = "and";
         $this->_WhereGroupCount = 0;
         $this->_OpenWhereGroupCount = 0;
         $this->_GroupBys = [];
@@ -1867,6 +2235,66 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
+     * Parse select information for SqlDriver::select().
+     *
+     * @param mixed $select NotRequired "*" The field(s) being selected. It
+     * can be a comma delimited string, the name of a single field, or an array
+     * of field names.
+     * @param string $function NotRequired "" The aggregate function to be used on
+     * the select column. Only valid if a single column name is provided.
+     * Accepted values are MAX, MIN, AVG, SUM.
+     * @param string $alias NotRequired "" The alias to give a column name.
+     * @return array The select information. ['Field:s', 'Function:s', 'Alias:s'];
+     */
+    public function parseSelectExpression($select = "*", $function = "", $alias = ""): array
+    {
+        if (is_string($select)) {
+            if ($function == "") {
+                $select = explode(",", $select);
+            } else {
+                $select = [$select];
+            }
+        }
+
+        if ($select instanceof Select) {
+            $select = [$select];
+        }
+
+        $count = count($select);
+
+        $selects = [];
+        for ($i = 0; $i < $count; $i++) {
+            $field = $select[$i];
+            if ($field instanceof Select) {
+                // No processing to do here.
+                $selects[] = ["Field" => $field->fieldExpression, "Function" => "", "Alias" => $field->alias];
+                continue;
+            }
+
+            $field = trim($field);
+
+            // Try and figure out an alias for the field.
+            if ($alias == "" || ($count > 1 && $i > 0)) {
+                if (preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/i', $field, $matches) > 0) {
+                    // This is an explicit alias in the select clause.
+                    $field = $matches[1];
+                    $alias = $matches[2];
+                } else {
+                    // This is an alias from the field name.
+                    $alias = trim(strstr($field, "."), " .`");
+                }
+                // Make sure we aren't selecting * as an alias.
+                if ($alias === "*") {
+                    $alias = "";
+                }
+            }
+            $expr = ["Field" => $field, "Function" => $function, "Alias" => $alias];
+            $selects[] = $expr;
+        }
+        return $selects;
+    }
+
+    /**
      * Allows the specification of columns to be selected in a database query.
      * Returns this object for chaining purposes. ie. $db->select()->from();
      *
@@ -1877,45 +2305,29 @@ abstract class Gdn_SQLDriver {
      * the select column. Only valid if a single column name is provided.
      * Accepted values are MAX, MIN, AVG, SUM.
      * @param string $alias NotRequired "" The alias to give a column name.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function select($select = '*', $function = '', $alias = '') {
-        if (is_string($select)) {
-            if ($function == '') {
-                $select = explode(',', $select);
+    public function select($select = "*", $function = "", $alias = "")
+    {
+        $selectInfos = $this->parseSelectExpression($select, $function, $alias);
+        foreach ($selectInfos as $selectInfo) {
+            if ($alias == "") {
+                $this->_Selects[] = $selectInfo;
             } else {
-                $select = [$select];
+                $this->_Selects[$alias] = $selectInfo;
             }
         }
-        $count = count($select);
+        return $this;
+    }
 
-        for ($i = 0; $i < $count; $i++) {
-            $field = trim($select[$i]);
-
-            // Try and figure out an alias for the field.
-            if ($alias == '' || ($count > 1 && $i > 0)) {
-                if (preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/i', $field, $matches) > 0) {
-                    // This is an explicit alias in the select clause.
-                    $field = $matches[1];
-                    $alias = $matches[2];
-                } else {
-                    // This is an alias from the field name.
-                    $alias = trim(strstr($field, '.'), ' .`');
-                }
-                // Make sure we aren't selecting * as an alias.
-                if ($alias === '*') {
-                    $alias = '';
-                }
-            }
-
-            $expr = ['Field' => $field, 'Function' => $function, 'Alias' => $alias];
-
-            if ($alias == '') {
-                $this->_Selects[] = $expr;
-            } else {
-                $this->_Selects[$alias] = $expr;
-            }
-        }
+    /**
+     * Clear out all selects.
+     *
+     * @return $this
+     */
+    public function resetSelects()
+    {
+        $this->_Selects = [];
         return $this;
     }
 
@@ -1925,23 +2337,24 @@ abstract class Gdn_SQLDriver {
      * @param string $field The field being examined in the case statement.
      * @param array $options The options and results in an associative array. A
      * blank key will be the final "else" option of the case statement. eg.
-     * array('null' => 1, '' => 0) results in "when null then 1 else 0".
+     * ['null' => 1, '' => 0] results in "when null then 1 else 0".
      * @param string $alias The alias to give a column name.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function selectCase($field, $options, $alias) {
-        $caseOptions = '';
+    public function selectCase($field, $options, $alias)
+    {
+        $caseOptions = "";
         foreach ($options as $key => $val) {
-            if ($key == '') {
-                $caseOptions .= ' else '.$val;
+            if ($key == "") {
+                $caseOptions .= " else " . $val;
             } else {
-                $caseOptions .= ' when '.$key.' then '.$val;
+                $caseOptions .= " when " . $key . " then " . $val;
             }
         }
 
-        $expr = ['Field' => $field, 'Function' => '', 'Alias' => $alias, 'CaseOptions' => $caseOptions];
+        $expr = ["Field" => $field, "Function" => "", "Alias" => $alias, "CaseOptions" => $caseOptions];
 
-        if ($alias == '') {
+        if ($alias == "") {
             $this->_Selects[] = $expr;
         } else {
             $this->_Selects[$alias] = $expr;
@@ -1962,11 +2375,14 @@ abstract class Gdn_SQLDriver {
      * created, and (b) that name already exists in $this->_NamedParameters
      * collection, then a new one should be created rather than overwriting the
      * existing one.
-     * @return Gdn_SQLDriver $this Returns this for fluent calls
+     * @return $this Returns this for fluent calls
      * @throws \Exception Throws an exception if an invalid type is passed for {@link $value}.
      */
-    public function set($field, $value = '', $escapeString = true, $createNewNamedParameter = true) {
-        $field = Gdn_Format::objectAsArray($field);
+    public function set($field, $value = "", $escapeString = true, $createNewNamedParameter = true)
+    {
+        if (is_object($field)) {
+            $field = (array) $field;
+        }
 
         if (!is_array($field)) {
             $field = [$field => $value];
@@ -1974,13 +2390,18 @@ abstract class Gdn_SQLDriver {
 
         foreach ($field as $f => $v) {
             if ($v instanceof DateTimeImmutable) {
-                $v = $v->format(MYSQL_DATE_FORMAT);
-            } elseif (is_array($v) || is_object($v)) {
-                throw new Exception('Invalid value type ('.gettype($v).') in INSERT/UPDATE statement.', 500);
+                $v = $v->format(CurrentTimeStamp::MYSQL_DATE_FORMAT_PRECISE);
+            } elseif (is_array($v) || (is_object($v) && !$v instanceof \Vanilla\Database\SetLiterals\SetLiteral)) {
+                throw new Exception("Invalid value type (" . gettype($v) . ") in INSERT/UPDATE statement.", 500);
             }
 
             $escapedName = $this->escapeFieldReference($f, true);
-            if (in_array(substr($f, -1), ['+', '-'], true)) {
+            if (is_object($v) && $v instanceof \Vanilla\Database\SetLiterals\SetLiteral) {
+                $expr = $v->toSql($this, $escapedName);
+                if (!empty($expr)) {
+                    $this->_Sets[$escapedName] = $expr;
+                }
+            } elseif (in_array(substr($f, -1), ["+", "-"], true)) {
                 // This is an increment/decrement.
                 $op = substr($f, -1);
                 $f = substr($f, 0, -1);
@@ -2003,9 +2424,19 @@ abstract class Gdn_SQLDriver {
 
     /**
      * Sets the character encoding for this database engine.
+     *
+     * @param string $encoding
      */
-    public function setEncoding($encoding) {
-        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'SetEncoding'), E_USER_ERROR);
+    public function setEncoding($encoding)
+    {
+        trigger_error(
+            errorMessage(
+                "The selected database engine does not perform the requested task.",
+                $this->ClassName,
+                "SetEncoding"
+            ),
+            E_USER_ERROR
+        );
     }
 
     /**
@@ -2019,8 +2450,10 @@ abstract class Gdn_SQLDriver {
      * properties containing one rowset.
      * @param string $value The value to be set in $field. Ignored if $field was an array or object.
      * @param boolean $escapeString A boolean value indicating if the $value(s) should be escaped or not.
+     * @return $this
      */
-    public function setOverwrite($field, $value = '', $escapeString = true) {
+    public function setOverwrite($field, $value = "", $escapeString = true)
+    {
         return $this->set($field, $value, $escapeString, false);
     }
 
@@ -2029,20 +2462,22 @@ abstract class Gdn_SQLDriver {
      * does not support truncate).
      *
      * @param string $table The table to truncate.
+     * @return bool
      */
-    public function truncate($table = '') {
-        if ($table == '') {
+    public function truncate($table = "")
+    {
+        if ($table == "") {
             if (!isset($this->_Froms[0])) {
                 return false;
             }
 
             $table = $this->_Froms[0];
         } else {
-            $table = $this->escapeIdentifier($this->Database->DatabasePrefix.$table);
+            $table = $this->escapeIdentifier($this->Database->DatabasePrefix . $table);
         }
 
         $sql = $this->getTruncate($table);
-        $result = $this->query($sql, 'truncate');
+        $result = $this->query($sql, "delete");
         return $result;
     }
 
@@ -2053,12 +2488,13 @@ abstract class Gdn_SQLDriver {
      * @param string $table The table to which data should be updated.
      * @param mixed $set An array of $FieldName => $Value pairs, or an object of $DataSet->Field
      * properties containing one rowset.
-     * @param string $where Adds to the $this->_Wheres collection using $this->where();
-     * @param int $limit Adds a limit to the query.
-     * @return Gdn_SQLDriver $this
+     * @param string|false $where Adds to the $this->_Wheres collection using $this->where();
+     * @param int|false $limit Adds a limit to the query.
+     * @return $this
      */
-    public function update($table, $set = null, $where = false, $limit = false) {
-        if ($table != '') {
+    public function update($table, $set = null, $where = false, $limit = false)
+    {
+        if ($table != "") {
             $this->from($table);
         }
 
@@ -2080,9 +2516,10 @@ abstract class Gdn_SQLDriver {
     /**
      * Returns a plain-english string containing the version of the database engine.
      */
-    public function version() {
+    public function version()
+    {
         $query = $this->query($this->fetchVersionSql());
-        return $query->value('Version');
+        return $query->value("Version");
     }
 
     /**
@@ -2091,23 +2528,24 @@ abstract class Gdn_SQLDriver {
      * It should be used only in conjunction with methods that properly escape the sql.
      *
      * @param string $sql The condition to add.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    protected function _where($sql) {
+    protected function _where($sql)
+    {
         // Figure out the concatenation operator.
-        $concat = '';
+        $concat = "";
 
         if ($this->_OpenWhereGroupCount > 0) {
             $this->_WhereConcat = $this->_WhereGroupConcat;
         }
 
         if (count($this->_Wheres) > 0) {
-            $concat = str_repeat(' ', $this->_WhereGroupCount + 1).$this->_WhereConcat.' ';
+            $concat = str_repeat(" ", $this->_WhereGroupCount + 1) . $this->_WhereConcat . " ";
         }
 
         // Open the group(s) if necessary.
         while ($this->_OpenWhereGroupCount > 0) {
-            $concat .= '(';
+            $concat .= "(";
             $this->_OpenWhereGroupCount--;
         }
 
@@ -2115,7 +2553,7 @@ abstract class Gdn_SQLDriver {
         $this->_WhereConcat = $this->_WhereConcatDefault;
         $this->_WhereGroupConcat = $this->_WhereGroupConcatDefault;
 
-        $this->_Wheres[] = $concat.$sql;
+        $this->_Wheres[] = $concat . $sql;
 
         return $this;
     }
@@ -2132,9 +2570,20 @@ abstract class Gdn_SQLDriver {
      * on $field.
      * @param boolean $escapeValueSql A boolean value indicating if $this->EscapeString method should be called
      * on $value.
-     * @return Gdn_SQLDriver $this
+     * @return $this
      */
-    public function where($field, $value = null, $escapeFieldSql = true, $escapeValueSql = true) {
+    public function where($field, $value = null, $escapeFieldSql = true, $escapeValueSql = true)
+    {
+        if ($value instanceof CallbackWhereExpression) {
+            call_user_func($value->callback, $this);
+            return $this;
+        }
+
+        if ($field instanceof CallbackWhereExpression) {
+            call_user_func($field->callback, $this);
+            return $this;
+        }
+
         if (!is_array($field)) {
             $field = [$field => $value];
         }
@@ -2144,11 +2593,18 @@ abstract class Gdn_SQLDriver {
                 if (count($subValue) == 1) {
                     $firstVal = reset($subValue);
                     $this->where($subField, $firstVal);
+                } elseif (str_ends_with($subField, "<>")) {
+                    $this->whereNotIn(
+                        trim(\Vanilla\Utility\StringUtils::substringRightTrim($subField, "<>")),
+                        $subValue
+                    );
                 } else {
                     $this->whereIn($subField, $subValue);
                 }
             } elseif (is_object($subValue) && $subValue instanceof \Vanilla\Schema\RangeExpression) {
                 $this->whereRangeExpression($subField, $subValue);
+            } elseif ($subValue instanceof CallbackWhereExpression) {
+                $this->where($subValue);
             } else {
                 $whereExpr = $this->conditionExpr($subField, $subValue, $escapeFieldSql, $escapeValueSql);
                 if (strlen($whereExpr) > 0) {
@@ -2164,7 +2620,8 @@ abstract class Gdn_SQLDriver {
      *
      * @return int Returns the number of items in the where array.
      */
-    public function whereCount() {
+    public function whereCount()
+    {
         return count($this->_Wheres);
     }
 
@@ -2179,7 +2636,8 @@ abstract class Gdn_SQLDriver {
      * @param bool $escape Whether or not to escape the items in $values.
      * @return $this
      */
-    public function _whereIn($field, $values, $op = 'in', $escape = true) {
+    public function _whereIn($field, $values, $op = "in", $escape = true)
+    {
         if (is_null($field) || !is_array($values)) {
             return $this;
         }
@@ -2192,7 +2650,7 @@ abstract class Gdn_SQLDriver {
             if ($escape) {
                 $valueExpr = $this->Database->connection()->quote($value);
             } else {
-                $valueExpr = (string)$value;
+                $valueExpr = (string) $value;
             }
 
             if (strlen($valueExpr) > 0) {
@@ -2200,19 +2658,19 @@ abstract class Gdn_SQLDriver {
             }
         }
         if (count($in) > 0) {
-            $inExpr = '('.implode(', ', $in).')';
+            $inExpr = "(" . implode(", ", $in) . ")";
 
             // Set the final expression.
-            $expr = $fieldExpr.' '.$op.' '.$inExpr;
+            $expr = $fieldExpr . " " . $op . " " . $inExpr;
         } else {
             // We have an empty set.
-            if ($op === 'not in') {
+            if ($op === "not in") {
                 // This is necessarily true.
                 // This is a statement just in case their are any boolean expressions depending on this being here.
-                $expr = '1 = 1';
+                $expr = "1 = 1";
             } else {
                 // This is necessarily false.
-                $expr = '1 = 0';
+                $expr = "1 = 0";
             }
         }
         $this->_where($expr);
@@ -2221,16 +2679,30 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
+     * Convert an array into unnamed SQL parameters for a prepared statement for an IN or NOT IN statement.
+     *
+     * @param array $groupValue An array of values like ['asdfasdf', 4, 'asf]
+     * @return string A placeholder for a prepared statement. (?,?,?).
+     */
+    public function parameterizeGroupValue(array $groupValue): string
+    {
+        $resultMarks = array_fill(0, count($groupValue), "?");
+        return "(" . implode(",", $resultMarks) . ")";
+    }
+
+    /**
      * Adds to the $this->_WhereIns collection. Used to generate a "where field
      * in (1,2,3)" query. Concatenated with AND.
      *
      * @param string $field The field to search in for $values.
-     * @param array $values An array of values to look for in $field.
+     * @param array|string $values An array of values to look for in $field.
      * @param bool $escape Whether or not to escape individual values.
-     * @return Gdn_SQLDriver $this
+     * @return $this
+     * @deprecated
      */
-    public function whereIn($field, $values, $escape = true) {
-        return $this->_whereIn($field, $values, 'in', $escape);
+    public function whereIn($field, $values, $escape = true)
+    {
+        return $this->_whereIn($field, $values, "in", $escape);
     }
 
     /**
@@ -2242,8 +2714,9 @@ abstract class Gdn_SQLDriver {
      * @see Gdn_DatabaseDriver::whereIn()
      * @return $this
      */
-    public function whereNotIn($field, $values, $escape = true) {
-        return $this->_whereIn($field, $values, 'not in', $escape);
+    public function whereNotIn($field, $values, $escape = true)
+    {
+        return $this->_whereIn($field, $values, "not in", $escape);
     }
 
     /**
@@ -2253,8 +2726,9 @@ abstract class Gdn_SQLDriver {
      * @param string $op Either 'exists' or 'not exists'
      * @return $this
      */
-    public function whereExists($sqlDriver, $op = 'exists') {
-        $sql = $op." (\r\n".$sqlDriver->getSelect()."\n)";
+    public function whereExists($sqlDriver, $op = "exists")
+    {
+        $sql = $op . " (\r\n" . $sqlDriver->getSelect() . "\n)";
 
         // Add the inner select.
         $this->_where($sql);
@@ -2274,8 +2748,9 @@ abstract class Gdn_SQLDriver {
      * @return $this
      * @see Gdn_DatabaseDriver::whereExists()
      */
-    public function whereNotExists($sqlDriver) {
-        return $this->whereExists($sqlDriver, 'not exists');
+    public function whereNotExists($sqlDriver)
+    {
+        return $this->whereExists($sqlDriver, "not exists");
     }
 
     /**
@@ -2284,9 +2759,10 @@ abstract class Gdn_SQLDriver {
      * @param string $field The name of the field.
      * @param \Vanilla\Schema\RangeExpression $range The range expression to filter on.
      */
-    private function whereRangeExpression(string $field, \Vanilla\Schema\RangeExpression $range): void {
+    private function whereRangeExpression(string $field, \Vanilla\Schema\RangeExpression $range): void
+    {
         foreach ($range->getValues() as $op => $value) {
-            if ($op === '=') {
+            if ($op === "=") {
                 $this->where($field, $value);
             } else {
                 $this->where("$field $op", $value);

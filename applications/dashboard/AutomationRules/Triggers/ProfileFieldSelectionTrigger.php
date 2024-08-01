@@ -69,10 +69,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger
                 "type" => "string",
                 "required" => true,
                 "x-control" => SchemaForm::dropDown(
-                    new FormOptions(
-                        "Profile Field",
-                        "Dropdown (Single-, Multi-, or Numeric) and Single Checkbox profile field types are eligible for automation."
-                    ),
+                    new FormOptions("Profile Field", "Select a profile field"),
                     new ApiFormChoices(
                         "/api/v2/profile-fields?enabled=true&formType[]=dropdown&formType[]=tokens&formType[]=checkbox",
                         "/api/v2/profile-fields/%s",

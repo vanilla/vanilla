@@ -7,9 +7,7 @@
 
 namespace Models;
 
-use Vanilla\AutomationRules\Actions\CreateEscalationAction;
 use Vanilla\AutomationRules\Actions\UserFollowCategoryAction;
-use Vanilla\AutomationRules\Triggers\ReportPostTrigger;
 use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
 use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
@@ -32,9 +30,8 @@ class AutomationRuleModelTest extends SiteTestCase
      */
     public function setUp(): void
     {
-        \Gdn::config()->set("Feature.CommunityManagementBeta.Enabled", true);
-        \Gdn::config()->set("Feature.escalations.Enabled", true);
         parent::setUp();
+
         $mockAutomationRuleModel = $this->container()->get(MockAutomationRuleModel::class);
         $this->container()->setInstance(AutomationRuleModel::class, $mockAutomationRuleModel);
         $this->initialize();
@@ -92,32 +89,6 @@ class AutomationRuleModelTest extends SiteTestCase
         ]);
         $this->assertCount(1, $automationRules);
         $this->assertEquals(2, $automationRules[0]["automationRuleID"]);
-    }
-
-    /**
-     * Test get recipes filter by escalations.
-     *
-     * @return void
-     */
-    public function testGetRecipesFilterByEscalations(): void
-    {
-        // Filter by escalation
-        $automationRules = $this->automationRuleModel->getAutomationRules([
-            "escalations" => true,
-        ]);
-        $this->assertCount(0, $automationRules);
-
-        $trigger = ["type" => ReportPostTrigger::getType(), "value" => ["some dummy value"]];
-        $action = [
-            "type" => CreateEscalationAction::getType(),
-            "value" => ["Escalation Action values"],
-        ];
-        $this->createAutomationRule($trigger, $action);
-
-        $automationRules = $this->automationRuleModel->getAutomationRules([
-            "escalations" => true,
-        ]);
-        $this->assertCount(1, $automationRules);
     }
 
     /**

@@ -135,7 +135,6 @@ export default function AddEditReportReasonModalImp(props: IProps) {
               name: reportReason.name,
               description: reportReason.description,
               reportReasonID: reportReason.reportReasonID,
-              roleIDs: reportReason.roleIDs,
           }
         : {};
 
@@ -159,9 +158,6 @@ export default function AddEditReportReasonModalImp(props: IProps) {
     useEffect(() => {
         if (!isEqual(values, initial)) {
             setIsDirty(true);
-        }
-        if (values?.["reportReasonID"] && !reportReasonIDTouched) {
-            setReportReasonIDTouched(true);
         }
     }, [values]);
 
@@ -285,7 +281,12 @@ export default function AddEditReportReasonModalImp(props: IProps) {
                                             generateReportReasonID();
                                         }
                                     }}
-                                    onChange={setValues}
+                                    onChange={(values) => {
+                                        setValues(values);
+                                        if (values.reportReasonID && !reportReasonIDTouched) {
+                                            setReportReasonIDTouched(true);
+                                        }
+                                    }}
                                 />
                             </FrameBody>
                         }

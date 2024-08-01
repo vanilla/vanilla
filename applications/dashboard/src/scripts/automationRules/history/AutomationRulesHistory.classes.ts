@@ -92,11 +92,6 @@ export const automationRulesHistoryClasses = useThemeCache(() => {
         marginTop: 2,
     });
 
-    const centerAlign = css({
-        "& svg": { marginLeft: 0 },
-        "&&&": { textAlign: "center" },
-    });
-
     return {
         tableCellWrapper,
         tableHeader,
@@ -108,6 +103,5 @@ export const automationRulesHistoryClasses = useThemeCache(() => {
         accordionChevron,
         filterConatainer,
         dateIcon,
-        centerAlign,
     };
 });

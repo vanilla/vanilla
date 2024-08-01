@@ -67,8 +67,6 @@ class AttachmentModel extends Gdn_Model
     /** @var AttachmentModel */
     static $Instance = null;
 
-    const ESCALATED_BY_AI = "escalatedByAI";
-
     /**
      * Set up the attachment.
      */

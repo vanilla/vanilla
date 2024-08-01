@@ -589,7 +589,7 @@ components:
                     description: |
                         This is where we store the default followed categories
                     type: string
-                    default: "[]"
+                    default: ""
                     x-key: "Preferences.CategoryFollowed.Defaults"
                     x-read: community.manage
                     x-write: community.manage

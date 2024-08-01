@@ -102,7 +102,7 @@ class StaleCollectionTriggerTest extends SiteTestCase
     private function automationRuleRecord(array $triggerOverRides = []): array
     {
         $body = [
-            "name" => "Stale Collection Automation Rule - " . CurrentTimeStamp::getDateTime()->format("U"),
+            "name" => "Stale Collection Automation Rule - " . date("U"),
             "trigger" => [
                 "triggerType" => StaleCollectionTrigger::getType(),
                 "triggerValue" => [
@@ -222,7 +222,6 @@ class StaleCollectionTriggerTest extends SiteTestCase
      */
     public function testLongRunnerExecution()
     {
-        CurrentTimeStamp::mockTime("+5 seconds");
         $this->resetTable("collectionRecord");
         $this->resetTable("collection");
         // Create two collection records

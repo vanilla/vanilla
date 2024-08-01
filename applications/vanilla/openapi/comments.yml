@@ -653,6 +653,11 @@ components:
                     type: string
                 reportMeta:
                     $ref: "../../vanilla/openapi/reports.yml#/components/schemas/ReportMeta"
+                countReports:
+                    type: integer
+                    default: 0
+                    description: The number of reports on the discussion.
+                    x-feature: "Feature.CommunityManagement.Enabled"
                 suggestion:
                     type: object
                     properties:

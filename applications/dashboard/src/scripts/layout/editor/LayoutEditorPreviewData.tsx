@@ -356,10 +356,9 @@ export class LayoutEditorPreviewData {
             return Array(3)
                 .fill(0)
                 .map((_, idx) => ({
-                    aiSuggestionID: 1,
                     format: "Vanilla",
                     type: "discussion",
-                    documentID: idx + 1,
+                    id: idx + 1,
                     url: siteUrl("/#"),
                     title: "Suggested Discussion Title",
                     summary:

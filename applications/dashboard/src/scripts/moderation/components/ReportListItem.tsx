@@ -41,7 +41,6 @@ import apiv2 from "@library/apiv2";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { ReportStatus, reportStatusLabel } from "@dashboard/moderation/components/ReportFilters.constants";
-import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
 
 interface IProps {
     report: IReport;
@@ -52,14 +51,12 @@ export function ReportListItem(props: IProps) {
     const classes = reportListItemClasses();
     const url = "/dashboard/content/triage/" + report.reportID;
     const [showEscalate, setShowEscalate] = useState(false);
-    const { fetchDashboardSections } = useDashboardSectionActions();
 
     const queryClient = useQueryClient();
     const toast = useToast();
     function invalidateCaches() {
         queryClient.invalidateQueries(["reports"]);
         queryClient.invalidateQueries(["post"]);
-        fetchDashboardSections();
     }
 
     const dismissMutation = useMutation({

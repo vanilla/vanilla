@@ -13,10 +13,9 @@ import { IconType } from "@vanilla/icons";
 import { RecordID } from "@vanilla/utils";
 
 export interface ISuggestedAnswer {
-    aiSuggestionID: RecordID;
     format: string;
     type: string;
-    documentID: RecordID;
+    id: RecordID;
     url: string;
     title: string;
     summary: string;

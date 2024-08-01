@@ -48,30 +48,27 @@ function MockWrapper(props: { children: ReactNode }) {
 
 const suggestions = [
     {
-        aiSuggestionID: 1,
         format: "Vanilla",
         type: "discussion",
-        documentID: 1,
+        id: 1,
         url: "http://example.com/suggested-discussion/1",
         title: "Suggested Discussion",
         summary: "Summary for suggested answer from a discussion.",
         hidden: false,
     },
     {
-        aiSuggestionID: 2,
         format: "Vanilla",
         type: "article",
-        documentID: 2,
+        id: 2,
         url: "http://example.com/suggested-article/2",
         title: "Suggested Article",
         summary: "Summary for suggested answer from an article.",
         hidden: true,
     },
     {
-        aiSuggestionID: 3,
         format: "Zendesk",
         type: "article",
-        documentID: 2,
+        id: 2,
         url: "http://example.com/suggested-zendesk/2",
         title: "Suggested Zendesk Article",
         summary: "Summary for suggested answer from a Zendesk Article.",

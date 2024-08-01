@@ -21,13 +21,6 @@ class AutomationRuleService
     /** @var array<class-string<AutomationAction>> */
     private array $automationActions = [];
 
-    private EscalationRuleService $escalationRuleService;
-
-    public function __construct(EscalationRuleService $escalationRuleService)
-    {
-        $this->escalationRuleService = $escalationRuleService;
-    }
-
     /**
      * Add an automation trigger
      *
@@ -61,13 +54,11 @@ class AutomationRuleService
     {
         $triggerTypes = [];
         foreach ($this->automationTriggers as $key => $trigger) {
-            $triggerTypes[$key] = $trigger;
+            if ($trigger::canAddTrigger()) {
+                $triggerTypes[$key] = $trigger;
+            }
         }
-        // Add escalation triggers
-        $escalationTriggers = $this->escalationRuleService->getEscalationTriggers();
-        foreach ($escalationTriggers as $key => $trigger) {
-            $triggerTypes[$key] = $trigger;
-        }
+
         return $triggerTypes;
     }
 
@@ -79,11 +70,12 @@ class AutomationRuleService
      */
     public function getAutomationTrigger(string $trigger): ?AutomationTrigger
     {
-        $class = $this->automationTriggers[$trigger] ?? $this->escalationRuleService->getEscalationTrigger($trigger);
-        if (!empty($class)) {
-            return new $class();
+        $class = $this->automationTriggers[$trigger];
+        $trigger = new $class();
+        if ($trigger::canAddTrigger()) {
+            return $trigger;
         }
-        return $class;
+        return null;
     }
 
     /**
@@ -95,13 +87,11 @@ class AutomationRuleService
     {
         $actionTypes = [];
         foreach ($this->automationActions as $key => $action) {
-            $actionTypes[$key] = $action;
+            if ($action::canAddAction()) {
+                $actionTypes[$key] = $action;
+            }
         }
-        // Add escalation actions
-        $escalationActions = $this->escalationRuleService->getEscalationActions();
-        foreach ($escalationActions as $key => $action) {
-            $actionTypes[$key] = $action;
-        }
+
         return $actionTypes;
     }
 
@@ -113,8 +103,11 @@ class AutomationRuleService
      */
     public function isActionRegistered(string $actionType): bool
     {
-        return isset($this->automationActions[$actionType]) ||
-            !empty($this->escalationRuleService->getEscalationAction($actionType));
+        $action = $this->automationActions[$actionType];
+        if (isset($action) && $action::canAddAction()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -125,8 +118,11 @@ class AutomationRuleService
      */
     public function isTriggerRegistered(string $triggerType): bool
     {
-        return isset($this->automationTriggers[$triggerType]) ||
-            !empty($this->escalationRuleService->getEscalationTrigger($triggerType));
+        $trigger = $this->automationTriggers[$triggerType];
+        if (isset($trigger) && $trigger::canAddTrigger()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -137,8 +133,11 @@ class AutomationRuleService
      */
     public function getAction(string $actionType): ?string
     {
-        return $this->automationActions[$actionType] ??
-            ($this->escalationRuleService->getEscalationAction($actionType) ?? null);
+        $action = $this->automationActions[$actionType] ?? null;
+        if (isset($action) && $action::canAddAction()) {
+            return $action;
+        }
+        return null;
     }
 
     /**
@@ -149,10 +148,10 @@ class AutomationRuleService
     public function getTimedAutomationTriggerTypes(): array
     {
         $triggerTypes = [];
-        $automationTriggers = $this->getAutomationTriggers();
-        $escalationTriggers = $this->escalationRuleService->getEscalationTriggers();
-        $triggers = array_merge($automationTriggers, $escalationTriggers);
-        foreach ($triggers as $type => $trigger) {
+        foreach ($this->automationTriggers as $type => $trigger) {
+            if (!$trigger::canAddTrigger()) {
+                continue;
+            }
             if (is_a($trigger, TimedAutomationTrigger::class, true)) {
                 $triggerTypes[] = $type;
             }

@@ -30,6 +30,7 @@ use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Dashboard\Events\UserPointEvent;
 use Vanilla\Dashboard\Events\UserRoleModificationEvent;
+use Vanilla\Dashboard\Events\UserRoleRemoveEvent;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Dashboard\Models\UserFragment;
@@ -142,7 +143,6 @@ class UserModel extends Gdn_Model implements
     public const OPT_FORCE_SYNC = "forceSync";
     public const OPT_TRUSTED_PROVIDER = "trustedProvider";
     public const OPT_NO_CONFIRM_EMAIL = "NoConfirmEmail";
-    public const OPT_SSO_REGISTRATION = "SSORegistration";
     public const OPT_FIX_UNIQUE = "FixUnique";
     public const OPT_SAVE_ROLES = "SaveRoles";
     public const OPT_VALIDATE_NAME = "ValidateName";
@@ -927,19 +927,7 @@ class UserModel extends Gdn_Model implements
      */
     public static function requireConfirmEmail()
     {
-        return (Gdn::config("Garden.Registration.ConfirmEmail") ||
-            Gdn::config("Garden.Registration.SSOConfirmEmail")) &&
-            !self::noEmail();
-    }
-
-    /**
-     * Whether or not the application requires email confirmation.
-     *
-     * @return bool
-     */
-    public static function requireSSOConfirmEmail()
-    {
-        return c("Garden.Registration.SSOConfirmEmail") && !self::noEmail();
+        return c("Garden.Registration.ConfirmEmail") && !self::noEmail();
     }
 
     /**
@@ -1310,7 +1298,6 @@ class UserModel extends Gdn_Model implements
         }
 
         $result = $this->save($newUser, [
-            self::OPT_SSO_REGISTRATION => true,
             self::OPT_NO_CONFIRM_EMAIL => true,
             self::OPT_FIX_UNIQUE => true,
             self::OPT_SAVE_ROLES => isset($newUser["RoleID"]),
@@ -1338,7 +1325,6 @@ class UserModel extends Gdn_Model implements
 
         $options += [
             self::OPT_CHECK_CAPTCHA => false,
-            self::OPT_SSO_REGISTRATION => true,
             self::OPT_NO_CONFIRM_EMAIL => isset($userData["Email"]) || !UserModel::requireConfirmEmail(),
             self::OPT_NO_ACTIVITY => true,
             self::OPT_SYNC_EXISTING => true,
@@ -1516,10 +1502,7 @@ class UserModel extends Gdn_Model implements
         unset($fields["Roles"]);
 
         // Massage the roles for email confirmation.
-        if (
-            (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $options)) ||
-            (self::requireSSOConfirmEmail() && val(self::OPT_SSO_REGISTRATION, $options))
-        ) {
+        if (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $options)) {
             $confirmRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
 
             if (!empty($confirmRoleIDs)) {
@@ -3205,10 +3188,7 @@ class UserModel extends Gdn_Model implements
             }
 
             // Check for email confirmation.
-            if (
-                (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $settings)) ||
-                (self::requireSSOConfirmEmail() && val(self::OPT_SSO_REGISTRATION, $settings))
-            ) {
+            if (self::requireConfirmEmail() && !val(self::OPT_NO_CONFIRM_EMAIL, $settings)) {
                 $currentUserEmailIsBeingChanged =
                     $this->session->isValid() &&
                     $userID == $this->session->UserID &&

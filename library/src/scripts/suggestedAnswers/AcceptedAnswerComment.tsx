@@ -44,11 +44,9 @@ export function AcceptedAnswerComment(props: IAcceptedAnswerProps) {
 
     const handleUndoAcceptAnswer = async () => {
         try {
-            await acceptAnswer({
-                suggestion: suggestion.aiSuggestionID,
-                accept: false,
-                commentID: suggestion.commentID,
-            });
+            const index =
+                discussion.suggestions?.findIndex(({ commentID }) => commentID === suggestion.commentID) ?? -1;
+            await acceptAnswer({ suggestion: index, accept: false, commentID: suggestion.commentID });
             onMutateSuccess?.();
         } catch (err) {
             toastError(err);

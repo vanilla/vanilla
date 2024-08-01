@@ -127,7 +127,7 @@ export function makeViteCommonConfig(): UserConfig {
                 "@vanilla/icons",
                 "@vanilla/i18n",
                 "@vanilla/json-schema-forms",
-                "chunk-*",
+                `fake-dep-${Math.random()}`,
             ],
             include: [
                 "@vanilla/utils > tabbable",

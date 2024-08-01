@@ -6,15 +6,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {{ pageHead }}
         <noscript>
+            {% apply minifyStylesheetContents %}
             <style>
                 body .page {
                     max-height: initial;
                     height: initial;
                 }
             </style>
+            {% endapply %}
         </noscript>
 
         <style>
+            {% apply minifyStylesheetContents %}
             body {
                 background: {{ "#{theme.variable('global.body.backgroundImage.color', theme.variable('global.options.preset', 'light') == 'light' ? '#fff' : '#272A2D')}" }};
                 font-size: {{ "#{theme.variable('global.fonts.size.medium', 14)}px" }};
@@ -57,8 +60,7 @@
 
                 min-height: 100vh;
             }
-        </style>
-        <style>
+
             body.isLoading #titleBar {
                 background: {{ theme.variable("titleBar.colors.bg", "#037DBC") }};
                 height: {{ theme.pixelVariable('titleBar.sizing.height', 48) }}px;
@@ -72,14 +74,17 @@
                 /* For the legacy Gdn_Controller FOUC */
                 visibility: hidden;
             }
+            {% endapply %}
         </style>
         <noscript>
+            {% apply minifyStylesheetContents %}
             <style>
                 body.isLoading .Frame {
                     /* For the legacy Gdn_Controller FOUC */
                     visibility: visible;
                 }
             </style>
+            {% endapply %}
         </noscript>
     </head>
 

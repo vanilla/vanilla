@@ -236,7 +236,7 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
             "default" => array_keys($formChoices),
             "enum" => array_keys($formChoices),
             "x-control" => SchemaForm::dropDown(
-                new FormOptions("Post Type"),
+                new FormOptions("Post Type", "Select a post type."),
                 new StaticFormChoices($formChoices),
                 null,
                 true

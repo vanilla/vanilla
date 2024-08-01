@@ -23,7 +23,6 @@ use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Vanilla\Analytics\AnalyticsActionsProvider;
 use Vanilla\Analytics\TrackableDecoratorInterface;
 use Vanilla\Cache\CacheCacheAdapter;
-use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\Providers\DefaultImageResizeProvider;
 use Vanilla\Layout\GlobalLayoutRecordProvider;
@@ -312,9 +311,6 @@ class Bootstrap
 
                 return $uid;
             })
-
-            ->rule(AiSuggestionSourceService::class)
-            ->setShared(true)
 
             ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
             ->setShared(true)

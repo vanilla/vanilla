@@ -1137,8 +1137,7 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
                 $roleType = val("Type", $role);
                 $newType = val("Type", $formPostValues, null);
                 if (
-                    (Gdn::config("Garden.Registration.ConfirmEmail") ||
-                        Gdn::config("Garden.Registration.SSOConfirmEmail")) &&
+                    c("Garden.Registration.ConfirmEmail") &&
                     $roleType === self::TYPE_UNCONFIRMED &&
                     $newType !== self::TYPE_UNCONFIRMED &&
                     $newType !== null

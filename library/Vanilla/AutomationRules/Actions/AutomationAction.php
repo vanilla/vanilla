@@ -7,7 +7,6 @@
 
 namespace Vanilla\AutomationRules\Actions;
 
-use AttachmentModel;
 use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
@@ -331,22 +330,6 @@ abstract class AutomationAction
      */
     abstract static function getTriggers(): array;
 
-    public static function isTriggeredByAi(string $triggerType, array $triggers): bool
-    {
-        $currentTrigger = null;
-        foreach ($triggers as $trigger) {
-            if ($trigger::getType() == $triggerType) {
-                $currentTrigger = $trigger;
-                break;
-            }
-        }
-        if (is_a($currentTrigger, \Vanilla\AutomationRules\Trigger\AiTriggerInterface::class, true)) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * Add valid action based where clause to limit list of objects to act on.
      *
@@ -526,6 +509,14 @@ abstract class AutomationAction
      * @return bool
      */
     abstract public function executeLongRunner(array $actionValue, array $object): bool;
+
+    /**
+     * @return string
+     */
+    public function getDispatchType(): string
+    {
+        return $this->dispatchType;
+    }
 
     /**
      * Can This action can be added

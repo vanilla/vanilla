@@ -10,8 +10,6 @@
 
 use Ramsey\Uuid\Uuid;
 use Vanilla\Addon;
-use Vanilla\Dashboard\AiSuggestionModel;
-use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\Dashboard\Models\ModerationMessageStructure;
 use Vanilla\Dashboard\Models\QueuedJobModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
@@ -1359,7 +1357,6 @@ $Construct
     ->column("dateUpdated", "datetime", false, ["index"])
     ->set($Explicit, $Drop);
 
-AiSuggestionModel::structure($Database, $Explicit, $Drop);
 // Automation Rules Structure
 AutomationRuleModel::structure($Database, $Explicit, $Drop);
 AutomationRuleRevisionModel::structure($Database, $Explicit, $Drop);
@@ -1454,9 +1451,6 @@ AuditLogModel::structure($Construct);
 UserMentionsModel::structure($Database);
 ProfileFieldModel::structure();
 ReactionModel::structure($Construct);
-
-// Interests
-InterestModel::structure($Construct, $Explicit, $Drop);
 
 // Remove legacy Plugins
 Gdn::config()->removeFromConfig($LEGACYADDON);

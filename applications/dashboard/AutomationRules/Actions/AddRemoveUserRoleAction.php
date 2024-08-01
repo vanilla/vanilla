@@ -96,14 +96,14 @@ class AddRemoveUserRoleAction extends AutomationAction implements UserInterface,
                     "type" => "string",
                     "required" => true,
                     "x-control" => SchemaForm::dropDown(
-                        new FormOptions("Assign Role"),
+                        new FormOptions("Assign Role", "Select a role to be assigned"),
                         new ApiFormChoices("/api/v2/roles", "/api/v2/roles/%s", "roleID", "name")
                     ),
                 ],
                 "removeRoleID" => [
                     "type" => "string",
                     "x-control" => SchemaForm::dropDown(
-                        new FormOptions("Remove Role (optional)"),
+                        new FormOptions("Remove Role (optional)", "Select a role to be removed"),
                         new ApiFormChoices("/api/v2/roles", "/api/v2/roles/%s", "roleID", "name")
                     ),
                 ],

@@ -27,11 +27,16 @@ interface IAutomationRulesSummaryProps {
 export default function AutomationRulesSummary(props: IAutomationRulesSummaryProps) {
     const { formValues, isEditing, isRuleRunning } = props;
     const classes = automationRulesClasses();
-    const { automationRulesCatalog, rolesByID, profileFields, tags, collections, categories, ideaStatusesByID, users } =
+    const { automationRulesCatalog, rolesByID, profileFields, tags, collections, categories, ideaStatusesByID } =
         useAutomationRules();
 
     const reportReasonsFromCatalog = (
         automationRulesCatalog?.triggers?.reportPostTrigger?.schema?.properties?.reportReasonID?.[
+            "x-control"
+        ] as IDropdownControl
+    )?.choices?.staticOptions as Record<string, string>;
+    const moderatorsFromCatalog = (
+        automationRulesCatalog?.actions?.createEscalationAction?.schema?.properties?.assignedModeratorID?.[
             "x-control"
         ] as IDropdownControl
     )?.choices?.staticOptions as Record<string, string>;
@@ -43,7 +48,6 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
           !categories ||
           !tags ||
           !collections ||
-          !users ||
           (Object.keys(automationRulesCatalog?.triggers ?? {}).includes("ideationVoteTrigger") && !ideaStatusesByID)
         : false;
 
@@ -310,10 +314,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
                                         <>
                                             {`${t("and assign to")} `}
                                             {valueAsTokenItem(
-                                                assignedModeratorActionValue,
-                                                undefined,
-                                                users,
-                                                "userID",
+                                                moderatorsFromCatalog?.[assignedModeratorActionValue],
                                             )}{" "}
                                         </>
                                     )}
@@ -331,9 +332,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
     );
 
     const shouldCheckAdditionalQuery =
-        (categories && (categoryActionValue || reportCategoryTriggerValue)) ||
-        (tags && tagActionValue) ||
-        (users && assignedModeratorActionValue);
+        (categories && (categoryActionValue || reportCategoryTriggerValue)) || (tags && tagActionValue);
 
     return isLoading ? (
         <>
@@ -345,6 +344,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
             {shouldCheckAdditionalQuery && (
                 <AutomationRulesSummaryQuery
                     categories={categories}
+                    tags={tags}
                     categoryValue={
                         categoryActionValue
                             ? categoryActionValue
@@ -352,10 +352,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
                             ? reportCategoryTriggerValue
                             : false
                     }
-                    tags={tags}
                     tagValue={tagActionValue}
-                    users={users}
-                    userValue={assignedModeratorActionValue}
                 />
             )}
             {isEditing && isRuleRunning && (

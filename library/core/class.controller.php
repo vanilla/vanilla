@@ -2058,7 +2058,6 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
      */
     public function renderException($ex)
     {
-        $isContainerException = $ex instanceof \Garden\Container\NotFoundException;
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             try {
                 // Pick our route.
@@ -2068,11 +2067,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                         $route = "DefaultPermission";
                         break;
                     case 404:
-                        if ($isContainerException) {
-                            $route = "/home/error";
-                        } else {
-                            $route = "Default404";
-                        }
+                        $route = "Default404";
                         break;
                     default:
                         $route = "/home/error";
@@ -2097,7 +2092,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                         ->passData("Url", url())
                         ->passData("Breadcrumbs", $this->data("Breadcrumbs", []))
                         ->dispatch($route);
-                } elseif (in_array($ex->getCode(), [401, 403, 404]) && !$isContainerException) {
+                } elseif (in_array($ex->getCode(), [401, 403, 404])) {
                     // Default forbidden & not found codes.
                     Gdn::dispatcher()
                         ->passData("Message", $ex->getMessage())
@@ -2199,7 +2194,9 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
                 $cssAnchors = LegacyAssetModel::getAnchors();
                 $assetProvider = \Gdn::getContainer()->get(ViteAssetProvider::class);
-                $bootstrapInline = $assetProvider->getBootstrapInlineScript();
+                $inlineScript = $assetProvider->getBootstrapInlineScript();
+                $jsMinifier = new MatthiasMullie\Minify\JS($inlineScript);
+                $bootstrapInline = $jsMinifier->minify();
                 $this->Head->addScript("", "", false, ["content" => $bootstrapInline, HeadModule::SORT_KEY => -1]);
 
                 $this->EventArguments["CssFiles"] = &$this->_CssFiles;
@@ -2456,6 +2453,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             /** @var MasterViewRenderer $viewRenderer */
             $viewRenderer = Gdn::getContainer()->get(MasterViewRenderer::class);
             $result = $viewRenderer->renderGdnController($this);
+
             echo $result;
         } else {
             // Force our icons into the legacy master template

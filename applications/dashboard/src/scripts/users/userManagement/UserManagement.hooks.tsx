@@ -12,7 +12,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserSortParams, USERS_LIMIT_PER_PAGE } from "@dashboard/users/userManagement/UserManagementUtils";
 import { IApiError, IFieldError } from "@library/@types/api/core";
 export interface IGetUsersQueryParams {
-    userID?: Array<IUser["userID"]>;
     query?: string;
     name?: string;
     email?: string;

@@ -21,10 +21,8 @@ import { useTagList } from "@library/features/tags/TagsHooks";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { AxiosResponseHeaders } from "axios";
-import { IGetUsersResponse, useGetUsers } from "@dashboard/users/userManagement/UserManagement.hooks";
 
-export function useRecipes(continiousFetch: boolean = true, escalationActionsFilter?: boolean) {
-    const queryParams = escalationActionsFilter ? { escalations: true } : {};
+export function useRecipes(continiousFetch: boolean = true) {
     const {
         data: recipes,
         isLoading,
@@ -32,14 +30,12 @@ export function useRecipes(continiousFetch: boolean = true, escalationActionsFil
         isRefetching,
     } = useQuery<any, IApiError, IAutomationRule[]>({
         queryFn: async () => {
-            const response = await apiv2.get("/automation-rules/recipes?expand=all", {
-                params: queryParams,
-            });
+            const response = await apiv2.get("/automation-rules/recipes?expand=all");
             return response.data;
         },
         refetchOnMount: "always",
         refetchInterval: continiousFetch ? 15000 : false,
-        queryKey: ["automationRules", queryParams],
+        queryKey: ["automationRules"],
     });
 
     return { recipes, isLoading, error, isRefetching };
@@ -129,16 +125,13 @@ export function useRunAutomationRule(automationRuleID: AddEditAutomationRulePara
     });
 }
 
-export function useAutomationRulesCatalog(escalationActionsFilter?: boolean) {
-    const queryParams = escalationActionsFilter ? { escalations: true } : {};
+export function useAutomationRulesCatalog() {
     const { data, isLoading } = useQuery<any, IApiError, IAutomationRulesCatalog>({
         queryFn: async () => {
-            const response = await apiv2.get("/automation-rules/catalog", {
-                params: queryParams,
-            });
+            const response = await apiv2.get("/automation-rules/catalog");
             return response.data;
         },
-        queryKey: ["automationRulesCatalog", queryParams],
+        queryKey: ["automationRulesCatalog"],
     });
 
     return { data, isLoading };
@@ -179,29 +172,16 @@ export function useGetAdditionalData(query: AutomationRulesAdditionalDataQuery, 
 
     const { data: additionalTags } = useTagList(query?.tagsQuery ?? {}, Boolean(query?.tagsQuery?.tagID?.length));
 
-    const { data: additionalUsersData } = useGetUsers(
-        query?.usersQuery ?? {},
-        Boolean(query?.usersQuery?.userID?.length),
-    );
-
     useEffect(() => {
         if (additionalCategories) {
-            queryClient.setQueryData(["categoryList", initialQuery], (initialData: ICategory[]) => {
-                return [...initialData, ...additionalCategories];
+            queryClient.setQueryData(["categoryList", initialQuery], (initialData) => {
+                return [...(initialData as ICategory[]), ...additionalCategories];
             });
         }
         if (additionalTags) {
-            queryClient.setQueryData(["tags", initialQuery], (initialData: ITag[]) => {
-                return [...initialData, ...additionalTags];
+            queryClient.setQueryData(["tags", initialQuery], (initialData) => {
+                return [...(initialData as ITag[]), ...additionalTags];
             });
         }
-        if (additionalUsersData) {
-            queryClient.setQueryData(["users_userManagement", initialQuery], (initialData: IGetUsersResponse) => {
-                return {
-                    ...initialData,
-                    users: [...initialData?.users, ...additionalUsersData.users],
-                };
-            });
-        }
-    }, [additionalCategories, additionalTags, additionalUsersData]);
+    }, [additionalCategories, additionalTags]);
 }

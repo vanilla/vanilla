@@ -20,7 +20,6 @@ import { formatUrl } from "@library/utility/appUtils";
 import {
     AutomationRuleDispatchStatusType,
     IAutomationRuleDispatch,
-    IAutomationRulesCatalog,
     IGetAutomationRuleDispatchesParams,
 } from "@dashboard/automationRules/AutomationRules.types";
 import { loadingPlaceholder, mapApiValuesToFormValues } from "@dashboard/automationRules/AutomationRules.utils";
@@ -38,18 +37,17 @@ interface IProps {
     isLoading?: boolean;
     updateQuery: (newFilter: IGetAutomationRuleDispatchesParams) => void;
     isFilteredByRuleID?: boolean;
-    automationRulesCatalog?: IAutomationRulesCatalog;
 }
 
 export function AutomationRulesHistoryTable(props: IProps) {
-    const { dispatches, isLoading, updateQuery, isFilteredByRuleID, automationRulesCatalog } = props;
+    const { dispatches, isLoading, updateQuery, isFilteredByRuleID } = props;
     const classes = automationRulesHistoryClasses();
 
     return (
         <table className={classes.table}>
             <thead className={classes.tableHeader}>
                 <tr className={cx(tableClasses().row)}>
-                    {[isFilteredByRuleID ? "Action" : "Rule", "Affected", "Updated", "Status", "Last run", ""].map(
+                    {[isFilteredByRuleID ? "Action" : "Rule", "Affected", "Updated", "Last run", "Status", ""].map(
                         (header, index) => (
                             <th
                                 key={index}
@@ -71,7 +69,6 @@ export function AutomationRulesHistoryTable(props: IProps) {
                             key={index}
                             updateQuery={updateQuery}
                             isFilteredByRuleID={isFilteredByRuleID}
-                            automationRulesCatalog={automationRulesCatalog}
                         />
                     ))}
             </tbody>
@@ -83,12 +80,9 @@ function AutomationRulesHistoryAccordion(props: {
     dispatch: IAutomationRuleDispatch;
     updateQuery: (newFilter: IGetAutomationRuleDispatchesParams) => void;
     isFilteredByRuleID?: boolean;
-    automationRulesCatalog?: IAutomationRulesCatalog;
 }) {
-    const { dispatch, updateQuery, isFilteredByRuleID, automationRulesCatalog } = props;
+    const { dispatch, updateQuery, isFilteredByRuleID } = props;
     const classes = automationRulesHistoryClasses();
-
-    const triggerContentType = automationRulesCatalog?.triggers?.[dispatch.trigger.triggerType ?? ""]?.contentType;
 
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -134,7 +128,9 @@ function AutomationRulesHistoryAccordion(props: {
                     className={classes.tableCellWrapper}
                 >
                     <span>
-                        {triggerContentType === "users"
+                        {["emailDomainTrigger", "profileFieldTrigger", "timeSinceUserRegistrationTrigger"].includes(
+                            dispatch.trigger.triggerType,
+                        )
                             ? `${t("Users")}: ${dispatch.affectedRows?.user ?? ""}`
                             : `${t("Posts")}: ${dispatch.affectedRows?.post ?? ""}`}
                     </span>
@@ -160,22 +156,13 @@ function AutomationRulesHistoryAccordion(props: {
                     </animated.div>
                 </span>
             </td>
-            <td className={cx(tableClasses().cell, classes.centerAlign)}>
-                <span>
-                    <AutomationRulesHistoryStatus
-                        dispatchID={dispatch.automationRuleDispatchUUID}
-                        status={dispatch.dispatchStatus}
-                    />
-                </span>
-            </td>
             <td className={tableClasses().cell}>
                 <span className={cx(classes.tableCellWrapper, classes.tableDateCell)}>
-                    <div className={automationRulesClasses().flexContainer()}>
-                        <DateTime
-                            timestamp={dispatch.dateFinished ?? dispatch.dateDispatched}
-                            type={DateFormats.EXTENDED}
-                        />
-                    </div>
+                    {dispatch.dateFinished && (
+                        <div className={automationRulesClasses().flexContainer()}>
+                            <DateTime timestamp={dispatch.dateFinished} type={DateFormats.EXTENDED} />
+                        </div>
+                    )}
                     <animated.div style={{ height: animatedDateLastRunHeight }}>
                         <div ref={dateLastRunRef}>
                             {dispatch.dispatchType === "triggered" && <div>{t("Auto Run")}</div>}
@@ -192,6 +179,14 @@ function AutomationRulesHistoryAccordion(props: {
                             )}
                         </div>
                     </animated.div>
+                </span>
+            </td>
+            <td className={tableClasses().cell}>
+                <span>
+                    <AutomationRulesHistoryStatus
+                        dispatchID={dispatch.automationRuleDispatchUUID}
+                        status={dispatch.dispatchStatus}
+                    />
                 </span>
             </td>
             <td className={tableClasses().cell}>

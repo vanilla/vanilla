@@ -69,12 +69,11 @@ export function AutomationRulesPreviewContentHeader(props: IProps) {
                         </div>
                     </>
                 ) : emptyResults ? (
-                    <Translate
-                        source={
-                            "This will not affect any <0 /> right now. It will affect those that meet the criteria in future."
-                        }
-                        c0={contentType.toLowerCase()}
-                    />
+                    <>
+                        {t(
+                            `This will not affect any ${contentType.toLowerCase()} right now. It will affect those that meet the criteria in future.`,
+                        )}
+                    </>
                 ) : (
                     <></>
                 )}

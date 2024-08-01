@@ -13,6 +13,7 @@ $Configuration['EnabledPlugins']['stubcontent'] = true;
 $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledApplications']['Dashboard'] = 'dashboard';
 $Configuration['EnabledPlugins']['rich-editor'] = true;
+$Configuration['EnabledPlugins']['FederatedSearch'] = true;
 
 // ImageUpload
 $Configuration['ImageUpload']['Limits']['Enabled'] = false;
@@ -21,9 +22,9 @@ $Configuration['ImageUpload']['Limits']['Height'] = '1400';
 
 // Database defaults.
 $Configuration['Database']['Engine'] = 'MySQL';
-$Configuration['Database']['Host'] = 'database';
-$Configuration['Database']['Name'] = 'vanilla_dev';
-$Configuration['Database']['User'] = 'root';
+$Configuration['Database']['Host'] = 'dbhost';
+$Configuration['Database']['Name'] = 'dbname';
+$Configuration['Database']['User'] = 'dbuser';
 $Configuration['Database']['Password']  = '';
 $Configuration['Database']['CharacterEncoding'] = 'utf8mb4';
 $Configuration['Database']['DatabasePrefix'] = 'GDN_';
@@ -32,7 +33,6 @@ $Configuration['Database']['ConnectionOptions'] = [
     12 => false, // PDO::ATTR_PERSISTENT
     1000 => true, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY (missing in some PHP installations)
 ];
-
 
 //Configuration for Dba Counts
 $Configuration['Dba']['Limit'] = 1000;

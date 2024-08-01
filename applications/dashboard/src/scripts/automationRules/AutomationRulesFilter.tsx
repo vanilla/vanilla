@@ -52,7 +52,7 @@ export function AutomationRulesFilter(props: {
                         staticOptions: Object.fromEntries(
                             Object.keys(automationRulesCatalog?.triggers ?? {}).map((trigger) => [
                                 trigger,
-                                automationRulesCatalog?.triggers[trigger]?.name,
+                                automationRulesCatalog?.triggers[trigger].name,
                             ]),
                         ),
                     },

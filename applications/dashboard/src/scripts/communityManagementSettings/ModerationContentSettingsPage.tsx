@@ -21,12 +21,7 @@ import { useCollisionDetector } from "@vanilla/react-utils";
 import { css, cx } from "@emotion/css";
 import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
 import { getMeta } from "@library/utility/appUtils";
-import { useEffect, useState } from "react";
-import Button from "@library/forms/Button";
-import ModalConfirm from "@library/modal/ModalConfirm";
-import { useMutation } from "@tanstack/react-query";
-import apiv2 from "@library/apiv2";
-import { useToast } from "@library/features/toaster/ToastContext";
+import { useEffect } from "react";
 
 const BETA_ENABLED = getMeta("featureFlags.CommunityManagementBeta.Enabled", false);
 export const CONF_ESCALATIONS_ENABLED = "escalations.enabled";
@@ -53,7 +48,6 @@ export default function ModerationContentSettingsPage() {
 
     const isTriageLoading = isConfigLoading || triagePatcher.isLoading;
     const isTriageEnabled: boolean = configs.data?.[CONF_TRIAGE_ENABLED] ?? false;
-    const [showResolveAll, setShowResolveAll] = useState(false);
 
     let toggle = (
         <span className="input-wrap">
@@ -155,58 +149,9 @@ export default function ModerationContentSettingsPage() {
                             />
                         </span>
                     </DashboardFormGroup>
-                    <DashboardFormGroup
-                        label={t("Resolve All Discussions")}
-                        description={t(
-                            "Resolve All Posts will resolve all existing posts in the community. This bulk action will not trigger webhooks or analytics.",
-                        )}
-                        className={dashboardClasses().spaceBetweenFormGroup}
-                    >
-                        <span className="input-wrap">
-                            <Button onClick={() => setShowResolveAll(true)}>{t("Resolve All")}</Button>
-                        </span>
-                    </DashboardFormGroup>
-                    <ResolveAllModal isVisible={showResolveAll} setIsVisible={setShowResolveAll} />
                     {BETA_ENABLED && <ReportReasonList />}
                 </section>
             }
         />
-    );
-}
-
-function ResolveAllModal(props: { isVisible: boolean; setIsVisible: (isVisible: boolean) => void }) {
-    const { fetchDashboardSections } = useDashboardSectionActions();
-    const toast = useToast();
-    const resolveAllMutation = useMutation({
-        mutationFn: async () => {
-            await apiv2.post("/discussions/resolve-bulk");
-        },
-        onSuccess() {
-            toast.addToast({
-                body: t("All posts have been resolved."),
-                autoDismiss: true,
-            });
-            fetchDashboardSections();
-            props.setIsVisible(false);
-        },
-    });
-    return (
-        <ModalConfirm
-            onCancel={() => props.setIsVisible(false)}
-            isVisible={props.isVisible}
-            title={t("Resolve All")}
-            confirmTitle={t("Continue")}
-            isConfirmLoading={resolveAllMutation.isLoading}
-            isConfirmDisabled={resolveAllMutation.isLoading}
-            onConfirm={() => {
-                resolveAllMutation.mutateAsync().then(() => {
-                    props.setIsVisible(false);
-                });
-            }}
-        >
-            {t(
-                "This will resolve all existing posts in the community. This bulk action will not trigger webhooks or log analytics. Continue?",
-            )}
-        </ModalConfirm>
     );
 }

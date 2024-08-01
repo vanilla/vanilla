@@ -1162,7 +1162,7 @@ class CategoryModel extends Gdn_Model implements
         $filterNonDiscussionCategories = $options["filterNonDiscussionCategories"] ?? false;
 
         foreach ($categories as $categoryID => $category) {
-            if (!($category["PermsDiscussionsView"] ?? false)) {
+            if (!$category["PermsDiscussionsView"]) {
                 $unfiltered = false;
                 continue;
             }

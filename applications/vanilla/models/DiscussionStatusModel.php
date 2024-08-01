@@ -229,12 +229,8 @@ class DiscussionStatusModel
      * @param bool $isInternal
      * @return int
      */
-    public function getCountStatusID(
-        array $statusIDs,
-        int $limit = 10000,
-        bool $isInternal = false,
-        bool $cached = true
-    ): int {
+    public function getCountStatusID(array $statusIDs, int $limit = 10000, bool $isInternal = false): int
+    {
         // Filter for current permissions.
         $visibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs([
             "forceArrayReturn" => true,
@@ -244,40 +240,36 @@ class DiscussionStatusModel
 
         $modelCache = new ModelCache("discussionStatus", $this->cache);
 
-        $doFetch = function () use ($statusIDs, $limit, $isInternal, $visibleCategoryIDs) {
-            $where = [
-                "CategoryID" => $visibleCategoryIDs,
-            ];
-            if ($isInternal) {
-                $where["internalStatusID"] = $statusIDs;
-            } else {
-                $where["statusID"] = $statusIDs;
-            }
-            $count = $this->discussionModel
-                ->createSql()
-                ->from("Discussion")
-                ->where($where)
-                ->getPagingCount("DiscussionID", $limit);
+        $count = $modelCache->getCachedOrHydrate(
+            [
+                "discussionStatus/count",
+                "statusIDs" => $statusIDs,
+                "limit" => $limit,
+                "isInternal" => $isInternal,
+                "cats" => $visibleCategoryIDs,
+            ],
+            function () use ($statusIDs, $limit, $isInternal, $visibleCategoryIDs) {
+                $where = [
+                    "CategoryID" => $visibleCategoryIDs,
+                ];
+                if ($isInternal) {
+                    $where["internalStatusID"] = $statusIDs;
+                } else {
+                    $where["statusID"] = $statusIDs;
+                }
+                $count = $this->discussionModel
+                    ->createSql()
+                    ->from("Discussion")
+                    ->where($where)
+                    ->getPagingCount("DiscussionID", $limit);
 
-            return $count;
-        };
+                return $count;
+            },
+            [
+                Gdn_Cache::FEATURE_EXPIRY => 15, // 15 seconds.
+            ]
+        );
 
-        if ($cached) {
-            return $modelCache->getCachedOrHydrate(
-                [
-                    "discussionStatus/count",
-                    "statusIDs" => $statusIDs,
-                    "limit" => $limit,
-                    "isInternal" => $isInternal,
-                    "cats" => $visibleCategoryIDs,
-                ],
-                $doFetch,
-                [
-                    Gdn_Cache::FEATURE_EXPIRY => 15, // 15 seconds.
-                ]
-            );
-        } else {
-            return $doFetch();
-        }
+        return $count;
     }
 }

@@ -26,7 +26,7 @@ export function useAcceptSuggestion(discussionID: RecordID) {
 
     const { mutateAsync } = useMutation({
         mutationKey: ["acceptSuggestion", discussionID],
-        mutationFn: async (params: { suggestion: RecordID | "all"; accept: boolean; commentID?: RecordID }) => {
+        mutationFn: async (params: { suggestion: number | "all"; accept: boolean; commentID?: RecordID }) => {
             if (params.suggestion === -1 && !params.accept && params.commentID) {
                 await apiv2.delete(`/comments/${params.commentID}`);
             } else {

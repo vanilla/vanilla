@@ -91,7 +91,6 @@ class VanillaCli extends Console\Application
             Commands\RecalculatePoints::class,
             Commands\ConvertToRich::class,
             Commands\ReparseRich2Quotes::class,
-            Commands\SpawnSiteCommand::class,
         ];
     }
 

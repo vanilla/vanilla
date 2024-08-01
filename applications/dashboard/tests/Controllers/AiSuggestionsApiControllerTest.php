@@ -10,7 +10,6 @@ namespace VanillaTests\Dashboard\Controllers;
 use DiscussionModel;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\Exception\Database\NoResultsException;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -39,7 +38,6 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
     public static $addons = ["qna"];
 
     private DiscussionModel $discussionModel;
-    private AiSuggestionModel $aiSuggestionModel;
 
     /**
      * @inheritDoc
@@ -49,7 +47,6 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         parent::setUp();
         self::enableFeature("AISuggestions");
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
-        $this->aiSuggestionModel = $this->container()->get(AiSuggestionModel::class);
     }
 
     /**
@@ -253,26 +250,28 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $this->setupConfigs();
         $discussion = $this->createDiscussion(["type" => "question"]);
 
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+        $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+        $suggestions = $newDiscussion["Attributes"]["suggestions"];
         $this->assertCount(3, $suggestions);
-        $this->assertArraySubsetRecursive(
+        $this->assertSame(
             [
                 "format" => "Vanilla",
                 "type" => "mockSuggestion",
+                "id" => 0,
                 "url" => "someplace.com/here",
                 "title" => "answer 1",
                 "summary" => "This is how you do this.",
-                "hidden" => 0,
+                "hidden" => false,
             ],
             $suggestions[0]
         );
 
-        $createdComments = $this->runWithUser(function () use ($discussion, $suggestions) {
+        $createdComments = $this->runWithUser(function () use ($discussion) {
             $createdComments = $this->api()
                 ->post("/ai-suggestions/accept-suggestion", [
                     "allSuggestions" => false,
                     "discussionID" => $discussion["discussionID"],
-                    "suggestionIDs" => [$suggestions[0]["aiSuggestionID"], $suggestions[2]["aiSuggestionID"]],
+                    "suggestionIDs" => [0, 2],
                 ])
                 ->getBody();
 
@@ -299,26 +298,28 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
 
         $discussion = $this->createDiscussion(["type" => "question"]);
 
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+        $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+        $suggestions = $newDiscussion["Attributes"]["suggestions"];
         $this->assertCount(3, $suggestions);
-        $this->assertArraySubsetRecursive(
+        $this->assertSame(
             [
                 "format" => "Vanilla",
                 "type" => "mockSuggestion",
+                "id" => 0,
                 "url" => "someplace.com/here",
                 "title" => "answer 1",
                 "summary" => "This is how you do this.",
-                "hidden" => 0,
+                "hidden" => false,
             ],
             $suggestions[0]
         );
 
-        $createdComments = $this->runWithUser(function () use ($discussion, $suggestions) {
+        $createdComments = $this->runWithUser(function () use ($discussion) {
             $createdComments = $this->api()
                 ->post("/ai-suggestions/accept-suggestion", [
                     "allSuggestions" => false,
                     "discussionID" => $discussion["discussionID"],
-                    "suggestionIDs" => [$suggestions[0]["aiSuggestionID"], $suggestions[2]["aiSuggestionID"]],
+                    "suggestionIDs" => [0, 2],
                 ])
                 ->getBody();
 
@@ -331,12 +332,12 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
 
         $this->assertSame(\QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $updatedDiscussion["statusID"]);
 
-        $removeStatus = $this->runWithUser(function () use ($discussion, $suggestions) {
+        $removeStatus = $this->runWithUser(function () use ($discussion) {
             $createdComments = $this->api()
                 ->post("/ai-suggestions/remove-accept-suggestion", [
                     "allSuggestions" => false,
                     "discussionID" => $discussion["discussionID"],
-                    "suggestionIDs" => [$suggestions[0]["aiSuggestionID"], $suggestions[2]["aiSuggestionID"]],
+                    "suggestionIDs" => [0, 2],
                 ])
                 ->getBody();
 
@@ -552,9 +553,9 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
     {
         // Quick test that suggestions are generated when the question is first posted.
         $discussionID = $this->createDiscussion(["type" => "question"])["discussionID"];
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussionID);
-        $this->assertNotEmpty($suggestions);
-        $this->assertSame("mockSuggestion", $suggestions[0]["type"]);
+        $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+        $this->assertNotEmpty($discussion["Attributes"]["suggestions"]);
+        $this->assertSame("mockSuggestion", $discussion["Attributes"]["suggestions"][0]["type"]);
 
         // Null out attributes.
         $this->discussionModel->update(["Attributes" => null, ["DiscussionID" => $discussionID]]);
@@ -567,8 +568,8 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $response = $this->api()->put("/ai-suggestions/generate", ["discussionID" => $discussionID]);
         $this->assertTrue($response->isSuccessful());
         $this->assertContains("mockSuggestion", $response->getBody()["progress"]["successIDs"]);
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussionID);
-        $this->assertNotEmpty($suggestions);
-        $this->assertSame("mockSuggestion", $suggestions[0]["type"]);
+        $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+        $this->assertNotEmpty($discussion["Attributes"]["suggestions"]);
+        $this->assertSame("mockSuggestion", $discussion["Attributes"]["suggestions"][0]["type"]);
     }
 }

@@ -197,7 +197,7 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     errors={fieldErrors}
                     afterInput={helperText && <div className={dashboardClasses().helperText}>{helperText}</div>}
                     value={value}
-                    clear={!required && !multiple}
+                    clear={!required}
                     placeholder={control.placeholder}
                     onChange={onChange}
                     onBlur={onBlur}

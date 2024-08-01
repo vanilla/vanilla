@@ -63,8 +63,7 @@ class CreateEscalationAction extends AutomationAction implements PostInterface
      */
     public static function canAddAction(): bool
     {
-        return FeatureFlagHelper::featureEnabled("CommunityManagementBeta") &&
-            FeatureFlagHelper::featureEnabled("escalations");
+        return FeatureFlagHelper::featureEnabled("CommunityManagement");
     }
 
     /**
@@ -89,9 +88,10 @@ class CreateEscalationAction extends AutomationAction implements PostInterface
     public static function getSchema(): Schema
     {
         $roleModel = Gdn::getContainer()->get(RoleModel::class);
+        $userModel = Gdn::getContainer()->get(UserModel::class);
         $roles = $roleModel->getByPermission("Garden.Moderation.Manage")->resultArray();
-        $roleIDs = array_column($roles, "RoleID");
-        $qs = !empty($roleIDs) ? "?" . http_build_query(["roleIDs" => $roleIDs]) : "";
+        $users = $userModel->search(["roleIDs" => array_column($roles, "RoleID")], "name", "asc")->resultArray();
+        $userEnum = array_column($users, "Name", "UserID");
         $schema = [
             "recordIsLive?" => [
                 "type" => "boolean",
@@ -102,9 +102,10 @@ class CreateEscalationAction extends AutomationAction implements PostInterface
             ],
             "assignedModeratorID?" => [
                 "type" => "integer",
+                "enum" => array_keys($userEnum),
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Assign Moderator", "Select what moderator escalations should be assigned to"),
-                    new ApiFormChoices("/api/v2/users$qs", "/api/v2/users/%s", "userID", "name")
+                    new StaticFormChoices($userEnum)
                 ),
             ],
         ];

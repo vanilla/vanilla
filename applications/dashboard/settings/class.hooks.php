@@ -359,8 +359,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         $triageCount = $statusModel->getCountStatusID(
             [RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED],
             limit: 1000,
-            isInternal: true,
-            cached: false
+            isInternal: true
         );
         if ($triageCount >= 1000) {
             $triageCount = "{$triageCount}+";
@@ -513,18 +512,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 t("Premoderation Settings"),
                 "/dashboard/content/premoderation",
                 "settings.premoderation",
-                "",
-                $sort
-            )
-            ->addLinkToSectionIf(
-                Gdn::config("Feature.CommunityManagementBeta.Enabled") &&
-                    Gdn::config("Feature.escalations.Enabled") &&
-                    Gdn::config("Feature.AutomationRules.Enabled") &&
-                    $session->checkPermission(["community.moderate"], false),
-                "Moderation",
-                t("Escalation Rules"),
-                "/dashboard/content/escalation-rules",
-                "settings.escalation-rules",
                 "",
                 $sort
             )

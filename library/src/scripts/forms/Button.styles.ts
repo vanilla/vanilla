@@ -160,8 +160,7 @@ export const buttonLoaderClasses = useThemeCache(() => {
     const root = useThemeCache((alignment: "left" | "center" = "center") =>
         css({
             ...(alignment === "center" ? flexUtils.middle() : flexUtils.middleLeft),
-            paddingLeft: 4,
-            paddingRight: 4,
+            padding: styleUnit(4),
             height: percent(100),
             width: percent(100),
             ...{
@@ -174,8 +173,7 @@ export const buttonLoaderClasses = useThemeCache(() => {
 
     const reducedPadding = css({
         "&&": {
-            paddingLeft: 3,
-            paddingRight: 3,
+            padding: styleUnit(3),
         },
     });
 

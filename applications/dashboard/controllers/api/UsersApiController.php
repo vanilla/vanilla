@@ -1037,7 +1037,7 @@ class UsersApiController extends AbstractApiController
 
         $userData = $this->normalizeInput($body);
         $settings = [
-            UserModel::OPT_NO_CONFIRM_EMAIL => true,
+            "NoConfirmEmail" => true,
             "SaveRoles" => array_key_exists("RoleID", $userData),
             "ValidateName" => false,
         ];

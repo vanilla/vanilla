@@ -19,9 +19,6 @@ import { t } from "@vanilla/i18n";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 import cloneDeep from "lodash/cloneDeep";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
-import { compare } from "@vanilla/utils";
-
-export const RECIPES_MAX_LIMIT = 150;
 
 export const EMPTY_AUTOMATION_RULE_FORM_VALUES: AutomationRuleFormValues = {
     trigger: {
@@ -43,19 +40,6 @@ export const isTimeBasedTrigger = (
 ): boolean => {
     if (triggerType && catalog) {
         return catalog.triggers[triggerType]?.schema?.properties?.triggerTimeDelay ? true : false;
-    }
-    return false;
-};
-
-/**
- *  Checks if the trigger has postType field
- */
-export const hasPostType = (
-    triggerType?: AutomationRuleTriggerType | string,
-    catalog?: IAutomationRulesCatalog,
-): boolean => {
-    if (triggerType && catalog) {
-        return catalog.triggers[triggerType]?.schema?.properties?.postType ? true : false;
     }
     return false;
 };
@@ -213,40 +197,36 @@ export function getTriggerActionFormSchema(
         });
     }
 
-    const triggerDropdownOptions = Object.keys(automationRulesCatalog?.triggers ?? {})
-        .map((trigger) => {
-            return {
-                value: trigger,
-                label: automationRulesCatalog?.triggers[trigger].name,
-                group:
-                    automationRulesCatalog?.triggers[trigger].contentType === "users"
-                        ? t("User Management")
-                        : t("Post Management"),
-            };
-        })
-        .sort((a, b) => compare(a.label, b.label));
+    const triggerDropdownOptions = Object.keys(automationRulesCatalog?.triggers ?? {}).map((trigger) => {
+        return {
+            value: trigger,
+            label: automationRulesCatalog?.triggers[trigger].name,
+            group:
+                automationRulesCatalog?.triggers[trigger].contentType === "users"
+                    ? t("User Management")
+                    : t("Post Management"),
+        };
+    });
 
     const perTriggerActions = Object.keys(automationRulesCatalog?.actions ?? {}).filter((actionType) =>
         currentFormValues?.trigger?.triggerType
-            ? automationRulesCatalog?.triggers[currentFormValues?.trigger.triggerType]?.triggerActions.includes(
+            ? automationRulesCatalog?.triggers[currentFormValues?.trigger.triggerType].triggerActions.includes(
                   actionType as AutomationRuleActionType,
               )
             : true,
     );
 
     const actionDropdownOptions = perTriggerActions.length
-        ? Object.values(perTriggerActions ?? {})
-              .map((action) => {
-                  return {
-                      value: action,
-                      label: automationRulesCatalog?.actions[action]?.name,
-                      group:
-                          automationRulesCatalog?.actions[action]?.contentType === "users"
-                              ? t("User Management")
-                              : t("Post Management"),
-                  };
-              })
-              .sort((a, b) => compare(a.label, b.label))
+        ? Object.values(perTriggerActions ?? {}).map((action) => {
+              return {
+                  value: action,
+                  label: automationRulesCatalog?.actions[action]?.name,
+                  group:
+                      automationRulesCatalog?.actions[action].contentType === "users"
+                          ? t("User Management")
+                          : t("Post Management"),
+              };
+          })
         : [];
 
     const selectedTriggerType = currentFormValues.trigger?.triggerType;

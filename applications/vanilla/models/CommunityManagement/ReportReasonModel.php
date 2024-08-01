@@ -224,31 +224,31 @@ class ReportReasonModel extends FullRecordCacheModel
         $reportReasonModel->createInitialReason([
             "reportReasonID" => self::INITIAL_REASON_SPAM,
             "name" => "Spam / Solicitation",
-            "description" => "Ads, Spam or other promotional content disrupting the community.",
+            "description" => "This content is spam.",
             "sort" => 0,
         ]);
         $reportReasonModel->createInitialReason([
             "reportReasonID" => self::INITIAL_REASON_ABUSE,
             "name" => "Abuse",
-            "description" => "Threatening, harassing, or intimidating behavior or content.",
+            "description" => "This content is abusive.",
             "sort" => 1,
         ]);
         $reportReasonModel->createInitialReason([
             "reportReasonID" => self::INITIAL_REASON_INAPPROPRIATE,
             "name" => "Inappropriate",
-            "description" => "Offensive or unsuitable content, including profanity and explicit material.",
+            "description" => "This content is inappropriate.",
             "sort" => 2,
         ]);
         $reportReasonModel->createInitialReason([
             "reportReasonID" => self::INITIAL_REASON_DECEPTIVE,
             "name" => "Deceptive / Misleading",
-            "description" => "Intentionally false or manipulative content that misleads members.",
+            "description" => "Illegal activity, malware, or promotion of illegal products or services.",
             "sort" => 3,
         ]);
         $reportReasonModel->createInitialReason([
             "reportReasonID" => self::INITIAL_REASON_RULE_BREAKING,
             "name" => "Breaks Community Rules",
-            "description" => "Any content or behavior that violates the community's guidelines or rules.",
+            "description" => "The content is breaking community rules.",
             "sort" => 4,
         ]);
         $reportReasonModel->createInitialReason([

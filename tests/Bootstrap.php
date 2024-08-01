@@ -447,6 +447,7 @@ class Bootstrap
 
             ->rule(AiSuggestionSourceService::class)
             ->addCall("registerSuggestionSource", [new Reference(MockSuggestionModel::class)])
+            ->setShared(true)
 
             ->rule(RecordStatusModel::class)
             ->setShared(true);

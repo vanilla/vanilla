@@ -34,11 +34,8 @@ class AiSuggestionSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
     public function getValue(): array
     {
         $answerSuggestionsEnabled = $this->aiSuggestionSourceService->suggestionFeatureEnabled();
-        $assistantID = $this->aiSuggestionSourceService->aiSuggestionConfigs()["userID"] ?? 0;
-        $aiAssistant = null;
-        if ($assistantID > 0) {
-            $aiAssistant = $this->userModel->getFragmentByID($assistantID, true);
-        }
+        $assistantID = $this->aiSuggestionSourceService->aiSuggestionConfigs()["userID"];
+        $aiAssistant = $this->userModel->getFragmentByID($assistantID, true);
         return [
             "answerSuggestionsEnabled" => $answerSuggestionsEnabled,
             "aiAssistant" => $aiAssistant,

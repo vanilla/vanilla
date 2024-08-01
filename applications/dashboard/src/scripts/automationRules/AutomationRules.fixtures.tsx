@@ -157,33 +157,6 @@ export const mockRecipesList: IAutomationRule[] = [
             },
         },
     },
-    {
-        automationRuleID: 6,
-        name: "Test Escalation Rule",
-        automationRuleRevisionID: 6,
-        dateInserted: STORY_DATE_STARTS,
-        insertUserID: 2,
-        updateUserID: 2,
-        dateUpdated: STORY_DATE_STARTS,
-        dateLastRun: STORY_DATE_ENDS,
-        status: "active",
-        recentDispatch: {
-            dispatchStatus: "success",
-        },
-        trigger: {
-            triggerType: "staleDiscussionTrigger",
-            triggerName: "triggerName",
-            triggerValue: {
-                triggerTimeDelay: { length: 1, unit: "day" },
-                postType: ["discussion", "question"],
-            },
-        },
-        action: {
-            actionType: "createEscalationAction",
-            actionName: "action6Name",
-            actionValue: {},
-        },
-    },
 ];
 
 export const mockDispatches: IAutomationRuleDispatch[] = [
@@ -356,7 +329,6 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                 "moveToCategoryAction",
                 "addToCollectionAction",
                 "removeDiscussionFromCollectionAction",
-                "createEscalationAction",
             ],
             contentType: "posts",
             schema: {

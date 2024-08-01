@@ -141,8 +141,7 @@ class SSOModel
             $emailFromTrustedProvider = !$userSuppliedEmail && $ssoAuthenticator->isTrusted();
 
             $userID = $this->userModel->save($userInfo, [
-                UserModel::OPT_NO_CONFIRM_EMAIL => $emailFromTrustedProvider,
-                UserModel::OPT_SSO_REGISTRATION => true,
+                "NoConfirmEmail" => $emailFromTrustedProvider,
                 "ValidateEmail" => !$emailFromTrustedProvider,
                 "FixUnique" => true,
             ]);
@@ -574,8 +573,7 @@ class SSOModel
         }
 
         $userID = $this->userModel->save($userInfo, [
-            UserModel::OPT_NO_CONFIRM_EMAIL => true,
-            UserModel::OPT_SSO_REGISTRATION => true,
+            "NoConfirmEmail" => true,
             "FixUnique" => true,
             "SaveRoles" => $saveRoles,
         ]);

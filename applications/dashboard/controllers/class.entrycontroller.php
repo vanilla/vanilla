@@ -828,8 +828,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 $registerOptions = [
                     "CheckCaptcha" => false,
                     "ValidateEmail" => false,
-                    UserModel::OPT_NO_CONFIRM_EMAIL => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
-                    UserModel::OPT_SSO_REGISTRATION => true,
+                    "NoConfirmEmail" => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
                     "SaveRoles" => $saveRolesRegister,
                     "ValidateName" => !$isTrustedProvider,
                 ];
@@ -1024,8 +1023,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                 $registerOptions = [
                     "CheckCaptcha" => false,
-                    UserModel::OPT_NO_CONFIRM_EMAIL => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
-                    UserModel::OPT_SSO_REGISTRATION => true,
+                    "NoConfirmEmail" => !$userProvidedEmail || !UserModel::requireConfirmEmail(),
                     "SaveRoles" => $saveRolesRegister,
                     "ValidateName" => !$isTrustedProvider,
                 ];
@@ -1248,7 +1246,6 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         // Synchronize the user's data.
         $saved = $userModel->save(["UserID" => $userID, "ProfileFields" => $profileFields] + $data, [
             UserModel::OPT_NO_CONFIRM_EMAIL => true,
-            UserModel::OPT_SSO_REGISTRATION => true,
             UserModel::OPT_FIX_UNIQUE => true,
             UserModel::OPT_SAVE_ROLES => $saveRoles,
             UserModel::OPT_VALIDATE_NAME => !$isTrustedProvider,

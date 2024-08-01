@@ -8,14 +8,11 @@
 namespace Vanilla\Dashboard\Models;
 
 use AttachmentModel;
-use CommentModel;
-use DiscussionModel;
 use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Utils\ContextException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
-use Gdn;
 use Vanilla\Community\Events\EscalationEvent;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
@@ -38,8 +35,12 @@ class AttachmentService
     /**
      * DI.
      */
-    public function __construct(private AttachmentModel $attachmentModel, private EventManager $eventManager)
-    {
+    public function __construct(
+        private AttachmentModel $attachmentModel,
+        private \CommentModel $commentModel,
+        private \DiscussionModel $discussionModel,
+        private EventManager $eventManager
+    ) {
     }
 
     /**
@@ -254,23 +255,21 @@ class AttachmentService
     {
         switch ($recordType) {
             case "discussion":
-                $model = $this->getDiscussionModel();
-                $record = $model->getID($recordID, DATASET_TYPE_ARRAY);
+                $record = $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
 
                 if (!$record) {
                     throw new NotFoundException("Record not found");
                 }
-                $record = $model->normalizeRow($record);
+                $record = $this->discussionModel->normalizeRow($record);
                 break;
             case "comment":
-                $model = $this->getCommentModel();
-                $record = $model->getID($recordID, DATASET_TYPE_ARRAY);
+                $record = $this->commentModel->getID($recordID, DATASET_TYPE_ARRAY);
 
                 if (!$record) {
                     throw new NotFoundException("Record not found");
                 }
 
-                $record = $model->normalizeRow($record);
+                $record = $this->commentModel->normalizeRow($record);
                 break;
             case "escalation":
                 $escalation =
@@ -347,8 +346,9 @@ TWIG;
         $attachment = $provider->createAttachment($recordType, $recordID, $body);
         // Dispatch a Discussion event (close)
         if ($recordType === "discussion") {
-            $model = $this->getDiscussionModel();
-            $discussion = $model->normalizeRow($model->getID($recordID, DATASET_TYPE_ARRAY));
+            $discussion = $this->discussionModel->normalizeRow(
+                $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY)
+            );
             $trackingEventInterface = EscalationEvent::fromDiscussion(
                 EscalationEvent::POST_COLLECTION_NAME,
                 [
@@ -359,8 +359,7 @@ TWIG;
                 $discussion
             );
         } elseif ($recordType === "comment") {
-            $model = $this->getCommentModel();
-            $comment = $model->normalizeRow($model->getID($recordID, DATASET_TYPE_ARRAY));
+            $comment = $this->commentModel->normalizeRow($this->commentModel->getID($recordID, DATASET_TYPE_ARRAY));
             $trackingEventInterface = EscalationEvent::fromComment(
                 EscalationEvent::POST_COLLECTION_NAME,
                 [
@@ -389,21 +388,5 @@ TWIG;
         }
 
         return $attachment;
-    }
-
-    /**
-     * @return DiscussionModel
-     */
-    private function getDiscussionModel(): DiscussionModel
-    {
-        return Gdn::getContainer()->get(DiscussionModel::class);
-    }
-
-    /**
-     * @return CommentModel
-     */
-    private function getCommentModel(): CommentModel
-    {
-        return Gdn::getContainer()->get(CommentModel::class);
     }
 }

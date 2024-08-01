@@ -90,7 +90,6 @@ export default function AdminLayout(props: IProps) {
                         titleAndActionsContainerClassName={titleAndActionsContainerClassName}
                         actions={titleBarActions}
                         titleLabel={titleLabel}
-                        actionsWrapperClassName={props.actionsWrapperClassName}
                     />
                 </>
             ),

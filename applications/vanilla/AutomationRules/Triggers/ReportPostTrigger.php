@@ -67,8 +67,7 @@ class ReportPostTrigger extends AutomationTrigger
      */
     public static function canAddTrigger(): bool
     {
-        return FeatureFlagHelper::featureEnabled("CommunityManagementBeta") &&
-            FeatureFlagHelper::featureEnabled("escalations");
+        return FeatureFlagHelper::featureEnabled("CommunityManagement");
     }
 
     /**
@@ -96,7 +95,7 @@ class ReportPostTrigger extends AutomationTrigger
                 "default" => [],
                 "enum" => array_keys($formChoices),
                 "x-control" => SchemaForm::dropDown(
-                    new FormOptions("Report Reason"),
+                    new FormOptions("Report Reason", "Select at least one report reason."),
                     new StaticFormChoices($formChoices),
                     null,
                     true

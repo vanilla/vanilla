@@ -9,7 +9,6 @@ namespace VanillaTests\Models;
 
 use VanillaTests\Bootstrap;
 use VanillaTests\SiteTestCase;
-use VanillaTests\VanillaTestCase;
 
 /**
  * Test some SSO functions in the `UserModel`.
@@ -129,31 +128,6 @@ class UserModelSSOTest extends SiteTestCase
             \UserModel::OPT_ROLE_SYNC => ["sso"],
         ]);
         $this->assertSame([$this->roleID(Bootstrap::ROLE_MEMBER), $roleID], $this->userModel->getRoleIDs($id));
-    }
-
-    /**
-     * The role sync option should work through `UserModel::connect()` with Garden.Registration.SSOConfirmEmail set to true.
-     */
-    public function testConnectUnconfirmedRoleSync(): void
-    {
-        $this->runWithConfig(["Garden.Registration.SSOConfirmEmail" => true], function () {
-            $roleID = $this->defineRole(["Name" => "SSO1", "Sync" => "sso"]);
-            $user = $this->dummyUser(["Password" => __FUNCTION__]);
-            $this->saveUser($user, __FUNCTION__);
-
-            $user["Roles"] = ["SSO1"];
-            $id = $this->userModel->connect(__FUNCTION__, self::PROVIDER_KEY, $user, [
-                \UserModel::OPT_ROLE_SYNC => ["sso"],
-            ]);
-            $this->assertSame(
-                [
-                    $this->roleID(VanillaTestCase::ROLE_UNCONFIRMED),
-                    $this->roleID(VanillaTestCase::ROLE_MEMBER),
-                    $roleID,
-                ],
-                $this->userModel->getRoleIDs($id)
-            );
-        });
     }
 
     /**
@@ -321,7 +295,6 @@ class UserModelSSOTest extends SiteTestCase
         $userID = $this->userModel->save($user, [
             \UserModel::OPT_SAVE_ROLES => isset($user["RoleID"]),
             \UserModel::OPT_NO_CONFIRM_EMAIL => true,
-            \UserModel::OPT_SSO_REGISTRATION => true,
         ]);
         $this->userModel->saveAuthentication([
             "UniqueID" => $uniqueID,

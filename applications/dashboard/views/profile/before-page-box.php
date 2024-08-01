@@ -1,7 +1,5 @@
 <?php
 
-use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Theme\BoxThemeShim;
 
 $Session = Gdn::session();
@@ -12,21 +10,7 @@ echo '<h1 class="H">';
 
     echo '<span class="Gloss">';
     Gdn_Theme::bulletRow();
-
-    $config = Gdn::getContainer()->get(ConfigurationInterface::class);
-    $profileFieldEnabled = $config->get(ProfileFieldModel::CONFIG_FEATURE_FLAG, false);
-    $enabledProfileFieldsApiNames = [];
-    if ($profileFieldEnabled) {
-        $enabledProfileFields = \Gdn::getContainer()
-            ->get(ProfileFieldModel::class)
-            ->getEnabledProfileFieldsIndexed();
-        $enabledProfileFieldsApiNames = array_map(function (array $field) {
-            return $field["apiName"];
-        }, $enabledProfileFields);
-    }
-
-    if (in_array("Title", $enabledProfileFieldsApiNames) && $this->User->Title) {
-
+    if ($this->User->Title) {
         echo Gdn_Theme::bulletItem('Title');
         echo ' '.bullet().' '.wrap(htmlspecialchars($this->User->Title), 'span', ['class' => 'User-Title']);
     }

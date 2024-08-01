@@ -25,6 +25,8 @@ import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/D
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 import { Icon } from "@vanilla/icons";
 import { ReportCountMeta } from "@vanilla/addon-vanilla/thread/ReportCountMeta";
+import { getMeta } from "@library/utility/appUtils";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 interface IProps {
     discussion: IDiscussion;
@@ -36,6 +38,7 @@ export function DiscussionOriginalPostAsset(props: IProps) {
     const { discussion: discussionPreload, discussionApiParams, category } = props;
     const { discussionID } = discussionPreload;
 
+    const { hasPermission } = usePermissionsContext();
     const { page } = useDiscussionThreadPaginationContext();
 
     const {
@@ -48,10 +51,7 @@ export function DiscussionOriginalPostAsset(props: IProps) {
 
     const discussion = data!;
 
-    const toShare: ShareData = {
-        url: discussion!.url,
-        title: discussion!.name,
-    };
+    const showResolved = hasPermission("staff.allow") && getMeta("triage.enabled", false);
 
     return (
         <DiscussionThreadContextProvider discussion={discussion}>
@@ -67,9 +67,11 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                 <PageHeadingBox
                     title={
                         <>
-                            <span className={discussionThreadClasses().resolved}>
-                                <Icon icon={discussion.resolved ? "cmd-approve" : "cmd-alert"} />
-                            </span>
+                            {showResolved && (
+                                <span className={discussionThreadClasses().resolved}>
+                                    <Icon icon={discussion.resolved ? "cmd-approve" : "cmd-alert"} />
+                                </span>
+                            )}
                             <span>{discussion.name}</span>
                             {discussion.closed && (
                                 <Tag

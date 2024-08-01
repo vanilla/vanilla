@@ -15,49 +15,37 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { IAutomationRule } from "@dashboard/automationRules/AutomationRules.types";
 import { AutomationRulesDeleteRule } from "@dashboard/automationRules/AutomationRulesDeleteRule";
 
-export function AutomationRulesActions(props: { isEscalationRulesMode?: boolean; automationRule: IAutomationRule }) {
-    const { automationRule, isEscalationRulesMode } = props;
+export function AutomationRulesActions(props: IAutomationRule) {
     const classes = automationRulesClasses();
 
     const dispatchStatusIsPending =
-        automationRule.recentDispatch?.dispatchStatus === "queued" ||
-        automationRule.recentDispatch?.dispatchStatus === "running";
+        props.recentDispatch?.dispatchStatus === "queued" || props.recentDispatch?.dispatchStatus === "running";
 
     return (
         <div className={cx(classes.flexContainer(), classes.noOverflow)}>
-            <ToolTip label={t("View History")}>
-                <span>
-                    <LinkAsButton
-                        to={`/settings/automation-rules/history?automationRuleID=${automationRule.automationRuleID}`}
-                        ariaLabel={t("History")}
-                        buttonType={ButtonTypes.ICON_COMPACT}
-                    >
-                        <Icon icon={"meta-time"} />
-                    </LinkAsButton>
-                </span>
-            </ToolTip>
-            <ToolTip label={t("Edit Rule")}>
-                <span>
-                    <LinkAsButton
-                        to={
-                            isEscalationRulesMode
-                                ? `/dashboard/content/escalation-rules/${automationRule.automationRuleID}/edit`
-                                : `/settings/automation-rules/${automationRule.automationRuleID}/edit`
-                        }
-                        ariaLabel={t("Edit Rule")}
-                        buttonType={ButtonTypes.ICON_COMPACT}
-                    >
-                        <EditIcon />
-                    </LinkAsButton>
-                </span>
-            </ToolTip>
-            <ToolTip
-                label={dispatchStatusIsPending ? t("Rule may not be deleted while it is running") : t("Delete Rule")}
+            <LinkAsButton
+                to={`/settings/automation-rules/history?automationRuleID=${props.automationRuleID}`}
+                ariaLabel={t("History")}
+                buttonType={ButtonTypes.ICON_COMPACT}
+            >
+                <Icon icon={"meta-time"} />
+            </LinkAsButton>
+            <LinkAsButton
+                to={`/settings/automation-rules/${props.automationRuleID}/edit`}
+                ariaLabel={t("Edit")}
+                buttonType={ButtonTypes.ICON_COMPACT}
+            >
+                <EditIcon />
+            </LinkAsButton>
+            <ConditionalWrap
+                component={ToolTip}
+                condition={dispatchStatusIsPending}
+                componentProps={{ label: t("Rule may not be deleted while it is running") }}
             >
                 <span>
-                    <AutomationRulesDeleteRule asActionButtonInTable {...automationRule} />
+                    <AutomationRulesDeleteRule asActionButtonInTable {...props} />
                 </span>
-            </ToolTip>
+            </ConditionalWrap>
         </div>
     );
 }

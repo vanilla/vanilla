@@ -28,7 +28,6 @@ class VanillaTestCase extends TestCase
     public const ROLE_ADMIN = "Administrator";
     public const ROLE_MOD = "Moderator";
     public const ROLE_MEMBER = "Member";
-    public const ROLE_UNCONFIRMED = "Unconfirmed";
 
     public const KEY_SPARSE_COMPARISON = "x-do-sparse-comparision";
 

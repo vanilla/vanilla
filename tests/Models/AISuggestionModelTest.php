@@ -10,7 +10,6 @@ namespace VanillaTests\Models;
 use DiscussionModel;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Utility\ArrayUtils;
@@ -32,8 +31,6 @@ class AISuggestionModelTest extends SiteTestCase
     public static $addons = ["qna"];
 
     private DiscussionModel $discussionModel;
-
-    private AiSuggestionModel $aiSuggestionModel;
 
     private AiSuggestionSourceService $suggestionSourceService;
 
@@ -57,7 +54,6 @@ class AISuggestionModelTest extends SiteTestCase
         $this->assistantUser = $assistantUser;
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->suggestionSourceService = $this->container()->get(AiSuggestionSourceService::class);
-        $this->aiSuggestionModel = \Gdn::getContainer()->get(AiSuggestionModel::class);
     }
 
     /**
@@ -71,28 +67,25 @@ class AISuggestionModelTest extends SiteTestCase
     {
         $discussion = $this->createDiscussion(["type" => "question"]);
 
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+        $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+        $suggestions = $newDiscussion["Attributes"]["suggestions"];
         $this->assertCount(3, $suggestions);
-        $this->assertArraySubsetRecursive(
+        $this->assertSame(
             [
-                "discussionID" => $discussion["discussionID"],
                 "format" => "Vanilla",
                 "type" => "mockSuggestion",
+                "id" => 0,
                 "url" => "someplace.com/here",
                 "title" => "answer 1",
                 "summary" => "This is how you do this.",
-                "hidden" => 0,
-                "sourceIcon" => "mock",
+                "hidden" => false,
             ],
             $suggestions[0]
         );
 
-        $createdComments = $this->runWithUser(function () use ($discussion, $suggestions) {
+        $createdComments = $this->runWithUser(function () use ($discussion) {
             $suggestion = $this->container()->get(AiSuggestionSourceService::class);
-            return $suggestion->createComments($discussion["discussionID"], false, [
-                $suggestions[0]["aiSuggestionID"],
-                $suggestions[2]["aiSuggestionID"],
-            ]);
+            return $suggestion->createComments($discussion["discussionID"], [0, 2]);
         }, $discussion["insertUserID"]);
         $this->assertCount(2, $createdComments);
         $this->assertSame(\QnaModel::ACCEPTED, $createdComments[0]["qnA"]);
@@ -113,27 +106,25 @@ class AISuggestionModelTest extends SiteTestCase
     {
         $discussion = $this->createDiscussion(["type" => "question"]);
 
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+        $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+        $suggestions = $newDiscussion["Attributes"]["suggestions"];
         $this->assertCount(3, $suggestions);
-        $this->assertArraySubsetRecursive(
+        $this->assertSame(
             [
-                "discussionID" => $discussion["discussionID"],
                 "format" => "Vanilla",
                 "type" => "mockSuggestion",
+                "id" => 0,
                 "url" => "someplace.com/here",
                 "title" => "answer 1",
                 "summary" => "This is how you do this.",
-                "hidden" => 0,
+                "hidden" => false,
             ],
             $suggestions[0]
         );
 
-        $createdComments = $this->runWithUser(function () use ($discussion, $suggestions) {
+        $createdComments = $this->runWithUser(function () use ($discussion) {
             $suggestion = $this->container()->get(AiSuggestionSourceService::class);
-            return $suggestion->createComments($discussion["discussionID"], false, [
-                $suggestions[0]["aiSuggestionID"],
-                $suggestions[2]["aiSuggestionID"],
-            ]);
+            return $suggestion->createComments($discussion["discussionID"], [0, 2]);
         }, $discussion["insertUserID"]);
         $this->assertCount(2, $createdComments);
         $this->assertSame(\QnaModel::ACCEPTED, $createdComments[0]["qnA"]);
@@ -142,61 +133,9 @@ class AISuggestionModelTest extends SiteTestCase
 
         $this->assertSame(\QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $updatedDiscussion["statusID"]);
 
-        $removeStatus = $this->runWithUser(function () use ($discussion, $suggestions) {
+        $removeStatus = $this->runWithUser(function () use ($discussion) {
             $suggestion = $this->container()->get(AiSuggestionSourceService::class);
-            return $suggestion->deleteComments($discussion["discussionID"], false, [
-                $suggestions[0]["aiSuggestionID"],
-                $suggestions[2]["aiSuggestionID"],
-            ]);
-        }, $discussion["insertUserID"]);
-
-        $this->assertSame(true, $removeStatus);
-
-        $updatedDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
-
-        $this->assertSame(\QnAPlugin::DISCUSSION_STATUS_UNANSWERED, $updatedDiscussion["statusID"]);
-    }
-
-    /**
-     * Test generation of suggestions, accepting them and cancelling them
-     *
-     * @throws ClientException Not Applicable.
-     * @throws ValidationException Not Applicable.
-     * @throws NoResultsException Not Applicable.
-     */
-    public function testRemoveAllAcceptedSuggestions()
-    {
-        $discussion = $this->createDiscussion(["type" => "question"]);
-
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
-        $this->assertCount(3, $suggestions);
-        $this->assertArraySubsetRecursive(
-            [
-                "discussionID" => $discussion["discussionID"],
-                "format" => "Vanilla",
-                "type" => "mockSuggestion",
-                "url" => "someplace.com/here",
-                "title" => "answer 1",
-                "summary" => "This is how you do this.",
-                "hidden" => 0,
-            ],
-            $suggestions[0]
-        );
-
-        $createdComments = $this->runWithUser(function () use ($discussion, $suggestions) {
-            $suggestion = $this->container()->get(AiSuggestionSourceService::class);
-            return $suggestion->createComments($discussion["discussionID"], true);
-        }, $discussion["insertUserID"]);
-        $this->assertCount(3, $createdComments);
-        $this->assertSame(\QnaModel::ACCEPTED, $createdComments[0]["qnA"]);
-
-        $updatedDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
-
-        $this->assertSame(\QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $updatedDiscussion["statusID"]);
-
-        $removeStatus = $this->runWithUser(function () use ($discussion, $suggestions) {
-            $suggestion = $this->container()->get(AiSuggestionSourceService::class);
-            return $suggestion->deleteComments($discussion["discussionID"], true);
+            return $suggestion->deleteComments($discussion["discussionID"], [0, 2]);
         }, $discussion["insertUserID"]);
 
         $this->assertSame(true, $removeStatus);
@@ -219,7 +158,8 @@ class AISuggestionModelTest extends SiteTestCase
         $this->runWithConfig($config, function () {
             $discussion = $this->createDiscussion(["type" => "question"]);
 
-            $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+            $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+            $suggestions = $newDiscussion["Attributes"]["suggestions"] ?? [];
             $this->assertCount(0, $suggestions);
         });
     }
@@ -256,24 +196,21 @@ class AISuggestionModelTest extends SiteTestCase
         $discussion = $this->createDiscussion(["type" => "question"]);
 
         $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"], null);
+        $suggestions = $newDiscussion["Attributes"]["suggestions"];
 
         // Test that suggestions are not hidden by default
         $this->assertCount(3, $suggestions);
-        $this->assertSame(0, $suggestions[0]["hidden"]);
-        $this->assertSame(0, $suggestions[1]["hidden"]);
-        $this->assertSame(0, $suggestions[2]["hidden"]);
+        $this->assertSame(false, $suggestions[0]["hidden"]);
+        $this->assertSame(false, $suggestions[1]["hidden"]);
+        $this->assertSame(false, $suggestions[2]["hidden"]);
 
         // Hide the first two suggestions.
-        $this->suggestionSourceService->toggleSuggestions($newDiscussion, [
-            $suggestions[0]["aiSuggestionID"],
-            $suggestions[1]["aiSuggestionID"],
-        ]);
+        $this->suggestionSourceService->toggleSuggestions($newDiscussion, [0, 1]);
         $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"], null);
-        $this->assertSame(1, $suggestions[0]["hidden"]);
-        $this->assertSame(1, $suggestions[1]["hidden"]);
-        $this->assertSame(0, $suggestions[2]["hidden"]);
+        $suggestions = $newDiscussion["Attributes"]["suggestions"];
+        $this->assertSame(true, $suggestions[0]["hidden"]);
+        $this->assertSame(true, $suggestions[1]["hidden"]);
+        $this->assertSame(false, $suggestions[2]["hidden"]);
         return $newDiscussion;
     }
 
@@ -287,10 +224,11 @@ class AISuggestionModelTest extends SiteTestCase
     {
         // Test that all suggestions are no longer hidden.
         $this->suggestionSourceService->toggleSuggestions($discussion, hide: false);
-        $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["DiscussionID"], null);
-        $this->assertSame(0, $suggestions[0]["hidden"]);
-        $this->assertSame(0, $suggestions[1]["hidden"]);
-        $this->assertSame(0, $suggestions[2]["hidden"]);
+        $discussion = $this->discussionModel->getID($discussion["DiscussionID"], DATASET_TYPE_ARRAY);
+        $suggestions = $discussion["Attributes"]["suggestions"];
+        $this->assertSame(false, $suggestions[0]["hidden"]);
+        $this->assertSame(false, $suggestions[1]["hidden"]);
+        $this->assertSame(false, $suggestions[2]["hidden"]);
     }
 
     /**
@@ -303,7 +241,8 @@ class AISuggestionModelTest extends SiteTestCase
         $user = $this->createUser();
         $this->runWithUser(function () {
             $discussion = $this->createDiscussion(["type" => "question"]);
-            $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"], null);
+            $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+            $suggestions = $newDiscussion["Attributes"]["suggestions"];
             $this->assertCount(3, $suggestions);
         }, $user);
 

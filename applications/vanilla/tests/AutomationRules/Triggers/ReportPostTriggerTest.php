@@ -37,8 +37,7 @@ class ReportPostTriggerTest extends SiteTestCase
     {
         parent::setUp();
         $this->initialize();
-        \Gdn::config()->set("Feature.CommunityManagementBeta.Enabled", true);
-        \Gdn::config()->set("Feature.escalations.Enabled", true);
+        \Gdn::config()->set("Feature.CommunityManagement.Enabled", true);
         $this->logModel = $this->container()->get(\LogModel::class);
     }
 

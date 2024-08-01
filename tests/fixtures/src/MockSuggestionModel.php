@@ -32,36 +32,35 @@ class MockSuggestionModel implements AiSuggestionSourceInterface
      */
     public function generateSuggestions(array $discussion, string $keywords): array
     {
+        $this->discussionModel->formatField($discussion, "Body", $discussion["Format"]);
+
         $formattedResult = [
             [
                 "format" => "Vanilla",
                 "type" => $this->getName(),
-                "documentID" => 0,
+                "id" => 0,
                 "url" => "someplace.com/here",
                 "title" => "answer 1",
                 "summary" => "This is how you do this.",
                 "hidden" => false,
-                "sourceIcon" => "mock",
             ],
             [
                 "format" => "Vanilla",
                 "type" => $this->getName(),
-                "documentID" => 1,
+                "id" => 1,
                 "url" => "someplace.com/else",
                 "title" => "answer 2",
                 "summary" => "This is how you do this a different way.",
                 "hidden" => false,
-                "sourceIcon" => "mock",
             ],
             [
                 "format" => "Vanilla",
                 "type" => $this->getName(),
-                "documentID" => 2,
+                "id" => 2,
                 "url" => "someplace.com/else1",
                 "title" => "answer 3",
                 "summary" => "This is how you do this, a third way.",
                 "hidden" => false,
-                "sourceIcon" => "mock",
             ],
         ];
 

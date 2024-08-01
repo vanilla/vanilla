@@ -17,6 +17,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Addon;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Events\DiscussionQueryEvent;
@@ -25,7 +26,6 @@ use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
-use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\Dashboard\Models\AggregateCountableInterface;
 use Vanilla\Dashboard\Models\PremoderationModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
@@ -67,7 +67,10 @@ use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\Deprecation;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\SchemaUtils;
+use Vanilla\Utility\StringUtils;
 use Vanilla\Web\SystemCallableInterface;
+use VanillaTests\APIv2\DiscussionsTest;
 
 /**
  * Manages discussions data.
@@ -259,8 +262,6 @@ class DiscussionModel extends Gdn_Model implements
     /** @var DiscussionStatusModel */
     private $discussionStatusModel;
 
-    private AiSuggestionModel $aiSuggestionModel;
-
     private ReactionModel $reactionModel;
 
     /**
@@ -292,8 +293,7 @@ class DiscussionModel extends Gdn_Model implements
             TagModel $tagModel,
             SiteSectionModel $siteSectionModel,
             UserMentionsModel $userMentionsModel,
-            DiscussionStatusModel $discussionStatusModel,
-            AiSuggestionModel $aiSuggestionModel
+            DiscussionStatusModel $discussionStatusModel
         ) {
             $this->categoryModel = $categoryModel;
             $this->userModel = $userModel;
@@ -301,7 +301,6 @@ class DiscussionModel extends Gdn_Model implements
             $this->siteSectionModel = $siteSectionModel;
             $this->userMentionsModel = $userMentionsModel;
             $this->discussionStatusModel = $discussionStatusModel;
-            $this->aiSuggestionModel = $aiSuggestionModel;
         });
         $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
@@ -1238,11 +1237,14 @@ class DiscussionModel extends Gdn_Model implements
             unset($where["d.Announce"]);
         }
 
-        // If we have a user role where, make sure we join on that table.
         $insertUserRoleIDs = $where["uri.RoleID"] ?? null;
         if (!empty($insertUserRoleIDs)) {
             $sql->join("UserRole uri", "d.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
+
+            // Ensure rows aren't duplicated
+            $sql->distinct();
         }
+        unset($where["uri.RoleID"]);
 
         $this->EventArguments["SQL"] = $sql;
         $this->fireEvent("BeforeGetSubQuery");
@@ -1253,7 +1255,6 @@ class DiscussionModel extends Gdn_Model implements
         if (!empty($orderBy)) {
             $sql->orderBy($orderBy);
         }
-        $sql->groupBy("d.DiscussionID");
 
         $sql->limit($limit);
         $sql->offset($offset);
@@ -2288,7 +2289,6 @@ class DiscussionModel extends Gdn_Model implements
             ->from("Discussion d")
             ->join("UserDiscussion w", "d.DiscussionID = w.DiscussionID and w.UserID = " . $session->UserID, "left")
             ->where("d.DiscussionID", $id)
-            ->groupBy("d.DiscussionID")
             ->get()
             ->firstRow();
 
@@ -4302,13 +4302,12 @@ SQL;
         $result["image"] = $this->formatterService->parseMainImage($bodyParsed, $format);
 
         // Return suggestions if suggestions are enabled and exist for the discussion
-        if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
-            $result["suggestions"] = $this->aiSuggestionModel->getByDiscussionID($row["DiscussionID"]);
-            if (count($result["suggestions"]) > 0) {
-                $result["showSuggestions"] = $result["attributes"]["showSuggestions"] ?? $result["countComments"] == 0;
-                if (isset($result["attributes"]["suggestions"])) {
-                    unset($result["attributes"]["showSuggestions"]);
-                }
+        if (FeatureFlagHelper::featureEnabled("AISuggestions") && isset($result["attributes"]["suggestions"])) {
+            $result["suggestions"] = $result["attributes"]["suggestions"] ?? [];
+            $result["showSuggestions"] = $result["attributes"]["showSuggestions"] ?? $result["countComments"] == 0;
+            unset($result["attributes"]["suggestions"]);
+            if (isset($result["attributes"]["suggestions"])) {
+                unset($result["attributes"]["showSuggestions"]);
             }
         }
 

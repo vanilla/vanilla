@@ -7,7 +7,7 @@ import { css } from "@emotion/css";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { useThemeCache } from "@library/styles/themeCache";
 
-export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boolean) => {
+export const automationRulesClasses = useThemeCache(() => {
     const headerContainer = css({
         position: "sticky",
         top: titleBarVariables().fullHeight,
@@ -25,7 +25,6 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
     const searchAndFilterContainer = css({
         display: "flex",
         padding: 16,
-        ...(isEscalationRulesList && { paddingLeft: 0 }),
         "&& .inputText.withButton": {
             height: 36,
         },
@@ -38,14 +37,6 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         "&& button": {
             fontSize: 13,
         },
-        ...(isEscalationRulesList && {
-            "&& th:first-child": {
-                paddingLeft: 28,
-            },
-            "&& td:first-child": {
-                paddingLeft: 22,
-            },
-        }),
     });
 
     const tableCell = css({
@@ -285,25 +276,6 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         },
     });
 
-    const addEditForm = css({
-        "& li": {
-            marginLeft: 0,
-            marginRight: 0,
-            width: "auto",
-        },
-    });
-
-    const addEditTitleBar = css({
-        "& > div": {
-            justifyContent: "normal",
-        },
-    });
-
-    const addEditTitleBarActionsWrapper = css({
-        width: "100%",
-        justifyContent: "space-between",
-    });
-
     return {
         headerContainer,
         searchAndFilterContainer,
@@ -347,8 +319,5 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         addEditLoader,
         historyLoader,
         previewLoader,
-        addEditForm,
-        addEditTitleBar,
-        addEditTitleBarActionsWrapper,
     };
 });

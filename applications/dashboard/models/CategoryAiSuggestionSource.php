@@ -14,7 +14,6 @@ use Psr\Log\LoggerAwareTrait;
 use Vanilla\Controllers\Api\SearchApiController;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormChoicesInterface;
-use Vanilla\Http\InternalClient;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Site\SiteSectionModel;
 
@@ -28,9 +27,9 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
     /**
      * Constructor
      *
-     * @param InternalClient $api
+     * @param SearchApiController $searchApiController
      */
-    public function __construct(private InternalClient $api)
+    public function __construct(private SearchApiController $searchApiController)
     {
         $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
     }
@@ -105,8 +104,8 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
             }
         }
 
-        $searchResult = $this->api->get("/search", $params);
-        $results = $searchResult->getBody();
+        $searchResult = $this->searchApiController->index($params);
+        $results = $searchResult->getData()->getResultItems();
 
         $formattedResult = [];
         foreach ($results as $result) {
@@ -115,10 +114,10 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
                     "format" => "Vanilla",
                     "sourceIcon" => "search-discussion",
                     "type" => $result["type"],
-                    "documentID" => $result["recordID"],
+                    "id" => $result["recordID"],
                     "url" => $result["url"],
                     "title" => $result["name"],
-                    "summary" => $result->getBody(),
+                    "summary" => $result->getBody(), //$answer["answer"],
                     "hidden" => false,
                 ];
             }

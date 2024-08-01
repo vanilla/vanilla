@@ -20,7 +20,6 @@ use Psr\SimpleCache\CacheInterface;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\CommentQueryEvent;
 use Vanilla\Community\Schemas\PostFragmentSchema;
-use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\Dashboard\Models\PremoderationModel;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\UserMentionsInterface;
@@ -127,9 +126,6 @@ class CommentModel extends Gdn_Model implements
     /** @var UserMentionsModel */
     private $userMentionsModel;
 
-    /** @var AiSuggestionModel */
-    private $aiSuggestionModel;
-
     private ReactionModel $reactionModel;
     public int $LastCommentCount = 0;
 
@@ -157,7 +153,6 @@ class CommentModel extends Gdn_Model implements
         $this->setSessionInterface(Gdn::getContainer()->get("Session"));
         $this->ownSite = \Gdn::getContainer()->get(OwnSite::class);
         $this->reactionModel = Gdn::getContainer()->get(ReactionModel::class);
-        $this->aiSuggestionModel = Gdn::getContainer()->get(AiSuggestionModel::class);
     }
 
     /**
@@ -1308,7 +1303,7 @@ class CommentModel extends Gdn_Model implements
         if ($isDiscussionComment) {
             $this->EventArguments["CommentID"] = $commentID;
             $this->EventArguments["Insert"] = $isInsert;
-            $this->EventArguments["CommentData"] = $commentData;
+
             // IsNewDiscussion is passed when the first comment for new discussions are created.
             $this->EventArguments["IsNewDiscussion"] = val("IsNewDiscussion", $formPostValues);
             $this->fireEvent("AfterSaveComment");
@@ -1486,11 +1481,8 @@ class CommentModel extends Gdn_Model implements
         // Get the comment's parsed content's first image & get the srcset for it.
         $result["image"] = $this->formatterService->parseMainImage($rawBody, $format);
 
-        if (
-            \Vanilla\FeatureFlagHelper::featureEnabled("AISuggestions") &&
-            isset($result["attributes"]["aiSuggestionID"])
-        ) {
-            $result["suggestion"] = $this->aiSuggestionModel->getByID($result["attributes"]["aiSuggestionID"]);
+        if (\Vanilla\FeatureFlagHelper::featureEnabled("AISuggestions") && isset($result["attributes"]["suggestion"])) {
+            $result["suggestion"] = $result["attributes"]["suggestion"] ?? [];
         }
 
         return $result;

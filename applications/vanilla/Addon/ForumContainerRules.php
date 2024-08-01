@@ -17,7 +17,6 @@ use Vanilla\Analytics\SearchDiscussionEventProvider;
 use Vanilla\AutomationRules\Actions\CreateEscalationAction;
 use Vanilla\AutomationRules\Triggers\ReportPostTrigger;
 use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
-use Vanilla\Dashboard\AutomationRules\EscalationRuleService;
 use Vanilla\Dashboard\AutomationRules\Triggers\ProfileFieldSelectionTrigger;
 use Vanilla\Dashboard\AutomationRules\Triggers\TimeSinceUserRegistrationTrigger;
 use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
@@ -35,6 +34,7 @@ use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
 use Vanilla\AutomationRules\Triggers\StaleCollectionTrigger;
 use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
+use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Forum\Controllers\Pages\CategoryListPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionCategoryPageController;
@@ -262,6 +262,7 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addAutomationTrigger", [ProfileFieldSelectionTrigger::class])
             ->addCall("addAutomationTrigger", [TimeSinceUserRegistrationTrigger::class])
             ->addCall("addAutomationTrigger", [UserEmailDomainTrigger::class])
+            ->addCall("addAutomationTrigger", [ReportPostTrigger::class])
             ->addCall("addAutomationAction", [AddDiscussionToCollectionAction::class])
             ->addCall("addAutomationAction", [AddTagToDiscussionAction::class])
             ->addCall("addAutomationAction", [BumpDiscussionAction::class])
@@ -270,15 +271,8 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addAutomationAction", [RemoveDiscussionFromCollectionAction::class])
             ->addCall("addAutomationAction", [RemoveDiscussionFromTriggerCollectionAction::class])
             ->addCall("addAutomationAction", [UserFollowCategoryAction::class])
-            ->addCall("addAutomationAction", [AddRemoveUserRoleAction::class]);
-
-        //Escalation Automation Rules
-        $container
-            ->rule(EscalationRuleService::class)
-            ->addCall("addEscalationTrigger", [ReportPostTrigger::class])
-            ->addCall("addEscalationTrigger", [StaleDiscussionTrigger::class])
-            ->addCall("addEscalationTrigger", [LastActiveDiscussionTrigger::class])
-            ->addCall("addEscalationAction", [CreateEscalationAction::class]);
+            ->addCall("addAutomationAction", [AddRemoveUserRoleAction::class])
+            ->addCall("addAutomationAction", [CreateEscalationAction::class]);
 
         $container
             ->rule(AttachmentService::class)

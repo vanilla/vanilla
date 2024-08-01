@@ -131,10 +131,7 @@ export function PremoderationSettingsPage() {
                         className={dashboardClasses().spaceBetweenFormGroup}
                         label={"Akismet"}
                         description={
-                            <Translate
-                                source="Enable Akismet to filter spam in all posts by applicant registrations and unverified users. Learn more: <0/>"
-                                c0={<SmartLink to={"https://akismet.com"}>https://akismet.com</SmartLink>}
-                            />
+                            "Adds Akismet spam filtering to all posts by unverified users and applicant registrations."
                         }
                     >
                         <AddonToggle addonKey={"akismet"} />
@@ -143,17 +140,7 @@ export function PremoderationSettingsPage() {
                         className={dashboardClasses().spaceBetweenFormGroup}
                         label={"StopForumSpam"}
                         description={
-                            <Translate
-                                source={
-                                    "Enable Stopforumspam to check community users against a list of reported spammers, and either reports the post as spam or rejects them outright. The reporting and rejecting thresholds are managed in the <0>addon's settings</0>. Learn more: <1/>"
-                                }
-                                c0={(content) => <SmartLink to={"/settings/addons"}>{content}</SmartLink>}
-                                c1={
-                                    <SmartLink to={"https://www.stopforumspam.com"}>
-                                        https://www.stopforumspam.com
-                                    </SmartLink>
-                                }
-                            />
+                            "Got spammer problems? This integrates the spammer blacklist from stopforumspam.com to mitigate the issue."
                         }
                     >
                         <AddonToggle addonKey={"stopforumspam"} />

@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Pavel Goncharov <pgoncharov@higherlogic.com>>
+ * @author Pavel Goncharov <olamy-canuel@higherlogic.com>
  * @copyright 2009-2024 Higher Logic Inc.
  * @license Proprietary
  */
@@ -19,7 +19,6 @@ class EscalationRuleDataType extends RuleDataType
 {
     /**
      * @inheridoc
-     * @psalm-suppress UndefinedClass
      */
     protected function getAllTriggerClasses(): array
     {

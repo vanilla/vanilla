@@ -112,15 +112,11 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                                 break;
                             case "date-time":
                                 valueContents = (
-                                    <>
-                                        {detail?.value && (
-                                            <DateTime
-                                                timestamp={detail.value?.toString()}
-                                                mode="fixed"
-                                                type={DateFormats.EXTENDED}
-                                            />
-                                        )}
-                                    </>
+                                    <DateTime
+                                        timestamp={detail.value.toString()}
+                                        mode="fixed"
+                                        type={DateFormats.EXTENDED}
+                                    />
                                 );
                                 break;
                             default:

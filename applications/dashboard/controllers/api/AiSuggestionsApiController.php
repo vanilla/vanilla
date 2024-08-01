@@ -340,8 +340,7 @@ class AiSuggestionsApiController extends \AbstractApiController
 
         $comments = $this->suggestionSourceService->createComments(
             $body["discussionID"],
-            $body["allSuggestions"],
-            $body["suggestionIDs"]
+            $body["allSuggestions"] ? [0, 1, 2] : $body["suggestionIDs"]
         );
 
         $comments = $out->validate($comments);
@@ -381,8 +380,7 @@ class AiSuggestionsApiController extends \AbstractApiController
 
         $status = $this->suggestionSourceService->deleteComments(
             $body["discussionID"],
-            $body["allSuggestions"],
-            $body["suggestionIDs"]
+            $body["allSuggestions"] ? [0, 1, 2] : $body["suggestionIDs"]
         );
         return new Data(["removed" => $status]);
     }
@@ -406,7 +404,10 @@ class AiSuggestionsApiController extends \AbstractApiController
         if (strtolower($discussion["Type"]) !== "question") {
             throw new ClientException("Suggestions may only be generated on questions");
         }
-        $this->suggestionSourceService->deleteSuggestions($discussionID);
+
+        $attributes = $discussion["Attributes"];
+        $attributes["suggestions"] = [];
+        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($attributes));
         $action = new LongRunnerAction(AiSuggestionSourceService::class, "generateSuggestions", [$discussionID, true]);
         return $this->longRunner->runApi($action);
     }

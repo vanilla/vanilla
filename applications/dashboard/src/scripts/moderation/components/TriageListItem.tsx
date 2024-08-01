@@ -31,7 +31,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import { Icon } from "@vanilla/icons";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
-import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
 
 interface IProps {
     discussion: IDiscussion;
@@ -45,7 +44,6 @@ export function TriageListItem(props: IProps) {
     const isResolved = discussion.internalStatusID?.toString() == TriageInternalStatus.RESOLVED;
     const toast = useToast();
     const queryClient = useQueryClient();
-    const { fetchDashboardSections } = useDashboardSectionActions();
     const resolveMutation = useMutation({
         mutationFn: (options: {
             discussionID: IDiscussion["discussionID"];
@@ -58,7 +56,6 @@ export function TriageListItem(props: IProps) {
         },
         onSuccess() {
             queryClient.invalidateQueries(["triageItems"]);
-            fetchDashboardSections();
             toast.addToast({
                 autoDismiss: true,
                 body: "Post marked as resolved.",

@@ -45,8 +45,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
     public function setUp(): void
     {
         parent::setUp();
-        \Gdn::config()->set("Feature.CommunityManagementBeta.Enabled", true);
-        \Gdn::config()->set("Feature.escalations.Enabled", true);
+        \Gdn::config()->set("Feature.CommunityManagement.Enabled", true);
 
         $this->automationRuleService = $this->container()->get(AutomationRuleService::class);
         $this->automationRuleModel = $this->container()->get(AutomationRuleModel::class);
@@ -89,24 +88,6 @@ class AutomationRulesTest extends AbstractAPIv2Test
             $this->assertIsArray($response["actions"]);
             $this->assertEquals($this->getExpectedCatalogTriggerArray(), $response["triggers"]);
             $this->assertEquals($this->getExpectedCatalogActionArray(), $response["actions"]);
-        }, $this->adminID);
-    }
-
-    /**
-     * Test that catalog only provides escalation triggers and actions when the escalation parameter is set to true
-     *
-     * @return void
-     */
-    public function testCatalogGivesBackOnlyEscalationTriggersAndActions(): void
-    {
-        $this->runWithUser(function () {
-            $response = $this->api()
-                ->get("automation-rules/catalog?escalations=true")
-                ->getBody();
-            $this->assertIsArray($response["triggers"]);
-            $this->assertIsArray($response["actions"]);
-            $this->assertEquals($this->getExpectedCatalogEscalationTriggerArray(), $response["triggers"]);
-            $this->assertEquals($this->getExpectedCatalogEscalationActionArray(), $response["actions"]);
         }, $this->adminID);
     }
 
@@ -191,7 +172,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "default" => ["discussion"],
                     "enum" => ["discussion"],
                     "x-control" => [
-                        "description" => "",
+                        "description" => "Select a post type.",
                         "label" => "Post Type",
                         "inputType" => "dropDown",
                         "placeholder" => "",
@@ -244,8 +225,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "profileField" => [
                             "type" => "string",
                             "x-control" => [
-                                "description" =>
-                                    "Dropdown (Single-, Multi-, or Numeric) and Single Checkbox profile field types are eligible for automation.",
+                                "description" => "Select a profile field",
                                 "label" => "Profile Field",
                                 "inputType" => "dropDown",
                                 "placeholder" => "",
@@ -395,7 +375,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "spam-automation",
                             ],
                             "x-control" => [
-                                "description" => "",
+                                "description" => "Select at least one report reason.",
                                 "label" => "Report Reason",
                                 "inputType" => "dropDown",
                                 "placeholder" => "",
@@ -467,10 +447,18 @@ class AutomationRulesTest extends AbstractAPIv2Test
      * @param string $label
      * @param string $description
      * @param bool $multiple
+     * @param bool $discussionCategoriesOnly
      * @return array[]
      */
-    private function getCategorySchema(string $label, string $description, bool $multiple = false): array
-    {
+    private function getCategorySchema(
+        string $label,
+        string $description,
+        bool $multiple = false,
+        bool $discussionCategoriesOnly = false
+    ): array {
+        $categoriesSearchUrl = $discussionCategoriesOnly
+            ? "/api/v2/categories/search?query=%s&limit=30&displayAs[]=Discussions"
+            : "/api/v2/categories/search?query=%s&limit=30";
         return [
             "type" => "object",
             "properties" => [
@@ -487,7 +475,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "placeholder" => "",
                         "choices" => [
                             "api" => [
-                                "searchUrl" => "/api/v2/categories/search?query=%s&limit=30&displayAs[]=Discussions",
+                                "searchUrl" => $categoriesSearchUrl,
                                 "singleUrl" => "/api/v2/categories/%s",
                                 "valueKey" => "categoryID",
                                 "labelKey" => "name",
@@ -510,8 +498,9 @@ class AutomationRulesTest extends AbstractAPIv2Test
      */
     private function getExpectedCatalogActionArray(): array
     {
-        $roleIDs = $this->getModerationManagePermissionRoleIDs();
-        $qs = "?" . http_build_query(["roleIDs" => $roleIDs]);
+        $roles = $this->roleModel->getByPermission("Garden.Moderation.Manage")->resultArray();
+        $users = $this->userModel->search(["roleIDs" => array_column($roles, "RoleID")], "name", "asc")->resultArray();
+        $moderatorUsers = array_column($users, "Name", "UserID");
 
         return [
             "categoryFollowAction" => [
@@ -521,6 +510,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 "schema" => $this->getCategorySchema(
                     "Category to Follow",
                     "Select one or more categories to follow",
+                    true,
                     true
                 ),
                 "contentType" => "users",
@@ -529,10 +519,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 "actionType" => "moveToCategoryAction",
                 "name" => "Move post",
                 "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
-                "schema" => $this->getCategorySchema(
-                    "Category to move to",
-                    "Category settings are respected by automation rules. Posts will only be moved into categories that accept that post type."
-                ),
+                "schema" => $this->getCategorySchema("Category to move to", "Select a category"),
                 "contentType" => "posts",
             ],
             "closeDiscussionAction" => [
@@ -607,7 +594,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "addRoleID" => [
                             "type" => "string",
                             "x-control" => [
-                                "description" => "",
+                                "description" => "Select a role to be assigned",
                                 "label" => "Assign Role",
                                 "inputType" => "dropDown",
                                 "placeholder" => "",
@@ -628,7 +615,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "removeRoleID" => [
                             "type" => "string",
                             "x-control" => [
-                                "description" => "",
+                                "description" => "Select a role to be removed",
                                 "label" => "Remove Role (optional)",
                                 "inputType" => "dropDown",
                                 "placeholder" => "",
@@ -681,87 +668,12 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "inputType" => "dropDown",
                                 "placeholder" => "",
                                 "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/users$qs",
-                                        "singleUrl" => "/api/v2/users/%s",
-                                        "valueKey" => "userID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
+                                    "staticOptions" => $moderatorUsers,
                                 ],
                                 "multiple" => false,
                                 "tooltip" => "",
                             ],
-                        ],
-                    ],
-                ],
-                "contentType" => "posts",
-            ],
-        ];
-    }
-
-    /**
-     * Get moderation manage permission role IDs
-     *
-     * @return array
-     */
-    private function getModerationManagePermissionRoleIDs(): array
-    {
-        $roles = $this->roleModel->getByPermission("Garden.Moderation.Manage")->resultArray();
-        return array_column($roles, "RoleID");
-    }
-
-    /**
-     * Expected escalation triggers
-     * @return array[]
-     */
-    private function getExpectedCatalogEscalationTriggerArray(): array
-    {
-        $triggers = ["reportPostTrigger", "staleDiscussionTrigger", "lastActiveDiscussionTrigger"];
-        return array_intersect_key($this->getExpectedCatalogTriggerArray(), array_flip($triggers));
-    }
-
-    private function getExpectedCatalogEscalationActionArray(): array
-    {
-        $roleIDs = $this->getModerationManagePermissionRoleIDs();
-        $qs = "?" . http_build_query(["roleIDs" => $roleIDs]);
-        return [
-            "createEscalationAction" => [
-                "actionType" => "createEscalationAction",
-                "name" => "Create Escalation",
-                "actionTriggers" => ["reportPostTrigger"],
-                "schema" => [
-                    "type" => "object",
-                    "properties" => [
-                        "recordIsLive" => [
-                            "type" => "boolean",
-                            "default" => false,
-                            "x-control" => [
-                                "description" => "Keep post visible in community",
-                                "label" => "Keep record live",
-                                "inputType" => "checkBox",
-                                "labelType" => null,
-                            ],
-                        ],
-                        "assignedModeratorID" => [
-                            "type" => "integer",
-                            "x-control" => [
-                                "description" => "Select what moderator escalations should be assigned to",
-                                "label" => "Assign Moderator",
-                                "inputType" => "dropDown",
-                                "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/users$qs",
-                                        "singleUrl" => "/api/v2/users/%s",
-                                        "valueKey" => "userID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
-                                ],
-                                "multiple" => false,
-                                "tooltip" => "",
-                            ],
+                            "enum" => array_keys($moderatorUsers),
                         ],
                     ],
                 ],

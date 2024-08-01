@@ -12,6 +12,7 @@ use DiscussionModel;
 use Exception;
 use Garden\EventManager;
 use Garden\Schema\Schema;
+use Garden\Utils\ArrayUtils;
 use Gdn;
 use Generator;
 use Psr\Log\LoggerAwareInterface;
@@ -19,7 +20,6 @@ use Psr\Log\LoggerAwareTrait;
 use UserMetaModel;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Dashboard\Activity\AiSuggestionsActivity;
-use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
@@ -42,26 +42,55 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
 
     protected string $domain;
 
+    /** @var ConfigurationInterface */
+    protected ConfigurationInterface $config;
+
+    /** @var OpenAIClient */
+    private OpenAIClient $openAIClient;
+
+    /** @var DiscussionModel  */
+    private DiscussionModel $discussionModel;
+
+    /** @var CommentModel  */
+    private CommentModel $commentModel;
+
+    /** @var UserMetaModel  */
+    private UserMetaModel $userMetaModel;
+
     private array $reporterData = [];
+
+    /** @var LongRunner */
+    private LongRunner $longRunner;
+
+    private \ActivityModel $activityModel;
 
     /**
      * AI Suggestion constructor.
      *
      * @param ConfigurationInterface $config
      * @param OpenAIClient $openAIClient
+     * @param DiscussionModel $discussionModel
+     * @param CommentModel $commentModel
      * @param UserMetaModel $userMetaModel
      * @param LongRunner $longRunner
-     * @param AiSuggestionModel $aiSuggestionModel
      */
     public function __construct(
-        private ConfigurationInterface $config,
-        private OpenAIClient $openAIClient,
-        private UserMetaModel $userMetaModel,
-        private LongRunner $longRunner,
-        private \ActivityModel $activityModel,
-        private AiSuggestionModel $aiSuggestionModel
+        ConfigurationInterface $config,
+        OpenAIClient $openAIClient,
+        DiscussionModel $discussionModel,
+        CommentModel $commentModel,
+        UserMetaModel $userMetaModel,
+        LongRunner $longRunner,
+        \ActivityModel $activityModel
     ) {
+        $this->config = $config;
+        $this->openAIClient = $openAIClient;
         $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
+        $this->discussionModel = $discussionModel;
+        $this->commentModel = $commentModel;
+        $this->userMetaModel = $userMetaModel;
+        $this->longRunner = $longRunner;
+        $this->activityModel = $activityModel;
     }
 
     /**
@@ -163,7 +192,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      */
     public function generateSuggestions(int $recordID): Generator
     {
-        $discussion = $this->getDiscussionModel()->getID($recordID, DATASET_TYPE_ARRAY);
+        $discussion = $this->discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
         $aiConfig = $this->aiSuggestionConfigs()["sources"];
         $suggestions = [];
         try {
@@ -191,8 +220,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         } catch (Exception $e) {
             $suggestionsMerged = $suggestions;
         }
-
-        $this->aiSuggestionModel->saveSuggestions($recordID, $suggestionsMerged);
+        $discussion["Attributes"]["suggestions"] = $suggestionsMerged;
+        $this->discussionModel->setProperty($recordID, "Attributes", dbencode($discussion["Attributes"]));
 
         if (!empty($suggestionsMerged)) {
             $this->notifyAiSuggestions($discussion);
@@ -209,7 +238,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      */
     public function generateKeywords(array $discussion): string
     {
-        $this->getDiscussionModel()->formatField($discussion, "Body", $discussion["Format"]);
+        $this->discussionModel->formatField($discussion, "Body", $discussion["Format"]);
 
         $discussionBody = $discussion["Name"] . $discussion["Body"];
         $question = $discussion["Body"];
@@ -325,34 +354,31 @@ PROMPT
      * Generate one or multiple comments based on accepted suggestions.
      *
      * @param int $discussionID
-     * @param bool $allSuggestions
-     * @param array $aiSuggestionID
+     * @param array $suggestionIndex
      *
      * @return array
      */
-    public function createComments(int $discussionID, bool $allSuggestions, array $aiSuggestionID = []): array
+    public function createComments(int $discussionID, array $suggestionIndex): array
     {
-        $discussion = $this->getDiscussionModel()->getID($discussionID, DATASET_TYPE_ARRAY);
+        $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
         if (!$this->suggestionEnabled() && "question" !== strtolower($discussion["Type"])) {
             return [];
         }
         $aiConfig = $this->aiSuggestionConfigs();
         $suggestionUserID = $aiConfig["userID"];
-        if ($allSuggestions) {
-            $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussionID);
-        } else {
-            $suggestions = $this->aiSuggestionModel->getByIDs($aiSuggestionID);
-        }
+        $attributes = $discussion["Attributes"] ?? [];
+        $suggestions = $attributes["suggestions"] ?? [];
         $comments = [];
 
-        foreach ($suggestions as $suggestion) {
-            $comment = $this->createComment($suggestion, $discussion, $suggestionUserID);
-            $this->aiSuggestionModel->update(
-                ["commentID" => $comment["commentID"]],
-                ["aiSuggestionID" => $suggestion["aiSuggestionID"]]
-            );
-            $comments[] = $comment;
+        foreach ($suggestionIndex as $index) {
+            if (($suggestions[$index] ?? false) && ($suggestions[$index]["commentID"] ?? null) === null) {
+                $comment = $this->createComment($suggestions[$index], $discussion, $suggestionUserID);
+                $suggestions[$index]["commentID"] = $comment["commentID"];
+                $comments[] = $comment;
+            }
         }
+        $attributes["suggestions"] = $suggestions;
+        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($attributes));
         return $comments;
     }
 
@@ -375,46 +401,47 @@ PROMPT
             "Format" => HtmlFormat::FORMAT_KEY,
             "InsertUserID" => $suggestionUserID,
             "Attributes" => [
-                "aiSuggestionID" => $suggestion["aiSuggestionID"],
+                "suggestion" => ArrayUtils::pluck($suggestion, ["sourceIcon", "title", "url", "format", "type"]),
             ],
         ];
 
-        $commentID = $this->getCommentModel()->save($newComment);
+        $commentID = $this->commentModel->save($newComment);
         if (strtolower($discussion["Type"]) == "question") {
             $eventManager = Gdn::getContainer()->get(EventManager::class);
             $eventManager->fireFilter("commentModel_markAccepted", $commentID);
         }
-        $comment = $this->getCommentModel()->getID($commentID, DATASET_TYPE_ARRAY);
+        $comment = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
 
-        return $this->getCommentModel()->normalizeRow($comment);
+        return $this->commentModel->normalizeRow($comment);
     }
 
     /**
      * Delete comments based on accepted suggestions.
      *
      * @param int $discussionID
-     * @param bool $allSuggestions
-     * @param array $suggestionIDs
+     * @param array $suggestionIndex
      *
      * @return bool
      */
 
-    public function deleteComments(int $discussionID, bool $allSuggestions, array $suggestionIDs = []): bool
+    public function deleteComments(int $discussionID, array $suggestionIndex): bool
     {
-        $discussion = $this->getDiscussionModel()->getID($discussionID, DATASET_TYPE_ARRAY);
+        $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
         if (!$this->suggestionEnabled() && "question" !== strtolower($discussion["Type"])) {
             return false;
         }
-        if ($allSuggestions) {
-            $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussionID);
-        } else {
-            $suggestions = $this->aiSuggestionModel->getByIDs($suggestionIDs);
+        $attributes = $discussion["Attributes"] ?? [];
+        $suggestions = $attributes["suggestions"] ?? [];
+        foreach ($suggestionIndex as $index) {
+            if ($suggestions[$index] ?? false) {
+                $commentID = $suggestions[$index]["commentID"];
+                $this->commentModel->deleteID($commentID);
+                $suggestions[$index]["commentID"] = null;
+            }
         }
-        foreach ($suggestions as &$suggestion) {
-            $commentID = $suggestion["commentID"];
-            $this->getCommentModel()->deleteID($commentID);
-        }
-        $this->aiSuggestionModel->update(["commentID" => null], ["aiSuggestionID" => $suggestionIDs]);
+        $attributes["suggestions"] = $suggestions;
+        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($attributes));
+
         return true;
     }
 
@@ -505,11 +532,17 @@ PROMPT
      */
     public function toggleSuggestions(array $discussion, ?array $suggestionIDs = null, bool $hide = true): void
     {
-        $where = ["discussionID" => $discussion["DiscussionID"]];
-        if (!is_null($suggestionIDs)) {
-            $where["aiSuggestionID"] = $suggestionIDs;
+        $suggestions = $discussion["Attributes"]["suggestions"] ?? [];
+
+        foreach ($suggestions as $index => &$suggestion) {
+            if (is_null($suggestionIDs) || in_array($index, $suggestionIDs)) {
+                $suggestion["hidden"] = $hide;
+            }
         }
-        $this->aiSuggestionModel->update(["hidden" => $hide], $where);
+
+        $discussion["Attributes"]["suggestions"] = $suggestions;
+        $discussionID = $discussion["DiscussionID"];
+        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($discussion["Attributes"]));
     }
 
     /**
@@ -524,24 +557,7 @@ PROMPT
     {
         $discussion["Attributes"]["showSuggestions"] = $visible;
         $discussionID = $discussion["DiscussionID"];
-        $this->getDiscussionModel()->setProperty($discussionID, "Attributes", dbencode($discussion["Attributes"]));
-    }
-
-    /**
-     * Mark suggestions for this discussion as deleted, to not show them again.
-     *
-     * @param int $discussionID
-     * @param bool $isDelete
-     * @return void
-     * @throws Exception
-     */
-    public function deleteSuggestions(int $discussionID, ?array $suggestionIDs = null, bool $isDelete = true)
-    {
-        $where = ["discussionID" => $discussionID];
-        if (!is_null($suggestionIDs)) {
-            $where["aiSuggestionID"] = $suggestionIDs;
-        }
-        $this->aiSuggestionModel->update(["isDeleted" => $isDelete], $where);
+        $this->discussionModel->setProperty($discussionID, "Attributes", dbencode($discussion["Attributes"]));
     }
 
     /**
@@ -552,32 +568,15 @@ PROMPT
     public static function getSuggestionSchema(): Schema
     {
         return Schema::parse([
-            "aiSuggestionID:i",
             "format:s",
             "sourceIcon:s?",
             "type:s",
-            "documentID:i?",
+            "id:i?",
             "url:s",
             "title:s",
             "summary:s?",
             "hidden:b?",
             "commentID:i?",
         ]);
-    }
-
-    /**
-     * @return DiscussionModel
-     */
-    private function getDiscussionModel(): DiscussionModel
-    {
-        return Gdn::getContainer()->get(DiscussionModel::class);
-    }
-
-    /**
-     * @return CommentModel
-     */
-    private function getCommentModel(): CommentModel
-    {
-        return Gdn::getContainer()->get(CommentModel::class);
     }
 }

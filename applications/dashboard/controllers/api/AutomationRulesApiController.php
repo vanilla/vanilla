@@ -17,7 +17,6 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
-use Vanilla\Dashboard\AutomationRules\EscalationRuleService;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\AutomationRules\Schema\AutomationRuleInputSchema;
@@ -32,7 +31,6 @@ use Vanilla\Web\Controller;
 class AutomationRulesApiController extends Controller
 {
     private AutomationRuleService $automationRuleService;
-    private EscalationRuleService $escalationRuleService;
     private AutomationRuleDispatchesModel $automationRuleDispatchesModel;
     private AutomationRuleModel $automationRuleModel;
 
@@ -47,63 +45,39 @@ class AutomationRulesApiController extends Controller
      */
     public function __construct(
         AutomationRuleService $automationRuleService,
-        EscalationRuleService $escalationRuleService,
         AutomationRuleModel $automationRuleModel,
         AutomationRuleDispatchesModel $automationRuleDispatchesModel
     ) {
         $this->automationRuleService = $automationRuleService;
-        $this->escalationRuleService = $escalationRuleService;
         $this->automationRuleModel = $automationRuleModel;
         $this->automationRuleDispatchesModel = $automationRuleDispatchesModel;
     }
 
     /**
      * Get automation catalog
-     * @param array $query
-     * @return Data
-     * @throws HttpException
-     * @throws PermissionException
-     * @throws ValidationException
      */
-    public function get_catalog(array $query = []): Data
+    public function get_catalog(): Data
     {
         $this->permission("Garden.Settings.Manage");
 
-        $in = Schema::parse([
-            "escalations:b?" => [
-                "default" => false,
-                "description" => "Filter by escalation triggers and actions.",
-            ],
-        ]);
-
-        $query = $in->validate($query);
-
         $out = Schema::parse(["triggers:o", "actions:o"]);
 
-        if ($query["escalations"]) {
-            $triggers = $this->escalationRuleService->getEscalationTriggers();
-            $actions = $this->escalationRuleService->getEscalationActions();
-        } else {
-            $triggers = $this->automationRuleService->getAutomationTriggers();
-            $actions = $this->automationRuleService->getAutomationActions();
-        }
-        $triggerActionSchema = [];
-        foreach ($triggers as $trigger) {
+        foreach ($this->automationRuleService->getAutomationTriggers() as $trigger) {
             $schema = $trigger::getSchema();
-            $triggerActionSchema["triggers"][$trigger::getType()] = $trigger::getBaseSchemaArray();
+            $triggerSchema["triggers"][$trigger::getType()] = $trigger::getBaseSchemaArray();
             if (!empty($schema->getSchemaArray())) {
-                $triggerActionSchema["triggers"][$trigger::getType()]["schema"] = $schema;
+                $triggerSchema["triggers"][$trigger::getType()]["schema"] = $schema;
             }
         }
-        foreach ($actions as $action) {
+        foreach ($this->automationRuleService->getAutomationActions() as $action) {
             $schema = $action::getSchema();
-            $triggerActionSchema["actions"][$action::getType()] = $action::getBaseSchemaArray();
+            $triggerSchema["actions"][$action::getType()] = $action::getBaseSchemaArray();
             if (!empty($schema->getSchemaArray())) {
-                $triggerActionSchema["actions"][$action::getType()]["schema"] = $schema;
+                $triggerSchema["actions"][$action::getType()]["schema"] = $schema;
             }
         }
 
-        $result = $out->validate($triggerActionSchema);
+        $result = $out->validate($triggerSchema);
         return new Data($result);
     }
 
@@ -129,7 +103,6 @@ class AutomationRulesApiController extends Controller
             "out"
         );
         $result = $out->validate($this->automationRuleModel->getAutomationRules($query));
-
         return new Data($result);
     }
 

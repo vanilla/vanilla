@@ -75,10 +75,10 @@ use Vanilla\Dashboard\Models\ModerationMessagesFilterOpenApi;
 use Vanilla\Dashboard\Models\ProfileFieldsOpenApi;
 use Vanilla\Dashboard\Models\RolesExpander;
 use Vanilla\Dashboard\Models\SsoUsersExpander;
-use Vanilla\Dashboard\Models\SuggestedContentMeta;
 use Vanilla\Dashboard\Models\UsersExpander;
 use Vanilla\Dashboard\Models\UserSiteTotalProvider;
 use Vanilla\Dashboard\UserLeaderService;
+use Vanilla\Forum\Models\AiSuggestionSiteMetaExtra;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
@@ -232,6 +232,5 @@ class DashboardContainerRules extends AddonContainerRules
             ->rule(AiSuggestionSourceService::class)
             ->addCall("registerSuggestionSource", [new Reference(CategoryAiSuggestionSource::class)]);
         $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(AiSuggestionSourceMeta::class)]);
-        $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(SuggestedContentMeta::class)]);
     }
 }

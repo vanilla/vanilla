@@ -7,7 +7,6 @@
 
 namespace Vanilla\Models;
 
-use Garden\Container\Container;
 use Garden\Web\RequestInterface;
 use Gdn_Session;
 use UserModel;
@@ -17,11 +16,14 @@ use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Logging\ErrorLogger;
+use Vanilla\Search\SearchService;
 use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\ThemeService;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Web\RoleTokenFactory;
@@ -31,37 +33,225 @@ use Vanilla\Web\RoleTokenFactory;
  */
 class SiteMeta implements \JsonSerializable
 {
+    /** @var string */
+    private $host;
+
+    /** @var string */
+    private $basePath;
+
+    /** @var string */
+    private $assetPath;
+
+    /** @var bool */
+    private $debugModeEnabled;
+
+    /** @var bool */
+    private $translationDebugModeEnabled;
+
+    /** @var bool */
+    private $conversationsEnabled;
+
+    /** @var string */
+    private $siteTitle;
+
+    /** @var UserModel $userModel */
+    private $userModel;
+
+    /** @var Contracts\ConfigurationInterface */
+    private $config;
+
+    /** @var string[] */
+    private $allowedExtensions;
+
+    /** @var int */
+    private $maxUploadSize;
+
+    /** @var int */
+    private $maxUploads;
+
+    /** @var string */
+    private $activeThemeKey;
+
+    /** @var int $activeThemeRevisionID */
+    private $activeThemeRevisionID;
+
+    /** @var string */
+    private $mobileThemeKey;
+
+    /** @var string */
+    private $desktopThemeKey;
+
+    /** @var string */
+    private $activeThemeViewPath;
+
+    /** @var ThemeFeatures */
+    private $themeFeatures;
+
+    /** @var array $themePreview */
+    private $themePreview;
+
+    /** @var string */
+    private $favIcon;
+
+    /** @var string */
+    private $mobileAddressBarColor;
+
+    /** @var string|null */
+    private $bannerImage;
+
+    /** @var array */
+    private $featureFlags;
+
+    /** @var string */
+    private $logo;
+
+    /** @var string */
+    private $orgName;
+
+    /** @var string */
+    private $cacheBuster;
+
+    /** @var Gdn_Session */
+    private $session;
+
+    /** @var string */
+    private $reCaptchaKey = "";
+
+    /** @var FormatService */
+    private $formatService;
+
+    /** @var int */
+    private $editContentTimeout = -1;
+
+    /** @var bool  */
+    private $bannedPrivateProfiles = false;
+
     /** @var SiteMetaExtra[] */
     private $extraMetas = [];
 
     /**
+     * @var int
+     */
+    private $siteID;
+
+    /** @var string $roleTokenEncoded */
+    private $roleTokenEncoded;
+
+    private RequestInterface $request;
+
+    private SiteSectionModel $siteSectionModel;
+
+    /**
      * SiteMeta constructor.
+     *
+     * @param RequestInterface $request The request to gather data from.
+     * @param Contracts\ConfigurationInterface $config The config object.
+     * @param SiteSectionModel $siteSectionModel
+     * @param DeploymentCacheBuster $deploymentCacheBuster
+     * @param ThemeService $themeService
+     * @param Gdn_Session $session
+     * @param FormatService $formatService
+     * @param UserModel $userModel
+     * @param AddonManager $addonManager
+     * @param OwnSite $site
+     * @param RoleTokenFactory $roleTokenFactory
      */
     public function __construct(
-        private Container $container,
-        private RequestInterface $request,
-        private Contracts\ConfigurationInterface $config,
-        private Gdn_Session $session,
-        private AddonManager $addonManager,
-        private OwnSite $site,
-        private SiteSectionModel $siteSectionModel,
-        private ThemeService $themeService,
-        private FormatService $formatService,
-        private UserModel $userModel
+        RequestInterface $request,
+        Contracts\ConfigurationInterface $config,
+        SiteSectionModel $siteSectionModel,
+        DeploymentCacheBuster $deploymentCacheBuster,
+        ThemeService $themeService,
+        Gdn_Session $session,
+        FormatService $formatService,
+        UserModel $userModel,
+        AddonManager $addonManager,
+        OwnSite $site,
+        RoleTokenFactory $roleTokenFactory,
+        private EscalationModel $escalationModel
     ) {
-    }
+        $this->request = $request;
+        $this->siteSectionModel = $siteSectionModel;
+        $this->host = $request->getHost();
+        $this->config = $config;
+        $this->formatService = $formatService;
 
-    private function getRoleTokenEncoded(): string
-    {
+        // We expect the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
+        // But never with a trailing slash.
+        $this->basePath = rtrim("/" . trim($request->getRoot(), "/"), "/");
+        $this->assetPath = rtrim("/" . trim($request->getAssetRoot(), "/"), "/");
+        $this->debugModeEnabled = $config->get("Debug");
+        $this->translationDebugModeEnabled = $config->get("TranslationDebug");
+        $this->conversationsEnabled = $addonManager->isEnabled("conversations", Addon::TYPE_ADDON);
+
+        $this->featureFlags = $config->get("Feature", []);
+
+        // Get some ui metadata
+        // This title may become knowledge base specific or may come down in a different way in the future.
+        // For now it needs to come from some where, so I'm putting it here.
+        $this->siteTitle = $this->formatService->renderPlainText(
+            $config->get("Garden.Title", ""),
+            HtmlFormat::FORMAT_KEY
+        );
+
+        $this->orgName = $config->get("Garden.OrgName") ?: $this->siteTitle;
+
+        // Fetch Uploading metadata.
+        $this->allowedExtensions = $config->get("Garden.Upload.AllowedFileExtensions", []);
+        if ($session->getPermissions()->has("Garden.Community.Manage")) {
+            $this->allowedExtensions = array_merge(
+                $this->allowedExtensions,
+                \MediaApiController::UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS
+            );
+        }
+        $maxSize = $config->get("Garden.Upload.MaxFileSize", ini_get("upload_max_filesize"));
+        $this->maxUploadSize = \Gdn_Upload::unformatFileSize($maxSize);
+        $this->maxUploads = (int) $config->get("Garden.Upload.maxFileUploads", ini_get("max_file_uploads"));
+
+        // DeploymentCacheBuster
+        $this->cacheBuster = $deploymentCacheBuster->value();
+
+        $this->session = $session;
+        $this->userModel = $userModel;
         if ($this->session->isValid()) {
             $roleIDs = $this->userModel->getRoleIDs($this->session->UserID);
             if (!empty($roleIDs)) {
-                $factory = $this->container->get(RoleTokenFactory::class);
-                $roleToken = $factory->forEncoding($roleIDs);
-                return $roleToken->encode();
+                $roleToken = $roleTokenFactory->forEncoding($roleIDs);
+                $this->roleTokenEncoded = $roleToken->encode();
             }
         }
-        return "";
+
+        // Theming
+        $currentTheme = $themeService->getCurrentTheme();
+        $currentThemeAddon = $themeService->getCurrentThemeAddon();
+
+        $this->activeThemeKey = $currentTheme->getThemeID();
+        $this->activeThemeRevisionID = $currentTheme->getRevisionID() ?? null;
+        $this->activeThemeViewPath = $currentThemeAddon->path("/views/");
+        $this->mobileThemeKey = $config->get("Garden.MobileTheme", "Garden.Theme");
+        $this->desktopThemeKey = $config->get("Garden.Theme", ThemeService::FALLBACK_THEME_KEY);
+        $this->themePreview = $themeService->getPreviewTheme();
+
+        $editContentTimeout = $config->get("Garden.EditContentTimeout");
+        $this->editContentTimeout = intval($editContentTimeout);
+
+        if ($favIcon = $config->get("Garden.FavIcon")) {
+            $this->favIcon = \Gdn_Upload::url($favIcon);
+        }
+
+        if ($logo = $config->get("Garden.Logo")) {
+            $this->logo = \Gdn_Upload::url($logo);
+        }
+
+        $this->bannerImage = BannerImageModel::getCurrentBannerImageLink() ?: null;
+
+        $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
+
+        $this->reCaptchaKey = $config->get("RecaptchaV3.PublicKey", "");
+
+        $this->bannedPrivateProfiles = $config->get("Vanilla.BannedUsers.PrivateProfiles", false);
+
+        $this->siteID = $site->getSiteID();
     }
 
     /**
@@ -145,26 +335,22 @@ class SiteMeta implements \JsonSerializable
 
         // Deferred for performance reasons.
         $themeFeatures = \Gdn::getContainer()->get(ThemeFeatures::class);
-        $activeSearchDriver = $this->config->get("Vanilla.Search.Driver", "MySQL");
-
-        $currentTheme = $this->themeService->getCurrentTheme();
-        $activeThemeKey = $currentTheme->getThemeID();
-        $mobileThemeKey = $this->config->get("Garden.MobileTheme", "Garden.Theme");
-        $desktopThemeKey = $this->config->get("Garden.Theme", ThemeService::FALLBACK_THEME_KEY);
-        $themePreview = $this->themeService->getPreviewTheme();
+        $activeDriverInstance = \Gdn::getContainer()
+            ->get(SearchService::class)
+            ->getActiveDriver();
 
         return array_replace_recursive(
             [
                 "context" => [
                     "requestID" => $this->request->getMeta("requestID"),
-                    "host" => $this->getAssetPath(), // Notably not the actual host.
-                    "basePath" => $this->getBasePath(),
-                    "assetPath" => $this->getAssetPath(),
-                    "debug" => $this->getDebugModeEnabled(),
-                    "translationDebug" => $this->config->get("TranslationDebug"),
-                    "conversationsEnabled" => $this->addonManager->isEnabled("conversations", Addon::TYPE_ADDON),
-                    "cacheBuster" => $this->container->get(DeploymentCacheBuster::class)->value(),
-                    "siteID" => $this->site->getSiteID(),
+                    "host" => $this->assetPath,
+                    "basePath" => $this->basePath,
+                    "assetPath" => $this->assetPath,
+                    "debug" => $this->debugModeEnabled,
+                    "translationDebug" => $this->translationDebugModeEnabled,
+                    "conversationsEnabled" => $this->conversationsEnabled,
+                    "cacheBuster" => $this->cacheBuster,
+                    "siteID" => $this->siteID,
                 ],
                 "embed" => [
                     "enabled" => (bool) $embedAllowValue,
@@ -174,21 +360,21 @@ class SiteMeta implements \JsonSerializable
                     "remoteUrl" => $this->config->get("Garden.Embed.RemoteUrl", null),
                 ],
                 "ui" => [
-                    "siteName" => $this->getSiteTitle(),
-                    "orgName" => $this->getOrgName(),
+                    "siteName" => $this->siteTitle,
+                    "orgName" => $this->orgName,
                     "localeKey" => $this->getLocaleKey(),
-                    "themeKey" => $activeThemeKey,
-                    "mobileThemeKey" => $mobileThemeKey,
-                    "desktopThemeKey" => $desktopThemeKey,
-                    "logo" => $this->getLogo(),
-                    "favIcon" => $this->getFavIcon(),
+                    "themeKey" => $this->activeThemeKey,
+                    "mobileThemeKey" => $this->mobileThemeKey,
+                    "desktopThemeKey" => $this->desktopThemeKey,
+                    "logo" => $this->logo,
+                    "favIcon" => $this->favIcon,
                     "shareImage" => $this->getShareImage(),
-                    "bannerImage" => BannerImageModel::getCurrentBannerImageLink() ?: null,
-                    "mobileAddressBarColor" => $this->getMobileAddressBarColor(),
+                    "bannerImage" => $this->bannerImage,
+                    "mobileAddressBarColor" => $this->mobileAddressBarColor,
                     "fallbackAvatar" => UserModel::getDefaultAvatarUrl(),
                     "currentUser" => $this->userModel->currentFragment(),
-                    "editContentTimeout" => intval($this->config->get("Garden.EditContentTimeout")),
-                    "bannedPrivateProfile" => $this->config->get("Vanilla.BannedUsers.PrivateProfiles", false),
+                    "editContentTimeout" => $this->editContentTimeout,
+                    "bannedPrivateProfile" => $this->bannedPrivateProfiles,
                     "useAdminCheckboxes" => boolval($this->config->get("Vanilla.AdminCheckboxes.Use", false)),
                     "autoOffsetComments" => boolval($this->config->get("Vanilla.Comments.AutoOffset", true)),
                     "allowSelfDelete" => boolval($this->config->get("Vanilla.Comments.AllowSelfDelete", false)),
@@ -198,36 +384,33 @@ class SiteMeta implements \JsonSerializable
                     "defaultScope" => $this->config->get("Search.DefaultScope", "site"),
                     "supportsScope" =>
                         (bool) $this->config->get("Search.SupportsScope", false) &&
-                        $activeSearchDriver === "ElasticSearch",
-                    "activeDriver" => $activeSearchDriver,
+                        $activeDriverInstance->supportsForeignRecords(),
+                    "activeDriver" => $activeDriverInstance->getName(),
                     "externalSearch" => [
                         "query" => $this->config->get("Garden.ExternalSearch.Query", false),
                         "resultsInNewTab" => $this->config->get("Garden.ExternalSearch.ResultsInNewTab", false),
                     ],
                 ],
                 "upload" => [
-                    "maxSize" => $this->getMaxUploadSize(),
-                    "maxUploads" => (int) $this->config->get(
-                        "Garden.Upload.maxFileUploads",
-                        ini_get("max_file_uploads")
-                    ),
-                    "allowedExtensions" => $this->getAllowedExtensions(),
+                    "maxSize" => $this->maxUploadSize,
+                    "maxUploads" => $this->maxUploads,
+                    "allowedExtensions" => $this->allowedExtensions,
                 ],
 
                 // In case there is a some failure here we don't want the site to crash.
                 "registrationUrl" => $this->tryWithFallback("registerUrl", ""),
                 "signInUrl" => $this->tryWithFallback("signInUrl", ""),
                 "signOutUrl" => $this->tryWithFallback("signOutUrl", ""),
-                "featureFlags" => $this->config->get("Feature", []),
+                "featureFlags" => $this->featureFlags,
                 "themeFeatures" => $themeFeatures->allFeatures(),
                 "addonFeatures" => $themeFeatures->allAddonFeatures(),
                 "defaultSiteSection" => $defaultSiteSection->jsonSerialize(),
                 "siteSection" => $currentSiteSection->jsonSerialize(),
                 "siteSectionSlugs" => $siteSectionSlugs,
-                "themePreview" => $themePreview,
-                "reCaptchaKey" => $this->config->get("RecaptchaV3.PublicKey", ""),
+                "themePreview" => $this->themePreview,
+                "reCaptchaKey" => $this->reCaptchaKey,
                 "TransientKey" => $this->session->transientKey(),
-                "roleToken" => $this->getRoleTokenEncoded(),
+                "roleToken" => $this->roleTokenEncoded ?? "",
             ],
             ...$extras
         );
@@ -238,7 +421,7 @@ class SiteMeta implements \JsonSerializable
      */
     public function getSiteTitle(): string
     {
-        return $this->formatService->renderPlainText($this->config->get("Garden.Title", ""), HtmlFormat::FORMAT_KEY);
+        return $this->siteTitle;
     }
 
     /**
@@ -246,7 +429,7 @@ class SiteMeta implements \JsonSerializable
      */
     public function getOrgName(): string
     {
-        return $this->config->get("Garden.OrgName") ?: $this->getSiteTitle();
+        return $this->orgName;
     }
 
     /**
@@ -254,7 +437,7 @@ class SiteMeta implements \JsonSerializable
      */
     public function getHost(): string
     {
-        return $this->request->getHost();
+        return $this->host;
     }
 
     /**
@@ -262,7 +445,7 @@ class SiteMeta implements \JsonSerializable
      */
     public function getBasePath(): string
     {
-        return rtrim("/" . trim($this->request->getRoot(), "/"), "/");
+        return $this->basePath;
     }
 
     /**
@@ -270,7 +453,7 @@ class SiteMeta implements \JsonSerializable
      */
     public function getAssetPath(): string
     {
-        return rtrim("/" . trim($this->request->getAssetRoot(), "/"), "/");
+        return $this->assetPath;
     }
 
     /**
@@ -278,7 +461,7 @@ class SiteMeta implements \JsonSerializable
      */
     public function getDebugModeEnabled(): bool
     {
-        return $this->config->get("Debug");
+        return $this->debugModeEnabled;
     }
 
     /**
@@ -286,21 +469,15 @@ class SiteMeta implements \JsonSerializable
      */
     public function getAllowedExtensions(): array
     {
-        $extensions = $this->config->get("Garden.Upload.AllowedFileExtensions", []);
-        if ($this->session->getPermissions()->has("Garden.Community.Manage")) {
-            $extensions = array_merge($extensions, \MediaApiController::UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS);
-        }
-        return $extensions;
+        return $this->allowedExtensions;
     }
 
     /**
      * @return int
      */
-    private function getMaxUploadSize(): int
+    public function getMaxUploadSize(): int
     {
-        // Fetch Uploading metadata.
-        $maxSize = $this->config->get("Garden.Upload.MaxFileSize", ini_get("upload_max_filesize"));
-        return \Gdn_Upload::unformatFileSize($maxSize);
+        return $this->maxUploadSize;
     }
 
     /**
@@ -312,16 +489,37 @@ class SiteMeta implements \JsonSerializable
     }
 
     /**
+     * @return string
+     */
+    public function getActiveThemeKey(): string
+    {
+        return $this->activeThemeKey;
+    }
+
+    /**
+     * @return int
+     */
+    public function getActiveThemeRevisionID(): ?int
+    {
+        return $this->activeThemeRevisionID;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActiveThemeViewPath(): string
+    {
+        return $this->activeThemeViewPath;
+    }
+
+    /**
      * Get the configured "favorite icon" for the site.
      *
      * @return string|null
      */
     public function getFavIcon(): ?string
     {
-        if ($favIcon = $this->config->get("Garden.FavIcon")) {
-            return \Gdn_Upload::url($favIcon);
-        }
-        return null;
+        return $this->favIcon;
     }
 
     /**
@@ -340,14 +538,11 @@ class SiteMeta implements \JsonSerializable
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getLogo(): ?string
     {
-        if ($logo = $this->config->get("Garden.Logo")) {
-            return \Gdn_Upload::url($logo);
-        }
-        return null;
+        return $this->logo;
     }
 
     /**
@@ -357,7 +552,17 @@ class SiteMeta implements \JsonSerializable
      */
     public function getMobileAddressBarColor(): ?string
     {
-        return $this->config->get("Garden.MobileAddressBarColor", null);
+        return $this->mobileAddressBarColor;
+    }
+
+    /**
+     * Get the configured banned profile setting.
+     *
+     * @return bool
+     */
+    public function getBannedPrivateProfiles(): bool
+    {
+        return $this->bannedPrivateProfiles;
     }
 
     /**

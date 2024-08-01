@@ -22,7 +22,6 @@ use UserModel;
 use Vanilla\AutomationRules\Actions\AutomationAction;
 use Vanilla\AutomationRules\Trigger\AutomationTrigger;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
-use Vanilla\Dashboard\AutomationRules\EscalationRuleService;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Exception\Database\NoResultsException;
@@ -173,15 +172,6 @@ class AutomationRuleModel extends PipelineModel
         ) {
             if (!empty($query[$key])) {
                 $where["ar.$column"] = $query[$key];
-            }
-        }
-        if (!empty($query["escalations"])) {
-            $escalationService = \Gdn::getContainer()->get(EscalationRuleService::class);
-            $escalationActions = array_keys($escalationService->getEscalationActions());
-            if (!empty($escalationActions)) {
-                $where["arr.actionType"] = $escalationActions;
-            } else {
-                return [];
             }
         }
         if (empty($query["status"])) {

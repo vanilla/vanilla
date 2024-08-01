@@ -2,6 +2,7 @@ body {
     margin: 0px;
     padding: 0px;
     text-align: center;
+    visibility: hidden;
 }
 
 a,

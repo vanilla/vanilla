@@ -156,7 +156,6 @@ class SetupController extends DashboardController
             "Database.User",
             "Database.Password",
             "Garden.Registration.ConfirmEmail",
-            "Garden.Registration.SSOConfirmEmail",
             "Garden.Email.SupportName",
         ]);
 
@@ -166,7 +165,7 @@ class SetupController extends DashboardController
         // If seeing the form for the first time...
         if (!$this->Form->isPostback()) {
             // Force the webroot using our best guesstimates
-            $ConfigurationModel->Data["Database.Host"] = "database";
+            $ConfigurationModel->Data["Database.Host"] = "localhost";
             $this->Form->setData($ConfigurationModel->Data);
         } else {
             // Define some validation rules for the fields being saved

@@ -62,12 +62,9 @@ class MoveDiscussionToCategoryAction extends AutomationAction
                 ],
                 "required" => true,
                 "x-control" => SchemaForm::dropDown(
-                    new FormOptions(
-                        "Category to move to",
-                        "Category settings are respected by automation rules. Posts will only be moved into categories that accept that post type."
-                    ),
+                    new FormOptions("Category to move to", "Select a category"),
                     new ApiFormChoices(
-                        "/api/v2/categories/search?query=%s&limit=30&displayAs[]=Discussions",
+                        "/api/v2/categories/search?query=%s&limit=30",
                         "/api/v2/categories/%s",
                         "categoryID",
                         "name"

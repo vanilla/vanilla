@@ -19,8 +19,6 @@ import { useCollectionList } from "@library/featuredCollections/collectionsHooks
 import { useStatusOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
 import { IGroupOption } from "@library/forms/select/Tokens.loadable";
 import { t } from "@vanilla/i18n";
-import { useGetUsers } from "@dashboard/users/userManagement/UserManagement.hooks";
-import { IUser } from "@library/@types/api/users";
 
 export interface IAutomationRulesContext {
     profileFields?: ProfileField[];
@@ -30,10 +28,9 @@ export interface IAutomationRulesContext {
     collections?: ICollection[];
     categories?: ICategory[];
     ideaStatusesByID?: Record<number, string>;
-    users?: IUser[];
+    setAdditionalDataQuery?: (query?: { categoriesQuery?: IGetCategoryListParams; tagsQuery?: IGetTagsParams }) => void;
     initialOrderedRulesIDs?: Array<IAutomationRule["automationRuleID"]>;
     setInitialOrderedRulesIDs?: (initialOrderedRulesIDs: Array<IAutomationRule["automationRuleID"]>) => void;
-    setAdditionalDataQuery?: (query?: { categoriesQuery?: IGetCategoryListParams; tagsQuery?: IGetTagsParams }) => void;
 }
 
 /**
@@ -47,21 +44,19 @@ export const AutomationRulesContext = React.createContext<IAutomationRulesContex
     collections: undefined,
     categories: undefined,
     ideaStatusesByID: undefined,
-    users: undefined,
+    setAdditionalDataQuery: () => {},
     initialOrderedRulesIDs: undefined,
     setInitialOrderedRulesIDs: () => {},
-    setAdditionalDataQuery: () => {},
 });
 
-export function AutomationRulesProvider(props: { children: ReactNode; isEscalationRulesMode?: boolean }) {
+export function AutomationRulesProvider(props: { children: ReactNode }) {
     const categoriesData = useCategoryList({ limit: 500 });
     const profileFieldsConfig = useProfileFields({ enabled: true });
-    const automationRulesCatalogData = useAutomationRulesCatalog(props.isEscalationRulesMode);
+    const automationRulesCatalogData = useAutomationRulesCatalog();
     const rolesData = useRoles();
     const tagsData = useTagList({ limit: 500 });
     const collectionsData = useCollectionList();
     const discussionStatusesData = useStatusOptions();
-    const usersData = useGetUsers({ limit: 500 });
 
     //store initial rules list order
     const [initialOrderedRulesIDs, setInitialOrderedRulesIDs] = useState<Array<IAutomationRule["automationRuleID"]>>(
@@ -96,10 +91,6 @@ export function AutomationRulesProvider(props: { children: ReactNode; isEscalati
         return collectionsData.data;
     }, [collectionsData]);
 
-    const users = useMemo(() => {
-        return usersData.data?.users;
-    }, [usersData]);
-
     const ideaStatusesByID = useMemo(() => {
         if (discussionStatusesData) {
             const ideas = [...(discussionStatusesData as IGroupOption[])].find((option) => option.label === t("Ideas"));
@@ -119,10 +110,9 @@ export function AutomationRulesProvider(props: { children: ReactNode; isEscalati
                 collections: collections,
                 categories: categories,
                 ideaStatusesByID: ideaStatusesByID,
-                users: users,
+                setAdditionalDataQuery: setAdditionalDataQuery,
                 initialOrderedRulesIDs: initialOrderedRulesIDs,
                 setInitialOrderedRulesIDs: setInitialOrderedRulesIDs,
-                setAdditionalDataQuery: setAdditionalDataQuery,
             }}
         >
             {props.children}

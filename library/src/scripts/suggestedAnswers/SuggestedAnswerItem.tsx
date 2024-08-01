@@ -19,7 +19,12 @@ import { t } from "@library/utility/appUtils";
 import { Icon } from "@vanilla/icons";
 import startCase from "lodash-es/startCase";
 
-export function SuggestedAnswerItem(props: ISuggestedAnswer) {
+interface IProps extends ISuggestedAnswer {
+    index: number;
+}
+
+export function SuggestedAnswerItem(props: IProps) {
+    const { index, ...suggestion } = props;
     const classes = suggestedAnswersClasses();
     const { discussionID, onMutateSuccess } = useSuggestedAnswerContext();
     const acceptAnswer = useAcceptSuggestion(discussionID);
@@ -29,7 +34,7 @@ export function SuggestedAnswerItem(props: ISuggestedAnswer) {
     const handleAcceptAnswer = async () => {
         try {
             await acceptAnswer({
-                suggestion: props.aiSuggestionID,
+                suggestion: index,
                 accept: true,
             });
             onMutateSuccess?.();
@@ -40,7 +45,7 @@ export function SuggestedAnswerItem(props: ISuggestedAnswer) {
 
     const handleDismissAnswer = async () => {
         try {
-            await dismissAnswer(props.aiSuggestionID);
+            await dismissAnswer(index);
             onMutateSuccess?.();
         } catch (err) {
             toastError(err);
@@ -50,7 +55,7 @@ export function SuggestedAnswerItem(props: ISuggestedAnswer) {
     return (
         <li className={classes.item}>
             <div className={classes.itemContent}>
-                <SuggestedAnswerContent {...props} />
+                <SuggestedAnswerContent {...suggestion} />
                 <Button
                     buttonType={ButtonTypes.TEXT_PRIMARY}
                     className={classes.answerButton}

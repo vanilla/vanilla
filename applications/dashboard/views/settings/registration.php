@@ -1,48 +1,27 @@
-<?php if (!defined("APPLICATION")) {
-    exit();
-}
-$confirmationSupported = $this->data("ConfirmationSupported");
-helpAsset(sprintf(t("About %s"), t("Registration")), t("Change the way that new users register with the site."));
-helpAsset(
-    t("Need More Help?"),
-    anchor(
-        t("Video tutorial on user registration"),
-        "https://success.vanillaforums.com/kb/articles/457-n-registration-methods-video"
-    )
-);
+<?php if (!defined('APPLICATION')) exit();
+$confirmationSupported = $this->data('ConfirmationSupported');
+helpAsset(sprintf(t('About %s'), t('Registration')), t('Change the way that new users register with the site.'));
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on user registration"), 'https://success.vanillaforums.com/kb/articles/457-n-registration-methods-video'))
 ?>
-<h1><?php echo t("User Registration Settings"); ?></h1>
+<h1><?php echo t('User Registration Settings'); ?></h1>
 <?php
 echo $this->Form->open();
-echo $this->Form->errors();
-?>
+echo $this->Form->errors(); ?>
 
 <?php if (UserModel::noEmail()) {
-    echo '<div class="alert alert-danger padded-top">' .
-        t(
-            "Email addresses are disabled.",
-            "Email addresses are disabled. You can only add an email address if you are an administrator."
-        ) .
-        "</div>";
+    echo '<div class="alert alert-danger padded-top">'.
+        t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.').
+        '</div>';
 } ?>
 <?php if (!$confirmationSupported) {
-    echo '<div class="alert alert-warning padded-top">' .
-        t(
-            "No unconfirmed role available for email confirmation.",
-            'The site needs a role with default type "unconfirmed" to use email confirmation. Please add one to enable this setting.'
-        ) .
-        "</div>";
+    echo '<div class="alert alert-warning padded-top">'.
+        t('No unconfirmed role available for email confirmation.', 'The site needs a role with default type "unconfirmed" to use email confirmation. Please add one to enable this setting.').
+        '</div>';
 } ?>
-<div class="form-group<?php echo !$confirmationSupported ? " foggy" : ""; ?>">
+<div class="form-group<?php echo !$confirmationSupported ? ' foggy' : ''; ?>">
     <?php
-    $label = t("Confirm email addresses", "Require users to confirm their email addresses (recommended)");
-    echo $this->Form->toggle("Garden.Registration.ConfirmEmail", $label);
-    ?>
-</div>
-<div class="form-group<?php echo !$confirmationSupported ? " foggy" : ""; ?>">
-    <?php
-    $label = t("Confirm email addresses SSO", "Require users to confirm their email addresses for SSO (recommended)");
-    echo $this->Form->toggle("Garden.Registration.SSOConfirmEmail", $label);
+    $label = t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)');
+    echo $this->Form->toggle('Garden.Registration.ConfirmEmail', $label);
     ?>
 </div>
 
@@ -51,8 +30,8 @@ echo $this->Form->errors();
         <table class="Label table-data js-tj">
             <thead>
             <tr>
-                <th><?php echo t("Method"); ?></th>
-                <th class="column-lg"><?php echo t("Description"); ?></th>
+                <th><?php echo t('Method'); ?></th>
+                <th class="column-lg"><?php echo t('Description'); ?></th>
             </tr>
             </thead>
             <tbody>
@@ -61,23 +40,22 @@ echo $this->Form->errors();
             $i = 0;
             $Alt = false;
             foreach ($this->RegistrationMethods as $Method => $Description) {
-
                 $Alt = !$Alt;
-                $CssClass = "";
+                $CssClass = '';
                 if ($Alt) {
-                    $CssClass = "Alt";
+                    $CssClass = 'Alt';
                 }
                 ++$i;
-                if ($Count == $i) {
-                    $CssClass .= " Last";
-                }
+                if ($Count == $i)
+                    $CssClass .= ' Last';
+
                 $CssClass = trim($CssClass);
                 ?>
-                <tr<?php echo $CssClass != "" ? ' class="' . $CssClass . '"' : ""; ?>>
+                <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
                     <th><?php
-                    $MethodName = $Method;
-                    echo $this->Form->radio("Garden.Registration.Method", $MethodName, ["value" => $Method]);
-                    ?></th>
+                        $MethodName = $Method;
+                        echo $this->Form->radio('Garden.Registration.Method', $MethodName, ['value' => $Method]);
+                        ?></th>
                     <td class="Alt"><?php echo t($Description); ?></td>
                 </tr>
             <?php
@@ -90,43 +68,37 @@ echo $this->Form->errors();
 
 <?php Captcha::settings($this); ?>
 
-<?php $this->fireEvent("RegistrationView"); ?>
+<?php $this->fireEvent('RegistrationView'); ?>
 
 <div id="InvitationTarget" class="form-group">
     <div class="label-wrap">
-        <?php echo $this->Form->label("Invitation target", "Garden.Registration.InviteTarget"); ?>
+        <?php echo $this->Form->label('Invitation target', 'Garden.Registration.InviteTarget'); ?>
         <div class="info">
-            <?php echo t(
-                "Users will be redirected to this URL after accepting an invitation.",
-                "Users will be redirected to this URL after accepting an invitation. It can be a full URL or a path to redirect within the site."
-            ); ?>
+            <?php echo t('Users will be redirected to this URL after accepting an invitation.', "Users will be redirected to this URL after accepting an invitation. It can be a full URL or a path to redirect within the site."); ?>
         </div>
     </div>
     <div class="input-wrap invite-url-code">
-        <?php echo $this->Form->textBox("Garden.Registration.InviteTarget", [
-            "value" => $this->InviteTarget,
-            "placeholder" => t("Url"),
-        ]); ?>
+        <?php echo $this->Form->textBox('Garden.Registration.InviteTarget', ['value' => $this->InviteTarget, 'placeholder' => t('Url')]); ?>
     </div>
 </div>
 <div id="InvitationExpiration" class="form-group">
     <div class="label-wrap">
-    <?php echo $this->Form->label("Invitations will expire", "Garden.Registration.InviteExpiration"); ?>
+    <?php echo $this->Form->label('Invitations will expire', 'Garden.Registration.InviteExpiration'); ?>
     </div>
     <div class="input-wrap">
-    <?php echo $this->Form->dropDown("Garden.Registration.InviteExpiration", $this->InviteExpirationOptions, [
-        "value" => $this->InviteExpiration,
-    ]); ?>
+    <?php echo $this->Form->dropDown('Garden.Registration.InviteExpiration', $this->InviteExpirationOptions, ['value' => $this->InviteExpiration]); ?>
     </div>
 </div>
 <div id="InvitationSettings">
-    <?php echo '<div class="padded">' . t("Choose who can send out invitations to new members:") . "</div>"; ?>
+    <?php
+    echo '<div class="padded">'.t('Choose who can send out invitations to new members:').'</div>';
+    ?>
     <div class="table-wrap">
     <table class="Label table-data js-tj">
         <thead>
         <tr>
-            <th><?php echo t("Role"); ?></th>
-            <th class="column-xl"><?php echo t("Invitations per month"); ?></th>
+            <th><?php echo t('Role'); ?></th>
+            <th class="column-xl"><?php echo t('Invitations per month'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -135,27 +107,25 @@ echo $this->Form->errors();
         $Count = $this->RoleData->numRows();
         $Alt = false;
         foreach ($this->RoleData->result() as $Role) {
-
             $Alt = !$Alt;
-            $CssClass = "";
+            $CssClass = '';
             if ($Alt) {
-                $CssClass = "Alt";
+                $CssClass = 'Alt';
             }
             ++$i;
             if ($Count == $i) {
-                $CssClass .= " Last";
+                $CssClass .= ' Last';
             }
+
             $CssClass = trim($CssClass);
-            $CurrentValue = val($Role["RoleID"], $this->ExistingRoleInvitations, false);
+            $CurrentValue = val($Role['RoleID'], $this->ExistingRoleInvitations, false);
             ?>
-            <tr<?php echo $CssClass != "" ? ' class="' . $CssClass . '"' : ""; ?>>
-                <th><?php echo $Role["Name"]; ?></th>
+            <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
+                <th><?php echo $Role['Name']; ?></th>
                 <td class="Alt">
                     <?php
-                    echo $this->Form->dropDown("InvitationCount[]", $this->InvitationOptions, [
-                        "value" => $CurrentValue,
-                    ]);
-                    echo $this->Form->hidden("InvitationRoleID[]", ["value" => $Role["RoleID"]]);
+                    echo $this->Form->dropDown('InvitationCount[]', $this->InvitationOptions, ['value' => $CurrentValue]);
+                    echo $this->Form->hidden('InvitationRoleID[]', ['value' => $Role['RoleID']]);
                     ?>
                 </td>
             </tr>
@@ -166,4 +136,4 @@ echo $this->Form->errors();
     </table>
     </div>
 </div>
-<?php echo $this->Form->close("Save"); ?>
+<?php echo $this->Form->close('Save'); ?>

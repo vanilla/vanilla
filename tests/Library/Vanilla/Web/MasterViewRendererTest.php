@@ -108,7 +108,7 @@ class MasterViewRendererTest extends SiteTestCase
         $page->initialize();
         $result = $renderer->renderPage($page, []);
         $testHtml = new TestHtmlDocument($result);
-        $testHtml->assertContainsString('dir="rtl"');
+        $testHtml->assertContainsString("dir=rtl");
 
         // layouts page, with locale "ar", RTLLocales contains all default RTL languages by default, we SHOULD HAVE dir=rtl applied
         /** @var LayoutPage $layoutPage */
@@ -116,7 +116,7 @@ class MasterViewRendererTest extends SiteTestCase
         $layoutPage->initialize();
         $result = $renderer->renderPage($layoutPage, []);
         $testHtml = new TestHtmlDocument($result);
-        $testHtml->assertContainsString('dir="rtl"');
+        $testHtml->assertContainsString("dir=rtl");
 
         $this->runWithConfig(
             [
@@ -132,7 +132,7 @@ class MasterViewRendererTest extends SiteTestCase
                 $page->initialize();
                 $result = $renderer->renderPage($page, []);
                 $testHtml = new TestHtmlDocument($result);
-                $testHtml->assertNotContainsString('dir="rtl"');
+                $testHtml->assertNotContainsString("dir=rtl");
 
                 // layouts page, with locale "ar", RTLLocales config IS empty, we SHOULD NOT HAVE dir=rtl applied
                 /** @var LayoutPage $layoutPage */
@@ -140,7 +140,7 @@ class MasterViewRendererTest extends SiteTestCase
                 $layoutPage->initialize();
                 $result = $renderer->renderPage($layoutPage, []);
                 $testHtml = new TestHtmlDocument($result);
-                $testHtml->assertNotContainsString('dir="rtl"');
+                $testHtml->assertNotContainsString("dir=rtl");
             }
         );
 
@@ -163,7 +163,7 @@ class MasterViewRendererTest extends SiteTestCase
                 $page->initialize();
                 $result = $renderer->renderPage($page, []);
                 $testHtml = new TestHtmlDocument($result);
-                $testHtml->assertNotContainsString('dir="rtl"');
+                $testHtml->assertNotContainsString("dir=rtl");
 
                 // layouts page, with locale "en", RTLLocales has ar and en(wrong) values, we still SHOULD NOT HAVE dir=rtl applied, because 'en' is not in default RTL languages list
                 /** @var LayoutPage $layoutPage */
@@ -171,7 +171,7 @@ class MasterViewRendererTest extends SiteTestCase
                 $layoutPage->initialize();
                 $result = $renderer->renderPage($layoutPage, []);
                 $testHtml = new TestHtmlDocument($result);
-                $testHtml->assertNotContainsString('dir="rtl"');
+                $testHtml->assertNotContainsString("dir=rtl");
             }
         );
     }

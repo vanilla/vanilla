@@ -170,8 +170,12 @@ export function SuggestedAnswers(props: ISuggestedAnswersProps) {
                                 )}
                             </p>
                             <ul className={classes.list}>
-                                {filteredSuggestions.map((item) => (
-                                    <SuggestedAnswerItem key={item.aiSuggestionID} {...item} />
+                                {filteredSuggestions.map((item, idx) => (
+                                    <SuggestedAnswerItem
+                                        key={[item.format, item.type, item.id].join("-")}
+                                        {...item}
+                                        index={idx}
+                                    />
                                 ))}
                             </ul>
                         </>

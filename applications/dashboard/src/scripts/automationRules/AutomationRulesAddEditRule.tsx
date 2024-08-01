@@ -26,7 +26,6 @@ import {
     mapApiValuesToFormValues,
     mapFormValuesToApiValues,
     getTriggerAdditionalSettings,
-    hasPostType,
 } from "@dashboard/automationRules/AutomationRules.utils";
 import { IFieldError, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
@@ -41,7 +40,7 @@ import { AutoWidthInput } from "@library/forms/AutoWidthInput";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { AutomationRulesDeleteRule } from "@dashboard/automationRules/AutomationRulesDeleteRule";
 import { AutomationRulesPreview } from "@dashboard/automationRules/preview/AutomationRulesPreview";
-import { useCollisionDetector, useLastValue } from "@vanilla/react-utils";
+import { useLastValue } from "@vanilla/react-utils";
 import isEqual from "lodash/isEqual";
 import { Icon } from "@vanilla/icons";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -52,23 +51,15 @@ import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator"
 import { AutomationRulesRunOnce } from "@dashboard/automationRules/AutomationRulesRunOnce";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { stableObjectHash } from "@vanilla/utils";
-import BackLink from "@library/routing/links/BackLink";
-import AdminLayout from "@dashboard/components/AdminLayout";
-import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
-import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
 
-export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEcalationRulesMode?: boolean }) {
-    const { automationRuleID, isEcalationRulesMode } = props;
+export function AutomationRulesAddEditImpl(props: { automationRuleID?: string }) {
+    const { automationRuleID } = props;
     const [showConfirmExit, setShowConfirmExit] = useState(false);
     const [ruleName, setRuleName] = useState(automationRuleID ? "" : t("Rule Name"));
     const classes = automationRulesClasses();
     const toast = useToast();
     const history = useHistory();
     const editableRef = useRef<HTMLInputElement | null>();
-
-    const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
 
     const [topLevelErrors, setTopLevelErrors] = useState<IError[]>([]);
     const [fieldErrors, setFieldErrors] = useState<Record<string, IFieldError[]>>({});
@@ -157,7 +148,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                             </>
                         ),
                     });
-                    history.goBack();
+                    history.push("/settings/automation-rules");
                 } catch (error) {
                     handleErrors(error);
                 }
@@ -192,7 +183,10 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
 
         // apply the default value postType if no value is set for time based triggers with postType
         // if we have already the postType value, double check with default values as we might have disabled one of the question/poll/idea plugins, so we need to adjust postType form values accordingly
-        if (values.trigger?.triggerType && hasPostType(values.trigger?.triggerType, automationRulesCatalog)) {
+        if (
+            values.trigger?.triggerType &&
+            ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"].includes(values.trigger?.triggerType ?? "")
+        ) {
             const triggerPostTypeDefaultValue =
                 automationRulesCatalog?.triggers?.[values.trigger?.triggerType].schema?.properties?.postType?.default;
             if (!values.trigger?.triggerValue.postType) {
@@ -279,115 +273,123 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
         </ToolTip>
     );
 
-    const rightPanelContent = (
+    return (
         <>
-            {isEcalationRulesMode ? (
-                <h3>{t("Create/Edit Escalation Rule").toLocaleUpperCase()}</h3>
-            ) : (
-                <h3>{t("Create/Edit Automation Rule").toLocaleUpperCase()}</h3>
-            )}
-            <p>
-                {t(
-                    "Create or edit a single automation rule using triggers and actions. Set rules to run once or continually.",
-                )}
-            </p>
-            <SmartLink to={"https://success.vanillaforums.com/kb/articles/1569-automation-rules"}>
-                {t("See documentation for more information.")}
-            </SmartLink>
-        </>
-    );
-
-    const addEditHeaderActionButtons = (
-        <div className={classes.addEditHeader}>
-            <div className={classes.addEditHeaderItem}>
-                <BackLink
-                    visibleLabel={true}
-                    onClick={dirty ? () => setShowConfirmExit(true) : undefined}
-                    className={classes.leftGap(isEcalationRulesMode ? -20 : -4)}
-                />
-            </div>
-            <ConditionalWrap
-                component={ToolTip}
-                condition={isRuleRunning}
-                componentProps={{ label: t("Rule may not be edited while it is running") }}
-            >
-                <span>
-                    <div className={cx(classes.flexContainer(), classes.addEditHeaderItem)}>
-                        <AutoWidthInput
-                            onChange={(event) => setRuleName(event.target.value)}
-                            className={autoWidthInputClasses().themeInput}
-                            ref={(ref) => (editableRef.current = ref)}
-                            value={ruleName}
-                            maxLength={100}
-                            onKeyDown={(event) => {
-                                if (event.key === "Enter") {
-                                    event.preventDefault();
-                                    (event.target as HTMLElement).blur();
-                                }
-                            }}
-                            onMouseDown={focusAndSelectAll}
-                            disabled={isRuleRunning}
-                        />
-                        <Button buttonType={ButtonTypes.ICON} onClick={focusAndSelectAll} disabled={isRuleRunning}>
-                            <EditIcon small />
-                        </Button>
+            <DashboardHeaderBlock
+                title={""}
+                actionButtons={
+                    <div className={classes.addEditHeader}>
+                        <div className={classes.addEditHeaderItem}>
+                            <Button
+                                onClick={() => {
+                                    if (dirty) {
+                                        setShowConfirmExit(true);
+                                    } else {
+                                        history.push("/settings/automation-rules");
+                                    }
+                                }}
+                                buttonType={ButtonTypes.TEXT}
+                                className={classes.flexContainer()}
+                            >
+                                <LeftChevronIcon />
+                                {t("Back")}
+                            </Button>
+                        </div>
+                        <ConditionalWrap
+                            component={ToolTip}
+                            condition={isRuleRunning}
+                            componentProps={{ label: t("Rule may not be edited while it is running") }}
+                        >
+                            <span>
+                                <div className={cx(classes.flexContainer(), classes.addEditHeaderItem)}>
+                                    <AutoWidthInput
+                                        onChange={(event) => setRuleName(event.target.value)}
+                                        className={autoWidthInputClasses().themeInput}
+                                        ref={(ref) => (editableRef.current = ref)}
+                                        value={ruleName}
+                                        maxLength={100}
+                                        onKeyDown={(event) => {
+                                            if (event.key === "Enter") {
+                                                event.preventDefault();
+                                                (event.target as HTMLElement).blur();
+                                            }
+                                        }}
+                                        onMouseDown={focusAndSelectAll}
+                                        disabled={isRuleRunning}
+                                    />
+                                    <Button
+                                        buttonType={ButtonTypes.ICON}
+                                        onClick={focusAndSelectAll}
+                                        disabled={isRuleRunning}
+                                    >
+                                        <EditIcon small />
+                                    </Button>
+                                </div>
+                            </span>
+                        </ConditionalWrap>
+                        <div className={cx(classes.flexContainer(true), classes.addEditHeaderItem)}>
+                            <DropDown
+                                flyoutType={FlyoutType.LIST}
+                                key={stableObjectHash({ ...recipe?.recentDispatch })}
+                            >
+                                <AutomationRulesPreview
+                                    formValues={values}
+                                    isRuleRunning={isRuleRunning}
+                                    schema={schema}
+                                />
+                                {isEditing && recipe && recipe.status === "inactive" && (
+                                    <AutomationRulesRunOnce
+                                        automationRuleID={recipe.automationRuleID}
+                                        formFieldsChanged={dirty}
+                                        isRunning={isRuleRunning}
+                                        formValues={values}
+                                        onConfirmSaveChanges={async () =>
+                                            await updateRecipe({ ...mapFormValuesToApiValues(values), name: ruleName })
+                                        }
+                                        onError={handleErrors}
+                                        schema={schema}
+                                    />
+                                )}
+                                {isEditing && (
+                                    <DropDownItemLink
+                                        to={`/settings/automation-rules/history?automationRuleID=${props.automationRuleID}`}
+                                    >
+                                        {t("History")}
+                                    </DropDownItemLink>
+                                )}
+                                <DropDownItemSeparator />
+                                {isEditing && recipe && (
+                                    <>
+                                        {isRuleRunning ? (
+                                            disabledDropdownItem("Delete")
+                                        ) : (
+                                            <AutomationRulesDeleteRule {...recipe} />
+                                        )}
+                                    </>
+                                )}
+                            </DropDown>
+                            <ConditionalWrap
+                                component={ToolTip}
+                                condition={isRuleRunning}
+                                componentProps={{ label: t("Rule may not be edited while it is running") }}
+                            >
+                                <span>
+                                    <Button
+                                        buttonType={ButtonTypes.DASHBOARD_PRIMARY}
+                                        onClick={() => {
+                                            submitForm();
+                                        }}
+                                        disabled={isRuleRunning}
+                                        className={cx({ [classes.disabled]: isRuleRunning })}
+                                    >
+                                        {isSubmitting ? <ButtonLoader /> : t("Save")}
+                                    </Button>
+                                </span>
+                            </ConditionalWrap>
+                        </div>
                     </div>
-                </span>
-            </ConditionalWrap>
-            <div className={cx(classes.flexContainer(true), classes.addEditHeaderItem)}>
-                <DropDown flyoutType={FlyoutType.LIST} key={stableObjectHash({ ...recipe?.recentDispatch })}>
-                    <AutomationRulesPreview formValues={values} isRuleRunning={isRuleRunning} schema={schema} />
-                    {isEditing && recipe && recipe.status === "inactive" && (
-                        <AutomationRulesRunOnce
-                            automationRuleID={recipe.automationRuleID}
-                            formFieldsChanged={dirty}
-                            isRunning={isRuleRunning}
-                            formValues={values}
-                            onConfirmSaveChanges={async () =>
-                                await updateRecipe({ ...mapFormValuesToApiValues(values), name: ruleName })
-                            }
-                            onError={handleErrors}
-                            schema={schema}
-                        />
-                    )}
-                    {isEditing && (
-                        <DropDownItemLink
-                            to={`/settings/automation-rules/history?automationRuleID=${props.automationRuleID}`}
-                        >
-                            {t("History")}
-                        </DropDownItemLink>
-                    )}
-                    <DropDownItemSeparator />
-                    {isEditing && recipe && (
-                        <>
-                            {isRuleRunning ? disabledDropdownItem("Delete") : <AutomationRulesDeleteRule {...recipe} />}
-                        </>
-                    )}
-                </DropDown>
-                <ConditionalWrap
-                    component={ToolTip}
-                    condition={isRuleRunning}
-                    componentProps={{ label: t("Rule may not be edited while it is running") }}
-                >
-                    <span>
-                        <Button
-                            buttonType={isEcalationRulesMode ? ButtonTypes.OUTLINE : ButtonTypes.DASHBOARD_PRIMARY}
-                            onClick={() => {
-                                submitForm();
-                            }}
-                            disabled={isRuleRunning}
-                            className={cx({ [classes.disabled]: isRuleRunning })}
-                        >
-                            {isSubmitting ? <ButtonLoader /> : t("Save")}
-                        </Button>
-                    </span>
-                </ConditionalWrap>
-            </div>
-        </div>
-    );
-
-    const addEditContent = (
-        <>
+                }
+            />
             <ModalConfirm
                 isVisible={showConfirmExit}
                 title={t("Unsaved Changes")}
@@ -396,7 +398,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                 }}
                 onConfirm={() => {
                     setShowConfirmExit(false);
-                    history.goBack();
+                    history.push("/settings/automation-rules");
                 }}
                 confirmTitle={t("Exit")}
             >
@@ -405,7 +407,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                 )}
             </ModalConfirm>
             {topLevelErrors && topLevelErrors.length > 0 && (
-                <div className={classes.padded(!isEcalationRulesMode)}>
+                <div className={classes.padded(true)}>
                     <Message
                         type="error"
                         stringContents={topLevelErrors[0].message}
@@ -414,7 +416,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                     />
                 </div>
             )}
-            <section className={cx({ [dashboardClasses().extendRow]: !isEcalationRulesMode })}>
+            <section className={dashboardClasses().extendRow}>
                 <div className={cx(classes.sectionHeader, classes.noBorderTop)}>
                     {t("Summary")}
                     {recipe && isRuleRunning && (
@@ -444,7 +446,6 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                     onSubmit={(e) => {
                         e.preventDefault();
                     }}
-                    className={cx({ [classes.addEditForm]: isEcalationRulesMode })}
                 >
                     <JsonSchemaForm
                         fieldErrors={fieldErrors}
@@ -456,9 +457,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                             return (
                                 <>
                                     {props.header && (
-                                        <section
-                                            className={cx({ [dashboardClasses().extendRow]: !isEcalationRulesMode })}
-                                        >
+                                        <section className={dashboardClasses().extendRow}>
                                             <div
                                                 className={cx(classes.sectionHeader, {
                                                     [classes.noBorderTop]: props.header !== "Trigger",
@@ -477,39 +476,31 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                     />
                 </form>
             )}
-        </>
-    );
-
-    return isEcalationRulesMode ? (
-        <AdminLayout
-            titleBarContainerClassName={classes.addEditTitleBar}
-            actionsWrapperClassName={classes.addEditTitleBarActionsWrapper}
-            title={""}
-            leftPanel={!isCompact && <ModerationNav />}
-            rightPanel={rightPanelContent}
-            content={addEditContent}
-            titleBarActions={addEditHeaderActionButtons}
-        />
-    ) : (
-        <>
-            <DashboardHeaderBlock title={""} actionButtons={addEditHeaderActionButtons} />
-            {addEditContent}
-            <DashboardHelpAsset>{rightPanelContent}</DashboardHelpAsset>
+            <DashboardHelpAsset>
+                <h3>{t("Create/Edit Automation Rule").toLocaleUpperCase()}</h3>
+                <p>
+                    {t(
+                        "Create or edit a single automation rule using triggers and actions. Set rules to run once or continually.",
+                    )}
+                </p>
+                <SmartLink to={"https://success.vanillaforums.com/kb/articles/1569-automation-rules"}>
+                    {t("See documentation for more information.")}
+                </SmartLink>
+            </DashboardHelpAsset>
         </>
     );
 }
 
-export default function AutomationRulesAddEditPage(
+export default function AutomationRulesAddEdit(
     props: RouteComponentProps<{
         automationRuleID: string;
     }>,
 ) {
     const automationRuleID = props.match.params.automationRuleID;
-    const isEscalationRulesMode = props.location.pathname.includes("dashboard/content/escalation-rules");
 
     return (
-        <AutomationRulesProvider isEscalationRulesMode={isEscalationRulesMode}>
-            <AutomationRulesAddEdit automationRuleID={automationRuleID} isEcalationRulesMode={isEscalationRulesMode} />
+        <AutomationRulesProvider>
+            <AutomationRulesAddEditImpl automationRuleID={automationRuleID} />
         </AutomationRulesProvider>
     );
 }

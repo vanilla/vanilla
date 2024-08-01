@@ -142,7 +142,6 @@ export type AddEditAutomationRuleParams = AutomationRuleFormValues & {
 export type AutomationRulesAdditionalDataQuery = {
     categoriesQuery?: IGetCategoryListParams;
     tagsQuery?: IGetTagsParams;
-    usersQuery?: IGetUsersQueryParams;
 };
 
 export interface IAutomationRulesHistoryFilter

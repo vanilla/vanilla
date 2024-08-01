@@ -2207,4 +2207,29 @@ facilisis luctus, metus</p>";
             ["discussionID" => [$disc1["discussionID"]]]
         );
     }
+
+    /**
+     * Test to ensure joining the UserRole table doesn't duplicate discussion records.
+     *
+     * @return void
+     */
+    public function testRoleFilterNoDuplication()
+    {
+        $this->resetTable("Discussion");
+        $user1 = $this->createUser([
+            "roleID" => [\RoleModel::MOD_ID, \RoleModel::MEMBER_ID],
+        ]);
+
+        $disc1 = $this->runWithUser(function () {
+            return $this->createDiscussion();
+        }, $user1);
+
+        $this->assertApiResults(
+            "/discussions",
+            ["insertUserRoleID" => [\RoleModel::MOD_ID, \RoleModel::MEMBER_ID]],
+            ["discussionID" => [$disc1["discussionID"]]],
+            true,
+            1
+        );
+    }
 }

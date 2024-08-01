@@ -19,12 +19,12 @@ import { AutomationRulesSearchbar } from "@dashboard/automationRules/AutomationR
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
 import { AutomationRulesFilter } from "@dashboard/automationRules/AutomationRulesFilter";
 import { useRecipes } from "@dashboard/automationRules/AutomationRules.hooks";
-import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
+import { AutomationRulesProvider, useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
+import { ErrorPageBoundary } from "@library/errorPages/ErrorPageBoundary";
 import { IAutomationRule, IAutomationRulesFilterValues } from "@dashboard/automationRules/AutomationRules.types";
 import {
     loadingPlaceholder,
     mapApiValuesToFormValues,
-    RECIPES_MAX_LIMIT,
     sortDateColumn,
 } from "@dashboard/automationRules/AutomationRules.utils";
 import AutomationRulesSummary from "@dashboard/automationRules/AutomationRulesSummary";
@@ -39,17 +39,11 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import Button from "@library/forms/Button";
 import { TableAccordion } from "@dashboard/components/TableAccordion";
 
-interface IProps {
-    isEscalationRulesList?: boolean;
-    headerClassName?: string;
-    onRulesMaxLimitReach?: (value: boolean) => void;
-}
-
-export function AutomationRulesList(props: IProps) {
-    const { isEscalationRulesList } = props;
-
-    const classes = automationRulesClasses(isEscalationRulesList);
+export function AutomationRulesListImpl() {
+    const classes = automationRulesClasses();
     const [maxLimitModalVisible, setMaxLimitModalVisible] = useState<boolean>(false);
+
+    const RECIPES_MAX_LIMIT = 150;
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filters, setFilters] = useState<IAutomationRulesFilterValues>({});
@@ -68,17 +62,13 @@ export function AutomationRulesList(props: IProps) {
         });
     };
 
-    const { recipes, isLoading, error, isRefetching } = useRecipes(!previewModalVisible, isEscalationRulesList);
+    const { recipes, isLoading, error, isRefetching } = useRecipes(!previewModalVisible);
 
     // let's store initial fetch order, so when we enable/disable auto-run,
     // we can keep the same order as api response is always ordered by dateLastRun and enabled first
     useEffect(() => {
         if (recipes && !initialOrderedRulesIDs?.length && !isRefetching) {
             setInitialOrderedRulesIDs?.(recipes.map((rule) => rule.automationRuleID));
-        }
-        // to notify parent components
-        if (recipes?.length === RECIPES_MAX_LIMIT) {
-            props.onRulesMaxLimitReach?.(true);
         }
     }, [recipes, isRefetching]);
 
@@ -134,7 +124,6 @@ export function AutomationRulesList(props: IProps) {
                             toggleButtonContent={<span>{rule.name}</span>}
                             onExpandChange={(newVal) => onRuleExpandChange(rule.automationRuleID, newVal)}
                             isExpanded={expandedRules.includes(rule.automationRuleID)}
-                            contentClassName={isEscalationRulesList ? classes.leftGap(6) : undefined}
                         >
                             <AutomationRulesSummary formValues={mapApiValuesToFormValues(rule)} />
                         </TableAccordion>
@@ -170,9 +159,7 @@ export function AutomationRulesList(props: IProps) {
                             onPreviewModalVisible={setPreviewModalVisible}
                         />
                     ),
-                    actions: (
-                        <AutomationRulesActions automationRule={rule} isEscalationRulesMode={isEscalationRulesList} />
-                    ),
+                    actions: <AutomationRulesActions {...rule} />,
                 };
             });
         }
@@ -189,35 +176,28 @@ export function AutomationRulesList(props: IProps) {
 
     return (
         <>
-            <div
-                className={cx(
-                    { [classes.headerContainer]: !isEscalationRulesList },
-                    { [props.headerClassName ?? ""]: isEscalationRulesList },
-                )}
-            >
-                {!isEscalationRulesList && (
-                    <DashboardHeaderBlock
-                        title={t("Automation Rules")}
-                        actionButtons={
-                            recipes?.length === RECIPES_MAX_LIMIT ? (
-                                <Button
-                                    buttonType={ButtonTypes.DASHBOARD_PRIMARY}
-                                    onClick={() => setMaxLimitModalVisible(true)}
-                                >
-                                    {t("Add Rule")}
-                                </Button>
-                            ) : (
-                                <LinkAsButton
-                                    style={{ marginLeft: "auto" }}
-                                    buttonType={ButtonTypes.DASHBOARD_PRIMARY}
-                                    to={"/settings/automation-rules/add"}
-                                >
-                                    {t("Add Rule")}
-                                </LinkAsButton>
-                            )
-                        }
-                    />
-                )}
+            <div className={classes.headerContainer}>
+                <DashboardHeaderBlock
+                    title={t("Automation Rules")}
+                    actionButtons={
+                        recipes?.length === RECIPES_MAX_LIMIT ? (
+                            <Button
+                                buttonType={ButtonTypes.DASHBOARD_PRIMARY}
+                                onClick={() => setMaxLimitModalVisible(true)}
+                            >
+                                {t("Add Rule")}
+                            </Button>
+                        ) : (
+                            <LinkAsButton
+                                style={{ marginLeft: "auto" }}
+                                buttonType={ButtonTypes.DASHBOARD_PRIMARY}
+                                to={"/settings/automation-rules/add"}
+                            >
+                                {t("Add Rule")}
+                            </LinkAsButton>
+                        )
+                    }
+                />
                 <section>
                     <div className={classes.searchAndFilterContainer}>
                         <AutomationRulesSearchbar onSearch={setSearchQuery} />
@@ -226,11 +206,7 @@ export function AutomationRulesList(props: IProps) {
                 </section>
             </div>
             <section>
-                <div
-                    className={cx(classes.scrollTable, {
-                        [dashboardClasses().extendRow]: !isEscalationRulesList,
-                    })}
-                >
+                <div className={cx(dashboardClasses().extendRow, classes.scrollTable)}>
                     {error && (
                         <div className={classes.padded()}>
                             <Message
@@ -277,5 +253,15 @@ export function AutomationRulesList(props: IProps) {
                 {t("You cannot add more than 150 automation rules. Delete some rules and try again.")}
             </ModalConfirm>
         </>
+    );
+}
+
+export default function AutomationRulesList() {
+    return (
+        <AutomationRulesProvider>
+            <ErrorPageBoundary>
+                <AutomationRulesListImpl />
+            </ErrorPageBoundary>
+        </AutomationRulesProvider>
     );
 }

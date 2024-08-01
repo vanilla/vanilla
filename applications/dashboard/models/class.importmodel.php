@@ -1864,7 +1864,6 @@ class ImportModel extends Gdn_Model
 
         $roleDefaults = [
             "Garden.Registration.ConfirmEmail" => false,
-            "Garden.Registration.SSOConfirmEmail" => false,
         ];
         $roleTypes = [];
 
@@ -1890,7 +1889,6 @@ class ImportModel extends Gdn_Model
                 case "pending":
                     $roleTypes[$roleID] = RoleModel::TYPE_UNCONFIRMED;
                     $roleDefaults["Garden.Registration.ConfirmEmail"] = true;
-                    $roleDefaults["Garden.Registration.SSOConfirmEmail"] = true;
                     break;
                 case "member":
                 case "members":

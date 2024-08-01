@@ -35,6 +35,7 @@
     "check-types": "tsc -p tsconfig.json --noemit",
     "check-types:watch": "tsc -p tsconfig.json --noemit --watch",
     "lint": "yarn jest --config ./jest.eslint.config.mjs",
+    "minifyLegacyScripts": "node -r esbuild-register build/scripts/minifyLegacyScripts.ts",
     "storybook": "storybook dev -p 9001 -c build/.storybook",
     "build-storybook": "NODE_ENV=\"production\" storybook build -c build/.storybook -o build/.out",
     "test-storybook": "test-storybook --url http://localhost:9001 -c build/.storybook"

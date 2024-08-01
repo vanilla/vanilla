@@ -8,19 +8,16 @@ import { AutomationRulesAdditionalDataQuery } from "@dashboard/automationRules/A
 import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { ITag } from "@library/features/tags/TagsReducer";
-import { IUser } from "@library/@types/api/users";
 
 interface IAutomationRulesSummaryQueryProps {
     categories?: ICategory[];
     categoryValue?: number | number[];
     tags?: ITag[];
     tagValue?: number[];
-    users?: IUser[];
-    userValue?: number;
 }
 
 export default function AutomationRulesSummaryQuery(props: IAutomationRulesSummaryQueryProps) {
-    const { categories, categoryValue, tags, tagValue, users, userValue } = props;
+    const { categories, categoryValue, tags, tagValue } = props;
     const { setAdditionalDataQuery } = useAutomationRules();
 
     // lets check if we should fetch new data
@@ -34,28 +31,21 @@ export default function AutomationRulesSummaryQuery(props: IAutomationRulesSumma
                 : !categories.find((category) => category.categoryID === categoryValue)
                 ? [categoryValue]
                 : [];
-            if (newCategoriesToFetch.length > 0) {
-                query["categoriesQuery"] = { categoryID: newCategoriesToFetch };
-            }
+            query["categoriesQuery"] = { categoryID: newCategoriesToFetch };
         }
-        if (tags && tagValue && tagValue.some((tagID) => !tags.find((tag) => tag.tagID === tagID))) {
+        if (tags && tagValue) {
             query["tagsQuery"] = {
                 tagID: tagValue.filter((tagID) => !tags.find((tag) => tag.tagID === tagID)),
             };
         }
-        if (users && userValue && !users.find((user) => user.userID == userValue)) {
-            query["usersQuery"] = {
-                userID: [userValue],
-            };
-        }
         return query;
-    }, [categories, categoryValue, tags, tagValue, users, userValue]);
+    }, [categories, categoryValue, tags, tagValue]);
 
     useEffect(() => {
         if (
-            additionalDataQuery.categoriesQuery?.categoryID ||
-            additionalDataQuery.tagsQuery?.tagID ||
-            additionalDataQuery.usersQuery?.userID
+            (additionalDataQuery.categoriesQuery?.categoryID &&
+                additionalDataQuery.categoriesQuery?.categoryID?.length > 0) ||
+            (additionalDataQuery.tagsQuery?.tagID && additionalDataQuery.tagsQuery?.tagID?.length > 0)
         ) {
             setAdditionalDataQuery?.(additionalDataQuery);
         }

@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { css, cx } from "@emotion/css";
+import { css } from "@emotion/css";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -18,7 +18,6 @@ interface IProps {
     toggleButtonContent: React.ReactNode;
     children: React.ReactNode;
     className?: string;
-    contentClassName?: string;
     isExpanded?: boolean;
     onExpandChange?: (isExpanded: boolean) => void;
 }
@@ -64,7 +63,7 @@ export function TableAccordion(props: IProps) {
                 style={{
                     height: props.isExpanded ? (isExpanded ? measurements.height + 8 : 0) : animatedHeight,
                 }}
-                className={cx(classes.accordionContentContainer, props.contentClassName)}
+                className={classes.accordionContentContainer}
                 aria-expanded={isExpanded}
             >
                 <div ref={ref}>{props.children}</div>

@@ -2285,12 +2285,16 @@ class DiscussionModel extends Gdn_Model implements
             $this->SQL->select($select);
         }
 
-        $discussion = $this->SQL
+        $data = $this->SQL
             ->from("Discussion d")
             ->join("UserDiscussion w", "d.DiscussionID = w.DiscussionID and w.UserID = " . $session->UserID, "left")
             ->where("d.DiscussionID", $id)
-            ->get()
-            ->firstRow();
+            ->get();
+
+        $this->EventArguments["Data"] = $data;
+        $this->getEventManager()->fire("discussionModel_afterAddColumns", $this);
+
+        $discussion = $data->firstRow();
 
         if (!$discussion) {
             return $discussion;

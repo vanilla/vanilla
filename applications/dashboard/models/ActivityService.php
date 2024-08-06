@@ -183,7 +183,7 @@ class ActivityService
                 $typeName = $activity::getPreference();
                 $schema->setField("{$pathRoot}.properties.{$typeName}", [
                     "x-control" => [
-                        "description" => t($activity::getPreferenceDescription()),
+                        "description" => $activity::getPreferenceDescription(),
                     ],
                     "type" => "object",
                     "properties" => $properties,

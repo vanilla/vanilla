@@ -63,6 +63,10 @@ export function AutomationRulesPreviewContent(props: IProps) {
               })
             : triggerTime.toUTCString().replace(/,/g, ""));
 
+    const isStaleDiscussionOrUnansweredQuestionTrigger =
+        apiValues.trigger?.triggerType === "staleDiscussionTrigger" ||
+        apiValues.trigger?.triggerType === "unAnsweredQuestionTrigger";
+
     switch (apiValues.trigger?.triggerType) {
         case "profileFieldTrigger":
             const profileFieldApiKey = Object.keys(apiValues.trigger?.triggerValue?.profileField || {})[0];
@@ -94,18 +98,29 @@ export function AutomationRulesPreviewContent(props: IProps) {
                 ...(schema?.properties?.trigger?.properties.triggerValue?.postType && {
                     type: apiValues.trigger?.triggerValue.postType,
                 }),
-                ...(apiValues.trigger?.triggerType === "staleDiscussionTrigger" && {
-                    hasComments: false,
+                ...(isStaleDiscussionOrUnansweredQuestionTrigger && {
                     dateInserted: dateValueForAPI,
+                    categoryID: apiValues.trigger?.triggerValue?.categoryID,
+                    tagID: apiValues.trigger?.triggerValue?.tagID,
+                    ...(apiValues.trigger?.triggerType === "staleDiscussionTrigger" && { hasComments: false }),
+                    ...(apiValues.trigger?.triggerType === "unAnsweredQuestionTrigger" && {
+                        type: "question",
+                        statusID: [1, 4],
+                    }),
                 }),
                 ...(apiValues.trigger?.triggerType === "lastActiveDiscussionTrigger" && {
                     dateLastComment: dateValueForAPI,
                 }),
-                ...(apiValues.trigger?.triggerType === "ideationVoteTrigger" &&
+                ...((apiValues.trigger?.triggerType === "ideationVoteTrigger" ||
+                    apiValues.trigger?.triggerType === "discussionReachesScoreTrigger") &&
                     apiValues.trigger?.triggerValue?.score && {
-                        type: "idea",
+                        type:
+                            apiValues.trigger?.triggerType === "ideationVoteTrigger"
+                                ? "idea"
+                                : apiValues.trigger?.triggerValue?.postType,
                         score: apiValues.trigger?.triggerValue?.score,
                     }),
+
                 ...(apiValues.trigger?.triggerType === "staleCollectionTrigger" &&
                     apiValues.trigger?.triggerValue?.collectionID?.length > 0 && {
                         collectionID: apiValues.trigger?.triggerValue?.collectionID,
@@ -125,7 +140,7 @@ export function AutomationRulesPreviewContent(props: IProps) {
             break;
     }
 
-    // reset the query to empty if we did not set required fields for the trigger
+    // Reset the query to empty if we did not set required fields for the trigger
     if (
         schema &&
         (!apiValues.trigger?.triggerType ||

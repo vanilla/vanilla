@@ -42,7 +42,6 @@ interface IProps extends IFlyoutToggleChildParameters {
     handleID: string;
     renderAbove?: boolean;
     renderLeft?: boolean;
-    legacyMode: boolean;
     titleRef?: React.RefObject<HTMLElement | null>;
     onInsertEmoji(emojiChar: string): void;
 }
@@ -90,7 +89,7 @@ export default class EmojiPicker extends React.PureComponent<IProps, IState> {
         const description = [t("Insert an emoji in your message."), t("richEditor.emoji.pagingInstructions")].join(" ");
         const emojiClasses = emojiGroupsClasses();
         const classesInsertEmoji = insertEmojiClasses();
-        const classesRichEditor = richEditorClasses(this.props.legacyMode);
+        const classesRichEditor = richEditorClasses();
 
         const extraHeadingContent = (
             <button type="button" className="accessibility-jumpTo" onClick={this.focusOnCategories}>
@@ -117,7 +116,6 @@ export default class EmojiPicker extends React.PureComponent<IProps, IState> {
                             isSelected={isSelected}
                             navigateToGroup={this.scrollToCategory}
                             groupIndex={groupIndex}
-                            legacyMode={this.props.legacyMode}
                         />
                     );
                 })}
@@ -170,8 +168,7 @@ export default class EmojiPicker extends React.PureComponent<IProps, IState> {
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
                 bodyClass={classesInsertEmoji.body}
-                className={!this.props.legacyMode ? classesRichEditor.flyoutOffset : ""}
-                legacyMode={this.props.legacyMode}
+                className={classesRichEditor.flyoutOffset}
             />
         );
     }

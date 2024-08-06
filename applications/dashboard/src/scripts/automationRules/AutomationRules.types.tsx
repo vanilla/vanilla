@@ -15,16 +15,18 @@ import { IGetReportsForAutomationRulesParams } from "@dashboard/automationRules/
 export type AutomationRuleTriggerType =
     | "emailDomainTrigger"
     | "ideationVoteTrigger"
+    | "discussionReachesScoreTrigger"
+    | "lastActiveDiscussionTrigger"
     | "profileFieldTrigger"
     | "reportPostTrigger"
     | "staleDiscussionTrigger"
     | "staleCollectionTrigger"
-    | "lastActiveDiscussionTrigger"
-    | "timeSinceUserRegistrationTrigger";
+    | "timeSinceUserRegistrationTrigger"
+    | "unAnsweredQuestionTrigger";
 export type AutomationRuleActionType =
+    | "addDiscussionToCollectionAction"
     | "addRemoveRoleAction"
     | "addTagAction"
-    | "addToCollectionAction"
     | "bumpDiscussionAction"
     | "categoryFollowAction"
     | "changeIdeationStatusAction"

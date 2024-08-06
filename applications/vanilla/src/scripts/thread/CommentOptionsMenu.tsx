@@ -6,6 +6,7 @@
 
 import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { css } from "@emotion/css";
 import { IApiError } from "@library/@types/api/core";
 import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
 import { useUserCanStillEditDiscussionOrComment } from "@library/features/discussions/discussionHooks";
@@ -54,6 +55,12 @@ interface IProps {
     isEditLoading: boolean;
     isVisible?: IDropDownProps["isVisible"];
 }
+
+const reportButtonAlignment = css({
+    "&:not(:last-child)": {
+        marginInlineEnd: -8,
+    },
+});
 
 export function CommentOptionsMenu(props: IProps) {
     const { discussion, comment, onMutateSuccess } = props;
@@ -214,7 +221,11 @@ export function CommentOptionsMenu(props: IProps) {
                     customTrigger={(props) => {
                         return (
                             <ToolTip label={t("Report content")}>
-                                <Button buttonType={ButtonTypes.ICON} onClick={props.onClick}>
+                                <Button
+                                    buttonType={ButtonTypes.ICON}
+                                    onClick={props.onClick}
+                                    className={reportButtonAlignment}
+                                >
                                     <Icon icon="post-flag" />
                                 </Button>
                             </ToolTip>

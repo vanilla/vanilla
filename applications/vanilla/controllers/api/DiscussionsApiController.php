@@ -16,6 +16,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Database\Select;
@@ -77,7 +78,8 @@ class DiscussionsApiController extends AbstractApiController
         private LongRunner $longRunner,
         private DiscussionStatusModel $discussionStatusModel,
         private ReactionModel $reactionModel,
-        private Gdn_Database $db
+        private Gdn_Database $db,
+        private InterestModel $interestModel
     ) {
     }
 
@@ -840,10 +842,10 @@ class DiscussionsApiController extends AbstractApiController
             "in",
         ])->setDescription("List discussions.");
         $query["followed"] = $query["followed"] ?? false;
+        $query["suggestions"] = $query["suggestions"] ?? false;
         $query["excludeHiddenCategories"] = $query["excludeHiddenCategories"] ?? false;
         $query = $in->validate($query);
         $query = $this->filterValues($query);
-
         $discussionSchema = CrawlableRecordSchema::applyExpandedSchema(
             $this->discussionSchema(),
             "discussion",
@@ -952,6 +954,16 @@ class DiscussionsApiController extends AbstractApiController
             }
         }
 
+        $selects = [];
+        if ($query["suggestions"] && InterestModel::isSuggestedContentEnabled()) {
+            [$categoryIDs, $tagIDs] = $this->interestModel->getRecordIDsByUserID($this->getSession()->UserID);
+            if (count($tagIDs) === 0 && $categoryIDs === 0) {
+                return new Data(null);
+            }
+            $where["InterestCategoryID"] = $categoryIDs;
+            $query["tagID"] = $tagIDs;
+        }
+
         /*pull all discussion Ids based on the given Tagid/Id's and pass it on*/
         if (array_key_exists("tagID", $query)) {
             $cond = ["TagID" => $query["tagID"]];
@@ -1017,8 +1029,6 @@ class DiscussionsApiController extends AbstractApiController
         [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection(
             $query["sort"] ?? "-DateLastComment"
         );
-
-        $selects = [];
 
         if ($orderField === DiscussionModel::SORT_EXPIRIMENTAL_TRENDING) {
             // Experimental trending works on the following equation

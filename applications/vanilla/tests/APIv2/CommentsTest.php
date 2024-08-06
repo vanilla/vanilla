@@ -366,6 +366,94 @@ class CommentsTest extends AbstractResourceTest
     }
 
     /**
+     * Test filtering comments by userRoleID.
+     *
+     * @return void
+     */
+    public function testGettingCommentsByRoleID(): void
+    {
+        $category = $this->createCategory();
+        $discussion = $this->createDiscussion(["categoryID" => $category["categoryID"]]);
+
+        $newRole = $this->createRole([
+            "permissions" => [
+                [
+                    "permissions" => [
+                        "session.valid" => true,
+                    ],
+                    "type" => "global",
+                ],
+                [
+                    "id" => $category["categoryID"],
+                    "permissions" => [
+                        "discussions.view" => true,
+                        "discussions.add" => true,
+                        "comments.add" => true,
+                    ],
+                    "type" => "category",
+                ],
+            ],
+        ]);
+
+        $this->runWithUser(
+            function () use ($discussion) {
+                $this->createComment(["discussionID" => $discussion["discussionID"]]);
+            },
+            $this->createUser([
+                "roleID" => [$newRole["roleID"]],
+            ])
+        );
+
+        $comments = $this->api()
+            ->get("comments", ["insertUserRoleID" => [$newRole["roleID"]]])
+            ->getBody();
+        $this->assertCount(1, $comments);
+    }
+
+    /**
+     * Test filtering comments by categoryID.
+     *
+     * @return void
+     */
+    public function testGetCommentsByCategoryID()
+    {
+        $category = $this->createCategory();
+        $discussion = $this->createDiscussion(["categoryID" => $category["categoryID"]]);
+        $comment = $this->createComment(["discussionID" => $discussion["discussionID"]]);
+
+        $allComments = $this->api()
+            ->get("comments")
+            ->getBody();
+
+        $this->assertTrue(count($allComments) > 1);
+
+        // There are more than one comment, but only one comment in the category.
+        $comments = $this->api()
+            ->get("comments?categoryID={$category["categoryID"]}")
+            ->getBody();
+        $this->assertCount(1, $comments);
+        $this->assertEquals($comment["commentID"], $comments[0]["commentID"]);
+    }
+
+    /**
+     * Test category permissions are respected when filtering by categoryID.
+     *
+     * @return void
+     */
+    public function testCategoryViewPermission(): void
+    {
+        $category = $this->createPermissionedCategory([], [\RoleModel::ADMIN_ID, \RoleModel::MOD_ID]);
+        $discussion = $this->createDiscussion(["categoryID" => $category["categoryID"]]);
+        $this->createComment(["discussionID" => $discussion["discussionID"]]);
+        $this->api()->setUserID($this->createUserFixture(self::ROLE_MEMBER));
+        $comments = $this->api()
+            ->get("comments?categoryID={$category["categoryID"]}")
+            ->getBody();
+        // There should be no comments, since the user does not have permission to view the category.
+        $this->assertEmpty($comments);
+    }
+
+    /**
      * Ensure that there are dirtyRecords for a specific resource.
      */
     protected function triggerDirtyRecords()

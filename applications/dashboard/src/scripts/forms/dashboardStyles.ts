@@ -215,7 +215,8 @@ export const dashboardClasses = useThemeCache(() => {
 
     const labelIcon = css({
         marginLeft: 4,
-        marginTop: 2,
+        maxHeight: "1em",
+        verticalAlign: "middle",
     });
 
     const noLeftPadding = css({
@@ -278,16 +279,17 @@ export const dashboardClasses = useThemeCache(() => {
         },
     });
 
+    const currencySymbol = css({
+        position: "relative",
+        width: 0,
+        transform: "translateX(15px)",
+        fontSize: 16,
+        fontWeight: globalVars.fonts.weights.semiBold,
+    });
+
     const currencyInput = css({
         display: "flex",
         alignItems: "center",
-
-        "& .dollar": {
-            position: "relative",
-            left: "25px",
-            fontSize: 16,
-            fontWeight: globalVars.fonts.weights.semiBold,
-        },
 
         "& input": {
             paddingLeft: "35px",
@@ -312,8 +314,6 @@ export const dashboardClasses = useThemeCache(() => {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
-        justifyContent: "space-between",
-        maxWidth: "7em",
 
         "& input": {
             textAlign: "center",
@@ -322,20 +322,11 @@ export const dashboardClasses = useThemeCache(() => {
         "@media (max-width: 300px)": {
             flexDirection: "column",
         },
-    });
-
-    const ratioInputReadOnlyNumerator = css({
-        padding: "6px 6px 6px 0",
+        gap: "12px",
     });
 
     const ratioInput = css({
         maxWidth: "4em",
-        padding: 6,
-    });
-
-    const ratioInputSeparator = css({
-        padding: 6,
-        minWidth: "max-content",
     });
 
     const highlight = css({
@@ -369,6 +360,7 @@ export const dashboardClasses = useThemeCache(() => {
         passwordInput,
         spaceBetweenFormGroup,
         buttonRow,
+        currencySymbol,
         currencyInput,
         multiLineInput,
         readonlyRow,
@@ -376,9 +368,7 @@ export const dashboardClasses = useThemeCache(() => {
         readonlyDescription,
         readonlyEmptyMessage,
         ratioInputContainer,
-        ratioInputReadOnlyNumerator,
         ratioInput,
-        ratioInputSeparator,
         highlight,
     };
 });

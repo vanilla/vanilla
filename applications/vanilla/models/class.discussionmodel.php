@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\Container\ContainerException;
 use Garden\Events\BulkUpdateEvent;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
@@ -68,6 +69,7 @@ use Vanilla\Utility\Deprecation;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\SystemCallableInterface;
+use VanillaTests\APIv2\DiscussionsTest;
 
 /**
  * Manages discussions data.
@@ -768,8 +770,10 @@ class DiscussionModel extends Gdn_Model implements
     /**
      * Get the allowed discussion types.
      *
-     * @param stdClass $category
+     * @param null $category
      * @return array Returns an array of discussion type definitions.
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public static function discussionTypes($category = null)
     {
@@ -1200,6 +1204,25 @@ class DiscussionModel extends Gdn_Model implements
             }
         }
 
+        if (isset($where["d.DiscussionID"]) && isset($where["d.InterestCategoryID"])) {
+            $sql->beginWhereGroup()
+                ->where("d.DiscussionID", $where["d.DiscussionID"])
+                ->orWhere(
+                    "d.CategoryID",
+                    isset($where["d.CategoryID"])
+                        ? array_intersect($where["d.CategoryID"], $where["d.InterestCategoryID"])
+                        : $where["d.InterestCategoryID"]
+                )
+                ->endWhereGroup();
+            unset($where["d.DiscussionID"]);
+            unset($where["d.InterestCategoryID"]);
+        } elseif (isset($where["d.InterestCategoryID"])) {
+            $where["d.CategoryID"] = isset($where["d.CategoryID"])
+                ? array_intersect($where["d.CategoryID"], $where["d.InterestCategoryID"])
+                : $where["d.InterestCategoryID"];
+            unset($where["d.InterestCategoryID"]);
+        }
+
         // Add the UserDiscussion query.
         if ($userID > 0) {
             $sql->join("UserDiscussion ud", "ud.DiscussionID = d.DiscussionID and ud.UserID = $userID", "left")
@@ -1215,12 +1238,12 @@ class DiscussionModel extends Gdn_Model implements
 
         if (($where["d.Announce"] ?? null) === "all") {
             // This value historically meant to not do any announcement filtering because it was implicitly baked in.
-            // Nowadays we should just strip it and do not filtering.
+            // Nowadays we should just strip it and do no filtering.
             unset($where["d.Announce"]);
         }
 
         if (isset($where["d.Announce"]) && $userID) {
-            // If we have an announce value and a sessioned user we need to or with UserDiscussion.
+            // If we have an Announce value and a sessioned user we need to or with UserDiscussion.
 
             $announceValue = (array) $where["d.Announce"];
             if (in_array(0, $announceValue)) {
@@ -1238,11 +1261,14 @@ class DiscussionModel extends Gdn_Model implements
             unset($where["d.Announce"]);
         }
 
-        // If we have a user role where, make sure we join on that table.
         $insertUserRoleIDs = $where["uri.RoleID"] ?? null;
         if (!empty($insertUserRoleIDs)) {
             $sql->join("UserRole uri", "d.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
+
+            // Ensure rows aren't duplicated
+            $sql->distinct();
         }
+        unset($where["uri.RoleID"]);
 
         $this->EventArguments["SQL"] = $sql;
         $this->fireEvent("BeforeGetSubQuery");
@@ -1253,7 +1279,6 @@ class DiscussionModel extends Gdn_Model implements
         if (!empty($orderBy)) {
             $sql->orderBy($orderBy);
         }
-        $sql->groupBy("d.DiscussionID");
 
         $sql->limit($limit);
         $sql->offset($offset);
@@ -2284,13 +2309,16 @@ class DiscussionModel extends Gdn_Model implements
             $this->SQL->select($select);
         }
 
-        $discussion = $this->SQL
+        $data = $this->SQL
             ->from("Discussion d")
             ->join("UserDiscussion w", "d.DiscussionID = w.DiscussionID and w.UserID = " . $session->UserID, "left")
             ->where("d.DiscussionID", $id)
-            ->groupBy("d.DiscussionID")
-            ->get()
-            ->firstRow();
+            ->get();
+
+        $this->EventArguments["Data"] = $data;
+        $this->getEventManager()->fire("discussionModel_afterAddColumns", $this);
+
+        $discussion = $data->firstRow();
 
         if (!$discussion) {
             return $discussion;

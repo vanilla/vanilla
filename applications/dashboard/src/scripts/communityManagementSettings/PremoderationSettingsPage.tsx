@@ -48,6 +48,7 @@ const CONF_PREMOD_DISCUSSIONS = "premoderation.discussions";
 const CONF_PREMOD_COMMENTS = "premoderation.comments";
 const CONF_PREMOD_CATEGORY_IDS = "premoderation.categoryIDs";
 const CONF_PREMOD_KEYWORDS = "premoderation.keywords";
+const CONF_PREMOD_CHALLENGE_NEW_USERS = "premoderation.challengeNewUsers";
 
 const classes = {
     main: css({
@@ -61,7 +62,13 @@ export function PremoderationSettingsPage() {
         CONF_PREMOD_COMMENTS,
         CONF_PREMOD_CATEGORY_IDS,
         CONF_PREMOD_KEYWORDS,
+        CONF_PREMOD_CHALLENGE_NEW_USERS,
     ]);
+    const challengeNewUsersPatcher = useConfigPatcher();
+
+    const areConfigsLoading = [LoadStatus.PENDING, LoadStatus.LOADING].includes(configs.status);
+    const isChallengeNewUsersLoading: boolean = areConfigsLoading || challengeNewUsersPatcher.isLoading;
+    const isChallengeNewUsersEnabled: boolean = configs.data?.[CONF_PREMOD_CHALLENGE_NEW_USERS] ?? false;
 
     const device = useTitleBarDevice();
     const rolesQuery = useQuery({
@@ -157,6 +164,36 @@ export function PremoderationSettingsPage() {
                         }
                     >
                         <AddonToggle addonKey={"stopforumspam"} />
+                    </DashboardFormGroup>
+                    <DashboardFormGroup
+                        label={t("Verify browsers of new members")}
+                        description={
+                            <Translate
+                                source="Unverified members who have been in the community for less than 7 days will be prompted to complete a Cloudflare (Captcha or Checkbox) challenge to prevent spam. Learn more: <0/>"
+                                c0={
+                                    <SmartLink
+                                        to={
+                                            "https://success.vanillaforums.com/kb/articles/1643-verify-browsers-of-new-unverified-members"
+                                        }
+                                    >
+                                        https://success.vanillaforums.com/kb/articles/1643-verify-browsers-of-new-unverified-members
+                                    </SmartLink>
+                                }
+                            />
+                        }
+                        className={dashboardClasses().spaceBetweenFormGroup}
+                    >
+                        <span className="input-wrap">
+                            <FormToggle
+                                indeterminate={isChallengeNewUsersLoading}
+                                enabled={isChallengeNewUsersEnabled}
+                                onChange={(enabled) => {
+                                    challengeNewUsersPatcher.patchConfig({
+                                        [CONF_PREMOD_CHALLENGE_NEW_USERS]: enabled,
+                                    });
+                                }}
+                            />
+                        </span>
                     </DashboardFormGroup>
                     <DashboardFormReadOnlySection
                         title={t("Premoderated Roles")}

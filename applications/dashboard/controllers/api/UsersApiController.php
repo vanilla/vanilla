@@ -699,6 +699,9 @@ class UsersApiController extends AbstractApiController
             ],
             ["UserIndex", "in"]
         )
+            ->addValidator("roleIDs", function ($data, $field) {
+                RoleModel::roleViewValidator($data, $field);
+            })
             ->addValidator("", SchemaUtils::onlyOneOf(["dateInserted", "dateUpdated", "roleID"]))
             ->addValidator("ipAddresses", $this->createIpAddressesValidator());
 

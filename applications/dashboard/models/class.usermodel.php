@@ -628,7 +628,7 @@ class UserModel extends Gdn_Model implements
     }
 
     /**
-     * Check whether a user has access to view discussions in a particular category.
+     * Check whether a user has access to view element in a particular category.
      *
      * @param int $userID
      * @param int $categoryID
@@ -644,7 +644,7 @@ class UserModel extends Gdn_Model implements
             $permission = "Vanilla.Discussions.View";
         }
 
-        if (empty($userID) || empty($categoryID)) {
+        if (empty($categoryID)) {
             return false;
         }
         $category = CategoryModel::categories($categoryID);

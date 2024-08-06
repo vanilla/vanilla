@@ -23,9 +23,9 @@ class TagWidgetTest extends SiteTestCase
     public function testHydrateTagWidget()
     {
         //create tags
-        $tag1 = $this->createTag();
-        $tag2 = $this->createTag();
-        $tag3 = $this->createTag();
+        $tag1 = $this->createTag(["name" => "tagName_1"]);
+        $tag2 = $this->createTag(["name" => "tagName_2"]);
+        $tag3 = $this->createTag(["name" => "tagName_3"]);
 
         //associate to discussion
         $discussion = $this->createDiscussion();
@@ -72,9 +72,9 @@ class TagWidgetTest extends SiteTestCase
         <h2>My Tags</h2>
     </div>
     <ul class=linkList>
-        <li><a href=https://vanilla.test/tagwidgettest/discussions/tagged/tagname-1>tagName_1</a></li>
-        <li><a href=https://vanilla.test/tagwidgettest/discussions/tagged/tagname-2>tagName_2</a></li>
-        <li><a href=https://vanilla.test/tagwidgettest/discussions/tagged/tagname-3>tagName_3</a></li>
+        <li><a href=https://vanilla.test/tagwidgettest/discussions/tagged/{$tag1["urlcode"]}>{$tag1["name"]}</a></li>
+        <li><a href=https://vanilla.test/tagwidgettest/discussions/tagged/{$tag2["urlcode"]}>{$tag2["name"]}</a></li>
+        <li><a href=https://vanilla.test/tagwidgettest/discussions/tagged/{$tag3["urlcode"]}>{$tag3["name"]}</a></li>
     </ul>
 </div>
 HTML

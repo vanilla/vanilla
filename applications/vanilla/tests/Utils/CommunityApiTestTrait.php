@@ -41,6 +41,9 @@ trait CommunityApiTestTrait
     protected $lastInsertedTagID = null;
 
     /** @var int|null */
+    protected $lastInsertedInterestID = null;
+
+    /** @var int|null */
     protected $lastInsertedCollectionID = null;
 
     /** @var int|null */
@@ -61,6 +64,7 @@ trait CommunityApiTestTrait
         $this->lastInsertedDiscussionID = null;
         $this->lastInsertCommentID = null;
         $this->lastInsertedTagID = null;
+        $this->lastInsertedInterestID = null;
         $this->lastInsertedCollectionID = null;
         $this->lastResponse = null;
         $this->lastReportID = null;
@@ -450,6 +454,30 @@ trait CommunityApiTestTrait
         $result = $this->lastCommunityResponse->getBody();
         $this->lastInsertedTagID = $result["tagID"] ?? null;
         if ($this->lastInsertedTagID === null) {
+            return $result;
+        }
+        return $result;
+    }
+
+    /**
+     * Create Interest
+     */
+    public function createInterest(array $overrides = []): array
+    {
+        $interestName = $overrides["name"] ?? "interestName_" . VanillaTestCase::id("interestName");
+        $params = $overrides + [
+            "name" => $interestName,
+            "apiName" => "test",
+            "categoryIDs" => $this->lastInsertedCategoryID,
+            "profileFieldMapping" => [],
+        ];
+
+        $apiUrl = "/interests";
+
+        $this->lastCommunityResponse = $this->api()->post($apiUrl, $params);
+        $result = $this->lastCommunityResponse->getBody();
+        $this->lastInsertedInterestID = $result["interestID"] ?? null;
+        if ($this->lastInsertedInterestID === null) {
             return $result;
         }
         return $result;

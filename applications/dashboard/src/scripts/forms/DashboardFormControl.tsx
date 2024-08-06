@@ -30,6 +30,8 @@ import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/Au
 import isEmpty from "lodash-es/isEmpty";
 import React from "react";
 import { DashboardDurationPicker } from "@dashboard/forms/DashboardDurationPicker";
+import DashboardCurrencyInput from "@dashboard/forms/DashboardCurrencyInput";
+import DashboardRatioInput from "@dashboard/forms/DashboardRatioInput";
 
 interface IControlOverride<T = ICommonControl> {
     /** This boolean controls if the associated component (in callback) should be rendered */
@@ -75,10 +77,12 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
     const fieldErrors = props.errors;
     switch (control.inputType) {
         case "textBox":
-            const isMultiline = control.type === "textarea";
-            const typeIsNumber = control.type === "number";
-            const typeIsUrl = control.type === "url";
-            const typeIsPassword = control.type === "password";
+            const controlType = control.type;
+
+            const isMultiline = controlType === "textarea";
+            const typeIsNumber = controlType === "number";
+            const typeIsUrl = controlType === "url";
+            const typeIsPassword = controlType === "password";
             const type = typeIsUrl ? "url" : typeIsPassword ? "password" : "text";
             const inputProps = {
                 value: value ?? "",
@@ -104,6 +108,12 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     pattern: "[0-9]*",
                 }),
             };
+            if (controlType === "currency") {
+                return <DashboardCurrencyInput {...inputProps} value={value} onChange={onChange} />;
+            }
+            if (controlType === "ratio") {
+                return <DashboardRatioInput {...inputProps} value={value} onChange={onChange} />;
+            }
             return typeIsPassword ? (
                 <DashboardPasswordInput
                     errors={fieldErrors}

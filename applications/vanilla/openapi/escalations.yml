@@ -1,5 +1,10 @@
 openapi: 3.0.2
 info:
+x-resourceEvents:
+    escalation:
+        x-addon: "vanilla"
+        name: "Escalation"
+        type: "cmdEscalation"
 paths:
     /escalations:
         post:

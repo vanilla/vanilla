@@ -15,7 +15,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { em, important, percent } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { Property } from "csstype";
-import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
+import { blockQuoteVariables } from "@rich-editor/editor/components/blockQuoteStyles";
 import { media } from "@library/styles/styleShim";
 import { userContentVariables } from "@library/content/UserContent.variables";
 import { LinkDecorationType } from "@library/styles/cssUtilsTypes";

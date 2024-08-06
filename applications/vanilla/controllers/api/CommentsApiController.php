@@ -22,6 +22,7 @@ use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\Model;
 use Vanilla\Permissions;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchResultItem;
 use Garden\Web\Exception\ClientException;
@@ -60,8 +61,8 @@ class CommentsApiController extends AbstractApiController
      * Get a comment by its numeric ID.
      *
      * @param int $id The comment ID.
-     * @throws NotFoundException if the comment could not be found.
      * @return array
+     * @throws NotFoundException if the comment could not be found.
      */
     public function commentByID($id)
     {
@@ -134,8 +135,8 @@ class CommentsApiController extends AbstractApiController
      * Get a discussion by its numeric ID.
      *
      * @param int $id The discussion ID.
-     * @throws NotFoundException if the discussion could not be found.
      * @return array
+     * @throws NotFoundException if the discussion could not be found.
      */
     public function discussionByID($id)
     {
@@ -383,6 +384,17 @@ class CommentsApiController extends AbstractApiController
                         },
                     ],
                 ],
+                "categoryID:i?" => RangeExpression::createSchema([":int"])
+                    ->setDescription("Filter by a range of category IDs.")
+                    ->setField("x-filter", [
+                        "field" => "d.CategoryID",
+                        "processor" => function ($name, $value) {
+                            foreach ($value as $categoryID) {
+                                $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $categoryID);
+                            }
+                            return [$name => $value];
+                        },
+                    ]),
                 "parentRecordType:s?" => [
                     "enum" => ["discussion", "escalation"],
                     "x-filter" => true,
@@ -412,6 +424,16 @@ class CommentsApiController extends AbstractApiController
                         "field" => "InsertUserID",
                     ],
                 ],
+                "insertUserRoleID?" => [
+                    "type" => "array",
+                    "items" => [
+                        "type" => "integer",
+                    ],
+                    "style" => "form",
+                    "x-filter" => [
+                        "field" => "uri.RoleID",
+                    ],
+                ],
                 "expand?" => ApiUtils::getExpandDefinition([
                     "insertUser",
                     "-body",
@@ -423,7 +445,9 @@ class CommentsApiController extends AbstractApiController
             ],
             ["CommentIndex", "in"]
         )
-            ->requireOneOf(["commentID", "discussionID", "parentRecordID", "insertUserID"])
+            ->addValidator("insertUserRoleID", function ($data, $field) {
+                RoleModel::roleViewValidator($data, $field);
+            })
             ->addValidator("", SchemaUtils::fieldRequirement("parentRecordID", "parentRecordType"))
             ->setDescription("List comments.");
 

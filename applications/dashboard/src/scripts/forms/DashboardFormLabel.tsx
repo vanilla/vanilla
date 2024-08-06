@@ -66,8 +66,10 @@ export const DashboardFormLabel: React.FC<IProps> = (props: IProps) => {
                             *
                         </span>
                     )}
-                    {label}
-                    {tooltip && <InformationIcon className={dashboardClasses().labelIcon} />}
+                    <span>
+                        {label}
+                        {tooltip && <InformationIcon className={dashboardClasses().labelIcon} />}
+                    </span>
                 </LabelOrDiv>
             </ConditionalWrap>
 

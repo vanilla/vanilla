@@ -26,20 +26,4 @@ class PostingSettingsTest extends SiteTestCase
         $html->assertCssSelectorText("select[name='Garden-dot-InputFormatter'] option[value='Rich2']", "Rich");
         $html->assertCssSelectorText("select[name='Garden-dot-MobileInputFormatter'] option[value='Rich2']", "Rich");
     }
-
-    /**
-     * If rich 1 is enabled rich1 and rich2 still appear in the dropdown.
-     */
-    public function testRich1Holdover()
-    {
-        \Gdn::config()->saveToConfig([
-            "Garden.InputFormatter" => "Rich",
-        ]);
-        $html = $this->bessy()->getHtml("/vanilla/settings/posting");
-
-        $html->assertCssSelectorText("select[name='Garden-dot-InputFormatter'] option[value='Rich2']", "Rich2");
-        $html->assertCssSelectorText("select[name='Garden-dot-InputFormatter'] option[value='Rich']", "Rich");
-        $html->assertCssSelectorText("select[name='Garden-dot-MobileInputFormatter'] option[value='Rich2']", "Rich2");
-        $html->assertCssSelectorText("select[name='Garden-dot-MobileInputFormatter'] option[value='Rich']", "Rich");
-    }
 }

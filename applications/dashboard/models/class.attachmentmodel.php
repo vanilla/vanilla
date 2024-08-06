@@ -423,6 +423,7 @@ class AttachmentModel extends Gdn_Model
             "sourceID:s?",
             "sourceUrl:s?",
             "status:s",
+            "escalatedByAI:b?",
             "lastModifiedDate:dt",
             "metadata:a" => [
                 "default" => [],

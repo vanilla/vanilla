@@ -1190,4 +1190,30 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
         }
         return $valid;
     }
+
+    /**
+     * Validator to ensure user has permissions to view a role.
+     *
+     * @param array $roleIDs
+     * @param ValidationField $validationField
+     * @return bool
+     */
+    public static function roleViewValidator(array $roleIDs, \Garden\Schema\ValidationField $validationField): bool
+    {
+        $roles = self::roles();
+        $valid = true;
+        foreach ($roleIDs as $roleID) {
+            $role = $roles[$roleID] ?? [];
+            if (!empty($role) && $role["PersonalInfo"]) {
+                $hasPermission = checkPermission("personalInfo.view");
+                if (!$hasPermission) {
+                    $validationField
+                        ->getValidation()
+                        ->addError($validationField->getName(), "Role $roleID is personal info.");
+                    $valid = false;
+                }
+            }
+        }
+        return $valid;
+    }
 }

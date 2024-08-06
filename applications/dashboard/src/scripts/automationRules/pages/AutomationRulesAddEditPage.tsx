@@ -183,14 +183,14 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
             automationRulesCatalog &&
             values.trigger?.triggerType &&
             values.action?.actionType &&
-            !automationRulesCatalog?.triggers[values.trigger?.triggerType].triggerActions.includes(
+            !automationRulesCatalog?.triggers[values.trigger?.triggerType]?.triggerActions.includes(
                 values.action?.actionType,
             );
         if (shouldResetActionType) {
             setFieldValue("action.actionType", "");
         }
 
-        // apply the default value postType if no value is set for time based triggers with postType
+        // Apply the default value postType if no value is set for time based triggers with postType
         // if we have already the postType value, double check with default values as we might have disabled one of the question/poll/idea plugins, so we need to adjust postType form values accordingly
         if (values.trigger?.triggerType && hasPostType(values.trigger?.triggerType, automationRulesCatalog)) {
             const triggerPostTypeDefaultValue =
@@ -438,13 +438,13 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                 </div>
             </section>
             {isLoading && isEditing ? (
-                loadingPlaceholder("addEdit")
+                loadingPlaceholder("addEdit", isEcalationRulesMode)
             ) : (
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
                     }}
-                    className={cx({ [classes.addEditForm]: isEcalationRulesMode })}
+                    className={cx(classes.addEditForm, { [classes.escalationRuleAddEditForm]: isEcalationRulesMode })}
                 >
                     <JsonSchemaForm
                         fieldErrors={fieldErrors}
@@ -482,8 +482,8 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
 
     return isEcalationRulesMode ? (
         <AdminLayout
-            titleBarContainerClassName={classes.addEditTitleBar}
-            actionsWrapperClassName={classes.addEditTitleBarActionsWrapper}
+            titleBarContainerClassName={classes.escalationRuleAddEditTitleBar}
+            actionsWrapperClassName={classes.escalationRuleAddEditTitleBarActionsWrapper}
             title={""}
             leftPanel={!isCompact && <ModerationNav />}
             rightPanel={rightPanelContent}

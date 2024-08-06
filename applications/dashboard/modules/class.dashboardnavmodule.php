@@ -44,7 +44,7 @@ class DashboardNavModule extends SiteNavModule
         "Moderation" => [
             "permission" => [
                 "Garden.Moderation.Manage",
-                "Vanilla.Posts.Manage",
+                "Vanilla.Posts.Moderate",
                 "Garden.Community.Manage",
                 "Garden.Users.Add",
                 "Garden.Users.Edit",
@@ -57,7 +57,7 @@ class DashboardNavModule extends SiteNavModule
             "description" => "Community Management",
             "url" => [
                 "Garden.Moderation.Manage" => "/dashboard/content/reports",
-                "Vanilla.Posts.Manage" => "/dashboard/content/reports",
+                "Vanilla.Posts.Moderate" => "/dashboard/content/reports",
                 "staff.allow" => "/dashboard/content/triage",
                 "Garden.Users.Add" => "/dashboard/user",
                 "Garden.Users.Edit" => "/dashboard/user",

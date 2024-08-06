@@ -372,12 +372,27 @@ class ThemesApiController extends AbstractApiController
      * @param string $assetPath
      * @return array [ThemeAsset, string $assetName, string $extension]
      */
-    private function extractAssetForPath(Theme $theme, string $assetPath): array
+    private function extractAssetForPath(Theme $theme, string $assetPath, $minify = true): array
     {
         $assetName = pathinfo($assetPath, PATHINFO_FILENAME);
         $ext = pathinfo($assetPath, PATHINFO_EXTENSION);
 
         $asset = $theme->getAssets()[$assetName] ?? null;
+
+        // We want to provide minified css and js assets
+        if ($asset && $minify) {
+            $minifier = null;
+            if ($ext === "css") {
+                $minifier = new MatthiasMullie\Minify\CSS($asset->getData());
+                $minified = $minifier->minify();
+                $asset->setData($minified);
+            }
+            if ($ext === "js") {
+                $minifier = new MatthiasMullie\Minify\JS($asset->getValue());
+                $minified = $minifier->minify();
+                $asset = $this->assetFactory->createAsset($theme, "js", $assetName, $minified);
+            }
+        }
         return [$asset, $assetName, $ext];
     }
 

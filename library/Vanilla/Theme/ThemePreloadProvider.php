@@ -221,7 +221,9 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
             }
             $styles = $theme->getAssets()[ThemeAssetFactory::ASSET_STYLES] ?? null;
             if ($styles) {
-                $this->inlineStyles = "<style>" . $styles->__toString() . "</style>";
+                $cssMinifier = new \MatthiasMullie\Minify\CSS($styles->__toString());
+                $minified = $cssMinifier->minify();
+                $this->inlineStyles = "<style>" . $minified . "</style>";
             }
         }
 

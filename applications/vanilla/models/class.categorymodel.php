@@ -143,7 +143,7 @@ class CategoryModel extends Gdn_Model implements
     const DEFAULT_FOLLOWED_CATEGORIES_KEY = "Preferences.CategoryFollowed.Defaults";
 
     /** The default maximum number of categories a user can follow. */
-    const MAX_FOLLOWED_CATEGORIES_DEFAULT = 100;
+    const MAX_FOLLOWED_CATEGORIES_DEFAULT = 500;
 
     /** Flag for aggregating comment counts. */
     const AGGREGATE_COMMENT = "comment";
@@ -994,8 +994,24 @@ class CategoryModel extends Gdn_Model implements
 
         if ($followed == 1) {
             $followedCategories = $this->getFollowed($userID);
-            if (count($followedCategories) >= $this->getMaxFollowedCategories()) {
-                throw new ClientException(t("Already following the maximum number of categories."));
+            $maxFollowedCategories = $this->getMaxFollowedCategories();
+            if (count($followedCategories) >= $maxFollowedCategories) {
+                throw new ClientException(
+                    sprintf(
+                        t(
+                            "You are already following the maximum of %d categories. Unfollow a category before following another."
+                        ),
+                        $maxFollowedCategories
+                    ),
+                    400,
+                    [
+                        "actionButton" => [
+                            "label" => "Review your followed categories",
+                            "url" => "/profile/followed-content",
+                            "target" => "_blank",
+                        ],
+                    ]
+                );
             }
         } else {
             //force '$digestEnabled' to be false if the user is not following a category
@@ -4656,7 +4672,7 @@ class CategoryModel extends Gdn_Model implements
         if ($currentlyFollowed != $followingPref || (!$currentlyFollowed && !$followingPref)) {
             try {
                 $this->follow($userID, $categoryID, $followingPref, $newDigestPref);
-            } catch (Throwable $throwable) {
+            } catch (InvalidArgumentException $throwable) {
                 throw new \Error("Failed setting users notification preference.", 0, $throwable);
             }
 

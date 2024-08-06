@@ -9,6 +9,8 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
+use Vanilla\Dashboard\Models\InterestModel;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Scheduler\LongRunner;
@@ -34,9 +36,6 @@ use Vanilla\Community\Schemas\PostFragmentSchema;
  */
 class CategoriesApiController extends AbstractApiController
 {
-    /** @var CategoryModel */
-    private $categoryModel;
-
     /** @var Schema */
     private $categoryPostSchema;
 
@@ -48,12 +47,6 @@ class CategoriesApiController extends AbstractApiController
 
     /** @var Schema */
     private $idParamSchema;
-
-    /** @var BreadcrumbModel */
-    private $breadcrumbModel;
-
-    /** @var LongRunner */
-    private $runner;
 
     public const OUTPUT_FORMAT_TREE = "tree";
     public const OUTPUT_FORMAT_FLAT = "flat";
@@ -74,9 +67,6 @@ class CategoriesApiController extends AbstractApiController
     /** @var string */
     const ERRORINDEXMSG = "The following fields: {page, limit, outputFormat=flat} is incompatible with {maxDepth, outputFormat=tree}";
 
-    /** @var SiteSectionModel */
-    private $siteSectionModel;
-
     /**
      * CategoriesApiController constructor.
      *
@@ -86,15 +76,12 @@ class CategoriesApiController extends AbstractApiController
      * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
-        CategoryModel $categoryModel,
-        BreadcrumbModel $breadcrumbModel,
-        LongRunner $runner,
-        SiteSectionModel $siteSectionModel
+        private CategoryModel $categoryModel,
+        private BreadcrumbModel $breadcrumbModel,
+        private LongRunner $runner,
+        private SiteSectionModel $siteSectionModel,
+        private InterestModel $interestModel
     ) {
-        $this->categoryModel = $categoryModel;
-        $this->breadcrumbModel = $breadcrumbModel;
-        $this->runner = $runner;
-        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -977,6 +964,72 @@ class CategoriesApiController extends AbstractApiController
             "followed" => $this->categoryModel->isFollowed($userID, $id),
         ]);
         return $result;
+    }
+
+    /**
+     * Endpoint to get suggested categories based on interests.
+     *
+     * @return Data
+     */
+    public function get_suggested(array $query = []): Data
+    {
+        $this->interestModel->ensureSuggestedContentEnabled();
+        $this->permission("Garden.SignIn.Allow");
+
+        $in = $this->schema([
+            "page:i?" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
+            ],
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "default" => 5,
+                "minimum" => 1,
+                "maximum" => ApiUtils::getMaxLimit(),
+            ],
+        ]);
+        $query = $in->validate($query);
+        $out = $this->schema([":a" => $this->fullSchema()], "out");
+
+        // Get a list of suggested category IDs.
+        [$suggestedCategoryIDs] = $this->interestModel->getRecordIDsByUserID($this->getSession()->UserID);
+
+        $this->categoryModel->setJoinUserCategory(false);
+
+        $where = [];
+
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
+
+        /** @var RangeExpression $categoryIDs */
+        $categoryIDs = $query["categoryID"] ?? new RangeExpression(">", 0);
+
+        // Exclude categories already followed.
+        $followedRecords = $this->categoryModel->getFollowed($this->getSession()->UserID);
+        $followedIDs = array_column($followedRecords, "CategoryID");
+        $suggestedCategoryIDs = array_diff($suggestedCategoryIDs, $followedIDs);
+
+        // Apply permission filtering.
+        $visibleIDs = $this->categoryModel->getVisibleCategoryIDs();
+        if ($visibleIDs === true) {
+            $categoryIDs = $categoryIDs->withFilteredValue("=", $suggestedCategoryIDs);
+        } else {
+            $categoryIDs = $categoryIDs->withFilteredValue("=", array_intersect($suggestedCategoryIDs, $visibleIDs));
+        }
+
+        $where["CategoryID"] = $categoryIDs;
+
+        [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
+
+        foreach ($categories as $key => $category) {
+            $categories[$key] = $this->normalizeOutput($category);
+        }
+        $categories = $out->validate(array_values($categories));
+        $categories = $this->treeNormalizedBuilder()->sort($categories);
+
+        $paging = ApiUtils::numberedPagerInfo($totalCountCallBack(), "/api/v2/categories/suggested", $query, $in);
+
+        return new Data($categories, ["paging" => $paging]);
     }
 
     /**

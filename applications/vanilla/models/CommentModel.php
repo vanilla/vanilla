@@ -792,6 +792,12 @@ class CommentModel extends Gdn_Model implements
             $this->applyDirtyWheres("c");
         }
 
+        // If we have a user role where, make sure we join on that table.
+        $insertUserRoleIDs = $where["uri.RoleID"] ?? null;
+        if (!empty($insertUserRoleIDs)) {
+            $query->join("UserRole uri", "c.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
+        }
+
         $eventManager = $this->getEventManager();
         $eventManager->dispatch(new CommentQueryEvent($this->SQL));
         return $query;

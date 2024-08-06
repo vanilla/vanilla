@@ -27,6 +27,7 @@ use Vanilla\Web\ContentSecurityPolicy\Policy;
 use Vanilla\Web\JsInterpop\StatePreloadTrait;
 use Vanilla\Web\MasterViewRenderer;
 use Vanilla\Dashboard\Pages\LegacyDashboardPage;
+use Vanilla\Web\Middleware\CloudflareChallengeMiddleware;
 use Vanilla\Web\SeoMetaModel;
 use Vanilla\Web\TwigStaticRenderer;
 
@@ -360,6 +361,11 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         $xFrameString = $cspModel->getXFrameString();
         if ($xFrameString !== null) {
             $this->_Headers[ContentSecurityPolicyModel::X_FRAME_OPTIONS] = $xFrameString;
+        }
+
+        $cloudflareChallengeMiddleware = Gdn::getContainer()->get(CloudflareChallengeMiddleware::class);
+        if ($cloudflareChallengeMiddleware->shouldUserReceiveChallenge()) {
+            $this->setHeader(...CloudflareChallengeMiddleware::CF_CHALLENGE_HEADER);
         }
 
         $this->_ErrorMessages = "";
@@ -2199,7 +2205,9 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
                 $cssAnchors = LegacyAssetModel::getAnchors();
                 $assetProvider = \Gdn::getContainer()->get(ViteAssetProvider::class);
-                $bootstrapInline = $assetProvider->getBootstrapInlineScript();
+                $inlineScript = $assetProvider->getBootstrapInlineScript();
+                $jsMinifier = new MatthiasMullie\Minify\JS($inlineScript);
+                $bootstrapInline = $jsMinifier->minify();
                 $this->Head->addScript("", "", false, ["content" => $bootstrapInline, HeadModule::SORT_KEY => -1]);
 
                 $this->EventArguments["CssFiles"] = &$this->_CssFiles;
@@ -2456,6 +2464,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             /** @var MasterViewRenderer $viewRenderer */
             $viewRenderer = Gdn::getContainer()->get(MasterViewRenderer::class);
             $result = $viewRenderer->renderGdnController($this);
+
             echo $result;
         } else {
             // Force our icons into the legacy master template

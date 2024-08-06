@@ -255,7 +255,6 @@ const additionalSettingsSchemaProperties = {
                     "When enabled, this rule will only be applied to new content that meets the trigger criteria.",
                 label: "Apply to new content only",
                 inputType: "checkBox",
-                labelType: "none",
             },
         },
         triggerTimeLookBackLimit: {
@@ -350,11 +349,11 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             triggerType: "staleDiscussionTrigger",
             name: "A certain amount of time has passed since a post has been created but has not received any comments",
             triggerActions: [
-                "closeDiscussionAction",
-                "bumpDiscussionAction",
+                "addDiscussionToCollectionAction",
                 "addTagAction",
+                "bumpDiscussionAction",
+                "closeDiscussionAction",
                 "moveToCategoryAction",
-                "addToCollectionAction",
                 "removeDiscussionFromCollectionAction",
                 "createEscalationAction",
             ],
@@ -395,11 +394,11 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             triggerType: "lastActiveDiscussionTrigger",
             name: "A certain amount of time has passed since a post has been active.",
             triggerActions: [
-                "closeDiscussionAction",
-                "bumpDiscussionAction",
+                "addDiscussionToCollectionAction",
                 "addTagAction",
+                "bumpDiscussionAction",
+                "closeDiscussionAction",
                 "moveToCategoryAction",
-                "addToCollectionAction",
                 "removeDiscussionFromCollectionAction",
             ],
             contentType: "posts",
@@ -482,10 +481,63 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                 required: ["score"],
             },
         },
+        discussionReachesScoreTrigger: {
+            triggerType: "discussionReachesScoreTrigger",
+            name: "A discussion reaches a certain amount of points",
+            triggerActions: ["addDiscussionToCollectionAction", "bumpDiscussionAction"],
+            contentType: "posts",
+            schema: {
+                type: "object",
+                properties: {
+                    points: {
+                        type: "integer",
+                        "x-control": {
+                            description:
+                                "Enter the number of points a discussion should receive to trigger this automation rule. Whole numbers only.",
+                            label: "Number of points",
+                            inputType: "textBox",
+                            placeholder: "",
+                            type: "number",
+                            tooltip: "",
+                        },
+                    },
+                    postType: {
+                        type: "array",
+                        items: {
+                            type: "string",
+                        },
+                        default: ["discussion", "question"],
+                        enum: ["discussion", "question"],
+                        "x-control": {
+                            description: "Select a post type.",
+                            label: "Post Type",
+                            inputType: "dropDown",
+                            placeholder: "",
+                            choices: {
+                                staticOptions: {
+                                    discussion: "Discussion",
+                                    question: "Question",
+                                },
+                            },
+                            multiple: true,
+                            tooltip: "",
+                        },
+                    },
+                },
+                required: ["points"],
+            },
+        },
         reportPostTrigger: {
             triggerType: "reportPostTrigger",
             name: "Post Received reports",
             triggerActions: ["createEscalationAction", "escalateGithubIssueAction", "escalateToZendeskAction"],
+            contentType: "posts",
+            schema: { properties: {} },
+        },
+        unAnsweredQuestionTrigger: {
+            triggerType: "unAnsweredQuestionTrigger",
+            name: "Time since question had no answers",
+            triggerActions: ["addDiscussionToCollectionAction", "escalateToZendeskAction", "createEscalationAction"],
             contentType: "posts",
             schema: { properties: {} },
         },
@@ -606,10 +658,10 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                 required: ["tagID"],
             },
         },
-        addToCollectionAction: {
-            actionType: "addToCollectionAction",
-            name: "Add to collection",
-            actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+        addDiscussionToCollectionAction: {
+            actionType: "addDiscussionToCollectionAction",
+            name: "Add Discussion To Collection",
+            actionTriggers: ["lastActiveDiscussionTrigger", "staleDiscussionTrigger"],
             contentType: "posts",
             schema: {
                 type: "object",

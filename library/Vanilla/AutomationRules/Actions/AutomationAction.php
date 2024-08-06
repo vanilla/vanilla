@@ -474,7 +474,7 @@ abstract class AutomationAction
             $longRunnerParams["lastRunDate"] = $lastRunDate;
         } else {
             $automationRule = $this->getAutomationRule();
-            $where = $automationRule["trigger"]["triggerValue"];
+            $where = $triggerClass->getWhereArray($automationRule["trigger"]["triggerValue"]);
         }
         return $triggerClass->getRecordCountsToProcess($where);
     }
@@ -535,5 +535,14 @@ abstract class AutomationAction
     public static function canAddAction(): bool
     {
         return true;
+    }
+
+    /**
+     * @param array $triggerValue
+     * @return array
+     */
+    public function getWhereArray(array $triggerValue): array
+    {
+        return $triggerValue;
     }
 }

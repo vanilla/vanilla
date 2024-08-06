@@ -26,7 +26,7 @@ export function LayoutOverviewSkeleton() {
             <ContainerContextReset>
                 <SectionBehaviourContext.Provider value={{ isSticky: false, autoWrap: false, useMinHeight: false }}>
                     <WidgetLayout>
-                        <div>
+                        <div style={{ minHeight: "200vh" }}>
                             <SectionFullWidth>
                                 <LoadingRectangle height={200} />
                             </SectionFullWidth>

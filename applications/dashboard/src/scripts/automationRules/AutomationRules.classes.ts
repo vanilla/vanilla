@@ -40,10 +40,10 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         },
         ...(isEscalationRulesList && {
             "&& th:first-child": {
-                paddingLeft: 28,
+                paddingLeft: 18,
             },
             "&& td:first-child": {
-                paddingLeft: 22,
+                paddingLeft: 12,
             },
         }),
     });
@@ -134,7 +134,6 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
 
     const summaryValue = css({
         fontWeight: 600,
-        marginRight: 8,
         marginTop: 2,
         marginBottom: 2,
     });
@@ -189,6 +188,17 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
 
     const leftAlign = css({
         justifyContent: "flex-start",
+    });
+
+    const addEditForm = css({
+        "& .form-group.formGroup-checkBox .input-wrap": {
+            "@media (min-width: 544px)": {
+                flex: "0 0 41.67%",
+            },
+            "& p": {
+                marginLeft: 25,
+            },
+        },
     });
 
     const addEditHeader = css({
@@ -259,6 +269,7 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         "& > span:last-of-Type": {
             width: "70%",
         },
+        ...(isEscalationRulesList && { paddingLeft: 16, paddingRight: 16 }),
     });
 
     const historyLoader = css({
@@ -285,7 +296,7 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         },
     });
 
-    const addEditForm = css({
+    const escalationRuleAddEditForm = css({
         "& li": {
             marginLeft: 0,
             marginRight: 0,
@@ -293,13 +304,13 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         },
     });
 
-    const addEditTitleBar = css({
+    const escalationRuleAddEditTitleBar = css({
         "& > div": {
             justifyContent: "normal",
         },
     });
 
-    const addEditTitleBarActionsWrapper = css({
+    const escalationRuleAddEditTitleBarActionsWrapper = css({
         width: "100%",
         justifyContent: "space-between",
     });
@@ -322,6 +333,7 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         summaryTitle,
         summaryValue,
         noBorderTop,
+        addEditForm,
         addEditHeader,
         addEditHeaderItem,
         flexContainer,
@@ -347,8 +359,8 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         addEditLoader,
         historyLoader,
         previewLoader,
-        addEditForm,
-        addEditTitleBar,
-        addEditTitleBarActionsWrapper,
+        escalationRuleAddEditTitleBar,
+        escalationRuleAddEditTitleBarActionsWrapper,
+        escalationRuleAddEditForm,
     };
 });

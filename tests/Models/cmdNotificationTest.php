@@ -65,7 +65,7 @@ class cmdNotificationTest extends SiteTestCase
             $this->assertUserHasNotificationsLike($user, [
                 new ExpectedNotification(
                     "Escalation",
-                    ["{$discussion["name"]} has been escalated!"],
+                    ["{$discussion["name"]} has been escalated."],
                     EscalationActivity::getActivityReason()
                 ),
             ]);
@@ -73,7 +73,7 @@ class cmdNotificationTest extends SiteTestCase
             $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
                 new ExpectedNotification(
                     "Escalation",
-                    ["{$discussion["name"]} has been escalated!"],
+                    ["{$discussion["name"]} has been escalated."],
                     EscalationActivity::getActivityReason()
                 ),
             ]);
@@ -133,7 +133,7 @@ class cmdNotificationTest extends SiteTestCase
         $this->assertUserHasNotificationsLike($user, [
             new ExpectedNotification(
                 "Escalation",
-                ["{$comment["name"]} has been escalated!"],
+                ["{$comment["name"]} has been escalated."],
                 EscalationActivity::getActivityReason()
             ),
         ]);
@@ -141,7 +141,7 @@ class cmdNotificationTest extends SiteTestCase
         $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
             new ExpectedNotification(
                 "Escalation",
-                ["{$comment["name"]} has been escalated!"],
+                ["{$comment["name"]} has been escalated."],
                 EscalationActivity::getActivityReason()
             ),
         ]);
@@ -180,7 +180,7 @@ class cmdNotificationTest extends SiteTestCase
                     $this->assertUserHasNotificationsLike($user, [
                         new ExpectedNotification(
                             "Escalation",
-                            ["{$discussion["name"]} has been escalated!"],
+                            ["{$discussion["name"]} has been escalated."],
                             EscalationActivity::getActivityReason()
                         ),
                     ]);
@@ -188,7 +188,7 @@ class cmdNotificationTest extends SiteTestCase
                     $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
                         new ExpectedNotification(
                             "Escalation",
-                            ["{$discussion["name"]} has been escalated!"],
+                            ["{$discussion["name"]} has been escalated."],
                             EscalationActivity::getActivityReason()
                         ),
                     ]);

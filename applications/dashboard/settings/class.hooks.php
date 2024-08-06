@@ -471,7 +471,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             ->addLinkToSectionIf(
                 $session->checkPermission(["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete"], false),
                 "Moderation",
-                t("Members"),
+                t("Manage Users"),
                 "/dashboard/user",
                 "users.members",
                 "",

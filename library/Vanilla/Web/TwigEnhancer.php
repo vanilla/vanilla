@@ -123,6 +123,9 @@ class TwigEnhancer
                 $twig->addFunction(new TwigFunction($key, $callable));
             }
         }
+
+        $twig->addFilter(new \Twig\TwigFilter("minifyStylesheetContents", [$this, "minifyStylesheetContents"]));
+        $twig->addFilter(new \Twig\TwigFilter("minifyScriptContents", [$this, "minifyScriptContents"]));
     }
 
     /**
@@ -355,6 +358,28 @@ class TwigEnhancer
     }
 
     /**
+     * @param string $scriptContents
+     * @return \Twig\Markup
+     */
+    public function minifyScriptContents(string $scriptContents): \Twig\Markup
+    {
+        $minifier = new \MatthiasMullie\Minify\JS($scriptContents);
+        $minified = $minifier->minify();
+        return new \Twig\Markup($minified, "utf-8");
+    }
+
+    /**
+     * @param string $stylesheetContents
+     * @return \Twig\Markup
+     */
+    public function minifyStylesheetContents(string $stylesheetContents): \Twig\Markup
+    {
+        $minifier = new \MatthiasMullie\Minify\CSS($stylesheetContents);
+        $minified = $minifier->minify();
+        return new \Twig\Markup($minified, "utf-8");
+    }
+
+    /**
      * Return a mapping of twig function name -> callable.
      */
     private function getFunctionMappings(): array
@@ -407,6 +432,10 @@ class TwigEnhancer
             // Routing.
             "assetUrl" => [$this, "assetUrl"],
             "url" => [$this->request, "url"],
+
+            // Minification
+            "minifyStylesheetContents" => [$this, "minifyStylesheetContents"],
+            "minifyScriptContents" => [$this, "minifyScriptContents"],
         ];
     }
 }

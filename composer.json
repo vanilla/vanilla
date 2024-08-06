@@ -86,7 +86,10 @@
         "vanilla/garden-sites": "^1.5",
         "chrome-php/chrome": "^1.10",
         "filp/whoops": "^2.15",
-        "jaybizzle/crawler-detect": "^1.2"
+        "jaybizzle/crawler-detect": "^1.2",
+        "matthiasmullie/minify": "^1.3",
+        "voku/html-min": "^4.0",
+        "voku/simple_html_dom": "4.8.0"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",
@@ -100,8 +103,6 @@
         "roave/security-advisories": "dev-latest",
         "symfony/phpunit-bridge": "^5.1",
         "vimeo/psalm": "^4.0",
-        "voku/html-min": "3.0.5",
-        "voku/simple_html_dom": "4.8.0",
         "wikimedia/composer-merge-plugin": "2.0.1",
         "vanilla/garden-git": "^1.2",
         "jetbrains/phpstorm-attributes": "^1.1"

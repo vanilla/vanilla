@@ -67,6 +67,7 @@ export interface IAttachment {
     state?: string;
     status?: string;
     metadata: MetaData[];
+    escalatedByAi?: boolean;
 }
 
 export interface IGetAttachmentSchemaParams {

@@ -66,7 +66,6 @@ export function PersistentToolbar(props: IProps) {
                         <EditorUploadButton
                             disabled={false}
                             type="image"
-                            legacyMode={false}
                             onUpload={(files) => {
                                 ensureEditorFocused();
                                 files.forEach((file) => {
@@ -97,7 +96,6 @@ export function PersistentToolbar(props: IProps) {
                         <EditorUploadButton
                             disabled={false}
                             type="file"
-                            legacyMode={false}
                             onUpload={(files) => {
                                 ensureEditorFocused();
                                 files.forEach((file) => {

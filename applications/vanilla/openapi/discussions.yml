@@ -191,6 +191,12 @@ paths:
                       type: array
                       items:
                           type: integer
+                - name: suggestions
+                  description: Filter discussion list based on user interests.
+                  in: query
+                  schema:
+                      type: boolean
+                  x-feature: "suggestedContent.enabled"
             responses:
                 "200":
                     content:

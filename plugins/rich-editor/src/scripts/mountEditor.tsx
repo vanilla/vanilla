@@ -5,11 +5,9 @@
  */
 
 import { ensureHtmlElement } from "@vanilla/dom-utils";
-import { ForumEditor } from "@rich-editor/editor/ForumEditor";
 import React from "react";
 import { mountReact } from "@vanilla/react-utils";
-import { getMeta } from "@library/utility/appUtils";
-import { LegacyVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
 
 /**
  * Mount the editor into a DOM Node.
@@ -19,8 +17,6 @@ import { LegacyVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loada
 export default function mountEditor(containerSelector: string | Element, descriptionID?: string) {
     const container = ensureHtmlElement(containerSelector);
     const bodybox = container.closest("form")!.querySelector(".BodyBox");
-    const placeholder = bodybox?.getAttribute("placeholder") ?? undefined;
-    const isRich2 = getMeta("inputFormat.desktop")?.match(/rich2/i);
 
     const uploadEnabled = !!container.dataset.uploadenabled;
     const needsHtmlConversion = !!container.dataset.needshtmlconversion;
@@ -30,33 +26,19 @@ export default function mountEditor(containerSelector: string | Element, descrip
         throw new Error("Could not find the BodyBox to mount editor to.");
     }
 
-    const initialFormat = bodybox.getAttribute("format"); // Could be Rich or rich or any other format
-
-    // This one is a special case when initial format is Rich, current format is Rich2 and we have the toggle to not reinterpret initial format to current
-    // So we need to still render Rich. This may not be necessary when we deprecate Rich completely in favour of Rich2
-    const forceForumEditor =
-        isRich2 && !getMeta("inputFormat.reinterpretPostsAsRich") && initialFormat?.toLowerCase() === "rich";
+    const initialFormat = bodybox.getAttribute("format"); // Could be Rich or rich2 or any other format
 
     if (initialFormat?.match(/rich|2/i)) {
         handleLegacyAttachments(container);
         mountReact(
-            isRich2 && !forceForumEditor ? (
-                <LegacyVanillaEditor
-                    initialFormat={initialFormat}
-                    needsHtmlConversion={needsHtmlConversion}
-                    legacyTextArea={bodybox as HTMLInputElement}
-                    uploadEnabled={uploadEnabled}
-                    showConversionNotice={showConversionNotice}
-                />
-            ) : (
-                <ForumEditor
-                    placeholder={placeholder}
-                    legacyTextArea={bodybox as HTMLInputElement}
-                    descriptionID={descriptionID ?? undefined}
-                    uploadEnabled={uploadEnabled}
-                    needsHtmlConversion={needsHtmlConversion}
-                />
-            ),
+            <LegacyFormVanillaEditor
+                initialFormat={initialFormat}
+                needsHtmlConversion={needsHtmlConversion}
+                legacyTextArea={bodybox as HTMLInputElement}
+                uploadEnabled={uploadEnabled}
+                showConversionNotice={showConversionNotice}
+            />,
+
             container,
             () => {
                 container.classList.remove("isDisabled");

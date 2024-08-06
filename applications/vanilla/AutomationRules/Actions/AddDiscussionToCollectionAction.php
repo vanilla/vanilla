@@ -19,16 +19,25 @@ use Vanilla\Forms\SchemaForm;
 use Vanilla\Logger;
 use Vanilla\Models\CollectionModel;
 use Gdn;
+use Vanilla\Models\DiscussionInterface;
 
-class AddDiscussionToCollectionAction extends AutomationAction
+/**
+ * Automation Action to add a discussion to a collection.
+ */
+class AddDiscussionToCollectionAction extends AutomationAction implements DiscussionInterface
 {
     public string $affectedRecordType = "Discussion";
+
+    private int $discussionID;
+
+    private array $collectionIDs;
+
     /**
      * @inheridoc
      */
     public static function getType(): string
     {
-        return "addToCollectionAction";
+        return "addDiscussionToCollectionAction";
     }
 
     /**
@@ -36,7 +45,7 @@ class AddDiscussionToCollectionAction extends AutomationAction
      */
     public static function getName(): string
     {
-        return "Add to collection";
+        return "Add Discussion To Collection";
     }
 
     /**
@@ -90,27 +99,40 @@ class AddDiscussionToCollectionAction extends AutomationAction
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
+        $this->setDiscussionID($object["DiscussionID"]);
+        $this->setCollectionIDs($actionValue["collectionID"]);
+        return $this->execute();
+    }
+
+    /**
+     * @return bool
+     * @throws ContainerException
+     * @throws NoResultsException
+     * @throws NotFoundException
+     */
+    public function execute(): bool
+    {
         $addedToCollection = false;
         $collectionModel = Gdn::getContainer()->get(CollectionModel::class);
 
         // Get all the collectionIDs that this record is already part of
         $recordCollections = $collectionModel->getCollectionsByRecord([
-            "recordID" => $object["DiscussionID"],
+            "recordID" => $this->getDiscussionID(),
             "recordType" => "discussion",
         ]);
         $recordCollectionIDs = array_column($recordCollections, "collectionID");
         $addedCollectionIDs = [];
 
-        foreach ($actionValue["collectionID"] as $collectionID) {
+        foreach ($this->getCollectionIDs() as $collectionID) {
             if (!in_array($collectionID, $recordCollectionIDs)) {
-                $record = ["recordID" => $object["DiscussionID"], "recordType" => "discussion"];
+                $record = ["recordID" => $this->getDiscussionID(), "recordType" => "discussion"];
                 $collectionModel->addCollectionRecords($collectionID, [$record]);
                 $addedToCollection = true;
                 $addedCollectionIDs[] = $collectionID;
             } else {
                 $this->logger->info("Record already part of collection", [
                     Logger::FIELD_TAGS => ["automationRules", "addDiscussionToCollection"],
-                    "recordID" => $object["DiscussionID"],
+                    "recordID" => $this->getDiscussionID(),
                     "collectionID" => $collectionID,
                     "dispatchUUID" => $this->getDispatchUUID(),
                 ]);
@@ -121,10 +143,11 @@ class AddDiscussionToCollectionAction extends AutomationAction
             $logData = [
                 "addDiscussionToCollection" => [
                     "collectionID" => $addedCollectionIDs,
-                    "recordID" => $object["DiscussionID"],
+                    "recordID" => $this->getDiscussionID(),
                 ],
             ];
-            $this->insertPostLog($object["DiscussionID"], $logData);
+
+            $this->insertPostLog($this->getDiscussionID(), $logData);
         }
         return $addedToCollection;
     }
@@ -192,5 +215,42 @@ class AddDiscussionToCollectionAction extends AutomationAction
             $result .= "</div>";
         }
         return $result;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function setDiscussionID(int $discussionID): void
+    {
+        $this->discussionID = $discussionID;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function getDiscussionID(): int
+    {
+        return $this->discussionID;
+    }
+
+    /**
+     * Set destination collection IDs.
+     *
+     * @param array $collectionID
+     * @return void
+     */
+    private function setCollectionIDs(array $collectionID): void
+    {
+        $this->collectionIDs = $collectionID;
+    }
+
+    /**
+     * Get destination collection IDs.
+     *
+     * @return array
+     */
+    private function getCollectionIDs(): array
+    {
+        return $this->collectionIDs;
     }
 }

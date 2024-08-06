@@ -874,3 +874,11 @@ components:
                     x-key: "premoderation.keywords"
                     x-read: community.moderate
                     x-write: community.moderate
+                "premoderation.challengeNewUsers":
+                    description: |
+                        Toggle feature that requires new unverified users to complete a challenge.
+                    type: boolean
+                    default: false
+                    x-key: "premoderation.challengeNewUsers"
+                    x-read: community.moderate
+                    x-write: community.moderate

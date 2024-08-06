@@ -229,6 +229,9 @@ class AttachmentService
 
                 $normalized = ArrayUtils::camelCase($normalized);
                 $normalized["status"] = $normalized["status"] ?? "unknown";
+                if (!$provider->canViewFullAttachment($attachment)) {
+                    unset($normalized["escalatedByAI"]);
+                }
                 $normalizedAttachments[] = $normalized;
             } catch (\Throwable $ex) {
                 if (DebugUtils::isTestMode()) {

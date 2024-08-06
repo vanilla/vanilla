@@ -17,7 +17,6 @@ interface IProps {
     disabled?: boolean;
     renderAbove?: boolean;
     renderLeft?: boolean;
-    legacyMode?: boolean;
     onVisibilityChange?: React.ComponentProps<typeof FlyoutToggle>["onVisibilityChange"];
     onInsertEmoji: React.ComponentProps<typeof EmojiPicker>["onInsertEmoji"];
 }
@@ -62,7 +61,6 @@ export default function EmojiFlyout(props: IProps) {
                         titleRef={titleRef}
                         renderAbove={props.renderAbove}
                         renderLeft={props.renderLeft}
-                        legacyMode={props.legacyMode ?? false}
                         onInsertEmoji={props.onInsertEmoji}
                     />
                 );

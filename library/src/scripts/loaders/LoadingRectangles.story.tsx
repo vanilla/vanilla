@@ -9,14 +9,12 @@ import { LoadingRectangle, LoadingSpacer } from "@library/loaders/LoadingRectang
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { codeBlockCSS } from "@rich-editor/quill/components/codeBlockStyles";
 
 export default {
     title: "Loaders/LoadingRectangle",
 };
 
 function LoadingRectangleStory() {
-    const codeBlock = codeBlockCSS();
     return (
         <StoryContent>
             <StoryHeading>Loaders</StoryHeading>

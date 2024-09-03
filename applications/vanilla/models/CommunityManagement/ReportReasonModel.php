@@ -33,6 +33,8 @@ class ReportReasonModel extends FullRecordCacheModel
     public const INITIAL_REASON_SPAM_AUTOMATION = "spam-automation";
     public const INITIAL_REASON_APPROVAL = "approval-required";
 
+    public const INITIAL_REASON_AUTOMATION_RULE = "automation-rule";
+
     /**
      * Constructor.
      */
@@ -165,14 +167,15 @@ class ReportReasonModel extends FullRecordCacheModel
      */
     public function getPermissionAvailableReasonIDs(bool $includeSystem = false): array
     {
+        $isMod = \Gdn::session()->checkPermission("community.moderate");
         $where = [
             "deleted" => false,
-            "isSystem" => false,
+            "isSystem" => $includeSystem && $isMod,
         ];
         $reasons = $this->select(where: $where, options: [self::OPT_SELECT => ["reportReasonID", "roleIDs"]]);
 
         $result = [];
-        $isMod = \Gdn::session()->checkPermission("community.moderate");
+
         $userRoleIDs = $this->userModel->getRoleIDs($this->session->UserID) ?: [];
         foreach ($reasons as $reason) {
             $roleIDs = $reason["roleIDs"] ?? [];
@@ -263,6 +266,13 @@ class ReportReasonModel extends FullRecordCacheModel
             "reportReasonID" => self::INITIAL_REASON_APPROVAL,
             "name" => "Approval Required",
             "description" => "The user making the post needs moderator approval for posts in this category.",
+            "sort" => 0,
+            "isSystem" => true,
+        ]);
+        $reportReasonModel->createInitialReason([
+            "reportReasonID" => self::INITIAL_REASON_AUTOMATION_RULE,
+            "name" => "Automation Rule Escalated",
+            "description" => "The content was marked by existing automation rule.",
             "sort" => 0,
             "isSystem" => true,
         ]);

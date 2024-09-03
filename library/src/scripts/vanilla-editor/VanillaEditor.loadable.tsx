@@ -100,7 +100,7 @@ export function createVanillaEditor(options?: { initialValue?: MyEditor; id?: st
     });
 }
 
-export function LegacyVanillaEditor(props: IProps) {
+export function LegacyFormVanillaEditor(props: IProps) {
     const { legacyTextArea, initialFormat, needsHtmlConversion, ...rest } = props;
     const store = getStore();
 

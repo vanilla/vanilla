@@ -167,10 +167,10 @@ function EscalationsPage(props: IProps) {
                                             key={escalation.escalationID}
                                             escalation={escalation}
                                             onMessageAuthor={(messageInfo) => setAuthorMessage(messageInfo)}
-                                            onRecordVisibilityChange={(isRecordLive) =>
+                                            onRecordVisibilityChange={(recordIsLive) =>
                                                 escalationMutation.mutateAsync({
                                                     escalationID: escalation.escalationID,
-                                                    payload: { isRecordLive },
+                                                    payload: { recordIsLive },
                                                 })
                                             }
                                         />

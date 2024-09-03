@@ -6,9 +6,6 @@
 
 import { globbySync } from "globby";
 import path from "path";
-import { visualizer } from "rollup-plugin-visualizer";
-import * as tmp from "tmp";
-import { build } from "vite";
 import { VANILLA_ROOT } from "./scripts/env";
 import * as sass from "sass";
 import fse from "fs-extra";
@@ -16,7 +13,7 @@ import { print, printSection } from "./scripts/utility/utils";
 
 run();
 
-async function run() {
+function run() {
     printSection("Building Legacy Dashboard");
     const DASHBOARD_ROOT = path.resolve(VANILLA_ROOT, "applications/dashboard");
     const glob = path.join(DASHBOARD_ROOT, "/scss/**/*.scss");

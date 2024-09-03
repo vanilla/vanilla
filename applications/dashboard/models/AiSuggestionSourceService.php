@@ -109,9 +109,19 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      *
      * @return bool
      */
-    private function checkIfUserHasEnabledAiSuggestions(): bool
+    public function checkIfUserHasEnabledAiSuggestions(int $userID = null): bool
     {
-        return $this->userMetaModel->getUserMeta(Gdn::session()->UserID, "SuggestAnswers", true)["SuggestAnswers"];
+        $userID = $userID ?? Gdn::session()->UserID;
+        $anonymize = \Gdn::config("VanillaAnalytics.AnonymizeData");
+        $anonymizeUser = $this->userMetaModel->getUserMeta($userID, UserMetaModel::ANONYMIZE_DATA_USER_META, "-1");
+        $suggestAnswers = $this->userMetaModel->getUserMeta($userID, "SuggestAnswers", true)["SuggestAnswers"];
+        if (
+            ($anonymize && $anonymizeUser[UserMetaModel::ANONYMIZE_DATA_USER_META] == "-1") ||
+            $anonymizeUser[UserMetaModel::ANONYMIZE_DATA_USER_META] == "1"
+        ) {
+            $suggestAnswers = false;
+        }
+        return $suggestAnswers;
     }
 
     /**
@@ -190,14 +200,20 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
             $suggestionsMerged = $this->calculateTopSuggestions($suggestions, $discussion);
         } catch (Exception $e) {
             $suggestionsMerged = $suggestions;
+            $this->logger->warning("Error Throws calculateTopSuggestions", ["exception" => $e]);
         }
 
-        $this->aiSuggestionModel->saveSuggestions($recordID, $suggestionsMerged);
-
+        if (count($suggestionsMerged) === 0) {
+            $this->logger->info("No found suggestion results.");
+        }
+        try {
+            $this->aiSuggestionModel->saveSuggestions($recordID, $suggestionsMerged);
+        } catch (Exception $e) {
+            $this->logger->warning("Error Throws saving suggestions", ["exception" => $e]);
+        }
         if (!empty($suggestionsMerged)) {
             $this->notifyAiSuggestions($discussion);
         }
-
         return LongRunner::FINISHED;
     }
 
@@ -222,9 +238,9 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
             $result = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $schema)["properties"];
             $keywords = $result["keywords"];
         } catch (\Exception $e) {
-            $this->logger->warning(
-                "Error generating Vanilla category suggestions for discussion {$discussion["DiscussionID"]}: {$e->getMessage()}"
-            );
+            $this->logger->warning("Error generating Vanilla category suggestions for discussion", [
+                "exception" => $e->getMessage(),
+            ]);
             $keywords = $question;
         }
         return $keywords;
@@ -441,7 +457,7 @@ PROMPT
         );
 
         $sortSchema = Schema::parse([
-            ":a" => [
+            "result:a" => [
                 "items" => Schema::parse(["articleID:i", "sortValue:i"]),
             ],
         ]);
@@ -453,7 +469,7 @@ PROMPT
         }
 
         $sortedSuggestions = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $sortSchema);
-        $sortedSuggestions = array_column($sortedSuggestions, "sortValue", "articleID");
+        $sortedSuggestions = array_column($sortedSuggestions["result"], "sortValue", "articleID");
         uksort($suggestions, function ($item1, $item2) use ($sortedSuggestions) {
             return $sortedSuggestions[$item1] <=> $sortedSuggestions[$item2];
         });

@@ -3,6 +3,7 @@ use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Forum\Digest\DigestContentModel;
 use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\Forum\Digest\UserDigestModel;
+use Vanilla\Forum\Models\CommentThreadModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportModel;

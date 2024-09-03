@@ -14,8 +14,10 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Community\Events\SpamEvent;
 use Vanilla\Dashboard\Events\LogPostEvent;
 use Vanilla\Forum\Models\ForumAggregateModel;
+use Vanilla\Forum\Models\SpamReport;
 use Vanilla\Models\CommunityNotificationGenerator;
 use Vanilla\PrunableTrait;
 use Vanilla\Utility\ArrayUtils;
@@ -23,6 +25,7 @@ use Vanilla\Web\Middleware\LogTransactionMiddleware;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Forum\Models\CommunityManagement\ReportModel;
 
 /**
  * Handles additional logging.
@@ -1525,5 +1528,36 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Conditionally dispatches spam events for each of the given log records that are spam.
+     *
+     * @param array ...$logs One or more log records.
+     * @return void
+     */
+    public function dispatchSpamEventsFromLogs(array ...$logs): void
+    {
+        $logs = array_filter($logs, fn($item) => $item["Operation"] === "Spam" && isset($item["RecordID"]));
+        foreach ($logs as $log) {
+            $recordUser = Gdn::userModel()->getID($log["RecordUserID"], DATASET_TYPE_ARRAY);
+            $record = ReportModel::getRecord($log["RecordType"], $log["RecordID"]);
+
+            $bodyPlainText = isset($log["Data"]["Body"], $log["Data"]["Format"])
+                ? Gdn::formatService()->renderPlainText($log["Data"]["Body"], $log["Data"]["Format"])
+                : $log["Data"]["Body"] ?? null;
+            $bodyPlainText = implode("\n\n", array_filter([$log["Data"]["Name"] ?? null, $bodyPlainText]));
+
+            $spamReport = new SpamReport(
+                $log["RecordType"],
+                $recordUser["Name"] ?? null,
+                $recordUser["Email"] ?? null,
+                $bodyPlainText,
+                $log["Data"]["InsertIPAddress"] ?? null,
+                $record["url"] ?? null
+            );
+
+            Gdn::eventManager()->dispatch(new SpamEvent($spamReport));
+        }
     }
 }

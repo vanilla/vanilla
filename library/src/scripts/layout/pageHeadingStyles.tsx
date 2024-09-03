@@ -49,7 +49,6 @@ export const pageHeadingClasses = useThemeCache(() => {
         display: "flex",
         flexWrap: "nowrap",
         position: "relative",
-        width: percent(100),
         flexGrow: 1,
     });
 

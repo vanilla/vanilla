@@ -18,7 +18,7 @@ class AdminContentPageController extends PageDispatchController
     public function index(string $path): Data
     {
         $data = $this->usePage(\DashboardPage::class)
-            ->permission(["site.manage", "community.moderate", "staff.allow"])
+            ->permission(["site.manage", "community.moderate", "staff.allow", "posts.moderate"])
             ->setSeoTitle(t("Moderation Content"))
             ->setSeoRequired(false)
             ->blockRobots()

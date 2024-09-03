@@ -80,7 +80,7 @@ export function SearchFilterPanelDiscussions() {
                 }}
                 value={form.authors ?? []}
             />
-            <InputBlock legend={t("Date Updated")}>
+            <InputBlock legend={t("Date Created")}>
                 <LazyDateRange
                     onStartChange={(date: string) => {
                         updateForm({ startDate: date });
@@ -90,6 +90,18 @@ export function SearchFilterPanelDiscussions() {
                     }}
                     start={form.startDate}
                     end={form.endDate}
+                />
+            </InputBlock>
+            <InputBlock legend={t("Date Updated")}>
+                <LazyDateRange
+                    onStartChange={(date: string) => {
+                        updateForm({ startDateUpdated: date });
+                    }}
+                    onEndChange={(date: string) => {
+                        updateForm({ endDateUpdated: date });
+                    }}
+                    start={form.startDateUpdated}
+                    end={form.endDateUpdated}
                 />
             </InputBlock>
             <CommunityCategoryInput

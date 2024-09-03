@@ -4,23 +4,8 @@
  * @license Proprietary
  */
 
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import { ButtonTypes } from "@library/forms/buttonTypes";
-import Button from "@library/forms/Button";
-import { SettingsIcon } from "@library/icons/titleBar";
-import Frame from "@library/layout/frame/Frame";
-import FrameBody from "@library/layout/frame/FrameBody";
-import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
-import LinkAsButton from "@library/routing/LinkAsButton";
-import { categoryFollowDropDownClasses } from "@vanilla/addon-vanilla/categories/categoryFollowDropDown.styles";
-import { t } from "@vanilla/i18n";
-import { Icon } from "@vanilla/icons";
-import FrameFooter from "@library/layout/frame/FrameFooter";
-import { ToolTip } from "@library/toolTip/ToolTip";
-import { css, cx } from "@emotion/css";
 import { IUser } from "@library/@types/api/users";
-import { CategoryPreferencesTable } from "@library/preferencesTable/CategoryPreferencesTable";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { isINotificationPreference } from "@library/notificationPreferences/utils";
 import {
     INotificationPreferencesApi,
@@ -32,37 +17,22 @@ import debounce from "lodash-es/debounce";
 import { useFormik } from "formik";
 import {
     useCategoryNotificationPreferencesContext,
-    CATEGORY_NOTIFICATION_TYPES,
     getDefaultCategoryNotificationPreferences,
     ICategoryPreferences,
+    CATEGORY_NOTIFICATION_TYPES,
 } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
 import { CategoryNotificationPreferencesContextProvider } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.context";
+import { FollowDropdown, IFollowDropdownProps } from "@vanilla/addon-vanilla/forms/FollowDropdown";
+import { CategoryPreferencesTable } from "@library/preferencesTable/CategoryPreferencesTable";
 
-interface IProps {
+interface IProps extends IFollowDropdownProps {
     categoryID: number;
     categoryName: string;
     notificationPreferences?: ICategoryPreferences;
-    emailDigestEnabled: boolean;
-    className?: string;
-    onPreferencesChange?: (categoryWithNewPreferences) => void;
-    /** Used for testing to override open state */
-    isOpen?: boolean;
-    /** Disable network calls for widget preview */
-    preview?: boolean;
-    /** Widget style overrides */
-    borderRadius?: number;
-    buttonColor?: string;
-    textColor?: string;
-    alignment?: "start" | "center" | "end";
-    /** Only the bell icon instead of the button with text */
-    isCompact?: boolean;
 }
 
 export function CategoryFollowDropDownImpl(props: IProps) {
-    const [isOpen, setOpen] = useState<boolean>(!!props.isOpen);
-
-    const { categoryID, emailDigestEnabled, preview, borderRadius, buttonColor, textColor, alignment, isCompact } =
-        props;
+    const { categoryID, emailDigestEnabled, isCompact } = props;
 
     const { preferences: categoryNotificationPreferences, setPreferences } =
         useCategoryNotificationPreferencesContext();
@@ -81,22 +51,6 @@ export function CategoryFollowDropDownImpl(props: IProps) {
         emailDigestEnabled &&
         isINotificationPreference(defaultUserPreferences?.DigestEnabled) &&
         defaultUserPreferences?.DigestEnabled?.email;
-
-    const isFollowed = categoryNotificationPreferences?.["preferences.followed"] ?? false;
-
-    const classes = categoryFollowDropDownClasses({
-        isOpen,
-        isFollowed,
-        borderRadius,
-        buttonColor,
-        textColor,
-        alignment,
-    });
-
-    // My special child needs bigger pants
-    const widthOverride = css({
-        minWidth: 345,
-    });
 
     const { values, setValues, submitForm } = useFormik<ICategoryPreferences>({
         enableReinitialize: true,
@@ -119,120 +73,31 @@ export function CategoryFollowDropDownImpl(props: IProps) {
     }
 
     return (
-        <div className={cx(classes.layout, props.className)}>
-            <DropDown
-                name={isFollowed ? t("Following") : t("Follow")}
-                buttonType={isCompact ? ButtonTypes.ICON : ButtonTypes.OUTLINE}
-                buttonClassName={cx(classes.followButton, {
-                    [classes.unClickable]: preview,
-                })}
-                buttonContents={
-                    isFollowed ? (
-                        <>
-                            <Icon icon="me-notifications-solid" /> {!isCompact && t("Following")}
-                        </>
-                    ) : (
-                        <>
-                            <Icon icon="me-notifications" /> {!isCompact && t("Follow")}
-                        </>
-                    )
-                }
-                flyoutType={FlyoutType.FRAME}
-                contentsClassName={widthOverride}
-                onVisibilityChange={async (b) => {
-                    if (!preview && !isFollowed && b) {
-                        let newPreferences: Partial<ICategoryPreferences> = {};
-                        // apply the default user notification preferences
-                        Object.entries(CATEGORY_NOTIFICATION_TYPES).forEach(([_key, type]) => {
-                            newPreferences = {
-                                ...newPreferences,
-                                ...type.getDefaultPreferences?.(defaultUserPreferences ?? {}),
-                            };
-                        });
-
-                        await setPreferences({
-                            "preferences.followed": true,
-                            ...newPreferences,
-                            ...(emailDigestEnabled && { "preferences.email.digest": true }),
-                        });
-
-                        props.onPreferencesChange?.({
-                            categoryID: categoryID,
-                            preferences: {
-                                "preferences.followed": true,
-                            },
-                        });
-                    }
-                    setOpen(b);
-                }}
-                isVisible={isOpen}
-                asReachPopover
-            >
-                <Frame
-                    header={
-                        <FrameHeaderWithAction title={t("Notification Preferences")}>
-                            {/* If we're on the followed content preference page, this button should be hidden */}
-                            {!window.location.pathname.includes("/followed-content") && (
-                                <ToolTip label={t("View all followed categories")}>
-                                    <span>
-                                        <LinkAsButton
-                                            to="/profile/followed-content"
-                                            buttonType={ButtonTypes.ICON}
-                                            className={classes.preferencesButton}
-                                            ariaLabel={t("View all followed categories")}
-                                        >
-                                            <SettingsIcon />
-                                        </LinkAsButton>
-                                    </span>
-                                </ToolTip>
-                            )}
-                        </FrameHeaderWithAction>
-                    }
-                    body={
-                        <FrameBody hasVerticalPadding={true}>
-                            <>
-                                <p className={classes.heading}>{props.categoryName}</p>
-                                <form
-                                    role="form"
-                                    onSubmit={async (e) => {
-                                        e.preventDefault();
-                                        await submitForm();
-                                    }}
-                                >
-                                    <CategoryPreferencesTable
-                                        canIncludeInDigest={canIncludeInDigest}
-                                        preferences={values}
-                                        onPreferenceChange={async function (delta) {
-                                            setValues((values) => ({ ...values, ...delta }));
-                                            await submitForm();
-                                        }}
-                                        preview={preview}
-                                    />
-                                </form>
-                            </>
-                        </FrameBody>
-                    }
-                    footer={
-                        isFollowed && (
-                            <FrameFooter forDashboard={true}>
-                                <Button
-                                    className={classes.fullWidth}
-                                    onClick={async () => {
-                                        await unfollowAndResetPreferences();
-                                        props.onPreferencesChange?.({
-                                            categoryID: categoryID,
-                                            preferences: {},
-                                        });
-                                    }}
-                                >
-                                    {t("Unfollow Category")}
-                                </Button>
-                            </FrameFooter>
-                        )
-                    }
+        <FollowDropdown
+            {...props}
+            recordID={categoryID}
+            name={props.categoryName}
+            emailDigestEnabled={emailDigestEnabled}
+            preferencesTable={
+                <CategoryPreferencesTable
+                    canIncludeInDigest={canIncludeInDigest}
+                    preferences={values}
+                    onPreferenceChange={async function (delta) {
+                        setValues((values) => ({ ...values, ...delta }));
+                        await submitForm();
+                    }}
+                    preview={props.preview}
+                    notificationTypes={CATEGORY_NOTIFICATION_TYPES}
                 />
-            </DropDown>
-        </div>
+            }
+            notificationTypes={CATEGORY_NOTIFICATION_TYPES}
+            updatePreferences={setPreferences}
+            submitForm={submitForm}
+            unfollowAndResetPreferences={unfollowAndResetPreferences}
+            isFollowed={categoryNotificationPreferences?.["preferences.followed"] ?? false}
+            defaultUserPreferences={defaultUserPreferences}
+            onPreferencesChange={props.onPreferencesChange}
+        />
     );
 }
 

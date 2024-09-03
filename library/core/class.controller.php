@@ -27,6 +27,7 @@ use Vanilla\Web\ContentSecurityPolicy\Policy;
 use Vanilla\Web\JsInterpop\StatePreloadTrait;
 use Vanilla\Web\MasterViewRenderer;
 use Vanilla\Dashboard\Pages\LegacyDashboardPage;
+use Vanilla\Web\Middleware\CloudflareChallengeMiddleware;
 use Vanilla\Web\SeoMetaModel;
 use Vanilla\Web\TwigStaticRenderer;
 
@@ -234,7 +235,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     /** @var array A collection of view locations that have already been found. Used to prevent re-finding views. */
     protected $_ViewLocations;
 
-    /** @var string|null  */
+    /** @var string|null */
     protected $_PageName = null;
 
     /** @var bool */
@@ -360,6 +361,11 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         $xFrameString = $cspModel->getXFrameString();
         if ($xFrameString !== null) {
             $this->_Headers[ContentSecurityPolicyModel::X_FRAME_OPTIONS] = $xFrameString;
+        }
+
+        $cloudflareChallengeMiddleware = Gdn::getContainer()->get(CloudflareChallengeMiddleware::class);
+        if ($cloudflareChallengeMiddleware->shouldUserReceiveChallenge()) {
+            $this->setHeader(...CloudflareChallengeMiddleware::CF_CHALLENGE_HEADER);
         }
 
         $this->_ErrorMessages = "";
@@ -975,9 +981,9 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     /**
      * Add error messages to be displayed to the user.
      *
+     * @param string $messages The html of the errors to be display.
      * @since 2.0.18
      *
-     * @param string $messages The html of the errors to be display.
      */
     public function errorMessage($messages)
     {
@@ -1330,11 +1336,11 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     /**
      * Add an "inform" message to be displayed to the user.
      *
-     * @since 2.0.18
-     *
      * @param string $message The message to be displayed.
      * @param mixed $options An array of options for the message. If not an array, it is assumed to be a string of CSS
      * classes to apply to the message.
+     * @since 2.0.18
+     *
      */
     public function informMessage($message, $options = ["CssClass" => "Dismissable AutoDismiss"])
     {
@@ -2199,8 +2205,15 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
                 $cssAnchors = LegacyAssetModel::getAnchors();
                 $assetProvider = \Gdn::getContainer()->get(ViteAssetProvider::class);
-                $bootstrapInline = $assetProvider->getBootstrapInlineScript();
-                $this->Head->addScript("", "", false, ["content" => $bootstrapInline, HeadModule::SORT_KEY => -1]);
+                $inlineScript = $assetProvider->getBootstrapInlineScript();
+                $isMinificationEnabled = Gdn::config("minify.scripts", true);
+                if ($isMinificationEnabled) {
+                    $jsMinifier = new MatthiasMullie\Minify\JS($inlineScript);
+                    $bootstrapInline = $jsMinifier->minify();
+                    $this->Head->addScript("", "", false, ["content" => $bootstrapInline, HeadModule::SORT_KEY => -1]);
+                } else {
+                    $this->Head->addScript("", "", false, ["content" => $inlineScript, HeadModule::SORT_KEY => -1]);
+                }
 
                 $this->EventArguments["CssFiles"] = &$this->_CssFiles;
                 $this->fireEvent("BeforeAddCss");
@@ -2456,6 +2469,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             /** @var MasterViewRenderer $viewRenderer */
             $viewRenderer = Gdn::getContainer()->get(MasterViewRenderer::class);
             $result = $viewRenderer->renderGdnController($this);
+
             echo $result;
         } else {
             // Force our icons into the legacy master template
@@ -2606,12 +2620,12 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
      * The $key can also use dot notation in order to set a value deeper inside the Data array.
      * Works the same way if $addProperty is true, but uses objects instead of arrays.
      *
-     * @see setvalr
-     *
      * @param string|array $key The key that identifies the data.
      * @param mixed $value The data.  Will not be used if $key is an array
      * @param mixed $addProperty Whether or not to also set the data as a property of this object.
      * @return mixed The $Value that was set.
+     * @see setvalr
+     *
      */
     public function setData($key, $value = null, $addProperty = false)
     {

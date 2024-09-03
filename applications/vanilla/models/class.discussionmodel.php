@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\Container\ContainerException;
 use Garden\Events\BulkUpdateEvent;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
@@ -27,6 +28,7 @@ use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\Dashboard\Models\AggregateCountableInterface;
+use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\PremoderationModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\UserMentionsInterface;
@@ -44,6 +46,7 @@ use Vanilla\Forum\Jobs\DeferredResourceEventJob;
 use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\MainImageSchema;
+use Vanilla\Permissions;
 use Vanilla\Premoderation\PremoderationItem;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\LongRunner;
@@ -68,6 +71,7 @@ use Vanilla\Utility\Deprecation;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\SystemCallableInterface;
+use VanillaTests\APIv2\DiscussionsTest;
 
 /**
  * Manages discussions data.
@@ -389,33 +393,66 @@ class DiscussionModel extends Gdn_Model implements
     }
 
     /**
+     * Check if a user has view permission on a discussion.
+     *
+     * @param int $discussionID
+     * @param bool $throw
+     *
+     * @return bool
+     */
+    public function hasViewPermission(int $discussionID, bool $throw = true): bool
+    {
+        $categoryID =
+            $this->createSql()
+                ->select("CategoryID")
+                ->from("Discussion")
+                ->where(["DiscussionID" => $discussionID])
+                ->limit(1)
+                ->get()
+                ->firstRow()->CategoryID ?? null;
+        if ($categoryID === null) {
+            throw new NotFoundException("Discussion", ["discussionID" => $discussionID]);
+        }
+
+        return $this->categoryPermission("discussions.view", $categoryID, $throw);
+    }
+
+    /**
      * Verify the current user has a permission in a category.
      *
      * @param string|array $permission The permission slug(s) to check (e.g. Vanilla.Discussions.View).
      * @param int $categoryID The category's numeric ID.
+     * @param bool $throw
+     *
      * @throws PermissionException if the current user does not have the permission in the category.
      */
-    public function categoryPermission($permission, $categoryID)
+    public function categoryPermission(string|array $permission, int $categoryID, bool $throw = true): bool
     {
-        $category = CategoryModel::categories($categoryID);
-        if ($category) {
-            $id = $category["PermissionCategoryID"];
-        } else {
-            $id = -1;
-        }
         $permissions = (array) $permission;
 
         if (
-            !Gdn::session()
+            !$this->getSessionInterface()
                 ->getPermissions()
-                ->hasAny($permissions, $id)
+                ->hasAny(
+                    $permissions,
+                    $categoryID,
+                    Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION,
+                    CategoryModel::PERM_JUNCTION_TABLE
+                )
         ) {
-            throw new PermissionException($permissions);
+            if ($throw) {
+                throw new PermissionException($permission);
+            } else {
+                return false;
+            }
         }
+
+        return true;
     }
 
     /**
      * @return array The current sort array.
+     * @throws Exception
      */
     public static function getAllowedSorts()
     {
@@ -430,6 +467,7 @@ class DiscussionModel extends Gdn_Model implements
      * This method must never be called before plugins initialisation.
      *
      * @return array The current filter array.
+     * @throws Exception
      */
     public static function getAllowedFilters()
     {
@@ -488,6 +526,7 @@ class DiscussionModel extends Gdn_Model implements
 
     /**
      * @return string
+     * @throws Exception
      */
     public static function getDefaultSortKey()
     {
@@ -768,8 +807,10 @@ class DiscussionModel extends Gdn_Model implements
     /**
      * Get the allowed discussion types.
      *
-     * @param stdClass $category
+     * @param null $category
      * @return array Returns an array of discussion type definitions.
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public static function discussionTypes($category = null)
     {
@@ -820,6 +861,7 @@ class DiscussionModel extends Gdn_Model implements
      * @param array $limit SQL conditions.
      * @param array $pageNumber Allows selection of additional fields as Alias=>Table.Fieldname.
      * @return Gdn_DataSet SQL result.
+     * @throws Exception
      * @deprecated Don't use this method. It is not defined properly. Use `getWhere()` instead.
      */
     public function get($orderFields = 0, $orderDirection = false, $limit = [], $pageNumber = [])
@@ -1057,8 +1099,9 @@ class DiscussionModel extends Gdn_Model implements
      * @param bool $expand Expand relevant related records (e.g. category, users).
      * @param bool|string $filterType Query Filter.
      * @param bool|int $userID potential User ID.
-     * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
      * @param array $selects Extra fields to select.
+     * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
+     * @throws Exception
      */
     public function getWhere(
         $where = [],
@@ -1200,6 +1243,25 @@ class DiscussionModel extends Gdn_Model implements
             }
         }
 
+        if (isset($where["d.DiscussionID"]) && isset($where["d.InterestCategoryID"])) {
+            $sql->beginWhereGroup()
+                ->where("d.DiscussionID", $where["d.DiscussionID"])
+                ->orWhere(
+                    "d.CategoryID",
+                    isset($where["d.CategoryID"])
+                        ? array_intersect($where["d.CategoryID"], $where["d.InterestCategoryID"])
+                        : $where["d.InterestCategoryID"]
+                )
+                ->endWhereGroup();
+            unset($where["d.DiscussionID"]);
+            unset($where["d.InterestCategoryID"]);
+        } elseif (isset($where["d.InterestCategoryID"])) {
+            $where["d.CategoryID"] = isset($where["d.CategoryID"])
+                ? array_intersect($where["d.CategoryID"], $where["d.InterestCategoryID"])
+                : $where["d.InterestCategoryID"];
+            unset($where["d.InterestCategoryID"]);
+        }
+
         // Add the UserDiscussion query.
         if ($userID > 0) {
             $sql->join("UserDiscussion ud", "ud.DiscussionID = d.DiscussionID and ud.UserID = $userID", "left")
@@ -1215,12 +1277,12 @@ class DiscussionModel extends Gdn_Model implements
 
         if (($where["d.Announce"] ?? null) === "all") {
             // This value historically meant to not do any announcement filtering because it was implicitly baked in.
-            // Nowadays we should just strip it and do not filtering.
+            // Nowadays we should just strip it and do no filtering.
             unset($where["d.Announce"]);
         }
 
         if (isset($where["d.Announce"]) && $userID) {
-            // If we have an announce value and a sessioned user we need to or with UserDiscussion.
+            // If we have an Announce value and a sessioned user we need to or with UserDiscussion.
 
             $announceValue = (array) $where["d.Announce"];
             if (in_array(0, $announceValue)) {
@@ -1238,11 +1300,14 @@ class DiscussionModel extends Gdn_Model implements
             unset($where["d.Announce"]);
         }
 
-        // If we have a user role where, make sure we join on that table.
         $insertUserRoleIDs = $where["uri.RoleID"] ?? null;
         if (!empty($insertUserRoleIDs)) {
             $sql->join("UserRole uri", "d.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
+
+            // Ensure rows aren't duplicated
+            $sql->distinct();
         }
+        unset($where["uri.RoleID"]);
 
         $this->EventArguments["SQL"] = $sql;
         $this->fireEvent("BeforeGetSubQuery");
@@ -1253,7 +1318,6 @@ class DiscussionModel extends Gdn_Model implements
         if (!empty($orderBy)) {
             $sql->orderBy($orderBy);
         }
-        $sql->groupBy("d.DiscussionID");
 
         $sql->limit($limit);
         $sql->offset($offset);
@@ -1272,6 +1336,10 @@ class DiscussionModel extends Gdn_Model implements
     {
         $safeWheres = [];
         foreach ($where as $key => $value) {
+            if ($value instanceof \Vanilla\Database\CallbackWhereExpression) {
+                $safeWheres[$key] = $value;
+                continue;
+            }
             // Normalize the legacy UserDiscussion alias.
             if (str_contains($key, "w.")) {
                 $this->logger->warning("Using deprecated `w` alias for UserDiscussion", [
@@ -1637,6 +1705,7 @@ class DiscussionModel extends Gdn_Model implements
      * @param array $where
      * @param bool $includeAnnouncement
      * @return int|array
+     * @throws Exception
      */
     public function getAnnouncementWhere(array $where, bool $includeAnnouncement = false)
     {
@@ -1684,9 +1753,9 @@ class DiscussionModel extends Gdn_Model implements
      *
      * @param int $discussionID Unique ID to find bookmarks for.
      * @return object SQL result.
+     * @throws Exception
      * @since 2.0.0
      * @access public
-     *
      */
     public function getBookmarkUsers($discussionID)
     {
@@ -1704,6 +1773,7 @@ class DiscussionModel extends Gdn_Model implements
      * @param int $discussionID
      *
      * @return int[]
+     * @throws Exception
      */
     public function getBookmarkUserIDs(int $discussionID): array
     {
@@ -1729,6 +1799,7 @@ class DiscussionModel extends Gdn_Model implements
      * @param int|false $watchUserID User to use for read/unread data.
      * @param string $permission Permission to filter categories by.
      * @return Gdn_DataSet SQL results.
+     * @throws Exception
      * @since 2.1
      * @access public
      *
@@ -1851,6 +1922,7 @@ class DiscussionModel extends Gdn_Model implements
      *
      * @param int $discussionID
      * @return array
+     * @throws Exception
      */
     public function getParticipatedUserIDs($discussionID): array
     {
@@ -2210,6 +2282,7 @@ class DiscussionModel extends Gdn_Model implements
      * @param int $foreignID Foreign ID of discussion to get.
      * @param string $type The record type or an empty string for any record type.
      * @return stdClass SQL result.
+     * @throws Exception
      * @since 2.0.18
      */
     public function getForeignID($foreignID, $type = "")
@@ -2259,6 +2332,7 @@ class DiscussionModel extends Gdn_Model implements
      * @param string $datasetType One of the **DATASET_TYPE_*** constants.
      * @param array $options An array of extra options for the query.
      * @return mixed SQL result.
+     * @throws Exception
      */
     public function getID($id, $datasetType = DATASET_TYPE_OBJECT, $options = [])
     {
@@ -2284,13 +2358,16 @@ class DiscussionModel extends Gdn_Model implements
             $this->SQL->select($select);
         }
 
-        $discussion = $this->SQL
+        $data = $this->SQL
             ->from("Discussion d")
             ->join("UserDiscussion w", "d.DiscussionID = w.DiscussionID and w.UserID = " . $session->UserID, "left")
             ->where("d.DiscussionID", $id)
-            ->groupBy("d.DiscussionID")
-            ->get()
-            ->firstRow();
+            ->get();
+
+        $this->EventArguments["Data"] = $data;
+        $this->getEventManager()->fire("discussionModel_afterAddColumns", $this);
+
+        $discussion = $data->firstRow();
 
         if (!$discussion) {
             return $discussion;
@@ -2315,6 +2392,7 @@ class DiscussionModel extends Gdn_Model implements
      *
      * @param array $discussionIDs Array of DiscussionIDs to get.
      * @return Gdn_DataSet SQL result.
+     * @throws Exception
      * @since 2.0.18
      */
     public function getIn($discussionIDs)
@@ -2373,6 +2451,7 @@ class DiscussionModel extends Gdn_Model implements
      *
      * @param int $discussionID
      * @return mixed|null
+     * @throws Exception
      */
     public static function getViewsFallback($discussionID)
     {
@@ -2873,7 +2952,7 @@ class DiscussionModel extends Gdn_Model implements
                     $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
                     if ($discussion) {
                         $this->aggregateModel()->handleDiscussionInsert($discussion);
-
+                        $this->EventArguments["DiscussionData"] = $discussion;
                         // Send notifications
                         $notificationGenerator = Gdn::getContainer()->get(
                             \Vanilla\Models\CommunityNotificationGenerator::class
@@ -3123,6 +3202,7 @@ class DiscussionModel extends Gdn_Model implements
      * @param int|null $userID
      *
      * @return int
+     * @throws Exception
      */
     public function getCountParticipated(?int $userID = null): int
     {
@@ -3410,6 +3490,7 @@ SQL;
      * @param string|null $redirectUrl Force a specific redirect url.
      *
      * @return int|bool Redirect ID or false on failure.
+     * @throws NotFoundException
      */
     public function createRedirect(
         array $targetDiscussion,
@@ -3666,6 +3747,7 @@ SQL;
      *
      * @param array $array The array to get the filters from.
      * @return array The valid filters from the passed array or an empty array.
+     * @throws Exception
      */
     protected function getFiltersFromArray($array)
     {
@@ -3697,6 +3779,7 @@ SQL;
      *
      * @param array $array The array to get the sort from.
      * @return string The valid sort from the passed array or an empty string.
+     * @throws Exception
      */
     protected function getSortFromArray($array)
     {
@@ -3852,6 +3935,7 @@ SQL;
      *
      * @param array $filterKeyValues The filters key array to get the filter for.
      * @return array An array of filters.
+     * @throws Exception
      */
     protected function getFiltersFromKeys($filterKeyValues)
     {
@@ -3868,6 +3952,7 @@ SQL;
     /**
      * @param string $sortKey
      * @return array
+     * @throws Exception
      */
     protected function getSortFromKey($sortKey)
     {
@@ -4161,9 +4246,10 @@ SQL;
      *
      * @param array $row
      * @param array $expand
+     * @param array $options
      * @return array
      */
-    public function normalizeRow(array $row, $expand = []): array
+    public function normalizeRow(array $row, $expand = [], array $options = []): array
     {
         $this->fixRow($row);
         $session = \Gdn::session();
@@ -4254,7 +4340,11 @@ SQL;
         }
 
         if (ModelUtils::isExpandOption("excerpt", $expand)) {
-            $row["excerpt"] = $this->formatterService->renderExcerpt($bodyParsed, $format);
+            $row["excerpt"] = $this->formatterService->renderExcerpt(
+                $bodyParsed,
+                $format,
+                $options["excerptLength"] ?? null
+            );
         }
         if (ModelUtils::isExpandOption("snippet", $expand)) {
             $row["snippet"] = $this->formatterService->renderExcerpt($bodyParsed, $format, self::MAX_SNIPPET_LENGTH);
@@ -4303,11 +4393,19 @@ SQL;
 
         // Return suggestions if suggestions are enabled and exist for the discussion
         if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
-            $result["suggestions"] = $this->aiSuggestionModel->getByDiscussionID($row["DiscussionID"]);
-            if (count($result["suggestions"]) > 0) {
-                $result["showSuggestions"] = $result["attributes"]["showSuggestions"] ?? $result["countComments"] == 0;
-                if (isset($result["attributes"]["suggestions"])) {
-                    unset($result["attributes"]["showSuggestions"]);
+            $aiConfig = AiSuggestionSourceService::aiSuggestionConfigs();
+            if ($aiConfig["enabled"]) {
+                $aiSuggestion = Gdn::getContainer()->get(AiSuggestionSourceService::class);
+                $suggestAnswers = $aiSuggestion->checkIfUserHasEnabledAiSuggestions();
+                if ($suggestAnswers) {
+                    $result["suggestions"] = $this->aiSuggestionModel->getByDiscussionID($row["DiscussionID"]);
+                    if (count($result["suggestions"]) > 0) {
+                        $result["showSuggestions"] =
+                            $result["attributes"]["showSuggestions"] ?? $result["countComments"] == 0;
+                        if (isset($result["attributes"]["suggestions"])) {
+                            unset($result["attributes"]["showSuggestions"]);
+                        }
+                    }
                 }
             }
         }
@@ -5022,6 +5120,8 @@ SQL;
         if (!$discussion) {
             throw new NotFoundException("Discussion", ["discussionID" => $discussionOrDiscussionID]);
         }
+        // Default/Empty/Null discussion type is a discussion.
+        $discussion["Type"] = $discussion["Type"] ?? DiscussionModel::DISCUSSION_TYPE;
 
         $discussionID = $discussion["DiscussionID"];
         $newCategoryID = $newCategory["CategoryID"];
@@ -5032,6 +5132,7 @@ SQL;
             return true;
         } else {
             $postingCategory = CategoryModel::doesCategoryAllowPosts($newCategoryID);
+
             if (!$postingCategory) {
                 throw new ClientException("Destination category does not allow discussions.", 400, [
                     "discussionID" => $discussionID,
@@ -5041,16 +5142,24 @@ SQL;
         }
 
         $allowedDiscussionTypes = $newCategory["AllowedDiscussionTypes"];
+
+        $allowedDiscussionTypes = is_array($allowedDiscussionTypes)
+            ? $allowedDiscussionTypes
+            : array_keys(\DiscussionModel::discussionTypes());
+
         $eventManager = $this->getEventManager();
         $allowedDiscussionTypes = $eventManager->fireFilter(
             "discussionModel_moveAllowedTypes",
-            $allowedDiscussionTypes
+            $allowedDiscussionTypes,
+            $newCategory
         );
+
+        $allowedDiscussionTypes = array_map("strtolower", $allowedDiscussionTypes);
 
         if (
             isset($discussion["Type"]) &&
             !empty($allowedDiscussionTypes) &&
-            !in_array($discussion["Type"], $allowedDiscussionTypes)
+            !in_array(strtolower($discussion["Type"]), $allowedDiscussionTypes)
         ) {
             throw new ClientException("Discussion type is not allowed in the destination category.", 400, [
                 "discussionID" => $discussionID,
@@ -5117,7 +5226,6 @@ SQL;
      *
      * @return Generator<int, LongRunnerItemResultInterface, null, string|LongRunnerNextArgs>
      *
-     * @throws NotFoundException If the category we are moving into doesn't exist.
      */
     public function moveDiscussionsIterator(array $discussionIDs, int $categoryID, bool $addRedirects): Generator
     {
@@ -5264,6 +5372,15 @@ SQL
      */
     public function applyDiscussionCategoryPermissionsWhere(Gdn_SQLDriver $sql): void
     {
+        if (
+            $this->getSessionInterface()
+                ->getPermissions()
+                ->isAdmin()
+        ) {
+            $sql->where("d.DiscussionID IS NOT NULL");
+            return;
+        }
+
         $permCategoryIDs = $this->categoryModel->getCategoryIDsWithPermissionForUser(
             userID: Gdn::session()->UserID,
             permission: "Vanilla.Discussions.View"

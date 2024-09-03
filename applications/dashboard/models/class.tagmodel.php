@@ -5,7 +5,9 @@
  * @package Tagging
  */
 
+use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
@@ -454,7 +456,17 @@ class TagModel extends Gdn_Model
      */
     public function getPostTagSchema(): Schema
     {
-        $schema = Schema::parse(["name:s", "urlcode:s?", "parentTagID:i|n?", "type:s|n?"]);
+        $schema = Schema::parse(["name:s", "urlcode:s?", "parentTagID:i|n?", "type:s|n?"])->addValidator(
+            "urlcode",
+            function ($urlcode, ValidationField $field) {
+                if (trim(str_replace(" ", "-", $urlcode)) !== TagModel::tagSlug($urlcode)) {
+                    $field
+                        ->setName("urlcode")
+                        ->addError("The Url Slug may only contain alphanumeric characters and hyphens.");
+                    return Invalid::value();
+                }
+            }
+        );
         return $schema;
     }
 
@@ -1514,5 +1526,56 @@ class TagModel extends Gdn_Model
         $allowedTypes = (array) Gdn::config("Tagging.Discussions.AllowedTypes", []);
         $searchableTypes = array_unique(array_merge($allowedTypes, $defaultTypes));
         return $searchableTypes;
+    }
+
+    /**
+     * Iterator for discussions having specific tags.
+     *
+     * @param array $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param int $batchSize
+     * @return Generator<int, array>
+     */
+    public function getTagDiscussionIterator(
+        array $where,
+        string $orderFields,
+        string $orderDirection = "asc",
+        int $batchSize = 100
+    ): Generator {
+        $offset = 0;
+        while (true) {
+            $sql = $this->createSql();
+            if (
+                is_array($where["d.Type"]) &&
+                (in_array("discussion", $where["d.Type"]) || in_array("Discussion", $where["d.Type"]))
+            ) {
+                $sql->beginWhereGroup()
+                    ->where("d.Type", $where["d.Type"])
+                    ->orWhere("d.Type is null")
+                    ->endWhereGroup();
+                unset($where["d.Type"]);
+            }
+            $results = $sql
+                ->select(["d.*"])
+                ->from("TagDiscussion td")
+                ->join("Discussion d", "d.DiscussionID = td.DiscussionID")
+                ->where($where)
+                ->orderBy($orderFields, $orderDirection)
+                ->groupBy("d.DiscussionID")
+                ->limit($batchSize, $offset)
+                ->get()
+                ->resultArray();
+            foreach ($results as $result) {
+                $primaryKey = $result["DiscussionID"];
+                yield $primaryKey => $result;
+            }
+
+            $offset += $batchSize;
+            if (count($results) < $batchSize) {
+                // We made it to the end.
+                return;
+            }
+        }
     }
 }

@@ -191,6 +191,24 @@ paths:
                       type: array
                       items:
                           type: integer
+                - name: suggestions
+                  description: Filter discussion list based on user interests.
+                  in: query
+                  schema:
+                      type: boolean
+                  x-feature: "suggestedContent.enabled"
+                - name: excerptLength
+                  description: Length of excerpts.
+                  in: query
+                  schema:
+                      type: integer
+                - name: excludedCategoryIDs[]
+                  description: Category IDs to exclude.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: integer
             responses:
                 "200":
                     content:

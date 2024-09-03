@@ -72,12 +72,25 @@ interface IRadioControl extends ICommonControl {
 
 interface ITextBoxControl extends ICommonControl {
     inputType: "textBox";
-    type?: "text" | "textarea" | "number" | "url" | "password" | "time";
-    min?: React.InputHTMLAttributes<HTMLInputElement>["min"];
-    max?: React.InputHTMLAttributes<HTMLInputElement>["max"];
+    type?: "text" | "textarea" | "url" | "password" | "time";
+
     minLength?: React.InputHTMLAttributes<HTMLInputElement>["minLength"];
     maxLength?: React.InputHTMLAttributes<HTMLInputElement>["maxLength"];
     pattern?: React.InputHTMLAttributes<HTMLInputElement>["pattern"];
+}
+
+interface INumberControl extends Omit<ITextBoxControl, "type"> {
+    type: "number";
+    min?: React.InputHTMLAttributes<HTMLInputElement>["min"];
+    max?: React.InputHTMLAttributes<HTMLInputElement>["max"];
+}
+
+interface IRatioControl extends Omit<INumberControl, "type"> {
+    type: "ratio";
+}
+
+interface ICurrencyControl extends Omit<INumberControl, "type"> {
+    type: "currency";
 }
 
 interface ICodeBoxControl extends ICommonControl {
@@ -151,6 +164,9 @@ export type IFormControl =
     | IRadioControl
     | ITokensControl
     | ITextBoxControl
+    | INumberControl
+    | IRatioControl
+    | ICurrencyControl
     | ICheckBoxControl
     | IRichEditorControl
     | ICodeBoxControl

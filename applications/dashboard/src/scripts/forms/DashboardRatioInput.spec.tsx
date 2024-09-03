@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { RenderResult, fireEvent, render } from "@testing-library/react";
-import { DashboardRatioInput } from "@dashboard/forms/DashboardRatioInput";
+import DashboardRatioInput from "@dashboard/forms/DashboardRatioInput";
+import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 
 function MockForm() {
     const [value, setValue] = useState(35);
-
     return (
-        <DashboardRatioInput
-            inputProps={{
-                value: value,
-                onChange: (event) => setValue(parseInt(event.target.value)),
-            }}
-        />
+        <DashboardFormGroup labelType={DashboardLabelType.VERTICAL} label={"Ratio"}>
+            <DashboardRatioInput value={value} onChange={(newValue) => setValue(newValue)} />
+        </DashboardFormGroup>
     );
 }
 
@@ -37,24 +35,24 @@ describe("DashboardRatioInput", () => {
     it("allows users to update the value of the second input", () => {
         input = result.getByDisplayValue("35");
         fireEvent.change(input, { target: { value: "10" } });
-        expect(input).toHaveValue("10");
+        expect(input).toHaveValue(10);
     });
 
     it("does not allow decimals", () => {
         input = result.getByDisplayValue("35");
         fireEvent.change(input, { target: { value: "5.9" } });
-        expect(input).toHaveValue("5");
+        expect(input).toHaveValue(5);
     });
 
     it("does not allow zero, replaces it with default value of 1", () => {
         input = result.getByDisplayValue("35");
         fireEvent.change(input, { target: { value: "0" } });
-        expect(input).toHaveValue("1");
+        expect(input).toHaveValue(1);
     });
 
     it("replaces the empty string with default value of 1", () => {
         input = result.getByDisplayValue("35");
         fireEvent.change(input, { target: { value: "" } });
-        expect(input).toHaveValue("1");
+        expect(input).toHaveValue(1);
     });
 });

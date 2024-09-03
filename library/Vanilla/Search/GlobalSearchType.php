@@ -93,6 +93,10 @@ class GlobalSearchType extends AbstractSearchType
             $query->setDateFilterSchema("dateInserted", $dateInserted);
         }
 
+        if ($dateUpdated = $query->getQueryParameter("dateUpdated")) {
+            $query->setDateFilterSchema("dateUpdated", $dateUpdated);
+        }
+
         $locale = $query->getQueryParameter("locale");
         if ($locale) {
             $query->setFilter(
@@ -165,14 +169,13 @@ class GlobalSearchType extends AbstractSearchType
                 "style" => "form",
                 "x-search-filter" => true,
             ],
-            "dateInserted?" => new DateFilterSchema([
-                "x-search-filter" => true,
-            ]),
+            "dateInserted?" => new DateFilterSchema(),
+            "dateUpdated?" => new DateFilterSchema(),
             "driver?" => [
                 "enum" => $this->searchService->getDriverNames(),
             ],
             "sort:s?" => [
-                "enum" => ["relevance", "dateInserted", "-dateInserted"],
+                "enum" => ["relevance", "dateInserted", "-dateInserted", "dateUpdated", "-dateUpdated"],
             ],
             "locale:s?" => [
                 "description" => "The locale articles are published in.",

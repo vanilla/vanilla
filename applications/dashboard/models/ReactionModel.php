@@ -1387,6 +1387,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
      *
      * @param null $urlCode
      * @return mixed|null
+     * @throws Exception
      */
     public static function reactionTypes($urlCode = null)
     {

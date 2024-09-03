@@ -14,16 +14,29 @@ use Gdn_SQLDriver;
  */
 class CommentQueryEvent
 {
-    protected Gdn_SQLDriver $commentSQL;
-
     /**
      * Constructor.
      *
      * @param Gdn_SQLDriver $commentSQL
+     * @param array $parentRecordTypes
+     * @param array $whereGroups
      */
-    public function __construct(\Gdn_SQLDriver &$commentSQL)
+    public function __construct(
+        private \Gdn_SQLDriver &$commentSQL,
+        private array $parentRecordTypes,
+        private array $whereGroups
+    ) {
+    }
+
+    /**
+     * Add an additional where clause to the query.
+     *
+     * @param array $where
+     * @return void
+     */
+    public function addWhereGroup(array $where): void
     {
-        $this->commentSQL = &$commentSQL;
+        $this->whereGroups[] = $where;
     }
 
     /**
@@ -34,5 +47,39 @@ class CommentQueryEvent
     public function &getCommentSQL(): Gdn_SQLDriver
     {
         return $this->commentSQL;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParentRecordTypes(): array
+    {
+        return $this->parentRecordTypes;
+    }
+
+    /**
+     * Apply the collected where's to the query.
+     *
+     * @return void
+     */
+    public function applyWheresToQuery(): void
+    {
+        $sql = $this->getCommentSQL();
+        $whereGroups = $this->whereGroups;
+
+        if (count($whereGroups) === 0) {
+            // There's just the one.
+            $sql->where(reset($whereGroups));
+            return;
+        }
+
+        $sql->beginWhereGroup();
+        foreach ($whereGroups as $where) {
+            $sql->orOp();
+            $sql->beginWhereGroup();
+            $sql->where($where);
+            $sql->endWhereGroup();
+        }
+        $sql->endWhereGroup();
     }
 }

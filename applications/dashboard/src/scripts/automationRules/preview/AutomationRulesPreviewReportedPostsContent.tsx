@@ -10,7 +10,6 @@ import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPa
 import { MetaItem } from "@library/metas/Metas";
 import { cx } from "@emotion/css";
 import DateTime from "@library/content/DateTime";
-import { AutomationRulesPreviewContent } from "@dashboard/automationRules/preview/AutomationRulesPreviewContent";
 import { IApiError } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { useQuery } from "@tanstack/react-query";
@@ -29,8 +28,10 @@ export interface IGetReportsForAutomationRulesParams {
     includeSubcategories?: boolean;
 }
 
-interface IProps extends Omit<React.ComponentProps<typeof AutomationRulesPreviewContent>, "formValues"> {
+interface IProps {
     query: IGetReportsForAutomationRulesParams;
+    fromStatusToggle?: boolean;
+    onPreviewContentLoad?: (emptyResult: boolean) => void;
 }
 
 export function AutomationRulesPreviewReportedPostsContent(props: IProps) {

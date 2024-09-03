@@ -121,15 +121,15 @@ class Gdn_Theme
             }
 
             $row["Url"] = !empty($row["Url"]) ? url($row["Url"]) : "#";
-            $cssClass = "CrumbLabel " . htmlspecialchars(val("CssClass", $row));
+            $cssClass = htmlspecialchars("CrumbLabel " . val("CssClass", $row));
             if ($dataCount == count($data)) {
                 $cssClass .= " Last";
             }
 
             $sanitizedRow = [
-                "Name" => htmlspecialchars($row["Name"]),
+                "Name" => $row["Name"],
                 "Url" => htmlspecialchars($row["Url"]),
-                "CssClass" => htmlspecialchars($cssClass),
+                "CssClass" => $cssClass,
             ];
 
             $label =

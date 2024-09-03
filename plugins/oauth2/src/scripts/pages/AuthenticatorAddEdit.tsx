@@ -325,6 +325,18 @@ function OAuth2AddEditSettings(props: ITabContentsProps) {
                     checked={values.allowAccessTokens || false}
                 ></DashboardToggle>
             </DashboardFormGroup>
+            <DashboardFormGroup
+                label={t("Mark users as verified")}
+                description={t("Mark users as verified (bypass pre-moderation) if their email is confirmed.")}
+                labelType={DashboardLabelType.WIDE}
+            >
+                <DashboardToggle
+                    checked={values.markVerified ?? false}
+                    onChange={(value) => {
+                        update({ markVerified: value });
+                    }}
+                />
+            </DashboardFormGroup>
         </div>
     );
 }

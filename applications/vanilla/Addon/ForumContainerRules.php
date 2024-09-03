@@ -14,6 +14,8 @@ use Garden\Web\PageControllerRoute;
 use Vanilla\AddonContainerRules;
 use Vanilla\Analytics\EventProviderService;
 use Vanilla\Analytics\SearchDiscussionEventProvider;
+use Vanilla\AutomationRules\Actions\RemoveDiscussionFromCollectionAction;
+use Vanilla\AutomationRules\Triggers\DiscussionReachesScoreTrigger;
 use Vanilla\AutomationRules\Actions\CreateEscalationAction;
 use Vanilla\AutomationRules\Triggers\ReportPostTrigger;
 use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
@@ -28,7 +30,6 @@ use Vanilla\AutomationRules\Actions\AddTagToDiscussionAction;
 use Vanilla\AutomationRules\Actions\BumpDiscussionAction;
 use Vanilla\AutomationRules\Actions\CloseDiscussionAction;
 use Vanilla\AutomationRules\Actions\MoveDiscussionToCategoryAction;
-use Vanilla\AutomationRules\Actions\RemoveDiscussionFromCollectionAction;
 use Vanilla\AutomationRules\Actions\RemoveDiscussionFromTriggerCollectionAction;
 use Vanilla\AutomationRules\Actions\UserFollowCategoryAction;
 use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
@@ -37,10 +38,8 @@ use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Forum\Controllers\Pages\CategoryListPageController;
-use Vanilla\Forum\Controllers\Pages\DiscussionCategoryPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionThreadPageController;
-use Vanilla\Forum\Controllers\Pages\NestedCategoryListPageController;
 use Vanilla\Forum\Controllers\Pages\UnsubscribePageController;
 use Vanilla\Forum\Controllers\Pages\ConvertHTMLPageController;
 use Vanilla\Forum\Layout\View\CategoryListLayoutView;
@@ -67,6 +66,7 @@ use Vanilla\Forum\Models\VanillaEscalationAttachmentProvider;
 use Vanilla\Forum\Widgets\DiscussionAnnouncementsWidget;
 use Vanilla\Forum\Widgets\DiscussionDiscussionsWidget;
 use Vanilla\Forum\Widgets\DiscussionTagsAsset;
+use Vanilla\Forum\Widgets\SuggestedContentWidget;
 use Vanilla\Forum\Widgets\TagWidget;
 use Vanilla\Forum\Widgets\CategoriesWidget;
 use Vanilla\Forum\Widgets\RSSWidget;
@@ -122,6 +122,7 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addReactResolver", [FeaturedCollectionsWidget::class])
             ->addCall("addReactResolver", [BreadcrumbWidget::class])
             ->addCall("addReactResolver", [DiscussionTagsAsset::class])
+            ->addCall("addReactResolver", [SuggestedContentWidget::class])
             ->addCall("addMiddleware", [new Reference(CategoryFilterMiddleware::class)])
 
             // Modern layout views.
@@ -253,24 +254,28 @@ class ForumContainerRules extends AddonContainerRules
             ->rule(QuickLinksVariableProvider::class)
             ->addCall("addQuickLinkProvider", [new Reference(ReactionsQuickLinksProvider::class)]);
 
-        //Automation Rules
+        //Automation Rules (Add new ones alphabetically, please)
         $container
             ->rule(AutomationRuleService::class)
+            ->addCall("addAutomationTrigger", [DiscussionReachesScoreTrigger::class])
             ->addCall("addAutomationTrigger", [LastActiveDiscussionTrigger::class])
+            ->addCall("addAutomationTrigger", [ProfileFieldSelectionTrigger::class])
+            ->addCall("addAutomationTrigger", [ReportPostTrigger::class])
             ->addCall("addAutomationTrigger", [StaleCollectionTrigger::class])
             ->addCall("addAutomationTrigger", [StaleDiscussionTrigger::class])
-            ->addCall("addAutomationTrigger", [ProfileFieldSelectionTrigger::class])
             ->addCall("addAutomationTrigger", [TimeSinceUserRegistrationTrigger::class])
             ->addCall("addAutomationTrigger", [UserEmailDomainTrigger::class])
+
             ->addCall("addAutomationAction", [AddDiscussionToCollectionAction::class])
+            ->addCall("addAutomationAction", [AddRemoveUserRoleAction::class])
             ->addCall("addAutomationAction", [AddTagToDiscussionAction::class])
             ->addCall("addAutomationAction", [BumpDiscussionAction::class])
             ->addCall("addAutomationAction", [CloseDiscussionAction::class])
+            ->addCall("addAutomationAction", [CreateEscalationAction::class])
             ->addCall("addAutomationAction", [MoveDiscussionToCategoryAction::class])
             ->addCall("addAutomationAction", [RemoveDiscussionFromCollectionAction::class])
             ->addCall("addAutomationAction", [RemoveDiscussionFromTriggerCollectionAction::class])
-            ->addCall("addAutomationAction", [UserFollowCategoryAction::class])
-            ->addCall("addAutomationAction", [AddRemoveUserRoleAction::class]);
+            ->addCall("addAutomationAction", [UserFollowCategoryAction::class]);
 
         //Escalation Automation Rules
         $container

@@ -23,6 +23,7 @@ export function usePostReactionsContext() {
     return useContext(PostReactionsContext);
 }
 
+// TODO : FIX ME from making so many requests
 export function PostReactionsProvider(props: PropsWithChildren<IPostRecord>) {
     const { children, ...record } = props;
     const { reactionLog, refetchLog } = useReactionLog(record);

@@ -118,7 +118,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
                     "documentID" => $result["recordID"],
                     "url" => $result["url"],
                     "title" => $result["name"],
-                    "summary" => $result->getBody(),
+                    "summary" => $result["body"],
                     "hidden" => false,
                 ];
             }

@@ -776,9 +776,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
     {
         $tableName = $this->tableName();
         if ($this->indexExists($tableName, $indexName)) {
-            $db = $this->Database;
             $px = $this->Database->DatabasePrefix;
-            $db->query("DROP INDEX `$indexName` ON " . $px . $tableName . " ALGORITHM = INPLACE LOCK = NONE");
+            $this->executeQuery("DROP INDEX `$indexName` ON " . $px . $tableName . " ALGORITHM = INPLACE LOCK = NONE");
         }
         return $this;
     }

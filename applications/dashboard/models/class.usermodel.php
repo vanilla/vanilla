@@ -45,6 +45,7 @@ use Vanilla\Logging\AuditLogger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\Model;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Permissions;
 use Vanilla\Scheduler\LongRunner;
@@ -628,7 +629,7 @@ class UserModel extends Gdn_Model implements
     }
 
     /**
-     * Check whether a user has access to view discussions in a particular category.
+     * Check whether a user has access to view element in a particular category.
      *
      * @param int $userID
      * @param int $categoryID
@@ -644,7 +645,7 @@ class UserModel extends Gdn_Model implements
             $permission = "Vanilla.Discussions.View";
         }
 
-        if (empty($userID) || empty($categoryID)) {
+        if (empty($categoryID)) {
             return false;
         }
         $category = CategoryModel::categories($categoryID);
@@ -1742,7 +1743,7 @@ class UserModel extends Gdn_Model implements
      *
      * @param int[] $userIDs
      *
-     * @return array[]
+     * @return array<int, UserFragment>
      */
     public function getUserFragments(array $userIDs): array
     {
@@ -1778,12 +1779,16 @@ class UserModel extends Gdn_Model implements
                     setValue("Name", $user, "Unknown");
                 }
             }
-
+            $hasFullProfileViewPermission = $this->session->checkPermission(
+                ["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete", "Garden.PersonalInfo.View"],
+                false
+            );
             $user = !empty($user)
-                ? new UserFragment($user)
+                ? new UserFragment($user, $hasFullProfileViewPermission)
                 : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
             $userFragments[$userID] = $user;
         }
+
         return $userFragments;
     }
 
@@ -2256,7 +2261,11 @@ class UserModel extends Gdn_Model implements
                 throw new NoResultsException("No user found for ID: " . $id);
             }
         } else {
-            $userFragment = new UserFragment($record);
+            $hasFullProfileViewPermission = $this->session->checkPermission(
+                ["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete", "Garden.PersonalInfo.View"],
+                false
+            );
+            $userFragment = new UserFragment($record, $hasFullProfileViewPermission);
         }
         return $userFragment;
     }
@@ -3610,6 +3619,8 @@ class UserModel extends Gdn_Model implements
 
         $result = ArrayUtils::camelCase($row);
 
+        $result["url"] = $this->getProfileUrl($result);
+
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
             $result["canonicalID"] = "user_{$result["userID"]}";
             $result["excerpt"] = "";
@@ -3623,11 +3634,8 @@ class UserModel extends Gdn_Model implements
         if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
             $aiConfig = AiSuggestionSourceService::aiSuggestionConfigs();
             if ($aiConfig["enabled"]) {
-                $result["suggestAnswers"] = $this->userMetaModel->getUserMeta(
-                    $result["userID"],
-                    "SuggestAnswers",
-                    true
-                )["SuggestAnswers"];
+                $aiSuggestion = Gdn::getContainer()->get(AiSuggestionSourceService::class);
+                $result["suggestAnswers"] = $aiSuggestion->checkIfUserHasEnabledAiSuggestions($userID);
             }
         }
         return $result;
@@ -4283,10 +4291,7 @@ class UserModel extends Gdn_Model implements
                 $crawlableFields = array_keys(CrawlableRecordSchema::schema("")->getField("properties"));
                 $row = ArrayUtils::pluck(
                     $row,
-                    array_merge(
-                        ["userID", "name", "banned", "photoUrl", "dateInserted", "dateLastActive", "url"],
-                        $crawlableFields
-                    )
+                    array_merge(["userID", "name", "banned", "photoUrl", "url"], $crawlableFields)
                 );
             }
             if ($isUserPrivate) {
@@ -4445,7 +4450,34 @@ class UserModel extends Gdn_Model implements
      * @param int|bool $offset Offset for result rows.
      * @return Gdn_DataSet
      */
-    public function searchByName($name, $sortField = "name", $sortDirection = "asc", $limit = false, $offset = false)
+    public function searchByName(
+        $name,
+        $sortField = "name",
+        $sortDirection = "asc",
+        $limit = false,
+        $offset = false
+    ): Gdn_DataSet {
+        $results = $this->queryByName(
+            $name,
+            [],
+            options: [
+                Model::OPT_ORDER => $sortField,
+                Model::OPT_DIRECTION => $sortDirection,
+                Model::OPT_LIMIT => $limit,
+                Model::OPT_OFFSET => $offset,
+            ]
+        )->get();
+        return $results;
+    }
+
+    /**
+     * @param string $name
+     * @param array $where
+     * @param array $options
+     *
+     * @return Gdn_SQLDriver
+     */
+    public function queryByName(string $name, array $where = [], array $options = []): Gdn_SQLDriver
     {
         $wildcardSearch = substr($name, -1, 1) === "*";
 
@@ -4453,24 +4485,24 @@ class UserModel extends Gdn_Model implements
         $name = trim($name);
 
         // Avoid potential pollution by resetting.
-        $this->SQL->reset();
-        $this->SQL->from("User");
-        if ($wildcardSearch) {
-            $name = $this->escapeField($name);
-            $name = rtrim($name, "*");
-            $this->SQL
-                ->where("Name", $name)
-                ->orOp()
-                ->like("Name", $name, "right");
-        } else {
-            $this->SQL->where("Name", $name);
+        $sql = $this->createSql();
+        $sql->from("User u");
+
+        if (!empty($name)) {
+            if ($wildcardSearch) {
+                $name = $this->escapeField($name);
+                $name = rtrim($name, "*");
+                $sql->where("u.Name", $name)
+                    ->orOp()
+                    ->like("u.Name", $name, "right");
+            } else {
+                $sql->where("u.Name", $name);
+            }
         }
-        $result = $this->SQL
-            ->where("Deleted", 0)
-            ->orderBy($sortField, $sortDirection)
-            ->limit($limit, $offset)
-            ->get();
-        return $result;
+        $sql->where("u.Deleted", 0)
+            ->where($where)
+            ->applyModelOptions($options);
+        return $sql;
     }
 
     /**

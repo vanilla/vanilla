@@ -11,10 +11,12 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Database\CallbackWhereExpression;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Models\CommunityManagement\CommunityManagementRecordModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
+use Vanilla\Forum\Models\CommunityManagement\ReportModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Forum\Models\VanillaEscalationAttachmentProvider;
 use Vanilla\Models\FormatSchema;
@@ -37,7 +39,9 @@ class EscalationsApiController extends \AbstractApiController
         private ReportsApiController $reportsApiController,
         private ReportReasonModel $reportReasonModel,
         private \CommentModel $commentModel,
-        private FormatService $formatService
+        private FormatService $formatService,
+        private \UserModel $userModel,
+        private ReportModel $reportModel
     ) {
     }
 
@@ -139,6 +143,75 @@ class EscalationsApiController extends \AbstractApiController
     }
 
     /**
+     * @param array $query
+     * @return Data
+     */
+    public function get_lookupAssignee(array $query)
+    {
+        $this->permission(["posts.moderate", "community.moderate"]);
+
+        $in = Schema::parse([
+            "name:s?" => [
+                "default" => "",
+            ],
+            "page:i?" => [
+                "default" => 1,
+                "minimum" => 1,
+            ],
+            "limit:i?" => [
+                "default" => 30,
+                "minimum" => 1,
+                "maximum" => ApiUtils::getMaxLimit(),
+            ],
+            "escalationID:i?",
+        ]);
+        $out = Schema::parse([
+            ":a" => $this->getUserFragmentSchema(),
+        ]);
+
+        $query = $in->validate($query);
+        [$offset, $limit] = ApiUtils::offsetLimit($query);
+
+        $escalationID = $query["escalationID"] ?? null;
+        if ($escalationID !== null) {
+            // Make sure the escalation exists and we have permission to see it.
+            $escalation = $this->getEscalation($escalationID);
+        }
+
+        // Now we need to get all the roleIDs that would have access to this (or any if no escalationID) escalation.
+        $where = [
+            new CallbackWhereExpression(function (\Gdn_SQLDriver $sql) use ($escalationID) {
+                $validRoleIDs = $this->escalationsModel->selectRoleIDsCanViewEscalation($escalationID);
+
+                // Now join userRole and filter the list.
+                $sql->distinct()
+                    ->leftJoin("UserRole ur", "u.UserID = ur.UserID")
+                    ->where("ur.RoleID", $validRoleIDs);
+            }),
+        ];
+
+        $rows = $this->userModel
+            ->queryByName($query["name"], $where, [
+                Model::OPT_ORDER => "-dateLastActive",
+                Model::OPT_LIMIT => $limit,
+                Model::OPT_OFFSET => $offset,
+            ])
+            ->get()
+            ->resultArray();
+
+        foreach ($rows as &$row) {
+            $row = $this->userModel->normalizeRow($row);
+        }
+
+        $this->userModel->filterPrivateUserRecord($rows);
+        $result = $out->validate($rows);
+
+        $paging = ApiUtils::morePagerInfo($result, "/api/v2/users/names", $query, $in);
+
+        return new Data($result, ["paging" => $paging]);
+    }
+
+    /**
      * POST /api/v2/escalations
      *
      * @param array $body
@@ -196,6 +269,8 @@ class EscalationsApiController extends \AbstractApiController
         if (isset($body["initialCommentFormat"]) && isset($body["initialCommentBody"])) {
             $this->formatService->filter($body["initialCommentBody"], $body["initialCommentFormat"]);
         }
+
+        $this->reportModel->dispatchSpamEventFromReport($report);
 
         $escalationID = $this->escalationsModel->insert([
             "name" => $body["name"],

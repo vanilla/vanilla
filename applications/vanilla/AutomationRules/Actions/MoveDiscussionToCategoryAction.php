@@ -15,16 +15,24 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
 use Gdn;
-use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
-use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
 use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
+use Vanilla\Models\DiscussionInterface;
 
-class MoveDiscussionToCategoryAction extends AutomationAction
+/**
+ * Automation rule action to move a discussion to a specific category.
+ */
+class MoveDiscussionToCategoryAction extends AutomationAction implements DiscussionInterface
 {
     public string $affectedRecordType = "Discussion";
+
+    private int $discussionID;
+
+    private int $categoryID;
+
     /**
      * @inheridoc
      */
@@ -92,30 +100,49 @@ class MoveDiscussionToCategoryAction extends AutomationAction
      *
      * @param array $actionValue Action value.
      * @param array $object Discussion DB object to perform action on.
-     * @return void
+     * @return bool
+     * @throws ClientException
      * @throws ContainerException
      * @throws NotFoundException
      * @throws ValidationException
-     * @throws ClientException
      * @throws \Garden\Web\Exception\NotFoundException
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
+        $this->setDiscussionID($object["DiscussionID"]);
+        $this->setCategoryID($actionValue["categoryID"]);
+
+        return $this->execute();
+    }
+
+    /**
+     * Execute the action.
+     *
+     * @return bool
+     * @throws ClientException
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws \Garden\Web\Exception\NotFoundException
+     * @throws NoResultsException
+     */
+    public function execute(): bool
+    {
         $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
-        $discussion = $discussionModel->getID($object["DiscussionID"], DATASET_TYPE_ARRAY);
+        $discussion = $discussionModel->getID($this->getDiscussionID(), DATASET_TYPE_ARRAY);
         $currentCategoryID = $discussion["CategoryID"];
-        if ($currentCategoryID === $actionValue["categoryID"]) {
+        if ($currentCategoryID === $this->getCategoryID()) {
             return false;
         }
-        $discussionModel->moveDiscussion($object["DiscussionID"], $actionValue["categoryID"], true);
+        $discussionModel->moveDiscussion($this->getDiscussionID(), $this->getCategoryID(), true);
         $logData = [
             "moveDiscussion" => [
-                "recordID" => $object["DiscussionID"],
+                "recordID" => $this->getDiscussionID(),
                 "fromCategoryID" => $currentCategoryID,
-                "toCategoryID" => $actionValue["categoryID"],
+                "toCategoryID" => $this->categoryID,
             ],
         ];
-        $this->insertPostLog($object["DiscussionID"], $logData);
+        $this->insertPostLog($this->getDiscussionID(), $logData);
         return true;
     }
 
@@ -179,5 +206,42 @@ class MoveDiscussionToCategoryAction extends AutomationAction
 
         $result .= "</div>";
         return $result;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function setDiscussionID(int $discussionID): void
+    {
+        $this->discussionID = $discussionID;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function getDiscussionID(): int
+    {
+        return $this->discussionID;
+    }
+
+    /**
+     * Set category ID.
+     *
+     * @param int $categoryID
+     * @return void
+     */
+    private function setCategoryID(int $categoryID): void
+    {
+        $this->categoryID = $categoryID;
+    }
+
+    /**
+     * Get category ID.
+     *
+     * @return int
+     */
+    private function getCategoryID(): int
+    {
+        return $this->categoryID;
     }
 }

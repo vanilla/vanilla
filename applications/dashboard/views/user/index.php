@@ -22,7 +22,7 @@ helpAsset(
 );
 helpAsset(
     t("Need More Help?"),
-    anchor(t("Managing Users"), "https://success.vanillaforums.com/kb/articles/27-moderation-overview#managing-users")
+    anchor(t("Managing Users"), "https://success.vanillaforums.com/kb/articles/1474-manage-users")
 );
 
 if (checkPermission("Garden.Users.Add")) {

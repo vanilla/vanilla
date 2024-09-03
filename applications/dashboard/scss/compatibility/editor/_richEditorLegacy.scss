@@ -13,10 +13,6 @@ $richEditor_innerPadding: 12px !default;
         margin: 0;
     }
 
-    .richEditorParagraphMenu {
-        left: 0;
-    }
-
     &.isDisabled {
         // Before React has replaced initial HTML
         &,

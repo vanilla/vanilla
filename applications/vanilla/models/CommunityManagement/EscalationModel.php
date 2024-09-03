@@ -66,7 +66,8 @@ class EscalationModel extends PipelineModel
         private UserModel $userModel,
         private DiscussionModel $discussionModel,
         private CommentModel $commentModel,
-        private EventManager $eventManager
+        private EventManager $eventManager,
+        private \PermissionModel $permissionModel
     ) {
         parent::__construct("escalation");
 
@@ -86,6 +87,34 @@ class EscalationModel extends PipelineModel
     private function attachmentService(): AttachmentService
     {
         return \Gdn::getContainer()->get(AttachmentService::class);
+    }
+
+    /**
+     * Get all the roleIDs that can view an escalation.
+     *
+     * @param ?int $escalationID If null, this will filter users that can view any escalation.
+     * @return array
+     */
+    public function selectRoleIDsCanViewEscalation(?int $escalationID): array
+    {
+        $categoryID = null;
+        if ($escalationID !== null) {
+            $escalation = $this->selectSingle(["escalationID" => $escalationID]);
+
+            if (!$escalation["placeRecordType"] === "category") {
+                throw new ServerException("Only category escalations are currently supported.");
+            }
+            $categoryID = $escalation["placeRecordID"];
+        }
+
+        $categoryModRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission(
+            "posts.moderate",
+            \CategoryModel::PERM_JUNCTION_TABLE,
+            $categoryID
+        );
+        $globalModRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission("community.moderate");
+
+        return array_unique(array_merge($categoryModRoleIDs, $globalModRoleIDs));
     }
 
     /**

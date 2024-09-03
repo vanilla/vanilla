@@ -33,6 +33,64 @@ class EscalationsTest extends AbstractAPIv2Test
     }
 
     /**
+     * This test is first so we don't have any extra users we have to worry about.
+     *
+     * @return void
+     */
+    public function testLookupAssignee(): void
+    {
+        $globalMod1 = $this->createGlobalMod(["name" => "Adam Global Mod"]);
+        $globalMod2 = $this->createGlobalMod(["name" => "Adam Other Global Mod"]);
+        $cat = $this->createCategory(["name" => "My Category"]);
+        $catMod = $this->createCategoryMod($cat, ["name" => "Adam Cat Mod"]);
+        $regularUser = $this->createUser(["name" => "Adam Member"]);
+        $post = $this->createDiscussion();
+        $escalation = $this->createEscalation($post);
+
+        $cat2 = $this->createCategory(["name" => "Other Category"]);
+        $cat2Mod = $this->createCategoryMod($cat2, ["name" => "Adam Other Cat Mod"]);
+
+        // If we don't pass the escalationID it will pull all people that could have an escalation.
+        $this->assertApiResults(
+            "/escalations/lookup-assignee",
+            ["name" => "Adam*"],
+            [
+                "name" => [$globalMod1["name"], $globalMod2["name"], $catMod["name"], $cat2Mod["name"]],
+            ]
+        );
+
+        // We don't have to pass a name to this endpoint.
+        $this->assertApiResults(
+            "/escalations/lookup-assignee",
+            [
+                "escalationID" => $escalation["escalationID"],
+            ],
+            [
+                // Global Admins are included too
+                "name" => [$globalMod1["name"], $globalMod2["name"], $catMod["name"], "System", "circleci"],
+            ]
+        );
+
+        // Wildcard name match
+        $this->assertApiResults(
+            "/escalations/lookup-assignee",
+            ["name" => "Adam*", "escalationID" => $escalation["escalationID"]],
+            [
+                "name" => [$globalMod1["name"], $globalMod2["name"], $catMod["name"]],
+            ]
+        );
+
+        // Exact name match
+        $this->assertApiResults(
+            "/escalations/lookup-assignee",
+            ["name" => "Adam Global Mod", "escalationID" => $escalation["escalationID"]],
+            [
+                "name" => [$globalMod1["name"]],
+            ]
+        );
+    }
+
+    /**
      * Test that we can create an escalation from one or more reports.
      */
     public function testCreateEscalationsFromReports(): void

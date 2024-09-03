@@ -57,7 +57,7 @@ class EscalationActivity extends Activity
      */
     public static function getProfileHeadline(): ?string
     {
-        return "%1\$s has been escalated!";
+        return "%1\$s has been escalated.";
     }
 
     /**
@@ -65,7 +65,7 @@ class EscalationActivity extends Activity
      */
     public static function getFullHeadline(): ?string
     {
-        return "%1\$s has been escalated!";
+        return "%1\$s has been escalated.";
     }
 
     /**

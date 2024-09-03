@@ -1082,6 +1082,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      * @param int|string $discussionID Identifier of the discussion.
      *
      * @throws notFoundException
+     * @throws Gdn_UserException
      */
     protected function _discussionOptions($sender, $discussionID)
     {
@@ -1611,6 +1612,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      *
      * @param CommentModel $sender Sending controller instance.
      * @param array $args Event arguments.
+     * @throws Exception
      */
     public function base_afterSaveComment_handler($sender, $args)
     {

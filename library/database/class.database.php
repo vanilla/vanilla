@@ -12,6 +12,7 @@
 use Garden\EventManager;
 use Garden\Schema\Schema;
 use Vanilla\InjectableInterface;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\Spans\AbstractSpan;
 use Vanilla\Utility\StringUtils;
 
@@ -573,6 +574,9 @@ class Gdn_Database implements InjectableInterface
                         $this->closeConnection();
                         continue;
                     } else {
+                        if (DebugUtils::isTestMode()) {
+                            $message .= "\nFrom Query:\n" . $sql;
+                        }
                         throw new Gdn_UserException($message, $code, $pex);
                     }
                 } catch (Exception $ex) {

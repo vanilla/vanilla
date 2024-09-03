@@ -14,7 +14,7 @@ import { mockRolesState } from "@dashboard/components/panels/MembersSearchFilter
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import { createReducer } from "@reduxjs/toolkit";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import { AutomationRulesPreview } from "@dashboard/automationRules/preview/AutomationRulesPreview";
+import { AutomationRulesPreviewModal } from "@dashboard/automationRules/preview/AutomationRulesPreviewModal";
 import {
     EMPTY_AUTOMATION_RULE_FORM_VALUES,
     convertTimeIntervalToApiValues,
@@ -125,7 +125,13 @@ describe("AutomationRules Preview", () => {
         expect(expectedContent).toBeDefined();
     });
     it("Preview - no trigger values, should show the relevant message", async () => {
-        renderInProvider(<AutomationRulesPreview formValues={EMPTY_AUTOMATION_RULE_FORM_VALUES} isVisible={true} />);
+        renderInProvider(
+            <AutomationRulesPreviewModal
+                formValues={EMPTY_AUTOMATION_RULE_FORM_VALUES}
+                isVisible={true}
+                schema={{ properties: {} }}
+            />,
+        );
         const modal = await screen.findByRole("dialog");
         expect(modal).toBeInTheDocument();
 
@@ -140,7 +146,7 @@ describe("AutomationRules Preview", () => {
     it("Preview - no content, should show the relevant message", async () => {
         mockAdapter.onGet("/users?expand=profileFields").reply(200, [], {});
         renderInProvider(
-            <AutomationRulesPreview formValues={mapApiValuesToFormValues(mockRecipesList[2])} isVisible={true} />,
+            <AutomationRulesPreviewModal formValues={mapApiValuesToFormValues(mockRecipesList[2])} isVisible={true} />,
         );
         const modal = await screen.findByRole("dialog");
         expect(modal).toBeInTheDocument();

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import path from "path";
+import path, { dirname, join } from "path";
 import fs from "fs";
 import { globbySync } from "globby";
 import type { StorybookConfig } from "@storybook/react-vite";
@@ -52,12 +52,6 @@ const config: StorybookConfig = {
     addons: [
         {
             name: "@storybook/addon-essentials",
-            options: {
-                actions: false,
-                backgrounds: false,
-                toolbars: false,
-                controls: false,
-            },
         },
     ],
 
@@ -73,11 +67,13 @@ const config: StorybookConfig = {
         return finalConfig;
     },
 
-    framework: "@storybook/react-vite",
+    framework: getAbsolutePath("@storybook/react-vite"),
 
-    docs: {
-        autodocs: false,
-    },
+    docs: {},
 };
 
 export default config;
+
+function getAbsolutePath(value: string): any {
+    return dirname(require.resolve(join(value, "package.json")));
+}

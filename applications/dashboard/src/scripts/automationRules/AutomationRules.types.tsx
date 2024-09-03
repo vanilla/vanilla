@@ -13,18 +13,21 @@ import { JsonSchema } from "@vanilla/json-schema-forms";
 import { IGetReportsForAutomationRulesParams } from "@dashboard/automationRules/preview/AutomationRulesPreviewReportedPostsContent";
 
 export type AutomationRuleTriggerType =
+    | "discussionReachesScoreTrigger"
     | "emailDomainTrigger"
     | "ideationVoteTrigger"
+    | "lastActiveDiscussionTrigger"
+    | "postSentimentTrigger"
     | "profileFieldTrigger"
     | "reportPostTrigger"
     | "staleDiscussionTrigger"
     | "staleCollectionTrigger"
-    | "lastActiveDiscussionTrigger"
-    | "timeSinceUserRegistrationTrigger";
+    | "timeSinceUserRegistrationTrigger"
+    | "unAnsweredQuestionTrigger";
 export type AutomationRuleActionType =
+    | "addDiscussionToCollectionAction"
     | "addRemoveRoleAction"
     | "addTagAction"
-    | "addToCollectionAction"
     | "bumpDiscussionAction"
     | "categoryFollowAction"
     | "changeIdeationStatusAction"
@@ -32,6 +35,8 @@ export type AutomationRuleActionType =
     | "createEscalationAction"
     | "escalateGithubIssueAction"
     | "escalateToZendeskAction"
+    | "escalateSalesforceCaseAction"
+    | "escalateSalesforceLeadAction"
     | "moveToCategoryAction"
     | "removeDiscussionFromCollectionAction"
     | "removeDiscussionFromTriggerCollectionAction";
@@ -155,4 +160,17 @@ export type AutomationRulePreviewQuery =
     | IGetUsersQueryParams
     | IGetDiscussionListParams
     | IGetCollectionResourcesParams
-    | IGetReportsForAutomationRulesParams;
+    | IGetReportsForAutomationRulesParams
+    | CommentsApi.IndexParams;
+
+export type AutomationRulesPreviewContent = Record<
+    string,
+    {
+        component: React.ComponentType<{
+            query: AutomationRulePreviewQuery;
+            fromStatusToggle?: boolean;
+            onPreviewContentLoad?: (emptyResult: boolean) => void;
+        }>;
+        queryBuilder: (apiValues: AddEditAutomationRuleParams) => AutomationRulePreviewQuery;
+    }
+>;

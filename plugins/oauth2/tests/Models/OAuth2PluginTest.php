@@ -9,6 +9,7 @@ namespace Vanilla\OAuth2\Tests\Models;
 
 use Firebase\JWT\JWT;
 use Garden\Web\Exception\ResponseException;
+use Gdn;
 use Gdn_CookieIdentity;
 use PHPUnit\Framework\TestCase;
 use UserAuthenticationNonceModel;
@@ -107,12 +108,14 @@ class OAuth2PluginTest extends SiteTestCase
             });
             $this->config = $config;
         });
-
+        Gdn::sql()->truncate("UserAuthenticationNonce");
+        Gdn::sql()->truncate("UserAuthenticationToken");
+        Gdn::sql()->truncate("UserAuthentication");
         // Re-run the structure because some tests assert fixing of the structure.
         $this->providerModel->delete([
             \Gdn_AuthenticationProviderModel::COLUMN_ALIAS => $this->oauth2Plugin->getProviderKey(),
         ]);
-        //        \Gdn::sql()->truncate('Gdn_UserAuthentication');
+
         $this->oauth2Plugin->structure();
         $this->providers = [];
         $this->testAccessCode = "code" . self::id();
@@ -143,6 +146,7 @@ class OAuth2PluginTest extends SiteTestCase
                 "AllowAccessTokens" => true,
                 "PostProfileRequest" => false,
                 "isOidc" => true,
+                "markVerified" => true,
                 "AcceptedScope" => "openid",
             ];
             if ($defaultFirst && $id === self::CLIENT_ID1) {
@@ -156,8 +160,10 @@ class OAuth2PluginTest extends SiteTestCase
 
     /**
      * Set up the default single provider.
+     *
+     * @var bool $markVerified
      */
-    private function setupSingleProvider()
+    private function setupSingleProvider(bool $markVerified = false)
     {
         // Give the single provider a key that is different than the default.
         $provider = \Gdn_AuthenticationProviderModel::getProviderByScheme($this->oauth2Plugin->getProviderKey());
@@ -170,6 +176,7 @@ class OAuth2PluginTest extends SiteTestCase
                 "BasicAuthToken" => true,
                 "PostProfileRequest" => true,
                 "isOidc" => true,
+                "markVerified" => $markVerified,
                 "AssociationSecret" => "secret$id",
                 "AuthorizeUrl" => "https://example.com/$id/authorize",
                 "TokenUrl" => "https://example.com/$id/token",
@@ -456,6 +463,71 @@ class OAuth2PluginTest extends SiteTestCase
             $this->assertIsArray($auth, "The GDN_UserAuthentication entry was not found or incorrect.");
             $private = $this->userModel->getAttribute($user1["userID"], "Private");
             $this->assertSame(true, $private);
+            $user = $this->userModel->getID($user1["userID"], DATASET_TYPE_ARRAY);
+            $this->assertSame(1, $user["Confirmed"]);
+            $this->assertSame(1, $user["Verified"]);
+        }
+    }
+
+    /**
+     * Test the Post return URL that goes from `/entry/oauth2` -> `/entry/connect/oauth2`.
+     * And Keep existing attributes from loosing.
+     *
+     */
+    public function testAssertReturnPostUrlFlowKeepsAttributesNewUser(): void
+    {
+        $this->setupSingleProvider(true);
+        $user1 = ["name" => "AnotherTest_NewUser", "email" => "AnotherTest_NewUser@test.com"];
+        \Gdn::session()->end();
+        $clientID = self::CLIENT_ID_SINGLE;
+        $this->createProviderProxyRequestMock($clientID);
+        $nonceModel = new UserAuthenticationNonceModel();
+        $nonce = uniqid("oidc_", true);
+        $nonceModel->insert(["Nonce" => $nonce, "Token" => "OIDC_Nonce"]);
+
+        $id_token = [
+            "name" => $user1["name"],
+            "nickname" => $user1["name"],
+            "picture" => "",
+            "updated_at" => "2022-06-07T15:44:54.927Z",
+            "email" => $user1["email"],
+            "email_verified" => false,
+            "verified" => false,
+            "iss" => "https://dev-hs9tepb0.us.auth0.com/",
+            "sub" => "auth0|628fd38ff9d32a006f9103c5",
+            "aud" => "zZBr4ZgdS9uyPPy2JawQLFkTenpyO1wm",
+            "iat" => 1654702587,
+            "exp" => 1654738587,
+            "at_hash" => "opjf1cVoRvev9Xkva-_mDg",
+            "c_hash" => "-oJlLqf-wCs_r2OMf-NW4Q",
+            "nonce" => $nonce,
+        ];
+
+        $idToken = JWT::encode($id_token, "", Gdn_CookieIdentity::JWT_ALGORITHM);
+        $this->config->set("Garden.Registration.AutoConnect", true);
+        try {
+            $this->bessy()->post("/entry/" . $this->oauth2Plugin->getProviderKey(), [
+                "code" => $this->testAccessCode,
+                "state" => $this->generateState($clientID),
+                "id_token" => $idToken,
+            ]);
+        } catch (ResponseException $ex) {
+            // 2. Our OAuth implementation then redirects to `/entry/connect/oauth2`.
+            $response = $ex->getResponse();
+            $this->assertSame(302, $response->getStatus());
+            $location = new Request($response->getHeader("Location"));
+            $this->assertSubpath("/entry/connect/" . $this->oauth2Plugin->getProviderKey(), $location->getPath());
+
+            // 3. Simulate the browser requesting the redirected URL.
+            $controller = $this->bessy()->get($this->stripWebRoot($location->getPath()), $location->getQuery());
+
+            // 4. The user should be signed in.
+            $this->assertTrue(\Gdn::session()->isValid(), "The user was not signed into Vanilla.");
+            $auth = \Gdn::userModel()->getAuthenticationByUser(\Gdn::session()->UserID, $clientID);
+            $this->assertIsArray($auth, "The GDN_UserAuthentication entry was not found or incorrect.");
+            $user = $this->userModel->getID(\Gdn::session()->UserID, DATASET_TYPE_ARRAY);
+            $this->assertSame(0, $user["Confirmed"]);
+            $this->assertSame(0, $user["Verified"]);
         }
     }
 

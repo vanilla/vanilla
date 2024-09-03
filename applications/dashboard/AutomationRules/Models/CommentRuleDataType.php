@@ -10,6 +10,8 @@ namespace Vanilla\Dashboard\AutomationRules\Models;
 use EscalateGithubIssueAction;
 use EscalateToZendeskAction;
 use SentimentAnalysis\Triggers\PostSentimentTrigger;
+use Vanilla\Salesforce\Action\EscalateSalesforceCaseAction;
+use Vanilla\Salesforce\Action\EscalateSalesforceLeadAction;
 
 /**
  * Every recipe that can be applied to a comment.
@@ -31,6 +33,11 @@ class CommentRuleDataType extends RuleDataType
      */
     protected function getAllActionsClasses(): array
     {
-        return [EscalateGithubIssueAction::class, EscalateToZendeskAction::class];
+        return [
+            EscalateGithubIssueAction::class,
+            EscalateToZendeskAction::class,
+            EscalateSalesforceLeadAction::class,
+            EscalateSalesforceCaseAction::class,
+        ];
     }
 }

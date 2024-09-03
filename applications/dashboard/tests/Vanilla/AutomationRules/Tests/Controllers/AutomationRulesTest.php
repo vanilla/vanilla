@@ -6,6 +6,7 @@
 
 namespace VanillaTests\AutomationRules\APIv2;
 
+use Exception;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Vanilla\AutomationRules\Actions\BumpDiscussionAction;
 use Garden\Container\ContainerException;
@@ -148,7 +149,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "When enabled, this rule will only be applied to new content that meets the trigger criteria.",
                     "label" => "Apply to new content only",
                     "inputType" => "checkBox",
-                    "labelType" => "none",
+                    "labelType" => null,
                 ],
             ],
             "triggerTimeLookBackLimit" => [
@@ -209,6 +210,78 @@ class AutomationRulesTest extends AbstractAPIv2Test
             ],
             "required" => ["triggerTimeDelay", "postType", "additionalSettings"],
         ];
+
+        $staleDiscussionSchema = $timeTriggerSchema;
+        $staleDiscussionSchema["properties"] = array_merge($staleDiscussionSchema["properties"], [
+            "categoryID" => [
+                "required" => false,
+                "type" => "array",
+                "items" => ["type" => "integer"],
+                "x-control" => [
+                    "description" => "",
+                    "label" => "Category",
+                    "inputType" => "dropDown",
+                    "placeholder" => "",
+                    "choices" => [
+                        "api" => [
+                            "searchUrl" => "/api/v2/categories/search?query=%s&limit=30",
+                            "singleUrl" => "/api/v2/categories/%s",
+                            "valueKey" => "categoryID",
+                            "labelKey" => "name",
+                            "extraLabelKey" => null,
+                        ],
+                    ],
+                    "multiple" => true,
+                    "tooltip" => "",
+                ],
+            ],
+            "includeSubcategories" => [
+                "required" => false,
+                "type" => "boolean",
+                "x-control" => [
+                    "description" => "Include discussions from subcategories of the chosen category.",
+                    "label" => "Include Subcategories",
+                    "inputType" => "checkBox",
+                    "labelType" => null,
+                    "conditions" => [
+                        [
+                            "field" => "trigger.triggerValue",
+                            "type" => "object",
+                            "properties" => [
+                                "categoryID" => [
+                                    "type" => "array",
+                                    "items" => ["type" => "integer"],
+                                    "minItems" => 1,
+                                ],
+                            ],
+                            "required" => ["categoryID"],
+                        ],
+                    ],
+                ],
+            ],
+            "tagID" => [
+                "type" => "array",
+                "items" => ["type" => "integer"],
+                "required" => false,
+                "x-control" => [
+                    "description" => "Select one or more tags",
+                    "label" => "Tag",
+                    "inputType" => "dropDown",
+                    "placeholder" => "",
+                    "choices" => [
+                        "api" => [
+                            "searchUrl" => "/api/v2/tags?type=User&limit=30&query=%s",
+                            "singleUrl" => "/api/v2/tags/%s",
+                            "valueKey" => "tagID",
+                            "labelKey" => "name",
+                            "extraLabelKey" => null,
+                        ],
+                    ],
+                    "multiple" => true,
+                    "tooltip" => "",
+                ],
+            ],
+        ]);
         $triggers = [
             "emailDomainTrigger" => [
                 "triggerType" => "emailDomainTrigger",
@@ -271,16 +344,17 @@ class AutomationRulesTest extends AbstractAPIv2Test
             ],
             "staleDiscussionTrigger" => [
                 "triggerType" => "staleDiscussionTrigger",
-                "name" => "Time since a post has no comments",
+                "name" => "Time since post has had no comments",
                 "triggerActions" => [
-                    "addToCollectionAction",
+                    "addDiscussionToCollectionAction",
                     "addTagAction",
                     "bumpDiscussionAction",
                     "closeDiscussionAction",
                     "moveToCategoryAction",
                     "removeDiscussionFromCollectionAction",
+                    "createEscalationAction",
                 ],
-                "schema" => $timeTriggerSchema,
+                "schema" => $staleDiscussionSchema,
                 "contentType" => "posts",
             ],
             "staleCollectionTrigger" => [
@@ -302,9 +376,9 @@ class AutomationRulesTest extends AbstractAPIv2Test
             ],
             "lastActiveDiscussionTrigger" => [
                 "triggerType" => "lastActiveDiscussionTrigger",
-                "name" => "Time since post had no activity",
+                "name" => "Time since post has had no activity",
                 "triggerActions" => [
-                    "addToCollectionAction",
+                    "addDiscussionToCollectionAction",
                     "addTagAction",
                     "bumpDiscussionAction",
                     "closeDiscussionAction",
@@ -328,6 +402,62 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 ],
                 "contentType" => "users",
             ],
+            "discussionReachesScoreTrigger" => [
+                "triggerType" => "discussionReachesScoreTrigger",
+                "name" => "Post receives a minimum of points",
+                "triggerActions" => [
+                    "addDiscussionToCollectionAction",
+                    "addTagAction",
+                    "bumpDiscussionAction",
+                    "closeDiscussionAction",
+                    "moveToCategoryAction",
+                    "removeDiscussionFromCollectionAction",
+                ],
+                "schema" => [
+                    "type" => "object",
+                    "properties" => [
+                        "score" => [
+                            "type" => "integer",
+                            "minimum" => 1,
+                            "step" => 1,
+                            "x-control" => [
+                                "description" =>
+                                    "Enter the total number of points the post should receive to trigger the rule.",
+                                "label" => "Points",
+                                "inputType" => "textBox",
+                                "placeholder" => "",
+                                "type" => "number",
+                                "tooltip" => "",
+                            ],
+                            "required" => true,
+                        ],
+                        "postType" => [
+                            "type" => "array",
+                            "items" => [
+                                "type" => "string",
+                            ],
+                            "default" => ["discussion"],
+                            "enum" => ["discussion"],
+                            "x-control" => [
+                                "description" => "",
+                                "label" => "Post Type",
+                                "inputType" => "dropDown",
+                                "placeholder" => "",
+                                "choices" => [
+                                    "staticOptions" => [
+                                        "discussion" => "Discussion",
+                                    ],
+                                ],
+                                "multiple" => true,
+                                "tooltip" => "",
+                            ],
+                            "required" => false,
+                        ],
+                    ],
+                    "required" => ["score", "postType"],
+                ],
+                "contentType" => "posts",
+            ],
             "reportPostTrigger" => [
                 "triggerType" => "reportPostTrigger",
                 "name" => "Post received reports",
@@ -350,10 +480,10 @@ class AutomationRulesTest extends AbstractAPIv2Test
                         "categoryID" => [
                             "type" => "array",
                             "items" => [
-                                "type" => "string",
+                                "type" => "integer",
                             ],
                             "x-control" => [
-                                "description" => "Select category",
+                                "description" => "",
                                 "label" => "Category",
                                 "inputType" => "dropDown",
                                 "placeholder" => "",
@@ -369,6 +499,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "multiple" => true,
                                 "tooltip" => "",
                             ],
+                            "required" => false,
                         ],
                         "includeSubcategories" => [
                             "type" => "boolean",
@@ -377,6 +508,22 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "label" => "Include Subcategories",
                                 "inputType" => "checkBox",
                                 "labelType" => null,
+                                "conditions" => [
+                                    [
+                                        "field" => "trigger.triggerValue",
+                                        "type" => "object",
+                                        "properties" => [
+                                            "categoryID" => [
+                                                "type" => "array",
+                                                "items" => [
+                                                    "type" => "integer",
+                                                ],
+                                                "minItems" => 1,
+                                            ],
+                                        ],
+                                        "required" => ["categoryID"],
+                                    ],
+                                ],
                             ],
                         ],
                         "reportReasonID" => [
@@ -385,15 +532,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "type" => "string",
                             ],
                             "default" => [],
-                            "enum" => [
-                                "abuse",
-                                "approval-required",
-                                "deceptive-misleading",
-                                "inappropriate",
-                                "rule-breaking",
-                                "spam",
-                                "spam-automation",
-                            ],
+                            "enum" => ["abuse", "deceptive-misleading", "inappropriate", "rule-breaking", "spam"],
                             "x-control" => [
                                 "description" => "",
                                 "label" => "Report Reason",
@@ -402,11 +541,9 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "choices" => [
                                     "staticOptions" => [
                                         "spam" => "Spam / Solicitation",
-                                        "approval-required" => "Approval Required",
                                         "deceptive-misleading" => "Deceptive / Misleading",
                                         "inappropriate" => "Inappropriate",
                                         "rule-breaking" => "Breaks Community Rules",
-                                        "spam-automation" => "Spam Automation",
                                         "abuse" => "Abuse",
                                     ],
                                 ],
@@ -528,7 +665,11 @@ class AutomationRulesTest extends AbstractAPIv2Test
             "moveToCategoryAction" => [
                 "actionType" => "moveToCategoryAction",
                 "name" => "Move post",
-                "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+                "actionTriggers" => [
+                    "discussionReachesScoreTrigger",
+                    "lastActiveDiscussionTrigger",
+                    "staleDiscussionTrigger",
+                ],
                 "schema" => $this->getCategorySchema(
                     "Category to move to",
                     "Category settings are respected by automation rules. Posts will only be moved into categories that accept that post type."
@@ -538,19 +679,31 @@ class AutomationRulesTest extends AbstractAPIv2Test
             "closeDiscussionAction" => [
                 "actionType" => "closeDiscussionAction",
                 "name" => "Close post",
-                "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+                "actionTriggers" => [
+                    "discussionReachesScoreTrigger",
+                    "lastActiveDiscussionTrigger",
+                    "staleDiscussionTrigger",
+                ],
                 "contentType" => "posts",
             ],
             "bumpDiscussionAction" => [
                 "actionType" => "bumpDiscussionAction",
                 "name" => "Bump post",
-                "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+                "actionTriggers" => [
+                    "discussionReachesScoreTrigger",
+                    "lastActiveDiscussionTrigger",
+                    "staleDiscussionTrigger",
+                ],
                 "contentType" => "posts",
             ],
             "addTagAction" => [
                 "actionType" => "addTagAction",
                 "name" => "Add tag",
-                "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+                "actionTriggers" => [
+                    "discussionReachesScoreTrigger",
+                    "lastActiveDiscussionTrigger",
+                    "staleDiscussionTrigger",
+                ],
                 "schema" => [
                     "type" => "object",
                     "properties" => [
@@ -583,17 +736,25 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 ],
                 "contentType" => "posts",
             ],
-            "addToCollectionAction" => [
-                "actionType" => "addToCollectionAction",
-                "name" => "Add to collection",
-                "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+            "addDiscussionToCollectionAction" => [
+                "actionType" => "addDiscussionToCollectionAction",
+                "name" => "Add Discussion To Collection",
+                "actionTriggers" => [
+                    "discussionReachesScoreTrigger",
+                    "lastActiveDiscussionTrigger",
+                    "staleDiscussionTrigger",
+                ],
                 "schema" => $this->getCollectionSchema("Collection to add to"),
                 "contentType" => "posts",
             ],
             "removeDiscussionFromCollectionAction" => [
                 "actionType" => "removeDiscussionFromCollectionAction",
                 "name" => "Remove from collection",
-                "actionTriggers" => ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+                "actionTriggers" => [
+                    "discussionReachesScoreTrigger",
+                    "lastActiveDiscussionTrigger",
+                    "staleDiscussionTrigger",
+                ],
                 "schema" => $this->getCollectionSchema("Collection to remove from"),
                 "contentType" => "posts",
             ],
@@ -1248,7 +1409,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
             ],
             "test invalid collection" => [
                 $this->modifyRecord($bodyTrigger, [
-                    "actionType" => "addToCollectionAction",
+                    "actionType" => "addDiscussionToCollectionAction",
                     "actionValue" => ["collectionID" => [25]],
                 ]),
                 "Not all collections are valid.",
@@ -1398,6 +1559,9 @@ class AutomationRulesTest extends AbstractAPIv2Test
      *
      * @param int $automationRuleID
      * @return void
+     * @throws ContainerException
+     * @throws NoResultsException
+     * @throws \Garden\Container\NotFoundException
      * @depends testPost
      */
     public function testGetRecipeWithDispatchStatus(int $automationRuleID): void
@@ -1443,6 +1607,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
      * Test for exceptions while updating a recipe
      *
      * @return void
+     * @throws Exception
      */
     public function testPatchRecipeThrowsExceptions(): void
     {
@@ -1485,10 +1650,13 @@ class AutomationRulesTest extends AbstractAPIv2Test
     }
 
     /**
-     * test update a recipe
+     * Test update a recipe
      *
      * @param int $automationRuleID
      * @return void
+     * @throws ContainerException
+     * @throws NoResultsException
+     * @throws \Garden\Container\NotFoundException
      * @depends testPost
      */
     public function testPatchRecipe(int $automationRuleID)
@@ -1518,6 +1686,9 @@ class AutomationRulesTest extends AbstractAPIv2Test
      *
      * @param int $automationRuleID
      * @return void
+     * @throws ContainerException
+     * @throws NoResultsException
+     * @throws \Garden\Container\NotFoundException
      * @depends testPost
      */
     public function testDeleteRecipe(int $automationRuleID): void
@@ -1589,5 +1760,34 @@ class AutomationRulesTest extends AbstractAPIv2Test
         $this->runWithExpectedExceptionMessage("Automation rule not found.", function () {
             $this->api()->post("automation-rules/999/trigger");
         });
+    }
+
+    /**
+     * Test that default automation rules are created when the feature is enabled for the first time
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testCreateDefaultAutomationRule()
+    {
+        $this->resetTable("automationRule");
+        $this->resetTable("automationRuleRevision");
+        $this->runWithConfig(
+            [
+                "Feature.AutomationRules.Enabled" => true,
+                "Feature.CommunityManagementBeta.Enabled" => true,
+                "Feature.escalations.Enabled" => true,
+            ],
+            function () {
+                AutomationRuleModel::structure(\Gdn::database());
+                $automationRules = $this->automationRuleModel->select([
+                    "status" => AutomationRuleModel::STATUS_INACTIVE,
+                ]);
+                $this->assertCount(3, $automationRules);
+                $defaultAutomationRules = \Gdn::config()->get("Preferences.AutomationRules.Defaults");
+                $defaultAutomationRules = json_decode($defaultAutomationRules, true);
+                $this->assertCount(3, $defaultAutomationRules);
+            }
+        );
     }
 }

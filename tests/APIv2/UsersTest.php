@@ -840,12 +840,12 @@ class UsersTest extends AbstractResourceTest
         $this->assertArrayHasKey("private", $response);
         $this->assertTrue($response["private"]);
 
-        //Now access the information as guest. Guest shouldn't be able to see it.
-        $this->api()->setUserID(0);
-        $this->expectException(ForbiddenException::class);
+        //Now access the information as guest. Guest has very limited information.
         $this->api()
             ->get("/users/{$privateUser["userID"]}")
             ->getBody();
+        $this->assertArrayHasKey("private", $response);
+        $this->assertTrue($response["private"]);
     }
 
     /**

@@ -7,7 +7,6 @@
 import { IUserFragment } from "@library/@types/api/users";
 import { userLabelClasses } from "@library/content/UserLabel.classes";
 import { t } from "@vanilla/i18n";
-import React from "react";
 
 interface IProps {
     user: IUserFragment;
@@ -17,7 +16,7 @@ export function UserTitle(props: IProps): JSX.Element | null {
     const { user } = props;
     const classes = userLabelClasses();
 
-    const { label, title } = user;
+    const { label, title } = user ?? {};
     if (user.banned) {
         return <div className={classes.rankLabel}>{t("Banned")}</div>;
     }

@@ -15,6 +15,7 @@ use Vanilla\Utility\ModelUtils;
 use VanillaTests\AuditLogTestTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\EventSpyTestTrait;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 use Garden\EventManager;
 use Vanilla\Dashboard\Events\UserEvent;
@@ -29,6 +30,7 @@ use ActivityModel;
 class UserModelTest extends SiteTestCase
 {
     use EventSpyTestTrait;
+    use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait {
         createUser as protected createUserByApi;
     }
@@ -1279,8 +1281,25 @@ class UserModelTest extends SiteTestCase
      */
     public function testCategoryViewPermission()
     {
-        $viewPermission = $this->userModel->getCategoryViewPermission(0, 2);
+        $category = $this->createCategory(["CustomPermissions" => true]);
+        $viewPermission = $this->userModel->getCategoryViewPermission(0, $category["categoryID"]);
+        $this->assertTrue($viewPermission);
+
+        $this->api()->patch("/roles/" . \RoleModel::GUEST_ID, [
+            "permissions" => [
+                [
+                    "id" => $category["categoryID"],
+                    "type" => "category",
+                    "permissions" => [
+                        "discussions.view" => false,
+                    ],
+                ],
+            ],
+        ]);
+
+        $viewPermission = $this->userModel->getCategoryViewPermission(0, $category["categoryID"]);
         $this->assertFalse($viewPermission);
+
         $viewPermission = $this->userModel->getCategoryViewPermission(2, 0);
         $this->assertFalse($viewPermission);
         $viewPermission = $this->userModel->getCategoryViewPermission(2, 999);

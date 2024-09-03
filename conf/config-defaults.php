@@ -63,7 +63,10 @@ $Configuration['Garden']['AllowSSL'] = true;
 $Configuration['Garden']['ForceSSL'] = true;
 $Configuration['Garden']['PrivateCommunity'] = false;
 $Configuration['Garden']['Forms']['HoneypotName'] = 'hpt';
+
+// Feature flags
 $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
+$Configuration["Feature"]["GroupsFollowing"]["Enabled"] = false;
 
 // Developer stuff.
 $Configuration['Garden']['Debug'] = false;

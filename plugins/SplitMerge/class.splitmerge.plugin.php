@@ -344,10 +344,11 @@ class SplitMergePlugin extends Gdn_Plugin
     /**
      * Add "redirect" to allowed discussion types when moving discussions.
      *
+     * @param $destinationCategory
      * @param $allowedDiscussions
      * @return mixed
      */
-    public function discussionModel_moveAllowedTypes($allowedDiscussions)
+    public function discussionModel_moveAllowedTypes($allowedDiscussions, $destinationCategory)
     {
         // If the array is empty or null, the default is to allow all types. We don't
         // want to interfere with that.

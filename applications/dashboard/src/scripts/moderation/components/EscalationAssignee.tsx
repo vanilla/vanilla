@@ -82,7 +82,7 @@ export function EscalationAssignee(props: IProps) {
     const classes = escalationAssigneeClasses(props.inCard);
 
     const userLookup: ILookupApi = {
-        searchUrl: "/api/v2/users/by-names?name=%s*&limit=10",
+        searchUrl: `/api/v2/escalations/lookup-assignee?name=%s*&limit=10&escalationID=${escalation.escalationID}`,
         labelKey: "name",
         valueKey: "userID",
         singleUrl: "/api/v2/users/%s",

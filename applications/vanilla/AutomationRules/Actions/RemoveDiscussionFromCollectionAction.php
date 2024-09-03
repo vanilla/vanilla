@@ -16,6 +16,9 @@ use Vanilla\Forms\SchemaForm;
 use Vanilla\Logger;
 use Vanilla\Models\CollectionModel;
 
+/**
+ * Automation rule action to remove a discussion from a collection.
+ */
 class RemoveDiscussionFromCollectionAction extends AutomationAction
 {
     public string $affectedRecordType = "CollectionRecord";

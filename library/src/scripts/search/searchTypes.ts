@@ -61,6 +61,7 @@ export type ISearchForm<ExtraFormValues extends object = {}> = ISearchFormBase &
 
 export type ISearchRequestQuery<ExtraFormValues extends object = {}> = Omit<ISearchForm<ExtraFormValues>, "authors"> & {
     dateInserted?: string;
+    dateUpdated?: string;
     insertUserIDs?: number[];
 
     limit?: RecordID;

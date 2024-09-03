@@ -13,6 +13,8 @@ declare namespace CommentsApi {
         page: number;
         expand?: string[];
         qna?: string;
+        insertUserRoleID?: number[];
+        sentiment?: string[];
     }
 
     export interface PostParams {

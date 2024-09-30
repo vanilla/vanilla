@@ -37,6 +37,9 @@ class UnsubscribeApiController extends Controller
     public function post(string $token): array
     {
         $result = $this->unsubscribeModel->validateAccess($token, "1");
+        if ($this->isUnsubscribeRequestProcessed($result)) {
+            return $result;
+        }
         $count = count($result);
         $follow = $result["FollowedCategory"] ?? [];
         unset($result["FollowedCategory"]);
@@ -63,6 +66,9 @@ class UnsubscribeApiController extends Controller
     public function post_resubscribe(string $token): array
     {
         $result = $this->unsubscribeModel->validateAccess($token, "0");
+        if ($this->isUnsubscribeRequestProcessed($result)) {
+            return $result;
+        }
         $count = count($result);
         $follow = $result["FollowedCategory"] ?? [];
         unset($result["FollowedCategory"]);
@@ -78,6 +84,20 @@ class UnsubscribeApiController extends Controller
         }
 
         return ["preferences" => $result, "followCategory" => $follow];
+    }
+
+    /**
+     * Check if the unsubscibe request has been already processed
+     * @param array $result
+     * @return bool
+     */
+    private function isUnsubscribeRequestProcessed(array &$result): bool
+    {
+        if (isset($result["processed"]) && $result["processed"] == "1") {
+            unset($result["processed"]);
+            return true;
+        }
+        return false;
     }
 
     /**

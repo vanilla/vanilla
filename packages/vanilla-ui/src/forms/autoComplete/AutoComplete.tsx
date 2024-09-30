@@ -28,7 +28,7 @@ import {
 import { useComboboxContext } from "@reach/combobox";
 import groupBy from "lodash-es/groupBy";
 import sortBy from "lodash-es/sortBy";
-import { useStackingContext } from "@vanilla/react-utils";
+import { useFocusWatcher, useStackingContext } from "@vanilla/react-utils";
 
 function AutoCompleteArrow() {
     const { size } = useAutoCompleteContext();
@@ -136,6 +136,7 @@ export interface IAutoCompleteProps {
     onChange?(value: any | any[]): void;
     onSearch?(value: string): void;
     allowArbitraryInput?: boolean;
+    resetOnBlur?: boolean;
 }
 
 /**
@@ -159,6 +160,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         placeholder,
         optionProvider,
         id,
+        resetOnBlur,
         ...otherProps
     } = props;
     const { zIndex } = useStackingContext();
@@ -173,6 +175,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
 
     // This ref records the outmost container so that the pop over can use its size and placement
     const containerRef = useRef() as RefObject<HTMLDivElement>;
+
     const containerRect = useRect(containerRef);
     // This ref records the HTML input so that we can focus it when clicking on the parent container
     const inputRef = useRef() as RefObject<HTMLInputElement>;
@@ -302,11 +305,13 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         }
     }, [displayValue, allowArbitraryInput]);
 
+    const isSelectingRef = useRef(false);
     /**
      * Select a label and send its value through onChange.
      */
     const onSelect = useCallback(
         (label: string) => {
+            isSelectingRef.current = true;
             const currentValue = valuesState && !Array.isArray(valuesState) && isMultiple ? [valuesState] : valuesState;
             const value = optionByLabel[label].value;
 
@@ -338,9 +343,20 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
 
             onChange?.(finalValue);
             afterSelectHandler();
+            isSelectingRef.current = false;
         },
         [onChange, optionByLabel, isMultiple, valuesState],
     );
+
+    const isActiveRef = useRef(false);
+    useFocusWatcher(containerRef, (focused) => {
+        const wasActive = isActiveRef.current;
+        isActiveRef.current = focused;
+        if (!isSelectingRef.current && wasActive && !isActiveRef.current && props.resetOnBlur) {
+            setInputValue(displayValue);
+            setValuesState(displayValue);
+        }
+    });
 
     /**
      * Handle a change in the input, suggesting options.

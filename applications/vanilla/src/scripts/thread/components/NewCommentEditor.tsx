@@ -14,12 +14,20 @@ import { discussionCommentEditorClasses } from "@vanilla/addon-vanilla/thread/Di
 import { t } from "@vanilla/i18n";
 import isEqual from "lodash-es/isEqual";
 import { ReactNode } from "react";
+import { RecordID } from "@vanilla/utils";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import { Icon } from "@vanilla/icons";
 
-interface IDraftProps {
-    draftID: number;
+export interface IDraftProps {
+    draftID: RecordID;
     body: string;
     dateUpdated: string;
     format: string;
+}
+
+export enum DraftIndicatorPosition {
+    WITHIN = "within",
+    BELOW = "below",
 }
 
 interface CommonProps {
@@ -30,29 +38,52 @@ interface CommonProps {
     editorKey: number;
     title?: ReactNode;
     isPreview?: boolean;
+    className?: string;
+    /** Any other actions  */
+    tertiaryActions?: ReactNode;
+    /** The post button label - Default to "Post Comment" */
+    postLabel?: string;
 }
 
 type IProps = CommonProps &
     (
         | {
-              onDraft: (value: MyValue) => void;
+              onDraft?: (value: MyValue) => void;
               draft: IDraftProps | undefined;
-              draftLoading: boolean;
+              draftLoading?: boolean;
               draftLastSaved: Date | null;
+              /** If the "save draft" button should be displayed */
+              manualDraftSave?: boolean;
+              draftIndicatorPosition?: DraftIndicatorPosition;
           }
         | {
               onDraft?: false;
               draft?: never;
               draftLoading?: never;
               draftLastSaved?: never;
+              manualDraftSave?: never;
+              draftIndicatorPosition?: never;
           }
     );
 
 const EMPTY_DRAFT: MyValue = [{ type: "p", children: [{ text: "" }] }];
 
 export function NewCommentEditor(props: IProps) {
-    const { value, onValueChange, onPublish, onDraft, draft, draftLoading, publishLoading, editorKey, draftLastSaved } =
-        props;
+    const {
+        value,
+        onValueChange,
+        onPublish,
+        onDraft,
+        draft,
+        draftLoading,
+        publishLoading,
+        editorKey,
+        draftLastSaved,
+        className,
+        postLabel,
+        manualDraftSave = true,
+        draftIndicatorPosition = DraftIndicatorPosition.BELOW,
+    } = props;
 
     const classes = discussionCommentEditorClasses();
 
@@ -61,7 +92,7 @@ export function NewCommentEditor(props: IProps) {
             options={{
                 borderType: BorderType.NONE,
             }}
-            className={classes.pageBox}
+            className={cx(classes.pageBox, className)}
         >
             <form
                 onSubmit={async (e) => {
@@ -79,9 +110,35 @@ export function NewCommentEditor(props: IProps) {
                         onValueChange(newValue);
                     }}
                     isPreview={props.isPreview}
+                    inEditorContent={
+                        <>
+                            {draftLastSaved && draftIndicatorPosition === "within" && (
+                                <span className={classes.draftIndicator}>
+                                    <ToolTip
+                                        label={
+                                            <Translate
+                                                source="Draft saved <0/>"
+                                                c0={
+                                                    <DateTime
+                                                        timestamp={draftLastSaved.toUTCString()}
+                                                        mode="relative"
+                                                    />
+                                                }
+                                            />
+                                        }
+                                    >
+                                        <span>
+                                            <Icon icon={"data-checked"} />
+                                        </span>
+                                    </ToolTip>
+                                </span>
+                            )}
+                        </>
+                    }
                 />
                 <div className={classes.editorPostActions}>
-                    {draftLastSaved && (
+                    {props.tertiaryActions}
+                    {draftLastSaved && draftIndicatorPosition === "below" && (
                         <span className={cx(metasClasses().metaStyle, classes.draftMessage)}>
                             {draftLoading ? (
                                 t("Saving draft...")
@@ -93,7 +150,7 @@ export function NewCommentEditor(props: IProps) {
                             )}
                         </span>
                     )}
-                    {onDraft && (
+                    {onDraft && manualDraftSave && (
                         <Button
                             disabled={publishLoading || draftLoading || isEqual(value, EMPTY_DRAFT)}
                             buttonType={ButtonTypes.STANDARD}
@@ -103,7 +160,7 @@ export function NewCommentEditor(props: IProps) {
                         </Button>
                     )}
                     <Button disabled={publishLoading} submit buttonType={ButtonTypes.PRIMARY}>
-                        {publishLoading ? <ButtonLoader /> : t("Post Comment")}
+                        {publishLoading ? <ButtonLoader /> : postLabel ? t(postLabel) : t("Post Comment")}
                     </Button>
                 </div>
             </form>

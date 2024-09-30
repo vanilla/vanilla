@@ -59,24 +59,18 @@ class cmdNotificationTest extends SiteTestCase
         $user = $this->createUser(["roleID" => $roleIDs], [], ["escalation" => $preferences]);
 
         $discussion = $this->createDiscussion();
-        $this->createEscalation($discussion);
+        $escalation = $this->createEscalation($discussion);
 
         if ($expectNotifications) {
-            $this->assertUserHasNotificationsLike($user, [
-                new ExpectedNotification(
-                    "Escalation",
-                    ["{$discussion["name"]} has been escalated!"],
-                    EscalationActivity::getActivityReason()
-                ),
-            ]);
+            $notification = new ExpectedNotification(
+                "Escalation",
+                ["{$escalation["name"]} has been escalated."],
+                EscalationActivity::getActivityReason()
+            );
 
-            $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
-                new ExpectedNotification(
-                    "Escalation",
-                    ["{$discussion["name"]} has been escalated!"],
-                    EscalationActivity::getActivityReason()
-                ),
-            ]);
+            $this->assertUserHasNotificationsLike($user, [$notification]);
+
+            $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [$notification]);
         } else {
             $this->assertUserHasNoNotifications($user);
             $this->assertUserHasNoEmails($user);
@@ -128,23 +122,16 @@ class cmdNotificationTest extends SiteTestCase
                 "[{\"type\":\"rich_embed_card\",\"children\":[{\"text\":\"\"}],\"dataSourceType\":\"url\",\"url\":\"https://ca.v-cdn.net/6032207/uploads/userpics/XHRS8AS9238C/pD678PHVV0I4T.jpeg\",\"embedData\":{\"url\":\"https://ca.v-cdn.net/6032207/uploads/userpics/XHRS8AS9238C/pD678PHVV0I4T.jpeg\",\"name\":\"Untitled Image\",\"type\":\"image/jpeg\",\"size\":0,\"width\":356,\"height\":200,\"displaySize\":\"large\",\"float\":\"none\",\"embedType\":\"image\"}},{\"type\":\"p\",\"children\":[{\"text\":\"test\"}]}]",
             "format" => "rich2",
         ]);
-        $this->createEscalation($comment);
+        $escalation = $this->createEscalation($comment);
+        $notification = new ExpectedNotification(
+            "Escalation",
+            ["{$escalation["name"]} has been escalated."],
+            EscalationActivity::getActivityReason()
+        );
 
-        $this->assertUserHasNotificationsLike($user, [
-            new ExpectedNotification(
-                "Escalation",
-                ["{$comment["name"]} has been escalated!"],
-                EscalationActivity::getActivityReason()
-            ),
-        ]);
+        $this->assertUserHasNotificationsLike($user, [$notification]);
 
-        $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
-            new ExpectedNotification(
-                "Escalation",
-                ["{$comment["name"]} has been escalated!"],
-                EscalationActivity::getActivityReason()
-            ),
-        ]);
+        $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [$notification]);
     }
 
     /**
@@ -174,24 +161,17 @@ class cmdNotificationTest extends SiteTestCase
 
                 $user = $this->createUser(["roleID" => $roleIDs], [], ["escalation" => $preferences]);
                 $discussion = $this->createDiscussion();
-                $this->createEscalation($discussion);
+                $escalation = $this->createEscalation($discussion);
 
                 if ($expectNotifications) {
-                    $this->assertUserHasNotificationsLike($user, [
-                        new ExpectedNotification(
-                            "Escalation",
-                            ["{$discussion["name"]} has been escalated!"],
-                            EscalationActivity::getActivityReason()
-                        ),
-                    ]);
+                    $notification = new ExpectedNotification(
+                        "Escalation",
+                        ["{$escalation["name"]} has been escalated."],
+                        EscalationActivity::getActivityReason()
+                    );
 
-                    $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
-                        new ExpectedNotification(
-                            "Escalation",
-                            ["{$discussion["name"]} has been escalated!"],
-                            EscalationActivity::getActivityReason()
-                        ),
-                    ]);
+                    $this->assertUserHasNotificationsLike($user, [$notification]);
+                    $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [$notification]);
                 } else {
                     $this->assertUserHasNoNotifications($user);
                 }
@@ -242,24 +222,17 @@ class cmdNotificationTest extends SiteTestCase
     {
         $user = $this->createUser(["roleID" => $roleIDs], [], ["myEscalation" => $preferences]);
         $discussion = $this->createDiscussion();
-        $this->createEscalation($discussion, ["assignedUserID" => $user["userID"]]);
+        $escalation = $this->createEscalation($discussion, ["assignedUserID" => $user["userID"]]);
 
         if ($expectNotifications) {
-            $this->assertUserHasNotificationsLike($user, [
-                new ExpectedNotification(
-                    "MyEscalation",
-                    ["{$discussion["name"]} has been escalated and assigned to you."],
-                    MyEscalationActivity::getActivityReason()
-                ),
-            ]);
+            $notification = new ExpectedNotification(
+                "MyEscalation",
+                ["{$escalation["name"]} has been escalated and assigned to you."],
+                MyEscalationActivity::getActivityReason()
+            );
 
-            $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
-                new ExpectedNotification(
-                    "MyEscalation",
-                    ["{$discussion["name"]} has been escalated and assigned to you."],
-                    MyEscalationActivity::getActivityReason()
-                ),
-            ]);
+            $this->assertUserHasNotificationsLike($user, [$notification]);
+            $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [$notification]);
         } else {
             $this->assertUserHasNoNotifications($user);
             $this->assertUserHasNoEmails($user);
@@ -288,23 +261,15 @@ class cmdNotificationTest extends SiteTestCase
                 "[{\"type\":\"rich_embed_card\",\"children\":[{\"text\":\"\"}],\"dataSourceType\":\"url\",\"url\":\"https://ca.v-cdn.net/6032207/uploads/userpics/XHRS8AS9238C/pD678PHVV0I4T.jpeg\",\"embedData\":{\"url\":\"https://ca.v-cdn.net/6032207/uploads/userpics/XHRS8AS9238C/pD678PHVV0I4T.jpeg\",\"name\":\"Untitled Image\",\"type\":\"image/jpeg\",\"size\":0,\"width\":356,\"height\":200,\"displaySize\":\"large\",\"float\":\"none\",\"embedType\":\"image\"}},{\"type\":\"p\",\"children\":[{\"text\":\"test\"}]}]",
             "format" => "rich2",
         ]);
-        $this->createEscalation($comment, ["assignedUserID" => $user["userID"]]);
+        $escalation = $this->createEscalation($comment, ["assignedUserID" => $user["userID"]]);
+        $notification = new ExpectedNotification(
+            "MyEscalation",
+            ["{$escalation["name"]} has been escalated and assigned to you."],
+            MyEscalationActivity::getActivityReason()
+        );
 
-        $this->assertUserHasNotificationsLike($user, [
-            new ExpectedNotification(
-                "MyEscalation",
-                ["{$comment["name"]} has been escalated and assigned to you."],
-                MyEscalationActivity::getActivityReason()
-            ),
-        ]);
-
-        $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
-            new ExpectedNotification(
-                "MyEscalation",
-                ["{$comment["name"]} has been escalated and assigned to you."],
-                MyEscalationActivity::getActivityReason()
-            ),
-        ]);
+        $this->assertUserHasNotificationsLike($user, [$notification]);
+        $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [$notification]);
     }
 
     /**
@@ -333,24 +298,17 @@ class cmdNotificationTest extends SiteTestCase
 
                 $user = $this->createUser(["roleID" => $roleIDs], [], ["myEscalation" => $preferences]);
                 $discussion = $this->createDiscussion();
-                $this->createEscalation($discussion, ["assignedUserID" => $user["userID"]]);
+                $escalation = $this->createEscalation($discussion, ["assignedUserID" => $user["userID"]]);
 
                 if ($expectNotifications) {
-                    $this->assertUserHasNotificationsLike($user, [
-                        new ExpectedNotification(
-                            "MyEscalation",
-                            ["{$discussion["name"]} has been escalated and assigned to you."],
-                            MyEscalationActivity::getActivityReason()
-                        ),
-                    ]);
+                    $notification = new ExpectedNotification(
+                        "MyEscalation",
+                        ["{$escalation["name"]} has been escalated and assigned to you."],
+                        MyEscalationActivity::getActivityReason()
+                    );
 
-                    $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
-                        new ExpectedNotification(
-                            "MyEscalation",
-                            ["{$discussion["name"]} has been escalated and assigned to you."],
-                            MyEscalationActivity::getActivityReason()
-                        ),
-                    ]);
+                    $this->assertUserHasNotificationsLike($user, [$notification]);
+                    $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [$notification]);
                 } else {
                     $this->assertUserHasNoNotifications($user);
                 }
@@ -401,6 +359,11 @@ class cmdNotificationTest extends SiteTestCase
 
         $discussion = $this->createDiscussion();
         $escalation = $this->createEscalation($discussion);
+        $notification = new ExpectedNotification(
+            "MyEscalation",
+            ["{$escalation["name"]} has been escalated and assigned to you."],
+            MyEscalationActivity::getActivityReason()
+        );
 
         // Sanity check to make sure notifications were not sent.
         $this->assertUserHasNoNotifications($user);
@@ -408,21 +371,8 @@ class cmdNotificationTest extends SiteTestCase
 
         $this->api()->patch("escalations/{$escalation["escalationID"]}", ["assignedUserID" => $user["userID"]]);
 
-        $this->assertUserHasNotificationsLike($user, [
-            new ExpectedNotification(
-                "MyEscalation",
-                ["{$discussion["name"]} has been escalated and assigned to you."],
-                MyEscalationActivity::getActivityReason()
-            ),
-        ]);
-
-        $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
-            new ExpectedNotification(
-                "MyEscalation",
-                ["{$discussion["name"]} has been escalated and assigned to you."],
-                MyEscalationActivity::getActivityReason()
-            ),
-        ]);
+        $this->assertUserHasNotificationsLike($user, [$notification]);
+        $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [$notification]);
     }
 
     // New report
@@ -576,6 +526,44 @@ class cmdNotificationTest extends SiteTestCase
 
         $this->assertUserHasNoNotifications($user);
         $this->assertUserHasNoEmails($user);
+    }
+
+    /**
+     * Test that escalation notification will fall back to the escalation name.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testAssignEscalationForDeletedRecord(): void
+    {
+        $discussion = $this->createDiscussion();
+        $escalation = $this->createEscalation($discussion);
+        $this->api()->delete("discussions/{$discussion["discussionID"]}");
+
+        $user = $this->createUser(
+            ["roleID" => [RoleModel::ADMIN_ID]],
+            [],
+            ["myEscalation" => ["email" => true, "popup" => true]]
+        );
+        $this->api()->patch("escalations/{$escalation["escalationID"]}", ["assignedUserID" => $user["userID"]]);
+
+        $this->assertUserHasNotificationsLike($user, [
+            new ExpectedNotification(
+                "MyEscalation",
+                ["{$escalation["name"]} has been escalated and assigned to you."],
+                MyEscalationActivity::getActivityReason()
+            ),
+        ]);
+
+        $this->assertUserHasEmailsLike($user, ActivityModel::SENT_OK, [
+            new ExpectedNotification(
+                "MyEscalation",
+                ["{$escalation["name"]} has been escalated and assigned to you."],
+                MyEscalationActivity::getActivityReason()
+            ),
+        ]);
     }
 
     /**

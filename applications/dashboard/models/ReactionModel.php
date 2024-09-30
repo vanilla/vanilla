@@ -1182,8 +1182,14 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             throw new Gdn_UserException(t("You can't react to your own post."));
         }
 
+        $moderatorCheck = true;
+        //if the current user has moderator permission and if the user is un doing a spam reaction allow it
+        if ($force === self::FORCE_REMOVE && $isModerator && $reactionUrlCode === "spam") {
+            $moderatorCheck = false;
+        }
+
         // Check and see if moderators are protected.
-        if (val("Protected", $reactionType)) {
+        if (val("Protected", $reactionType) && $moderatorCheck) {
             $insertUser = Gdn::userModel()->getID($row["InsertUserID"]);
             if (Gdn::userModel()->checkPermission($insertUser, "Garden.Moderation.Manage")) {
                 throw new Gdn_UserException(t("You can't flag a moderator's post."));
@@ -1387,6 +1393,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
      *
      * @param null $urlCode
      * @return mixed|null
+     * @throws Exception
      */
     public static function reactionTypes($urlCode = null)
     {

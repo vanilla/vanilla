@@ -12,9 +12,12 @@ namespace Vanilla\Dashboard\Tests\Controllers;
 use EntryController;
 use Garden\Schema\ValidationException;
 use PermissionModel;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
+use VanillaTests\AuditLogTestTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\Dashboard\EntryControllerConnectTestTrait;
+use VanillaTests\ExpectedAuditLog;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -57,6 +60,7 @@ class EntryControllerConnectTest extends SiteTestCase
     use UsersAndRolesApiTestTrait;
     use ExpectExceptionTrait;
     use CommunityApiTestTrait;
+    use AuditLogTestTrait;
 
     protected const PROVIDER_KEY = "ec-test";
 

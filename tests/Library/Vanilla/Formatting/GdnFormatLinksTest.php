@@ -281,8 +281,8 @@ HTML;
 HTML;
         $expectedHref = htmlspecialchars($this->leavingUrl("https://test.com"));
         $expected = <<<HTML
-<div><div><a href=$expectedHref>https://test.com</a></div></div>
-<a href=/test.com>https://othertest.com</a>
+<div><div><a href="$expectedHref">https://test.com</a></div></div>
+<a href="/test.com">https://othertest.com</a>
 <code>https://test.com</code>
 HTML;
 

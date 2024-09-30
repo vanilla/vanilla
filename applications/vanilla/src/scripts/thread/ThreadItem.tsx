@@ -19,6 +19,10 @@ import ThreadItemActions from "@vanilla/addon-vanilla/thread/ThreadItemActions";
 import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
 import React from "react";
 import { useThreadItemContext } from "./ThreadItemContext";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { t } from "@vanilla/i18n";
 
 interface IProps {
     content: string;
@@ -32,6 +36,10 @@ interface IProps {
     reactions?: IReaction[];
     attachmentsContent?: React.ReactNode;
     suggestionContent?: IAcceptedAnswerProps;
+    onReply?: () => void;
+    showOPTag?: boolean;
+    isPreview?: boolean;
+    isHighlighted?: boolean;
 }
 
 function getThreadItemID(recordType: string, recordID: string | number) {
@@ -40,7 +48,7 @@ function getThreadItemID(recordType: string, recordID: string | number) {
 }
 
 export function ThreadItem(props: IProps) {
-    const { content, user, userPhotoLocation, collapsed, suggestionContent } = props;
+    const { content, user, userPhotoLocation, collapsed, suggestionContent, showOPTag, isHighlighted } = props;
 
     const headerHasUserPhoto = userPhotoLocation === "header";
 
@@ -66,12 +74,24 @@ export function ThreadItem(props: IProps) {
 
     let result = (
         <>
-            <ThreadItemHeader options={props.options} user={user} excludePhoto={!headerHasUserPhoto} />
+            <ThreadItemHeader
+                options={props.options}
+                user={user}
+                excludePhoto={!headerHasUserPhoto}
+                showOPTag={showOPTag}
+            />
             {props.editor || (
                 <>
                     {userContent}
                     {props.actions}
-                    {props.reactions && <ThreadItemActions reactions={props.reactions} />}
+                    <div className={classes.footerWrapper}>
+                        {props.reactions && <ThreadItemActions reactions={props.reactions} />}
+                        {props.onReply && (
+                            <Button onClick={() => props.onReply && props.onReply()} buttonType={ButtonTypes.TEXT}>
+                                {t("Reply")}
+                            </Button>
+                        )}
+                    </div>
                     {!!props.attachmentsContent && (
                         <div className={classes.attachmentsContentWrapper}>{props.attachmentsContent}</div>
                     )}
@@ -91,8 +111,32 @@ export function ThreadItem(props: IProps) {
         );
     }
 
+    if (isHighlighted) {
+        result = (
+            <PageBox
+                options={{
+                    borderType: BorderType.BORDER,
+                    border: {
+                        color: globalVariables().mainColors.primary,
+                    },
+                    background: {
+                        color: globalVariables().mixPrimaryAndBg(0.1),
+                    },
+                }}
+            >
+                {result}
+            </PageBox>
+        );
+    }
+
     return (
-        <PageBox id={itemID} options={{ borderType: BorderType.SEPARATOR_BETWEEN, ...props.boxOptions }}>
+        <PageBox
+            id={itemID}
+            options={{
+                borderType: BorderType.SEPARATOR_BETWEEN,
+                ...props.boxOptions,
+            }}
+        >
             {result}
         </PageBox>
     );

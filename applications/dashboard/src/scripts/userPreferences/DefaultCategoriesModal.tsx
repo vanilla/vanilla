@@ -33,6 +33,7 @@ import { css, cx } from "@emotion/css";
 import { CategoryPreferencesTable } from "@library/preferencesTable/CategoryPreferencesTable";
 import { useNotificationPreferencesContext } from "@library/notificationPreferences";
 import {
+    CATEGORY_NOTIFICATION_TYPES,
     getDefaultCategoryNotificationPreferences,
     ICategoryPreferences,
 } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
@@ -217,6 +218,7 @@ export default function DefaultCategoriesModal(props: IProps) {
                                 }}
                                 admin
                                 canIncludeInDigest
+                                notificationTypes={CATEGORY_NOTIFICATION_TYPES}
                             />
                         </>
                     ),

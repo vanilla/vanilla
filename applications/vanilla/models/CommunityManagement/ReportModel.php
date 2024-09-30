@@ -8,6 +8,7 @@
 namespace Vanilla\Forum\Models\CommunityManagement;
 
 use Garden\Container\ContainerException;
+use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -16,6 +17,7 @@ use Gdn_SQLDriver;
 use PermissionNotificationGenerator;
 use Ramsey\Uuid\Uuid;
 use Vanilla\Community\Events\ReportEvent;
+use Vanilla\Community\Events\SpamEvent;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Activity\ReportActivity;
 use Vanilla\Database\Operation\BooleanFieldProcessor;
@@ -26,6 +28,7 @@ use Vanilla\Database\Operation\ResourceEventProcessor;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Formatting\Formats\WysiwygFormat;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Forum\Models\SpamReport;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\ArrayUtils;
@@ -54,7 +57,8 @@ class ReportModel extends PipelineModel
         private \UserModel $userModel,
         private ReportReasonModel $reportReasonModel,
         private CommunityManagementRecordModel $communityManagementRecordModel,
-        private ResourceEventProcessor $resourceEventProcessor
+        private ResourceEventProcessor $resourceEventProcessor,
+        private EventManager $eventManager
     ) {
         parent::__construct("report");
         $this->addPipelineProcessor(new CurrentDateFieldProcessor(["dateInserted"], ["dateUpdated"]));
@@ -311,6 +315,9 @@ class ReportModel extends PipelineModel
             $report["recordHtml"] = trim(
                 $this->formatService->renderHTML($report["recordBody"], $report["recordFormat"])
             );
+            $report["recordPlainText"] = trim(
+                $this->formatService->renderPlainText($report["recordBody"], $report["recordFormat"])
+            );
             unset($report["noteBody"], $report["noteFormat"], $report["recordBody"], $report["recordBodyFormat"]);
             $report["isPendingUpdate"] = (bool) $report["isPendingUpdate"];
             $report["isPending"] = (bool) $report["isPending"];
@@ -358,6 +365,7 @@ class ReportModel extends PipelineModel
             ->column("recordBody", "mediumtext")
             ->column("recordFormat", "mediumtext")
             ->column("recordDateInserted", "datetime", true)
+            ->column("recordInsertIPAddress", "ipaddress", true)
             ->column("premoderatedRecord", "json", true)
             ->column("isPending", "tinyint(1)", "0")
             ->column("isPendingUpdate", "tinyint(1)", "0")
@@ -621,5 +629,53 @@ class ReportModel extends PipelineModel
         }
 
         return $body . "<div>";
+    }
+
+    /**
+     * Conditionally dispatches a spam event for a given report record if the reason is spam.
+     *
+     * @param array $report
+     * @return void
+     */
+    public function dispatchSpamEventFromReport(array $report): void
+    {
+        $reasons = array_column($report["reasons"], "reportReasonID");
+        if (in_array(ReportReasonModel::INITIAL_REASON_SPAM, $reasons, true)) {
+            $recordUser = $this->userModel->getID($report["recordUserID"], DATASET_TYPE_ARRAY);
+            $record = $this->getRecord($report["recordType"], $report["recordID"]);
+
+            $spamReport = new SpamReport(
+                $report["recordType"],
+                $recordUser["Name"] ?? null,
+                $recordUser["Email"] ?? null,
+                $report["recordName"] . "\n\n" . $report["recordPlainText"],
+                isset($report["recordInsertIPAddress"]) ? ipDecode($report["recordInsertIPAddress"]) : null,
+                $record["url"] ?? null
+            );
+
+            $this->eventManager->dispatch(new SpamEvent($spamReport));
+        }
+    }
+
+    /**
+     * Retrieve a normalized record for the given recordType and recordID.
+     *
+     * @param string $recordType
+     * @param int $recordID
+     * @return array|null
+     */
+    public static function getRecord(string $recordType, int $recordID): ?array
+    {
+        switch (strtolower($recordType)) {
+            case "discussion":
+                $model = Gdn::getContainer()->get(\DiscussionModel::class);
+                $record = $model->getID($recordID, DATASET_TYPE_ARRAY);
+                return $record ? $model->normalizeRow($record) : null;
+            case "comment":
+                $model = Gdn::getContainer()->get(\CommentModel::class);
+                $record = $model->getID($recordID, DATASET_TYPE_ARRAY);
+                return $record ? $model->normalizeRow($record) : null;
+        }
+        return null;
     }
 }

@@ -26,9 +26,6 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
-    /** @var Breadcrumb[] */
-    private $crumbsByCategoryID = [];
-
     /**
      * DI.
      *
@@ -56,11 +53,6 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface
         $crumbs = [new Breadcrumb(self::t("Home"), \Gdn::request()->url("/", true))];
         foreach ($ancestors as $ancestor) {
             $categoryID = $ancestor["CategoryID"];
-            $existingCrumb = $this->crumbsByCategoryID[$categoryID] ?? null;
-            if ($existingCrumb !== null) {
-                $crumbs[] = $existingCrumb;
-                continue;
-            }
 
             if ($categoryID === -1) {
                 // If we actually get the root category, we don't want to see the "synthetic" root.
@@ -77,7 +69,6 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface
             } else {
                 $newCrumb = new Breadcrumb($ancestor["Name"] ?? t("Category"), categoryUrl($ancestor, "", true));
             }
-            $this->crumbsByCategoryID[$categoryID] = $newCrumb;
             $crumbs[] = $newCrumb;
         }
         return $crumbs;

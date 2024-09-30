@@ -443,7 +443,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
             $this->table($tableName);
         }
 
-        $columns = $this->Database->sql()->fetchTableSchema($this->_TableName);
+        $columns = $this->Database->sql()->fetchTableSchema($this->_TableName, true);
         $this->_Columns = $columns;
 
         return $this;
@@ -759,7 +759,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
     {
         if ($this->_ExistingColumns === null) {
             if ($this->tableExists()) {
-                $this->_ExistingColumns = $this->Database->sql()->fetchTableSchema($this->_TableName);
+                $this->_ExistingColumns = $this->Database->sql()->fetchTableSchema($this->_TableName, true);
             } else {
                 $this->_ExistingColumns = [];
             }
@@ -776,9 +776,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
     {
         $tableName = $this->tableName();
         if ($this->indexExists($tableName, $indexName)) {
-            $db = $this->Database;
             $px = $this->Database->DatabasePrefix;
-            $db->query("DROP INDEX `$indexName` ON " . $px . $tableName . " ALGORITHM = INPLACE LOCK = NONE");
+            $this->executeQuery("DROP INDEX `$indexName` ON " . $px . $tableName . " ALGORITHM = INPLACE LOCK = NONE");
         }
         return $this;
     }

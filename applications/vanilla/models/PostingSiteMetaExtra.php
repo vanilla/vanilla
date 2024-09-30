@@ -54,6 +54,8 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
             "triage" => [
                 "enabled" => $this->config->get("triage.enabled", false),
             ],
+            "threadStyle" => $this->config->get("threadStyle", "flat"),
+            "threadDepth" => $this->config->get("Vanilla.Comment.MaxDepth", 5),
             "trustedDomains" => $trustedDomains,
             "disableUrlEmbeds" => $disableUrlEmbeds,
             "postTypes" => $postTypes,

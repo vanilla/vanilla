@@ -70,6 +70,8 @@ class Gdn_Session implements LoggerAwareInterface
      */
     private $timeZone;
 
+    private bool $spoofedInUser = false;
+
     /**
      * Private constructor prevents direct instantiation of object
      *
@@ -495,6 +497,10 @@ class Gdn_Session implements LoggerAwareInterface
         $this->UserID = $userID !== false ? (int) $userID : Gdn::authenticator()->getIdentity();
         $this->SessionID = Gdn::authenticator()->getSession();
         $this->Session = Gdn::authenticator()->getSessionArray();
+
+        if (!empty($this->Session["Attributes"]) && !empty($this->Session["Attributes"]["spoofedUserID"])) {
+            $this->spoofedInUser = true;
+        }
 
         $this->User = false;
         $this->loadTransientKey();
@@ -979,5 +985,15 @@ class Gdn_Session implements LoggerAwareInterface
             return false;
         }
         return (bool) $this->User->Verified;
+    }
+
+    /**
+     * Check if the current user is a spoofed in user
+     *
+     * @return bool
+     */
+    public function isSpoofedInUser(): bool
+    {
+        return $this->spoofedInUser;
     }
 }

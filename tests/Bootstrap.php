@@ -673,6 +673,7 @@ class Bootstrap
         foreach ($excluded as $subdir) {
             $loader->excludeDirectory(PATH_PLUGINS . "/" . $subdir);
         }
+        $loader->excludeDirectory(PATH_APPLICATIONS . "/vfdata/controllers");
 
         // And set caching to the 'temp' directory
         $loader->setAutoRefresh();

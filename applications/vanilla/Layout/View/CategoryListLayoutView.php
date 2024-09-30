@@ -35,6 +35,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     {
         $this->breadcrumbModel = $breadcrumbModel;
         $this->registerAssetClass(CategoryListAsset::class);
+        $this->registerAssetClass(CategoryFollowAsset::class);
     }
 
     /**

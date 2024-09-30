@@ -7,6 +7,7 @@
 
 namespace Vanilla\Dashboard\AutomationRules\Models;
 
+use Vanilla\AutomationRules\Actions\AutomationAction;
 use Vanilla\AutomationRules\Actions\UserFollowCategoryAction;
 use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
 use Vanilla\Dashboard\AutomationRules\Triggers\ProfileFieldSelectionTrigger;
@@ -18,6 +19,7 @@ use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
  */
 class UserRuleDataType extends RuleDataType
 {
+    private array $automationUserActions = [UserFollowCategoryAction::class, AddRemoveUserRoleAction::class];
     /**
      * @inheridoc
      */
@@ -31,10 +33,21 @@ class UserRuleDataType extends RuleDataType
     }
 
     /**
+     * Add an automation user action
+     *
+     * @param <class-string<AutomationAction> $automationAction
+     * @return void
+     */
+    public function addUserAutomationAction(string $automationAction): void
+    {
+        $this->automationUserActions[] = $automationAction;
+    }
+
+    /**
      * @inheridoc
      */
     protected function getAllActionsClasses(): array
     {
-        return [UserFollowCategoryAction::class, AddRemoveUserRoleAction::class];
+        return $this->automationUserActions;
     }
 }

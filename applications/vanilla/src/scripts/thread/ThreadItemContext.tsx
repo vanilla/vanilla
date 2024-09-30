@@ -25,6 +25,7 @@ export interface IThreadItemContext {
     handleNativeShare?: () => Promise<void>;
     emailUrl: string;
     shareInMessageUrl?: string;
+    extraMetas?: React.ReactNode;
 }
 
 const ThreadItemContext = React.createContext<IThreadItemContext>({

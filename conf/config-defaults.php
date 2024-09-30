@@ -13,6 +13,7 @@ $Configuration['EnabledPlugins']['stubcontent'] = true;
 $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledApplications']['Dashboard'] = 'dashboard';
 $Configuration['EnabledPlugins']['rich-editor'] = true;
+$Configuration['EnabledPlugins']['FederatedSearch'] = true;
 
 // ImageUpload
 $Configuration['ImageUpload']['Limits']['Enabled'] = false;
@@ -63,7 +64,10 @@ $Configuration['Garden']['AllowSSL'] = true;
 $Configuration['Garden']['ForceSSL'] = true;
 $Configuration['Garden']['PrivateCommunity'] = false;
 $Configuration['Garden']['Forms']['HoneypotName'] = 'hpt';
+
+// Feature flags
 $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
+$Configuration["Feature"]["GroupsFollowing"]["Enabled"] = false;
 
 // Developer stuff.
 $Configuration['Garden']['Debug'] = false;

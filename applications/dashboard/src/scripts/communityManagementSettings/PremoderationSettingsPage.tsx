@@ -39,8 +39,11 @@ import { t } from "@vanilla/i18n";
 import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { logError, uuidv4 } from "@vanilla/utils";
+import { NumberBox } from "@vanilla/ui";
 import { useEffect, useState } from "react";
 import { sprintf } from "sprintf-js";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { Icon } from "@vanilla/icons";
 
 const BETA_ENABLED = getMeta("featureFlags.CommunityManagementBeta.Enabled", false);
 
@@ -48,10 +51,38 @@ const CONF_PREMOD_DISCUSSIONS = "premoderation.discussions";
 const CONF_PREMOD_COMMENTS = "premoderation.comments";
 const CONF_PREMOD_CATEGORY_IDS = "premoderation.categoryIDs";
 const CONF_PREMOD_KEYWORDS = "premoderation.keywords";
+const CONF_PREMOD_CHALLENGE_NEW_USERS = "premoderation.challengeNewUsers";
+const CONF_PREMOD_CHALLENGE_AGE = "premoderation.challengeAgeCutoffInDays";
 
 const classes = {
     main: css({
         padding: "0 18px",
+    }),
+    comboInputWrapper: css({
+        padding: "0 18px",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "stretch",
+        justifyContent: "flex-end",
+    }),
+    comboInput: css({
+        flex: 1,
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+    }),
+    comboInputButton: css({
+        minWidth: "unset",
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderLeftWidth: 0,
+        margin: 0,
+        paddingLeft: 8,
+        paddingRight: 8,
+        "&&:hover, &&:focus, &&:active": {
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            borderLeftWidth: 0,
+        },
     }),
 };
 
@@ -61,7 +92,22 @@ export function PremoderationSettingsPage() {
         CONF_PREMOD_COMMENTS,
         CONF_PREMOD_CATEGORY_IDS,
         CONF_PREMOD_KEYWORDS,
+        CONF_PREMOD_CHALLENGE_NEW_USERS,
+        CONF_PREMOD_CHALLENGE_AGE,
     ]);
+    const challengeNewUsersPatcher = useConfigPatcher();
+    const challengeAgePatcher = useConfigPatcher();
+
+    const areConfigsLoading = [LoadStatus.PENDING, LoadStatus.LOADING].includes(configs.status);
+    const isChallengeNewUsersLoading: boolean = areConfigsLoading || challengeNewUsersPatcher.isLoading;
+    const isChallengeNewUsersEnabled: boolean = configs.data?.[CONF_PREMOD_CHALLENGE_NEW_USERS] ?? false;
+    const [challengeCutoffAge, setChallengeCutoffAge] = useState<number>(7);
+
+    useEffect(() => {
+        if (configs.data?.[CONF_PREMOD_CHALLENGE_AGE] !== challengeCutoffAge) {
+            setChallengeCutoffAge(configs.data?.[CONF_PREMOD_CHALLENGE_AGE] ?? 7);
+        }
+    }, [configs.data]);
 
     const device = useTitleBarDevice();
     const rolesQuery = useQuery({
@@ -132,8 +178,8 @@ export function PremoderationSettingsPage() {
                         label={"Akismet"}
                         description={
                             <Translate
-                                source="Enable Akismet to filter spam in all posts by applicant registrations and unverified users. Learn more: <0/>"
-                                c0={<SmartLink to={"https://akismet.com"}>https://akismet.com</SmartLink>}
+                                source="Enable Akismet to filter spam in all posts by applicant registrations and unverified users. <0/>"
+                                c0={<SmartLink to={"https://akismet.com"}>{t("Learn more.")}</SmartLink>}
                             />
                         }
                     >
@@ -145,18 +191,69 @@ export function PremoderationSettingsPage() {
                         description={
                             <Translate
                                 source={
-                                    "Enable Stopforumspam to check community users against a list of reported spammers, and either reports the post as spam or rejects them outright. The reporting and rejecting thresholds are managed in the <0>addon's settings</0>. Learn more: <1/>"
+                                    "Enable Stopforumspam to check community users against a list of reported spammers, and either reports the post as spam or rejects them outright. The reporting and rejecting thresholds are managed in the <0>addon's settings</0>. Learn more in the <1/>"
                                 }
                                 c0={(content) => <SmartLink to={"/settings/addons"}>{content}</SmartLink>}
-                                c1={
-                                    <SmartLink to={"https://www.stopforumspam.com"}>
-                                        https://www.stopforumspam.com
-                                    </SmartLink>
-                                }
+                                c1={<SmartLink to={"https://www.stopforumspam.com"}>{t("documentation.")}</SmartLink>}
                             />
                         }
                     >
                         <AddonToggle addonKey={"stopforumspam"} />
+                    </DashboardFormGroup>
+                    <DashboardFormGroup
+                        label={t("Verify browsers of new members")}
+                        description={
+                            <Translate
+                                source="Unverified members who have been in the community for less than the specified number of days will be prompted to complete a Cloudflare (Captcha or Checkbox) challenge to prevent spam. <0/>"
+                                c0={
+                                    <SmartLink
+                                        to={
+                                            "https://success.vanillaforums.com/kb/articles/1643-verify-browsers-of-new-unverified-members"
+                                        }
+                                    >
+                                        {t("Learn more.")}
+                                    </SmartLink>
+                                }
+                            />
+                        }
+                        className={dashboardClasses().spaceBetweenFormGroup}
+                    >
+                        <span className="input-wrap">
+                            <FormToggle
+                                indeterminate={isChallengeNewUsersLoading}
+                                enabled={isChallengeNewUsersEnabled}
+                                onChange={(enabled) => {
+                                    challengeNewUsersPatcher.patchConfig({
+                                        [CONF_PREMOD_CHALLENGE_NEW_USERS]: enabled,
+                                    });
+                                }}
+                            />
+                        </span>
+                    </DashboardFormGroup>
+                    <DashboardFormGroup
+                        label={t("Challenge Cutoff Age")}
+                        description={t("Number of days since registration to bypass Cloudflare challenge")}
+                        className={dashboardClasses().spaceBetweenFormGroup}
+                    >
+                        <span className={classes.comboInputWrapper}>
+                            <NumberBox
+                                value={challengeCutoffAge}
+                                className={classes.comboInput}
+                                onValueChange={setChallengeCutoffAge}
+                            />
+                            <Button
+                                buttonType={ButtonTypes.STANDARD}
+                                className={classes.comboInputButton}
+                                title={t("Save challenge cutoff age")}
+                                onClick={() => {
+                                    challengeAgePatcher.patchConfig({
+                                        [CONF_PREMOD_CHALLENGE_AGE]: challengeCutoffAge,
+                                    });
+                                }}
+                            >
+                                <Icon icon="data-send" />
+                            </Button>
+                        </span>
                     </DashboardFormGroup>
                     <DashboardFormReadOnlySection
                         title={t("Premoderated Roles")}
@@ -416,7 +513,7 @@ function KeywordModal(props: ModalProps) {
             onCancel={() => clearAndClose()}
             isConfirmDisabled={areConfigsLoading || configPatcher.isLoading}
             onConfirm={() => {
-                configPatcher.patchConfig({ [CONF_PREMOD_KEYWORDS]: keywords } ?? {}).then(() => {
+                configPatcher.patchConfig({ [CONF_PREMOD_KEYWORDS]: keywords }).then(() => {
                     clearAndClose();
                 });
             }}

@@ -9,6 +9,7 @@ import { IUserFragment } from "@library/@types/api/users";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { t } from "@vanilla/i18n";
 
 export interface IPremoderatedRecordResponse {
     status: 202;
@@ -33,6 +34,17 @@ export interface IComment {
     attachments?: IAttachment[];
     reportMeta?: IReportMeta;
     suggestion?: ISuggestedAnswer;
+    experimentalTrending?: number;
+    experimentalTrendingDebug?: {
+        plainText: {
+            template: string;
+            equation: string;
+        };
+        mathMl: {
+            template: string;
+            equation: string;
+        };
+    };
 }
 
 export interface ICommentEdit {
@@ -58,4 +70,11 @@ export enum QnAStatus {
     ACCEPTED = "accepted",
     REJECTED = "rejected",
     PENDING = "pending",
+}
+
+export enum CommentListSortOption {
+    OLDEST = "dateInserted",
+    NEWEST = "-dateInserted",
+    TOP = "-score",
+    TRENDING = "-experimentalTrending",
 }

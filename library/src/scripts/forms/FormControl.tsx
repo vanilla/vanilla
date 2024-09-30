@@ -74,8 +74,10 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                 return (
                     <TextInput
                         value={value}
-                        min={control.min}
-                        max={control.max}
+                        {...(control.type === "number" && {
+                            min: control.min,
+                            max: control.max,
+                        })}
                         minLength={control.minLength}
                         maxLength={control.maxLength}
                         type={control.type}

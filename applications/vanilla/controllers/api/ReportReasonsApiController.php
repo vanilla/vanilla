@@ -50,12 +50,12 @@ class ReportReasonsApiController extends \AbstractApiController
             "isSystem" => false,
         ];
         if ($query["includedDeleted"] ?? false) {
-            $this->permission("community.moderate");
+            $this->permission(["community.moderate", "posts.moderate"]);
             unset($where["deleted"]);
         }
 
         if ($query["includeSystem"] ?? false) {
-            $this->permission("community.moderate");
+            $this->permission(["community.moderate", "posts.moderate"]);
             unset($where["isSystem"]);
         }
 

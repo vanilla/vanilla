@@ -7,6 +7,7 @@
 import { IComment, ICommentEdit, IPremoderatedRecordResponse } from "@dashboard/@types/api/comment";
 import apiv2 from "@library/apiv2";
 import SimplePagerModel, { IWithPaging } from "@library/navigation/SimplePagerModel";
+import { IThreadResponse } from "@vanilla/addon-vanilla/thread/@types/CommentThreadTypes";
 import { RecordID } from "@vanilla/utils";
 
 const CommentsApi = {
@@ -20,6 +21,23 @@ const CommentsApi = {
             data: result.data,
             paging,
         };
+    },
+    threadIndex: async (apiParams: CommentsApi.IndexThreadParams): Promise<IWithPaging<IThreadResponse>> => {
+        const result = await apiv2.get<IThreadResponse>("/comments/thread", {
+            params: apiParams,
+        });
+
+        const paging = SimplePagerModel.parseHeaders(result.headers);
+        return {
+            data: result.data,
+            paging,
+        };
+    },
+    get: async (commentID: RecordID, params?: CommentsApi.SingleParams): Promise<IComment> => {
+        const result = await apiv2.get<IComment>(`/comments/${commentID}`, {
+            params,
+        });
+        return result.data;
     },
     getEdit: async (commentID: RecordID): Promise<ICommentEdit> => {
         const result = await apiv2.get<ICommentEdit>(`/comments/${commentID}/edit`);

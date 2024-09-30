@@ -41,7 +41,7 @@ export const userSpotlightVariables = useThemeCache(
                  */
                 box: Variables.box({
                     background: optionOverrides?.innerBackground,
-                    borderType: optionOverrides?.borderType as BorderType,
+                    borderType: optionOverrides?.borderType,
                     border: globalVars.border,
                 }),
 

@@ -16,6 +16,10 @@ use Garden\Schema\ValidationField;
  */
 abstract class ExternalAction extends AutomationAction
 {
+    protected array $postRecord;
+
+    abstract public function execute(): bool;
+
     /**
      * Prevent the escalation actions from being executed on existing content.
      *
@@ -35,5 +39,34 @@ abstract class ExternalAction extends AutomationAction
 
             return $postFields;
         });
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function setPostRecord(array $postRecord): void
+    {
+        $this->postRecord = $postRecord;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function getPostRecord(): array
+    {
+        return $this->postRecord;
+    }
+
+    /**
+     * Escalate a post to an external service as a long-runner.
+     *
+     * @param array $actionValue
+     * @param array $object Discussion or Comment Data.
+     * @return bool
+     */
+    public function executeLongRunner(array $actionValue, array $object): bool
+    {
+        $this->setPostRecord($object);
+        return $this->execute();
     }
 }

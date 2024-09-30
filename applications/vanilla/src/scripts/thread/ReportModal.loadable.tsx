@@ -36,6 +36,7 @@ import isEqual from "lodash-es/isEqual";
 import { useState } from "react";
 import { useDiscussionThreadContext } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
 import { formatUrl } from "@library/utility/appUtils";
+import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
 
 interface IProps {
     discussionName: string;
@@ -60,13 +61,6 @@ interface IReportReason {
     updateUserID: RecordID;
     permission: IPermission | null;
 }
-
-const EMPTY_RICH2: MyValue = [
-    {
-        children: [{ text: "" }],
-        type: "p",
-    },
-];
 
 /**
  * @deprecated Do not import this component, import ReportModal instead
@@ -94,7 +88,7 @@ export default function ReportModalLoadable(props: IProps) {
     const [hideFromCommunity, setHideFromCommunity] = useState(false);
     const [error, setError] = useState<IError>();
     const [reasons, setReasons] = useState<string[]>([]);
-    const [notes, setNotes] = useState<MyValue>(EMPTY_RICH2);
+    const [notes, setNotes] = useState<MyValue>(EMPTY_RICH2_BODY);
 
     // Get report reasons
     const reportReasons = useQuery<any, IError, IReportReason[]>({
@@ -173,7 +167,7 @@ export default function ReportModalLoadable(props: IProps) {
         setConfirmDialogVisible(false);
         onVisibilityChange(false);
         setReasons([]);
-        setNotes(EMPTY_RICH2);
+        setNotes(EMPTY_RICH2_BODY);
         setError(undefined);
         setEscalateImmediately(false);
         setHideFromCommunity(false);
@@ -181,7 +175,7 @@ export default function ReportModalLoadable(props: IProps) {
     };
 
     const handleCloseButton = () => {
-        if (reasons.length > 0 || !isEqual(notes, EMPTY_RICH2)) {
+        if (reasons.length > 0 || !isEqual(notes, EMPTY_RICH2_BODY)) {
             setConfirmDialogVisible(true);
         } else {
             resetAndExit();

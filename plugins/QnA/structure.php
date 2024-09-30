@@ -26,6 +26,16 @@ Gdn::structure()
     ->set();
 
 Gdn::structure()
+    ->table("Comment")
+    ->createIndexIfNotExists("IX_Comment_DiscussionID_QnA", ["DiscussionID", "QnA", "DateInserted"])
+    ->createIndexIfNotExists("IX_Comment_parentRecord_QnA", [
+        "parentRecordType",
+        "parentRecordID",
+        "QnA",
+        "DateInserted",
+    ]);
+
+Gdn::structure()
     ->table("User")
     ->column("CountAcceptedAnswers", "int", "0")
     ->set();

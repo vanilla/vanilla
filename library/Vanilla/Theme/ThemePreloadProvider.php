@@ -9,6 +9,7 @@ namespace Vanilla\Theme;
 
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
+use Gdn;
 use PHPUnit\Framework\Error\Notice;
 use PHPUnit\Framework\Error\Warning;
 use Vanilla\Addon;
@@ -220,8 +221,14 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
                 return "";
             }
             $styles = $theme->getAssets()[ThemeAssetFactory::ASSET_STYLES] ?? null;
+            $isMinificationEnabled = Gdn::config("minify.styles", true);
             if ($styles) {
-                $this->inlineStyles = "<style>" . $styles->__toString() . "</style>";
+                $styleString = $styles->__toString();
+                if ($isMinificationEnabled) {
+                    $cssMinifier = new \MatthiasMullie\Minify\CSS($styleString);
+                    $styleString = $cssMinifier->minify();
+                }
+                $this->inlineStyles = "<style>" . $styleString . "</style>";
             }
         }
 

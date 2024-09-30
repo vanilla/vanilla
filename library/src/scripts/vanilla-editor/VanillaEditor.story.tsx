@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { LegacyVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
 import { loadTranslations } from "@vanilla/i18n";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryHeading } from "@library/storybook/StoryHeading";
@@ -52,7 +52,7 @@ export function EditorPlayground() {
             <StoryParagraph>
                 This is a demo of the new version of Rich Editor. A lot of functionality is still a work in progress.
             </StoryParagraph>
-            <LegacyVanillaEditor />
+            <LegacyFormVanillaEditor />
         </div>
     );
 }

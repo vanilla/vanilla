@@ -6,12 +6,12 @@
 import React, { useEffect, useState } from "react";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { IAutomationRule } from "@dashboard/automationRules/AutomationRules.types";
-import { AutomationRulesPreview } from "@dashboard/automationRules/preview/AutomationRulesPreview";
+import { AutomationRulesPreviewModal } from "@dashboard/automationRules/preview/AutomationRulesPreviewModal";
 import { useUpdateRecipeStatus } from "@dashboard/automationRules/AutomationRules.hooks";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { t } from "@vanilla/i18n";
 
-interface IProps extends React.ComponentProps<typeof AutomationRulesPreview> {
+interface IProps extends React.ComponentProps<typeof AutomationRulesPreviewModal> {
     status: IAutomationRule["status"];
     automationRuleID: IAutomationRule["automationRuleID"];
     onPreviewModalVisible: (isVisible: boolean) => void;
@@ -72,7 +72,7 @@ export function AutomationRulesStatusToggle(props: IProps) {
                 }}
                 checked={enabled}
             />
-            <AutomationRulesPreview
+            <AutomationRulesPreviewModal
                 formValues={formValues}
                 isRuleRunning={isRuleRunning}
                 isVisible={isPreviewVisible}

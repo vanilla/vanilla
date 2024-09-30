@@ -27,6 +27,7 @@ use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Site\SiteSectionSchema;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\BreadcrumbJsonLD;
 use Vanilla\Web\PageHeadInterface;
 
@@ -74,7 +75,14 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
 
     public function getParamInputSchema(): Schema
     {
-        return Schema::parse(["discussionID:i", "commentID:i?", "page:i?" => ["default" => 1]]);
+        return Schema::parse([
+            "discussionID:i",
+            "commentID:i?",
+            "page:i" => ["default" => 1],
+            "sort:s?" => [
+                "enum" => ["-dateInserted", "dateInserted", "-score", "-" . ModelUtils::SORT_TRENDING],
+            ],
+        ]);
     }
 
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array

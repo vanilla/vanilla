@@ -405,6 +405,9 @@ trait CategoriesWidgetTrait
     {
         // allowed categories for our user
         $visibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs();
+        if ($visibleCategoryIDs === true) {
+            $visibleCategoryIDs = array_column(\CategoryModel::categories(), "CategoryID");
+        }
 
         return array_map(function ($category) use ($visibleCategoryIDs) {
             $fallbackImage = $this->props["itemOptions"]["fallbackImage"] ?? null;

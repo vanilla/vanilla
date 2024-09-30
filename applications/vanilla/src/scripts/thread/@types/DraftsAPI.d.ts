@@ -10,7 +10,8 @@ declare namespace DraftsApi {
             format: string;
             body: string;
         };
-        parentRecordID: RecordID;
+        discussionID?: RecordID;
+        parentRecordID?: RecordID;
         recordType: "discussion" | "comment";
     }
 

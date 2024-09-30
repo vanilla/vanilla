@@ -302,7 +302,7 @@ class ActivityModelTest extends SiteTestCase
         $link = explode("/unsubscribe/", $unsubscribeLink);
         $token = $link[1];
 
-        $activity = $this->activityModel->decodeNotificationToken($token);
+        $activity = $this->getActivityFromToken($token);
         $this->assertEquals("badge, badge", $activity["reason"]);
     }
 
@@ -334,7 +334,7 @@ class ActivityModelTest extends SiteTestCase
         $broken = explode("\"", $token);
         $token = $broken[0];
         $this->expectExceptionMessage("Notification not found.");
-        $this->activityModel->decodeNotificationToken($token);
+        $this->getActivityFromToken($token);
     }
 
     /**
@@ -353,7 +353,7 @@ class ActivityModelTest extends SiteTestCase
         $link = explode("/unsubscribe/", $unsubscribeLink);
         $token = $link[1];
 
-        $activity = $this->activityModel->decodeNotificationToken($token);
+        $activity = $this->getActivityFromToken($token);
         $this->assertEquals("advanced", $activity["reason"]);
         $this->assertEquals("Digest", $activity["activityType"]);
     }
@@ -373,7 +373,7 @@ class ActivityModelTest extends SiteTestCase
         $link = explode("/unsubscribe/", $unsubscribeLink);
         $token = $link[1];
 
-        $activity = $this->activityModel->decodeNotificationToken($token);
+        $activity = $this->getActivityFromToken($token);
         $this->assertEquals("DigestEnabled", $activity["reason"]);
     }
 
@@ -587,5 +587,17 @@ class ActivityModelTest extends SiteTestCase
         $this->assertUserHasEmailsLike($secondUser["userID"], \ActivityModel::SENT_OK, [
             new ExpectedNotification("WallComment", ["commented on your <strong>wall</strong>."]),
         ]);
+    }
+
+    /**
+     * Get activity data from token string
+     * @param string $token
+     * @return array
+     * @throws \Garden\Web\Exception\NotFoundException
+     */
+    private function getActivityFromToken(string $token): array
+    {
+        $payload = $this->activityModel->decodeNotificationToken($token);
+        return $this->activityModel->getNotificationData($payload);
     }
 }

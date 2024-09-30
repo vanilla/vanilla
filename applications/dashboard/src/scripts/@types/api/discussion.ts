@@ -132,6 +132,8 @@ export interface IGetDiscussionListParams {
     dateInserted?: string;
     dateLastComment?: string;
     hasComments?: boolean;
+    insertUserRoleID?: number[];
+    sentiment?: string[];
 }
 
 export enum DiscussionListSortOptions {

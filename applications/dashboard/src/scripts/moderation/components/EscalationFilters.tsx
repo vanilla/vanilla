@@ -51,6 +51,7 @@ export function EscalationFilters(props: IProps) {
                 initialFilters={props.value.assignedUserID}
                 dynamicOptionApi={{
                     ...userLookup,
+                    searchUrl: "/escalations/lookup-assignee?name=%s*&limit=10",
                     optionOverride: [{ value: "-4", name: "Unassigned", data: { icon: deletedUserFragment() } }],
                 }}
                 onFilterChange={props.onFilter}

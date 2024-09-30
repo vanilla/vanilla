@@ -1,7 +1,13 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+/**
+ * Maximum page count for most of our api endpoints.
+ */
+
+export const MAX_PAGE_COUNT = 10000;
 
 /**
  * Represent pages potentially returned from a Link header.

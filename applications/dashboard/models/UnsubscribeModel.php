@@ -116,9 +116,18 @@ class UnsubscribeModel
      * @return array
      * @throws NotFoundException
      */
-    public function validateAccess(string $token, string $enabled = null): array
+    public function validateAccess(string $token, ?bool $enabled = null): array
     {
-        $activityInfo = $this->activityModel->decodeNotificationToken($token);
+        $result = [];
+        $payload = $this->activityModel->decodeNotificationToken($token);
+        // We need to inverse the enabled flag, because we need to set that as the preference value
+        $status = $enabled == null || !$enabled;
+        $result = Gdn::eventManager()->fireFilter("unsubscribeModel_processPayload", $result, $payload, $status);
+        // If the notification is related to any plugin, process and return the result
+        if (!empty($result)) {
+            return $result;
+        }
+        $activityInfo = $this->activityModel->getNotificationData($payload);
         $reasons = empty($activityInfo["reason"]) ? [] : explode(", ", $activityInfo["reason"]);
         $user = $this->userModel->getID($activityInfo["notifyUserID"], DATASET_TYPE_ARRAY);
         $this->metaPrefs = $this->userMetaModel->getUserMeta(
@@ -144,12 +153,11 @@ class UnsubscribeModel
             } elseif (in_array("participated", $reasons)) {
                 $reasons[] = "ParticipateComment";
             }
-        } else {
+        } elseif ($activityInfo["activityType"] !== "Digest") {
             $reasons[] = $activityInfo["activityType"];
         }
 
         $reasons = array_unique(array_merge($reasons, $activityInfo["ActivityTypeList"]));
-        $result = [];
         foreach ($reasons as $reason) {
             if (str_starts_with($reason, "FollowedCategory:")) {
                 $categoryInfo = explode(":", $reason);

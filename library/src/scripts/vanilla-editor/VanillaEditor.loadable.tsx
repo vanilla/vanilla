@@ -85,6 +85,8 @@ interface IProps {
     isMobile?: boolean;
     /** Show a static message for the layout editor instead of an editable field */
     isPreview?: boolean;
+    /** Any react node which need to appear within the editor bounds */
+    inEditorContent?: React.ReactNode;
 
     editorRef?: React.RefObject<MyEditor>;
     showConversionNotice?: boolean;
@@ -100,7 +102,7 @@ export function createVanillaEditor(options?: { initialValue?: MyEditor; id?: st
     });
 }
 
-export function LegacyVanillaEditor(props: IProps) {
+export function LegacyFormVanillaEditor(props: IProps) {
     const { legacyTextArea, initialFormat, needsHtmlConversion, ...rest } = props;
     const store = getStore();
 
@@ -118,7 +120,7 @@ export function LegacyVanillaEditor(props: IProps) {
 }
 
 export function VanillaEditorLoadable(props: IProps) {
-    const { uploadEnabled = true, legacyTextArea } = props;
+    const { uploadEnabled = true, legacyTextArea, inEditorContent } = props;
     const syncContext = useSynchronizationContext();
     const { syncTextArea, initialValue } = syncContext;
     const showConversionNotice = props.showConversionNotice ?? syncContext.showConversionNotice;
@@ -261,13 +263,15 @@ export function VanillaEditorLoadable(props: IProps) {
                                 </Plate>
                             </VanillaEditorFocusContext>
                         )}
-
-                        <PersistentToolbar
-                            uploadEnabled={uploadEnabled}
-                            flyoutsDirection={"above"}
-                            isMobile={followMobileRenderingRules}
-                        />
-                        {!followMobileRenderingRules && <FloatingElementToolbar />}
+                        <div className={vanillaEditorClasses().footer}>
+                            <PersistentToolbar
+                                uploadEnabled={uploadEnabled}
+                                flyoutsDirection={"above"}
+                                isMobile={followMobileRenderingRules}
+                            />
+                            {!followMobileRenderingRules && <FloatingElementToolbar />}
+                            {inEditorContent}
+                        </div>
                     </VanillaEditorContainer>
                 </VanillaEditorBoundsContext>
             </PlateProvider>

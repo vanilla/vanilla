@@ -1,20 +1,18 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { ReactNode } from "react";
+import { cx } from "@emotion/css";
+import { checkRadioClasses } from "@library/forms/checkRadioStyles";
+import { useRadioGroupContext } from "@library/forms/RadioGroupContext";
+import { InformationIcon } from "@library/icons/common";
+import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@library/utility/appUtils";
 import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
-import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import classNames from "classnames";
-import { cx } from "@emotion/css";
-import { ToolTip } from "@library/toolTip/ToolTip";
-import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
-import { InformationIcon } from "@library/icons/common";
-import { Icon } from "@vanilla/icons";
-import { useRadioGroupContext } from "@library/forms/RadioGroupContext";
+import React, { ReactNode } from "react";
 interface IProps extends IOptionalComponentID {
     id?: string;
     className?: string;
@@ -81,7 +79,7 @@ export function RadioButton(props: IProps) {
                 )}
             </label>
             {note && (
-                <div id={noteID} className={"info"}>
+                <div id={noteID} className={cx("info", classes.radioNote)}>
                     {note}
                 </div>
             )}

@@ -953,7 +953,7 @@ export const AsNavLinks = storyWithConfig({ useWrappers: false }, () => {
                 title="As Navigation Links"
                 maxItemCount={4}
                 containerOptions={{
-                    borderType: "navLinks",
+                    borderType: BorderType.NAV_LINKS,
                     maxColumnCount: 1,
                     viewAll: { to: "#", position: "bottom" },
                 }}
@@ -966,7 +966,7 @@ export const AsNavLinks = storyWithConfig({ useWrappers: false }, () => {
                 title="As Navigation Links"
                 maxItemCount={4}
                 containerOptions={{
-                    borderType: "navLinks",
+                    borderType: BorderType.NAV_LINKS,
                     maxColumnCount: 2,
                     viewAll: { to: "#", position: "bottom" },
                 }}

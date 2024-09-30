@@ -35,6 +35,13 @@ export const discussionCommentEditorClasses = useThemeCache(() => {
         },
     });
 
+    const draftIndicator = css({
+        width: 24,
+        height: "100%",
+        marginInlineEnd: 8,
+        transform: "translateY(2px)",
+    });
+
     const previewDisablePointerEvents = css({
         pointerEvents: "none",
     });
@@ -43,6 +50,7 @@ export const discussionCommentEditorClasses = useThemeCache(() => {
         pageBox,
         editorPostActions,
         draftMessage,
+        draftIndicator,
         previewDisablePointerEvents,
     };
 });

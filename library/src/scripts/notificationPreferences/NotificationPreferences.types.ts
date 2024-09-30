@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
 import { JSONSchemaType } from "@vanilla/json-schema-forms";
 import { RecordID } from "@vanilla/utils";
 import type { TableInstance } from "react-table";
@@ -40,3 +41,20 @@ export interface INotificationPreferencesApi {
 
 export type ColumnType = { popup?: boolean; email?: boolean; description: string; id: string; error?: boolean };
 export type TableType = TableInstance<ColumnType>;
+
+export interface NotificationType {
+    /**
+     * The phrase returned should be translatable; it will be interpolated into a sentence like "Notify users of `${getDescription()}`".
+     * When adding a new category notification type, make sure to add a the phrase to the locales file.
+     */
+    getDescription(): string;
+
+    /**
+     * Return the default preferences for this category type.
+     * When available, the user's global notification preferences will be passed as an argument.
+     * Implementations should default to false for all properties.
+     */
+    getDefaultPreferences?(
+        userPreferences?: INotificationPreferences,
+    ): Partial<ICategoryPreferences> | Record<string, string>;
+}

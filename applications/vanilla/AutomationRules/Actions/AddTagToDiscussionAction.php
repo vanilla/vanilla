@@ -11,6 +11,7 @@ use Garden\Container\NotFoundException;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
+use Gdn_UserException;
 use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Forms\ApiFormChoices;
@@ -18,9 +19,17 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use TagModel;
 use Vanilla\Logger;
+use Vanilla\Models\DiscussionInterface;
 
-class AddTagToDiscussionAction extends AutomationAction
+/**
+ * Automation Action to add a tag to a discussion.
+ */
+class AddTagToDiscussionAction extends AutomationAction implements DiscussionInterface
 {
+    private int $discussionID;
+
+    private array $actionValue = [];
+
     public string $affectedRecordType = "Discussion";
     /**
      * @inheridoc
@@ -86,40 +95,53 @@ class AddTagToDiscussionAction extends AutomationAction
      * @return bool
      * @throws ContainerException
      * @throws NotFoundException
-     * @throws \Gdn_UserException
+     * @throws Gdn_UserException
      * @throws NoResultsException
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
+        $this->setActionValue($actionValue);
+        $this->setDiscussionID($object["DiscussionID"]);
+        return $this->execute();
+    }
+
+    /**
+     * Execute the action.
+     *
+     * @return bool
+     * @throws ContainerException
+     * @throws NoResultsException|Gdn_UserException
+     */
+    public function execute(): bool
+    {
+        $tagIDs = $this->getActionValue("tagID");
+
         $tagModel = \Gdn::getContainer()->get(TagModel::class);
         // Make sure the tags are not already added to the discussion
         $currentDiscussionTagIDs = [];
-        $tagsToApply = [];
-        $currentDiscussionTags = $tagModel->getDiscussionTags($object["DiscussionID"], TagModel::IX_TAGID);
+        $currentDiscussionTags = $tagModel->getDiscussionTags($this->getDiscussionID(), TagModel::IX_TAGID);
         if (!empty($currentDiscussionTags)) {
             $currentDiscussionTagIDs = array_keys($currentDiscussionTags);
-        } else {
-            $currentDiscussionTagIDs = [];
         }
-        $tagsToApply = array_diff($actionValue["tagID"], $currentDiscussionTagIDs);
+        $tagsToApply = array_diff($tagIDs, $currentDiscussionTagIDs);
         if (empty($tagsToApply)) {
             $this->logger->info("No tags to apply for discussion.", [
                 Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
                 Logger::FIELD_TAGS => ["automation rules", "addTagsToDiscussion"],
-                "discussionID" => $object["DiscussionID"],
+                "discussionID" => $this->getDiscussionID(),
                 "automationRuleID" => $this->getAutomationRuleID(),
                 "dispatchUUID" => $this->getDispatchUUID(),
             ]);
             return false;
         }
-        $tagModel->addDiscussion($object["DiscussionID"], $actionValue["tagID"]);
+        $tagModel->addDiscussion($this->getDiscussionID(), $tagIDs);
         $logData = [
             "addTagToDiscussion" => [
                 "tagID" => array_values($tagsToApply),
-                "recordID" => $object["DiscussionID"],
+                "recordID" => $this->getDiscussionID(),
             ],
         ];
-        $this->insertPostLog($object["DiscussionID"], $logData);
+        $this->insertPostLog($this->getDiscussionID(), $logData);
         return true;
     }
 
@@ -181,5 +203,46 @@ class AddTagToDiscussionAction extends AutomationAction
         }
 
         return $result;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function setDiscussionID(int $discussionID): void
+    {
+        $this->discussionID = $discussionID;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function getDiscussionID(): int
+    {
+        return $this->discussionID;
+    }
+
+    /**
+     * `actionValue` setter function.
+     *
+     * @param array $actionValue
+     * @return void
+     */
+    public function setActionValue(array $actionValue): void
+    {
+        $this->actionValue = $actionValue;
+    }
+
+    /**
+     * `actionValue` getter function.
+     *
+     * @param string $key
+     * @return array
+     */
+    private function getActionValue(string $key = ""): array
+    {
+        if ($key != "") {
+            return $this->actionValue[$key] ?? [];
+        }
+        return $this->actionValue;
     }
 }

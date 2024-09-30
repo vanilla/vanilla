@@ -51,6 +51,7 @@ use Vanilla\Dashboard\Events\AiSuggestionAccessEvent;
 use Vanilla\Dashboard\Events\ConfigurationChangeEvent;
 use Vanilla\Dashboard\Events\DashboardAccessEvent;
 use Vanilla\Dashboard\Events\DashboardApiAccessEvent;
+use Vanilla\Dashboard\Events\ExportAccessEvent;
 use Vanilla\Dashboard\Events\LayoutApplyEvent;
 use Vanilla\Dashboard\Events\PasswordResetCompletedEvent;
 use Vanilla\Dashboard\Events\PasswordResetEmailSentEvent;
@@ -89,6 +90,7 @@ use Vanilla\OpenAPIBuilder;
 use Vanilla\Premoderation\SuperSpamAuditLog;
 use Vanilla\SamlSSO\Events\JsConnectAuditEvent;
 use Vanilla\SamlSSO\Events\OAuth2AuditEvent;
+use Vanilla\Dashboard\Events\SsoStringAuditEvent;
 use Vanilla\Web\APIExpandMiddleware;
 
 /**
@@ -203,6 +205,7 @@ class DashboardContainerRules extends AddonContainerRules
                 [
                     DashboardAccessEvent::class,
                     DashboardApiAccessEvent::class,
+                    ExportAccessEvent::class,
                     ResourceEvent::class,
                     UserSpoofEvent::class,
                     UserSignInEvent::class,
@@ -222,6 +225,7 @@ class DashboardContainerRules extends AddonContainerRules
                     JsConnectAuditEvent::class,
                     AiSuggestionAccessEvent::class,
                     SuperSpamAuditLog::class,
+                    SsoStringAuditEvent::class,
                 ],
             ]);
 

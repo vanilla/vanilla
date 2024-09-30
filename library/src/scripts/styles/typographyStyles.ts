@@ -30,6 +30,7 @@ export const typographyClasses = useThemeCache(() => {
                 ...globalVars.fontSizeAndWeightVars("title"),
                 lineHeight: globalVars.lineHeights.condensed,
             }),
+            textWrap: "balance",
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontalOffset)})`,
             margin: 0,
             ...lineHeightAdjustment(),

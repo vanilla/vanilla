@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Gdn;
+use UserMetaModel;
 use UserModel;
 use UsersApiController;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
@@ -16,6 +17,7 @@ use Vanilla\Events\EventAction;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\PrivateCommunityMiddleware;
+use VanillaTests\Dashboard\Controllers\AiSuggestionsApiControllerTest;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Fixtures\TestUploader;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -648,10 +650,42 @@ class UsersTest extends AbstractResourceTest
         $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
         $this->assertArrayNotHasKey("suggestAnswers", $response->getBody());
         $this->runWithConfig(
-            ["Feature.AISuggestions.Enabled" => true, "aiSuggestions.enabled" => true],
+            [
+                "Feature.AISuggestions.Enabled" => true,
+                "Feature.aiFeatures.Enabled" => true,
+                "aiSuggestions.enabled" => true,
+            ],
             function () use ($user) {
                 $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
                 $this->assertSame(false, $response->getBody()["suggestAnswers"]);
+                $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => true]);
+                $this->assertSame(true, $response->getBody()["suggestAnswers"]);
+            }
+        );
+    }
+
+    /**
+     * Test that the private field can be patched.
+     */
+    public function testPatchSuggestAnswersFieldError()
+    {
+        $user = $this->createUser(["name" => __FUNCTION__]);
+        \Gdn::userMetaModel()->setUserMeta($user["userID"], UserMetaModel::ANONYMIZE_DATA_USER_META, 1);
+        $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
+        $this->assertArrayNotHasKey("suggestAnswers", $response->getBody());
+        $this->expectExceptionMessage(
+            AiSuggestionsApiControllerTest::VALID_SETTINGS["name"] .
+                " Answers is not available if you have not accepted cookies."
+        );
+
+        $this->runWithConfig(
+            [
+                "Feature.AISuggestions.Enabled" => true,
+                "Feature.aiFeatures.Enabled" => true,
+                "aiSuggestions.enabled" => true,
+            ],
+            function () use ($user) {
+                $this->api()->patch("/ai-suggestions/settings", AiSuggestionsApiControllerTest::VALID_SETTINGS);
                 $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => true]);
                 $this->assertSame(true, $response->getBody()["suggestAnswers"]);
             }
@@ -840,12 +874,12 @@ class UsersTest extends AbstractResourceTest
         $this->assertArrayHasKey("private", $response);
         $this->assertTrue($response["private"]);
 
-        //Now access the information as guest. Guest shouldn't be able to see it.
-        $this->api()->setUserID(0);
-        $this->expectException(ForbiddenException::class);
+        //Now access the information as guest. Guest has very limited information.
         $this->api()
             ->get("/users/{$privateUser["userID"]}")
             ->getBody();
+        $this->assertArrayHasKey("private", $response);
+        $this->assertTrue($response["private"]);
     }
 
     /**
@@ -1646,7 +1680,7 @@ class UsersTest extends AbstractResourceTest
         array $permissions,
         bool $visibleToUser = true
     ) {
-        $user = $this->createUser();
+        $user = $this->createUser(["Private" => false]);
         $profileField = $this->createProfileField(["visibility" => $visibility]);
 
         $this->api()->patch("$this->baseUrl/{$user["userID"]}/profile-fields", [

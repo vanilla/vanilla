@@ -6,6 +6,7 @@
 
 import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { css } from "@emotion/css";
 import { IApiError } from "@library/@types/api/core";
 import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
 import { useUserCanStillEditDiscussionOrComment } from "@library/features/discussions/discussionHooks";
@@ -53,10 +54,17 @@ interface IProps {
     onMutateSuccess?: () => Promise<void>;
     isEditLoading: boolean;
     isVisible?: IDropDownProps["isVisible"];
+    isInternal?: boolean;
 }
 
+const reportButtonAlignment = css({
+    "&:not(:last-child)": {
+        marginInlineEnd: -8,
+    },
+});
+
 export function CommentOptionsMenu(props: IProps) {
-    const { discussion, comment, onMutateSuccess } = props;
+    const { discussion, comment, onMutateSuccess, isInternal } = props;
     const items: React.ReactNode[] = [];
     const currentUser = useCurrentUser();
     const { hasPermission } = usePermissionsContext();
@@ -66,7 +74,7 @@ export function CommentOptionsMenu(props: IProps) {
         resourceID: comment.categoryID,
     };
 
-    const canReport = hasPermission("flag.add") && getMeta("featureFlags.escalations.Enabled", false);
+    const canReport = !isInternal && hasPermission("flag.add") && getMeta("featureFlags.escalations.Enabled", false);
 
     const toast = useToast();
     const deleteMutation = useMutation({
@@ -182,7 +190,7 @@ export function CommentOptionsMenu(props: IProps) {
             );
         });
 
-    if (integrationItems.length > 0) {
+    if (integrationItems.length > 0 && !isInternal) {
         items.push(<DropDownItemSeparator />);
         items.push(...integrationItems);
     }
@@ -214,7 +222,11 @@ export function CommentOptionsMenu(props: IProps) {
                     customTrigger={(props) => {
                         return (
                             <ToolTip label={t("Report content")}>
-                                <Button buttonType={ButtonTypes.ICON} onClick={props.onClick}>
+                                <Button
+                                    buttonType={ButtonTypes.ICON}
+                                    onClick={props.onClick}
+                                    className={reportButtonAlignment}
+                                >
                                     <Icon icon="post-flag" />
                                 </Button>
                             </ToolTip>

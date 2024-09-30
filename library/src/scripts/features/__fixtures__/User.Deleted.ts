@@ -15,3 +15,12 @@ export function deletedUserFragment(): IUserFragment {
         dateLastActive: null,
     };
 }
+
+export function unknownUserFragment(): IUserFragment {
+    return {
+        userID: 0,
+        name: t("Unknown User"),
+        photoUrl: "",
+        dateLastActive: null,
+    };
+}

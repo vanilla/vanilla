@@ -25,20 +25,20 @@ import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAt
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { StackingContextProvider } from "@vanilla/react-utils";
-
-interface IProps {
-    escalations: IEscalation[];
-}
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { IAttachmentIntegration } from "@library/features/discussions/integrations/Integrations.types";
 
 export function EscalationListItem(props: {
     escalation: IEscalation;
     onMessageAuthor: (messageInfo: IMessageInfo) => void;
     onRecordVisibilityChange: (recordIsLive: boolean) => void;
+    onAttachmentCreated?: (attachmentType: IAttachmentIntegration) => void;
 }) {
     const { escalation, onMessageAuthor, onRecordVisibilityChange } = props;
     const classes = escalationClasses();
     const writeableIntegrations = useWriteableAttachmentIntegrations();
     const queryClient = useQueryClient();
+    const url = props.escalation.url;
 
     return (
         <div className={classes.listItem}>
@@ -48,10 +48,7 @@ export function EscalationListItem(props: {
                     depth={4}
                     title={
                         <div className={classes.title}>
-                            <SmartLink
-                                className={classes.titleContents}
-                                to={`/dashboard/content/escalations/${escalation.escalationID}`}
-                            >
+                            <SmartLink className={classes.titleContents} to={url}>
                                 {escalation.name}
                             </SmartLink>
                             <EscalationStatus status={escalation.status} />
@@ -82,8 +79,8 @@ export function EscalationListItem(props: {
                                 <DropDownSection title={t("Integrations")}>
                                     {writeableIntegrations
                                         .filter(({ recordTypes }) => recordTypes.includes("escalation"))
-
-                                        .map(({ attachmentType }) => {
+                                        .map((attachmentCatalog) => {
+                                            const { attachmentType } = attachmentCatalog;
                                             return (
                                                 <WriteableIntegrationContextProvider
                                                     key={attachmentType}
@@ -93,6 +90,7 @@ export function EscalationListItem(props: {
                                                 >
                                                     <IntegrationButtonAndModal
                                                         onSuccess={() => {
+                                                            props.onAttachmentCreated?.(attachmentCatalog);
                                                             queryClient.invalidateQueries(["escalations"]);
                                                             return Promise.resolve();
                                                         }}
@@ -132,6 +130,9 @@ export function EscalationListItem(props: {
                 <EscalationAssignee escalation={escalation} inCard />
                 <span style={{ flex: 1 }}></span>
 
+                <LinkAsButton to={url} buttonType={ButtonTypes.TEXT}>
+                    View Details
+                </LinkAsButton>
                 <Button
                     buttonType={ButtonTypes.TEXT}
                     onClick={() => {

@@ -24,6 +24,10 @@ class UserMetaModel extends Gdn_Model
     /** Anonymize Meta */
     const ANONYMIZE_DATA_USER_META = "AnonymizeData";
 
+    const ANONYMIZE_DATA_ACCEPTED = "-1";
+    const ANONYMIZE_DATA_DECLINED = "1";
+    const ANONYMIZE_DATA_NOT_ACTED = "0";
+
     /** @var Gdn_Cache */
     private $cache;
 
@@ -377,5 +381,25 @@ class UserMetaModel extends Gdn_Model
         $queryValue = $key . "." . "$valuePart";
         $queryValue = substr($queryValue, 0, self::QUERY_VALUE_LENGTH);
         return $queryValue;
+    }
+
+    /**
+     * Check if user accepted Cookie
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function hasUserAcceptedCookie(int $userID)
+    {
+        $anonymize = \Gdn::config("VanillaAnalytics.AnonymizeData");
+        $anonymizeUser = $this->getUserMeta(
+            $userID,
+            UserMetaModel::ANONYMIZE_DATA_USER_META,
+            self::ANONYMIZE_DATA_NOT_ACTED
+        );
+
+        return (!$anonymize &&
+            $anonymizeUser[UserMetaModel::ANONYMIZE_DATA_USER_META] !== self::ANONYMIZE_DATA_DECLINED) ||
+            $anonymizeUser[UserMetaModel::ANONYMIZE_DATA_USER_META] === self::ANONYMIZE_DATA_ACCEPTED;
     }
 }

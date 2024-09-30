@@ -9,13 +9,10 @@ namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Forms\FormOptions;
-use Vanilla\Forms\SchemaForm;
 use Vanilla\Http\InternalClient;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
-use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
@@ -24,6 +21,7 @@ class DiscussionCommentsAsset extends AbstractLayoutAsset implements HydrateAwar
     use HydrateAwareTrait;
     use TwigRenderTrait;
     use HomeWidgetContainerSchemaTrait;
+    use DiscussionCommentsAssetSchemaTrait;
 
     /** @var InternalClient */
     private InternalClient $internalClient;
@@ -44,20 +42,61 @@ class DiscussionCommentsAsset extends AbstractLayoutAsset implements HydrateAwar
         $discussionID = $this->getHydrateParam("discussionID");
         $page = $this->getHydrateParam("page");
         $limit = $this->props["apiParams"]["limit"] ?? $this->configuration->get("Vanilla.Comments.PerPage");
+        $collapseChildDepth = $this->props["apiParams"]["collapseChildDepth"] ?? null;
+
         $apiParams = [
             "discussionID" => $discussionID,
             "page" => $page,
             "limit" => $limit,
             "expand" => ["insertUser", "reactions", "attachments", "reportMeta"],
+            "sort" => $this->getHydrateParam("sort") ?? ($this->props["apiParams"]["sort"] ?? "dateInserted"),
+            "defaultSort" => $this->props["apiParams"]["sort"],
         ];
-        $comments = $this->internalClient->get("/comments", $apiParams)->asData();
+
+        $props = [];
+        $threadStyle = \Gdn::config("threadStyle", "flat");
+        // maybe we should always get comments and commentsThread ?
+        if ($threadStyle === "nested") {
+            $apiParams = $apiParams + [
+                "parentRecordID" => $discussionID,
+                "parentRecordType" => "discussion",
+                "collapseChildDepth" => $collapseChildDepth,
+            ];
+            $commentsThread = $this->internalClient->get("/comments/thread", $apiParams)->asData();
+            $props["commentsThread"] = $commentsThread->withPaging();
+
+            // this one for seo html
+            $comments = $commentsThread->getData();
+            if ($comments && $comments["commentsByID"]) {
+                $props["comments"]["data"] = array_values($comments["commentsByID"]);
+            }
+        } else {
+            $comments = $this->internalClient->get("/comments", $apiParams)->asData();
+            $props["comments"] = $comments->withPaging();
+        }
+
         $props =
-            [
-                "comments" => $comments->withPaging(),
+            $props + [
                 "apiParams" => array_merge($this->props["apiParams"] ?? [], $apiParams),
                 "discussion" => $this->getHydrateParam("discussion"),
                 "discussionApiParams" => $this->getHydrateParam("discussionApiParams"),
-            ] + $this->props;
+            ] +
+            $this->props;
+
+        $drafts = $this->internalClient->get("/drafts?recordType=comment&parentRecordID=" . $discussionID)->asData();
+
+        // If there is a drafts, pass it on
+        if ($drafts[0]) {
+            $draft = [
+                "draft" => [
+                    "draftID" => $drafts[0]["draftID"],
+                    "body" => $drafts[0]["attributes"]["body"],
+                    "dateUpdated" => $drafts[0]["dateUpdated"],
+                    "format" => $drafts[0]["attributes"]["format"],
+                ],
+            ];
+            $props = array_merge($props, $draft);
+        }
 
         return $props;
     }
@@ -98,25 +137,7 @@ TWIG
 
     public static function getWidgetSchema(): Schema
     {
-        $schema = SchemaUtils::composeSchemas(
-            Schema::parse([
-                "apiParams" => [
-                    "default" => [],
-                    "type" => "object",
-                    "properties" => [
-                        "limit" => [
-                            "type" => "integer",
-                            "x-control" => SchemaForm::textBox(new FormOptions("Count Comments"), "number"),
-                        ],
-                    ],
-                ],
-            ])
-        );
-        $schema
-            ->setDescription("Configure API options")
-            ->setField("x-control", SchemaForm::section(new FormOptions("Data Options")));
-
-        return $schema;
+        return self::getAssetSchema();
     }
 
     public static function getWidgetName(): string

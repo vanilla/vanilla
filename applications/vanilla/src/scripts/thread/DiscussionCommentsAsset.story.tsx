@@ -31,7 +31,13 @@ const StoryCommentList = () => {
         <QueryClientProvider client={queryClient}>
             <DiscussionCommentsAsset
                 comments={{ data: STORY_COMMENTS, paging: LayoutEditorPreviewData.paging(5) }}
-                apiParams={{ discussionID: fakeDiscussion.discussionID, limit: 5, page: 1 }}
+                apiParams={{
+                    parentRecordType: "discussion",
+                    parentRecordID: fakeDiscussion.discussionID,
+                    limit: 5,
+                    page: 1,
+                }}
+                threadStyle="flat"
                 discussion={fakeDiscussion}
             />
         </QueryClientProvider>

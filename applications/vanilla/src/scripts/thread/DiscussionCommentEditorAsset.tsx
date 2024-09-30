@@ -19,6 +19,7 @@ import { IComment, IPremoderatedRecordResponse } from "@dashboard/@types/api/com
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { NewCommentEditor } from "@vanilla/addon-vanilla/thread/components/NewCommentEditor";
 import { t } from "@vanilla/i18n";
+import { getLocalStorageOrDefault } from "@vanilla/react-utils";
 
 interface IDraftProps {
     draftID: number;
@@ -38,12 +39,14 @@ export const EMPTY_DRAFT: MyValue = [{ type: "p", children: [{ text: "" }] }];
 
 export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "", categoryID: 0 }) {
     const { draft, discussionID } = props;
-    const [ownDraft, setDraft] = useState<IDraftProps | undefined>(draft);
+    const [ownDraft, setDraft] = useState<IDraftProps | undefined>();
     const { addToast } = useToast();
     const [value, setValue] = useState<MyValue | undefined>();
     const [editorKey, setEditorKey] = useState(0);
     const queryClient = useQueryClient();
     const lastSaved = useRef<Date | null>(draft ? new Date(draft.dateUpdated) : null);
+
+    const cacheDraftParentID = getLocalStorageOrDefault(`commentDraftParentID-${discussionID}`, null);
 
     const resetState = () => {
         setDraft(undefined);
@@ -51,6 +54,13 @@ export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "",
         setValue(EMPTY_DRAFT);
         setEditorKey((existing) => existing + 1);
     };
+
+    // FIXME: Need to integrate with the new draft system
+    useEffect(() => {
+        if (cacheDraftParentID === discussionID) {
+            setDraft(draft);
+        }
+    }, [draft, cacheDraftParentID]);
 
     const postMutation = useMutation({
         mutationFn: async (body: string) => {
@@ -75,6 +85,7 @@ export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "",
         resetState();
         await queryClient.invalidateQueries({ queryKey: ["discussion"] });
         await queryClient.invalidateQueries({ queryKey: ["commentList"] });
+        await queryClient.invalidateQueries({ queryKey: ["commentThread"] });
         //FIXME: comment permalinks don't work in new thread view yet
         // window.location.href = comment.url;
     }

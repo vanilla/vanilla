@@ -26,6 +26,7 @@
             "@Zendesk/*": ["./cloud/plugins/Zendesk/src/scripts/*"],
             "@QnA/*": ["./plugins/QnA/src/scripts/*"],
             "@vanilla-ai/*": ["./cloud/plugins/vanilla-ai/src/scripts/*"],
+            "@vfdeploy/*": ["./plugins/vfdeploy/src/scripts/*"],
             "@zoom/*": ["./cloud/plugins/zoom/src/scripts/*"],
             "typestyle": ["./library/src/scripts/styles/styleShim.ts"],
             "@vanilla/dom-utils": ["./packages/vanilla-dom-utils/*"],

@@ -20,6 +20,9 @@ use Vanilla\Web\SystemCallableInterface;
  */
 class PermissionNotificationGenerator implements SystemCallableInterface
 {
+    const BATCH_SIZE_CONFIG_KEY = "Vanilla.Permission.NotificationBatchSize";
+    private int $batchSize;
+
     /**
      * D.I.
      *
@@ -29,6 +32,7 @@ class PermissionNotificationGenerator implements SystemCallableInterface
      * @param UserMetaModel $userMetaModel
      * @param ActivityModel $activityModel
      * @param LongRunner $longRunner
+     * @param ConfigurationInterface $config
      */
     public function __construct(
         protected PermissionModel $permissionModel,
@@ -39,6 +43,7 @@ class PermissionNotificationGenerator implements SystemCallableInterface
         protected LongRunner $longRunner,
         protected ConfigurationInterface $config
     ) {
+        $this->batchSize = $this->config->get(self::BATCH_SIZE_CONFIG_KEY, 100);
     }
 
     /**
@@ -118,62 +123,71 @@ class PermissionNotificationGenerator implements SystemCallableInterface
             [$permissions, $preference, $junctionTable, $junctionID, $hasDefaultPreferences]
         );
 
-        // Grab all the users that need to be notified.
-        $usersToNotify = $this->getUsersWithPreferences(
-            $permissions,
-            $preference,
-            $lastUserID,
-            $junctionTable,
-            $junctionID,
-            $hasDefaultPreferences
-        );
-
         // Start sending the notifications.
-        foreach ($usersToNotify as $userID => $userPreferences) {
-            try {
-                if (!$this->usermodel->checkPermission($userID, $permissions)) {
-                    continue;
-                }
+        do {
+            $usersToNotify = $this->getUsersWithPreferences(
+                $permissions,
+                $preference,
+                $lastUserID,
+                $junctionTable,
+                $junctionID,
+                $hasDefaultPreferences
+            );
 
-                $activity["NotifyUserID"] = $userID;
-                $activity["Emailed"] =
-                    $userPreferences["Emailed"] ?? false ? ActivityModel::SENT_PENDING : ActivityModel::SENT_SKIPPED;
-                $activity["Notified"] =
-                    $userPreferences["Notified"] ?? false ? ActivityModel::SENT_PENDING : ActivityModel::SENT_SKIPPED;
+            foreach ($usersToNotify as $userID => $userPreferences) {
+                try {
+                    if (!$this->usermodel->checkPermission($userID, $permissions)) {
+                        continue;
+                    }
 
-                $longRunnerID = "User_{$userID}_NotificationType_{$activityType}_Preference_$preference";
-                if (
-                    $activity["Notified"] === ActivityModel::SENT_SKIPPED &&
-                    $activity["Emailed"] === ActivityModel::SENT_SKIPPED
-                ) {
-                    // No point sending a notification if the user has opted out.
-                    yield new LongRunnerSuccessID($longRunnerID);
-                    continue;
-                }
-                $options += [
-                    "NoDelete" => true,
-                    "DisableFloodControl" => true,
-                ];
-                $result = $this->activityModel->save($activity, false, $options);
+                    $activity["NotifyUserID"] = $userID;
+                    $activity["Emailed"] =
+                        $userPreferences["Emailed"] ?? false
+                            ? ActivityModel::SENT_PENDING
+                            : ActivityModel::SENT_SKIPPED;
+                    $activity["Notified"] =
+                        $userPreferences["Notified"] ?? false
+                            ? ActivityModel::SENT_PENDING
+                            : ActivityModel::SENT_SKIPPED;
 
-                if (!$this->didActivitySave($result)) {
-                    yield new LongRunnerFailedID($longRunnerID);
-                } else {
-                    yield new LongRunnerSuccessID($longRunnerID);
+                    $longRunnerID = "User_{$userID}_NotificationType_{$activityType}_Preference_$preference";
+                    if (
+                        $activity["Notified"] === ActivityModel::SENT_SKIPPED &&
+                        $activity["Emailed"] === ActivityModel::SENT_SKIPPED
+                    ) {
+                        // No point sending a notification if the user has opted out.
+                        yield new LongRunnerSuccessID($longRunnerID);
+                        continue;
+                    }
+                    $options += [
+                        "NoDelete" => true,
+                        "DisableFloodControl" => true,
+                    ];
+                    $result = $this->activityModel->save($activity, false, $options);
+
+                    if (!$this->didActivitySave($result)) {
+                        yield new LongRunnerFailedID($longRunnerID);
+                    } else {
+                        yield new LongRunnerSuccessID($longRunnerID);
+                    }
+                } catch (LongRunnerTimeoutException $e) {
+                    return new LongRunnerNextArgs([
+                        $activity,
+                        $permissions,
+                        $preference,
+                        $userID,
+                        $junctionTable,
+                        $junctionID,
+                    ]);
+                } catch (Exception $e) {
+                    yield new LongRunnerFailedID(
+                        "User_{$userID}_NotificationType_{$activityType}_Preference_$preference"
+                    );
+                } finally {
+                    $lastUserID = $userID;
                 }
-            } catch (LongRunnerTimeoutException $e) {
-                return new LongRunnerNextArgs([
-                    $activity,
-                    $permissions,
-                    $preference,
-                    $userID,
-                    $junctionTable,
-                    $junctionID,
-                ]);
-            } catch (Exception $e) {
-                yield new LongRunnerFailedID("User_{$userID}_NotificationType_{$activityType}_Preference_$preference");
             }
-        }
+        } while (!empty($usersToNotify));
         return LongRunner::FINISHED;
     }
 
@@ -294,7 +308,7 @@ class PermissionNotificationGenerator implements SystemCallableInterface
         );
         $sql->select("ur.UserID")
             ->where("ur.UserID >", $lastUserID)
-            ->limit(100)
+            ->limit($this->batchSize)
             ->orderBy("ur.UserID", "asc");
 
         if ($hasDefaultPreferences) {
@@ -306,7 +320,6 @@ class PermissionNotificationGenerator implements SystemCallableInterface
         }
 
         $userPrefs = $sql->get()->resultArray();
-
         foreach ($userPrefs as $userPref) {
             $userID = $userPref["UserID"];
             if ($hasDefaultPreferences) {
@@ -320,6 +333,11 @@ class PermissionNotificationGenerator implements SystemCallableInterface
                     $userToNotifyByID[$userID]["Notified"] = ActivityModel::SENT_PENDING;
                 }
             }
+        }
+
+        // Fetch the last user preferences in case one of its permissions missed the cut-off point.
+        if (isset($userID)) {
+            $userToNotifyByID[$userID] += $this->userMetaModel->getUserMeta($userID);
         }
 
         return $userToNotifyByID;

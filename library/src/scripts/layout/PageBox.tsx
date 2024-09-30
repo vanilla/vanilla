@@ -3,12 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import React, { ElementType, useRef } from "react";
+import React, { ElementType, useMemo, useRef } from "react";
 import { cx, css } from "@emotion/css";
 import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 import { Variables } from "@library/styles/Variables";
 import { Mixins } from "@library/styles/Mixins";
 import { PageBoxDepthContextProvider, usePageBoxContext } from "@library/layout/PageBox.context";
+import { stableObjectHash } from "@vanilla/utils";
 
 interface IProps extends React.HTMLAttributes<HTMLElement> {
     children?: React.ReactNode;

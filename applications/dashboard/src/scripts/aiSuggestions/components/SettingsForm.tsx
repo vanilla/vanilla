@@ -30,7 +30,7 @@ interface IProps {
 
 export function SettingsForm(props: IProps) {
     const { sections, title, settings } = props;
-    const { error, mutateAsync } = useSaveAISuggestionsSettings();
+    const { mutateAsync } = useSaveAISuggestionsSettings();
     const toast = useToast();
     const [fieldErrors, setFieldErrors] = useState<Record<string, IFieldError[]> | undefined>(undefined);
 

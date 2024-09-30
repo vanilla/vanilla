@@ -141,4 +141,55 @@ class ReactionsTest extends SiteTestCase
         $currentPoints = $userPoints();
         $this->assertSame(1, $currentPoints);
     }
+
+    /**
+     * Test that a moderator un spam another moderator post
+     *
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function testSpamCanBeUnmarkedByModerators(): void
+    {
+        $logModel = $this->container()->get(\LogModel::class);
+        $discussionModel = $this->container()->get(\DiscussionModel::class);
+
+        $userID = $this->createUserFixture("Member");
+        $this->runWithUser(function () {
+            $this->createDiscussion(["name" => "NotSpamCheck", "body" => "This is a discussion to test undo spam"]);
+        }, $userID);
+        $discussionID = $this->lastInsertedDiscussionID;
+        $this->react("discussion", $discussionID, "Spam");
+        //Check if the record was marked as spam
+        $log = $logModel->getWhere([
+            "RecordType" => "Discussion",
+            "RecordID" => $discussionID,
+            "Operation" => "Spam",
+        ])[0];
+        $this->assertNotEmpty($log);
+        $this->assertEquals("Spam", $log["Operation"]);
+        $this->assertEquals($this->getSession()->UserID, $log["InsertUserID"]);
+
+        $discussion = $discussionModel->getID($this->lastInsertedDiscussionID);
+        $this->assertEmpty($discussion);
+
+        //Now give the created user moderator privileges
+        $this->userModel->addRoles($userID, [\RoleModel::MOD_ID], false);
+
+        //Now remove the discussion from spam queue
+        $this->bessy()->post("/log/notSpam", ["LogIDs" => [$log["LogID"]]]);
+
+        //Now make sure the discussion is added back
+        $discussion = $discussionModel->getID($discussionID);
+        $this->assertNotEmpty($discussion);
+
+        //Now check if the log is removed
+        $log = $logModel->getWhere([
+            "RecordType" => "Discussion",
+            "RecordID" => $discussionID,
+            "Operation" => "Spam",
+        ]);
+
+        $this->assertEmpty($log);
+    }
 }

@@ -4,16 +4,16 @@
  * @license Proprietary
  */
 
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import { getMeta, t } from "@library/utility/appUtils";
-import set from "lodash-es/set";
-import { JsonSchema } from "packages/vanilla-json-schema-forms/src";
 import {
     AISuggestionSourceData,
     AISuggestionsSettings,
     AISuggestionsSettingsForm,
 } from "@dashboard/aiSuggestions/AISuggestions.types";
 import { ManageSourcesInput } from "@dashboard/aiSuggestions/components/ManageSourcesInput";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { getMeta, t } from "@library/utility/appUtils";
+import set from "lodash-es/set";
+import { JsonSchema } from "packages/vanilla-json-schema-forms/src";
 
 export interface AISuggestionSectionSchema {
     title: string;
@@ -79,7 +79,7 @@ export function getSettingsSchema(settings?: AISuggestionsSettings): AISuggestio
                         default: settings.name ?? "",
                         "x-control": {
                             label: t("Assistant Name"),
-                            description: t("This name will be shown in the front-facing community."),
+                            description: t("This name will be shown in the community."),
                             inputType: "textBox",
                         },
                     },

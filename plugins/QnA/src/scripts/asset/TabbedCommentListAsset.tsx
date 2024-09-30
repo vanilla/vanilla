@@ -15,7 +15,7 @@ import { ITabData, Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { useCommentListQuery } from "@vanilla/addon-vanilla/thread/Comments.hooks";
-import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
+import { DiscussionCommentsAssetFlat } from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset.flat";
 import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
 import { t } from "@vanilla/i18n";
 import React, { useEffect, useState } from "react";
@@ -23,14 +23,14 @@ import React, { useEffect, useState } from "react";
 interface IProps {
     discussion: IDiscussion;
     discussionApiParams?: DiscussionsApi.GetParams;
-    comments: React.ComponentProps<typeof DiscussionCommentsAsset>["comments"];
-    apiParams: React.ComponentProps<typeof DiscussionCommentsAsset>["apiParams"];
+    comments: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["comments"];
+    apiParams: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["apiParams"];
 
-    acceptedAnswers?: React.ComponentProps<typeof DiscussionCommentsAsset>["comments"];
-    acceptedAnswersApiParams?: React.ComponentProps<typeof DiscussionCommentsAsset>["apiParams"];
+    acceptedAnswers?: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["comments"];
+    acceptedAnswersApiParams?: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["apiParams"];
 
-    rejectedAnswers?: React.ComponentProps<typeof DiscussionCommentsAsset>["comments"];
-    rejectedAnswersApiParams?: React.ComponentProps<typeof DiscussionCommentsAsset>["apiParams"];
+    rejectedAnswers?: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["comments"];
+    rejectedAnswersApiParams?: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["apiParams"];
 }
 
 function TabbedCommentListAsset(props: IProps) {
@@ -76,12 +76,13 @@ function TabbedCommentListAsset(props: IProps) {
             label: t("All Comments"),
             tabID: "all",
             contents: (
-                <DiscussionCommentsAsset
+                <DiscussionCommentsAssetFlat
                     discussion={discussion}
                     discussionApiParams={discussionApiParams}
                     comments={comments}
                     apiParams={apiParams}
                     renderTitle={false}
+                    threadStyle="flat"
                     ThreadItemActionsComponent={DidThisAnswer}
                 />
             ),
@@ -94,12 +95,13 @@ function TabbedCommentListAsset(props: IProps) {
                           label: t("Accepted Answers"),
                           tabID: "accepted",
                           contents: (
-                              <DiscussionCommentsAsset
+                              <DiscussionCommentsAssetFlat
                                   discussion={discussion}
                                   discussionApiParams={discussionApiParams}
                                   comments={acceptedAnswersQuery?.data}
                                   apiParams={acceptedAnswersApiParams!}
                                   renderTitle={false}
+                                  threadStyle="flat"
                                   ThreadItemActionsComponent={ViewInContext}
                               />
                           ),
@@ -114,12 +116,13 @@ function TabbedCommentListAsset(props: IProps) {
                           label: t("Rejected Answers"),
                           tabID: "rejected",
                           contents: (
-                              <DiscussionCommentsAsset
+                              <DiscussionCommentsAssetFlat
                                   discussion={discussion}
                                   discussionApiParams={discussionApiParams}
                                   comments={rejectedAnswersQuery?.data}
                                   apiParams={rejectedAnswersApiParams!}
                                   renderTitle={false}
+                                  threadStyle="flat"
                                   ThreadItemActionsComponent={ViewInContext}
                               />
                           ),

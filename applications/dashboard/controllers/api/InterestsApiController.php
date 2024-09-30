@@ -14,6 +14,7 @@ use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\Model;
+use Vanilla\Utility\SchemaUtils;
 
 class InterestsApiController extends \AbstractApiController
 {
@@ -22,8 +23,11 @@ class InterestsApiController extends \AbstractApiController
      *
      * @param InterestModel $interestModel
      */
-    public function __construct(protected InterestModel $interestModel)
-    {
+    public function __construct(
+        protected InterestModel $interestModel,
+        protected \DiscussionsApiController $discussionsApi,
+        protected \CategoriesApiController $categoriesApi
+    ) {
     }
 
     /**
@@ -165,6 +169,52 @@ class InterestsApiController extends \AbstractApiController
         ]);
 
         return new Data($enabled);
+    }
+
+    /**
+     * Get suggested categories and content for the current user.
+     *
+     * @param array $query
+     * @return Data
+     */
+    public function get_suggestedContent(array $query = []): Data
+    {
+        $this->interestModel->ensureSuggestedContentEnabled();
+        $this->permission("Garden.SignIn.Allow");
+
+        $in = $this->schema([
+            "suggestedContentLimit:i?" => ["minimum" => 1, "maximum" => 20],
+            "suggestedContentExcerptLength:i" => ["default" => 200],
+            "suggestedFollowsLimit:i?" => ["minimum" => 1, "maximum" => 20],
+            "excludedCategoryIDs:a" => ["default" => [], "items" => ["type" => "integer"]],
+        ]);
+        $query = $in->validate($query);
+
+        $output = [
+            "discussions" => isset($query["suggestedContentLimit"])
+                ? $this->discussionsApi
+                    ->index([
+                        "limit" => $query["suggestedContentLimit"],
+                        "expand" => ["all", "-body"],
+                        "sort" => "-" . \DiscussionModel::SORT_EXPIRIMENTAL_TRENDING,
+                        "slotType" => "w",
+                        "suggestions" => true,
+                        "excerptLength" => $query["suggestedContentExcerptLength"],
+                        "excludedCategoryIDs" => $query["excludedCategoryIDs"],
+                    ])
+                    ->getData()
+                : [],
+            "categories" => isset($query["suggestedFollowsLimit"])
+                ? $this->categoriesApi
+                    ->get_suggested([
+                        "limit" => $query["suggestedFollowsLimit"],
+                        "excludedCategoryIDs" => $query["excludedCategoryIDs"],
+                    ])
+                    ->getData()
+                : [],
+        ];
+
+        return new Data($output);
     }
 
     /**

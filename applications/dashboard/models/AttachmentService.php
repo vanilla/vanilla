@@ -109,6 +109,8 @@ class AttachmentService
                     "recordTypes" => $provider->getRecordTypes(),
                     "escalationDelayUnit" => $provider->getEscalationDelayUnit(),
                     "escalationDelayLength" => $provider->getEscalationDelayLength(),
+                    "escalationStatusID" =>
+                        $provider instanceof EscalationStatusProviderInterface ? $provider->getStatusID() : null,
                 ]);
 
                 //Get if there is any additional info to be displayed in the catalog
@@ -229,6 +231,9 @@ class AttachmentService
 
                 $normalized = ArrayUtils::camelCase($normalized);
                 $normalized["status"] = $normalized["status"] ?? "unknown";
+                if (!$provider->canViewFullAttachment($attachment)) {
+                    unset($normalized["escalatedByAI"]);
+                }
                 $normalizedAttachments[] = $normalized;
             } catch (\Throwable $ex) {
                 if (DebugUtils::isTestMode()) {

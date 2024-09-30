@@ -554,10 +554,18 @@ class E2ETestClient extends HttpClient
      */
     public function signInUser($username, $password)
     {
-        $r = $this->post("/entry/password.json", [
-            "Email" => $username,
-            "Password" => $password,
-        ]);
+        $r = $this->post(
+            "/entry/password.json",
+            [
+                "Email" => $username,
+                "Password" => $password,
+            ],
+            [
+                // So we pass the CSRF check.
+                "X-Requested-With" => "XMLHttpRequest",
+                "Referer" => $this->getBaseUrl(),
+            ]
+        );
 
         return $r;
     }

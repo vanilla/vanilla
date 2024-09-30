@@ -7,27 +7,37 @@
 import { IUserFragment } from "@library/@types/api/users";
 import { userLabelClasses } from "@library/content/UserLabel.classes";
 import { t } from "@vanilla/i18n";
-import React from "react";
+import { ReactElement } from "react";
 
 interface IProps {
     user: IUserFragment;
+    showOPTag?: boolean;
 }
 
 export function UserTitle(props: IProps): JSX.Element | null {
-    const { user } = props;
+    const { user, showOPTag } = props;
     const classes = userLabelClasses();
 
-    const { label, title } = user;
+    const { label, title } = user ?? {};
+
+    let mainContent: ReactElement | null = null;
+
     if (user.banned) {
-        return <div className={classes.rankLabel}>{t("Banned")}</div>;
+        mainContent = <div className={classes.rankLabel}>{t("Banned")}</div>;
+    } else if (title) {
+        // Title can be input by the user.
+        mainContent = <div className={classes.rankLabel}>{title}</div>;
+    } else if (label) {
+        // Labels (from rank label) are sanitized server side.
+        mainContent = <div className={classes.rankLabel} dangerouslySetInnerHTML={{ __html: label }} />;
     }
-    if (title) {
-        /* Title can be input by the user. */
-        return <div className={classes.rankLabel}>{title}</div>;
-    }
-    if (!title && label) {
-        /* Labels (from rank label) are sanitized server side. */
-        return <div className={classes.rankLabel} dangerouslySetInnerHTML={{ __html: label }} />;
-    }
-    return null;
+
+    return showOPTag ? (
+        <div className={classes.flexWrapper}>
+            {mainContent}
+            <span className={classes.rankLabel}>{"OP"}</span>
+        </div>
+    ) : (
+        mainContent
+    );
 }

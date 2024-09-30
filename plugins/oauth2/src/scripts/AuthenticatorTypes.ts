@@ -32,6 +32,7 @@ export interface IAuthenticator {
     postProfileRequest: boolean;
     allowAccessTokens: boolean;
     isOidc?: boolean;
+    markVerified?: boolean;
     active: boolean;
     default: boolean;
     visible: boolean;

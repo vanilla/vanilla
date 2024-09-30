@@ -45,7 +45,6 @@ import {
     LegacyIntegrationsOptionsMenuItems,
     LegacyThreadAttachmentsAsset,
 } from "@vanilla/addon-vanilla/thread/LegacyAttachments";
-import ReportModal from "@vanilla/addon-vanilla/thread/ReportModal";
 import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
 
 registerReducer("forum", forumReducer);

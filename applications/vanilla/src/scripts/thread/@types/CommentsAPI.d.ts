@@ -5,6 +5,8 @@
  */
 
 declare namespace CommentsApi {
+    import { CommentListSortOption } from "@dashboard/@types/api/comment";
+
     export interface IndexParams {
         parentRecordType?: "discussion" | "escalation";
         parentRecordID?: string | number;
@@ -13,6 +15,22 @@ declare namespace CommentsApi {
         page: number;
         expand?: string[];
         qna?: string;
+        insertUserRoleID?: number[];
+        sentiment?: string[];
+        sort?: CommentListSortOption;
+    }
+
+    export interface IndexThreadParams {
+        parentRecordType: "discussion" | "escalation";
+        parentRecordID: RecordID;
+        page: number;
+        limit: number;
+        sort: CommentListSortOption;
+        expand: string[];
+    }
+
+    export interface SingleParams {
+        expand?: string[];
     }
 
     export interface PostParams {
@@ -20,6 +38,7 @@ declare namespace CommentsApi {
         format: string;
         discussionID: string | number;
         draftID?: string | number;
+        parentCommentID?: string | number;
     }
 
     export interface PatchParams {

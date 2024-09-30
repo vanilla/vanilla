@@ -1,25 +1,27 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { useState, useEffect } from "react";
-import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
+import React, { useState } from "react";
+import InputTextBlock, { IInputProps } from "@library/forms/InputTextBlock";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { cx } from "@emotion/css";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { IOptionalComponentID } from "@library/utility/idUtils";
 
-interface IProps extends IInputTextProps {
-    errors?: IFieldError[];
-    afterInput?: React.ReactNode;
-    nextToInput?: React.ReactNode;
+interface ICurrencyInputProps extends IOptionalComponentID, Omit<IInputProps, "onChange"> {
+    onChange: (value: string | number) => void;
 }
 
-export const DashboardCurrencyInput: React.FC<IProps> = (props: IProps) => {
-    const [value, setValue] = useState(props.inputProps?.value || "0.00");
+function CurrencyInput(props: ICurrencyInputProps) {
+    const { id, value, onChange, className, ...rest } = props;
     const classes = dashboardClasses();
-    const rootClass = "input-wrap";
+
+    const [ownValue, setOwnValue] = useState(formatCurrency(`${value ?? ""}`));
 
     function formatCurrency(value: string) {
         if (value === "" || value === "0.00") return "0.00";
@@ -41,37 +43,52 @@ export const DashboardCurrencyInput: React.FC<IProps> = (props: IProps) => {
     }
 
     return (
-        <div className={cx(rootClass, props.className)}>
-            <div className={(classes.inputWrapper, classes.currencyInput)}>
-                <span className="dollar">{"$"}</span>
-                <InputTextBlock
-                    inputProps={{
-                        ...props.inputProps,
-                        inputmode: "numeric",
-                        min: 0,
-                        step: 0.01,
-                        pattern: "[0-9]*",
-                        value: value,
-                        onBlur: (event) => {
-                            const newValue = formatCurrency(event.target.value);
-                            setValue(newValue);
-                            if (props.inputProps?.onBlur) {
-                                props.inputProps.onBlur(event);
-                            }
-                        },
-                        onChange: (event) => {
-                            const newValue = event.target.value;
-                            setValue(newValue);
-                            if (props.inputProps?.onChange) {
-                                props.inputProps.onChange(event);
-                            }
-                        },
-                    }}
-                    className={cx(props.inputProps ? props.inputProps.className : null, props.className)}
-                    noMargin={true}
-                />
-            </div>
-            {props.errors && <ErrorMessages errors={props.errors} />}
+        <div className={classes.currencyInput}>
+            <span className={classes.currencySymbol}>{"$"}</span>
+            <InputTextBlock
+                id={id}
+                inputProps={{
+                    ...rest,
+                    type: "number",
+                    inputmode: "numeric",
+                    min: 0,
+                    step: 0.01,
+                    pattern: "[0-9]*",
+                    value: ownValue,
+                    onBlur: (event) => {
+                        setOwnValue(formatCurrency(`${value ?? ""}`));
+                        props.onBlur?.(event);
+                    },
+
+                    onChange: (event) => {
+                        const newValue = event.target.value;
+                        setOwnValue(newValue);
+                        onChange(newValue);
+                    },
+                }}
+                className={className}
+                noMargin={true}
+            />
         </div>
     );
-};
+}
+
+export default function DashboardCurrencyInput(
+    props: ICurrencyInputProps & {
+        errors?: IFieldError[];
+    },
+) {
+    const { className, errors, ...rest } = props;
+    const { inputID, labelType } = useFormGroup();
+    const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
+    const classes = dashboardClasses();
+
+    return (
+        <div className={cx(rootClass, className)}>
+            <div className={classes.inputWrapper}>
+                <CurrencyInput {...rest} id={inputID} />
+                {props.errors && <ErrorMessages errors={props.errors} />}
+            </div>
+        </div>
+    );
+}

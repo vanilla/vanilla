@@ -47,7 +47,9 @@ class AISuggestionModelTest extends SiteTestCase
         parent::setUp();
         $assistantUser = $this->createUser();
         \Gdn::config()->saveToConfig([
+            "Feature.customLayout.discussionThread.Enabled" => true,
             "Feature.AISuggestions.Enabled" => true,
+            "Feature.aiFeatures.Enabled" => true,
             "aiSuggestions" => [
                 "enabled" => true,
                 "userID" => $assistantUser["userID"],

@@ -173,7 +173,7 @@ export function useEscalationQuery(escalationID: IEscalation["escalationID"]) {
             const response = await apiv2.get(`/escalations/${escalationID}?expand=users`);
             return response.data;
         },
-        queryKey: ["escalation", escalationID],
+        queryKey: ["escalations", escalationID],
         keepPreviousData: true,
     });
     return escalation;
@@ -191,7 +191,7 @@ export function useEscalationMutation(escalationID?: IEscalation["escalationID"]
         },
         mutationKey: ["escalationPatch", escalationID],
         onSuccess: () => {
-            queryClient.invalidateQueries(["escalation", escalationID]);
+            queryClient.invalidateQueries(["escalations", escalationID]);
             queryClient.invalidateQueries(["escalations"]);
             toast.addToast({ body: t("Escalation Updated"), autoDismiss: true, dismissible: true });
         },

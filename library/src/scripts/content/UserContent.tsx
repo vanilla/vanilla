@@ -58,7 +58,12 @@ function useUnsafeResponsiveTableHTML(html: string) {
         const element = document.createElement("div");
         element.innerHTML = html;
 
-        element.querySelectorAll("table").forEach(responsifyTable);
+        try {
+            element.querySelectorAll("table").forEach(responsifyTable);
+        } catch (e) {
+            console.error("Failed to responsify table", e);
+            return element.innerHTML;
+        }
 
         return element.innerHTML;
     }, [html]);
@@ -141,7 +146,7 @@ export function responsifyTable(table: HTMLTableElement) {
                 mobileTh.textContent = label;
                 mobileTh.classList.add("mobileTableHead");
                 mobileTh.setAttribute("aria-hidden", "true");
-                tr.insertBefore(mobileTh, td);
+                td.insertAdjacentElement("beforebegin", mobileTh);
             }
 
             if (i % 2 === 1) {

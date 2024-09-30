@@ -9,7 +9,7 @@ import { applyAnyFallbackError, mockAPI } from "@library/__tests__/utility";
 import { setMeta } from "@library/utility/appUtils";
 import { insertRichEmbed } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichEmbed";
 import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
-import { createVanillaEditor, LegacyVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { createVanillaEditor, LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
 import { getByRole, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { focusEditor, select } from "@udecode/plate-common";
@@ -32,7 +32,7 @@ describe("<RichLinkToolbar />", () => {
 
             render(
                 <TestReduxProvider>
-                    <LegacyVanillaEditor editor={editor} />
+                    <LegacyFormVanillaEditor editor={editor} />
                 </TestReduxProvider>,
             );
 
@@ -65,7 +65,7 @@ describe("<RichLinkToolbar />", () => {
 
             render(
                 <TestReduxProvider>
-                    <LegacyVanillaEditor editor={editor} />
+                    <LegacyFormVanillaEditor editor={editor} />
                 </TestReduxProvider>,
             );
 
@@ -90,7 +90,7 @@ describe("<RichLinkToolbar />", () => {
 
             render(
                 <TestReduxProvider>
-                    <LegacyVanillaEditor editor={editor} />
+                    <LegacyFormVanillaEditor editor={editor} />
                 </TestReduxProvider>,
             );
 

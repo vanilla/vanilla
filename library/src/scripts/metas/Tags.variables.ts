@@ -323,7 +323,7 @@ export const tagCloudVariables = useThemeCache((options?: IHomeWidgetContainerOp
          */
         box: Variables.box({
             background: options?.innerBackground,
-            borderType: options?.borderType as BorderType,
+            borderType: options?.borderType,
             border: globalVars.border,
         }),
 

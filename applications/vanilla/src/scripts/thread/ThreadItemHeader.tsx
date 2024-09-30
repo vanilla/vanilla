@@ -11,13 +11,15 @@ import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhot
 import { MetaItem, Metas } from "@library/metas/Metas";
 import ProfileLink from "@library/navigation/ProfileLink";
 import React from "react";
-import ThreadItemPermalink from "./ThreadItemPermalink";
-import { IThreadItemContext, useThreadItemContext } from "./ThreadItemContext";
+import ThreadItemPermalink from "@vanilla/addon-vanilla/thread/ThreadItemPermalink";
+import { IThreadItemContext, useThreadItemContext } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 
 interface IProps {
     user: IUserFragment;
     excludePhoto?: boolean;
     options?: React.ReactNode;
+    showOPTag?: boolean;
+    isPreview?: boolean;
 }
 
 export function ThreadItemHeader(props: IProps) {
@@ -39,7 +41,7 @@ export function ThreadItemHeader(props: IProps) {
             </MetaItem>
             {dynamicTitleMetas}
             <MetaItem>
-                <UserTitle user={user} />
+                <UserTitle user={user} showOPTag={props.showOPTag} />
             </MetaItem>
         </>
     );
@@ -53,6 +55,7 @@ export function ThreadItemHeader(props: IProps) {
         <>
             {dynamicMetadataMetas}
             <ThreadItemPermalink />
+            {threadItemContext.extraMetas}
         </>
     );
 

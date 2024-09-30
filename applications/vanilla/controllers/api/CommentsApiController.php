@@ -17,11 +17,16 @@ use Vanilla\Events\BeforeCommentPostEvent;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Forum\Models\CommentThreadModel;
+use Vanilla\Forum\Models\CommentThreadStructure;
+use Vanilla\Forum\Models\CommentThreadStructureOptions;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\LegacyModelUtils;
 use Vanilla\Models\Model;
 use Vanilla\Permissions;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchResultItem;
 use Garden\Web\Exception\ClientException;
@@ -48,6 +53,7 @@ class CommentsApiController extends AbstractApiController
      */
     public function __construct(
         private CommentModel $commentModel,
+        private CommentThreadModel $threadModel,
         private DiscussionModel $discussionModel,
         private UserModel $userModel,
         private ReactionModel $reactionModel,
@@ -60,8 +66,8 @@ class CommentsApiController extends AbstractApiController
      * Get a comment by its numeric ID.
      *
      * @param int $id The comment ID.
-     * @throws NotFoundException if the comment could not be found.
      * @return array
+     * @throws NotFoundException if the comment could not be found.
      */
     public function commentByID($id)
     {
@@ -77,16 +83,21 @@ class CommentsApiController extends AbstractApiController
      *
      * @return Schema Returns a schema object.
      */
-    public function commentPostSchema(): Schema
+    private function commentPostSchema(bool $isPatch): Schema
     {
-        $schema = Schema::parse([
+        $fields = [
             "body",
             "format" => new \Vanilla\Models\FormatSchema(),
             "discussionID?",
             "parentRecordType",
             "parentRecordID",
             "draftID?",
-        ])
+        ];
+
+        if (!$isPatch) {
+            $fields[] = "parentCommentID:i?";
+        }
+        $schema = Schema::parse($fields)
             ->add($this->fullSchema())
             ->addFilter("", function (array $row): array {
                 if (isset($row["discussionID"])) {
@@ -134,8 +145,8 @@ class CommentsApiController extends AbstractApiController
      * Get a discussion by its numeric ID.
      *
      * @param int $id The discussion ID.
-     * @throws NotFoundException if the discussion could not be found.
      * @return array
+     * @throws NotFoundException if the discussion could not be found.
      */
     public function discussionByID($id)
     {
@@ -337,6 +348,128 @@ class CommentsApiController extends AbstractApiController
     }
 
     /**
+     * @return Schema
+     */
+    private function expandDefinition(): Schema
+    {
+        return ApiUtils::getExpandDefinition([
+            "insertUser",
+            "-body",
+            "attachments",
+            "reactions",
+            "reportMeta",
+            "countReports",
+        ]);
+    }
+
+    /**
+     * GET /api/v2/comments/thread
+     *
+     * @param array $query
+     * @return Data
+     */
+    public function get_thread(array $query): Data
+    {
+        $this->permission();
+
+        $in = Schema::parse([
+            "parentRecordType:s" => [
+                "enum" => ["discussion", "escalation"],
+                "x-filter" => true,
+            ],
+            "parentRecordID:i" => [
+                "x-filter" => true,
+            ],
+            "parentCommentID:i?" => [
+                "x-filter" => true,
+            ],
+            "focusCommentID:i?",
+            "collapseChildDepth:i?",
+            "collapseChildLimit:i?",
+            "sort:s" => [
+                "enum" => ApiUtils::sortEnum("dateInserted", "score", ModelUtils::SORT_TRENDING),
+                "default" => "dateInserted",
+            ],
+            "page:i" => [
+                "min" => 0,
+                "default" => 1,
+            ],
+            "limit:i" => [
+                "min" => 1,
+                "max" => 100,
+                "default" => 50,
+            ],
+            "expand?" => $this->expandDefinition(),
+        ]);
+
+        $query = $in->validate($query);
+        $this->getEventManager()->fireFilter("commentsApiController_beforePermissions", $query);
+
+        $this->commentModel->hasViewPermission($query["parentRecordType"], $query["parentRecordID"], throw: true);
+
+        $where = ApiUtils::queryToFilters($in, $query);
+        $parentCommentID = $where["parentCommentID"] ?? null;
+
+        if ($parentCommentID === null) {
+            unset($where["parentCommentID"]);
+            $where["parentCommentID IS NULL"] = null;
+        }
+
+        [$offset, $limit] = ApiUtils::offsetLimit($query);
+
+        [$order, $direction] = LegacyModelUtils::orderFieldDirection($query["sort"]);
+
+        $extraSelects = [];
+        if ($order === ModelUtils::SORT_TRENDING) {
+            $slotType = $this->commentModel->getAutoSlotType($query["parentRecordType"], $query["parentRecordID"]);
+            $where[] = ModelUtils::slotTypeWhereExpression("DateInserted", $slotType);
+            $extraSelects = ModelUtils::getTrendingSelects(
+                "DateInserted",
+                "COALESCE(Score, 0) + COALESCE(countChildComments, 0) * 2 + COALESCE(scoreChildComments, 0) / 10",
+                $slotType
+            );
+        }
+
+        $threadStructure = $this->threadModel->selectCommentThreadStructure($where, [
+            Model::OPT_OFFSET => $offset,
+            Model::OPT_LIMIT => $limit,
+            Model::OPT_ORDER => $order,
+            Model::OPT_DIRECTION => $direction,
+            Model::OPT_SELECT => $extraSelects,
+            CommentThreadModel::OPT_THREAD_STRUCTURE => new CommentThreadStructureOptions(
+                collapseChildDepth: $query["collapseChildDepth"] ?? 3,
+                collapseChildLimit: $query["collapseChildLimit"] ?? 3,
+                focusCommentID: $query["focusCommentID"] ?? null
+            ),
+        ]);
+
+        $threadStructure->applyApiUrlsToHoles(\Gdn::request()->getSimpleUrl("/api/v2/comments/thread"), $query);
+
+        $preloadIDs = $threadStructure->getPreloadCommentIDs();
+        $preloadComments = $this->index([
+            "commentID" => $preloadIDs,
+            "expand" => $query["expand"] ?? null,
+            "limit" => $preloadIDs ? count($preloadIDs) : $query["limit"],
+            "sort" => $query["sort"],
+            "parentRecordType" => $query["parentRecordType"],
+            "parentRecordID" => $query["parentRecordID"],
+        ])->getData();
+
+        $preloadComments = array_column($preloadComments, null, "commentID");
+
+        $pagingCount = $this->threadModel->selectPagingCount(where: $where, options: [Model::OPT_LIMIT => 10000]);
+        $paging = ApiUtils::numberedPagerInfo($pagingCount, "/api/v2/comments/thread", $query, $in);
+
+        return new Data(
+            [
+                "threadStructure" => $threadStructure,
+                "commentsByID" => $preloadComments,
+            ],
+            ["paging" => $paging]
+        );
+    }
+
+    /**
      * List comments.
      *
      * @param array $query The query string.
@@ -373,16 +506,19 @@ class CommentsApiController extends AbstractApiController
                     "description" => "The discussion ID.",
                     "x-filter" => [
                         "field" => "DiscussionID",
-                        "processor" => function ($name, $value) {
-                            $discussion = $this->discussionByID($value);
-                            $this->discussionModel->categoryPermission(
-                                "Vanilla.Discussions.View",
-                                $discussion["CategoryID"]
-                            );
-                            return [$name => $value];
-                        },
                     ],
                 ],
+                "categoryID:i?" => RangeExpression::createSchema([":int"])
+                    ->setDescription("Filter by a range of category IDs.")
+                    ->setField("x-filter", [
+                        "field" => "d.CategoryID",
+                        "processor" => function ($name, $value) {
+                            foreach ($value as $categoryID) {
+                                $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $categoryID);
+                            }
+                            return [$name => $value];
+                        },
+                    ]),
                 "parentRecordType:s?" => [
                     "enum" => ["discussion", "escalation"],
                     "x-filter" => true,
@@ -397,7 +533,13 @@ class CommentsApiController extends AbstractApiController
                     "minimum" => 1,
                 ],
                 "sort:s?" => [
-                    "enum" => ApiUtils::sortEnum("dateInserted", "commentID", "dateUpdated"),
+                    "enum" => ApiUtils::sortEnum(
+                        "dateInserted",
+                        "commentID",
+                        "dateUpdated",
+                        "score",
+                        ModelUtils::SORT_TRENDING
+                    ),
                     "default" => "dateInserted",
                 ],
                 "limit:i?" => [
@@ -412,18 +554,23 @@ class CommentsApiController extends AbstractApiController
                         "field" => "InsertUserID",
                     ],
                 ],
-                "expand?" => ApiUtils::getExpandDefinition([
-                    "insertUser",
-                    "-body",
-                    "attachments",
-                    "reactions",
-                    "reportMeta",
-                    "countReports",
-                ]),
+                "insertUserRoleID?" => [
+                    "type" => "array",
+                    "items" => [
+                        "type" => "integer",
+                    ],
+                    "style" => "form",
+                    "x-filter" => [
+                        "field" => "uri.RoleID",
+                    ],
+                ],
+                "expand?" => $this->expandDefinition(),
             ],
             ["CommentIndex", "in"]
         )
-            ->requireOneOf(["commentID", "discussionID", "parentRecordID", "insertUserID"])
+            ->addValidator("insertUserRoleID", function ($data, $field) {
+                RoleModel::roleViewValidator($data, $field);
+            })
             ->addValidator("", SchemaUtils::fieldRequirement("parentRecordID", "parentRecordType"))
             ->setDescription("List comments.");
 
@@ -436,15 +583,20 @@ class CommentsApiController extends AbstractApiController
         $out = $this->schema([":a" => $commentSchema], "out");
 
         if (isset($query["discussionID"])) {
-            $this->getEventManager()->fireFilter(
-                "commentsApiController_getFilters",
-                $this,
-                $query["discussionID"],
-                $query
-            );
+            $query["parentRecordType"] = "discussion";
+            $query["parentRecordID"] = $query["discussionID"];
+        }
+
+        $this->getEventManager()->fireFilter("commentsApiController_beforePermissions", $query);
+
+        if (isset($query["parentRecordID"])) {
+            $this->commentModel->hasViewPermission($query["parentRecordType"], $query["parentRecordID"], throw: true);
         }
 
         $where = ApiUtils::queryToFilters($in, $query);
+
+        // Allow addons to update the where clause.
+        $where = $this->getEventManager()->fireFilter("commentsApiController_indexFilters", $where, $this, $in, $query);
 
         $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
         if ($joinDirtyRecords) {
@@ -454,15 +606,33 @@ class CommentsApiController extends AbstractApiController
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
         [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query["sort"]);
+
+        $extraSelects = [];
+        if ($orderField === ModelUtils::SORT_TRENDING) {
+            if (!isset($query["parentRecordType"]) || !isset($query["parentRecordID"])) {
+                throw new ClientException("Trending sort requires a parentRecordType and parentRecordID.", 400);
+            }
+            // Determine a slotType
+            $autoSlotType = $this->commentModel->getAutoSlotType($query["parentRecordType"], $query["parentRecordID"]);
+            $where[] = ModelUtils::slotTypeWhereExpression("c.DateInserted", $autoSlotType);
+
+            $extraSelects = ModelUtils::getTrendingSelects(
+                dateField: "c.DateInserted",
+                scoreCalculation: CommentModel::trendingScoreCalculationSql(),
+                slotType: $autoSlotType
+            );
+        }
+
         $rows = $this->commentModel
             ->selectComments($where, [
                 Model::OPT_LIMIT => $limit,
                 Model::OPT_OFFSET => $offset,
                 Model::OPT_DIRECTION => $orderDirection,
                 Model::OPT_ORDER => $orderField,
+                Model::OPT_SELECT => $extraSelects,
             ])
             ->resultArray();
-        $hasMore = $this->commentModel->LastCommentCount >= $limit;
+        $hasMore = count($rows) >= $limit;
 
         // Expand associated rows.
         $this->userModel->expandUsers($rows, $this->resolveExpandFields($query, ["insertUser" => "InsertUserID"]));
@@ -573,7 +743,7 @@ class CommentsApiController extends AbstractApiController
         $this->permission("Garden.SignIn.Allow");
 
         $this->idParamSchema("in");
-        $in = $this->commentPostSchema("in")->setDescription("Update a comment.");
+        $in = $this->commentPostSchema(isPatch: true)->setDescription("Update a comment.");
         $out = $this->commentSchema("out");
 
         $body = $in->validate($body, true);
@@ -617,7 +787,7 @@ class CommentsApiController extends AbstractApiController
     public function post(array $body)
     {
         $this->permission("Garden.SignIn.Allow");
-        $in = $this->commentPostSchema("in")->setDescription("Add a comment.");
+        $in = $this->commentPostSchema(isPatch: false)->setDescription("Add a comment.");
         $out = $this->commentSchema("out");
 
         $body = $in->validate($body);
@@ -628,7 +798,41 @@ class CommentsApiController extends AbstractApiController
 
         $this->validateCanPost($parentRecordType, $parentRecordID);
 
-        $commentData = ApiUtils::convertInputKeys($body, excludedKeys: ["parentRecordType", "parentRecordID"]);
+        if (isset($body["parentCommentID"])) {
+            // Validate that the parent comment exists.
+            $parentComment = $this->threadModel->selectThreadCommentFragment($body["parentCommentID"]);
+
+            // Validate that we are in the same thread.
+            if (
+                $parentComment["parentRecordType"] !== $parentRecordType ||
+                $parentComment["parentRecordID"] !== $parentRecordID
+            ) {
+                throw new ClientException("Parent comment is from a different thread.", 400, [
+                    "expected" => [
+                        "parentRecordType" => $parentComment["parentRecordType"],
+                        "parentRecordID" => $parentComment["parentRecordID"],
+                    ],
+                    "actual" => [
+                        "parentRecordType" => $parentRecordType,
+                        "parentRecordID" => $parentRecordID,
+                    ],
+                ]);
+            }
+
+            // Validate that we didn't exceed our maximum depth.
+            $maxDepth = \Gdn::config("Vanilla.Comment.MaxDepth", 5);
+            if ($parentComment["depth"] + 1 > $maxDepth) {
+                throw new ClientException("Comment exceeds maximum depth.", 400, [
+                    "maxDepth" => $maxDepth,
+                    "actualDepth" => $parentComment["depth"] + 1,
+                ]);
+            }
+        }
+
+        $commentData = ApiUtils::convertInputKeys(
+            $body,
+            excludedKeys: ["parentRecordType", "parentRecordID", "parentCommentID"]
+        );
 
         $id = $this->commentModel->save($commentData);
         $this->validateModel($this->commentModel);

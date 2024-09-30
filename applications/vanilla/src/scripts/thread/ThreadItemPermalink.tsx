@@ -11,6 +11,7 @@ import { t } from "@vanilla/i18n";
 import React from "react";
 import { ThreadItemPermalinkClasses } from "@vanilla/addon-vanilla/thread/ThreadItemPermalink.classes";
 import { useThreadItemContext } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
+import { useHistory, useLocation } from "react-router";
 
 export default function ThreadItemPermalink() {
     const toast = useToast();
@@ -18,9 +19,33 @@ export default function ThreadItemPermalink() {
 
     const { recordUrl, timestamp, handleCopyUrl } = useThreadItemContext();
 
+    async function handleCopyAndUpdateUrl() {
+        const queryParams = new URLSearchParams(window.location.search);
+
+        window.history.pushState({}, "", recordUrl);
+
+        // Special handling for Q&A tabbed comment section
+        if (queryParams.has("tab")) {
+            await handleCopyUrl("tab", queryParams.get("tab"));
+        } else {
+            await handleCopyUrl();
+        }
+
+        toast.addToast({
+            body: <>{t("Link copied to clipboard.")}</>,
+            autoDismiss: true,
+        });
+    }
+
     return (
         <>
-            <MetaLink to={recordUrl}>
+            <MetaLink
+                to={recordUrl}
+                onClick={(e) => {
+                    e.preventDefault();
+                    handleCopyAndUpdateUrl();
+                }}
+            >
                 <DateTime timestamp={timestamp} />
             </MetaLink>
 
@@ -30,19 +55,7 @@ export default function ThreadItemPermalink() {
                 title={t("Copy Link")}
                 aria-label={t("Copy Link")}
                 onClick={async () => {
-                    const queryParams = new URLSearchParams(window.location.search);
-
-                    // Special handling for Q&A tabbed comment section
-                    if (queryParams.has("tab")) {
-                        await handleCopyUrl("tab", queryParams.get("tab"));
-                    } else {
-                        await handleCopyUrl();
-                    }
-
-                    toast.addToast({
-                        body: <>{t("Link copied to clipboard.")}</>,
-                        autoDismiss: true,
-                    });
+                    handleCopyAndUpdateUrl();
                 }}
             />
         </>

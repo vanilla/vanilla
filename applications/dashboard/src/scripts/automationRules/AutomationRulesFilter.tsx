@@ -25,6 +25,7 @@ import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
 import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
 import { IAutomationRulesFilterValues } from "@dashboard/automationRules/AutomationRules.types";
+import { compare } from "@vanilla/utils";
 
 export function AutomationRulesFilter(props: {
     onFilter: (newFilters: IAutomationRulesFilterValues) => void;
@@ -50,10 +51,9 @@ export function AutomationRulesFilter(props: {
                     inputType: "dropDown",
                     choices: {
                         staticOptions: Object.fromEntries(
-                            Object.keys(automationRulesCatalog?.triggers ?? {}).map((trigger) => [
-                                trigger,
-                                automationRulesCatalog?.triggers[trigger]?.name,
-                            ]),
+                            Object.keys(automationRulesCatalog?.triggers ?? {})
+                                .map((trigger) => [trigger, automationRulesCatalog?.triggers[trigger]?.name])
+                                .sort((a, b) => compare(a[1], b[1])),
                         ),
                     },
                     labelType: DashboardLabelType.VERTICAL,
@@ -67,10 +67,9 @@ export function AutomationRulesFilter(props: {
                     inputType: "dropDown",
                     choices: {
                         staticOptions: Object.fromEntries(
-                            Object.keys(automationRulesCatalog?.actions ?? {}).map((action) => [
-                                action,
-                                automationRulesCatalog?.actions[action].name,
-                            ]),
+                            Object.keys(automationRulesCatalog?.actions ?? {})
+                                .map((action) => [action, automationRulesCatalog?.actions[action].name])
+                                .sort((a, b) => compare(a[1], b[1])),
                         ),
                     },
                     labelType: DashboardLabelType.VERTICAL,

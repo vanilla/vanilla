@@ -12,8 +12,8 @@ import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardCheckGroup, DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
-import { DashboardCurrencyInput } from "@dashboard/forms/DashboardCurrencyInput";
-import { DashboardRatioInput } from "@dashboard/forms/DashboardRatioInput";
+import DashboardCurrencyInput from "@dashboard/forms/DashboardCurrencyInput";
+import DashboardRatioInput from "@dashboard/forms/DashboardRatioInput";
 import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorator";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { StoryContent } from "@library/storybook/StoryContent";
@@ -367,21 +367,20 @@ export function InputWithAutoWidth() {
 }
 
 export function CurrencyInput() {
-    const [value, setValue] = useState("3.75");
+    const [value, setValue] = useState<string | number>("3.75");
 
     return (
         <>
             <StoryHeading depth={1}>Currency Input</StoryHeading>
             <form>
-                <DashboardCurrencyInput
-                    inputProps={{
-                        type: "number",
-                        value: value,
-                        onChange: (event) => {
-                            setValue(event.target.value);
-                        },
-                    }}
-                />
+                <DashboardFormGroup labelType={DashboardLabelType.VERTICAL} label={t("Currency")}>
+                    <DashboardCurrencyInput
+                        value={value}
+                        onChange={(newValue) => {
+                            setValue(newValue);
+                        }}
+                    />
+                </DashboardFormGroup>
             </form>
         </>
     );
@@ -394,15 +393,14 @@ export function RatioInput() {
         <>
             <StoryHeading depth={1}>Ratio Input</StoryHeading>
             <form>
-                <DashboardRatioInput
-                    inputProps={{
-                        type: "number",
-                        value: value,
-                        onChange: (event) => {
-                            setValue(parseInt(event.target.value));
-                        },
-                    }}
-                />
+                <DashboardFormGroup labelType={DashboardLabelType.VERTICAL} label={t("Ratio")}>
+                    <DashboardRatioInput
+                        value={value}
+                        onChange={(newValue) => {
+                            setValue(newValue);
+                        }}
+                    />
+                </DashboardFormGroup>
             </form>
         </>
     );

@@ -11,6 +11,8 @@ use EscalateGithubIssueAction;
 use EscalateToZendeskAction;
 use Vanilla\AutomationRules\Actions\CreateEscalationAction;
 use Vanilla\AutomationRules\Triggers\ReportPostTrigger;
+use Vanilla\Salesforce\Action\EscalateSalesforceCaseAction;
+use Vanilla\Salesforce\Action\EscalateSalesforceLeadAction;
 
 /**
  * Define what triggers and action can be applied to post reports.
@@ -32,6 +34,12 @@ class EscalationRuleDataType extends RuleDataType
      */
     protected function getAllActionsClasses(): array
     {
-        return [CreateEscalationAction::class, EscalateGithubIssueAction::class, EscalateToZendeskAction::class];
+        return [
+            CreateEscalationAction::class,
+            EscalateGithubIssueAction::class,
+            EscalateToZendeskAction::class,
+            EscalateSalesforceLeadAction::class,
+            EscalateSalesforceCaseAction::class,
+        ];
     }
 }

@@ -10,6 +10,7 @@ namespace VanillaTests\Dashboard\Controllers;
 use DiscussionModel;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
+use UserMetaModel;
 use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\Exception\Database\NoResultsException;
 use VanillaTests\APIv2\AbstractAPIv2Test;
@@ -48,6 +49,7 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
     {
         parent::setUp();
         self::enableFeature("AISuggestions");
+        self::enableFeature("aiFeatures");
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->aiSuggestionModel = $this->container()->get(AiSuggestionModel::class);
     }
@@ -284,6 +286,87 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $updatedDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
 
         $this->assertSame(\QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $updatedDiscussion["statusID"]);
+    }
+
+    /**
+     * Test generation of suggestions when user accepted analytics. tracking
+     *
+     * @throws ClientException Not Applicable.
+     * @throws ValidationException Not Applicable.
+     * @throws NoResultsException Not Applicable.
+     */
+    public function testGenerationOfSuggestionEnableTracking()
+    {
+        $this->setupConfigs();
+        $this->runWithConfig(["VanillaAnalytics.AnonymizeData" => true], function () {
+            $user = $this->createUser();
+            \Gdn::userMetaModel()->setUserMeta($user["userID"], UserMetaModel::ANONYMIZE_DATA_USER_META, 0);
+            $this->runWithUser(function () {
+                $discussion = $this->createDiscussion(["type" => "question"]);
+
+                $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+                $this->assertCount(3, $suggestions);
+                $this->assertArraySubsetRecursive(
+                    [
+                        "format" => "Vanilla",
+                        "type" => "mockSuggestion",
+                        "url" => "someplace.com/here",
+                        "title" => "answer 1",
+                        "summary" => "This is how you do this.",
+                        "hidden" => 0,
+                    ],
+                    $suggestions[0]
+                );
+
+                $createdComments = $this->runWithUser(function () use ($discussion, $suggestions) {
+                    $createdComments = $this->api()
+                        ->post("/ai-suggestions/accept-suggestion", [
+                            "allSuggestions" => false,
+                            "discussionID" => $discussion["discussionID"],
+                            "suggestionIDs" => [$suggestions[0]["aiSuggestionID"], $suggestions[2]["aiSuggestionID"]],
+                        ])
+                        ->getBody();
+
+                    return $createdComments;
+                }, $discussion["insertUserID"]);
+                $this->assertCount(2, $createdComments);
+                $this->assertSame(\QnaModel::ACCEPTED, $createdComments[0]["qnA"]);
+
+                $updatedDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+
+                $this->assertSame(\QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $updatedDiscussion["statusID"]);
+            }, $user);
+        });
+    }
+
+    /**
+     * Test suggestion are not generated when site or user did not accept tracking, user data is anonymized.
+     *
+     * @throws ClientException Not Applicable.
+     * @throws ValidationException Not Applicable.
+     * @throws NoResultsException Not Applicable.
+     */
+    public function testSuggestionNotGenerationWhenTackingNotAccepted()
+    {
+        $this->setupConfigs();
+        $this->runWithConfig(["VanillaAnalytics.AnonymizeData" => true], function () {
+            $discussion = $this->createDiscussion(["type" => "question"]);
+
+            $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+
+            $this->assertCount(0, $suggestions);
+        });
+
+        $this->runWithConfig(["VanillaAnalytics.AnonymizeData" => false], function () {
+            $user = $this->createUser();
+            \Gdn::userMetaModel()->setUserMeta($user["userID"], UserMetaModel::ANONYMIZE_DATA_USER_META, 1);
+            $discussion = $this->runWithUser(function () {
+                return $this->createDiscussion(["type" => "question"]);
+            }, $user);
+            $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+
+            $this->assertCount(0, $suggestions);
+        });
     }
 
     /**
@@ -534,6 +617,7 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $this->createUser();
         \Gdn::config()->saveToConfig([
             "Feature.AISuggestions.Enabled" => true,
+            "Feature.aiFeatures.Enabled" => true,
             "aiSuggestions" => [
                 "enabled" => true,
                 "userID" => $this->lastUserID,

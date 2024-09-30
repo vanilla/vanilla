@@ -41,13 +41,14 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
      * DI.
      *
      * @param array $data
+     * @param bool $hasFullProfileViewPermission True if the current user has full permission to view the users profile
      */
-    public function __construct(array $data)
+    public function __construct(array $data, bool $hasFullProfileViewPermission = true)
     {
         $this->email = $data["email"] ?? ($data["Email"] ?? null);
         $this->insertIPAddress = $data["insertIPAddress"] ?? ($data["InsertIPAddress"] ?? null);
         $this->lastIPAddress = $data["lastIPAddress"] ?? ($data["LastIPAddress"] ?? null);
-        $this->data = UserFragmentSchema::normalizeUserFragment($data);
+        $this->data = UserFragmentSchema::normalizeUserFragment($data, $hasFullProfileViewPermission);
     }
 
     /**

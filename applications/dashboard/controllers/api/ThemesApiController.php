@@ -378,6 +378,23 @@ class ThemesApiController extends AbstractApiController
         $ext = pathinfo($assetPath, PATHINFO_EXTENSION);
 
         $asset = $theme->getAssets()[$assetName] ?? null;
+
+        // We want to provide minified css and js assets
+        if ($asset) {
+            $isStyleMinificationEnabled = Gdn::config("minify.styles", true);
+            $isScriptMinificationEnabled = Gdn::config("minify.scripts", true);
+            $minifier = null;
+            if ($ext === "css" && $isStyleMinificationEnabled) {
+                $minifier = new MatthiasMullie\Minify\CSS($asset->getData());
+                $minified = $minifier->minify();
+                $asset->setData($minified);
+            }
+            if ($ext === "js" && $isScriptMinificationEnabled) {
+                $minifier = new MatthiasMullie\Minify\JS($asset->getValue());
+                $minified = $minifier->minify();
+                $asset = $this->assetFactory->createAsset($theme, "js", $assetName, $minified);
+            }
+        }
         return [$asset, $assetName, $ext];
     }
 

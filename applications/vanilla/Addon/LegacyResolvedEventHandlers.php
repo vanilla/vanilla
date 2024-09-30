@@ -226,7 +226,7 @@ class LegacyResolvedEventHandlers implements PsrEventHandlersInterface
      */
     public function base_beforeDiscussionMeta_handler(\Gdn_Controller $sender, $args)
     {
-        if (!checkPermission("Garden.Staff.Allow")) {
+        if (!$this->triageEnabled()) {
             return;
         }
 
@@ -241,7 +241,7 @@ class LegacyResolvedEventHandlers implements PsrEventHandlersInterface
      */
     public function base_discussionOptions_handler(\Gdn_Controller $sender, $args)
     {
-        if (!checkPermission("Garden.Staff.Allow")) {
+        if (!$this->triageEnabled()) {
             return;
         }
 

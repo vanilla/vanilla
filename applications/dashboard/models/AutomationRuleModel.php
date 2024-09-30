@@ -20,12 +20,17 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use UserModel;
 use Vanilla\AutomationRules\Actions\AutomationAction;
+use Vanilla\AutomationRules\Actions\CreateEscalationAction;
 use Vanilla\AutomationRules\Trigger\AutomationTrigger;
+use Vanilla\AutomationRules\Triggers\ReportPostTrigger;
+use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Vanilla\Dashboard\AutomationRules\EscalationRuleService;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Logger;
 use Vanilla\Models\LegacyModelUtils;
 use Vanilla\Models\PipelineModel;
@@ -98,6 +103,77 @@ class AutomationRuleModel extends PipelineModel
             ->column("dateLastRun", "datetime", true)
             ->column("status", ["active", "inactive", "deleted"], "inactive")
             ->set($explicit, $drop);
+        self::createDefaultAutomationRules($database);
+    }
+
+    /**
+     * Create default automation rules
+     *
+     * @param \Gdn_Database $database
+     * @return void
+     */
+    private static function createDefaultAutomationRules(\Gdn_Database $database): void
+    {
+        //check configs to see if we need to create default automation rules
+        if (
+            FeatureFlagHelper::featureEnabled("AutomationRules") &&
+            FeatureFlagHelper::featureEnabled("CommunityManagementBeta") &&
+            FeatureFlagHelper::featureEnabled("escalations") &&
+            !Gdn::config()->get("Preferences.AutomationRules.Defaults", false)
+        ) {
+            $automationRuleModel = Gdn::getContainer()->get(AutomationRuleModel::class);
+            $defaultAction = [
+                "actionType" => CreateEscalationAction::getType(),
+                "actionValue" => [
+                    "recordIsLive" => true,
+                ],
+            ];
+            $defaultAutomationRules = [
+                [
+                    "name" => "Escalate posts with no comments after 3 days",
+                    "triggerType" => StaleDiscussionTrigger::getType(),
+                    "triggerValue" => [
+                        "applyToNewContentOnly" => true,
+                        "triggerTimeDelay" => [
+                            "length" => 3,
+                            "unit" => "day",
+                        ],
+                        "postType" => \DiscussionModel::apiDiscussionTypes(),
+                    ],
+                ],
+                [
+                    "name" => "Escalate unanswered questions after 2 days",
+                    "triggerType" => "unAnsweredQuestionTrigger",
+                    "triggerValue" => [
+                        "applyToNewContentOnly" => true,
+                        "triggerTimeDelay" => [
+                            "length" => 2,
+                            "unit" => "day",
+                        ],
+                    ],
+                ],
+                [
+                    "name" => "Escalate and remove posts with 5 reports",
+                    "triggerType" => ReportPostTrigger::getType(),
+                    "triggerValue" => [
+                        "countReports" => 5,
+                    ],
+                ],
+            ];
+
+            $automationRuleConfig = [];
+            foreach ($defaultAutomationRules as $defaultAutomationRule) {
+                $defaultAutomationRule = array_merge($defaultAutomationRule, $defaultAction, [
+                    "status" => self::STATUS_INACTIVE,
+                ]);
+                if ($defaultAutomationRule["triggerType"] === ReportPostTrigger::getType()) {
+                    $defaultAutomationRule["actionValue"]["recordIsLive"] = false;
+                }
+                $automationRuleID = $automationRuleModel->saveAutomationRule($defaultAutomationRule);
+                $automationRuleConfig[$defaultAutomationRule["triggerType"]] = $automationRuleID;
+            }
+            Gdn::config()->set("Preferences.AutomationRules.Defaults", json_encode($automationRuleConfig));
+        }
     }
 
     /**
@@ -610,7 +686,9 @@ class AutomationRuleModel extends PipelineModel
         if ($automationRecipe["status"] === $status) {
             return true;
         }
-        $result = $this->update(["status" => $status], ["automationRuleID" => $automationRuleID]);
+        $result = (bool) $this->createSql()
+            ->put($this->getTableName(), ["status" => $status], ["automationRuleID" => $automationRuleID])
+            ->count();
         if ($status === self::STATUS_ACTIVE) {
             try {
                 $this->startAutomationRunByID($automationRuleID);

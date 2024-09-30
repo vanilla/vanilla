@@ -12,6 +12,7 @@ use Garden\Container\Container;
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Container\Reference;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ResponseException;
 use Psr\Log\LoggerAwareInterface;
@@ -25,7 +26,10 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Logging\AuditLogger;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\SamlSSO\Events\SsoStringAuditEvent;
 use Vanilla\Utility\ContainerUtils;
+use Vanilla\Utility\ModelUtils;
 use Vanilla\Widgets\WidgetService;
 
 /**
@@ -356,12 +360,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
 
         $sort = -1; // Ensure these nav items come before any plugin nav items.
 
-        $triageCount = $statusModel->getCountStatusID(
-            [RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED],
-            limit: 1000,
-            isInternal: true,
-            cached: false
-        );
+        $triageCount = $statusModel->getUnresolvedCount(limit: 1000, cached: false);
         if ($triageCount >= 1000) {
             $triageCount = "{$triageCount}+";
         }
@@ -471,7 +470,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             ->addLinkToSectionIf(
                 $session->checkPermission(["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete"], false),
                 "Moderation",
-                t("Members"),
+                t("Manage Users"),
                 "/dashboard/user",
                 "users.members",
                 "",
@@ -617,7 +616,9 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             ->addGroup(t("Discussions"), "forum", "", ["after" => "email"])
             ->addLinkIf("Garden.Settings.Manage", t("Tagging"), "settings/tagging", "forum.tagging", $sort)
             ->addLinkIf(
-                "Garden.Settings.Manage" && Gdn::config("Feature.AISuggestions.Enabled"),
+                Gdn::config("Feature.AISuggestions.Enabled") &&
+                    Gdn::config("Feature.aiFeatures.Enabled") &&
+                    $session->checkPermission("Garden.Settings.Manage"),
                 t("AI Suggested Answers"),
                 "/settings/ai-suggestions",
                 "forum.ai-suggestions",
@@ -1051,53 +1052,26 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             $deliveryMethod = $sender->getDeliveryMethod(Gdn::request());
             $isApi = $deliveryMethod === DELIVERY_METHOD_JSON;
 
-            $userID = false;
-            try {
-                $currentUserID = Gdn::session()->UserID;
-                $userID = Gdn::userModel()->sso($sso);
-            } catch (Exception $ex) {
-                trace($ex, TRACE_ERROR);
-            }
+            $currentUserID = Gdn::session()->UserID;
+            $userID = Gdn::userModel()->sso($sso);
 
-            if ($userID) {
-                Gdn::session()->start($userID, !$isApi, !$isApi);
-                if ($isApi) {
-                    Gdn::session()->validateTransientKey(true);
-                }
-
-                if ($userID != $currentUserID) {
-                    Gdn::userModel()->fireEvent("AfterSignIn");
-                }
-            } else {
-                // There was some sort of error. Let's print that out.
-                foreach (Gdn::userModel()->Validation->resultsArray() as $msg) {
-                    trace($msg, TRACE_ERROR);
-                }
-                if (c("Vanilla.SSO.Debug") && $this->logger instanceof Psr\Log\LoggerInterface) {
-                    $this->logger->info("SSO String Failed to Connect", [
-                        Vanilla\Logger::FIELD_CHANNEL => Vanilla\Logger::CHANNEL_APPLICATION,
-                        "event" => "embedded_sso",
-                        "timestamp" => time(),
-                        "userid" => Gdn::session()->UserID,
-                        "username" => Gdn::session()->User->Name ?? "anonymous",
-                        "ip" => Gdn::request()->getIP(),
-                        "method" => Gdn::request()->requestMethod(),
-                        "domain" => rtrim(url("/", true), "/"),
-                        "path" => Gdn::request()->getPath(),
-                        "error_message" => $msg ?? "Unknown Error",
-                        "vanilla_sso" => $sso,
-                    ]);
-                }
+            if (!$userID) {
                 Gdn::userModel()->Validation->reset();
             }
 
-            // Let's redirect to the same url but without the sso parameter to be sure there will be
-            // no leak via the Referer field.
-            $deliveryType = $sender->getDeliveryType($deliveryMethod);
-            if (!$isApi && !Gdn::request()->isPostBack() && $deliveryType !== DELIVERY_TYPE_DATA) {
-                $url = \Vanilla\Utility\UrlUtils::replaceQuery(Gdn::request()->getUri(), ["sso" => null]);
-                redirectTo($url);
+            if ($userID !== $currentUserID) {
+                Gdn::session()->start($userID, !$isApi, !$isApi);
             }
+            if ($isApi) {
+                Gdn::session()->validateTransientKey(true);
+            }
+
+            if ($userID != $currentUserID) {
+                Gdn::userModel()->fireEvent("AfterSignIn");
+            }
+
+            // Make sure we don't leak the sso query param through referrer headers.
+            safeHeader("Referrer-Policy: strict-origin");
         }
     }
 

@@ -16,6 +16,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn;
 use Vanilla\ApiUtils;
+use Vanilla\Community\Events\SpamEvent;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
@@ -141,6 +142,7 @@ class ReportsApiController extends \AbstractApiController
         // Permission and existance check.
         $this->permission(["posts.moderate", "community.moderate"]);
         $report = $this->getReport($reportID);
+        $this->reportModel->dispatchSpamEventFromReport($report);
 
         if ($report["recordIsLive"]) {
             $this->communityManagementRecordModel->removeRecord($report["recordType"], $report["recordID"]);
@@ -160,7 +162,7 @@ class ReportsApiController extends \AbstractApiController
     /**
      * @return Schema
      */
-    public function postSchema(): Schema
+    public function postSchema($includeSystemReason = false): Schema
     {
         return Schema::parse([
             "recordType:s" => [
@@ -172,7 +174,7 @@ class ReportsApiController extends \AbstractApiController
             "reportReasonIDs:a" => [
                 "items" => [
                     "type" => "string",
-                    "enum" => $this->reportReasonModel->getPermissionAvailableReasonIDs(),
+                    "enum" => $this->reportReasonModel->getPermissionAvailableReasonIDs($includeSystemReason),
                 ],
             ],
         ]);
@@ -193,7 +195,8 @@ class ReportsApiController extends \AbstractApiController
             throw new ClientException("No report reasons available.", 403);
         }
 
-        $in = $this->postSchema();
+        $includeSystemReason = $body["automation"] ?? false;
+        $in = $this->postSchema((bool) $includeSystemReason);
 
         $body = $in->validate($body);
         $record = $this->communityManagementRecordModel->getRecord($body["recordType"], $body["recordID"]);
@@ -224,6 +227,7 @@ class ReportsApiController extends \AbstractApiController
             "recordBody" => $record["Body"],
             "recordFormat" => $record["Format"],
             "recordDateInserted" => $record["DateInserted"],
+            "recordInsertIPAddress" => $record["InsertIPAddress"],
             "reportReasonIDs" => $body["reportReasonIDs"] ?? [],
         ]);
 

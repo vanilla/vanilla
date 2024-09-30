@@ -199,10 +199,14 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver
      * Schemas are cached until a structure is run.
      *
      * @param string $table The name of the table to get schema data for.
+     * @param bool $bypassCache
      * @return array
      */
-    public function fetchTableSchema($table): array
+    public function fetchTableSchema($table, bool $bypassCache = false): array
     {
+        if ($bypassCache) {
+            return $this->fetchTableSchemaInternal($table);
+        }
         $result = $this->modelCache->getCachedOrHydrate(
             [__FUNCTION__, $table],
             function () use ($table) {

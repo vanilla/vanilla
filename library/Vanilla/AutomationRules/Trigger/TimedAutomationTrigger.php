@@ -119,9 +119,7 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
                     new FormOptions(
                         "Apply to new content only",
                         "When enabled, this rule will only be applied to new content that meets the trigger criteria."
-                    ),
-                    null,
-                    "none"
+                    )
                 ),
             ],
             "triggerTimeLookBackLimit" => [
@@ -302,7 +300,7 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
                 if (
                     isset($triggerValue["applyToNewContentOnly"]) &&
                     $triggerValue["applyToNewContentOnly"] === true &&
-                    !empty($triggerValue["triggerTimeLookBackLimit"]["length"])
+                    !empty($triggerValue["triggerTimeLookBackLimit"])
                 ) {
                     unset($triggerValue["triggerTimeLookBackLimit"]);
                 }

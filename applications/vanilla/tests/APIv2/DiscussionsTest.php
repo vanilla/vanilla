@@ -556,6 +556,7 @@ class DiscussionsTest extends AbstractResourceTest
         $this->assertCount(1, $discussionWithScoreMinus3);
         $this->assertEquals($discussions["score-3"][0]["discussionID"], $discussionWithScoreMinus3[0]["discussionID"]);
     }
+
     /**
      * Test PATCH /discussions/<id> with a single field update.
      *
@@ -716,7 +717,7 @@ class DiscussionsTest extends AbstractResourceTest
      *
      * @param int $statusID status ID.
      *
-     * @depends testPrepareMoveDiscussionsData
+     * @depends      testPrepareMoveDiscussionsData
      * @dataProvider providerTestGetDiscussionsByStatus
      */
     public function testGetDiscussionsByStatus(int $statusID)
@@ -758,7 +759,7 @@ class DiscussionsTest extends AbstractResourceTest
      * @param string $statusState
      * @param int $expectedCount
      *
-     * @depends testPrepareMoveDiscussionsData
+     * @depends      testPrepareMoveDiscussionsData
      * @dataProvider providerTestGetDiscussionsByStatusState
      */
     public function testGetDiscussionsByState(int $statusID, string $statusState = "", int $expectedCount = 0)
@@ -942,7 +943,7 @@ class DiscussionsTest extends AbstractResourceTest
         self::resetTable("Discussion");
         $discussionA = $this->testPost();
         $tagA = $this->api()
-            ->post("tags", ["name" => "testa" . __FUNCTION__, "urlCode" => "testa" . __FUNCTION__])
+            ->post("tags", ["name" => "testa" . __FUNCTION__, "urlCode" => "testa" . strtolower(__FUNCTION__)])
             ->getBody();
         $this->api()->post("discussions/{$discussionA["discussionID"]}/tags", [
             "urlcodes" => [$tagA["urlcode"]],
@@ -972,7 +973,7 @@ class DiscussionsTest extends AbstractResourceTest
         self::resetTable("TagDiscussion");
         $addedDiscussions = $this->insertDiscussions(4);
         $tagA = $this->api()
-            ->post("tags", ["name" => "testa" . __FUNCTION__, "urlCode" => "testa" . __FUNCTION__])
+            ->post("tags", ["name" => "testa" . __FUNCTION__, "urlCode" => "testa" . strtolower(__FUNCTION__)])
             ->getBody();
         $taggedDiscussions = [];
         for ($i = 0; $i < 2; $i++) {
@@ -1426,7 +1427,7 @@ class DiscussionsTest extends AbstractResourceTest
      * @param int $expectedCode
      * @param int|null $maxIterations
      * @dataProvider provideDiscussionsMoveData
-     * @depends testPrepareMoveDiscussionsData
+     * @depends      testPrepareMoveDiscussionsData
      */
     public function testFailMoveDiscussionsList(
         string $discussionIDs,
@@ -2206,5 +2207,76 @@ facilisis luctus, metus</p>";
             ["insertUserRoleID" => \RoleModel::MOD_ID],
             ["discussionID" => [$disc1["discussionID"]]]
         );
+    }
+
+    /**
+     * Test to ensure joining the UserRole table doesn't duplicate discussion records.
+     *
+     * @return void
+     */
+    public function testRoleFilterNoDuplication()
+    {
+        $this->resetTable("Discussion");
+        $user1 = $this->createUser([
+            "roleID" => [\RoleModel::MOD_ID, \RoleModel::MEMBER_ID],
+        ]);
+
+        $disc1 = $this->runWithUser(function () {
+            return $this->createDiscussion();
+        }, $user1);
+
+        $this->assertApiResults(
+            "/discussions",
+            ["insertUserRoleID" => [\RoleModel::MOD_ID, \RoleModel::MEMBER_ID]],
+            ["discussionID" => [$disc1["discussionID"]]],
+            true,
+            1
+        );
+    }
+
+    /**
+     * Test that filtering by a role designated as personal info throws an exception when the session user
+     * doesn't have the `personalInfo.view` permission.
+     *
+     * @return void
+     */
+    public function testRolePermissionValidator(): void
+    {
+        $personalRole = $this->createRole();
+
+        $memberUser = $this->createUser([
+            "roleID" => [\RoleModel::MEMBER_ID],
+        ]);
+
+        $this->runWithUser(function () use ($personalRole) {
+            $this->expectExceptionMessage("Role 33 is personal info.");
+            $this->expectExceptionCode(400);
+            $this->api()->get("/discussions", ["insertUserRoleID" => [$personalRole["roleID"]]]);
+        }, $memberUser);
+    }
+
+    /**
+     * Tests the `excludedCategoryIDs` filter.
+     *
+     * @return void
+     */
+    public function testExcludedCategories()
+    {
+        $excludedCategory = $this->createCategory();
+        $discussionInExcludedCategory = $this->createDiscussion();
+        $this->createCategory();
+        $discussionNotInExcludedCategory = $this->createDiscussion();
+
+        $discussions = $this->api()
+            ->get($this->baseUrl, [
+                "discussionID" => [
+                    $discussionInExcludedCategory["discussionID"],
+                    $discussionNotInExcludedCategory["discussionID"],
+                ],
+                "excludedCategoryIDs" => [$excludedCategory["categoryID"]],
+            ])
+            ->getBody();
+        $this->assertCount(1, $discussions);
+        $this->assertEquals($discussionNotInExcludedCategory["discussionID"], $discussions[0]["discussionID"]);
     }
 }

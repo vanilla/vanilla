@@ -910,8 +910,8 @@ class PostController extends VanillaController
                         if ($Editing) {
                             // Just reload the comment in question
                             $this->Offset = 1;
-                            $Comments = $this->CommentModel->getIDData($CommentID, ["Slave" => false]);
-                            $this->setData("Comments", $Comments);
+                            $Comments = $this->CommentModel->getID($CommentID);
+                            $this->setData("Comments", new Gdn_DataSet([$Comments]));
                             $this->setData("Discussion", $Discussion);
                             // Load the discussion
                             $this->ControllerName = "discussion";
@@ -925,32 +925,14 @@ class PostController extends VanillaController
                         } else {
                             // If the comment model isn't sorted by DateInserted or CommentID then we can't do any fancy loading of comments.
                             $OrderBy = valr("0.0", $this->CommentModel->orderBy());
-                            //                     $Redirect = !in_array($OrderBy, array('c.DateInserted', 'c.CommentID'));
-                            //							$DisplayNewCommentOnly = $this->Form->getFormValue('DisplayNewCommentOnly');
 
-                            //                     if (!$Redirect) {
-                            //                        // Otherwise load all new comments that the user hasn't seen yet
-                            //                        $LastCommentID = $this->Form->getFormValue('LastCommentID');
-                            //                        if (!is_numeric($LastCommentID))
-                            //                           $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
-                            //
-                            //                        // Don't reload the first comment if this new comment is the first one.
-                            //                        $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->getOffset($LastCommentID);
-                            //                        // Do not load more than a single page of data...
-                            //                        $Limit = c('Vanilla.Comments.PerPage', 30);
-                            //
-                            //                        // Redirect if the new new comment isn't on the same page.
-                            //                        $Redirect |= !$DisplayNewCommentOnly && pageNumber($this->Offset, $Limit) != pageNumber($Discussion->CountComments - 1, $Limit);
-                            //                     }
+                            if (is_numeric($CommentID)) {
+                                $this->Offset = $this->CommentModel->getDiscussionThreadOffset($CommentID);
+                                $Comments = new Gdn_DataSet([$this->CommentModel->getID($CommentID)]);
+                            } else {
+                                $Comments = new Gdn_DataSet();
+                            }
 
-                            //                     if ($Redirect) {
-                            //                        // The user posted a comment on a page other than the last one, so just redirect to the last page.
-                            //                        $this->RedirectUrl = Gdn::request()->url("discussion/comment/$CommentID/#Comment_$CommentID", true);
-                            //                     } else {
-                            //                        // Make sure to load all new comments since the page was last loaded by this user
-                            //								if ($DisplayNewCommentOnly)
-                            $this->Offset = $this->CommentModel->getDiscussionThreadOffset($CommentID);
-                            $Comments = $this->CommentModel->getIDData($CommentID, ["Slave" => false]);
                             $this->setData("Comments", $Comments);
 
                             $this->setData("NewComments", true);
@@ -966,6 +948,7 @@ class PostController extends VanillaController
                                 ? $this->data("Comments")->numRows()
                                 : $Discussion->CountComments;
                             $Offset = $CountComments - $Limit;
+                            $this->Offset = $this->Offset ?? $Offset;
                             $this->DiscussionModel->setWatch(
                                 $this->Discussion,
                                 $Limit,
@@ -1007,8 +990,11 @@ class PostController extends VanillaController
         include_once $this->fetchViewLocation("reaction_functions", "reactions", "dashboard");
 
         if ($this->deliveryType() == DELIVERY_TYPE_DATA) {
-            if ($this->data("Comments") instanceof Gdn_DataSet) {
-                $Comment = $this->data("Comments")->firstRow(DATASET_TYPE_ARRAY);
+            if ($this->data("Comments") instanceof Gdn_DataSet || is_array($this->data("Comments"))) {
+                $Comment =
+                    $this->data("Comments") instanceof Gdn_DataSet
+                        ? $this->data("Comments")->firstRow(DATASET_TYPE_ARRAY)
+                        : (array) $this->data("Comments")[0];
                 if ($Comment) {
                     $Photo = $Comment["InsertPhoto"];
 

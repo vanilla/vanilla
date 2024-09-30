@@ -1,0 +1,15 @@
+<svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.5" y="0.5" width="119" height="99" rx="5.5" stroke="#555A62"/>
+<rect x="9" y="43.8" width="21.5333" height="4.53333" rx="1" stroke="#979797" stroke-width="0.4"/>
+<rect x="33" y="43.9333" width="11.3333" height="4.53333" rx="1" stroke="#979797" stroke-width="0.4"/>
+<rect x="43" y="37" width="12.4667" height="4.53333" rx="1" stroke="#979797" stroke-width="0.4"/>
+<rect x="26" y="37" width="14.7333" height="4.53333" rx="1" stroke="#979797" stroke-width="0.4"/>
+<rect x="9" y="37" width="14.7333" height="4.53333" rx="1" stroke="#979797" stroke-width="0.4"/>
+<rect x="8.96295" y="21" width="25.037" height="3.85185" fill="#ADB2BB"/>
+<path d="M8.27083 31.1111H111.729" stroke="#ADB2BB" stroke-width="0.5" stroke-linecap="square"/>
+<rect x="9" y="62" width="25.037" height="3.85185" fill="#ADB2BB"/>
+<rect x="9" y="69.7036" width="46.2222" height="1.92593" fill="#ADB2BB"/>
+<rect x="59.5555" y="69.7036" width="23.1111" height="1.92593" fill="#ADB2BB"/>
+<path d="M8.27083 78.8518H111.729" stroke="#ADB2BB" stroke-width="0.5" stroke-linecap="square"/>
+<path d="M8.27083 54.4815H111.729" stroke="#ADB2BB" stroke-width="0.5" stroke-linecap="square"/>
+</svg>

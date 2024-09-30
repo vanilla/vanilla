@@ -54,6 +54,7 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
             "triage" => [
                 "enabled" => $this->config->get("triage.enabled", false),
             ],
+            "threadStyle" => $this->config->get("threadStyle", "flat"),
             "trustedDomains" => $trustedDomains,
             "disableUrlEmbeds" => $disableUrlEmbeds,
             "postTypes" => $postTypes,

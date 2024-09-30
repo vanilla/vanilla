@@ -45,6 +45,7 @@ use Vanilla\Widgets\React\HtmlReactWidget;
 use Vanilla\Widgets\React\LeaderboardWidget;
 use Vanilla\Widgets\React\QuickLinksWidget;
 use Vanilla\Widgets\Schema\ReactSingleChildSchema;
+use Vanilla\Widgets\ToggledWidgetInterface;
 
 /**
  * Class for hydrating layouts with the vanilla/garden-hydrate library.
@@ -184,7 +185,9 @@ final class LayoutHydrator
      */
     public function addReactResolver(string $reactModuleClass): LayoutHydrator
     {
-        $this->dataHydrator->addResolver(new ReactResolver($reactModuleClass, $this->container));
+        if (!is_a($reactModuleClass, ToggledWidgetInterface::class, true) || $reactModuleClass::isEnabled()) {
+            $this->dataHydrator->addResolver(new ReactResolver($reactModuleClass, $this->container));
+        }
         return $this;
     }
 

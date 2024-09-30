@@ -9,7 +9,7 @@ import Translate from "@library/content/Translate";
 import Checkbox from "@library/forms/Checkbox";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import ErrorMessages from "@library/forms/ErrorMessages";
-import { ColumnType, TableType } from "@library/notificationPreferences";
+import { ColumnType, NotificationType, TableType } from "@library/notificationPreferences";
 import { makeRowDescriptionId } from "@library/notificationPreferences/utils";
 import { categoryPreferencesTableClasses } from "@library/preferencesTable/CategoryPreferencesTable.styles";
 import { PreferencesTable } from "@library/preferencesTable/PreferencesTable";
@@ -17,7 +17,6 @@ import { notificationPreferencesFormClasses } from "@library/preferencesTable/Pr
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { getMeta } from "@library/utility/appUtils";
 import {
-    CATEGORY_NOTIFICATION_TYPES,
     getDefaultCategoryNotificationPreferences,
     ICategoryPreferences,
 } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
@@ -30,7 +29,9 @@ import { Column, Row, useTable } from "react-table";
 interface IProps {
     canIncludeInDigest?: boolean;
     preferences: Partial<ICategoryPreferences>;
+    notificationTypes: Record<string, NotificationType>;
     onPreferenceChange(delta: Partial<ICategoryPreferences>): Promise<void>;
+    defaultNotificationPreferences?: ICategoryPreferences;
     className?: string;
     /** Does the labels reference me, or other users? */
     admin?: boolean;
@@ -39,11 +40,11 @@ interface IProps {
 }
 
 /**
- * This component is used to display and emit changes for category preferences
+ * This component is used to display and emit changes for category (or group) notification preferences
  * Email and Digest visibility is handled internally
  */
 export function CategoryPreferencesTable(props: IProps) {
-    const { onPreferenceChange, admin, canIncludeInDigest, preview } = props;
+    const { onPreferenceChange, notificationTypes, admin, canIncludeInDigest, preview } = props;
     const formClasses = notificationPreferencesFormClasses();
 
     const classes = categoryPreferencesTableClasses();
@@ -78,7 +79,7 @@ export function CategoryPreferencesTable(props: IProps) {
 
     // Format notification preferences as table data
     const data: ColumnType[] = useMemo(() => {
-        return Object.entries(CATEGORY_NOTIFICATION_TYPES).map(([id, categoryNotificationType]) => {
+        return Object.entries(notificationTypes).map(([id, categoryNotificationType]) => {
             return {
                 popup: props.preferences[`preferences.popup.${id}`],
                 ...(emailEnabled && { email: props.preferences[`preferences.email.${id}`] }),
@@ -202,7 +203,7 @@ export function CategoryPreferencesTable(props: IProps) {
                             setNotificationPreferenceTableVisibility(event.target.checked);
                             if (!event.target.checked) {
                                 const { "preferences.followed": omitted, ...defaultPreferences } =
-                                    getDefaultCategoryNotificationPreferences(); //this should set all preferences to `false`
+                                    props.defaultNotificationPreferences ?? getDefaultCategoryNotificationPreferences(); //this should set all preferences to `false`
                                 await onPreferenceChange({
                                     ...defaultPreferences,
                                 });

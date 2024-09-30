@@ -171,17 +171,8 @@ class RichEditorPlugin extends Gdn_Plugin
      */
     public function getPostFormats_handler(array $postFormats): array
     {
-        $hasRich1 =
-            strtolower(\Gdn::config("Garden.InputFormatter")) === RichFormat::FORMAT_KEY ||
-            strtolower(\Gdn::config("Garden.MobileInputFormatter")) === RichFormat::FORMAT_KEY;
-        if ($hasRich1) {
-            // We still show rich2 in the dropdown.
-            $postFormats[] = "Rich";
-            $postFormats[] = "Rich2";
-        } else {
-            // Rich2 is the one true format.
-            $postFormats["Rich2"] = "Rich";
-        }
+        // Rich2 is the one true format.
+        $postFormats["Rich2"] = "Rich";
         return $postFormats;
     }
 

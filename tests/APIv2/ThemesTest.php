@@ -58,6 +58,7 @@ class ThemesTest extends AbstractAPIv2Test
                 "javascript.js",
                 file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/javascript.js"),
                 "application/javascript",
+                file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/javascript.min.js"),
             ],
             [
                 "asset-test-no-parent",
@@ -70,6 +71,7 @@ class ThemesTest extends AbstractAPIv2Test
                 "styles.css",
                 file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/styles.css"),
                 "text/css",
+                file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/styles.min.css"),
             ],
             [
                 "asset-test-no-parent",
@@ -89,13 +91,19 @@ class ThemesTest extends AbstractAPIv2Test
      * @param string $contentType
      * @dataProvider provideAssetTypes
      */
-    public function testGetAsset(string $theme, string $assetKey, string $rawBody, string $contentType)
-    {
-        $this->runWithPrivateCommunity(function () use ($theme, $assetKey, $rawBody, $contentType) {
+    public function testGetAsset(
+        string $theme,
+        string $assetKey,
+        string $rawBody,
+        string $contentType,
+        string $expectedAsset = null
+    ) {
+        $this->runWithPrivateCommunity(function () use ($theme, $assetKey, $rawBody, $contentType, $expectedAsset) {
             $response = $this->api()->get("themes/{$theme}/assets/{$assetKey}");
             $this->assertEquals(200, $response->getStatusCode());
             $this->assertEquals($contentType, $response->getHeader("Content-Type"));
-            $this->assertEquals(rtrim($rawBody), rtrim($response->getRawBody()));
+            $expected = $expectedAsset ?? rtrim($rawBody);
+            $this->assertEquals($expected, rtrim($response->getRawBody()));
         });
     }
 

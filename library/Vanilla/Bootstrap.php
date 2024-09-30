@@ -266,6 +266,7 @@ class Bootstrap
             ->addCall("addMiddleware", [new Reference(Vanilla\Web\ApiExtensionMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\ValidateUTF8Middleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\ValidateJSONMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(Vanilla\Web\Middleware\CloudflareChallengeMiddleware::class)])
 
             // Specific route definitions and middlewares
             ->rule("@api-v2-route")

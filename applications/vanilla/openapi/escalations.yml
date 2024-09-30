@@ -1,5 +1,10 @@
 openapi: 3.0.2
 info:
+x-resourceEvents:
+    escalation:
+        x-addon: "vanilla"
+        name: "Escalation"
+        type: "cmdEscalation"
 paths:
     /escalations:
         post:
@@ -142,7 +147,53 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Escalation"
-
+    /escalations/lookup-assignee:
+        get:
+            summary: Search for users that could be assigned to an escalation by full or partial name matching.
+            parameters:
+                - name: escalationID
+                  description: If passed will filter to potential assignees for this specific escalation.
+                  in: query
+                  required: true
+                  schema:
+                      type: integer
+                - description: >
+                      Filter for username. Supports full or partial matching with
+                      appended wildcard (e.g. User*).
+                  in: query
+                  name: name
+                  required: true
+                  schema:
+                      minLength: 1
+                      type: string
+                - description: |
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      default: 1
+                      minimum: 1
+                - description: |
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 100
+                      minimum: 1
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                                type: array
+                    description: Success
+            tags:
+                - Reports & Escalations
 components:
     schemas:
         EscalationPatch:

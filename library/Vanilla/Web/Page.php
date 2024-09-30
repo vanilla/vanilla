@@ -100,6 +100,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      * Render the page content and wrap it in a data object for the dispatcher.
      *
      * @return Data Data object for global dispatcher.
+     * @throws ServerException
      */
     public function render(): Data
     {

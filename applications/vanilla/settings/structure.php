@@ -3,6 +3,7 @@ use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Forum\Digest\DigestContentModel;
 use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\Forum\Digest\UserDigestModel;
+use Vanilla\Forum\Models\CommentThreadModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportModel;
@@ -390,6 +391,16 @@ if ($Construct->table("User")->tableExists()) {
         );
     }
     $Construct->createIndexIfNotExists("IX_User_CountPosts", ["CountPosts"]);
+}
+
+if ($Construct->table("User")->tableExists()) {
+    if (!$Construct->columnExists("Private")) {
+        $userTable = $SQL->prefixTable("User");
+        $Construct->executeQuery(
+            "alter table $userTable add `Private` tinyint(1) generated always as (case when JSON_VALID(Attributes) = 1 then Attributes->>\"$.Private\" else  null end);"
+        );
+    }
+    $Construct->createIndexIfNotExists("IX_User_Private", ["Private"]);
 }
 
 $Construct

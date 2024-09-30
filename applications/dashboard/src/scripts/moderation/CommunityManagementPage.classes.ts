@@ -17,7 +17,7 @@ export const communityManagementPageClasses = () => {
         minHeight: 45,
         backgroundColor: "white",
         position: "sticky",
-        top: 98, // 🪄 number
+        top: 95, // 🪄 number
         zIndex: 1050,
     });
 

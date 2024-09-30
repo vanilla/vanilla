@@ -16,6 +16,7 @@ use Vanilla\AutomationRules\Trigger\AutomationTrigger;
 use Vanilla\Dashboard\AutomationRules\Models\EscalationRuleDataType;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forms\ApiFormChoices;
+use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
@@ -77,7 +78,7 @@ class ReportPostTrigger extends AutomationTrigger
     public static function getSchema(): Schema
     {
         $reportReasonModel = Gdn::getContainer()->get(ReportReasonModel::class);
-        $formChoices = $reportReasonModel->selectReasons();
+        $formChoices = $reportReasonModel->selectReasons(["isSystem" => false]);
 
         $schema = [
             "countReports" => [
@@ -103,12 +104,13 @@ class ReportPostTrigger extends AutomationTrigger
                 ),
             ],
             "categoryID?" => [
+                "required" => false,
                 "type" => "array",
                 "items" => [
-                    "type" => "string",
+                    "type" => "integer",
                 ],
                 "x-control" => SchemaForm::dropDown(
-                    new FormOptions("Category", "Select category"),
+                    new FormOptions("Category"),
                     new ApiFormChoices("/api/v2/categories", "/api/v2/categories/%s", "categoryID", "name"),
                     null,
                     true
@@ -120,6 +122,16 @@ class ReportPostTrigger extends AutomationTrigger
                     new FormOptions(
                         "Include Subcategories",
                         "Include content from subcategories of the chosen category"
+                    ),
+                    new FieldMatchConditional(
+                        "trigger.triggerValue",
+                        Schema::parse([
+                            "categoryID" => [
+                                "type" => "array",
+                                "items" => ["type" => "integer"],
+                                "minItems" => 1,
+                            ],
+                        ])
                     )
                 ),
             ],
@@ -144,7 +156,7 @@ class ReportPostTrigger extends AutomationTrigger
             ],
             "categoryID?" => [
                 "type" => "array",
-                "items" => ["type" => "string"],
+                "items" => ["type" => "integer"],
                 "nullable" => true,
             ],
             "includeSubcategories?" => [
@@ -168,7 +180,7 @@ class ReportPostTrigger extends AutomationTrigger
             })
             ->addValidator("reportReasonID", function ($reportReason, ValidationField $field) {
                 $reportReasonModel = Gdn::getContainer()->get(ReportReasonModel::class);
-                $validPostTypes = $reportReasonModel->selectReasonIDs();
+                $validPostTypes = $reportReasonModel->selectReasonIDs(["isSystem" => false]);
                 $failed = false;
                 if (!is_array($reportReason) || empty($reportReason)) {
                     $failed = false;

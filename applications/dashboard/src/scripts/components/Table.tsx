@@ -68,10 +68,9 @@ const TableHeader = (props: ITableHeaderProps) => {
                                 className={cx(
                                     classes.head,
                                     classes.basicColumn,
-                                    columnIndex === 0 && classes.leftAlignHead,
+                                    classes.leftAlignHead,
                                     sortable && !columnsNotSortable?.includes(column.id) && classes.isSortHead,
                                     column.isSorted && classes.isSortedHead,
-                                    valueTypeLookUp[`${column.Header}`] === "string" && classes.leftAlignHead,
                                 )}
                                 {...(column.isSorted && {
                                     "aria-sort": column.isSortedDesc ? "descending" : "ascending",

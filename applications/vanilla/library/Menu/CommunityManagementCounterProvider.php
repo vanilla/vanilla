@@ -71,10 +71,7 @@ class CommunityManagementCounterProvider implements CounterProviderInterface
         if ($this->config->get("triage.enabled") && $permissions->has("staff.allow")) {
             $counters[] = new Counter(
                 "triage",
-                $this->discussionStatusModel->getCountStatusID(
-                    [RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED],
-                    isInternal: true
-                )
+                $this->discussionStatusModel->getUnresolvedCount(limit: 1000, cached: true)
             );
         }
         return $counters;

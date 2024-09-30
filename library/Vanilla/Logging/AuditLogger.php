@@ -100,12 +100,20 @@ class AuditLogger
         $requestMethod = $request->getMethod();
         $requestPath = $request->getUri()->getPath();
 
+        $secretPaths = ["sso", "password", "secret"];
+        $sanitizedQuery = $request->getQuery();
+        foreach ($sanitizedQuery as $key => &$val) {
+            if (in_array(strtolower($key), $secretPaths)) {
+                $val = "***REDACTED***";
+            }
+        }
+
         $insert = [
             "auditLogID" => $auditLogEvent->getAuditLogID(),
             "eventType" => $auditLogEvent->getAuditEventType(),
             "requestMethod" => $requestMethod,
             "requestPath" => substr($requestPath, 0, 200),
-            "requestQuery" => $request->getQuery(),
+            "requestQuery" => $sanitizedQuery,
             "context" => $auditLogEvent->getAuditContext(),
             "meta" => $auditLogEvent->getAuditMeta(),
         ];

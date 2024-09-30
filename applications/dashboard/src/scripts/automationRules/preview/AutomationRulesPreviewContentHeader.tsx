@@ -11,7 +11,7 @@ import { humanReadableNumber } from "@library/content/NumberFormatted";
 import Message from "@library/messages/Message";
 
 interface IProps {
-    contentType: "Users" | "Posts";
+    contentType: "Users" | "Posts" | "Comments" | "Discussions";
     totalResults?: number;
     emptyResults?: boolean;
     fromStatusToggle?: boolean;

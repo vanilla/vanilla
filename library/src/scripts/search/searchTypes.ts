@@ -61,6 +61,7 @@ export type ISearchForm<ExtraFormValues extends object = {}> = ISearchFormBase &
 
 export type ISearchRequestQuery<ExtraFormValues extends object = {}> = Omit<ISearchForm<ExtraFormValues>, "authors"> & {
     dateInserted?: string;
+    dateUpdated?: string;
     insertUserIDs?: number[];
 
     limit?: RecordID;
@@ -108,10 +109,13 @@ export interface IVanillaSearchResult extends IBaseSearchResult {
     subqueryExtraParams?: Record<string, any>;
     tags?: ITag[];
 }
-
 export interface IArticlesSearchResult extends IVanillaSearchResult {
     excerpt?: string;
     updateUser?: IUserFragment;
+
+    articleID?: number;
+    insertUserID?: RecordID;
+    knowledgeCategoryID?: RecordID;
 }
 
 export interface IPlacesSearchResult extends IVanillaSearchResult {

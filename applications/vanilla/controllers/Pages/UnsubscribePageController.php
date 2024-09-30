@@ -1,12 +1,16 @@
 <?php
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Higher Logic Inc.
  * @license Proprietary
  */
 
 namespace Vanilla\Forum\Controllers\Pages;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Garden\Web\Data;
+use Garden\Web\Exception\ServerException;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Web\PageDispatchController;
 
@@ -31,8 +35,11 @@ class UnsubscribePageController extends PageDispatchController
     /**
      * Handle /unsubscribe/:token?
      *
-     * @param array $query
-     * @return \Garden\Web\Data
+     * @param string $token
+     * @return Data
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ServerException
      */
     public function index(string $token)
     {

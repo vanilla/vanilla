@@ -11,7 +11,7 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import Message from "@library/messages/Message";
 import { useRunAutomationRule } from "@dashboard/automationRules/AutomationRules.hooks";
 import { useToast } from "@library/features/toaster/ToastContext";
-import { AutomationRulesPreview } from "@dashboard/automationRules/preview/AutomationRulesPreview";
+import { AutomationRulesPreviewModal } from "@dashboard/automationRules/preview/AutomationRulesPreviewModal";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { JsonSchema } from "packages/vanilla-json-schema-forms/src";
 
@@ -74,7 +74,7 @@ export function AutomationRulesRunOnce(props: IProps) {
             >
                 {t("Run Once")}
             </DropDownItemButton>
-            <AutomationRulesPreview
+            <AutomationRulesPreviewModal
                 formValues={props.formValues}
                 isRuleRunning={props.isRunning}
                 isVisible={isPreviewModalVisible}

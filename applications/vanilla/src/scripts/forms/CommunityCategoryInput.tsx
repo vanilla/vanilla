@@ -115,7 +115,7 @@ export function useCategorySuggestions(
 ): ILoadable<ICategory[]> {
     const actions = useReduxActions(CategorySuggestionActions);
     const suggestions = useSelector((state: IForumStoreState) => {
-        return state.forum.categories.suggestionsByQuery[query] ?? { status: LoadStatus.PENDING };
+        return state.forum?.categories?.suggestionsByQuery[query] ?? { status: LoadStatus.PENDING };
     });
 
     useEffect(() => {

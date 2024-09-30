@@ -11,6 +11,7 @@ use ActivityModel;
 use CategoryModel;
 use CommentModel;
 use DiscussionModel;
+use Exception;
 use Gdn;
 use Gdn_Database;
 use Generator;
@@ -71,8 +72,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
      * Notify the relevant users after a new discussion has been posted.
      *
      * @param array $discussion The discussion record in question.
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
+     * @throws Exception
      */
     public function notifyNewDiscussion(array $discussion)
     {
@@ -507,7 +507,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                     $discussionID,
                     $maxNotifiedUserID,
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 yield new LongRunnerFailedID(
                     "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}"
                 );
@@ -586,7 +586,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                     $discussionID,
                     $maxNotifiedUserID,
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 yield new LongRunnerFailedID(
                     "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}"
                 );

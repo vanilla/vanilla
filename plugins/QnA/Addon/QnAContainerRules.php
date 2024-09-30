@@ -10,11 +10,14 @@ namespace Vanilla\QnA\Addon;
 use Garden\Container\ContainerConfigurationInterface;
 use Garden\Container\Reference;
 use Vanilla\AddonContainerRules;
+use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
+use Vanilla\Dashboard\AutomationRules\EscalationRuleService;
 use Vanilla\Dashboard\Models\ActivityService;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\QnA\Activity\AnswerAcceptedActivity;
 use Vanilla\QnA\Activity\QuestionAnswerActivity;
 use Vanilla\QnA\Activity\QuestionFollowUpActivity;
+use Vanilla\QnA\AutomationRules\Triggers\UnAnsweredQuestionTrigger;
 use Vanilla\QnA\Models\QnaQuickLinksProvider;
 use Vanilla\QnA\Models\Totals\AcceptedSiteTotalProvider;
 use Vanilla\QnA\Models\Totals\QuestionSiteTotalProvider;
@@ -64,5 +67,12 @@ class QnAContainerRules extends AddonContainerRules
             ->addCall("addLayoutView", [new Reference(QuestionThreadLayoutView::class)])
             ->rule(LayoutService::class)
             ->addCall("addLayoutView", [new Reference(QuestionThreadLayoutView::class)]);
+
+        $container
+            ->rule(AutomationRuleService::class)
+            ->addCall("addAutomationTrigger", [UnAnsweredQuestionTrigger::class]);
+        $container
+            ->rule(EscalationRuleService::class)
+            ->addCall("addEscalationTrigger", [UnAnsweredQuestionTrigger::class]);
     }
 }

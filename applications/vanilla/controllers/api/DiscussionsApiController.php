@@ -16,6 +16,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Database\Select;
@@ -77,7 +78,8 @@ class DiscussionsApiController extends AbstractApiController
         private LongRunner $longRunner,
         private DiscussionStatusModel $discussionStatusModel,
         private ReactionModel $reactionModel,
-        private Gdn_Database $db
+        private Gdn_Database $db,
+        private InterestModel $interestModel
     ) {
     }
 
@@ -501,6 +503,7 @@ class DiscussionsApiController extends AbstractApiController
                     "sink?",
                     "pinned?",
                     "pinLocation?",
+                    "announce?",
                 ])
                     ->add(DiscussionExpandSchema::commonExpandSchema())
                     ->add($this->fullSchema()),
@@ -665,14 +668,15 @@ class DiscussionsApiController extends AbstractApiController
      *
      * @param array $dbRecord Database record.
      * @param array $expand
+     * @param array $options
      * @return array Return a Schema record.
      * @throws ContainerException
      * @throws \Garden\Container\NotFoundException
      * @throws BreadcrumbProviderNotFoundException
      */
-    public function normalizeOutput(array $dbRecord, $expand = [])
+    public function normalizeOutput(array $dbRecord, $expand = [], array $options = [])
     {
-        $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand);
+        $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand, $options);
 
         if (isset($dbRecord[DiscussionModel::SORT_EXPIRIMENTAL_TRENDING])) {
             $normalizedRow["trending"] = [
@@ -840,10 +844,10 @@ class DiscussionsApiController extends AbstractApiController
             "in",
         ])->setDescription("List discussions.");
         $query["followed"] = $query["followed"] ?? false;
+        $query["suggestions"] = $query["suggestions"] ?? false;
         $query["excludeHiddenCategories"] = $query["excludeHiddenCategories"] ?? false;
         $query = $in->validate($query);
         $query = $this->filterValues($query);
-
         $discussionSchema = CrawlableRecordSchema::applyExpandedSchema(
             $this->discussionSchema(),
             "discussion",
@@ -936,6 +940,10 @@ class DiscussionsApiController extends AbstractApiController
             }
         }
 
+        if (isset($query["excludedCategoryIDs"])) {
+            $where["CategoryID <>"] = $query["excludedCategoryIDs"];
+        }
+
         // Do we exclude hidden categories?
         if ($excludeHiddenCategories) {
             $categoriesShowingDiscussions = CategoryModel::instance()
@@ -950,6 +958,16 @@ class DiscussionsApiController extends AbstractApiController
                     $where["CategoryID"] = $categoriesShowingDiscussions;
                 }
             }
+        }
+
+        $selects = [];
+        if ($query["suggestions"] && InterestModel::isSuggestedContentEnabled()) {
+            [$categoryIDs, $tagIDs] = $this->interestModel->getRecordIDsByUserID($this->getSession()->UserID);
+            if (count($tagIDs) === 0 && $categoryIDs === 0) {
+                return new Data(null);
+            }
+            $where["InterestCategoryID"] = $categoryIDs;
+            $query["tagID"] = $tagIDs;
         }
 
         /*pull all discussion Ids based on the given Tagid/Id's and pass it on*/
@@ -1017,8 +1035,6 @@ class DiscussionsApiController extends AbstractApiController
         [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection(
             $query["sort"] ?? "-DateLastComment"
         );
-
-        $selects = [];
 
         if ($orderField === DiscussionModel::SORT_EXPIRIMENTAL_TRENDING) {
             // Experimental trending works on the following equation
@@ -1165,7 +1181,11 @@ class DiscussionsApiController extends AbstractApiController
             ])
         );
         foreach ($rows as &$currentRow) {
-            $currentRow = $this->normalizeOutput($currentRow, $query["expand"]);
+            $currentRow = $this->normalizeOutput(
+                $currentRow,
+                $query["expand"],
+                ArrayUtils::pluck($query, ["excerptLength"])
+            );
         }
         $this->discussionExpandSchema->commonExpand($rows, $query["expand"] ?? []);
         $this->expandLastCommentBody($rows, $query["expand"]);

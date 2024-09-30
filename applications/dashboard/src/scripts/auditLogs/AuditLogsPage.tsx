@@ -267,7 +267,7 @@ const schema: JsonSchema = {
                         labelKey: "name",
                         valueKey: "eventType",
                         searchUrl: "/api/v2/audit-logs/event-types",
-                        singleUrl: "",
+                        singleUrl: null,
                         extraLabelKey: "eventType",
                     },
                 },

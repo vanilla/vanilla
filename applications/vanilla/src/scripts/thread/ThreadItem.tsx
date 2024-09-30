@@ -19,6 +19,8 @@ import ThreadItemActions from "@vanilla/addon-vanilla/thread/ThreadItemActions";
 import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
 import React from "react";
 import { useThreadItemContext } from "./ThreadItemContext";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IProps {
     content: string;
@@ -32,6 +34,7 @@ interface IProps {
     reactions?: IReaction[];
     attachmentsContent?: React.ReactNode;
     suggestionContent?: IAcceptedAnswerProps;
+    canReplyInline?: boolean;
 }
 
 function getThreadItemID(recordType: string, recordID: string | number) {
@@ -71,7 +74,10 @@ export function ThreadItem(props: IProps) {
                 <>
                     {userContent}
                     {props.actions}
-                    {props.reactions && <ThreadItemActions reactions={props.reactions} />}
+                    <div className={classes.footerWrapper}>
+                        {props.reactions && <ThreadItemActions reactions={props.reactions} />}
+                        {props.canReplyInline && <Button buttonType={ButtonTypes.TEXT}>Reply</Button>}
+                    </div>
                     {!!props.attachmentsContent && (
                         <div className={classes.attachmentsContentWrapper}>{props.attachmentsContent}</div>
                     )}

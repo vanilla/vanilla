@@ -2,11 +2,14 @@
 
 namespace VanillaTests\AutomationRules\Actions;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Vanilla\AutomationRules\Actions\BumpDiscussionAction;
 use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
+use Vanilla\Exception\Database\NoResultsException;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
 use VanillaTests\SiteTestCase;
@@ -26,6 +29,9 @@ class BumpDiscussionActionTest extends SiteTestCase
      * Test that a discussion is bumped when it becomes stale.
      *
      * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws NoResultsException
      */
     public function testManualBumpDiscussionAction()
     {

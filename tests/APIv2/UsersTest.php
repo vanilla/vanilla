@@ -648,7 +648,11 @@ class UsersTest extends AbstractResourceTest
         $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
         $this->assertArrayNotHasKey("suggestAnswers", $response->getBody());
         $this->runWithConfig(
-            ["Feature.AISuggestions.Enabled" => true, "aiSuggestions.enabled" => true],
+            [
+                "Feature.AISuggestions.Enabled" => true,
+                "Feature.aiFeatures.Enabled" => true,
+                "aiSuggestions.enabled" => true,
+            ],
             function () use ($user) {
                 $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
                 $this->assertSame(false, $response->getBody()["suggestAnswers"]);
@@ -840,12 +844,12 @@ class UsersTest extends AbstractResourceTest
         $this->assertArrayHasKey("private", $response);
         $this->assertTrue($response["private"]);
 
-        //Now access the information as guest. Guest shouldn't be able to see it.
-        $this->api()->setUserID(0);
-        $this->expectException(ForbiddenException::class);
+        //Now access the information as guest. Guest has very limited information.
         $this->api()
             ->get("/users/{$privateUser["userID"]}")
             ->getBody();
+        $this->assertArrayHasKey("private", $response);
+        $this->assertTrue($response["private"]);
     }
 
     /**
@@ -1646,7 +1650,7 @@ class UsersTest extends AbstractResourceTest
         array $permissions,
         bool $visibleToUser = true
     ) {
-        $user = $this->createUser();
+        $user = $this->createUser(["Private" => false]);
         $profileField = $this->createProfileField(["visibility" => $visibility]);
 
         $this->api()->patch("$this->baseUrl/{$user["userID"]}/profile-fields", [

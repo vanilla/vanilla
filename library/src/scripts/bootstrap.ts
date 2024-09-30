@@ -27,7 +27,7 @@ import { translationDebug } from "@vanilla/i18n";
 import apiv2 from "@library/apiv2";
 import { onPageView } from "@library/pageViews/pageViewTracking";
 import { _mountComponents } from "@library/utility/componentRegistry";
-import { blotCSS } from "@rich-editor/quill/components/blotStyles";
+import { blotCSS } from "@rich-editor/editor/components/blotStyles";
 import { bootstrapLocales } from "@library/locales/localeBootstrap";
 import "@library/VanillaGlobals";
 

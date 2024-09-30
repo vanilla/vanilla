@@ -191,19 +191,13 @@ class CommentModelTest extends SiteTestCase
 
     /**
      * Smoke test `CommentModel::getByUser()`.
-     *
-     * @param int $version
      */
-    public function testGetByUser(int $version = 1): void
+    public function testGetByUser(): void
     {
         $userID = \Gdn::session()->UserID;
 
-        $comments = $this->insertComments(10);
-        if ($version === 1) {
-            $actual = $this->commentModel->getByUser($userID, 10, 0);
-        } else {
-            $actual = $this->commentModel->getByUser2($userID, 10, 0);
-        }
+        $comments = $this->insertComments(3);
+        $actual = $this->commentModel->getByUser($userID, 3, 0);
         foreach ($actual as $row) {
             $this->assertEquals($userID, $row->InsertUserID);
             $this->assertNotEmpty($row->CategoryID);
@@ -221,7 +215,7 @@ class CommentModelTest extends SiteTestCase
     /**
      * Test `CommentModel::getByUser2()` with permission.
      */
-    public function testGetByUser2Permission(): void
+    public function testGetByUserPermission(): void
     {
         $adminUserID = \Gdn::session()->UserID;
         $roles = $this->getRoles();
@@ -253,14 +247,14 @@ class CommentModelTest extends SiteTestCase
 
         // Switch to member user.
         \Gdn::session()->start($memberUserID, false, false);
-        $this->insertComments(10);
-        $actual = $this->commentModel->getByUser2($memberUserID, 10, 0, false, null, "desc", "PermsDiscussionsView");
+        $this->insertComments(3);
+        $actual = $this->commentModel->getByUser($memberUserID, 3);
         $countRows = $actual->numRows();
         foreach ($actual as $row) {
             $this->assertEquals($memberUserID, $row->InsertUserID);
             $this->assertNotEmpty($row->CategoryID);
         }
-        $this->assertEquals(10, $countRows);
+        $this->assertEquals(3, $countRows);
     }
 
     /**

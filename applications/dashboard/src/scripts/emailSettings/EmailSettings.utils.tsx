@@ -13,8 +13,9 @@ import {
 } from "@dashboard/emailSettings/EmailSettings.types";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { t } from "@vanilla/i18n";
+import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
 
-const emptyRichEditorValue = [{ children: [{ text: "" }], type: "p" }];
+const emptyRichEditorValue = EMPTY_RICH2_BODY;
 /**
  *  Get the email settings schemas
  */

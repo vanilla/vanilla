@@ -20,6 +20,7 @@ use Vanilla\Dashboard\Models\UserLeaderQuery;
 use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\DateFilterSchema;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Search\UserSearchType;
 use Vanilla\ImageResizer;
 use Vanilla\Models\CrawlableRecordSchema;
@@ -54,6 +55,11 @@ class UsersApiController extends AbstractApiController
     const PERMISSIONS_ACTION_CONSTANT = "@@users/GET_PERMISSIONS_DONE";
     const ERROR_SELF_EDIT_PASSWORD_MISSING = "The field `passwordConfirmation` is required to edit this profile";
     const ERROR_PATCH_HIGHER_PERMISSION_USER = "You are not allowed to edit a user that has higher permissions than you.";
+
+    // Used to determine level of access current user has to other user profile.
+    const FULL_USER_VIEW_PERMISSIONS = 1;
+    const BASIC_USER_VIEW_PERMISSIONS = 0;
+    const NO_USER_VIEW_PERMISSIONS = -1;
 
     /** @var ActivityModel */
     private $activityModel;
@@ -228,30 +234,35 @@ class UsersApiController extends AbstractApiController
 
     /**
      * Check if current session user has just Profile.View permission
-     * or advanced permissions as well
+     * or advanced permissions as well returns (BASIC_USER_VIEW_PERMISSIONS) for full permissions, BASIC_USER_VIEW_PERMISSIONS for profile.view,
+     * NO_USER_VIEW_PERMISSIONS for no permissions, or throws Exception if $throw is set to true.
      *
      * @param string|null $permissionToCheck The permissions you are requiring.
-     *
-     * @return bool
+     * @param bool $throw Whether to throw an exception if the user does not have the specified permission(s).
+     * @return int
      */
-    public function checkPermission(string $permissionToCheck = null): bool
+    public function checkUserPermissionMode(string $permissionToCheck = null, bool $throw = true): int
     {
         $session = $this->getSession();
-
-        $showFullSchema = false;
+        $showFullSchema = self::BASIC_USER_VIEW_PERMISSIONS;
         $permissions = ["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete", "Garden.PersonalInfo.View"];
         if ($permissionToCheck !== null) {
             $permissions[] = $permissionToCheck;
         }
         if ($session->checkPermission($permissions, false)) {
-            $showFullSchema = true;
+            $showFullSchema = self::FULL_USER_VIEW_PERMISSIONS;
         } else {
             $permissions = ["Garden.Profiles.View"];
             if ($permissionToCheck !== null) {
                 $permissions[] = $permissionToCheck;
             }
-
-            $this->permission($permissions);
+            if ($throw) {
+                $this->permission($permissions);
+            } else {
+                $showFullSchema = $session->checkPermission($permissions)
+                    ? self::BASIC_USER_VIEW_PERMISSIONS
+                    : self::NO_USER_VIEW_PERMISSIONS;
+            }
         }
 
         return $showFullSchema;
@@ -269,7 +280,9 @@ class UsersApiController extends AbstractApiController
     public function get(int $id, array $query): Data
     {
         $isSelf = $id === $this->getSession()->UserID;
-        $showFullSchema = $isSelf || $this->checkPermission(Permissions::BAN_ROLE_TOKEN);
+        $showFullSchema = $isSelf
+            ? self::FULL_USER_VIEW_PERMISSIONS
+            : $this->checkUserPermissionMode(Permissions::BAN_ROLE_TOKEN, false);
         $queryIn = $this->schema(
             ["expand?" => ApiUtils::getExpandDefinition(["profileFields", "discoveryText", "reactionsReceived"])],
             ["UserGet", "in"]
@@ -278,8 +291,16 @@ class UsersApiController extends AbstractApiController
         $this->idParamSchema();
         $query = $queryIn->validate($query);
         $expand = $query["expand"] ?? [];
-        $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
         $row = $this->userByID($id);
+        $outSchema = match ($showFullSchema) {
+            self::FULL_USER_VIEW_PERMISSIONS => $this->userSchema(),
+            self::BASIC_USER_VIEW_PERMISSIONS => $this->viewProfileSchema(),
+            default => match ($row["Attributes"]["Private"]) {
+                "0" => $this->viewProfileSchema(),
+                default => $this->viewPrivateProfileSchema(),
+            },
+        };
+
         $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, "user", $expand);
         if (
             $this->getSession()->checkPermission("Garden.Profiles.View") &&
@@ -627,7 +648,7 @@ class UsersApiController extends AbstractApiController
             return $result;
         }
 
-        $showFullSchema = $this->checkPermission();
+        $showFullSchema = $this->checkUserPermissionMode(null, false);
 
         $in = $this->schema(
             [
@@ -699,12 +720,20 @@ class UsersApiController extends AbstractApiController
             ],
             ["UserIndex", "in"]
         )
+            ->addValidator("roleIDs", function ($data, $field) {
+                RoleModel::roleViewValidator($data, $field);
+            })
             ->addValidator("", SchemaUtils::onlyOneOf(["dateInserted", "dateUpdated", "roleID"]))
             ->addValidator("ipAddresses", $this->createIpAddressesValidator());
 
         $query = $in->validate($query);
         $expand = $query["expand"] ?? [];
-        $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
+
+        $outSchema = match ($showFullSchema) {
+            self::FULL_USER_VIEW_PERMISSIONS => $this->userSchema(),
+            self::BASIC_USER_VIEW_PERMISSIONS => $this->viewProfileSchema(),
+            default => $this->viewPrivateProfileSchema(),
+        };
         $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, "user", $expand);
         if (
             is_array($expand) &&
@@ -744,12 +773,13 @@ class UsersApiController extends AbstractApiController
             }
         }
 
-        if (!$showFullSchema) {
+        if ($showFullSchema !== self::FULL_USER_VIEW_PERMISSIONS) {
             $this->userModel->filterPrivateUserRecord($rows);
         }
         if (ModelUtils::isExpandOption("reactionsReceived", $expand)) {
             $rows = $this->reactionModel->expandUserReactionsReceived($rows);
         }
+
         $result = $out->validate($rows);
 
         if ($joinDirtyRecords) {
@@ -786,7 +816,7 @@ class UsersApiController extends AbstractApiController
     public function createIpAddressesValidator(): Closure
     {
         return function (array $ipAddresses, \Garden\Schema\ValidationField $field) {
-            if (!$this->checkPermission()) {
+            if ($this->checkUserPermissionMode() !== self::FULL_USER_VIEW_PERMISSIONS) {
                 $field->addError("You don't have permission to filter by IP address", ["status" => 403]);
             }
             foreach ($ipAddresses as $ipAddress) {
@@ -930,7 +960,6 @@ class UsersApiController extends AbstractApiController
     protected function normalizeOutput(array $dbRecord, $expand = [])
     {
         $result = $this->userModel->normalizeRow($dbRecord, $expand);
-        $result["url"] = $this->userModel->getProfileUrl($result);
         return $result;
     }
 
@@ -957,7 +986,7 @@ class UsersApiController extends AbstractApiController
         }
 
         $this->idParamSchema("in");
-        if ($this->checkPermission("Garden.Users.Edit")) {
+        if ($this->checkUserPermissionMode() === self::FULL_USER_VIEW_PERMISSIONS) {
             $in = $this->schema($this->userPatchSchema(), ["UserPatchCommon", "in"])->setDescription("Update a user.");
         } else {
             $in = $this->schema($this->userPatchSelfEditSchema(), ["UserPatchCommon", "in"])->setDescription(
@@ -1605,7 +1634,28 @@ class UsersApiController extends AbstractApiController
     }
 
     /**
-     * Get a user schema with minimal profile fields.
+     * Get a user schema with private profile fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function viewPrivateProfileSchema()
+    {
+        return $this->schema(
+            Schema::parse([
+                "userID:i",
+                "name:s?",
+                "sortName?",
+                "photoUrl:s?",
+                "profilePhotoUrl:s?",
+                "banned:b?",
+                "private:b?" => ["default" => false],
+            ])->add($this->fullSchema()),
+            "ViewProfile"
+        );
+    }
+
+    /**
+     * Get a user schema with public profile fields.
      *
      * @return Schema Returns a schema object.
      */

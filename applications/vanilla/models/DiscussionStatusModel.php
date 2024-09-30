@@ -224,35 +224,33 @@ class DiscussionStatusModel
     /**
      * Get the count of discussions with a particular statusID. 15 seconds cache time. Counts are filtered to user permissions.
      *
-     * @param array $statusIDs
      * @param int $limit
-     * @param bool $isInternal
+     * @param bool $cached
      * @return int
      */
-    public function getCountStatusID(
-        array $statusIDs,
-        int $limit = 10000,
-        bool $isInternal = false,
-        bool $cached = true
-    ): int {
+    public function getUnresolvedCount(int $limit = 10000, bool $cached = true): int
+    {
         // Filter for current permissions.
-        $visibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs([
-            "forceArrayReturn" => true,
-            "filterHideDiscussions" => true,
-            "filterArchivedCategories" => true,
-        ]);
+        $visibleCategoryIDs = $this->categoryModel->getCategoryIDsWithPermissionForUser(
+            $this->session->UserID,
+            "Vanilla.Discussions.View"
+        );
+        if (!$this->session->checkPermission("community.moderate")) {
+            // If the user isn't a global moderator apply permission filters.
+            $moderateCategoryIDs = $this->categoryModel->getCategoryIDsWithPermissionForUser(
+                $this->session->UserID,
+                "Vanilla.Posts.Moderate"
+            );
+            $visibleCategoryIDs = array_intersect($visibleCategoryIDs, $moderateCategoryIDs);
+        }
 
         $modelCache = new ModelCache("discussionStatus", $this->cache);
 
-        $doFetch = function () use ($statusIDs, $limit, $isInternal, $visibleCategoryIDs) {
+        $doFetch = function () use ($limit, $visibleCategoryIDs) {
             $where = [
                 "CategoryID" => $visibleCategoryIDs,
             ];
-            if ($isInternal) {
-                $where["internalStatusID"] = $statusIDs;
-            } else {
-                $where["statusID"] = $statusIDs;
-            }
+            $where["internalStatusID"] = [RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED];
             $count = $this->discussionModel
                 ->createSql()
                 ->from("Discussion")
@@ -264,16 +262,10 @@ class DiscussionStatusModel
 
         if ($cached) {
             return $modelCache->getCachedOrHydrate(
-                [
-                    "discussionStatus/count",
-                    "statusIDs" => $statusIDs,
-                    "limit" => $limit,
-                    "isInternal" => $isInternal,
-                    "cats" => $visibleCategoryIDs,
-                ],
+                ["discussionStatus/count", "limit" => $limit, "cats" => $visibleCategoryIDs],
                 $doFetch,
                 [
-                    Gdn_Cache::FEATURE_EXPIRY => 15, // 15 seconds.
+                    Gdn_Cache::FEATURE_EXPIRY => 60,
                 ]
             );
         } else {

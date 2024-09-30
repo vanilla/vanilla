@@ -27,10 +27,18 @@ const ThreadItemClasses = useThemeCache((headerHasUserPhoto = false) => {
         },
     });
 
+    const footerWrapper = css({
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginInlineEnd: 10,
+    });
+
     return {
         userContent,
         resultWrapper,
         attachmentsContentWrapper,
+        footerWrapper,
     };
 });
 

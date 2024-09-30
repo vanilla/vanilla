@@ -437,7 +437,11 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             ->select("t.Name", "", "ActivityType")
             ->from("Activity a")
             ->join("ActivityType t", "a.ActivityTypeID = t.ActivityTypeID");
-
+        if (isset($where["Private"])) {
+            $this->SQL->join("User u", "u.UserID = a.ActivityUserID");
+            $this->SQL->where("u.Private", 0);
+            unset($where["Private"]);
+        }
         // Add prefixes to the where.
         foreach ($where as $key => $value) {
             if (strpos($key, ".") === false) {

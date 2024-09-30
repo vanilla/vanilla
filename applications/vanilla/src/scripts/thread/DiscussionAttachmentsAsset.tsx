@@ -66,16 +66,19 @@ export function DiscussionAttachmentsAsset(props: IProps) {
 }
 
 export function DiscussionAttachment(props: { attachment: IAttachment; onSuccessfulRefresh?: () => Promise<void> }) {
-    const {
-        attachment: { state, status, sourceUrl, sourceID, dateUpdated, dateInserted, metadata, insertUser },
-    } = props;
+    const { attachment } = props;
 
+    const { state, status, sourceUrl, sourceID, dateUpdated, dateInserted, metadata, insertUser } = attachment;
     const integration = useReadableIntegrationContext();
 
     const title = integration?.title ?? "Unknown Integration";
     const externalIDLabel = integration?.externalIDLabel ?? "Unknown #";
     const logoIcon = integration?.logoIcon ?? "meta-external";
     const attachmentTypeIcon = integration?.attachmentTypeIcon;
+
+    const dynamicMetas = DiscussionAttachment.additionalMetaItems
+        .filter(({ shouldRender }) => shouldRender(attachment))
+        .map(({ component: MetaItemComponent }, index) => <MetaItemComponent key={index} attachment={attachment} />);
 
     return (
         <AttachmentLayout
@@ -89,8 +92,34 @@ export function DiscussionAttachment(props: { attachment: IAttachment; onSuccess
             dateUpdated={dateUpdated ?? dateInserted}
             user={insertUser}
             metadata={metadata}
+            metas={dynamicMetas.length > 0 ? dynamicMetas : undefined}
         />
     );
 }
+
+export type DiscussionAttachmentLayoutMetaItem = {
+    component: React.ComponentType<{ attachment: IAttachment }>;
+    shouldRender: (attachment?: IAttachment) => boolean;
+};
+
+DiscussionAttachment.additionalMetaItems = [] as DiscussionAttachmentLayoutMetaItem[];
+
+DiscussionAttachment.registerMetaItem = (
+    /**
+     * The component to render
+     *
+     */
+    component: DiscussionAttachmentLayoutMetaItem["component"],
+
+    /**
+     * shouldRender receives the attachment as an argument and should return a boolean.
+     */
+    shouldRender: DiscussionAttachmentLayoutMetaItem["shouldRender"],
+) => {
+    DiscussionAttachment.additionalMetaItems.push({
+        component,
+        shouldRender,
+    });
+};
 
 export default DiscussionAttachmentsAsset;

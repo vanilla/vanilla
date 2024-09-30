@@ -12,12 +12,13 @@ import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhot
 import { USERS_LIMIT_PER_PAGE, USERS_MAX_PAGE_COUNT } from "@dashboard/users/userManagement/UserManagementUtils";
 import NumberedPager from "@library/features/numberedPager/NumberedPager";
 import { cx } from "@emotion/css";
-import { AutomationRulesPreviewContent } from "@dashboard/automationRules/preview/AutomationRulesPreviewContent";
 import { loadingPlaceholder } from "@dashboard/automationRules/AutomationRules.utils";
 import { AutomationRulesPreviewContentHeader } from "@dashboard/automationRules/preview/AutomationRulesPreviewContentHeader";
 
-interface IProps extends Omit<React.ComponentProps<typeof AutomationRulesPreviewContent>, "formValues"> {
+interface IProps {
     query: IGetUsersQueryParams;
+    fromStatusToggle?: boolean;
+    onPreviewContentLoad?: (emptyResult: boolean) => void;
 }
 
 export function AutomationRulesPreviewUsersContent(props: IProps) {

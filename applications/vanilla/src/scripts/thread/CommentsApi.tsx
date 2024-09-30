@@ -21,6 +21,10 @@ const CommentsApi = {
             paging,
         };
     },
+    get: async (commentID: RecordID): Promise<IComment> => {
+        const result = await apiv2.get<IComment>(`/comments/${commentID}`);
+        return result.data;
+    },
     getEdit: async (commentID: RecordID): Promise<ICommentEdit> => {
         const result = await apiv2.get<ICommentEdit>(`/comments/${commentID}/edit`);
         return result.data;

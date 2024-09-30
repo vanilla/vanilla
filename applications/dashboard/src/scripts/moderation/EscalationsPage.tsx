@@ -29,6 +29,7 @@ import { EmptyState } from "@dashboard/moderation/components/EmptyState";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { useEscalationMutation } from "@dashboard/moderation/CommunityManagement.hooks";
 import { DisabledBanner } from "@dashboard/moderation/components/DisabledBanner";
+import { notEmpty } from "@vanilla/utils";
 
 interface IProps {}
 
@@ -164,13 +165,35 @@ function EscalationsPage(props: IProps) {
                                 <div className={cmdClasses.list}>
                                     {escalationsQuery.data.results.map((escalation) => (
                                         <EscalationListItem
+                                            onAttachmentCreated={(attachmentCatalog) => {
+                                                if (attachmentCatalog.escalationStatusID) {
+                                                    // Enable that statusID
+                                                    setFilters((prev) => {
+                                                        if (
+                                                            attachmentCatalog.escalationStatusID &&
+                                                            !prev.statuses.includes(
+                                                                attachmentCatalog.escalationStatusID,
+                                                            )
+                                                        ) {
+                                                            return {
+                                                                ...prev,
+                                                                statuses: prev.statuses.concat([
+                                                                    attachmentCatalog.escalationStatusID,
+                                                                ]),
+                                                            };
+                                                        } else {
+                                                            return prev;
+                                                        }
+                                                    });
+                                                }
+                                            }}
                                             key={escalation.escalationID}
                                             escalation={escalation}
                                             onMessageAuthor={(messageInfo) => setAuthorMessage(messageInfo)}
-                                            onRecordVisibilityChange={(isRecordLive) =>
+                                            onRecordVisibilityChange={(recordIsLive) =>
                                                 escalationMutation.mutateAsync({
                                                     escalationID: escalation.escalationID,
-                                                    payload: { isRecordLive },
+                                                    payload: { recordIsLive },
                                                 })
                                             }
                                         />

@@ -10,13 +10,28 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { useThemeCache } from "@library/styles/themeCache";
 
-export const followedContentClasses = useThemeCache(() => {
+export const followedContentClasses = useThemeCache((pagerOnly?: boolean) => {
     const globalVars = globalVariables();
 
     const root = css({});
 
     const section = css({
         marginTop: globalVars.spacer.headingItem,
+    });
+
+    const tabsContent = css({
+        paddingTop: 16,
+    });
+
+    const tabsPanel = css({
+        "& > div[role='tabpanel']": {
+            paddingLeft: 0,
+            paddingRight: 0,
+        },
+    });
+
+    const tabList = css({
+        marginLeft: -12,
     });
 
     const subtitle = css({
@@ -27,10 +42,16 @@ export const followedContentClasses = useThemeCache(() => {
         ...Mixins.margin({ top: globalVars.spacer.mainLayout, bottom: globalVars.spacer.pageComponentCompact }),
     });
 
-    const sortBy = css({
+    const sortByAndPager = css({
         display: "flex",
-        justifyContent: "flex-start",
+        justifyContent: pagerOnly ? "flex-end" : "space-between",
         ...Mixins.margin({ bottom: globalVars.spacer.headingBoxCompact }),
+    });
+
+    const pager = css({
+        paddingBottom: 0,
+        paddingTop: 0,
+        marginTop: -8,
     });
 
     const photoWrap = css({
@@ -61,8 +82,12 @@ export const followedContentClasses = useThemeCache(() => {
     return {
         root,
         section,
+        tabsContent,
+        tabsPanel,
+        tabList,
         subtitle,
-        sortBy,
+        sortByAndPager,
+        pager,
         photoWrap,
         iconWrap,
         name,

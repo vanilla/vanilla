@@ -18,6 +18,7 @@ import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadI
 import React, { useState } from "react";
 import { DiscussionAttachment } from "./DiscussionAttachmentsAsset";
 import { useDiscussionThreadContext } from "./DiscussionThreadContext";
+import { useCommentThread } from "@vanilla/addon-vanilla/thread/CommentThreadContext";
 
 interface IProps {
     comment: IComment;
@@ -27,12 +28,15 @@ interface IProps {
     actions?: React.ComponentProps<typeof ThreadItem>["actions"];
     boxOptions?: Partial<IBoxOptions>;
     userPhotoLocation?: "header" | "left";
+    isInternal?: boolean;
+    canReplyInline?: boolean;
 }
 
 export function CommentThreadItem(props: IProps) {
     const { comment, onMutateSuccess, actions } = props;
     const [isEditing, setIsEditing] = useState(false);
     const { discussion } = useDiscussionThreadContext();
+    const { updateComment } = useCommentThread();
 
     const editCommentQuery = useQuery({
         enabled: isEditing,
@@ -68,9 +72,10 @@ export function CommentThreadItem(props: IProps) {
                         <CommentEditor
                             commentEdit={editCommentQuery.data}
                             comment={props.comment}
-                            onSuccess={async () => {
+                            onSuccess={async (data) => {
                                 !!onMutateSuccess && (await onMutateSuccess());
                                 await invalidateEditCommentQuery();
+                                updateComment(comment.commentID, data);
                                 setIsEditing(false);
                             }}
                             onClose={() => {
@@ -112,6 +117,7 @@ export function CommentThreadItem(props: IProps) {
                             }}
                             onMutateSuccess={onMutateSuccess}
                             isEditLoading={isEditing && editCommentQuery.isLoading}
+                            isInternal={props.isInternal}
                         />
                     </>
                 }
@@ -126,6 +132,7 @@ export function CommentThreadItem(props: IProps) {
                         onMutateSuccess,
                     }
                 }
+                canReplyInline={props.canReplyInline}
             />
         </ThreadItemContextProvider>
     );

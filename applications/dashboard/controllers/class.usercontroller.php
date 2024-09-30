@@ -75,7 +75,7 @@ class UserController extends DashboardController
         // Page setup
         $this->addJsFile("jquery.gardenmorepager.js");
         $this->addJsFile("user.js");
-        $this->title(t("Users"));
+        $this->title(t("Manage Users"));
         $this->setHighlightRoute("dashboard/user");
         Gdn_Theme::section("Moderation");
 

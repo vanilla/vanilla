@@ -28,7 +28,7 @@ class DashboardApiController extends Controller
             "Garden.Settings.Manage",
             "Garden.Community.Manage",
             "Garden.Moderation.Manage",
-            "posts.manage",
+            "posts.moderate",
             "Garden.Settings.View",
             "Garden.Users.Add",
             "Garden.Users.Edit",

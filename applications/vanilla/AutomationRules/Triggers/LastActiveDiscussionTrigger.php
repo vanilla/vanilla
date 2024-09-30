@@ -33,7 +33,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
      */
     public static function getName(): string
     {
-        return "Time since post had no activity";
+        return "Time since post has had no activity";
     }
 
     /**

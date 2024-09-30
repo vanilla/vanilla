@@ -1016,16 +1016,15 @@ class VanillaHooks extends Gdn_Plugin
         [$offset, $limit] = offsetLimit($page, $pageSize);
 
         $commentModel = new CommentModel();
+
+        $where = [
+            "c.InsertUserID" => $sender->User->UserID,
+        ];
+        if ($lastCommentID = $sender->Request->get("lid")) {
+            $where["c.CommentID <"] = $lastCommentID;
+        }
         /** @var Gdn_DataSet $comments */
-        $comments = $commentModel->getByUser2(
-            $sender->User->UserID,
-            $limit,
-            $offset,
-            $sender->Request->get("lid"),
-            null,
-            "desc",
-            "PermsDiscussionsView"
-        );
+        $comments = $commentModel->getWhere($where, "CommentID", "DESC", $limit, $offset);
         $totalRecords = $offset + $commentModel->LastCommentCount + 1;
 
         // Build a pager

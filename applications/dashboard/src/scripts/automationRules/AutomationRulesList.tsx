@@ -124,7 +124,7 @@ export function AutomationRulesList(props: IProps) {
 
     const rows = useMemo(() => {
         if (isLoading) {
-            return loadingPlaceholder() as ITableData[];
+            return loadingPlaceholder(undefined, isEscalationRulesList) as ITableData[];
         }
         if (rulesList.length) {
             return rulesList.map((rule, index) => {

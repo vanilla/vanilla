@@ -122,6 +122,9 @@ abstract class Gdn_SQLDriver
     /** @var array A collection of where clauses. */
     protected $_Wheres;
 
+    /** @var array<array{string, Gdn_MySQLDriver, Gdn_MySQLDriver|null}> */
+    protected array $withs = [];
+
     /**
      *
      */
@@ -162,8 +165,9 @@ abstract class Gdn_SQLDriver
 
             $this->select($selects);
         }
-
-        $this->orderBy($orderFields, $orderDirection);
+        if (!empty($orderFields)) {
+            $this->orderBy($orderFields, $orderDirection);
+        }
         $this->limit($limit, $offset);
 
         return $this;
@@ -671,9 +675,10 @@ abstract class Gdn_SQLDriver
      * Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
      *
      * @param string $table The name of the table to get schema data for.
+     * @param bool $bypassCache;
      * @return array
      */
-    public function fetchTableSchema($table)
+    public function fetchTableSchema($table, bool $bypassCache = false)
     {
         trigger_error(
             errorMessage(
@@ -740,6 +745,50 @@ abstract class Gdn_SQLDriver
             ),
             E_USER_ERROR
         );
+    }
+
+    /**
+     * Apply a CTE to the query.
+     *
+     * @link https://dev.mysql.com/doc/refman/8.4/en/with.html
+     *
+     * @param string $name
+     * @param Gdn_SQLDriver $withQuery
+     *
+     * @return $this
+     */
+    public function with(string $name, Gdn_SQLDriver $withQuery): static
+    {
+        $this->withs[] = [$name, $withQuery, null];
+        return $this;
+    }
+
+    /**
+     * Apply a recursive CTE to the query.
+     *
+     * @link https://dev.mysql.com/doc/refman/8.4/en/with.html
+     *
+     * @param string $name
+     * @param Gdn_SQLDriver $withQuery
+     * @param Gdn_SQLDriver $recursiveQuery
+     * @return $this
+     */
+    public function withRecursive(string $name, Gdn_SQLDriver $withQuery, Gdn_SQLDriver $recursiveQuery): static
+    {
+        $this->withs[] = [$name, $withQuery, $recursiveQuery];
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param Gdn_SQLDriver $subquery
+     * @return $this
+     */
+    public function fromSubquery(string $name, Gdn_SQLDriver $subquery): static
+    {
+        $this->mergeParameters($subquery);
+        $this->_Froms[] = "({$subquery->getSelect()}) as $name";
+        return $this;
     }
 
     /**
@@ -1016,7 +1065,39 @@ SQL;
         // Close off any open query elements.
         $this->_endQuery();
 
-        $sql = !$this->_Distinct ? "select " : "select distinct ";
+        $sql = "";
+
+        if (!empty($this->withs)) {
+            $allWiths = [];
+            $hasRecursive = false;
+            foreach ($this->withs as $with) {
+                [$name, $query, $recursiveQuery] = $with;
+                $this->mergeParameters($query);
+                if ($recursiveQuery !== null) {
+                    $hasRecursive = true;
+                    $this->mergeParameters($recursiveQuery);
+                    $allWiths[] = <<<SQL
+{$name} AS (
+{$query->getSelect($prepared)}
+UNION DISTINCT
+{$recursiveQuery->getSelect($prepared)}
+)\n
+SQL;
+                } else {
+                    $allWiths[] = <<<SQL
+$name AS (
+{$query->getSelect($prepared)}
+)\n
+SQL;
+                }
+            }
+
+            $combinedWiths = implode(",\n", $allWiths);
+            $sql .= $hasRecursive ? "WITH RECURSIVE " : "WITH ";
+            $sql .= $combinedWiths;
+        }
+
+        $sql .= !$this->_Distinct ? "select " : "select distinct ";
 
         // Don't escape the field if it is numeric or an asterisk (all columns)
         $selects = [];
@@ -1263,10 +1344,14 @@ SQL;
         }
 
         foreach ($fields as $field) {
-            $field = trim($field);
+            if ($field instanceof RawExpression) {
+                $this->_GroupBys[] = $field->getExpression();
+            } else {
+                $field = trim($field);
 
-            if ($field != "") {
-                $this->_GroupBys[] = $this->escapeFieldReference($field);
+                if ($field != "") {
+                    $this->_GroupBys[] = $this->escapeFieldReference($field);
+                }
             }
         }
         return $this;
@@ -1604,7 +1689,9 @@ SQL;
             $tableName = $m[1];
             $alias = $m[2] ?? $tableName;
 
-            $fullTableName = $this->Database->DatabasePrefix . $tableName;
+            $fullTableName = str_starts_with($tableName, "@")
+                ? str_replace("@", "", $tableName)
+                : $this->Database->DatabasePrefix . $tableName;
             $escapedTableName = $escape ? $this->escapeIdentifier($fullTableName) : $fullTableName;
             $escapedAlias = $escape ? $this->escapeIdentifier($alias) : $alias;
 

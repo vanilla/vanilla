@@ -161,6 +161,18 @@ class TagsTest extends AbstractResourceTest
     }
 
     /**
+     * Test getting an error when posting tag with invalid urlCode.
+     */
+    public function testPostWithInvalidUrlCode()
+    {
+        $this->expectExceptionCode(400);
+        $this->expectExceptionMessage("The Url Slug may only contain alphanumeric characters and hyphens.");
+        $this->api()
+            ->post($this->baseUrl, $this->record(["urlCode" => "CapitalName"]))
+            ->getBody();
+    }
+
+    /**
      * Test getting an error when deleting a tag with a child.
      */
     public function testDeleteTagWithParent()

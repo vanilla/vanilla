@@ -25,23 +25,18 @@ export function usePostReactionsContext() {
 
 export function PostReactionsProvider(props: PropsWithChildren<IPostRecord>) {
     const { children, ...record } = props;
-    const { reactionLog, refetchLog } = useReactionLog(record);
+    const reactionLog = useReactionLog(record);
     const { toggleReaction, toggleResponse } = useToggleReaction(record);
 
     const getUsers = (tagID: number): IUserFragment[] => {
-        return reactionLog.filter((reaction) => reaction.tagID === tagID).map(({ user }) => user);
+        return (reactionLog?.data ?? []).filter((reaction) => reaction.tagID === tagID).map(({ user }) => user);
     };
-
-    // update the log list when the counts list is updated
-    useEffect(() => {
-        refetchLog();
-    }, [toggleResponse]);
 
     return (
         <PostReactionsContext.Provider
             value={{
                 ...record,
-                reactionLog,
+                reactionLog: reactionLog.data,
                 getUsers,
                 toggleReaction,
                 counts: toggleResponse,

@@ -146,7 +146,7 @@ paths:
                   in: query
                   schema:
                       type: string
-                - $ref: "#/components/parameters/DiscussionExpand"
+                - $ref: "#/components/parameters/expand[]"
                 - name: groupID
                   description: The group the discussion is in.
                   in: query
@@ -191,6 +191,36 @@ paths:
                       type: array
                       items:
                           type: integer
+                - name: suggestions
+                  description: Filter discussion list based on user interests.
+                  in: query
+                  schema:
+                      type: boolean
+                  x-feature: "suggestedContent.enabled"
+                - name: excerptLength
+                  description: Length of excerpts.
+                  in: query
+                  schema:
+                      type: integer
+                - name: excludedCategoryIDs[]
+                  description: Category IDs to exclude.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: integer
+                - name: sentiment
+                  x-addon: SentimentAnalysis
+                  description: Filter by post sentiment.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - stronglyNegative
+                          - negative
+                          - balanced
+                          - positive
+                          - stronglyPositive
             responses:
                 "200":
                     content:
@@ -233,7 +263,7 @@ paths:
                       default: 30
                       maximum: 100
                       minimum: 1
-                - $ref: "#/components/parameters/DiscussionExpand"
+                - $ref: "#/components/parameters/expand[]"
             responses:
                 "200":
                     content:
@@ -318,7 +348,7 @@ paths:
                       default: 30
                       maximum: 100
                       minimum: 1
-                - $ref: "#/components/parameters/DiscussionExpand"
+                - $ref: "#/components/parameters/expand[]"
             responses:
                 "200":
                     content:
@@ -341,7 +371,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/DiscussionExpand"
+                - $ref: "#/components/parameters/expand[]"
             responses:
                 "202":
                     $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
@@ -363,7 +393,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/DiscussionExpand"
+                - $ref: "#/components/parameters/expand[]"
             responses:
                 "200":
                     content:
@@ -572,7 +602,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/DiscussionExpand"
+                - $ref: "#/components/parameters/expand[]"
             responses:
                 "200":
                     content:
@@ -750,7 +780,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/DiscussionExpand"
+                - $ref: "#/components/parameters/expand[]"
             responses:
                 "200":
                     content:
@@ -970,7 +1000,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/DiscussionExpand"
+                - $ref: "#/components/parameters/expand[]"
             responses:
                 "204":
                     description: Success
@@ -1165,7 +1195,7 @@ components:
             schema:
                 format: date-filter
                 type: string
-        DiscussionExpand:
+        expand[]:
             name: expand[]
             description: >
                 Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
@@ -1190,6 +1220,7 @@ components:
                         - reportMeta
                         - attachments
             style: form
+
     schemas:
         CategoryFragment:
             properties:
@@ -1254,6 +1285,9 @@ components:
                                 - type
                             type: object
                             x-addon: ideation
+                        sentiment:
+                            type: integer
+                            x-addon: SentimentAnalysis
                     type: object
                 body:
                     description: The body of the discussion.
@@ -1361,6 +1395,9 @@ components:
                     description: Total points associated with this post.
                     nullable: true
                     type: integer
+                announce:
+                    description: Whether or not the discussion has been announced.
+                    type: boolean
                 sink:
                     description: Whether or not the discussion has been sunk.
                     type: boolean

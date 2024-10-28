@@ -15,6 +15,7 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { animated, useSpring } from "react-spring";
 import ReactDOM from "react-dom";
 import { ColorHelper } from "csx";
+import { expand } from "css-box-model";
 
 interface IProps {
     /** The maximum collapsed height of the collapser. */
@@ -46,13 +47,15 @@ interface IProps {
     bgColor?: ColorHelper;
 
     gradientClasses?: string;
+
+    onToggle?: (isExpanded: boolean) => void;
 }
 
 /**
  * Content collapsing react component.
  */
 export function CollapsableContent(props: IProps) {
-    const { isExpandedDefault = false, domNodesToAttach } = props;
+    const { isExpandedDefault = false, domNodesToAttach, onToggle } = props;
     const [isExpanded, setIsExpanded] = useState(isExpandedDefault);
 
     const containerMaxHeight = props.maxHeight ? props.maxHeight : 100;
@@ -89,6 +92,7 @@ export function CollapsableContent(props: IProps) {
         } else {
             setIsExpanded(true);
         }
+        onToggle?.(isExpanded);
     };
 
     const hasMeasuredHeight = measurements.height > 0;

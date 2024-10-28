@@ -5,7 +5,8 @@
  */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { DashboardFormControlGroup, DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControlGroup";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Frame from "@library/layout/frame/Frame";
@@ -199,13 +200,27 @@ export default function ProfileFieldForm(props: IProps) {
                     ],
                 },
                 description: {
-                    type: "string",
-                    "x-control": {
-                        label: t("Description"),
-                        description: t("The description is shown as helper text to users."),
-                        inputType: "textBox",
+                    type: "object",
+                    properties: {
+                        description: {
+                            type: "string",
+                            "x-control": {
+                                label: t("Description"),
+                                description: t("The description is shown as helper text to users."),
+                                inputType: "textBox",
+                                type: "textarea",
+                            },
+                        },
+                        descriptionHtml: {
+                            type: "boolean",
+                            "x-control": {
+                                inputType: "checkBox",
+                                label: t("Render description as HTML"),
+                            },
+                        },
                     },
                 },
+
                 ...(requiresDropdownOptions && {
                     dropdownOptions: {
                         type: "string",
@@ -220,9 +235,6 @@ export default function ProfileFieldForm(props: IProps) {
                 }),
                 visibility: {
                     type: "object",
-                    "x-control": {
-                        label: t("Visibility"),
-                    },
                     properties: {
                         visibility: {
                             type: "string",
@@ -343,7 +355,7 @@ export default function ProfileFieldForm(props: IProps) {
     }, [values.registrationOptions, setFieldValue]);
 
     const formGroupWrapper: React.ComponentProps<typeof JsonSchemaForm>["FormGroupWrapper"] = function (props) {
-        return <div className={classes.formGroup}>{props.children}</div>;
+        return <div className={classes.formGroupWrapper}>{props.children}</div>;
     };
 
     return (

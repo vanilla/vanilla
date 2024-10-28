@@ -39,6 +39,7 @@ interface IProps {
     isVisible: boolean;
     fullWidthContent?: boolean;
     bodyClassName?: string;
+    confirmClasses?: string;
 }
 
 /**
@@ -106,7 +107,7 @@ export default class ModalConfirm extends React.Component<IProps> {
                             </Button>
                             {!!onConfirm && (
                                 <Button
-                                    className={classFrameFooter.actionButton}
+                                    className={cx(classFrameFooter.actionButton, this.props.confirmClasses)}
                                     onClick={onConfirm}
                                     buttonType={ButtonTypes.TEXT_PRIMARY}
                                     disabled={isConfirmLoading || isConfirmDisabled}
@@ -116,7 +117,7 @@ export default class ModalConfirm extends React.Component<IProps> {
                             )}
                             {!!confirmLinkTo && (
                                 <LinkAsButton
-                                    className={classFrameFooter.actionButton}
+                                    className={cx(classFrameFooter.actionButton, this.props.confirmClasses)}
                                     to={confirmLinkTo}
                                     buttonType={ButtonTypes.TEXT_PRIMARY}
                                     disabled={isConfirmLoading || isConfirmDisabled}

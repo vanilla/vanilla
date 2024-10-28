@@ -42,7 +42,7 @@ export function RichLinkElement(props: IProps) {
     }, [url, forceBasicLink, editor, ownPath, textContent]);
 
     return (
-        <a {...attributes} {...nodeProps} href={url}>
+        <a {...attributes} {...nodeProps} href={url} tabIndex={-1}>
             {children}
         </a>
     );

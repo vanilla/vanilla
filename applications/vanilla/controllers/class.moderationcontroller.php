@@ -179,7 +179,7 @@ class ModerationController extends VanillaController
         $hadCheckedDiscussions = $force;
         if ($session->isValid() && Gdn::request()->isAuthenticatedPostBack()) {
             // Form was posted, so accept changes to checked items.
-            $checkIDs = val("CheckIDs", $_POST);
+            $checkIDs = \Gdn::request()->post("CheckIDs");
             if (empty($checkIDs)) {
                 $checkIDs = [];
             }

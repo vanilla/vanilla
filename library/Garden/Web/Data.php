@@ -33,6 +33,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     /** @var callable(array $value): array */
     private $beforeJsonSerialize;
 
+    private $didApplyMetaHeaders = false;
+
     /**
      * Create a {@link Data} instance representing the data in a web response.
      *
@@ -463,6 +465,11 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      */
     public function applyMetaHeaders()
     {
+        if ($this->didApplyMetaHeaders) {
+            return;
+        }
+
+        $this->didApplyMetaHeaders = true;
         $paging = $this->getMeta("paging");
         $pagingQueryParams = $this->getMeta("pagingQueryParams", []);
 

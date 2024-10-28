@@ -1,0 +1,398 @@
+openapi: 3.0.2
+info:
+paths:
+    /post-fields:
+        x-hidden: true
+        get:
+            summary: List post fields.
+            parameters:
+                - name: postTypeID
+                  description: Filter by post type.
+                  in: query
+                  schema:
+                      type: string
+                - name: dataType
+                  description: Filter by data type.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - text
+                          - boolean
+                          - date
+                          - number
+                          - string[]
+                          - number[]
+                - name: formType
+                  description: Filter by form type.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - text
+                          - text-multiline
+                          - dropdown
+                          - tokens
+                          - checkbox
+                          - date
+                          - number
+                - name: visibility
+                  description: Filter by visibility.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - public
+                          - private
+                          - internal
+                - name: isRequired
+                  description: Filter by required post fields.
+                  in: query
+                  schema:
+                      type: boolean
+                - name: isActive
+                  description: Filter by active post fields.
+                  in: query
+                  schema:
+                      type: boolean
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/PostField"
+                                type: array
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+            tags:
+                - Post Fields
+        post:
+            summary: Create a post field.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PostFieldPost"
+            tags:
+                - Post Fields
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PostField"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+
+    /post-fields/{postTypeID}/{postFieldID}:
+        x-hidden: true
+        get:
+            summary: Get a post field.
+            tags:
+                - Post Fields
+            parameters:
+                - description: The ID of the post type.
+                  in: path
+                  name: postTypeID
+                  required: true
+                  schema:
+                      type: string
+                - description: The ID of the post field.
+                  in: path
+                  name: postFieldID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/PostField"
+                "404":
+                    description: Not Found
+        patch:
+            summary: Update a post field.
+            tags:
+                - Post Fields
+            parameters:
+                - description: The ID of the post type.
+                  in: path
+                  name: postTypeID
+                  required: true
+                  schema:
+                      type: string
+                - description: The ID of the post field.
+                  in: path
+                  name: postFieldID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PostFieldPatch"
+                required: true
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/PostField"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+        delete:
+            summary: Delete a post field.
+            parameters:
+                - description: The ID of the post type.
+                  in: path
+                  name: postTypeID
+                  required: true
+                  schema:
+                      type: string
+                - description: The ID of the post field.
+                  in: path
+                  name: postFieldID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "204":
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+            tags:
+                - Post Fields
+    /post-fields/{postTypeID}/sorts:
+        x-hidden: true
+        put:
+            summary: Update the sort values of post fields.
+            tags:
+                - Post Fields
+            parameters:
+                - description: The ID of the post type.
+                  in: path
+                  name: postTypeID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties:
+                                type: integer
+
+            responses:
+                "200":
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+components:
+    schemas:
+        PostFieldPost:
+            properties:
+                postFieldID:
+                    description: The ID of the post field.
+                    type: string
+                postTypeID:
+                    description: The ID of an associated post type.
+                    type: string
+                label:
+                    description: The label of the post field.
+                    type: string
+                description:
+                    description: The description of the post field.
+                    type: string
+                dataType:
+                    description: The data type of the post field.
+                    type: string
+                    enum:
+                        - text
+                        - boolean
+                        - date
+                        - number
+                        - string[]
+                        - number[]
+                formType:
+                    description: The form type of the post field.
+                    type: string
+                    enum:
+                        - text
+                        - text-multiline
+                        - dropdown
+                        - tokens
+                        - checkbox
+                        - date
+                        - number
+                dropdownOptions:
+                    description: The list of available options for a dropdown field. All dropdown options must be of the specified dataType.
+                    type: array
+                    items:
+                        oneOf:
+                            - type: string
+                            - type: number
+                    nullable: true
+                visibility:
+                    description: The visibility of the post field.
+                    type: string
+                    enum:
+                        - public
+                        - private
+                        - internal
+                isRequired:
+                    description: Whether the post field is required.
+                    type: boolean
+                isActive:
+                    description: Whether the post field is active.
+                    type: boolean
+                    default: true
+            required:
+                - postFieldID
+                - postTypeID
+                - label
+                - dataType
+                - formType
+                - visibility
+            type: object
+        PostFieldPatch:
+            properties:
+                label:
+                    description: The label of the post field.
+                    type: string
+                description:
+                    description: The description of the post field.
+                    type: string
+                dropdownOptions:
+                    description: The list of available options for a dropdown field. All dropdown options must be of the specified dataType.
+                    type: array
+                    items:
+                        oneOf:
+                            - type: string
+                            - type: number
+                    nullable: true
+                visibility:
+                    description: The visibility of the post field.
+                    type: string
+                    enum:
+                        - public
+                        - private
+                        - internal
+                isRequired:
+                    description: Whether the post field is required.
+                    type: boolean
+                isActive:
+                    description: Whether the post field is active.
+                    type: boolean
+            type: object
+        PostField:
+            properties:
+                postFieldID:
+                    description: The ID of the post field.
+                    type: string
+                postTypeID:
+                    description: The ID of an associated post type.
+                    type: string
+                label:
+                    description: The label of the post field.
+                    type: string
+                description:
+                    description: The description of the post field.
+                    type: string
+                dataType:
+                    description: The data type of the post field.
+                    type: string
+                formType:
+                    description: The form type of the post field.
+                    type: string
+                dropdownOptions:
+                    description: The list of available options for a dropdown field. All dropdown options must be of the specified dataType.
+                    type: array
+                    items:
+                        oneOf:
+                            - type: string
+                            - type: number
+                    nullable: true
+                visibility:
+                    description: The visibility of the post field.
+                    type: string
+                    enum:
+                        - public
+                        - private
+                        - internal
+                displayOptions:
+                    description: The display options of the post field.
+                    type: string
+                isRequired:
+                    description: Whether the post field is required.
+                    type: boolean
+                isActive:
+                    description: Whether the post field is active.
+                    type: boolean
+                sort:
+                    description: The sort value of the post field.
+                    type: string
+                dateInserted:
+                    description: When the post field was created.
+                    format: date-time
+                    type: string
+                dateUpdated:
+                    description: When the post field was last updated.
+                    format: date-time
+                    type: string
+                insertUserID:
+                    description: The user that created the post field.
+                    type: string
+                updateUserID:
+                    description: The user that last updated the post field.
+                    type: string
+            required:
+                - postFieldID
+                - postTypeID
+                - label
+                - description
+                - dataType
+                - formType
+                - visibility
+                - displayOptions
+                - dropdownOptions
+                - isRequired
+                - isActive
+                - sort
+                - dateInserted
+                - dateUpdated
+                - insertUserID
+                - updateUserID
+            type: object

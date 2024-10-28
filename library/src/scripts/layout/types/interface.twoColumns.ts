@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 
 export enum twoColumnDevices {
     XS = "xs",

@@ -39,6 +39,7 @@ import { ReportRecordOption } from "@library/features/discussions/ReportRecordOp
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DiscussionOptionsResolve } from "@library/features/discussions/DiscussionOptionsResolve";
+import { css } from "@emotion/css";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -62,6 +63,17 @@ interface IDiscussionOptionsMenuProps {
      */
     onMutateSuccess?: () => Promise<void>;
 }
+
+const reportButtonAlignment = css({
+    "&:not(:last-child)": {
+        marginInlineEnd: -8,
+    },
+    "@media (max-width: 806px)": {
+        "&:not(:last-child)": {
+            marginInlineEnd: "initial",
+        },
+    },
+});
 
 const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({ discussion, onMutateSuccess }) => {
     const { hasPermission } = usePermissionsContext();
@@ -283,7 +295,11 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
                     customTrigger={(props) => {
                         return (
                             <ToolTip label={t("Report content")}>
-                                <Button buttonType={ButtonTypes.ICON} onClick={props.onClick}>
+                                <Button
+                                    buttonType={ButtonTypes.ICON}
+                                    onClick={props.onClick}
+                                    className={reportButtonAlignment}
+                                >
                                     <Icon icon="post-flag" />
                                 </Button>
                             </ToolTip>

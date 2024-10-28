@@ -35,6 +35,8 @@ import ThreeColumnSection from "@library/layout/ThreeColumnSection";
 import TwoColumnSection from "@library/layout/TwoColumnSection";
 import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
 import { MetaIcon } from "@library/metas/Metas";
+import AiEscalationMetaIcon from "@library/features/discussions/integrations/components/AiEscalationMetaIcon";
+import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 
 // App Setup
 logDebug("Boot layout app");
@@ -121,6 +123,10 @@ registerLoadableWidgets({
         import(
             /* webpackChunkName: "widgets/CategoryFollowWidget" */ "@vanilla/addon-vanilla/categories/CategoryFollowDropdown"
         ),
+    SuggestedContentWidget: () =>
+        import(
+            /* webpackChunkName: "widgets/SuggestedContentWidget" */ "@library/suggestedContent/SuggestedContentWidget"
+        ),
 });
 
 // Reducers
@@ -166,4 +172,10 @@ if (getMeta("answerSuggestionsEnabled", false)) {
         },
         { placement: "author", order: 0 },
     );
+}
+
+if (getMeta("featureFlags.escalations.Enabled", false)) {
+    DiscussionAttachment.registerMetaItem(AiEscalationMetaIcon, (attachment) => {
+        return attachment?.escalatedByAi ?? false;
+    });
 }

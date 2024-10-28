@@ -45,6 +45,7 @@ class InterestsTest extends AbstractResourceTest
             "dataType" => ProfileFieldModel::DATA_TYPE_BOOL,
         ]);
         $this->tag = $this->createTag();
+        \Gdn::sql()->truncate("interest");
     }
 
     /**
@@ -209,5 +210,52 @@ class InterestsTest extends AbstractResourceTest
             ->patch($this->baseUrl . "/" . $interest["interestID"], $payload)
             ->getBody();
         $this->assertDataLike($payload, $interestUpdated);
+    }
+
+    /**
+     * Tests the `/api/v2/interests/suggested-content` endpoint
+     *
+     * @return void
+     */
+    public function testGetSuggestedContent()
+    {
+        $user = $this->createUser();
+        $profileField = $this->createProfileField(["dataType" => "boolean", "formType" => "checkbox"]);
+        $this->api()->patch("/users/{$user["userID"]}/profile-fields", [
+            $profileField["apiName"] => true,
+        ]);
+
+        $category = $this->createCategory();
+        $discussion = $this->createDiscussion();
+
+        $tag = $this->createTag();
+        $this->api()->post("/discussions/{$discussion["discussionID"]}/tags", [
+            "tagIDs" => [$tag["tagID"]],
+        ]);
+
+        // Create interest associated with profile fields.
+        $this->createInterest([
+            "profileFieldMapping" => [
+                $profileField["apiName"] => true,
+            ],
+            "tagIDs" => [$tag["tagID"]],
+        ]);
+
+        $this->runWithUser(function () use ($category, $discussion) {
+            $suggested = $this->api()
+                ->get($this->baseUrl . "/suggested-content", [
+                    "suggestedFollowsLimit" => 3,
+                    "suggestedContentLimit" => 3,
+                ])
+                ->getBody();
+
+            // Should have 1 suggested category and 1 suggested discussion
+            $this->assertArrayHasKey("categories", $suggested);
+            $this->assertArrayHasKey("discussions", $suggested);
+            $this->assertCount(1, $suggested["categories"]);
+            $this->assertCount(1, $suggested["discussions"]);
+            $this->assertEquals($category["categoryID"], $suggested["categories"][0]["categoryID"]);
+            $this->assertEquals($discussion["discussionID"], $suggested["discussions"][0]["discussionID"]);
+        }, $user);
     }
 }

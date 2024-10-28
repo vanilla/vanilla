@@ -66,6 +66,8 @@ abstract class SearchQuery
     /** @var string */
     protected array $highlightTextFieldNames = [];
 
+    protected bool $canOptimizeRecordTypes = true;
+
     /**
      * Create a query.
      *
@@ -130,8 +132,10 @@ abstract class SearchQuery
         }
 
         // Give each of the search types a chance to validate the query object.
-        /** @var AbstractSearchType $searchType */
-        foreach ($filteredTypes->getAsOptimizedRecordTypes() as $searchTypeGroup) {
+        $recordTypes = $this->canOptimizeRecordTypes
+            ? $filteredTypes->getAsOptimizedRecordTypes()
+            : $filteredTypes->getAsUnoptimizedRecordTypes();
+        foreach ($recordTypes as $searchTypeGroup) {
             $hasGlobal = false;
             foreach ($searchTypeGroup as $searchType) {
                 if ($searchType instanceof GlobalSearchType) {
@@ -205,9 +209,9 @@ abstract class SearchQuery
      *
      * @return mixed|null
      */
-    public function getQueryParameter(string $queryParam, $default = null)
+    public function getQueryParameter(string $queryParam, mixed $default = null): mixed
     {
-        return $this->queryData[$queryParam] ?? $default;
+        return ArrayUtils::getByPath($queryParam, $this->queryData, $default);
     }
 
     /**

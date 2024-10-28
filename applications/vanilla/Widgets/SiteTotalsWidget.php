@@ -15,6 +15,11 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Layout\Section\SectionFullWidth;
+use Vanilla\Layout\Section\SectionOneColumn;
+use Vanilla\Layout\Section\SectionThreeColumns;
+use Vanilla\Layout\Section\SectionThreeColumnsEven;
+use Vanilla\Layout\Section\SectionTwoColumns;
+use Vanilla\Layout\Section\SectionTwoColumnsEven;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\Schema\WidgetBackgroundSchema;
@@ -93,11 +98,18 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * Only allow placement in a full width section
+     * Only allow placement in all sections.
      */
     public static function getAllowedSectionIDs(): array
     {
-        return [SectionFullWidth::getWidgetID()];
+        return [
+            SectionOneColumn::getWidgetID(),
+            SectionTwoColumns::getWidgetID(),
+            SectionThreeColumns::getWidgetID(),
+            SectionFullWidth::getWidgetID(),
+            SectionThreeColumnsEven::getWidgetID(),
+            SectionTwoColumnsEven::getWidgetID(),
+        ];
     }
 
     /**

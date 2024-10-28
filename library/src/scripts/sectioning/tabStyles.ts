@@ -14,7 +14,8 @@ import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc, quote, color } from "csx";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
@@ -138,7 +139,7 @@ export const tabStandardClasses = useThemeCache(() => {
                 flex: 1,
                 fontWeight: globalVars.fonts.weights.semiBold,
                 textAlign: "center",
-                border: singleBorder({ color: color("#bfcbd8") }),
+                border: singleBorder(),
                 borderTop: legacyButton ? "none" : undefined,
                 padding: "2px 0",
                 color: ColorsUtils.colorOut(vars.colors.fg),
@@ -151,14 +152,14 @@ export const tabStandardClasses = useThemeCache(() => {
                     "& > *": {
                         ...Mixins.padding({ horizontal: globalVars.gutter.half }),
                     },
-                    "& + &": {
+                    "& + [role='tab']": {
                         marginLeft: styleUnit(negative(vars.border.width)),
                     },
                     "&[data-selected]": {
                         background: ColorsUtils.colorOut(globalVars.elementaryColors.white),
                     },
                     "&:hover, &:focus, &:active": {
-                        border: singleBorder({ color: color("#bfcbd8") }),
+                        border: singleBorder(),
                         borderTop: legacyButton ? "none" : undefined,
                         color: ColorsUtils.colorOut(globalVars.mainColors.primary),
                         zIndex: 1,

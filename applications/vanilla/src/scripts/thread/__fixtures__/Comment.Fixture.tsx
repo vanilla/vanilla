@@ -9,10 +9,24 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { render } from "@testing-library/react";
 import React from "react";
-import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { IComment } from "@dashboard/@types/api/comment";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { IThreadItem } from "@vanilla/addon-vanilla/thread/@types/CommentThreadTypes";
+import { RecordID, uuidv4 } from "@vanilla/utils";
+
+interface IOptions {
+    maxDepth?: number;
+    minCommentsPerDepth?: number;
+    includeHoles?: boolean;
+    parentCommentID?: IComment["commentID"];
+    randomizeCommentContent?: boolean;
+}
+
+interface IRecursiveOptions {
+    currentDepth: number;
+    path?: string;
+}
 
 export class CommentFixture {
     public static mockComment: IComment = {
@@ -54,5 +68,128 @@ export class CommentFixture {
             </TestReduxProvider>,
         );
         await vi.dynamicImportSettled();
+    };
+
+    public static makeThreadHole = (
+        offset: number,
+        countAllComments: number,
+        countAllInsertUsers: number,
+        depth: number,
+        parentCommentID: IComment["commentID"] | null,
+    ): IThreadItem => {
+        return {
+            type: "hole",
+            offset,
+            insertUsers: new Array(5).fill(null).map((_) => UserFixture.createMockUser()),
+            countAllComments,
+            countAllInsertUsers,
+            parentCommentID,
+            depth,
+            apiUrl: "/api/v2/",
+            path: "",
+        };
+    };
+
+    public static createMockThreadStructure = (
+        options?: IOptions,
+        recursiveOptions?: IRecursiveOptions,
+    ): IThreadItem[] => {
+        // Some defaults
+        const { maxDepth = 3, minCommentsPerDepth = 2, parentCommentID = null, includeHoles = false } = options ?? {};
+
+        const { currentDepth = 1 } = recursiveOptions ?? {};
+
+        const allCommentIDs: RecordID[] = [];
+
+        const threadStructure = new Array(minCommentsPerDepth).fill(null).map((_) => {
+            const id = uuidv4() as unknown as IComment["commentID"];
+            allCommentIDs.push(id);
+            const threadItem: IThreadItem = {
+                type: "comment",
+                commentID: id,
+                parentCommentID,
+                depth: currentDepth,
+                path: recursiveOptions?.path ? `${recursiveOptions?.path}.${id}` : `${id}`,
+                ...(maxDepth > 0 && {
+                    children: this.createMockThreadStructure(
+                        {
+                            maxDepth: maxDepth - 1,
+                            parentCommentID: id,
+                            includeHoles,
+                        },
+                        {
+                            currentDepth: currentDepth + 1,
+                            path: recursiveOptions?.path,
+                        },
+                    ),
+                }),
+            };
+            return threadItem;
+        });
+
+        return [
+            ...threadStructure,
+            ...(includeHoles && currentDepth !== 1
+                ? [
+                      this.makeThreadHole(
+                          minCommentsPerDepth + 1,
+                          Number(Math.abs(100 / currentDepth).toFixed(0)),
+                          Number(Math.abs(30 / currentDepth).toFixed(0)),
+                          currentDepth,
+                          parentCommentID,
+                      ),
+                  ]
+                : []),
+        ];
+    };
+
+    public static getCommentIDs = (
+        threadStructure: IThreadItem[],
+        currentIDs?: Array<IComment["commentID"]>,
+    ): Array<IComment["commentID"]> => {
+        const current = currentIDs ?? [];
+        threadStructure.forEach((item) => {
+            if (item.type === "comment") {
+                current.push(item.commentID);
+                if (item.children) {
+                    return this.getCommentIDs(item.children, current);
+                }
+            }
+        });
+        return current;
+    };
+
+    public static randomComments = [
+        "Strive not to be a success, but rather to be of value.",
+        "You miss 100% of the shots you don't take.",
+        "Twenty years from now you will be more disappointed by the things that you didn't do than by the ones you did do, so throw off the bowlines, sail away from safe harbor, catch the trade winds in your sails.  Explore, Dream, Discover.",
+        "The best time to plant a tree was 20 years ago. The second best time is now.",
+        "You can never cross the ocean until you have the courage to lose sight of the shore.",
+        "People often say that motivation doesn't last. Well, neither does bathing.  That's why we recommend it daily.",
+        "The only way to do great work is to love what you do.",
+        "The best revenge is massive success.",
+        "The two most important days in your life are the day you are born and the day you find out why.",
+        "The only person you are destined to become is the person you decide to be.",
+        "Don't watch the clock; do what it does. Keep going.",
+        "The only limit to our realization of tomorrow will be our doubts of today.",
+    ];
+
+    public static createMockThreadStructureResponse = (options?: IOptions) => {
+        const structure = this.createMockThreadStructure(options);
+        let allCommentIDs = this.getCommentIDs(structure);
+        return {
+            threadStructure: structure,
+            commentsByID: Object.fromEntries(
+                allCommentIDs.map((id) => [
+                    id,
+                    this.comment({
+                        commentID: id,
+                        ...(options?.randomizeCommentContent && {
+                            body: this.randomComments[Math.floor(Math.random() * this.randomComments.length)],
+                        }),
+                    }),
+                ]),
+            ),
+        };
     };
 }

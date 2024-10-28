@@ -1,3 +1,9 @@
+/**
+ * @author Maneesh Chiba <mchiba@higherlogic.com>
+ * @copyright 2009-2024 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 import { IComment } from "@dashboard/@types/api/comment";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";

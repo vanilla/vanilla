@@ -33,18 +33,19 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
     }
 
     /**
-     * Test valid routes for getting a discussion thread.
+     * Test content is what we expect for both flat/nested threadStyle.
      *
      * @return void
      */
-    public function testCustomLayoutDiscussionThread()
+    public function assertPageContent()
     {
         $discussion = $this->createDiscussion();
 
+        CurrentTimeStamp::mockTime("2024-01-01");
         $comment1 = $this->createComment(["body" => "I am the first comment"]);
-        CurrentTimeStamp::mockTime("+1 minute");
+        CurrentTimeStamp::mockTime("2024-01-02");
         $comment2 = $this->createComment(["body" => "I am the second comment"]);
-        CurrentTimeStamp::mockTime("+1 day");
+        CurrentTimeStamp::mockTime("2024-01-03");
         $comment3 = $this->createComment(["body" => "I am the third comment"]);
 
         $dispatcher = Gdn::getContainer()->get(\Garden\Web\Dispatcher::class);
@@ -69,5 +70,20 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
         $this->assertStringContainsString($comment3["body"], $permalink);
         $this->assertStringNotContainsString($comment2["body"], $permalink);
         $this->assertStringNotContainsString($comment1["body"], $permalink);
+    }
+
+    /**
+     * Test valid routes for getting a discussion thread.
+     *
+     * @return void
+     */
+    public function testCustomLayoutDiscussionThread()
+    {
+        $this->assertPageContent();
+
+        // even with "threadStyle" = "nested", when we are still getting expected content
+        $this->runWithConfig(["threadStyle" => "nested"], function () {
+            $this->assertPageContent();
+        });
     }
 }

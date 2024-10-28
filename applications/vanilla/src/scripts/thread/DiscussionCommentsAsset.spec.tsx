@@ -19,6 +19,8 @@ import { vitest } from "vitest";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import DiscussionCommentsAssetFlat from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset.flat";
+import { MemoryRouter } from "react-router";
 
 const MOCK_DISCUSSION: React.ComponentProps<typeof DiscussionCommentsAsset>["discussion"] = {
     ...DiscussionFixture[0],
@@ -32,7 +34,7 @@ const MOCK_API_PARAMS: React.ComponentProps<typeof DiscussionCommentsAsset>["api
     page: 1,
 };
 
-const MOCK_PAGING: NonNullable<React.ComponentProps<typeof DiscussionCommentsAsset>["comments"]>["paging"] = {
+const MOCK_PAGING: NonNullable<React.ComponentProps<typeof DiscussionCommentsAssetFlat>["comments"]>["paging"] = {
     nextURL: "#",
     prevURL: "#",
     total: 100,
@@ -57,11 +59,13 @@ async function renderInProvider(children: ReactNode) {
     return render(
         <TestReduxProvider>
             <LiveAnnouncer>
-                <CurrentUserContextProvider currentUser={UserFixture.createMockUser({ userID: 1 })}>
-                    <QueryClientProvider client={queryClient}>
-                        <PermissionsFixtures.AllPermissions>{children}</PermissionsFixtures.AllPermissions>
-                    </QueryClientProvider>
-                </CurrentUserContextProvider>
+                <MemoryRouter>
+                    <CurrentUserContextProvider currentUser={UserFixture.createMockUser({ userID: 1 })}>
+                        <QueryClientProvider client={queryClient}>
+                            <PermissionsFixtures.AllPermissions>{children}</PermissionsFixtures.AllPermissions>
+                        </QueryClientProvider>
+                    </CurrentUserContextProvider>
+                </MemoryRouter>
             </LiveAnnouncer>
         </TestReduxProvider>,
     );
@@ -82,6 +86,7 @@ describe("DiscussionCommentsAsset", () => {
                                 limit: 5,
                             },
                         }}
+                        threadStyle="flat"
                         apiParams={MOCK_API_PARAMS}
                         discussion={MOCK_DISCUSSION}
                     />,
@@ -99,6 +104,7 @@ describe("DiscussionCommentsAsset", () => {
                         discussion={MOCK_DISCUSSION}
                         comments={{ data: LayoutEditorPreviewData.comments(5), paging: MOCK_PAGING }}
                         apiParams={MOCK_API_PARAMS}
+                        threadStyle="flat"
                     />,
                 );
             });
@@ -107,13 +113,13 @@ describe("DiscussionCommentsAsset", () => {
                 expect(await result.findByText(/Next/)).toBeInTheDocument();
             });
             it("Navigator is updated when going to a new comment list page", async () => {
-                window.history.replaceState = vitest.fn();
+                window.history.pushState = vitest.fn();
 
                 const nextButton = await result.findByText(/Next/);
                 await act(async () => {
                     nextButton && fireEvent.click(nextButton);
                 });
-                expect(window.history.replaceState).toHaveBeenCalled();
+                expect(window.history.pushState).toHaveBeenCalled();
             });
         });
     });
@@ -125,6 +131,7 @@ describe("DiscussionCommentsAsset", () => {
                     comments={{ data: LayoutEditorPreviewData.comments(5), paging: MOCK_PAGING }}
                     apiParams={MOCK_API_PARAMS}
                     discussion={{ ...MOCK_DISCUSSION, closed: true }}
+                    threadStyle="flat"
                 />,
             );
         });
@@ -149,11 +156,13 @@ async function renderWithAPI(children: ReactNode) {
     return render(
         <TestReduxProvider>
             <LiveAnnouncer>
-                <CurrentUserContextProvider currentUser={UserFixture.createMockUser({ userID: 1 })}>
-                    <QueryClientProvider client={queryClient}>
-                        <PermissionsFixtures.AllPermissions>{children}</PermissionsFixtures.AllPermissions>
-                    </QueryClientProvider>
-                </CurrentUserContextProvider>
+                <MemoryRouter>
+                    <CurrentUserContextProvider currentUser={UserFixture.createMockUser({ userID: 1 })}>
+                        <QueryClientProvider client={queryClient}>
+                            <PermissionsFixtures.AllPermissions>{children}</PermissionsFixtures.AllPermissions>
+                        </QueryClientProvider>
+                    </CurrentUserContextProvider>
+                </MemoryRouter>
             </LiveAnnouncer>
         </TestReduxProvider>,
     );
@@ -178,12 +187,14 @@ describe("DiscussionCommentsAsset - Edit", () => {
                 comments={{ data: mockComments, paging: MOCK_PAGING }}
                 apiParams={MOCK_API_PARAMS}
                 discussion={MOCK_DISCUSSION}
+                threadStyle="flat"
+                hasComments={true}
             />,
         );
     });
 
     it("Editing a comment loads comment in a vanilla editor instance", async () => {
-        const contextMenu = screen.queryAllByRole("button", { expanded: false })[0];
+        const contextMenu = screen.queryAllByRole("button", { expanded: false, name: "Comment Options" })[0];
         expect(contextMenu).toBeInTheDocument();
         fireEvent.click(contextMenu);
 

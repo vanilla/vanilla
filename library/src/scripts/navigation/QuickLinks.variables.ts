@@ -37,7 +37,7 @@ export const quickLinksVariables = useThemeCache(
             "box",
             Variables.box({
                 ...globalVars.panelBoxes.depth2,
-                borderType: containerOptions?.borderType as BorderType,
+                borderType: containerOptions?.borderType,
                 background: containerOptions?.innerBackground,
             }),
         );

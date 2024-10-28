@@ -6,6 +6,7 @@ import InputBlock from "@library/forms/InputBlock";
 import { DurationPicker } from "@library/forms/durationPicker/DurationPicker";
 import { IFieldError } from "@library/@types/api/core";
 import { DurationPickerUnit } from "@library/forms/durationPicker/DurationPicker.types";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 interface IProps {
     value: string;
@@ -19,7 +20,7 @@ interface IProps {
 
 export function DashboardDurationPicker(props: IProps) {
     return (
-        <div className="input-wrap">
+        <DashboardInputWrap>
             <InputBlock noMargin errors={props.errors}>
                 <DurationPicker
                     value={props.value}
@@ -28,6 +29,6 @@ export function DashboardDurationPicker(props: IProps) {
                     disabled={props.disabled}
                 />
             </InputBlock>
-        </div>
+        </DashboardInputWrap>
     );
 }

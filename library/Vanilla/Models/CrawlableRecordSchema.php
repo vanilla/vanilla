@@ -145,8 +145,9 @@ final class CrawlableRecordSchema
                 "type" => "string",
                 "enum" => [self::SCOPE_PUBLIC, self::SCOPE_RESTRICTED],
             ],
-            "name:s" => [
+            "name:s?" => [
                 "x-localize" => true,
+                "minLength" => 0,
             ],
             "excerpt:s" => [
                 "minLength" => 0,

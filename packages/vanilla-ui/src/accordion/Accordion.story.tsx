@@ -5,10 +5,10 @@
  */
 
 import React from "react";
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel } from "./";
+import { Accordion as AccordionComponent, AccordionHeader, AccordionItem, AccordionPanel } from "./";
 
 export default {
-    title: "Vanilla UI/Accordion",
+    title: "vanilla/ui",
 };
 
 const ExampleContent = [
@@ -17,39 +17,39 @@ const ExampleContent = [
     "Bring her forward! Shut up! Will you shut up?! How do you know she is a witch? Listen. Strange women lying in ponds distributing swords is no basis for a system of government. Supreme executive power derives from a mandate from the masses, not from some farcical aquatic ceremony.",
 ];
 
-export function Default() {
+export function Accordion() {
     return (
-        <Accordion collapsible>
-            <AccordionItem>
-                <AccordionHeader arrow>Item 1</AccordionHeader>
-                <AccordionPanel>{ExampleContent[0]}</AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-                <AccordionHeader arrow>Item 2</AccordionHeader>
-                <AccordionPanel>{ExampleContent[1]}</AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-                <AccordionHeader arrow>Item 3</AccordionHeader>
-                <AccordionPanel>{ExampleContent[2]}</AccordionPanel>
-            </AccordionItem>
-        </Accordion>
-    );
-}
-export function Multiple() {
-    return (
-        <Accordion multiple collapsible expandAll>
-            <AccordionItem>
-                <AccordionHeader arrow>Item 1</AccordionHeader>
-                <AccordionPanel>{ExampleContent[0]}</AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-                <AccordionHeader arrow>Item 2</AccordionHeader>
-                <AccordionPanel>{ExampleContent[1]}</AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-                <AccordionHeader arrow>Item 3</AccordionHeader>
-                <AccordionPanel>{ExampleContent[2]}</AccordionPanel>
-            </AccordionItem>
-        </Accordion>
+        <div>
+            <h2>Standard</h2>
+            <AccordionComponent collapsible>
+                <AccordionItem>
+                    <AccordionHeader arrow>Item 1</AccordionHeader>
+                    <AccordionPanel>{ExampleContent[0]}</AccordionPanel>
+                </AccordionItem>
+                <AccordionItem>
+                    <AccordionHeader arrow>Item 2</AccordionHeader>
+                    <AccordionPanel>{ExampleContent[1]}</AccordionPanel>
+                </AccordionItem>
+                <AccordionItem>
+                    <AccordionHeader arrow>Item 3</AccordionHeader>
+                    <AccordionPanel>{ExampleContent[2]}</AccordionPanel>
+                </AccordionItem>
+            </AccordionComponent>
+            <h2>Collapseable</h2>
+            <AccordionComponent multiple collapsible expandAll>
+                <AccordionItem>
+                    <AccordionHeader arrow>Item 1</AccordionHeader>
+                    <AccordionPanel>{ExampleContent[0]}</AccordionPanel>
+                </AccordionItem>
+                <AccordionItem>
+                    <AccordionHeader arrow>Item 2</AccordionHeader>
+                    <AccordionPanel>{ExampleContent[1]}</AccordionPanel>
+                </AccordionItem>
+                <AccordionItem>
+                    <AccordionHeader arrow>Item 3</AccordionHeader>
+                    <AccordionPanel>{ExampleContent[2]}</AccordionPanel>
+                </AccordionItem>
+            </AccordionComponent>
+        </div>
     );
 }

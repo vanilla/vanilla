@@ -130,6 +130,9 @@ class OAuth2Plugin extends Gdn_OAuth2
             "isOidc:b?" => [
                 "default" => false,
             ],
+            "markVerified:b?" => [
+                "default" => false,
+            ],
             "urls:o" => [
                 "authorizeUrl:s",
                 "profileUrl:s?",
@@ -164,6 +167,7 @@ class OAuth2Plugin extends Gdn_OAuth2
         $schema = Schema::parse([
             "secret:s?",
             "isOidc:b?",
+            "markVerified:b?",
             "urls:o" => ["authorizeUrl:s?", "profileUrl:s?", "tokenUrl:s?"],
         ]);
         $schema->merge($this->providerFragmentSchema());
@@ -301,6 +305,7 @@ class OAuth2Plugin extends Gdn_OAuth2
             "BasicAuthToken" => "useBasicAuthToken",
             "PostProfileRequest" => "postProfileRequest",
             "isOidc" => "isOidc",
+            "markVerified" => "markVerified",
         ]);
         $result = $transformer->transform($input);
         return $result;
@@ -325,6 +330,7 @@ class OAuth2Plugin extends Gdn_OAuth2
                 "tokenUrl" => "TokenUrl",
             ],
             "isOidc" => "isOidc",
+            "markVerified" => "markVerified",
             "userMappings" => [
                 "email" => "ProfileKeyEmail",
                 "fullName" => "ProfileKeyFullName",

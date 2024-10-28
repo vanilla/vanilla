@@ -98,7 +98,7 @@ export const tagsVariables = useThemeCache(() => {
                 border.radius ??
                 ((((font.lineHeight || 1.45) as number) * ((font.size as number) ?? 12)) as number) / 2 +
                     ((padding.vertical || 0) as number) +
-                    (!!border.width && border.width > 0 ? (border.width as number) : 0),
+                    (!!border.width && getPixelNumber(border.width) > 0 ? (border.width as number) : 0),
         }),
     );
 
@@ -117,12 +117,12 @@ export const tagsVariables = useThemeCache(() => {
     };
 });
 
-interface ITagSimple {
+export interface ITagSimple {
     fontColor?: ColorHelper | string;
     bgColor?: ColorHelper | string;
     borderColor?: ColorHelper | string;
 }
-interface ITag extends ITagSimple {
+export interface ITag extends ITagSimple {
     fontColorState?: ITagSimple["fontColor"];
     bgColorState?: ITagSimple["fontColor"];
     borderColorState?: ITagSimple["borderColor"];
@@ -323,7 +323,7 @@ export const tagCloudVariables = useThemeCache((options?: IHomeWidgetContainerOp
          */
         box: Variables.box({
             background: options?.innerBackground,
-            borderType: options?.borderType as BorderType,
+            borderType: options?.borderType,
             border: globalVars.border,
         }),
 

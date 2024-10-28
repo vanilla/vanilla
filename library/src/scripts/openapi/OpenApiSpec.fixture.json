@@ -1,0 +1,951 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "description": "API access to your community.",
+        "title": "Vanilla API",
+        "version": "2.0-alpha"
+    },
+    "tags": [
+        {
+            "name": "Addons",
+            "description": "Manage addons on the site."
+        }
+    ],
+    "paths": {
+        "/addons": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "The type of addon.",
+                        "in": "query",
+                        "name": "type",
+                        "schema": {
+                            "enum": ["addon", "theme", "locale"],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Filter enabled or disabled addons.\n",
+                        "in": "query",
+                        "name": "enabled",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "description": "Which theme to show the enabled status for.\n",
+                        "in": "query",
+                        "name": "themeType",
+                        "schema": {
+                            "type": "string",
+                            "default": "desktop",
+                            "enum": ["desktop", "mobile"]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Addon"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    }
+                },
+                "tags": ["Addons"],
+                "summary": "List addons.",
+                "x-addon": "dashboard"
+            }
+        },
+        "/addons/{addonID}": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "The ID of the addon.\n",
+                        "in": "path",
+                        "name": "addonID",
+                        "required": true,
+                        "schema": {
+                            "minLength": 1,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Which theme to show the enabled status for.\n",
+                        "in": "query",
+                        "name": "themeType",
+                        "schema": {
+                            "type": "string",
+                            "default": "desktop",
+                            "enum": ["desktop", "mobile"]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Addon"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    }
+                },
+                "tags": ["Addons"],
+                "summary": "Get an addon.",
+                "x-addon": "dashboard"
+            },
+            "patch": {
+                "parameters": [
+                    {
+                        "description": "The ID of the addon.",
+                        "in": "path",
+                        "name": "addonID",
+                        "required": true,
+                        "schema": {
+                            "minLength": 1,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Addon"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    }
+                },
+                "tags": ["Addons"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "enabled": {
+                                        "description": "Enable or disable the addon.",
+                                        "type": "boolean"
+                                    },
+                                    "themeType": {
+                                        "type": "string",
+                                        "default": "desktop",
+                                        "description": "Which theme type to set.",
+                                        "enum": ["desktop", "mobile"]
+                                    }
+                                },
+                                "required": ["enabled"],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "summary": "Enable or disable an addon.",
+                "x-addon": "dashboard"
+            }
+        },
+        "/comments": {
+            "get": {
+                "parameters": [
+                    {
+                        "name": "commentID",
+                        "in": "query",
+                        "description": "Filter by a range or CSV of comment IDs.",
+                        "schema": {
+                            "$ref": "#/components/schemas/RangeExpression"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/DateInserted"
+                    },
+                    {
+                        "$ref": "#/components/parameters/DateUpdated"
+                    },
+                    {
+                        "description": "The discussion ID.",
+                        "in": "query",
+                        "name": "discussionID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "parentRecordType",
+                        "in": "query",
+                        "description": "The type of the parent record. Must be used with parentRecordID.",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["discussion", "escalation"]
+                        }
+                    },
+                    {
+                        "name": "parentRecordID",
+                        "in": "query",
+                        "description": "The ID of the parent record. Must be used with parentRecordType.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "description": "Desired number of items per page.\n",
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "type": "integer",
+                            "default": "30",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "description": "Sort the results.",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "dateInserted",
+                                "-dateInserted",
+                                "commentID",
+                                "-commentID",
+                                "score",
+                                "-score",
+                                "-experimentalTrending"
+                            ]
+                        }
+                    },
+                    {
+                        "description": "Filter by author.\n",
+                        "in": "query",
+                        "name": "insertUserID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Expand associated records using one or more valid field names. A value of \"all\" will expand all expandable fields.\n",
+                        "in": "query",
+                        "name": "expand",
+                        "schema": {
+                            "items": {
+                                "enum": [
+                                    "insertUser",
+                                    "all",
+                                    "reactions",
+                                    "attachments",
+                                    "reportMeta",
+                                    "insertUser.extended",
+                                    "insertUser.ssoID",
+                                    "insertUser.profileFields"
+                                ],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "name": "qna",
+                        "in": "query",
+                        "description": "Filter comment by answer status.",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["accepted", "rejected"]
+                        },
+                        "x-addon": "qna"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Comment"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    }
+                },
+                "tags": ["Comments"],
+                "summary": "List comments.",
+                "x-addon": "vanilla"
+            },
+            "post": {
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    }
+                },
+                "tags": ["Comments"],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/CommentPost"
+                },
+                "summary": "Add a comment.",
+                "x-addon": "vanilla"
+            }
+        },
+        "/comments/search": {
+            "get": {
+                "parameters": [
+                    {
+                        "description": "The numeric ID of a category.\n",
+                        "in": "query",
+                        "name": "categoryID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Search terms.\n",
+                        "in": "query",
+                        "name": "query",
+                        "required": true,
+                        "schema": {
+                            "minLength": 1,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/Page"
+                    },
+                    {
+                        "description": "Desired number of items per page.\n",
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "type": "integer",
+                            "default": 30,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "description": "Expand associated records.\n",
+                        "in": "query",
+                        "name": "expand",
+                        "schema": {
+                            "default": false,
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Comment"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    }
+                },
+                "tags": ["Comments"],
+                "summary": "Search comments.",
+                "x-addon": "vanilla"
+            }
+        },
+        "/comments/{id}": {
+            "delete": {
+                "parameters": [
+                    {
+                        "description": "The comment ID.\n",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Expand associated records using one or more valid field names. A value of \"all\" will expand all expandable fields.\n",
+                        "in": "query",
+                        "name": "expand",
+                        "schema": {
+                            "items": {
+                                "enum": ["reactions", "all"],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Success"
+                    }
+                },
+                "tags": ["Comments"],
+                "summary": "Delete a comment.",
+                "x-addon": "vanilla"
+            },
+            "get": {
+                "parameters": [
+                    {
+                        "description": "The comment ID.\n",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Expand associated records using one or more valid field names. A value of \"all\" will expand all expandable fields.\n",
+                        "in": "query",
+                        "name": "expand",
+                        "schema": {
+                            "items": {
+                                "enum": ["reactions", "all"],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    }
+                },
+                "tags": ["Comments"],
+                "summary": "Get a comment.",
+                "x-addon": "vanilla"
+            },
+            "patch": {
+                "parameters": [
+                    {
+                        "description": "The comment ID.",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Comment"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    }
+                },
+                "tags": ["Comments"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CommentPost"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "summary": "Update a comment.",
+                "x-addon": "vanilla"
+            }
+        }
+    },
+    "components": {
+        "parameters": {
+            "DateInserted": {
+                "name": "dateInserted",
+                "in": "query",
+                "description": "Filter by insert date. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).\n",
+                "schema": {
+                    "format": "date-filter",
+                    "type": "string"
+                },
+                "x-addon": "dashboard"
+            },
+            "DateLastComment": {
+                "name": "dateLastComment",
+                "in": "query",
+                "description": "Filter by the date of the last comment or the original discussion date if it has no comments. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).\n",
+                "schema": {
+                    "format": "date-filter",
+                    "type": "string"
+                },
+                "x-addon": "vanilla"
+            },
+            "DateUpdated": {
+                "name": "dateUpdated",
+                "in": "query",
+                "description": "Filter by update date. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).\n",
+                "schema": {
+                    "format": "date-filter",
+                    "type": "string"
+                },
+                "x-addon": "dashboard"
+            },
+            "Page": {
+                "name": "page",
+                "in": "query",
+                "description": "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).\n",
+                "schema": {
+                    "type": "integer",
+                    "default": 1,
+                    "minimum": 1
+                },
+                "x-addon": "dashboard"
+            }
+        },
+        "requestBodies": {
+            "CommentPost": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/CommentPost"
+                        }
+                    }
+                },
+                "required": true,
+                "x-addon": "vanilla"
+            }
+        },
+        "schemas": {
+            "RangeExpression": {
+                "description": "Specify a range or CSV of values.",
+                "type": "string",
+                "format": "range-expression",
+                "externalDocs": {
+                    "url": "https://success.vanillaforums.com/kb/articles/308-range-expressions"
+                },
+                "x-addon": "dashboard"
+            },
+            "Addon": {
+                "properties": {
+                    "addonID": {
+                        "description": "The ID of the addon used for API calls.",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "conflict": {
+                        "description": "An array of addons that conflict with this addon.",
+                        "items": {
+                            "properties": {
+                                "addonID": {
+                                    "description": "The ID of the addon used for API calls.",
+                                    "minLength": 1,
+                                    "type": "string"
+                                },
+                                "constraint": {
+                                    "description": "The version requirement.",
+                                    "minLength": 1,
+                                    "type": "string"
+                                },
+                                "key": {
+                                    "description": "The unique key that identifies the addon",
+                                    "minLength": 1,
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "description": "The name of the addon.",
+                                    "minLength": 1,
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "description": "The type of addon.",
+                                    "enum": ["addon", "theme", "locale"],
+                                    "minLength": 1,
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["addonID", "name", "key", "type", "constraint"],
+                            "type": "object"
+                        },
+                        "type": "array"
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "locale": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "description": {
+                        "description": "The addon's description",
+                        "type": "string"
+                    },
+                    "enabled": {
+                        "description": "Whether or not the addon is enabled.",
+                        "type": "boolean"
+                    },
+                    "iconUrl": {
+                        "description": "The addon's icon.",
+                        "format": "uri",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "key": {
+                        "description": "The unique key that identifies the addon",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "The name of the addon.",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "require": {
+                        "description": "An array of addons that are required to enable the addon.",
+                        "items": {
+                            "properties": {
+                                "addonID": {
+                                    "description": "The ID of the addon used for API calls.",
+                                    "minLength": 1,
+                                    "type": "string"
+                                },
+                                "constraint": {
+                                    "description": "The version requirement.",
+                                    "minLength": 1,
+                                    "type": "string"
+                                },
+                                "key": {
+                                    "description": "The unique key that identifies the addon",
+                                    "minLength": 1,
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "description": "The name of the addon.",
+                                    "minLength": 1,
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "description": "The type of addon.",
+                                    "enum": ["addon", "theme", "locale"],
+                                    "minLength": 1,
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["addonID", "name", "key", "type", "constraint"],
+                            "type": "object"
+                        },
+                        "type": "array"
+                    },
+                    "type": {
+                        "description": "The type of addon.",
+                        "enum": ["addon", "theme", "locale"],
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "version": {
+                        "description": "The addon's version.",
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "required": ["addonID", "name", "key", "type", "iconUrl", "version", "enabled"],
+                "type": "object",
+                "x-addon": "dashboard"
+            },
+            "Comment": {
+                "properties": {
+                    "attributes": {
+                        "nullable": true,
+                        "type": "object"
+                    },
+                    "name": {
+                        "description": "Name of the comment (based on the discussion).",
+                        "type": "string"
+                    },
+                    "body": {
+                        "description": "The body of the comment.",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "image": {
+                        "$ref": "#/components/schemas/MainImage"
+                    },
+                    "commentID": {
+                        "description": "The ID of the comment.",
+                        "type": "integer"
+                    },
+                    "dateInserted": {
+                        "description": "When the comment was created.",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "groupID": {
+                        "description": "GroupID of the comment if applicable.",
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "dateUpdated": {
+                        "description": "When the comment was last updated.",
+                        "format": "date-time",
+                        "nullable": true,
+                        "type": "string"
+                    },
+                    "categoryID": {
+                        "description": "The category of the comment.",
+                        "type": "integer"
+                    },
+                    "discussionID": {
+                        "description": "The ID of the discussion.",
+                        "type": "integer"
+                    },
+                    "parentRecordType": {
+                        "description": "The type of the parent record.",
+                        "type": "string",
+                        "enum": ["discussion", "escalation"]
+                    },
+                    "parentRecordID": {
+                        "description": "The ID of the parent record.",
+                        "type": "integer"
+                    },
+                    "parentCommentID": {
+                        "description": "The ID of the parent comment.",
+                        "type": "integer"
+                    },
+                    "insertUser": {
+                        "$ref": "#/components/schemas/UserFragment"
+                    },
+                    "insertUserID": {
+                        "description": "The user that created the comment.",
+                        "type": "integer"
+                    },
+                    "score": {
+                        "description": "Total points associated with this post.",
+                        "nullable": true,
+                        "type": "integer"
+                    },
+                    "scoreChildComments": {
+                        "description": "Total points associated with this post and its children.",
+                        "type": "integer"
+                    },
+                    "countChildComments": {
+                        "description": "Count of all the nested comments.",
+                        "type": "integer"
+                    },
+                    "depth": {
+                        "description": "The depth of the comment. Depths start at 1 and increment for every parent comment.",
+                        "type": "integer",
+                        "default": 1
+                    },
+                    "url": {
+                        "description": "The full URL to the comment.",
+                        "type": "string"
+                    },
+                    "reportMeta": {
+                        "$ref": "#/components/schemas/ReportMeta"
+                    },
+                    "suggestion": {
+                        "type": "object",
+                        "properties": {
+                            "format": {
+                                "type": "string",
+                                "description": "Source of the suggestion"
+                            },
+                            "sourceIcon": {
+                                "type": "string",
+                                "description": "Icon of the suggestion source"
+                            },
+                            "type": {
+                                "type": "string",
+                                "description": "Type of suggestion discussion/comment"
+                            },
+                            "id": {
+                                "type": "integer",
+                                "description": "Index of the suggestion"
+                            },
+                            "url": {
+                                "type": "string",
+                                "description": "URL of the suggestion"
+                            },
+                            "title": {
+                                "type": "string",
+                                "description": "Title of the suggestion"
+                            }
+                        },
+                        "x-feature": "Feature.AISuggestions.Enabled"
+                    }
+                },
+                "required": [
+                    "commentID",
+                    "categoryID",
+                    "name",
+                    "body",
+                    "parentRecordID",
+                    "parentRecordType",
+                    "dateInserted",
+                    "dateUpdated",
+                    "insertUserID",
+                    "score",
+                    "attributes"
+                ],
+                "type": "object",
+                "x-addon": "vanilla"
+            },
+            "CommentGet": {
+                "properties": {
+                    "expand": {
+                        "description": "Expand associated records using one or more valid field names. A value of \"all\" will expand all expandable fields.",
+                        "items": {
+                            "enum": ["reactions", "all"],
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "x-collectionFormat": "csv"
+                    },
+                    "id": {
+                        "description": "The comment ID.",
+                        "type": "integer"
+                    }
+                },
+                "required": ["id"],
+                "type": "object",
+                "x-addon": "vanilla"
+            },
+            "CommentPost": {
+                "properties": {
+                    "body": {
+                        "description": "The body of the comment.",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "discussionID": {
+                        "description": "The ID of the discussion.",
+                        "type": "integer"
+                    },
+                    "parentRecordType": {
+                        "description": "The type of the parent record.",
+                        "type": "string",
+                        "enum": ["discussion", "escalation"]
+                    },
+                    "parentRecordID": {
+                        "description": "The ID of the parent record.",
+                        "type": "integer"
+                    },
+                    "format": {
+                        "$ref": "#/components/schemas/Format"
+                    }
+                },
+                "required": ["body", "format"],
+                "type": "object",
+                "x-addon": "vanilla"
+            },
+            "CommentThreadStructureComment": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["comment"]
+                    },
+                    "commentID": {
+                        "type": "integer"
+                    },
+                    "parentCommentID": {
+                        "type": "integer"
+                    },
+                    "depth": {
+                        "type": "integer"
+                    },
+                    "children": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CommentThreadStructureItem"
+                        }
+                    }
+                },
+                "x-addon": "vanilla"
+            },
+            "CommentThreadStructureHole": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["hole"]
+                    },
+                    "parentCommentID": {
+                        "type": "integer"
+                    },
+                    "depth": {
+                        "type": "integer"
+                    },
+                    "countAllComments": {
+                        "description": "Count of all the nested comments.",
+                        "type": "integer"
+                    },
+                    "countAllInsertUsers": {
+                        "description": "Count of all unique insert users for the nested comments.",
+                        "type": "integer"
+                    },
+                    "insertUsers": {
+                        "description": "The first 5 insert users from the nested comments.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserFragment"
+                        }
+                    },
+                    "apiUrl": {
+                        "description": "The API URL to fetch the nested comments.",
+                        "type": "string",
+                        "format": "uri"
+                    }
+                },
+                "x-addon": "vanilla"
+            },
+            "CommentThreadStructureItem": {
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/CommentThreadStructureHole"
+                    },
+                    {
+                        "$ref": "#/components/schemas/CommentThreadStructureComment"
+                    }
+                ],
+                "x-addon": "vanilla"
+            }
+        }
+    }
+}

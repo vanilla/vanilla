@@ -1016,17 +1016,16 @@ class VanillaHooks extends Gdn_Plugin
         [$offset, $limit] = offsetLimit($page, $pageSize);
 
         $commentModel = new CommentModel();
+
+        $where = [
+            "c.InsertUserID" => $sender->User->UserID,
+        ];
+        if ($lastCommentID = $sender->Request->get("lid")) {
+            $where["c.CommentID <"] = $lastCommentID;
+        }
         /** @var Gdn_DataSet $comments */
-        $comments = $commentModel->getByUser2(
-            $sender->User->UserID,
-            $limit,
-            $offset,
-            $sender->Request->get("lid"),
-            null,
-            "desc",
-            "PermsDiscussionsView"
-        );
-        $totalRecords = $offset + $commentModel->LastCommentCount + 1;
+        $comments = $commentModel->getWhere($where, "CommentID", "DESC", $limit, $offset);
+        $totalRecords = $offset + $comments->count() + 1;
 
         // Build a pager
         $pagerFactory = new Gdn_PagerFactory();
@@ -1048,7 +1047,7 @@ class VanillaHooks extends Gdn_Plugin
             $sender->View = "profilecomments";
         }
         $sender->setData("Comments", $comments);
-        $sender->setData("UnfilteredCommentsCount", $commentModel->LastCommentCount);
+        $sender->setData("UnfilteredCommentsCount", $comments->count());
 
         // Set the HandlerType back to normal on the profilecontroller so that it fetches it's own views
         $sender->HandlerType = HANDLER_TYPE_NORMAL;

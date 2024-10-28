@@ -387,7 +387,7 @@ abstract class AutomationAction
         $count = $this->getLongRunnerRuleItemCount($firstRun, $triggerClass, $longRunnerParams);
         if ($count > 0) {
             $this->logDispatched(AutomationRuleDispatchesModel::STATUS_QUEUED, null, [
-                "affectedRecordType" => $this->affectedRecordType,
+                "affectedRecordType" => $this->affectedRecordType ?? "",
                 "estimatedRecordCount" => $count,
             ]);
             $longRunnerParams["dispatchUUID"] = $this->getDispatchUUID();
@@ -424,7 +424,7 @@ abstract class AutomationAction
                 AutomationRuleDispatchesModel::STATUS_WARNING,
                 "initial dispatch with 0 entries for future iterations ",
                 [
-                    "affectedRecordType" => $this->affectedRecordType,
+                    "affectedRecordType" => $this->affectedRecordType ?? "",
                     "estimatedRecordCount" => 0,
                     "affectedRecordCount" => 0,
                 ]
@@ -474,7 +474,7 @@ abstract class AutomationAction
             $longRunnerParams["lastRunDate"] = $lastRunDate;
         } else {
             $automationRule = $this->getAutomationRule();
-            $where = $automationRule["trigger"]["triggerValue"];
+            $where = $triggerClass->getWhereArray($automationRule["trigger"]["triggerValue"]);
         }
         return $triggerClass->getRecordCountsToProcess($where);
     }
@@ -535,5 +535,25 @@ abstract class AutomationAction
     public static function canAddAction(): bool
     {
         return true;
+    }
+
+    /**
+     * @param array $triggerValue
+     * @return array
+     */
+    public function getWhereArray(array $triggerValue): array
+    {
+        return $triggerValue;
+    }
+
+    /**
+     * Get conditional form schema that depend on query parameters.
+     *
+     * @param array $query
+     * @return Schema|null
+     */
+    public static function getConditionalSettingsSchema(array $query): ?Schema
+    {
+        return null;
     }
 }

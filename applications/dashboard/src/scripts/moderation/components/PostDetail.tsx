@@ -1,8 +1,13 @@
-import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
+/**
+ * @author Maneesh Chiba <mchiba@higherlogic.com>
+ * @copyright 2009-2024 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 
+import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { PageBoxContextProvider } from "@library/layout/PageBox.context";
@@ -12,7 +17,6 @@ import { BorderType } from "@library/styles/styleHelpersBorders";
 import { t } from "@vanilla/i18n";
 import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
-
 import DateTime from "@library/content/DateTime";
 import { Tag } from "@library/metas/Tags";
 import { TagPreset } from "@library/metas/Tags.variables";
@@ -24,8 +28,6 @@ import { metasClasses } from "@library/metas/Metas.styles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { listItemClasses } from "@library/lists/ListItem.styles";
 import { ToolTip } from "@library/toolTip/ToolTip";
-import { ButtonTypes } from "@library/forms/buttonTypes";
-import LinkAsButton from "@library/routing/LinkAsButton";
 import { usePostRevision } from "@dashboard/moderation/PostRevisionContext";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 

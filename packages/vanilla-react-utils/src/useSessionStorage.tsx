@@ -10,7 +10,7 @@ import { getMeta } from "@library/utility/appUtils";
 /**
  * Get saved data from sessionStorage or DefaultValue
  */
-function getStorageOrDefault<T>(key: string, defaultValue: T): T {
+function getSessionStorageOrDefault<T>(key: string, defaultValue: T): T {
     const stored = sessionStorage.getItem(key);
 
     if (!stored) {
@@ -27,7 +27,7 @@ const PREFIX = `vanilla/${host}`;
  */
 export function useSessionStorage<T>(key: string, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
     key = `${PREFIX}/${key}`;
-    const [value, setValue] = useState(getStorageOrDefault(key, defaultValue));
+    const [value, setValue] = useState(getSessionStorageOrDefault(key, defaultValue));
 
     // This effect ensures memory state is pushed to session
     useEffect(() => {

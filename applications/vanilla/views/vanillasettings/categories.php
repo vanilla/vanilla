@@ -2,15 +2,6 @@
 echo heading(
     t('Manage Categories'),
     [
-        [
-            'text' => dashboardSymbol('settings'),
-            'url' => '/vanilla/settings/categorysettings',
-            'attributes' => [
-                'class' => 'btn btn-icon-border js-modal',
-                'aria-label' => t('Advanced Category Settings'),
-                'data-reload-page-on-save' => false
-            ]
-        ],
         ['text' => t('Add Category'), 'url' => 'vanilla/settings/addcategory?parent='.$this->data('Category.CategoryID')],
     ]
 );

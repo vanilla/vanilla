@@ -51,4 +51,36 @@ JSON;
         $dataEmbed = new FileEmbed($oldData);
         $this->assertInstanceOf(FileEmbed::class, $dataEmbed);
     }
+
+    /**
+     * Make sure that file URLs that are not coming from our CDN are removed.
+     *
+     * @return void
+     */
+    public function testSanitizingURL(): void
+    {
+        $data = [
+            "url" => "https://evil-corp/f-society.zip",
+            "name" => "f-society.zip",
+            "foreignUrl" => "https://evil-corp/f-society.zip",
+            "type" => "file",
+            "size" => 0,
+            "dateInserted" => "2015-05-09 00:00:01",
+            "mediaID" => 62,
+            "foreignID" => 4,
+            "foreignTable" => "embed",
+            "active" => 1,
+            "insertUserID" => 4,
+            "imageWidth" => null,
+            "imageHeight" => null,
+            "thumbWidth" => null,
+            "thumbHeight" => null,
+            "thumbPath" => null,
+            "foreignType" => "embed",
+        ];
+
+        $embed = new FileEmbed($data);
+        $body = $embed->renderHtml();
+        $this->assertEquals("<div></div>", $body);
+    }
 }

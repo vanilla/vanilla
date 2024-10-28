@@ -2,10 +2,10 @@ import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { EmbedRenderError } from "@library/embeddedContent/components/EmbedRenderError";
 import AttachmentError from "@library/content/attachments/AttachmentError";
-import StandardEmbedError from "@rich-editor/quill/blots/embeds/StandardEmbedError";
 import AttachmentLoading from "@library/content/attachments/AttachmentLoading";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
+import StandardEmbedError from "@library/vanilla-editor/StandardEmbedError";
 
 export default {
     title: "User Content",

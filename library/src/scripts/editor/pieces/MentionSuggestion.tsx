@@ -91,7 +91,7 @@ export function MentionSuggestionLoading() {
  * We need a dummy "spacer" suggestion so that we can get our initial measurements.
  */
 export function MentionSuggestionSpacer() {
-    const classesRichEditor = richEditorClasses(false);
+    const classesRichEditor = richEditorClasses();
 
     const classes = mentionClasses();
 

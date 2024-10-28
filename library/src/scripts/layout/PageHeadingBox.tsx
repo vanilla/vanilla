@@ -26,10 +26,13 @@ interface IProps {
     options?: Partial<IPageHeadingBoxOptions>;
     titleCount?: string;
     depth?: number;
+    classNames?: string;
+    pageHeadingClasses?: string;
 }
 
 export function PageHeadingBox(props: IProps) {
-    const { title, description, subtitle, actions, includeBackLink, titleCount } = props;
+    const { title, description, subtitle, actions, includeBackLink, titleCount, classNames, pageHeadingClasses } =
+        props;
     const options = pageHeadingBoxVariables(props.options).options;
     const classes = pageHeadingBoxClasses(props.options);
     const { subtitleType } = options;
@@ -62,7 +65,10 @@ export function PageHeadingBox(props: IProps) {
     );
 
     return (
-        <div ref={wrapperRef} className={cx(classes.root, contextClasses.headingBlockClass, "pageHeadingBox")}>
+        <div
+            ref={wrapperRef}
+            className={cx(classes.root, contextClasses.headingBlockClass, "pageHeadingBox", classNames)}
+        >
             {subtitleType === SubtitleType.OVERLINE && subtitleView}
             <div className={classes.titleWrap}>
                 <PageHeading
@@ -70,6 +76,7 @@ export function PageHeadingBox(props: IProps) {
                     actions={actions}
                     titleCount={titleCountView}
                     includeBackLink={includeBackLink ?? false}
+                    className={pageHeadingClasses}
                 >
                     {title}
                 </PageHeading>

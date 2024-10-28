@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import { ITranslationService } from "@dashboard/languages/LanguageSettingsTypes";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -83,12 +83,10 @@ export const MachineTranslationConfigurationModal = (props: IProps) => {
                     service.configSchema && (
                         <FrameBody>
                             <div className={classesFrameBody.contents}>
-                                <JsonSchemaForm
+                                <DashboardSchemaForm
                                     schema={service && service.configSchema}
                                     instance={value}
                                     onChange={setValue}
-                                    FormControlGroup={DashboardFormControlGroup}
-                                    FormControl={DashboardFormControl}
                                 />
                             </div>
                         </FrameBody>

@@ -43,7 +43,7 @@ type FormValues = {
     newCollections: string[];
 };
 
-interface IProps extends ICollectionResource {
+export interface CollectionsFormProps extends ICollectionResource {
     onSuccess: () => void;
     onCancel: () => void;
 }
@@ -53,7 +53,7 @@ const collectionToOption = ({ collectionID, name }) => ({
     value: collectionID,
 });
 
-export function CollectionsFormLoadable(props: IProps) {
+export function CollectionsFormLoadable(props: CollectionsFormProps) {
     const { onSuccess, onCancel, recordID, recordType } = props;
     const [options, setOptions] = useState<IComboBoxOption[]>([]);
     const classesFrameBody = frameBodyClasses();

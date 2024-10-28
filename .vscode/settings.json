@@ -6,7 +6,8 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         ".idea": true,
-        "dist": true,
+        "/dist": true,
+        "legacy-dist": true,
         "**/node_modules": false,
         "**/bower_components": true,
         "**/.phpunit.result.cache": true,
@@ -32,6 +33,7 @@
         "composer.lock": true,
         "**/node_modules": true,
         "dist": true,
+        "legacy-dist": true,
         "coverage": true,
         "plugins/AdvancedRedirector": true,
         "plugins/AdvancedSearch": true,
@@ -80,6 +82,7 @@
         "plugins/RoleTracker": true,
         "plugins/SEOLinks": true,
         "plugins/Salesforce": true,
+        "plugins/SentimentAnalysis": true,
         "plugins/SimpleAPI": true,
         "plugins/SlugUrls": true,
         "plugins/SnowStorm": true,
@@ -196,7 +199,11 @@
     "editor.wordWrapColumn": 120,
     "typescript.preferences.autoImportFileExcludePatterns": [
         "jquery*",
-        "vitest/dist/*"
+        "vitest/dist/*",
+        "packages/vanilla-ui-library",
+        "@icons/*",
+        "styled-components",
+        "react-select/*"
     ],
     "php.suggest.basic": false,
     "files.associations": {

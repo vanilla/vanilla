@@ -19,7 +19,6 @@ import { useMeasure } from "@vanilla/react-utils";
 interface IProps {
     discussionIDs?: Array<IDiscussion["discussionID"]>;
     noCheckboxes?: boolean;
-    categoryFollowEnabled?: boolean;
     paginationProps?: INumberedPagerProps;
     apiParams: IGetDiscussionListParams;
     updateApiParams: (newParams: Partial<IGetDiscussionListParams>) => void;
@@ -48,13 +47,13 @@ export function DiscussionListAssetHeader(props: IProps) {
                         discussionIDs={props.discussionIDs ?? []}
                     />
                 )}
-                {props.categoryFollowEnabled && (
-                    <DiscussionListAssetCategoryFilter
-                        filter={apiParams.followed ? "followed" : "all"}
-                        onFilterChange={(followed: boolean) => updateApiParams({ followed })}
-                        isMobile={isMobile}
-                    />
-                )}
+                <DiscussionListAssetCategoryFilter
+                    filter={apiParams.followed ? "followed" : apiParams.suggested ? "suggested" : "all"}
+                    onFilterChange={(filter: string) => {
+                        updateApiParams({ followed: filter === "followed", suggested: filter === "suggested" });
+                    }}
+                    isMobile={isMobile}
+                />
                 <DiscussionListSort
                     currentSort={apiParams.sort ?? DiscussionListSortOptions.RECENTLY_COMMENTED}
                     selectSort={(sort: DiscussionListSortOptions) => updateApiParams({ sort })}

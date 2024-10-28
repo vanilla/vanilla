@@ -114,6 +114,7 @@ export class CommunityManagementFixture {
 
         return {
             ...record,
+            url: "#",
             name: record.recordName,
             escalationID: 1,
             dateInserted: new Date(2024, 3, 12).toISOString(),

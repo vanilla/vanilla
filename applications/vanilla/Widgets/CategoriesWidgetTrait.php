@@ -405,6 +405,9 @@ trait CategoriesWidgetTrait
     {
         // allowed categories for our user
         $visibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs();
+        if ($visibleCategoryIDs === true) {
+            $visibleCategoryIDs = array_column(\CategoryModel::categories(), "CategoryID");
+        }
 
         return array_map(function ($category) use ($visibleCategoryIDs) {
             $fallbackImage = $this->props["itemOptions"]["fallbackImage"] ?? null;
@@ -477,7 +480,7 @@ trait CategoriesWidgetTrait
             ];
 
             // appropriate message for heading categories with empty children
-            if ($category["displayAs"] === "heading" && count($category["children"]) === 0) {
+            if ($category["displayAs"] === "heading" && $category["children"] && count($category["children"]) === 0) {
                 // double-checking here to see if we really don't have categories, or it's a permission thing
                 $permissionMessage = false;
                 $childCategoryIDs = $this->categoryModel->getCollection()->getChildIDs([$category["categoryID"]]);

@@ -56,8 +56,6 @@ class DiscussionSearchType extends AbstractSearchType
     /** @var ConfigurationInterface */
     private $config;
 
-    protected $queryFullTextFields = ["name", "bodyPlainText"];
-
     /**
      * DI.
      *
@@ -185,17 +183,6 @@ class DiscussionSearchType extends AbstractSearchType
         } else {
             $query->addIndex($this->getIndex());
 
-            $name = $query->getQueryParameter("name");
-            if ($name) {
-                $query->whereText($name, ["name"], $query::MATCH_FULLTEXT_EXTENDED);
-            }
-
-            $allTextQuery = $query->getQueryParameter("query");
-            if ($allTextQuery) {
-                $fields = $this->queryFullTextFields;
-                $query->whereText($allTextQuery, $fields, $query::MATCH_FULLTEXT_EXTENDED);
-            }
-
             if ($discussionID = $query->getQueryParameter("discussionID", false)) {
                 $query->setFilter("DiscussionID", [$discussionID]);
             }
@@ -214,7 +201,6 @@ class DiscussionSearchType extends AbstractSearchType
             if ($query instanceof BoostableSearchQueryInterface && $query->getBoostParameter("discussionRecency")) {
                 $query->startBoostQuery();
                 $query->boostFieldRecency("dateInserted");
-                $query->boostType($this, $this->getBoostValue());
                 $query->endBoostQuery();
             }
 
@@ -242,7 +228,7 @@ class DiscussionSearchType extends AbstractSearchType
     /**
      * @return float|null
      */
-    protected function getBoostValue(): ?float
+    public function getBoostValue(): ?float
     {
         return $this->config->get("Elastic.Boost.Discussion", 0.5);
     }

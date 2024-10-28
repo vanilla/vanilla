@@ -1,10 +1,9 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import { IError } from "@library/errorPages/CoreErrorMessages";
 import { Toast } from "@library/features/toaster/Toast";
 import { toastManagerClasses } from "@library/features/toaster/ToastContext.styles";
 import { uuidv4 } from "@vanilla/utils";
@@ -31,7 +30,7 @@ interface IToasterContext {
     /** Add a new toast to the top of the stack */
     addToast(toast: IToast): string;
     /** Update a specific toast */
-    updateToast(toastID: string, toast: IToast): void;
+    updateToast(toastID: string, toast: IToast, visibility?: boolean): void;
     /** Remove a specific toast */
     removeToast(toastID: string): void;
 }
@@ -90,7 +89,7 @@ export function ToastProvider(props: { children: ReactNode }) {
     // Expose new toasts so regular js and legacy views can use them
     window.__LEGACY_ADD_TOAST__ = addToast;
 
-    const updateToast = (toastID: string, updatedToast: IToast) => {
+    const updateToast = (toastID: string, updatedToast: IToast, visibility?: boolean) => {
         if (updatedToast) {
             setToast((prevState) =>
                 prevState
@@ -100,6 +99,7 @@ export function ToastProvider(props: { children: ReactNode }) {
                                   ...prevToast,
                                   ...updatedToast,
                                   toastID: prevToast.toastID,
+                                  ...(visibility !== undefined && { visibility: visibility }),
                               };
                           }
                           return prevToast;

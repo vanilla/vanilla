@@ -28,9 +28,6 @@ export const BrandingAndSEOPageClasses = {
             "& > li > div:last-child > label": {
                 float: "right",
             },
-            "& .input-wrap textarea": {
-                fontSize: 14,
-            },
         },
     }),
 };

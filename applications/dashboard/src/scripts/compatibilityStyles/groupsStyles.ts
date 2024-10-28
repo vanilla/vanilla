@@ -187,7 +187,7 @@ export const groupsCSS = () => {
             ...absolutePosition.topLeft(13, 8),
             float: "none",
         },
-        ".Groups .DataList .Item.hasPhotoWrap .ItemContent": {
+        ".Groups .DataList .Item.hasPhotoWrap.hasPhotoWrap .ItemContent": {
             paddingLeft: styleUnit(58),
         },
         ".Groups .DataList .Item.noPhotoWrap .ItemContent": {
@@ -271,6 +271,27 @@ export const groupsCSS = () => {
                     },
                 },
             }),
+        },
+
+        ".Button-Controls.Button-Controls.FollowGroup-ButtonWrapper": {
+            ...mediaQueries.mobileDown({
+                display: "block",
+                marginTop: 0,
+            }),
+        },
+
+        ".Group-Box .DataList .Item .FollowGroup-ButtonWrapper-IsCompact": {
+            marginRight: -6,
+            marginTop: -6,
+        },
+
+        ".Group-Content .Group-Box.ApplicantList .Options": {
+            position: "relative",
+            paddingLeft: 16,
+        },
+
+        ".GroupWrap.DataTableWrap .DataTable .Group-Name .Title-Wrapper": {
+            paddingRight: 70,
         },
     });
 };

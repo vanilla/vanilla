@@ -8,10 +8,11 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
-use Garden\Utils\ContextException;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Psr\Log\LoggerAwareInterface;
@@ -26,14 +27,15 @@ use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\UserMentionsInterface;
 use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Database\CallbackWhereExpression;
+use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Events\LegacyDirtyRecordTrait;
-use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Forum\Jobs\DeferredResourceEventJob;
+use Vanilla\Forum\Models\CommentThreadModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
@@ -42,6 +44,7 @@ use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\Model;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Permissions;
+use Vanilla\Premoderation\PremoderationException;
 use Vanilla\Premoderation\PremoderationItem;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\SchemaFactory;
@@ -50,7 +53,9 @@ use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Web\TwigStaticRenderer;
 use Webmozart\Assert\Assert;
 use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchTypeQueryExtenderInterface;
@@ -75,6 +80,9 @@ class CommentModel extends Gdn_Model implements
 
     use LoggerAwareTrait;
 
+    const PARENT_TYPE_DISCUSSION = "discussion";
+    const PARENT_TYPE_ESCALATION = "escalation";
+
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
 
@@ -85,7 +93,7 @@ class CommentModel extends Gdn_Model implements
     const COUNT_RECALC_MOD = 50;
 
     /** @var array List of fields to order results by. */
-    protected $_OrderBy = [["c.DateInserted", ""]];
+    protected $_OrderBy = [["DateInserted", ""]];
 
     /** @var array Wheres. */
     protected $_Where = [];
@@ -130,8 +138,9 @@ class CommentModel extends Gdn_Model implements
     /** @var AiSuggestionModel */
     private $aiSuggestionModel;
 
+    private CommentThreadModel $threadModel;
+
     private ReactionModel $reactionModel;
-    public int $LastCommentCount = 0;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -158,6 +167,7 @@ class CommentModel extends Gdn_Model implements
         $this->ownSite = \Gdn::getContainer()->get(OwnSite::class);
         $this->reactionModel = Gdn::getContainer()->get(ReactionModel::class);
         $this->aiSuggestionModel = Gdn::getContainer()->get(AiSuggestionModel::class);
+        $this->threadModel = Gdn::getContainer()->get(CommentThreadModel::class);
     }
 
     /**
@@ -188,6 +198,9 @@ class CommentModel extends Gdn_Model implements
             ->column("UpdateIPAddress", "ipaddress", true)
             ->column("Flag", "tinyint", 0)
             ->column("Score", "float", null)
+            ->column("depth", "int", 1)
+            ->column("countChildComments", "int", 0)
+            ->column("scoreChildComments", "int", 0)
             ->column("Attributes", "text", true)
             ->set();
 
@@ -195,29 +208,45 @@ class CommentModel extends Gdn_Model implements
 
         $structure
             ->table("Comment")
-
+            ->createIndexIfNotExists("IX_Comment_parentCommentID", ["parentCommentID"])
             ->createIndexIfNotExists("IX_Comment_DateInserted_parentRecordType_parentRecordID", [
                 "DateInserted",
                 "parentRecordType",
                 "parentRecordID",
             ])
-            ->createIndexIfNotExists("IX_Comment_parentRecordType_parentRecordID_DateInserted", [
+            // Added as a covering index.
+            // Name cannot include all fields due to max length on index names in MySQL.
+            ->createIndexIfNotExists("IX_Comment_commentThread_dateInserted", [
                 "parentRecordType",
                 "parentRecordID",
                 "DateInserted",
+                "parentCommentID",
             ])
+            // Not needed anymore due to the above covering index.
+            ->dropIndexIfExists("IX_Comment_parentRecordType_parentRecordID_DateInserted")
             ->createIndexIfNotExists("IX_Comment_InsertUserID_parentRecordType_parentRecordID", [
                 "InsertUserID",
                 "parentRecordType",
                 "parentRecordID",
             ])
             ->createIndexIfNotExists("IX_Comment_Score", ["Score"])
+            ->createIndexIfNotExists("IX_Comment_parentRecord_InsertUserID_DateInserted", [
+                "parentRecordType",
+                "parentRecordID",
+                "InsertUserID",
+                "DateInserted",
+            ])
 
             // Legacy indexes
             ->tryRenameIndex("IX_Comment_1", "IX_Comment_DiscussionID_DateInserted")
             ->createIndexIfNotExists("IX_Comment_DateInserted", ["DateInserted"])
             ->createIndexIfNotExists("IX_Comment_InsertUserID_DiscussionID", ["InsertUserID", "DiscussionID"])
-            ->createIndexIfNotExists("IX_Comment_DiscussionID_DateInserted", ["DiscussionID", "DateInserted"]);
+            ->createIndexIfNotExists("IX_Comment_DiscussionID_DateInserted", ["DiscussionID", "DateInserted"])
+            ->createIndexIfNotExists("IX_Comment_DiscussionID_InsertUserID_DateInserted", [
+                "DiscussionID",
+                "InsertUserID",
+                "DateInserted",
+            ]);
 
         // Allows the tracking of already-read comments & votes on a per-user basis.
         $structure
@@ -227,6 +256,48 @@ class CommentModel extends Gdn_Model implements
             ->column("Score", "float", null)
             ->column("DateLastViewed", "datetime", null) // null signals never
             ->set();
+    }
+
+    /**
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     * @param bool $throw
+     *
+     * @return bool
+     * @throws PermissionException
+     * @throws NotFoundException
+     */
+    public function hasViewPermission(string $parentRecordType, int $parentRecordID, bool $throw = false): bool
+    {
+        $context = [
+            "parentRecordType" => $parentRecordType,
+            "parentRecordID" => $parentRecordID,
+        ];
+        return match ($parentRecordType) {
+            "discussion" => $this->discussionModel->hasViewPermission($parentRecordID, throw: $throw),
+            "escalation" => $this->escalationModel()->hasViewPermission($parentRecordID, throw: $throw),
+            default => throw new ClientException("Unknown parentRecordType: {$parentRecordType}", 400, $context),
+        };
+    }
+
+    /**
+     * Get an automatic slot type based on the date of parent records.
+     *
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     * @return string
+     */
+    public function getAutoSlotType(string $parentRecordType, int $parentRecordID): string
+    {
+        $context = [
+            "parentRecordType" => $parentRecordType,
+            "parentRecordID" => $parentRecordID,
+        ];
+        return match ($parentRecordType) {
+            "discussion" => $this->discussionModel->getAutoSlotType($parentRecordID),
+            "escalation" => $this->escalationModel()->getAutoSlotType($parentRecordID),
+            default => throw new ClientException("Unknown parentRecordType: {$parentRecordType}", 400, $context),
+        };
     }
 
     /**
@@ -267,46 +338,133 @@ class CommentModel extends Gdn_Model implements
     }
 
     /**
-     * Create the base comment query with parent records joined.
+     * Create an optimized based comment query with required tables joined and permimssion filtering applied.
      *
-     * @param bool $joinUsers Whether or not to join in insertUser/updateUser information.
-     * @param string[] $parentRecordTypes The types of parent records to join.
+     * @param array $parentRecordTypes
+     * @param array $where
+     * @param bool $joinUsers
+     *
+     * @return Gdn_SQLDriver
      */
-    public function commentQuery(bool $joinUsers = true, array $parentRecordTypes = ["discussion", "escalation"])
+    private function permissionedCommentQuery(
+        #[JetBrains\PhpStorm\ExpectedValues(values: ["discussion", "escalation"])] array $parentRecordTypes,
+        array $where,
+        array $options = [],
+        bool $joinUsers = false
+    ): Gdn_SQLDriver {
+        $subQuery = $this->permissionedCommentBaseQuery($parentRecordTypes, $where);
+        $defaultOptions = [
+            Model::OPT_LIMIT => $this->getDefaultLimit(),
+            Model::OPT_OFFSET => 0,
+            Model::OPT_ORDER => "DateInserted",
+            Model::OPT_DIRECTION => "asc",
+        ];
+        $options += $defaultOptions;
+        if ($options[Model::OPT_ORDER] === "dateUpdated") {
+            $options[Model::OPT_ORDER] = "sortDateUpdated";
+            $subQuery->select("c.dateUpdated, c.dateInserted", "COALESCE", "sortDateUpdated");
+        } elseif (!empty($options[Model::OPT_ORDER]) && $options[Model::OPT_ORDER] !== ModelUtils::SORT_TRENDING) {
+            $options[Model::OPT_ORDER] = "c.{$options[Model::OPT_ORDER]}";
+        }
+        $subQuery->applyModelOptions($options);
+
+        // Outer query selects
+        $outerQuery = $this->createSql()
+            ->with("CommentBase", $subQuery)
+            ->select("cb.*")
+            ->select("c.*")
+            ->from("@CommentBase cb")
+            ->join("Comment c", "cb.CommentID = c.CommentID");
+
+        if ($joinUsers) {
+            $outerQuery
+                ->select("iu.Name", "", "InsertName")
+                ->select("iu.Photo", "", "InsertPhoto")
+                ->select("iu.Email", "", "InsertEmail")
+                ->join("User iu", "c.InsertUserID = iu.UserID", "left")
+                ->select("uu.Name", "", "UpdateName")
+                ->select("uu.Photo", "", "UpdatePhoto")
+                ->select("uu.Email", "", "UpdateEmail")
+                ->join("User uu", "c.UpdateUserID = uu.UserID", "left");
+        }
+
+        $this->addParentCommentQuery($outerQuery);
+
+        return $outerQuery;
+    }
+
+    /**
+     * Do a database join of user data.
+     *
+     * @param Gdn_SQLDriver $sql
+     * @return Gdn_SQLDriver
+     */
+    private function joinUsersSql(Gdn_SQLDriver $sql): Gdn_SQLDriver
     {
+        return $sql
+            ->select("iu.Name", "", "InsertName")
+            ->select("iu.Photo", "", "InsertPhoto")
+            ->select("iu.Email", "", "InsertEmail")
+            ->join("User iu", "c.InsertUserID = iu.UserID", "left")
+            ->select("uu.Name", "", "UpdateName")
+            ->select("uu.Photo", "", "UpdatePhoto")
+            ->select("uu.Email", "", "UpdateEmail")
+            ->join("User uu", "c.UpdateUserID = uu.UserID", "left");
+    }
+
+    /**
+     * Create an optimized based comment query with required tables joined and permimssion filtering applied.
+     *
+     * @param array $parentRecordTypes
+     * @param array $where
+     *
+     * @return Gdn_SQLDriver
+     */
+    private function permissionedCommentBaseQuery(
+        #[JetBrains\PhpStorm\ExpectedValues(values: ["discussion", "escalation"])] array $parentRecordTypes,
+        array $where
+    ): Gdn_SQLDriver {
         Assert::notEmpty($parentRecordTypes, "You must specify parentRecordTypes.");
-        $this->SQL->select("c.*")->from("Comment c");
+
+        $subQuery = $this->createSql()->from("Comment c");
 
         $parentRecordNameFields = [];
         $categoryIDFields = [];
         $permissionWheres = [];
 
-        $hasPermissionBypass = $this->sessionInterface
-            ->getPermissions()
-            ->hasAny(["community.moderate", "site.manage", Permissions::PERMISSION_SYSTEM]);
+        $discussionID = $where["c.DiscussionID"] ?? ($where["DiscussionID"] ?? null);
+        $parentRecordType = $where["c.parentRecordType"] ?? ($where["parentRecordType"] ?? null);
+        $parentRecordID = $where["c.parentRecordID"] ?? ($where["parentRecordID"] ?? null);
+        $escalationID = $parentRecordType === "escalation" ? $parentRecordID : null;
+        $discussionID = $parentRecordType === "discussion" ? $parentRecordID : $discussionID;
 
+        // See if we can avoid more expensive permission checking with a simple permission check.
+        $hasPermissionBypass =
+            $this->sessionInterface
+                ->getPermissions()
+                ->hasAny(["community.moderate", "site.manage", Permissions::PERMISSION_SYSTEM]) ||
+            ($discussionID !== null && !$this->hasViewPermission("discussion", $discussionID)) ||
+            ($escalationID !== null && !$this->hasViewPermission("escalation", $escalationID));
+
+        // Do the more expensive parent record filtering.
         if (in_array("discussion", $parentRecordTypes)) {
-            $this->SQL
+            $subQuery
                 ->select(["d.Type as DiscussionType"])
-                ->leftJoin(
-                    "Discussion d",
-                    "coalesce(c.parentRecordType, 'discussion') = 'discussion' AND coalesce(c.parentRecordID, c.DiscussionID) = d.DiscussionID"
-                );
+                ->leftJoin("Discussion d", "c.DiscussionID = d.DiscussionID");
             $categoryIDFields[] = "d.CategoryID";
             $parentRecordNameFields[] = "d.Name";
             if (!$hasPermissionBypass) {
                 $permissionWheres[] = new CallbackWhereExpression(function (Gdn_SQLDriver $sql) {
                     $this->discussionModel->applyDiscussionCategoryPermissionsWhere($sql);
                 });
-            } else {
-                $permissionWheres[] = "d.CategoryID IS NOT NULL";
             }
         }
 
+        // Apply the base of the query.
         if (in_array("escalation", $parentRecordTypes)) {
-            $this->SQL->leftJoin(
+            $subQuery->leftJoin(
                 "escalation e",
-                "c.parentRecordType = 'escalation' AND c.parentRecordID = e.EscalationID"
+                "c.parentRecordType = 'escalation' AND c.parentRecordID = e.escalationID"
             );
             $categoryIDFields[] = "e.placeRecordID";
             $parentRecordNameFields[] = "e.name";
@@ -319,53 +477,80 @@ class CommentModel extends Gdn_Model implements
                     "e.placeRecordType" => "category",
                     "e.placeRecordID" => $escCategoryIDs,
                 ];
-            } else {
-                $permissionWheres[] = "e.placeRecordID IS NOT NULL";
             }
         }
 
-        $this->SQL
+        $subQuery
+            ->select("c.CommentID")
             ->select(implode(",", $parentRecordNameFields), "coalesce", "parentRecordName")
             ->select(implode(",", $parentRecordNameFields), "coalesce", "DiscussionName") // Backwards compatibility
             ->select(implode(",", $categoryIDFields), "coalesce", "CategoryID")
             ->select(implode(",", $categoryIDFields), "coalesce", "placeRecordID")
-            ->select("'category' as placeRecordType");
+            ->select("'category' as placeRecordType")
+            ->select("c.DateInserted");
 
         // We only want records that joined on in some type of way.
-
-        $this->SQL->beginWhereGroup();
-        foreach ($permissionWheres as $i => $permissionWhere) {
-            if ($i > 0) {
-                $this->SQL->orOp();
+        if (count($permissionWheres) !== 0) {
+            $subQuery->beginWhereGroup();
+            foreach ($permissionWheres as $permWhere) {
+                $subQuery->orOp();
+                $subQuery->beginWhereGroup();
+                $subQuery->where($permWhere);
+                $subQuery->endWhereGroup();
             }
-            $this->SQL
-                ->beginWhereGroup()
-                ->where($permissionWhere)
-                ->endWhereGroup();
+            $subQuery->endWhereGroup();
         }
-        $this->SQL->endWhereGroup();
+        // Legacy event, Currently used by PennyArcade theme.
+        $sqlBefore = $this->SQL;
+        $this->SQL = $subQuery;
+        $this->fireEvent("BeforeGet");
+        $subQuery = $this->SQL;
+        $this->SQL = $sqlBefore;
+
+        // Where on dirty records.
+        $joinDirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+            unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
+        }
+        if ($joinDirtyRecords) {
+            $this->applyDirtyWheres("c", $subQuery);
+        }
+
+        // If we have a user role where, make sure we join on that table.
+        $insertUserRoleIDs = $where["uri.RoleID"] ?? null;
+        if (!empty($insertUserRoleIDs)) {
+            $subQuery->join("UserRole uri", "c.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
+            $subQuery->distinct();
+        }
+        if (
+            isset($where["DiscussionID"]) &&
+            $where["DiscussionID"] === ($where["parentRecordID"] ?? null) &&
+            ($where["parentRecordType"] ?? null) === "discussion"
+        ) {
+            unset($where["parentRecordID"]);
+        }
+        if (isset($where["parentRecordType"])) {
+            $subQuery->where("coalesce(c.parentRecordType, \"discussion\")", $where["parentRecordType"], false);
+            unset($where["parentRecordType"]);
+        }
+        // All fields should be associated with a table. If there isn't one, assign it to comments.
+        foreach ($where as $field => $value) {
+            if (!str_contains($field, ".")) {
+                $where["c.{$field}"] = $value;
+                unset($where[$field]);
+            }
+        }
+        $subQuery->where($where);
 
         if (in_array("discussion", $parentRecordTypes)) {
             // Groups hooks here to join a group ID off the discussion.
             $extraSelects = \Gdn::eventManager()->fireFilter("commentModel_extraSelects", []);
             if (!empty($extraSelects)) {
-                $this->SQL->select($extraSelects);
+                $subQuery->select($extraSelects);
             }
         }
-
-        if ($joinUsers) {
-            $this->SQL
-                ->select("iu.Name", "", "InsertName")
-                ->select("iu.Photo", "", "InsertPhoto")
-                ->select("iu.Email", "", "InsertEmail")
-                ->join("User iu", "c.InsertUserID = iu.UserID", "left")
-                ->select("uu.Name", "", "UpdateName")
-                ->select("uu.Photo", "", "UpdatePhoto")
-                ->select("uu.Email", "", "UpdateEmail")
-                ->join("User uu", "c.UpdateUserID = uu.UserID", "left");
-        }
+        return $subQuery;
     }
-
     /**
      * {@inheritdoc}
      */
@@ -380,63 +565,6 @@ class CommentModel extends Gdn_Model implements
     }
 
     /**
-     * Select from the comment table, filling in default options where appropriate.
-     *
-     * @param array $where The where clause.
-     * @param string|array $orderFields The columns to order by.
-     * @param string $orderDirection The direction to order by.
-     * @param int $limit The database limit.
-     * @param int $offset The database offset.
-     * @param string $alias A named alias for the Comment table.
-     * @return Gdn_SQLDriver Returns SQL driver filled in with the select settings.
-     */
-    private function select(
-        $where = [],
-        $orderFields = "",
-        $orderDirection = "asc",
-        $limit = 0,
-        $offset = 0,
-        $alias = null
-    ) {
-        // Setup a clean copy of the SQL object.
-        $sql = clone $this->SQL;
-        $sql->reset();
-
-        // Build up the basic query, accounting for a potential table name alias.
-        $from = $this->Name;
-        if ($alias) {
-            $from .= " {$alias}";
-        }
-        $sql->select("CommentID")
-            ->from($from)
-            ->where($where);
-
-        // Apply a limit.
-        $limit = $limit ?: $this->getDefaultLimit();
-        $sql->limit($limit, $offset);
-
-        // Determine which sort fields to apply.
-        if ($orderFields) {
-            $sql->orderBy($orderFields, $orderDirection);
-        } else {
-            // Fallback to the configured sort fields on the object.
-            foreach ($this->_OrderBy as $defaultOrder) {
-                [$field, $dir] = $defaultOrder;
-                // Reset any potential table prefixes, if we have an alias.
-                if ($alias) {
-                    $parts = explode(".", $field);
-                    $field = $parts[count($parts) === 1 ? 0 : 1];
-                    $field = "{$alias}.{$field}";
-                }
-                $sql->orderBy($field, $dir);
-            }
-            unset($parts, $field, $dir, $defaultOrder);
-        }
-
-        return $sql;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getWhere(
@@ -445,24 +573,17 @@ class CommentModel extends Gdn_Model implements
         $orderDirection = "asc",
         $limit = false,
         $offset = false
-    ) {
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
-        $where = $this->stripWherePrefixes($where);
+    ): Gdn_DataSet {
         [$where, $options] = $this->splitWhere($where, ["joinUsers" => true, "joinDiscussions" => false]);
 
-        // Build up an inner select of comments to force late-loading.
-        $innerSelect = $this->select($where, $orderFields, $orderDirection, $limit, $offset, "c3");
+        $options += [
+            Model::OPT_LIMIT => $limit,
+            Model::OPT_OFFSET => $offset,
+            Model::OPT_ORDER => $orderFields,
+            Model::OPT_DIRECTION => $orderDirection,
+        ];
 
-        // Add the inner select's parameters to the outer select.
-        $this->SQL->mergeParameters($innerSelect);
-
-        $innerSelectSql = $innerSelect->getSelect();
-        $result = $this->SQL
-            ->select("c.*")
-            ->from($this->Name . " c")
-            ->join("($innerSelectSql) c2", "c.CommentID = c2.CommentID")
-            ->get();
+        $result = $this->permissionedCommentQuery(["discussion"], $where, $options)->get();
 
         if ($options["joinUsers"]) {
             $this->userModel->joinUsers($result, ["InsertUserID", "UpdateUserID"]);
@@ -473,6 +594,8 @@ class CommentModel extends Gdn_Model implements
         }
         $this->setCalculatedFields($result);
 
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new CommentQueryEvent($result));
         return $result;
     }
 
@@ -485,56 +608,30 @@ class CommentModel extends Gdn_Model implements
      * @param array $where Additional conditions to pass when querying comments.
      * @return Gdn_DataSet Returns a list of comments.
      */
-    public function getByDiscussion($discussionID, $limit, $offset = 0, array $where = [])
+    public function getByDiscussion(int $discussionID, $limit, $offset = 0, array $where = []): Gdn_DataSet
     {
-        $this->commentQuery(true, ["discussion"]);
-        $this->EventArguments["DiscussionID"] = &$discussionID;
-        $this->EventArguments["Limit"] = &$limit;
-        $this->EventArguments["Offset"] = &$offset;
-        $this->EventArguments["Where"] = &$where;
-        $this->fireEvent("BeforeGet");
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
+        $where = array_merge($where, [
+            "d.DiscussionID" => $discussionID,
+        ]);
 
-        // Use a subquery to force late-loading of comments. This optimizes pagination.
-        $sql2 = clone $this->SQL;
-        $sql2->reset();
-
-        // Using a subquery isn't compatible with Vanilla's named parameter implementation. Manually escape conditions.
-        $where = array_merge($where, ["c.DiscussionID" => $discussionID]);
-        foreach ($where as $field => &$value) {
-            if (filter_var($value, FILTER_VALIDATE_INT)) {
-                continue;
-            }
-            $value = Gdn::database()
-                ->connection()
-                ->quote($value);
+        $options = [
+            Model::OPT_LIMIT => $limit,
+            Model::OPT_OFFSET => $offset,
+        ];
+        $presetOrderBy = $this->orderBy();
+        if (isset($presetOrderBy)) {
+            $options[Model::OPT_ORDER] = $presetOrderBy[0][0];
+            $options[Model::OPT_DIRECTION] = $presetOrderBy[0][1];
         }
 
-        $sql2
-            ->select("CommentID")
-            ->from("Comment c")
-            ->where($where, null, true, false)
-            ->limit($limit, $offset);
-        $this->orderBy($sql2);
-        $select = $sql2->getSelect();
-
-        $px = $this->SQL->Database->DatabasePrefix;
-        $this->SQL->Database->DatabasePrefix = "";
-
-        $this->SQL->join("($select) c2", "c.CommentID = c2.CommentID");
-        $this->SQL->Database->DatabasePrefix = $px;
-
-        $this->where($this->SQL);
-
-        $result = $this->SQL->get();
+        $result = $this->permissionedCommentQuery(["discussion"], where: $where, options: $options)->get();
 
         $this->userModel->joinUsers($result, ["InsertUserID", "UpdateUserID"]);
 
         $this->setCalculatedFields($result);
 
-        $this->EventArguments["Comments"] = &$result;
-        $this->fireEvent("AfterGet");
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new CommentQueryEvent($result));
 
         return $result;
     }
@@ -548,136 +645,27 @@ class CommentModel extends Gdn_Model implements
      * @param int $userID Which user to get comments for.
      * @param int $limit Max number to get.
      * @param int $offset Number to skip.
-     * @return object SQL results.
-     */
-    public function getByUser($userID, $limit, $offset = 0)
-    {
-        // Get category permissions
-        $perms = DiscussionModel::categoryPermissions();
-
-        // Build main query
-        $this->commentQuery(
-            // Only discussions supported here for now.
-            parentRecordTypes: ["discussion"]
-        );
-        $this->fireEvent("BeforeGet");
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
-        $this->SQL
-            ->select("d.Name", "", "DiscussionName")
-            ->where("c.InsertUserID", $userID)
-            ->orderBy("c.CommentID", "desc")
-            ->limit($limit, $offset);
-
-        // Verify permissions (restricting by category if necessary)
-        if ($perms !== true) {
-            $this->SQL->join("Category ca", "d.CategoryID = ca.CategoryID", "left")->whereIn("d.CategoryID", $perms);
-        }
-
-        //$this->orderBy($this->SQL);
-
-        $data = $this->SQL->get();
-        $this->userModel->joinUsers($data, ["InsertUserID", "UpdateUserID"]);
-
-        return $data;
-    }
-
-    /**
-     *
-     * Get comments for a user. This is an optimized version of CommentModel->getByUser().
-     *
-     * @since 2.1
-     * @access public
-     *
-     * @param int $userID Which user to get comments for.
-     * @param int $limit Max number to get.
-     * @param int $offset Number to skip.
-     * @param int|bool $lastCommentID A hint for quicker paging.
-     * @param string|null $after Only pull comments following this date.
-     * @param string $order Order comments ascending (asc) or descending (desc) by ID.
-     * @param string $permission Permission to filter categories by.
      * @return Gdn_DataSet SQL results.
      */
-    public function getByUser2(
-        $userID,
-        $limit,
-        $offset,
-        $lastCommentID = false,
-        $after = null,
-        $order = "desc",
-        string $permission = ""
-    ) {
-        // This will load all categories. (do not use unless necessary).
-        if (!empty($permission)) {
-            $categories = CategoryModel::categories();
-            $perms = CategoryModel::filterExistingCategoryPermissions($categories, $permission);
-            $perms = array_column($perms, "CategoryID");
-        } else {
-            $perms = DiscussionModel::categoryPermissions();
-        }
+    public function getByUser(int $userID, $limit, $offset = 0): Gdn_DataSet
+    {
+        $options = [
+            Model::OPT_LIMIT => $limit,
+            Model::OPT_OFFSET => $offset,
+        ];
 
-        if (is_array($perms) && empty($perms)) {
-            return new Gdn_DataSet([]);
-        }
-
-        // The point of this query is to select from one comment table, but filter and sort on another.
-        // This puts the paging into an index scan rather than a table scan.
-        $this->SQL
-            ->select("c2.*")
-            ->select("d.Name", "", "DiscussionName")
-            ->select("d.CategoryID")
-            ->from("Comment c")
-            ->join("Comment c2", "c.CommentID = c2.CommentID")
-            ->join("Discussion d", "c2.DiscussionID = d.DiscussionID")
-            ->where("c.InsertUserID", $userID)
-            ->orderBy("c.CommentID", $order);
-
-        if ($after) {
-            $this->SQL->where("c.DateInserted >", $after);
-        }
-
-        if ($lastCommentID) {
-            // The last comment id from the last page was given and can be used as a hint to speed up the query.
-            $this->SQL->where("c.CommentID <", $lastCommentID)->limit($limit);
-        } else {
-            $this->SQL->limit($limit, $offset);
-        }
-        $this->fireEvent("BeforeGetByUser");
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
-        $data = $this->SQL->get();
-
-        $result = &$data->result();
-        $this->LastCommentCount = $data->numRows();
-        if (count($result) > 0) {
-            $this->LastCommentID = $result[count($result) - 1]->CommentID;
-        } else {
-            $this->LastCommentID = null;
-        }
-
-        // Now that we have th comments we can filter out the ones we don't have permission to.
-        if ($perms !== true) {
-            $remove = [];
-
-            foreach ($data->result() as $index => $row) {
-                if (!in_array($row->CategoryID, $perms)) {
-                    $remove[] = $index;
-                }
-            }
-
-            if (count($remove) > 0) {
-                foreach ($remove as $index) {
-                    unset($result[$index]);
-                }
-
-                $result = array_values($result);
-            }
-        }
+        // Build main query
+        $data = $this->permissionedCommentQuery(
+            // Only discussions supported here for now.
+            parentRecordTypes: ["discussion"],
+            where: ["c.InsertUserID" => $userID],
+            options: $options
+        )->get();
 
         $this->userModel->joinUsers($data, ["InsertUserID", "UpdateUserID"]);
 
-        $this->EventArguments["Comments"] = &$data;
-        $this->fireEvent("AfterGet");
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new CommentQueryEvent($data));
 
         return $data;
     }
@@ -730,21 +718,24 @@ class CommentModel extends Gdn_Model implements
             Model::OPT_ORDER => "CommentID",
         ];
 
-        $query = $this->createSelectCommentsQuery($where);
+        $parentRecordTypes = isset($where["parentRecordType"])
+            ? [$where["parentRecordType"]]
+            : ["discussion", "escalation"];
+        $query = $this->permissionedCommentQuery($parentRecordTypes, $where, $options);
         if ($options[Model::OPT_ORDER] === "dateUpdated") {
             $options[Model::OPT_ORDER] = "sortDateUpdated";
             $query->select("c.dateUpdated, c.dateInserted", "COALESCE", "sortDateUpdated");
-        } else {
+        } elseif (!empty($options[Model::OPT_ORDER]) && $options[Model::OPT_ORDER] !== ModelUtils::SORT_TRENDING) {
             $options[Model::OPT_ORDER] = "c.{$options[Model::OPT_ORDER]}";
         }
-        $this->SQL->applyModelOptions($options);
+
+        unset($options[Model::OPT_LIMIT]);
+        unset($options[Model::OPT_OFFSET]);
+        $query->applyModelOptions($options);
 
         $result = $query->get();
-        $this->LastCommentCount = $result->numRows();
-
-        $this->EventArguments["Comments"] = &$result;
-        $this->fireEvent("AfterGet");
-
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch(new CommentQueryEvent($result));
         return $result;
     }
 
@@ -757,44 +748,11 @@ class CommentModel extends Gdn_Model implements
      */
     public function selectPagingCount(array $where, int $maxLimit = 10000): int
     {
-        $baseQuery = $this->createSelectCommentsQuery($where);
+        $parentRecordTypes = isset($where["c.parentRecordType"]) ? [$where["c.parentRecordType"]] : ["discussion"];
+        $baseQuery = $this->permissionedCommentBaseQuery($parentRecordTypes, $where);
+
         $count = $baseQuery->getPagingCount("c.CommentID", $maxLimit);
         return $count;
-    }
-
-    /**
-     * @param array $where
-     * @return Gdn_SQLDriver
-     */
-    private function createSelectCommentsQuery(array $where): Gdn_SQLDriver
-    {
-        $joinDirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
-        if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {
-            unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
-        }
-
-        // All fields should be associated with a table. If there isn't one, assign it to comments.
-        foreach ($where as $field => $value) {
-            if (!str_contains($field, ".")) {
-                $where["c.{$field}"] = $value;
-                unset($where[$field]);
-            }
-        }
-
-        $query = $this->SQL;
-        // Apply the base of the query.
-        $this->commentQuery(
-            // This method is primarily used for API lookups which has its own user joining mechanism.
-            joinUsers: false
-        );
-        $query->where($where);
-        if ($joinDirtyRecords) {
-            $this->applyDirtyWheres("c");
-        }
-
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new CommentQueryEvent($this->SQL));
-        return $query;
     }
 
     /**
@@ -886,11 +844,13 @@ class CommentModel extends Gdn_Model implements
             "discussionID:i?" => "The ID of the discussion.",
             "parentRecordType:s?",
             "parentRecordID:i?",
+            "parentCommentID:i?",
             "discussionCollapseID:s?",
             "name:s?" => [
                 "description" => "The name of the comment",
                 "x-localize" => true,
             ],
+            "_name:s?",
             "categoryID:i?" => "The ID of the category of the comment",
             "body:s?" => [
                 "description" => "The body of the comment.",
@@ -907,7 +867,18 @@ class CommentModel extends Gdn_Model implements
             "dateUpdated:dt|n" => "When the comment was last updated.",
             "insertUserID:i" => "The user that created the comment.",
             "updateUserID:i|n",
-            "score:i|n" => "Total points associated with this post.",
+            "score:i" => [
+                "default" => 0,
+            ],
+            "depth:i" => [
+                "default" => 1,
+            ],
+            "scoreChildComments:i" => [
+                "default" => 0,
+            ],
+            "countChildComments:i" => [
+                "default" => 0,
+            ],
             "insertUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             "url:s?" => "The full URL to the comment.",
             "labelCodes:a?" => ["items" => ["type" => "string"]],
@@ -923,7 +894,12 @@ class CommentModel extends Gdn_Model implements
             "reportMeta?" => \Vanilla\Forum\Models\CommunityManagement\ReportModel::reportMetaSchema(),
             "countReports:i?",
             "suggestion?" => AiSuggestionSourceService::getSuggestionSchema(),
+            ModelUtils::SORT_TRENDING . ":f?",
+            ModelUtils::SORT_TRENDING . "Debug:o?",
         ]);
+
+        $eventManager = Gdn::getContainer()->get(EventManager::class);
+        $eventManager->fire("commentModel_commentSchema", $result);
         return $result;
     }
 
@@ -967,37 +943,41 @@ class CommentModel extends Gdn_Model implements
      * @param int $id Unique ID of the comment.
      * @param string $datasetType Format to return comment in.
      * @param array $options options to pass to the database.
-     * @return mixed SQL result in format specified by $resultType.
+     * @return array|object SQL result in format specified by $resultType.
      */
     public function getID($id, $datasetType = DATASET_TYPE_OBJECT, $options = [])
     {
-        $this->options($options);
-
-        $this->commentQuery(); // `false` suppresses FireEvent
-        $comment = $this->SQL
+        $query = $this->createSql()
+            ->select("c.*")
+            ->select(["d.Type as DiscussionType"])
+            ->select("d.Name,e.name", "coalesce", "parentRecordName")
+            ->select("d.Name,e.name", "coalesce", "DiscussionName") // Backwards compatibility
+            ->select("d.CategoryID,e.placeRecordID", "coalesce", "CategoryID")
+            ->select("d.CategoryID,e.escalationID", "coalesce", "placeRecordID")
+            ->select("'category' as placeRecordType")
+            ->leftJoin("escalation e", "c.parentRecordType = 'escalation' AND c.parentRecordID = e.escalationID")
+            ->leftJoin("Discussion d", "c.DiscussionID = d.DiscussionID")
+            ->from("Comment c")
             ->where("c.CommentID", $id)
-            ->get()
-            ->firstRow($datasetType);
+            ->limit(1);
+
+        $this->addParentCommentQuery($query);
+
+        // Groups hooks here to join a group ID off the discussion.
+        $extraSelects = \Gdn::eventManager()->fireFilter("commentModel_extraSelects", []);
+        if (!empty($extraSelects)) {
+            $query->select($extraSelects);
+        }
+        $this->joinUsersSql($query);
+
+        $this->SQL = $query;
+        $this->options($options);
+        $comment = $query->get()->firstRow($datasetType);
 
         if ($comment) {
             $this->calculate($comment);
         }
         return $comment;
-    }
-
-    /**
-     * Get single comment by ID as SQL result data.
-     *
-     * @param int $commentID Unique ID of the comment.
-     * @param array $options
-     * @return Gdn_DataSet SQL result.
-     */
-    public function getIDData($commentID, $options = [])
-    {
-        $this->commentQuery(); // FALSE supresses FireEvent
-        $this->options($options);
-
-        return $this->SQL->where("c.CommentID", $commentID)->get();
     }
 
     /**
@@ -1103,6 +1083,9 @@ class CommentModel extends Gdn_Model implements
      * @param array $formPostValues Data from the form model.
      * @param array|false $settings Currently unused.
      * @return int $commentID
+     * @throws ClientException
+     * @throws NotFoundException
+     * @throws PremoderationException
      * @since 2.0.0
      */
     public function save($formPostValues, $settings = false)
@@ -1158,7 +1141,17 @@ class CommentModel extends Gdn_Model implements
 
         $parentRecordType =
             $formPostValues["parentRecordType"] ?? ($previousComment["parentRecordType"] ?? "discussion");
+        $parentRecordID =
+            $formPostValues["parentRecordID"] ??
+            ($previousComment["parentRecordID"] ?? $previousComment["DiscussionID"]);
         $formPostValues["parentRecordType"] = $parentRecordType;
+
+        $parentCommentID = $formPostValues["parentCommentID"] ?? ($previousComment["parentCommentID"] ?? null);
+        if ($parentCommentID !== null) {
+            // Make sure the parent comment exists and is correct.
+            $parentComment = $this->validateParentComment($parentCommentID, $parentRecordType, $parentRecordID);
+            $formPostValues["depth"] = $parentComment["depth"] + 1;
+        }
 
         $isDiscussionComment = $parentRecordType === "discussion";
 
@@ -1321,8 +1314,13 @@ class CommentModel extends Gdn_Model implements
         }
 
         ///
-        /// Post fetch side-effects for discussion comments.
+        /// Post fetch side-effects for comments.
         ///
+        $this->threadModel->handleParentCommentInsertSideEffects(
+            $comment,
+            empty($previousComment) ? null : $previousComment
+        );
+
         if ($isDiscussionComment) {
             $this->handleDiscussionCommentSideEffects(
                 commentRow: $comment,
@@ -1354,6 +1352,32 @@ class CommentModel extends Gdn_Model implements
             ])
         );
         return $commentID;
+    }
+
+    /**
+     * @param int $parentCommentID
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     * @return array The parent comment.
+     */
+    private function validateParentComment(int $parentCommentID, string $parentRecordType, int $parentRecordID): array
+    {
+        $parentComment = $this->getID($parentCommentID, DATASET_TYPE_ARRAY);
+        if (!$parentComment) {
+            throw new NotFoundException("Parent Comment", ["commentID" => $parentCommentID]);
+        }
+
+        if (
+            $parentComment["parentRecordType"] !== $parentRecordType ||
+            $parentComment["parentRecordID"] !== $parentRecordID
+        ) {
+            throw new ClientException("Parent comment does not match the parent record type and ID.", 400, [
+                "parentCommentID" => $parentCommentID,
+                "parentRecordType" => $parentRecordType,
+                "parentRecordID" => $parentRecordID,
+            ]);
+        }
+        return $parentComment;
     }
 
     /**
@@ -1417,7 +1441,7 @@ class CommentModel extends Gdn_Model implements
     {
         $this->userModel->expandUsers($row, ["InsertUserID"]);
 
-        $parentRecordType = $row["parentRecordType"];
+        $parentRecordType = $row["parentRecordType"] ?? "discussion";
 
         $out = $this->schema();
         if ($parentRecordType === "discussion") {
@@ -1440,6 +1464,85 @@ class CommentModel extends Gdn_Model implements
     }
 
     /**
+     * @return string
+     */
+    public static function trendingScoreCalculationSql(): string
+    {
+        return "COALESCE(c.Score, 0) + COALESCE(c.countChildComments, 0) * 2 + COALESCE(c.scoreChildComments, 0) / 10";
+    }
+
+    /**
+     * @param array $rawCommentRow
+     * @return array[]
+     */
+    public static function trendingScoreCalculationDebug(array $rawCommentRow): array
+    {
+        $score = $rawCommentRow["Score"] ?? 0;
+
+        $plainTextTwig = <<<TWIG
+({{score}} + ({{countChildComments}} * 2) + ({{scoreChildComments}} / 10)) / ({{hoursSinceCreation}} + {{trendingWindowHours}}) ^ {{trendingWindowExponent}}
+TWIG;
+
+        $mathMlTwig = <<<TWIG
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+  <mfrac>
+    <mrow>
+      <mi>{{score}}</mi>
+      <mo>+</mo>
+      <mo>(</mo>
+      <mi>{{countChildComments}}</mi>
+      <mo>&#x2217;</mo>
+      <mn>2</mn>
+      <mo>)</mo>
+      <mo>+</mo>
+      <mo>(</mo>
+      <mi>{{scoreChildComments}}</mi>
+      <mo>/</mo>
+      <mn>10</mn>
+      <mo>)</mo>
+    </mrow>
+    <mrow>
+      <mo>(</mo>
+      <mi>{{hoursSinceCreation}}</mi>
+      <mo>+</mo>
+      <mi>{{trendingWindowHours}}</mi>
+      <mo>)</mo>
+      <msup>
+        <mrow></mrow>
+        <mi>{{trendingWindowExponent}}</mi>
+      </msup>
+    </mrow>
+  </mfrac>
+</math>
+TWIG;
+        $templateValues = [
+            "score" => "score",
+            "countChildComments" => "countChildComments",
+            "scoreChildComments" => "scoreChildComments",
+            "hoursSinceCreation" => "hoursSinceCreation",
+            "trendingWindowHours" => "trendingWindowHours",
+            "trendingWindowExponent" => "trendingWindowExponent",
+        ];
+        $realValues = $rawCommentRow + ["score" => $score];
+
+        $templatePlainText = TwigStaticRenderer::renderString($plainTextTwig, $templateValues);
+        $templateMathMl = TwigStaticRenderer::renderString($mathMlTwig, $templateValues);
+        $equationPlainText = TwigStaticRenderer::renderString($plainTextTwig, $realValues);
+        $equationMathMl = TwigStaticRenderer::renderString($mathMlTwig, $realValues);
+
+        return [
+            "plainText" => [
+                "template" => $templatePlainText,
+                "equation" => $equationPlainText,
+            ],
+            "mathMl" => [
+                "template" => $templateMathMl,
+                "equation" => $equationMathMl,
+            ],
+        ];
+    }
+
+    /**
      * Given a database row, massage the data into a more externally-useful format.
      *
      * @param array $row
@@ -1459,6 +1562,15 @@ class CommentModel extends Gdn_Model implements
         $row["Attributes"] = new Attributes($row["Attributes"] ?? null);
         $row["InsertUserID"] = $row["InsertUserID"] ?? 0;
         $row["DateInserted"] = $row["DateInserted"] ?? ($row["DateUpdated"] ?? new DateTime());
+
+        if (DebugUtils::isDebug() && isset($row[ModelUtils::SORT_TRENDING])) {
+            $row[ModelUtils::SORT_TRENDING . "Debug"] = self::trendingScoreCalculationDebug($row);
+        }
+
+        if (empty($row["Score"])) {
+            $row["Score"] = 0;
+        }
+
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
 
@@ -1576,8 +1688,39 @@ class CommentModel extends Gdn_Model implements
      */
     public function setField($rowID, $property, $value = false)
     {
-        parent::setField($rowID, $property, $value);
-        $this->addDirtyRecord("comment", $rowID);
+        if (!is_array($property)) {
+            $set = [$property => $value];
+        } else {
+            $set = $property;
+        }
+
+        $this->Database->runWithTransaction(function () use ($rowID, $set) {
+            if (isset($set["Score"])) {
+                // A score was passed, let's compare it to our previous one.
+                $currentPartial = $this->createSql()
+                    ->select("Score")
+                    ->select("parentCommentID")
+                    ->from("Comment")
+                    ->where("CommentID", $rowID)
+                    ->get()
+                    ->firstRow(DATASET_TYPE_ARRAY);
+                $scoreIncrement = $set["Score"] - ($currentPartial["Score"] ?? 0);
+
+                // If we have a parent apply it to them too.
+                $parentCommentID = $currentPartial["parentCommentID"] ?? null;
+                if ($parentCommentID !== null) {
+                    $this->threadModel->updateParentsRecursively(
+                        firstParentCommentID: $parentCommentID,
+                        set: [
+                            "scoreChildComments" => new Increment($scoreIncrement),
+                        ]
+                    );
+                }
+            }
+            parent::setField($rowID, $set);
+
+            $this->addDirtyRecord("comment", $rowID);
+        });
     }
 
     /**
@@ -1659,6 +1802,8 @@ class CommentModel extends Gdn_Model implements
 
         $discussionID = $comment["DiscussionID"] ?? null;
         if ($discussionID !== null) {
+            $comment["parentRecordType"] = "discussion";
+            $comment["parentRecordID"] = $discussionID;
             $this->handleDiscussionCommentPreDeleteSideEffects($comment);
             // Log the deletion. Change log currently only supports discussion comment deletes.
             $log = val("Log", $options, "Delete");
@@ -1671,6 +1816,8 @@ class CommentModel extends Gdn_Model implements
 
         // Delete the comment.
         $this->SQL->delete("Comment", ["CommentID" => $id]);
+
+        $this->threadModel->handleParentCommentDeleteSideEffects($comment);
 
         // After deletion
         if ($discussionID !== null) {
@@ -1722,6 +1869,11 @@ class CommentModel extends Gdn_Model implements
      */
     public function calculate($comment)
     {
+        if (val("parentRecordType", $comment, null) === null && val("DiscussionID", $comment, null) !== null) {
+            setValue("parentRecordType", $comment, "discussion");
+            setValue("parentRecordID", $comment, val("DiscussionID", $comment));
+        }
+
         // Do nothing yet.
         if ($attributes = val("Attributes", $comment)) {
             setValue("Attributes", $comment, dbdecode($attributes));
@@ -1848,12 +2000,13 @@ class CommentModel extends Gdn_Model implements
     public static function createRawCommentUrl($comment, $withDomain = true)
     {
         $comment = (object) $comment;
+        $commentID = val("CommentID", $comment) ?? val("commentID", $comment);
 
         $parentRecordType = $comment->parentRecordType ?? "discussion";
         if ($parentRecordType === "escalation") {
             // Escalation comments.
             $escalationID = $comment->parentRecordID;
-            return url("/dashboard/content/escalations/{$escalationID}?commentID={$comment->CommentID}", $withDomain);
+            return url("/dashboard/content/escalations/{$escalationID}?commentID={$commentID}", $withDomain);
         }
 
         // Discussion comments
@@ -1862,7 +2015,7 @@ class CommentModel extends Gdn_Model implements
             return $eventManager->fireFilter("customCommentUrl", "", $comment, $withDomain);
         }
 
-        $result = "/discussion/comment/{$comment->CommentID}#Comment_{$comment->CommentID}";
+        $result = "/discussion/comment/{$commentID}#Comment_{$commentID}";
         return url($result, $withDomain);
     }
 
@@ -1875,6 +2028,13 @@ class CommentModel extends Gdn_Model implements
     private function addDiscussionData(array $apiComment): array
     {
         $apiComment["discussion"] = $this->discussionModel->getID($apiComment["DiscussionID"], DATASET_TYPE_ARRAY);
+        if (!$apiComment["discussion"]) {
+            $apiComment["discussion"] = [
+                "Name" => "name",
+                "Url" => "url",
+                "InsertUserID" => $apiComment["InsertUserID"],
+            ];
+        }
         $apiComment["discussion"]["Type"] = $apiComment["discussion"]["Type"] ?? "discussion";
         // Don't track the discussion body.
         $apiComment["discussion"]["Body"] = null;
@@ -1906,5 +2066,16 @@ class CommentModel extends Gdn_Model implements
         }
 
         return false;
+    }
+
+    public function addParentCommentQuery(&$query): void
+    {
+        $query
+            ->select("cc.Body", "", "parentCommentBody")
+            ->select("cc.Format", "", "parentCommentFormat")
+            ->select("cc.InsertUserID", "", "parentCommentInsertUserID")
+            ->select("cc.DateInserted", "", "parentCommentDateInserted")
+            ->select("cc.DiscussionID", "", "parentDiscussionID")
+            ->leftJoin("Comment cc", "cc.CommentID = c.parentCommentID");
     }
 }

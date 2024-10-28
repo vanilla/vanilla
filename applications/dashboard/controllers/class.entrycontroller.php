@@ -2411,9 +2411,14 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             $options = [];
             $attributes = [];
 
-            $description = !empty($field["description"])
-                ? '<div class="Gloss">' . htmlspecialchars($field["description"]) . "</div>"
-                : null;
+            $description = null;
+
+            if (!empty($field["description"])) {
+                $descriptionContent = $field["descriptionHtml"]
+                    ? $field["description"]
+                    : htmlspecialchars($field["description"]);
+                $description = '<div class="Gloss">' . $descriptionContent . "</div>";
+            }
 
             if ($field["formType"] === "text-multiline") {
                 $options["MultiLine"] = true;

@@ -27,3 +27,4 @@ export * from "./deconstructAttributesFromElement";
 export * from "./useSessionStorage";
 export * from "./StackingContext";
 export * from "./useLocalStorage";
+export * from "./useMobile";

@@ -53,6 +53,7 @@ class CivilTonguePlugin extends Gdn_Plugin
      *
      * @param $sender
      * @param array $args
+     * @throws Gdn_UserException
      */
     public function pluginController_tongue_create($sender, $args = [])
     {

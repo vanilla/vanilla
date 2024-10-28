@@ -11,15 +11,19 @@ use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
 use Gdn;
-use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
-use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
+use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Models\DiscussionInterface;
 
-class BumpDiscussionAction extends AutomationAction
+/**
+ * Automation Action to bump a discussion.
+ */
+class BumpDiscussionAction extends AutomationAction implements DiscussionInterface
 {
     public string $affectedRecordType = "Discussion";
+    private int $discussionID;
     /**
      * @inheridoc
      */
@@ -84,14 +88,38 @@ class BumpDiscussionAction extends AutomationAction
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
+        $this->setDiscussionID($object["DiscussionID"]);
+        return $this->execute();
+    }
+
+    /**
+     * Execute the action.
+     *
+     * @return bool
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
+    public function execute(): bool
+    {
         $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
-        $discussionModel->setField($object["DiscussionID"], "DateLastComment", CurrentTimeStamp::getMySQL());
+        $discussionModel->setField($this->getDiscussionID(), "DateLastComment", CurrentTimeStamp::getMySQL());
+
+        // Log the action
         $logData = [
             "bumpDiscussion" => [
-                "recordID" => $object["DiscussionID"],
+                "recordID" => $this->getDiscussionID(),
             ],
         ];
-        $this->insertPostLog($object["DiscussionID"], $logData);
+
+        if (!$this->dispatched) {
+            $attributes = [
+                "affectedRecordType" => "Discussion",
+                "estimatedRecordCount" => 1,
+                "affectedRecordCount" => 0,
+            ];
+            $this->logDispatched(AutomationRuleDispatchesModel::STATUS_RUNNING, null, $attributes);
+        }
+        $this->insertPostLog($this->getDiscussionID(), $logData);
         return true;
     }
 
@@ -114,5 +142,21 @@ class BumpDiscussionAction extends AutomationAction
             $result .= "<div>Bump discussion</div>";
         }
         return $result;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function setDiscussionID(int $discussionID): void
+    {
+        $this->discussionID = $discussionID;
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function getDiscussionID(): int
+    {
+        return $this->discussionID;
     }
 }

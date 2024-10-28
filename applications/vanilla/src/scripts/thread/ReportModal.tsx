@@ -10,8 +10,11 @@ import { createLoadableComponent } from "@vanilla/react-utils";
 
 export const ReportModal = createLoadableComponent({
     loadFunction: () => import("./ReportModal.loadable"),
-    fallback() {
-        return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
+    fallback(props) {
+        if (!props.isVisible) {
+            return <></>;
+        }
+        return <Loader size={100} loaderStyleClass={loaderClasses().smallLoader} />;
     },
 });
 

@@ -13,6 +13,10 @@ import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
+import { cx } from "@emotion/css";
+import { dashboardImageUploadClasses } from "@dashboard/forms/DashboardImageUpload.classes";
+import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
 
 interface IProps {
     value: string | null; // The image url
@@ -23,10 +27,11 @@ interface IProps {
     imageUploader?: typeof uploadFile;
     disabled?: boolean;
     errors?: IFieldError[];
+    preview?: React.ReactNode;
 }
 
 export function DashboardImageUpload(props: IProps) {
-    const { inputID, labelType } = useFormGroup();
+    const { inputID } = useFormGroup();
     const imageUploader = props.imageUploader || uploadFile;
     const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState<string | null>(null);
@@ -41,19 +46,18 @@ export function DashboardImageUpload(props: IProps) {
         }
     }, [props.value]);
 
-    const classes = classNames("form-control", props.className);
-    const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
-
     const fallbackName = props.value?.substring(props.value?.lastIndexOf("/") + 1);
+    const classes = dashboardImageUploadClasses();
+    const formStyle = useDashboardFormStyle();
 
     return (
-        <div className={rootClass}>
-            <label className="file-upload">
+        <DashboardInputWrap>
+            <label className={cx("file-upload", classes.fileUpload, { isCompact: formStyle.compact })}>
                 <input
                     key={`${isLoading}`}
                     type="file"
                     id={inputID}
-                    className={classes}
+                    className={cx("form-control", props.className)}
                     disabled={props.disabled}
                     onChange={async (event) => {
                         const file = event.target.files && event.target.files[0];
@@ -84,10 +88,11 @@ export function DashboardImageUpload(props: IProps) {
                     {isLoading ? <ButtonLoader buttonType={ButtonTypes.DASHBOARD_PRIMARY} /> : t("Browse")}
                 </span>
             </label>
+            {props.preview}
             {props.errors && <ErrorMessages errors={props.errors} />}
             {uploadError && (
                 <ErrorMessages errors={[{ message: uploadError.message, code: "UploadError", field: "" }]} />
             )}
-        </div>
+        </DashboardInputWrap>
     );
 }

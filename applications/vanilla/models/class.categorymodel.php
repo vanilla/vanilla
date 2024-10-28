@@ -11,6 +11,7 @@
 use Garden\Container\ContainerException;
 use Garden\EventManager;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
@@ -143,7 +144,7 @@ class CategoryModel extends Gdn_Model implements
     const DEFAULT_FOLLOWED_CATEGORIES_KEY = "Preferences.CategoryFollowed.Defaults";
 
     /** The default maximum number of categories a user can follow. */
-    const MAX_FOLLOWED_CATEGORIES_DEFAULT = 100;
+    const MAX_FOLLOWED_CATEGORIES_DEFAULT = 500;
 
     /** Flag for aggregating comment counts. */
     const AGGREGATE_COMMENT = "comment";
@@ -220,9 +221,6 @@ class CategoryModel extends Gdn_Model implements
         self::DISPLAY_FLAT => "Flat",
         self::DISPLAY_HEADING => "Heading",
     ];
-
-    /** @var bool Whether or not to explicitly shard the categories cache. */
-    public static $ShardCache = false;
 
     /**
      * @var bool Whether or not to join users to recent posts.
@@ -462,13 +460,11 @@ class CategoryModel extends Gdn_Model implements
         $allowedDiscussionTypes = self::getAllowedDiscussionData($row);
         $allowedDiscussionTypes = array_keys($allowedDiscussionTypes);
 
-        $discussionTypes = array_intersect($categoryAllowedDiscussionTypes, $allowedDiscussionTypes);
-
-        return $discussionTypes ?? [];
+        return array_intersect($categoryAllowedDiscussionTypes, $allowedDiscussionTypes);
     }
 
     /**
-     * Load all of the categories from the cache or the database.
+     * Load every category from the cache or the database.
      */
     private static function loadAllCategories()
     {
@@ -894,7 +890,7 @@ class CategoryModel extends Gdn_Model implements
      *
      * @return array
      */
-    public static function getGenericCategoryPreferenceKeys(): array
+    public function getGenericCategoryPreferenceKeys(): array
     {
         $preferences = [
             self::stripCategoryPreferenceKey(self::PREFERENCE_FOLLOW),
@@ -906,6 +902,12 @@ class CategoryModel extends Gdn_Model implements
 
         if (self::isDigestEnabled()) {
             $preferences[] = self::stripCategoryPreferenceKey(self::PREFERENCE_DIGEST_EMAIL);
+        }
+
+        $modifiedPreferences = $this->getEventManager()->fire("categoryModel_getGenericPreferenceKeys", $preferences);
+
+        if (is_array($modifiedPreferences) && !empty($modifiedPreferences)) {
+            $preferences = $modifiedPreferences[0];
         }
 
         return $preferences;
@@ -994,8 +996,24 @@ class CategoryModel extends Gdn_Model implements
 
         if ($followed == 1) {
             $followedCategories = $this->getFollowed($userID);
-            if (count($followedCategories) >= $this->getMaxFollowedCategories()) {
-                throw new ClientException(t("Already following the maximum number of categories."));
+            $maxFollowedCategories = $this->getMaxFollowedCategories();
+            if (count($followedCategories) >= $maxFollowedCategories) {
+                throw new ClientException(
+                    sprintf(
+                        t(
+                            "You are already following the maximum of %d categories. Unfollow a category before following another."
+                        ),
+                        $maxFollowedCategories
+                    ),
+                    400,
+                    [
+                        "actionButton" => [
+                            "label" => "Review your followed categories",
+                            "url" => "/profile/followed-content",
+                            "target" => "_blank",
+                        ],
+                    ]
+                );
             }
         } else {
             //force '$digestEnabled' to be false if the user is not following a category
@@ -1367,7 +1385,6 @@ class CategoryModel extends Gdn_Model implements
             ],
             [
                 Gdn_Cache::FEATURE_EXPIRY => $expiry,
-                Gdn_Cache::FEATURE_SHARD => self::$ShardCache,
             ]
         );
     }
@@ -1670,6 +1687,7 @@ class CategoryModel extends Gdn_Model implements
      *
      * @param int|array $categoryOrCategoryID
      * @return bool
+     * @throws NotFoundException
      */
     public static function doesCategoryAllowPosts($categoryOrCategoryID): bool
     {
@@ -1686,7 +1704,8 @@ class CategoryModel extends Gdn_Model implements
      * Checks if a category allows posts and throws an error if not.
      *
      * @param int|array $categoryOrCategoryID
-     * @throws \Garden\Web\Exception\ForbiddenException Throws an exception if category does not allow posting.
+     * @throws ForbiddenException Throws an exception if category does not allow posting.
+     * @throws NotFoundException
      */
     public static function checkCategoryAllowsPosts($categoryOrCategoryID): void
     {
@@ -1695,7 +1714,7 @@ class CategoryModel extends Gdn_Model implements
             : ArrayUtils::pascalCase($categoryOrCategoryID);
         $canPost = self::doesCategoryAllowPosts($category);
         if (!$canPost) {
-            throw new \Garden\Web\Exception\ForbiddenException(
+            throw new ForbiddenException(
                 sprintft(
                     "You are not allowed to post in categories with a display type of %s.",
                     t($category["DisplayAs"])
@@ -2519,9 +2538,11 @@ class CategoryModel extends Gdn_Model implements
      * Normalize a database record to match the Schema definition.
      *
      * @param array|object $dbRecord Database record.
-     * @param array|string|bool $expand Expand options.
+     * @param array $expand Expand options.
      *
      * @return array Return a Schema record.
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function normalizeRow($dbRecord, $expand = [])
     {
@@ -2572,14 +2593,14 @@ class CategoryModel extends Gdn_Model implements
         $dbRecord["Description"] = $dbRecord["Description"] ?: "";
         $displayAs = $dbRecord["DisplayAs"] ?? "";
         $dbRecord["DisplayAs"] = $displayAs ? strtolower($displayAs) : "discussions";
-        $discussionTypes = self::getAllowedDiscussionTypes($dbRecord);
+        $allowedDiscussionTypes = self::getAllowedDiscussionTypes($dbRecord);
 
         $dbDiscussionTypes = array_map(
             "strtolower",
             is_array($dbRecord["AllowedDiscussionTypes"]) ? $dbRecord["AllowedDiscussionTypes"] : ["Discussion"]
         );
 
-        $dbRecord["AllowedDiscussionTypes"] = array_intersect($discussionTypes, $dbDiscussionTypes);
+        $dbRecord["AllowedDiscussionTypes"] = array_intersect($allowedDiscussionTypes, $dbDiscussionTypes);
         // Reindex array values, otherwise it _may_ fail validation.
         $dbRecord["AllowedDiscussionTypes"] = array_values($dbRecord["AllowedDiscussionTypes"]);
 
@@ -2855,7 +2876,7 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
-     * Get all of the ancestor categories above this one.
+     * Get every ancestor categories above this one.
      * @param int|string|null|false $Category The category ID or url code.
      * @param bool $checkPermissions Whether or not to only return the categories with view permission.
      * @param bool $includeHeadings Whether or not to include heading categories.
@@ -4504,7 +4525,7 @@ class CategoryModel extends Gdn_Model implements
                     continue;
                 }
                 // set the preferences here and it should be all set
-                $preferencesToSet = self::getGenericCategoryPreferenceKeys();
+                $preferencesToSet = $this->getGenericCategoryPreferenceKeys();
                 $categoryPreference = $this->normalizePreferencesInput($categoryPreference["preferences"] ?? []);
                 $preferences = [];
                 foreach ($preferencesToSet as $pref) {
@@ -4656,7 +4677,7 @@ class CategoryModel extends Gdn_Model implements
         if ($currentlyFollowed != $followingPref || (!$currentlyFollowed && !$followingPref)) {
             try {
                 $this->follow($userID, $categoryID, $followingPref, $newDigestPref);
-            } catch (Throwable $throwable) {
+            } catch (InvalidArgumentException $throwable) {
                 throw new \Error("Failed setting users notification preference.", 0, $throwable);
             }
 
@@ -4679,7 +4700,10 @@ class CategoryModel extends Gdn_Model implements
             $preferencesToRecord[self::stripCategoryPreferenceKey(self::PREFERENCE_DIGEST_EMAIL)] = $newDigestPref;
         }
 
-        UserModel::setMeta($userID, $preferencesToRecord);
+        $userMetaModel = \Gdn::getContainer()->get(UserMetaModel::class);
+        foreach ($preferencesToRecord as $metaName => $metaValue) {
+            $userMetaModel->setUserMeta($userID, $metaName, $metaValue);
+        }
         self::clearUserCache($userID);
         // update follower count on new inserts and when user unfollows a category
         if (($currentlyFollowed && !$followingPref) || !$currentlyFollowed) {
@@ -5227,6 +5251,8 @@ SQL;
      * @param int|null $categoryID
      *
      * @return array|null
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function getFragmentByID(?int $categoryID): ?array
     {
@@ -5333,6 +5359,9 @@ SQL;
      *
      * @param int $categoryID
      * @param string $type One of the resource event types.
+     * @throws ContainerException
+     * @throws ValidationException
+     * @throws \Garden\Container\NotFoundException
      */
     private function dispatchInsertUpdateEvent(int $categoryID, string $type)
     {
@@ -5348,9 +5377,12 @@ SQL;
      *
      * @param array $row
      * @param string $action
-     * @param array|object|null $sender
+     * @param null $sender
      *
      * @return ResourceEvent
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws ValidationException
      */
     public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent
     {
@@ -5375,7 +5407,6 @@ SQL;
         self::$Categories = null;
         self::$isClearScheduled = false;
         self::$stopHeadingsCalculation = false;
-        self::$ShardCache = false;
         self::$toLazySet = [];
         self::instance()
             ->getCollection()
@@ -5387,6 +5418,10 @@ SQL;
      *
      * @param int $categoryID
      * @param bool $rebuildTree
+     * @throws ContainerException
+     * @throws JsonException
+     * @throws ValidationException
+     * @throws \Garden\Container\NotFoundException
      */
     private function deleteInternal(int $categoryID, bool $rebuildTree): void
     {

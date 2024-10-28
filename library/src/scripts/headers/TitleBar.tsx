@@ -252,7 +252,7 @@ export default function TitleBar(_props: IProps) {
                                                 <>
                                                     <Hamburger
                                                         className={classes.hamburger}
-                                                        extraNavTop={props.extraBurgerNavigation}
+                                                        extraNavAfterDynamicComponents={props.extraBurgerNavigation}
                                                         showCloseIcon={false}
                                                     />
                                                     {isMobileLogoCentered && <FlexSpacer actualSpacer />}

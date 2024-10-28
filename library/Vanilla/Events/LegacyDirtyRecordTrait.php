@@ -26,11 +26,12 @@ trait LegacyDirtyRecordTrait
      *
      * @param string $prefix
      */
-    public function applyDirtyWheres(string $prefix = "")
+    public function applyDirtyWheres(string $prefix = "", \Gdn_SQLDriver $sql = null)
     {
         $model = $this->getLegacyModel();
         $type = strtolower($model->Name);
-        $this->joinDirtyRecordTable($model->SQL, $model->PrimaryKey, $type, $prefix);
-        $model->SQL->where(["dr.recordType" => $type]);
+        $sql = $sql ?? $model->SQL;
+        $this->joinDirtyRecordTable($sql, $model->PrimaryKey, $type, $prefix);
+        $sql->where(["dr.recordType" => $type]);
     }
 }

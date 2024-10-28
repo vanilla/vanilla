@@ -7,7 +7,10 @@
 
 namespace VanillaTests\Models;
 
+use Vanilla\CurrentTimeStamp;
+use VanillaTests\AuditLogTestTrait;
 use VanillaTests\Bootstrap;
+use VanillaTests\ExpectedAuditLog;
 use VanillaTests\SiteTestCase;
 use VanillaTests\VanillaTestCase;
 
@@ -17,6 +20,8 @@ use VanillaTests\VanillaTestCase;
 class UserModelSSOTest extends SiteTestCase
 {
     const PROVIDER_KEY = "UserModelSSOTest";
+
+    use AuditLogTestTrait;
 
     /**
      * @var \Gdn_AuthenticationProviderModel
@@ -371,37 +376,94 @@ class UserModelSSOTest extends SiteTestCase
     }
 
     /**
-     * Test errors for `UserModel::sso()`.
+     * @param string $ssoString
      *
-     * @param string|array $sso
-     * @param string $expectedMessage
-     * @dataProvider provideSSOStringErrors
+     * @return void
      */
-    public function testSSOStringErrors($sso, string $expectedMessage): void
+    protected function ssoStringConnect(string $ssoString): void
     {
-        $this->expectExceptionMessage($expectedMessage);
-        $r = $this->ssoByString($sso, __FUNCTION__);
+        $this->api()->setUserID(0);
+        $dashboardHooks = self::container()->get(\DashboardHooks::class);
+        \Gdn::request()->setUrl("/discussions?sso=" . urlencode($ssoString));
+        $dashboardHooks->gdn_dispatcher_appStartup_handler(\Gdn::dispatcher());
     }
 
     /**
-     * Data provider.
+     * Test audit logs with the sso string connection
      *
-     * @return array
+     * @return void
      */
-    public function provideSSOStringErrors(): array
+    public function testSSOStringConnectAuditLogs(): void
     {
-        $user = $this->dummyUser();
-
-        $r = [
-            "one part" => ["foo", "Missing SSO signature. Missing SSO timestamp."],
-            "two parts" => ["foo bar", "Missing SSO timestamp."],
-            "bad timestamp" => ["foo bar baz", "The timestamp is invalid."],
-            "expired timestamp" => ["foo bar 123", "The timestamp is invalid."],
-            "no client_id" => [$user + ["client_id" => null], "Missing SSO client_id."],
-            "bad client_id" => [$user + ["client_id" => "foo"], "Unknown SSO Provider: foo."],
-            "bad hash method" => ["foo bar " . time() . " baz", "Invalid SSO hash method: baz."],
+        $userData = [
+            "uniqueid" => 1000,
+            "client_id" => self::PROVIDER_KEY,
+            "name" => "SSO String User",
+            "email" => "sso-string-user@example.com",
+            "roles" => ["Administrator"],
         ];
 
-        return $r;
+        $partialUserData = [
+            "uniqueid" => 1001,
+            "client_id" => self::PROVIDER_KEY,
+            "name" => "Partial SSO String User",
+            "roles" => ["Administrator"],
+        ];
+
+        $secret = self::PROVIDER_KEY;
+        $string = base64_encode(json_encode($userData));
+        $partialString = base64_encode(json_encode($partialUserData));
+        $timestamp = CurrentTimeStamp::get();
+        $hash = hash_hmac("sha1", "$string $timestamp", $secret);
+        $partialHash = hash_hmac("sha1", "$partialString $timestamp", $secret);
+
+        // Success Path
+        $ssoString = "{$string} {$hash} {$timestamp} hmacsha1";
+        $this->ssoStringConnect($ssoString);
+        $this->assertAuditLogged(ExpectedAuditLog::create("sso_string_success"));
+        $this->assertAuditLogged(
+            ExpectedAuditLog::create("user_register")->withMessage("User `SSO String User` registered.")
+        );
+
+        // Missing Timestamp
+        $ssoString = "{$string} {$hash}";
+        $this->resetTable("auditLog");
+        $this->ssoStringConnect($ssoString);
+        $this->assertAuditLogged(
+            ExpectedAuditLog::create("sso_string_invalid")->withContext([
+                "errorMessage" => "Missing SSO timestamp. Invalid SSO signature: {$hash}.",
+            ])
+        );
+
+        // Invalid timestamp
+        $ssoString = "{$string} {$hash} 1234567890";
+        $this->resetTable("auditLog");
+        $this->ssoStringConnect($ssoString);
+        $this->assertAuditLogged(
+            ExpectedAuditLog::create("sso_string_invalid")->withContext([
+                "errorMessage" => "The SSO timestamp has expired. Invalid SSO signature: {$hash}.",
+            ])
+        );
+
+        // Bad signature
+        $badHash = "BAD_HASH";
+        $ssoString = "{$string} {$badHash} {$timestamp} hmacsha1";
+        $this->resetTable("auditLog");
+        $this->ssoStringConnect($ssoString);
+        $this->assertAuditLogged(
+            ExpectedAuditLog::create("sso_string_invalid")->withContext([
+                "errorMessage" => "Invalid SSO signature: {$badHash}.",
+            ])
+        );
+
+        // Missing user data.
+        $ssoString = "{$partialString} {$partialHash} {$timestamp} hmacsha1";
+        $this->resetTable("auditLog");
+        $this->ssoStringConnect($ssoString);
+        $this->assertAuditLogged(
+            ExpectedAuditLog::create("sso_string_invalid_user")->withContext([
+                "errorMessage" => "Email is required.",
+            ])
+        );
     }
 }

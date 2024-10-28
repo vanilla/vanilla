@@ -124,10 +124,11 @@ export function AutomationRulesList(props: IProps) {
 
     const rows = useMemo(() => {
         if (isLoading) {
-            return loadingPlaceholder() as ITableData[];
+            return loadingPlaceholder(undefined, isEscalationRulesList) as ITableData[];
         }
         if (rulesList.length) {
             return rulesList.map((rule, index) => {
+                const labelID = "automation-rule-" + index;
                 return {
                     rule: (
                         <TableAccordion
@@ -136,7 +137,7 @@ export function AutomationRulesList(props: IProps) {
                             isExpanded={expandedRules.includes(rule.automationRuleID)}
                             contentClassName={isEscalationRulesList ? classes.leftGap(6) : undefined}
                         >
-                            <AutomationRulesSummary formValues={mapApiValuesToFormValues(rule)} />
+                            <AutomationRulesSummary id={labelID} formValues={mapApiValuesToFormValues(rule)} />
                         </TableAccordion>
                     ),
                     "last updated": <div>{rule.dateUpdated && <DateTime timestamp={rule.dateUpdated} />}</div>,
@@ -160,6 +161,7 @@ export function AutomationRulesList(props: IProps) {
                     ),
                     "auto-run": (
                         <AutomationRulesStatusToggle
+                            labelID={labelID}
                             automationRuleID={rule.automationRuleID}
                             status={rule.status}
                             isRuleRunning={

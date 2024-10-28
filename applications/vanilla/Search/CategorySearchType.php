@@ -189,33 +189,9 @@ class CategorySearchType extends AbstractSearchType
         } else {
             $query->addIndex($this->getIndex());
 
-            $enableBoost = false;
-
-            if ($queryParam = $query->getQueryParameter("query", false)) {
-                $query->whereText($queryParam, ["name", "description"], SearchQuery::MATCH_FULLTEXT_EXTENDED);
-                $enableBoost = true;
-            }
-
-            if ($name = $query->getQueryParameter("name", false)) {
-                $query->whereText($name, ["name"], SearchQuery::MATCH_FULLTEXT_EXTENDED);
-                $enableBoost = true;
-            }
-
-            if ($description = $query->getQueryParameter("description", false)) {
-                $query->whereText($description, ["description"], SearchQuery::MATCH_FULLTEXT_EXTENDED);
-            }
-
             $categoryIDs = $this->getCategoryIDs($query);
             if (!empty($categoryIDs)) {
                 $query->setFilter("CategoryID", $categoryIDs);
-            }
-
-            if ($enableBoost) {
-                if ($query instanceof BoostableSearchQueryInterface && $query->getBoostParameter("categoryBoost")) {
-                    $query->startBoostQuery();
-                    $query->boostType($this, $this->getBoostValue());
-                    $query->endBoostQuery();
-                }
             }
         }
     }
@@ -259,7 +235,7 @@ class CategorySearchType extends AbstractSearchType
      *
      * @return float|null
      */
-    protected function getBoostValue(): ?float
+    public function getBoostValue(): ?float
     {
         return $this->config->get("Elastic.Boost.Category", 15);
     }

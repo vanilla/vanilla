@@ -37,9 +37,8 @@ class FollowedCategoriesActivityGroup extends ActivityGroup
     {
         $user = Gdn::session()->User;
         $url = userUrl($user, "", "followed-content");
-        $descriptionString = t(
-            'Default notification settings can be modified for each followed category in <a href="{url,html}">Manage Followed Categories</a>.'
-        );
+        $descriptionString =
+            'Default notification settings can be modified for each followed category in <a href="{url,html}">Manage Followed Content</a>.';
         return formatString($descriptionString, ["url" => $url]);
     }
 

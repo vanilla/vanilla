@@ -732,6 +732,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
         $provider = $this->provider();
         $redirect_uri = "/entry/" . $this->getProviderKey();
         $isOidc = $provider["isOidc"] ?? false;
+
         $defaultParams = [
             "client_id" => $provider[$this->clientIDField] ?? "not-found",
             "redirect_uri" => url($redirect_uri, true),
@@ -834,7 +835,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
             } else {
                 $message = "HTTP Error communicating Code: " . $proxy->ResponseStatus;
             }
-            $this->log("API Response Error Thrown", ["response" => json_decode($response)]);
+            $this->log("API Response Error Thrown", ["response" => $proxy->ResponseBody]);
             throw new Gdn_UserException($message, $proxy->ResponseStatus);
         }
 
@@ -1075,18 +1076,28 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
     public function translateProfileResults($rawProfile = [])
     {
         $provider = $this->provider();
+        $markVerified = $provider["markVerified"] ?? false;
         $translatedKeys = [
             $provider["ProfileKeyEmail"] ?? "email" => "Email",
             $provider["ProfileKeyPhoto"] ?? "picture" => "Photo",
             $provider["ProfileKeyName"] ?? "displayname" => "Name",
-            $provider["ProfileVerified"] ?? "email_verified" => "Verified",
             $provider["ProfileKeyFullName"] ?? "name" => "FullName",
             $provider["ProfileKeyUniqueID"] ?? "user_id" => "UniqueID",
             $provider["ProfileKeyRoles"] ?? "roles" => "Roles",
         ];
 
+        if ($markVerified) {
+            $translatedKeys[$provider["ProfileVerified"] ?? "email_verified"] = "Verified";
+            $translatedKeys[$provider["ProfileVerified"] ?? "email_verified"] = "Confirmed";
+        } else {
+            $translatedKeys[$provider["ProfileVerified"] ?? "verified"] = "Verified";
+        }
+
         $profile = self::translateArrayMulti($rawProfile, $translatedKeys, true);
-        if ($profile["Verified"] === null) {
+        if (key_exists("Confirmed", $profile) && $profile["Confirmed"] === null) {
+            unset($profile["Confirmed"]);
+        }
+        if (key_exists("Verified", $profile) && $profile["Verified"] === null) {
             unset($profile["Verified"]);
         }
         $profile["Provider"] = $provider[\Gdn_AuthenticationProviderModel::COLUMN_KEY];

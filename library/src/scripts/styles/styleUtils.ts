@@ -4,7 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { CSSObject, css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
+import { css } from "@emotion/css";
 import merge from "lodash-es/merge";
 import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
 import { logDebug, logWarning, logError, notEmpty, flattenObject, unflattenObject } from "@vanilla/utils";

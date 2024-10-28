@@ -13,7 +13,7 @@ import { CollapsableContent } from "@library/content/CollapsableContent";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
 import UserContent from "@library/content/UserContent";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
@@ -56,16 +56,16 @@ export function ReportListItem(props: IProps) {
 
     const queryClient = useQueryClient();
     const toast = useToast();
-    function invalidateCaches() {
-        queryClient.invalidateQueries(["reports"]);
-        queryClient.invalidateQueries(["post"]);
+    async function invalidateCaches() {
+        await queryClient.invalidateQueries(["reports"]);
+        await queryClient.invalidateQueries(["post"]);
         fetchDashboardSections();
     }
 
     const dismissMutation = useMutation({
         mutationFn: async () => {
             const response = await apiv2.patch(`/reports/${report.reportID}/dismiss`);
-            invalidateCaches();
+            await invalidateCaches();
             toast.addToast({
                 autoDismiss: true,
                 body: t("Report dismissed."),
@@ -78,7 +78,7 @@ export function ReportListItem(props: IProps) {
     const approveMutation = useMutation({
         mutationFn: async () => {
             const response = await apiv2.patch(`/reports/${report.reportID}/approve-record`);
-            invalidateCaches();
+            await invalidateCaches();
             toast.addToast({
                 autoDismiss: true,
                 body: t("Post approved."),
@@ -91,7 +91,7 @@ export function ReportListItem(props: IProps) {
     const rejectMutation = useMutation({
         mutationFn: async () => {
             const response = await apiv2.patch(`/reports/${report.reportID}/reject-record`);
-            invalidateCaches();
+            await invalidateCaches();
             toast.addToast({
                 autoDismiss: true,
                 body: t("Post rejected."),
@@ -233,6 +233,7 @@ export function ReportListItem(props: IProps) {
                 onClose={() => {
                     setShowEscalate(false);
                 }}
+                onSuccess={invalidateCaches}
             />
         </div>
     );

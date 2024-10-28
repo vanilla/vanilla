@@ -9,6 +9,7 @@ import { useStackingContext } from "@vanilla/react-utils";
 import React from "react";
 import { css } from "@emotion/css";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 interface IProps {
     value: string;
@@ -24,7 +25,7 @@ export function DashboardDatePicker(props: IProps) {
     const { inputID } = useFormGroup();
 
     return (
-        <div className="input-wrap">
+        <DashboardInputWrap isVertical>
             <InputBlock noMargin>
                 <DatePicker
                     id={inputID}
@@ -38,6 +39,6 @@ export function DashboardDatePicker(props: IProps) {
                     inputAriaLabel={props.inputAriaLabel}
                 />
             </InputBlock>
-        </div>
+        </DashboardInputWrap>
     );
 }

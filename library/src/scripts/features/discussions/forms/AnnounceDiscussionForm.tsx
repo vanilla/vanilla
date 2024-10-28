@@ -27,13 +27,13 @@ type FormValues = {
     pinLocation: "recent" | "category" | "";
 };
 
-interface IProps {
+export interface AnnounceDiscussionFormProps {
     onCancel: () => void;
     onSuccess?: () => Promise<void>;
     discussion: IDiscussion;
 }
 
-export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion }: IProps) {
+export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion }: AnnounceDiscussionFormProps) {
     const { patchDiscussion } = useDiscussionPatch(discussion.discussionID, "announce");
     const formik = useFormik<FormValues>({
         initialValues: {

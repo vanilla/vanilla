@@ -33,7 +33,7 @@ import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 /**
  * Implements Messages Contents to be included in drop down or tabs
  */
-export class MessagesContents extends React.Component<IProps> {
+export class MessagesContents extends React.Component<MessagesContentsProps> {
     public render() {
         const buttonUtils = buttonUtilityClasses();
         const title = t("Messages");
@@ -109,13 +109,15 @@ export class MessagesContents extends React.Component<IProps> {
 }
 
 // For clarity, I'm adding className separately because both the container and the content have className, but it's not applied to the same element.
-interface IOwnProps extends IDeviceProps {
+export interface MessageContentsOwnProps extends IDeviceProps {
     className?: string;
     countClass?: string;
     panelBodyClass?: string;
 }
 
-type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+export type MessagesContentsProps = MessageContentsOwnProps &
+    ReturnType<typeof mapStateToProps> &
+    ReturnType<typeof mapDispatchToProps>;
 
 /**
  * Update the component state, based on changes to the Redux store.

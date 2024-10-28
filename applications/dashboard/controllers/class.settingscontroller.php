@@ -14,6 +14,10 @@ use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Widgets\WidgetService;
+use Vanilla\Dashboard\Controllers\Api\ChurnExportApiController;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Garden\Web\Exception\ClientException;
 
 /**
  * Handles /settings endpoint.
@@ -766,6 +770,23 @@ class SettingsController extends DashboardController
 
         // Set the model on the form.
         $this->Form->setModel($configurationModel);
+        $configurationModel->Data["hasExportPermission"] =
+            Gdn::session()
+                ->getPermissions()
+                ->has("Garden.Exports.Manage") && !Gdn::session()->isSpoofedInUser();
+
+        try {
+            $churnExportController = \Gdn::getContainer()->get(ChurnExportApiController::class);
+            $exportAvailable = $churnExportController->get_exportAvailable();
+            if ($exportAvailable["exportAvailable"]) {
+                $exportStatus = $exportAvailable["exportStatus"] ?? "Pending";
+                $configurationModel->Data["exportAvailableForDownload"] = $exportStatus === "completed";
+                $configurationModel->Data["exportExpirationDate"] = $exportAvailable["exportExpiry"] ?? null;
+            }
+        } catch (ClientException $e) {
+            $logger = Gdn::getContainer()->get(LoggerInterface::class);
+            $logger->log(LogLevel::INFO, $e->getMessage());
+        }
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
@@ -774,11 +795,7 @@ class SettingsController extends DashboardController
             if (is_array($trustedDomains)) {
                 $trustedDomains = implode("\n", $trustedDomains);
             }
-
             $configurationModel->Data[self::CONFIG_TRUSTED_DOMAINS] = $trustedDomains;
-
-            // Apply the config settings to the form.
-            $this->Form->setData($configurationModel->Data);
         } else {
             $this->Form->setFormValue(
                 self::CONFIG_CSP_STRICT_DYNAMIC,
@@ -846,6 +863,10 @@ class SettingsController extends DashboardController
 
             // Reformat array as string so it displays properly in the form
             $this->Form->setFormValue(self::CONFIG_TRUSTED_DOMAINS, $trustedDomains);
+        }
+        if (!empty($configurationModel->Data)) {
+            // Apply the config settings to the form.
+            $this->Form->setData($configurationModel->Data);
         }
 
         $this->render();
@@ -927,8 +948,23 @@ class SettingsController extends DashboardController
         $this->permission("Garden.Settings.Manage");
         $this->setHighlightRoute("settings/ai-suggestions");
         $this->title(t("AI Suggested Answers"));
-        if (Gdn::config("Feature.AISuggestions.Enabled")) {
+        if (Gdn::config("Feature.AISuggestions.Enabled") && Gdn::config("Feature.aiFeatures.Enabled")) {
             $this->render("ai-suggestions");
+        } else {
+            $this->renderException(notFoundException());
+        }
+    }
+
+    /**
+     * Manage Interests and Suggested Content settings
+     */
+    public function interests()
+    {
+        $this->permission("Garden.Settings.Manage");
+        $this->setHighlightRoute("settings/interests");
+        $this->title(t("Interests & Suggested Content"));
+        if (Gdn::config("Feature.SuggestedContent.Enabled")) {
+            $this->render("interests");
         } else {
             $this->renderException(notFoundException());
         }

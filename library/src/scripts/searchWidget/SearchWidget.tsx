@@ -12,7 +12,7 @@ import { TabsTypes } from "@library/sectioning/TabsTypes";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IControlProps, IForm, JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { SelectLookup } from "@library/forms/select/SelectLookup";
+import { ILookupApi, SelectLookup } from "@library/forms/select/SelectLookup";
 import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { ISearchWidgetOptions, searchWidgetVariables } from "@library/searchWidget/SearchWidget.variables";
@@ -34,13 +34,13 @@ const FormControl = (props: IControlProps) => {
             if (api) {
                 return (
                     <SelectLookup
-                        label={label!}
+                        label={label as string}
                         disabled={disabled}
                         isClearable={!props.required}
                         placeholder={placeholder || undefined}
                         value={instance}
                         onChange={(option) => onChange(option?.value)}
-                        api={api}
+                        api={api as ILookupApi}
                     />
                 );
             }
@@ -52,7 +52,7 @@ const FormControl = (props: IControlProps) => {
                 : [];
             return (
                 <SelectOne
-                    label={label!}
+                    label={label as string}
                     disabled={disabled}
                     isClearable={!required}
                     value={options.find((opt) => opt.value === String(instance))}

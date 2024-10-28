@@ -737,7 +737,7 @@ $PluralHeadline = $Construct->columnExists("PluralHeadline");
 $Construct
     ->table("ActivityType")
     ->primaryKey("ActivityTypeID")
-    ->column("Name", "varchar(20)")
+    ->column("Name", "varchar(50)")
     ->column("AllowComments", "tinyint(1)", "0")
     ->column("ShowIcon", "tinyint(1)", "0")
     ->column("ProfileHeadline", "varchar(255)", true)

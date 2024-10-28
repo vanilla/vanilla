@@ -35,14 +35,35 @@ export const discussionCommentEditorClasses = useThemeCache(() => {
         },
     });
 
+    const draftIndicator = css({
+        width: 24,
+        height: "100%",
+        marginInlineEnd: 8,
+        transform: "translateY(2px)",
+    });
+
     const previewDisablePointerEvents = css({
         pointerEvents: "none",
+    });
+
+    const draftHeaderWrapper = css({
+        display: "flex",
+        alignItems: "baseline",
+        justifyContent: "space-between",
+    });
+
+    const title = css({
+        flexShrink: 0,
+        marginBlockEnd: 0,
     });
 
     return {
         pageBox,
         editorPostActions,
         draftMessage,
+        draftIndicator,
         previewDisablePointerEvents,
+        draftHeaderWrapper,
+        title,
     };
 });

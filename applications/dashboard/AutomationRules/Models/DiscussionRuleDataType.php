@@ -16,8 +16,12 @@ use Vanilla\AutomationRules\Actions\BumpDiscussionAction;
 use Vanilla\AutomationRules\Actions\CloseDiscussionAction;
 use Vanilla\AutomationRules\Actions\MoveDiscussionToCategoryAction;
 use Vanilla\AutomationRules\Actions\RemoveDiscussionFromCollectionAction;
+use Vanilla\AutomationRules\Triggers\DiscussionReachesScoreTrigger;
 use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
 use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
+use Vanilla\Jira\Action\EscalateToJiraAction;
+use Vanilla\Salesforce\Action\EscalateSalesforceCaseAction;
+use Vanilla\Salesforce\Action\EscalateSalesforceLeadAction;
 
 /**
  * Define what triggers and action can be applied to discussions.
@@ -30,7 +34,13 @@ class DiscussionRuleDataType extends RuleDataType
      */
     protected function getAllTriggerClasses(): array
     {
-        return [StaleDiscussionTrigger::class, LastActiveDiscussionTrigger::class, PostSentimentTrigger::class];
+        // Add new ones alphabetically, please.
+        return [
+            DiscussionReachesScoreTrigger::class,
+            LastActiveDiscussionTrigger::class,
+            PostSentimentTrigger::class,
+            StaleDiscussionTrigger::class,
+        ];
     }
 
     /**
@@ -48,6 +58,9 @@ class DiscussionRuleDataType extends RuleDataType
             RemoveDiscussionFromCollectionAction::class,
             EscalateGithubIssueAction::class,
             EscalateToZendeskAction::class,
+            EscalateSalesforceLeadAction::class,
+            EscalateSalesforceCaseAction::class,
+            EscalateToJiraAction::class,
         ];
     }
 }

@@ -302,7 +302,23 @@ class SetupController extends DashboardController
                     file_get_contents(PATH_APPLICATIONS . DS . "dashboard" . DS . "addon.json"),
                     true
                 );
-
+                // Setting default for new site enabled customLayout
+                saveToConfig([
+                    "Feature.layoutEditor.Enabled" => true,
+                    "Feature.layoutEditor.subcommunityHome.Enabled" => true,
+                    "Feature.layoutEditor.discussionList.Enabled" => true,
+                    "Feature.layoutEditor.categoryList.Enabled" => true,
+                    "Feature.layoutEditor.nestedCategoryList.Enabled" => true,
+                    "Feature.layoutEditor.discussionCategoryPage.Enabled" => true,
+                    "Feature.layoutEditor.discussionThread.Enabled" => false,
+                    "Feature.customLayout.home.Enabled" => true,
+                    "Feature.customLayout.discussionList.Enabled" => true,
+                    "Feature.customLayout.categoryList.Enabled" => true,
+                    "Feature.customLayout.nestedCategoryList.Enabled" => true,
+                    "Feature.customLayout.discussionThread.Enabled" => false,
+                    "Feature.customLayout.discussionCategoryPage.Enabled" => true,
+                    "Feature.customLayout.subcommunityHome.Enabled" => true,
+                ]);
                 saveToConfig([
                     "Garden.Version" => val("Version", val("Dashboard", $ApplicationInfo, []), "Undefined"),
                     "Garden.CanProcessImages" => function_exists("gd_info"),

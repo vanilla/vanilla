@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from "react";
+import React, { ReactNode, useEffect, useMemo } from "react";
 
 import Container from "@library/layout/components/Container";
 import { adminLayoutClasses } from "@dashboard/components/AdminLayout.classes";
@@ -7,6 +7,7 @@ import AdminHeader from "@dashboard/components/AdminHeader";
 import SectionThreeColumns from "@library/layout/ThreeColumnSection";
 import AdminTitleBar from "@dashboard/components/AdminTitleBar";
 import { userContentClasses } from "@library/content/UserContent.styles";
+import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 
 type IProps = {
     /** The content which should be rendered in the hamburger menu on mobile */
@@ -96,6 +97,12 @@ export default function AdminLayout(props: IProps) {
             ),
         [classes, customTitleBar, title, titleAndActionsContainerClassName, titleBarActions, preTitle],
     );
+
+    const scrollOffset = useScrollOffset();
+
+    useEffect(() => {
+        scrollOffset.setScrollOffset(104);
+    }, []);
 
     return (
         <>

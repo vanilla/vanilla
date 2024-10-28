@@ -9,7 +9,7 @@ import { widgetSettingsAccordionClasses } from "@dashboard/layout/editor/widgetS
 import { cx } from "@emotion/css";
 
 interface IProps {
-    header: string;
+    header: React.ReactNode;
 }
 
 export default function WidgetSettingsAccordion(props: React.PropsWithChildren<IProps>) {

@@ -24,6 +24,7 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const inputText = css({
         display: "block",
+        fontSize: "14px",
     });
 
     const inputWrap = css({
@@ -97,6 +98,7 @@ export const inputBlockClasses = useThemeCache(() => {
         display: "block",
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("small"),
+            lineHeight: globalVars.lineHeights.base,
         }),
     });
 

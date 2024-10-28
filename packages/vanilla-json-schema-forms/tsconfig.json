@@ -1,4 +1,0 @@
-{
-    "extends": "@vanilla/tsconfig/base",
-    "compilerOptions": {}
-}

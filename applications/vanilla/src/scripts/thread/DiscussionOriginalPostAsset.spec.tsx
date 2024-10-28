@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { act, render, screen, within } from "@testing-library/react";
 import DiscussionOriginalPostAsset from "@vanilla/addon-vanilla/thread/DiscussionOriginalPostAsset";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
@@ -14,6 +14,7 @@ import { GUEST_USER_ID } from "@library/features/users/userModel";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { MemoryRouter } from "react-router";
 
 const MOCK_CATEGORY_FRAGMENT: ICategoryFragment = {
     categoryID: DiscussionFixture.mockDiscussion.categoryID,
@@ -39,7 +40,11 @@ async function renderInProvider(children: ReactNode, currentUser?: Partial<IMe>)
         render(
             <TestReduxProvider>
                 <QueryClientProvider client={queryClient}>
-                    <CurrentUserContextProvider currentUser={currentUser as IMe}>{children}</CurrentUserContextProvider>
+                    <MemoryRouter>
+                        <CurrentUserContextProvider currentUser={currentUser as IMe}>
+                            {children}
+                        </CurrentUserContextProvider>
+                    </MemoryRouter>
                 </QueryClientProvider>
             </TestReduxProvider>,
         );

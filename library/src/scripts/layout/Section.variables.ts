@@ -2,7 +2,7 @@ import { media } from "@library/styles/styleShim";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 import { fallbackSectionVariables, IOneColumnVariables } from "@library/layout/types/interface.panelLayout";

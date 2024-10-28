@@ -13,6 +13,7 @@ import { ToastProvider } from "@library/features/toaster/ToastContext";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 import { vitest } from "vitest";
 import MockAdapter from "axios-mock-adapter/types";
+import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
 
 const discussion = {
     ...DiscussionFixture.mockDiscussion,

@@ -12,12 +12,14 @@ import { AccountSettingType, AccountSettingsDetail } from "@library/accountSetti
 import { AccountSettingsModal } from "@library/accountSettings/AccountSettingsModal";
 import { StatusIndicator } from "@library/accountSettings/StatusIndicator";
 import Translate from "@library/content/Translate";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ErrorPageBoundary } from "@library/errorPages/ErrorPageBoundary";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IPatchUserParams } from "@library/features/users/UserActions";
 import { usePatchUser } from "@library/features/users/userHooks";
 import Button from "@library/forms/Button";
 import CheckBox from "@library/forms/Checkbox";
+import ErrorMessages from "@library/forms/ErrorMessages";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ApproveIcon } from "@library/icons/common";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -76,6 +78,7 @@ export function AccountSettingsImpl() {
 
     const aiSuggestionsEnabled = getMeta("answerSuggestionsEnabled", false);
     const aiAssistant = getMeta("aiAssistant", { name: "AI Suggestion Assistant" });
+    const [suggestedAnswersErrors, setSuggestedAnswersErrors] = useState<IError[] | null>(null);
 
     const handleEditClick = (type: AccountSettingType) => {
         setEditType(type);
@@ -143,6 +146,7 @@ export function AccountSettingsImpl() {
             userID: viewingUserID,
             suggestAnswers: checked,
         };
+        setSuggestedAnswersErrors(null);
 
         try {
             await patchUser(patchParams);
@@ -157,8 +161,9 @@ export function AccountSettingsImpl() {
         } catch (err) {
             toast.addToast({
                 dismissible: true,
-                body: <>{t("An error ocurred updating your privacy setting.")}</>,
+                body: <>{err.message ?? t("An error occurred updating your privacy setting.")}</>,
             });
+            setSuggestedAnswersErrors([err]);
         }
     };
 
@@ -301,6 +306,7 @@ export function AccountSettingsImpl() {
                         onChange={toggleSuggestAnswers}
                         className={classes.fitWidth}
                     />
+                    {suggestedAnswersErrors && <ErrorMessages errors={suggestedAnswersErrors} />}
                 </>
             )}
         </section>

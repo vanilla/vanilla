@@ -4,9 +4,16 @@
  * @license Proprietary
  */
 
+import { StoryContent } from "@library/storybook/StoryContent";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { STORY_IPSUM_LONG, STORY_IPSUM_MEDIUM, STORY_IPSUM_SHORT } from "@library/storybook/storyData";
+import {
+    STORY_IPSUM_LONG,
+    STORY_IPSUM_LONG2,
+    STORY_IPSUM_LONG3,
+    STORY_IPSUM_MEDIUM,
+    STORY_IPSUM_SHORT,
+} from "@library/storybook/storyData";
 import { SuggestedAnswers } from "@library/suggestedAnswers/SuggestedAnswers";
 import { SuggestedAnswersProvider } from "@library/suggestedAnswers/SuggestedAnswers.context";
 import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
@@ -94,6 +101,17 @@ const suggestions: ISuggestedAnswer[] = [
         sourceIcon: "new-discussion",
     },
     {
+        aiSuggestionID: 4,
+        format: "Vanilla",
+        type: "discussion",
+        url: "#",
+        documentID: 1,
+        title: "Suggested Answer from a Vanilla Discussion",
+        summary: [STORY_IPSUM_LONG, STORY_IPSUM_LONG2, STORY_IPSUM_LONG3].join(" "),
+        hidden: false,
+        sourceIcon: "new-discussion",
+    },
+    {
         aiSuggestionID: 2,
         format: "Vanilla",
         type: "article",
@@ -124,10 +142,12 @@ function MockStory(props: { title: string }) {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <StoryHeading>{props.title}</StoryHeading>
-            <SuggestedAnswersProvider value={{ discussionID: 1 }}>
-                <SuggestedAnswers suggestions={suggestions} showSuggestions={true} />
-            </SuggestedAnswersProvider>
+            <StoryContent>
+                <StoryHeading>{props.title}</StoryHeading>
+                <SuggestedAnswersProvider value={{ discussionID: 1 }}>
+                    <SuggestedAnswers suggestions={suggestions} showSuggestions={true} />
+                </SuggestedAnswersProvider>
+            </StoryContent>
         </QueryClientProvider>
     );
 }

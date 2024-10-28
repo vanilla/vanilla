@@ -39,6 +39,14 @@ abstract class AbstractSearchType
     abstract public function getRecordType(): string;
 
     /**
+     * @return string
+     */
+    public function getOptimizedRecordType(): string
+    {
+        return $this->getRecordType();
+    }
+
+    /**
      * Get the type of the record.
      *
      * Eg. Discussion, Comment, Article, Category.
@@ -76,6 +84,19 @@ abstract class AbstractSearchType
      * @return SearchResultItem[]
      */
     abstract public function getResultItems(array $recordIDs, SearchQuery $query): array;
+
+    /**
+     * Boost ranking of a specific type.
+     *
+     * Boost values are relative to the default value of 1.0.
+     * A boost value between 0 and 1.0 decreases the type relevance. A value greater than 1.0 increases the relevance score.
+     *
+     * @return float|null The amount to boost by or null to use the default.
+     */
+    public function getBoostValue(): ?float
+    {
+        return null;
+    }
 
     /**
      * Convert a foreign record into a search result.

@@ -2,7 +2,8 @@ import { roleLookUp, userLookup } from "@dashboard/moderation/communityManagment
 import { getEscalationStatuses } from "@dashboard/moderation/components/escalationStatuses";
 import { FilterBlock } from "@dashboard/moderation/components/FilterBlock";
 import { ReasonFilter } from "@dashboard/moderation/components/ReasonFilter";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
+
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { t } from "@vanilla/i18n";
@@ -51,6 +52,7 @@ export function EscalationFilters(props: IProps) {
                 initialFilters={props.value.assignedUserID}
                 dynamicOptionApi={{
                     ...userLookup,
+                    searchUrl: "/escalations/lookup-assignee?name=%s*&limit=10",
                     optionOverride: [{ value: "-4", name: "Unassigned", data: { icon: deletedUserFragment() } }],
                 }}
                 onFilterChange={props.onFilter}

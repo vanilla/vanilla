@@ -70,6 +70,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testRenderHtml(string $input, string $expectedOutput, string $errorMessage)
     {
+        $input = $this->processInput($input);
+        $expectedOutput = $this->processOutput($expectedOutput);
         $format = $this->formatService();
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput,
@@ -165,6 +167,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testRenderQuote(string $input, string $expectedOutput, string $errorMessage)
     {
+        $input = $this->processInput($input);
+        $expectedOutput = $this->processOutput($expectedOutput);
         $format = $this->formatService();
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput,
@@ -274,6 +278,12 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testParseAttachments(string $input, array $expectedOutput)
     {
+        $input = $this->processInput($input);
+
+        foreach ($expectedOutput as $key => $output) {
+            $expectedOutput[$key]["url"] = $this->processOutput($output["url"]);
+        }
+
         $format = $this->formatService();
         $headings = $format->parseAttachments($input, $this->formatKey());
         $this->assertEquals(json_encode($expectedOutput, JSON_PRETTY_PRINT), json_encode($headings, JSON_PRETTY_PRINT));
@@ -376,5 +386,37 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
             $this->markTestSkipped("Could not find a $renderType fixture.");
         }
         return $paramSets;
+    }
+
+    /**
+     * Process the input by:
+     * - Replace `__UPLOAD_URL__` with the actual upload URL.
+     *
+     * @param $input
+     * @return string
+     */
+    private function processInput($input): string
+    {
+        $uploader = \Gdn::getContainer()->get(\Gdn_Upload::class);
+        $uploadPath = $uploader->getUploadWebPaths()[""];
+        return str_replace("__UPLOAD_URL__", $uploadPath, $input);
+    }
+
+    /**
+     * Process the output by:
+     * - Replace `__UPLOAD_URL__` with the actual upload URL.
+     *
+     * @param $input
+     * @return string
+     */
+    private function processOutput($output): string
+    {
+        $uploader = \Gdn::getContainer()->get(\Gdn_Upload::class);
+        $uploadPath = $uploader->getUploadWebPaths()[""];
+        $output = str_replace("__UPLOAD_URL__", $uploadPath, $output);
+
+        // Escape the path for use in a regex.
+        $escapedPath = addcslashes($uploadPath, "/");
+        return str_replace("__UPLOAD_URL_ESCAPED__", $escapedPath, $output);
     }
 }

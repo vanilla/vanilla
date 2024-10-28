@@ -111,7 +111,7 @@ class RichEditorPlugin extends Gdn_Plugin
      *
      * @return bool
      */
-    private function isForcedRich(Gdn_Form $form): bool
+    public function isForcedRich(Gdn_Form $form): bool
     {
         // Get the format of the post
         $data = $form->formData();
@@ -120,6 +120,11 @@ class RichEditorPlugin extends Gdn_Plugin
         // Ge the format set in config
         $formatConfig = Gdn::getContainer()->get(FormatConfig::class);
         $defaultFormat = $formatConfig->getDefaultFormat();
+
+        // Always reinterpret if the old format is rich and the one is rich2
+        if ($this->isFormatRich($formFormat) && $this->isFormatRich2($defaultFormat)) {
+            return true;
+        }
 
         // If reinterpret is true, we should compare the two formats
         if (Gdn::config(self::CONFIG_REINTERPRET_ENABLE)) {
@@ -136,7 +141,7 @@ class RichEditorPlugin extends Gdn_Plugin
      * @param string $format - Format string to check
      * @return bool
      */
-    private function isFormatRich(string $format): bool
+    public function isFormatRich(string $format): bool
     {
         return strcasecmp($format, RichFormat::FORMAT_KEY) === 0;
     }
@@ -171,17 +176,8 @@ class RichEditorPlugin extends Gdn_Plugin
      */
     public function getPostFormats_handler(array $postFormats): array
     {
-        $hasRich1 =
-            strtolower(\Gdn::config("Garden.InputFormatter")) === RichFormat::FORMAT_KEY ||
-            strtolower(\Gdn::config("Garden.MobileInputFormatter")) === RichFormat::FORMAT_KEY;
-        if ($hasRich1) {
-            // We still show rich2 in the dropdown.
-            $postFormats[] = "Rich";
-            $postFormats[] = "Rich2";
-        } else {
-            // Rich2 is the one true format.
-            $postFormats["Rich2"] = "Rich";
-        }
+        // Rich2 is the one true format.
+        $postFormats["Rich2"] = "Rich";
         return $postFormats;
     }
 

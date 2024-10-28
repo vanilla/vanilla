@@ -3,35 +3,43 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { cx } from "@emotion/css";
-import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
+import InputTextBlock, { IInputProps } from "@library/forms/InputTextBlock";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { t } from "@library/utility/appUtils";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { IOptionalComponentID } from "@library/utility/idUtils";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
-interface IProps extends IInputTextProps {
-    errors?: IFieldError[];
+interface IRatioInputProps extends IOptionalComponentID, Omit<IInputProps, "value" | "onChange"> {
+    value: number;
+    onChange: (value: number) => void;
 }
 
 const DEFAULT_DENOMINATOR = 1;
 
-export const DashboardRatioInput: React.FC<IProps> = (props: IProps) => {
-    const [value, setValue] = useState(props.inputProps?.value || DEFAULT_DENOMINATOR);
+function RatioInput(props: IRatioInputProps) {
+    const { id, value = DEFAULT_DENOMINATOR, onChange, className, ...rest } = props;
+
     const classes = dashboardClasses();
 
     return (
-        <div className={cx(props.className, classes.ratioInputContainer)}>
+        <>
             {/* The first number in the ratio is always 1, it's not editable by the user */}
-            <div className={classes.ratioInputReadOnlyNumerator}>{"1"}</div>
+            <span>{"1"}</span>
 
-            <span className={classes.ratioInputSeparator}>{t("in")}</span>
+            <span>{t("in")}</span>
 
             <div className={classes.ratioInput}>
                 <InputTextBlock
+                    id={id}
                     inputProps={{
-                        ...props.inputProps,
+                        ...rest,
+                        type: "number",
                         inputmode: "numeric",
                         min: 1,
                         step: 1,
@@ -39,18 +47,32 @@ export const DashboardRatioInput: React.FC<IProps> = (props: IProps) => {
                         value: value,
                         onChange: (event) => {
                             const newValue = parseInt(event.target.value);
-
-                            setValue(isNaN(newValue) || newValue === 0 ? DEFAULT_DENOMINATOR : newValue);
-                            if (props.inputProps?.onChange) {
-                                props.inputProps.onChange(event);
-                            }
+                            props.onChange(isNaN(newValue) || newValue === 0 ? DEFAULT_DENOMINATOR : newValue);
                         },
                     }}
+                    className={className}
                     noMargin={true}
                 />
             </div>
-
-            {props.errors && <ErrorMessages errors={props.errors} />}
-        </div>
+        </>
     );
-};
+}
+
+export default function DashboardRatioInput(
+    props: IRatioInputProps & {
+        errors?: IFieldError[];
+    },
+) {
+    const { className, errors, ...rest } = props;
+    const { inputID } = useFormGroup();
+    const classes = dashboardClasses();
+
+    return (
+        <DashboardInputWrap className={className}>
+            <div className={classes.ratioInputContainer}>
+                <RatioInput {...rest} id={inputID} />
+            </div>
+            {props.errors && <ErrorMessages errors={props.errors} />}
+        </DashboardInputWrap>
+    );
+}

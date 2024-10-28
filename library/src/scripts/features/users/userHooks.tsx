@@ -48,10 +48,7 @@ export function useCurrentUserSignedIn(): boolean {
     return currentUser?.userID !== GUEST_USER_ID;
 }
 
-export function CurrentUserContextProvider(props: {
-    currentUser: IMe | IUserFragment | undefined;
-    children: React.ReactNode;
-}) {
+export function CurrentUserContextProvider(props: { currentUser?: IMe | IUserFragment; children: React.ReactNode }) {
     const { currentUser, children } = props;
     const user: IMe | undefined = currentUser
         ? {

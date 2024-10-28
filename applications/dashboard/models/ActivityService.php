@@ -24,6 +24,11 @@ class ActivityService
     /** @var array<string> */
     private $activityTypeIDs = [];
 
+    /**
+     * Class constructor.
+     *
+     * @param Gdn_Database $database
+     */
     public function __construct(private Gdn_Database $database)
     {
     }
@@ -32,7 +37,10 @@ class ActivityService
      * Register an activity.
      *
      * @param class-string<Activity> $activity
+     * @param bool $insertActivityType
      * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function registerActivity(string $activity, bool $insertActivityType = true): void
     {
@@ -111,7 +119,7 @@ class ActivityService
      * Get the schema for activity notification preferences.
      * Each activity is grouped under its corresponding activity group.
      *
-     * @param bool $hasEmailViewPermission Whether the user associated with the schema has the email.view permission.
+     * @param Permissions $permissions
      * @param bool $defaults Whether to get the schema for the site-wide defaults. If false, get the schema for a user.
      * @return Schema
      */
@@ -183,7 +191,7 @@ class ActivityService
                 $typeName = $activity::getPreference();
                 $schema->setField("{$pathRoot}.properties.{$typeName}", [
                     "x-control" => [
-                        "description" => t($activity::getPreferenceDescription()),
+                        "description" => $activity::getPreferenceDescription(),
                     ],
                     "type" => "object",
                     "properties" => $properties,
@@ -270,7 +278,7 @@ class ActivityService
      * Fetch the preference based on the activityType provided.
      *
      * @param $activityType
-     * @return string
+     * @return string|null
      */
     public function getPreferenceByActivityType($activityType): ?string
     {

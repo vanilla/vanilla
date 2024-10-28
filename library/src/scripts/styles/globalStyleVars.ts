@@ -321,11 +321,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         }
     });
 
-    interface IBody {
-        backgroundImage: IBackground;
-    }
-
-    const body: IBody = makeThemeVars("body", {
+    const body = makeThemeVars("body", {
         /**
          * @varGroup global.body.backgroundImage
          * @description Background variables for the page.

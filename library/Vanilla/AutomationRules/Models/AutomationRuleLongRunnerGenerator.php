@@ -26,7 +26,7 @@ use Vanilla\Web\SystemCallableInterface;
  */
 class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
 {
-    const LOCK_KEY = "ARTrigger-%sAction-%s";
+    const LOCK_KEY = "ARTrigger-ID-%d";
     const BUCKET_SIZE = 50;
 
     private \StealableLock $stealableLock;
@@ -100,7 +100,7 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
 
             // We don't want to recreate new dispatches for the same rule
             $actionClass->setDispatched();
-            $lock = sprintf(self::LOCK_KEY, $params["triggerType"], $params["actionType"]);
+            $lock = sprintf(self::LOCK_KEY, $automationRuleID);
             $this->stealableLock = new \StealableLock($this->cache, $lock);
             if (isset($cacheLockCombo)) {
                 $this->stealableLock->refresh($cacheLockCombo);
@@ -114,12 +114,13 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
                         AutomationRuleDispatchesModel::STATUS_RUNNING
                     );
                 }
+                $where = $automationRule["trigger"]["triggerValue"];
                 if ($triggerClass instanceof TimedAutomationTrigger) {
                     $lastRunDate = $params["lastRunDate"];
                     $where = $triggerClass->getWhereArray($automationRule["trigger"]["triggerValue"], $lastRunDate);
                     $where = $actionClass->addWhereArray($where, $actionValue);
                 } else {
-                    $where = $automationRule["trigger"]["triggerValue"];
+                    $where = $triggerClass->getWhereArray($automationRule["trigger"]["triggerValue"]);
                 }
                 $toProcess = $triggerClass->getRecordsToProcess($lastRecordID, $where);
                 foreach ($toProcess as $primaryKey => $objects) {

@@ -5,7 +5,8 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/themeCache";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { Mixins } from "@library/styles/Mixins";
 import { singleBorder } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";

@@ -26,17 +26,14 @@ export const postReactionsClasses = useThemeCache(() => {
         gap: globalVars.gutter.quarter,
     });
 
-    const button = css(
-        {
-            height: 20,
-            display: "inline-flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 0,
-        },
-        media({ maxWidth: 600 }, { marginBottom: globalVars.gutter.size }),
-    );
+    const button = css({
+        height: 20,
+        display: "inline-flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 0,
+    });
 
     const activeButton = css({
         background: ColorsUtils.colorOut(globalVars.mainColors.primary),

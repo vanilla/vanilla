@@ -85,24 +85,6 @@ export default function DashboardAddEditUser(props: IDashboardAddEditProps) {
         formGroupNames.push("password");
     }
 
-    const formGroupWrapper: React.ComponentProps<typeof JsonSchemaForm>["FormGroupWrapper"] = function (props) {
-        if (
-            props.groupName &&
-            formGroupNames.map((name) => name.toLowerCase()).includes(props.groupName.toLowerCase())
-        ) {
-            return props.groupName === "privacy" ? (
-                //need to do some custom stuff here to achieve inline header for a form group
-                <div className={cx(classes.unifiedFormGroupWrapper, "form-group")}>
-                    <span className={"label-wrap"}>{props.header}</span>
-                    <div className={cx(classes.unifiedFormGroup, "input-wrap")}>{props.children}</div>
-                </div>
-            ) : (
-                <div className={classes.unifiedFormGroup}>{props.children}</div>
-            );
-        }
-        return <>{props.children}</>;
-    };
-
     const currentUserID = useCurrentUserID();
     const isOwnUser = currentUserID === userData?.userID;
     const userSchema = getUserSchema(isEdit, isOwnUser, ranks, newPasswordFieldID, minPasswordLength);
@@ -146,7 +128,7 @@ export default function DashboardAddEditUser(props: IDashboardAddEditProps) {
         modalVisible,
         handleCloseModal,
         schema,
-        formGroupWrapper,
+        // formGroupWrapper,
         newPasswordFieldID,
     };
 

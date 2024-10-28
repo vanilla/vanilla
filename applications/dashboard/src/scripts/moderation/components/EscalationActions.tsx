@@ -17,11 +17,11 @@ import {
     useWriteableAttachmentIntegrations,
     WriteableIntegrationContextProvider,
 } from "@library/features/discussions/integrations/Integrations.context";
-import { queryClient } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
 import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
+import { useQueryClient } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
 import { DropDownArrow } from "@vanilla/ui/src/forms/shared/DropDownArrow";
 import { labelize } from "@vanilla/utils";
@@ -48,6 +48,8 @@ export function EscalationActions(props: IProps) {
             },
         });
     };
+
+    const queryClient = useQueryClient();
 
     return (
         <div className={classes.layout}>

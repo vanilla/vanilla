@@ -209,7 +209,7 @@ class ProfileFieldModel extends FullRecordCacheModel
             \Gdn_Cache::FEATURE_EXPIRY => 3600, // 1 hour.
         ]);
         $this->addPipelineProcessor(new JsonFieldProcessor(["displayOptions", "dropdownOptions", "attributes"]));
-        $this->addPipelineProcessor(new BooleanFieldProcessor(["enabled"]));
+        $this->addPipelineProcessor(new BooleanFieldProcessor(["enabled", "descriptionHtml"]));
     }
 
     /**
@@ -244,6 +244,7 @@ class ProfileFieldModel extends FullRecordCacheModel
             ->column("apiName", "varchar($apiNameMaxLength)", false, "primary")
             ->column("label", "varchar(700)", false, "unique")
             ->column("description", "text", true)
+            ->column("descriptionHtml", "tinyint", 0)
             ->column("dataType", self::DATA_TYPES)
             ->column("formType", self::FORM_TYPES)
             ->column("visibility", self::VISIBILITIES)
@@ -413,6 +414,9 @@ class ProfileFieldModel extends FullRecordCacheModel
             "description:s" => [
                 "default" => "",
             ],
+            "descriptionHtml:b" => [
+                "default" => false,
+            ],
             "dataType:s" => ["enum" => self::DATA_TYPES],
             "formType:s" => ["enum" => self::FORM_TYPES],
             "dropdownOptions:a|n",
@@ -444,6 +448,7 @@ class ProfileFieldModel extends FullRecordCacheModel
                 "minLength" => 1,
             ],
             "description:s?",
+            "descriptionHtml:b?",
             "formType:s?" => ["enum" => self::FORM_TYPES],
             "dropdownOptions:a|n?",
             "visibility:s?" => ["enum" => self::VISIBILITIES],
@@ -471,6 +476,9 @@ class ProfileFieldModel extends FullRecordCacheModel
                 "minLength" => 1,
             ],
             "description:s?",
+            "descriptionHtml:b?" => [
+                "default" => false,
+            ],
             "dataType:s" => ["enum" => self::DATA_TYPES],
             "formType:s" => ["enum" => self::FORM_TYPES],
             "dropdownOptions:a|n?",
@@ -857,8 +865,34 @@ class ProfileFieldModel extends FullRecordCacheModel
      */
     public function getUserProfileFields(int $userID, bool $ignoreVisibility = false): array
     {
-        $values = $this->userMetaModel->getUserMeta($userID, "Profile.%", null, "Profile.");
-        $this->processUserProfileFields($userID, $values, $ignoreVisibility);
+        $values = [];
+        $session = Gdn::session();
+        // Load profiles fields if the loading current user's data, or have full permissions
+        if (
+            $session->UserID === $userID ||
+            $session->checkPermission(
+                [
+                    "Garden.Users.Add",
+                    "Garden.Users.Edit",
+                    "Garden.Users.Delete",
+                    "Garden.PersonalInfo.View",
+                    "internalInfo.view",
+                ],
+                false
+            )
+        ) {
+            $values = $this->userMetaModel->getUserMeta($userID, "Profile.%", null, "Profile.");
+            $this->processUserProfileFields($userID, $values, $ignoreVisibility);
+        } else {
+            $userModel = Gdn::getContainer()->get(\UserModel::class);
+            $user = $userModel->getID($userID, DATASET_TYPE_ARRAY);
+            // Loading public account with profile view permissions
+            if (($user["Private"] ?? 0) === 0 && $session->checkPermission(["Garden.Profiles.View"], false)) {
+                $values = $this->userMetaModel->getUserMeta($userID, "Profile.%", null, "Profile.");
+                $this->processUserProfileFields($userID, $values, $ignoreVisibility);
+            }
+        }
+
         return $values;
     }
 

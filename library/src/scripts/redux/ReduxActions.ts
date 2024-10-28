@@ -289,20 +289,20 @@ interface IActionCreatorsMapObject {
 }
 
 // API Action interfaces
-interface IApiAction<ActionType, Meta> {
+export interface IApiAction<ActionType, Meta> {
     type: ActionType;
     meta: Meta;
 }
 
-interface IApiErrorAction<ActionType, Meta> extends IApiAction<ActionType, Meta> {
+export interface IApiErrorAction<ActionType, Meta> extends IApiAction<ActionType, Meta> {
     payload: IApiError;
 }
 
-interface IApiResponseAction<ActionType, Meta, ResponseDataType> extends IApiAction<ActionType, Meta> {
+export interface IApiResponseAction<ActionType, Meta, ResponseDataType> extends IApiAction<ActionType, Meta> {
     payload: IApiResponse<ResponseDataType>;
 }
 
-type RequestType = "get" | "post" | "put" | "delete" | "patch";
+export type RequestType = "get" | "post" | "put" | "delete" | "patch";
 
 // Utility to pull a group of action types out of an actions object
 export type ActionsUnion<A extends IActionCreatorsMapObject> = ReturnType<A[keyof A]>;

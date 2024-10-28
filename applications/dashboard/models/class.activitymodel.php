@@ -129,7 +129,6 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
 
     /** @var string */
     private $unsubscribeSalt;
-
     /**
      * Defines the related database table name.
      *
@@ -437,7 +436,11 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             ->select("t.Name", "", "ActivityType")
             ->from("Activity a")
             ->join("ActivityType t", "a.ActivityTypeID = t.ActivityTypeID");
-
+        if (isset($where["Private"])) {
+            $this->SQL->join("User u", "u.UserID = a.ActivityUserID");
+            $this->SQL->where("u.Private", 0);
+            unset($where["Private"]);
+        }
         // Add prefixes to the where.
         foreach ($where as $key => $value) {
             if (strpos($key, ".") === false) {
@@ -1209,6 +1212,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         }
 
         $activity["Headline"] = $this->getActivityHeadline($activity, $user);
+        $activity["Data"]["type"] = "NotificationEmail";
 
         // Build the email to send.
         $email = new Gdn_Email();
@@ -1264,13 +1268,23 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
     /**
      * Decode Notification Token.
      *
-     * @param string $token Encode token string.
+     * @param string $token Encoded token string.
+     * @return stdClass
+     */
+    public function decodeNotificationToken(string $token): stdClass
+    {
+        return JWT::decode($token, new Key($this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM));
+    }
+
+    /**
+     * Process the token payload to get the notification data.
+     *
+     * @param stdClass$payload
      * @return array
      * @throws NotFoundException
      */
-    public function decodeNotificationToken(string $token): array
+    public function getNotificationData(stdClass $payload): array
     {
-        $payload = JWT::decode($token, new Key($this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM));
         $activityID = val("ActivityID", $payload);
         $categoryID = val("CategoryID", $payload);
         $activityType = val("ActivityType", $payload);
@@ -1295,6 +1309,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             $notificationRow["reason"] .= ", " . $notificationRow["preference"];
             $notificationRow["ActivityTypeList"] = val("ActivityTypes", $payload);
         }
+
         return $notificationRow;
     }
 
@@ -1398,6 +1413,18 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
     }
 
     /**
+     * Generate unsubscribe link
+     *
+     * @param array $tokenData
+     * @return string
+     */
+    protected function generateUnsubscribeLink(array $tokenData): string
+    {
+        $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
+        return url("/unsubscribe/$token", true);
+    }
+
+    /**
      * Generate Unfollow link.
      *
      * @param array{UserID: int, Name: string, Email: string, PhotoUrl: string} $user User object.
@@ -1423,11 +1450,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             "CategoryID" => $categoryID,
             "ActivityData" => ["category" => $category["Name"]],
         ];
-
-        $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
-
-        $linkUrl = url("/unsubscribe/$token", true);
-        return $linkUrl;
+        return $this->generateUnsubscribeLink($tokenData);
     }
 
     /**

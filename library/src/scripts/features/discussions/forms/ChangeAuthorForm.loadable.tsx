@@ -20,12 +20,12 @@ import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useMutation } from "@tanstack/react-query";
 import { CommunityMemberInput } from "@vanilla/addon-vanilla/forms/CommunityMemberInput";
-import DiscussionsApi from "@vanilla/addon-vanilla/thread/DiscussionsApi";
 import { t } from "@vanilla/i18n";
 import { RecordID } from "@vanilla/utils";
 import React, { useState } from "react";
+import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
 
-interface IProps {
+export interface ChangeAuthorFormProps {
     discussion: IDiscussion;
     onSuccess?: () => Promise<void>;
     onError?: (error: IApiError) => void;
@@ -36,7 +36,7 @@ interface IProps {
  * Displays the change author form
  * @deprecated Do not import this component, import ChangeAuthor instead
  */
-export default function ChangeAuthorForm(props: IProps) {
+export default function ChangeAuthorForm(props: ChangeAuthorFormProps) {
     const { onSuccess, onError, onCancel } = props;
     const { discussionID, insertUser } = props.discussion;
 

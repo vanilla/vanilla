@@ -1,14 +1,14 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { initAllUserContent } from "@library/content";
 import { onContent, onReady } from "@library/utility/appUtils";
 import { Router } from "@library/Router";
 import { AppContext } from "@library/AppContext";
-import { addComponent, disableComponentTheming } from "@library/utility/componentRegistry";
+import { addComponent } from "@library/utility/componentRegistry";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { applySharedPortalContext, mountReact } from "@vanilla/react-utils/src";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
@@ -44,6 +44,8 @@ import { ExternalSearchSettingsPage } from "@dashboard/pages/ExternalSearchSetti
 import { MemoryRouter } from "react-router";
 import { RouterRegistry } from "@library/Router.registry";
 import { AISuggestions } from "@dashboard/aiSuggestions/AISuggestions";
+import { InterestsSettings } from "@dashboard/interestsSettings/InterestsSettings";
+import GenerateDataExportURL from "@dashboard/components/GenerateDataExportURL";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -137,3 +139,5 @@ addComponent("automationRules", () => {
 });
 
 addComponent("aiSuggestions", AISuggestions);
+addComponent("interests", InterestsSettings);
+addComponent("GenerateDataExportURL", GenerateDataExportURL);

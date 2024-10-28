@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -151,14 +151,6 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
             return null;
         }
 
-        let discussionSettings: INavigationTreeItem = {
-            name: getLayoutTypeSettingsLabel("discussionThread"),
-            parentID: "discussionThread",
-            recordType: "appearanceNavItem",
-            recordID: "discussionThreadLayoutSettings",
-            url: getLayoutTypeSettingsUrl("discussionThread"),
-        };
-
         let subTypes: INavigationTreeItem[] = [];
 
         if (enabledPostTypes.includes("discussion")) {
@@ -286,6 +278,37 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
             ],
         },
         makeDiscussionThreadItem(),
+        getMeta("featureFlags.layoutEditor.knowledgeBase.Enabled", false)
+            ? {
+                  name: getLayoutTypeGroupLabel("knowledgeBase"),
+                  parentID: ownID,
+                  recordID: "knowledgeBase",
+                  recordType: "panelMenu",
+                  children: [
+                      {
+                          name: getLayoutTypeSettingsLabel("knowledgeBase"),
+                          parentID: "knowledgeBase",
+                          recordType: "appearanceNavItem",
+                          recordID: "knowledgeBaseLayoutSettings",
+                          url: getLayoutTypeSettingsUrl("knowledgeBase"),
+                      },
+                      {
+                          name: getLayoutTypeLabel("guideArticle"),
+                          parentID: "knowledgeBase",
+                          recordID: "guideArticle",
+                          recordType: "panelMenu",
+                          children: [...getChildLayouts("guideArticle", "knowledgeBase")],
+                      },
+                      {
+                          name: getLayoutTypeLabel("helpCenterArticle"),
+                          parentID: "knowledgeBase",
+                          recordID: "helpCenterArticle",
+                          recordType: "panelMenu",
+                          children: [...getChildLayouts("helpCenterArticle", "knowledgeBase")],
+                      },
+                  ],
+              }
+            : null,
     ].filter(notEmpty);
 
     const topLevelItem: INavigationTreeItem = {

@@ -118,6 +118,7 @@ export interface IGetDiscussionListParams {
     discussionID?: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>;
     expand?: string | string[];
     followed?: boolean;
+    suggested?: boolean;
     featuredImage?: boolean;
     fallbackImage?: string;
     sort?: DiscussionListSortOptions;
@@ -132,6 +133,8 @@ export interface IGetDiscussionListParams {
     dateInserted?: string;
     dateLastComment?: string;
     hasComments?: boolean;
+    insertUserRoleID?: number[];
+    sentiment?: string[];
 }
 
 export enum DiscussionListSortOptions {

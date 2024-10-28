@@ -33,6 +33,8 @@ import { useFormik } from "formik";
 import { defaultNotificationPreferencesFormClasses } from "@dashboard/userPreferences/DefaultNotificationPreferences/DefaultNotificationPreferences.classes";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { translateDescription } from "@library/notificationPreferences/utils";
+import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 export default function DefaultNotificationPreferences() {
     const [modalVisible, setModalVisible] = useState(false);
@@ -54,7 +56,7 @@ export default function DefaultNotificationPreferences() {
                 )}
                 labelType={DashboardLabelType.WIDE}
             >
-                <span className={"input-wrap-right"}>
+                <DashboardInputWrap>
                     <Button
                         onClick={() => {
                             openModal();
@@ -62,7 +64,7 @@ export default function DefaultNotificationPreferences() {
                     >
                         {t("Edit Default Notifications")}
                     </Button>
-                </span>
+                </DashboardInputWrap>
             </DashboardFormGroup>
 
             <DefaultNotificationPreferencesModal isVisible={modalVisible} exitHandler={() => closeModal()} />
@@ -207,15 +209,20 @@ export function DefaultNotificationPreferencesModal(
 
 const NotificationPreferencesFormSection: React.ComponentType<ISectionProps> = (props) => {
     const classes = defaultNotificationPreferencesFormClasses();
+    const groupClasses = dashboardFormGroupClasses();
 
     return props.pathString === "/" && !!props.title && !!props.description ? (
         <>
-            <div className="form-group">
-                <div className="label-wrap-wide">
+            <div className={groupClasses.formGroup}>
+                <div className={groupClasses.labelWrapWide}>
                     <Heading depth={5} className={classes.sectionHeading}>
                         {props.title}
                     </Heading>
-                    <p dangerouslySetInnerHTML={{ __html: translateDescription(props.description) }} />
+                    {typeof props.description === "string" ? (
+                        <p dangerouslySetInnerHTML={{ __html: translateDescription(props.description) }} />
+                    ) : (
+                        <p>{props.description}</p>
+                    )}
                 </div>
             </div>
             {props.children}

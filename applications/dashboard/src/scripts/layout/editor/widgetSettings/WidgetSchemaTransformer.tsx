@@ -1,14 +1,14 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { ILayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { getMeta } from "@library/utility/appUtils";
 import { t } from "@vanilla/i18n";
 import { IFormControl, JsonSchema } from "@vanilla/json-schema-forms";
-import React from "react";
 
 /**
  * Determine if a widget schema should be transformed to display the
@@ -187,7 +187,6 @@ export function widgetsSchemaTransformer(
     /**
      * Tabs-specific transform
      */
-
     if (schema.description === "Tabs") {
         transformedSchema = {
             ...schema,
@@ -240,6 +239,23 @@ export function widgetsSchemaTransformer(
                 apiParams: tempApiParams,
             },
         };
+    }
+
+    /**
+     * Comments thread specific transform
+     */
+    if (schema.description === "Comments" && getMeta("threadStyle") === "nested") {
+        const threadDepth = getMeta("threadDepth", 5);
+        // invalid value, fallback to default
+        if (parseInt(initialValue.apiParams?.collapseChildDepth) > parseInt(threadDepth)) {
+            value = {
+                ...value,
+                apiParams: {
+                    ...value.apiParams,
+                    collapseChildDepth: undefined,
+                },
+            };
+        }
     }
 
     /**

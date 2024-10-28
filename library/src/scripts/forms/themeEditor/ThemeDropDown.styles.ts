@@ -24,9 +24,6 @@ export const themeDropDownClasses = useThemeCache(() => {
         width: percent(100),
         background: ColorsUtils.colorOut(globalVars.mainColors.bg),
         ...{
-            ".input-wrap-right": {
-                width: percent(100),
-            },
             ".SelectOne__menu": {
                 ...Mixins.border(
                     {

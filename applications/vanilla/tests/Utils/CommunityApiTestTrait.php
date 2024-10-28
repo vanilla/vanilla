@@ -41,6 +41,9 @@ trait CommunityApiTestTrait
     protected $lastInsertedTagID = null;
 
     /** @var int|null */
+    protected $lastInsertedInterestID = null;
+
+    /** @var int|null */
     protected $lastInsertedCollectionID = null;
 
     /** @var int|null */
@@ -48,6 +51,12 @@ trait CommunityApiTestTrait
 
     /** @var int|null */
     protected $lastEscalationID = null;
+
+    /** @var string|null */
+    protected $lastPostTypeID = null;
+
+    /** @var string|null */
+    protected $lastPostFieldID = null;
 
     /** @var HttpResponse|null */
     protected $lastCommunityResponse;
@@ -61,10 +70,12 @@ trait CommunityApiTestTrait
         $this->lastInsertedDiscussionID = null;
         $this->lastInsertCommentID = null;
         $this->lastInsertedTagID = null;
+        $this->lastInsertedInterestID = null;
         $this->lastInsertedCollectionID = null;
         $this->lastResponse = null;
         $this->lastReportID = null;
         $this->lastEscalationID = null;
+        $this->lastPostTypeID = null;
     }
 
     /**
@@ -393,7 +404,7 @@ trait CommunityApiTestTrait
             "categoryID" => $categoryID,
         ];
 
-        $type = $overrides["type"] ?? "discussion";
+        $type = strtolower($overrides["type"] ?? "discussion");
         $apiUrl = "/discussions";
         if ($type !== "discussion") {
             $apiUrl .= "/" . strtolower($type);
@@ -450,6 +461,31 @@ trait CommunityApiTestTrait
         $result = $this->lastCommunityResponse->getBody();
         $this->lastInsertedTagID = $result["tagID"] ?? null;
         if ($this->lastInsertedTagID === null) {
+            return $result;
+        }
+        return $result;
+    }
+
+    /**
+     * Create Interest
+     */
+    public function createInterest(array $overrides = []): array
+    {
+        $interestName = $overrides["name"] ?? "interestName_" . VanillaTestCase::id("interestName");
+        $interestApiName = $overrides["apiName"] ?? "interestApiName_" . VanillaTestCase::id("interestApiName");
+        $params = $overrides + [
+            "name" => $interestName,
+            "apiName" => $interestApiName,
+            "categoryIDs" => [$this->lastInsertedCategoryID],
+            "profileFieldMapping" => [],
+        ];
+
+        $apiUrl = "/interests";
+
+        $this->lastCommunityResponse = $this->api()->post($apiUrl, $params);
+        $result = $this->lastCommunityResponse->getBody();
+        $this->lastInsertedInterestID = $result["interestID"] ?? null;
+        if ($this->lastInsertedInterestID === null) {
             return $result;
         }
         return $result;
@@ -519,14 +555,30 @@ trait CommunityApiTestTrait
     }
 
     /**
-     * Create a comment.
+     * Create a nested comment.
      *
+     * @param array $parentComment The parent comment API data.
      * @param array $overrides Fields to override on the insert.
      *
      * @return array
      * @throws Exception
      */
-    public function createComment(array $overrides = []): array
+    public function createNestedComment(array $parentComment, array $overrides = []): array
+    {
+        $parentCommentID = $parentComment["commentID"];
+        return $this->createComment($overrides + ["parentCommentID" => $parentCommentID]);
+    }
+
+    /**
+     * Create a comment.
+     *
+     * @param array $overrides Fields to override on the insert.
+     * @param array $extras Fields to set directly in the DB.
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function createComment(array $overrides = [], array $extras = []): array
     {
         $discussionID = $overrides["discussionID"] ?? $this->lastInsertedDiscussionID;
 
@@ -548,6 +600,16 @@ trait CommunityApiTestTrait
         if (isset($overrides["score"])) {
             $this->setCommentScore($this->lastInsertCommentID, $overrides["score"]);
         }
+
+        if (!empty($extras)) {
+            /** @var \CommentModel $commentModel */
+            $commentModel = \Gdn::getContainer()->get(\CommentModel::class);
+            $commentModel->setField($this->lastInsertCommentID, $extras);
+            ModelUtils::validationResultToValidationException($commentModel);
+            $this->lastCommunityResponse = $this->api()->get("/comments/{$result["commentID"]}");
+            $result = $this->lastCommunityResponse->getBody();
+        }
+
         return $result;
     }
 
@@ -651,6 +713,63 @@ trait CommunityApiTestTrait
     }
 
     /**
+     * Create a post type.
+     *
+     * @param array $overrides
+     * @return array
+     */
+    public function createPostType(array $overrides = []): array
+    {
+        $params = $overrides + [
+            "postTypeID" => "posttypeid-" . VanillaTestCase::id("postType"),
+            "name" => "posttypename-" . VanillaTestCase::id("postType"),
+            "parentPostTypeID" => "discussion",
+            "isActive" => true,
+            "isDeleted" => false,
+        ];
+
+        $this->lastCommunityResponse = $this->api()->post("/post-types", $params);
+        $result = $this->lastCommunityResponse->getBody();
+        $this->lastPostTypeID = $result["postTypeID"];
+        return $result;
+    }
+
+    /**
+     * Create a post field.
+     *
+     * @param array $overrides
+     * @return array
+     * @throws Exception
+     */
+    public function createPostField(array $overrides = []): array
+    {
+        if (!isset($overrides["postTypeID"])) {
+            // See if we have an postTypeID
+            if ($this->lastPostTypeID === null) {
+                throw new Exception("Could not insert a test post field because no post type was specified.");
+            }
+
+            $overrides["postTypeID"] = $this->lastPostTypeID;
+        }
+
+        $params = $overrides + [
+            "postFieldID" => "postfieldid-" . VanillaTestCase::id("postField"),
+            "dataType" => "text",
+            "label" => "field label",
+            "description" => "field description",
+            "formType" => "text",
+            "visibility" => "public",
+            "isRequired" => false,
+            "isActive" => true,
+        ];
+
+        $this->lastCommunityResponse = $this->api()->post("/post-fields", $params);
+        $result = $this->lastCommunityResponse->getBody();
+        $this->lastPostFieldID = $result["postFieldID"];
+        return $result;
+    }
+
+    /**
      * Have a user follow a category
      *
      * @param array|int $userOrUserID A user or userID.
@@ -701,6 +820,32 @@ trait CommunityApiTestTrait
             : $discussionOrDiscussionID;
         $response = $this->api()->post(
             "/discussions/$discussionID/reactions",
+            [
+                "reactionType" => $reactionType,
+            ],
+            [],
+            ["throw" => false]
+        );
+        if (!$response->isSuccessful() && $response->getStatusCode() !== 410) {
+            // 410 is a known response to a spam reaction.
+            throw $response->asException();
+        }
+    }
+
+    /**
+     * React to a comment.
+     *
+     * @param $commentOrCommentID
+     * @param string $reactionType
+     *
+     * @return void
+     */
+    public function reactComment($commentOrCommentID, string $reactionType): void
+    {
+        $commentID = is_array($commentOrCommentID) ? $commentOrCommentID["commentID"] : $commentOrCommentID;
+
+        $response = $this->api()->post(
+            "/comments/$commentID/reactions",
             [
                 "reactionType" => $reactionType,
             ],

@@ -10,6 +10,7 @@ namespace Vanilla;
 use Garden\Web\RequestInterface;
 use Symfony\Component\Yaml\Yaml;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Web\ApiSelectOpenApiFilter;
 
 /**
  * A class for building a full OpenAPI 3.0 spec by combining all of the add-on OpenAPI files.
@@ -49,6 +50,8 @@ class OpenAPIBuilder
         $this->addonManager = $addonManager;
         $this->cachePath = $cachePath ?: PATH_CACHE . "/openapi.php";
         $this->request = $request;
+
+        $this->filters[] = new ApiSelectOpenApiFilter();
     }
 
     /**
@@ -104,6 +107,7 @@ class OpenAPIBuilder
         $result = $this->getFullOpenAPI();
 
         $fn = function (array &$parent) use ($disabled, $hidden, &$fn) {
+            $wasNumeric = ArrayUtils::serializesAsNumericArray($parent);
             foreach ($parent as $key => &$data) {
                 if (is_array($data)) {
                     if (!$hidden && isset($data["x-hidden"]) && $data["x-hidden"]) {
@@ -121,6 +125,10 @@ class OpenAPIBuilder
                         }
                     }
                 }
+            }
+            $isStillNumeric = ArrayUtils::serializesAsNumericArray($parent);
+            if ($wasNumeric && !$isStillNumeric) {
+                $parent = array_values($parent);
             }
         };
 

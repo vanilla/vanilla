@@ -15,6 +15,8 @@ import { Icon } from "@vanilla/icons";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { stackableTableClasses } from "@dashboard/tables/StackableTable/StackableTable.classes";
 import { spaceshipCompare } from "@vanilla/utils";
+import pickBy from "lodash-es/pickBy";
+import isEmpty from "lodash-es/isEmpty";
 
 export interface ColumnConfig {
     order: number;
@@ -81,6 +83,7 @@ const StackableTableHeader = (props: IStackableTableHeaderProps) => {
     } = props;
 
     const classes = stackableTableClasses(actionsColumnWidth);
+    const firstColumnWrapped = !isEmpty(pickBy(columnsConfiguration, ({ wrapped }) => wrapped));
 
     return (
         <thead className={headerClassNames}>
@@ -103,6 +106,9 @@ const StackableTableHeader = (props: IStackableTableHeaderProps) => {
                             <ConditionalWrap
                                 condition={hasWrapper}
                                 component={headerWrappers && headerWrappers[header]}
+                                componentProps={{
+                                    ...(headerWrappers && headerWrappers[header] && { firstColumnWrapped }),
+                                }}
                             >
                                 <ConditionalWrap
                                     condition={isSortable}
@@ -164,6 +170,7 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
         actionsColumnWidth,
     } = props;
     const classes = stackableTableClasses(actionsColumnWidth);
+    const firstColumnWrapped = !isEmpty(pickBy(columnsConfiguration, ({ wrapped }) => wrapped));
     let rows;
 
     if (isLoading) {
@@ -218,9 +225,13 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
         return <tbody>{rows}</tbody>;
     }
 
-    rows = data.map((entry: IUser, key) => {
+    interface IEntry extends IUser {
+        rowClassName?: string;
+    }
+    rows = data.map((entry: IEntry, key) => {
+        const rowClassName = entry?.rowClassName ?? "";
         return (
-            <tr key={key} className={classes.tableRow} role="row">
+            <tr key={key} className={cx(classes.tableRow, rowClassName)} role="row">
                 {orderedColumns.map((columnName, key) => {
                     const isFirstColumn = columnsConfiguration[columnName].order === 1;
                     const customWidth = columnsConfiguration[columnName].width;
@@ -237,7 +248,12 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
                             >
                                 <ConditionalWrap condition={isFirstColumn} className={cx("first-column")} key={key}>
                                     {CellRenderer && (
-                                        <CellRenderer data={entry} columnName={columnName} updateQuery={updateQuery} />
+                                        <CellRenderer
+                                            data={entry}
+                                            columnName={columnName}
+                                            updateQuery={updateQuery}
+                                            wrappedVersion={isFirstColumn && firstColumnWrapped}
+                                        />
                                     )}
                                     {isFirstColumn && (
                                         <div className={cx(classes.wrappedContent, "wrapped-content")}>

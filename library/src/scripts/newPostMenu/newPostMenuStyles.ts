@@ -222,7 +222,7 @@ export const newPostMenuClasses = useThemeCache(
             flexDirection: "column",
             ...Mixins.box({
                 ...Variables.box({
-                    borderType: containerOptions?.borderType as BorderType,
+                    borderType: containerOptions?.borderType,
                 }),
             }),
             backgroundColor: containerOptions?.outerBackground?.color

@@ -4,8 +4,8 @@
  * @license gpl-2.0-only
  */
 
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import WidgetSettingsFormGroupWrapper from "@dashboard/layout/editor/widgetSettings/WidgetSettingsFormGroupWrapper";
 import { GLOBAL_LAYOUT_VIEW } from "@dashboard/layout/layoutSettings/LayoutSettings.constants";
 import {
@@ -318,11 +318,9 @@ export function ApplyLayout(props: IProps) {
                                         )}
                                     />
                                 )}
-                                <JsonSchemaForm
-                                    FormControl={DashboardFormControl}
-                                    FormControlGroup={(props) => (
-                                        <DashboardFormControlGroup {...props} labelType={DashboardLabelType.VERTICAL} />
-                                    )}
+
+                                <DashboardSchemaForm
+                                    forceVerticalLabels={true}
                                     FormGroupWrapper={WidgetSettingsFormGroupWrapper}
                                     instance={formValues}
                                     onChange={setFormValues}

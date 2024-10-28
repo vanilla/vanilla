@@ -44,6 +44,7 @@ export type ProfileField = {
     apiName: string;
     label: string;
     description: string;
+    descriptionHtml?: boolean;
     registrationOptions: ProfileFieldRegistrationOptions;
     visibility: ProfileFieldVisibility;
     mutability: ProfileFieldMutability;
@@ -60,8 +61,12 @@ export type ProfileField = {
 // The form structure differs from the actual object's structure: some fields are nested in groups with others
 export type ProfileFieldFormValues = Pick<
     ProfileField,
-    "apiName" | "label" | "description" | "registrationOptions" | "enabled" | "mutability"
+    "apiName" | "label" | "registrationOptions" | "enabled" | "mutability"
 > & {
+    description: {
+        description: ProfileField["description"];
+        descriptionHtml: ProfileField["descriptionHtml"];
+    };
     visibility: {
         visibility: ProfileField["visibility"];
     } & ProfileField["displayOptions"];
@@ -92,6 +97,7 @@ export enum ProfileFieldFormType {
 
 export type FetchProfileFieldsParams = {
     enabled?: true;
+    formType?: ProfileFieldFormType[];
 };
 
 export type PostProfileFieldParams = ProfileField;

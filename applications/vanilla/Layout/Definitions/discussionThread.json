@@ -20,7 +20,13 @@
                     "$hydrate": "react.asset.discussionAttachments"
                 },
                 {
-                    "$hydrate": "react.asset.discussionComments"
+                    "$hydrate": "react.asset.discussionComments",
+                    "title": "Comments",
+                    "apiParams": {
+                        "sort": "dateInserted"
+                    },
+                    "showOPTag": true,
+                    "isAsset": true
                 },
                 {
                     "$hydrate": "react.asset.comment-editor"

@@ -19,6 +19,7 @@ import { t } from "@vanilla/i18n";
 import { IControlProps, IModalControl } from "@vanilla/json-schema-forms";
 import { IconType } from "@vanilla/icons";
 import { useValidCounts } from "@library/siteTotals/SiteTotals";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 export const SITE_TOTALS_AS_MODAL = {
     condition: (props: IControlProps): boolean => {
@@ -50,11 +51,11 @@ export const SITE_TOTALS_AS_MODAL = {
 
         return (
             <>
-                <div className="input-wrap">
+                <DashboardInputWrap>
                     <Button onClick={openModal} buttonType={ButtonTypes.STANDARD}>
                         {control["modalTriggerLabel"]}
                     </Button>
-                </div>
+                </DashboardInputWrap>
                 <Modal isVisible={isOpen} size={ModalSizes.LARGE} exitHandler={closeModal}>
                     <Frame
                         header={<FrameHeader closeFrame={closeModal} title={control.modalContent.label} />}

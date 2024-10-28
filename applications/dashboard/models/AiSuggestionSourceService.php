@@ -11,7 +11,9 @@ use CommentModel;
 use DiscussionModel;
 use Exception;
 use Garden\EventManager;
+use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Gdn;
 use Generator;
 use Psr\Log\LoggerAwareInterface;
@@ -51,7 +53,9 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      * @param OpenAIClient $openAIClient
      * @param UserMetaModel $userMetaModel
      * @param LongRunner $longRunner
+     * @param \ActivityModel $activityModel
      * @param AiSuggestionModel $aiSuggestionModel
+     * @param FormatService $formatService
      */
     public function __construct(
         private ConfigurationInterface $config,
@@ -59,7 +63,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         private UserMetaModel $userMetaModel,
         private LongRunner $longRunner,
         private \ActivityModel $activityModel,
-        private AiSuggestionModel $aiSuggestionModel
+        private AiSuggestionModel $aiSuggestionModel,
+        private FormatService $formatService
     ) {
         $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
     }
@@ -87,7 +92,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      */
     private function aiSuggestionFeatureEnabled(): bool
     {
-        return FeatureFlagHelper::featureEnabled("AISuggestions");
+        return FeatureFlagHelper::featureEnabled("aiFeatures") && FeatureFlagHelper::featureEnabled("AISuggestions");
     }
 
     /**
@@ -105,13 +110,30 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
     }
 
     /**
+     * Get Ai Suggestion User
+     *
+     * @return array
+     */
+    public static function getSuggestionUser(): array
+    {
+        $config = self::aiSuggestionConfigs();
+        return Gdn::userModel()->getID($config["userID"], DATASET_TYPE_ARRAY);
+    }
+
+    /**
      * Check if AI suggestions are enabled for the user.
      *
      * @return bool
      */
-    private function checkIfUserHasEnabledAiSuggestions(): bool
+    public function checkIfUserHasEnabledAiSuggestions(int $userID = null): bool
     {
-        return $this->userMetaModel->getUserMeta(Gdn::session()->UserID, "SuggestAnswers", true)["SuggestAnswers"];
+        $userID = $userID ?? Gdn::session()->UserID;
+        $suggestAnswers = $this->userMetaModel->getUserMeta($userID, "SuggestAnswers", true)["SuggestAnswers"];
+        if (!$this->userMetaModel->hasUserAcceptedCookie($userID)) {
+            $suggestAnswers = false;
+        }
+
+        return $suggestAnswers;
     }
 
     /**
@@ -124,7 +146,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         $aiConfig = $this->aiSuggestionConfigs();
         return $this->aiSuggestionFeatureEnabled() &&
             $this->checkIfUserHasEnabledAiSuggestions() === true &&
-            $aiConfig["enabled"];
+            $aiConfig["enabled"] &&
+            FeatureFlagHelper::featureEnabled("customLayout.discussionThread");
     }
 
     /**
@@ -166,10 +189,11 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         $discussion = $this->getDiscussionModel()->getID($recordID, DATASET_TYPE_ARRAY);
         $aiConfig = $this->aiSuggestionConfigs()["sources"];
         $suggestions = [];
-        try {
-            $keywords = $this->generateKeywords($discussion);
-            /** @var AiSuggestionSourceInterface|null $source */
-            foreach ($this->suggestionSources as $source) {
+
+        $keywords = $this->generateKeywords($discussion);
+        /** @var AiSuggestionSourceInterface|null $source */
+        foreach ($this->suggestionSources as $source) {
+            try {
                 //Skip this search path if it's not enabled in configs.
                 $providerConfig = $aiConfig[$source->getName()] ?? [];
                 if (($providerConfig["enabled"] ?? false) === false) {
@@ -178,11 +202,11 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
                 $localSuggestions = $source->generateSuggestions($discussion, $keywords);
                 $suggestions = array_merge($localSuggestions, $suggestions);
                 yield new LongRunnerSuccessID($source->getName());
+            } catch (Exception $e) {
+                $this->logger->warning(
+                    "Error generating suggestions for discussion {$discussion["DiscussionID"]}: {$e->getMessage()}"
+                );
             }
-        } catch (Exception $e) {
-            $this->logger->warning(
-                "Error generating suggestions for discussion {$discussion["DiscussionID"]}: {$e->getMessage()}"
-            );
         }
 
         try {
@@ -190,14 +214,20 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
             $suggestionsMerged = $this->calculateTopSuggestions($suggestions, $discussion);
         } catch (Exception $e) {
             $suggestionsMerged = $suggestions;
+            $this->logger->warning("Error Throws calculateTopSuggestions", ["exception" => $e]);
         }
 
-        $this->aiSuggestionModel->saveSuggestions($recordID, $suggestionsMerged);
-
+        if (count($suggestionsMerged) === 0) {
+            $this->logger->info("No found suggestion results.");
+        }
+        try {
+            $this->aiSuggestionModel->saveSuggestions($recordID, $suggestionsMerged);
+        } catch (Exception $e) {
+            $this->logger->warning("Error Throws saving suggestions", ["exception" => $e]);
+        }
         if (!empty($suggestionsMerged)) {
             $this->notifyAiSuggestions($discussion);
         }
-
         return LongRunner::FINISHED;
     }
 
@@ -209,23 +239,22 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      */
     public function generateKeywords(array $discussion): string
     {
-        $this->getDiscussionModel()->formatField($discussion, "Body", $discussion["Format"]);
+        $discussionBody = $discussion["Name"];
+        $discussionBody .= $this->formatService->renderPlainText($discussion["Body"], $discussion["Format"]);
 
-        $discussionBody = $discussion["Name"] . $discussion["Body"];
-        $question = $discussion["Body"];
         try {
             $prompt = OpenAIPrompt::create()->instruct(
-                "You are a recommendation bot, giving comma separated list of 5 'keywords' related to a list of documents provided."
+                "You are a recommendation bot. Provide an array of 5 'keywords' related to the document provided."
             );
-            $schema = Schema::parse(["properties:o" => Schema::parse(["keywords:s"])]);
+            $schema = Schema::parse(["keywords:a" => ["items" => ["type" => "string", "maxItems" => 5]]]);
             $prompt->addUserMessage("Recommend based on '$discussionBody'");
-            $result = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $schema)["properties"];
-            $keywords = $result["keywords"];
+            $keywords = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $schema)["keywords"];
+            $keywords = implode(",", $keywords);
         } catch (\Exception $e) {
-            $this->logger->warning(
-                "Error generating Vanilla category suggestions for discussion {$discussion["DiscussionID"]}: {$e->getMessage()}"
-            );
-            $keywords = $question;
+            $this->logger->warning("Error generating Vanilla category suggestions for discussion", [
+                "exception" => $e->getMessage(),
+            ]);
+            $keywords = $discussion["Name"];
         }
         return $keywords;
     }
@@ -239,17 +268,38 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      */
     public function processResponses(array $discussion, array $potentialAnswers): array
     {
-        $answerSchema = AiSuggestionSourceService::getAnswerSchema();
+        $result = [];
+        $questionPlainText = $discussion["Name"] . "\n";
+        $questionPlainText .= $this->formatService->renderPlainText($discussion["Body"], $discussion["Format"]);
 
-        foreach ($potentialAnswers as &$article) {
-            $prompt = AiSuggestionSourceService::getBasePrompt($article["summary"]);
-            $prompt->addUserMessage($discussion["Body"]);
-            $answer = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $answerSchema);
-            if ($answer["hasAnswer"]) {
-                $article["summary"] = $answer["answer"];
+        foreach ($potentialAnswers as $item) {
+            try {
+                $answerSchema = AiSuggestionSourceService::getAnswerSchema($item["summary"]);
+                $prompt = AiSuggestionSourceService::getBasePrompt($item["summary"]);
+                $prompt->addUserMessage($questionPlainText);
+                $answer = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $answerSchema);
+                if (!in_array($answer["answerSource"], [null, "null"], true)) {
+                    $result[] = ["summary" => $answer["answerSource"]] + $item;
+                }
+            } catch (Exception $e) {
+                $this->logger->warning("Error processing response", ["exception" => $e]);
+                // If the body of the article is too long, abridge it to the provided limit, and try one more time to summarize.
+                if (
+                    str_contains($e->getMessage(), "maximum context length is") &&
+                    preg_match("/[\d]+/", $e->getMessage(), $size)
+                ) {
+                    $extraSize = strlen($questionPlainText);
+                    $summary = substr($item["summary"], 0, $size[0] - $extraSize);
+                    $prompt = AiSuggestionSourceService::getBasePrompt($summary);
+                    $prompt->addUserMessage($questionPlainText);
+                    $answer = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $answerSchema);
+                    if (!in_array($answer["answerSource"], [null, "null"], true)) {
+                        $result[] = ["summary" => $answer["answerSource"]] + $item;
+                    }
+                }
             }
         }
-        return $potentialAnswers;
+        return $result;
     }
 
     /**
@@ -265,20 +315,25 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         $persona = Gdn::userMetaModel()->getUserMeta($config["userID"], "aiAssistant.%", [], "aiAssistant.");
         $persona = $persona + ["toneOfVoice" => "friendly", "levelOfTech" => "layman", "useBrEnglish" => false];
 
+        $useBrEnglishPrompt = $persona["useBrEnglish"] ? "Respond in British English." : "";
+
         $prompt = OpenAIPrompt::create()->instruct(
             <<<PROMPT
 You are an answer bot, giving an answer to the user's question.
 Answer the question using the text provided in a {$persona["toneOfVoice"]} tone of voice
 for an audience that can understand the material with a {$persona["levelOfTech"]} level of technical knowledge.
+$useBrEnglishPrompt
+
+Answer the question by providing a quote from the source text that answers the user's question.
+Only quote the relevant portion of the source text that directly answers the question. Do not include any irrelevant information.
+Provide the quote as a value of the `answerSource` property in your response.
+
+If the source text does not provide an answer to the question, set `answerSource` to `null`.
+
+Source Text:
+$sourceText
 PROMPT
         );
-        if ($persona["useBrEnglish"]) {
-            $prompt->instruct("Respond in British English.");
-        }
-        $prompt->instruct(
-            "Use ONLY the content derived from the following source text. If the answer cannot be derived from the source text alone, respond with a `hasAnswer` field with a value of `false`."
-        );
-        $prompt->instruct("Source Text:\n$sourceText");
 
         return $prompt;
     }
@@ -288,9 +343,18 @@ PROMPT
      *
      * @return Schema
      */
-    public static function getAnswerSchema(): Schema
+    public static function getAnswerSchema($suggestionSourceText): Schema
     {
-        return Schema::parse(["answer:s", "hasAnswer:b?" => ["default" => true]]);
+        return Schema::parse(["answerSource:s|n"])->addValidator("answerSource", function (
+            $quote,
+            ValidationField $field
+        ) use ($suggestionSourceText) {
+            if (!str_contains(strtolower($suggestionSourceText), strtolower($quote))) {
+                $field->addError("The provided answer does not exist within the source text.");
+                return Invalid::value();
+            }
+            return true;
+        });
     }
 
     /**
@@ -371,7 +435,7 @@ PROMPT
     {
         $newComment = [
             "DiscussionID" => $discussion["DiscussionID"],
-            "Body" => Gdn::formatService()->renderHtml($suggestion["summary"], "text"),
+            "Body" => $this->formatService->renderHtml($suggestion["summary"], "text"),
             "Format" => HtmlFormat::FORMAT_KEY,
             "InsertUserID" => $suggestionUserID,
             "Attributes" => [
@@ -429,22 +493,16 @@ PROMPT
     {
         $suggestions = array_values($suggestions);
 
-        $formatService = Gdn::getContainer()->get(FormatService::class);
-        $bodyPlainText = $formatService->renderPlainText($discussion["Body"], $discussion["Format"]);
+        $bodyPlainText = $this->formatService->renderPlainText($discussion["Body"], $discussion["Format"]);
         $prompt = OpenAIPrompt::create()->instruct(
             <<<PROMPT
-You are given a list of articles. Sort the articles from most to least relevant based on their relevance to the following discussion.
-Return the top 3 results as an array of objects. Each object contains the articleID and its sort value.
+You are given a list of articles. Return the top 3 articles sorted based on their relevance to the following discussion.
+Return an array of article IDs sorted from most relevant to least relevant.
 
 $bodyPlainText
 PROMPT
         );
 
-        $sortSchema = Schema::parse([
-            ":a" => [
-                "items" => Schema::parse(["articleID:i", "sortValue:i"]),
-            ],
-        ]);
         foreach ($suggestions as $index => $suggestion) {
             $prompt->addUserMessage([
                 "articleID" => $index,
@@ -452,12 +510,18 @@ PROMPT
             ]);
         }
 
-        $sortedSuggestions = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $sortSchema);
-        $sortedSuggestions = array_column($sortedSuggestions, "sortValue", "articleID");
-        uksort($suggestions, function ($item1, $item2) use ($sortedSuggestions) {
-            return $sortedSuggestions[$item1] <=> $sortedSuggestions[$item2];
-        });
-        return array_values($suggestions);
+        $sortSchema = Schema::parse(["result:a" => ["items" => "integer", "maxItems" => 3]]);
+        $sorts = $this->openAIClient->prompt(OpenAIClient::MODEL_GPT35, $prompt, $sortSchema);
+
+        $result = [];
+
+        foreach ($sorts["result"] as $index) {
+            if (isset($suggestions[$index])) {
+                $result[] = $suggestions[$index];
+            }
+        }
+
+        return $result;
     }
 
     /**

@@ -270,7 +270,6 @@ trait LayoutTestTrait
                                 "discussionOptions" => [],
                                 "isAsset" => true,
                                 "defaultSort" => "-dateLastComment",
-                                "categoryFollowEnabled" => false,
                             ],
                         ],
                     ],

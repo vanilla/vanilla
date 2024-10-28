@@ -102,6 +102,7 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
         $newQuery->setParams([
             "page" => $page,
             "discussionID" => $discussionID,
+            "commentID" => $query->recordID,
         ]);
 
         return $newQuery;

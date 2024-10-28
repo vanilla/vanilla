@@ -10,9 +10,13 @@ namespace VanillaTests\Dashboard\Controllers;
 use DiscussionModel;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
+use UserMetaModel;
 use Vanilla\Dashboard\AiSuggestionModel;
+use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\OpenAI\OpenAIClient;
 use VanillaTests\APIv2\AbstractAPIv2Test;
+use VanillaTests\Fixtures\OpenAI\MockOpenAIClient;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -48,8 +52,53 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
     {
         parent::setUp();
         self::enableFeature("AISuggestions");
+        self::enableFeature("aiFeatures");
+        \Gdn::config()->saveToConfig("VanillaAnalytics.AnonymizeData", false);
+        self::enableFeature("customLayout.discussionThread");
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->aiSuggestionModel = $this->container()->get(AiSuggestionModel::class);
+        $this->clearSettings();
+        $this->api()->patch("/ai-suggestions/settings", self::VALID_SETTINGS);
+    }
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        $mockOpenAIClient = \Gdn::getContainer()->get(MockOpenAIClient::class);
+        $mockOpenAIClient->addMockResponse("/This is how you do this./", [
+            "format" => "Vanilla",
+            "type" => "mockSuggestion",
+            "documentID" => 0,
+            "url" => "someplace.com/here",
+            "title" => "answer 1",
+            "summary" => "This is how you do this.",
+            "hidden" => false,
+            "sourceIcon" => "mock",
+            "answerSource" => "This is how you do this.",
+        ]);
+        $mockOpenAIClient->addMockResponse("/This is how you do this a different way./", [
+            "format" => "Vanilla",
+            "type" => "mockSuggestion",
+            "documentID" => 1,
+            "url" => "someplace.com/else",
+            "title" => "answer 2",
+            "summary" => "This is how you do this a different way.",
+            "hidden" => false,
+            "sourceIcon" => "mock",
+            "answerSource" => "This is how you do this a different way.",
+        ]);
+        $mockOpenAIClient->addMockResponse("/This is how you do this, a third way./", [
+            "format" => "Vanilla",
+            "type" => "mockSuggestion",
+            "documentID" => 2,
+            "url" => "someplace.com/else1",
+            "title" => "answer 3",
+            "summary" => "This is how you do this, a third way.",
+            "hidden" => false,
+            "sourceIcon" => "mock",
+            "answerSource" => "This is how you do this, a third way.",
+        ]);
+        \Gdn::getContainer()->setInstance(OpenAIClient::class, $mockOpenAIClient);
     }
 
     /**
@@ -65,7 +114,7 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
             ->value("UserID");
 
         if (!empty($assistantUserID)) {
-            $this->userModel->delete($assistantUserID);
+            $this->userModel->deleteID($assistantUserID);
         }
     }
 
@@ -107,7 +156,9 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $assistantUser = $this->userModel->getID($assistantUserID, DATASET_TYPE_ARRAY);
         $this->assertSame("JarJarBinks", $assistantUser["Name"]);
         $this->assertSame("https://www.example.com/icon.png", $assistantUser["Photo"]);
-
+        $suggestionUser = AiSuggestionSourceService::getSuggestionUser();
+        $this->assertSame("JarJarBinks", $suggestionUser["Name"]);
+        $this->assertSame("https://www.example.com/icon.png", $suggestionUser["Photo"]);
         $meta = \Gdn::getContainer()
             ->get(\UserMetaModel::class)
             ->getUserMeta($assistantUserID, "aiAssistant.%", prefix: "aiAssistant.");
@@ -123,6 +174,7 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
      */
     public function testForbiddenExceptionForDismissingAnotherDiscussionSuggestion()
     {
+        $this->api()->patch("/ai-suggestions/settings", self::VALID_SETTINGS);
         $this->expectExceptionCode(403);
         $this->expectExceptionMessage("You are not allowed to use suggestions.");
 
@@ -284,6 +336,87 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $updatedDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
 
         $this->assertSame(\QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $updatedDiscussion["statusID"]);
+    }
+
+    /**
+     * Test generation of suggestions when user accepted analytics. tracking
+     *
+     * @throws ClientException Not Applicable.
+     * @throws ValidationException Not Applicable.
+     * @throws NoResultsException Not Applicable.
+     */
+    public function testGenerationOfSuggestionEnableTracking()
+    {
+        $this->setupConfigs();
+        $this->runWithConfig(["VanillaAnalytics.AnonymizeData" => true], function () {
+            $user = $this->createUser();
+            \Gdn::userMetaModel()->setUserMeta($user["userID"], UserMetaModel::ANONYMIZE_DATA_USER_META, -1);
+            $this->runWithUser(function () {
+                $discussion = $this->createDiscussion(["type" => "question"]);
+
+                $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+                $this->assertCount(3, $suggestions);
+                $this->assertArraySubsetRecursive(
+                    [
+                        "format" => "Vanilla",
+                        "type" => "mockSuggestion",
+                        "url" => "someplace.com/here",
+                        "title" => "answer 1",
+                        "summary" => "This is how you do this.",
+                        "hidden" => 0,
+                    ],
+                    $suggestions[0]
+                );
+
+                $createdComments = $this->runWithUser(function () use ($discussion, $suggestions) {
+                    $createdComments = $this->api()
+                        ->post("/ai-suggestions/accept-suggestion", [
+                            "allSuggestions" => false,
+                            "discussionID" => $discussion["discussionID"],
+                            "suggestionIDs" => [$suggestions[0]["aiSuggestionID"], $suggestions[2]["aiSuggestionID"]],
+                        ])
+                        ->getBody();
+
+                    return $createdComments;
+                }, $discussion["insertUserID"]);
+                $this->assertCount(2, $createdComments);
+                $this->assertSame(\QnaModel::ACCEPTED, $createdComments[0]["qnA"]);
+
+                $updatedDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+
+                $this->assertSame(\QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $updatedDiscussion["statusID"]);
+            }, $user);
+        });
+    }
+
+    /**
+     * Test suggestion are not generated when site or user did not accept tracking, user data is anonymized.
+     *
+     * @throws ClientException Not Applicable.
+     * @throws ValidationException Not Applicable.
+     * @throws NoResultsException Not Applicable.
+     */
+    public function testSuggestionNotGenerationWhenTackingNotAccepted()
+    {
+        $this->setupConfigs();
+        $this->runWithConfig(["VanillaAnalytics.AnonymizeData" => true], function () {
+            $discussion = $this->createDiscussion(["type" => "question"]);
+
+            $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+
+            $this->assertCount(0, $suggestions);
+        });
+
+        $this->runWithConfig(["VanillaAnalytics.AnonymizeData" => false], function () {
+            $user = $this->createUser();
+            \Gdn::userMetaModel()->setUserMeta($user["userID"], UserMetaModel::ANONYMIZE_DATA_USER_META, 1);
+            $discussion = $this->runWithUser(function () {
+                return $this->createDiscussion(["type" => "question"]);
+            }, $user);
+            $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
+
+            $this->assertCount(0, $suggestions);
+        });
     }
 
     /**
@@ -534,6 +667,7 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $this->createUser();
         \Gdn::config()->saveToConfig([
             "Feature.AISuggestions.Enabled" => true,
+            "Feature.aiFeatures.Enabled" => true,
             "aiSuggestions" => [
                 "enabled" => true,
                 "userID" => $this->lastUserID,

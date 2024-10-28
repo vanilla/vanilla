@@ -6,6 +6,7 @@
 
 namespace Vanilla\Community\Events;
 
+use Exception;
 use Garden\Events\ResourceEvent;
 use Garden\Events\TrackingEventInterface;
 use Psr\Log\LogLevel;
@@ -45,6 +46,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
      * @param string $action
      * @param array $payload
      * @param array|object|null $sender
+     * @throws Exception
      */
     public function __construct(string $action, array $payload, $sender = null)
     {
@@ -228,6 +230,16 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     {
         $this->sourceCategoryID = $sourceCategoryID;
         $this->payload["sourceCategoryID"] = $sourceCategoryID;
+    }
+
+    /**
+     * Set the `announce` value for the source discussion.
+     *
+     * @param int $sourceAnnounce
+     */
+    public function setSourceAnnounce(int $sourceAnnounce): void
+    {
+        $this->payload["sourceAnnounce"] = $sourceAnnounce;
     }
 
     /**

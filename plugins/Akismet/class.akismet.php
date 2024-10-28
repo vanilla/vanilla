@@ -1,8 +1,14 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
+
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Vanilla\Logger;
 
 require "class.socketwriteread.php";
 /**
@@ -69,8 +75,9 @@ require "class.socketwriteread.php";
  * @link        http://www.achingbrain.net/
  */
 
-class Akismet
+class Akismet implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
     private $version = "0.4";
     private $wordPressAPIKey;
     private $blogURL;
@@ -100,6 +107,8 @@ class Akismet
      *
      * @param String $blogURL The URL of your blog.
      * @param String $wordPressAPIKey WordPress APTI key.
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function __construct($blogURL, $wordPressAPIKey)
     {
@@ -129,6 +138,8 @@ class Akismet
          */
         $this->comment["user_ip"] =
             $_SERVER["REMOTE_ADDR"] != getenv("SERVER_ADDR") ? $_SERVER["REMOTE_ADDR"] : getenv("HTTP_X_FORWARDED_FOR");
+
+        $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
     }
 
     /**
@@ -137,6 +148,7 @@ class Akismet
      * Use this method if you suspect your API key is invalid.
      *
      * @return bool True is if the key is valid, false if not.
+     * @throws Exception
      */
     public function isKeyValid()
     {
@@ -158,6 +170,7 @@ class Akismet
      * @param string $path The Path.
      *
      * @return array
+     * @throws Exception
      */
     private function sendRequest($request, $host, $path)
     {
@@ -226,7 +239,18 @@ class Akismet
             );
         }
 
-        return $response[1] == "true";
+        $isSpam = $response[1] == "true";
+
+        // Check if we require some extra logging.
+        if ($isSpam && Gdn::config("ModerationExtraLogging.Enabled")) {
+            $this->logger->warning("Akismet marked the content as Spam", [
+                Logger::FIELD_TAGS => ["spam", "akismet"],
+                "queryString" => $this->getQueryString(),
+                "response" => $response,
+            ]);
+        }
+
+        return $isSpam;
     }
 
     /**
@@ -236,6 +260,7 @@ class Akismet
      * This will improve the service for everybody.
      *
      * @return string.
+     * @throws Exception
      */
     public function submitSpam()
     {
@@ -253,6 +278,7 @@ class Akismet
      * This will improve the service for everybody.
      *
      * @return string.
+     * @throws Exception
      */
     public function submitHam()
     {
@@ -267,10 +293,12 @@ class Akismet
      * To override the user IP address when submitting spam/ham later on.
      *
      * @param string $userip An IP address  Optional.
+     * @return $this
      */
-    public function setUserIP($userip)
+    public function setUserIP($userip): self
     {
         $this->comment["user_ip"] = $userip;
+        return $this;
     }
 
     /**
@@ -287,10 +315,13 @@ class Akismet
      * A permanent URL referencing the blog post the comment was submitted to.
      *
      * @param string $permalink The URL.  Optional.
+     * @return $this
      */
-    public function setPermalink($permalink)
+    public function setPermalink($permalink): self
     {
         $this->comment["permalink"] = $permalink;
+
+        return $this;
     }
 
     /**
@@ -299,30 +330,36 @@ class Akismet
      * May be blank, comment, trackback, pingback, or a made up value like "registration" or "wiki".
      *
      * @param string $commentType The comment type.
+     * @return $this
      */
-    public function setCommentType($commentType)
+    public function setCommentType($commentType): self
     {
         $this->comment["comment_type"] = $commentType;
+        return $this;
     }
 
     /**
      * The name that the author submitted with the comment.
      *
      * @param string $commentAuthor The comment author.
+     * @return $this
      */
-    public function setCommentAuthor($commentAuthor)
+    public function setCommentAuthor($commentAuthor): self
     {
         $this->comment["comment_author"] = $commentAuthor;
+        return $this;
     }
 
     /**
      * The email address that the author submitted with the comment.  The address is assumed to be valid.
      *
      * @param string $authorEmail The email author.
+     * @return $this
      */
-    public function setCommentAuthorEmail($authorEmail)
+    public function setCommentAuthorEmail($authorEmail): self
     {
         $this->comment["comment_author_email"] = $authorEmail;
+        return $this;
     }
 
     /**
@@ -339,10 +376,13 @@ class Akismet
      * The comment's body text.
      *
      * @param string $commentBody The comment body.
+     * @return $this
      */
-    public function setCommentContent($commentBody)
+    public function setCommentContent($commentBody): self
     {
         $this->comment["comment_content"] = $commentBody;
+
+        return $this;
     }
 
     /**

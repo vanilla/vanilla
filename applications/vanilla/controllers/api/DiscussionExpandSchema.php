@@ -9,6 +9,7 @@ use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
+use Vanilla\Forum\Models\PostMetaModel;
 use Vanilla\Permissions;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\PermissionCheckTrait;
@@ -29,7 +30,8 @@ class DiscussionExpandSchema
         private AttachmentModel $attachmentModel,
         private ReactionModel $reactionModel,
         private \Vanilla\Forum\Models\CommunityManagement\ReportModel $reportModel,
-        private Gdn_Session $session
+        private Gdn_Session $session,
+        private PostMetaModel $postMetaModel
     ) {
     }
 
@@ -73,6 +75,7 @@ class DiscussionExpandSchema
             "attachments",
             "reportMeta",
             "countReports",
+            "postFields",
         ]);
     }
 
@@ -115,6 +118,10 @@ class DiscussionExpandSchema
 
         if (ModelUtils::isExpandOption("reactions", $expandOption)) {
             $this->reactionModel->expandDiscussionReactions($rows);
+        }
+
+        if (ModelUtils::isExpandOption("postFields", $expandOption)) {
+            $this->postMetaModel->joinPostFields($rows);
         }
     }
 }

@@ -4,7 +4,7 @@
  */
 
 import React, { useContext } from "react";
-import { FormGroupContext, useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
+import { FormGroupContext, useFormGroup, useOptionalFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import classNames from "classnames";
 import { visibility } from "@library/styles/styleHelpers";
@@ -13,68 +13,72 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { cx } from "@emotion/css";
 import { ToolTip } from "@library/toolTip/ToolTip";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
+import { FormToggle } from "@library/forms/FormToggle";
+import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
 
-interface IProps {
+type ICommonProps = {
+    errors?: IFieldError[];
+};
+
+type ILegacyProps = {
     checked: boolean;
     onChange: (newValue: boolean) => void;
     inProgress?: boolean;
     disabled?: boolean;
-    errors?: IFieldError[];
-    name?: string;
     tooltip?: string;
+    name?: string;
+} & ICommonProps;
+type IModernProps = Omit<React.ComponentProps<typeof FormToggle>, "visibleLabel" | "visibleLabelUrl"> & ICommonProps;
+
+type IProps = ILegacyProps | IModernProps;
+
+function ensureModernProps(props: IProps): IModernProps {
+    if ("checked" in props) {
+        const { checked, onChange, inProgress, disabled, tooltip } = props as ILegacyProps;
+        return {
+            ...props,
+            enabled: checked,
+            onChange,
+            indeterminate: inProgress,
+            disabled,
+            tooltip,
+            errors: props.errors,
+        };
+    }
+
+    return props as IModernProps;
 }
 
 export function DashboardToggle(props: IProps) {
-    const formGroup = useContext(FormGroupContext);
+    const formGroup = useOptionalFormGroup();
+    props = ensureModernProps(props);
 
     const classes = dashboardClasses();
 
-    const { inputID, labelType } = formGroup || {};
-    const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
+    const { inputID, labelID } = formGroup || {};
 
-    let wellAndSlider = (
-        <>
-            <div tabIndex={0}>
-                <div className="toggle-well" />
-                <div className="toggle-slider" />
-            </div>
-        </>
-    );
+    const formStyle = useDashboardFormStyle();
 
     let toggle = (
-        <label
-            className={classNames("toggle-wrap", {
-                "toggle-wrap-on": props.checked,
-                "toggle-wrap-off": !props.checked,
-            })}
-        >
-            <div
-                className={classNames({
-                    "toggle-wrap-active": props.inProgress,
-                })}
-            >
-                <input
-                    name={props.name}
-                    disabled={props.disabled || props.inProgress}
-                    id={inputID}
-                    type="checkbox"
-                    className={classNames(visibility().visuallyHidden, "toggle-input")}
-                    checked={props.checked}
-                    onChange={(event) => props.onChange(!!event.target.checked)}
-                />
-                {wellAndSlider}
-            </div>
-        </label>
+        <FormToggle
+            slim={formStyle.compact}
+            indeterminate={props.indeterminate}
+            enabled={props.enabled}
+            onChange={props.onChange}
+            disabled={props.disabled}
+            accessibleLabel={props.accessibleLabel}
+            labelID={labelID || props.labelID}
+            id={inputID || props.id}
+            tooltip={props.tooltip}
+            name={props.name}
+        />
     );
 
-    if (props.tooltip) {
-        toggle = <ToolTip label={props.tooltip}>{toggle}</ToolTip>;
-    }
-
     return (
-        <div className={cx(rootClass, props.disabled && classes.disabled)}>
+        <DashboardInputWrap className={props.disabled ? classes.disabled : undefined}>
             {toggle}
             {props.errors && <ErrorMessages errors={props.errors} />}
-        </div>
+        </DashboardInputWrap>
     );
 }

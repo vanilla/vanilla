@@ -12,6 +12,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Database\SetLiterals\RawExpression;
 use Vanilla\Database\SetLiterals\SetLiteral;
+use Vanilla\Database\SetLiterals\SubQuery;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\CallbackJob;
 use Vanilla\Scheduler\SchedulerInterface;
@@ -170,7 +171,7 @@ class ForumAggregateModel
 
         $sinkOverrides = $this->getSinkOverrides($discussion, $comment);
         $discussionUpdates = $sinkOverrides + [
-            "CountComments" => new Increment(1),
+            "CountComments" => $this->getCountCommentsUpdateExpression($comment["DiscussionID"]),
             "FirstCommentID" => $this->getFirstCommentIDUpdateExpression($comment["DiscussionID"]),
         ];
 
@@ -228,19 +229,35 @@ class ForumAggregateModel
      * Get a setExpression that fetches the first commentID for a discussion.
      *
      * @param int $discussionID
-     * @return SetLiteral
+     * @return SubQuery
      */
-    private function getFirstCommentIDUpdateExpression(int $discussionID): SetLiteral
+    private function getFirstCommentIDUpdateExpression(int $discussionID): SubQuery
     {
-        return new RawExpression(
-            <<<SQL
-(
-SELECT CommentID FROM GDN_Comment
-WHERE DiscussionID = {$this->db->quoteExpression($discussionID)}
-ORDER BY DateInserted ASC
-LIMIT 1
-)
-SQL
+        return new SubQuery(
+            $this->db
+                ->createSql()
+                ->select("CommentID")
+                ->from("Comment")
+                ->where(["DiscussionID" => $discussionID])
+                ->orderBy("DateInserted", "ASC")
+                ->limit(1)
+        );
+    }
+
+    /**
+     * Get a set expression that fetches the count of comments for a discussion.
+     *
+     * @param int $discussionID
+     * @return SubQuery
+     */
+    private function getCountCommentsUpdateExpression(int $discussionID): SubQuery
+    {
+        return new SubQuery(
+            $this->db
+                ->createSql()
+                ->select("*", "count", "CountComments")
+                ->from("Comment")
+                ->where(["DiscussionID" => $discussionID])
         );
     }
 
@@ -300,7 +317,7 @@ SQL
         );
         $newDateLastComment = $newLastComment["DateInserted"] ?? $discussion["DateInserted"];
         $this->discussionModel->setField($discussion["DiscussionID"], [
-            "CountComments" => new Increment(-1),
+            "CountComments" => $this->getCountCommentsUpdateExpression($discussion["DiscussionID"]),
             "DateLastComment" => $newDateLastComment,
             "hot" => $this->discussionModel->getHotCalculationExpression(),
             "FirstCommentID" => $this->getFirstCommentIDUpdateExpression($discussion["DiscussionID"]),

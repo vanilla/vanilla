@@ -4,7 +4,8 @@
  * @license Proprietary
  */
 
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControlGroup";
 import { DashboardFormGroupPlaceholder } from "@dashboard/forms/DashboardFormGroupPlaceholder";
 import { ProfileRedirectFormClasses } from "@dashboard/userProfiles/components/ProfileRedirectForm.classes";
 import { LoadStatus } from "@library/@types/api/core";

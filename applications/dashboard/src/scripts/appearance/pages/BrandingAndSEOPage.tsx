@@ -7,7 +7,7 @@
 import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
 import { BrandingAndSEOPageClasses } from "@dashboard/appearance/pages/BrandingAndSEOPage.classes";
 import AdminLayout from "@dashboard/components/AdminLayout";
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import { cx } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
@@ -285,13 +285,11 @@ export default function BrandingAndSEOPage() {
             contentClassNames={cx(BrandingAndSEOPageClasses.layout)}
             content={
                 <section>
-                    <JsonSchemaForm
+                    <DashboardSchemaForm
                         disabled={!isLoaded}
                         fieldErrors={error?.errors ?? {}}
                         schema={BRANDING_SETTINGS}
                         instance={values}
-                        FormControlGroup={DashboardFormControlGroup}
-                        FormControl={DashboardFormControl}
                         onChange={setValues}
                     />
                 </section>

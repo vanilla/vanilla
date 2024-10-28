@@ -9,15 +9,17 @@ import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.class
 import { LayoutEditorDirection, LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
 import { WidgetSettingsModal } from "@dashboard/layout/editor/widgetSettings/WidgetSettingsModal";
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
-import { ILayoutEditorWidgetPath, IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ILayoutEditorWidgetPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { cx } from "@emotion/css";
 import { EmbedMenu } from "@library/editor/pieces/EmbedMenu";
 import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
+import { extractDataByKeyLookup } from "@library/json-schema-forms";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import React, { useMemo, useState } from "react";
+import { useState } from "react";
+import isEmpty from "lodash/isEmpty";
 
 interface IProps {
     path: ILayoutEditorWidgetPath;
@@ -32,10 +34,11 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
 
     const catalog = useLayoutCatalog(layoutViewType);
     const widgetSpec = editorContents.getWidget(props.path);
-    const { $hydrate, ...widgetProps } = widgetSpec ?? {};
+    const { $hydrate, ...rest } = widgetSpec ?? {};
     const [isWidgetSettingsModalOpen, setWidgetSettingsModalOpen] = useState(false);
     const isAsset = $hydrate?.includes("asset");
     const widget = $hydrate ? catalog?.assets[$hydrate] ?? catalog?.widgets[$hydrate] : undefined;
+    const widgetProps = isEmpty(rest) ? undefined : rest;
 
     const trashButton = (
         <EmbedButton
@@ -143,7 +146,7 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                     isVisible={isWidgetSettingsModalOpen}
                     schema={widget.schema}
                     name={widget.name}
-                    initialValues={widgetProps}
+                    initialValues={widgetProps ?? extractDataByKeyLookup(widget.schema, "default")}
                     widgetCatalog={catalog.widgets}
                     middlewaresCatalog={catalog.middlewares ?? {}}
                     widgetID={$hydrate}

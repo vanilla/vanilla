@@ -84,19 +84,23 @@ export function MetaIcon(props: React.ComponentProps<typeof Icon>) {
 export function MetaButton(
     props: React.ButtonHTMLAttributes<HTMLButtonElement> & {
         icon?: IconType;
+        buttonClassName?: string;
     },
 ) {
     const classes = metasClasses();
 
-    const { icon, className, children, ...buttonProps } = props;
+    const { icon, className, children, buttonClassName, ...buttonProps } = props;
 
     return (
         <MetaItem className={className}>
             <button
                 {...buttonProps}
-                className={cx({
-                    [classes.iconButton]: !!icon,
-                })}
+                className={cx(
+                    {
+                        [classes.iconButton]: !!icon,
+                    },
+                    buttonClassName,
+                )}
             >
                 {icon && (
                     <Icon

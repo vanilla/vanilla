@@ -20,7 +20,8 @@ import {
 } from "@library/styles/cssUtilsTypes";
 import { useThemeCache } from "@library/styles/themeCache";
 import { ColorHelper, important, percent, px } from "csx";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { Property } from "csstype";
 import merge from "lodash-es/merge";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";

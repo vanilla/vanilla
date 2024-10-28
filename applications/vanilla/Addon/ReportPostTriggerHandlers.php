@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportModel;
+use Vanilla\Logger;
 use Vanilla\Utility\DebugUtils;
 
 /**
@@ -159,6 +160,43 @@ class ReportPostTriggerHandler
             $object["DiscussionID"] = $report["recordID"];
         }
         $triggerAction->setPostRecord($object);
-        $triggerAction->execute();
+        $errorData = [
+            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+            Logger::FIELD_TAGS => ["automationRules", $actionType],
+            "automationRuleID" => $automationRuleID,
+            "recordID" => $object["recordID"],
+            "recordType" => $object["recordType"],
+            "dispatchID" => $dispatchID,
+        ];
+        try {
+            $triggerAction->execute();
+        } catch (\Exception $e) {
+            $errorData["error"] = $e->getMessage();
+            $this->log->error("Error executing action $actionType for automation rule $automationRuleID:", $errorData);
+            $this->automationRuleDispatchesModel->updateDispatchStatus(
+                $dispatchID,
+                AutomationRuleDispatchesModel::STATUS_FAILED,
+                [],
+                $e->getMessage()
+            );
+            return;
+        } catch (\Throwable $e) {
+            $errorData["error"] = $e->getMessage();
+            $this->log->error("Error executing action $actionType for automation rule $automationRuleID: ", $errorData);
+            $this->automationRuleDispatchesModel->updateDispatchStatus(
+                $dispatchID,
+                AutomationRuleDispatchesModel::STATUS_FAILED,
+                [],
+                $e->getMessage()
+            );
+            return;
+        }
+
+        // Update dispatch status
+        $this->automationRuleDispatchesModel->updateDispatchStatus(
+            $dispatchID,
+            AutomationRuleDispatchesModel::STATUS_SUCCESS,
+            ["affectedRecordCount" => 1]
+        );
     }
 }

@@ -29,6 +29,7 @@ import sortBy from "lodash-es/sortBy";
 import React, { useMemo, useState } from "react";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { ToolTip } from "@library/toolTip/ToolTip";
+import { FormToggle } from "@library/forms/FormToggle";
 
 interface IProps {
     /** Callback when the edit button is pressed */
@@ -139,7 +140,13 @@ export function ProfileFieldsList(props: IProps) {
                             <ProfileFieldVisibilityIcon visibility={field.visibility} />
                         </>
                     ),
-                    active: <DashboardToggle checked={field.enabled ?? false} onChange={() => toggleEnabled(field)} />,
+                    active: (
+                        <FormToggle
+                            accessibleLabel={t(`Toggle profile field ${field.label}`)}
+                            enabled={field.enabled ?? false}
+                            onChange={() => toggleEnabled(field)}
+                        />
+                    ),
                     actions: (
                         <RowActions
                             fieldName={field.apiName}

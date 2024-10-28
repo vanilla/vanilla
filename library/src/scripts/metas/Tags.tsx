@@ -12,13 +12,13 @@ import { tagClasses } from "@library/metas/Tags.styles";
 import { TagPreset } from "@library/metas/Tags.variables";
 import { ToolTip } from "@library/toolTip/ToolTip";
 
-interface IProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface ITagProps extends React.HTMLAttributes<HTMLSpanElement> {
     to?: LocationDescriptor;
     preset?: TagPreset;
     tooltipLabel?: string;
 }
 
-export function Tag(props: IProps) {
+export function Tag(props: ITagProps) {
     const { to, className, color, preset = TagPreset.STANDARD, tooltipLabel, ...rest } = props;
     const classes = tagClasses();
 

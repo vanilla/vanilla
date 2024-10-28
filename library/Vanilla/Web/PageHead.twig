@@ -14,7 +14,7 @@
 
 {% for script in inlineScripts -%}
     <script type="module" nonce="{{ nonce }}">
-        {{- script|raw -}}
+        {{- script|minifyScriptContents -}}
     </script>
 {% endfor %}
 
@@ -24,13 +24,13 @@
 
 {%- if jsonLD -%}
     <script type="application/ld+json">
-        {{- jsonLD|raw -}}
+        {{- jsonLD|minifyScriptContents -}}
     </script>
 {%- endif -%}
 
 {%- for inlineStyle in inlineStyles -%}
     <style>
-        {{- inlineStyle|raw -}}
+        {{- inlineStyle|minifyStylesheetContents -}}
     </style>
 {%- endfor -%}
 

@@ -79,7 +79,8 @@ class DBAModel extends Gdn_Model
         $parentJoinColumn = "",
         $childJoinColumn = "",
         $where = [],
-        $default = 0
+        $default = 0,
+        array $childWhere = []
     ) {
         $pDO = Gdn::database()->connection();
         $default = !is_null($default) ? $pDO->quote($default) : $default;
@@ -111,6 +112,10 @@ class DBAModel extends Gdn_Model
         if (!$childJoinColumn) {
             $childJoinColumn = $parentJoinColumn;
         }
+
+        $childWheres = self::formatWheres($childWhere, "c", $pDO);
+        $childWhereQuery = !empty($childWheres) ? " and " . implode(" and ", $childWheres) : "";
+
         $subSelect = is_null($default)
             ? "coalesce($aggregate(c.$childColumnName), null)"
             : "coalesce($aggregate(c.$childColumnName), $default)";
@@ -118,10 +123,28 @@ class DBAModel extends Gdn_Model
                   set p.$parentColumnName = (
                      select $subSelect
                      from :_$childTable c
-                     where p.$parentJoinColumn = c.$childJoinColumn)";
+                     where p.$parentJoinColumn = c.$childJoinColumn $childWhereQuery)";
 
+        $wheres = self::formatWheres($where, "p", $pDO);
+        if (!empty($wheres)) {
+            $result .= "\n where " . implode(" and ", $wheres);
+        }
+
+        return str_replace(":_", Gdn::database()->DatabasePrefix, $result);
+    }
+
+    /**
+     * Format where to be used in a query.
+     *
+     * @param array $where
+     * @param string $alias
+     * @param $pDO
+     * @return array
+     */
+    private static function formatWheres(array $where, string $alias, $pDO): array
+    {
+        $wheres = [];
         if (!empty($where)) {
-            $wheres = [];
             foreach ($where as $column => $value) {
                 if ($value instanceof RangeExpression) {
                     // Handle range expressions here.
@@ -129,30 +152,26 @@ class DBAModel extends Gdn_Model
                         if ($op === "=") {
                             if (is_array($opValue)) {
                                 $opValue = array_map([$pDO, "quote"], $opValue);
-                                $wheres[] = "p.`$column` IN (" . join(",", $opValue) . ")";
+                                $wheres[] = "$alias.`$column` IN (" . join(",", $opValue) . ")";
                             } else {
                                 $opValue = $pDO->quote($opValue);
-                                $wheres[] = "p.`$column` = $opValue";
+                                $wheres[] = "$alias.`$column` = $opValue";
                             }
                         } else {
                             $opValue = $pDO->quote($opValue);
-                            $wheres[] = "p.`$column` $op $opValue";
+                            $wheres[] = "$alias.`$column` $op $opValue";
                         }
                     }
                 } elseif (is_array($value)) {
                     $value = array_map([$pDO, "quote"], $value);
-                    $wheres[] = "p.`$column` IN (" . join(",", $value) . ")";
+                    $wheres[] = "$alias.`$column` IN (" . join(",", $value) . ")";
                 } else {
                     $value = $pDO->quote($value);
-                    $wheres[] = "p.`$column` = $value";
+                    $wheres[] = "$alias.`$column` = $value";
                 }
             }
-
-            $result .= "\n where " . implode(" and ", $wheres);
         }
-
-        $result = str_replace(":_", Gdn::database()->DatabasePrefix, $result);
-        return $result;
+        return $wheres;
     }
 
     /**

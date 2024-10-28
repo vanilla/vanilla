@@ -9,7 +9,7 @@ import { IUserFragment } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
 import { useCurrentUser } from "@library/features/users/userHooks";
 import { IPostReaction, IPostRecord } from "@library/postReactions/PostReactions.types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { indexArrayByKey } from "@vanilla/utils";
 
 // Toggle reaction selection for the record
@@ -17,6 +17,8 @@ export function useToggleReaction(props: IPostRecord) {
     const { recordType, recordID } = props;
     const currentUser = useCurrentUser();
     const apiUrl = `/${recordType}s/${recordID}/reactions`;
+
+    const queryClient = useQueryClient();
 
     const { data, mutateAsync } = useMutation({
         mutationKey: ["toggle-reaction", recordType, recordID],
@@ -52,6 +54,9 @@ export function useToggleReaction(props: IPostRecord) {
                 };
             });
         },
+        onSettled() {
+            queryClient.invalidateQueries(["reaction-log", recordType, recordID]);
+        },
     });
 
     return { toggleResponse: data, toggleReaction: mutateAsync };
@@ -60,14 +65,13 @@ export function useToggleReaction(props: IPostRecord) {
 // Get a list of users for the reaction on the current record
 export function useReactionLog(props: IPostRecord) {
     const { recordType, recordID } = props;
-    const { data, refetch } = useQuery({
+    return useQuery({
         queryKey: ["reaction-log", recordType, recordID],
         queryFn: async ({ queryKey }) => {
             const [_, recordType, recordID] = queryKey;
             const response = await apiv2.get<IPostReaction[]>(`/${recordType}s/${recordID}/reactions`);
             return response.data;
         },
+        enabled: false,
     });
-
-    return { reactionLog: data ?? [], refetchLog: refetch };
 }

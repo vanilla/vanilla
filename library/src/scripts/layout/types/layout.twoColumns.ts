@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { media } from "@library/styles/styleShim";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";

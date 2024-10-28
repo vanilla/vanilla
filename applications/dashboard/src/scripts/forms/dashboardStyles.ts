@@ -12,12 +12,14 @@ import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const dashboardClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const style = styleFactory("dashboard");
+
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const subHeading = css({
         ...extendItemContainer(18),
@@ -183,7 +185,7 @@ export const dashboardClasses = useThemeCache(() => {
     const colorInput = css({
         "&&": {
             marginTop: 0,
-            borderRadius: "6px 0 0 6px",
+            borderRadius: "6px 0 0 6px !important",
         },
     });
 
@@ -215,7 +217,8 @@ export const dashboardClasses = useThemeCache(() => {
 
     const labelIcon = css({
         marginLeft: 4,
-        marginTop: 2,
+        maxHeight: "1em",
+        verticalAlign: "middle",
     });
 
     const noLeftPadding = css({
@@ -236,39 +239,17 @@ export const dashboardClasses = useThemeCache(() => {
         "& input": { fontSize: 14 },
     });
 
-    const spaceBetweenFormGroup = css({
-        justifyContent: "space-between",
-
-        "& .input-wrap": {
-            flex: 0,
-        },
-    });
-
-    const buttonRow = css({
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingInline: 10,
-
-        "& .label-wrap": {
-            // Create the 58.3333333% used from the old 24 col grid system css
-            flex: `0 0 ${(100 / 24) * 14}%`,
-        },
-
-        "& h1, h2, h3, h4": {
-            marginTop: 9,
-        },
-
-        ...mediaQueries.oneColumnDown({
-            display: "block",
-        }),
-    });
-
     const inputWrapper = css({
         display: "flex",
         width: "100%",
         "& > input": {
             flex: 1,
+        },
+
+        "&.isCompact": {
+            "& input": {
+                height: "initial",
+            },
         },
     });
 
@@ -278,16 +259,27 @@ export const dashboardClasses = useThemeCache(() => {
         },
     });
 
+    const reachAutocompleteInput = css({
+        paddingTop: 1,
+        paddingBottom: 1,
+        alignItems: "center",
+        "& input": {
+            minHeight: 32,
+            lineHeight: "32px",
+        },
+    });
+
+    const currencySymbol = css({
+        position: "relative",
+        width: 0,
+        transform: "translateX(15px)",
+        fontSize: 16,
+        fontWeight: globalVars.fonts.weights.semiBold,
+    });
+
     const currencyInput = css({
         display: "flex",
         alignItems: "center",
-
-        "& .dollar": {
-            position: "relative",
-            left: "25px",
-            fontSize: 16,
-            fontWeight: globalVars.fonts.weights.semiBold,
-        },
 
         "& input": {
             paddingLeft: "35px",
@@ -312,8 +304,6 @@ export const dashboardClasses = useThemeCache(() => {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
-        justifyContent: "space-between",
-        maxWidth: "7em",
 
         "& input": {
             textAlign: "center",
@@ -322,24 +312,29 @@ export const dashboardClasses = useThemeCache(() => {
         "@media (max-width: 300px)": {
             flexDirection: "column",
         },
-    });
-
-    const ratioInputReadOnlyNumerator = css({
-        padding: "6px 6px 6px 0",
+        gap: "12px",
     });
 
     const ratioInput = css({
         maxWidth: "4em",
-        padding: 6,
-    });
-
-    const ratioInputSeparator = css({
-        padding: 6,
-        minWidth: "max-content",
     });
 
     const highlight = css({
         backgroundColor: ColorsUtils.colorOut(globalVars.messageColors.error.bg.fade(0.25)),
+    });
+
+    const imagePreview = css({
+        maxWidth: "100%",
+        height: "auto",
+        border: singleBorder(),
+        borderRadius: 4,
+        marginTop: 8,
+        marginBottom: 8,
+    });
+
+    const content = css({
+        margin: "16px 0",
+        padding: "0 18px",
     });
 
     return {
@@ -367,8 +362,7 @@ export const dashboardClasses = useThemeCache(() => {
         noLeftPadding,
         helperText,
         passwordInput,
-        spaceBetweenFormGroup,
-        buttonRow,
+        currencySymbol,
         currencyInput,
         multiLineInput,
         readonlyRow,
@@ -376,9 +370,10 @@ export const dashboardClasses = useThemeCache(() => {
         readonlyDescription,
         readonlyEmptyMessage,
         ratioInputContainer,
-        ratioInputReadOnlyNumerator,
         ratioInput,
-        ratioInputSeparator,
         highlight,
+        imagePreview,
+        content,
+        reachAutocompleteInput,
     };
 });

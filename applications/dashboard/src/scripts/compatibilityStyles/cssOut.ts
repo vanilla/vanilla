@@ -5,7 +5,8 @@
  */
 
 import { flattenNests } from "@library/styles/styleShim";
-import { CSSObject, injectGlobal } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
+import { injectGlobal } from "@emotion/css";
 
 /**
  * @deprecated Use injectGlobal instead.

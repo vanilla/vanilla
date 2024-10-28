@@ -67,4 +67,21 @@ class ModelUtilsTest extends TestCase
         $this->assertSame(1, $i);
         $this->assertSame(true, $result);
     }
+
+    /**
+     * Test automatic slot type determinations.
+     *
+     * @return void
+     */
+    public function testGetDateBasedSlotType(): void
+    {
+        $this->assertEquals(
+            "d",
+            ModelUtils::getDateBasedSlotType(postDate: "2019-01-01T00:00:00", now: "2019-01-01T23:00:00")
+        );
+        $this->assertEquals("w", ModelUtils::getDateBasedSlotType(postDate: "2019-01-01", now: "2019-01-07"));
+        $this->assertEquals("m", ModelUtils::getDateBasedSlotType(postDate: "2019-01-01", now: "2019-01-31"));
+        $this->assertEquals("y", ModelUtils::getDateBasedSlotType(postDate: "2019-01-01", now: "2019-12-31"));
+        $this->assertEquals("a", ModelUtils::getDateBasedSlotType(postDate: "2019-01-01", now: "2020-03-01"));
+    }
 }

@@ -110,6 +110,10 @@ class OAuth2AuthenticationTypeProvider implements AuthenticatorTypeInterface
                     "OAuth Configuration: This is an OIDC Connection (This connection should use OIDC ID Token instead of a profile URL).",
                 "default" => false,
             ],
+            "markVerified:b?" => [
+                "description" => "Mark users as verified (bypass pre-moderation) if their email is confirmed.",
+                "default" => false,
+            ],
         ]);
     }
 }

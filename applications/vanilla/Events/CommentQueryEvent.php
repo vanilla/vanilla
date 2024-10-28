@@ -7,32 +7,49 @@
 
 namespace Vanilla\Community\Events;
 
-use Gdn_SQLDriver;
+use Gdn_DataSet;
 
 /**
  * Event for handling comment query checks.
  */
 class CommentQueryEvent
 {
-    protected Gdn_SQLDriver $commentSQL;
-
     /**
      * Constructor.
      *
-     * @param Gdn_SQLDriver $commentSQL
+     * @param Gdn_DataSet $comment
      */
-    public function __construct(\Gdn_SQLDriver &$commentSQL)
+    public function __construct(private Gdn_DataSet &$comment)
     {
-        $this->commentSQL = &$commentSQL;
     }
 
     /**
-     * Get the CommentSQL.
+     * Get the Comment.
      *
-     * @return Gdn_SQLDriver
+     * @return Gdn_DataSet
      */
-    public function &getCommentSQL(): Gdn_SQLDriver
+    public function &getComment(): Gdn_DataSet
     {
-        return $this->commentSQL;
+        return $this->comment;
+    }
+
+    public function applyWheresToQuery(): void
+    {
+        $sql = $this->getCommentSQL();
+        $whereGroups = $this->whereGroups;
+
+        if (count($whereGroups) === 0) {
+            // There are none.
+            return;
+        }
+
+        $sql->beginWhereGroup();
+        foreach ($whereGroups as $where) {
+            $sql->orOp();
+            $sql->beginWhereGroup();
+            $sql->where($where);
+            $sql->endWhereGroup();
+        }
+        $sql->endWhereGroup();
     }
 }

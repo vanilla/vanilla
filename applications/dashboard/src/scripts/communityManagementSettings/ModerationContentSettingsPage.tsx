@@ -27,6 +27,9 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import { useMutation } from "@tanstack/react-query";
 import apiv2 from "@library/apiv2";
 import { useToast } from "@library/features/toaster/ToastContext";
+import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 
 const BETA_ENABLED = getMeta("featureFlags.CommunityManagementBeta.Enabled", false);
 export const CONF_ESCALATIONS_ENABLED = "escalations.enabled";
@@ -54,32 +57,6 @@ export default function ModerationContentSettingsPage() {
     const isTriageLoading = isConfigLoading || triagePatcher.isLoading;
     const isTriageEnabled: boolean = configs.data?.[CONF_TRIAGE_ENABLED] ?? false;
     const [showResolveAll, setShowResolveAll] = useState(false);
-
-    let toggle = (
-        <span className="input-wrap">
-            <FormToggle
-                enabled={isEscalationsEnabled}
-                indeterminate={isEscalationsLoading}
-                disabled={isEscalationsLoading || (isCustomDiscussionThreadsEnabled && isEscalationsEnabled)}
-                onChange={(enabled) => {
-                    escalationsPatcher
-                        .patchConfig({
-                            [CONF_ESCALATIONS_ENABLED]: enabled,
-                        })
-                        .then(() => {
-                            // reload dashboard sections.
-                            fetchDashboardSections();
-                        });
-                }}
-            />
-        </span>
-    );
-
-    if (isCustomDiscussionThreadsEnabled && isEscalationsEnabled) {
-        toggle = (
-            <ToolTip label={t("This setting must be enabled to use Custom Discussion Threads.")}>{toggle}</ToolTip>
-        );
-    }
 
     const device = useTitleBarDevice();
     const { hasCollision } = useCollisionDetector();
@@ -123,12 +100,31 @@ export default function ModerationContentSettingsPage() {
                                     )}
                                 />
                             }
-                            className={cx(
-                                dashboardClasses().spaceBetweenFormGroup,
-                                isCmdHighlighted && dashboardClasses().highlight,
-                            )}
+                            className={cx(isCmdHighlighted && dashboardClasses().highlight)}
+                            labelType={DashboardLabelType.JUSTIFIED}
                         >
-                            {toggle}
+                            <DashboardToggle
+                                enabled={isEscalationsEnabled}
+                                indeterminate={isEscalationsLoading}
+                                disabled={
+                                    isEscalationsLoading || (isCustomDiscussionThreadsEnabled && isEscalationsEnabled)
+                                }
+                                onChange={(enabled) => {
+                                    escalationsPatcher
+                                        .patchConfig({
+                                            [CONF_ESCALATIONS_ENABLED]: enabled,
+                                        })
+                                        .then(() => {
+                                            // reload dashboard sections.
+                                            fetchDashboardSections();
+                                        });
+                                }}
+                                tooltip={
+                                    isCustomDiscussionThreadsEnabled && isEscalationsEnabled
+                                        ? t("This setting must be enabled to use Custom Discussion Threads.")
+                                        : undefined
+                                }
+                            />
                         </DashboardFormGroup>
                     )}
                     <DashboardFormGroup
@@ -136,35 +132,33 @@ export default function ModerationContentSettingsPage() {
                         description={t(
                             "All users with the staff permission will be able to see and mark discussions as resolved or unresolved. These users will also be able to access the triage dashboard to moderate their categories.",
                         )}
-                        className={dashboardClasses().spaceBetweenFormGroup}
+                        labelType={DashboardLabelType.JUSTIFIED}
                     >
-                        <span className="input-wrap">
-                            <FormToggle
-                                indeterminate={isTriageLoading}
-                                enabled={isTriageEnabled}
-                                onChange={(enabled) => {
-                                    triagePatcher
-                                        .patchConfig({
-                                            [CONF_TRIAGE_ENABLED]: enabled,
-                                        })
-                                        .then(() => {
-                                            // reload dashboard sections.
-                                            fetchDashboardSections();
-                                        });
-                                }}
-                            />
-                        </span>
+                        <DashboardToggle
+                            indeterminate={isTriageLoading}
+                            enabled={isTriageEnabled}
+                            onChange={(enabled) => {
+                                triagePatcher
+                                    .patchConfig({
+                                        [CONF_TRIAGE_ENABLED]: enabled,
+                                    })
+                                    .then(() => {
+                                        // reload dashboard sections.
+                                        fetchDashboardSections();
+                                    });
+                            }}
+                        />
                     </DashboardFormGroup>
                     <DashboardFormGroup
                         label={t("Resolve All Discussions")}
                         description={t(
                             "Resolve All Posts will resolve all existing posts in the community. This bulk action will not trigger webhooks or analytics.",
                         )}
-                        className={dashboardClasses().spaceBetweenFormGroup}
+                        labelType={DashboardLabelType.JUSTIFIED}
                     >
-                        <span className="input-wrap">
+                        <DashboardInputWrap>
                             <Button onClick={() => setShowResolveAll(true)}>{t("Resolve All")}</Button>
-                        </span>
+                        </DashboardInputWrap>
                     </DashboardFormGroup>
                     <ResolveAllModal isVisible={showResolveAll} setIsVisible={setShowResolveAll} />
                     {BETA_ENABLED && <ReportReasonList />}

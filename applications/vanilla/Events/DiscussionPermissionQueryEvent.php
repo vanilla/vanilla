@@ -63,11 +63,13 @@ class DiscussionPermissionQueryEvent
             return;
         }
 
+        $sql->beginWhereGroup();
         foreach ($whereGroups as $where) {
             $sql->orOp();
             $sql->beginWhereGroup();
             $sql->where($where);
             $sql->endWhereGroup();
         }
+        $sql->endWhereGroup();
     }
 }

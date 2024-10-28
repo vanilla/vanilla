@@ -1,20 +1,22 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { defaultTransition, disabledInput, userSelect } from "@library/styles/styleHelpers";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { defaultTransition, disabledInput, userSelect } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { calc, important, percent, px } from "csx";
-import { css, CSSObject } from "@emotion/css";
+import { metasVariables } from "@library/metas/Metas.variables";
+import { important, percent, px } from "csx";
 
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -103,6 +105,7 @@ export const checkRadioClasses = useThemeCache(() => {
         ...Mixins.padding({
             vertical: 5,
             horizontal: 6,
+            left: 0,
         }),
     });
 
@@ -240,6 +243,9 @@ export const checkRadioClasses = useThemeCache(() => {
                 bottom: styleUnit(6),
             }),
         },
+        "&.minContent": {
+            width: "min-content",
+        },
     });
 
     const fullWidth = css({
@@ -272,13 +278,18 @@ export const checkRadioClasses = useThemeCache(() => {
     });
 
     const checkBoxDescription = css({
-        marginLeft: 30,
+        marginLeft: 25,
         marginTop: -5,
+        ...Mixins.font(metasVariables().font),
     });
 
     const tooltipPerOption = css({
         marginLeft: 8,
         marginBottom: -4,
+    });
+
+    const radioNote = css({
+        marginLeft: 30,
     });
 
     return {
@@ -299,5 +310,6 @@ export const checkRadioClasses = useThemeCache(() => {
         grid,
         dashboardRadioButton,
         checkBoxDescription,
+        radioNote,
     };
 });

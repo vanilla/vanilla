@@ -9,7 +9,7 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { DeepPartial } from "redux";
 import { Variables } from "@library/styles/Variables";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { media } from "@library/styles/styleShim";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";

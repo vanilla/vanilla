@@ -1,0 +1,216 @@
+openapi: 3.0.2
+info:
+paths:
+    /post-types:
+        x-hidden: true
+        get:
+            summary: List post types.
+            parameters:
+                - name: apiName
+                  description: Filter by apiName.
+                  in: query
+                  schema:
+                      type: string
+                - name: name
+                  description: Filter by name.
+                  in: query
+                  schema:
+                      type: string
+                - name: baseType
+                  description: Filter by base type.
+                  in: query
+                  schema:
+                      type: string
+                - name: isOriginal
+                  description: Filter by original post types.
+                  in: query
+                  schema:
+                      type: boolean
+                - name: isActive
+                  description: Filter by active post types.
+                  in: query
+                  schema:
+                      type: boolean
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/PostType"
+                                type: array
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+            tags:
+                - Post Types & Post Fields
+        post:
+            summary: Create a post type.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PostTypePost"
+            tags:
+                - Post Types & Post Fields
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PostType"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+
+    /post-types/{postTypeID}:
+        x-hidden: true
+        get:
+            summary: Get a post type.
+            tags:
+                - Post Types & Post Fields
+            parameters:
+                - description: The ID of the post type.
+                  in: path
+                  name: postTypeID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/PostType"
+                "404":
+                    description: Not Found
+        patch:
+            summary: Update a post type.
+            tags:
+                - Post Types & Post Fields
+            parameters:
+                - description: The ID of the post type.
+                  in: path
+                  name: postTypeID
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PostTypePatch"
+                required: true
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/PostType"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+        delete:
+            summary: Delete a post type.
+            parameters:
+                - description: The ID of the post type
+                  in: path
+                  name: postTypeID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "204":
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+            tags:
+                - Post Types & Post Fields
+components:
+    schemas:
+        PostTypePost:
+            properties:
+                apiName:
+                    description: The API name of the post type.
+                    type: string
+                name:
+                    description: The name of the post type.
+                    type: string
+                parentPostTypeID:
+                    description: The ID of an associated post type.
+                    type: integer
+                baseType:
+                    description: The base type of the post type.
+                    type: string
+                isActive:
+                    description: Whether the post type is active.
+                    type: boolean
+            required:
+                - apiName
+                - name
+                - baseType
+            type: object
+        PostTypePatch:
+            properties:
+                name:
+                    description: The name of the post type.
+                    type: string
+                isActive:
+                    description: Whether the post type is active.
+                    type: boolean
+            required:
+                - name
+            type: object
+        PostType:
+            properties:
+                postTypeID:
+                    description: The ID of the post type.
+                    type: integer
+                apiName:
+                    description: The API name of the post type.
+                    type: string
+                name:
+                    description: The name of the post type.
+                    type: string
+                parentPostTypeID:
+                    description: The ID of an associated post type.
+                    type: integer
+                baseType:
+                    description: The base type of the post type.
+                    type: string
+                isOriginal:
+                    description: Whether the post type is original.
+                    type: boolean
+                isActive:
+                    description: Whether the post type is active.
+                    type: boolean
+            required:
+                - postTypeID
+                - apiName
+                - name
+                - baseType
+                - isOriginal
+                - isActive
+            type: object

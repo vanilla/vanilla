@@ -260,7 +260,8 @@ const schema: JsonSchema = {
                 type: "string",
             },
             "x-control": {
-                inputType: "tokens",
+                inputType: "dropDown",
+                multiple: true,
                 label: t("Action"),
                 choices: {
                     api: {

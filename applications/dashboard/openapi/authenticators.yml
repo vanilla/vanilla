@@ -130,6 +130,9 @@ components:
                 isOidc:
                     type: boolean
                     default: false
+                markVerified:
+                    type: boolean
+                    default: false
                 urls:
                     $ref: "#/components/schemas/AuthenticatorUrlSchema"
             required:

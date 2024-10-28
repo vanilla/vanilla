@@ -7,7 +7,7 @@
 import { IEscalation } from "@dashboard/moderation/CommunityManagementTypes";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import { MetaItem, MetaIcon, MetaLink } from "@library/metas/Metas";
 import { metasClasses } from "@library/metas/Metas.styles";
 import ProfileLink from "@library/navigation/ProfileLink";

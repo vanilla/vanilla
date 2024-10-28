@@ -12,7 +12,7 @@ import { percent } from "csx";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { CSSPercentage } from "csx/lib/types";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { TileAlignment } from "@library/features/tiles/TileAlignment";
 import { Mixins } from "@library/styles/Mixins";
 import { ITilesOptions, tilesVariables } from "./Tiles.variables";

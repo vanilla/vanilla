@@ -6,6 +6,7 @@
 
 namespace VanillaTests\Fixtures\Scheduler;
 
+use Exception;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Scheduler\Descriptor\JobDescriptorInterface;
@@ -75,6 +76,7 @@ class InstantScheduler extends DeferredScheduler
      *
      * @param JobDescriptorInterface $jobDescriptor
      * @return TrackingSlipInterface
+     * @throws Exception
      */
     public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface
     {

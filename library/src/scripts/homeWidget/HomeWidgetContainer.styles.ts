@@ -3,7 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { HomeWidgetItemContentType, homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { pageHeadingBoxVariables, SubtitleType } from "@library/layout/PageHeadingBox.variables";
@@ -31,7 +32,7 @@ export enum WidgetContainerDisplayType {
 export interface IHomeWidgetContainerOptions {
     outerBackground?: IBackground;
     innerBackground?: IBackground;
-    borderType?: BorderType | "navLinks";
+    borderType?: BorderType;
     maxWidth?: number | string;
     viewAll?: IViewAll;
     maxColumnCount?: number;
@@ -55,7 +56,7 @@ export interface IHomeWidgetContainerOptions {
     contentIsListWithSeparators?: boolean;
 }
 
-interface IViewAll {
+export interface IViewAll {
     position?: "top" | "bottom";
     to?: string;
     onClick?: (e) => void;
@@ -80,7 +81,7 @@ export const homeWidgetContainerVariables = useThemeCache(
             {
                 outerBackground: Variables.background({}),
                 innerBackground: Variables.background({}),
-                borderType: BorderType.NONE as BorderType | "navLinks",
+                borderType: BorderType.NONE as BorderType,
                 maxWidth: undefined as "string" | "number" | undefined,
                 viewAll: {
                     onClick: undefined,
@@ -193,9 +194,9 @@ export const homeWidgetContainerVariables = useThemeCache(
             Variables.boxHasOutline(
                 Variables.box({
                     background: options.innerBackground,
-                    borderType: options.borderType as BorderType,
+                    borderType: options.borderType,
                 }),
-            ) && options.borderType !== "navLinks";
+            ) && options.borderType !== BorderType.NAV_LINKS;
 
         const mobileMediaQuery = oneColumnVariables().mediaQueries().oneColumnDown;
 
@@ -231,11 +232,6 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const halfHorizontalSpacing = getPixelNumber(vars.itemSpacing.horizontal) / 2;
     const halfHorizontalSpacingMobile = getPixelNumber(vars.itemSpacing.mobile.horizontal) / 2;
 
-    const contentMixin: CSSObject = {
-        ...extendItemContainer(getPixelNumber(vars.itemSpacing.horizontal)),
-        ...vars.mobileMediaQuery(extendItemContainer(getPixelNumber(vars.itemSpacing.mobile.horizontal))),
-    };
-
     const container = css(
         {
             // Backwards compatibility.
@@ -250,7 +246,10 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         vars.mobileMediaQuery(extendItemContainer(0)),
     );
 
-    const content = css(contentMixin);
+    const content = css({
+        ...extendItemContainer(getPixelNumber(vars.itemSpacing.horizontal)),
+        ...vars.mobileMediaQuery(extendItemContainer(getPixelNumber(vars.itemSpacing.mobile.horizontal))),
+    });
 
     const itemWrapper = css(vars.hasVisibleContainer && Mixins.padding({ horizontal: halfHorizontalSpacing * 2 }));
 

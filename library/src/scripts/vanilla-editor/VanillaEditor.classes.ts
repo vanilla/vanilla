@@ -45,5 +45,11 @@ export const vanillaEditorClasses = useThemeCache(() => {
         });
     }
 
-    return { root, elementToolbarPosition, elementToolbarContents };
+    const footer = css({
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+    });
+
+    return { root, elementToolbarPosition, elementToolbarContents, footer };
 });

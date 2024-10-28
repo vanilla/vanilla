@@ -8,7 +8,7 @@ x-resourceEvents:
 components:
     parameters:
         # This is a partial schema to add Q&A options to the main schema.
-        DiscussionExpand:
+        expand[]:
             schema:
                 items:
                     enum:

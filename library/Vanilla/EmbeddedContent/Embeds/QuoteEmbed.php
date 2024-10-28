@@ -161,4 +161,14 @@ class QuoteEmbed extends AbstractEmbed
             "category:o?" => ["categoryID", "name", "url"],
         ]);
     }
+
+    /**
+     * Override quote embeds to not be cacheable.
+     *
+     * {@inheritDoc}
+     */
+    public function isCacheable(): bool
+    {
+        return false;
+    }
 }

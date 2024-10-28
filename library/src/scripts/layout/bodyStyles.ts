@@ -10,7 +10,8 @@ import { percent, viewHeight } from "csx";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash-es/isEmpty";
-import { CSSObject, injectGlobal } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
+import { injectGlobal } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 import { useEffect } from "react";
 

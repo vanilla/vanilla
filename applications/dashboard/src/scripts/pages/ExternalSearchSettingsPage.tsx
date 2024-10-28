@@ -4,7 +4,6 @@
  */
 
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
@@ -19,6 +18,7 @@ import { t } from "@vanilla/i18n";
 import { JSONSchemaType, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import React, { useEffect, useState } from "react";
 import { MemoryRouter } from "react-router";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 
 export interface IExternalSearchSettings {
     externalSearchQuery: string;
@@ -100,12 +100,10 @@ export function ExternalSearchSettingsPage() {
                     )}
                     <ErrorBoundary>
                         <DashboardFormList>
-                            <JsonSchemaForm
+                            <DashboardSchemaForm
                                 disabled={configs.status !== LoadStatus.SUCCESS}
                                 schema={schema}
                                 instance={value}
-                                FormControlGroup={DashboardFormControlGroup}
-                                FormControl={DashboardFormControl}
                                 onChange={setValue}
                             />
                         </DashboardFormList>

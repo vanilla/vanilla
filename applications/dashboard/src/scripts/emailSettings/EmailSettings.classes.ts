@@ -18,45 +18,6 @@ export const emailSettingsClasses = useThemeCache(() => {
         scrollMarginTop: 96,
     });
 
-    // a bit messy, but it's the only way to get the right spacing/borders etc
-    const contentSection = css({
-        "li.meta-group-header ": {
-            borderBottom: "none",
-            paddingBottom: 0,
-        },
-        "li.meta-group-header + li": {
-            "&.formGroup-checkBox": {
-                borderBottom: "none",
-                paddingBottom: 0,
-                paddingTop: 8,
-            },
-        },
-        "li.formGroup-checkBox": {
-            borderBottom: "none",
-            paddingTop: 0,
-        },
-        "li.formGroup-checkBox + li": {
-            "&.formGroup-checkBox": {
-                borderBottom: "none",
-                paddingBottom: 0,
-            },
-        },
-        "li.formGroup-checkBox + li.formGroup-textBox": {
-            marginTop: 16,
-            borderTop: "1px solid #d8d8d8",
-            borderBottom: "none",
-            "& + li.formGroup-checkBox": {
-                borderBottom: "1px solid #d8d8d8",
-                "& .input-wrap": {
-                    flex: "0 0 100%",
-                    "& label": {
-                        paddingTop: 0,
-                    },
-                },
-            },
-        },
-    });
-
     const metaGroupHeader = css({
         fontWeight: 600,
         paddingLeft: 18,
@@ -76,5 +37,5 @@ export const emailSettingsClasses = useThemeCache(() => {
         textTransform: "uppercase",
     });
 
-    return { root, section, contentSection, metaGroupHeader, quickLinks, hidden, uppercase };
+    return { root, section, metaGroupHeader, quickLinks, hidden, uppercase };
 });

@@ -4,9 +4,9 @@
  */
 
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import { INotificationPreferences } from "@library/notificationPreferences";
-import { t } from "@vanilla/i18n";
 import { RecordID } from "@vanilla/utils";
+import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 
 export interface ICategoryFragment {
     categoryID: number;
@@ -33,6 +33,9 @@ export interface ICategory extends ICategoryFragment {
     children: ICategory[];
     dateInserted: string;
     iconUrl?: string;
+    dateFollowed?: string;
+    preferences?: ICategoryPreferences;
+    lastPost?: IDiscussion;
 }
 
 export enum CategoryDisplayAs {

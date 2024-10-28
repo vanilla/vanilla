@@ -11,7 +11,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 import { media } from "@library/styles/styleShim";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";

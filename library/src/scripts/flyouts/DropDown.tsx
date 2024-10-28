@@ -305,9 +305,11 @@ const resolveOpenDirection = (data: IResolveDirectionProps): DropDownOpenDirecti
     // Early bailout if we aren't auto.
     if (props.openDirection === DropDownOpenDirection.AUTO || (!props.openDirection && (!renderAbove || !renderLeft))) {
         if (!renderAbove) {
-            const documentHeight = document.body.clientHeight;
-            const centerY = (buttonRect.top + buttonRect.bottom) / 2; // center Y position of button
-            renderAbove = centerY > documentHeight / 2;
+            // We only want to render upwards if we don't fit downwards.
+            const endOfScreen = window.scrollY + window.innerHeight;
+            const contentHeight = contentRect.height === 0 ? window.innerHeight * 0.3 : contentRect.height;
+            const endOfDropdownIfPositionedBelow = buttonRect.bottom + contentHeight;
+            renderAbove = endOfDropdownIfPositionedBelow >= endOfScreen;
         }
         if (!renderLeft) {
             const documentWidth = document.body.clientWidth;

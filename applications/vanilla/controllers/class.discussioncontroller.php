@@ -947,8 +947,8 @@ body { background: transparent !important; }
 
             // Load the comments.
             $currentOrderBy = $this->CommentModel->orderBy();
-            if (stringBeginsWith(getValueR("0.0", $currentOrderBy), "c.DateInserted")) {
-                $this->CommentModel->orderBy("c.DateInserted " . $sortComments); // allow custom sort
+            if (stringBeginsWith(getValueR("0.0", $currentOrderBy), "DateInserted")) {
+                $this->CommentModel->orderBy("DateInserted " . $sortComments); // allow custom sort
             }
             $this->setData(
                 "Comments",

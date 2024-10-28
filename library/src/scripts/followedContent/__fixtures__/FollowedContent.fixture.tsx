@@ -4,12 +4,11 @@
  * @license Proprietary
  */
 
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { FollowedContentContext } from "@library/followedContent/FollowedContentContext";
 import { CategoryDisplayAs } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { STORY_USER } from "@library/storybook/storyData";
-import { CategorySortOption } from "@dashboard/@types/api/category";
 import { CategoryPreferencesFixture } from "@dashboard/userPreferences/__fixtures__/CategoryNotificationPreferences.Fixture";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
@@ -46,44 +45,3 @@ export const mockedCategories = [
         },
     },
 ];
-
-function HasFollowedCategories({ children }: { children: ReactNode }) {
-    return (
-        <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
-            <FollowedContentContext.Provider
-                value={{
-                    userID: 1,
-                    followedCategories: mockedCategories,
-                    sortBy: CategorySortOption.ALPHABETICAL,
-                    setSortBy: () => {},
-                    error: null,
-                }}
-            >
-                {children}
-            </FollowedContentContext.Provider>
-        </CurrentUserContextProvider>
-    );
-}
-
-function NoFollowedCategories({ children }: { children: ReactNode }) {
-    return (
-        <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
-            <FollowedContentContext.Provider
-                value={{
-                    userID: 1,
-                    followedCategories: [],
-                    sortBy: CategorySortOption.ALPHABETICAL,
-                    setSortBy: () => {},
-                    error: null,
-                }}
-            >
-                {children}
-            </FollowedContentContext.Provider>
-        </CurrentUserContextProvider>
-    );
-}
-
-export const FollowedContentFixtures = {
-    HasFollowedCategories,
-    NoFollowedCategories,
-};

@@ -33,7 +33,7 @@ import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
 
-interface IIntegrationModalProps extends Pick<React.ComponentProps<typeof Modal>, "isVisible" | "exitHandler"> {
+export interface IIntegrationModalProps extends Pick<React.ComponentProps<typeof Modal>, "isVisible" | "exitHandler"> {
     onSuccess?: () => Promise<void>;
 }
 

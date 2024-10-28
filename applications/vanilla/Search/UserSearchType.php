@@ -106,10 +106,18 @@ class UserSearchType extends AbstractSearchType
             ]);
             $results = $results->getData();
 
-            $showFullSchema = $this->usersApi->checkPermission();
-            $outSchema = $showFullSchema ? $this->usersApi->userSchema() : $this->usersApi->viewProfileSchema();
+            $showFullSchema = $this->usersApi->checkUserPermissionMode(null, false);
 
-            $resultItems = array_map(function ($result) use ($outSchema) {
+            $resultItems = array_map(function ($result) use ($showFullSchema) {
+                $outSchema = match ($showFullSchema) {
+                    UsersApiController::FULL_USER_VIEW_PERMISSIONS => $this->usersApi->userSchema(),
+                    UsersApiController::BASIC_USER_VIEW_PERMISSIONS => match ($result["private"]) {
+                        false => $this->usersApi->viewPrivateProfileSchema(),
+                        true => $this->usersApi->viewProfileSchema(),
+                    },
+                    default => $this->usersApi->viewPrivateProfileSchema(),
+                };
+
                 $mapped = ArrayUtils::remapProperties($result, [
                     "recordID" => "userID",
                 ]);
@@ -309,11 +317,11 @@ class UserSearchType extends AbstractSearchType
         }
 
         $ipAddresses = $query->getQueryParameter("ipAddresses", []);
-        if (!empty($ipAddresses) && !$this->usersApi->checkPermission()) {
+        if (!empty($ipAddresses) && !$this->usersApi->checkUserPermissionMode()) {
             throw new PermissionException("You don't have permission to search by IP address.");
         }
 
-        if ($query->getQueryParameter("includeBanned") === true && !$this->usersApi->checkPermission()) {
+        if ($query->getQueryParameter("includeBanned") === true && !$this->usersApi->checkUserPermissionMode()) {
             throw new PermissionException("You don't have permission to search banned users.");
         }
 
@@ -331,7 +339,7 @@ class UserSearchType extends AbstractSearchType
      */
     private function canSearchEmails(): bool
     {
-        return $this->usersApi->checkPermission();
+        return $this->usersApi->checkUserPermissionMode() == UsersApiController::FULL_USER_VIEW_PERMISSIONS;
     }
 
     /**
@@ -370,7 +378,7 @@ class UserSearchType extends AbstractSearchType
     public function userHasPermission(): bool
     {
         try {
-            $this->usersApi->checkPermission();
+            $this->usersApi->checkUserPermissionMode();
             return true;
         } catch (PermissionException $permissionException) {
             return false;

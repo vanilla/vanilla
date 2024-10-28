@@ -13,6 +13,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { InformationIcon } from "@library/icons/common";
 import { t } from "@vanilla/i18n";
 import { useFormGroup, useOptionalFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
+import { ToolTip } from "@library/toolTip/ToolTip";
 
 interface IProps {
     enabled: boolean;
@@ -27,6 +28,7 @@ interface IProps {
     slim?: boolean;
     disabled?: boolean;
     tooltip?: string;
+    name?: string;
 }
 
 export function FormToggle(props: IProps) {
@@ -40,6 +42,8 @@ export function FormToggle(props: IProps) {
         visibleLabelUrl,
         slim,
         disabled,
+        tooltip,
+        name,
         ...IDs
     } = props;
     const [isFocused, setIsFocused] = useState(false);
@@ -69,6 +73,7 @@ export function FormToggle(props: IProps) {
             <ScreenReaderContent>
                 {!visibleLabel && accessibleLabel && <span id={labelID}>{accessibleLabel}</span>}
                 <input
+                    name={name}
                     className="exclude-icheck"
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
@@ -88,7 +93,7 @@ export function FormToggle(props: IProps) {
         </WellContainer>
     );
 
-    return visibleLabel ? (
+    let toggle = visibleLabel ? (
         <label className={classes.visibleLabelContainer}>
             {visibleLabel && (
                 <label id={labelID} className={classes.visibleLabel}>
@@ -110,4 +115,9 @@ export function FormToggle(props: IProps) {
     ) : (
         well
     );
+
+    if (tooltip) {
+        toggle = <ToolTip label={tooltip}>{toggle}</ToolTip>;
+    }
+    return toggle;
 }

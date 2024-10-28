@@ -267,10 +267,12 @@ class Akismet
      * To override the user IP address when submitting spam/ham later on.
      *
      * @param string $userip An IP address  Optional.
+     * @return $this
      */
-    public function setUserIP($userip)
+    public function setUserIP($userip): self
     {
         $this->comment["user_ip"] = $userip;
+        return $this;
     }
 
     /**
@@ -287,10 +289,13 @@ class Akismet
      * A permanent URL referencing the blog post the comment was submitted to.
      *
      * @param string $permalink The URL.  Optional.
+     * @return $this
      */
-    public function setPermalink($permalink)
+    public function setPermalink($permalink): self
     {
         $this->comment["permalink"] = $permalink;
+
+        return $this;
     }
 
     /**
@@ -299,30 +304,36 @@ class Akismet
      * May be blank, comment, trackback, pingback, or a made up value like "registration" or "wiki".
      *
      * @param string $commentType The comment type.
+     * @return $this
      */
-    public function setCommentType($commentType)
+    public function setCommentType($commentType): self
     {
         $this->comment["comment_type"] = $commentType;
+        return $this;
     }
 
     /**
      * The name that the author submitted with the comment.
      *
      * @param string $commentAuthor The comment author.
+     * @return $this
      */
-    public function setCommentAuthor($commentAuthor)
+    public function setCommentAuthor($commentAuthor): self
     {
         $this->comment["comment_author"] = $commentAuthor;
+        return $this;
     }
 
     /**
      * The email address that the author submitted with the comment.  The address is assumed to be valid.
      *
      * @param string $authorEmail The email author.
+     * @return $this
      */
-    public function setCommentAuthorEmail($authorEmail)
+    public function setCommentAuthorEmail($authorEmail): self
     {
         $this->comment["comment_author_email"] = $authorEmail;
+        return $this;
     }
 
     /**
@@ -339,10 +350,13 @@ class Akismet
      * The comment's body text.
      *
      * @param string $commentBody The comment body.
+     * @return $this
      */
-    public function setCommentContent($commentBody)
+    public function setCommentContent($commentBody): self
     {
         $this->comment["comment_content"] = $commentBody;
+
+        return $this;
     }
 
     /**

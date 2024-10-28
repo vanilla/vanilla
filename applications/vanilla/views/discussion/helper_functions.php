@@ -18,9 +18,9 @@ if (!function_exists("getCustomFields")):
     /**
      * Get the profile fields for a user to display next to their name.
      *
-     * @since 2.1
      * @param int $userID
      * @return string all input field values for the userId that has posts in their displayOptions.
+     * @since 2.1
      */
     function getCustomFields($userID)
     {
@@ -48,9 +48,9 @@ if (!function_exists("formatBody")):
      *
      * Event argument for $object will be 'Comment' or 'Discussion'.
      *
-     * @since 2.1
-     * @param DataSet $object Comment or discussion.
+     * @param Gdn_DataSet $object Comment or discussion.
      * @return string Parsed body.
+     * @since 2.1
      */
     function formatBody($object)
     {
@@ -104,7 +104,7 @@ if (!function_exists("writeComment")):
      * Prior to 2.1, this also output the discussion ("FirstComment") to the browser.
      * That has moved to the discussion.php view.
      *
-     * @param DataSet $comment .
+     * @param Gdn_DataSet $comment .
      * @param Gdn_Controller $sender .
      * @param Gdn_Session $session .
      * @param int $CurrentOffet How many comments into the discussion we are (for anchors).
@@ -119,7 +119,8 @@ if (!function_exists("writeComment")):
         if ($userPhotoFirst === null) {
             $userPhotoFirst = c("Vanilla.Comment.UserPhotoFirst", true);
         }
-        $author = Gdn::userModel()->getID($comment->InsertUserID); //UserBuilder($Comment, 'Insert');
+        $isTrollComment = $comment->IsTroll ?? false;
+        $author = Gdn::userModel()->getID($comment->InsertUserID);
         $permalink = val(
             "Url",
             $comment,
@@ -172,7 +173,7 @@ if (!function_exists("writeComment")):
         if ($currentOffset == Gdn::controller()->data("_LatestItem") && Gdn::config("Vanilla.Comments.AutoOffset")) {
                     echo '<span id="latest"></span>';
                 } ?>
-                <?php if (!BoxThemeShim::isActive()) { ?>
+                <?php if (!BoxThemeShim::isActive() && !$isTrollComment) { ?>
                     <div class="Options">
                         <?php writeCommentOptions($comment); ?>
                     </div>
@@ -183,41 +184,42 @@ if (!function_exists("writeComment")):
                     <?php BoxThemeShim::activeHtml('<div class="Item-HeaderContent">'); ?>
                     <div class="AuthorWrap">
                         <span class="Author">
-                           <?php
-                           if ($userPhotoFirst) {
-                               BoxThemeShim::inactiveHtml(userPhoto($author));
-                               echo userAnchor($author, "Username");
-                           } else {
-                               echo userAnchor($author, "Username");
-                               BoxThemeShim::inactiveHtml(userPhoto($author));
-                           }
-                           echo formatMeAction($comment);
-                           $sender->fireEvent("AuthorPhoto");
-                           ?>
+                                <?php
+                                if ($userPhotoFirst) {
+                                    BoxThemeShim::inactiveHtml(userPhoto($author));
+                                    echo userAnchor($author, "Username");
+                                } else {
+                                    echo userAnchor($author, "Username");
+                                    BoxThemeShim::inactiveHtml(userPhoto($author));
+                                }
+                                echo formatMeAction($comment);
+                                $sender->fireEvent("AuthorPhoto");
+                                ?>
+
                         </span>
 
                         <span class="AuthorInfo">
-                            <?php
-                            if (
-                                Gdn::config("Feature.CustomProfileFields.Enabled") &&
-                                function_exists("getCustomFields") &&
-                                is_object($author) &&
-                                $author->UserID &&
-                                !$author->Deleted
-                            ) {
-                                echo getCustomFields($author->UserID);
-                            } else {
-                                echo " " .
-                                    wrapIf(htmlspecialchars(val("Title", $author)), "span", [
-                                        "class" => "MItem AuthorTitle",
-                                    ]);
-                                echo " " .
-                                    wrapIf(htmlspecialchars(val("Location", $author)), "span", [
-                                        "class" => "MItem AuthorLocation",
-                                    ]);
-                            }
-                            $sender->fireEvent("AuthorInfo");
-                            ?>
+                            <?php if (!$isTrollComment) {
+                                if (
+                                    Gdn::config("Feature.CustomProfileFields.Enabled") &&
+                                    function_exists("getCustomFields") &&
+                                    is_object($author) &&
+                                    $author->UserID &&
+                                    !$author->Deleted
+                                ) {
+                                    echo getCustomFields($author->UserID);
+                                } else {
+                                    echo " " .
+                                        wrapIf(htmlspecialchars(val("Title", $author)), "span", [
+                                            "class" => "MItem AuthorTitle",
+                                        ]);
+                                    echo " " .
+                                        wrapIf(htmlspecialchars(val("Location", $author)), "span", [
+                                            "class" => "MItem AuthorLocation",
+                                        ]);
+                                }
+                                $sender->fireEvent("AuthorInfo");
+                            } ?>
                         </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
@@ -259,15 +261,25 @@ if (!function_exists("writeComment")):
                 <div class="Item-BodyWrap">
                     <div class="Item-Body">
                         <div class="Message userContent">
-                            <?php echo formatBody($comment); ?>
+                            <?php if ($isTrollComment && $session->checkPermission("Garden.Moderation.Manage")) {
+                                echo TwigStaticRenderer::renderReactModule("TrollComment", [
+                                    "comment" => formatBody($comment),
+                                    "hideText" => Gdn::config(
+                                        TrollManagementPlugin::REMOVED_CONTECT_KEY,
+                                        "This content has been removed."
+                                    ),
+                                ]);
+                            } else {
+                                echo formatBody($comment);
+                            } ?>
                         </div>
-                        <?php
-                        $sender->fireEvent("AfterCommentBody");
-                        writeReactions($comment);
-                        if (val("Attachments", $comment)) {
-                            writeAttachments($comment->Attachments);
-                        }
-                        ?>
+                        <?php if (!$isTrollComment) {
+                            $sender->fireEvent("AfterCommentBody");
+                            writeReactions($comment);
+                            if (val("Attachments", $comment)) {
+                                writeAttachments($comment->Attachments);
+                            }
+                        } ?>
                     </div>
                 </div>
             </div>
@@ -307,9 +319,9 @@ if (!function_exists("getDiscussionOptions")):
     /**
      * Get options for the current discussion.
      *
-     * @since 2.1
      * @param DataSet $discussion .
      * @return array $options Each element must include keys 'Label' and 'Url'.
+     * @since 2.1
      */
     function getDiscussionOptions($discussion = null)
     {
@@ -658,9 +670,9 @@ if (!function_exists("getCommentOptions")):
     /**
      * Get comment options.
      *
-     * @since 2.1
      * @param object $comment The comment to get the options for.
      * @return array $options Each element must include keys 'Label' and 'Url'.
+     * @since 2.1
      */
     function getCommentOptions($comment)
     {
@@ -744,8 +756,8 @@ if (!function_exists("writeCommentOptions")):
     /**
      * Output comment options.
      *
-     * @since 2.1
      * @param DataSet $comment
+     * @since 2.1
      */
     function writeCommentOptions($comment)
     {
@@ -817,35 +829,35 @@ if (!function_exists("writeCommentForm")):
         <?php } elseif (!$userCanComment) {
             if (!Gdn::session()->isValid()) {
                 if (Gdn::themeFeatures()->get("NewGuestModule")) {
-                    /** @var GuestModule  $guestModule */
+                    /** @var GuestModule $guestModule */
                     $guestModule = Gdn::getContainer()->get(GuestModule::class);
                     $guestModule->setWidgetAlignment("center");
                     $guestModule->setDesktopOnlyWidget(true);
                     echo $guestModule;
                 } else {
                      ?>
-                <div class="Foot Closed pageBox">
-                    <div class="Note Closed SignInOrRegister"><?php
-                    $popup = c("Garden.SignIn.Popup") ? ' class="Popup"' : "";
-                    $returnUrl = Gdn::request()->pathAndQuery();
-                    echo formatString(
-                        t(
-                            "Sign In or Register to Comment.",
-                            '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'
-                        ),
-                        [
-                            "SignInUrl" => url(signInUrl($returnUrl)),
-                            "RegisterUrl" => url(registerUrl($returnUrl)),
-                            "Popup" => $popup,
-                        ]
-                    );
+                    <div class="Foot Closed pageBox">
+                        <div class="Note Closed SignInOrRegister"><?php
+                        $popup = c("Garden.SignIn.Popup") ? ' class="Popup"' : "";
+                        $returnUrl = Gdn::request()->pathAndQuery();
+                        echo formatString(
+                            t(
+                                "Sign In or Register to Comment.",
+                                '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'
+                            ),
+                            [
+                                "SignInUrl" => url(signInUrl($returnUrl)),
+                                "RegisterUrl" => url(registerUrl($returnUrl)),
+                                "Popup" => $popup,
+                            ]
+                        );
+                        ?>
+                        </div>
+                        <?php
+                    //echo anchor(t('All Discussions'), 'discussions', 'TabLink');
                     ?>
                     </div>
                     <?php
-                    //echo anchor(t('All Discussions'), 'discussions', 'TabLink');
-                    ?>
-                </div>
-            <?php
                 }
             }
         }

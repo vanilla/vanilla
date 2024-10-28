@@ -8,6 +8,9 @@
 namespace VanillaTests;
 
 use Garden\Container\Container;
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Garden\Schema\ValidationException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\AddonModel;
 
@@ -71,27 +74,41 @@ class SiteTestCase extends VanillaTestCase
      * Enable an addon on the site.
      *
      * @param string $key
+     * @param bool $throw
      */
-    public function enableAddon(string $key)
+    public function enableAddon(string $key, bool $throw = false): void
     {
-        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
-        $addonManager = $addonModel->getAddonManager();
+        try {
+            $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+            $addonManager = $addonModel->getAddonManager();
 
-        $addon = $addonManager->lookupAddon($key);
-        $addonModel->enable($addon);
+            $addon = $addonManager->lookupAddon($key);
+            $addonModel->enable($addon);
+        } catch (\Exception $e) {
+            if ($throw) {
+                throw $e;
+            }
+        }
     }
 
     /**
      * Disable an addon on the site.
      *
      * @param string $key
+     * @param bool $throw
      */
-    public function disableAddon(string $key)
+    public function disableAddon(string $key, bool $throw = false): void
     {
-        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
-        $addonManager = $addonModel->getAddonManager();
+        try {
+            $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+            $addonManager = $addonModel->getAddonManager();
 
-        $addon = $addonManager->lookupAddon($key);
-        $addonModel->disable($addon);
+            $addon = $addonManager->lookupAddon($key);
+            $addonModel->disable($addon);
+        } catch (\Exception $e) {
+            if ($throw) {
+                throw $e;
+            }
+        }
     }
 }

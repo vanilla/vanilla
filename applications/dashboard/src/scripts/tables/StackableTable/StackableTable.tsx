@@ -218,9 +218,13 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
         return <tbody>{rows}</tbody>;
     }
 
-    rows = data.map((entry: IUser, key) => {
+    interface IEntry extends IUser {
+        rowClassName?: string;
+    }
+    rows = data.map((entry: IEntry, key) => {
+        const rowClassName = entry?.rowClassName ?? "";
         return (
-            <tr key={key} className={classes.tableRow} role="row">
+            <tr key={key} className={cx(classes.tableRow, rowClassName)} role="row">
                 {orderedColumns.map((columnName, key) => {
                     const isFirstColumn = columnsConfiguration[columnName].order === 1;
                     const customWidth = columnsConfiguration[columnName].width;

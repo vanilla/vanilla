@@ -234,10 +234,25 @@ final class SearchTypeCollection implements \IteratorAggregate
 
         foreach ($this->allTypes as $searchType) {
             if ($searchType->canBeOptimizedIntoRecordType()) {
-                $typesByAllowedGroup[$searchType->getRecordType()][] = $searchType;
+                $typesByAllowedGroup[$searchType->getOptimizedRecordType()][] = $searchType;
             } else {
                 $typesByAllowedGroup[$searchType->getType()][] = $searchType;
             }
+        }
+        return array_values($typesByAllowedGroup);
+    }
+
+    /**
+     * Like {@link self::getAsOptimizedRecordTypes()} but does not optimize grouping.
+     *
+     * @return array
+     */
+    public function getAsUnoptimizedRecordTypes(): array
+    {
+        $typesByAllowedGroup = [];
+
+        foreach ($this->allTypes as $searchType) {
+            $typesByAllowedGroup[$searchType->getType()][] = $searchType;
         }
         return array_values($typesByAllowedGroup);
     }

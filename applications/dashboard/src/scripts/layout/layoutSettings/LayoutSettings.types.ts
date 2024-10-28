@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -52,6 +52,10 @@ export const LAYOUT_VIEW_TYPES = [
     "discussionPage",
     "ideaThread",
     "questionThread",
+    "knowledgeBase",
+    "article",
+    "guideArticle",
+    "helpCenterArticle",
 ] as const;
 export type LayoutViewType = (typeof LAYOUT_VIEW_TYPES)[number];
 

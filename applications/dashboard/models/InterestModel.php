@@ -7,9 +7,12 @@
 
 namespace Vanilla\Dashboard\Models;
 
+use CategoryModel;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
+use Gdn;
+use Gdn_SQLDriver;
 use Vanilla\Database\Operation\BooleanFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
@@ -32,8 +35,8 @@ class InterestModel extends PipelineModel
      */
     public function __construct(
         private ProfileFieldModel $profileFieldModel,
-        private \CategoryModel $categoryModel,
-        private \TagModel $tagModel
+        private \TagModel $tagModel,
+        private \UserMetaModel $userMetaModel
     ) {
         parent::__construct("interest");
 
@@ -62,7 +65,7 @@ class InterestModel extends PipelineModel
      */
     public function ensureSuggestedContentEnabled(): void
     {
-        if (!$this->isSuggestedContentEnabled()) {
+        if (!$this::isSuggestedContentEnabled()) {
             throw new ClientException("Suggested Content is not enabled");
         }
     }
@@ -72,7 +75,7 @@ class InterestModel extends PipelineModel
      *
      * @return bool
      */
-    public function isSuggestedContentEnabled(): bool
+    public static function isSuggestedContentEnabled(): bool
     {
         return FeatureFlagHelper::featureEnabled(self::SUGGESTED_CONTENT_FEATURE_FLAG) &&
             \Gdn::config(self::CONF_SUGGESTED_CONTENT_ENABLED);
@@ -90,6 +93,20 @@ class InterestModel extends PipelineModel
     }
 
     /**
+     * Returns base query for fetching records.
+     *
+     * @return \Gdn_SQLDriver
+     */
+    public function getWhereQuery(): \Gdn_SQLDriver
+    {
+        $sql = $this->createSql()->from($this->getTable());
+
+        $sql->where("isDeleted", 0);
+
+        return $sql;
+    }
+
+    /**
      * Query interests with filters.
      *
      * @param array $where
@@ -98,11 +115,12 @@ class InterestModel extends PipelineModel
      */
     public function getWhere(array $where, array $options = []): array
     {
-        $sql = $this->createSql()->from($this->getTable());
+        $sql = $this->getWhereQuery();
 
         $this->applyFiltersToQuery($sql, $where);
 
         $sql->applyModelOptions($options);
+
         $rows = $sql->get()->resultArray();
 
         $rows = $this->normalizeRows($rows);
@@ -144,7 +162,7 @@ class InterestModel extends PipelineModel
      */
     protected function joinCategories(array &$rows): void
     {
-        $categories = $this->categoryModel::categories();
+        $categories = CategoryModel::categories();
         foreach ($rows as &$row) {
             $row["categories"] = [];
 
@@ -188,11 +206,58 @@ class InterestModel extends PipelineModel
      */
     public function getWhereCount(array $where): int
     {
-        $sql = $this->createSql()->from($this->getTable());
+        $sql = $this->getWhereQuery();
 
         $this->applyFiltersToQuery($sql, $where);
 
         return $sql->getPagingCount("interestID");
+    }
+
+    /**
+     * This returns either default interests or interests matching profile fields.
+     *
+     * @param array $profileFieldValues
+     * @return array
+     */
+    private function getByProfileFieldValues(array $profileFieldValues): array
+    {
+        $sql = $this->getWhereQuery();
+
+        $sql->beginWhereGroup();
+        $sql->where("isDefault", 1);
+
+        if (!empty($profileFieldValues)) {
+            $profileFieldValuesJson = $sql->quote(json_encode($profileFieldValues));
+            $sql->orWhere("JSON_OVERLAPS(profileFieldMapping, $profileFieldValuesJson)", null, false, false);
+        }
+
+        $sql->endWhereGroup();
+
+        $rows = $sql->get()->resultArray();
+        return $this->normalizeRows($rows);
+    }
+
+    /**
+     * Return arrays of associated record IDs that match a user's interests.
+     *
+     * @param int $userID
+     * @return array
+     */
+    public function getRecordIDsByUserID(int $userID): array
+    {
+        $profileFieldValues = $this->profileFieldModel->getUserProfileFields($userID);
+        $rows = $this->getByProfileFieldValues($profileFieldValues);
+
+        $categoryIDs = [];
+        $tagIDs = [];
+        foreach ($rows as $row) {
+            $categoryIDs = array_merge($categoryIDs, $row["categoryIDs"]);
+            $tagIDs = array_merge($tagIDs, $row["tagIDs"]);
+        }
+        $categoryIDs = array_unique($categoryIDs);
+        $tagIDs = array_unique($tagIDs);
+
+        return [$categoryIDs, $tagIDs];
     }
 
     /**
@@ -207,11 +272,13 @@ class InterestModel extends PipelineModel
         if (!empty($where["categoryIDs"])) {
             $joinedCategoryIDs = implode(",", array_map("intval", $where["categoryIDs"]));
             $sql->where("JSON_OVERLAPS(categoryIDs, '[$joinedCategoryIDs]')", null, false, false);
+            unset($where["categoryIDs"]);
         }
 
         if (!empty($where["tagIDs"])) {
             $joinedTagIDs = implode(",", array_map("intval", $where["tagIDs"]));
             $sql->where("JSON_OVERLAPS(tagIDs, '[$joinedTagIDs]')", null, false, false);
+            unset($where["tagIDs"]);
         }
 
         if (!empty($where["profileFields"])) {
@@ -219,10 +286,10 @@ class InterestModel extends PipelineModel
             $profileFields = array_map($sanitizeKey, $where["profileFields"]);
             $joinedProfileFields = implode(",", $profileFields);
             $sql->where("JSON_CONTAINS_PATH(profileFieldMapping, 'one',  $joinedProfileFields)", null, false, false);
+            unset($where["profileFields"]);
         }
 
-        unset($where["categoryIDs"], $where["tagIDs"], $where["profileFields"], $where["page"], $where["limit"]);
-        $where["isDeleted"] = 0;
+        unset($where["page"], $where["limit"]);
         $sql->where($where);
     }
 
@@ -268,7 +335,7 @@ class InterestModel extends PipelineModel
                 }
             })
             ->addValidator("categoryIDs", function ($categories, ValidationField $field) {
-                $unknownCategories = array_diff($categories, array_keys($this->categoryModel::categories()));
+                $unknownCategories = array_diff($categories, array_keys(CategoryModel::categories()));
                 if (!empty($unknownCategories)) {
                     $field->addError("Categories not found: " . implode(", ", $unknownCategories));
                 }

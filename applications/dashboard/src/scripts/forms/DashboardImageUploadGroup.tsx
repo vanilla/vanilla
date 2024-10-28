@@ -12,6 +12,8 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@vanilla/i18n";
 import { IFieldError } from "@library/@types/api/core";
 import ModalConfirm from "@library/modal/ModalConfirm";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 
 interface IProps {
     // Controlled props.
@@ -23,7 +25,7 @@ interface IProps {
     initialValue?: string;
 
     // Common props.
-    label: string;
+    label: React.ReactNode;
     tooltip?: string;
     description?: React.ReactNode;
     imageUploader?: typeof uploadFile;
@@ -44,6 +46,7 @@ export function DashboardImageUploadGroup(props: IProps) {
     const imagePreviewSrc = previewUrl || value;
     const isStillOriginalValue = originalValue === value;
     const undoTitle = isStillOriginalValue ? t("Delete") : t("Undo");
+    const classes = dashboardClasses();
 
     return (
         <>
@@ -54,37 +57,40 @@ export function DashboardImageUploadGroup(props: IProps) {
                 description={props.description}
             >
                 {props.fieldName && <input type="hidden" value={value || ""} name={props.fieldName} />}
-                <div className="input-wrap">
-                    <DashboardImageUpload
-                        value={value}
-                        onChange={onChange}
-                        onImagePreview={setPreviewUrl}
-                        imageUploader={props.imageUploader}
-                        disabled={props.disabled}
-                        errors={props.errors}
-                    />
-                    {imagePreviewSrc && (
-                        <>
-                            <div>{<img src={imagePreviewSrc} loading="lazy" />}</div>
-                            <div>
-                                <Button
-                                    buttonType={ButtonTypes.TEXT_PRIMARY}
-                                    onClick={() => {
-                                        setPreviewUrl(null);
-                                        if (isStillOriginalValue) {
-                                            setWantsDelete(true);
-                                        } else {
-                                            onChange(originalValue);
-                                        }
-                                    }}
-                                    disabled={props.disabled}
-                                >
-                                    {undoTitle}
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </div>
+
+                <DashboardImageUpload
+                    value={value}
+                    onChange={onChange}
+                    onImagePreview={setPreviewUrl}
+                    imageUploader={props.imageUploader}
+                    disabled={props.disabled}
+                    errors={props.errors}
+                    preview={
+                        imagePreviewSrc && (
+                            <>
+                                <div>
+                                    {<img className={classes.imagePreview} src={imagePreviewSrc} loading="lazy" />}
+                                </div>
+                                <div>
+                                    <Button
+                                        buttonType={ButtonTypes.TEXT_PRIMARY}
+                                        onClick={() => {
+                                            setPreviewUrl(null);
+                                            if (isStillOriginalValue) {
+                                                setWantsDelete(true);
+                                            } else {
+                                                onChange(originalValue);
+                                            }
+                                        }}
+                                        disabled={props.disabled}
+                                    >
+                                        {undoTitle}
+                                    </Button>
+                                </div>
+                            </>
+                        )
+                    }
+                />
             </DashboardFormGroup>
             <ModalConfirm
                 isVisible={wantsDelete}

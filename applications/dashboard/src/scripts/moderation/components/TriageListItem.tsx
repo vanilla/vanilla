@@ -15,7 +15,7 @@ import Translate from "@library/content/Translate";
 import UserContent from "@library/content/UserContent";
 import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { useToast } from "@library/features/toaster/ToastContext";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ListItem, ListItemContext } from "@library/lists/ListItem";

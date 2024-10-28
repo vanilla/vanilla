@@ -34,7 +34,8 @@ import {
     viewWidth,
 } from "csx";
 import backLinkClasses from "@library/routing/links/BackLink.classes";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { oneColumnVariables } from "@library/layout/Section.variables";

@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\ClientException;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Html\HtmlSanitizer;
@@ -267,6 +268,7 @@ class CategoriesController extends VanillaController
                 $categoryIdentifier = "";
             }
         }
+
         return [$categoryIdentifier, $page];
     }
 

@@ -121,4 +121,16 @@ class QnaEventHandler implements PsrEventHandlersInterface
     {
         return $schema->merge(Schema::parse(["qnA:s?", "dateAccepted:s?", "acceptedUserID:s?"]));
     }
+
+    /**
+     * Add to post type base types.
+     *
+     * @param array $baseTypes
+     * @return array
+     */
+    public function postTypeModel_getBaseTypes(array $baseTypes)
+    {
+        $baseTypes[] = "question";
+        return $baseTypes;
+    }
 }

@@ -88,6 +88,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
             "expandBody" => true,
             "limit" => 3,
             "recordTypes" => ["discussion", "comment"],
+            "queryOperator" => "or",
         ];
         $config = AiSuggestionSourceService::aiSuggestionConfigs();
         $providerConfig = $config["sources"][$this->getName()];
@@ -118,7 +119,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
                     "documentID" => $result["recordID"],
                     "url" => $result["url"],
                     "title" => $result["name"],
-                    "summary" => $result->getBody(),
+                    "summary" => $result["bodyPlainText"],
                     "hidden" => false,
                 ];
             }

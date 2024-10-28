@@ -306,3 +306,14 @@ export function matchWithWildcard(target: string, matchers: string): boolean | n
         return new RegExp("^" + match.replace(/\//gi, "").split("*").map(escapeForRegex).join(".*") + "$").test(target);
     });
 }
+
+export function generateString(length: number = 12) {
+    var chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*";
+    var string = "";
+    var pos = 0;
+    for (var i = 0; i < length; i++) {
+        pos = Math.floor(Math.random() * chars.length);
+        string += chars.substring(pos, pos + 1);
+    }
+    return string;
+}

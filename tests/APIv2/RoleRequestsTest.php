@@ -146,7 +146,7 @@ class RoleRequestsTest extends AbstractAPIv2Test
         $meta = [
             "roleID" => $this->roleID(Bootstrap::ROLE_ADMIN),
             "type" => RoleRequestModel::TYPE_APPLICATION,
-            "name" => "Test",
+            "name" => "Administrator",
             "body" => "Test 0",
             "format" => "text",
             "attributesSchema" => Schema::parse(["body:s", "format:s", "email:s"])->jsonSerialize(),

@@ -13,7 +13,8 @@ import { Mixins } from "@library/styles/Mixins";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, px } from "csx";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { userContentVariables } from "@library/content/UserContent.variables";
 
 export const embedContainerVariables = useThemeCache(() => {

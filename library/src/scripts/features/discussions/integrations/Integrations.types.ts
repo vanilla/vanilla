@@ -29,6 +29,7 @@ export interface IAttachmentIntegration {
         message: string;
         linkText: string;
     };
+    escalationStatusID?: string | null;
 }
 
 export function isWriteableAttachmentIntegration(integration: IAttachmentIntegration): boolean {
@@ -67,6 +68,7 @@ export interface IAttachment {
     state?: string;
     status?: string;
     metadata: MetaData[];
+    escalatedByAi?: boolean;
 }
 
 export interface IGetAttachmentSchemaParams {

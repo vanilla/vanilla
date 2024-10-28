@@ -5,13 +5,14 @@
 
 import React from "react";
 import { IControlProps, ICustomControl } from "@vanilla/json-schema-forms/src/types";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 export function DashboardCustomComponent(props: IControlProps<ICustomControl>) {
     const { control, instance, onChange, errors } = props;
     const CustomComponent = control.component;
 
     return (
-        <div className="input-wrap">
+        <DashboardInputWrap>
             <CustomComponent
                 {...(control.componentProps ?? {})}
                 errors={errors}
@@ -20,6 +21,6 @@ export function DashboardCustomComponent(props: IControlProps<ICustomControl>) {
             >
                 {control.componentProps?.children}
             </CustomComponent>
-        </div>
+        </DashboardInputWrap>
     );
 }

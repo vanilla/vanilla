@@ -7,9 +7,9 @@
 import { IEscalation } from "@dashboard/moderation/CommunityManagementTypes";
 import { css, cx } from "@emotion/css";
 import apiv2 from "@library/apiv2";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { useToast } from "@library/features/toaster/ToastContext";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import { inputClasses } from "@library/forms/inputStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -82,7 +82,7 @@ export function EscalationAssignee(props: IProps) {
     const classes = escalationAssigneeClasses(props.inCard);
 
     const userLookup: ILookupApi = {
-        searchUrl: "/api/v2/users/by-names?name=%s*&limit=10",
+        searchUrl: `/api/v2/escalations/lookup-assignee?name=%s*&limit=10&escalationID=${escalation.escalationID}`,
         labelKey: "name",
         valueKey: "userID",
         singleUrl: "/api/v2/users/%s",
@@ -134,6 +134,7 @@ export function EscalationAssignee(props: IProps) {
                 userInfo={escalation.assignedUser ?? deletedUserFragment()}
             />
             <AutoComplete
+                resetOnBlur={true}
                 id={"assign-user"}
                 value={escalation.assignedUserID}
                 onChange={(assignedUserID) => {

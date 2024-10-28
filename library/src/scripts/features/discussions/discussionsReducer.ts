@@ -79,7 +79,7 @@ function setDiscussionReaction(
 /**
  * Reducer for discussion related data.
  */
-export const discussionsReducer = produce(
+export const discussionsReducer: any = produce(
     reducerWithInitialState(INITIAL_DISCUSSIONS_STATE)
         .case(DiscussionActions.getDiscussionByIDACs.started, (state, params) => {
             const { discussionID } = params;

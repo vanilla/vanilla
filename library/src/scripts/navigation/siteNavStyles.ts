@@ -12,11 +12,12 @@ import { negative, allLinkStates } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { percent, px, calc } from "csx";
-import { css, CSSObject, cx } from "@emotion/css";
+import { css, cx } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { SiteNavNodeTypes } from "./SiteNavNodeTypes";
+import { CSSObject } from "@emotion/css/types/create-instance";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();

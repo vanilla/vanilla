@@ -16,7 +16,7 @@ import { getResourceHash } from "@library/featuredCollections/CollectionsUtils";
 export interface ICollectionsStoreState {
     collections: ICollectionsState;
 }
-interface ICollectionsState {
+export interface ICollectionsState {
     collections: ILoadable<ICollection[]>;
     collectionsByResourceHash: Record<RecordID, ILoadable<ICollection[]>>;
     collectionsStatusByResourceHash: Record<string, Record<RecordID, ILoadable<RecordID>>>;
@@ -30,7 +30,7 @@ export const INITIAL_COLLECTIONS_STATE: ICollectionsState = {
     putCollectionsByResourceHash: {},
 };
 
-export const collectionsReducer = produce(
+export const collectionsReducer: any = produce(
     reducerWithInitialState(INITIAL_COLLECTIONS_STATE)
         .case(CollectionsActions.getCollectionsListACs.started, (state) => {
             state.collections = {

@@ -2,7 +2,9 @@
  * @copyright 2009-2023 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControlGroup";
+import { DashboardFormControlLabelSection } from "@dashboard/forms/DashboardFormControlLabelSection";
 import { UserProfileFields } from "@dashboard/userProfiles/types/UserProfiles.types";
 import dashboardAddEditUserClasses from "@dashboard/users/userManagement/dashboardAddEditUser/DashboardAddEditUser.classes";
 import DashboardAddEditUserModal from "@dashboard/users/userManagement/dashboardAddEditUser/DashboardAddEditUserModal";
@@ -27,7 +29,7 @@ interface IProps {
     title?: string;
     newPasswordFieldID?: string;
     initialValues?: DashboardAddEditUserFormValues;
-    formGroupWrapper?: React.ComponentProps<typeof JsonSchemaForm>["FormGroupWrapper"];
+    formSection?: React.ComponentProps<typeof JsonSchemaForm>["FormSection"];
     schema?: JsonSchema;
     handleSubmit: (values: DashboardAddEditUserFormValues) => Promise<IUser>;
     onSubmitSuccess?: (user: IUser) => void;
@@ -81,7 +83,7 @@ export default function DashboardAddEditUserForm(props: IProps) {
     const {
         title,
         initialValues = ADD_USER_EMPTY_INITIAL_VALUES,
-        formGroupWrapper,
+        formSection,
         schema,
         handleSubmit,
         newPasswordFieldID,
@@ -204,7 +206,7 @@ export default function DashboardAddEditUserForm(props: IProps) {
                             FormControlGroup={DashboardFormControlGroup}
                             FormControl={DashboardFormControl}
                             onChange={setValues}
-                            FormGroupWrapper={formGroupWrapper}
+                            FormSection={DashboardFormControlLabelSection}
                         />
                     </div>
                     {!renderInModal && (

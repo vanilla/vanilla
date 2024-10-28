@@ -2,7 +2,7 @@ import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheadin
 
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { PageBoxContextProvider } from "@library/layout/PageBox.context";

@@ -13,8 +13,9 @@ import {
 } from "@dashboard/emailSettings/EmailSettings.types";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { t } from "@vanilla/i18n";
+import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
 
-const emptyRichEditorValue = [{ children: [{ text: "" }], type: "p" }];
+const emptyRichEditorValue = EMPTY_RICH2_BODY;
 /**
  *  Get the email settings schemas
  */
@@ -165,6 +166,7 @@ export function getEmailSettingsSchemas() {
                 default: emptyRichEditorValue,
                 "x-control": {
                     label: t("Email Footer"),
+                    labelType: DashboardLabelType.VERTICAL,
                     description: t(
                         "This may be used to include content such as organization name and address in all outgoing notification emails.",
                     ),
@@ -289,7 +291,9 @@ export function getDigestSettingsSchemas() {
             "emailDigest.metaOptions": {
                 type: "object",
                 "x-control": {
+                    inputType: "empty",
                     label: t("Meta Options"),
+                    noBorder: true,
                 },
                 properties: {},
             },
@@ -302,6 +306,8 @@ export function getDigestSettingsSchemas() {
                     inputType: "checkBox",
                     labelType: DashboardLabelType.NONE,
                     conditions: [{ field: "emailDigest.enabled", type: "boolean", const: true }],
+                    noBorder: true,
+                    isNested: true,
                 },
             },
             "emailDigest.authorEnabled": {
@@ -312,6 +318,8 @@ export function getDigestSettingsSchemas() {
                     inputType: "checkBox",
                     labelType: DashboardLabelType.NONE,
                     conditions: [{ field: "emailDigest.enabled", type: "boolean", const: true }],
+                    noBorder: true,
+                    isNested: true,
                 },
             },
             "emailDigest.viewCountEnabled": {
@@ -322,6 +330,8 @@ export function getDigestSettingsSchemas() {
                     inputType: "checkBox",
                     labelType: DashboardLabelType.NONE,
                     conditions: [{ field: "emailDigest.enabled", type: "boolean", const: true }],
+                    noBorder: true,
+                    isNested: true,
                 },
             },
             "emailDigest.commentCountEnabled": {
@@ -332,6 +342,8 @@ export function getDigestSettingsSchemas() {
                     inputType: "checkBox",
                     labelType: DashboardLabelType.NONE,
                     conditions: [{ field: "emailDigest.enabled", type: "boolean", const: true }],
+                    noBorder: true,
+                    isNested: true,
                 },
             },
             "emailDigest.scoreCountEnabled": {
@@ -342,6 +354,7 @@ export function getDigestSettingsSchemas() {
                     inputType: "checkBox",
                     labelType: DashboardLabelType.NONE,
                     conditions: [{ field: "emailDigest.enabled", type: "boolean", const: true }],
+                    isNested: true,
                 },
             },
             "emailDigest.title": {
@@ -366,6 +379,7 @@ export function getDigestSettingsSchemas() {
                     inputType: "textBox",
                     placeholder: t("This week's trending content"),
                     conditions: [{ field: "emailDigest.enabled", type: "boolean", const: true }],
+                    noBorder: true,
                 },
             },
             "emailDigest.includeCommunityName": {
@@ -378,6 +392,7 @@ export function getDigestSettingsSchemas() {
                     inputType: "checkBox",
                     labelType: DashboardLabelType.NONE,
                     conditions: [{ field: "emailDigest.enabled", type: "boolean", const: true }],
+                    isNested: true,
                 },
             },
             "emailDigest.introduction": {
@@ -385,6 +400,7 @@ export function getDigestSettingsSchemas() {
                 default: emptyRichEditorValue,
                 "x-control": {
                     label: t("Introduction"),
+                    labelType: DashboardLabelType.VERTICAL,
                     description: t("The first line of content in the email digest after the title."),
                     inputType: "richeditor",
                     conditions: [{ field: "emailDigest.enabled", type: "boolean", const: true }],
@@ -395,6 +411,7 @@ export function getDigestSettingsSchemas() {
                 default: emptyRichEditorValue,
                 "x-control": {
                     label: t("Footer"),
+                    labelType: DashboardLabelType.VERTICAL,
                     description: t(
                         "This may be used to include content such as organization name and address in the email digest.",
                     ),

@@ -1,11 +1,11 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { getDefaultSiteSection, hasMultipleSiteSections, t } from "@library/utility/appUtils";
+import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { hasMultipleSiteSections, t } from "@library/utility/appUtils";
 
 export function getLayoutFeatureFlagKey(layoutViewType: LayoutViewType): string {
     switch (layoutViewType) {
@@ -20,6 +20,8 @@ export function getLayoutFeatureFlagKey(layoutViewType: LayoutViewType): string 
             return "customLayout.home";
         case "discussionList":
             return "customLayout.discussionList";
+        case "knowledgeBase":
+            return "customLayout.knowledgeBase";
         default:
             return "";
     }
@@ -37,6 +39,8 @@ export function getLayoutTypeSettingsUrl(layoutViewType: LayoutViewType): string
             return `/appearance/layouts/home/legacy`;
         case "discussionList":
             return `/appearance/layouts/discussionList/legacy`;
+        case "knowledgeBase":
+            return `/appearance/layouts/knowledgeBase/legacy`;
         default:
             return "";
     }
@@ -54,6 +58,8 @@ export function getLayoutTypeSettingsLabel(layoutViewType: LayoutViewType): stri
             return t("Home Layout Settings");
         case "discussionList":
             return t("Discussions Layout Settings");
+        case "knowledgeBase":
+            return t("Knowledge Base Layout Settings");
         default:
             return "";
     }
@@ -70,6 +76,8 @@ export function getLayoutTypeGroupLabel(layoutViewType: LayoutViewType): string 
             return t("Discussions Pages");
         case "discussionThread":
             return t("Discussion Thread Pages");
+        case "knowledgeBase":
+            return t("Knowledge Base Pages");
         default:
             return "";
     }
@@ -105,6 +113,10 @@ export function getLayoutTypeLabel(layoutViewType: LayoutViewType): string {
             }
         case "discussionList":
             return t("Discussion List Pages");
+        case "guideArticle":
+            return t("Guide Article Pages");
+        case "helpCenterArticle":
+            return t("Help Center Article Pages");
         default:
             return "";
     }

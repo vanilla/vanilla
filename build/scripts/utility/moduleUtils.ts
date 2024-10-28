@@ -19,7 +19,7 @@ export function copyMonacoEditorModule() {
 
     print("Copying monaco editor to /dist");
     if (fse.existsSync(MONACO_PATH)) {
-        fse.copySync(MONACO_PATH, path.resolve(DIST_DIRECTORY, "monaco-editor-30-1"), {
+        fse.copySync(MONACO_PATH, path.resolve(DIST_DIRECTORY, "monaco-editor-52-0"), {
             filter: (file) => {
                 if (file.match(/\/monaco-editor\/node_modules/) || file.match(/\/monaco-editor\/(dev|esm|min-maps)/)) {
                     return false;

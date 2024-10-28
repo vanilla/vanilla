@@ -51,9 +51,12 @@ paths:
                       type: string
                       enum:
                           - dateInserted
-                          - commentID
                           - -dateInserted
+                          - commentID
                           - -commentID
+                          - score
+                          - -score
+                          - -experimentalTrending
                 - description: |
                       Filter by author.
                   in: query
@@ -85,6 +88,18 @@ paths:
                           - accepted
                           - rejected
                   x-addon: qna
+                - name: sentiment
+                  x-addon: SentimentAnalysis
+                  description: Filter by post sentiment.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - stronglyNegative
+                          - negative
+                          - balanced
+                          - positive
+                          - stronglyPositive
             responses:
                 "200":
                     content:
@@ -110,6 +125,97 @@ paths:
             requestBody:
                 $ref: "#/components/requestBodies/CommentPost"
             summary: Add a comment.
+    /comments/thread:
+        x-hidden: true
+        get:
+            tags:
+                - Comments
+            summary: Get comment thread structure and the initial comments to populate this part of the thread.
+            parameters:
+                - name: parentRecordType
+                  in: query
+                  description: The type of the parent record. Must be used with parentRecordID.
+                  schema:
+                      type: string
+                      enum:
+                          - discussion
+                          - escalation
+                - name: parentRecordID
+                  in: query
+                  description: The ID of the parent record. Must be used with parentRecordType.
+                  schema:
+                      type: integer
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+                - description: |
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: "30"
+                      maximum: 100
+                      minimum: 1
+                - name: sort
+                  description: Sort the results.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - dateInserted
+                          - -dateInserted
+                          - score
+                          - -score
+                          - -experimentalTrending
+                - description: >
+                      Expand associated records using one or more valid field names. A
+                      value of "all" will expand all expandable fields.
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - insertUser
+                              - all
+                              - reactions
+                              - attachments
+                              - reportMeta
+                          type: string
+                      type: array
+                  style: form
+                - name: focusCommentID
+                  in: query
+                  description: The ID of the comment to focus on. This comment and it's parents will be expanded in the results.
+                  schema:
+                      type: integer
+                - name: collapseChildDepth
+                  in: query
+                  description: The depth at which we start fully collapsing child comments.
+                  schema:
+                      type: integer
+                      default: 3
+                - name: collapseChildLimit
+                  in: query
+                  description: The number of children displayed for non-top level items less than collapseChildDepth.
+                  schema:
+                      type: integer
+                      default: 3
+
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                type: object
+                                properties:
+                                    threadStructure:
+                                        type: array
+                                        items:
+                                            $ref: "#/components/schemas/CommentThreadStructureItem"
+                                    commentsByID:
+                                        type: object
+                                        description: Comments indexed by ID.
+                                        additionalProperties: { $ref: "#/components/schemas/Comment" }
+                    description: Success
     /comments/search:
         get:
             parameters:
@@ -614,6 +720,9 @@ components:
                 parentRecordID:
                     description: The ID of the parent record.
                     type: integer
+                parentCommentID:
+                    description: The ID of the parent comment.
+                    type: integer
                 insertUser:
                     $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
                 insertUserID:
@@ -648,6 +757,16 @@ components:
                     description: Total points associated with this post.
                     nullable: true
                     type: integer
+                scoreChildComments:
+                    description: Total points associated with this post and its children.
+                    type: integer
+                countChildComments:
+                    description: Count of all the nested comments.
+                    type: integer
+                depth:
+                    description: The depth of the comment. Depths start at 1 and increment for every parent comment.
+                    type: integer
+                    default: 1
                 url:
                     description: The full URL to the comment.
                     type: string
@@ -675,6 +794,13 @@ components:
                             type: string
                             description: Title of the suggestion
                     x-feature: "Feature.AISuggestions.Enabled"
+                sentiment:
+                    type: integer
+                    x-addon: SentimentAnalysis
+                isTroll:
+                    type: boolean
+                    x-addon: trollmanagement
+                    x-read: "Moderation.Manage"
             required:
                 - commentID
                 - categoryID
@@ -716,10 +842,69 @@ components:
                 discussionID:
                     description: The ID of the discussion.
                     type: integer
+                parentRecordType:
+                    description: The type of the parent record.
+                    type: string
+                    enum:
+                        - discussion
+                        - escalation
+                parentRecordID:
+                    description: The ID of the parent record.
+                    type: integer
+                parentCommentID:
+                    x-hidden: true
+                    description: The ID of the parent comment. The parentRecordType and parentRecordID must match that of the parentComment.
+                    type: integer
                 format:
                     $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/Format"
             required:
                 - body
                 - format
-                - discussionID
             type: object
+        CommentThreadStructureItem:
+            oneOf:
+                - $ref: "#/components/schemas/CommentThreadStructureHole"
+                - $ref: "#/components/schemas/CommentThreadStructureComment"
+        CommentThreadStructureHole:
+            type: object
+            properties:
+                type:
+                    type: "string"
+                    enum:
+                        - "hole"
+                parentCommentID:
+                    type: "integer"
+                depth:
+                    type: "integer"
+                countAllComments:
+                    description: Count of all the nested comments.
+                    type: "integer"
+                countAllInsertUsers:
+                    description: Count of all unique insert users for the nested comments.
+                    type: "integer"
+                insertUsers:
+                    description: The first 5 insert users from the nested comments.
+                    type: "array"
+                    items:
+                        $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                apiUrl:
+                    description: The API URL to fetch the nested comments.
+                    type: "string"
+                    format: "uri"
+        CommentThreadStructureComment:
+            type: object
+            properties:
+                type:
+                    type: "string"
+                    enum:
+                        - "comment"
+                commentID:
+                    type: "integer"
+                parentCommentID:
+                    type: "integer"
+                depth:
+                    type: "integer"
+                children:
+                    type: "array"
+                    items:
+                        $ref: "#/components/schemas/CommentThreadStructureItem"

@@ -8,11 +8,11 @@ services:
             - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
             - discovery.type=single-node
             - bootstrap.memory_lock=true
-            - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+            - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
             - action.destructive_requires_name=false
             - xpack.security.enabled=false
             - xpack.security.enrollment.enabled=false
-        mem_limit: 2g
+        mem_limit: 3g
         volumes:
             - elasticsearch-data:/usr/share/elasticsearch/data
         ports:

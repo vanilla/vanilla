@@ -17,7 +17,6 @@ import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import FrameBody from "@library/layout/frame/FrameBody";
 import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { cx } from "@emotion/css";
@@ -25,6 +24,8 @@ import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
 import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
 import { IAutomationRulesFilterValues } from "@dashboard/automationRules/AutomationRules.types";
+import { compare } from "@vanilla/utils";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 
 export function AutomationRulesFilter(props: {
     onFilter: (newFilters: IAutomationRulesFilterValues) => void;
@@ -50,10 +51,9 @@ export function AutomationRulesFilter(props: {
                     inputType: "dropDown",
                     choices: {
                         staticOptions: Object.fromEntries(
-                            Object.keys(automationRulesCatalog?.triggers ?? {}).map((trigger) => [
-                                trigger,
-                                automationRulesCatalog?.triggers[trigger]?.name,
-                            ]),
+                            Object.keys(automationRulesCatalog?.triggers ?? {})
+                                .map((trigger) => [trigger, automationRulesCatalog?.triggers[trigger]?.name])
+                                .sort((a, b) => compare(a[1], b[1])),
                         ),
                     },
                     labelType: DashboardLabelType.VERTICAL,
@@ -67,10 +67,9 @@ export function AutomationRulesFilter(props: {
                     inputType: "dropDown",
                     choices: {
                         staticOptions: Object.fromEntries(
-                            Object.keys(automationRulesCatalog?.actions ?? {}).map((action) => [
-                                action,
-                                automationRulesCatalog?.actions[action].name,
-                            ]),
+                            Object.keys(automationRulesCatalog?.actions ?? {})
+                                .map((action) => [action, automationRulesCatalog?.actions[action].name])
+                                .sort((a, b) => compare(a[1], b[1])),
                         ),
                     },
                     labelType: DashboardLabelType.VERTICAL,
@@ -139,12 +138,10 @@ export function AutomationRulesFilter(props: {
                         }
                         body={
                             <FrameBody>
-                                <div className={cx(frameBodyClasses().contents, classes.filterForm)}>
-                                    <JsonSchemaForm
+                                <div className={cx(frameBodyClasses().contents)}>
+                                    <DashboardSchemaForm
                                         schema={filtersSchema}
                                         instance={localFilters ?? {}}
-                                        FormControl={DashboardFormControl}
-                                        FormControlGroup={DashboardFormControlGroup}
                                         onChange={setLocalFilters}
                                     />
                                 </div>

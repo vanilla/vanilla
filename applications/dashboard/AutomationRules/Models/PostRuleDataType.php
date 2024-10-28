@@ -26,7 +26,7 @@ class PostRuleDataType extends RuleDataType
      */
     protected function getAllActionsClasses(): array
     {
-        $postType = array_merge(DiscussionRuleDataType::getActions(), CommentRuleDataType::getActions());
+        $postType = array_merge(DiscussionRuleDataType::getActions(), EscalationRuleDataType::getActions());
         return array_unique($postType);
     }
 }

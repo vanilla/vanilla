@@ -4,11 +4,12 @@
  * @license gpl-2.0-only
  */
 
-import { IApiError } from "@library/@types/api/core";
-import { useQueryClient, QueryKey, useQuery } from "@tanstack/react-query";
-import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
-import { IWithPaging } from "@library/navigation/SimplePagerModel";
 import { IComment } from "@dashboard/@types/api/comment";
+import { IApiError } from "@library/@types/api/core";
+import { IWithPaging } from "@library/navigation/SimplePagerModel";
+import { QueryKey, useQuery, useQueryClient } from "@tanstack/react-query";
+import { IThreadResponse } from "@vanilla/addon-vanilla/thread/@types/CommentThreadTypes";
+import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
 
 export function useCommentListQuery(apiParams: CommentsApi.IndexParams, comments?: IWithPaging<IComment[]>) {
     const queryClient = useQueryClient();
@@ -30,4 +31,18 @@ export function useCommentListQuery(apiParams: CommentsApi.IndexParams, comments
             });
         },
     };
+}
+
+export function useCommentThreadQuery(
+    apiParams: CommentsApi.IndexThreadParams,
+    commentsData?: IWithPaging<IThreadResponse>,
+) {
+    return useQuery<IWithPaging<IThreadResponse>, IApiError>({
+        queryKey: ["commentThread", apiParams],
+        queryFn: () => {
+            return CommentsApi.threadIndex(apiParams);
+        },
+        initialData: commentsData,
+        keepPreviousData: true,
+    });
 }

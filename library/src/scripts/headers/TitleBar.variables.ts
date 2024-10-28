@@ -14,7 +14,7 @@ import { getPixelNumber, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { color, px, rgba, viewHeight } from "csx";
 import { media, TLength } from "@library/styles/styleShim";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { IButton } from "@library/forms/styleHelperButtonInterface";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LogoAlignment } from "./LogoAlignment";

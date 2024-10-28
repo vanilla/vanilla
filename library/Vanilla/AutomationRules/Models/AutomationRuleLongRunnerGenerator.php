@@ -114,12 +114,13 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
                         AutomationRuleDispatchesModel::STATUS_RUNNING
                     );
                 }
+                $where = $automationRule["trigger"]["triggerValue"];
                 if ($triggerClass instanceof TimedAutomationTrigger) {
                     $lastRunDate = $params["lastRunDate"];
                     $where = $triggerClass->getWhereArray($automationRule["trigger"]["triggerValue"], $lastRunDate);
                     $where = $actionClass->addWhereArray($where, $actionValue);
                 } else {
-                    $where = $automationRule["trigger"]["triggerValue"];
+                    $where = $triggerClass->getWhereArray($automationRule["trigger"]["triggerValue"]);
                 }
                 $toProcess = $triggerClass->getRecordsToProcess($lastRecordID, $where);
                 foreach ($toProcess as $primaryKey => $objects) {

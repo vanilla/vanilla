@@ -10,12 +10,14 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Database\Select;
@@ -77,7 +79,8 @@ class DiscussionsApiController extends AbstractApiController
         private LongRunner $longRunner,
         private DiscussionStatusModel $discussionStatusModel,
         private ReactionModel $reactionModel,
-        private Gdn_Database $db
+        private Gdn_Database $db,
+        private InterestModel $interestModel
     ) {
     }
 
@@ -501,6 +504,7 @@ class DiscussionsApiController extends AbstractApiController
                     "sink?",
                     "pinned?",
                     "pinLocation?",
+                    "announce?",
                 ])
                     ->add(DiscussionExpandSchema::commonExpandSchema())
                     ->add($this->fullSchema()),
@@ -665,22 +669,15 @@ class DiscussionsApiController extends AbstractApiController
      *
      * @param array $dbRecord Database record.
      * @param array $expand
+     * @param array $options
      * @return array Return a Schema record.
      * @throws ContainerException
      * @throws \Garden\Container\NotFoundException
      * @throws BreadcrumbProviderNotFoundException
      */
-    public function normalizeOutput(array $dbRecord, $expand = [])
+    public function normalizeOutput(array $dbRecord, $expand = [], array $options = [])
     {
-        $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand);
-
-        if (isset($dbRecord[DiscussionModel::SORT_EXPIRIMENTAL_TRENDING])) {
-            $normalizedRow["trending"] = [
-                "value" => $dbRecord[DiscussionModel::SORT_EXPIRIMENTAL_TRENDING],
-                "aggregateScore" => $dbRecord["aggregateScore"],
-                "hoursSinceCreation" => $dbRecord["hoursSinceCreation"],
-            ];
-        }
+        $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand, $options);
 
         // Fetch the crumb model lazily to prevent DI issues.
         /** @var BreadcrumbModel $breadcrumbModel */
@@ -830,9 +827,9 @@ class DiscussionsApiController extends AbstractApiController
      * @throws NotFoundException
      * @throws PermissionException
      * @throws ValidationException
-     * @throws \Garden\Container\NotFoundException
+     * @throws NotFoundException
      */
-    public function index(array $query)
+    public function index(array $query): Data
     {
         $this->permission();
         $in = $this->schema(new DiscussionsApiIndexSchema($this->discussionModel->getDefaultLimit()), [
@@ -840,10 +837,10 @@ class DiscussionsApiController extends AbstractApiController
             "in",
         ])->setDescription("List discussions.");
         $query["followed"] = $query["followed"] ?? false;
+        $query["suggestions"] = $query["suggestions"] ?? false;
         $query["excludeHiddenCategories"] = $query["excludeHiddenCategories"] ?? false;
         $query = $in->validate($query);
         $query = $this->filterValues($query);
-
         $discussionSchema = CrawlableRecordSchema::applyExpandedSchema(
             $this->discussionSchema(),
             "discussion",
@@ -936,6 +933,10 @@ class DiscussionsApiController extends AbstractApiController
             }
         }
 
+        if (isset($query["excludedCategoryIDs"])) {
+            $where["CategoryID <>"] = $query["excludedCategoryIDs"];
+        }
+
         // Do we exclude hidden categories?
         if ($excludeHiddenCategories) {
             $categoriesShowingDiscussions = CategoryModel::instance()
@@ -952,6 +953,16 @@ class DiscussionsApiController extends AbstractApiController
             }
         }
 
+        $selects = [];
+        if ($query["suggestions"] && InterestModel::isSuggestedContentEnabled()) {
+            [$categoryIDs, $tagIDs] = $this->interestModel->getRecordIDsByUserID($this->getSession()->UserID);
+            if (count($tagIDs) === 0 && $categoryIDs === 0) {
+                return new Data(null);
+            }
+            $where["InterestCategoryID"] = $categoryIDs;
+            $query["tagID"] = $tagIDs;
+        }
+
         /*pull all discussion Ids based on the given Tagid/Id's and pass it on*/
         if (array_key_exists("tagID", $query)) {
             $cond = ["TagID" => $query["tagID"]];
@@ -963,27 +974,8 @@ class DiscussionsApiController extends AbstractApiController
 
         // SlotType support
         $slotType = $query["slotType"] ?? "";
-        $currentTime = CurrentTimeStamp::getDateTime();
-        $filterTime = null;
-        switch ($slotType) {
-            case "d":
-                $filterTime = $currentTime->modify("-1 day");
-                break;
-            case "w":
-                $filterTime = $currentTime->modify("-1 week");
-                break;
-            case "m":
-                $filterTime = $currentTime->modify("-1 month");
-                break;
-            case "y":
-                $filterTime = $currentTime->modify("-1 year");
-                break;
-            case "a":
-            default:
-                break;
-        }
-        if ($filterTime !== null) {
-            $where["DateInserted >"] = $filterTime;
+        if ($slotType) {
+            $where[] = ModelUtils::slotTypeWhereExpression("d.DateInserted", $slotType);
         }
 
         if (isset($query["reactionType"])) {
@@ -1018,60 +1010,16 @@ class DiscussionsApiController extends AbstractApiController
             $query["sort"] ?? "-DateLastComment"
         );
 
-        $selects = [];
-
         if ($orderField === DiscussionModel::SORT_EXPIRIMENTAL_TRENDING) {
-            // Experimental trending works on the following equation
-            // sc = score
-            // hc = Hours since creation
-            // he = Hour exponent - Make the time decay curve stronger. Size this to your time window.
-            // wo = Window offset hours - Offset all posts by a certain amount of the curve. Stronger lessens the effect of the curve over a time period.
-            // Our equation is
-            //
-            // sc / (hc + wo)^he
-            //
-            // The idea is that we take some aggregate score
-            // Then divide by a time factor that makes older posts require a higher score to come to the top
-            // Performance of this was tested to be reasonable for discussion datasets of up to ~10k rows
-            // Our biggest communities don't tend to make more posts than this in a month.
-            // Query time was similar to a DateInserted sort with that many posts.
-            //
-            // We can't index this easily for bigger datasets because of the time component so at
-            // the moment we are relying on the validation to prevent time windows greater than 1 month.
-
             // Validation requires that we must have a slotType.
-            $slotType = $query["slotType"];
-            switch ($slotType) {
-                case "d":
-                    $windowOffsetHours = 2;
-                    $hourExponent = 1.5;
-                    break;
-                case "w":
-                    $windowOffsetHours = 24 * 7;
-                    $hourExponent = 1.15;
-                    break;
-                case "m":
-                default:
-                    $windowOffsetHours = 24 * 30;
-                    $hourExponent = 1.1;
-                    break;
-            }
-
-            // We need to add a select for our trending.
-            $selects = array_merge($selects, [
-                new Select(
-                    "@aggregateScore := COALESCE(d.Score, 0) + COALESCE(d.CountComments, 0) * 2 + COALESCE(d.CountViews, 0) / 10",
-                    "aggregateScore"
-                ),
-                new Select(
-                    "@hoursSinceCreation := (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(d.DateInserted)) / 60 / 24",
-                    "hoursSinceCreation"
-                ),
-                new Select(
-                    "@aggregateScore / POWER(@hoursSinceCreation + {$windowOffsetHours}, {$hourExponent})",
-                    DiscussionModel::SORT_EXPIRIMENTAL_TRENDING
-                ),
-            ]);
+            $selects = array_merge(
+                $selects,
+                ModelUtils::getTrendingSelects(
+                    dateField: "d.DateInserted",
+                    scoreCalculation: "COALESCE(d.Score, 0) + COALESCE(d.CountComments, 0) * 2 + COALESCE(d.CountViews, 0) / 10",
+                    slotType: $slotType
+                )
+            );
         }
         $this->discussionModel->SQL->reset();
         if ($bookmarkUserID) {
@@ -1165,7 +1113,11 @@ class DiscussionsApiController extends AbstractApiController
             ])
         );
         foreach ($rows as &$currentRow) {
-            $currentRow = $this->normalizeOutput($currentRow, $query["expand"]);
+            $currentRow = $this->normalizeOutput(
+                $currentRow,
+                $query["expand"],
+                ArrayUtils::pluck($query, ["excerptLength"])
+            );
         }
         $this->discussionExpandSchema->commonExpand($rows, $query["expand"] ?? []);
         $this->expandLastCommentBody($rows, $query["expand"]);
@@ -1450,8 +1402,16 @@ class DiscussionsApiController extends AbstractApiController
      * @param array $body The request body.
      * @param array $query The request query.
      * @return Data
+     * @throws BreadcrumbProviderNotFoundException
+     * @throws ClientException
+     * @throws ContainerException
+     * @throws HttpException
      * @throws NotFoundException If a category is not found.
+     * @throws PermissionException
      * @throws ServerException If the discussion could not be created.
+     * @throws ValidationException
+     * @throws NotFoundException
+     * @throws ForbiddenException
      */
     public function post(array $body, array $query = []): Data
     {
@@ -1941,7 +1901,7 @@ class DiscussionsApiController extends AbstractApiController
      * Check to make sure the category is a discussion-type category. Throw an error if not.
      *
      * @param int|array $categoryOrCategoryID
-     * @throws \Garden\Web\Exception\ForbiddenException Throws if the category is a non-discussion type.
+     * @throws ForbiddenException Throws if the category is a non-discussion type.
      */
     public function checkCategoryAllowsPosting($categoryOrCategoryID): void
     {
@@ -1950,7 +1910,7 @@ class DiscussionsApiController extends AbstractApiController
             : ArrayUtils::PascalCase($categoryOrCategoryID);
         $canPost = CategoryModel::doesCategoryAllowPosts($categoryOrCategoryID);
         if (!$canPost) {
-            throw new \Garden\Web\Exception\ForbiddenException(
+            throw new ForbiddenException(
                 sprintft(
                     "You are not allowed to post in categories with a display type of %s.",
                     t($category["DisplayAs"])

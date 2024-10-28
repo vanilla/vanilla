@@ -38,6 +38,7 @@ class StaleCollectionTriggerTest extends SiteTestCase
         $this->collectionRecordModel = $this->container()->get(CollectionRecordModel::class);
         $this->automationRuleService = $this->container()->get(AutomationRuleService::class);
         $this->automationRuleDispatchesModel = $this->container()->get(AutomationRuleDispatchesModel::class);
+        CurrentTimeStamp::mockTime("2024-06-24 06:00:00");
     }
 
     /**
@@ -181,7 +182,7 @@ class StaleCollectionTriggerTest extends SiteTestCase
         $collectionRecord = $this->getRecord("Stale Collection", 5);
         $collection = $this->createCollection($collectionRecord);
         $collectionID = $collection["collectionID"];
-        $dateNow = CurrentTimeStamp::getDateTime();
+        $dateNow = CurrentTimeStamp::mockTime(time());
         // Set the dateInserted to 1 day before
         $this->collectionRecordModel->update(
             ["dateInserted" => $dateNow->modify("-1 day")->format(CurrentTimeStamp::MYSQL_DATE_FORMAT)],
@@ -222,6 +223,7 @@ class StaleCollectionTriggerTest extends SiteTestCase
      */
     public function testLongRunnerExecution()
     {
+        CurrentTimeStamp::clearMockTime();
         CurrentTimeStamp::mockTime("+5 seconds");
         $this->resetTable("collectionRecord");
         $this->resetTable("collection");

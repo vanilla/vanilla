@@ -202,7 +202,8 @@ export function useCarousel(countSlides: number, sliderWidth: number, options: C
     const result = {
         activeIndex: state.activeIndex,
         desiredIndex: state.desiredIndex,
-        actions,
+        // Too complex of a type to generate d.ts files.
+        actions: actions as any,
         handlers,
         sliderPosition: clamp(sliderPosition, -maximumOffset, minimumOffset),
     };

@@ -14,25 +14,19 @@ const ThreadItemActionsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const metasVars = metasVariables();
 
-    const root = css(
-        {
-            ...Mixins.margin({ top: globalVars.gutter.size }),
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            flexWrap: "wrap",
-            gap: 16,
+    const root = css({
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        flexWrap: "wrap",
+        gap: 16,
+
+        "@container threadItemContainer (width < 500px)": {
+            columnGap: 16,
+            rowGap: 8,
         },
-        media(
-            { maxWidth: 600 },
-            {
-                flexDirection: "column",
-                alignItems: "flex-start",
-                gap: 0,
-            },
-        ),
-    );
+    });
 
     const actionItemsContainer = css({
         display: "flex",
@@ -40,6 +34,20 @@ const ThreadItemActionsClasses = useThemeCache(() => {
         flexWrap: "wrap",
         alignItems: "center",
         gap: globalVars.gutter.size,
+
+        "@container threadItemContainer (width < 516px)": {
+            gridColumn: "1/2",
+            gridRow: "2/3",
+            justifySelf: "start",
+            alignSelf: "end",
+        },
+    });
+
+    const reactionItemsContainer = css({
+        "@container threadItemContainer (width < 516px)": {
+            gridColumn: "1/3",
+            gridRow: "1/2",
+        },
     });
 
     const actionItem = css({
@@ -51,17 +59,27 @@ const ThreadItemActionsClasses = useThemeCache(() => {
         },
     });
 
+    const quoteButton = css({
+        alignSelf: "center",
+    });
+
     const actionButton = css({
         ...Mixins.font(metasVars.font),
         display: "inline-flex",
         alignItems: "center",
         gap: 2,
+        "@media (max-width : 516px)": {
+            fontSize: globalVars.fontSizeAndWeightVars("medium").size,
+            fontWeight: globalVars.fontSizeAndWeightVars("medium").weight,
+        },
     });
 
     return {
         root,
+        reactionItemsContainer,
         actionItemsContainer,
         actionItem,
+        quoteButton,
         actionButton,
     };
 });

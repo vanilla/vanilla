@@ -24,7 +24,10 @@ class ProfileFieldsOpenApi
         // Add the profile field schema for updating users' profile fields to openapi.
         $schema = $this->profileFieldModel->getUserProfileFieldSchema();
         $properties = $schema->jsonSerialize()["properties"] ?? [];
-        ArrayUtils::setByPath("components.schemas.UserProfileFields.properties", $openApi, $properties);
+        ArrayUtils::setByPath("components.schemas.UserProfileFields", $openApi, [
+            "type" => "object",
+            "properties" => $properties,
+        ]);
 
         // Add the profile field schema for filtering users to openapi.
         $schema = $this->profileFieldModel->getProfileFieldFilterSchema();

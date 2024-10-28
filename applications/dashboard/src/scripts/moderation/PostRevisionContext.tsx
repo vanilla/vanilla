@@ -52,6 +52,7 @@ export function PostRevisionProvider(props: {
             return response.data;
         },
         queryKey: ["post", recordID],
+        enabled: !!recordID,
     });
 
     const reportsForID = useQuery<any, IError, IReport[]>({

@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html lang="{{ locale }}" {{  isDirectionRTL ? 'dir="rtl"' : ""}}>
+<html lang="{{ locale }}" {{  isDirectionRTL ? 'dir="rtl"' : ""}} style="min-height: 100%;">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {{ pageHead }}
         <noscript>
+            {% apply minifyStylesheetContents %}
             <style>
                 body .page {
                     max-height: initial;
                     height: initial;
                 }
             </style>
+            {% endapply %}
         </noscript>
 
         <style>
+            {% apply minifyStylesheetContents %}
             body {
                 background: {{ "#{theme.variable('global.body.backgroundImage.color', theme.variable('global.options.preset', 'light') == 'light' ? '#fff' : '#272A2D')}" }};
                 font-size: {{ "#{theme.variable('global.fonts.size.medium', 14)}px" }};
@@ -54,11 +57,41 @@
                 -webkit-flex-direction: column;
                 -ms-flex-direction: column;
                 flex-direction: column;
-
                 min-height: 100vh;
             }
+            {% endapply %}
         </style>
+
+        {%- if themeFooter -%}
+            <style>
+                {% apply minifyStylesheetContents %}
+                body.isLoading .page-minHeight {
+                    min-height: 200vh;
+                }
+                body.isLoading #themeFooter {
+                    display: none;
+                }
+                {% endapply %}
+            </style>
+
+            <noscript>
+                <style>
+                    {% apply minifyStylesheetContents %}
+                    body.isLoading .page-minHeight {
+                        min-height: initial;
+                    }
+
+                    body.isLoading #themeFooter {
+                        display: initial;
+                    }
+                    {% endapply %}
+                </style>
+            </noscript>
+        {%- endif -%}
+
+
         <style>
+            {% apply minifyStylesheetContents %}
             body.isLoading #titleBar {
                 background: {{ theme.variable("titleBar.colors.bg", "#037DBC") }};
                 height: {{ theme.pixelVariable('titleBar.sizing.height', 48) }}px;
@@ -72,13 +105,16 @@
                 /* For the legacy Gdn_Controller FOUC */
                 visibility: hidden;
             }
+            {% endapply %}
         </style>
         <noscript>
             <style>
+                {% apply minifyStylesheetContents %}
                 body.isLoading .Frame {
                     /* For the legacy Gdn_Controller FOUC */
                     visibility: visible;
                 }
+                {% endapply %}
             </style>
         </noscript>
     </head>

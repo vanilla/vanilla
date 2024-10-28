@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import { languageSettingsStyles } from "@dashboard/languages/LanguageSettings.styles";
 import { IAddon, ITranslationService } from "@dashboard/languages/LanguageSettingsTypes";
 import { useLocaleConfig } from "@library/config/configHooks";
@@ -138,7 +138,7 @@ export const LocaleConfigurationModal = (props: IProps) => {
                 body={
                     <FrameBody>
                         <div className={classesFrameBody.contents}>
-                            <JsonSchemaForm
+                            <DashboardSchemaForm
                                 schema={schema as JsonSchema}
                                 instance={value}
                                 FormSection={({ children }) => (
@@ -147,8 +147,6 @@ export const LocaleConfigurationModal = (props: IProps) => {
                                         {children}
                                     </>
                                 )}
-                                FormControlGroup={DashboardFormControlGroup}
-                                FormControl={DashboardFormControl}
                                 onChange={setValue}
                             />
                         </div>

@@ -11,17 +11,25 @@ import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhot
 import { MetaItem, Metas } from "@library/metas/Metas";
 import ProfileLink from "@library/navigation/ProfileLink";
 import React from "react";
-import ThreadItemPermalink from "./ThreadItemPermalink";
-import { IThreadItemContext, useThreadItemContext } from "./ThreadItemContext";
+import ThreadItemPermalink from "@vanilla/addon-vanilla/thread/ThreadItemPermalink";
+import { IThreadItemContext, useThreadItemContext } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
+import { QuoteButton } from "@vanilla/addon-vanilla/thread/ThreadItemActions";
+import { css } from "@emotion/css";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 
 interface IProps {
     user: IUserFragment;
     excludePhoto?: boolean;
     options?: React.ReactNode;
+    showOPTag?: boolean;
+    isPreview?: boolean;
+    isClosed?: boolean;
+    categoryID: ICategory["categoryID"];
+    readOnly?: boolean;
 }
 
 export function ThreadItemHeader(props: IProps) {
-    const { user, excludePhoto, options } = props;
+    const { user, excludePhoto, options, readOnly } = props;
 
     const classes = threadItemHeaderClasses();
 
@@ -39,7 +47,7 @@ export function ThreadItemHeader(props: IProps) {
             </MetaItem>
             {dynamicTitleMetas}
             <MetaItem>
-                <UserTitle user={user} />
+                <UserTitle user={user} showOPTag={props.showOPTag} />
             </MetaItem>
         </>
     );
@@ -52,7 +60,17 @@ export function ThreadItemHeader(props: IProps) {
     const metadata = (
         <>
             {dynamicMetadataMetas}
-            <ThreadItemPermalink />
+            <ThreadItemPermalink readOnly={readOnly} />
+            {!readOnly && (
+                <>
+                    <QuoteButton
+                        scrapeUrl={threadItemContext.recordUrl}
+                        categoryID={props.categoryID}
+                        isClosed={!!props.isClosed}
+                    />
+                </>
+            )}
+            {threadItemContext.extraMetas}
         </>
     );
 
@@ -67,14 +85,14 @@ export function ThreadItemHeader(props: IProps) {
     }
 
     return (
-        <div className={classes.root}>
+        <div className={classes.root} key={user.userID}>
             <ProfileLink className={classes.userName} userFragment={user} isUserCard aria-hidden="true">
                 <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={user} />
             </ProfileLink>
             <div className={classes.main}>
                 {/* Render metas on separate rows */}
                 <Metas>{authorMeta}</Metas>
-                <Metas>{metadata}</Metas>
+                <span className={classes.headerMeta}>{metadata}</span>
             </div>
             {options}
         </div>

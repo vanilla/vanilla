@@ -20,7 +20,7 @@ interface IProps {
 
 export class IconForButtonWrap extends React.PureComponent<IProps> {
     public render() {
-        const classesRichEditor = richEditorClasses(false);
+        const classesRichEditor = richEditorClasses();
         return (
             <>
                 <span className={classesRichEditor.iconWrap} />

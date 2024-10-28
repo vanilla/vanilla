@@ -6,6 +6,7 @@
 
 import { IDraft } from "@dashboard/@types/api/draft";
 import apiv2 from "@library/apiv2";
+import { RecordID } from "@vanilla/utils";
 
 export const DraftsApi = {
     post: async (apiParams: DraftsApi.PostParams): Promise<IDraft> => {
@@ -18,3 +19,19 @@ export const DraftsApi = {
         return result.data;
     },
 };
+
+export namespace DraftsApi {
+    export interface PostParams {
+        attributes: {
+            format: string;
+            body: string;
+        };
+        discussionID?: RecordID;
+        parentRecordID?: RecordID;
+        recordType: "discussion" | "comment";
+    }
+
+    export interface PatchParams extends PostParams {
+        draftID: RecordID;
+    }
+}

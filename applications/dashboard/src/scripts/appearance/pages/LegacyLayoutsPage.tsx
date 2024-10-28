@@ -1,12 +1,11 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import {
     getLayoutFeatureFlagKey,
     getLayoutTypeGroupLabel,
-    getLayoutTypeLabel,
     getLayoutTypeSettingsLabel,
 } from "@dashboard/appearance/components/layoutViewUtils";
 import { LegacyLayoutFormPage } from "@dashboard/appearance/components/LegacyLayoutForm";
@@ -119,6 +118,24 @@ export default function LegacyLayoutsPage(
                         legendLabel: t("Discussion Thread Layout Version"),
                         legacyLabel: t("Legacy Discussion Thread Layouts"),
                         customLabel: t("Custom Discussion Thread Layouts"),
+                    }}
+                />
+            );
+        case "knowledgeBase":
+        case "article":
+            // FIXME: Remove this. When KB layouts are ready, we will not offer the legacy layout option.
+            // This is just to aid toggling the feature during development.
+            return (
+                <LegacyLayoutFormPage
+                    layoutTypeLabel={getLayoutTypeGroupLabel("knowledgeBase")}
+                    title={getLayoutTypeSettingsLabel("knowledgeBase")}
+                    customLayoutConfigKey={getLayoutFeatureFlagKey("knowledgeBase")}
+                    legacyTitle={t("Legacy Knowledge Base Layout")}
+                    legacyDescription={t("Choose the preferred Legacy Knowledge Base Layout.")}
+                    radios={{
+                        legendLabel: t("Knowledge Base Layout Version"),
+                        legacyLabel: t("Legacy Knowledge Base Layouts"),
+                        customLabel: t("Custom Knowledge Base Layouts"),
                     }}
                 />
             );

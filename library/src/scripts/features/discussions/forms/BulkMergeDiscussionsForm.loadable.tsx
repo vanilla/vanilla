@@ -39,11 +39,11 @@ interface IMergeRequestBody {
     addRedirects?: boolean;
 }
 
-interface IProps {
+export interface BulkMergeDiscussionsFormProps {
     onCancel: () => void;
 }
 
-export default function DiscussionMergeFormImpl(props: IProps) {
+export default function DiscussionMergeFormImpl(props: BulkMergeDiscussionsFormProps) {
     const { checkedDiscussionIDs, addPendingDiscussionByIDs, removePendingDiscussionByIDs } =
         useDiscussionCheckBoxContext();
 

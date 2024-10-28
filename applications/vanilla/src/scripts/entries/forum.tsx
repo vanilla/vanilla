@@ -45,8 +45,8 @@ import {
     LegacyIntegrationsOptionsMenuItems,
     LegacyThreadAttachmentsAsset,
 } from "@vanilla/addon-vanilla/thread/LegacyAttachments";
-import ReportModal from "@vanilla/addon-vanilla/thread/ReportModal";
 import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
+import { TrollComment } from "@vanilla/addon-vanilla/thread/LegacyTrollComment";
 
 registerReducer("forum", forumReducer);
 
@@ -76,6 +76,7 @@ addComponent("FollowedContent", FollowedContent, { overwrite: true });
 addComponent("NotificationPreferences", NotificationPreferences, { overwrite: true });
 addComponent("LegacyThreadAttachmentsAsset", LegacyThreadAttachmentsAsset);
 addComponent("LegacyIntegrationsOptionsMenuItems", LegacyIntegrationsOptionsMenuItems);
+addComponent("TrollComment", TrollComment);
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();

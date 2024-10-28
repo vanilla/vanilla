@@ -52,7 +52,7 @@ export default function CheckBox(props: IProps) {
     const {
         isHorizontal,
         fullWidth,
-        labelBold = true,
+        labelBold = false,
         onChange,
         onBlur,
         checked,
@@ -84,7 +84,14 @@ export default function CheckBox(props: IProps) {
     );
 
     return (
-        <label className={classNames(className, classes.root, { isHorizontal }, fullWidth && classes.fullWidth)}>
+        <label
+            className={classNames(
+                className,
+                classes.root,
+                { isHorizontal, minContent: hideLabel },
+                fullWidth && classes.fullWidth,
+            )}
+        >
             <input
                 className={classNames(classes.input, fakeFocus && "focus-visible", {
                     "exclude-icheck": excludeFromICheck,

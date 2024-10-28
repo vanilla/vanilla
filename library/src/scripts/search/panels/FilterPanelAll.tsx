@@ -20,7 +20,12 @@ interface IProps {}
  * Implement search filter panel for all types
  */
 export function FilterPanelAll(props: IProps) {
-    const { form, updateForm, search } = useSearchForm<{ startDate?: string; endDate?: string }>();
+    const { form, updateForm, search } = useSearchForm<{
+        startDate?: string;
+        endDate?: string;
+        startDateUpdated?: string;
+        endDateUpdated?: string;
+    }>();
     const classesInputBlock = inputBlockClasses();
     return (
         <FilterFrame title={t("Filter Results")} handleSubmit={search}>
@@ -41,7 +46,7 @@ export function FilterPanelAll(props: IProps) {
                 }}
                 value={form.authors ?? []}
             />
-            <InputBlock legend={t("Date Updated")}>
+            <InputBlock legend={t("Date Created")}>
                 <LazyDateRange
                     onStartChange={(date: string) => {
                         updateForm({ startDate: date });
@@ -51,6 +56,18 @@ export function FilterPanelAll(props: IProps) {
                     }}
                     start={form.startDate}
                     end={form.endDate}
+                />
+            </InputBlock>
+            <InputBlock legend={t("Date Updated")}>
+                <LazyDateRange
+                    onStartChange={(date: string) => {
+                        updateForm({ startDateUpdated: date });
+                    }}
+                    onEndChange={(date: string) => {
+                        updateForm({ endDateUpdated: date });
+                    }}
+                    start={form.startDateUpdated}
+                    end={form.endDateUpdated}
                 />
             </InputBlock>
         </FilterFrame>

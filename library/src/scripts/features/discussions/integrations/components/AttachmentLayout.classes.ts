@@ -112,7 +112,7 @@ const AttachmentLayoutClasses = useThemeCache(() => {
     });
 
     const inlineMetas = css({
-        display: "inline-flex",
+        display: "inline-flex !important",
         flexBasis: "content",
     });
 
@@ -204,6 +204,13 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         marginRight: 16,
     });
 
+    const aiEscalationMetaIcon = css({
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px",
+        marginInlineStart: "6px",
+    });
+
     return {
         root,
         logoSection,
@@ -227,6 +234,7 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         userMetaValue,
         tokens,
         attchmentTypeWrapper,
+        aiEscalationMetaIcon,
     };
 });
 

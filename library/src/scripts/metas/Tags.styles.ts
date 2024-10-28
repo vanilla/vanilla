@@ -3,7 +3,8 @@
  * @license gpl-2.0-only
  */
 
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { TagPreset, tagPresetVariables, tagsVariables, TagType } from "@library/metas/Tags.variables";
 import { Mixins } from "@library/styles/Mixins";
 import { defaultTransition, userSelect } from "@library/styles/styleHelpers";

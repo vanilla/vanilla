@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
 import { TitleBarNavItem } from "@library/headers/mebox/pieces/TitleBarNavItem";
@@ -12,7 +12,7 @@ import { INavigationVariableItem, navigationVariables } from "@library/headers/n
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { IMegaMenuHandle, TitleBarMegaMenu } from "@library/headers/TitleBarMegaMenu";
 import { formatUrl, siteUrl, t } from "@library/utility/appUtils";
-import { useLocation } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { useMeasure } from "@vanilla/react-utils";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
@@ -28,18 +28,29 @@ export interface ITitleBarNavProps {
     afterNode?: React.ReactNode;
     // For storybook.
     forceOpen?: boolean;
+    navigationItems?: INavigationVariableItem[];
 }
 
 /**
  * Implements Navigation component for header
  */
 export default function TitleBarNav(props: ITitleBarNavProps) {
-    const { navigationItems } = navigationVariables();
+    const navigationItems = props.navigationItems ?? navigationVariables().navigationItems;
 
     const location = useLocation();
 
     const [menuItem, setMenuItem] = useState<HTMLElement>();
     const [expanded, setExpanded] = useState<INavigationVariableItem>();
+
+    // If the location changes we close the menu.
+    const history = useHistory();
+    useEffect(() => {
+        const unlisten = history.listen(() => {
+            setMenuItem(undefined);
+            setExpanded(undefined);
+        });
+        return unlisten;
+    }, [history, setMenuItem, setExpanded]);
 
     const megaMenuRef = useRef<IMegaMenuHandle>(null);
     const firstItemRef = useRef<HTMLAnchorElement | HTMLButtonElement>();
@@ -71,7 +82,13 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
         }
 
         function onFocus(element) {
-            if (expanded !== item) setExpanded(undefined);
+            if (expanded !== item) {
+                setExpanded(undefined);
+            }
+
+            if (item.children && item.children.length > 0) {
+                onActive(element);
+            }
         }
 
         function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
@@ -91,6 +108,11 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
                     } else {
                         (event.target as HTMLElement).click();
                     }
+                    break;
+                case "Escape":
+                    event.preventDefault();
+                    setExpanded(undefined);
+                    setMenuItem(undefined);
                     break;
                 case "ArrowDown":
                     event.preventDefault();
@@ -134,6 +156,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
 
         return (
             <TitleBarNavItem
+                id={item.id}
                 to={item.url}
                 ref={(ref) => {
                     if (key === 0) firstItemRef.current = ref!;

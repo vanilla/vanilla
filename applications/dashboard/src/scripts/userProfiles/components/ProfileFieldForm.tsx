@@ -5,7 +5,8 @@
  */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { DashboardFormControlGroup, DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControlGroup";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Frame from "@library/layout/frame/Frame";

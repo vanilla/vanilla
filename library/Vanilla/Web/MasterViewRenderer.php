@@ -101,7 +101,9 @@ class MasterViewRenderer
         $data = array_merge($this->getSharedData(), $extraData, $viewData);
         $data["cssClasses"] = implode(" ", $data["cssClasses"]);
 
-        return $this->renderTwig($masterViewPath, $data);
+        $result = $this->renderTwig($masterViewPath, $data);
+        $minified = $this->minifyHTML($result);
+        return $minified;
     }
 
     /**
@@ -122,7 +124,14 @@ class MasterViewRenderer
             $modernPageHead = \Gdn::getContainer()->get(PageHead::class);
             $inlineContent = $modernPageHead->getInlineStyleFromUrl($fontCssUrl);
             if ($inlineContent !== null) {
-                $controller->Head->addString("<style>{$inlineContent}</style>");
+                $isMinificationEnabled = $this->config->get("minify.styles", true);
+                if ($isMinificationEnabled) {
+                    $cssMinifier = new \MatthiasMullie\Minify\CSS($inlineContent);
+                    $minifiedInlineContent = $cssMinifier->minify();
+                    $controller->Head->addString("<style>{$minifiedInlineContent}</style>");
+                } else {
+                    $controller->Head->addString("<style>{$inlineContent}</style>");
+                }
             } else {
                 $controller->Head->addCss($fontCssUrl);
             }
@@ -139,7 +148,9 @@ class MasterViewRenderer
 
         $data = array_merge($data, $extraData);
 
-        return $this->renderTwig(self::MASTER_VIEW_PATH, $data);
+        $result = $this->renderTwig(self::MASTER_VIEW_PATH, $data);
+        $minified = $this->minifyHTML($result);
+        return $minified;
     }
 
     /**
@@ -225,5 +236,25 @@ class MasterViewRenderer
             // Default fallback.
             return [$googleFontUrl];
         }
+    }
+
+    /**
+     * Minify some HTML
+     * @param string $html
+     * @return string
+     */
+    private function minifyHTML(string $html): string
+    {
+        $isMinificationEnabled = $this->config->get("minify.html", false);
+        if ($isMinificationEnabled) {
+            $minifier = new \voku\helper\HtmlMin();
+            $minifier
+                ->doSumUpWhitespace()
+                ->doSortHtmlAttributes()
+                ->doRemoveOmittedHtmlTags(false);
+
+            return @$minifier->minify($html);
+        }
+        return $html;
     }
 }

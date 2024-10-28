@@ -55,14 +55,16 @@ export function DropDownPanelNav(props: IProps) {
                 >
                     <div className={classes.headingContentContainer}>
                         <div className={classes.headingTitleContainer}> {props.title} </div>
-                        <Button
-                            className={classes.closeButton}
-                            onClick={props.onClose}
-                            buttonType={ButtonTypes.ICON_COMPACT}
-                        >
-                            <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
-                            <CloseTinyIcon />
-                        </Button>
+                        {!!props.onClose && (
+                            <Button
+                                className={classes.closeButton}
+                                onClick={props.onClose}
+                                buttonType={ButtonTypes.ICON_COMPACT}
+                            >
+                                <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
+                                <CloseTinyIcon />
+                            </Button>
+                        )}
                     </div>
                 </Heading>
             )}

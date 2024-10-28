@@ -19,6 +19,11 @@ import ThreadItemActions from "@vanilla/addon-vanilla/thread/ThreadItemActions";
 import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
 import React from "react";
 import { useThreadItemContext } from "./ThreadItemContext";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { t } from "@vanilla/i18n";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 
 interface IProps {
     content: string;
@@ -32,6 +37,14 @@ interface IProps {
     reactions?: IReaction[];
     attachmentsContent?: React.ReactNode;
     suggestionContent?: IAcceptedAnswerProps;
+    onReply?: () => void;
+    showOPTag?: boolean;
+    isPreview?: boolean;
+    isHighlighted?: boolean;
+    isClosed?: boolean;
+    categoryID: ICategory["categoryID"];
+    readOnly?: boolean;
+    replyLabel?: string;
 }
 
 function getThreadItemID(recordType: string, recordID: string | number) {
@@ -40,7 +53,7 @@ function getThreadItemID(recordType: string, recordID: string | number) {
 }
 
 export function ThreadItem(props: IProps) {
-    const { content, user, userPhotoLocation, collapsed, suggestionContent } = props;
+    const { content, user, userPhotoLocation, collapsed, suggestionContent, showOPTag, isHighlighted } = props;
 
     const headerHasUserPhoto = userPhotoLocation === "header";
 
@@ -65,19 +78,41 @@ export function ThreadItem(props: IProps) {
     const itemID = getThreadItemID(recordType, recordID);
 
     let result = (
-        <>
-            <ThreadItemHeader options={props.options} user={user} excludePhoto={!headerHasUserPhoto} />
+        <div className={classes.threadItemContainer}>
+            <ThreadItemHeader
+                options={props.options}
+                user={user}
+                excludePhoto={!headerHasUserPhoto}
+                showOPTag={showOPTag}
+                categoryID={props.categoryID}
+                isClosed={props.isClosed}
+                readOnly={props.readOnly}
+            />
             {props.editor || (
                 <>
                     {userContent}
                     {props.actions}
-                    {props.reactions && <ThreadItemActions reactions={props.reactions} />}
+                    {!props.readOnly && (
+                        <div className={classes.footerWrapper}>
+                            {props.reactions && <ThreadItemActions reactions={props.reactions} />}
+                            {props.onReply && (
+                                <Button
+                                    className={classes.replyButton}
+                                    onClick={() => props.onReply && props.onReply()}
+                                    buttonType={ButtonTypes.TEXT}
+                                >
+                                    {props.replyLabel ?? t("Reply")}
+                                </Button>
+                            )}
+                        </div>
+                    )}
+
                     {!!props.attachmentsContent && (
                         <div className={classes.attachmentsContentWrapper}>{props.attachmentsContent}</div>
                     )}
                 </>
             )}
-        </>
+        </div>
     );
 
     if (!headerHasUserPhoto) {
@@ -91,8 +126,32 @@ export function ThreadItem(props: IProps) {
         );
     }
 
+    if (isHighlighted) {
+        result = (
+            <PageBox
+                options={{
+                    borderType: BorderType.BORDER,
+                    border: {
+                        color: globalVariables().mainColors.primary,
+                    },
+                    background: {
+                        color: globalVariables().mixPrimaryAndBg(0.1),
+                    },
+                }}
+            >
+                {result}
+            </PageBox>
+        );
+    }
+
     return (
-        <PageBox id={itemID} options={{ borderType: BorderType.SEPARATOR_BETWEEN, ...props.boxOptions }}>
+        <PageBox
+            id={itemID}
+            options={{
+                borderType: BorderType.SEPARATOR_BETWEEN,
+                ...props.boxOptions,
+            }}
+        >
             {result}
         </PageBox>
     );

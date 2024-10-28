@@ -16,7 +16,6 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { useMutation } from "@tanstack/react-query";
 import apiv2 from "@library/apiv2";
 import { ITestEmailPayload, IEmailSettings } from "@dashboard/emailSettings/EmailSettings.types";
@@ -27,6 +26,7 @@ import Message from "@library/messages/Message";
 import { IApiError } from "@library/@types/api/core";
 import { useFormik } from "formik";
 import { mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 
 interface IProps {
     settings: IEmailSettings | {};
@@ -165,13 +165,11 @@ export function TestEmailModalImpl(props: {
                                 />
                             )}
 
-                            <JsonSchemaForm
+                            <DashboardSchemaForm
                                 disabled={isSubmitting}
                                 fieldErrors={fieldErrors}
                                 schema={SCHEMA}
                                 instance={values}
-                                FormControlGroup={DashboardFormControlGroup}
-                                FormControl={DashboardFormControl}
                                 onChange={setValues}
                                 ref={schemaFormRef}
                             />

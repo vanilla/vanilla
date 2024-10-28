@@ -3,6 +3,8 @@ import axios from "axios";
 import qs from "qs";
 import debounce from "lodash-es/debounce";
 import { logDebug } from "@vanilla/utils";
+import { isEmptyRich2 } from "@library/vanilla-editor/utils/emptyRich2";
+import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
 
 /** Attach auto save function after vanilla is loaded */
 window.onVanillaReady(function () {
@@ -79,8 +81,7 @@ const generateFormRequestBody = (form: HTMLFormElement): object | null => {
         }
 
         const parsedBody = safelyParseJSON(`${formBody}`);
-        // Empty Rich2 body
-        if (Array.isArray(parsedBody) && parsedBody.length == 1 && parsedBody[0]?.children?.[0]?.text === "") {
+        if (isMyValue(parsedBody) && isEmptyRich2(parsedBody)) {
             return null;
         }
 

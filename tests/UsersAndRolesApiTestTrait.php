@@ -144,10 +144,15 @@ trait UsersAndRolesApiTestTrait
      * @param array $overrides
      * @param array $extras Extra fields to set directly through the model.
      * @param array $notificationPreferences
+     * @param array $profileFields An array of Key -> Value to set hte profile fields.
      * @return array
      */
-    protected function createUser(array $overrides = [], array $extras = [], array $notificationPreferences = []): array
-    {
+    protected function createUser(
+        array $overrides = [],
+        array $extras = [],
+        array $notificationPreferences = [],
+        array $profileFields = []
+    ): array {
         $salt = $this->generateSalt();
 
         $body = $overrides + [
@@ -172,6 +177,10 @@ trait UsersAndRolesApiTestTrait
 
         if (!empty($notificationPreferences)) {
             $this->api()->patch("/notification-preferences/$this->lastUserID", $notificationPreferences);
+        }
+
+        if (!empty($profileFields)) {
+            $this->api()->patch("/users/$this->lastUserID/profile-fields", $profileFields);
         }
 
         return $result;
@@ -410,6 +419,33 @@ trait UsersAndRolesApiTestTrait
             $this->assertIsObject($registrationResults);
             return $registrationResults;
         });
+    }
+
+    /**
+     * Get a test registration record
+     *
+     * @param array $overrides
+     * @param array $profileFields
+     * @return array
+     * @throws \Exception
+     */
+    public static function getRegistrationRecord(array $overrides = [], array $profileFields = [])
+    {
+        $password = bin2Hex(random_bytes(6));
+        $slug = randomString(10, "abcdefghijklmnopqrstuvwxyz1234567890");
+        $record = $overrides + [
+            "Email" => $slug . "@test.com",
+            "Name" => $slug,
+            "Password" => $password,
+            "PasswordMatch" => $password,
+            "TermsOfService" => "1",
+            "Save" => "Save",
+        ];
+
+        if (!empty($profileFields)) {
+            $record["Profile"] = $profileFields;
+        }
+        return $record;
     }
 
     /**

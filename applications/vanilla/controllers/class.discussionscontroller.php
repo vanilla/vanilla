@@ -220,16 +220,19 @@ class DiscussionsController extends VanillaController
         }
 
         $this->setData("CountDiscussions", $CountDiscussions);
-
+        $whereAnnounce = array_merge($announcementsWhere, [
+            "Announce" => $DiscussionModel->getAnnouncementWhere($announcementsWhere, true),
+        ]);
         // Get Announcements
-        $this->AnnounceData = $Offset == 0 ? $DiscussionModel->getAnnouncements($announcementsWhere) : false;
+        $this->AnnounceData = $Offset == 0 ? $DiscussionModel->getWhere($whereAnnounce) : false;
         $this->setData("Announcements", $this->AnnounceData !== false ? $this->AnnounceData : [], true);
 
         // We already have global announcements, now get recent, including announced in category
         $where["Announce"] = [false, $DiscussionModel::CATEGORY_ANNOUNCEMENT];
 
         // Get Discussions
-        $this->DiscussionData = $DiscussionModel->getWhereRecent($where, $Limit, $Offset);
+
+        $this->DiscussionData = $DiscussionModel->getWhere($where, "", "", $Limit, $Offset);
 
         $this->setData("Discussions", $this->DiscussionData, true);
         $this->setJson("Loading", $Offset . " to " . $Limit);

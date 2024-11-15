@@ -14,6 +14,7 @@ import classNames from "classnames";
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 export function PocketCategoryInput(props) {
     const [category, setCategory] = useState(
@@ -34,7 +35,7 @@ export function PocketCategoryInput(props) {
 
     return (
         <DashboardFormGroup label={t("Category")} tag={"div"}>
-            <div className="input-wrap">
+            <DashboardInputWrap>
                 <div className={classes.inputWrap}>
                     <CommunityCategoryInput
                         placeholder={t("Select...")}
@@ -60,7 +61,7 @@ export function PocketCategoryInput(props) {
                     </DashboardRadioGroup>
                 </div>
                 <input name={"InheritCategory"} type={"hidden"} value={`${inheritCategory ? 1 : 0}`} />
-            </div>
+            </DashboardInputWrap>
         </DashboardFormGroup>
     );
 }

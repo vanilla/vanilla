@@ -1,38 +1,46 @@
 /**
- * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React from "react";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { FollowedContentFixtures } from "@library/followedContent/__fixtures__/FollowedContent.fixture";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { FollowedContentImpl } from "@library/followedContent/FollowedContent";
-import { FollowedContentContext } from "@library/followedContent/FollowedContentContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { UserFixture } from "@library/features/__fixtures__/User.fixture";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
+import { FollowedContentContext } from "@library/followedContent/FollowedContentContext";
+import MockAdapter from "axios-mock-adapter";
 import { mockAPI } from "@library/__tests__/utility";
+import { mockedCategories } from "@library/followedContent/__fixtures__/FollowedContent.fixture";
 
 const queryClient = new QueryClient();
 
-const renderFollowedContent = () => {
+const renderFollowedContent = (withAdditionalFollowedContent?: boolean) => {
+    const additionalFollowedContent = withAdditionalFollowedContent
+        ? [{ contentName: "Test-Content", contentRenderer: () => <div>{"Something"}</div> }]
+        : [];
     return render(
         <QueryClientProvider client={queryClient}>
-            <FollowedContentFixtures.HasFollowedCategories>
-                <FollowedContentImpl />
-            </FollowedContentFixtures.HasFollowedCategories>
+            <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
+                <FollowedContentContext.Provider
+                    value={{
+                        userID: 1,
+                        additionalFollowedContent: additionalFollowedContent,
+                    }}
+                >
+                    <FollowedContentImpl userID={1} renderAdditionalFollowedContent={withAdditionalFollowedContent} />
+                </FollowedContentContext.Provider>
+            </CurrentUserContextProvider>
         </QueryClientProvider>,
     );
 };
 
-const renderEmptyContent = () => {
-    return render(
-        <FollowedContentFixtures.NoFollowedCategories>
-            <FollowedContentImpl />
-        </FollowedContentFixtures.NoFollowedCategories>,
-    );
-};
-
 describe("FollowedContent", () => {
+    let mockAdapter: MockAdapter;
+    beforeAll(() => {
+        mockAdapter = mockAPI();
+        mockAdapter.onGet("/categories").reply(200, mockedCategories);
+    });
     it("Displays the page header", () => {
         renderFollowedContent();
         const header = screen.getByRole("heading", { name: "Followed Content" });
@@ -42,14 +50,14 @@ describe("FollowedContent", () => {
 
     it("Displays the sub header", () => {
         renderFollowedContent();
-        const header = screen.getByRole("heading", { name: "Manage Followed Categories" });
+        const header = screen.getByRole("heading", { name: "Manage Categories" });
         expect(header).toBeInTheDocument();
         expect(header.tagName.toLowerCase()).toEqual("h2");
     });
 
     it("Displays the mocked category", async () => {
         renderFollowedContent();
-        const categoryTitle = screen.getByRole("heading", { name: "Mocked Category" });
+        const categoryTitle = await screen.getByRole("heading", { name: "Mocked Category" });
         expect(categoryTitle).toBeInTheDocument();
         expect(categoryTitle.tagName.toLowerCase()).toEqual("h3");
 
@@ -64,7 +72,8 @@ describe("FollowedContent", () => {
 
     it("Displays the CategoryFollowDropDown", async () => {
         renderFollowedContent();
-        const followButton = screen.getByTitle("Following");
+
+        const followButton = await screen.getByRole("button", { name: "Following" });
         expect(followButton).toBeInTheDocument();
 
         expect(screen.queryByText("Follow")).not.toBeInTheDocument();
@@ -76,8 +85,15 @@ describe("FollowedContent", () => {
         expect(screen.queryByText("Unfollow Category")).toBeInTheDocument();
     });
 
-    it("Displays the empty state", async () => {
-        renderEmptyContent();
-        expect(screen.getByText("No categories followed")).toBeInTheDocument();
+    it("We have followed content other than categories, tabs should be rendered with relevant info instead of sub header", async () => {
+        renderFollowedContent(true);
+        const header = await screen.queryByRole("heading", { name: "Manage Categories" });
+        expect(header).not.toBeInTheDocument();
+
+        const tabs = await screen.getByRole("tablist");
+        expect(tabs).toBeInTheDocument();
+
+        const additionalFollowedContent = await screen.getByText("Manage Test-Content");
+        expect(additionalFollowedContent).toBeInTheDocument();
     });
 });

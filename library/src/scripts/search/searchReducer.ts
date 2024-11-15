@@ -7,7 +7,7 @@ import { SearchActions } from "@library/search/SearchActions";
 import { ISearchForm, ISearchResponse } from "@library/search/searchTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
-import { reducerWithoutInitialState } from "typescript-fsa-reducers";
+import { reducerWithoutInitialState, type ReducerBuilder } from "typescript-fsa-reducers";
 import { SEARCH_SCOPE_LOCAL } from "@library/features/search/SearchScopeContext";
 import { EMPTY_SEARCH_DOMAIN_KEY } from "./searchConstants";
 
@@ -117,4 +117,4 @@ export const searchReducer = produce(
             };
             return nextState;
         }),
-);
+) as ReducerBuilder<ISearchState<{}>, ISearchState<{}>, ISearchState<{}>>;

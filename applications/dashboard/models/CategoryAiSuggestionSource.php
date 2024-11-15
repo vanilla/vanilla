@@ -80,6 +80,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
         $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
         $siteSection = $siteSectionModel->getCurrentSiteSection();
         $currentLocale = $siteSection->getContentLocale();
+        $config = AiSuggestionSourceService::aiSuggestionConfigs();
         $params = [
             "query" => $keywords,
             "locale" => $currentLocale,
@@ -88,8 +89,9 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
             "expandBody" => true,
             "limit" => 3,
             "recordTypes" => ["discussion", "comment"],
+            "queryOperator" => "or",
+            "excludedInsertUserIDs" => [$config["userID"]],
         ];
-        $config = AiSuggestionSourceService::aiSuggestionConfigs();
         $providerConfig = $config["sources"][$this->getName()];
         if (count($providerConfig["exclusionIDs"] ?? []) > 0) {
             $categoryModel = GDN::getContainer()->get(CategoryModel::class);
@@ -118,7 +120,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
                     "documentID" => $result["recordID"],
                     "url" => $result["url"],
                     "title" => $result["name"],
-                    "summary" => $result->getBody(),
+                    "summary" => $result["bodyPlainText"],
                     "hidden" => false,
                 ];
             }

@@ -16,7 +16,7 @@ export function NewAnalyticsLabItem() {
             imageUrl={image}
             themeFeatureName="NewAnalytics"
             labName={"newAnalytics"}
-            name={t("Analytics BETA")}
+            name={t("Analytics")}
             description={t(
                 "Our new Analytics Experience is finally here, and we want your feedback.",
                 "Our new Analytics Experience is finally here, and we want your feedback. Enable this option to test out our new Analytics UI, Custom Dashboard Builder and Chart Editor and access more of your analytics data.",

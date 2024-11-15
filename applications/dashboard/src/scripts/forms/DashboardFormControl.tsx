@@ -7,29 +7,35 @@
 import { DashboardAutoComplete } from "@dashboard/forms/DashboardAutoComplete";
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { DashboardCodeEditor } from "@dashboard/forms/DashboardCodeEditor";
+import DashboardCurrencyInput from "@dashboard/forms/DashboardCurrencyInput";
 import { DashboardCustomComponent } from "@dashboard/forms/DashboardCustomComponent";
 import { DashboardDatePicker } from "@dashboard/forms/DashboardDatePicker";
+import { DashboardDurationPicker } from "@dashboard/forms/DashboardDurationPicker";
 import { DashboardColorPicker } from "@dashboard/forms/DashboardFormColorPicker";
-import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import { DashboardPasswordInput } from "@dashboard/forms/DashboardPasswordInput";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
+import { DashboardRadioPicker } from "@dashboard/forms/DashboardRadioPicker";
+import DashboardRatioInput from "@dashboard/forms/DashboardRatioInput";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
-import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
+import { css, cx } from "@emotion/css";
 import apiv2 from "@library/apiv2";
+import LazyDateRange from "@library/forms/LazyDateRange";
+import { NestedSelect } from "@library/forms/nestedSelect";
 import { FormTreeControl } from "@library/tree/FormTreeControl";
 import { useUniqueID } from "@library/utility/idUtils";
+import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { t } from "@vanilla/i18n";
-import { ICommonControl, IControlGroupProps, IControlProps, ICustomControl } from "@vanilla/json-schema-forms";
-import { IFormGroupProps } from "@vanilla/ui";
+import { ICommonControl, IControlProps, ICustomControl } from "@vanilla/json-schema-forms";
+import { useStackingContext } from "@vanilla/react-utils";
 import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/AutoCompleteLookupOptions";
 import isEmpty from "lodash-es/isEmpty";
-import React from "react";
-import { DashboardDurationPicker } from "@dashboard/forms/DashboardDurationPicker";
 
 interface IControlOverride<T = ICommonControl> {
     /** This boolean controls if the associated component (in callback) should be rendered */
@@ -56,9 +62,13 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
         schema,
         onChange,
         onBlur,
-        size,
         autocompleteClassName,
+        dateRangeDirection: propsDateRangeDirection = "above",
     } = props;
+
+    const dateRangeDirection = props.control?.["dateRangeDirection"] ?? propsDateRangeDirection;
+
+    const { zIndex } = useStackingContext();
 
     const inputName = useUniqueID("input");
 
@@ -75,10 +85,12 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
     const fieldErrors = props.errors;
     switch (control.inputType) {
         case "textBox":
-            const isMultiline = control.type === "textarea";
-            const typeIsNumber = control.type === "number";
-            const typeIsUrl = control.type === "url";
-            const typeIsPassword = control.type === "password";
+            const controlType = control.type;
+
+            const isMultiline = controlType === "textarea";
+            const typeIsNumber = controlType === "number";
+            const typeIsUrl = controlType === "url";
+            const typeIsPassword = controlType === "password";
             const type = typeIsUrl ? "url" : typeIsPassword ? "password" : "text";
             const inputProps = {
                 value: value ?? "",
@@ -104,6 +116,12 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     pattern: "[0-9]*",
                 }),
             };
+            if (controlType === "currency") {
+                return <DashboardCurrencyInput {...inputProps} value={value} onChange={onChange} />;
+            }
+            if (controlType === "ratio") {
+                return <DashboardRatioInput {...inputProps} value={value} onChange={onChange} />;
+            }
             return typeIsPassword ? (
                 <DashboardPasswordInput
                     errors={fieldErrors}
@@ -145,9 +163,9 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
         case "richeditor":
             // Force the Vanilla editor to mobile mode so that the floating toolbar stays within the editor, it otherwise floats offscreen in this view
             return (
-                <div className="input-wrap">
+                <DashboardInputWrap>
                     <VanillaEditor uploadEnabled={false} onChange={onChange} initialContent={value} isMobile />
-                </div>
+                </DashboardInputWrap>
             );
         case "radio":
             return (
@@ -175,6 +193,35 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     )}
                 </DashboardRadioGroup>
             );
+        case "radioPicker":
+            return (
+                <DashboardRadioPicker
+                    value={value}
+                    onChange={onChange}
+                    options={control.options}
+                    pickerTitle={control.pickerTitle}
+                />
+            );
+        case "select": {
+            return (
+                <DashboardInputWrap>
+                    <NestedSelect
+                        defaultValue={control.default}
+                        multiple={control.multiple}
+                        errors={fieldErrors}
+                        value={value}
+                        required={required}
+                        disabled={props.disabled}
+                        isClearable={control.isClearable ?? !required}
+                        placeholder={control.placeholder}
+                        onChange={onChange}
+                        options={control.options}
+                        optionsLookup={control.optionsLookup}
+                        createable={control.createable}
+                    />
+                </DashboardInputWrap>
+            );
+        }
         case "dropDown":
         case "tokens":
             const multiple = control.inputType === "tokens" ? true : control.multiple;
@@ -203,16 +250,16 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     onBlur={onBlur}
                     optionProvider={api ? <AutoCompleteLookupOptions api={apiv2} lookup={api} /> : undefined}
                     options={createOptions()}
-                    size={size}
-                    className={autocompleteClassName}
+                    className={cx(dashboardClasses().reachAutocompleteInput, autocompleteClassName)}
                     multiple={multiple}
                     required={required}
                     disabled={props.disabled}
                 />
             );
         case "checkBox":
+            const useStandardLabel = control.checkPosition === "right";
             return (
-                <div className="input-wrap">
+                <DashboardInputWrap>
                     <DashboardCheckBox
                         fullWidth
                         label={control.label ?? "Unlabeled"}
@@ -224,11 +271,12 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                         }
                         tooltip={control.tooltip}
                         tooltipIcon={control.tooltipIcon}
-                        description={control.description}
+                        description={useStandardLabel ? undefined : control.description}
                         name={inputName}
                         labelBold={control.labelBold}
+                        hideLabel={useStandardLabel}
                     />
-                </div>
+                </DashboardInputWrap>
             );
 
         case "toggle":
@@ -263,8 +311,32 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     onChange={onChange}
                     disabled={props.disabled}
                     placeholder={control.placeholder}
-                    inputAriaLabel={control.inputAriaLabel || control.label}
+                    inputAriaLabel={
+                        control.inputAriaLabel || (typeof control.label === "string" ? control.label : undefined)
+                    }
                 />
+            );
+        }
+        case "dateRange": {
+            return (
+                <DashboardInputWrap isVertical>
+                    <LazyDateRange
+                        onStartChange={(date: string) => {
+                            onChange({ ...(value ?? {}), start: date });
+                        }}
+                        onEndChange={(date: string) => {
+                            onChange({ ...(value ?? {}), end: date });
+                        }}
+                        start={value?.start}
+                        end={value?.end}
+                        datePickerDropdownClassName={css({
+                            zIndex: zIndex,
+                            // FIXME: We should come up with better solution at some point, so this is determined automatically
+                            // here is the ticket created for it: https://higherlogic.atlassian.net/browse/VNLA-4549
+                            ...(dateRangeDirection !== "below" && { top: -350 }), //render above or below the input
+                        })}
+                    />
+                </DashboardInputWrap>
             );
         }
         case "timeDuration": {
@@ -278,6 +350,13 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                 />
             );
         }
+        case "subheading": {
+            return (
+                <DashboardFormSubheading hasBackground={true} actions={control.actions}>
+                    {control.label}
+                </DashboardFormSubheading>
+            );
+        }
         case "custom": {
             return <DashboardCustomComponent {...(props as IControlProps<ICustomControl>)} />;
         }
@@ -286,35 +365,4 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
         default:
             return <div>{(control as any).inputType} is not supported</div>;
     }
-}
-
-/**
- * This is intended for use in the JsonSchemaForm component
- * @param props
- * @returns
- */
-export function DashboardFormControlGroup(
-    props: React.PropsWithChildren<IControlGroupProps> & IFormGroupProps & { labelType?: DashboardLabelType },
-) {
-    const { children, controls, required, errors } = props;
-    const { label, legend, description, fullSize, inputType, tooltip, labelType } = controls[0];
-    const isFieldset = ["radio"].includes(inputType);
-    if (fullSize || inputType === "upload") {
-        return <>{children}</>;
-    }
-    return (
-        <DashboardFormGroup
-            label={legend ?? label ?? ""}
-            description={description}
-            inputType={inputType}
-            tooltip={tooltip}
-            labelType={props.labelType ?? (labelType as DashboardLabelType)}
-            inputID={controls[0].inputID}
-            fieldset={isFieldset}
-            required={required}
-            errors={errors}
-        >
-            {children}
-        </DashboardFormGroup>
-    );
 }

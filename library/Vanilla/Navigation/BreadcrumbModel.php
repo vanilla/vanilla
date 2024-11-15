@@ -43,8 +43,8 @@ class BreadcrumbModel
         if (!$provider) {
             throw new BreadcrumbProviderNotFoundException($record->getRecordType() . " could not be found");
         }
-
-        return $provider->getForRecord($record, $locale);
+        $breadcrumbs = $provider->getForRecord($record, $locale);
+        return $breadcrumbs;
     }
 
     /**

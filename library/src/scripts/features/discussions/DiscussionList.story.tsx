@@ -447,7 +447,6 @@ const DiscussionListStory = (props) => {
         <DiscussionListAssetHeader
             discussionIDs={DiscussionFixture.fakeDiscussions.map(({ discussionID }) => discussionID)}
             noCheckboxes={mockProps.noCheckboxes || isLink}
-            categoryFollowEnabled
             paginationProps={{ totalResults: DiscussionFixture.fakeDiscussions.length }}
             apiParams={apiParams}
             updateApiParams={updateApiParams}

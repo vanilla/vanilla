@@ -479,6 +479,32 @@ class PremoderationTest extends SiteTestCase
     }
 
     /**
+     * Test that the correct message is shown when a comment posted through the legacy controller is premoderated.
+     */
+    public function testCommentSpam(): void
+    {
+        $this->api()->setUserID(self::$siteInfo["adminUserID"]);
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+
+        $comment = $this->createComment();
+        $member = $this->createUser();
+        $this->mockPremoderationResponse(new PremoderationResponse(PremoderationResponse::SPAM, null));
+        $this->runWithUser(function () use ($discussion, $comment) {
+            $response = $this->bessy()
+                ->post("/post/comment/?discussionid={$discussion["discussionID"]}", [
+                    "DiscussionID" => $discussion["discussionID"],
+                    "Format" => "Wysiwyg",
+                    "Body" => "test comment",
+                    "Type" => "Post",
+                    "LastCommentID" => $comment["commentID"],
+                ])
+                ->getInformMessages();
+            $this->assertSame("Your comment will appear after it is approved.", $response[0]["Message"]);
+        }, $member);
+    }
+
+    /**
      * Ensure the premoderation service returns the expected response.
      *
      * @param PremoderationResponse $expectedResponse

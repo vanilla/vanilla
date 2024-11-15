@@ -100,7 +100,7 @@ describe("IntegrationButtonAndModal", () => {
                 expect.assertions(Object.keys(schema.properties).length * 2);
 
                 for (const [key, value] of Object.entries(schema.properties)) {
-                    const input = within(form).getByLabelText((value["x-control"] as IFormControl).label!, {
+                    const input = within(form).getByLabelText((value["x-control"] as IFormControl).label as string, {
                         exact: false,
                     });
                     expect(input).toBeInTheDocument();

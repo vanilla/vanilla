@@ -10,50 +10,56 @@ import { getMeta, getSiteSection } from "@library/utility/appUtils";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
 import { DiscussionThreadPaginationContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadPaginationContext";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { IComment } from "@dashboard/@types/api/comment";
+import qs from "qs";
 
-interface IDiscussionThreadPageParams {
-    id: IDiscussion["discussionID"];
-    page: string;
-}
+type IDiscussionThreadPageParams =
+    | {
+          discussionID: IDiscussion["discussionID"];
+          page: string;
+      }
+    | {
+          commentID: IComment["commentID"];
+          page: string;
+      };
 
 export function registerDiscussionThreadPage() {
     registerLayoutPage<IDiscussionThreadPageParams>(
-        ["/discussion/comment/:id(\\d+)"],
+        [
+            "/discussion/:discussionID(\\d+)(/[^/]+)?/p:page(\\d+)",
+            "/discussion/:discussionID(\\d+)(/[^/]+)?",
+            "/discussion/comment/:commentID(\\d+)",
+        ],
         (params) => {
-            return {
-                layoutViewType: "discussionThread",
-                recordType: "comment",
-                recordID: params.match.params.id,
-                params: {
-                    siteSectionID: getSiteSection().sectionID,
-                    locale: getSiteSection().contentLocale,
-                    commentID: params.match.params.id,
-                },
-            };
-        },
-        (layoutQuery, page) => {
-            return (
-                <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
-                    {page}
-                </DiscussionThreadPaginationContextProvider>
-            );
-        },
-    );
+            const { location } = params;
+            const urlQuery = qs.parse(location.search.substring(1));
 
-    registerLayoutPage<IDiscussionThreadPageParams>(
-        ["/discussion/:id(\\d+)(/[^/]+)?/p:page(\\d+)", "/discussion/:id(\\d+)(/[^/]+)?"],
-        (params) => {
-            return {
-                layoutViewType: "discussionThread",
-                recordType: "discussion",
-                recordID: params.match.params.id,
-                params: {
-                    siteSectionID: getSiteSection().sectionID,
-                    locale: getSiteSection().contentLocale,
-                    discussionID: params.match.params.id,
-                    page: (params.match.params.page ?? 1).toString(),
-                },
-            };
+            if ("commentID" in params.match.params) {
+                return {
+                    layoutViewType: "discussionThread",
+                    recordType: "comment",
+                    recordID: params.match.params.commentID,
+                    params: {
+                        siteSectionID: getSiteSection().sectionID,
+                        locale: getSiteSection().contentLocale,
+                        commentID: params.match.params.commentID,
+                        sort: urlQuery.sort ?? undefined,
+                    },
+                };
+            } else {
+                return {
+                    layoutViewType: "discussionThread",
+                    recordType: "discussion",
+                    recordID: params.match.params.discussionID,
+                    params: {
+                        siteSectionID: getSiteSection().sectionID,
+                        locale: getSiteSection().contentLocale,
+                        discussionID: params.match.params.discussionID,
+                        page: (params.match.params.page ?? 1).toString(),
+                        sort: urlQuery.sort ?? undefined,
+                    },
+                };
+            }
         },
         (layoutQuery, page) => {
             return (

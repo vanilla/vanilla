@@ -68,7 +68,6 @@ describe("modernEmbed.remote - <vanilla-embed />", () => {
         const innerFrame = embed.querySelector("iframe")!;
         expect(innerFrame).toBeInstanceOf(HTMLIFrameElement);
         expect(innerFrame.src).toBe("https://mysite.vanillaforums.com/my-node/initial-path/to/thing#own-hash");
-        expect(window.location.hash).toBe("#/initial-path/to/thing%23own-hash");
     });
 
     it("can handle hash changes from the iframe", async () => {
@@ -107,7 +106,6 @@ describe("modernEmbed.remote - <vanilla-embed />", () => {
         const innerFrame = embed.querySelector("iframe")!;
         expect(innerFrame).toBeInstanceOf(HTMLIFrameElement);
         expect(innerFrame.src).toBe("https://mysite.vanillaforums.com/initial-path/to/thing#own-hash");
-        expect(window.location.hash).toBe("#/initial-path/to/thing%23own-hash");
     });
 
     it("appends a sso parameter to the iframe when the sso-string is configured on the embed element", () => {

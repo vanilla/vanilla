@@ -8,7 +8,7 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { DeepPartial } from "redux";
 import { Variables } from "@library/styles/Variables";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { BorderType } from "@library/styles/styleHelpers";
 import { UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
@@ -41,7 +41,7 @@ export const userSpotlightVariables = useThemeCache(
                  */
                 box: Variables.box({
                     background: optionOverrides?.innerBackground,
-                    borderType: optionOverrides?.borderType as BorderType,
+                    borderType: optionOverrides?.borderType,
                     border: globalVars.border,
                 }),
 

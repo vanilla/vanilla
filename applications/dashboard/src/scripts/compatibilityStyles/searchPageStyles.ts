@@ -19,7 +19,7 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { Mixins } from "@library/styles/Mixins";
 
 export const searchPageCSS = () => {

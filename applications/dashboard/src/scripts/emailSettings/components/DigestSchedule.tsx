@@ -17,6 +17,7 @@ import { t } from "@vanilla/i18n";
 import { Table } from "@dashboard/components/Table";
 import digestTableStyles from "./DigestTable.styles";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
+import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
 
 const dateFormat = "ddd MMM Do, YYYY";
 
@@ -73,15 +74,15 @@ export function DigestScheduleImpl(props: {
             : Object.values(sentDigestDates).map((sentDigest) => {
                   return {
                       dateScheduled: moment(sentDigest.dateScheduled).format(dateFormat),
-                      totalSubscribers:
-                          sentDigest.totalSubscribers && `${sentDigest.totalSubscribers} ${t("subscribers")}`,
+                      totalSubscribers: `${sentDigest.totalSubscribers ?? 0} ${t("subscribers")}`,
                   };
               });
     }, [isFetched, sentDigestDates]);
 
+    const classes = dashboardFormGroupClasses();
     return (
         <>
-            <li className="form-group" style={{ background: "#fff", marginTop: -28 }}>
+            <li className={classes.formGroup} style={{ background: "#fff", marginTop: -28 }}>
                 <div style={{ width: "100%", marginInline: 18 }}>
                     <Message
                         icon={<InformationIcon />}
@@ -93,7 +94,7 @@ export function DigestScheduleImpl(props: {
                     />
                 </div>
             </li>
-            <li className="form-group" style={{ background: "#fff", border: 0 }}>
+            <li className={classes.formGroup} style={{ background: "#fff", border: 0 }}>
                 <div style={{ width: "100%", marginInline: 18 }}>
                     <>
                         <Heading depth={5} title={t("History")} style={{ margin: 0 }} />

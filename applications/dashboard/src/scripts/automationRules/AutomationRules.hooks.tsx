@@ -15,13 +15,14 @@ import {
     IAutomationRulesCatalog,
     IGetAutomationRuleDispatchesParams,
 } from "@dashboard/automationRules/AutomationRules.types";
-import { useCategoryList } from "@library/categoriesWidget/CategoryList.hooks";
+import { IGetCategoryListResponse, useCategoryList } from "@library/categoriesWidget/CategoryList.hooks";
 import { useEffect } from "react";
 import { useTagList } from "@library/features/tags/TagsHooks";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { AxiosResponseHeaders } from "axios";
 import { IGetUsersResponse, useGetUsers } from "@dashboard/users/userManagement/UserManagement.hooks";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 export function useRecipes(continiousFetch: boolean = true, escalationActionsFilter?: boolean) {
     const queryParams = escalationActionsFilter ? { escalations: true } : {};
@@ -186,8 +187,11 @@ export function useGetAdditionalData(query: AutomationRulesAdditionalDataQuery, 
 
     useEffect(() => {
         if (additionalCategories) {
-            queryClient.setQueryData(["categoryList", initialQuery], (initialData: ICategory[]) => {
-                return [...initialData, ...additionalCategories];
+            queryClient.setQueryData(["categoryList", initialQuery], (initialData: IGetCategoryListResponse) => {
+                return {
+                    ...initialData,
+                    result: [...initialData?.result, ...additionalCategories.result],
+                };
             });
         }
         if (additionalTags) {

@@ -9,20 +9,22 @@ import { css } from "@emotion/css";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { MyEditor, MyValue } from "@library/vanilla-editor/typescript";
 import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { FormatConversionNotice } from "@rich-editor/editor/FormatConversionNotice";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { focusEditor } from "@udecode/plate-common";
-import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
+import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { t } from "@vanilla/i18n";
-import React, { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 interface IProps {
     comment: IComment;
     commentEdit: ICommentEdit;
     onClose: () => void;
-    onSuccess?: () => Promise<void>;
+    onSuccess?: (data?: IComment) => Promise<void>;
 }
 
 export function CommentEditor(props: IProps) {
@@ -31,9 +33,9 @@ export function CommentEditor(props: IProps) {
 
     const patchMutation = useMutation({
         mutationFn: async (params: CommentsApi.PatchParams) => await CommentsApi.patch(comment.commentID, params),
-        onSuccess: async () => {
+        onSuccess: async (data) => {
             setValue(undefined);
-            !!props.onSuccess && (await props.onSuccess?.());
+            !!props.onSuccess && (await props.onSuccess?.(data));
         },
     });
 
@@ -67,11 +69,14 @@ export function CommentEditor(props: IProps) {
                 />
             )}
             <VanillaEditor
+                containerClasses={css({
+                    background: ColorsUtils.colorOut(globalVariables().mainColors.bg),
+                })}
                 showConversionNotice={false}
                 editorRef={editorRef}
                 needsHtmlConversion={needsConversion}
-                initialFormat={commentEdit.format}
-                initialContent={commentEdit.body}
+                initialFormat={needsConversion ? "html" : commentEdit.format}
+                initialContent={needsConversion ? comment.body : commentEdit.body}
                 onChange={(newValue) => {
                     setValue(newValue);
                 }}

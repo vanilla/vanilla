@@ -97,6 +97,7 @@ export function ModalView(props: IProps) {
             case ModalSizes.MEDIUM:
             case ModalSizes.LARGE:
             case ModalSizes.XL:
+            case ModalSizes.XXL:
                 return {
                     xPercent: 0,
                     yPercent: 0,
@@ -117,6 +118,7 @@ export function ModalView(props: IProps) {
                     halfDirection: true,
                 };
             case ModalSizes.XL:
+            case ModalSizes.XXL:
                 return {
                     fade: true,
                 };
@@ -187,6 +189,7 @@ export function ModalView(props: IProps) {
                                     isSidePanelLeft: size === ModalSizes.MODAL_AS_SIDE_PANEL_LEFT,
                                     isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
                                     isXL: size === ModalSizes.XL,
+                                    isXXL: size === ModalSizes.XXL,
                                     isLarge: size === ModalSizes.LARGE,
                                     isMedium: size === ModalSizes.MEDIUM,
                                     isSmall: size === ModalSizes.SMALL,

@@ -91,11 +91,16 @@ function customErrorHandler(error: AxiosError) {
             description: data.description,
             errors: data.errors ?? {},
             actionButton: data.actionButton,
+            trace: data.trace ?? null,
         } as any;
     }
 
     const contentType = error.response?.headers?.["content-type"];
     if (error.response && typeof contentType === "string" && contentType.startsWith("text/html")) {
+        if (error.response.headers["cf-mitigated"] === "challenge") {
+            // This is a cloudflare managed challenge. We need to reload the page.
+            window.location.reload();
+        }
         // we have an HTML error.
 
         const htmlResponse = error.response.data || "";

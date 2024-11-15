@@ -29,18 +29,19 @@ import classNames from "classnames";
 import React, { useDebugValue, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { animated, useSpring } from "react-spring";
-import { useCollisionDetector } from "@vanilla/react-utils";
-import { useSelector } from "react-redux";
-import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import { useCollisionDetector, useMeasure } from "@vanilla/react-utils";
 import { SearchPageRoute } from "@library/search/SearchPageRoute";
 import { useRegisterLink, useSignInLink } from "@library/contexts/EntryLinkContext";
-import titleBarNavClasses from "@library/headers/titleBarNavStyles";
+import titleBarNavClasses, { titleBarNavigationVariables } from "@library/headers/titleBarNavStyles";
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
 import { SkipNavLink, SkipNavContent } from "@reach/skip-nav";
 import { LogoAlignment } from "@library/headers/LogoAlignment";
 import { useCurrentUser, useCurrentUserSignedIn } from "@library/features/users/userHooks";
 import { useThemeForcedVariables } from "@library/theming/Theme.context";
-
+import { navigationVariables } from "@library/headers/navigationVariables";
+import { measureText } from "@vanilla/utils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { defaultFontFamily } from "@library/styles/globalStyleVars";
 interface IProps {
     container?: HTMLElement | null; // Element containing header. Should be the default most if not all of the time.
     wrapperComponent?: React.ComponentType<{ children: React.ReactNode }>;
@@ -82,8 +83,7 @@ export default function TitleBar(_props: IProps) {
     const device = useTitleBarDevice();
     const [isSearchOpen, setIsSearchOpen] = useState(props.forceVisibility);
     const [isShowingSuggestions, setIsShowingSuggestions] = useState(false);
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
-    const showMobileDropDown = isCompact && !isSearchOpen && !!props.title;
+
     const classesMeBox = meBoxClasses();
     const currentUserIsSignedIn = useCurrentUserSignedIn();
     const isGuest = !currentUserIsSignedIn;
@@ -91,12 +91,53 @@ export default function TitleBar(_props: IProps) {
     const classes = titleBarClasses();
     const logoClasses = titleBarLogoClasses();
     const showSubNav = device === TitleBarDevices.COMPACT && props.hasSubNav;
-    const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
     const isMobileLogoCentered = vars.mobileLogo.justifyContent === LogoAlignment.CENTER;
     const isDesktopLogoCentered = vars.logo.justifyContent === LogoAlignment.CENTER;
+    const isNavbarCentered = vars.navAlignment.alignment === "center";
+
+    // for navbar desktop/compact handling when navbar is centered
+    const titleBarContainerRef = useRef(null);
+    const desktopMeBoxSectionRef = useRef(null);
+    const titleBarContainerWidth = useMeasure(titleBarContainerRef).width;
+    const desktopMeBoxWidth = useMeasure(desktopMeBoxSectionRef).width;
+    const desktopNavBarWidth = useMeasure(collisionSourceRef).width;
+
+    // we'll manage wether its compact or not in state
+    const hasCollisionOrIsCompactDevice = hasCollision || device === TitleBarDevices.COMPACT;
+    const [isCompact, setIsCompact] = useState(hasCollisionOrIsCompactDevice);
+
+    // store the minimal space needed for centered desktop nav bar
+    const [minimalSpaceForDesktopNavBar, setMinimalSpaceForDesktopNavBar] = useState<number | null>(null);
+    useEffect(() => {
+        if (!minimalSpaceForDesktopNavBar && desktopMeBoxWidth && desktopNavBarWidth) {
+            setMinimalSpaceForDesktopNavBar(desktopNavBarWidth + desktopMeBoxWidth * 2);
+        }
+    }, [collisionSourceRef.current, desktopMeBoxSectionRef.current, titleBarContainerWidth]);
+
+    // some logic to prevent hasCollision tweak centered nav bar to compact/full continuously
+    useEffect(() => {
+        if (isNavbarCentered) {
+            if (!isCompact && hasCollisionOrIsCompactDevice) {
+                setIsCompact(true);
+            } else if (!hasCollisionOrIsCompactDevice) {
+                const minSpaceForDesktopNavBar =
+                    minimalSpaceForDesktopNavBar ?? getMinimalSpaceForDesktopNavBar(isGuest);
+                if (
+                    titleBarContainerWidth &&
+                    minSpaceForDesktopNavBar &&
+                    titleBarContainerWidth - 2 > minSpaceForDesktopNavBar
+                ) {
+                    setIsCompact(false);
+                }
+            }
+        }
+    }, [isNavbarCentered, hasCollisionOrIsCompactDevice, minimalSpaceForDesktopNavBar, titleBarContainerWidth]);
+
+    const showMobileDropDown = isCompact && !isSearchOpen && !!props.title;
+    const meBox = isCompact ? !isSearchOpen && <MobileMeBox /> : <DesktopMeBox />;
+
     // When previewing and updating the colors live, there can be flickering of some components.
     // As a result we want to hide them on first render for these cases.
-
     const isPreviewing = !!useThemeForcedVariables();
     const [isPreviewFirstRender, setIsPreviewFirstRender] = useState(isPreviewing);
     useEffect(() => {
@@ -136,7 +177,7 @@ export default function TitleBar(_props: IProps) {
                     gutterSpacing={containerOptions.gutterSpacing}
                     maxWidth={containerOptions.maxWidth}
                 >
-                    <div className={classes.titleBarContainer}>
+                    <div className={classes.titleBarContainer} ref={titleBarContainerRef}>
                         <div className={classNames(classes.bar, { isHome: showSubNav })}>
                             {props.onlyLogo ? (
                                 <>
@@ -230,9 +271,9 @@ export default function TitleBar(_props: IProps) {
                                     {!isSearchOpen && !isCompact && (
                                         <TitleBarNav
                                             forceOpen={props.forceMenuOpen}
-                                            isCentered={vars.navAlignment.alignment === "center"}
+                                            isCentered={isNavbarCentered}
                                             containerRef={
-                                                vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
+                                                isNavbarCentered && !isDesktopLogoCentered
                                                     ? collisionSourceRef
                                                     : undefined
                                             }
@@ -252,7 +293,7 @@ export default function TitleBar(_props: IProps) {
                                                 <>
                                                     <Hamburger
                                                         className={classes.hamburger}
-                                                        extraNavTop={props.extraBurgerNavigation}
+                                                        extraNavAfterDynamicComponents={props.extraBurgerNavigation}
                                                         showCloseIcon={false}
                                                     />
                                                     {isMobileLogoCentered && <FlexSpacer actualSpacer />}
@@ -282,64 +323,70 @@ export default function TitleBar(_props: IProps) {
                                         <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }} />
                                     )}
                                     <ConditionalWrap
-                                        className={classes.rightFlexBasis}
-                                        condition={!!showMobileDropDown}
+                                        className={classes.desktopMeBoxSectionWrapper(isSearchOpen)}
+                                        componentProps={{ ref: desktopMeBoxSectionRef }}
+                                        condition={!isCompact && isNavbarCentered}
                                     >
-                                        {!isSearchOpen && (
-                                            <div className={classes.extraMeBoxIcons}>
-                                                {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
-                                                    return <ComponentName key={index} />;
+                                        <ConditionalWrap
+                                            className={classes.rightFlexBasis}
+                                            condition={!!showMobileDropDown}
+                                        >
+                                            {!isSearchOpen && (
+                                                <div className={classes.extraMeBoxIcons}>
+                                                    {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
+                                                        return <ComponentName key={index} />;
+                                                    })}
+                                                </div>
+                                            )}
+                                            <CompactSearch
+                                                className={classNames(classes.compactSearch, {
+                                                    isCentered: isSearchOpen,
                                                 })}
-                                            </div>
-                                        )}
-                                        <CompactSearch
-                                            className={classNames(classes.compactSearch, {
-                                                isCentered: isSearchOpen,
-                                            })}
-                                            focusOnMount
-                                            placeholder={t("Search")}
-                                            open={isSearchOpen}
-                                            onSearchButtonClick={() => {
-                                                SearchPageRoute.preload();
-                                                setIsSearchOpen(true);
-                                            }}
-                                            onCloseSearch={() => {
-                                                setIsSearchOpen(props.forceVisibility); // will be false if not used
-                                            }}
-                                            cancelButtonClassName={classNames(
-                                                classes.topElement,
-                                                classes.searchCancel,
-                                                titleBarNavClasses().link,
-                                            )}
-                                            cancelContentClassName="meBox-buttonContent"
-                                            buttonClass={classNames(classes.button, {
-                                                [classes.buttonOffset]: !isCompact && isGuest,
-                                            })}
-                                            showingSuggestions={isShowingSuggestions}
-                                            onOpenSuggestions={() => setIsShowingSuggestions(true)}
-                                            onCloseSuggestions={() => setIsShowingSuggestions(false)}
-                                            buttonContentClassName={classNames(
-                                                classesMeBox.buttonContent,
-                                                "meBox-buttonContent",
-                                            )}
-                                            clearButtonClass={classes.clearButtonClass}
-                                            scope={
-                                                props.scope
-                                                    ? {
-                                                          ...props.scope,
-                                                      }
-                                                    : undefined
-                                            }
-                                            searchCloseOverwrites={{
-                                                source: "fromTitleBar",
-                                                ...vars.stateColors,
-                                            }}
-                                            overwriteSearchBar={{
-                                                compact: isCompact,
-                                            }}
-                                            withLabel={meboxVars.withLabel}
-                                        />
-                                        {meBox}
+                                                focusOnMount
+                                                placeholder={t("Search")}
+                                                open={isSearchOpen}
+                                                onSearchButtonClick={() => {
+                                                    SearchPageRoute.preload();
+                                                    setIsSearchOpen(true);
+                                                }}
+                                                onCloseSearch={() => {
+                                                    setIsSearchOpen(props.forceVisibility); // will be false if not used
+                                                }}
+                                                cancelButtonClassName={classNames(
+                                                    classes.topElement,
+                                                    classes.searchCancel,
+                                                    titleBarNavClasses().link,
+                                                )}
+                                                cancelContentClassName="meBox-buttonContent"
+                                                buttonClass={classNames(classes.button, {
+                                                    [classes.buttonOffset]: !isCompact && isGuest,
+                                                })}
+                                                showingSuggestions={isShowingSuggestions}
+                                                onOpenSuggestions={() => setIsShowingSuggestions(true)}
+                                                onCloseSuggestions={() => setIsShowingSuggestions(false)}
+                                                buttonContentClassName={classNames(
+                                                    classesMeBox.buttonContent,
+                                                    "meBox-buttonContent",
+                                                )}
+                                                clearButtonClass={classes.clearButtonClass}
+                                                scope={
+                                                    props.scope
+                                                        ? {
+                                                              ...props.scope,
+                                                          }
+                                                        : undefined
+                                                }
+                                                searchCloseOverwrites={{
+                                                    source: "fromTitleBar",
+                                                    ...vars.stateColors,
+                                                }}
+                                                overwriteSearchBar={{
+                                                    compact: isCompact,
+                                                }}
+                                                withLabel={meboxVars.withLabel}
+                                            />
+                                            {meBox}
+                                        </ConditionalWrap>
                                     </ConditionalWrap>
                                 </>
                             )}
@@ -565,6 +612,45 @@ function MobileMeBox() {
         return <CompactMeBox className={classNames("titleBar-button", classes.button)} currentUser={currentUser} />;
     }
 }
+
+/**
+ * Calculation of titlebar navbar with based on navLinks labels and their styling.
+ */
+export const getMinimalSpaceForDesktopNavBar = (isGuest?: boolean) => {
+    const navigationItemsLabels = navigationVariables().navigationItems.map((item) => item.name);
+    const titleBarVars = titleBarVariables();
+    const navVars = titleBarNavigationVariables();
+    const formVars = formElementsVariables();
+
+    try {
+        const navBarWidthFromNavItems = navigationItemsLabels.reduce((acc, label) => {
+            const labelWidth =
+                measureText(
+                    label,
+                    navVars.navLinks.font.size ?? 14,
+                    navVars.navLinks.font.family?.[0] ?? defaultFontFamily,
+                ) +
+                navVars.navLinks.padding.left +
+                navVars.navLinks.padding.right +
+                titleBarVars.sizing.spacer;
+            return acc + labelWidth;
+        }, 0);
+
+        // max width of the mebox section with subcommunity chooser and search included, we opt for maximal possible size here
+        const meBoxSectionWidth = isGuest
+            ? formVars.sizing.height * 2 +
+              16 +
+              titleBarVars.button.guest.minWidth * 2 +
+              titleBarVars.guest.spacer * 2 +
+              16
+            : formVars.sizing.height * 5 + 16;
+
+        // with 20 extra as a buffer
+        return navBarWidthFromNavItems + 20 + meBoxSectionWidth * 2;
+    } catch (e) {
+        return null;
+    }
+};
 
 /** Hold the extra mebox components before rendering. */
 TitleBar.extraMeBoxComponents = [] as React.ComponentType[];

@@ -52,6 +52,8 @@ export class ColorsUtils {
             logDebugConditionnal(debug, "ColorsUtils.colorOut - linear gradient detected - colorValue: ", colorValue);
             // @ts-ignore
             return colorValue.toString();
+        } else if (colorValue.toString().startsWith("var")) {
+            return makeImportant ? important(colorValue.toString()) : colorValue.toString();
         } else {
             const output = typeof colorValue === "string" ? color(colorValue) : colorValue;
             // @ts-ignore

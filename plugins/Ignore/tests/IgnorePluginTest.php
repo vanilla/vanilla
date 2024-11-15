@@ -61,6 +61,13 @@ class IgnorePluginTest extends \VanillaTests\SiteTestCase
             "type" => "notification",
             "action" => \Garden\Events\ResourceEvent::ACTION_INSERT,
         ]);
+
+        $session->start($userA["userID"]);
+        // Check that the api endpoint returns the ignore info.
+        $results = $this->api()
+            ->get("/users/{$userA["userID"]}/ignored")
+            ->getBody();
+        $this->assertEquals($userB["userID"], $results[0]["userID"]);
     }
 
     /**

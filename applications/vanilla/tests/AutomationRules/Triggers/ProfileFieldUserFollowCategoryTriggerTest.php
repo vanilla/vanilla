@@ -65,33 +65,6 @@ class ProfileFieldUserFollowCategoryTriggerTest extends SiteTestCase
     }
 
     /**
-     * Get a test registration record
-     *
-     * @param array $overrides
-     * @param array $profileFields
-     * @return array
-     * @throws \Exception
-     */
-    public static function getRegistrationRecord(array $overrides = [], array $profileFields = [])
-    {
-        $password = bin2Hex(random_bytes(6));
-        $slug = randomString(10, "abcdefghijklmnopqrstuvwxyz1234567890");
-        $record = $overrides + [
-            "Email" => $slug . "@test.com",
-            "Name" => $slug,
-            "Password" => $password,
-            "PasswordMatch" => $password,
-            "TermsOfService" => "1",
-            "Save" => "Save",
-        ];
-
-        if (!empty($profileFields)) {
-            $record["Profile"] = $profileFields;
-        }
-        return $record;
-    }
-
-    /**
      * Test that the action is not executed when the automation rule is not active.
      */
     public function testActionNotExecutedWhenRuleIsNotActive(): void

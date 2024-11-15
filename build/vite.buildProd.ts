@@ -8,15 +8,18 @@ import { copyMonacoEditorModule } from "build/scripts/utility/moduleUtils";
 import path from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import * as tmp from "tmp";
-import { build, PluginOption } from "vite";
+import { build } from "vite";
 import { DYNAMIC_ENTRY_DIR_PATH, LIBRARY_SRC_DIRECTORY, DIST_DIRECTORY } from "./scripts/env";
 import EntryModel from "./scripts/utility/EntryModel";
 import { printSection } from "./scripts/utility/utils";
 import { makeViteBuildConfig } from "./vite.makeBuildConfig";
 import "./vite.buildLegacyDashboard";
+import { minifyScripts } from "./scripts/minifyLegacyScripts";
+
 // @ts-check
 
-run();
+minifyScripts();
+void run();
 
 async function run() {
     let buildSections = process.env.BUILD_SECTIONS?.split(",") ?? [];

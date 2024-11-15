@@ -11,7 +11,8 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { Mixins } from "@library/styles/Mixins";
 
 export const typographyClasses = useThemeCache(() => {
@@ -30,6 +31,7 @@ export const typographyClasses = useThemeCache(() => {
                 ...globalVars.fontSizeAndWeightVars("title"),
                 lineHeight: globalVars.lineHeights.condensed,
             }),
+            textWrap: "balance",
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontalOffset)})`,
             margin: 0,
             ...lineHeightAdjustment(),

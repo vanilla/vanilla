@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { CommentOptionsMenu } from "@vanilla/addon-vanilla/thread/CommentOptionsMenu";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import { CommentFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Comment.Fixture";
@@ -46,9 +46,11 @@ describe("CommentOptionsMenu", () => {
                     </PermissionsFixtures.AllPermissions>,
                 );
                 expect(screen.queryByTitle("Comment Options")).toBeInTheDocument();
-                expect(screen.queryByText(/Edit/)).toBeInTheDocument();
-                expect(screen.queryByText(/Delete/)).toBeInTheDocument();
-                expect(screen.queryByText(/Revision History/)).toBeInTheDocument();
+                await waitFor(() => {
+                    expect(screen.queryByText(/Edit/)).toBeInTheDocument();
+                    expect(screen.queryByText(/Delete/)).toBeInTheDocument();
+                    expect(screen.queryByText(/Revision History/)).toBeInTheDocument();
+                });
             });
         });
     });

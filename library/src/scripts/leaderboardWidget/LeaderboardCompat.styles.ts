@@ -9,7 +9,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { singleLineEllipsis } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { px } from "csx";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { BorderType } from "@library/styles/styleHelpers";
 
 export const leaderboardCSS = () => {

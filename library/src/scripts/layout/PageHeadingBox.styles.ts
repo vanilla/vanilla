@@ -4,7 +4,8 @@
  * @license gpl-2.0-only
  */
 
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { IPageHeadingBoxOptions, pageHeadingBoxVariables } from "@library/layout/PageHeadingBox.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -32,6 +33,7 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
         ...Mixins.margin({
             bottom: globalVars.spacer.headingBox,
         }),
+        color: `var(--fg-contrast-color, inherit)`,
     });
     const titleWrap = css(
         {

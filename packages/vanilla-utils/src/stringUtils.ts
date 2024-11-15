@@ -1,7 +1,7 @@
 /**
  * Utilities related to strings.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -306,3 +306,28 @@ export function matchWithWildcard(target: string, matchers: string): boolean | n
         return new RegExp("^" + match.replace(/\//gi, "").split("*").map(escapeForRegex).join(".*") + "$").test(target);
     });
 }
+
+export function generateString(length: number = 12) {
+    var chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%*";
+    var string = "";
+    var pos = 0;
+    for (var i = 0; i < length; i++) {
+        pos = Math.floor(Math.random() * chars.length);
+        string += chars.substring(pos, pos + 1);
+    }
+    return string;
+}
+
+/**
+ * Uses a canvas to measure the true width of rendered text
+ */
+export const measureText = (text: string, fontSize: string | number, fontFace?: string) => {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    if (context) {
+        context.font = `${fontSize}px ${fontFace}`;
+        return context.measureText(text).width;
+    }
+    return 0;
+};

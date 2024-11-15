@@ -16,13 +16,17 @@ export const widgetSettingsAccordionClasses = useThemeCache(() => {
         "&:last-child > .item": {
             borderBottom: "solid 1px #c1cbd7",
         },
+
+        ".modernFormGroup + &": {
+            marginTop: 12,
+        },
     });
     const panel = css({
         ...Mixins.padding({
             top: 8,
             horizontal: 16,
         }),
-        "& > .form-group:last-child": {
+        "& > .modernFormGroup:last-child": {
             paddingBottom: 24,
         },
     });
@@ -42,7 +46,7 @@ export const widgetSettingsAccordionClasses = useThemeCache(() => {
             horizontal: -16,
         }),
         width: calc(`100% + 32px`),
-        "& .form-group": {
+        "& .modernFormGroup": {
             borderBottom: "none",
         },
     });

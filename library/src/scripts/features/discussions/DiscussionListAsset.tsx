@@ -33,21 +33,13 @@ import { Icon } from "@vanilla/icons";
 import { useLocation } from "react-router";
 
 interface IProps extends React.ComponentProps<typeof DiscussionListModule> {
-    categoryFollowEnabled?: boolean;
     isList?: boolean;
     isPreview?: boolean;
     defaultSort?: DiscussionListSortOptions;
 }
 
 export function DiscussionListAsset(props: IProps) {
-    const {
-        discussions: discussionsFromProps,
-        categoryFollowEnabled,
-        title,
-        subtitle,
-        description,
-        containerOptions,
-    } = props;
+    const { discussions: discussionsFromProps, title, subtitle, description, containerOptions } = props;
     const selfRef = useRef<HTMLDivElement>(null);
     const [apiParams, setApiParams] = useState<IGetDiscussionListParams>(props.apiParams ?? {});
     const [pagination, setPagination] = useState<ILinkPages>(props.initialPaging ?? {});
@@ -128,7 +120,6 @@ export function DiscussionListAsset(props: IProps) {
         <DiscussionListAssetHeader
             discussionIDs={discussions.data?.discussionList?.map((discussion) => discussion.discussionID)}
             noCheckboxes={props.noCheckboxes || isLink}
-            categoryFollowEnabled={categoryFollowEnabled}
             paginationProps={paginationProps}
             apiParams={actualApiParams}
             updateApiParams={updateApiParams}
@@ -196,6 +187,7 @@ export function DiscussionListAsset(props: IProps) {
         hasComments: actualApiParams.hasComments,
         page: actualApiParams.page,
         followed: actualApiParams.followed,
+        suggested: actualApiParams.suggested,
         sort: actualApiParams.sort,
     };
     const urlQueryString = (
@@ -204,6 +196,7 @@ export function DiscussionListAsset(props: IProps) {
             defaults={{
                 page: 1,
                 followed: false,
+                suggested: false,
                 sort: props.defaultSort,
             }}
             syncOnFirstMount

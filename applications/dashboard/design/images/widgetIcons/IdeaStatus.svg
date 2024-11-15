@@ -1,0 +1,16 @@
+<!--
+  - @author Adam Charron <adam.c@vanillaforums.com>
+  - @copyright 2009-2024 Vanilla Forums Inc.
+  - @license Proprietary
+  -->
+
+<svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="8.5" y="37.5" width="103" height="25" rx="1.5" fill="white" stroke="#BCBEC1"/>
+<rect x="26.5085" y="51" width="81.9661" height="3" fill="#979797"/>
+<rect x="26.5085" y="56" width="66.1017" height="3" fill="#979797"/>
+<rect x="45.8982" y="42" width="17.6271" height="2" fill="#979797"/>
+<rect x="9" y="38" width="16" height="24" fill="#BCBEC1"/>
+<rect x="26.7085" y="41.2" width="17.2271" height="3.6" rx="0.8" stroke="#979797" stroke-width="0.4"/>
+<path d="M26.9492 48L108.034 48" stroke="#E3E3E3" stroke-linecap="square"/>
+<path d="M15.0617 47.5396C15.4445 46.8625 16.4198 46.8625 16.8027 47.5396L18.9049 51.2578C19.2818 51.9245 18.8002 52.75 18.0344 52.75H13.8299C13.0641 52.75 12.5825 51.9245 12.9594 51.2578L15.0617 47.5396Z" fill="white"/>
+</svg>

@@ -58,7 +58,7 @@ export interface IResolveDiscussionParams {
 }
 
 // this interface should extend every set of parameters that is accepted in the patch discussion endpoint
-interface IPatchDiscussionRequest
+export interface IPatchDiscussionRequest
     extends Partial<
         IAnnounceDiscussionParams &
             IMoveDiscussionParams &

@@ -223,9 +223,9 @@
       }
     ],
     "dataSourceType": "image",
-    "url": "https://dev.vanilla.localhost/uploads/Y6Y7LHBWJ2LW/20221130-140836.jpg",
+    "url": "__UPLOAD_URL__/uploads/Y6Y7LHBWJ2LW/20221130-140836.jpg",
     "embedData": {
-      "url": "https://dev.vanilla.localhost/uploads/Y6Y7LHBWJ2LW/20221130-140836.jpg",
+      "url": "__UPLOAD_URL__/uploads/Y6Y7LHBWJ2LW/20221130-140836.jpg",
       "name": "20221130_140836.jpg",
       "type": "image/jpeg",
       "size": 6240115,
@@ -257,9 +257,9 @@
       }
     ],
     "dataSourceType": "file",
-    "url": "https://dev.vanilla.localhost/uploads/EGZK6OLN0T2L/failed-staging.txt",
+    "url": "__UPLOAD_URL__/uploads/EGZK6OLN0T2L/failed-staging.txt",
     "embedData": {
-      "url": "https://dev.vanilla.localhost/uploads/EGZK6OLN0T2L/failed-staging.txt",
+      "url": "__UPLOAD_URL__/uploads/EGZK6OLN0T2L/failed-staging.txt",
       "name": "failed staging.txt",
       "type": "text/plain",
       "size": 204,

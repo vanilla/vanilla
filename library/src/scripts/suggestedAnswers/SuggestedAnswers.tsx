@@ -22,6 +22,7 @@ import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.var
 import { SuggestedAnswersOptionsMenu } from "@library/suggestedAnswers/SuggestedAnswersOptionsMenu";
 import { ToggleSuggestions } from "@library/suggestedAnswers/ToggleSuggestions";
 import { getMeta, t } from "@library/utility/appUtils";
+import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
 import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
 import { Icon } from "@vanilla/icons";
 import { useMemo, useState } from "react";
@@ -76,10 +77,11 @@ interface ISuggestedAnswersProps {
     suggestions: ISuggestedAnswer[];
     showSuggestions?: boolean;
     postHasBeenEdited?: boolean;
+    storyMode?: boolean; // for being able to see certain features in storybook
 }
 
 export function SuggestedAnswers(props: ISuggestedAnswersProps) {
-    const { suggestions, showSuggestions = true, postHasBeenEdited = false } = props;
+    const { suggestions, showSuggestions = true, postHasBeenEdited = false, storyMode = false } = props;
     const classes = suggestedAnswersClasses();
     const { discussionID, onMutateSuccess } = useSuggestedAnswerContext();
     const generateSuggestions = useGenerateSuggestions(discussionID);
@@ -96,13 +98,16 @@ export function SuggestedAnswers(props: ISuggestedAnswersProps) {
         setShowRegeneration(false);
         setIsGenerating(true);
 
-        try {
-            await generateSuggestions();
-            onMutateSuccess?.();
-        } catch (err) {
-            toastError(err);
-            setIsGenerating(false);
-            onMutateSuccess?.();
+        // In storybook, pressing the regeneration button should just show what the regeneration notice looks like
+        if (!storyMode) {
+            try {
+                await generateSuggestions();
+                onMutateSuccess?.();
+            } catch (err) {
+                toastError(err);
+                setIsGenerating(false);
+                onMutateSuccess?.();
+            }
         }
     };
 
@@ -154,9 +159,13 @@ export function SuggestedAnswers(props: ISuggestedAnswersProps) {
                 </div>
             ) : isGenerating ? (
                 <>
-                    <DotLoader className={classes.loader} />
                     <p className={classes.helperText}>
-                        {t("Generating Suggestions. You will be notified when they are ready for you to review.")}
+                        {t("Generating Suggestions, this may take some time.")}
+                        <span>
+                            {t(
+                                "You will be notified when suggestions are ready for you to review. You may navigate away or refresh the page.",
+                            )}
+                        </span>
                     </p>
                 </>
             ) : (

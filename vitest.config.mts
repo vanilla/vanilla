@@ -33,6 +33,9 @@ export default defineConfig(() => {
             "process.env.NODE_ENV": '"test"',
         },
         test: {
+            deps: {
+                inline: [/@radix-ui/], // necessary to fix this issue for React 17 https://github.com/radix-ui/primitives/issues/2974
+            },
             hookTimeout: 30000,
             globals: true,
             setupFiles: path.resolve(VANILLA_ROOT, "build/vitest.setup.ts"),

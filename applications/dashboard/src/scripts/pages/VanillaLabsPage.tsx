@@ -19,6 +19,7 @@ import { MemoryRouter } from "react-router";
 import Translate from "@library/content/Translate";
 import { NewEmbedSystemLabItem } from "@dashboard/labs/NewEmbedSystemLabItem";
 import { NewUserManagementLabItem } from "@dashboard/labs/NewUserManagementLabItem";
+import { NewAutomationRulesLabItem } from "@dashboard/labs/NewAutomationRulesLabItem";
 
 export function VanillaLabsPage() {
     return (
@@ -30,6 +31,7 @@ export function VanillaLabsPage() {
                     {VanillaLabsPage.extraLabComponents.map((ComponentName, index) => {
                         return <ComponentName key={index} />;
                     })}
+                    <NewAutomationRulesLabItem />
                     <UserCardsLabItem />
                     <NewSearchPageLabItem />
                     <NewQuickLinksLabItem />

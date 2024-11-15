@@ -27,6 +27,12 @@ abstract class HtmlProcessor
     const TYPE_STATIC = "static";
 
     /**
+     * The context required for processing the document.
+     * @var array
+     */
+    protected array $context = [];
+
+    /**
      * Get the processor type.
      *
      * @return string One of TYPE_DYNAMIC or TYPE_STATIC.
@@ -34,6 +40,21 @@ abstract class HtmlProcessor
     public function getProcessorType(): string
     {
         return self::TYPE_STATIC;
+    }
+
+    /**
+     * set the context required for processing the document.
+     * @param array|null $context
+     * @return $this
+     */
+    public function setContext(array $context = []): void
+    {
+        $this->context = $context;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 
     /**

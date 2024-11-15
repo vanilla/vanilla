@@ -57,8 +57,6 @@ class DiscussionTagsAssetTest extends SiteTestCase
             '$reactComponent' => "DiscussionTagAsset",
             '$reactProps' => [
                 "title" => "My Discussion Tags",
-                "titleType" => "static",
-                "descriptionType" => "none",
                 "tags" => $expectedTags,
             ],
             '$reactTestID' => "discussionTags",

@@ -5,6 +5,7 @@
  */
 
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import { css } from "@emotion/css";
 import TextEditor from "@library/textEditor/TextEditor";
 import { mountReact } from "@vanilla/react-utils";
@@ -37,7 +38,7 @@ export function DashboardCodeEditor(props: IProps) {
     }, [boxHeightOverride]);
 
     return (
-        <div className="input-wrap">
+        <DashboardInputWrap>
             <input id={inputID} name={inputName} type="hidden" value={value || ""} aria-hidden={true} />
             <TextEditor
                 minimal
@@ -47,7 +48,7 @@ export function DashboardCodeEditor(props: IProps) {
                 onChange={(value) => onChange(value ?? "")}
                 {...styleOverrides}
             />
-        </div>
+        </DashboardInputWrap>
     );
 }
 

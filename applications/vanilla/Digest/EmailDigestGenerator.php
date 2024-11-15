@@ -7,6 +7,7 @@
 
 namespace Vanilla\Forum\Digest;
 
+use Garden\EventManager;
 use Garden\Web\Exception\ServerException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -65,6 +66,8 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
 
     private NotificationPreferencesApiController $notificationPreferencesApiController;
 
+    private EventManager $eventManager;
+
     /**
      * @param \Gdn_Database $database
      * @param \CategoryModel $categoryModel
@@ -80,6 +83,7 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
      * @param \Gdn_Email $email
      * @param \DiscussionsApiController $discussionApiController
      * @param NotificationPreferencesApiController $notificationPreferencesApiController
+     * @param EventManager $eventManager
      */
     public function __construct(
         \Gdn_Database $database,
@@ -95,7 +99,8 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
         ConfigurationInterface $config,
         DigestEmail $email,
         \DiscussionsApiController $discussionApiController,
-        NotificationPreferencesApiController $notificationPreferencesApiController
+        NotificationPreferencesApiController $notificationPreferencesApiController,
+        EventManager $eventManager
     ) {
         $this->database = $database;
         $this->categoryModel = $categoryModel;
@@ -111,6 +116,7 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
         $this->email = $email;
         $this->discussionApiController = $discussionApiController;
         $this->notificationPreferencesApiController = $notificationPreferencesApiController;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -285,10 +291,12 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
         $canSubCategories = $digestRecord["digestAttributes"]["canUnsubscribeCategories"];
         $digestUser = $digestRecord["user"];
         $digestEmail->setToAddress($digestUser["Email"], $digestUser["Name"]);
+
         if ($canSubCategories) {
             $digestCategoryIDs = $digestRecord["digestAttributes"]["digestCategoryIDs"];
             $digestEmail->mergeCategoryUnSubscribe($digestUser, $digestCategoryIDs);
         }
+
         $digestEmail->mergeDigestUnsubscribe($digestUser);
         $addBannerTitle = $this->config->get("Garden.Digest.IncludeCommunityName", false);
         $digestTitle = "";
@@ -630,14 +638,15 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
      */
     private function getDigestEnabledUsersQuery(array $roleIDs): \Gdn_SQLDriver
     {
+        $userOnClause =
+            $this->config->get(DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE) == 1
+                ? 'u.UserID = um.UserID and um.QueryValue in ("Preferences.Email.DigestEnabled.1","Preferences.Email.DigestEnabled.3") AND u.Deleted = 0'
+                : 'u.UserID = um.UserID and um.QueryValue = "Preferences.Email.DigestEnabled.1" AND u.Deleted = 0';
         $query = $this->database
             ->createSql()
             ->from("UserMeta um")
-            // Here we are using the querying value so values can be pulled diretly from the QueryValue_UserID index.
-            ->join(
-                "User u",
-                'u.UserID = um.UserID and um.QueryValue = "Preferences.Email.DigestEnabled.1" AND u.Deleted = 0'
-            )
+            // Here we are using the querying value so values can be pulled directly from the QueryValue_UserID index.
+            ->join("User u", $userOnClause)
             // Exclude Deleted users
             ->join("UserRole ur", "ur.UserID = um.UserID")
             ->where([

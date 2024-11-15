@@ -17,6 +17,7 @@ import { IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.
 import { MemoryRouter } from "react-router-dom";
 import { resolveFieldParams } from "@dashboard/layout/editor/widgetSettings/resolveFieldParams";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
+import { cx } from "@emotion/css";
 
 interface IWidgetSettingsPreviewProps {
     widgetCatalog: IWidgetCatalog;
@@ -69,7 +70,7 @@ export function WidgetSettingsPreview(props: IWidgetConfigurationComponentProps 
                     onChange={(newValue) => props.onChange({ ...props.value, ...newValue })}
                 />
             ) : (
-                <div className={classes.previewBody}>
+                <div className={cx(classes.previewBody, "widgetSettingsPreview")}>
                     <WidgetContextProvider
                         // To override outer context
                         extraClasses={classes.previewContent}

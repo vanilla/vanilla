@@ -4,7 +4,8 @@
  * @license gpl-2.0-only
  */
 
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControlGroup";
 import { LoadStatus } from "@library/@types/api/core";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
 import { JSONSchemaType, JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";

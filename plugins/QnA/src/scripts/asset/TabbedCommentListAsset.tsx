@@ -14,30 +14,50 @@ import { useQueryParam } from "@library/routing/routingUtils";
 import { ITabData, Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { BorderType } from "@library/styles/styleHelpersBorders";
-import { useCommentListQuery } from "@vanilla/addon-vanilla/thread/Comments.hooks";
-import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
+import { useCommentListQuery, useCommentThreadQuery } from "@vanilla/addon-vanilla/thread/Comments.hooks";
+import { DiscussionCommentsAssetFlat } from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset.flat";
 import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
 import { t } from "@vanilla/i18n";
 import React, { useEffect, useState } from "react";
+import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
+import { DiscussionCommentsAssetNested } from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset.nested";
+import { hasPermission } from "@library/features/users/Permission";
+import type { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 
-interface IProps {
+type BaseThreadOrFlat =
+    | {
+          comments: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["comments"];
+          apiParams: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["apiParams"];
+          threadStyle: "flat";
+      }
+    | {
+          commentsThread: React.ComponentProps<typeof DiscussionCommentsAssetNested>["commentsThread"];
+          apiParams: React.ComponentProps<typeof DiscussionCommentsAssetNested>["apiParams"];
+          threadStyle: React.ComponentProps<typeof DiscussionCommentsAssetNested>["threadStyle"];
+      };
+
+type IProps = BaseThreadOrFlat & {
     discussion: IDiscussion;
     discussionApiParams?: DiscussionsApi.GetParams;
-    comments: React.ComponentProps<typeof DiscussionCommentsAsset>["comments"];
-    apiParams: React.ComponentProps<typeof DiscussionCommentsAsset>["apiParams"];
 
-    acceptedAnswers?: React.ComponentProps<typeof DiscussionCommentsAsset>["comments"];
-    acceptedAnswersApiParams?: React.ComponentProps<typeof DiscussionCommentsAsset>["apiParams"];
+    acceptedAnswers?: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["comments"];
+    acceptedAnswersApiParams?: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["apiParams"];
 
-    rejectedAnswers?: React.ComponentProps<typeof DiscussionCommentsAsset>["comments"];
-    rejectedAnswersApiParams?: React.ComponentProps<typeof DiscussionCommentsAsset>["apiParams"];
-}
+    rejectedAnswers?: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["comments"];
+    rejectedAnswersApiParams?: React.ComponentProps<typeof DiscussionCommentsAssetFlat>["apiParams"];
+    containerOptions?: IHomeWidgetContainerOptions;
+    defaultTabID?: string;
+    tabTitles: {
+        all: string;
+        accepted: string;
+        rejected: string;
+    };
+};
 
 function TabbedCommentListAsset(props: IProps) {
     const {
         discussion: discussionPreload,
         discussionApiParams,
-        comments,
         apiParams,
         rejectedAnswers: rejectedAnswersPreload,
         acceptedAnswersApiParams,
@@ -48,9 +68,6 @@ function TabbedCommentListAsset(props: IProps) {
     const { discussionID } = discussionPreload;
     const { query } = useDiscussionQuery(discussionID, discussionApiParams, discussionPreload);
     const discussion = query.data!;
-
-    //useCommentListQuery is invoked here so that there is a query in the cache to invalidate when the first comment is added
-    useCommentListQuery(apiParams, comments);
 
     const acceptedAnswers =
         acceptedAnswersPreload ??
@@ -69,21 +86,42 @@ function TabbedCommentListAsset(props: IProps) {
         undefined;
 
     const { query: acceptedAnswersQuery } = useCommentListQuery(acceptedAnswersApiParams!, acceptedAnswers);
-    const { query: rejectedAnswersQuery } = useCommentListQuery(rejectedAnswersApiParams!, rejectedAnswers);
+    const { query: rejectedAnswersQuery } = useCommentListQuery(
+        rejectedAnswersApiParams!,
+        rejectedAnswers,
+        hasPermission("curation.manage"),
+    );
 
     const tabs: ITabData[] = [
         {
-            label: t("All Comments"),
+            label: t(props.tabTitles.all),
             tabID: "all",
             contents: (
-                <DiscussionCommentsAsset
-                    discussion={discussion}
-                    discussionApiParams={discussionApiParams}
-                    comments={comments}
-                    apiParams={apiParams}
-                    renderTitle={false}
-                    ThreadItemActionsComponent={DidThisAnswer}
-                />
+                <>
+                    {props.threadStyle === "nested" ? (
+                        <DiscussionCommentsAssetNested
+                            discussion={discussion}
+                            discussionApiParams={discussionApiParams}
+                            commentsThread={props.commentsThread}
+                            apiParams={props.apiParams}
+                            renderTitle={false}
+                            threadStyle="nested"
+                            ThreadItemActionsComponent={DidThisAnswer}
+                            containerOptions={props.containerOptions}
+                        />
+                    ) : (
+                        <DiscussionCommentsAssetFlat
+                            discussion={discussion}
+                            discussionApiParams={discussionApiParams}
+                            comments={props.comments}
+                            apiParams={props.apiParams}
+                            renderTitle={false}
+                            threadStyle="flat"
+                            ThreadItemActionsComponent={DidThisAnswer}
+                            containerOptions={props.containerOptions}
+                        />
+                    )}
+                </>
             ),
         },
     ]
@@ -91,16 +129,18 @@ function TabbedCommentListAsset(props: IProps) {
             acceptedAnswersQuery?.data?.data?.length ?? 0 > 0
                 ? [
                       {
-                          label: t("Accepted Answers"),
+                          label: t(props.tabTitles.accepted),
                           tabID: "accepted",
                           contents: (
-                              <DiscussionCommentsAsset
+                              <DiscussionCommentsAssetFlat
                                   discussion={discussion}
                                   discussionApiParams={discussionApiParams}
                                   comments={acceptedAnswersQuery?.data}
                                   apiParams={acceptedAnswersApiParams!}
                                   renderTitle={false}
+                                  threadStyle="flat"
                                   ThreadItemActionsComponent={ViewInContext}
+                                  containerOptions={props.containerOptions}
                               />
                           ),
                       },
@@ -111,30 +151,32 @@ function TabbedCommentListAsset(props: IProps) {
             rejectedAnswersQuery?.data?.data?.length ?? 0 > 0
                 ? [
                       {
-                          label: t("Rejected Answers"),
+                          label: t(props.tabTitles.rejected),
                           tabID: "rejected",
                           contents: (
-                              <DiscussionCommentsAsset
+                              <DiscussionCommentsAssetFlat
                                   discussion={discussion}
                                   discussionApiParams={discussionApiParams}
                                   comments={rejectedAnswersQuery?.data}
                                   apiParams={rejectedAnswersApiParams!}
                                   renderTitle={false}
+                                  threadStyle="flat"
                                   ThreadItemActionsComponent={ViewInContext}
+                                  containerOptions={props.containerOptions}
                               />
                           ),
                       },
                   ]
                 : [],
         );
-
     const tabIDs = tabs.map((t) => t.tabID);
     const isCommentUrl = window.location.href.includes("/comment/");
 
     // If the user followed a link to a comment, default to the "all" tab
     // Otherwise default to the "accepted" tab if there are accepted answers, "all" if not
     const defaultTabID =
-        !isCommentUrl && !!acceptedAnswers?.data?.length && acceptedAnswers.data.length > 0 ? "accepted" : "all";
+        props.defaultTabID ??
+        (!isCommentUrl && !!acceptedAnswers?.data?.length && acceptedAnswers.data.length > 0 ? "accepted" : "all");
 
     // If a tab is specified, use that, otherwise use the default defined above
     const queryTab = useQueryParam("tab", defaultTabID);
@@ -167,21 +209,15 @@ function TabbedCommentListAsset(props: IProps) {
     return (
         <>
             {discussion.countComments > 0 && (
-                <PageBox
-                    options={{
-                        borderType: BorderType.SEPARATOR,
-                    }}
-                >
-                    <Tabs
-                        key={tabs.length}
-                        largeTabs
-                        tabType={TabsTypes.BROWSE}
-                        data={tabs}
-                        activeTab={selectedTabIndex}
-                        setActiveTab={setSelectedTabIndex}
-                        extendContainer
-                    />
-                </PageBox>
+                <Tabs
+                    key={tabs.length}
+                    largeTabs
+                    tabType={TabsTypes.BROWSE}
+                    data={tabs}
+                    activeTab={selectedTabIndex}
+                    setActiveTab={setSelectedTabIndex}
+                    extendContainer
+                />
             )}
         </>
     );

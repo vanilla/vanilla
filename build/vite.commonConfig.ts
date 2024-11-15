@@ -108,7 +108,6 @@ const warmupGlobs = [
     "lodash-es/startCase",
     "lodash/snakeCase",
     "lodash/startCase",
-    "swagger-ui",
     "immutable",
 ];
 
@@ -126,8 +125,7 @@ export function makeViteCommonConfig(): UserConfig {
                 "@vanilla/dom-utils",
                 "@vanilla/icons",
                 "@vanilla/i18n",
-                "@vanilla/json-schema-forms",
-                "chunk-*",
+                `fake-dep-${Math.random()}`,
             ],
             include: [
                 "@vanilla/utils > tabbable",
@@ -206,6 +204,14 @@ export function makeViteCommonConfig(): UserConfig {
                 {
                     find: "@vanilla/library/src/scripts",
                     replacement: path.resolve(VANILLA_ROOT, "library/src/scripts"),
+                },
+                {
+                    find: /^@vanilla\/json-schema-forms$/,
+                    replacement: path.resolve(VANILLA_ROOT, "library/src/scripts/json-schema-forms"),
+                },
+                {
+                    find: "@vanilla/json-schema-forms/src",
+                    replacement: path.resolve(VANILLA_ROOT, "library/src/scripts/json-schema-forms"),
                 },
                 {
                     find: /$lodash^/,

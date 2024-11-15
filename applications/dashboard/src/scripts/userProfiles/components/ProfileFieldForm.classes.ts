@@ -5,25 +5,24 @@
  */
 
 import { css } from "@emotion/css";
+import { singleBorder } from "@library/styles/styleHelpersBorders";
 
 export default function ProfileFieldFormClasses() {
     return {
-        formGroup: css({
-            [`.formGroup-dropDown`]: {
-                borderBottom: 0,
-            },
+        formGroupWrapper: css({
             [`.formGroup-checkBox`]: {
                 paddingTop: 0,
                 paddingBottom: 0,
-                borderBottom: 0,
                 [`label > span:nth-of-type(2)`]: {
                     fontWeight: 500,
                 },
             },
-
-            [`.formGroup-checkBox:last-of-type`]: {
-                paddingBottom: 16,
-                borderBottom: "1px dotted #e7e8e9",
+            [`[class*="formGroup"]`]: {
+                borderBottom: 0,
+                [`&:last-of-type`]: {
+                    paddingBottom: 16,
+                    borderBottom: singleBorder(),
+                },
             },
         }),
     };

@@ -34,6 +34,7 @@
 /locales/*
 !/locales/.gitkeep
 /plugins/*
+!/plugins/Akismet/
 !/plugins/AllViewed/
 !/plugins/ButtonBar/
 !/plugins/categoryaslink/
@@ -122,6 +123,7 @@ phpcs-diff.json
 /cli/vendor/
 /cli/composer.lock
 /coverage
+/legacy-dist
 
 # Yarn
 yarn-error.log

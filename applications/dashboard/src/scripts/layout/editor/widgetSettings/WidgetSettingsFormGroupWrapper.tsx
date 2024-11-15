@@ -8,7 +8,7 @@ import WidgetSettingsAccordion from "@dashboard/layout/editor/widgetSettings/Wid
 import React from "react";
 
 interface IProps {
-    header?: string;
+    header?: React.ReactNode;
     expandable?: boolean;
 }
 

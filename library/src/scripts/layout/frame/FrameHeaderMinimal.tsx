@@ -14,13 +14,16 @@ import { t } from "@vanilla/i18n/src";
 interface IProps {
     children?: React.ReactNode;
     onClose?: () => void;
+    id?: string;
 }
 
 export function FrameHeaderMinimal(props: IProps) {
     const classes = frameHeaderClasses();
     return (
         <header className={classNames(classes.root, classes.rootMinimal)}>
-            <h2 className={classNames(classes.centred, classes.headingMinimal)}>{props.children}</h2>
+            <h2 id={props.id} className={classNames(classes.centred, classes.headingMinimal)}>
+                {props.children}
+            </h2>
             {props.onClose && (
                 <Button buttonType={ButtonTypes.ICON_COMPACT} onClick={props.onClose} className={classes.closeMinimal}>
                     <ScreenReaderContent>{t("Close")}</ScreenReaderContent>

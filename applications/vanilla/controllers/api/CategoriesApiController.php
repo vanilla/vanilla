@@ -9,7 +9,12 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
+use Vanilla\Dashboard\Models\InterestModel;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
+use Vanilla\Database\CallbackWhereExpression;
 use Vanilla\Exception\PermissionException;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Models\CrawlableRecordSchema;
@@ -24,7 +29,9 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\SchemaUtils;
 use Vanilla\Utility\TreeBuilder;
 use Garden\Web\Pagination;
 use Vanilla\Community\Schemas\PostFragmentSchema;
@@ -34,9 +41,6 @@ use Vanilla\Community\Schemas\PostFragmentSchema;
  */
 class CategoriesApiController extends AbstractApiController
 {
-    /** @var CategoryModel */
-    private $categoryModel;
-
     /** @var Schema */
     private $categoryPostSchema;
 
@@ -48,12 +52,6 @@ class CategoriesApiController extends AbstractApiController
 
     /** @var Schema */
     private $idParamSchema;
-
-    /** @var BreadcrumbModel */
-    private $breadcrumbModel;
-
-    /** @var LongRunner */
-    private $runner;
 
     public const OUTPUT_FORMAT_TREE = "tree";
     public const OUTPUT_FORMAT_FLAT = "flat";
@@ -74,9 +72,6 @@ class CategoriesApiController extends AbstractApiController
     /** @var string */
     const ERRORINDEXMSG = "The following fields: {page, limit, outputFormat=flat} is incompatible with {maxDepth, outputFormat=tree}";
 
-    /** @var SiteSectionModel */
-    private $siteSectionModel;
-
     /**
      * CategoriesApiController constructor.
      *
@@ -86,15 +81,13 @@ class CategoriesApiController extends AbstractApiController
      * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
-        CategoryModel $categoryModel,
-        BreadcrumbModel $breadcrumbModel,
-        LongRunner $runner,
-        SiteSectionModel $siteSectionModel
+        private CategoryModel $categoryModel,
+        private BreadcrumbModel $breadcrumbModel,
+        private LongRunner $runner,
+        private SiteSectionModel $siteSectionModel,
+        private InterestModel $interestModel,
+        private PostTypeModel $postTypeModel
     ) {
-        $this->categoryModel = $categoryModel;
-        $this->breadcrumbModel = $breadcrumbModel;
-        $this->runner = $runner;
-        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -136,6 +129,35 @@ class CategoriesApiController extends AbstractApiController
                     ]);
                 }
             });
+            if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+                $validPostTypes = $this->postTypeModel->getAvailablePostTypes();
+                $this->categoryPostSchema
+                    ->merge(
+                        Schema::parse([
+                            "hasRestrictedPostTypes:b?",
+                            "allowedPostTypeIDs:a?" => [
+                                "items" => [
+                                    "type" => "string",
+                                    "enum" => array_column($validPostTypes, "postTypeID"),
+                                ],
+                            ],
+                        ])
+                    )
+                    ->addFilter("", SchemaUtils::fieldRequirement("allowedPostTypeIDs", "hasRestrictedPostTypes"))
+                    ->addFilter("", function ($data, ValidationField $field) {
+                        if (!ArrayUtils::isArray($data)) {
+                            return $data;
+                        }
+
+                        if (!($data["hasRestrictedPostTypes"] ?? false)) {
+                            // Make sure we clear associated post types.
+                            $data["allowedPostTypeIDs"] = [];
+                        }
+                        return $data;
+                    })
+                    ->addFilter("allowedPostTypeIDs", fn($allowedPostTypeIDs) => array_unique($allowedPostTypeIDs))
+                    ->addFilter("", SchemaUtils::onlyOneOf(["allowedDiscussionTypes", "allowedPostTypeIDs"]));
+            }
         }
         return $this->schema($this->categoryPostSchema, $type);
     }
@@ -166,6 +188,10 @@ class CategoriesApiController extends AbstractApiController
         $category = CategoryModel::categories($id);
         if (empty($category)) {
             throw new NotFoundException("Category");
+        }
+        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+            $categories = [&$category];
+            CategoryModel::joinPostTypes($categories);
         }
         return $category;
     }
@@ -487,14 +513,12 @@ class CategoriesApiController extends AbstractApiController
                      siteSectionID=$SubcommunityID:{folder} ie. ',
                 ],
                 "layoutViewType:s?",
+                "postTypeID:s?",
             ],
             "in"
         )
-            ->addValidator(
-                "",
-                \Vanilla\Utility\SchemaUtils::onlyOneOf(["categoryID", "parentCategoryID", "parentCategoryCode"])
-            )
-            ->addValidator("", \Vanilla\Utility\SchemaUtils::onlyOneOf(["followed", "followedUserID"]))
+            ->addValidator("", SchemaUtils::onlyOneOf(["categoryID", "parentCategoryID", "parentCategoryCode"]))
+            ->addValidator("", SchemaUtils::onlyOneOf(["followed", "followedUserID"]))
             ->setDescription("List categories.");
     }
 
@@ -663,6 +687,14 @@ class CategoriesApiController extends AbstractApiController
                 return $id !== $parentCategory["CategoryID"];
             });
             $categoryIDs = $categoryIDs->withFilteredValue("=", $descendantIDs);
+        }
+
+        // Additional filtering by post type
+        if (!empty($query["postTypeID"])) {
+            $postTypesByCategory = $this->postTypeModel->getPostTypesByCategory([
+                "ptcj.postTypeID" => $query["postTypeID"],
+            ]);
+            $categoryIDs = $categoryIDs->withFilteredValue("=", array_keys($postTypesByCategory));
         }
 
         $where["CategoryID"] = $categoryIDs;
@@ -980,6 +1012,79 @@ class CategoriesApiController extends AbstractApiController
     }
 
     /**
+     * Endpoint to get suggested categories based on interests.
+     *
+     * @return Data
+     */
+    public function get_suggested(array $query = []): Data
+    {
+        $this->interestModel->ensureSuggestedContentEnabled();
+        $this->permission("Garden.SignIn.Allow");
+
+        $in = $this->schema([
+            "excludedCategoryIDs:a?" => [
+                "items" => ["type" => "integer"],
+            ],
+            "page:i?" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
+            ],
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "default" => 5,
+                "minimum" => 1,
+                "maximum" => ApiUtils::getMaxLimit(),
+            ],
+        ]);
+        $query = $in->validate($query);
+        $out = $this->schema([":a" => $this->fullSchema()], "out");
+
+        // Get a list of suggested category IDs.
+        [$suggestedCategoryIDs] = $this->interestModel->getRecordIDsByUserID($this->getSession()->UserID);
+
+        $this->categoryModel->setJoinUserCategory(false);
+
+        $where = [];
+
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
+
+        /** @var RangeExpression $categoryIDs */
+        $categoryIDs = $query["categoryID"] ?? new RangeExpression(">", 0);
+
+        // Exclude categories already followed.
+        $followedRecords = $this->categoryModel->getFollowed($this->getSession()->UserID);
+        $followedIDs = array_column($followedRecords, "CategoryID");
+        $suggestedCategoryIDs = array_diff($suggestedCategoryIDs, $followedIDs);
+
+        if (isset($query["excludedCategoryIDs"])) {
+            $suggestedCategoryIDs = array_diff($suggestedCategoryIDs, $query["excludedCategoryIDs"]);
+        }
+
+        // Apply permission filtering.
+        $visibleIDs = $this->categoryModel->getVisibleCategoryIDs();
+        if ($visibleIDs === true) {
+            $categoryIDs = $categoryIDs->withFilteredValue("=", $suggestedCategoryIDs);
+        } else {
+            $categoryIDs = $categoryIDs->withFilteredValue("=", array_intersect($suggestedCategoryIDs, $visibleIDs));
+        }
+
+        $where["CategoryID"] = $categoryIDs;
+
+        [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset);
+
+        foreach ($categories as $key => $category) {
+            $categories[$key] = $this->normalizeOutput($category);
+        }
+        $categories = $out->validate(array_values($categories));
+        $categories = $this->treeNormalizedBuilder()->sort($categories);
+
+        $paging = ApiUtils::numberedPagerInfo($totalCountCallBack(), "/api/v2/categories/suggested", $query, $in);
+
+        return new Data($categories, ["paging" => $paging]);
+    }
+
+    /**
      * Normalize request data to be passed to a model.
      *
      * @param array $request
@@ -997,7 +1102,7 @@ class CategoriesApiController extends AbstractApiController
             unset($request["iconUrl"]);
         }
 
-        $request = ApiUtils::convertInputKeys($request);
+        $request = ApiUtils::convertInputKeys($request, ["allowedPostTypeIDs", "hasRestrictedPostTypes"]);
 
         if (array_key_exists("Urlcode", $request)) {
             $request["UrlCode"] = $request["Urlcode"];
@@ -1206,6 +1311,10 @@ class CategoriesApiController extends AbstractApiController
 
         foreach ($categories as &$category) {
             CategoryModel::calculate($category);
+        }
+
+        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+            CategoryModel::joinPostTypes($categories);
         }
 
         // Reset indexes for proper output detection as an indexed array.

@@ -147,6 +147,85 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
     }
 
     /**
+     * Test unsubscribe category follow Digest link and token and resubscribe.
+     *
+     * @return void
+     */
+    public function testUnsubscribeCategoryDigestResubscribeLinkToken()
+    {
+        $notifyUserID = 2;
+        $category = $this->createCategory();
+        \Gdn::config()->set("Garden.Digest.Enabled", true);
+        $this->runWithUser(function () use ($category, $notifyUserID) {
+            $url = "/categories/{$category["categoryID"]}/preferences/{$notifyUserID}";
+            $result = $this->api()->patch($url, [
+                \CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW => true,
+                \CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_APP => true,
+                \CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => true,
+                \CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_APP => true,
+                \CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL => true,
+                \CategoriesApiController::OUTPUT_PREFERENCE_DIGEST => true,
+            ]);
+            $this->assertArrayHasKey(\CategoriesApiController::OUTPUT_PREFERENCE_DIGEST, $result);
+            $this->assertTrue($result[\CategoriesApiController::OUTPUT_PREFERENCE_DIGEST]);
+        }, $notifyUserID);
+
+        $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        $this->userModel->savePreference($notifyUser["UserID"], [
+            "Email.DigestEnabled" => "1",
+        ]);
+        $unsubscribeLink = $this->activityModel->getUnfollowCategoryLink($notifyUser, $category["categoryID"]);
+
+        $link = explode("/unsubscribe/", $unsubscribeLink);
+        $token = $link[1];
+        // Unsubscribe 1 preference
+        $response = $this->api()->post("{$this->baseUrl}/$token}");
+        $body = $response->getBody();
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals(
+            [
+                "preference" => "Preferences.Email.Digest.{$category["categoryID"]}",
+                "name" => $category["name"],
+                "enabled" => "0",
+                "userID" => $notifyUserID,
+                "categoryID" => $category["categoryID"],
+            ],
+            $body["followCategory"]
+        );
+        $metaPrefs = \Gdn::userMetaModel()->getUserMeta(
+            $notifyUserID,
+            "Preferences.Email.Digest.{$category["categoryID"]}",
+            [],
+            "Preferences."
+        );
+        $discussionComment = val("Email.Digest.{$category["categoryID"]}", $metaPrefs, null);
+        $this->assertEquals("0", $discussionComment);
+
+        //Oops Resubscribe, didn't meant it.
+        $response = $this->api()->post("{$this->baseUrl}/resubscribe/$token}");
+        $body = $response->getBody();
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals(
+            [
+                "preference" => "Preferences.Email.Digest.{$category["categoryID"]}",
+                "name" => $category["name"],
+                "enabled" => "1",
+                "userID" => $notifyUserID,
+                "categoryID" => $category["categoryID"],
+            ],
+            $body["followCategory"]
+        );
+        $metaPrefs = \Gdn::userMetaModel()->getUserMeta(
+            $notifyUserID,
+            "Preferences.Email.Digest.%",
+            [],
+            "Preferences."
+        );
+        $discussionComment = val("Email.Digest.{$category["categoryID"]}", $metaPrefs, null);
+        $this->assertEquals("1", $discussionComment);
+    }
+
+    /**
      * Test unsubscribe link and token.
      *
      * @return void
@@ -281,6 +360,7 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
                     "preferences.email.posts" => true,
                     "preferences.popup.comments" => true,
                     "preferences.email.comments" => false,
+                    "preferences.email.digest" => false,
                 ],
                 $following->getBody()
             );
@@ -367,6 +447,7 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
                     "preferences.email.posts" => true,
                     "preferences.popup.comments" => true,
                     "preferences.email.comments" => true,
+                    "preferences.email.digest" => false,
                 ],
                 $following->getBody()
             );
@@ -468,6 +549,7 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
                     "preferences.email.posts" => true,
                     "preferences.popup.comments" => true,
                     "preferences.email.comments" => true,
+                    "preferences.email.digest" => false,
                 ],
                 $following->getBody()
             );

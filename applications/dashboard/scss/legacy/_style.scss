@@ -822,6 +822,10 @@ body:not(.dataDriven) {
     color: $grey-j;
 }
 
+.Gloss:has(a) {
+    font-size: 100%;
+}
+
 .Loading {
     height: 100px;
     padding: 0 20px;

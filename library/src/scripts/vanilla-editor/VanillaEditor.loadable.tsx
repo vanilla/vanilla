@@ -64,7 +64,7 @@ import { t } from "@library/utility/appUtils";
  * Full platejs sandbox https://codesandbox.io/s/github/udecode/plate-playground
  */
 
-interface IProps {
+export interface IVanillaEditorProps {
     /** Should we include upload image/file buttons in editor menu bar */
     uploadEnabled?: boolean;
     /** Should the content be converted before attempting to render */
@@ -85,11 +85,15 @@ interface IProps {
     isMobile?: boolean;
     /** Show a static message for the layout editor instead of an editable field */
     isPreview?: boolean;
+    /** Any react node which need to appear within the editor bounds */
+    inEditorContent?: React.ReactNode;
+    autoFocus?: boolean;
 
     editorRef?: React.RefObject<MyEditor>;
     showConversionNotice?: boolean;
     onBlur?: React.TextareaHTMLAttributes<HTMLDivElement>["onBlur"];
     containerClasses?: string;
+    editorClasses?: string;
 }
 
 export function createVanillaEditor(options?: { initialValue?: MyEditor; id?: string }) {
@@ -100,7 +104,7 @@ export function createVanillaEditor(options?: { initialValue?: MyEditor; id?: st
     });
 }
 
-export function LegacyVanillaEditor(props: IProps) {
+export function LegacyFormVanillaEditor(props: IVanillaEditorProps) {
     const { legacyTextArea, initialFormat, needsHtmlConversion, ...rest } = props;
     const store = getStore();
 
@@ -117,8 +121,8 @@ export function LegacyVanillaEditor(props: IProps) {
     );
 }
 
-export function VanillaEditorLoadable(props: IProps) {
-    const { uploadEnabled = true, legacyTextArea } = props;
+export function VanillaEditorLoadable(props: IVanillaEditorProps) {
+    const { uploadEnabled = true, legacyTextArea, inEditorContent } = props;
     const syncContext = useSynchronizationContext();
     const { syncTextArea, initialValue } = syncContext;
     const showConversionNotice = props.showConversionNotice ?? syncContext.showConversionNotice;
@@ -243,12 +247,12 @@ export function VanillaEditorLoadable(props: IProps) {
                                     editor={editor}
                                     editableProps={{
                                         onBlur: props.onBlur,
-                                        autoFocus: false,
-                                        placeholder: "Type…",
-                                        scrollSelectionIntoView: () => undefined,
+                                        autoFocus: props.autoFocus,
+                                        placeholder: t("Type..."),
                                         className: cx(
                                             userContentClasses().root,
                                             vanillaEditorClasses().root({ horizontalPadding: true }),
+                                            props.editorClasses,
                                         ),
                                         "aria-label": t(
                                             "To access the paragraph format menu, press control, shift, and P. To access the text format menu, press control, shift, and I. Use the arrow keys to navigate in each menu.",
@@ -261,13 +265,15 @@ export function VanillaEditorLoadable(props: IProps) {
                                 </Plate>
                             </VanillaEditorFocusContext>
                         )}
-
-                        <PersistentToolbar
-                            uploadEnabled={uploadEnabled}
-                            flyoutsDirection={"above"}
-                            isMobile={followMobileRenderingRules}
-                        />
-                        {!followMobileRenderingRules && <FloatingElementToolbar />}
+                        <div className={vanillaEditorClasses().footer}>
+                            {!followMobileRenderingRules && <FloatingElementToolbar />}
+                            <PersistentToolbar
+                                uploadEnabled={uploadEnabled}
+                                flyoutsDirection={"above"}
+                                isMobile={followMobileRenderingRules}
+                            />
+                            {inEditorContent}
+                        </div>
                     </VanillaEditorContainer>
                 </VanillaEditorBoundsContext>
             </PlateProvider>

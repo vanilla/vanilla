@@ -79,9 +79,28 @@ class AutomationRuleDispatchesTest extends SiteTestCase
         // Create Automation Recipe
         $this->createAutomationRule($body["trigger"], $body["action"]);
         $rule = $this->automationRuleModel->getAutomationRuleByID($this->lastRuleID);
+
+        //create a date 4 days back
+        $fourDaysBack = \DateTimeImmutable::createFromFormat("U", strtotime("-4 days"))->format("Y-m-d H:i:s");
+        $this->createAutomationDispatches([
+            "automationRuleID" => $rule["automationRuleID"],
+            "automationRuleRevisionID" => $rule["automationRuleRevisionID"],
+            "dispatchType" => "initial",
+            "attributes" => [
+                "affectedRecordType" => "Discussion",
+                "estimatedRecordCount" => 0,
+                "affectedRecordCount" => 0,
+            ],
+            "dateDispatched" => $fourDaysBack,
+            "dateFinished" => $fourDaysBack,
+            "errorMessage" => "initial dispatch with 0 entries for future iterations",
+            "status" => AutomationRuleDispatchesModel::STATUS_WARNING,
+        ]);
+
         // Move back time 3.5 days
         $now = time() - 3600 * 24 * 3.5;
         CurrentTimeStamp::mockTime($now);
+
         // Create 11 discussions
         $newDiscussions = $this->insertDiscussions(11, [
             "Type" => "discussion",
@@ -113,7 +132,10 @@ class AutomationRuleDispatchesTest extends SiteTestCase
             "dispatchUUID" => $actionClass->getDispatchUUID(),
         ];
 
-        $count = $actionClass->getLongRunnerRuleItemCount(true, $triggerClass, $longRunnerParams);
+        $count = $actionClass->getLongRunnerRuleItemCount(false, $triggerClass, $longRunnerParams);
+        $this->assertArrayHasKey("lastRunDate", $longRunnerParams);
+        $this->assertNotNull($longRunnerParams["lastRunDate"]);
+        $this->assertEquals($fourDaysBack, $longRunnerParams["lastRunDate"]->format("Y-m-d H:i:s"));
         $this->assertEquals(10, $count);
         $dispatch = [
             "automationRuleDispatchUUID" => $actionClass->getDispatchUUID(),

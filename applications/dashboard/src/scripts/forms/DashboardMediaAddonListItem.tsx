@@ -11,6 +11,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { visibility } from "@library/styles/styleHelpers";
 import { ToolTip } from "@library/toolTip/ToolTip";
+import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import addonPlaceHolder from "../../../design/images/addon-placeholder.png"; // This might need a refactor
@@ -55,6 +56,7 @@ export const DashboardMediaAddonListItem = (props: IProps) => {
         disabledNote,
     } = props;
     const classes = dashboardClasses();
+    const labelID = useUniqueID("mediaToggle");
 
     return (
         <li className={cx(classes.mediaAddonListItem, classes.extendBottomBorder, className)}>
@@ -62,7 +64,7 @@ export const DashboardMediaAddonListItem = (props: IProps) => {
                 <img src={iconUrl ? iconUrl : addonPlaceHolder} />
             </div>
             <div className="mediaAddonListItem_details">
-                <h3>{title}</h3>
+                <h3 id={labelID}>{title}</h3>
                 {/* This HTML is returned from the API, the API is responsible for HTML sanitization */}
                 {description && <span dangerouslySetInnerHTML={{ __html: description }} />}
             </div>
@@ -75,15 +77,13 @@ export const DashboardMediaAddonListItem = (props: IProps) => {
                 </div>
             )}
             <div className="mediaAddonListItem_control">
-                {disabled && disabledNote ? (
-                    <ToolTip label={disabledNote}>
-                        <span>
-                            <DashboardToggle checked={isEnabled} onChange={onChange} disabled={disabled} />
-                        </span>
-                    </ToolTip>
-                ) : (
-                    <DashboardToggle checked={isEnabled} onChange={onChange} disabled={disabled} />
-                )}
+                <DashboardToggle
+                    tooltip={disabled && disabledNote ? disabledNote : undefined}
+                    labelID={labelID}
+                    enabled={isEnabled}
+                    onChange={onChange}
+                    disabled={disabled}
+                />
             </div>
         </li>
     );

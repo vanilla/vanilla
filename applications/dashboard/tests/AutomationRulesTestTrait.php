@@ -18,9 +18,12 @@ use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 trait AutomationRulesTestTrait
 {
+    use CommunityApiTestTrait;
+
     /** @var int|null */
     protected $lastRuleID = null;
 
@@ -203,5 +206,28 @@ trait AutomationRulesTestTrait
         $this->api()->post("automation-rules", $automationRecord);
 
         return $discussion;
+    }
+
+    /**
+     * Like `createAutomationRule()` but uses the API to create the automation rule.
+     *
+     * @return void
+     */
+    protected function createAutomationRuleByApi($trigger, $action, $overrides = [])
+    {
+        $salt = "-" . round(microtime(true) * 1000) . rand(1, 1000);
+        $name = "Test Rule $salt";
+
+        return $this->api()
+            ->post(
+                "automation-rules",
+                $overrides + [
+                    "trigger" => $trigger,
+                    "action" => $action,
+                    "name" => $name,
+                    "status" => AutomationRuleModel::STATUS_ACTIVE,
+                ]
+            )
+            ->getBody();
     }
 }

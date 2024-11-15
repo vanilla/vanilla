@@ -5,6 +5,7 @@
  */
 
 import { NavigationLinksModal } from "@dashboard/components/navigation/NavigationLinksModal";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
@@ -30,11 +31,11 @@ export const QUICK_LINKS_LIST_AS_MODAL = {
         }
         return (
             <>
-                <div className="input-wrap">
+                <DashboardInputWrap>
                     <Button onClick={openModal} buttonType={ButtonTypes.STANDARD}>
                         {control["modalTriggerLabel"]}
                     </Button>
-                </div>
+                </DashboardInputWrap>
                 <NavigationLinksModal
                     title={"Quick Links"}
                     isNestingEnabled={false}

@@ -9,40 +9,8 @@ paths:
     /users:
         get:
             parameters:
-                - description: >
-                      When the user was created.
-
-                      This filter receive a string that can take two forms.
-
-                      A single date that matches '{Operator}{DateTime}' where {Operator}
-                      can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
-                      =.
-
-                      A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
-                      where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
-                      '[]' are inclusive and '()' are exclusive.
-                  in: query
-                  name: dateInserted
-                  schema:
-                      format: date-filter
-                      type: string
-                - description: >
-                      When the user was updated.
-
-                      This filter receive a string that can take two forms.
-
-                      A single date that matches '{Operator}{DateTime}' where {Operator}
-                      can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
-                      =.
-
-                      A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
-                      where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
-                      '[]' are inclusive and '()' are exclusive.
-                  in: query
-                  name: dateUpdated
-                  schema:
-                      format: date-filter
-                      type: string
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/DateInserted"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/DateUpdated"
                 - name: dateLastActive
                   description: When the user was last active on the community.
                   in: query
@@ -54,14 +22,14 @@ paths:
                   in: query
                   schema:
                       type: integer
-                - name: roleIDs[]
+                - name: roleIDs
                   description: Filter by one of multiple role IDs.
                   in: query
                   schema:
                       type: array
                       items:
                           type: integer
-                - name: rankIDs[]
+                - name: rankIDs
                   description: Filter by one of multiple rank IDs.
                   in: query
                   schema:
@@ -88,7 +56,7 @@ paths:
                   in: query
                   schema:
                       type: string
-                - name: ipAddresses[]
+                - name: ipAddresses
                   description: Filter by the user's associated IP addresses
                   in: query
                   schema:
@@ -130,7 +98,7 @@ paths:
                           - -userID
                           - -points
                           - -countPosts
-                - name: fields[]
+                - name: fields
                   description: >
                       Fields that will be included in the response.
                   in: query
@@ -723,6 +691,34 @@ paths:
                                 - photo
                             type: object
                 required: true
+    /users/{id}/ignored:
+        x-addon: ignore
+        get:
+            summary: Get a user's ignored users.
+            tags:
+                - Users
+            parameters:
+                - description: The user ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                type: array
+                                items:
+                                    allOf:
+                                        - $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                                        - type: "object"
+                                          properties:
+                                              dateIgnored:
+                                                  type: string
+                                                  format: "date-time"
+                    description: Success
     /users/leaders:
         get:
             summary: Get user's leaderboard.

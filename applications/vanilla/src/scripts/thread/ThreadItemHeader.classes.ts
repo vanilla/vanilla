@@ -70,10 +70,30 @@ export const threadItemHeaderClasses = useThemeCache(() => {
         top: "-1px",
     });
 
+    const headerMeta = css({
+        display: "flex",
+        alignItems: "start",
+        justifyContent: "start",
+        gap: 4,
+
+        "& > div": {
+            margin: "inherit",
+        },
+
+        "& svg": {
+            color: "currentColor",
+        },
+
+        "@container threadItemContainer (width < 500px)": {
+            gap: 12,
+        },
+    });
+
     return {
         root,
         rankLabel,
         userName,
+        headerMeta,
         main,
     };
 });

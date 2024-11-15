@@ -39,7 +39,7 @@ export interface ISelectBoxProps {
     renderLeft?: boolean;
     offsetPadding?: boolean;
     verticalPadding?: boolean;
-    describedBy: string;
+    describedBy?: string;
     labelWrap?: string; // conditional wrap around text to separate it from the icon.
     horizontalOffset?: boolean;
     afterButton?: React.ReactNode;

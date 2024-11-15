@@ -119,8 +119,9 @@ $panelMaxHeight: calc(100vh - #{$navbar-height * 2});
 .panel-right {
     order: 3;
     position: sticky;
-    max-height: $panelMaxHeight;
-
+    max-height: calc(100vh - #{$navbar-height});
+    padding-top: calc(#{$navbar-height} + 8px);
+    padding-bottom: 0;
     top: 16px;
 
     .panel-content {

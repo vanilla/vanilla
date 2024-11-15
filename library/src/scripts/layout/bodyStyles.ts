@@ -10,7 +10,8 @@ import { percent, viewHeight } from "csx";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash-es/isEmpty";
-import { CSSObject, injectGlobal } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
+import { injectGlobal } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 import { useEffect } from "react";
 
@@ -29,7 +30,7 @@ export const bodyStyleMixin = useThemeCache(() => {
         "h1, h2, h3, h4, h5, h6": {
             ...Mixins.font({
                 lineHeight: globalVars.lineHeights.condensed,
-                color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
+                color: `var(--fg-contrast-color, ${ColorsUtils.colorOut(globalVars.mainColors.fgHeading)})`,
                 family: globalVars.fonts.families.headings,
             }),
         },
@@ -51,11 +52,12 @@ export const useBodyCSS = () => {
                 font-family: ${bodyStyle.fontFamily};
                 color: ${bodyStyle.color};
                 word-break: ${bodyStyle.wordBreak};
+                scroll-padding-top: 48px;
             }
 
             h1, h2, h3, h4, h5, h6 {
                 line-height: ${globalVars.lineHeights.condensed};
-                color: ${ColorsUtils.colorOut(globalVars.mainColors.fgHeading)};
+                color: var(--fg-contrast-color, ${ColorsUtils.colorOut(globalVars.mainColors.fgHeading)});
                 font-family: ${globalVars.fonts.families.headings};
             }
         `;

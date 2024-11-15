@@ -1,3 +1,9 @@
+/**
+ * @author Maneesh Chiba <mchiba@higherlogic.com>
+ * @copyright 2009-2024 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 import { IComment } from "@dashboard/@types/api/comment";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
@@ -34,6 +40,9 @@ import { useCollisionDetector } from "@vanilla/react-utils";
 import { labelize, notEmpty } from "@vanilla/utils";
 import { useMemo, useState } from "react";
 import { RouteComponentProps } from "react-router";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { PermissionMode } from "@library/features/users/Permission";
 
 interface IProps extends RouteComponentProps<{ recordID: string }> {}
 
@@ -79,6 +88,10 @@ function TriageDetailPageImpl(props: IProps) {
         queryKey: ["comments", recordID],
     });
 
+    const escalation = postRevision.mostRecentRevision?.attachments?.find(
+        (item) => item.attachmentType === "vanilla-escalation",
+    );
+
     const filteredDiscussionComments = useMemo(() => {
         if (postRevision.mostRecentRevision && discussionComments.data) {
             const dateUpdated = postRevision.mostRecentRevision?.internalStatus?.log?.dateUpdated;
@@ -120,6 +133,7 @@ function TriageDetailPageImpl(props: IProps) {
                                     {comments?.map((comment) => {
                                         return (
                                             <CommentThreadItem
+                                                threadStyle={"flat"}
                                                 key={comment.commentID}
                                                 comment={comment}
                                                 discussion={postRevision.mostRecentRevision!}
@@ -139,6 +153,8 @@ function TriageDetailPageImpl(props: IProps) {
         }
         return [];
     };
+
+    const { hasPermission } = usePermissionsContext();
 
     return (
         <ErrorBoundary>
@@ -218,14 +234,26 @@ function TriageDetailPageImpl(props: IProps) {
                                     )}
                                 </>
 
-                                <Button
-                                    buttonType={ButtonTypes.TEXT_PRIMARY}
-                                    onClick={() => {
-                                        setEscalationModalVisibility(true);
-                                    }}
-                                >
-                                    {t("Escalate")}
-                                </Button>
+                                {(hasPermission("community.moderate") ||
+                                    hasPermission("posts.moderate", {
+                                        mode: PermissionMode.RESOURCE_IF_JUNCTION,
+                                        resourceType: "category",
+                                        resourceID: postRevision.mostRecentRevision?.categoryID,
+                                    })) &&
+                                    (!escalation ? (
+                                        <Button
+                                            buttonType={ButtonTypes.TEXT_PRIMARY}
+                                            onClick={() => {
+                                                setEscalationModalVisibility(true);
+                                            }}
+                                        >
+                                            {t("Escalate")}
+                                        </Button>
+                                    ) : (
+                                        <LinkAsButton buttonType={ButtonTypes.TEXT_PRIMARY} to={escalation.sourceUrl!}>
+                                            {t("View Escalation")}
+                                        </LinkAsButton>
+                                    ))}
                             </span>
                         </section>
                         <section className={classes.layout}>

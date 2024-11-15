@@ -5,7 +5,8 @@
  */
 
 import React from "react";
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControlGroup";
 import { t } from "@library/utility/appUtils";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";

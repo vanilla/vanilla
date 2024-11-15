@@ -18,6 +18,7 @@ import { getEmbedForType } from "@library/embeddedContent/embedService.loadable"
 import { IBaseEmbedData } from "@library/embeddedContent/embedService.register";
 import { EmbedContext, useEmbedContext } from "@library/embeddedContent/IEmbedContext";
 import { IError } from "@library/errorPages/CoreErrorMessages";
+import { useToast } from "@library/features/toaster/ToastContext";
 import { ErrorIcon } from "@library/icons/common";
 import Message from "@library/messages/Message";
 import { cx } from "@library/styles/styleShim";
@@ -287,6 +288,17 @@ export function RichEmbedElement(props: IProps) {
 function EmbedError(props: IProps & { error: IError; onDelete: () => void; onDismiss?: () => void }) {
     const { element } = props;
     const classes = embedContainerClasses();
+    const toast = useToast();
+
+    useEffect(() => {
+        if (props.isInline && element.dataSourceType === "url") {
+            toast.addToast({
+                body: <>{props.error.message}</>,
+                dismissible: true,
+            });
+            setRichLinkAppearance(props.editor, RichLinkAppearance.LINK);
+        }
+    }, [element.dataSourceType, props.isInline]);
 
     switch (element.dataSourceType) {
         case "file":

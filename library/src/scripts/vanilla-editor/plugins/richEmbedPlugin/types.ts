@@ -12,12 +12,12 @@ export const ELEMENT_RICH_EMBED_CARD = "rich_embed_card";
 export const ELEMENT_RICH_EMBED_INLINE = "rich_embed_inline";
 export const ELEMENT_LEGACY_EMOJI = "legacy_emoji_image";
 
-interface IRichLinkEmbedDataSource {
+export interface IRichLinkEmbedDataSource {
     dataSourceType: "url";
     url: string;
 }
 
-interface IFileEmbedDataSource {
+export interface IFileEmbedDataSource {
     dataSourceType: "image" | "file";
     uploadFile: File;
 }
@@ -31,7 +31,7 @@ export interface IIframeEmbedDataSource {
     };
 }
 
-type EmbedDataSources = IRichLinkEmbedDataSource | IFileEmbedDataSource | IIframeEmbedDataSource;
+export type EmbedDataSources = IRichLinkEmbedDataSource | IFileEmbedDataSource | IIframeEmbedDataSource;
 
 export type IRichEmbedElement = TElement & {
     type: typeof ELEMENT_RICH_EMBED_CARD | typeof ELEMENT_RICH_EMBED_INLINE;

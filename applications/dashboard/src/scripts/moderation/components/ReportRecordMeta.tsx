@@ -7,7 +7,7 @@
 import { ICommunityManagementRecord } from "@dashboard/moderation/CommunityManagementTypes";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import { MetaIcon, MetaItem, MetaProfile } from "@library/metas/Metas";
 import { metasClasses } from "@library/metas/Metas.styles";
 import { Tag } from "@library/metas/Tags";

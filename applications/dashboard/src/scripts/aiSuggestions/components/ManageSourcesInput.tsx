@@ -10,7 +10,7 @@ import CheckBox from "@library/forms/Checkbox";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@library/utility/appUtils";
-import { IFieldError } from "@vanilla/json-schema-forms/src/types";
+import { IFieldError } from "@library/json-schema-forms/types";
 import pull from "lodash-es/pull";
 import { ChangeEvent } from "react";
 

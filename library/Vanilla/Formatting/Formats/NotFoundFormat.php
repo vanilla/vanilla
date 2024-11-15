@@ -183,4 +183,9 @@ class NotFoundFormat implements FormatInterface
     {
         return [];
     }
+
+    public function applySanitizeProcessor(string $content): string
+    {
+        return $this->getErrorMessage();
+    }
 }

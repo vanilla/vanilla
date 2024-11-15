@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -17,7 +17,7 @@ import { getClassForButtonType } from "@library/forms/Button.getClassForButtonTy
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import Container from "@library/layout/components/Container";
-import { StackingContextProvider, useLastValue, useStackingContext } from "@vanilla/react-utils";
+import { StackingContextProvider, useLastValue, useMeasure, useStackingContext } from "@vanilla/react-utils";
 import { pointerEventsClass } from "@library/styles/styleHelpersFeedback";
 
 interface MenuButtonImplProps extends INewPostMenuProps, React.ComponentPropsWithoutRef<typeof MenuButton> {}
@@ -63,8 +63,50 @@ export default function NewPostMenuDropDown(props: INewPostMenuProps) {
     const { zIndex } = useStackingContext();
 
     const classes = newPostMenuClasses(containerOptions, zIndex);
+    const containerRef = useRef<HTMLDivElement>(null);
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const context = useLinkContext();
+
+    const { height: containerHeight } = useMeasure(containerRef);
+    const isInCustomLayout = Boolean(props.titleType);
+
+    // handle the edge cases when dropdowns container does not have enough space to open the dropdown without scroller
+    useLayoutEffect(() => {
+        if (containerRef.current && isInCustomLayout && (containerHeight > 0 || props.forceDesktopOnly)) {
+            // it's in modal preview, provide enough space for the dropdown
+            const widgetSettingsPreview =
+                props.disableDropdownItemsClick &&
+                (containerRef.current.closest(".widgetSettingsPreview") as HTMLElement);
+            if (widgetSettingsPreview) {
+                widgetSettingsPreview.style.minHeight = `${300}px`;
+            }
+
+            // in the FE in custom layout, adjust parent min height
+            const panelArea = containerRef.current.closest(".panelArea") as HTMLElement;
+            const panelWidgets = panelArea?.children;
+            if (panelArea && panelWidgets.length) {
+                const lastWidget = panelWidgets[panelWidgets.length - 1] as HTMLElement;
+
+                const panelAreaHeight = panelArea.style.height
+                    ? parseInt(panelArea.style.height, 10)
+                    : panelArea?.clientHeight;
+                const lastWidgetHeight = lastWidget.style.height
+                    ? parseInt(lastWidget.style.height, 10)
+                    : lastWidget?.clientHeight;
+
+                const isNewPostLastWidget = Boolean(lastWidget?.querySelector(`.${containerRef.current.className}`));
+                const isNewPostBeforeLastWidget =
+                    !isNewPostLastWidget &&
+                    Boolean(panelWidgets[panelWidgets.length - 2].querySelector(`.${containerRef.current.className}`));
+
+                if (isNewPostLastWidget) {
+                    panelArea.style.minHeight = `${panelAreaHeight + 180}px`;
+                } else if (isNewPostBeforeLastWidget && lastWidgetHeight > 0 && lastWidgetHeight < 180) {
+                    panelArea.style.minHeight = `${panelAreaHeight + 180 - lastWidgetHeight}px`;
+                }
+            }
+        }
+    }, [containerHeight]);
 
     // According to documentation here https://reach.tech/menu-button/#menu , "Escape" should close the menu drowdown,
     // but somehow, in our application it does not work so need to manually do it through this workaround
@@ -109,7 +151,7 @@ export default function NewPostMenuDropDown(props: INewPostMenuProps) {
                     }}
                 />
             )}
-            <div className={classes.container}>
+            <div className={classes.container} ref={containerRef}>
                 {itemsInDropdown.length ? (
                     <Menu>
                         <MenuButtonImpl {...props} ref={menuButtonRef}>

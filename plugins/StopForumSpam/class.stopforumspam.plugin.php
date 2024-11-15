@@ -79,7 +79,7 @@ class StopForumSpamPlugin extends Gdn_Plugin
                 $isSpam = true;
             }
 
-            // Don't even log registrations that are above another threahold.
+            // Don't even log registrations that are above another threshold.
             if (
                 $iPFrequency >= c("Plugins.StopForumSpam.IPThreshold2", 20) ||
                 $emailFrequency >= c("Plugins.StopForumSpam.EmailThreshold2", 50)

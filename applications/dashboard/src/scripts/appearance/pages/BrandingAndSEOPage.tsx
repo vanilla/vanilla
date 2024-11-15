@@ -7,7 +7,7 @@
 import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
 import { BrandingAndSEOPageClasses } from "@dashboard/appearance/pages/BrandingAndSEOPage.classes";
 import AdminLayout from "@dashboard/components/AdminLayout";
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import { cx } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
@@ -19,7 +19,7 @@ import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarCont
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { t } from "@vanilla/i18n";
 import { JsonSchemaForm, JSONSchemaType } from "@vanilla/json-schema-forms";
-import { extractDataByKeyLookup } from "@vanilla/json-schema-forms/src/utils";
+import { extractSchemaDefaults } from "@vanilla/json-schema-forms/src/utils";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { useFormik } from "formik";
 import React, { useEffect, useMemo } from "react";
@@ -251,8 +251,7 @@ export default function BrandingAndSEOPage() {
     const isLoaded = [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status);
 
     const { values, submitForm, setValues } = useFormik<object>({
-        initialValues:
-            isLoaded && !!settings.data ? settings.data : extractDataByKeyLookup(BRANDING_SETTINGS, "default"),
+        initialValues: isLoaded && !!settings.data ? settings.data : extractSchemaDefaults(BRANDING_SETTINGS),
 
         enableReinitialize: true,
 
@@ -285,13 +284,11 @@ export default function BrandingAndSEOPage() {
             contentClassNames={cx(BrandingAndSEOPageClasses.layout)}
             content={
                 <section>
-                    <JsonSchemaForm
+                    <DashboardSchemaForm
                         disabled={!isLoaded}
                         fieldErrors={error?.errors ?? {}}
                         schema={BRANDING_SETTINGS}
                         instance={values}
-                        FormControlGroup={DashboardFormControlGroup}
-                        FormControl={DashboardFormControl}
                         onChange={setValues}
                     />
                 </section>

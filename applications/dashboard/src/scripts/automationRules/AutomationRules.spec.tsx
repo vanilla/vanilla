@@ -310,7 +310,12 @@ describe("AutomationRules", () => {
     });
 
     it("Escalation Rules Add/Edit - Adding an escalation rule, triggers dropdown should have only triggers containing at least one escalation actions, actions dropdown should contain anly escalation actions", async () => {
-        const escalationActions = ["createEscalationAction", "escalateToZendeskAction", "escalateGithubIssueAction"];
+        const escalationActions = [
+            "createEscalationAction",
+            "escalateToZendeskAction",
+            "escalateGithubIssueAction",
+            "escalateToJiraAction",
+        ];
         const mockEscalationRulesCatalog = { ...mockAutomationRulesCatalog };
         Object.keys(mockEscalationRulesCatalog.triggers).forEach((trigger) => {
             if (

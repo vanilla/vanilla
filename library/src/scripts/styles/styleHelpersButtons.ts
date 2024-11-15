@@ -6,7 +6,7 @@
 
 import { ILinkStates } from "@library/styles/styleHelpersLinks";
 import { logDebug } from "@vanilla/utils/src/debugUtils";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 
 // Similar to ILinkStates, but can be button or link, so we don't have link specific states here and not specific to colors
 export interface IActionStates {

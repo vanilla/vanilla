@@ -25,17 +25,49 @@ import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/D
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 import { Icon } from "@vanilla/icons";
 import { ReportCountMeta } from "@vanilla/addon-vanilla/thread/ReportCountMeta";
+import { getMeta } from "@library/utility/appUtils";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { PageBox } from "@library/layout/PageBox";
+import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
+import type { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 
 interface IProps {
     discussion: IDiscussion;
     discussionApiParams?: DiscussionsApi.GetParams;
     category: ICategoryFragment;
+    containerOptions?: IHomeWidgetContainerOptions;
+    title?: string;
+    titleType: "discussion/name" | "none";
 }
+
+const discussionOriginalPostAssetClasses = () => {
+    const container = css({
+        position: "relative",
+        container: "originalPostContainer / inline-size",
+    });
+    const actions = css({
+        display: "flex",
+        alignItems: "center",
+        gap: 4,
+
+        "@container originalPostContainer (width: 500px)": {
+            gap: 16,
+        },
+    });
+    return {
+        container,
+        actions,
+    };
+};
 
 export function DiscussionOriginalPostAsset(props: IProps) {
     const { discussion: discussionPreload, discussionApiParams, category } = props;
     const { discussionID } = discussionPreload;
 
+    const classes = discussionOriginalPostAssetClasses();
+
+    const { hasPermission } = usePermissionsContext();
     const { page } = useDiscussionThreadPaginationContext();
 
     const {
@@ -48,73 +80,79 @@ export function DiscussionOriginalPostAsset(props: IProps) {
 
     const discussion = data!;
 
-    const toShare: ShareData = {
-        url: discussion!.url,
-        title: discussion!.name,
-    };
+    const showResolved = hasPermission("staff.allow") && getMeta("triage.enabled", false);
+
+    const postMeta = (
+        <>
+            {showResolved && (
+                <span className={discussionThreadClasses().resolved}>
+                    <Icon icon={discussion.resolved ? "cmd-approve" : "cmd-alert"} />
+                </span>
+            )}
+            {discussion.closed && (
+                <Tag
+                    className={discussionThreadClasses().closedTag}
+                    preset={discussionListVariables().labels.tagPreset}
+                >
+                    {t("Closed")}
+                </Tag>
+            )}
+        </>
+    );
+
+    const actions = currentUserSignedIn && (
+        <div className={classes.actions}>
+            {props.titleType === "none" ? postMeta : null}
+            <ReportCountMeta
+                countReports={discussion.reportMeta?.countReports}
+                recordID={discussion.discussionID}
+                recordType="discussion"
+            />
+            <DiscussionBookmarkToggle discussion={discussion} onSuccess={invalidateDiscussionQuery} />
+            <DiscussionOptionsMenu discussion={discussion} onMutateSuccess={invalidateDiscussionQuery} />
+        </div>
+    );
 
     return (
-        <DiscussionThreadContextProvider discussion={discussion}>
-            <ThreadItemContextProvider
-                recordType={"discussion"}
-                recordID={discussion.discussionID}
-                recordUrl={discussion.url}
-                name={discussion.name}
-                timestamp={discussion.dateInserted}
-                attributes={discussion.attributes}
-                authorID={discussion.insertUserID}
-            >
-                <PageHeadingBox
-                    title={
-                        <>
-                            <span className={discussionThreadClasses().resolved}>
-                                <Icon icon={discussion.resolved ? "cmd-approve" : "cmd-alert"} />
-                            </span>
-                            <span>{discussion.name}</span>
-                            {discussion.closed && (
-                                <Tag
-                                    className={discussionThreadClasses().closedTag}
-                                    preset={discussionListVariables().labels.tagPreset}
-                                >
-                                    {t("Closed")}
-                                </Tag>
-                            )}
-                        </>
-                    }
-                    includeBackLink
-                    actions={
-                        currentUserSignedIn && (
-                            <div className={css({ display: "flex", alignItems: "center", gap: 4 })}>
-                                <ReportCountMeta
-                                    countReports={discussion.reportMeta?.countReports}
-                                    recordID={discussion.discussionID}
-                                    recordType="discussion"
-                                />
-                                <DiscussionBookmarkToggle
-                                    discussion={discussion}
-                                    onSuccess={invalidateDiscussionQuery}
-                                />
-                                <DiscussionOptionsMenu
-                                    discussion={discussion}
-                                    onMutateSuccess={invalidateDiscussionQuery}
-                                />
-                            </div>
-                        )
-                    }
-                />
-
-                <ThreadItem
-                    boxOptions={{
-                        borderType: BorderType.NONE,
-                    }}
-                    user={discussion.insertUser!}
-                    content={discussion.body!}
-                    userPhotoLocation={"header"}
-                    collapsed={page > 1}
-                    reactions={discussion.type !== "idea" ? discussion.reactions : undefined}
-                />
-            </ThreadItemContextProvider>
-        </DiscussionThreadContextProvider>
+        <HomeWidgetContainer
+            options={{ ...props.containerOptions }}
+            depth={1}
+            title={
+                props.titleType !== "none" ? (
+                    <>
+                        <span>{props.title ?? discussion.name}</span>
+                        {postMeta}
+                    </>
+                ) : undefined
+            }
+            actions={props.titleType !== "none" ? actions : undefined}
+        >
+            <DiscussionThreadContextProvider discussion={discussion}>
+                <ThreadItemContextProvider
+                    threadStyle={"flat"}
+                    recordType={"discussion"}
+                    recordID={discussion.discussionID}
+                    recordUrl={discussion.url}
+                    name={discussion.name}
+                    timestamp={discussion.dateInserted}
+                    attributes={discussion.attributes}
+                    authorID={discussion.insertUserID}
+                >
+                    <ThreadItem
+                        boxOptions={{
+                            borderType: BorderType.NONE,
+                        }}
+                        user={discussion.insertUser!}
+                        content={discussion.body!}
+                        userPhotoLocation={"header"}
+                        collapsed={page > 1}
+                        reactions={discussion.type !== "idea" ? discussion.reactions : undefined}
+                        categoryID={discussion.categoryID}
+                        options={props.titleType === "none" ? actions : undefined}
+                    />
+                </ThreadItemContextProvider>
+            </DiscussionThreadContextProvider>
+        </HomeWidgetContainer>
     );
 }
 export default DiscussionOriginalPostAsset;

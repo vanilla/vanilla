@@ -9,6 +9,7 @@ import { getDeepPropertyListInDotNotation, t } from "@library/utility/appUtils";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 import get from "lodash-es/get";
 import type { Row } from "react-table";
+import { sprintf } from "sprintf-js";
 
 export function isParentOfNotificationPreferenceSchemas(schema: JsonSchema) {
     return (
@@ -112,13 +113,22 @@ export function makeRowDescriptionId(row: Row<ColumnType>): string {
 export function translateDescription(description: string): string {
     const parser = new DOMParser();
     const htmlContent = parser.parseFromString(description, "text/html");
-    const links = htmlContent.querySelectorAll("a");
 
-    links.forEach((link) => {
-        if (link.textContent) {
-            link.textContent = t(`${link.textContent}`);
-        }
+    const links = Array.from(htmlContent.querySelectorAll("a"));
+
+    const linksData = links.map((link) => {
+        return {
+            textContent: `${link.textContent}`,
+            href: `${link.href}`,
+        };
     });
 
-    return t(htmlContent.documentElement.innerHTML);
+    links.forEach((link, index) => {
+        link.textContent = `%${index + 1}$s`;
+    });
+
+    return sprintf(
+        t(htmlContent.documentElement.innerText),
+        ...linksData.map(({ href, textContent }) => `<a href="${href}">${t(textContent)}</a>`),
+    );
 }

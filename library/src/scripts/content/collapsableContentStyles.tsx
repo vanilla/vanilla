@@ -61,6 +61,7 @@ export const collapsableContentClasses = useThemeCache((options?: { bgColor?: Co
         height: 75,
         background: linearGradient("to bottom", ColorsUtils.colorOut(bgColor.fade(0))!, ColorsUtils.colorOut(bgColor)!),
         transform: `translateY(-100%)`,
+        pointerEvents: "none",
     });
 
     return { heightContainer, root, collapser, collapserIcon, footer, gradient, paddingAdjustment };

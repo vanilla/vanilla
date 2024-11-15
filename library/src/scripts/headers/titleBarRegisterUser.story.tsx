@@ -1,16 +1,15 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import React, { useState, createRef, useEffect } from "react";
-import { MemoryRouter, Router } from "react-router";
+import { useEffect } from "react";
+import { MemoryRouter } from "react-router";
 import TitleBar, { TitleBar as TitleBarStatic } from "@library/headers/TitleBar";
 import { Provider } from "react-redux";
 import getStore from "@library/redux/getStore";
 import { testStoreState } from "@library/__tests__/testStoreState";
-import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -20,11 +19,12 @@ import { loadTranslations } from "@vanilla/i18n";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { StoryFullPage } from "@library/storybook/StoryFullPage";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import gdn from "@library/gdn";
 import { setMeta } from "@library/utility/appUtils";
 import localLogoUrl from "./titleBarStoryLogo.png";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { ReduxThemeContextProvider } from "@library/theming/Theme.context";
+import { IThemeVariables } from "@library/theming/themeReducer";
+import { LoadStatus } from "@library/@types/api/core";
 
 loadTranslations({});
 
@@ -172,6 +172,113 @@ TitleBarRegisteredUserNoConversations.story = {
     parameters: {
         chromatic: {
             viewports: [oneColumnVariables().breakPoints.noBleed, oneColumnVariables().breakPoints.xs],
+        },
+    },
+};
+
+export const TitleBarRegisteredUserWithManyNavigationItemsAndCenterAligned = () => {
+    const initialState = testStoreState({
+        theme: {
+            assets: {
+                status: LoadStatus.SUCCESS,
+                data: {
+                    logo: {
+                        type: "image",
+                        url: localLogoUrl as string,
+                    },
+                    mobileLogo: {
+                        type: "image",
+                        url: localLogoUrl as string,
+                    },
+                    variables: {
+                        type: "json",
+                        data: {
+                            titleBar: {
+                                navAlignment: {
+                                    alignment: "center",
+                                },
+                            },
+                            navigation: {
+                                navigationItems: [
+                                    {
+                                        id: "builtin-discussions",
+                                        url: "/discussions",
+                                        name: "Discussions",
+                                        children: [],
+                                    },
+                                    {
+                                        id: "builtin-discussions",
+                                        url: "/categories",
+                                        name: "Categories",
+                                        children: [],
+                                    },
+                                    {
+                                        id: "testNavigationItem1",
+                                        url: "/testNavigationItem1",
+                                        name: "Test Navigation Item 1",
+                                        children: [],
+                                    },
+                                    {
+                                        id: "testNavigationItem2",
+                                        url: "/testNavigationItem2",
+                                        name: "Test Navigation Item 2",
+                                        children: [],
+                                    },
+                                    {
+                                        id: "testNavigationItem3",
+                                        url: "/testNavigationItem3",
+                                        name: "Test Navigation Item 3",
+                                        children: [],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    });
+    useEffect(() => {
+        TitleBarStatic.registerBeforeMeBox(() => {
+            return (
+                <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
+                    <>
+                        English
+                        <DownTriangleIcon />
+                    </>
+                </Button>
+            );
+        });
+
+        setMeta("context.conversationsEnabled", true);
+    }, []);
+
+    return (
+        <MemoryRouter>
+            <Provider store={getStore(initialState, true)}>
+                <ReduxThemeContextProvider>
+                    <CurrentUserContextProvider currentUser={makeMockRegisterUser}>
+                        <TitleBarDeviceProvider>
+                            <StoryFullPage>
+                                <StoryHeading>
+                                    If mebox section colides with nav items, titlebar will automatically switch to
+                                    compact view
+                                </StoryHeading>
+                                <TitleBar useMobileBackButton={false} isFixed={false} />
+                            </StoryFullPage>
+                        </TitleBarDeviceProvider>
+                    </CurrentUserContextProvider>
+                </ReduxThemeContextProvider>
+            </Provider>
+        </MemoryRouter>
+    );
+};
+
+TitleBarRegisteredUserWithManyNavigationItemsAndCenterAligned.story = {
+    name: "TitleBar With Many Navigation Items And Center Aligned",
+    parameters: {
+        chromatic: {
+            viewports: [oneColumnVariables().breakPoints.noBleed],
         },
     },
 };

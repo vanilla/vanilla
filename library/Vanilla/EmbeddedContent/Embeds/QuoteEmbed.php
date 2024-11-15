@@ -82,7 +82,7 @@ class QuoteEmbed extends AbstractEmbed
             $data["bodyRaw"] = json_encode($bodyRaw, JSON_UNESCAPED_UNICODE);
         }
 
-        // Due to security sentive nature of these they should always be rendered by the filterer.
+        // Due to security sensitive nature of these they should always be rendered by the filterer.
         $data["body"] = self::SECURE_UNRENDERED_MESSAGE;
         $userLabel = $data["insertUser"]["label"] ?? null;
         if ($userLabel !== null) {
@@ -93,7 +93,8 @@ class QuoteEmbed extends AbstractEmbed
     }
 
     /**
-     * Override to remove rawBody from output. It's unnecssary.
+     * Override to remove rawBody from output. It's unnecessary.
+     *
      * @inheritdoc
      */
     public function renderHtml(): string
@@ -160,5 +161,15 @@ class QuoteEmbed extends AbstractEmbed
             // Optional properties
             "category:o?" => ["categoryID", "name", "url"],
         ]);
+    }
+
+    /**
+     * Override quote embeds to not be cacheable.
+     *
+     * {@inheritDoc}
+     */
+    public function isCacheable(): bool
+    {
+        return false;
     }
 }

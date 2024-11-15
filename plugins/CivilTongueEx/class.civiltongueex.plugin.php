@@ -53,6 +53,7 @@ class CivilTonguePlugin extends Gdn_Plugin
      *
      * @param $sender
      * @param array $args
+     * @throws Gdn_UserException
      */
     public function pluginController_tongue_create($sender, $args = [])
     {
@@ -79,156 +80,6 @@ class CivilTonguePlugin extends Gdn_Plugin
     }
 
     /**
-     *
-     *
-     * @param $sender
-     * @param $args
-     */
-    public function profileController_render_before($sender, $args)
-    {
-        $this->activityController_render_before($sender, $args);
-        $this->discussionsController_render_before($sender, $args);
-    }
-
-    /**
-     * Clean up activities and activity comments.
-     *
-     * @param Gdn_Controller $sender
-     * @param array $args
-     */
-    public function activityController_render_before($sender, $args)
-    {
-        $user = val("User", $sender);
-        if ($user) {
-            setValue("About", $user, $this->replace(val("About", $user)));
-        }
-
-        if (isset($sender->Data["Activities"])) {
-            $activities = &$sender->Data["Activities"];
-            foreach ($activities as &$row) {
-                setValue("Story", $row, $this->replace(val("Story", $row)));
-
-                if (isset($row["Comments"])) {
-                    foreach ($row["Comments"] as &$comment) {
-                        $comment["Body"] = $this->replace($comment["Body"]);
-                    }
-                }
-
-                if (val("Headline", $row)) {
-                    $row["Headline"] = $this->replace($row["Headline"]);
-                }
-            }
-        }
-
-        // Reactions store their data in the Data key.
-        if (isset($sender->Data["Data"]) && is_array($sender->Data["Data"])) {
-            $data = &$sender->Data["Data"];
-            foreach ($data as &$row) {
-                if (!is_array($row) || !isset($row["Body"])) {
-                    continue;
-                }
-                setValue("Body", $row, $this->replace(val("Body", $row)));
-            }
-        }
-
-        $commentData = val("CommentData", $sender);
-        if ($commentData) {
-            $result = &$commentData->result();
-            foreach ($result as &$row) {
-                $value = $this->replace(val("Story", $row));
-                setValue("Story", $row, $value);
-
-                $value = $this->replace(val("DiscussionName", $row));
-                setValue("DiscussionName", $row, $value);
-
-                $value = $this->replace(val("Body", $row));
-                setValue("Body", $row, $value);
-            }
-        }
-
-        $comments = val("Comments", $sender->Data);
-        if ($comments) {
-            if (is_array($comments)) {
-                $result = $comments;
-            } elseif ($comments instanceof Gdn_DataSet) {
-                $result = &$comments->result();
-            } else {
-                $result = null;
-            }
-            if ($result) {
-                foreach ($result as &$row) {
-                    $value = $this->replace(val("Story", $row));
-                    setValue("Story", $row, $value);
-
-                    $value = $this->replace(val("DiscussionName", $row));
-                    setValue("DiscussionName", $row, $value);
-
-                    $value = $this->replace(val("Body", $row));
-                    setValue("Body", $row, $value);
-                }
-            }
-        }
-    }
-
-    /**
-     * Clean up the last title.
-     *
-     * @param CategoriesController $sender
-     */
-    public function categoriesController_render_before($sender)
-    {
-        $categoryTree = $sender->data("CategoryTree");
-        if ($categoryTree) {
-            $this->sanitizeCategories($categoryTree);
-            $sender->setData("CategoryTree", $categoryTree);
-        }
-
-        // When category layout is table.
-        $discussions = val("Discussions", $sender->Data, false);
-        if ($discussions) {
-            foreach ($discussions as &$discussion) {
-                $discussion->Name = $this->replace($discussion->Name);
-                $discussion->Body = $this->replace($discussion->Body);
-            }
-        }
-    }
-
-    /**
-     * Recursively replace the LastTitle field in a category tree.
-     *
-     * @param array $categories
-     */
-    protected function sanitizeCategories(array &$categories)
-    {
-        foreach ($categories as &$row) {
-            if (isset($row["LastTitle"])) {
-                $row["LastTitle"] = $this->replace($row["LastTitle"]);
-            }
-            if (!empty($row["Children"])) {
-                $this->sanitizeCategories($row["Children"]);
-            }
-        }
-    }
-
-    /**
-     * Cleanup discussions if category layout is Mixed
-     * @param $sender
-     * @param $args
-     */
-    public function categoriesController_discussions_render($sender, $args)
-    {
-        foreach ($sender->CategoryDiscussionData as $discussions) {
-            if (!$discussions instanceof Gdn_DataSet) {
-                continue;
-            }
-            $r = $discussions->result();
-            foreach ($r as &$row) {
-                setValue("Name", $row, $this->replace(val("Name", $row)));
-            }
-        }
-    }
-
-    /**
      * Censor words in /discussions
      *
      * @param DiscussionsController $sender
@@ -240,42 +91,8 @@ class CivilTonguePlugin extends Gdn_Plugin
             foreach ($discussions as &$discussion) {
                 $discussion->Name = $this->replace($discussion->Name);
                 $discussion->Body = $this->replace($discussion->Body);
+                $discussion->Category = $this->replace($discussion->Category);
             }
-        }
-    }
-
-    /**
-     * Censor words in discussions / comments.
-     *
-     * @param DiscussionController $sender Sending Controller.
-     * @param array $args Sending arguments.
-     */
-    public function discussionController_render_before($sender, $args)
-    {
-        // Process OP
-        $discussion = val("Discussion", $sender);
-        if ($discussion) {
-            $discussion->Name = $this->replace($discussion->Name);
-            if (isset($discussion->Body)) {
-                $discussion->Body = $this->replace($discussion->Body);
-            }
-        }
-        // Get comments (2.1+)
-        $comments = $sender->data("Comments");
-
-        // Backwards compatibility to 2.0.18
-        if (isset($sender->CommentData)) {
-            $comments = $sender->CommentData->result();
-        }
-
-        // Process comments
-        if ($comments) {
-            foreach ($comments as $comment) {
-                $comment->Body = $this->replace($comment->Body);
-            }
-        }
-        if (val("Title", $sender->Data)) {
-            $sender->Data["Title"] = $this->replace($sender->Data["Title"]);
         }
     }
 
@@ -353,23 +170,6 @@ class CivilTonguePlugin extends Gdn_Plugin
     }
 
     /**
-     * Cleanup Inform messages.
-     *
-     * @param $sender
-     * @param $args
-     */
-    public function notificationsController_informNotifications_handler($sender, $args)
-    {
-        $activities = val("Activities", $args);
-        foreach ($activities as $key => $activity) {
-            if (val("Headline", $activity)) {
-                $activity["Headline"] = $this->replace($activity["Headline"]);
-                $args["Activities"][$key]["Headline"] = $this->replace($args["Activities"][$key]["Headline"]);
-            }
-        }
-    }
-
-    /**
      * Cleanup Activity messages.
      *
      * @param ActivityModel $sender
@@ -405,23 +205,6 @@ class CivilTonguePlugin extends Gdn_Plugin
      * @param $args
      */
     public function messagesController_beforeMessagesAll_handler($sender, $args)
-    {
-        $conversations = val("Conversations", $args);
-        foreach ($conversations as $key => &$conversation) {
-            if (val("LastBody", $conversation)) {
-                $conversation["LastBody"] = $this->replace($conversation["LastBody"]);
-                $args["Conversations"][$key]["LastBody"] = $this->replace($args["Conversations"][$key]["LastBody"]);
-            }
-        }
-    }
-
-    /**
-     * Cleanup private messages displayed in the flyout.
-     *
-     * @param $sender
-     * @param $args
-     */
-    public function messagesController_beforeMessagesPopin_handler($sender, $args)
     {
         $conversations = val("Conversations", $args);
         foreach ($conversations as $key => &$conversation) {

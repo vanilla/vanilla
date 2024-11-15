@@ -64,6 +64,46 @@ paths:
                     description: Success
                 "403":
                     $ref: "#/components/responses/PermissionError"
+    /automation-rules/action-by-type:
+        x-hidden: true
+        get:
+            summary: Get meta data for a specific automation rule action.
+            tags:
+                - Automation Rules
+            parameters:
+                - name: type
+                  description: Filter by action type
+                  required: true
+                  in: query
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    actionType:
+                                        type: string
+                                        description: The type of the action
+                                    name:
+                                        type: string
+                                        description: The name of the action
+                                    actionTriggers:
+                                        type: array
+                                        description: The triggers for the action
+                                        items:
+                                            type: string
+                                    contentType:
+                                        type: string
+                                        description: The content type associated with the action
+                                    schema:
+                                        type: object
+                                        description: The schema for the action
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
     /automation-rules/recipes:
         x-hidden: true
         get:

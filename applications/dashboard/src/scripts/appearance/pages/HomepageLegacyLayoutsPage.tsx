@@ -6,7 +6,6 @@
 import {
     getLayoutFeatureFlagKey,
     getLayoutTypeGroupLabel,
-    getLayoutTypeLabel,
     getLayoutTypeSettingsLabel,
 } from "@dashboard/appearance/components/layoutViewUtils";
 import { LegacyLayoutFormPage } from "@dashboard/appearance/components/LegacyLayoutForm";

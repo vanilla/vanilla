@@ -52,6 +52,7 @@ export const tableClasses = () => {
     });
 
     const isSortHead = css({
+        paddingLeft: 0,
         color: ColorsUtils.colorOut(globalVars.mainColors.primary),
     });
 

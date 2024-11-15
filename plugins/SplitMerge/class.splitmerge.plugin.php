@@ -8,7 +8,11 @@
  */
 
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Forum\Models\DiscussionMergeModel;
 use Vanilla\Forum\Models\ForumAggregateModel;
+use Vanilla\Scheduler\LongRunnerFailedID;
+use Vanilla\Scheduler\LongRunnerSuccessID;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Class SplitMergePlugin
@@ -187,37 +191,37 @@ class SplitMergePlugin extends Gdn_Plugin
     /**
      * Add a method to the ModerationController to handle merging discussions.
      *
-     * @param moderationController $Sender
+     * @param ModerationController $controller
      *
      * @throws Gdn_UserException
      */
-    public function moderationController_mergeDiscussions_create($Sender)
+    public function moderationController_mergeDiscussions_create(ModerationController $controller)
     {
-        $Session = Gdn::session();
-        $Sender->Form = new Gdn_Form();
-        $Sender->title(t("Merge Discussions"));
+        $session = Gdn::session();
+        $controller->Form = new Gdn_Form();
+        $controller->title(t("Merge Discussions"));
 
-        $DiscussionModel = new DiscussionModel();
-        $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, "CheckedDiscussions", []);
-        if (!is_array($CheckedDiscussions)) {
-            $CheckedDiscussions = [];
+        $checkedDiscussions = Gdn::userModel()->getAttribute($session->User->UserID, "CheckedDiscussions", []);
+        if (!is_array($checkedDiscussions)) {
+            $checkedDiscussions = [];
         }
 
-        $DiscussionIDs = $CheckedDiscussions;
-        $CountCheckedDiscussions = count($DiscussionIDs);
-        $Discussions = $DiscussionModel->SQL
-            ->whereIn("DiscussionID", $DiscussionIDs)
+        $discussionIDs = $checkedDiscussions;
+        $countCheckedDiscussions = count($discussionIDs);
+        $discussions = \Gdn::database()
+            ->createSql()
+            ->where("DiscussionID", $discussionIDs)
             ->get("Discussion")
             ->resultArray();
 
         // Make sure none of the selected discussions are ghost redirects.
-        $discussionTypes = array_column($Discussions, "Type");
+        $discussionTypes = array_column($discussions, "Type");
         if (in_array("redirect", $discussionTypes)) {
             throw new Gdn_UserException("You cannot merge redirects.", 400);
         }
 
         // Check that the user has permission to edit all discussions
-        foreach ($Discussions as $discussion) {
+        foreach ($discussions as $discussion) {
             if (!DiscussionModel::canEdit($discussion)) {
                 throw permissionException(
                     "@" . t("You do not have permission to edit all of the posts you are trying to merge.")
@@ -225,129 +229,65 @@ class SplitMergePlugin extends Gdn_Plugin
             }
         }
 
-        $Sender->setData("DiscussionIDs", $DiscussionIDs);
-        $Sender->setData("CountCheckedDiscussions", $CountCheckedDiscussions);
-        $Sender->setData("Discussions", $Discussions);
+        $controller->setData("DiscussionIDs", $discussionIDs);
+        $controller->setData("CountCheckedDiscussions", $countCheckedDiscussions);
+        $controller->setData("Discussions", $discussions);
 
         // Perform the merge
-        if ($Sender->Form->authenticatedPostBack()) {
-            // Create a new discussion record
-            $MergeDiscussion = false;
-            $MergeDiscussionID = $Sender->Form->getFormValue("MergeDiscussionID");
-            foreach ($Discussions as $Discussion) {
-                if ($Discussion["DiscussionID"] == $MergeDiscussionID) {
-                    $MergeDiscussion = $Discussion;
-                    break;
+        if ($controller->Form->authenticatedPostBack()) {
+            $shouldRedirect = $controller->Form->getFormValue("RedirectLink");
+            $discussionMergeModel = \Gdn::getContainer()->get(DiscussionMergeModel::class);
+            $mergeDiscussionID = $controller->Form->getFormValue(
+                "MergeDiscussionID",
+                $discussions[0]["DiscussionID"] ?? null
+            );
+            if ($mergeDiscussionID === null) {
+                throw new Gdn_UserException("No discussion ID provided to merge into.", 400);
+            }
+
+            // Because this is a legacy controller we can't actually run this long runner normally.
+            // Instead we'll just consume the generator here.
+            $iterator = $discussionMergeModel->mergeDiscussionsIterator(
+                $discussionIDs,
+                $mergeDiscussionID,
+                addRedirects: $shouldRedirect
+            );
+            $errorMessages = "";
+
+            foreach ($iterator as $result) {
+                if ($result instanceof LongRunnerSuccessID) {
+                    $successDiscussionID = (int) $result->getRecordID();
+                    $checkedDiscussions = $newCheckedIDs = array_filter(
+                        $checkedDiscussions,
+                        fn($id) => $id != $successDiscussionID
+                    );
+                    Gdn::userModel()->saveAttribute($session->UserID, "CheckedDiscussions", $newCheckedIDs);
+                } elseif ($result instanceof LongRunnerFailedID) {
+                    $errorMessages .= $result->getException()->getMessage() . "\n";
                 }
             }
-            $RedirectLink = $Sender->Form->getFormValue("RedirectLink");
 
-            if ($MergeDiscussion) {
-                $ErrorCount = 0;
+            ModerationController::informCheckedDiscussions($controller);
 
-                // Verify that the user has permission to perform the merge.
-                $Category = CategoryModel::categories($MergeDiscussion["CategoryID"]);
-                if ($Category && !$Category["PermsDiscussionsEdit"]) {
-                    throw permissionException("Vanilla.Discussions.Edit");
-                }
-
-                $DiscussionModel->defineSchema();
-                $MaxNameLength = val("Length", $DiscussionModel->Schema->getField("Name"));
-
-                // Assign the comments to the new discussion record
-                $DiscussionModel->SQL
-                    ->update("Comment")
-                    ->set("DiscussionID", $MergeDiscussionID)
-                    ->whereIn("DiscussionID", $DiscussionIDs)
-                    ->put();
-
-                $CommentModel = new CommentModel();
-                foreach ($Discussions as $Discussion) {
-                    if ($Discussion["DiscussionID"] == $MergeDiscussionID) {
-                        continue;
-                    }
-
-                    // Create a comment out of the discussion.
-                    $Comment = arrayTranslate($Discussion, [
-                        "Body",
-                        "Format",
-                        "DateInserted",
-                        "InsertUserID",
-                        "InsertIPAddress",
-                        "DateUpdated",
-                        "UpdateUserID",
-                        "UpdateIPAddress",
-                        "Attributes",
-                        "Spam",
-                        "Likes",
-                        "Abuse",
-                    ]);
-                    $Comment["DiscussionID"] = $MergeDiscussionID;
-
-                    $CommentModel->Validation->results(true);
-                    $CommentID = $CommentModel->save($Comment);
-                    if ($CommentID) {
-                        $Comment["CommentID"] = $CommentID;
-                        $this->EventArguments["SourceDiscussion"] = $Discussion;
-                        $this->EventArguments["DestinationDiscussion"] = $MergeDiscussion;
-                        $this->EventArguments["TargetComment"] = $Comment;
-                        $this->fireEvent("TransformDiscussionToComment");
-
-                        // Dispatch a Discussion event (merge)
-                        $senderUserID = Gdn::session()->UserID;
-                        $sender = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
-                        $discussion = $DiscussionModel->getID($Discussion["DiscussionID"], DATASET_TYPE_ARRAY);
-                        $discussionEvent = $DiscussionModel->eventFromRow(
-                            $discussion,
-                            DiscussionEvent::ACTION_MERGE,
-                            $sender
-                        );
-                        $discussionEvent->setDestinationDiscussionID($MergeDiscussionID);
-                        $DiscussionModel->getEventManager()->dispatch($discussionEvent);
-
-                        if ($RedirectLink) {
-                            // The discussion needs to be changed to a moved link.
-                            $RedirectDiscussion = [
-                                "Name" => sliceString(sprintf(t("Merged: %s"), $Discussion["Name"]), $MaxNameLength),
-                                "Type" => "redirect",
-                                "Body" => formatString(t('This discussion has been <a href="{url,html}">merged</a>.'), [
-                                    "url" => discussionUrl($MergeDiscussion),
-                                ]),
-                                "Format" => "Html",
-                            ];
-                            $DiscussionModel->setField($Discussion["DiscussionID"], $RedirectDiscussion);
-                            $this->aggregateModel()->recalculateDiscussionAggregates($Discussion);
-                        } else {
-                            // Delete discussion that was merged.
-                            $DiscussionModel->deleteID($Discussion["DiscussionID"]);
-                        }
-                    } else {
-                        $Sender->informMessage($CommentModel->Validation->resultsText());
-                        $ErrorCount++;
-                    }
-                }
-                // Update counts on all affected discussions.
-                $this->aggregateModel()->recalculateDiscussionAggregates($MergeDiscussion);
-
-                // Clear selections
-                Gdn::userModel()->saveAttribute($Session->UserID, "CheckedDiscussions", []);
-                ModerationController::informCheckedDiscussions($Sender);
-                if ($ErrorCount == 0) {
-                    $Sender->jsonTarget("", "", "Refresh");
-                }
+            if (empty($errorMessages)) {
+                Gdn::userModel()->saveAttribute($session->UserID, "CheckedDiscussions", []);
+                $controller->jsonTarget("", "", "Refresh");
+            } else {
+                $controller->informMessage($errorMessages);
             }
         }
 
-        $Sender->render("MergeDiscussions", "", "plugins/SplitMerge");
+        $controller->render("MergeDiscussions", "", "plugins/SplitMerge");
     }
 
     /**
      * Add "redirect" to allowed discussion types when moving discussions.
      *
+     * @param $destinationCategory
      * @param $allowedDiscussions
      * @return mixed
      */
-    public function discussionModel_moveAllowedTypes($allowedDiscussions)
+    public function discussionModel_moveAllowedTypes($allowedDiscussions, $destinationCategory)
     {
         // If the array is empty or null, the default is to allow all types. We don't
         // want to interfere with that.

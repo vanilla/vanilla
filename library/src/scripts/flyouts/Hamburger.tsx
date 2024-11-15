@@ -27,6 +27,7 @@ import { PermissionChecker } from "@library/features/users/Permission";
 interface IProps {
     className?: string;
     extraNavTop?: React.ReactNode;
+    extraNavAfterDynamicComponents?: React.ReactNode;
     extraNavBottom?: React.ReactNode;
     showCloseIcon?: boolean;
     navigationItems?: INavigationVariableItem[];
@@ -101,8 +102,8 @@ export default function Hamburger(props: IProps) {
                 <div className={classes.container}>
                     <SiteNavigation onClose={() => setIsOpen(false)} navigationItems={props.navigationItems} />
                     <MobileOnlyNavigation />
-                    {props.extraNavTop}
                     {widgetComponents}
+                    {props.extraNavAfterDynamicComponents}
                     {props.extraNavBottom}
                     {extraNavGroups.map((GroupComponent, i) => (
                         <GroupComponent key={i} />

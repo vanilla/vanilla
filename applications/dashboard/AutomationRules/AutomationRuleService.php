@@ -23,6 +23,9 @@ class AutomationRuleService
 
     private EscalationRuleService $escalationRuleService;
 
+    /**
+     * Constructor
+     */
     public function __construct(EscalationRuleService $escalationRuleService)
     {
         $this->escalationRuleService = $escalationRuleService;

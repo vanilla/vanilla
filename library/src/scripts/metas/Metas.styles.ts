@@ -4,7 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";

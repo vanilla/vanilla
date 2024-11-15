@@ -25,7 +25,7 @@ export function AutomationRulesActions(props: { isEscalationRulesMode?: boolean;
 
     return (
         <div className={cx(classes.flexContainer(), classes.noOverflow)}>
-            <ToolTip label={t("View History")}>
+            <ToolTip label={t("View History")} customWidth={40}>
                 <span>
                     <LinkAsButton
                         to={`/settings/automation-rules/history?automationRuleID=${automationRule.automationRuleID}`}
@@ -36,7 +36,7 @@ export function AutomationRulesActions(props: { isEscalationRulesMode?: boolean;
                     </LinkAsButton>
                 </span>
             </ToolTip>
-            <ToolTip label={t("Edit Rule")}>
+            <ToolTip label={t("Edit Rule")} customWidth={40}>
                 <span>
                     <LinkAsButton
                         to={
@@ -53,6 +53,7 @@ export function AutomationRulesActions(props: { isEscalationRulesMode?: boolean;
             </ToolTip>
             <ToolTip
                 label={dispatchStatusIsPending ? t("Rule may not be deleted while it is running") : t("Delete Rule")}
+                customWidth={40}
             >
                 <span>
                     <AutomationRulesDeleteRule asActionButtonInTable {...automationRule} />

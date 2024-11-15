@@ -42,14 +42,13 @@ export const pageHeadingClasses = useThemeCache(() => {
         display: "flex",
         width: percent(100),
         lineHeight: vars.font.lineHeight,
-        alignItems: "center",
+        alignItems: "start",
     });
 
     const main = css({
         display: "flex",
         flexWrap: "nowrap",
         position: "relative",
-        width: percent(100),
         flexGrow: 1,
     });
 

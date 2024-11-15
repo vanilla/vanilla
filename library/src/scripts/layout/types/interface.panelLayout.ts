@@ -1,4 +1,4 @@
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { IThreeColumnMediaQueries, IThreeColumnMediaQueryStyles } from "@library/layout/types/interface.threeColumns";
 import {
     ITwoColumnMediaQueries,

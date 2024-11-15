@@ -6,14 +6,19 @@
 import { useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hooks";
 import { ProfileField } from "@dashboard/userProfiles/types/UserProfiles.types";
 import React, { ReactNode, useContext, useMemo, useState } from "react";
-import { IAutomationRulesCatalog, IAutomationRule, AutomationRulesAdditionalDataQuery } from "./AutomationRules.types";
+import {
+    IAutomationRulesCatalog,
+    IAutomationRule,
+    AutomationRulesAdditionalDataQuery,
+    DataFromOptionalSource,
+} from "@dashboard/automationRules/AutomationRules.types";
 import { useAutomationRulesCatalog, useGetAdditionalData } from "@dashboard/automationRules/AutomationRules.hooks";
 import { useRoles } from "@dashboard/roles/roleHooks";
 import { IRole } from "@dashboard/roles/roleTypes";
-import { IGetCategoryListParams, useCategoryList } from "@library/categoriesWidget/CategoryList.hooks";
+import { useCategoryList } from "@library/categoriesWidget/CategoryList.hooks";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { ITag } from "@library/features/tags/TagsReducer";
-import { IGetTagsParams, useTagList } from "@library/features/tags/TagsHooks";
+import { useTagList } from "@library/features/tags/TagsHooks";
 import { ICollection } from "@library/featuredCollections/Collections.variables";
 import { useCollectionList } from "@library/featuredCollections/collectionsHooks";
 import { useStatusOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
@@ -33,7 +38,9 @@ export interface IAutomationRulesContext {
     users?: IUser[];
     initialOrderedRulesIDs?: Array<IAutomationRule["automationRuleID"]>;
     setInitialOrderedRulesIDs?: (initialOrderedRulesIDs: Array<IAutomationRule["automationRuleID"]>) => void;
-    setAdditionalDataQuery?: (query?: { categoriesQuery?: IGetCategoryListParams; tagsQuery?: IGetTagsParams }) => void;
+    setAdditionalDataQuery?: (query?: AutomationRulesAdditionalDataQuery) => void;
+    optionalDataSources?: Record<string, DataFromOptionalSource>;
+    updateOptionalDataSources?: (dataSourceType: string, newData: DataFromOptionalSource["data"]) => void;
 }
 
 /**
@@ -51,7 +58,18 @@ export const AutomationRulesContext = React.createContext<IAutomationRulesContex
     initialOrderedRulesIDs: undefined,
     setInitialOrderedRulesIDs: () => {},
     setAdditionalDataQuery: () => {},
+    optionalDataSources: undefined,
+    updateOptionalDataSources: () => {},
 });
+
+/**
+ * This is responsible for adding additional data and data-fetcher optional sources, e.g. groups, can be enabled or not
+ */
+
+let dataFromOptionalSource: Record<string, DataFromOptionalSource> = {};
+AutomationRulesProvider.addDataFromOptionalSource = (dataSourceType: string, data: DataFromOptionalSource) => {
+    dataFromOptionalSource[dataSourceType] = data;
+};
 
 export function AutomationRulesProvider(props: { children: ReactNode; isEscalationRulesMode?: boolean }) {
     const categoriesData = useCategoryList({ limit: 500 });
@@ -63,10 +81,14 @@ export function AutomationRulesProvider(props: { children: ReactNode; isEscalati
     const discussionStatusesData = useStatusOptions();
     const usersData = useGetUsers({ limit: 500 });
 
-    //store initial rules list order
+    // store initial rules list order
     const [initialOrderedRulesIDs, setInitialOrderedRulesIDs] = useState<Array<IAutomationRule["automationRuleID"]>>(
         [],
     );
+
+    // store optional data sources
+    const [optionalDataSources, setOptionalDataSources] =
+        useState<Record<string, DataFromOptionalSource>>(dataFromOptionalSource);
 
     // these two are used to fetch and append additional data to initial list, in case there are more prefetched 500
     const [additionalDataQuery, setAdditionalDataQuery] = useState<AutomationRulesAdditionalDataQuery | undefined>();
@@ -85,7 +107,7 @@ export function AutomationRulesProvider(props: { children: ReactNode; isEscalati
     }, [rolesData]);
 
     const categories = useMemo(() => {
-        return categoriesData.data;
+        return categoriesData.data?.result;
     }, [categoriesData]);
 
     const tags = useMemo(() => {
@@ -123,6 +145,16 @@ export function AutomationRulesProvider(props: { children: ReactNode; isEscalati
                 initialOrderedRulesIDs: initialOrderedRulesIDs,
                 setInitialOrderedRulesIDs: setInitialOrderedRulesIDs,
                 setAdditionalDataQuery: setAdditionalDataQuery,
+                optionalDataSources: optionalDataSources,
+                updateOptionalDataSources: (dataSourceType: string, newData: DataFromOptionalSource["data"]) => {
+                    setOptionalDataSources({
+                        ...optionalDataSources,
+                        [dataSourceType]: {
+                            ...optionalDataSources[dataSourceType],
+                            data: [...optionalDataSources[dataSourceType].data, ...newData],
+                        },
+                    });
+                },
             }}
         >
             {props.children}

@@ -25,12 +25,18 @@ const AttachmentLayoutClasses = useThemeCache(() => {
             style: "solid",
         }),
         display: "flex",
-
+        ...Mixins.background({
+            color: globalVars.mainColors.bg,
+        }),
         lineHeight: globalVars.lineHeights.base,
 
         ...Mixins.margin({
-            bottom: globalVars.gutter.size,
+            bottom: globalVars.gutter.size / 2,
         }),
+
+        "&:last-child": {
+            marginBottom: 0,
+        },
 
         ...(wrap && {
             flexWrap: "wrap",
@@ -112,7 +118,7 @@ const AttachmentLayoutClasses = useThemeCache(() => {
     });
 
     const inlineMetas = css({
-        display: "inline-flex",
+        display: "inline-flex !important",
         flexBasis: "content",
     });
 
@@ -204,6 +210,13 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         marginRight: 16,
     });
 
+    const aiEscalationMetaIcon = css({
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px",
+        marginInlineStart: "6px",
+    });
+
     return {
         root,
         logoSection,
@@ -227,6 +240,7 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         userMetaValue,
         tokens,
         attchmentTypeWrapper,
+        aiEscalationMetaIcon,
     };
 });
 

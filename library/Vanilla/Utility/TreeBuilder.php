@@ -205,6 +205,9 @@ final class TreeBuilder
 
             $this->sortRecords($missing);
             $result = array_merge($result, $missing);
+
+            // One final sort to make sure unreachable nodes with the same parent as previously found nodes are sorted together.
+            $this->sortRecordsWithCommonParents($result);
         }
 
         return $result;
@@ -265,5 +268,23 @@ final class TreeBuilder
             uasort($records, $this->sorter);
             $records = array_values($records);
         }
+    }
+
+    /**
+     * This is called by `buildTree()` when we are adding unreachable nodes. When we have an unreachable node with children, that node is
+     * considered "seen" and placed in the resulting tree root first. Then all other unreachable nodes are added at the end of the root.
+     * This function makes sure that unreachable nodes that share a parent with nodes that have children are sorted together.
+     *
+     * @param array $records
+     * @return void
+     */
+    private function sortRecordsWithCommonParents(array &$records): void
+    {
+        // Group records by common parents and then sort each group.
+        $records = ArrayUtils::arrayColumnArrays($records, null, $this->parentIDFieldName);
+        array_walk($records, [$this, "sortRecords"]);
+
+        // Unpack groups back to original array format.
+        $records = array_merge(...array_values($records));
     }
 }

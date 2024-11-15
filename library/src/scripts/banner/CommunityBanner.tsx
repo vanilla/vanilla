@@ -8,7 +8,8 @@ import React, { useLayoutEffect, useMemo } from "react";
 import Banner from "@library/banner/Banner";
 import { MemoryRouter } from "react-router";
 import { bannerVariables } from "@library/banner/Banner.variables";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { NoDescription } from "@library/banner/banner.story";
 

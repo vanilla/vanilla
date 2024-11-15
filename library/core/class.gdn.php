@@ -700,6 +700,7 @@ class Gdn
         self::$_Request = null;
         self::$_PluginManager = null;
         self::$_Session = null;
+        self::$controller = null;
     }
 
     /**

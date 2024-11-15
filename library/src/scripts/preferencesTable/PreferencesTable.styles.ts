@@ -4,7 +4,8 @@
  * @license Proprietary
  */
 
-import { CSSObject, css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
+import { css } from "@emotion/css";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";

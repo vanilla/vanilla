@@ -39,7 +39,7 @@ export function QuickLinksView(props: IProps) {
     return (
         <Widget className={classes.root}>
             <PageHeadingBox
-                title={title}
+                title={title ?? ""}
                 options={{
                     alignment: props.containerOptions?.headerAlignment,
                 }}

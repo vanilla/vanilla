@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 import { ColorPicker } from "@dashboard/components/ColorPicker";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { cx } from "@emotion/css";
 import InputBlock from "@library/forms/InputBlock";
@@ -22,10 +23,9 @@ interface IProps {
 
 export function DashboardColorPicker(props: IProps) {
     const dashboardClassNames = dashboardClasses();
-    const classes = inputBlockClasses();
     const inputClassNames = inputClasses();
     return (
-        <div className="input-wrap">
+        <DashboardInputWrap>
             <InputBlock noMargin>
                 <ColorPicker
                     inputClassName={cx(inputClassNames.inputText, dashboardClassNames.colorInput)}
@@ -33,6 +33,6 @@ export function DashboardColorPicker(props: IProps) {
                     {...props}
                 />
             </InputBlock>
-        </div>
+        </DashboardInputWrap>
     );
 }

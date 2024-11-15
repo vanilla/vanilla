@@ -97,6 +97,14 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function clear(): void
+    {
+        $this->trackingSlips = [];
+    }
+
+    /**
      * Add a Driver to the Scheduler
      *
      * @param string $driverType

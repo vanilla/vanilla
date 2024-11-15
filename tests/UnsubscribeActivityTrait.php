@@ -8,6 +8,7 @@
 namespace VanillaTests;
 
 use ActivityModel;
+use Exception;
 use PHPUnit\Framework\Assert;
 use UserModel;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -63,6 +64,7 @@ trait UnsubscribeActivityTrait
      * @param $activityUserID
      * @param $notifyUserID
      * @return void
+     * @throws Exception
      */
     public function unsubscribeActivityTest($activityName, $activityUserID, $notifyUserID): void
     {

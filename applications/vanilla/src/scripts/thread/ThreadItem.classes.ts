@@ -12,6 +12,11 @@ import { useThemeCache } from "@library/styles/themeCache";
 const ThreadItemClasses = useThemeCache((headerHasUserPhoto = false) => {
     const globalVars = globalVariables();
 
+    const threadItemContainer = css({
+        position: "relative",
+        container: "threadItemContainer / inline-size",
+    });
+
     const userContent = css({
         ...Mixins.padding({
             top: headerHasUserPhoto ? 12 : 2,
@@ -27,10 +32,37 @@ const ThreadItemClasses = useThemeCache((headerHasUserPhoto = false) => {
         },
     });
 
+    const footerWrapper = css({
+        display: "flex",
+        width: "100%",
+        alignItems: "center",
+        gap: 16,
+        "@container threadItemContainer (width < 516px)": {
+            display: "grid",
+            gridTemplateColumns: "1fr 50px",
+            gridTemplateRows: "repeat(2, auto)",
+        },
+
+        marginBlockStart: globalVars.gutter.size,
+        marginInlineEnd: 10,
+    });
+
+    const replyButton = css({
+        alignSelf: "end",
+        justifySelf: "end",
+        "@container threadItemContainer (width < 516px)": {
+            gridColumn: "2 /3",
+            gridRow: "2 / 3",
+        },
+    });
+
     return {
+        threadItemContainer,
         userContent,
         resultWrapper,
         attachmentsContentWrapper,
+        replyButton,
+        footerWrapper,
     };
 });
 

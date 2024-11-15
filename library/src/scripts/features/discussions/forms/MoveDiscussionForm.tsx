@@ -34,14 +34,14 @@ type FormValues = {
     addRedirects: boolean;
 };
 
-interface IProps {
+export interface MoveDiscussionFormProps {
     onCancel: () => void;
     onSuccess?: () => Promise<void>;
     isLoading?: boolean;
     discussion: IDiscussion;
 }
 
-export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: IProps) {
+export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: MoveDiscussionFormProps) {
     const [moveIsTriggered, setMoveIsTriggered] = useState<boolean>(false);
 
     const toast = useToast();

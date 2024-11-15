@@ -10,7 +10,7 @@
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Formatting\Formats\HtmlFormat;
-use Vanilla\Formatting\Html\HtmlSanitizer;
+use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SiteSectionModel;
 
@@ -267,6 +267,7 @@ class CategoriesController extends VanillaController
                 $categoryIdentifier = "";
             }
         }
+
         return [$categoryIdentifier, $page];
     }
 
@@ -357,15 +358,19 @@ class CategoriesController extends VanillaController
             $this->permission("Vanilla.Discussions.View", true, "Category", val("PermissionCategoryID", $category));
 
             Gdn_Theme::section($category->CssClass);
-
+            $category->Name = Gdn::formatService()->renderPlainText(val("Name", $category, ""), TextFormat::FORMAT_KEY);
             // Load the breadcrumbs.
             $this->setData("Breadcrumbs", CategoryModel::getAncestors(val("CategoryID", $category)));
 
-            $this->setData("Category", $category, true);
-
-            $this->title(Gdn::formatService()->renderPlainText(val("Name", $category, ""), HtmlFormat::FORMAT_KEY));
-
+            $this->title($category->Name);
+            if (!empty($category->Description)) {
+                $category->Description = Gdn::formatService()->renderPlainText(
+                    $category->Description,
+                    TextFormat::FORMAT_KEY
+                );
+            }
             $this->description(val("Description", $category), false);
+            $this->setData("Category", $category, true);
 
             switch ($category->DisplayAs) {
                 case "Flat":
@@ -619,6 +624,10 @@ class CategoriesController extends VanillaController
             );
         }
 
+        foreach ($categoryTree as &$category) {
+            $this->CategoryModel->fixRow($category);
+        }
+
         $this->setData("CategoryTree", $categoryTree);
 
         // Add modules
@@ -691,6 +700,10 @@ class CategoriesController extends VanillaController
             $Categories = $this->CategoryModel->getFull()->resultArray();
         }
 
+        foreach ($Categories as &$category) {
+            $this->CategoryModel->fixRow($category);
+        }
+
         $this->setData("Categories", $Categories);
 
         // Get category data and discussions
@@ -727,6 +740,9 @@ class CategoriesController extends VanillaController
 
                 $Discussions = array_merge($Discussions, $categoryDiscussions);
             }
+        }
+        foreach ($Discussions as &$discussion) {
+            $discussion->Name = Gdn::formatService()->renderPlainText($discussion->Name, HtmlFormat::FORMAT_KEY);
         }
         $this->setData("Discussions", $Discussions);
 

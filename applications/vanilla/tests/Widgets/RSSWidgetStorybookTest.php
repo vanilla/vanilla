@@ -88,6 +88,8 @@ class RSSWidgetStorybookTest extends StorybookGenerationTestCase
                 "to" => "https://someplace.com",
                 "name" => "See All",
             ],
+            "headerAlignment" => "left",
+            "visualBackgroundType" => "inner",
         ];
         $spec = [
             '$hydrate' => "react.rss",

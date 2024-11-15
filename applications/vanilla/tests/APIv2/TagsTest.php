@@ -88,6 +88,57 @@ class TagsTest extends AbstractResourceTest
     }
 
     /**
+     * Verify ability to sort tags.
+     */
+    public function testIndexSort(): void
+    {
+        $indexUrl = $this->indexUrl();
+        $rows = $this->api()
+            ->get($indexUrl)
+            ->getBody();
+
+        /** @var \TagModel $tagModel */
+        $tagModel = \Gdn::getContainer()->get(\TagModel::class);
+        for ($i = 0; $i < count($rows); $i++) {
+            $tagModel->setField($rows[$i]["tagID"], "CountDiscussions", rand(1, 5));
+        }
+
+        $updatedRows = $this->api()
+            ->get($indexUrl)
+            ->getBody();
+        $updatedRows = array_column($updatedRows, "countDiscussions");
+        rsort($updatedRows);
+
+        $result = $this->api()->get($indexUrl, ["sort" => "-countDiscussions"]);
+        $resultRows = $result->getBody();
+
+        $this->assertSame(array_column($resultRows, "countDiscussions"), $updatedRows);
+    }
+
+    /**
+     * Test Index filtering user tags by name
+     *
+     * @return void
+     */
+    public function testIndexSortName(): void
+    {
+        $indexUrl = $this->indexUrl();
+        $expectedAscending = ["random", "tag1", "tag2", "tag3"];
+        $expectedDescending = ["tag3", "tag2", "tag1", "random"];
+
+        $records = $this->api()
+            ->get($indexUrl, ["type" => "User", "sort" => "name"])
+            ->getBody();
+        $sortedNames = array_column($records, "name");
+        $this->assertSame($expectedAscending, $sortedNames);
+
+        $records = $this->api()
+            ->get($indexUrl, ["type" => "User", "sort" => "-name"])
+            ->getBody();
+        $this->assertSame($expectedDescending, array_column($records, "name"));
+    }
+
+    /**
      * Test GET /tags endpoint.
      */
     public function testGetTags()
@@ -158,6 +209,18 @@ class TagsTest extends AbstractResourceTest
         $this->expectExceptionCode(409);
         $this->expectExceptionMessage("A tag with this name already exists.");
         $this->api()->post($this->baseUrl, ["name" => $tagToDuplicate["name"]]);
+    }
+
+    /**
+     * Test getting an error when posting tag with invalid urlCode.
+     */
+    public function testPostWithInvalidUrlCode()
+    {
+        $this->expectExceptionCode(400);
+        $this->expectExceptionMessage("The Url Slug may only contain alphanumeric characters and hyphens.");
+        $this->api()
+            ->post($this->baseUrl, $this->record(["urlCode" => "CapitalName"]))
+            ->getBody();
     }
 
     /**
@@ -309,34 +372,6 @@ class TagsTest extends AbstractResourceTest
             ])
             ->getBody();
         $this->assertCount($tagsWithDiscussionCounts, $result);
-    }
-
-    /**
-     * Verify ability to sort tags.
-     */
-    public function testIndexSort(): void
-    {
-        $indexUrl = $this->indexUrl();
-        $rows = $this->api()
-            ->get($indexUrl)
-            ->getBody();
-
-        /** @var \TagModel $tagModel */
-        $tagModel = \Gdn::getContainer()->get(\TagModel::class);
-        for ($i = 0; $i < count($rows); $i++) {
-            $tagModel->setField($rows[$i]["tagID"], "CountDiscussions", rand(1, 5));
-        }
-
-        $updatedRows = $this->api()
-            ->get($indexUrl)
-            ->getBody();
-        $updatedRows = array_column($updatedRows, "countDiscussions");
-        rsort($updatedRows);
-
-        $result = $this->api()->get($indexUrl, ["sort" => "countDiscussions"]);
-        $resultRows = $result->getBody();
-
-        $this->assertSame(array_column($resultRows, "countDiscussions"), $updatedRows);
     }
 
     /**

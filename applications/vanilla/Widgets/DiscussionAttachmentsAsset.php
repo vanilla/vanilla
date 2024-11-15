@@ -12,12 +12,14 @@ use Vanilla\Http\InternalClient;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
+use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\TwigRenderTrait;
+use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 class DiscussionAttachmentsAsset extends AbstractLayoutAsset implements HydrateAwareInterface
 {
     use HydrateAwareTrait;
-    use TwigRenderTrait;
+    use HomeWidgetContainerSchemaTrait;
 
     /** @var InternalClient */
     private InternalClient $internalClient;
@@ -55,7 +57,12 @@ class DiscussionAttachmentsAsset extends AbstractLayoutAsset implements HydrateA
 
     public static function getWidgetSchema(): Schema
     {
-        return Schema::parse([]);
+        return SchemaUtils::composeSchemas(
+            self::widgetTitleSchema(allowDynamic: false),
+            self::widgetSubtitleSchema("subtitle"),
+            self::widgetDescriptionSchema(allowDynamic: false),
+            self::containerOptionsSchema("containerOptions", minimalProperties: true, visualBackgroundType: "outer")
+        );
     }
 
     public static function getWidgetName(): string

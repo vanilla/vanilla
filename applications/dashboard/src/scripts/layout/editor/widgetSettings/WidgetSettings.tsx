@@ -3,8 +3,9 @@
  * @license gpl-2.0-only
  */
 
-import React from "react";
-import { DashboardFormControlGroup, DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import React, { useEffect } from "react";
+import { DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
+import { DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControlGroup";
 import { widgetSettingsClasses } from "@dashboard/layout/editor/widgetSettings/WidgetSettings.classes";
 import { IWidgetConfigurationComponentProps } from "@dashboard/layout/editor/widgetSettings/WidgetSettingsModal";
 import WidgetSettingsFormGroupWrapper from "@dashboard/layout/editor/widgetSettings/WidgetSettingsFormGroupWrapper";
@@ -17,6 +18,7 @@ import {
     widgetsSchemaTransformer,
     showDisplayOptions,
 } from "@dashboard/layout/editor/widgetSettings/WidgetSchemaTransformer";
+import { DashboardFormStyleContext } from "@dashboard/forms/DashboardFormStyleContext";
 
 interface IProps extends IWidgetConfigurationComponentProps {
     fieldErrors?: Record<string, IFieldError[]>;
@@ -49,23 +51,34 @@ export function WidgetSettings(props: IProps) {
         );
     };
 
+    /**
+     * Call onChange when the value changes because the transformer can update
+     * more fields than just the one that the user has interacted with for
+     * dynamic titles and descriptions.
+     */
+    useEffect(() => {
+        props.onChange(() => value);
+    }, [value]);
+
     return (
         <div className={classes.settings}>
             <h3 className={classes.settingsHeader}>{t("Widget Options")}</h3>
-            <JsonSchemaForm
-                FormControlGroup={DashboardFormControlGroup}
-                FormControl={(props) =>
-                    DashboardFormControl(props, [QUICK_LINKS_LIST_AS_MODAL, TABS_AS_MODAL, SITE_TOTALS_AS_MODAL])
-                }
-                FormGroupWrapper={formGroupWrapper}
-                schema={transformedSchema}
-                instance={value}
-                onChange={props.onChange}
-                hideDescriptionInLabels
-                size="small"
-                autocompleteClassName={classes.autocompleteContainer}
-                fieldErrors={props.fieldErrors}
-            />
+            <DashboardFormStyleContext.Provider value={{ compact: true }}>
+                <JsonSchemaForm
+                    FormControlGroup={DashboardFormControlGroup}
+                    FormControl={(props) =>
+                        DashboardFormControl(props, [QUICK_LINKS_LIST_AS_MODAL, TABS_AS_MODAL, SITE_TOTALS_AS_MODAL])
+                    }
+                    FormGroupWrapper={formGroupWrapper}
+                    schema={transformedSchema}
+                    instance={value}
+                    onChange={props.onChange}
+                    hideDescriptionInLabels
+                    size="small"
+                    autocompleteClassName={classes.autocompleteContainer}
+                    fieldErrors={props.fieldErrors}
+                />
+            </DashboardFormStyleContext.Provider>
         </div>
     );
 }

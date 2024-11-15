@@ -1,12 +1,13 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\APIv2;
 
+use DiscussionModel;
 use Garden\Web\Exception\ClientException;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
@@ -25,7 +26,7 @@ class DiscussionApiStatusTest extends SiteTestCase
 
     public static $addons = ["QnA"];
 
-    /** @var \DiscussionModel */
+    /** @var DiscussionModel */
     private $discussionModel;
 
     /** @var RecordStatusModel */
@@ -40,7 +41,7 @@ class DiscussionApiStatusTest extends SiteTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->discussionModel = self::container()->get(\DiscussionModel::class);
+        $this->discussionModel = self::container()->get(DiscussionModel::class);
         $this->recordStatusModel = static::container()->get(RecordStatusModel::class);
     }
 

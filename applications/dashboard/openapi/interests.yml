@@ -194,6 +194,58 @@ paths:
                     description: Not Found
                 "500":
                     description: Server Error
+    /interests/suggested-content:
+        x-hidden: true
+        get:
+            summary: Get suggested categories and content for the current user.
+            tags:
+                - Interests & Suggested Content
+            parameters:
+                - name: suggestedFollowsLimit
+                  description: Number of suggested categories to return.
+                  in: query
+                  schema:
+                      type: integer
+                - name: suggestedContentLimit
+                  description: Number of suggested discussions to return.
+                  in: query
+                  schema:
+                      type: integer
+                - name: suggestedContentExcerptLength
+                  description: Length of excerpts of suggested discussions.
+                  in: query
+                  schema:
+                      type: integer
+                - name: excludedCategoryIDs[]
+                  description: Category IDs to exclude.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                type: object
+                                properties:
+                                    discussions:
+                                        type: array
+                                        items:
+                                            $ref: "../../vanilla/openapi/discussions.yml#/components/schemas/Discussion"
+                                    categories:
+                                        type: array
+                                        items:
+                                            $ref: "../../vanilla/openapi/categories.yml#/components/schemas/CategorySchema"
+
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
 components:
     schemas:
         InterestPost:

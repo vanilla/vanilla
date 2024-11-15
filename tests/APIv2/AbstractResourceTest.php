@@ -339,6 +339,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test
             $value = $row[$key];
             if (in_array($key, ["name", "body", "description"])) {
                 $value .= " " . $dt->format(\DateTime::RSS);
+                $value = trim($value);
             } elseif (stripos($key, "id") === strlen($key) - 2) {
                 $value++;
             } else {

@@ -11,13 +11,14 @@ import { DISCUSSIONS_MAX_PAGE_COUNT } from "@library/features/discussions/discus
 import { MetaItem } from "@library/metas/Metas";
 import { cx } from "@emotion/css";
 import DateTime from "@library/content/DateTime";
-import { AutomationRulesPreviewContent } from "@dashboard/automationRules/preview/AutomationRulesPreviewContent";
 import { IGetCollectionResourcesParams, useCollectionContents } from "@library/featuredCollections/collectionsHooks";
 import { loadingPlaceholder } from "@dashboard/automationRules/AutomationRules.utils";
 import { AutomationRulesPreviewContentHeader } from "@dashboard/automationRules/preview/AutomationRulesPreviewContentHeader";
 
-interface IProps extends Omit<React.ComponentProps<typeof AutomationRulesPreviewContent>, "formValues"> {
+interface IProps {
     query: IGetCollectionResourcesParams;
+    fromStatusToggle?: boolean;
+    onPreviewContentLoad?: (emptyResult: boolean) => void;
 }
 
 export function AutomationRulesPreviewCollectionRecordsContent(props: IProps) {

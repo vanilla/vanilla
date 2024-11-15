@@ -16,6 +16,7 @@ use Vanilla\FloodControlTrait;
 use Vanilla\Models\ProfileFieldsPreloadProvider;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
+use Vanilla\Formatting\Formats\TextFormat;
 
 /**
  * Handles /profile endpoint.
@@ -2029,6 +2030,9 @@ EOT;
             $this->RoleData = $this->UserModel->getRoles($this->User->UserID);
             if ($this->RoleData !== false && $this->RoleData->numRows(DATASET_TYPE_ARRAY) > 0) {
                 $this->Roles = array_column($this->RoleData->resultArray(), "Name");
+            }
+            if (!empty(val("About", $this->User))) {
+                $this->User->About = Gdn::formatService()->renderPlainText($this->User->About, TextFormat::FORMAT_KEY);
             }
 
             // Hide personal info roles

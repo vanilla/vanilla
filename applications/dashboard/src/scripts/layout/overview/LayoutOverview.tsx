@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+import { useEditorSchemaDefaultsEnhancer } from "@dashboard/layout/editor/LayoutEditor.overviews";
 import { LayoutEditorContents } from "@dashboard/layout/editor/LayoutEditorContents";
 import { useCatalogForLayout, useLayoutJson } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { ILayoutDetails } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
@@ -66,6 +67,8 @@ export function LayoutOverview(props: IProps) {
 
     const catalog = useCatalogForLayout(layoutID);
 
+    const propEnhancer = useEditorSchemaDefaultsEnhancer(catalog);
+
     // Effect to load the initial
     const contents = useMemo(() => {
         if (!catalog || !jsonLoadable.data) {
@@ -101,6 +104,7 @@ export function LayoutOverview(props: IProps) {
                                 value={{
                                     fallbackWidget: FauxWidget,
                                     componentFetcher: fetchOverviewComponent,
+                                    propEnhancer,
                                 }}
                             >
                                 <LayoutRenderer layout={contents.hydrate().layout} />

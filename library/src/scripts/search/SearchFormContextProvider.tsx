@@ -116,7 +116,12 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
     // It is used only if a SearchSource has multiple SearchDomains. (e.g. for Community)
     const ALL_CONTENT_DOMAIN = useMemo<SearchDomain>(
         () =>
-            new (class AllContentDomain extends SearchDomain<{ startDate?: string; endDate?: string }> {
+            new (class AllContentDomain extends SearchDomain<{
+                startDate?: string;
+                endDate?: string;
+                startDateUpdated?: string;
+                endDateUpdated?: string;
+            }> {
                 public key = ALL_CONTENT_DOMAIN_KEY;
                 public sort = 0;
 
@@ -134,7 +139,15 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
 
                 public PanelComponent = FilterPanelAll;
 
-                public getAllowedFields = () => ["name", "authors", "insertUserIDs", "startDate", "endDate"];
+                public getAllowedFields = () => [
+                    "name",
+                    "authors",
+                    "insertUserIDs",
+                    "startDate",
+                    "endDate",
+                    "startDateUpdated",
+                    "endDateUpdated",
+                ];
 
                 public get recordTypes() {
                     return currentSourceDomains // Gather all other domains, and return their types.
@@ -147,8 +160,20 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
                     return getGlobalSearchSorts();
                 }
 
-                public transformFormToQuery(form: ISearchForm<{ startDate?: string; endDate?: string }>) {
-                    const query: ISearchRequestQuery<{ startDate?: string; endDate?: string }> = { ...form };
+                public transformFormToQuery(
+                    form: ISearchForm<{
+                        startDate?: string;
+                        endDate?: string;
+                        startDateUpdated?: string;
+                        endDateUpdated?: string;
+                    }>,
+                ) {
+                    const query: ISearchRequestQuery<{
+                        startDate?: string;
+                        endDate?: string;
+                        startDateUpdated?: string;
+                        endDateUpdated?: string;
+                    }> = { ...form };
 
                     if (query.sort === "relevance") {
                         delete query.sort;
@@ -156,6 +181,9 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
                     query.expand = ["insertUser", "breadcrumbs", "image", "excerpt", "-body"];
                     query.dateInserted = dateRangeToString({ start: form.startDate, end: form.endDate });
                     query.startDate = undefined;
+                    query.endDate = undefined;
+                    query.dateUpdated = dateRangeToString({ start: form.startDateUpdated, end: form.endDateUpdated });
+                    query.startDateUpdated = undefined;
                     query.endDate = undefined;
                     if (form.authors && form.authors.length) {
                         query.insertUserIDs = form.authors.map((author) => author.value as number);

@@ -107,7 +107,7 @@ class ComposerHelper
     public static function postUpdate()
     {
         require_once __DIR__ . "/../../environment.php";
-        printf("\nBuilding addon cache");
+        printf("\n============ Building addon cache ============");
         $addonManager = new AddonManager(AddonManager::getDefaultScanDirectories(), PATH_CACHE);
         $addonManager->ensureMultiCache();
         printf("\nAddon cache built");
@@ -122,7 +122,7 @@ class ComposerHelper
             return;
         }
 
-        printf("\nInstalling core node_modules\n");
+        printf("\n============ Installing core node_modules ============\n");
 
         passthru("yarn install", $installReturn);
         if ($installReturn !== 0) {
@@ -130,8 +130,9 @@ class ComposerHelper
             exit($installReturn);
         }
         // Run build
+        printf("\n============ Building Frontend ============\n");
         $buildCommand = "node -r esbuild-register ./build/vite.buildProd.ts 2>&1";
-        printf("\nBuilding frontend assets\n");
+        printf("\n============ Building frontend assets ============\n");
         printf("\n$buildCommand\n");
         system($buildCommand, $buildResult);
         if ($buildResult !== 0) {
@@ -140,7 +141,7 @@ class ComposerHelper
         }
 
         $buildCommand = "node -r esbuild-register ./build/scripts/variables/buildVariableDocs.ts 2>&1";
-        printf("\nBuilding variable documentation\n");
+        printf("\n============ Building variable documentation ============\n");
         printf("\n$buildCommand\n");
         system($buildCommand, $buildResult);
         if ($buildResult !== 0) {
@@ -154,7 +155,7 @@ class ComposerHelper
         if (!file_exists($distDir)) {
             mkdir($distDir);
         }
-        printf("\nGererating Vendor Licenses for build\n");
+        printf("\n============ Gererating Vendor Licenses for build ============\n");
         passthru("yarn licenses generate-disclaimer --production > $licensePath");
     }
 

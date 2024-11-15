@@ -26,7 +26,7 @@ import {
     PatchUserProfileFieldsParams,
     PutUserProfileFieldsParams,
     UserProfileFields,
-    ProfileFieldVisibility,
+    CreatableFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
@@ -71,11 +71,11 @@ export function useProfileFields(
                     filterPermissions
                         ? (profileField) => {
                               switch (profileField.visibility) {
-                                  case ProfileFieldVisibility.PUBLIC:
+                                  case CreatableFieldVisibility.PUBLIC:
                                       return true;
-                                  case ProfileFieldVisibility.PRIVATE:
+                                  case CreatableFieldVisibility.PRIVATE:
                                       return hasPermission("personalInfo.view") || isOwnProfile;
-                                  case ProfileFieldVisibility.INTERNAL:
+                                  case CreatableFieldVisibility.INTERNAL:
                                       return hasPermission("internalInfo.view");
                               }
                           }

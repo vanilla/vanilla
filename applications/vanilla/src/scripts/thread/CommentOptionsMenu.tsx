@@ -6,6 +6,7 @@
 
 import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { css } from "@emotion/css";
 import { IApiError } from "@library/@types/api/core";
 import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
 import { useUserCanStillEditDiscussionOrComment } from "@library/features/discussions/discussionHooks";
@@ -15,7 +16,7 @@ import {
     useWriteableAttachmentIntegrations,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { useToast } from "@library/features/toaster/ToastContext";
-import { IPermission, IPermissionOptions, PermissionChecker, PermissionMode } from "@library/features/users/Permission";
+import { IPermissionOptions, PermissionChecker, PermissionMode } from "@library/features/users/Permission";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { useCurrentUser } from "@library/features/users/userHooks";
 import DropDown, { DropDownOpenDirection, FlyoutType, IDropDownProps } from "@library/flyouts/DropDown";
@@ -27,12 +28,14 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { getMeta } from "@library/utility/appUtils";
-import { useMutation } from "@tanstack/react-query";
-import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import { Hoverable } from "@vanilla/react-utils";
-import React, { useState } from "react";
+import { Hoverable, useMobile } from "@vanilla/react-utils";
+import React, { useEffect, useState } from "react";
+import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
+import { stableObjectHash } from "@vanilla/utils";
+import PostReactionsModal from "@library/postReactions/PostReactionsModal";
 
 interface ICommentOptionItem {
     shouldRender: (comment: IComment, permissionChecker: PermissionChecker) => boolean;
@@ -53,10 +56,21 @@ interface IProps {
     onMutateSuccess?: () => Promise<void>;
     isEditLoading: boolean;
     isVisible?: IDropDownProps["isVisible"];
+    isInternal?: boolean;
+    isTrollContentVisible?: boolean;
+    toggleTrollContent?: (newVisibilityState: boolean) => void;
 }
 
+const reportButtonAlignment = css({
+    "&:not(:last-child)": {
+        marginInlineEnd: -8,
+    },
+});
+
 export function CommentOptionsMenu(props: IProps) {
-    const { discussion, comment, onMutateSuccess } = props;
+    const { discussion, comment, onMutateSuccess, isInternal, isTrollContentVisible, toggleTrollContent } = props;
+    const [ownVisible, setOwnVisible] = useState(false);
+    const queryClient = useQueryClient();
     const items: React.ReactNode[] = [];
     const currentUser = useCurrentUser();
     const { hasPermission } = usePermissionsContext();
@@ -66,7 +80,17 @@ export function CommentOptionsMenu(props: IProps) {
         resourceID: comment.categoryID,
     };
 
-    const canReport = hasPermission("flag.add") && getMeta("featureFlags.escalations.Enabled", false);
+    const isMobile = useMobile();
+
+    useEffect(() => {
+        if (props.isVisible && props.isVisible !== ownVisible) {
+            setOwnVisible(props.isVisible);
+        }
+    }, [props.isVisible]);
+
+    const isTroll = !!comment?.isTroll;
+
+    const canReport = !isInternal && hasPermission("flag.add") && getMeta("featureFlags.escalations.Enabled", false);
 
     const toast = useToast();
     const deleteMutation = useMutation({
@@ -82,6 +106,9 @@ export function CommentOptionsMenu(props: IProps) {
                 body: error.message,
                 dismissible: true,
             });
+        },
+        onSettled: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["commentThread"] });
         },
     });
 
@@ -105,7 +132,14 @@ export function CommentOptionsMenu(props: IProps) {
                 }}
             >
                 {(hoverProps) => (
-                    <DropDownItemButton isLoading={props.isEditLoading} {...hoverProps} onClick={props.onCommentEdit}>
+                    <DropDownItemButton
+                        isLoading={props.isEditLoading}
+                        {...hoverProps}
+                        onClick={() => {
+                            props.onCommentEdit();
+                            setOwnVisible(false);
+                        }}
+                    >
                         <span>{humanizedRemainingTime}</span>
                     </DropDownItemButton>
                 )}
@@ -118,6 +152,7 @@ export function CommentOptionsMenu(props: IProps) {
         (isOwnComment && canStillEdit && getMeta("ui.allowSelfDelete", false));
 
     const userCanAccessRevisionHistory = hasPermission("community.moderate") && comment.dateUpdated !== null;
+    const canManageReactions = hasPermission("community.moderate");
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -126,24 +161,10 @@ export function CommentOptionsMenu(props: IProps) {
             <DropDownItemButton
                 onClick={() => {
                     setShowDeleteConfirm(true);
+                    setOwnVisible(false);
                 }}
             >
                 {t("Delete")}
-                <ModalConfirm
-                    title={t("Delete Comment")}
-                    isVisible={showDeleteConfirm}
-                    onCancel={() => {
-                        setShowDeleteConfirm(false);
-                    }}
-                    isConfirmDisabled={deleteMutation.isLoading}
-                    isConfirmLoading={deleteMutation.isLoading}
-                    onConfirm={async () => {
-                        await deleteMutation.mutateAsync(comment.commentID);
-                        !!onMutateSuccess && (await onMutateSuccess());
-                    }}
-                >
-                    {t("Are you sure you want to delete this comment?")}
-                </ModalConfirm>
             </DropDownItemButton>,
         );
     }
@@ -154,11 +175,46 @@ export function CommentOptionsMenu(props: IProps) {
             </DropDownItemLink>,
         );
     }
+    const [logVisible, setLogVisible] = useState(false);
+    if (canManageReactions && isMobile) {
+        items.push(
+            <>
+                <DropDownItemButton
+                    onClick={() => {
+                        setLogVisible(true);
+                        setOwnVisible(false);
+                    }}
+                >
+                    {t("Reaction Log")}
+                </DropDownItemButton>
+            </>,
+        );
+    }
+
+    if (isTroll && hasPermission("community.moderate")) {
+        items.push(
+            <DropDownItemButton
+                onClick={() => {
+                    toggleTrollContent?.(!isTrollContentVisible);
+                }}
+            >
+                {isTrollContentVisible ? t("Hide troll content") : t("Show troll content")}
+            </DropDownItemButton>,
+        );
+    }
 
     const additionalItemsToRender = additionalCommentOptions
         .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
         .filter(({ shouldRender }) => shouldRender(comment, hasPermission))
-        .map((option, index) => <option.component key={index} comment={comment} onSuccess={onMutateSuccess} />);
+        .map((option, index) => (
+            <option.component
+                key={index}
+                comment={comment}
+                onSuccess={async () => {
+                    onMutateSuccess?.();
+                }}
+            />
+        ));
 
     if (additionalItemsToRender.length > 0) {
         items.push(<DropDownItemSeparator />);
@@ -177,12 +233,16 @@ export function CommentOptionsMenu(props: IProps) {
                     attachmentType={attachmentType}
                     recordID={comment.commentID}
                 >
-                    <IntegrationButtonAndModal onSuccess={onMutateSuccess} />
+                    <IntegrationButtonAndModal
+                        onSuccess={async () => {
+                            onMutateSuccess?.();
+                        }}
+                    />
                 </WriteableIntegrationContextProvider>,
             );
         });
 
-    if (integrationItems.length > 0) {
+    if (integrationItems.length > 0 && !isInternal) {
         items.push(<DropDownItemSeparator />);
         items.push(...integrationItems);
     }
@@ -194,15 +254,28 @@ export function CommentOptionsMenu(props: IProps) {
                 discussionName={discussion.name}
                 recordType={"comment"}
                 recordID={comment.commentID}
-                onSuccess={onMutateSuccess}
+                onSuccess={async () => {
+                    onMutateSuccess?.();
+                }}
                 placeRecordType="category"
                 placeRecordID={discussion.categoryID}
             />,
         );
     }
 
+    const commentOptionsMenuClasses = css({
+        display: "flex",
+        alignItems: "center",
+        alignSelf: "start",
+        gap: 0,
+
+        "@media (max-width: 807px)": {
+            gap: 16,
+        },
+    });
+
     return (
-        <>
+        <span className={commentOptionsMenuClasses}>
             {canReport ? (
                 <ReportRecordOption
                     discussionName={discussion.name}
@@ -214,7 +287,11 @@ export function CommentOptionsMenu(props: IProps) {
                     customTrigger={(props) => {
                         return (
                             <ToolTip label={t("Report content")}>
-                                <Button buttonType={ButtonTypes.ICON} onClick={props.onClick}>
+                                <Button
+                                    buttonType={ButtonTypes.ICON}
+                                    onClick={props.onClick}
+                                    className={reportButtonAlignment}
+                                >
                                     <Icon icon="post-flag" />
                                 </Button>
                             </ToolTip>
@@ -228,13 +305,40 @@ export function CommentOptionsMenu(props: IProps) {
                     buttonContents={<Icon icon="navigation-circle-ellipsis" />}
                     openDirection={DropDownOpenDirection.BELOW_LEFT}
                     flyoutType={FlyoutType.LIST}
-                    isVisible={props.isVisible}
+                    key={stableObjectHash({ ...comment })}
+                    isVisible={ownVisible}
+                    onVisibilityChange={(newVisibility) => setOwnVisible(newVisibility)}
                 >
                     {items.map((item, i) => {
                         return <React.Fragment key={i}>{item}</React.Fragment>;
                     })}
                 </DropDown>
             ) : null}
-        </>
+            <ModalConfirm
+                title={t("Delete Comment")}
+                isVisible={showDeleteConfirm}
+                onCancel={() => {
+                    setShowDeleteConfirm(false);
+                    setOwnVisible(true);
+                }}
+                isConfirmDisabled={deleteMutation.isLoading}
+                isConfirmLoading={deleteMutation.isLoading}
+                onConfirm={async () => {
+                    await deleteMutation.mutateAsync(comment.commentID);
+                    !!onMutateSuccess && (await onMutateSuccess());
+                }}
+            >
+                {t("Are you sure you want to delete this comment?")}
+            </ModalConfirm>
+            {logVisible && (
+                <PostReactionsModal
+                    visibility={logVisible}
+                    onVisibilityChange={() => {
+                        setLogVisible(false);
+                        setOwnVisible(true);
+                    }}
+                />
+            )}
+        </span>
     );
 }

@@ -10,7 +10,7 @@ import DatePicker from "@library/forms/DatePicker";
 import moment from "moment";
 import { inputClasses } from "./inputStyles";
 
-interface IProps {
+export interface IDateRangeProps {
     start: string | undefined;
     end: string | undefined;
     onStartChange: (value: string) => void;
@@ -21,7 +21,7 @@ interface IProps {
 /**
  * Implements the DateRange component
  */
-export default function DateRange(props: IProps) {
+export default function DateRange(props: IDateRangeProps) {
     const endDate = props.end ? moment(rectifyDate(props.end)) : null;
     const startDate = props.start ? moment(rectifyDate(props.start)) : null;
 

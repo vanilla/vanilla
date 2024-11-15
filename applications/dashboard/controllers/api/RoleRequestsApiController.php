@@ -443,6 +443,8 @@ class RoleRequestsApiController extends Controller
         ]);
         $folder = $row["type"] === RoleRequestModel::TYPE_INVITATION ? "role-invitations" : "role-applications";
         $r["url"] = url("/requests/$folder?role={$row["roleID"]}", true);
+        $role = $this->roleModel->getID($row["roleID"], DATASET_TYPE_ARRAY);
+        $r["name"] = $role["Name"];
         return $r;
     }
 

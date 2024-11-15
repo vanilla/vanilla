@@ -4,6 +4,8 @@
  * @license gpl-2.0-only
  */
 
+import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import { LoadingRectangle, LoadingSpacer } from "@library/loaders/LoadingRectangle";
 import React from "react";
 
@@ -12,9 +14,10 @@ interface IProps {
 }
 
 export function DashboardFormGroupPlaceholder(props: IProps) {
+    const classes = dashboardFormGroupClasses();
     return (
-        <div className="form-group">
-            <div className="label-wrap">
+        <div className={classes.formGroup}>
+            <div className={classes.labelWrap}>
                 <LoadingRectangle width="35%" height={14} />
                 <LoadingSpacer height={6} />
                 <LoadingRectangle width="80%" height={10} />
@@ -25,9 +28,9 @@ export function DashboardFormGroupPlaceholder(props: IProps) {
                     </>
                 )}
             </div>
-            <div className="input-wrap">
+            <DashboardInputWrap>
                 <input className="form-control" disabled aria-hidden tabIndex={-1} style={{ background: "#fff" }} />
-            </div>
+            </DashboardInputWrap>
         </div>
     );
 }

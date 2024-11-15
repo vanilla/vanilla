@@ -7,6 +7,8 @@
 namespace Vanilla\EmbeddedContent\Embeds;
 
 use Garden\Schema\Schema;
+use Gdn;
+use Gdn_Upload;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\Formatting\Attachment;
 use Vanilla\Models\VanillaMediaSchema;
@@ -42,7 +44,6 @@ class FileEmbed extends AbstractEmbed
         }
 
         // The `type` field may contain the mime-type data.
-
         return $data;
     }
 
@@ -53,6 +54,11 @@ class FileEmbed extends AbstractEmbed
      */
     public function renderHtml(): string
     {
+        $uploader = Gdn::getContainer()->get(Gdn_upload::class);
+        if (!$uploader->isOwnWebPath($this->getUrl())) {
+            return "<div></div>";
+        }
+
         $viewPath = dirname(__FILE__) . "/FileEmbed.twig";
         return $this->renderTwig($viewPath, [
             "url" => $this->getUrl(),

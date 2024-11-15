@@ -13,6 +13,7 @@ import {
     WidgetContainerDisplayType,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import Container from "@library/layout/components/Container";
+import { PageBox } from "@library/layout/PageBox";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
@@ -33,6 +34,7 @@ export interface IHomeWidgetContainerProps {
     titleCount?: string;
     contentIsListWithSeparators?: boolean;
     extraHeader?: React.ReactNode;
+    actions?: React.ReactNode;
 }
 
 export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
@@ -71,7 +73,12 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
         }
     }
 
-    const hasOuterBg = Variables.boxHasBackground(Variables.box({ background: options.outerBackground }));
+    const hasOuterBg = Variables.boxHasBackground(
+        Variables.box({
+            background: options.outerBackground,
+            borderType: options.visualBackgroundType === "outer" ? options.borderType : undefined,
+        }),
+    );
 
     const isNavLinks = options.borderType === "navLinks";
     const widgetClass = hasOuterBg ? widgetClasses.widgetWithContainerClass : widgetClasses.widgetClass;
@@ -87,6 +94,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                     </div>
                 </Container>
             )}
+
             <div className={cx(!isNavLinks && widgetClass, classes.root)}>
                 <Container
                     // Our own container will be setting the maximum width.
@@ -97,7 +105,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                     <div className={classes.container}>
                         <PageHeadingBox
                             title={props.title}
-                            actions={options.viewAll!.position === "top" && viewAllLinkOrButton}
+                            actions={props.actions ?? (options.viewAll!.position === "top" && viewAllLinkOrButton)}
                             description={props.description ?? options.description}
                             subtitle={props.subtitle ?? options?.subtitle?.content}
                             options={{

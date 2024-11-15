@@ -7,7 +7,8 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { containerMainMediaQueries, containerMainStyles } from "@library/layout/components/containerStyles";
-import { CSSObject, injectGlobal } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
+import { injectGlobal } from "@emotion/css";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, important, percent } from "csx";

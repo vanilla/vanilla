@@ -321,11 +321,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         }
     });
 
-    interface IBody {
-        backgroundImage: IBackground;
-    }
-
-    const body: IBody = makeThemeVars("body", {
+    const body = makeThemeVars("body", {
         /**
          * @varGroup global.body.backgroundImage
          * @description Background variables for the page.
@@ -1046,6 +1042,10 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             left: widget.padding,
         }),
     });
+
+    function getContrastFgColor(color: ColorHelper | string): ColorHelper {
+        return ColorsUtils.isLightColor(color) ? elementaryColors.darkText : elementaryColors.white;
+    }
 
     return {
         options,

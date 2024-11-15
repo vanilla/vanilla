@@ -45,6 +45,7 @@ use Vanilla\Widgets\React\HtmlReactWidget;
 use Vanilla\Widgets\React\LeaderboardWidget;
 use Vanilla\Widgets\React\QuickLinksWidget;
 use Vanilla\Widgets\Schema\ReactSingleChildSchema;
+use Vanilla\Widgets\ToggledWidgetInterface;
 
 /**
  * Class for hydrating layouts with the vanilla/garden-hydrate library.
@@ -184,7 +185,9 @@ final class LayoutHydrator
      */
     public function addReactResolver(string $reactModuleClass): LayoutHydrator
     {
-        $this->dataHydrator->addResolver(new ReactResolver($reactModuleClass, $this->container));
+        if (!is_a($reactModuleClass, ToggledWidgetInterface::class, true) || $reactModuleClass::isEnabled()) {
+            $this->dataHydrator->addResolver(new ReactResolver($reactModuleClass, $this->container));
+        }
         return $this;
     }
 
@@ -470,7 +473,7 @@ final class LayoutHydrator
     private function applyDynamicSchemas(?string $layoutViewType)
     {
         $this->dynamicSchemaOptions->reset();
-        if ($layoutViewType === "subcommunityHome") {
+        if ($layoutViewType !== "home") {
             $this->dynamicSchemaOptions->addDescriptionChoice("siteSection/description", "Subcommunity Description");
             $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Subcommunity Title");
             $this->dynamicSchemaOptions->addImageSourceChoice(
@@ -482,17 +485,20 @@ final class LayoutHydrator
             $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Banner Title");
         }
 
-        switch ($layoutViewType) {
-            case "discussionCategoryPage":
-            case "nestedCategoryList":
-            case "discussionThread":
-                $this->dynamicSchemaOptions->addDescriptionChoice("category/description", "Category Description");
-                $this->dynamicSchemaOptions->addTitleChoice("category/name", "Category Name");
-                $this->dynamicSchemaOptions->addImageSourceChoice(
-                    BannerFullWidget::IMAGE_SOURCE_CATEGORY,
-                    "Category Banner"
-                );
-                break;
+        $hasDiscussion = in_array($layoutViewType, ["discussionThread", "questionThread", "ideaThread"]);
+        $hasCategory = in_array($layoutViewType, ["discussionCategoryPage", "nestedCategoryList"]) || $hasDiscussion;
+
+        if ($hasCategory) {
+            $this->dynamicSchemaOptions->addDescriptionChoice("category/description", "Category Description");
+            $this->dynamicSchemaOptions->addTitleChoice("category/name", "Category Name");
+            $this->dynamicSchemaOptions->addImageSourceChoice(
+                BannerFullWidget::IMAGE_SOURCE_CATEGORY,
+                "Category Banner"
+            );
+        }
+
+        if ($hasDiscussion) {
+            $this->dynamicSchemaOptions->addTitleChoice("discussion/name", "Discussion Name");
         }
 
         $this->dynamicSchemaOptions->addImageSourceChoice(

@@ -90,7 +90,7 @@ class CategoriesWidgetTest extends SiteTestCase
         ];
 
         if ($childCategory) {
-            $categoryItem["children"][] = $this->makeCategoryItem($childCategory, 3);
+            $categoryItem["children"][] = $this->makeCategoryItem($childCategory, $depth + 1);
         }
         return $categoryItem;
     }
@@ -134,6 +134,8 @@ class CategoriesWidgetTest extends SiteTestCase
             "containerOptions" => [
                 "borderType" => "border",
                 "displayType" => "list",
+                "headerAlignment" => "left",
+                "visualBackgroundType" => "inner",
             ],
             "categoryOptions" => [
                 "description" => [
@@ -177,11 +179,16 @@ HTML
         // More categories to test if we specify parent category, we should have only top level categories under it
         $category3 = $this->createCategory(["name" => "My category 3"]);
         $category4 = $this->createCategory(["name" => "My category 4", "featured" => true]);
+        $category5 = $this->createCategory(["mame" => "My category 5", "parentCategoryID" => $category2["categoryID"]]);
+
+        // Explicitly set Sort values to test sorting.
+        \CategoryModel::instance()->setField($category5["categoryID"], ["Sort" => 1]);
+        \CategoryModel::instance()->setField($category3["categoryID"], ["Sort" => 2]);
 
         $parentCategoryFilterApiParams = [
             "filter" => "category",
             "filterCategorySubType" => "set",
-            "categoryID" => 2,
+            "categoryID" => $category2["categoryID"],
             "followed" => false,
         ];
 
@@ -193,7 +200,10 @@ HTML
             [],
             [
                 "apiParams" => $parentCategoryFilterApiParams,
-                "itemData" => [$this->makeCategoryItem($category3, 2, $category4)],
+                "itemData" => [
+                    $this->makeCategoryItem($category5, 2),
+                    $this->makeCategoryItem($category3, 2, $category4),
+                ],
             ]
         );
 

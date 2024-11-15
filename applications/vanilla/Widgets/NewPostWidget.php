@@ -9,10 +9,12 @@ namespace Vanilla\Forum\Widgets;
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\InjectableInterface;
 use Gdn;
 use CategoryModel;
@@ -116,7 +118,13 @@ class NewPostWidget implements
         }
 
         // Get allowed discussion types.
-        $allowedDiscussionTypes = $this->categoryModel::getAllowedDiscussionData($permissionCategory, $category);
+        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+            $allowedDiscussionTypes = $this->categoryModel->getAllowedPostTypeData($category);
+            $postableDiscussionTypes = null;
+        } else {
+            $allowedDiscussionTypes = $this->categoryModel::getAllowedDiscussionData($permissionCategory, $category);
+            $postableDiscussionTypes = CategoryModel::instance()->getPostableDiscussionTypes();
+        }
 
         $this->props["items"] = [];
         foreach ($allowedDiscussionTypes as $discussionTypeKey => $discussionType) {
@@ -151,7 +159,6 @@ class NewPostWidget implements
             ];
         }
 
-        $postableDiscussionTypes = CategoryModel::instance()->getPostableDiscussionTypes();
         $this->props["postableDiscussionTypes"] = $postableDiscussionTypes;
 
         return $this->props;
@@ -203,12 +210,19 @@ class NewPostWidget implements
         //prefilter allowed discussions for asOwnButton dropdown
         $permissionCategory = CategoryModel::permissionCategory(false);
         $globalAllowedDiscussions = CategoryModel::getAllowedDiscussionData($permissionCategory, []);
-        $asOwnButtonFormChoices = [];
-        foreach (array_keys($globalAllowedDiscussions) as $allowedDiscussion) {
-            $asOwnButtonFormChoices[strtolower($allowedDiscussion)] = $allowedDiscussion;
+
+        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+            $postTypeModel = Gdn::getContainer()->get(PostTypeModel::class);
+            $postTypes = $postTypeModel->getAvailablePostTypes();
+            $asOwnButtonFormChoices = array_column($postTypes, "name", "postTypeID");
+        } else {
+            $asOwnButtonFormChoices = [];
+            foreach (array_keys($globalAllowedDiscussions) as $allowedDiscussion) {
+                $asOwnButtonFormChoices[strtolower($allowedDiscussion)] = $allowedDiscussion;
+            }
         }
 
-        return Schema::parse([
+        $schema = Schema::parse([
             "asOwnButtons?" => [
                 "type" => "array",
                 "description" => "List of separate button types (not in the dropdown).",
@@ -246,43 +260,53 @@ class NewPostWidget implements
                     true
                 ),
             ],
-            "customLabels:?" => self::labelsSchema($globalAllowedDiscussions),
-            "containerOptions:?" => Schema::parse([
-                "outerBackground:?" => Schema::parse([
-                    "color:?" => [
-                        "description" => "Set the background color of the component.",
-                        "x-control" => SchemaForm::color(
-                            new FormOptions("Background color", "Pick a background color.")
+        ]);
+
+        if (!FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+            // Hiding for post types. The display name of post types can be changed in Post Types settings.
+            $schema->merge(Schema::parse(["customLabels:?" => self::labelsSchema($globalAllowedDiscussions)]));
+        }
+
+        $schema->merge(
+            Schema::parse([
+                "containerOptions:?" => Schema::parse([
+                    "outerBackground:?" => Schema::parse([
+                        "color:?" => [
+                            "description" => "Set the background color of the component.",
+                            "x-control" => SchemaForm::color(
+                                new FormOptions("Background color", "Pick a background color.")
+                            ),
+                        ],
+                    ]),
+                    "borderType:s?" => [
+                        "enum" => self::borderTypeOptions(),
+                        "description" => "Describe what type of border the widget should have.",
+                        "x-control" => SchemaForm::dropDown(
+                            new FormOptions("Border Type", "Choose widget border type", "Style Guide Default"),
+                            new StaticFormChoices([
+                                "border" => "Border",
+                                "none" => "None",
+                                "shadow" => "Shadow",
+                            ])
                         ),
                     ],
-                ]),
-                "borderType:s?" => [
-                    "enum" => self::borderTypeOptions(),
-                    "description" => "Describe what type of border the widget should have.",
-                    "x-control" => SchemaForm::dropDown(
-                        new FormOptions("Border Type", "Choose widget border type", "Style Guide Default"),
-                        new StaticFormChoices([
-                            "border" => "Border",
-                            "none" => "None",
-                            "shadow" => "Shadow",
-                        ])
-                    ),
-                ],
-                "headerAlignment:s?" => [
-                    "description" => "Configure alignment of the title, subtitle, and description.",
-                    "enum" => ["left", "center"],
-                    "x-control" => SchemaForm::dropDown(
-                        new FormOptions(
-                            "Header Alignment",
-                            "Configure alignment of the title, subtitle, and description."
+                    "headerAlignment:s?" => [
+                        "description" => "Configure alignment of the title, subtitle, and description.",
+                        "enum" => ["left", "center"],
+                        "x-control" => SchemaForm::dropDown(
+                            new FormOptions(
+                                "Header Alignment",
+                                "Configure alignment of the title, subtitle, and description."
+                            ),
+                            new StaticFormChoices(["left" => "Left", "center" => "Center"])
                         ),
-                        new StaticFormChoices(["left" => "Left", "center" => "Center"])
-                    ),
-                ],
+                    ],
+                ])
+                    ->setDescription("Configure various container options")
+                    ->setField("x-control", SchemaForm::section(new FormOptions("Container Options"))),
             ])
-                ->setDescription("Configure various container options")
-                ->setField("x-control", SchemaForm::section(new FormOptions("Container Options"))),
-        ]);
+        );
+        return $schema;
     }
 
     /**

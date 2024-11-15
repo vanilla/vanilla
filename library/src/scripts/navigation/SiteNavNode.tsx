@@ -152,7 +152,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                 role="treeitem"
                 aria-expanded={this.isOpen}
             >
-                {collapsible && (this.props.children?.length ?? []) > 0 ? (
+                {collapsible && (this.props.children?.length ?? 0) > 0 ? (
                     <div
                         className={cx(classes.buttonOffset, {
                             hasNoOffset: this.props.depth === 1,

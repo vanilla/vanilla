@@ -4,7 +4,10 @@
  */
 
 import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.classes";
-import { fetchEditorOverviewComponent } from "@dashboard/layout/editor/LayoutEditor.overviews";
+import {
+    fetchEditorOverviewComponent,
+    useEditorSchemaDefaultsEnhancer,
+} from "@dashboard/layout/editor/LayoutEditor.overviews";
 import { LayoutEditorAssetUtils } from "@dashboard/layout/editor/LayoutEditorAssetUtils";
 import { LayoutEditorContents, LayoutEditorPath } from "@dashboard/layout/editor/LayoutEditorContents";
 import {
@@ -26,6 +29,7 @@ import {
 import { FauxWidget } from "@dashboard/layout/overview/LayoutOverview";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
 import { LayoutLookupContext, LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
+import { extractSchemaDefaults } from "@library/json-schema-forms";
 import Container, { ContainerContextReset, ContainerWidthContextProvider } from "@library/layout/components/Container";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { LinkContext, LINK_CONTEXT_DEFAULTS } from "@library/routing/links/LinkContextProvider";
@@ -169,6 +173,8 @@ function LayoutEditorImpl(props: IProps) {
 
     const descriptionID = useUniqueID("description");
 
+    const propEnhancer = useEditorSchemaDefaultsEnhancer(catalog);
+
     if (editorContents.getSectionCount() === 0 && editorContents.validate().isValid) {
         // We are empty. Use the contents.
         const addInitialSection = (sectionID: LayoutSectionID) => {
@@ -235,6 +241,7 @@ function LayoutEditorImpl(props: IProps) {
                                         fallbackWidget: FauxWidget,
                                         componentFetcher: fetchEditorOverviewComponent,
                                         componentWrapper: LayoutEditorWidgetWrapper,
+                                        propEnhancer,
                                     }}
                                 >
                                     <LayoutRenderer<IHydratedEditableWidgetProps>

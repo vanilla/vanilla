@@ -5,19 +5,19 @@
 
 import { RecordID } from "@vanilla/utils";
 
-export enum ProfileFieldVisibility {
+export enum CreatableFieldVisibility {
     PUBLIC = "public",
     PRIVATE = "private",
     INTERNAL = "internal",
 }
 
-export enum ProfileFieldMutability {
+export enum CreatableFieldMutability {
     ALL = "all",
     RESTRICTED = "restricted",
     NONE = "none",
 }
 
-export enum ProfileFieldType {
+export enum CreatableFieldType {
     TEXT_INPUT = "textInput",
     TEXT_BOX = "textBox",
     SINGLE_CHECKBOX = "singleCheckbox",
@@ -44,12 +44,13 @@ export type ProfileField = {
     apiName: string;
     label: string;
     description: string;
+    descriptionHtml?: boolean;
     registrationOptions: ProfileFieldRegistrationOptions;
-    visibility: ProfileFieldVisibility;
-    mutability: ProfileFieldMutability;
+    visibility: CreatableFieldVisibility;
+    mutability: CreatableFieldMutability;
     displayOptions: IProfileFieldDisplayOptions;
-    dataType: ProfileFieldDataType;
-    formType: ProfileFieldFormType;
+    dataType: CreatableFieldDataType;
+    formType: CreatableFieldFormType;
     dropdownOptions?: string[] | number[] | null;
     enabled?: boolean;
     salesforceID?: string | null;
@@ -60,18 +61,22 @@ export type ProfileField = {
 // The form structure differs from the actual object's structure: some fields are nested in groups with others
 export type ProfileFieldFormValues = Pick<
     ProfileField,
-    "apiName" | "label" | "description" | "registrationOptions" | "enabled" | "mutability"
+    "apiName" | "label" | "registrationOptions" | "enabled" | "mutability"
 > & {
+    description: {
+        description: ProfileField["description"];
+        descriptionHtml: ProfileField["descriptionHtml"];
+    };
     visibility: {
         visibility: ProfileField["visibility"];
     } & ProfileField["displayOptions"];
 } & {
-    type: ProfileFieldType; //there are utils to map the type selected in the form to valid combination dataType and formType.
+    type: CreatableFieldType; //there are utils to map the type selected in the form to valid combination dataType and formType.
 } & {
     dropdownOptions?: string | null;
 };
 
-export enum ProfileFieldDataType {
+export enum CreatableFieldDataType {
     TEXT = "text",
     BOOLEAN = "boolean",
     DATE = "date",
@@ -80,7 +85,7 @@ export enum ProfileFieldDataType {
     NUMBER_MUL = "number[]",
 }
 
-export enum ProfileFieldFormType {
+export enum CreatableFieldFormType {
     TEXT = "text",
     TEXT_MULTILINE = "text-multiline",
     DROPDOWN = "dropdown",
@@ -92,6 +97,7 @@ export enum ProfileFieldFormType {
 
 export type FetchProfileFieldsParams = {
     enabled?: true;
+    formType?: CreatableFieldFormType[];
 };
 
 export type PostProfileFieldParams = ProfileField;

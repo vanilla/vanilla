@@ -497,7 +497,16 @@ class HeadModule extends Gdn_Module
         }
 
         if ($description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->description()))) {
-            $this->addTag("meta", ["name" => "description", "property" => "og:description", "content" => $description]);
+            $senderClass = get_class($this->_Sender);
+            if ($senderClass === "CategoriesController") {
+                $description = t("Categories") . " - " . $description;
+            }
+
+            $this->addTag("meta", [
+                "name" => "description",
+                "property" => "og:description",
+                "content" => $description,
+            ]);
         }
 
         if ($robots = $this->_Sender->data("_robots")) {

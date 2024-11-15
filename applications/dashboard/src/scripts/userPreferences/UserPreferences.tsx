@@ -25,6 +25,7 @@ import { useConfigMutation, useConfigQuery } from "@library/config/configHooks";
 import { convertOldConfig } from "./DefaultCategories.utils";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 interface IExtraUserPreference {
     key: string;
     component: ReactNode;
@@ -76,7 +77,7 @@ export function UserPreferences() {
                         "Users can follow categories to subscribe to notifications for new posts. Select which categories new users should follow by default.",
                     )}
                 >
-                    <span className={"input-wrap-right"}>
+                    <DashboardInputWrap>
                         <Button
                             onClick={() => {
                                 setShowEditDefaultCategoriesModal(true);
@@ -85,7 +86,7 @@ export function UserPreferences() {
                         >
                             {t("Edit Default Categories")}
                         </Button>
-                    </span>
+                    </DashboardInputWrap>
                 </DashboardFormGroup>
 
                 {UserPreferences.extraPreferences.map((preference) => (

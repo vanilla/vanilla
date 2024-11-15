@@ -155,13 +155,16 @@ const TopLevelGroup: NonNullable<React.ComponentProps<typeof JsonSchemaForm>["Fo
                 borderType: BorderType.SEPARATOR_BETWEEN,
             }}
         >
-            {!!header && <Heading depth={2} title={t(header)} />}
-            {!!description && (
-                <p
-                    className={formClasses.description}
-                    dangerouslySetInnerHTML={{ __html: `${translateDescription(description)}` }}
-                />
-            )}
+            {!!header && <Heading depth={2} title={typeof header === "string" ? t(header) : header} />}
+            {!!description &&
+                (typeof description === "string" ? (
+                    <p
+                        className={formClasses.description}
+                        dangerouslySetInnerHTML={{ __html: `${translateDescription(description)}` }}
+                    />
+                ) : (
+                    <p className={formClasses.description}>{description}</p>
+                ))}
             {props.children}
         </PageBox>
     );
@@ -178,13 +181,22 @@ const SubGroup: NonNullable<React.ComponentProps<typeof JsonSchemaForm>["FormSec
             }}
             className={formClasses.subgroupWrapper}
         >
-            {!!title && <Heading depth={3} title={t(title)} className={formClasses.subgroupHeading} />}
-            {!!description && (
-                <p
-                    className={formClasses.description}
-                    dangerouslySetInnerHTML={{ __html: `${translateDescription(description)}` }}
+            {!!title && (
+                <Heading
+                    depth={3}
+                    title={typeof title === "string" ? t(title) : title}
+                    className={formClasses.subgroupHeading}
                 />
             )}
+            {!!description &&
+                (typeof description === "string" ? (
+                    <p
+                        className={formClasses.description}
+                        dangerouslySetInnerHTML={{ __html: `${translateDescription(description)}` }}
+                    />
+                ) : (
+                    <p className={formClasses.description}>{description}</p>
+                ))}
             {props.children}
         </PageBox>
     );

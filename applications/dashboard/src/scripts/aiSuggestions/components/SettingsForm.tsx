@@ -9,9 +9,9 @@ import { AISuggestionsSettings, AISuggestionsSettingsForm } from "@dashboard/aiS
 import { AISuggestionSectionSchema, getInitialSettings } from "@dashboard/aiSuggestions/settingsSchemaUtils";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import Translate from "@library/content/Translate";
 import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
@@ -30,7 +30,7 @@ interface IProps {
 
 export function SettingsForm(props: IProps) {
     const { sections, title, settings } = props;
-    const { error, mutateAsync } = useSaveAISuggestionsSettings();
+    const { mutateAsync } = useSaveAISuggestionsSettings();
     const toast = useToast();
     const [fieldErrors, setFieldErrors] = useState<Record<string, IFieldError[]> | undefined>(undefined);
 
@@ -95,12 +95,10 @@ export function SettingsForm(props: IProps) {
                     {sections.map(({ title, schema }, idx) => (
                         <Fragment key={`section-${idx + 1}`}>
                             <DashboardFormSubheading hasBackground>{title}</DashboardFormSubheading>
-                            <JsonSchemaForm
+                            <DashboardSchemaForm
                                 instance={values}
                                 schema={schema}
                                 onChange={setValues}
-                                FormControl={DashboardFormControl}
-                                FormControlGroup={DashboardFormControlGroup}
                                 fieldErrors={fieldErrors}
                             />
                         </Fragment>

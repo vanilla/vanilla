@@ -2,6 +2,7 @@ import { css } from "@emotion/css";
 import { inputVariables } from "@library/forms/inputStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { Mixins } from "@library/styles/Mixins";
 import { cx } from "@library/styles/styleShim";
 import React from "react";
 
@@ -19,6 +20,7 @@ export function VanillaEditorContainer(props: { children: React.ReactNode; class
         justifyContent: "space-between",
         minHeight: 200,
         borderRadius: inputVars.border.radius,
+        ...Mixins.background({ color: globalVars.mainColors.bg }),
         ...(boxShadow && {
             boxShadow: `0 0 0 1px ${ColorsUtils.colorOut(inputVars.border.color)}`,
             // Border can get clipped by inner contents so use a box shadow instead.

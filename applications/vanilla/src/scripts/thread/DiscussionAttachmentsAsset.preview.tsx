@@ -21,11 +21,13 @@ const queryClient = new QueryClient({
     },
 });
 
-export function DiscussionAttachmentsAssetPreview() {
+export function DiscussionAttachmentsAssetPreview(
+    props: Omit<React.ComponentProps<typeof DiscussionAttachmentsAsset>, "discussion">,
+) {
     return (
         <Widget>
             <QueryClientProvider client={queryClient}>
-                <DiscussionAttachmentsAsset discussion={discussion} />
+                <DiscussionAttachmentsAsset {...props} discussion={discussion} />
             </QueryClientProvider>
         </Widget>
     );

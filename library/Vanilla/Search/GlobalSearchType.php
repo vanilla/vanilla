@@ -93,6 +93,10 @@ class GlobalSearchType extends AbstractSearchType
             $query->setDateFilterSchema("dateInserted", $dateInserted);
         }
 
+        if ($dateUpdated = $query->getQueryParameter("dateUpdated")) {
+            $query->setDateFilterSchema("dateUpdated", $dateUpdated);
+        }
+
         $locale = $query->getQueryParameter("locale");
         if ($locale) {
             $query->setFilter(
@@ -102,6 +106,24 @@ class GlobalSearchType extends AbstractSearchType
                 SearchQuery::FILTER_OP_OR,
                 false
             );
+        }
+
+        // Fulltext matching. These apply to everything except users which does queries name in a different way.
+        if (!in_array("user", $query->getQueryParameter("types"))) {
+            $name = $query->getQueryParameter("name");
+            if ($name) {
+                $query->whereText($name, ["name"], $query::MATCH_FULLTEXT_EXTENDED);
+            }
+
+            $allTextQuery = $query->getQueryParameter("query");
+            if ($allTextQuery) {
+                $fields = ["name", "bodyPlainText", "description"];
+                $query->whereText($allTextQuery, $fields, $query::MATCH_FULLTEXT_EXTENDED);
+            }
+
+            if ($description = $query->getQueryParameter("description", false)) {
+                $query->whereText($description, ["description"], SearchQuery::MATCH_FULLTEXT_EXTENDED);
+            }
         }
 
         // Site specific query.
@@ -165,14 +187,13 @@ class GlobalSearchType extends AbstractSearchType
                 "style" => "form",
                 "x-search-filter" => true,
             ],
-            "dateInserted?" => new DateFilterSchema([
-                "x-search-filter" => true,
-            ]),
+            "dateInserted?" => new DateFilterSchema(),
+            "dateUpdated?" => new DateFilterSchema(),
             "driver?" => [
                 "enum" => $this->searchService->getDriverNames(),
             ],
             "sort:s?" => [
-                "enum" => ["relevance", "dateInserted", "-dateInserted"],
+                "enum" => ["relevance", "dateInserted", "-dateInserted", "dateUpdated", "-dateUpdated"],
             ],
             "locale:s?" => [
                 "description" => "The locale articles are published in.",

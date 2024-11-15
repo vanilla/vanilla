@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { ProfileField, ProfileFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileField, CreatableFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { mapProfileFieldDropdownOptionsToComboBoxOptions } from "@library/editProfileFields/utils";
 
 import { t } from "@vanilla/i18n";
@@ -22,8 +22,8 @@ function createSchemaForProfileFieldConfig(profileFieldConfig: ProfileField): Pa
     const formType = profileFieldConfig["formType"];
 
     switch (formType) {
-        case ProfileFieldFormType.TEXT:
-        case ProfileFieldFormType.TEXT_MULTILINE:
+        case CreatableFieldFormType.TEXT:
+        case CreatableFieldFormType.TEXT_MULTILINE:
             return {
                 type: "string",
                 "x-control": {
@@ -32,7 +32,7 @@ function createSchemaForProfileFieldConfig(profileFieldConfig: ProfileField): Pa
                 },
             };
 
-        case ProfileFieldFormType.NUMBER:
+        case CreatableFieldFormType.NUMBER:
             return {
                 type: "number",
                 "x-control": {
@@ -41,7 +41,7 @@ function createSchemaForProfileFieldConfig(profileFieldConfig: ProfileField): Pa
                     type: "number",
                 },
             };
-        case ProfileFieldFormType.CHECKBOX:
+        case CreatableFieldFormType.CHECKBOX:
             return {
                 type: "boolean",
                 "x-control": {
@@ -56,7 +56,7 @@ function createSchemaForProfileFieldConfig(profileFieldConfig: ProfileField): Pa
                     },
                 },
             };
-        case ProfileFieldFormType.DATE:
+        case CreatableFieldFormType.DATE:
             return {
                 type: "object",
                 "x-control": {
@@ -76,8 +76,8 @@ function createSchemaForProfileFieldConfig(profileFieldConfig: ProfileField): Pa
                 required: [],
             };
 
-        case ProfileFieldFormType.DROPDOWN:
-        case ProfileFieldFormType.TOKENS:
+        case CreatableFieldFormType.DROPDOWN:
+        case CreatableFieldFormType.TOKENS:
             // we show a tokens input, meaning you can select multiple values
             // selecting multiple values should be understood as an OR operation
             return {

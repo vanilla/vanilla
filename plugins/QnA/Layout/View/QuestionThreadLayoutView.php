@@ -6,7 +6,6 @@
  */
 namespace Vanilla\QnA\Layout\View;
 
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Forum\Layout\View\DiscussionThreadLayoutView;
 use Vanilla\Http\InternalClient;
 use Vanilla\QnA\Layout\Assets\TabbedCommentListAsset;

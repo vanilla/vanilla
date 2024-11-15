@@ -32,7 +32,6 @@ interface IProps {
 
 export function TitleBarDeviceProvider(props: IProps) {
     const calculateDevice = useCallback(() => {
-        // const breakpoints = layoutVariables().panelLayoutBreakPoints;
         const breakpoints = titleBarVariables().breakpoints;
         const width = document.body.clientWidth;
         if (width <= breakpoints.compact) {

@@ -285,7 +285,8 @@ class SiteNavModule extends NavModule
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
-            return $this->addLink($text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
+            $hasSlash = str_starts_with($url, "/");
+            return $this->addLink($text, $hasSlash ? $url : "/" . $url, $key, $cssClass, $sort, $modifiers, $disabled);
         }
     }
 

@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-import { DashboardFormControlGroup, DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
 import { useReasonMutation } from "@dashboard/moderation/CommunityManagement.hooks";
 import { IReason } from "@dashboard/moderation/CommunityManagementTypes";
 import { IError } from "@library/errorPages/CoreErrorMessages";
@@ -30,8 +29,9 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 import Message from "@library/messages/Message";
 import { ErrorIcon } from "@library/icons/common";
 import { css } from "@emotion/css";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 
-interface IProps {
+export interface AddEditReportReasonModalProps {
     reportReason: IReason | null;
     isVisible: boolean;
     onVisibilityChange: (visible: boolean) => void;
@@ -118,7 +118,7 @@ const errorContainer = css({
     padding: "16px 0",
 });
 
-export default function AddEditReportReasonModalImp(props: IProps) {
+export default function AddEditReportReasonModalImp(props: AddEditReportReasonModalProps) {
     const { reportReason, isVisible, onVisibilityChange } = props;
     const reasonMutation = useReasonMutation(true);
     const classesFrameBody = frameBodyClasses();
@@ -273,13 +273,11 @@ export default function AddEditReportReasonModalImp(props: IProps) {
                                         />
                                     </div>
                                 )}
-                                <JsonSchemaForm
+                                <DashboardSchemaForm
                                     disabled={reasonMutation.isLoading}
                                     fieldErrors={reasonMutation.error?.response?.data?.errors}
                                     schema={schema}
                                     instance={values}
-                                    FormControlGroup={DashboardFormControlGroup}
-                                    FormControl={DashboardFormControl}
                                     onBlur={(e) => {
                                         if (e === "name") {
                                             generateReportReasonID();

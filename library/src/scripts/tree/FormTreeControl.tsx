@@ -56,7 +56,7 @@ export function FormTreeControl(props: IProps) {
             )}
             <FormTree<IHideableItem>
                 aria-describedby={props.control.description ? descriptionID : undefined}
-                aria-label={props.control.label}
+                aria-label={props.control.label as string}
                 value={treeValue}
                 onChange={(newTreeValue) => {
                     setTreeValue(newTreeValue);

@@ -25,7 +25,7 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@vanilla/i18n";
 import { EMPTY_SCHEMA, IJsonSchemaFormHandle, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { extractDataByKeyLookup, mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
+import { extractSchemaDefaults, mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
 import { useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import Message from "@library/messages/Message";
@@ -33,7 +33,7 @@ import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
 
-interface IIntegrationModalProps extends Pick<React.ComponentProps<typeof Modal>, "isVisible" | "exitHandler"> {
+export interface IIntegrationModalProps extends Pick<React.ComponentProps<typeof Modal>, "isVisible" | "exitHandler"> {
     onSuccess?: () => Promise<void>;
 }
 
@@ -103,8 +103,7 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
 
     const { values, submitForm, setValues, isSubmitting, resetForm, dirty } = useFormik<IPostAttachmentParams>({
         initialValues: {
-            ...{},
-            ...extractDataByKeyLookup(integrationSchema ?? EMPTY_SCHEMA, "default"),
+            ...extractSchemaDefaults(integrationSchema ?? EMPTY_SCHEMA),
         },
         onSubmit: async (values) => {
             setServerError(null);

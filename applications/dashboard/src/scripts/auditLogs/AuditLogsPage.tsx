@@ -58,7 +58,12 @@ export function AuditLogsPage() {
         onlySpoofedActions: useQueryParam("onlySpoofedActions", false),
         dateInserted: useQueryParam("dateInserted", DEFAULT_FORM.dateInserted),
     };
-    const [form, _setForm] = useState<IAuditLogForm>({ ...initialForm });
+    const [form, _setForm] = useState<IAuditLogForm>({
+        ...initialForm,
+        insertUserID: Array.isArray(initialForm.insertUserID)
+            ? (initialForm.insertUserID ?? []).flat()
+            : (Object.values(initialForm.insertUserID).flat() as RecordID[]),
+    });
     useQueryStringSync({ ...form, page }, { ...DEFAULT_FORM, page: 1 });
     const setForm = useCallback(
         (newForm: Partial<IAuditLogForm> | ((existingForm: IAuditLogForm) => IAuditLogForm)) => {
@@ -260,7 +265,8 @@ const schema: JsonSchema = {
                 type: "string",
             },
             "x-control": {
-                inputType: "tokens",
+                inputType: "dropDown",
+                multiple: true,
                 label: t("Action"),
                 choices: {
                     api: {

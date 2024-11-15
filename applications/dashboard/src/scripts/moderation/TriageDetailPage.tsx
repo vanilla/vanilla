@@ -133,7 +133,6 @@ function TriageDetailPageImpl(props: IProps) {
                                     {comments?.map((comment) => {
                                         return (
                                             <CommentThreadItem
-                                                threadStyle={"flat"}
                                                 key={comment.commentID}
                                                 comment={comment}
                                                 discussion={postRevision.mostRecentRevision!}

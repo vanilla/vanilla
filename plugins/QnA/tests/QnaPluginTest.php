@@ -11,8 +11,6 @@ use Garden\Events\ResourceEvent;
 use QnAPlugin;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Events\DiscussionStatusEvent;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Forum\Models\PostTypeModel;
 use VanillaTests\APIv2\QnaApiTestTrait;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\SiteTestCase;
@@ -171,30 +169,5 @@ class QnAPluginTest extends SiteTestCase
             ["deliveryType" => DELIVERY_TYPE_ALL]
         );
         $draftHtml->assertContainsString("Ask a Question");
-    }
-
-    /**
-     * Test saving qna configurations on a category when the post types feature is enabled.
-     *
-     * @return void
-     */
-    public function testSaveQuestionPostTypeSettingsController()
-    {
-        $this->runWithConfig(
-            [
-                FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS) => true,
-                "QnA.FollowUp.Enabled" => true,
-            ],
-            function () {
-                $this->api()->patch("post-types/question", ["isActive" => true]);
-                $this->bessy()->postJsonData("/vanilla/settings/addcategory", [
-                    "Name" => "testSaveQuestionPostTypeSettingsController",
-                    "UrlCode" => "testSaveQuestionPostTypeSettingsController",
-                    "allowedPostTypeIDs" => ["question"],
-                    "useDownVotes" => true,
-                    "QnaFollowUpNotification" => true,
-                ]);
-            }
-        );
     }
 }

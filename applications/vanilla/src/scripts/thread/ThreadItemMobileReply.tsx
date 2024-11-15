@@ -62,7 +62,6 @@ const mobileReplyModalClasses = () => {
         background: ColorsUtils.colorOut(global.elementaryColors.white),
         paddingInline: global.spacer.panelComponent,
         borderRadius: 8,
-        marginBottom: 16,
     });
 
     const editorContainer = css({
@@ -146,12 +145,7 @@ export function ThreadItemMobileReply(props: IProps) {
                 <div className={classes.commentWrapper}>
                     {comment && (
                         <CollapsableContent maxHeight={100} onToggle={() => handleToggle()}>
-                            <CommentThreadItem
-                                threadStyle={"nested"}
-                                comment={comment}
-                                discussion={discussion}
-                                readOnly
-                            />
+                            <CommentThreadItem comment={comment} discussion={discussion} readOnly />
                         </CollapsableContent>
                     )}
                 </div>
@@ -165,7 +159,7 @@ export function ThreadItemMobileReply(props: IProps) {
                         onCancel={() => {
                             props.onVisibilityChange(false);
                         }}
-                        draftPosition={DraftIndicatorPosition.WITHIN}
+                        draftPosition={DraftIndicatorPosition.ABOVE}
                         skipReplyThreadItem
                         autoFocus
                     />

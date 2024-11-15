@@ -237,7 +237,7 @@ export const ThreadCommentEditor = forwardRef(function ThreadCommentEditor(
             };
         }
         return {};
-    }, [cacheDraftContent, cacheDraftParentIDAndPath, props.draftPosition]);
+    }, [cacheDraftContent, cacheDraftParentIDAndPath]);
 
     return (
         <NewCommentEditor

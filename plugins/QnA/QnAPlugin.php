@@ -9,7 +9,6 @@ use Garden\Container\Reference;
 use Garden\EventManager;
 use Garden\PsrEventHandlersInterface;
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn_Session as SessionInterface;
@@ -17,11 +16,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Events\DiscussionStatusEvent;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Forms\FieldMatchConditional;
-use Vanilla\Forms\FormOptions;
-use Vanilla\Forms\SchemaForm;
-use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Zendesk\Events\ZendeskArticleDiscussionEvent;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusStructureEvent;
@@ -1205,78 +1199,12 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     }
 
     /**
-     * Update schema for setting allowed post types in categories.
-     *
-     * @param Schema $schema
-     * @return void
-     */
-    public function vanillaSettingsController_allowedPostTypesSchema_handler(Schema $schema): void
-    {
-        if ($this->questionFollowUpFeatureEnabled()) {
-            $schema->merge(
-                Schema::parse([
-                    "QnaFollowUpNotification:b?" => [
-                        "type" => "boolean",
-                        "default" => false,
-                        "x-control" => SchemaForm::checkBox(
-                            new FormOptions("Enable Q&A follow-up notifications."),
-                            conditions: new FieldMatchConditional(
-                                "allowedPostTypeIDs",
-                                Schema::parse([
-                                    "type" => "array",
-                                    "items" => [
-                                        "type" => "string",
-                                        "enum" => ["question"],
-                                    ],
-                                ])
-                            )
-                        ),
-                    ],
-                ])
-            );
-            $schema->addValidator("", function (array $data, \Garden\Schema\ValidationField $field) {
-                if (
-                    ($data["QnaFollowUpNotification"] ?? false) &&
-                    !in_array("question", $data["allowedPostTypeIDs"] ?? [])
-                ) {
-                    $field
-                        ->getValidation()
-                        ->addError(
-                            "QnaFollowUpNotification",
-                            "Q&A follow-up notifications cannot be enabled when category does not support questions"
-                        );
-
-                    return \Garden\Schema\Invalid::value();
-                }
-                return true;
-            });
-        }
-    }
-
-    /**
-     * Store QnaFollowUpNotification state for edit category page.
-     *
-     * @param VanillaSettingsController $sender
-     * @return void
-     */
-    public function settingsController_addEditCategory_handler($sender)
-    {
-        $categoryID = val("CategoryID", $sender->Data);
-        $category = CategoryModel::categories($categoryID);
-
-        $sender->setData("postTypeProps.QnaFollowUpNotification", $category["QnaFollowUpNotification"] ?? false);
-    }
-
-    /**
      * Add QnaFollowUpNotification toggle
      *
      * @param GDN_Controller $sender Sending controller instance
      */
     public function base_afterCategorySettings_handler($sender)
     {
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
-            return;
-        }
         if ($this->questionFollowUpFeatureEnabled()) {
             $category = $sender->Category;
             if ($category->DisplayAs === "Discussions") {
@@ -1350,7 +1278,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     public function discussionsController_unanswered_create($sender, $args)
     {
         // The frontend part of this isn't ready yet as it doesn't handle the appropriate url querystring.
-        if (FeatureFlagHelper::featureEnabled("customLayout.discussionList.QnAPlugin")) {
+        if (\Vanilla\FeatureFlagHelper::featureEnabled("customLayout.discussionList.QnAPlugin")) {
             redirectTo("/discussions?type=question&status=unanswered");
         }
         $sender->View = "Index";
@@ -1474,7 +1402,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     public function discussionController_discussionInfo_handler($sender, $args)
     {
         $discussion = $args["Discussion"];
-        if (!empty($discussion) && FeatureFlagHelper::featureEnabled(static::FEATURE_FLAG)) {
+        if (!empty($discussion) && \Vanilla\FeatureFlagHelper::featureEnabled(static::FEATURE_FLAG)) {
             echo $this->getDiscussionQnATagString($discussion);
         }
     }
@@ -1890,7 +1818,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      * @param DiscussionsApiController $discussionsApiController
      * @param array $options
      * @return array
-     * @throws ValidationException
      */
     public function discussionsApiController_normalizeOutput(
         array $discussion,

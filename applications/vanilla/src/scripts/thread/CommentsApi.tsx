@@ -73,8 +73,6 @@ export namespace CommentsApi {
         insertUserRoleID?: number[];
         sentiment?: string[];
         sort?: CommentListSortOption;
-        maxDepth?: number;
-        collapseChildDepth?: number;
     }
 
     export interface IndexThreadParams {
@@ -84,8 +82,6 @@ export namespace CommentsApi {
         limit: number;
         sort: CommentListSortOption;
         expand: string[];
-        maxDepth?: number;
-        collapseChildDepth?: number;
     }
 
     export interface SingleParams {

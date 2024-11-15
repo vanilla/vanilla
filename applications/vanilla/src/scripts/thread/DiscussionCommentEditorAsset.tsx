@@ -16,13 +16,10 @@ import isEqual from "lodash-es/isEqual";
 import { useEffect, useRef, useState } from "react";
 import { IComment, IPremoderatedRecordResponse } from "@dashboard/@types/api/comment";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { DraftIndicatorPosition, NewCommentEditor } from "@vanilla/addon-vanilla/thread/components/NewCommentEditor";
+import { NewCommentEditor } from "@vanilla/addon-vanilla/thread/components/NewCommentEditor";
 import { t } from "@vanilla/i18n";
 import { getLocalStorageOrDefault } from "@vanilla/react-utils";
 import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
-import { Widget } from "@library/layout/Widget";
-import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import type { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 
 interface IDraftProps {
     draftID: number;
@@ -36,10 +33,6 @@ interface IProps {
     categoryID: number;
     draft?: IDraftProps;
     isPreview?: boolean;
-    title?: string;
-    description?: string;
-    subtitle?: string;
-    containerOptions?: IHomeWidgetContainerOptions;
 }
 
 export const EMPTY_DRAFT: MyValue = [{ type: "p", children: [{ text: "" }] }];
@@ -93,17 +86,8 @@ export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "",
         await queryClient.invalidateQueries({ queryKey: ["discussion"] });
         await queryClient.invalidateQueries({ queryKey: ["commentList"] });
         await queryClient.invalidateQueries({ queryKey: ["commentThread"] });
-
-        if ("url" in comment) {
-            // Navigate to the comment.
-            window.location.href = comment.url;
-        } else {
-            // The comment was premoderated.
-            addToast({
-                body: comment.message,
-                dismissible: true,
-            });
-        }
+        //FIXME: comment permalinks don't work in new thread view yet
+        // window.location.href = comment.url;
     }
 
     const draftMutation = useMutation({
@@ -164,32 +148,23 @@ export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "",
     }, [debouncedComment]);
 
     return (
-        <HomeWidgetContainer
-            title={props.title}
-            description={props.description}
-            subtitle={props.subtitle}
-            options={props.containerOptions}
-            depth={2}
-        >
-            <NewCommentEditor
-                editorKey={editorKey}
-                value={value}
-                onValueChange={setValue}
-                onPublish={async (value) => {
-                    const newComment = await postMutation.mutateAsync(JSON.stringify(value));
-                    await handlePostCommentSuccess(newComment);
-                }}
-                publishLoading={postMutation.isLoading}
-                draft={ownDraft}
-                onDraft={() => {
-                    draftMutation.mutate();
-                }}
-                draftLoading={draftMutation.isLoading}
-                draftLastSaved={lastSaved.current}
-                isPreview={props.isPreview}
-                draftIndicatorPosition={DraftIndicatorPosition.WITHIN}
-            />
-        </HomeWidgetContainer>
+        <NewCommentEditor
+            editorKey={editorKey}
+            value={value}
+            onValueChange={setValue}
+            onPublish={async (value) => {
+                const newComment = await postMutation.mutateAsync(JSON.stringify(value));
+                await handlePostCommentSuccess(newComment);
+            }}
+            publishLoading={postMutation.isLoading}
+            draft={ownDraft}
+            onDraft={() => {
+                draftMutation.mutate();
+            }}
+            draftLoading={draftMutation.isLoading}
+            draftLastSaved={lastSaved.current}
+            isPreview={props.isPreview}
+        />
     );
 }
 

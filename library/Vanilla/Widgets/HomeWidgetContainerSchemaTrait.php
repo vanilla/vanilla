@@ -11,7 +11,6 @@ use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
-use Vanilla\Forms\FormPickerOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Forms\FieldMatchConditional;
@@ -42,9 +41,7 @@ trait HomeWidgetContainerSchemaTrait
     public static function widgetTitleSchema(
         string $placeholder = null,
         bool $required = false,
-        string $defaultValue = null,
-        bool $allowDynamic = true,
-        string $defaultTitleType = null
+        string $defaultValue = null
     ): Schema {
         $title = $required ? "title:s" : "title:s?";
         $titleSchema = [
@@ -53,15 +50,13 @@ trait HomeWidgetContainerSchemaTrait
             "x-control" => SchemaForm::textBox(
                 new FormOptions("Title", "Set a custom title.", $placeholder ?? "Type your title here"),
                 "text",
-                $allowDynamic
-                    ? new FieldMatchConditional(
-                        "titleType",
-                        Schema::parse([
-                            "type" => "string",
-                            "const" => "static",
-                        ])
-                    )
-                    : null
+                new FieldMatchConditional(
+                    "titleType",
+                    Schema::parse([
+                        "type" => "string",
+                        "const" => "static",
+                    ])
+                )
             ),
         ];
 
@@ -69,28 +64,23 @@ trait HomeWidgetContainerSchemaTrait
             $titleSchema["default"] = $defaultValue;
         }
 
-        if (!$allowDynamic) {
-            return Schema::parse([
-                $title => $titleSchema,
-            ]);
-        }
-
         $dynamicSchemas = \Gdn::getContainer()->get(DynamicContainerSchemaOptions::class);
 
-        $options = $dynamicSchemas->getTitleChoices();
+        $formChoices = $dynamicSchemas->getTitleChoices();
+
         // Always add "none" as the first option if the field is not required
         if (!$required) {
-            $options->option("None", "none");
+            $formChoices = ["none" => t("None")] + $formChoices;
         }
 
-        $options->option("Custom", "static");
+        $formChoices["static"] = t("Custom");
 
         return Schema::parse([
             $required ? "titleType:s" : "titleType:s?" => [
                 "type" => "string",
                 "description" => "The type of title to use (contextual or static)",
-                "default" => $defaultTitleType ?? ($defaultValue ? "static" : "none"),
-                "x-control" => SchemaForm::radioPicker(
+                "default" => $defaultValue ? "static" : "none",
+                "x-control" => SchemaForm::radio(
                     new FormOptions(
                         "Title Type",
                         "Select the kind of title",
@@ -99,7 +89,7 @@ trait HomeWidgetContainerSchemaTrait
                             "A contextual title will be the banner or subcommunity title depending on where which page this layout is applied."
                         )
                     ),
-                    $options
+                    new StaticFormChoices($formChoices)
                 ),
             ],
             $title => $titleSchema,
@@ -120,8 +110,7 @@ trait HomeWidgetContainerSchemaTrait
     public static function widgetDescriptionSchema(
         string $placeholder = null,
         bool $required = false,
-        string $defaultValue = null,
-        bool $allowDynamic = true
+        string $defaultValue = null
     ): Schema {
         $description = $required ? "description:s" : "description:s?";
         $descriptionSchema = [
@@ -134,15 +123,13 @@ trait HomeWidgetContainerSchemaTrait
                     $placeholder ?? "Type your description here"
                 ),
                 "textarea",
-                $allowDynamic
-                    ? new FieldMatchConditional(
-                        "descriptionType",
-                        Schema::parse([
-                            "type" => "string",
-                            "const" => "static",
-                        ])
-                    )
-                    : null
+                new FieldMatchConditional(
+                    "descriptionType",
+                    Schema::parse([
+                        "type" => "string",
+                        "const" => "static",
+                    ])
+                )
             ),
         ];
 
@@ -150,31 +137,25 @@ trait HomeWidgetContainerSchemaTrait
             $descriptionSchema["default"] = $defaultValue;
         }
 
-        if (!$allowDynamic) {
-            return Schema::parse([
-                $description => $descriptionSchema,
-            ]);
-        }
-
         $dynamicSchemas = \Gdn::getContainer()->get(DynamicContainerSchemaOptions::class);
 
-        $options = $dynamicSchemas->getDescriptionChoices();
+        $formChoices = $dynamicSchemas->getDescriptionChoices();
 
         // Always add "none" as the first option if the field is not required
         if (!$required) {
-            $options->option("None", "none");
+            $formChoices = ["none" => t("None")] + $formChoices;
         }
 
-        $options->option("Custom", "static");
+        $formChoices["static"] = t("Custom");
 
         return Schema::parse([
             "descriptionType" => [
                 "type" => "string",
                 "description" => "The type of description to use (contextual or static)",
                 "default" => $defaultValue ? "static" : "none",
-                "x-control" => SchemaForm::radioPicker(
+                "x-control" => SchemaForm::radio(
                     new FormOptions("Description Type", "Select the kind of title"),
-                    $options
+                    new StaticFormChoices($formChoices)
                 ),
             ],
             $description => $descriptionSchema,
@@ -189,8 +170,10 @@ trait HomeWidgetContainerSchemaTrait
      *
      * @return Schema
      */
-    public static function widgetSubtitleSchema(string $fieldName = "subtitle", string $placeholder = null): Schema
-    {
+    public static function widgetSubtitleSchema(
+        string $fieldName = "subtitleContent",
+        string $placeholder = null
+    ): Schema {
         return Schema::parse([
             "{$fieldName}:s?" => [
                 "type" => "string",
@@ -273,9 +256,7 @@ trait HomeWidgetContainerSchemaTrait
             "carousel" => "Carousel",
             "link" => "Link",
         ],
-        bool $viewAll = true,
-        string $visualBackgroundType = "inner",
-        string $defaultBorderType = "none"
+        bool $viewAll = true
     ): Schema {
         $viewAllSchema = [];
 
@@ -284,41 +265,30 @@ trait HomeWidgetContainerSchemaTrait
         }
 
         $basicPropertiesSchema = [
-            "outerBackground?" => new WidgetBackgroundSchema(
-                "Set a full width background for the container.",
-                $visualBackgroundType === "outer"
-            ),
+            "outerBackground?" => new WidgetBackgroundSchema("Set a full width background for the container.", false),
             "innerBackground?" => new WidgetBackgroundSchema(
                 "Set an inner background (inside of the margins) for the container.",
-                $visualBackgroundType === "inner"
+                true
             ),
-            "borderType:s" => [
+            "borderType:s?" => [
                 "enum" => self::borderTypeOptions(),
                 "description" => "Describe what type of border the widget should have.",
-                "default" => $defaultBorderType,
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Border Type", "Choose widget border type", "Style Guide Default"),
                     new StaticFormChoices([
-                        "none" => "None",
                         "border" => "Border",
+                        "none" => "None",
                         "shadow" => "Shadow",
-                        "separator" => "Separator",
                     ])
                 ),
             ],
-            "headerAlignment:s" => [
+            "headerAlignment:s?" => [
                 "description" => "Configure alignment of the title, subtitle, and description.",
                 "enum" => ["left", "center"],
-                "default" => "left",
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Header Alignment", "Configure alignment of the title, subtitle, and description."),
                     new StaticFormChoices(["left" => "Left", "center" => "Center"])
                 ),
-            ],
-            "visualBackgroundType" => [
-                "type" => "string",
-                "default" => $visualBackgroundType,
-                "enum" => ["inner", "outer"],
             ],
         ];
         $extendedSchema = [
@@ -372,7 +342,6 @@ trait HomeWidgetContainerSchemaTrait
         }
 
         if ($allowedProperties) {
-            $allowedProperties[] = "visualBackgroundType";
             $propertiesSchema = Schema::parse($allowedProperties)->add($propertiesSchema);
         }
 

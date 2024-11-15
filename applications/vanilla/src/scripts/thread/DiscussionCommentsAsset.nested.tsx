@@ -69,7 +69,7 @@ export function DiscussionCommentsAssetNested(props: IProps) {
             )}
             {!isLoading && threadStructure && commentsByID && (
                 <CommentThreadProvider
-                    threadDepthLimit={(props.apiParams.maxDepth ?? 5) - 1}
+                    threadDepthLimit={getMeta("threadDepth", 5) - 1}
                     threadStructure={threadStructure}
                     commentsByID={commentsByID}
                     commentApiParams={apiParams}

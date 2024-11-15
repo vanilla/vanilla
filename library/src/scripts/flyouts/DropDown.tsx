@@ -14,7 +14,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { Icon } from "@vanilla/icons";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
-import { useMeasure, useStackingContext } from "@vanilla/react-utils";
+import { useMeasure } from "@vanilla/react-utils";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { cx } from "@emotion/css";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -145,7 +145,6 @@ export default function DropDown(props: IDropDownProps) {
     const contentID = props.contentID ?? ID + "-contents";
 
     const buttonContents = props.buttonContents || <Icon icon="navigation-ellipsis" />;
-    const { zIndex } = useStackingContext();
 
     return (
         <FlyoutToggle
@@ -202,7 +201,6 @@ export default function DropDown(props: IDropDownProps) {
                                         return {
                                             ...position,
                                             top: adjustedTop,
-                                            zIndex: zIndex,
                                         };
                                     },
                                 }}

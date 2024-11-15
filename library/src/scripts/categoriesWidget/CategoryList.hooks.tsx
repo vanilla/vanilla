@@ -27,7 +27,7 @@ export interface IGetCategoryListResponse {
     pagination: ILinkPages;
 }
 
-export function useCategoryList(queryParams?: IGetCategoryListParams, shouldFetch: boolean = true) {
+export function useCategoryList(queryParams: IGetCategoryListParams, shouldFetch: boolean = true) {
     const { refetch, isLoading, error, isSuccess, isFetching, data } = useQuery<
         any,
         IApiError,

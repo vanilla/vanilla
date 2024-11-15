@@ -120,26 +120,23 @@ export class SchemaFormBuilder {
         description: string | null,
         type: ITextBoxControl["type"],
         disabled?: boolean,
-        pattern?: string,
     ) {
         return new TextBoxBuilder(
             this.custom(property, {
                 type: "string",
-                disabled,
                 "x-control": {
                     inputType: "textBox",
                     label,
                     description,
                     type,
                     disabled,
-                    pattern,
                 },
             }),
         );
     }
 
-    public textBox(property: string, label: string, description: string | null, disabled?: boolean, pattern?: string) {
-        return this.textBoxInternal(property, label, description, "text", disabled, pattern);
+    public textBox(property: string, label: string, description: string | null, disabled?: boolean) {
+        return this.textBoxInternal(property, label, description, "text", disabled);
     }
 
     public textArea(property: string, label: string, description: string | null, disabled?: boolean) {
@@ -211,16 +208,9 @@ export class SchemaFormBuilder {
         });
     }
 
-    public dropdown(
-        property: string,
-        label: string,
-        description: string | null,
-        options: IPickerOption[],
-        disabled?: boolean,
-    ) {
+    public dropdown(property: string, label: string, description: string | null, options: IPickerOption[]) {
         return this.custom(property, {
             type: "string",
-            disabled,
             "x-control": {
                 inputType: "dropDown",
                 label,

@@ -97,7 +97,6 @@ class NotificationsController extends Gdn_Controller
                     $activity["PluralHeadlineFormat"] ?? ($activity["PluralHeadline"] ?? $activity["HeadlineFormat"]);
             }
             $activity["Headline"] = formatString($activity["HeadlineFormat"], $activity);
-            $activity["Headline"] = Gdn::formatService()->renderPlainText($activity["Headline"], "text");
             if ($activity["Photo"]) {
                 $userPhoto = anchor(
                     img($activity["Photo"], ["class" => "ProfilePhotoMedium"]),

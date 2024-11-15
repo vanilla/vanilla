@@ -17,7 +17,6 @@ use Garden\Web\RequestInterface;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Dashboard\Models\UserLeaderQuery;
-use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\DateFilterSchema;
@@ -1078,9 +1077,9 @@ class UsersApiController extends AbstractApiController
         if ($id && $body["sendWelcomeEmail"] ?? true) {
             $this->userModel->sendWelcomeEmail($id, $userData["Password"] ?? "");
         }
-        // Add default preferences for the new user
-        $userNotificationPrefsModel = Gdn::getContainer()->get(UserNotificationPreferencesModel::class);
-        $userNotificationPrefsModel->setInitialDefaults($id, true);
+        // Add default followed category preferences to the new user
+        $categoryModel = CategoryModel::instance();
+        $categoryModel->setDefaultCategoryPreferences($id);
 
         $this->validateModel($this->userModel);
 

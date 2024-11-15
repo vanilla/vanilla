@@ -62,7 +62,6 @@ interface IDiscussionOptionsMenuProps {
      * and need to invalidate certain queries when a mutation is successful.
      */
     onMutateSuccess?: () => Promise<void>;
-    onDiscussionPage?: boolean;
 }
 
 const reportButtonAlignment = css({
@@ -76,11 +75,7 @@ const reportButtonAlignment = css({
     },
 });
 
-const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
-    discussion,
-    onMutateSuccess,
-    onDiscussionPage,
-}) => {
+const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({ discussion, onMutateSuccess }) => {
     const { hasPermission } = usePermissionsContext();
     const { canStillEdit, humanizedRemainingTime } = useUserCanStillEditDiscussionOrComment(discussion);
     const permOptions: IPermissionOptions = {
@@ -133,24 +128,11 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
     }
 
     if (canMove) {
-        firstGroupItems.push(
-            <DiscussionOptionsMove
-                discussion={discussion}
-                onSuccess={async () => {
-                    onMutateSuccess?.();
-                    if (onDiscussionPage) {
-                        // We may be getting redirected here.
-                        window.location.reload();
-                    }
-                }}
-            />,
-        );
+        firstGroupItems.push(<DiscussionOptionsMove discussion={discussion} onSuccess={onMutateSuccess} />);
     }
 
     if (canManageDiscussion) {
-        firstGroupItems.push(
-            <DiscussionOptionsDelete discussion={discussion} redirectAfterDelete={onDiscussionPage} />,
-        );
+        firstGroupItems.push(<DiscussionOptionsDelete discussion={discussion} />);
     }
 
     //FIXME: this looks like it should be a permission check

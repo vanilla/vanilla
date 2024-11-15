@@ -68,7 +68,6 @@ const ThreadItemActionsClasses = useThemeCache(() => {
         display: "inline-flex",
         alignItems: "center",
         gap: 2,
-        minHeight: 24,
         "@media (max-width : 516px)": {
             fontSize: globalVars.fontSizeAndWeightVars("medium").size,
             fontWeight: globalVars.fontSizeAndWeightVars("medium").weight,

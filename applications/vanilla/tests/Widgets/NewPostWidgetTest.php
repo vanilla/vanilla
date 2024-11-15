@@ -6,7 +6,6 @@
 
 namespace VanillaTests\Forum\Widgets;
 
-use Vanilla\Forum\Models\PostTypeModel;
 use VanillaTests\SiteTestCase;
 use VanillaTests\Layout\LayoutTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -176,63 +175,5 @@ HTML
         ]);
 
         $this->assertHydratesTo($spec, ["categoryID" => 1], $expected, "discussionCategoryPage");
-    }
-
-    /**
-     * Test hydrating the new post widget with the post type feature.
-     * This tests that only post types restricted to a category show up.
-     *
-     * @return void
-     */
-    public function testHydrateNewPostWidgetWithPostTypes()
-    {
-        $this->enableFeature(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS);
-        $postType1 = $this->createPostType();
-        $postType2 = $this->createPostType();
-        $category = $this->createCategory([
-            "hasRestrictedPostTypes" => true,
-            "allowedPostTypeIDs" => [$postType1["postTypeID"], $postType2["postTypeID"]],
-        ]);
-        $spec = [
-            '$hydrate' => "react.newpost",
-            '$reactTestID' => "newpost",
-        ];
-
-        $expected = self::markForSparseComparision([
-            '$reactComponent' => "NewPostMenu",
-            '$reactProps' => self::markForSparseComparision([
-                "items" => self::markForSparseComparision([
-                    [
-                        "label" => $postType1["postButtonLabel"],
-                        "action" => "/post/{$postType1["postTypeID"]}/{$category["urlcode"]}",
-                        "type" => "link",
-                        "id" => str_replace(" ", "-", strtolower($postType1["postButtonLabel"])),
-                        "icon" => "new-discussion",
-                        "asOwnButton" => false,
-                    ],
-                    [
-                        "label" => $postType2["postButtonLabel"],
-                        "action" => "/post/{$postType2["postTypeID"]}/{$category["urlcode"]}",
-                        "type" => "link",
-                        "id" => str_replace(" ", "-", strtolower($postType2["postButtonLabel"])),
-                        "icon" => "new-discussion",
-                        "asOwnButton" => false,
-                    ],
-                ]),
-            ]),
-            '$reactTestID' => "newpost",
-            '$seoContent' => <<<HTML
-<div class=pageBox>
-    <ul class=linkList>
-        <li><a href=/post/{$postType1["postTypeID"]}/{$category["urlcode"]}>{$postType1["postButtonLabel"]}</a></li>
-        <li><a href=/post/{$postType2["postTypeID"]}/{$category["urlcode"]}>{$postType2["postButtonLabel"]}</a></li>
-    </ul>
-</div>
-HTML
-        ,
-        ]);
-
-        $this->assertHydratesTo($spec, ["categoryID" => $category["categoryID"]], $expected, "discussionCategoryPage");
-        $this->disableFeature(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS);
     }
 }

@@ -94,7 +94,7 @@ describe("CommentThreadContext", () => {
     it("Fills holes", async () => {
         // Create a thread with 2 root comment, each with 2 children and a hole
         const mockThreadResponse = CommentFixture.createMockThreadStructureResponse({
-            maxDepth: 2,
+            maxDepth: 1,
             minCommentsPerDepth: 2,
             includeHoles: true,
             randomizeCommentContent: false,
@@ -153,9 +153,8 @@ describe("CommentThreadContext", () => {
         expect.assertions(6);
         // Create a thread with 2 root comment, each with 2 children
         const mockThreadResponse = CommentFixture.createMockThreadStructureResponse({
-            maxDepth: 4,
+            maxDepth: 2,
             minCommentsPerDepth: 2,
-            collapseChildDepth: 4,
             includeHoles: false,
             randomizeCommentContent: false,
         });

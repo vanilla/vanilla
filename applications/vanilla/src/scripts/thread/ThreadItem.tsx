@@ -35,7 +35,6 @@ import { getMeta } from "@library/utility/appUtils";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { DRAFT_PARENT_ID_AND_PATH_KEY } from "@vanilla/addon-vanilla/thread/components/ThreadCommentEditor";
 import { getLocalStorageOrDefault } from "@vanilla/react-utils";
-import FlexSpacer from "@library/layout/FlexSpacer";
 
 interface IProps {
     content: string;
@@ -66,8 +65,10 @@ function getThreadItemID(recordType: string, recordID: string | number) {
 
 export function ThreadItem(props: IProps) {
     const { content, user, userPhotoLocation, collapsed, suggestionContent, showOPTag, isHighlighted } = props;
-    const { recordType, recordID, threadStyle } = useThreadItemContext();
+    const { recordType, recordID } = useThreadItemContext();
     const itemID = getThreadItemID(recordType, recordID);
+
+    const threadStyle = getMeta("threadStyle", "flat");
 
     // when we have draftID in the URL, we want to show the draft content
     const { showReplyForm, threadStructure, discussion } = useCommentThread();
@@ -135,7 +136,6 @@ export function ThreadItem(props: IProps) {
                     {!props.readOnly && (
                         <div className={classes.footerWrapper}>
                             {props.reactions && <ThreadItemActions reactions={props.reactions} />}
-                            <FlexSpacer actualSpacer />
                             {props.onReply && (
                                 <Button
                                     className={classes.replyButton}

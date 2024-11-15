@@ -33,7 +33,6 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
         ...Mixins.margin({
             bottom: globalVars.spacer.headingBox,
         }),
-        color: `var(--fg-contrast-color, inherit)`,
     });
     const titleWrap = css(
         {

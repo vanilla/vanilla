@@ -91,7 +91,6 @@ function customErrorHandler(error: AxiosError) {
             description: data.description,
             errors: data.errors ?? {},
             actionButton: data.actionButton,
-            trace: data.trace ?? null,
         } as any;
     }
 

@@ -56,7 +56,6 @@ describe("DiscussionOriginalPostAsset", () => {
         beforeEach(async () => {
             await renderInProvider(
                 <DiscussionOriginalPostAsset
-                    titleType={"discussion/name"}
                     discussion={DiscussionFixture.mockDiscussion}
                     category={MOCK_CATEGORY_FRAGMENT}
                 />,
@@ -79,7 +78,6 @@ describe("DiscussionOriginalPostAsset", () => {
         beforeEach(async () => {
             await renderInProvider(
                 <DiscussionOriginalPostAsset
-                    titleType={"discussion/name"}
                     discussion={DiscussionFixture.mockDiscussion}
                     category={MOCK_CATEGORY_FRAGMENT}
                 />,
@@ -104,7 +102,6 @@ describe("DiscussionOriginalPostAsset", () => {
         beforeEach(async () => {
             await renderInProvider(
                 <DiscussionOriginalPostAsset
-                    titleType={"discussion/name"}
                     discussion={{ ...DiscussionFixture.mockDiscussion, closed: true }}
                     category={MOCK_CATEGORY_FRAGMENT}
                 />,

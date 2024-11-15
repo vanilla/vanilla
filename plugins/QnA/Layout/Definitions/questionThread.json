@@ -23,11 +23,7 @@
                     "$hydrate": "react.asset.discussionAttachments"
                 },
                 {
-                    "$hydrate": "react.asset.tabbed-comment-list",
-                    "apiParams": {
-                        "sort": "dateInserted"
-                    },
-                    "tabTitles": {}
+                    "$hydrate": "react.asset.tabbed-comment-list"
                 },
                 {
                     "$hydrate": "react.asset.comment-editor"

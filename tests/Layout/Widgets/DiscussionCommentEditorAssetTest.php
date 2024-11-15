@@ -38,7 +38,8 @@ class DiscussionCommentEditorAssetTest extends SiteTestCase
                 '$reactProps' => [
                     "discussionID" => $discussion["discussionID"],
                     "categoryID" => $discussion["categoryID"],
-                    "title" => "Leave a comment",
+                    "titleType" => "none",
+                    "descriptionType" => "none",
                 ],
                 '$reactTestID' => "defaults",
             ],
@@ -77,7 +78,8 @@ class DiscussionCommentEditorAssetTest extends SiteTestCase
                 '$reactProps' => [
                     "discussionID" => $discussion["discussionID"],
                     "categoryID" => $discussion["categoryID"],
-                    "title" => "Leave a comment",
+                    "titleType" => "none",
+                    "descriptionType" => "none",
                     "draft" => [
                         "draftID" => $draft["draftID"],
                         "dateUpdated" => $draft["dateUpdated"],

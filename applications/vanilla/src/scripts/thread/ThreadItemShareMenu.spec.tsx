@@ -25,7 +25,6 @@ async function renderInProvider() {
     return render(
         <ToastProvider>
             <ThreadItemContextProvider
-                threadStyle={"flat"}
                 recordID={mockDiscussion.discussionID}
                 recordType="discussion"
                 recordUrl={mockDiscussion.url}

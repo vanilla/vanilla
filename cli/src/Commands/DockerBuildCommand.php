@@ -111,11 +111,10 @@ class DockerBuildCommand extends Console\Command\Command
     {
         $process = new Process(["docker", "buildx", "ls"]);
         $this->logger()->runProcess($process);
-        $output = $process->getOutput();
-        $hasMultiArchBuilder = str_contains($output, "multiarch");
+        $hasMultiArchBuilder = str_contains($process->getOutput(), "multiarch");
         if (!$hasMultiArchBuilder) {
-            $this->logger()->info("Creating new multiarch builder.");
-            $process = new Process(["docker", "buildx", "create", "--name", "multiarch"]);
+            $this->logger()->info("Creating new mutliarch builder.");
+            $process = new Process(["docker", "buildx", "create", "--name", "mutliarch"]);
             $this->logger()->runProcess($process);
         }
     }

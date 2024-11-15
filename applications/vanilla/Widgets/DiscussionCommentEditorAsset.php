@@ -114,20 +114,19 @@ TWIG
     }
 
     /**
-     * @inheritDoc
+     * TODO: Get new icon from design and replace
      */
     public static function getWidgetIconPath(): ?string
     {
-        return "/applications/dashboard/design/images/widgetIcons/AddComment.svg";
+        return "";
     }
 
     public static function getWidgetSchema(): Schema
     {
         return SchemaUtils::composeSchemas(
-            self::widgetTitleSchema(defaultValue: "Leave a comment", allowDynamic: false),
+            self::widgetTitleSchema("Leave a Comment"),
             self::widgetSubtitleSchema(),
-            self::widgetDescriptionSchema(allowDynamic: false),
-            self::containerOptionsSchema("containerOptions", minimalProperties: true, visualBackgroundType: "outer")
+            self::widgetDescriptionSchema()
         );
     }
 

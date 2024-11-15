@@ -6,7 +6,6 @@
 
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { Widget } from "@library/layout/Widget";
-import { BorderType } from "@library/styles/styleHelpersBorders";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionOriginalPostAsset from "@vanilla/addon-vanilla/thread/DiscussionOriginalPostAsset";
 import React from "react";
@@ -28,16 +27,7 @@ export function DiscussionOriginalPostAssetPreview(props: IProps) {
     return (
         <Widget>
             <QueryClientProvider client={queryClient}>
-                <DiscussionOriginalPostAsset
-                    {...props}
-                    category={discussion.category!}
-                    discussion={discussion}
-                    containerOptions={{
-                        borderType: BorderType.SEPARATOR,
-                        visualBackgroundType: "outer",
-                        ...props.containerOptions,
-                    }}
-                />
+                <DiscussionOriginalPostAsset {...props} category={discussion.category!} discussion={discussion} />
             </QueryClientProvider>
         </Widget>
     );

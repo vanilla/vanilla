@@ -29,16 +29,11 @@ import { getMeta } from "@library/utility/appUtils";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { PageBox } from "@library/layout/PageBox";
 import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
-import type { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 
 interface IProps {
     discussion: IDiscussion;
     discussionApiParams?: DiscussionsApi.GetParams;
     category: ICategoryFragment;
-    containerOptions?: IHomeWidgetContainerOptions;
-    title?: string;
-    titleType: "discussion/name" | "none";
 }
 
 const discussionOriginalPostAssetClasses = () => {
@@ -82,54 +77,10 @@ export function DiscussionOriginalPostAsset(props: IProps) {
 
     const showResolved = hasPermission("staff.allow") && getMeta("triage.enabled", false);
 
-    const postMeta = (
-        <>
-            {showResolved && (
-                <span className={discussionThreadClasses().resolved}>
-                    <Icon icon={discussion.resolved ? "cmd-approve" : "cmd-alert"} />
-                </span>
-            )}
-            {discussion.closed && (
-                <Tag
-                    className={discussionThreadClasses().closedTag}
-                    preset={discussionListVariables().labels.tagPreset}
-                >
-                    {t("Closed")}
-                </Tag>
-            )}
-        </>
-    );
-
-    const actions = currentUserSignedIn && (
-        <div className={classes.actions}>
-            {props.titleType === "none" ? postMeta : null}
-            <ReportCountMeta
-                countReports={discussion.reportMeta?.countReports}
-                recordID={discussion.discussionID}
-                recordType="discussion"
-            />
-            <DiscussionBookmarkToggle discussion={discussion} onSuccess={invalidateDiscussionQuery} />
-            <DiscussionOptionsMenu discussion={discussion} onMutateSuccess={invalidateDiscussionQuery} />
-        </div>
-    );
-
     return (
-        <HomeWidgetContainer
-            options={{ ...props.containerOptions }}
-            depth={1}
-            title={
-                props.titleType !== "none" ? (
-                    <>
-                        <span>{props.title ?? discussion.name}</span>
-                        {postMeta}
-                    </>
-                ) : undefined
-            }
-            actions={props.titleType !== "none" ? actions : undefined}
-        >
+        <PageBox className={classes.container} options={{ borderType: BorderType.SEPARATOR }}>
             <DiscussionThreadContextProvider discussion={discussion}>
                 <ThreadItemContextProvider
-                    threadStyle={"flat"}
                     recordType={"discussion"}
                     recordID={discussion.discussionID}
                     recordUrl={discussion.url}
@@ -138,6 +89,48 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                     attributes={discussion.attributes}
                     authorID={discussion.insertUserID}
                 >
+                    <PageHeadingBox
+                        depth={1}
+                        title={
+                            <>
+                                <span>{discussion.name}</span>
+                                {showResolved && (
+                                    <span className={discussionThreadClasses().resolved}>
+                                        <Icon icon={discussion.resolved ? "cmd-approve" : "cmd-alert"} />
+                                    </span>
+                                )}
+                                {discussion.closed && (
+                                    <Tag
+                                        className={discussionThreadClasses().closedTag}
+                                        preset={discussionListVariables().labels.tagPreset}
+                                    >
+                                        {t("Closed")}
+                                    </Tag>
+                                )}
+                            </>
+                        }
+                        includeBackLink
+                        actions={
+                            currentUserSignedIn && (
+                                <div className={classes.actions}>
+                                    <ReportCountMeta
+                                        countReports={discussion.reportMeta?.countReports}
+                                        recordID={discussion.discussionID}
+                                        recordType="discussion"
+                                    />
+                                    <DiscussionBookmarkToggle
+                                        discussion={discussion}
+                                        onSuccess={invalidateDiscussionQuery}
+                                    />
+                                    <DiscussionOptionsMenu
+                                        discussion={discussion}
+                                        onMutateSuccess={invalidateDiscussionQuery}
+                                    />
+                                </div>
+                            )
+                        }
+                    />
+
                     <ThreadItem
                         boxOptions={{
                             borderType: BorderType.NONE,
@@ -148,11 +141,10 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                         collapsed={page > 1}
                         reactions={discussion.type !== "idea" ? discussion.reactions : undefined}
                         categoryID={discussion.categoryID}
-                        options={props.titleType === "none" ? actions : undefined}
                     />
                 </ThreadItemContextProvider>
             </DiscussionThreadContextProvider>
-        </HomeWidgetContainer>
+        </PageBox>
     );
 }
 export default DiscussionOriginalPostAsset;

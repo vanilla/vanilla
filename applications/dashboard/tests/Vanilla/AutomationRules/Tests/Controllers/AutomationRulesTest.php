@@ -150,8 +150,6 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "label" => "Apply to new content only",
                     "inputType" => "checkBox",
                     "labelType" => null,
-                    "placeholder" => "",
-                    "tooltip" => "",
                 ],
             ],
             "triggerTimeLookBackLimit" => [
@@ -259,8 +257,6 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "required" => ["categoryID"],
                         ],
                     ],
-                    "placeholder" => "",
-                    "tooltip" => "",
                 ],
             ],
             "tagID" => [
@@ -505,8 +501,6 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                         "required" => ["categoryID"],
                                     ],
                                 ],
-                                "placeholder" => "",
-                                "tooltip" => "",
                             ],
                             "required" => false,
                         ],
@@ -605,8 +599,6 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                         "required" => ["categoryID"],
                                     ],
                                 ],
-                                "placeholder" => "",
-                                "tooltip" => "",
                             ],
                         ],
                         "reportReasonID" => [
@@ -915,8 +907,6 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "label" => "Keep record live",
                                 "inputType" => "checkBox",
                                 "labelType" => null,
-                                "placeholder" => "",
-                                "tooltip" => "",
                             ],
                         ],
                         "assignedModeratorID" => [
@@ -992,8 +982,6 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "label" => "Keep record live",
                                 "inputType" => "checkBox",
                                 "labelType" => null,
-                                "placeholder" => "",
-                                "tooltip" => "",
                             ],
                         ],
                         "assignedModeratorID" => [

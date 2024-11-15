@@ -119,16 +119,6 @@ export const dashboardFormGroupClasses = useThemeCache((compact?: boolean) => {
                 minHeight: 28,
                 lineHeight: "28px",
             },
-
-            "&.isPicker": {
-                maxWidth: "100%",
-                flex: 1,
-            },
-        },
-
-        "&.isPicker": {
-            paddingLeft: 8,
-            paddingRight: 8,
         },
 
         ...mediaQueries.oneColumnDown({

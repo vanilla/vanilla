@@ -73,7 +73,6 @@ use Vanilla\Utility\Deprecation;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\SystemCallableInterface;
-use Vanilla\Formatting\Formats\TextFormat;
 
 /**
  * Manages discussions data.
@@ -4298,7 +4297,6 @@ SQL;
     public function normalizeRow(array $row, $expand = [], array $options = []): array
     {
         $this->fixRow($row);
-        // The stuff in tags is nonsense.
         $session = \Gdn::session();
         $discussionMoved = $row["Type"] === self::REDIRECT_TYPE && $row["Closed"];
         if ($session->User && !$discussionMoved) {
@@ -4491,7 +4489,6 @@ SQL;
     public function fixRow(array &$row): array
     {
         if (array_key_exists("Name", $row)) {
-            $row["Name"] = Gdn::formatService()->renderPlainText($row["Name"], TextFormat::FORMAT_KEY);
             $row["Name"] = htmlspecialchars_decode($row["Name"]);
         }
         return $row;

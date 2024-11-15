@@ -85,7 +85,6 @@ class DiscussionsApiController extends AbstractApiController
         private ReactionModel $reactionModel,
         private Gdn_Database $db,
         private InterestModel $interestModel,
-        private PostTypeModel $postTypeModel,
         private PostFieldModel $postFieldModel
     ) {
     }
@@ -522,21 +521,6 @@ class DiscussionsApiController extends AbstractApiController
             if (\Vanilla\FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
                 $this->discussionPostSchema
                     ->merge(Schema::parse(["postTypeID?", "postFields?"]))
-                    ->addFilter("", function ($data, \Garden\Schema\ValidationField $field) {
-                        if (!ArrayUtils::isArray($data)) {
-                            return $data;
-                        }
-                        if (isset($data["postTypeID"])) {
-                            $category = CategoryModel::categories($data["categoryID"]);
-                            $allowedPostTypes = $this->postTypeModel->getAllowedPostTypes($category);
-                            if (!in_array($data["postTypeID"], array_column($allowedPostTypes, "postTypeID"))) {
-                                $field->addError("{$data["postTypeID"]} is not a valid post type");
-                                return \Garden\Schema\Invalid::value();
-                            }
-                        }
-
-                        return $data;
-                    })
                     ->addFilter("", SchemaUtils::fieldRequirement("postFields", "postTypeID"))
                     ->addFilter("", $this->postFieldModel->createPostFieldsFilter());
             }
@@ -643,14 +627,11 @@ class DiscussionsApiController extends AbstractApiController
      * @param int $id The ID of the discussion.
      * @param array $query The request query.
      * @return array
-     * @throws BreadcrumbProviderNotFoundException
      * @throws ClientException
-     * @throws ContainerException
      * @throws HttpException
      * @throws NotFoundException if the discussion could not be found.
      * @throws PermissionException
      * @throws ValidationException
-     * @throws \Garden\Container\NotFoundException
      */
     public function get(int $id, array $query)
     {
@@ -675,7 +656,6 @@ class DiscussionsApiController extends AbstractApiController
             $out->merge(Schema::parse(["resolved:b?", "resolvedUserID:i?"]));
         }
 
-        $out = $this->getEventManager()->fireFilter("discussionsApiController_getOutSchema", $out);
         $this->getEventManager()->fireFilter("discussionsApiController_getFilters", $this, $id, $query);
 
         $row = $this->discussionByID($id);
@@ -779,7 +759,6 @@ class DiscussionsApiController extends AbstractApiController
 
         $isRich = strcasecmp($discussion["Format"], RichFormat::FORMAT_KEY) === 0;
         $discussion["bodyRaw"] = $isRich ? json_decode($discussion["Body"], true) : $discussion["Body"];
-        $discussion["bodyRaw"] = Gdn::formatService()->renderPlainText($discussion["bodyRaw"], "text");
         $discussion = $this->discussionModel->fixRow($discussion);
 
         $this->userModel->expandUsers($discussion, ["InsertUserID"]);
@@ -899,8 +878,6 @@ class DiscussionsApiController extends AbstractApiController
         if ($this->getPermissions()->has("staff.allow")) {
             $discussionSchema->merge(Schema::parse(["resolved:b?", "resolvedUserID:i?"]));
         }
-
-        $this->getEventManager()->fireFilter("discussionsApiController_getOutSchema", $discussionSchema);
 
         $out = $this->schema([":a" => $discussionSchema], "out");
 
@@ -1267,9 +1244,6 @@ class DiscussionsApiController extends AbstractApiController
      *
      * @param array $query
      * @return Data
-     * @throws HttpException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function index_statuses(array $query = []): Data
     {
@@ -1598,11 +1572,6 @@ class DiscussionsApiController extends AbstractApiController
      * @param int $id The ID of the discussion.
      * @param array $body The request body.
      * @return array
-     * @throws ClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function put_dismiss(int $id, array $body)
     {
@@ -1632,15 +1601,8 @@ class DiscussionsApiController extends AbstractApiController
      * @param int $id The ID of the discussion.
      * @param array $body The request body.
      *       Ex: ["canonicalUrl" => "https://mydomain.com/some+path/"]
-     * @return array
-     * @throws BreadcrumbProviderNotFoundException
-     * @throws ClientException
-     * @throws ContainerException
-     * @throws HttpException
      * @throws NotFoundException If unable to find the discussion.
-     * @throws PermissionException
-     * @throws ValidationException
-     * @throws \Garden\Container\NotFoundException
+     * @return array
      */
     public function put_canonicalUrl(int $id, array $body)
     {
@@ -1671,11 +1633,8 @@ class DiscussionsApiController extends AbstractApiController
      * Remove canonical url for a discussion.
      *
      * @param int $id The ID of the discussion.
-     * @return array
-     * @throws ClientException
-     * @throws HttpException
      * @throws NotFoundException If unable to find the discussion.
-     * @throws PermissionException
+     * @return array
      */
     public function delete_canonicalUrl(int $id)
     {
@@ -1701,12 +1660,6 @@ class DiscussionsApiController extends AbstractApiController
      *
      * @param array $query
      * @return Data
-     * @throws BreadcrumbProviderNotFoundException
-     * @throws ContainerException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function get_search(array $query)
     {

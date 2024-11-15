@@ -13,14 +13,13 @@ import { ILayoutEditorWidgetPath } from "@dashboard/layout/layoutSettings/Layout
 import { cx } from "@emotion/css";
 import { EmbedMenu } from "@library/editor/pieces/EmbedMenu";
 import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
-import { extractSchemaDefaults } from "@library/json-schema-forms";
+import { extractDataByKeyLookup } from "@library/json-schema-forms";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { useState } from "react";
 import isEmpty from "lodash/isEmpty";
-import { mergeAndReplaceArrays } from "@vanilla/utils";
 
 interface IProps {
     path: ILayoutEditorWidgetPath;
@@ -147,7 +146,7 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                     isVisible={isWidgetSettingsModalOpen}
                     schema={widget.schema}
                     name={widget.name}
-                    initialValues={mergeAndReplaceArrays(extractSchemaDefaults(widget.schema), widgetProps ?? {})}
+                    initialValues={widgetProps ?? extractDataByKeyLookup(widget.schema, "default")}
                     widgetCatalog={catalog.widgets}
                     middlewaresCatalog={catalog.middlewares ?? {}}
                     widgetID={$hydrate}

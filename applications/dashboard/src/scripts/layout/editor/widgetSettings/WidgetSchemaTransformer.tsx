@@ -242,6 +242,23 @@ export function widgetsSchemaTransformer(
     }
 
     /**
+     * Comments thread specific transform
+     */
+    if (schema.description === "Comments" && getMeta("threadStyle") === "nested") {
+        const threadDepth = getMeta("threadDepth", 5);
+        // invalid value, fallback to default
+        if (parseInt(initialValue.apiParams?.collapseChildDepth) > parseInt(threadDepth)) {
+            value = {
+                ...value,
+                apiParams: {
+                    ...value.apiParams,
+                    collapseChildDepth: undefined,
+                },
+            };
+        }
+    }
+
+    /**
      * Categories/Subcommunities specific transform
      */
     if (
@@ -528,20 +545,22 @@ export function widgetsSchemaTransformer(
     }
 
     //its the asset, no conditions section for this one
-    transformedSchema = {
-        ...transformedSchema,
-        properties: {
-            ...transformedSchema.properties,
-            $middleware: {
-                type: "object",
-                properties: middlewareSchemaProperties,
-                "x-control": {
-                    label: t("Conditions"),
-                    description: "",
+    if (!initialValue.isAsset) {
+        transformedSchema = {
+            ...transformedSchema,
+            properties: {
+                ...transformedSchema.properties,
+                $middleware: {
+                    type: "object",
+                    properties: middlewareSchemaProperties,
+                    "x-control": {
+                        label: t("Conditions"),
+                        description: "",
+                    },
                 },
             },
-        },
-    };
+        };
+    }
 
     // Special handling for banner since the title could be populated by variables
     if (["Banner", "Content Banner"].includes(schema.description)) {

@@ -249,35 +249,9 @@ class AutomationRuleDispatchesModel extends PipelineModel
         if (!empty($query["actionType"])) {
             $where["arr.actionType"] = $query["actionType"];
         }
-        if (empty($query["dispatchStatus"]) && empty($query["lastRun"])) {
-            // if no status is provided, provide only records that have estimatedRecordCount or failed status
-            $sql->beginWhereGroup()
-                ->where("=JSON_EXTRACT(ard.attributes, '$.estimatedRecordCount')>", 0, 0, false)
-                ->orWhere("ard.status", self::STATUS_FAILED)
-                ->endWhereGroup();
-        } else {
-            if ($query["lastRun"] ?? false) {
-                // if its last run we need a different calculation
-                $sql->beginWhereGroup()
-                    ->where("ard.status", self::STATUS_SUCCESS)
-                    ->orBeginWhereGroup()
-                    ->where([
-                        "ard.status" => self::STATUS_WARNING,
-                        "ard.dispatchType" => self::TYPE_INITIAL,
-                    ])
-                    ->endWhereGroup()
-                    ->orBeginWhereGroup()
-                    ->where("ard.status", self::STATUS_WARNING)
-                    ->where("=JSON_EXTRACT(ard.attributes, '$.affectedRecordCount')>", 0, 0, false)
-                    ->endWhereGroup()
-                    ->endWhereGroup();
-            } else {
-                // if status is provided, provide only records that have estimatedRecordCount
-                $where["ard.status"] = $query["dispatchStatus"];
-                $sql->where("=JSON_EXTRACT(ard.attributes, '$.estimatedRecordCount')>", 0, 0, false);
-            }
+        if (!empty($query["dispatchStatus"])) {
+            $where["ard.status"] = $query["dispatchStatus"];
         }
-
         if (!empty($query["sort"]) && is_array($query["sort"])) {
             foreach ($query["sort"] as $sort) {
                 [$orderField, $orderDirection] = LegacyModelUtils::orderFieldDirection($sort);
@@ -289,6 +263,10 @@ class AutomationRuleDispatchesModel extends PipelineModel
         if (count($where) > 0) {
             $sql->where($where);
         }
+        $sql->beginWhereGroup()
+            ->where("=JSON_EXTRACT(ard.attributes, '$.estimatedRecordCount')>", 0, 0, false)
+            ->orWhere("ard.status", self::STATUS_FAILED)
+            ->endWhereGroup();
 
         if (isset($query["page"]) && isset($query["limit"])) {
             [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
@@ -341,16 +319,8 @@ class AutomationRuleDispatchesModel extends PipelineModel
             $where["arr.actionType"] = $query["actionType"];
             $joinArr = true;
         }
-        if (empty($query["dispatchStatus"])) {
-            // if no status is provided, provide only records that have estimatedRecordCount or failed status
-            $sql->beginWhereGroup()
-                ->where("=JSON_EXTRACT(ard.attributes, '$.estimatedRecordCount')>", 0, 0, false)
-                ->orWhere("ard.status", self::STATUS_FAILED)
-                ->endWhereGroup();
-        } else {
-            // if status is provided, provide only records that have estimatedRecordCount
+        if (!empty($query["dispatchStatus"])) {
             $where["ard.status"] = $query["dispatchStatus"];
-            $sql->where("=JSON_EXTRACT(ard.attributes, '$.estimatedRecordCount')>", 0, 0, false);
         }
 
         // If we need the `automationRuleRevision` table, join it.
@@ -362,6 +332,10 @@ class AutomationRuleDispatchesModel extends PipelineModel
         if (count($where) > 0) {
             $sql->where($where);
         }
+        $sql->beginWhereGroup()
+            ->where("=JSON_EXTRACT(ard.attributes, '$.estimatedRecordCount')>", 0, 0, false)
+            ->orWhere("ard.status", self::STATUS_FAILED)
+            ->endWhereGroup();
         $results = $sql->get()->firstRow(DATASET_TYPE_ARRAY);
         return $results["count"];
     }

@@ -1,6 +1,6 @@
 import { css, cx } from "@emotion/css";
-import { measureText } from "@vanilla/utils";
-import React, { useState } from "react";
+import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface AutoWidthProps extends React.InputHTMLAttributes<HTMLInputElement> {
     maximumWidth?: number;
@@ -10,25 +10,46 @@ export const AutoWidthInput = React.forwardRef(function AutoWidthInput(
     props: AutoWidthProps,
     ref: React.RefObject<HTMLInputElement>,
 ) {
-    const maxWidth = props.maximumWidth ?? 300;
-    const width = measureText(String(props.value), 18);
-    const minWidth = measureText(String(props.placeholder), 18);
-
-    const [focused, setFocused] = useState(false);
+    const spanRef = useRef<HTMLSpanElement>(null);
+    const [minWidth, setMinWidth] = useState(0);
 
     const minWidthClass = css({
         label: "autoWidthSizer",
-        width: width,
+        width: 0,
+        minWidth: minWidth,
         color: "#555a62",
-        ...(props.placeholder && !props.value ? { minWidth: minWidth } : {}),
-        ...(!focused ? { maxWidth: width > maxWidth ? maxWidth : width } : { maxWidth: maxWidth * 1.25 }),
     });
 
+    const { value, placeholder } = props;
     const { maximumWidth, ...inputProps } = props;
+    const classes = autoWidthInputClasses();
+
+    const measureSpan = useCallback(
+        (content: string | undefined) => {
+            if (!spanRef.current) {
+                return;
+            }
+
+            content = content || placeholder || "";
+            spanRef.current.innerText = content;
+            // Measure the span widht.
+            const rect = spanRef.current.getBoundingClientRect();
+            let newWidth = rect.width + 12;
+            newWidth = Math.min(Math.max(80, newWidth), props.maximumWidth ?? 300);
+            setMinWidth(newWidth);
+        },
+        [placeholder],
+    );
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.currentTarget.value;
+        measureSpan(newValue);
         props.onChange?.(e);
     };
+
+    useEffect(() => {
+        measureSpan(value?.toString());
+    }, [measureSpan, value]);
 
     return (
         <>
@@ -38,9 +59,10 @@ export const AutoWidthInput = React.forwardRef(function AutoWidthInput(
                 className={cx(props.className, minWidthClass)}
                 onChange={handleChange}
                 disabled={props.disabled}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
             />
+            <span ref={spanRef} className={cx(classes.hiddenInputMeasure, props.className)}>
+                {props.value}
+            </span>
         </>
     );
 });

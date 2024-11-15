@@ -13,7 +13,7 @@ import {
 } from "@dashboard/automationRules/AutomationRules.types";
 import { CategoryDisplayAs } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
-import { CreatableFieldFormType, CreatableFieldVisibility } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileFieldFormType, ProfileFieldVisibility } from "@dashboard/userProfiles/types/UserProfiles.types";
 
 export const mockRecipesList: IAutomationRule[] = [
     {
@@ -921,11 +921,11 @@ export const mockCategoriesData = [
     },
 ];
 
-export const mockProfileField = ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TEXT, {
+export const mockProfileField = ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TEXT, {
     apiName: "test_text_profileField",
     displayOptions: {
         search: false,
     },
     enabled: true,
-    visibility: CreatableFieldVisibility.PUBLIC,
+    visibility: ProfileFieldVisibility.PUBLIC,
 });

@@ -7,14 +7,12 @@
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
-import { css, cx } from "@emotion/css";
+import { css } from "@emotion/css";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
 import { IPickerOption } from "@vanilla/json-schema-forms";
@@ -28,7 +26,6 @@ interface IProps {
     isOpen?: boolean;
     onOpenChange?: (isOpen: boolean) => void;
     pickerTitle?: string;
-    compact?: boolean;
 }
 
 export function RadioPicker(props: IProps) {
@@ -52,17 +49,14 @@ export function RadioPicker(props: IProps) {
         <DropDown
             isVisible={isOpen}
             onVisibilityChange={onOpenChange}
-            className={classes.root}
             buttonType={ButtonTypes.STANDARD}
-            buttonClassName={cx(classes.button, props.compact ? classes.compactButton : undefined)}
             buttonContents={
-                <span className={cx(classes.pickerLabel, props.compact ? classes.compactLabel : undefined)}>
+                <span className={classes.pickerLabel}>
                     {currentOption?.label}
                     <DropDownArrow />
                 </span>
             }
             flyoutType={FlyoutType.FRAME}
-            asReachPopover={true}
         >
             <Frame
                 header={
@@ -72,7 +66,6 @@ export function RadioPicker(props: IProps) {
                     <FrameBody selfPadded={true}>
                         <div className={classes.radioGroup}>
                             <DashboardRadioGroup
-                                isPicker
                                 labelType={DashboardLabelType.STANDARD}
                                 labelID={headingID}
                                 arrowBehaviour={"moves-focus"}
@@ -112,30 +105,12 @@ export function RadioPicker(props: IProps) {
 }
 
 const classes = {
-    root: css({ width: "100%" }),
     pickerLabel: css({
+        display: "inline-flex",
         gap: 6,
         justifyContent: "space-between",
-        display: "flex",
-        alignItems: "center",
-        width: "100%",
-        fontWeight: "normal",
-        WebkitFontSmoothing: "initial",
-    }),
-    compactLabel: css({
-        fontSize: 13,
     }),
     radioGroup: css({
         padding: "6px 6px 12px",
-    }),
-    button: css({
-        width: "100%",
-        paddingLeft: 8,
-        paddingRight: 8,
-        color: ColorsUtils.colorOut(globalVariables().mainColors.fg),
-    }),
-    compactButton: css({
-        maxHeight: 32,
-        minHeight: 32,
     }),
 };

@@ -254,9 +254,9 @@ abstract class AutomationAction
         if ($errorMessages) {
             $dispatches["errorMessage"] = $errorMessages;
         }
-        $this->automationRuleDispatchesModel->insert($dispatches);
+        $dispatchUUID = $this->automationRuleDispatchesModel->insert($dispatches);
         $this->dispatched = true;
-        return $this->getDispatchUUID();
+        return $dispatchUUID;
     }
 
     /**
@@ -420,7 +420,7 @@ abstract class AutomationAction
             $triggerClass instanceof TimedAutomationTrigger
         ) {
             //Create a dispatch entry with status of warning to indicate that the rule is active but no actionable items found.
-            $dispatchID = $this->logDispatched(
+            $this->logDispatched(
                 AutomationRuleDispatchesModel::STATUS_WARNING,
                 "initial dispatch with 0 entries for future iterations ",
                 [
@@ -429,12 +429,9 @@ abstract class AutomationAction
                     "affectedRecordCount" => 0,
                 ]
             );
-            // This is a special case where the rule is activated for the first time and there are no actionable items.
-            // We need to update the last run date to the current date so that the rule gets triggered from the last time.
-            $this->automationRuleDispatchesModel->updateDateFinished($dispatchID);
         }
         // Log a debug message if no actionable items found for the automation rule (triggered manually
-        $this->logger->info("No actionable items found for the automation rule.", [
+        $this->logger->debug("No actionable items found for the automation rule.", [
             "tags" => ["automationRules"],
             "automationRuleID" => $automationRule["automationRuleID"],
             "automationRuleRevisionID" => $automationRule["automationRuleRevisionID"],
@@ -491,15 +488,18 @@ abstract class AutomationAction
      * @throws ContainerException
      * @throws NotFoundException
      */
-    public function calculateTimeInterval(int $automationRuleID, int $automationRevisionID): ?\DateTimeImmutable
+    private function calculateTimeInterval(int $automationRuleID, int $automationRevisionID): ?\DateTimeImmutable
     {
         $lastRun = $this->automationRuleDispatchesModel->getAutomationRuleDispatches([
             "automationRuleID" => $automationRuleID,
             "automationRuleRevisionID" => $automationRevisionID,
             "sort" => ["-dateDispatched"],
+            "statuses" => [
+                AutomationRuleDispatchesModel::STATUS_SUCCESS,
+                AutomationRuleDispatchesModel::STATUS_WARNING,
+            ],
             "offset" => 0,
             "limit" => 1,
-            "lastRun" => true,
         ]);
         $lastRunDate = $lastRun[0]["dateFinished"] ?? null;
         if ($lastRunDate) {

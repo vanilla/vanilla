@@ -97,21 +97,6 @@ class SettingsController extends DashboardController
     }
 
     /**
-     * Render the post type settings page.
-     */
-    public function postTypes()
-    {
-        $this->permission("Garden.Settings.Manage");
-        $this->setHighlightRoute("/settings/post-types");
-        $this->title(t("Post Types and Post Fields"));
-        if (Gdn::config("Feature.PostTypesAndPostFields.Enabled")) {
-            $this->render("post-types");
-        } else {
-            $this->renderException(notFoundException());
-        }
-    }
-
-    /**
      * Render the reports page.
      */
     public function reports()

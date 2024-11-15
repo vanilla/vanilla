@@ -27,8 +27,6 @@ class SubscriptionChangeEvent extends ResourceEvent implements LoggableEventInte
     const ACTION_DIGEST_ENABLED = "digest_subscribe";
     const ACTION_DIGEST_DISABLED = "digest_unsubscribe";
 
-    const ACTION_DIGEST_AUTO_SUBSCRIBE = "digest_auto_subscribe";
-
     /**
      * DiscussionEvent constructor.
      *

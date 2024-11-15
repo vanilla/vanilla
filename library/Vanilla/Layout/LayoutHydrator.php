@@ -473,7 +473,7 @@ final class LayoutHydrator
     private function applyDynamicSchemas(?string $layoutViewType)
     {
         $this->dynamicSchemaOptions->reset();
-        if ($layoutViewType !== "home") {
+        if ($layoutViewType === "subcommunityHome") {
             $this->dynamicSchemaOptions->addDescriptionChoice("siteSection/description", "Subcommunity Description");
             $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Subcommunity Title");
             $this->dynamicSchemaOptions->addImageSourceChoice(
@@ -485,20 +485,17 @@ final class LayoutHydrator
             $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Banner Title");
         }
 
-        $hasDiscussion = in_array($layoutViewType, ["discussionThread", "questionThread", "ideaThread"]);
-        $hasCategory = in_array($layoutViewType, ["discussionCategoryPage", "nestedCategoryList"]) || $hasDiscussion;
-
-        if ($hasCategory) {
-            $this->dynamicSchemaOptions->addDescriptionChoice("category/description", "Category Description");
-            $this->dynamicSchemaOptions->addTitleChoice("category/name", "Category Name");
-            $this->dynamicSchemaOptions->addImageSourceChoice(
-                BannerFullWidget::IMAGE_SOURCE_CATEGORY,
-                "Category Banner"
-            );
-        }
-
-        if ($hasDiscussion) {
-            $this->dynamicSchemaOptions->addTitleChoice("discussion/name", "Discussion Name");
+        switch ($layoutViewType) {
+            case "discussionCategoryPage":
+            case "nestedCategoryList":
+            case "discussionThread":
+                $this->dynamicSchemaOptions->addDescriptionChoice("category/description", "Category Description");
+                $this->dynamicSchemaOptions->addTitleChoice("category/name", "Category Name");
+                $this->dynamicSchemaOptions->addImageSourceChoice(
+                    BannerFullWidget::IMAGE_SOURCE_CATEGORY,
+                    "Category Banner"
+                );
+                break;
         }
 
         $this->dynamicSchemaOptions->addImageSourceChoice(

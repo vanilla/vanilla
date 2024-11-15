@@ -266,12 +266,12 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
                             </VanillaEditorFocusContext>
                         )}
                         <div className={vanillaEditorClasses().footer}>
-                            {!followMobileRenderingRules && <FloatingElementToolbar />}
                             <PersistentToolbar
                                 uploadEnabled={uploadEnabled}
                                 flyoutsDirection={"above"}
                                 isMobile={followMobileRenderingRules}
                             />
+                            {!followMobileRenderingRules && <FloatingElementToolbar />}
                             {inEditorContent}
                         </div>
                     </VanillaEditorContainer>

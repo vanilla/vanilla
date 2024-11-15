@@ -25,7 +25,7 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@vanilla/i18n";
 import { EMPTY_SCHEMA, IJsonSchemaFormHandle, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { extractSchemaDefaults, mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
+import { extractDataByKeyLookup, mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
 import { useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import Message from "@library/messages/Message";
@@ -103,7 +103,8 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
 
     const { values, submitForm, setValues, isSubmitting, resetForm, dirty } = useFormik<IPostAttachmentParams>({
         initialValues: {
-            ...extractSchemaDefaults(integrationSchema ?? EMPTY_SCHEMA),
+            ...{},
+            ...extractDataByKeyLookup(integrationSchema ?? EMPTY_SCHEMA, "default"),
         },
         onSubmit: async (values) => {
             setServerError(null);

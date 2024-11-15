@@ -31,7 +31,7 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
     public function setUp(): void
     {
         $this->config = Gdn::getContainer()->get(ConfigurationInterface::class);
-        $this->enableFeature("customLayout.discussionThread");
+        $this->config->saveToConfig("Feature.customLayout.discussionThread.Enabled", true);
         $this->config->saveToConfig("Vanilla.Comments.PerPage", 2);
         parent::setUp();
     }
@@ -86,7 +86,9 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
         $this->assertPageContent();
 
         // even with "threadStyle" = "nested", when we are still getting expected content
-        $this->assertPageContent();
+        $this->runWithConfig(["threadStyle" => "nested"], function () {
+            $this->assertPageContent();
+        });
     }
 
     /**
@@ -110,53 +112,5 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
         $formValues = $result->getFormValues();
         $this->assertArrayHasKey("Announce", $formValues);
         $this->assertEquals(0, $formValues["Announce"]);
-    }
-
-    /**
-     * Test that permanlinks resolve top level comments only.
-     *
-     * @return void
-     */
-    public function testNestedPermalinks(): void
-    {
-        $this->runWithConfig(
-            [
-                "Vanilla.Comments.PerPage" => 1,
-            ],
-            function () {
-                $dispatcher = Gdn::getContainer()->get(\Garden\Web\Dispatcher::class);
-
-                CurrentTimeStamp::mockTime("2024-01-01");
-                $discussion = $this->createDiscussion();
-                $comment1 = $this->createComment();
-                $comment1_1 = $this->createNestedComment($comment1);
-                $comment2 = $this->createComment();
-                CurrentTimeStamp::increment();
-                $comment3 = $this->createComment();
-                CurrentTimeStamp::increment();
-                $comment3_1 = $this->createNestedComment($comment3);
-                $comment3_1_1 = $this->createNestedComment($comment3_1, [
-                    "body" => "3_1_1 comment",
-                ]);
-                CurrentTimeStamp::increment();
-                $comment4 = $this->createComment();
-
-                $commentModel = \Gdn::getContainer()->get(\CommentModel::class);
-
-                $comment3_1Page = $commentModel->getDiscussionPage($comment3_1);
-                $this->assertEquals(3, $comment3_1Page);
-
-                $comment4Page = $commentModel->getDiscussionPage($comment4);
-                $this->assertEquals(4, $comment4Page);
-
-                // Comment 3 should be on the third page.
-                $html = $dispatcher
-                    ->dispatch(new Request("/discussion/comment/{$comment3_1_1["commentID"]}"))
-                    ->getData();
-
-                // We should have comment 3_1 visible.
-                $this->assertStringContainsString($comment3_1["body"], $html);
-            }
-        );
     }
 }

@@ -128,22 +128,6 @@ final class CurrentTimeStamp
     }
 
     /**
-     * Increment the mock timer by 1 second.
-     *
-     * @return void
-     * @throws \Exception
-     */
-    public static function increment(): void
-    {
-        self::assertTestMode();
-        if (self::$timeMock === null) {
-            throw new \Exception("Cannot increment time when not mocked.");
-        }
-        self::$timeMock += 1;
-        JWT::$timestamp = (int) self::$timeMock;
-    }
-
-    /**
      * Reset the mock time.
      *
      * @codeCoverageIgnore

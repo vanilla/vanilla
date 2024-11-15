@@ -30,11 +30,8 @@ abstract class BaseFormat implements FormatInterface
     /** @var HtmlProcessor[] */
     protected $dynamicProcessors = [];
 
-    /** @var SanitizeInterface[] */
-    protected array $sanitizeProcessors = [];
-
-    /** @var array|null context */
-    protected array|null $context = null;
+    /** @var array context */
+    protected $context;
 
     /**
      * Apply an HTML processor to the stack of processors.
@@ -51,18 +48,6 @@ abstract class BaseFormat implements FormatInterface
             $this->staticProcessors[] = $processor;
         }
 
-        return $this;
-    }
-
-    /**
-     * Add sanitize processors to be applied to format contents
-     *
-     * @param SanitizeInterface $processor
-     * @return $this
-     */
-    public function addSanitizeProcessor(SanitizeInterface $processor): BaseFormat
-    {
-        $this->sanitizeProcessors[] = $processor;
         return $this;
     }
 
@@ -88,23 +73,14 @@ abstract class BaseFormat implements FormatInterface
 
         if ($processorType === HtmlProcessor::TYPE_STATIC || $processorType === null) {
             foreach ($this->staticProcessors as $processor) {
-                if ($this->context) {
-                    $processor->setContext($this->context);
-                }
                 $document = $processor->processDocument($document);
             }
         }
 
         if ($processorType === HtmlProcessor::TYPE_DYNAMIC || $processorType === null) {
             foreach ($this->dynamicProcessors as $processor) {
-                if ($this->context) {
-                    $processor->setContext($this->context);
-                }
                 $document = $processor->processDocument($document);
             }
-        }
-        foreach ($this->sanitizeProcessors as $processor) {
-            $document = $processor->sanitizeHtml($document);
         }
 
         return $document->getInnerHtml();
@@ -211,19 +187,5 @@ abstract class BaseFormat implements FormatInterface
         $otherMatches = $this->normalizeMatches($matches);
 
         return array_merge($urlMatches, $otherMatches);
-    }
-
-    /**
-     * Helper function to sanitize content on text content.
-     *
-     * @param string $content
-     * @return string
-     */
-    public function applySanitizeProcessor(string $content): string
-    {
-        foreach ($this->sanitizeProcessors as $processor) {
-            $content = $processor->sanitizeText($content);
-        }
-        return $content;
     }
 }

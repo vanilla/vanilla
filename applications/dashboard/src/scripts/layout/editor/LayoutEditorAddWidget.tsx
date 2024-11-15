@@ -18,7 +18,7 @@ import { cx } from "@library/styles/styleShim";
 import { Icon } from "@vanilla/icons";
 import { useFocusOnActivate } from "@vanilla/react-utils";
 import React, { useRef, useState } from "react";
-import { extractSchemaDefaults } from "@vanilla/json-schema-forms";
+import { extractDataByKeyLookup } from "@vanilla/json-schema-forms";
 
 interface IProps {
     path: ILayoutEditorDestinationPath;
@@ -111,7 +111,7 @@ export function LayoutEditorAddWidget(props: IProps) {
                     isVisible={widgetSettingsModalOpen}
                     schema={widgetSchema}
                     name={widgetName!}
-                    initialValues={extractSchemaDefaults(widgetSchema)}
+                    initialValues={extractDataByKeyLookup(widgetSchema, "default")}
                     widgetID={selectedWidgetID!}
                     widgetCatalog={catalog?.widgets ?? {}}
                     middlewaresCatalog={catalog?.middlewares ?? {}}

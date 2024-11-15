@@ -8,7 +8,6 @@
 namespace AutomationRules\Triggers;
 
 use CategoryModel;
-use League\Uri\Http;
 use LogModel;
 use Vanilla\AutomationRules\Actions\UserFollowCategoryAction;
 use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
@@ -273,56 +272,5 @@ class EmailDomainTriggerTest extends SiteTestCase
         $result = $this->api()->patch("/users/{$userID}", $data);
         $this->assertEquals(200, $result->getStatusCode());
         return $result->getBody();
-    }
-
-    /**
-     * Test that the email domain trigger is processed when a user confirms their email address.
-     *
-     * @return void
-     * @throws \Exception
-     */
-    public function testAutomationRuleIsProcessedWhenConfirmingEmailAddressFormConfirmationEmail()
-    {
-        $this->runWithConfig(["Garden.Registration.Method" => "Basic"], function () {
-            $this->createCategory([
-                "name" => "Test" . __FUNCTION__,
-                "urlCode" => "test-category",
-                "description" => "Test Category Description",
-            ]);
-            $categoryID = $this->lastInsertedCategoryID;
-
-            // Create an automation rule that follows a category when a user registers with a specific email domain.
-            $automationRecord = $this->getAutomationRecord(
-                UserFollowCategoryAction::getType(),
-                ["example.com"],
-                ["categoryID" => [$categoryID]]
-            );
-            $automationRule = $this->createAutomationRule($automationRecord["trigger"], $automationRecord["action"]);
-
-            // Register a user with the email domain that triggers the automation rule.
-            $user = self::sprintfCounter([
-                "Name" => "emailConfirmTest%s",
-                "Email" => "confirm.test%s@example.com",
-                "Password" => __FUNCTION__,
-                "PasswordMatch" => __FUNCTION__,
-                "TermsOfService" => "1",
-                "RememberMe" => 1,
-            ]);
-
-            $r = $this->bessy()->post("/entry/register", $user);
-            $welcome = $this->assertEmailSentTo($user["Email"]);
-            $userID = $r->data("UserID");
-
-            // The user has registered. Let's simulate clicking on the confirmation email.
-            $emailUrl = Http::createFromString($welcome->template->getButtonUrl());
-            $this->assertStringContainsString("/entry/emailconfirm", $emailUrl->getPath());
-
-            $r2 = $this->bessy()->get($welcome->template->getButtonUrl(), [], []);
-            $this->assertTrue($r2->data("EmailConfirmed"));
-
-            $userCategories = $this->categoryModel->getFollowed($userID);
-            $followedCategories = array_column($userCategories, "CategoryID");
-            $this->assertEquals([$categoryID], $followedCategories);
-        });
     }
 }

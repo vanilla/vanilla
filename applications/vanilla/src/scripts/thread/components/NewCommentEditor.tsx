@@ -35,6 +35,7 @@ export interface IDraftProps {
 export enum DraftIndicatorPosition {
     WITHIN = "within",
     BELOW = "below",
+    ABOVE = "above",
 }
 
 interface CommonProps {
@@ -120,75 +121,104 @@ export const NewCommentEditor = forwardRef(function NewCommentEditor(
     }));
 
     return (
-        <form
-            className={className}
-            onSubmit={async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                value && onPublish(value);
+        <PageBox
+            options={{
+                borderType: BorderType.NONE,
             }}
-            ref={formRef}
+            className={cx(classes.pageBox, className)}
         >
-            <div className={classes.draftHeaderWrapper}>{props.title}</div>
-            <VanillaEditor
-                editorRef={editorRef}
-                containerClasses={props.containerClasses}
-                autoFocus={props.autoFocus}
-                key={editorKey}
-                initialFormat={draft?.format}
-                initialContent={draft?.body}
-                onChange={(newValue) => {
-                    onValueChange(newValue);
+            <form
+                onSubmit={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    value && onPublish(value);
                 }}
-                isPreview={props.isPreview}
-                inEditorContent={
-                    <>
-                        {draftLastSaved && draftIndicatorPosition === "within" && (
-                            <span className={classes.draftIndicator}>
-                                <ToolTip
-                                    label={
-                                        <Translate
-                                            source="Draft saved <0/>"
-                                            c0={<DateTime timestamp={draftLastSaved.toUTCString()} mode="relative" />}
-                                        />
-                                    }
-                                >
-                                    <span>
-                                        <Icon icon={"data-checked"} />
-                                    </span>
-                                </ToolTip>
-                            </span>
-                        )}
-                    </>
-                }
-            />
-            <div className={classes.editorPostActions}>
-                {props.tertiaryActions}
-                {draftLastSaved && draftIndicatorPosition === "below" && (
-                    <span className={cx(metasClasses().metaStyle, classes.draftMessage)}>
-                        {draftLoading ? (
-                            t("Saving draft...")
-                        ) : (
-                            <Translate
-                                source="Draft saved <0/>"
-                                c0={<DateTime timestamp={draftLastSaved.toUTCString()} mode="relative" />}
-                            />
-                        )}
-                    </span>
-                )}
-                {onDraft && manualDraftSave && (
-                    <Button
-                        disabled={publishLoading || draftLoading || isEqual(value, EMPTY_DRAFT)}
-                        buttonType={ButtonTypes.STANDARD}
-                        onClick={() => onDraft && value && onDraft(value)}
-                    >
-                        {t("Save Draft")}
+                ref={formRef}
+            >
+                <div className={classes.draftHeaderWrapper}>
+                    {props.title ? (
+                        props.title
+                    ) : (
+                        <PageHeadingBox classNames={classes.title} title={t("Leave a Comment")} />
+                    )}
+                    {draftLastSaved && draftIndicatorPosition === "above" && (
+                        <span className={cx(metasClasses().metaStyle, classes.draftMessage)}>
+                            {draftLoading ? (
+                                t("Saving draft...")
+                            ) : (
+                                <Translate
+                                    source="Draft saved <0/>"
+                                    c0={<DateTime timestamp={draftLastSaved.toUTCString()} mode="relative" />}
+                                />
+                            )}
+                        </span>
+                    )}
+                </div>
+                <VanillaEditor
+                    editorRef={editorRef}
+                    containerClasses={props.containerClasses}
+                    autoFocus={props.autoFocus}
+                    key={editorKey}
+                    initialFormat={draft?.format}
+                    initialContent={draft?.body}
+                    onChange={(newValue) => {
+                        onValueChange(newValue);
+                    }}
+                    isPreview={props.isPreview}
+                    inEditorContent={
+                        <>
+                            {draftLastSaved && draftIndicatorPosition === "within" && (
+                                <span className={classes.draftIndicator}>
+                                    <ToolTip
+                                        label={
+                                            <Translate
+                                                source="Draft saved <0/>"
+                                                c0={
+                                                    <DateTime
+                                                        timestamp={draftLastSaved.toUTCString()}
+                                                        mode="relative"
+                                                    />
+                                                }
+                                            />
+                                        }
+                                    >
+                                        <span>
+                                            <Icon icon={"data-checked"} />
+                                        </span>
+                                    </ToolTip>
+                                </span>
+                            )}
+                        </>
+                    }
+                />
+                <div className={classes.editorPostActions}>
+                    {props.tertiaryActions}
+                    {draftLastSaved && draftIndicatorPosition === "below" && (
+                        <span className={cx(metasClasses().metaStyle, classes.draftMessage)}>
+                            {draftLoading ? (
+                                t("Saving draft...")
+                            ) : (
+                                <Translate
+                                    source="Draft saved <0/>"
+                                    c0={<DateTime timestamp={draftLastSaved.toUTCString()} mode="relative" />}
+                                />
+                            )}
+                        </span>
+                    )}
+                    {onDraft && manualDraftSave && (
+                        <Button
+                            disabled={publishLoading || draftLoading || isEqual(value, EMPTY_DRAFT)}
+                            buttonType={ButtonTypes.STANDARD}
+                            onClick={() => onDraft && value && onDraft(value)}
+                        >
+                            {t("Save Draft")}
+                        </Button>
+                    )}
+                    <Button disabled={publishLoading} submit buttonType={ButtonTypes.PRIMARY}>
+                        {publishLoading ? <ButtonLoader /> : postLabel ? t(postLabel) : t("Post Comment")}
                     </Button>
-                )}
-                <Button disabled={publishLoading} submit buttonType={ButtonTypes.PRIMARY}>
-                    {publishLoading ? <ButtonLoader /> : postLabel ? t(postLabel) : t("Post Comment")}
-                </Button>
-            </div>
-        </form>
+                </div>
+            </form>
+        </PageBox>
     );
 });

@@ -163,7 +163,6 @@ export const nestCommentListClasses = () => {
 
     const replyEditor = css({
         margin: 0,
-        width: "100%",
     });
 
     const warningModalContent = css({

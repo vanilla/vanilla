@@ -2,7 +2,7 @@ import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import { IInterest, InterestFormValues, InterestQueryParams } from "@dashboard/interestsSettings/Interests.types";
 import { getInterestFormValues, useSaveInterest } from "@dashboard/interestsSettings/InterestsSettings.hooks";
 import { useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hooks";
-import { CreatableFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import Translate from "@library/content/Translate";
 import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
@@ -75,7 +75,7 @@ export function AddInterest(props: IProps) {
 
     const { data: profileFieldData } = useProfileFields({
         enabled: true,
-        formType: [CreatableFieldFormType.DROPDOWN, CreatableFieldFormType.TOKENS, CreatableFieldFormType.CHECKBOX],
+        formType: [ProfileFieldFormType.DROPDOWN, ProfileFieldFormType.TOKENS, ProfileFieldFormType.CHECKBOX],
     });
 
     useEffect(() => {

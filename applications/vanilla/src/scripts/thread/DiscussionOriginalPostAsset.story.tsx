@@ -33,7 +33,6 @@ const StoryDiscussionOriginalPostAsset = (props?: IProps) => {
             <DiscussionOriginalPostAsset
                 category={STORY_DISCUSSION.category}
                 discussion={STORY_DISCUSSION}
-                titleType={"discussion/name"}
                 {...props}
             />
         </QueryClientProvider>

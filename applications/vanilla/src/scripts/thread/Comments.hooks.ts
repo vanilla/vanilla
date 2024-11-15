@@ -11,11 +11,7 @@ import { QueryKey, useQuery, useQueryClient } from "@tanstack/react-query";
 import { IThreadResponse } from "@vanilla/addon-vanilla/thread/@types/CommentThreadTypes";
 import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
 
-export function useCommentListQuery(
-    apiParams: CommentsApi.IndexParams,
-    comments?: IWithPaging<IComment[]>,
-    enabled: boolean = true,
-) {
+export function useCommentListQuery(apiParams: CommentsApi.IndexParams, comments?: IWithPaging<IComment[]>) {
     const queryClient = useQueryClient();
 
     const queryKey: QueryKey = ["commentList", apiParams];
@@ -25,7 +21,6 @@ export function useCommentListQuery(
         keepPreviousData: true,
         queryKey: queryKey,
         initialData: comments,
-        enabled,
     });
 
     return {

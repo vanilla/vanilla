@@ -11,15 +11,12 @@ use Garden\Schema\Schema;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
-use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\TwigRenderTrait;
-use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 class DiscussionOriginalPostAsset extends AbstractLayoutAsset implements HydrateAwareInterface
 {
     use HydrateAwareTrait;
     use TwigRenderTrait;
-    use HomeWidgetContainerSchemaTrait;
 
     public function getProps(): ?array
     {
@@ -64,15 +61,7 @@ TWIG
 
     public static function getWidgetSchema(): Schema
     {
-        return SchemaUtils::composeSchemas(
-            self::widgetTitleSchema(defaultTitleType: "discussion/name"),
-            self::containerOptionsSchema(
-                "containerOptions",
-                minimalProperties: true,
-                visualBackgroundType: "outer",
-                defaultBorderType: "separator"
-            )
-        )->setField("properties.containerOptions.properties.headerAlignment.x-control", null);
+        return Schema::parse([]);
     }
 
     public static function getWidgetName(): string

@@ -11,7 +11,6 @@
 use Vanilla\Message;
 use Vanilla\Models\DiscussionJsonLD;
 use Vanilla\Formatting\FormatConfig;
-use Vanilla\Formatting\Formats\TextFormat;
 
 /**
  * Handles accessing & displaying a single discussion via /discussion endpoint.
@@ -143,10 +142,6 @@ class DiscussionController extends VanillaController
         $this->setData("Breadcrumbs", CategoryModel::getAncestors($this->CategoryID));
 
         // Setup
-        $this->Discussion->Name = Gdn::formatService()->renderPlainText(
-            $this->Discussion->Name,
-            TextFormat::FORMAT_KEY
-        );
         $this->title($this->Discussion->Name);
 
         // Actual number of comments, excluding the discussion itself.

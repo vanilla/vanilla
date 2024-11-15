@@ -12,7 +12,7 @@ import {
     ProfileFieldsFixtures,
     mockProfileFieldsByUserID,
 } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
-import { CreatableFieldFormType, CreatableFieldMutability } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileFieldFormType, ProfileFieldMutability } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { mockAPI } from "@library/__tests__/utility";
 import { IUsersState } from "@library/features/users/userTypes";
 import { createReducer } from "@reduxjs/toolkit";
@@ -44,13 +44,13 @@ const mockUsersState: Partial<IUsersState> = {
 
 const mockProfileFields = [
     ...ProfileFieldsFixtures.mockProfileFields(),
-    ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TEXT, {
+    ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TEXT, {
         apiName: "mutableTextField",
-        mutability: CreatableFieldMutability.ALL,
+        mutability: ProfileFieldMutability.ALL,
     }),
-    ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TEXT, {
+    ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TEXT, {
         apiName: "immutableTextField",
-        mutability: CreatableFieldMutability.NONE,
+        mutability: ProfileFieldMutability.NONE,
     }),
 ];
 
@@ -87,7 +87,7 @@ async function renderInProvider(props: Partial<React.ComponentProps<typeof Dashb
 const assertProfileFieldsCurrentValues = (result: RenderResult) => {
     // the profile fields' initial values are pre-filled, and correspond to the user data
     mockProfileFields.forEach(({ apiName, label, formType }) => {
-        if (formType === CreatableFieldFormType.TOKENS) {
+        if (formType === ProfileFieldFormType.TOKENS) {
             //Combobox current values are in <label/> tags, so lets try to find them
             mockProfileFieldsByUserID[2]!.data![apiName].forEach((tokenValue) => {
                 const elementsWithTokenValue = result.queryAllByText(tokenValue);
@@ -97,7 +97,7 @@ const assertProfileFieldsCurrentValues = (result: RenderResult) => {
             });
         } else {
             const input = result.queryByLabelText(label)! as HTMLInputElement;
-            expect(formType === CreatableFieldFormType.CHECKBOX ? `${input.checked}` : `${input.value}`).toEqual(
+            expect(formType === ProfileFieldFormType.CHECKBOX ? `${input.checked}` : `${input.value}`).toEqual(
                 `${mockProfileFieldsByUserID[2]!.data![apiName] ?? ""}`,
             );
         }
@@ -130,7 +130,7 @@ describe("Adding a user", () => {
         mockProfileFields.forEach(({ label, formType }) => {
             const input = within(modal).queryByLabelText(label)! as HTMLInputElement;
             expect(input).toBeInTheDocument();
-            expect(formType === CreatableFieldFormType.CHECKBOX ? input.checked : input.value).toBeFalsy();
+            expect(formType === ProfileFieldFormType.CHECKBOX ? input.checked : input.value).toBeFalsy();
         });
     });
 
@@ -138,7 +138,7 @@ describe("Adding a user", () => {
         expect.hasAssertions();
 
         mockProfileFields.forEach(({ formType, description }) => {
-            if (!!description && formType !== CreatableFieldFormType.CHECKBOX) {
+            if (!!description && formType !== ProfileFieldFormType.CHECKBOX) {
                 const profileFieldDescription = result.queryByText(description);
                 expect(profileFieldDescription!).toBeInTheDocument();
             }

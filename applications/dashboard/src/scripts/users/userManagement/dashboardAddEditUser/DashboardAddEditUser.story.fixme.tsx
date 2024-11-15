@@ -6,11 +6,11 @@
 import { userProfilesSlice } from "@dashboard/userProfiles/state/UserProfiles.slice";
 import {
     ProfileField,
-    CreatableFieldDataType,
-    CreatableFieldFormType,
-    CreatableFieldMutability,
+    ProfileFieldDataType,
+    ProfileFieldFormType,
+    ProfileFieldMutability,
     ProfileFieldRegistrationOptions,
-    CreatableFieldVisibility,
+    ProfileFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import DashboardAddEditUser, {
     IUserDataProps,
@@ -48,32 +48,32 @@ const mockProfileFields: ProfileField[] = [
     {
         apiName: "test1",
         label: "My favourite color",
-        formType: CreatableFieldFormType.TEXT,
+        formType: ProfileFieldFormType.TEXT,
         description: "Just a description",
         registrationOptions: ProfileFieldRegistrationOptions.REQUIRED,
-        visibility: CreatableFieldVisibility.PUBLIC,
-        mutability: CreatableFieldMutability.ALL,
+        visibility: ProfileFieldVisibility.PUBLIC,
+        mutability: ProfileFieldMutability.ALL,
         displayOptions: {
             posts: true,
             userCards: false,
         },
-        dataType: CreatableFieldDataType.TEXT,
+        dataType: ProfileFieldDataType.TEXT,
         enabled: true,
     },
     {
         apiName: "test2_tokens",
         label: "My cars",
-        formType: CreatableFieldFormType.TOKENS,
+        formType: ProfileFieldFormType.TOKENS,
         description: "Just a description",
         registrationOptions: ProfileFieldRegistrationOptions.OPTIONAL,
-        visibility: CreatableFieldVisibility.PUBLIC,
-        mutability: CreatableFieldMutability.ALL,
+        visibility: ProfileFieldVisibility.PUBLIC,
+        mutability: ProfileFieldMutability.ALL,
         displayOptions: {
             posts: true,
             userCards: false,
         },
         dropdownOptions: ["Volvo", "Fiat", "Jeep"],
-        dataType: CreatableFieldDataType.TEXT,
+        dataType: ProfileFieldDataType.TEXT,
         enabled: true,
     },
 ];

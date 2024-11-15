@@ -218,7 +218,7 @@ class PostFieldModel extends PipelineModel
                 return true;
             })
             ->addValidator("postTypeID", function ($value, ValidationField $field) {
-                $postType = $this->postTypeModel->getWhere(["postTypeID" => $value], [self::OPT_LIMIT => 1]);
+                $postType = $this->postTypeModel->select(["postTypeID" => $value], [self::OPT_LIMIT => 1]);
 
                 if (empty($postType)) {
                     $field->addError("The post type does not exist", 404);

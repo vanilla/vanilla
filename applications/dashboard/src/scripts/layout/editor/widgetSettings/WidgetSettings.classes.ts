@@ -19,7 +19,11 @@ export const widgetSettingsClasses = useThemeCache(() => {
     const container = css({
         height: "100%",
         "&&&": {
+            width: 1125,
             maxHeight: viewHeight(80),
+            ...mediaQueries.oneColumnDown({
+                width: "100%",
+            }),
         },
     });
 

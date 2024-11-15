@@ -167,7 +167,6 @@ export interface IDurationPickerControl extends ICommonControl {
 
 export interface IDateRangeControl extends ICommonControl {
     inputType: "dateRange";
-    dateRangeDirection?: "above" | "below";
 }
 
 export interface IDragAndDropControl extends ICommonControl {
@@ -235,7 +234,6 @@ export interface Condition extends Partial<JsonSchema> {
     ref?: string;
     type?: string;
     const?: any;
-    enum?: any[];
 }
 
 export interface ISchemaTab {

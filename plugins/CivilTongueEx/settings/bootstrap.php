@@ -7,9 +7,6 @@
 
 use CivilTongueEx\Library\ContentFilter;
 use Vanilla\Utility\ContainerUtils;
-use Garden\Container\Reference;
-use Vanilla\Formatting\BaseFormat;
-use CivilTongueEx\Library\Processor\CivilTongueProcessor;
 
 $container = \Gdn::getContainer();
 
@@ -17,7 +14,4 @@ $container
     ->rule(ContentFilter::class)
     ->setClass(ContentFilter::class)
     ->addCall("setReplacement", [ContainerUtils::config("Plugins.CivilTongue.Replacement")])
-    ->addCall("setWords", [ContainerUtils::config("Plugins.CivilTongue.Words")])
-
-    ->rule(BaseFormat::class)
-    ->addCall("addSanitizeProcessor", [new Reference(CivilTongueProcessor::class)]);
+    ->addCall("setWords", [ContainerUtils::config("Plugins.CivilTongue.Words")]);

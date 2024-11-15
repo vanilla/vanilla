@@ -5,19 +5,19 @@
 
 import { RecordID } from "@vanilla/utils";
 
-export enum CreatableFieldVisibility {
+export enum ProfileFieldVisibility {
     PUBLIC = "public",
     PRIVATE = "private",
     INTERNAL = "internal",
 }
 
-export enum CreatableFieldMutability {
+export enum ProfileFieldMutability {
     ALL = "all",
     RESTRICTED = "restricted",
     NONE = "none",
 }
 
-export enum CreatableFieldType {
+export enum ProfileFieldType {
     TEXT_INPUT = "textInput",
     TEXT_BOX = "textBox",
     SINGLE_CHECKBOX = "singleCheckbox",
@@ -46,11 +46,11 @@ export type ProfileField = {
     description: string;
     descriptionHtml?: boolean;
     registrationOptions: ProfileFieldRegistrationOptions;
-    visibility: CreatableFieldVisibility;
-    mutability: CreatableFieldMutability;
+    visibility: ProfileFieldVisibility;
+    mutability: ProfileFieldMutability;
     displayOptions: IProfileFieldDisplayOptions;
-    dataType: CreatableFieldDataType;
-    formType: CreatableFieldFormType;
+    dataType: ProfileFieldDataType;
+    formType: ProfileFieldFormType;
     dropdownOptions?: string[] | number[] | null;
     enabled?: boolean;
     salesforceID?: string | null;
@@ -71,12 +71,12 @@ export type ProfileFieldFormValues = Pick<
         visibility: ProfileField["visibility"];
     } & ProfileField["displayOptions"];
 } & {
-    type: CreatableFieldType; //there are utils to map the type selected in the form to valid combination dataType and formType.
+    type: ProfileFieldType; //there are utils to map the type selected in the form to valid combination dataType and formType.
 } & {
     dropdownOptions?: string | null;
 };
 
-export enum CreatableFieldDataType {
+export enum ProfileFieldDataType {
     TEXT = "text",
     BOOLEAN = "boolean",
     DATE = "date",
@@ -85,7 +85,7 @@ export enum CreatableFieldDataType {
     NUMBER_MUL = "number[]",
 }
 
-export enum CreatableFieldFormType {
+export enum ProfileFieldFormType {
     TEXT = "text",
     TEXT_MULTILINE = "text-multiline",
     DROPDOWN = "dropdown",
@@ -97,7 +97,7 @@ export enum CreatableFieldFormType {
 
 export type FetchProfileFieldsParams = {
     enabled?: true;
-    formType?: CreatableFieldFormType[];
+    formType?: ProfileFieldFormType[];
 };
 
 export type PostProfileFieldParams = ProfileField;

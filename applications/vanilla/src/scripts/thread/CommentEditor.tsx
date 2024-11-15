@@ -9,8 +9,6 @@ import { css } from "@emotion/css";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { MyEditor, MyValue } from "@library/vanilla-editor/typescript";
 import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { FormatConversionNotice } from "@rich-editor/editor/FormatConversionNotice";
@@ -69,14 +67,11 @@ export function CommentEditor(props: IProps) {
                 />
             )}
             <VanillaEditor
-                containerClasses={css({
-                    background: ColorsUtils.colorOut(globalVariables().mainColors.bg),
-                })}
                 showConversionNotice={false}
                 editorRef={editorRef}
                 needsHtmlConversion={needsConversion}
-                initialFormat={needsConversion ? "html" : commentEdit.format}
-                initialContent={needsConversion ? comment.body : commentEdit.body}
+                initialFormat={commentEdit.format}
+                initialContent={commentEdit.body}
                 onChange={(newValue) => {
                     setValue(newValue);
                 }}

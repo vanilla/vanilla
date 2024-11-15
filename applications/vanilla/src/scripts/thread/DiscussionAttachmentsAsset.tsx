@@ -16,17 +16,10 @@ import AttachmentLayout from "@library/features/discussions/integrations/compone
 import { Icon } from "@vanilla/icons";
 import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
 import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
-import type { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { PageBox } from "@library/layout/PageBox";
-import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 
 interface IProps {
     discussion: IDiscussion;
     discussionApiParams?: DiscussionsApi.GetParams;
-    containerOptions?: IHomeWidgetContainerOptions;
-    title?: string;
-    description?: string;
-    subtitle?: string;
 }
 
 export function DiscussionAttachmentsAsset(props: IProps) {
@@ -56,18 +49,7 @@ export function DiscussionAttachmentsAsset(props: IProps) {
     }, [refreshStaleDiscussionAttachments]);
 
     return (
-        <PageBox
-            options={{
-                borderType: props.containerOptions?.borderType,
-                background: props.containerOptions?.outerBackground,
-            }}
-        >
-            <PageHeadingBox
-                options={{ alignment: props.containerOptions?.headerAlignment }}
-                title={props.title}
-                description={props.description}
-                subtitle={props.subtitle}
-            />
+        <>
             {attachments?.map((attachment) => (
                 <ReadableIntegrationContextProvider
                     key={attachment.attachmentID}
@@ -80,7 +62,7 @@ export function DiscussionAttachmentsAsset(props: IProps) {
                     />
                 </ReadableIntegrationContextProvider>
             ))}
-        </PageBox>
+        </>
     );
 }
 

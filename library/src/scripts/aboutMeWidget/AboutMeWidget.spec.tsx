@@ -7,7 +7,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { AboutMeWidget } from "@library/aboutMeWidget/AboutMeWidget";
-import { ProfileField, CreatableFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileField, ProfileFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { LoadStatus } from "@library/@types/api/core";
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 
@@ -16,9 +16,9 @@ const firstField = { apiName: "firstField", label: "field-1", sort: 1 };
 const secondField = { apiName: "secondField", label: "field-2", sort: 2 };
 
 const mockFields: ProfileField[] = [
-    ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TEXT, lastField),
-    ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TEXT, firstField),
-    ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TEXT, secondField),
+    ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TEXT, lastField),
+    ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TEXT, firstField),
+    ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TEXT, secondField),
 ];
 
 describe("AboutMeWidget", () => {

@@ -159,8 +159,6 @@ trait SiteTestTrait
         TracedContainer::setShouldTrace(false);
         Timers::instance()->reset();
 
-        \Gdn::getScheduler()->clear();
-
         // Clear out all notifications before each test.
         static::container()->call(function (\Gdn_SQLDriver $sql, \UserModel $userModel, \RoleModel $roleModel) {
             $this->resetTable("Activity");

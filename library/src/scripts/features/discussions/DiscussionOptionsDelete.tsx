@@ -15,9 +15,7 @@ import { useDiscussionActions } from "./DiscussionActions";
 import { LoadStatus } from "@library/@types/api/core";
 import { StackingContextProvider } from "@vanilla/react-utils";
 
-const DiscussionOptionsDelete: FunctionComponent<{ discussion: IDiscussion; redirectAfterDelete?: boolean }> = ({
-    discussion,
-}) => {
+const DiscussionOptionsDelete: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
     const [isVisible, setIsVisible] = useState(false);
     const open = () => setIsVisible(true);
     const close = () => setIsVisible(false);
@@ -36,9 +34,6 @@ const DiscussionOptionsDelete: FunctionComponent<{ discussion: IDiscussion; redi
     const handleDeleteConfirm = () => {
         actions.deleteDiscussion({ discussionID: discussion.discussionID });
         close();
-        if (discussion.category?.url) {
-            window.location.href = discussion.category?.url;
-        }
     };
 
     return (

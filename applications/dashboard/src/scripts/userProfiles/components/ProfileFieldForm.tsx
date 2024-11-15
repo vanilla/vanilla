@@ -30,9 +30,9 @@ import { useFormik } from "formik";
 import {
     ProfileFieldFormValues,
     ProfileField,
-    CreatableFieldType,
-    CreatableFieldMutability,
-    CreatableFieldVisibility,
+    ProfileFieldType,
+    ProfileFieldMutability,
+    ProfileFieldVisibility,
     ProfileFieldRegistrationOptions,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hooks";
@@ -122,14 +122,14 @@ export default function ProfileFieldForm(props: IProps) {
         const isCoreField = !!profileFieldConfiguration?.isCoreField;
 
         const visibilityIsNeitherPublicNorPrivate = ![
-            CreatableFieldVisibility.PUBLIC,
-            CreatableFieldVisibility.PRIVATE,
+            ProfileFieldVisibility.PUBLIC,
+            ProfileFieldVisibility.PRIVATE,
         ].includes(values.visibility.visibility);
 
         const requiresDropdownOptions = [
-            CreatableFieldType.MULTI_SELECT_DROPDOWN,
-            CreatableFieldType.NUMERIC_DROPDOWN,
-            CreatableFieldType.SINGLE_SELECT_DROPDOWN,
+            ProfileFieldType.MULTI_SELECT_DROPDOWN,
+            ProfileFieldType.NUMERIC_DROPDOWN,
+            ProfileFieldType.SINGLE_SELECT_DROPDOWN,
         ].includes(values.type);
 
         const schemaRequired = ["type", "apiName", "label", "registrationOptions", "mutability"];
@@ -243,17 +243,17 @@ export default function ProfileFieldForm(props: IProps) {
                                 inputType: "dropDown",
                                 label: t("Visibility"),
                                 helperText:
-                                    (values.visibility.visibility === CreatableFieldVisibility.PRIVATE &&
+                                    (values.visibility.visibility === ProfileFieldVisibility.PRIVATE &&
                                         t("This is private information and will not be shared with other members.")) ||
-                                    (values.visibility.visibility === CreatableFieldVisibility.INTERNAL &&
+                                    (values.visibility.visibility === ProfileFieldVisibility.INTERNAL &&
                                         t(
                                             "This information will only be shown to users with permission to view internal info.",
                                         )),
                                 choices: {
                                     staticOptions: {
-                                        [CreatableFieldVisibility.PUBLIC]: t("Public"),
-                                        [CreatableFieldVisibility.PRIVATE]: t("Private"),
-                                        [CreatableFieldVisibility.INTERNAL]: t("Internal"),
+                                        [ProfileFieldVisibility.PUBLIC]: t("Public"),
+                                        [ProfileFieldVisibility.PRIVATE]: t("Private"),
+                                        [ProfileFieldVisibility.INTERNAL]: t("Internal"),
                                     },
                                 },
                             },
@@ -261,7 +261,7 @@ export default function ProfileFieldForm(props: IProps) {
                         posts: {
                             type: "boolean",
                             disabled:
-                                ![CreatableFieldType.TEXT_INPUT, CreatableFieldType.SINGLE_SELECT_DROPDOWN].includes(
+                                ![ProfileFieldType.TEXT_INPUT, ProfileFieldType.SINGLE_SELECT_DROPDOWN].includes(
                                     values.type,
                                 ) || isCoreField,
                             "x-control": {
@@ -288,13 +288,13 @@ export default function ProfileFieldForm(props: IProps) {
                         choices: {
                             staticOptions:
                                 values.registrationOptions === ProfileFieldRegistrationOptions.REQUIRED
-                                    ? { [CreatableFieldMutability.ALL]: t("Allow") }
+                                    ? { [ProfileFieldMutability.ALL]: t("Allow") }
                                     : {
                                           ...(!visibilityIsNeitherPublicNorPrivate && {
-                                              [CreatableFieldMutability.ALL]: t("Allow"),
+                                              [ProfileFieldMutability.ALL]: t("Allow"),
                                           }),
-                                          [CreatableFieldMutability.RESTRICTED]: t("Restrict"),
-                                          [CreatableFieldMutability.NONE]: t("Block"),
+                                          [ProfileFieldMutability.RESTRICTED]: t("Restrict"),
+                                          [ProfileFieldMutability.NONE]: t("Block"),
                                       },
                         },
                     },
@@ -332,17 +332,17 @@ export default function ProfileFieldForm(props: IProps) {
 
     useEffect(() => {
         // These dropdown values are being filtered based off the value of visibilty set to internal. Need to update the dropdown to what is available
-        if (values.visibility.visibility === CreatableFieldVisibility.INTERNAL) {
+        if (values.visibility.visibility === ProfileFieldVisibility.INTERNAL) {
             setFieldValue("registrationOptions", ProfileFieldRegistrationOptions.HIDDEN);
-            if (values.mutability === CreatableFieldMutability.ALL) {
-                setFieldValue("mutability", CreatableFieldMutability.RESTRICTED);
+            if (values.mutability === ProfileFieldMutability.ALL) {
+                setFieldValue("mutability", ProfileFieldMutability.RESTRICTED);
             }
         }
     }, [values.visibility, values.mutability, setFieldValue]);
 
     useEffect(() => {
         // Can only be visible on posts if it is a textInput
-        if (![CreatableFieldType.TEXT_INPUT, CreatableFieldType.SINGLE_SELECT_DROPDOWN].includes(values.type)) {
+        if (![ProfileFieldType.TEXT_INPUT, ProfileFieldType.SINGLE_SELECT_DROPDOWN].includes(values.type)) {
             setFieldValue("visibility.posts", false);
         }
     }, [values.type, setFieldValue]);
@@ -350,7 +350,7 @@ export default function ProfileFieldForm(props: IProps) {
     useEffect(() => {
         // To mark a field as required, mutability must be all
         if (values.registrationOptions === ProfileFieldRegistrationOptions.REQUIRED) {
-            setFieldValue("mutability", CreatableFieldMutability.ALL);
+            setFieldValue("mutability", ProfileFieldMutability.ALL);
         }
     }, [values.registrationOptions, setFieldValue]);
 

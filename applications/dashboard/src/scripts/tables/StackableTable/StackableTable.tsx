@@ -27,13 +27,6 @@ export interface ColumnConfig {
     width?: number;
 }
 
-export interface CellRendererProps {
-    columnName: string;
-    data: Record<string, any>;
-    updateQuery?: (newQuery: any) => void;
-    wrappedVersion: boolean;
-}
-
 export type StackableTableColumnsConfig = Record<string, ColumnConfig>;
 
 export enum StackableTableSortOption {
@@ -44,19 +37,15 @@ export enum StackableTableSortOption {
 
 interface IStackableTableProps {
     data: Array<Record<string, any>>;
-    updateQuery?: (newQueryParams: any) => void;
-    onHeaderClick?: (columnName: string, sortOption: string) => void;
+    updateQuery: (newQueryParams: any) => void;
+    onHeaderClick: (columnName: string, sortOption: string) => void;
     hiddenHeaders?: string[];
     isLoading?: boolean;
-    /* Number of rows to show during loading */
-    loadSize?: number;
     columnsConfiguration: Record<string, ColumnConfig>;
     CellRenderer: ComponentType<any>;
     WrappedCellRenderer: ComponentType<any>;
     ActionsCellRenderer?: ComponentType<any>;
     className?: string;
-    headerClassNames?: string;
-    rowClassNames?: string;
     actionsColumnWidth?: number;
     headerWrappers?: Record<string, ComponentType<any>>;
 }
@@ -182,53 +171,67 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
     } = props;
     const classes = stackableTableClasses(actionsColumnWidth);
     const firstColumnWrapped = !isEmpty(pickBy(columnsConfiguration, ({ wrapped }) => wrapped));
+    let rows;
+
+    if (isLoading) {
+        const loadingRectangleArray = Array.from(new Array("loadingRectangle".length));
+        const notWrappedColumns = orderedColumns.filter((column) => !columnsConfiguration[column].wrapped);
+        rows = loadingRectangleArray.map((l, key) => {
+            return (
+                <tr key={key} className={classes.tableRow} role="row">
+                    {notWrappedColumns.map((columnName, key) => {
+                        const isFirstColumn = columnsConfiguration[columnName].order === 1;
+                        return (
+                            <td
+                                key={key}
+                                role="cell"
+                                style={
+                                    columnsConfiguration[columnName].width
+                                        ? {
+                                              minWidth: `${columnsConfiguration[columnName].width}px`,
+                                              width: `${columnsConfiguration[columnName].width}px`,
+                                          }
+                                        : undefined
+                                }
+                            >
+                                {isFirstColumn && (
+                                    <div className={classes.firstColumnPlaceholder}>
+                                        <LoadingRectangle
+                                            height={25}
+                                            width={25}
+                                            style={{ marginRight: 10, borderRadius: "50%" }}
+                                        />
+
+                                        <LoadingRectangle height={15} width={160} />
+                                    </div>
+                                )}
+                                {!isFirstColumn && (
+                                    <LoadingRectangle
+                                        height={15}
+                                        width={columnsConfiguration[columnName].width ?? 90}
+                                    />
+                                )}
+                            </td>
+                        );
+                    })}
+                    {ActionsCellRenderer && (
+                        <td role="cell">
+                            <div style={{ height: "15px", width: "90px" }}></div>
+                        </td>
+                    )}
+                </tr>
+            );
+        });
+        return <tbody>{rows}</tbody>;
+    }
 
     interface IEntry extends IUser {
         rowClassName?: string;
     }
-
-    function makeLoadingCells(notWrappedColumns: string[]) {
+    rows = data.map((entry: IEntry, key) => {
+        const rowClassName = entry?.rowClassName ?? "";
         return (
-            <>
-                {notWrappedColumns.map((columnName, key) => {
-                    const isFirstColumn = columnsConfiguration[columnName].order === 1;
-                    return (
-                        <td
-                            key={key}
-                            role="cell"
-                            style={
-                                columnsConfiguration[columnName].width
-                                    ? {
-                                          minWidth: `${columnsConfiguration[columnName].width}px`,
-                                          width: `${columnsConfiguration[columnName].width}px`,
-                                      }
-                                    : undefined
-                            }
-                        >
-                            {isFirstColumn && (
-                                <div className={classes.firstColumnPlaceholder}>
-                                    <LoadingRectangle
-                                        height={25}
-                                        width={25}
-                                        style={{ marginRight: 10, borderRadius: "50%" }}
-                                    />
-
-                                    <LoadingRectangle height={15} width={160} />
-                                </div>
-                            )}
-                            {!isFirstColumn && (
-                                <LoadingRectangle height={15} width={columnsConfiguration[columnName].width ?? 90} />
-                            )}
-                        </td>
-                    );
-                })}
-            </>
-        );
-    }
-
-    function makeTableCells(row: IEntry) {
-        return (
-            <>
+            <tr key={key} className={cx(classes.tableRow, rowClassName)} role="row">
                 {orderedColumns.map((columnName, key) => {
                     const isFirstColumn = columnsConfiguration[columnName].order === 1;
                     const customWidth = columnsConfiguration[columnName].width;
@@ -246,7 +249,7 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
                                 <ConditionalWrap condition={isFirstColumn} className={cx("first-column")} key={key}>
                                     {CellRenderer && (
                                         <CellRenderer
-                                            data={row}
+                                            data={entry}
                                             columnName={columnName}
                                             updateQuery={updateQuery}
                                             wrappedVersion={isFirstColumn && firstColumnWrapped}
@@ -257,7 +260,7 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
                                             {WrappedCellRenderer && (
                                                 <WrappedCellRenderer
                                                     configuration={columnsConfiguration}
-                                                    data={row}
+                                                    data={entry}
                                                     orderedColumns={orderedColumns}
                                                 />
                                             )}
@@ -268,43 +271,14 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
                         );
                     }
                 })}
-            </>
+                {ActionsCellRenderer && (
+                    <td role="cell">
+                        <ActionsCellRenderer data={entry} />
+                    </td>
+                )}
+            </tr>
         );
-    }
-
-    // This needs to memoized so that its not recalculated on every render
-    const rows = useMemo(() => {
-        if (isLoading) {
-            const loadingRectangleArray = Array.from(new Array(props.loadSize ?? "loadingRectangle".length));
-            const notWrappedColumns = orderedColumns.filter((column) => !columnsConfiguration[column].wrapped);
-            return loadingRectangleArray.map((_, key) => {
-                return (
-                    <tr key={key} className={cx(classes.tableRow, props.rowClassNames)} role="row">
-                        {makeLoadingCells(notWrappedColumns)}
-                        {ActionsCellRenderer && (
-                            <td role="cell">
-                                <div style={{ height: "15px", width: "90px" }}></div>
-                            </td>
-                        )}
-                    </tr>
-                );
-            });
-        }
-
-        return data.map((entry: IEntry, key) => {
-            const rowClassName = entry?.rowClassName ?? "";
-            return (
-                <tr key={key} className={cx(classes.tableRow, rowClassName, props.rowClassNames)} role="row">
-                    {makeTableCells(entry)}
-                    {ActionsCellRenderer && (
-                        <td role="cell">
-                            <ActionsCellRenderer data={entry} />
-                        </td>
-                    )}
-                </tr>
-            );
-        });
-    }, [data, columnsConfiguration, window.innerWidth]);
+    });
 
     return <tbody>{rows}</tbody>;
 };
@@ -355,7 +329,7 @@ export default function StackableTable(props: IStackableTableProps) {
             newConfiguration[columnName].sortDirection = newSortDirection;
 
             setConfiguration(newConfiguration);
-            onHeaderClick && onHeaderClick(columnName, newSortDirection);
+            onHeaderClick(columnName, newSortDirection);
         }
     };
 
@@ -365,8 +339,7 @@ export default function StackableTable(props: IStackableTableProps) {
                 <StackableTableHeader
                     headers={headers}
                     hiddenHeaders={hiddenHeaders}
-                    headerClassNames={cx(classes.tableHeader, props.headerClassNames)}
-                    rowClassNames={cx(props.rowClassNames)}
+                    headerClassNames={cx(classes.tableHeader)}
                     columnsConfiguration={configuration}
                     onClick={onTableHeaderClick}
                     actionsColumnWidth={props.actionsColumnWidth}
@@ -375,7 +348,6 @@ export default function StackableTable(props: IStackableTableProps) {
                 <StackableTableRows
                     columnsConfiguration={columnsConfiguration}
                     orderedColumns={orderedColumns}
-                    rowClassNames={cx(props.rowClassNames)}
                     {...rest}
                 />
             </table>

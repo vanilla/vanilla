@@ -10,7 +10,7 @@ import {
     recursivelyCleanInstance,
     validateConditions,
     validationErrorsToFieldErrors,
-    extractSchemaDefaults,
+    extractDataByKeyLookup,
 } from "./utils";
 import { OutputUnit } from "@cfworker/json-schema";
 
@@ -481,7 +481,7 @@ describe("json-schema-form/utils", () => {
 
         it("extract default props from widget schema", () => {
             //all values with key "default"
-            expect(extractSchemaDefaults(mockWidgetSchema)).toStrictEqual({
+            expect(extractDataByKeyLookup(mockWidgetSchema, "default")).toStrictEqual({
                 level1_withDefault_value: "foo",
                 level1_withNested_value: {
                     level2_withDefault_value: 10,
@@ -497,31 +497,11 @@ describe("json-schema-form/utils", () => {
                 },
             });
 
-            //empty object, empty object sent to lookup
-            expect(extractSchemaDefaults(EMPTY_SCHEMA)).toStrictEqual({});
+            //empty object, we don't have that key
+            expect(extractDataByKeyLookup(mockWidgetSchema, "someKey")).toStrictEqual({});
 
-            expect(
-                extractSchemaDefaults({
-                    type: "object",
-                    properties: {
-                        containerOptions: {
-                            type: "object",
-                            default: {},
-                            properties: {
-                                val: {
-                                    type: "string",
-                                    enum: ["foo1", "foo2"],
-                                    default: "foo1",
-                                },
-                            },
-                        },
-                    },
-                }),
-            ).toStrictEqual({
-                containerOptions: {
-                    val: "foo1",
-                },
-            });
+            //empty object, empty object sent to lookup
+            expect(extractDataByKeyLookup(EMPTY_SCHEMA, "someKey")).toStrictEqual({});
         });
     });
 });

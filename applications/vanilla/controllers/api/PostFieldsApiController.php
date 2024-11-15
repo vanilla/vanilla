@@ -68,13 +68,6 @@ class PostFieldsApiController extends \AbstractApiController
             Model::OPT_OFFSET => $offset,
             Model::OPT_ORDER => "sort",
         ]);
-
-        $rows = array_map(function ($row) {
-            $row["isRequired"] = (bool) $row["isRequired"];
-            $row["isActive"] = (bool) $row["isActive"];
-            return $row;
-        }, $rows);
-
         $rows = $out->validate($rows);
 
         $totalCount = $this->postFieldModel->getWhereCount($filters);

@@ -4,10 +4,8 @@
  * @license gpl-2.0-only
  */
 
-import { cx } from "@emotion/css";
 import FlyoutToggle from "@library/flyouts/FlyoutToggle";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { CloseCompactIcon, CloseIcon } from "@library/icons/common";
 import {
     BlockquoteIcon,
     CodeBlockIcon,
@@ -35,7 +33,6 @@ import { vanillaEditorClasses } from "@library/vanilla-editor/VanillaEditor.clas
 import { useVanillaEditorBounds } from "@library/vanilla-editor/VanillaEditorBoundsContext";
 import { VanillaEditorFormatter } from "@library/vanilla-editor/VanillaEditorFormatter";
 import { focusEditor, getSelectionText, isRangeAcrossBlocks, useEventPlateId, useHotkeys } from "@udecode/plate-common";
-import { Icon } from "@vanilla/icons";
 import { EMPTY_RECT } from "@vanilla/react-utils";
 import React, { useMemo, useState } from "react";
 
@@ -49,11 +46,8 @@ export function ElementToolbar(props: IElementToolbarProps) {
     const classes = vanillaEditorClasses();
     const id = useUniqueID("elementToolbar");
     const contentID = useUniqueID("elementToolbar-content");
-    const [ownIsVisible, setOwnIsVisible] = useState(props.isVisible ?? false);
 
     const isEdgeCase = useIsElementToolbarEdgeCase();
-
-    const classesMenuBar = menuBarClasses();
 
     return (
         <FlyoutToggle
@@ -61,22 +55,8 @@ export function ElementToolbar(props: IElementToolbarProps) {
                 buttonType: ButtonTypes.CUSTOM,
             }}
             name={t("Element Toolbar")}
-            buttonClassName={cx(
-                classesMenuBar.menuItemIconContent,
-                !props.renderAbove && classesMenuBar.floatingElementMenuButton,
-            )}
-            buttonContents={
-                ownIsVisible && !props.renderAbove ? (
-                    <>
-                        {/* Shrinking this down to 12 to fit */}
-                        <Icon style={{ width: 12, height: 12 }} icon="search-close" />
-                    </>
-                ) : isEdgeCase ? (
-                    <PilcrowIcon />
-                ) : (
-                    <TopLevelIcon />
-                )
-            }
+            buttonClassName={menuBarClasses().menuItemIconContent}
+            buttonContents={isEdgeCase ? <PilcrowIcon /> : <TopLevelIcon />}
             disabled={isEdgeCase}
             id={id}
             contentID={contentID}
@@ -86,7 +66,6 @@ export function ElementToolbar(props: IElementToolbarProps) {
             forceVisible={props.isVisible}
             onClose={props.onClose}
             onVisibilityChange={(isVisible) => {
-                setOwnIsVisible(isVisible);
                 if (!isVisible) {
                     props.onClose?.();
                 }

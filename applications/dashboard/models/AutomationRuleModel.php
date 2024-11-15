@@ -693,7 +693,7 @@ class AutomationRuleModel extends PipelineModel
             try {
                 $this->startAutomationRunByID($automationRuleID);
             } catch (NotFoundException $e) {
-                $this->logger->info("Failed starting automation run", [
+                $this->logger->debug("Failed starting automation run", [
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
                     Logger::FIELD_TAGS => ["automation rules"],
                     "automationRuleID" => $automationRuleID,
@@ -753,7 +753,7 @@ class AutomationRuleModel extends PipelineModel
                 }
             } catch (NotFoundException $e) {
                 // Plugin might be disabled.
-                $this->logger->info("Skipped executing the automation rule as it is not registered", [
+                $this->logger->debug("Skipped executing the automation rule as it is not registered", [
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
                     Logger::FIELD_TAGS => ["automation rules"],
                     "automationRuleID" => $automationRuleID,

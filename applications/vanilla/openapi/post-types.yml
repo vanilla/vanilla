@@ -169,22 +169,6 @@ components:
                 isActive:
                     description: Whether the post type is active.
                     type: boolean
-                postButtonLabel:
-                    description: The label used for the post button.
-                    type: string
-                postHelperText:
-                    description: The helper text for the post type.
-                    type: string
-                roleIDs:
-                    description: The roles that have permission to create a post of this type.
-                    type: array
-                    items:
-                        type: integer
-                categoryIDs:
-                    description: The categories that allow posts of this type.
-                    type: array
-                    items:
-                        type: integer
             required:
                 - postTypeID
                 - name
@@ -198,22 +182,6 @@ components:
                 isActive:
                     description: Whether the post type is active.
                     type: boolean
-                postButtonLabel:
-                    description: The label used for the post button.
-                    type: string
-                postHelperText:
-                    description: The helper text for the post type.
-                    type: string
-                roleIDs:
-                    description: The roles that have permission to create a post of this type.
-                    type: array
-                    items:
-                        type: integer
-                categoryIDs:
-                    description: The categories that allow posts of this type.
-                    type: array
-                    items:
-                        type: integer
             required:
                 - name
             type: object
@@ -228,17 +196,6 @@ components:
                 parentPostTypeID:
                     description: The ID of an associated post type.
                     type: integer
-                postButtonLabel:
-                    description: The label used for the post button.
-                    type: string
-                postHelperText:
-                    description: The helper text for the post type.
-                    type: string
-                roleIDs:
-                    description: The roles that have permission to create a post of this type.
-                    type: array
-                    items:
-                        type: integer
                 isOriginal:
                     description: Whether the post type is original.
                     type: boolean
@@ -263,9 +220,6 @@ components:
                 - postTypeID
                 - name
                 - parentPostTypeID
-                - postButtonLabel
-                - postHelperText
-                - roleIDs
                 - isOriginal
                 - isActive
                 - dateInserted

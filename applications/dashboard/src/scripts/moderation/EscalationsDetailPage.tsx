@@ -236,7 +236,6 @@ function EscalationsDetailPageImpl(props: IProps) {
                                         {comments?.data?.map((comment) => {
                                             return (
                                                 <CommentThreadItem
-                                                    threadStyle={"flat"}
                                                     key={comment.commentID}
                                                     comment={comment}
                                                     discussion={discussion}

@@ -1155,10 +1155,6 @@ class UserModel extends Gdn_Model implements
         if ($pendingEmail) {
             $this->setField($userID, "Email", $pendingEmail);
         }
-        $updatedUser = $this->getID($userID, DATASET_TYPE_ARRAY);
-        // Dispatch an update event as the user is confirmed
-        $userEvent = $this->eventFromRow($updatedUser, UserEvent::ACTION_UPDATE, (array) $user);
-        $this->getEventManager()->dispatch($userEvent);
         return true;
     }
 

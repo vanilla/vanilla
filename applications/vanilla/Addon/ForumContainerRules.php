@@ -40,7 +40,6 @@ use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Forum\Controllers\Pages\CategoryListPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionThreadPageController;
-use Vanilla\Forum\Controllers\Pages\PostController;
 use Vanilla\Forum\Controllers\Pages\UnsubscribePageController;
 use Vanilla\Forum\Controllers\Pages\ConvertHTMLPageController;
 use Vanilla\Forum\Layout\View\CategoryListLayoutView;
@@ -57,9 +56,7 @@ use Vanilla\Forum\Models\CategorySiteMetaExtra;
 use Vanilla\Forum\Models\DiscussionCollectionProvider;
 use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\Forum\Models\ForumQuickLinksProvider;
-use Vanilla\Forum\Models\PostFieldsExpander;
 use Vanilla\Forum\Models\PostingSiteMetaExtra;
-use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Forum\Models\ReactionsQuickLinksProvider;
 use Vanilla\Forum\Models\Totals\CategorySiteTotalProvider;
 use Vanilla\Forum\Models\Totals\CommentSiteTotalProvider;
@@ -94,7 +91,6 @@ use Vanilla\Models\SiteTotalService;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Utility\DebugUtils;
-use Vanilla\Web\APIExpandMiddleware;
 
 /**
  * Class ForumContainerRules
@@ -231,12 +227,6 @@ class ForumContainerRules extends AddonContainerRules
             ],
             null,
             -1
-        );
-
-        PageControllerRoute::configurePageRoutes(
-            $container,
-            ["/post/" => PostController::class],
-            PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS
         );
 
         PageControllerRoute::configurePageRoutes($container, [

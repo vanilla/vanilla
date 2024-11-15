@@ -394,23 +394,21 @@ class RecalculatePoints extends DatabaseCommand
                 InsertUserID,
                 sum(Points) AS Points
             FROM (
-                 SELECT
-                    d.DiscussionID,
-                    c.InsertUserID,
-                    1 AS Points
-                FROM GDN_Comment c
-
-                JOIN GDN_Discussion d ON c.DiscussionID = d.DiscussionID
-                WHERE
-                    d. `Type` = 'Question'
-                GROUP BY d.DiscussionID, c.InsertUserID
-
-                UNION
-
                 SELECT
                     c.CommentID,
                     c.InsertUserID,
-                    5 AS Points
+                    $this->answerPoints AS Points
+                FROM
+                    GDN_Discussion d
+                    JOIN GDN_Comment c ON c.CommentID = d.FirstCommentID
+                WHERE
+                    d. `Type` = 'Question'
+                    AND d.DateAccepted IS NULL
+                UNION
+                SELECT
+                    c.CommentID,
+                    c.InsertUserID,
+                    $this->acceptedAnswerPoints AS Points
                 FROM
                     GDN_Comment c
                 WHERE

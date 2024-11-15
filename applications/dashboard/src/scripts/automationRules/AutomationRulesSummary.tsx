@@ -9,7 +9,7 @@ import { AutomationRuleFormValues } from "@dashboard/automationRules/AutomationR
 import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { TokenItem } from "@library/metas/TokenItem";
-import { CreatableFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import Message from "@library/messages/Message";
 import { Icon } from "@vanilla/icons";
 import { isTimeBasedTrigger } from "@dashboard/automationRules/AutomationRules.utils";
@@ -108,7 +108,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
     const isProfileFieldValueCheckbox =
         hasProfileFieldValue &&
         profileFields?.find((field) => field.apiName === formValues.trigger?.triggerValue?.profileField)?.formType ===
-            CreatableFieldFormType.CHECKBOX;
+            ProfileFieldFormType.CHECKBOX;
 
     const isEmailDomainTrigger = formValues.trigger?.triggerType === "emailDomainTrigger";
     const isIdeaVoteTrigger = formValues.trigger?.triggerType === "ideationVoteTrigger";

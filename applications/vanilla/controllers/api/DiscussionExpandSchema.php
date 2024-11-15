@@ -10,7 +10,9 @@ use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Forum\Models\PostMetaModel;
+use Vanilla\Permissions;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Web\PermissionCheckTrait;
 
 /**
  * Class DiscussionExpandSchema
@@ -74,7 +76,6 @@ class DiscussionExpandSchema
             "reportMeta",
             "countReports",
             "postFields",
-            "warnings",
         ]);
     }
 

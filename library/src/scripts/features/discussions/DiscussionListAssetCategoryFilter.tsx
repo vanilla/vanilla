@@ -65,6 +65,8 @@ export default function DiscussionListAssetCategoryFilter(props: IProps) {
                         offsetPadding={true}
                         onChange={({ value }) => {
                             onFilterChange(value);
+                            // console.log("value", value);
+                            // onFilterChange(value === "followed" ? true : false);
                         }}
                     />
                 </div>

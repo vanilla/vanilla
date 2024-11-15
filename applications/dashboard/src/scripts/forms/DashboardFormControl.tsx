@@ -63,10 +63,8 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
         onChange,
         onBlur,
         autocompleteClassName,
-        dateRangeDirection: propsDateRangeDirection = "above",
+        dateRangeDirection = "above",
     } = props;
-
-    const dateRangeDirection = props.control?.["dateRangeDirection"] ?? propsDateRangeDirection;
 
     const { zIndex } = useStackingContext();
 

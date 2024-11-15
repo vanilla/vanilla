@@ -36,14 +36,6 @@ class InstantScheduler extends DeferredScheduler
     private $scheduledJobs = [];
 
     /**
-     * @inheritDoc
-     */
-    public function clear(): void
-    {
-        $this->scheduledJobs = [];
-    }
-
-    /**
      * Assert a job type was scheduled with a specific message.
      *
      * @param string $expectedType

@@ -37,8 +37,7 @@
                     "$hydrate": "react.newpost",
                     "asOwnButtons": [],
                     "excludedButtons": [],
-                    "postableDiscussionTypes": ["discussion", "question", "poll"],
-                    "title": "Leave a comment"
+                    "postableDiscussionTypes": ["discussion", "question", "poll"]
                 },
                 {
                     "$hydrate": "react.quick-links",

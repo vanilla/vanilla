@@ -5,8 +5,6 @@
  */
 
 import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
-import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
-import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import { cx } from "@emotion/css";
 import { RadioPicker } from "@library/forms/RadioPicker";
 
@@ -16,10 +14,10 @@ type IProps = React.ComponentProps<typeof RadioPicker> & {
 
 export function DashboardRadioPicker(props: IProps) {
     const { className, ...restProps } = props;
-    const { compact } = useDashboardFormStyle();
+    const classes = dashboardFormGroupClasses();
     return (
-        <DashboardInputWrap className={props.className}>
-            <RadioPicker compact={compact} {...restProps} />
-        </DashboardInputWrap>
+        <div className={cx(classes.inputWrapRight, className)}>
+            <RadioPicker {...restProps} />
+        </div>
     );
 }

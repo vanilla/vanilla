@@ -103,9 +103,8 @@ dashboardHeading({
     </li>
 
 </ul>
-{% if featureEnabled(constant("Vanilla\\Forum\\Models\\PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS")) %}
-    {{ form.react("stub", "CategoryPostTypes", postTypeProps) }}
-{% else %}
+<div class="CategoryPermissions">
+
     {% if AllowedDiscussionTypes is defined and AllowedDiscussionTypes|length > 1 %}
         <div class="P DiscussionTypes form-group">
             <div class="label-wrap">
@@ -118,8 +117,6 @@ dashboardHeading({
             </div>
         </div>
     {% endif %}
-{% endif %}
-<div class="CategoryPermissions">
 
     {% if _PermissionFields is defined %}
     {{ form.simple(_PermissionFields, []) }}

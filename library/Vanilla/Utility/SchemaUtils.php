@@ -228,43 +228,4 @@ final class SchemaUtils
         ]);
         return $newSchema;
     }
-
-    /**
-     * When serializing a schema over into json, empty default objects are prone to being serialized as arrays.
-     *
-     * This ensures we serialize them as objects for object type items.
-     *
-     * @param Schema $schema
-     * @return void
-     */
-    public static function fixObjectDefaultSerialization(Schema $schema): void
-    {
-        if ($schema->getField("type") !== "object") {
-            return;
-        }
-
-        $properties = $schema->getField("properties");
-
-        if (!empty($properties)) {
-            foreach ($properties as $property => $subSchema) {
-                if ($subSchema instanceof Schema) {
-                    self::fixObjectDefaultSerialization($subSchema);
-                } else {
-                    $actualSchema = new Schema($subSchema);
-                    self::fixObjectDefaultSerialization($actualSchema);
-                    $schema->setField("properties.{$property}", $actualSchema->getSchemaArray());
-                }
-            }
-        }
-
-        if ($schema->getField("default") === null) {
-            return;
-        }
-
-        if (empty($schema->getField("default"))) {
-            $schema->setField("default", new \stdClass());
-        }
-
-        return;
-    }
 }

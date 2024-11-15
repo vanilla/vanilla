@@ -5,16 +5,15 @@
  */
 
 import React, { ReactNode, useState } from "react";
-import { inputClasses, inputVariables } from "@library/forms/inputStyles";
+import { inputClasses } from "@library/forms/inputStyles";
 import Button from "@library/forms/Button";
 import { t } from "@vanilla/i18n";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { Icon } from "@vanilla/icons";
-import { css, cx } from "@emotion/css";
+import { cx } from "@emotion/css";
 import { getRequiredID } from "@library/utility/idUtils";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { globalVariables } from "@library/styles/globalStyleVars";
 
 interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
     showUnmask?: boolean;
@@ -25,10 +24,6 @@ interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
     hasError?: boolean;
     errorTooltip?: ReactNode;
 }
-
-const heightFix = css({
-    height: inputVariables().sizing.height,
-});
 
 export function PasswordInput(props: IProps) {
     const { showUnmask, inputRef, className, hasError, errorTooltip, ...rest } = props;
@@ -45,7 +40,7 @@ export function PasswordInput(props: IProps) {
 
     return (
         <div className={classes.inputWrapper}>
-            <div className={cx(classes.inputContainer, heightFix, className)}>
+            <div className={cx(classes.inputContainer, className)}>
                 <input {...rest} id={inputID} type={showText ? "text" : "password"} autoComplete="off" ref={inputRef} />
                 {hasError && (
                     <ConditionalWrap

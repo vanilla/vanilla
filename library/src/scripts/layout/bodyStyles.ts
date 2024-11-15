@@ -30,7 +30,7 @@ export const bodyStyleMixin = useThemeCache(() => {
         "h1, h2, h3, h4, h5, h6": {
             ...Mixins.font({
                 lineHeight: globalVars.lineHeights.condensed,
-                color: `var(--fg-contrast-color, ${ColorsUtils.colorOut(globalVars.mainColors.fgHeading)})`,
+                color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
                 family: globalVars.fonts.families.headings,
             }),
         },
@@ -52,12 +52,11 @@ export const useBodyCSS = () => {
                 font-family: ${bodyStyle.fontFamily};
                 color: ${bodyStyle.color};
                 word-break: ${bodyStyle.wordBreak};
-                scroll-padding-top: 48px;
             }
 
             h1, h2, h3, h4, h5, h6 {
                 line-height: ${globalVars.lineHeights.condensed};
-                color: var(--fg-contrast-color, ${ColorsUtils.colorOut(globalVars.mainColors.fgHeading)});
+                color: ${ColorsUtils.colorOut(globalVars.mainColors.fgHeading)};
                 font-family: ${globalVars.fonts.families.headings};
             }
         `;

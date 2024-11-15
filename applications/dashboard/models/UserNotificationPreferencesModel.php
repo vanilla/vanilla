@@ -15,8 +15,6 @@ use UserMetaModel;
 use UserModel;
 use Vanilla\Community\Events\SubscriptionChangeEvent;
 use Vanilla\Dashboard\Activity\Activity;
-use Vanilla\Dashboard\Activity\EmailDigestActivity;
-use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\Forum\Digest\EmailDigestGenerator;
 use Vanilla\Models\UserFragmentSchema;
 
@@ -154,14 +152,6 @@ class UserNotificationPreferencesModel
                     $prefsToSave[$key] = $val;
                     $this->userMetaModel->setUserMeta($userID, "Preferences." . $key, $val);
                 }
-            } elseif ($key == "Email." . EmailDigestActivity::getPreference()) {
-                // We need to preserve the auto-opt-in value if the user is not manually opting out.
-                $digestPref = $existingPrefs[$key];
-                if ($digestPref == DigestModel::AUTO_OPT_IN && $val != DigestModel::MANUAL_OPT_OUT) {
-                    $val = DigestModel::AUTO_OPT_IN;
-                }
-                $prefsToSave[$key] = $val;
-                $this->userMetaModel->setUserMeta($userID, "Preferences." . $key, intval($val));
             } else {
                 $parts = explode(".", $key);
                 $notificationMethod = $parts[0];
@@ -183,9 +173,7 @@ class UserNotificationPreferencesModel
 
         $this->userModel->savePreference($userID, $prefsToSave);
         if (array_key_exists("Email.DigestEnabled", $prefsToSave)) {
-            $newDigestPref = $prefsToSave["Email.DigestEnabled"];
-            $existingDigestPref = $existingPrefs["Email.DigestEnabled"] ?? 0;
-            if ($newDigestPref >= 1 && $existingDigestPref == 0) {
+            if ($prefsToSave["Email.DigestEnabled"] == 1) {
                 // The user has enabled the digest. We now need to forcibly enable digests for all the user's followed categories
                 $userFollowedCategories = array_keys($this->categoryModel->getFollowed($userID));
                 if (!empty($userFollowedCategories)) {
@@ -216,37 +204,32 @@ class UserNotificationPreferencesModel
                     Gdn::cache()->remove("Follow_{$userID}");
                 }
             }
-            if (
-                ($newDigestPref >= 1 && $existingDigestPref == 0) ||
-                ($newDigestPref == 0 && $existingDigestPref >= 1)
-            ) {
-                $action = SubscriptionChangeEvent::ACTION_DIGEST_ENABLED;
-                if ($newDigestPref == 0) {
-                    $action = SubscriptionChangeEvent::ACTION_DIGEST_DISABLED;
-                } elseif ($newDigestPref === 3) {
-                    $action = SubscriptionChangeEvent::ACTION_DIGEST_AUTO_SUBSCRIBE;
-                }
-                $sender = Gdn::userModel()->currentFragment();
-                $senderSchema = new UserFragmentSchema();
-                $sender = $senderSchema->validate($sender);
-                $totalDigestSubscribers = Gdn::getContainer()
-                    ->get(EmailDigestGenerator::class)
-                    ->getDigestEnabledUsersCount();
-                $digestSubscriptionChangeEvent = new SubscriptionChangeEvent(
+            $action =
+                $prefsToSave["Email.DigestEnabled"] == 1
+                    ? SubscriptionChangeEvent::ACTION_DIGEST_ENABLED
+                    : SubscriptionChangeEvent::ACTION_DIGEST_DISABLED;
+            $sender = Gdn::userModel()->currentFragment();
+            $senderSchema = new UserFragmentSchema();
+            $sender = $senderSchema->validate($sender);
+            $totalDigestSubscribers = Gdn::getContainer()
+                ->get(EmailDigestGenerator::class)
+                ->getDigestEnabledUsersCount();
+            $digestSubscriptionChangeEvent = new SubscriptionChangeEvent(
+                SubscriptionChangeEvent::ACTION_DIGEST_ENABLED,
+                [
                     $action,
-                    [
-                        $action,
-                        "subscriptionChange" => [
-                            "subscription" =>
-                                ($newDigestPref > 0 ? t("Enabled") : t("Disabled")) . " " . t("Email Digest"),
-                            "type" => $action,
-                            "digestSubscribers" => $totalDigestSubscribers,
-                        ],
+                    "subscriptionChange" => [
+                        "subscription" =>
+                            ($prefsToSave["Email.DigestEnabled"] == 1 ? t("Enabled") : t("Disabled")) .
+                            " " .
+                            t("Email Digest"),
+                        "type" => $action,
+                        "digestSubscribers" => $totalDigestSubscribers,
                     ],
-                    $sender
-                );
-                $this->eventManager->dispatch($digestSubscriptionChangeEvent);
-            }
+                ],
+                $sender
+            );
+            $this->eventManager->dispatch($digestSubscriptionChangeEvent);
         }
         return $this->getUserPrefs($userID);
     }
@@ -317,23 +300,5 @@ class UserNotificationPreferencesModel
         }
         $result = Gdn::config()->saveToConfig($defaultsToSave);
         return $result;
-    }
-
-    /**
-     * Set the initial default preferences for a user. Sets category following and digest preferences.
-     *
-     * @param int $userID
-     * @param bool $isNewUser
-     * @return void
-     */
-    public function setInitialDefaults(int $userID, bool $isNewUser = false): void
-    {
-        $this->categoryModel->setDefaultCategoryPreferences($userID, $isNewUser);
-        if (Gdn::config("Garden.Digest.Enabled") && Gdn::config(DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE)) {
-            $preferences = $this->getExplicitUserPreferences($userID);
-            if (!isset($preferences["Email.DigestEnabled"])) {
-                $this->save($userID, ["Email.DigestEnabled" => 3]);
-            }
-        }
     }
 }

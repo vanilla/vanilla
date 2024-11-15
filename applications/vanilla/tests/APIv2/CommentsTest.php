@@ -457,6 +457,40 @@ class CommentsTest extends AbstractResourceTest
     }
 
     /**
+     * Test that comments without a `parentRecordID` and `parentRecordType` are returned when querying by `discussionID`.
+     *
+     * @return void
+     */
+    public function testGetCommentsWithNoParentRecordID(): void
+    {
+        $discussion = $this->createDiscussion();
+
+        $commentModel = Gdn::getContainer()->get(CommentModel::class);
+
+        // This comment won't be assigned a `parentRecordID` or `parentRecordType`.
+        $commentID = (int) $commentModel->insert([
+            "DiscussionID" => $discussion["discussionID"],
+            "Body" => "Comment with no parent",
+            "Format" => "text",
+            "InsertUserID" => $this->api()->getUserID(),
+        ]);
+
+        $comment = $this->api()
+            ->get("comments/{$commentID}")
+            ->getBody();
+
+        // The comment exists.
+        $this->assertSame($commentID, $comment["commentID"]);
+
+        // The comment comes back when querying by `discussionID`.
+        $discussionComments = $this->api()
+            ->get("comments?discussionID={$discussion["discussionID"]}")
+            ->getBody();
+        $this->assertCount(1, $discussionComments);
+        $this->assertSame($commentID, $discussionComments[0]["commentID"]);
+    }
+
+    /**
      * Test that sysadmins can always access comments.
      *
      * @return void

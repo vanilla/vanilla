@@ -84,11 +84,9 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {
         $pageHead->setSeoTitle(t("Categories"), false);
-
-        $seoDescription = Gdn::config()->get("Garden.Description", "");
-        $seoDescription = $seoDescription != "" ? t("Categories") . " - " . $seoDescription : "";
-
-        $pageHead->setSeoDescription(\Gdn::formatService()->renderPlainText($seoDescription, HtmlFormat::FORMAT_KEY));
+        $pageHead->setSeoDescription(
+            \Gdn::formatService()->renderPlainText(Gdn::config()->get("Garden.Description", ""), HtmlFormat::FORMAT_KEY)
+        );
 
         $url = isset($paramInput["page"])
             ? $paramInput["category"]["url"] . "/p{$paramInput["page"]}"

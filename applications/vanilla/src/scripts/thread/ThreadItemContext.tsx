@@ -26,7 +26,6 @@ export interface IThreadItemContext {
     emailUrl: string;
     shareInMessageUrl?: string;
     extraMetas?: React.ReactNode;
-    threadStyle: "flat" | "nested";
 }
 
 const ThreadItemContext = React.createContext<IThreadItemContext>({
@@ -39,7 +38,6 @@ const ThreadItemContext = React.createContext<IThreadItemContext>({
     handleCopyUrl: async () => {},
     emailUrl: "",
     shareInMessageUrl: undefined,
-    threadStyle: "flat",
 });
 
 export function ThreadItemContextProvider(

@@ -1043,10 +1043,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         }),
     });
 
-    function getContrastFgColor(color: ColorHelper | string): ColorHelper {
-        return ColorsUtils.isLightColor(color) ? elementaryColors.darkText : elementaryColors.white;
-    }
-
     return {
         options,
         elementaryColors,

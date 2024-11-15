@@ -41,13 +41,13 @@ export function useEmailConfirmationToast() {
     const { addToast } = useToast();
     const currentUser = useCurrentUser();
     const isGuest = currentUser?.userID === 0;
+    const toastID = useRef<string | null>(null);
 
     useEffect(() => {
         if (currentUser && !isGuest) {
-            if (!currentUser.emailConfirmed) {
-                addToast({
+            if (!currentUser.emailConfirmed && !toastID.current) {
+                toastID.current = addToast({
                     body: <ToastContent />,
-                    toastID: "email-confirmation",
                 });
             }
         }

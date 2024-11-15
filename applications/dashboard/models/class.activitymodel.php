@@ -438,7 +438,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             ->join("ActivityType t", "a.ActivityTypeID = t.ActivityTypeID");
         if (isset($where["Private"])) {
             $this->SQL->join("User u", "u.UserID = a.ActivityUserID");
-            $this->SQL->where("CAST(u.Private as decimal)", 0, false, false);
+            $this->SQL->where("u.Private", 0);
             unset($where["Private"]);
         }
         // Add prefixes to the where.
@@ -2727,7 +2727,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         }
         $row["activityName"] = $row["ActivityName"];
 
-        $body = Gdn::formatService()->renderPlainText(formatString($row["Headline"], $row), TextFormat::FORMAT_KEY);
+        $body = formatString($row["Headline"], $row);
         // Replace anchors with bold text until notifications can be spun off from activities.
         $row["body"] = preg_replace("#<a [^>]+>(.+)</a>#Ui", "<strong>$1</strong>", $body);
 

@@ -5,7 +5,7 @@
  */
 
 import { useProfileFieldsByUserID, useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hooks";
-import { ProfileField, CreatableFieldVisibility } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileField, ProfileFieldVisibility } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { LoadStatus } from "@library/@types/api/core";
 import { IDataListNode } from "@library/dataLists/DataList";
 import { ProfileFieldVisibilityIcon } from "@dashboard/userProfiles/components/ProfileFieldVisibilityIcon";
@@ -35,7 +35,7 @@ export function useUserProfileFields(userID: RecordID) {
         return {};
     }, [profileFieldConfigs]);
 
-    const createListLabel = (labelText: string, visibility: CreatableFieldVisibility): ReactNode => {
+    const createListLabel = (labelText: string, visibility: ProfileFieldVisibility): ReactNode => {
         return (
             <span>
                 {labelText}

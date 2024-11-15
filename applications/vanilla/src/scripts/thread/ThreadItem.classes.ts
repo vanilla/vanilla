@@ -33,12 +33,12 @@ const ThreadItemClasses = useThemeCache((headerHasUserPhoto = false) => {
     });
 
     const footerWrapper = css({
-        display: "flex",
+        display: "grid",
         width: "100%",
-        alignItems: "center",
-        gap: 16,
+        gridTemplateColumns: "auto 1fr 50px",
+        gridTemplateRows: "1fr",
+        gap: 8,
         "@container threadItemContainer (width < 516px)": {
-            display: "grid",
             gridTemplateColumns: "1fr 50px",
             gridTemplateRows: "repeat(2, auto)",
         },

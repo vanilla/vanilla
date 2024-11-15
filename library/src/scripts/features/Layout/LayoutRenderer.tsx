@@ -14,7 +14,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { getComponent, IRegisteredComponent } from "@library/utility/componentRegistry";
-import { logDebug, mergeAndReplaceArrays } from "@vanilla/utils";
+import { logDebug } from "@vanilla/utils";
 import React, { useContext } from "react";
 import { isHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.utils";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
@@ -35,7 +35,6 @@ interface ILayoutLookupContext<T> {
     fallbackWidget?: FallbackLayoutWidget;
     componentFetcher: IComponentFetcher;
     componentWrapper?: IComponentWrapper<T>;
-    propEnhancer?: (hydrateKey: string) => any;
 }
 
 export const LayoutLookupContext = React.createContext<ILayoutLookupContext<any>>({
@@ -73,7 +72,6 @@ function LayoutRendererImpl<T>(props: IProps<T> & ILayoutLookupContext<T>) {
         fallbackWidget: props.fallbackWidget,
         componentWrapper: props.componentWrapper,
         allowInternalProps: props.allowInternalProps ?? false,
-        propEnhancer: props.propEnhancer,
     };
 
     return (
@@ -96,7 +94,6 @@ interface ILayoutRenderContext {
     device: LayoutDevice;
     fallbackWidget?: React.ComponentType<any>;
     componentFetcher?: (name: string) => IRegisteredComponent | null;
-    propEnhancer?: (hydrateKey: string) => any;
     componentWrapper?: IComponentWrapper<any>;
     allowInternalProps: boolean;
 }
@@ -112,8 +109,6 @@ function resolveDynamicComponent(
     if (componentConfig === null) {
         return null;
     }
-    const hydrateKey = componentConfig.$reactProps?.$hydrate ?? "unknown";
-
     if (!context.allowInternalProps) {
         componentConfig = {
             ...componentConfig,
@@ -147,12 +142,6 @@ function resolveDynamicComponent(
     }
 
     let result: React.ReactNode = null;
-
-    let componentProps = componentConfig.$reactProps ?? {};
-    if (context.propEnhancer) {
-        componentProps = mergeAndReplaceArrays(context.propEnhancer(hydrateKey), componentProps);
-    }
-
     // Return an error boundary wrapped component
     if (registeredComponent) {
         result = React.createElement(
@@ -160,7 +149,7 @@ function resolveDynamicComponent(
             { key: String(key), componentName: componentConfig?.$reactComponent },
             [
                 React.createElement(registeredComponent.Component, {
-                    ...resolveNestedComponents(componentProps, context),
+                    ...resolveNestedComponents(componentConfig.$reactProps, context),
                     key: key,
                 }),
             ],
@@ -168,7 +157,7 @@ function resolveDynamicComponent(
     } else if (context.fallbackWidget) {
         result = React.createElement(
             context.fallbackWidget,
-            { ...(componentConfig ?? {}), ...componentProps, key },
+            { ...(componentConfig ?? {}), ...(componentConfig.$reactProps ?? {}), key },
             [],
         );
     } else {
@@ -176,9 +165,11 @@ function resolveDynamicComponent(
     }
 
     if (context.componentWrapper) {
-        result = React.createElement(context.componentWrapper, { ...(componentConfig ?? {}), ...componentProps, key }, [
-            result,
-        ]);
+        result = React.createElement(
+            context.componentWrapper,
+            { ...(componentConfig ?? {}), ...(componentConfig.$reactProps ?? {}), key },
+            [result],
+        );
     }
 
     return result;

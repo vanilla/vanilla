@@ -22,12 +22,6 @@
  *
  */
 
-use Garden\Schema\Schema;
-use Garden\Web\Data;
-use Vanilla\Dashboard\Models\UserFragment;
-use Vanilla\Ignore\Models\IgnoreModel;
-use Vanilla\Utility\InstanceValidatorSchema;
-
 /**
  * Class IgnorePlugin.
  *
@@ -47,7 +41,7 @@ class IgnorePlugin extends Gdn_Plugin
     /**
      * IgnorePlugin constructor.
      */
-    public function __construct(private IgnoreModel $ignoreModel, private UserModel $userModel)
+    public function __construct()
     {
         parent::__construct();
         $this->allowModeratorIgnore = c("Plugins.Ignore.AllowModeratorIgnore", true);
@@ -266,8 +260,8 @@ class IgnorePlugin extends Gdn_Plugin
             return self::IGNORE_RESTRICTED;
         }
 
-        $ignoredUserIDs = $this->ignoreModel->getIgnoredUserIDs();
-        $numIgnoredUsers = sizeof($ignoredUserIDs);
+        $ignoredUsers = $this->getUserMeta($sessionUserID, "Blocked.User.%");
+        $numIgnoredUsers = sizeof($ignoredUsers);
         $maxIgnores = c("Plugins.Ignore.MaxIgnores", 5);
         if ($numIgnoredUsers >= $maxIgnores) {
             return self::IGNORE_LIMIT;
@@ -681,34 +675,6 @@ class IgnorePlugin extends Gdn_Plugin
                 );
             }
         }
-    }
-
-    /**
-     * GET /api/v2/users/{userID}/ignored
-     *
-     *
-     * @param UsersApiController $controller
-     * @param int $userID
-     * @return array
-     * @throws Exception
-     */
-    public function usersApiController_get_ignored(UsersApiController $controller, int $userID): array
-    {
-        $controller->permission();
-        $out = Schema::parse([
-            ":a" => new InstanceValidatorSchema(UserFragment::class),
-        ]);
-
-        if ($userID !== Gdn::session()->UserID) {
-            $controller->permission("users.edit");
-        }
-
-        // Make sure user exists.
-        $this->userModel->getFragmentByID($userID);
-
-        $users = $this->ignoreModel->getIgnoredUserFragments($userID);
-        $users = $out->validate($users);
-        return $users;
     }
 
     /**

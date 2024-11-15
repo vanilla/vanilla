@@ -13,7 +13,6 @@ use DiscussionModel;
 use Garden\Web\Exception\NotFoundException;
 use Gdn;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Forum\Models\CommentThreadModel;
 use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\Providers\LayoutViewRecordProviderInterface;
 use Vanilla\Site\SiteSectionModel;
@@ -25,15 +24,27 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
 {
     public const RECORD_TYPE = "comment";
 
+    private DiscussionModel $discussionModel;
+
+    private CommentModel $commentModel;
+
+    private ConfigurationInterface $configuration;
+
     /**
      * D.I.
+     *
+     * @param DiscussionModel $discussionModel
+     * @param CommentModel $commentModel
+     * @param ConfigurationInterface $configuration
      */
     public function __construct(
-        private DiscussionModel $discussionModel,
-        private CommentModel $commentModel,
-        private ConfigurationInterface $configuration,
-        private CommentThreadModel $commentThreadModel
+        DiscussionModel $discussionModel,
+        CommentModel $commentModel,
+        ConfigurationInterface $configuration
     ) {
+        $this->discussionModel = $discussionModel;
+        $this->commentModel = $commentModel;
+        $this->configuration = $configuration;
     }
 
     /**
@@ -78,18 +89,14 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
     public function resolveParentLayoutQuery(LayoutQuery $query): LayoutQuery
     {
         $comment = $this->commentModel->getID($query->getRecordID(), DATASET_TYPE_ARRAY);
-        if (!$comment) {
-            throw new NotFoundException("Comment");
-        }
         $discussion = $this->discussionModel->getID($comment["DiscussionID"], DATASET_TYPE_ARRAY);
-        if (!$discussion) {
-            throw new NotFoundException("Discussion");
-        }
         $discussionID = $discussion["DiscussionID"];
 
         $this->commentModel->orderBy("c.DateInserted asc");
+        $offset = $this->commentModel->getDiscussionThreadOffset($comment);
+        $limit = $this->configuration->get("Vanilla.Comments.PerPage", 30);
 
-        $page = $this->commentModel->getDiscussionPage($comment);
+        $page = (int) pageNumber($offset, $limit, false);
 
         $newQuery = $query->withRecordType("discussion")->withRecordID($discussionID);
         $newQuery->setParams([

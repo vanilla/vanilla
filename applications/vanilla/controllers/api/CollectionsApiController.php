@@ -279,7 +279,7 @@ class CollectionsApiController extends \AbstractApiController
         $paging =
             $totalRecordCount === 0
                 ? ApiUtils::morePagerInfo($results, "/api/v2/collections/contents", $query, $in)
-                : ApiUtils::numberedPagerInfo($totalRecordCount, "/api/v2/collections/contents", $query, $in);
+                : ApiUtils::numberedPagerInfo($totalRecordCount, "/api/v2collections/contents", $query, $in);
         $pagingObject = Pagination::tryCursorPagination($paging, $query, $results, "");
         return new Data($results, $pagingObject);
     }

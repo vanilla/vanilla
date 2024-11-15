@@ -24,7 +24,7 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { useUniqueID } from "@library/utility/idUtils";
 import { Popover, positionMatchWidth } from "@reach/popover";
 import { t } from "@vanilla/i18n";
-import { RecordID, stableObjectHash } from "@vanilla/utils";
+import { RecordID } from "@vanilla/utils";
 import { ChangeEventHandler, KeyboardEventHandler, RefObject, useEffect, useMemo, useRef, useState } from "react";
 import type { Select } from "@vanilla/json-schema-forms";
 
@@ -354,12 +354,12 @@ export function NestedSelect(props: INestedSelectProps) {
                                 <>
                                     {selectedTokens.map((token, idx) => {
                                         if (!token) {
-                                            return null;
+                                            return <></>;
                                         }
                                         const { label, value } = token;
                                         return (
                                             <TokenItem
-                                                key={stableObjectHash(token)}
+                                                key={idx}
                                                 className={classes.token}
                                                 compact={props.compact}
                                                 onRemove={() => handleOnSelect(value as RecordID)}

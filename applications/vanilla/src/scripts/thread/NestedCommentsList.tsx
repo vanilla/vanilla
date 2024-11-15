@@ -101,7 +101,7 @@ export function NestedCommentsList(props: Partial<IProps>) {
                                 const draftToScrollTo =
                                     visibleReplyFormRef?.current ??
                                     document.getElementById(`Comment_${draftParentIDAndPath?.parentCommentID}`);
-                                draftToScrollTo && scrollToElement(draftToScrollTo, 100);
+                                draftToScrollTo && scrollToElement(draftToScrollTo, 300);
                             }, 100);
                         }}
                         buttonType={ButtonTypes.TEXT_PRIMARY}
@@ -194,26 +194,23 @@ export function PartialCommentsList(props: Partial<IProps>) {
 
                 return (
                     <PageBox
-                        key={key}
                         options={{ borderType: threadItem.depth <= 1 ? BorderType.SEPARATOR : BorderType.NONE }}
+                        className={cx(props.rootClassName, threadItem.type)}
+                        data-depth={threadItem.depth}
+                        data-id={threadItem.parentCommentID}
+                        key={key}
+                        {...refProps}
                     >
-                        <div
-                            className={cx(props.rootClassName, threadItem.type)}
-                            data-depth={threadItem.depth}
-                            data-id={threadItem.parentCommentID}
-                            {...refProps}
-                        >
-                            {threadItem.type === "comment" && (
-                                <ThreadItemComment
-                                    threadItem={threadItem}
-                                    discussion={parentRecord}
-                                    showOPTag={showOPTag}
-                                    isPreview={props.isPreview}
-                                />
-                            )}
-                            {threadItem.type === "hole" && <ThreadItemHole threadItem={threadItem} />}
-                            {threadItem.type === "reply" && <ThreadItemReply threadItem={threadItem} />}
-                        </div>
+                        {threadItem.type === "comment" && (
+                            <ThreadItemComment
+                                threadItem={threadItem}
+                                discussion={parentRecord}
+                                showOPTag={showOPTag}
+                                isPreview={props.isPreview}
+                            />
+                        )}
+                        {threadItem.type === "hole" && <ThreadItemHole threadItem={threadItem} />}
+                        {threadItem.type === "reply" && <ThreadItemReply threadItem={threadItem} />}
                     </PageBox>
                 );
             })}

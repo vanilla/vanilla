@@ -8,13 +8,13 @@ import {
     ProfileField,
     PatchUserProfileFieldsParams,
     UserProfileFields,
-    CreatableFieldFormType,
-    CreatableFieldVisibility,
+    ProfileFieldFormType,
+    ProfileFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { IFormControl, JsonSchema } from "@vanilla/json-schema-forms";
 import {
-    CreatableFieldDataType,
-    CreatableFieldMutability,
+    ProfileFieldDataType,
+    ProfileFieldMutability,
     ProfileFieldRegistrationOptions,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { t } from "@vanilla/i18n";
@@ -53,10 +53,10 @@ export function mapProfileFieldsToSchema(
 
     const mapProfileFieldToType = (field: ProfileField) => {
         const dataType = field.dataType;
-        if (dataType === CreatableFieldDataType.TEXT || dataType === CreatableFieldDataType.DATE) {
+        if (dataType === ProfileFieldDataType.TEXT || dataType === ProfileFieldDataType.DATE) {
             return "string";
         }
-        if (dataType === CreatableFieldDataType.STRING_MUL || dataType === CreatableFieldDataType.NUMBER_MUL) {
+        if (dataType === ProfileFieldDataType.STRING_MUL || dataType === ProfileFieldDataType.NUMBER_MUL) {
             return "array";
         }
 
@@ -67,17 +67,17 @@ export function mapProfileFieldsToSchema(
         formType: ProfileField["formType"],
     ): IFormControl["inputType"] {
         switch (formType) {
-            case CreatableFieldFormType.TEXT:
-            case CreatableFieldFormType.NUMBER:
-            case CreatableFieldFormType.TEXT_MULTILINE:
+            case ProfileFieldFormType.TEXT:
+            case ProfileFieldFormType.NUMBER:
+            case ProfileFieldFormType.TEXT_MULTILINE:
                 return "textBox";
-            case CreatableFieldFormType.CHECKBOX:
+            case ProfileFieldFormType.CHECKBOX:
                 return "checkBox";
-            case CreatableFieldFormType.DROPDOWN:
+            case ProfileFieldFormType.DROPDOWN:
                 return "dropDown";
-            case CreatableFieldFormType.TOKENS:
+            case ProfileFieldFormType.TOKENS:
                 return "tokens";
-            case CreatableFieldFormType.DATE:
+            case ProfileFieldFormType.DATE:
                 return "datePicker";
         }
     }
@@ -94,11 +94,11 @@ export function mapProfileFieldsToSchema(
                         minLength: config["registrationOptions"] === ProfileFieldRegistrationOptions.REQUIRED ? 1 : 0,
                         minItems: config["registrationOptions"] === ProfileFieldRegistrationOptions.REQUIRED ? 1 : 0,
                         disabled:
-                            config["mutability"] === CreatableFieldMutability.NONE ||
-                            (config["mutability"] === CreatableFieldMutability.RESTRICTED && !userCanEdit),
+                            config["mutability"] === ProfileFieldMutability.NONE ||
+                            (config["mutability"] === ProfileFieldMutability.RESTRICTED && !userCanEdit),
                         visibility: config["visibility"],
                         "x-control": {
-                            ...(config["formType"] === CreatableFieldFormType.TOKENS
+                            ...(config["formType"] === ProfileFieldFormType.TOKENS
                                 ? {
                                       legend: config["label"],
                                   }
@@ -121,24 +121,24 @@ export function mapProfileFieldsToSchema(
                                     : null,
                             },
                             type:
-                                config["formType"] === CreatableFieldFormType.TEXT_MULTILINE
+                                config["formType"] === ProfileFieldFormType.TEXT_MULTILINE
                                     ? "textarea"
-                                    : config["formType"] === CreatableFieldFormType.NUMBER
+                                    : config["formType"] === ProfileFieldFormType.NUMBER
                                     ? "number"
                                     : undefined,
                             multiple:
-                                config["formType"] === CreatableFieldFormType.TOKENS && config["dropdownOptions"]
+                                config["formType"] === ProfileFieldFormType.TOKENS && config["dropdownOptions"]
                                     ? true
                                     : undefined,
 
-                            ...(config["visibility"] === CreatableFieldVisibility.INTERNAL && {
+                            ...(config["visibility"] === ProfileFieldVisibility.INTERNAL && {
                                 tooltip: t(
                                     "This information will only be shown to users with permission to view internal info.",
                                 ),
                                 tooltipIcon: "profile-crown",
                             }),
 
-                            ...(config["visibility"] === CreatableFieldVisibility.PRIVATE && {
+                            ...(config["visibility"] === ProfileFieldVisibility.PRIVATE && {
                                 tooltip: t("This is private information and will not be shared with other members."),
                                 tooltipIcon: "profile-lock",
                             }),
@@ -219,13 +219,13 @@ export const transformUserProfileFieldsData = (
     const finalUserProfileFieldsData = { ...initialUserProfileFields };
     profileFields.forEach(({ apiName, dataType }) => {
         //some tweaks here until dates are the right format in BE, see comment for formatDateStringIgnoringTimezone() in its origin file
-        if (dataType === CreatableFieldDataType.DATE) {
+        if (dataType === ProfileFieldDataType.DATE) {
             finalUserProfileFieldsData[apiName] = finalUserProfileFieldsData[apiName]
                 ? formatDateStringIgnoringTimezone(finalUserProfileFieldsData[apiName])
                 : "";
         }
         //convert these into string as our Autocomplete expects strings as dropdown values
-        if (dataType === CreatableFieldDataType.NUMBER_MUL) {
+        if (dataType === ProfileFieldDataType.NUMBER_MUL) {
             finalUserProfileFieldsData[apiName] = (finalUserProfileFieldsData[apiName] ?? []).map((field) =>
                 field.toString(),
             );

@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { getMeta } from "@library/utility/appUtils";
 import DiscussionCommentsAssetFlat from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset.flat";
 import { DiscussionCommentsAssetNested } from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset.nested";
 
@@ -12,7 +13,7 @@ type IProps =
     | React.ComponentProps<typeof DiscussionCommentsAssetFlat>;
 
 export default function DiscussionCommentsAsset(props: IProps) {
-    const threadStyle = props.threadStyle;
+    const threadStyle = props.threadStyle ?? getMeta("threadStyle", "flat");
 
     return (
         <>

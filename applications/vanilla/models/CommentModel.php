@@ -184,8 +184,8 @@ class CommentModel extends Gdn_Model implements
             // "Legacy" place to store discussion parentRecordID
             ->column("DiscussionID", "int", true)
             // Temporarily nullable for backwards compatibility.
-            ->column("parentRecordType", "varchar(10)")
-            ->column("parentRecordID", "int")
+            ->column("parentRecordType", "varchar(10)", true)
+            ->column("parentRecordID", "int", true)
             ->column("parentCommentID", "int", true)
             ->column("UpdateUserID", "int", true)
             ->column("DeleteUserID", "int", true)
@@ -981,24 +981,6 @@ class CommentModel extends Gdn_Model implements
     }
 
     /**
-     * Get the page of a discussion a comment should be in.
-     *
-     * @param array|int $commentRowOrCommentID
-     *
-     * @return int
-     */
-    public function getDiscussionPage(array|int $commentRowOrCommentID): int
-    {
-        $commentID = is_array($commentRowOrCommentID)
-            ? $commentRowOrCommentID["commentID"] ?? $commentRowOrCommentID["CommentID"]
-            : $commentRowOrCommentID;
-        $perPage = Gdn::config("Vanilla.Comments.PerPage", 30);
-        $topLevelComment = $this->threadModel->resolveTopLevelParentComment($commentID);
-        $threadOffset = $this->getDiscussionThreadOffset($topLevelComment);
-        return floor($threadOffset / $perPage) + 1;
-    }
-
-    /**
      * Gets the offset of the specified comment in its related discussion.
      *
      * @param int|array|object $commentRowOrCommentID Unique ID or a comment object for which the offset is being defined.
@@ -1020,15 +1002,21 @@ class CommentModel extends Gdn_Model implements
             ]);
         }
 
+        $discussionID = $comment["DiscussionID"] ?? null;
+        if ($discussionID === null) {
+            throw new ServerException(
+                "Can't get a discussion thread offset for a comment that is not part of a discussion.",
+                500,
+                [
+                    "commentID" => $commentID,
+                ]
+            );
+        }
+
         $this->SQL
             ->select("c.CommentID", "count", "CountComments")
             ->from("Comment c")
-            ->where([
-                "parentRecordType" => $comment["parentRecordType"],
-                "parentRecordID" => $comment["parentRecordID"],
-                "CommentID <>" => $commentID,
-            ])
-            ->where("parentCommentID is NULL");
+            ->where("c.DiscussionID", $comment["DiscussionID"]);
 
         $this->SQL->beginWhereGroup();
 
@@ -1628,9 +1616,6 @@ TWIG;
      */
     public static function generateCommentName(?string $discussionName): string
     {
-        if ($discussionName) {
-            $discussionName = Gdn::formatService()->renderPlainText($discussionName, "text");
-        }
         return sprintf(t("Re: %s"), $discussionName ?? t("Untitled"));
     }
 

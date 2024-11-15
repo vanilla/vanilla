@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -13,18 +13,14 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\Events\BeforeCommentPostEvent;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
-use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Forum\Models\CommentThreadModel;
 use Vanilla\Forum\Models\CommentThreadStructureOptions;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
-use Vanilla\Forum\Widgets\DiscussionCommentsAsset;
-use Vanilla\Layout\Asset\LayoutQuery;
-use Vanilla\Layout\LayoutModel;
-use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\LegacyModelUtils;
@@ -34,7 +30,6 @@ use Vanilla\Schema\RangeExpression;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchResultItem;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 use Garden\Web\Pagination;
 use Vanilla\Utility\SchemaUtils;
@@ -64,9 +59,7 @@ class CommentsApiController extends AbstractApiController
         private ReactionModel $reactionModel,
         private \Vanilla\Forum\Models\CommunityManagement\ReportModel $reportModel,
         private EscalationModel $escalationModel,
-        private ConfigurationInterface $config,
-        private LayoutViewModel $layoutViewModel,
-        private LayoutModel $layoutModel
+        private ConfigurationInterface $config
     ) {
     }
 
@@ -201,7 +194,6 @@ class CommentsApiController extends AbstractApiController
             $query["expand"]
         );
         $out = $this->schema($commentSchema, "out");
-        $out = $this->getEventManager()->fireFilter("commentsApiController_getOutSchema", $out);
 
         $comment = $this->commentByID($id);
         if (isset($comment["DiscussionID"])) {
@@ -225,7 +217,8 @@ class CommentsApiController extends AbstractApiController
         }
         $comment = $this->normalizeOutput($comment, $query["expand"]);
 
-        $quoteParent = $query["quoteParent"] ?? true;
+        $threadStyle = $this->config->get("threadStyle");
+        $quoteParent = $query["quoteParent"] ?? $threadStyle != "nested";
         $parentID = $comment["parentCommentID"] ?? null;
         if ($quoteParent && $parentID) {
             $quote = $this->threadModel->renderParentCommentAsQuote($comment);
@@ -272,6 +265,7 @@ class CommentsApiController extends AbstractApiController
         $this->permission();
 
         $this->idParamSchema();
+        $in = $this->schema([], "in")->setDescription("Get a comments embed data.");
         $out = $this->schema($this->quoteSchema(), "out");
 
         $comment = $this->commentByID($id);
@@ -285,7 +279,6 @@ class CommentsApiController extends AbstractApiController
         $comment["Url"] = commentUrl($comment);
         $isRich = strcasecmp($comment["Format"], RichFormat::FORMAT_KEY) === 0;
         $comment["bodyRaw"] = $isRich ? json_decode($comment["Body"], true) : $comment["Body"];
-        $comment["bodyRaw"] = Gdn::formatService()->renderPlainText($comment["bodyRaw"], "text");
 
         $this->userModel->expandUsers($comment, ["InsertUserID"]);
         $result = $out->validate($comment);
@@ -368,7 +361,6 @@ class CommentsApiController extends AbstractApiController
                         "reactions",
                         "reportMeta",
                         "countReports",
-                        "warnings",
                     ]),
                     "quoteParent:b?" => [
                         "description" => "Include the parent comment in the quote data.",
@@ -392,7 +384,6 @@ class CommentsApiController extends AbstractApiController
             "reactions",
             "reportMeta",
             "countReports",
-            "warnings",
         ]);
     }
 
@@ -401,11 +392,6 @@ class CommentsApiController extends AbstractApiController
      *
      * @param array $query
      * @return Data
-     * @throws ClientException
-     * @throws HttpException
-     * @throws NotFoundException
-     * @throws PermissionException
-     * @throws ValidationException
      */
     public function get_thread(array $query): Data
     {
@@ -623,8 +609,6 @@ class CommentsApiController extends AbstractApiController
             "comment",
             $query["expand"]
         );
-        $this->getEventManager()->fireFilter("commentsApiController_getOutSchema", $commentSchema);
-
         $out = $this->schema([":a" => $commentSchema], "out");
 
         if (isset($query["discussionID"])) {
@@ -686,7 +670,8 @@ class CommentsApiController extends AbstractApiController
             $attachmentModel->joinAttachments($rows);
         }
 
-        $quoteParent = $query["quoteParent"] ?? true;
+        $threadStyle = $this->config->get("threadStyle");
+        $quoteParent = $query["quoteParent"] ?? $threadStyle != "nested";
 
         foreach ($rows as &$currentRow) {
             $currentRow = $this->normalizeOutput($currentRow, $query["expand"]);
@@ -854,10 +839,6 @@ class CommentsApiController extends AbstractApiController
         $this->validateCanPost($parentRecordType, $parentRecordID);
 
         if (isset($body["parentCommentID"])) {
-            if (!FeatureFlagHelper::featureEnabled("customLayout.discussionThread")) {
-                throw new ClientException("Parent comments are not allowed without custom discussion threads.", 400);
-            }
-
             // Validate that the parent comment exists.
             $parentComment = $this->threadModel->selectThreadCommentFragment($body["parentCommentID"]);
 
@@ -878,8 +859,8 @@ class CommentsApiController extends AbstractApiController
                 ]);
             }
 
-            // Validate that we didn't exceed our maximum depth
-            $maxDepth = $this->resolveCommentMaxDepth($parentRecordID);
+            // Validate that we didn't exceed our maximum depth.
+            $maxDepth = \Gdn::config("Vanilla.Comment.MaxDepth", 5);
             if ($parentComment["depth"] + 1 > $maxDepth) {
                 throw new ClientException("Comment exceeds maximum depth.", 400, [
                     "maxDepth" => $maxDepth,
@@ -918,42 +899,6 @@ class CommentsApiController extends AbstractApiController
 
         $result = $out->validate($row);
         return $result;
-    }
-
-    /**
-     * @param int $parentCommentID
-     * @return int
-     */
-    private function resolveCommentMaxDepth(int $parentCommentID): int
-    {
-        if (!FeatureFlagHelper::featureEnabled("customLayout.discussionThread")) {
-            // No nesting allowed.
-            return 1;
-        }
-
-        [$layoutID, $resolvedQuery] = $this->layoutViewModel->queryLayout(
-            new LayoutQuery("discussionThread", "comment", $parentCommentID)
-        );
-
-        try {
-            $layout = $this->layoutModel->selectSingle(["layoutID" => $layoutID]);
-        } catch (NoResultsException $ex) {
-            // Default layout is applied.
-            return 5;
-        }
-
-        // Now let's loop through the layout
-        $maxDepth = 1;
-        ArrayUtils::walkRecursiveArray($layout["layout"], function (array $value) use (&$maxDepth) {
-            $hydrateKey = $value["\$hydrate"] ?? null;
-            $validHydrateKeys = ["react.asset.discussionComments", "react.asset.tabbed-comment-list"];
-            if (in_array($hydrateKey, $validHydrateKeys)) {
-                // This is it.
-                $maxDepth = $value["apiParams"]["maxDepth"] ?? 5;
-            }
-        });
-
-        return $maxDepth;
     }
 
     /**

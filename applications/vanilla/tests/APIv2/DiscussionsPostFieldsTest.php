@@ -11,14 +11,9 @@ use Garden\Web\Exception\ClientException;
 use Vanilla\Forum\Models\PostTypeModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
-use VanillaTests\UsersAndRolesApiTestTrait;
 
-/**
- * Various tests related to post types and post fields.
- */
-class DiscussionsPostTypesTest extends AbstractAPIv2Test
+class DiscussionsPostFieldsTest extends AbstractAPIv2Test
 {
-    use UsersAndRolesApiTestTrait;
     use CommunityApiTestTrait;
 
     /**
@@ -29,42 +24,6 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
         parent::setUp();
         $this->enableFeature(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS);
         \Gdn::sql()->truncate("postField");
-    }
-
-    /**
-     * Test role validation on posting discussions with a restricted post type.
-     *
-     * @return void
-     */
-    public function testPostTypeRoleValidation()
-    {
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage("not a valid post type");
-
-        $role = $this->createRole();
-        $postType = $this->createPostType(["roleIDs" => [$role["roleID"]]]);
-
-        // Create a user that has the member role required to post discussions but not the role required for the post type.
-        $user = $this->createUser(["roleID" => [\RoleModel::MEMBER_ID]]);
-
-        $this->runWithUser(function () use ($postType) {
-            $this->createDiscussion(["postTypeID" => $postType["postTypeID"]]);
-        }, $user);
-    }
-
-    /**
-     * Test category validation when posting in a category that has restricted post types.
-     *
-     * @return void
-     */
-    public function testPostTypeCategoryValidation()
-    {
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage("not a valid post type");
-
-        $this->createCategory(["hasRestrictedPostTypes" => true, "allowedPostTypeIDs" => ["discussion"]]);
-        $postType = $this->createPostType();
-        $this->createDiscussion(["postTypeID" => $postType["postTypeID"]]);
     }
 
     /**

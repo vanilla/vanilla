@@ -165,55 +165,6 @@ class CommentThreadModel
     }
 
     /**
-     * Given a comment row, resolve the top level parent comment of it.
-     *
-     * @param int $commentID The initial comment row.
-     * @return array The resolved comment row.
-     *
-     * @throws NotFoundException If the top level parent comment could not be found.
-     */
-    public function resolveTopLevelParentComment(int $commentID): array
-    {
-        $found = $this->db
-            ->createSql()
-            ->withRecursive(
-                "ParentCommentTree",
-                $this->db
-                    ->createSql()
-                    ->select("CommentID")
-                    ->select("parentCommentID")
-                    ->from("Comment")
-                    ->where("CommentID", $commentID),
-                $this->db
-                    ->createSql()
-                    ->select("c2.CommentID")
-                    ->select("c2.parentCommentID")
-                    ->from("Comment c2")
-                    ->join("@ParentCommentTree c1", "c1.parentCommentID = c2.CommentID", "inner")
-            )
-            ->select("*")
-            ->from("Comment c")
-            ->whereInSubquery(
-                "CommentID",
-                $this->db
-                    ->createSql()
-                    ->select("CommentID")
-                    ->from("@ParentCommentTree")
-                    ->where("parentCommentID is null")
-            )
-            ->limit(1)
-            ->get()
-            ->firstRow(DATASET_TYPE_ARRAY);
-
-        if (!$found) {
-            throw new NotFoundException("Could not resolve top level parent comment because the comment is orphaned.", [
-                "commentID" => $commentID,
-            ]);
-        }
-        return $found;
-    }
-
-    /**
      * Create a database query for recursively selecting comment fragments.
      *
      * @param array $where

@@ -138,10 +138,6 @@ addComponent("automationRules", () => {
     return <Router sectionRoots={["/settings/automation-rules"]} />;
 });
 
-addComponent("postTypes", () => {
-    return <Router sectionRoots={["/settings/post-types"]} />;
-});
-
 addComponent("aiSuggestions", AISuggestions);
 addComponent("interests", InterestsSettings);
 addComponent("GenerateDataExportURL", GenerateDataExportURL);

@@ -134,8 +134,6 @@ class CategoriesWidgetTest extends SiteTestCase
             "containerOptions" => [
                 "borderType" => "border",
                 "displayType" => "list",
-                "headerAlignment" => "left",
-                "visualBackgroundType" => "inner",
             ],
             "categoryOptions" => [
                 "description" => [

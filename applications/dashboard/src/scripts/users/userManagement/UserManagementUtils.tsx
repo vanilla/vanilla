@@ -11,7 +11,7 @@ import { IRole } from "@dashboard/roles/roleTypes";
 import { dateRangeToString, dateStringInUrlToDateRange } from "@library/search/SearchUtils";
 import { IGetUsersQueryParams } from "./UserManagement.hooks";
 import { isDateRange } from "@dashboard/components/panels/FilteredProfileFields";
-import { ProfileField, CreatableFieldDataType } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileField, ProfileFieldDataType } from "@dashboard/userProfiles/types/UserProfiles.types";
 
 export type UserManagementTableColumnName =
     | "username"
@@ -351,7 +351,7 @@ export const mapQueryParamsToFilterValues = (currentQuery: IGetUsersQueryParams,
     for (let key in filterValues.profileFields) {
         const profileFieldFilterValue = filterValues.profileFields[key];
         const isDateType = profileFields?.find((field) => {
-            return field.apiName === key && field.dataType === CreatableFieldDataType.DATE;
+            return field.apiName === key && field.dataType === ProfileFieldDataType.DATE;
         });
         if (isDateType) {
             profileFieldFilters[key] = dateStringInUrlToDateRange(profileFieldFilterValue);

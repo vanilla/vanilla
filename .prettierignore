@@ -86,4 +86,3 @@ applications/dashboard/scss/vendors
 # These files have minified JS and CSS for test assertions.
 tests/fixtures/themes/asset-test-no-parent/assets/javascript.min.js
 tests/fixtures/themes/asset-test-no-parent/assets/styles.min.css
-jest.eslint.config.mjs

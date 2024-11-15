@@ -28,9 +28,8 @@ import { isThreadHole } from "@vanilla/addon-vanilla/thread/threadUtils";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { getLocalStorageOrDefault, useMeasure, useMobile } from "@vanilla/react-utils";
-import { useCallback, useRef, useState, type ComponentProps } from "react";
+import { useCallback, useRef, useState } from "react";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
-import { useDiscussionThreadContext } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
 
 interface IProps {
     threadItem: IThreadItem & { type: "comment" };
@@ -147,13 +146,11 @@ export function ThreadItemComment(props: IProps) {
         }
     };
 
-    const { ThreadItemActionsComponent } = useDiscussionThreadContext();
-    const commentThreadItemProps: Omit<ComponentProps<typeof CommentThreadItem>, "comment"> = {
+    const commentThreadItemProps = {
         boxOptions: { borderType: BorderType.NONE },
         discussion: props.discussion,
         showOPTag: props.showOPTag,
         isPreview: props.isPreview,
-        threadStyle: "nested",
         ...(props.threadItem.depth <= threadDepthLimit &&
             canReply && {
                 onReply: () => handleReply(),
@@ -162,16 +159,6 @@ export function ThreadItemComment(props: IProps) {
             updateComment(props.threadItem.commentID);
         },
         hasActiveDraft: hasActiveDraft && isDraftForThisComment,
-        actions:
-            comment && ThreadItemActionsComponent ? (
-                <ThreadItemActionsComponent
-                    comment={comment}
-                    discussion={discussion}
-                    onMutateSuccess={async () => {
-                        updateComment(props.threadItem.commentID);
-                    }}
-                />
-            ) : undefined,
     };
 
     const onlyHasReply =

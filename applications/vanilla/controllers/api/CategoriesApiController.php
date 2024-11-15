@@ -11,10 +11,7 @@ use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
 use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
-use Vanilla\Database\CallbackWhereExpression;
 use Vanilla\Exception\PermissionException;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Models\CrawlableRecordSchema;
@@ -29,9 +26,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
-use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Utility\SchemaUtils;
 use Vanilla\Utility\TreeBuilder;
 use Garden\Web\Pagination;
 use Vanilla\Community\Schemas\PostFragmentSchema;
@@ -85,8 +80,7 @@ class CategoriesApiController extends AbstractApiController
         private BreadcrumbModel $breadcrumbModel,
         private LongRunner $runner,
         private SiteSectionModel $siteSectionModel,
-        private InterestModel $interestModel,
-        private PostTypeModel $postTypeModel
+        private InterestModel $interestModel
     ) {
     }
 
@@ -129,35 +123,6 @@ class CategoriesApiController extends AbstractApiController
                     ]);
                 }
             });
-            if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
-                $validPostTypes = $this->postTypeModel->getAvailablePostTypes();
-                $this->categoryPostSchema
-                    ->merge(
-                        Schema::parse([
-                            "hasRestrictedPostTypes:b?",
-                            "allowedPostTypeIDs:a?" => [
-                                "items" => [
-                                    "type" => "string",
-                                    "enum" => array_column($validPostTypes, "postTypeID"),
-                                ],
-                            ],
-                        ])
-                    )
-                    ->addFilter("", SchemaUtils::fieldRequirement("allowedPostTypeIDs", "hasRestrictedPostTypes"))
-                    ->addFilter("", function ($data, ValidationField $field) {
-                        if (!ArrayUtils::isArray($data)) {
-                            return $data;
-                        }
-
-                        if (!($data["hasRestrictedPostTypes"] ?? false)) {
-                            // Make sure we clear associated post types.
-                            $data["allowedPostTypeIDs"] = [];
-                        }
-                        return $data;
-                    })
-                    ->addFilter("allowedPostTypeIDs", fn($allowedPostTypeIDs) => array_unique($allowedPostTypeIDs))
-                    ->addFilter("", SchemaUtils::onlyOneOf(["allowedDiscussionTypes", "allowedPostTypeIDs"]));
-            }
         }
         return $this->schema($this->categoryPostSchema, $type);
     }
@@ -188,10 +153,6 @@ class CategoriesApiController extends AbstractApiController
         $category = CategoryModel::categories($id);
         if (empty($category)) {
             throw new NotFoundException("Category");
-        }
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
-            $categories = [&$category];
-            CategoryModel::joinPostTypes($categories);
         }
         return $category;
     }
@@ -513,12 +474,14 @@ class CategoriesApiController extends AbstractApiController
                      siteSectionID=$SubcommunityID:{folder} ie. ',
                 ],
                 "layoutViewType:s?",
-                "postTypeID:s?",
             ],
             "in"
         )
-            ->addValidator("", SchemaUtils::onlyOneOf(["categoryID", "parentCategoryID", "parentCategoryCode"]))
-            ->addValidator("", SchemaUtils::onlyOneOf(["followed", "followedUserID"]))
+            ->addValidator(
+                "",
+                \Vanilla\Utility\SchemaUtils::onlyOneOf(["categoryID", "parentCategoryID", "parentCategoryCode"])
+            )
+            ->addValidator("", \Vanilla\Utility\SchemaUtils::onlyOneOf(["followed", "followedUserID"]))
             ->setDescription("List categories.");
     }
 
@@ -687,14 +650,6 @@ class CategoriesApiController extends AbstractApiController
                 return $id !== $parentCategory["CategoryID"];
             });
             $categoryIDs = $categoryIDs->withFilteredValue("=", $descendantIDs);
-        }
-
-        // Additional filtering by post type
-        if (!empty($query["postTypeID"])) {
-            $postTypesByCategory = $this->postTypeModel->getPostTypesByCategory([
-                "ptcj.postTypeID" => $query["postTypeID"],
-            ]);
-            $categoryIDs = $categoryIDs->withFilteredValue("=", array_keys($postTypesByCategory));
         }
 
         $where["CategoryID"] = $categoryIDs;
@@ -1102,7 +1057,7 @@ class CategoriesApiController extends AbstractApiController
             unset($request["iconUrl"]);
         }
 
-        $request = ApiUtils::convertInputKeys($request, ["allowedPostTypeIDs", "hasRestrictedPostTypes"]);
+        $request = ApiUtils::convertInputKeys($request);
 
         if (array_key_exists("Urlcode", $request)) {
             $request["UrlCode"] = $request["Urlcode"];
@@ -1311,10 +1266,6 @@ class CategoriesApiController extends AbstractApiController
 
         foreach ($categories as &$category) {
             CategoryModel::calculate($category);
-        }
-
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
-            CategoryModel::joinPostTypes($categories);
         }
 
         // Reset indexes for proper output detection as an indexed array.

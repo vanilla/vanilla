@@ -10,8 +10,8 @@ import { EditProfileFields } from "@library/editProfileFields/EditProfileFields"
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import {
     ProfileField,
-    CreatableFieldDataType,
-    CreatableFieldFormType,
+    ProfileFieldDataType,
+    ProfileFieldFormType,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { transformUserProfileFieldsData } from "@library/editProfileFields/utils";
 import { mockAPI } from "@library/__tests__/utility";
@@ -45,9 +45,7 @@ describe("EditProfileForm", () => {
         expect.hasAssertions();
         mockProfileFields.forEach(({ label, formType }) => {
             const input = (
-                formType === CreatableFieldFormType.CHECKBOX
-                    ? result.queryByLabelText(label)
-                    : result.queryByText(label)
+                formType === ProfileFieldFormType.CHECKBOX ? result.queryByLabelText(label) : result.queryByText(label)
             ) as HTMLInputElement;
             expect(input).toBeInTheDocument();
         });
@@ -56,7 +54,7 @@ describe("EditProfileForm", () => {
     it("Renders the descriptions for each profile field (except checkboxes).", async () => {
         expect.hasAssertions();
         mockProfileFields.forEach(({ formType, description }) => {
-            if (!!description && formType !== CreatableFieldFormType.CHECKBOX) {
+            if (!!description && formType !== ProfileFieldFormType.CHECKBOX) {
                 const profileFieldDescription = result.queryByText(description);
                 expect(profileFieldDescription!).toBeInTheDocument();
             }
@@ -176,7 +174,7 @@ describe("Utils", () => {
         apiName: "number_tokens",
         label: "Number tokens field",
         description: "Mock number tokens for testing purposes",
-        dataType: CreatableFieldDataType.NUMBER_MUL,
+        dataType: ProfileFieldDataType.NUMBER_MUL,
         dropdownOptions: [99, 999, 9999],
     });
 

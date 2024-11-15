@@ -9,6 +9,12 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/themeCache";
 
 export const discussionCommentEditorClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+
+    const pageBox = css({
+        marginTop: globalVars.spacer.pageComponentCompact,
+    });
+
     const editorPostActions = css({
         display: "flex",
         alignItems: "center",
@@ -52,6 +58,7 @@ export const discussionCommentEditorClasses = useThemeCache(() => {
     });
 
     return {
+        pageBox,
         editorPostActions,
         draftMessage,
         draftIndicator,

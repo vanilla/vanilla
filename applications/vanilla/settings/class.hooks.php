@@ -1211,14 +1211,6 @@ class VanillaHooks extends Gdn_Plugin
                 $sort
             )
             ->addLinkIf(
-                ["Garden.Settings.Manage", "Feature.PostTypesAndPostFields.Enabled"],
-                t("Post Types"),
-                "/settings/post-types",
-                "forum.posting",
-                "nav-forum-posting",
-                $sort
-            )
-            ->addLinkIf(
                 "Garden.Community.Manage",
                 t("Reactions"),
                 "reactions",

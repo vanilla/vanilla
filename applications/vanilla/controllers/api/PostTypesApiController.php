@@ -17,8 +17,6 @@ use Vanilla\Models\Model;
 
 class PostTypesApiController extends \AbstractApiController
 {
-    const GET_POST_TYPE_RESPONSE = "@@postTypes/GET_POST_TYPE_DONE";
-
     public function __construct(private PostTypeModel $postTypeModel)
     {
     }
@@ -67,7 +65,6 @@ class PostTypesApiController extends \AbstractApiController
             Model::OPT_LIMIT => $limit,
             Model::OPT_OFFSET => $offset,
         ]);
-
         $rows = $out->validate($rows);
 
         $totalCount = $this->postTypeModel->getWhereCount($filters);
@@ -113,9 +110,6 @@ class PostTypesApiController extends \AbstractApiController
 
         $body = $in->validate($body);
         $this->postTypeModel->insert($body);
-        if (isset($body["categoryIDs"])) {
-            $this->postTypeModel->putCategoriesForPostType($body["postTypeID"], $body["categoryIDs"]);
-        }
 
         return $this->getPostTypeByID($body["postTypeID"], true);
     }
@@ -136,9 +130,6 @@ class PostTypesApiController extends \AbstractApiController
         $in = $this->schema($this->postTypeModel->patchSchema());
         $body = $in->validate($body, true);
         $this->postTypeModel->update($body, ["postTypeID" => $id]);
-        if (isset($body["categoryIDs"])) {
-            $this->postTypeModel->putCategoriesForPostType($id, $body["categoryIDs"]);
-        }
 
         return $this->getPostTypeByID($id, true);
     }
@@ -178,10 +169,10 @@ class PostTypesApiController extends \AbstractApiController
             unset($where["isDeleted"]);
         }
 
-        $row = $this->postTypeModel->getWhere($where, [Model::OPT_LIMIT => 1])[0] ?? null;
-
-        if (empty($row)) {
-            throw new NotFoundException("postType", ["postTypeID" => $id]);
+        try {
+            $row = $this->postTypeModel->selectSingle($where);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException("postType", ["postTypeID" => $id], $e);
         }
 
         return $row;

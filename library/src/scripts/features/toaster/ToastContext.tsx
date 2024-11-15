@@ -22,7 +22,6 @@ export interface IToast {
     className?: string;
     /** Use a wider toast variant */
     wide?: boolean;
-    toastID?: string;
 }
 
 interface IToasterContext {
@@ -81,16 +80,9 @@ export function ToastProvider(props: { children: ReactNode }) {
     const [toasts, setToast] = useState<IToastState[] | null>(null);
 
     const addToast = (toast: IToastState) => {
-        const toastID = toast.toastID ?? uuidv4();
+        const toastID = uuidv4();
         const newToast: IToastState = { ...toast, toastID, visibility: true };
-        setToast((prevState) => {
-            // We can replace the existing toast.
-            if (!prevState) {
-                return [newToast];
-            } else {
-                return [...prevState.filter((toast) => toast.toastID !== toastID), newToast];
-            }
-        });
+        setToast((prevState) => (prevState ? [...prevState, newToast] : [newToast]));
         return toastID;
     };
 

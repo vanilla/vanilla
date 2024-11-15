@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { CreatableFieldVisibility } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileFieldVisibility } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { Icon } from "@vanilla/icons";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -13,7 +13,7 @@ import { css } from "@emotion/css";
 import { t } from "@vanilla/i18n";
 import { Mixins } from "@library/styles/Mixins";
 
-export function ProfileFieldVisibilityIcon(props: { visibility: CreatableFieldVisibility }) {
+export function ProfileFieldVisibilityIcon(props: { visibility: ProfileFieldVisibility }) {
     const { visibility } = props;
 
     const iconContainerClass = css({
@@ -26,7 +26,7 @@ export function ProfileFieldVisibilityIcon(props: { visibility: CreatableFieldVi
         ...Mixins.verticallyAlignInContainer(24, globalVariables().lineHeights.base),
     });
 
-    if (visibility === CreatableFieldVisibility.INTERNAL) {
+    if (visibility === ProfileFieldVisibility.INTERNAL) {
         return (
             <ToolTip label={t("This information will only be shown to users with permission to view internal info.")}>
                 <span className={iconContainerClass}>
@@ -35,7 +35,7 @@ export function ProfileFieldVisibilityIcon(props: { visibility: CreatableFieldVi
             </ToolTip>
         );
     }
-    if (visibility === CreatableFieldVisibility.PRIVATE) {
+    if (visibility === ProfileFieldVisibility.PRIVATE) {
         return (
             <ToolTip label={t("This is private information and will not be shared with other members.")}>
                 <span className={iconContainerClass}>

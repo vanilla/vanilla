@@ -25,18 +25,12 @@ const AttachmentLayoutClasses = useThemeCache(() => {
             style: "solid",
         }),
         display: "flex",
-        ...Mixins.background({
-            color: globalVars.mainColors.bg,
-        }),
+
         lineHeight: globalVars.lineHeights.base,
 
         ...Mixins.margin({
-            bottom: globalVars.gutter.size / 2,
+            bottom: globalVars.gutter.size,
         }),
-
-        "&:last-child": {
-            marginBottom: 0,
-        },
 
         ...(wrap && {
             flexWrap: "wrap",

@@ -23,10 +23,6 @@ class PostTypesTest extends AbstractAPIv2Test
 
     protected $baseUrl = "/post-types";
 
-    private $role;
-
-    private $category;
-
     /**
      * @inheritDoc
      */
@@ -34,18 +30,6 @@ class PostTypesTest extends AbstractAPIv2Test
     {
         parent::setUp();
         $this->enableFeature(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS);
-
-        $this->role = $this->createRole();
-        $this->category = $this->createCategory();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        $this->disableFeature(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS);
     }
 
     /**
@@ -62,8 +46,6 @@ class PostTypesTest extends AbstractAPIv2Test
             "name" => "posttypename-$salt",
             "isActive" => true,
             "isDeleted" => false,
-            "roleIDs" => [$this->role["roleID"]],
-            "categoryIDs" => [$this->category["categoryID"]],
         ];
     }
 
@@ -117,7 +99,7 @@ class PostTypesTest extends AbstractAPIv2Test
             [
                 "name" => [$newPostType["name"]],
             ],
-            count: 1
+            1
         );
     }
 
@@ -129,12 +111,10 @@ class PostTypesTest extends AbstractAPIv2Test
     public function testPatch()
     {
         $postType = $this->testPost();
-        $category = $this->createCategory();
 
         $payload = [
             "name" => $postType["name"] . "updated",
             "isActive" => false,
-            "categoryIDs" => [$category["categoryID"]],
         ];
         $postTypeUpdated = $this->api()
             ->patch($this->baseUrl . "/" . $postType["postTypeID"], $payload)
@@ -225,29 +205,5 @@ class PostTypesTest extends AbstractAPIv2Test
         $this->expectException(ClientException::class);
         $this->expectExceptionMessage("The selected parent post type does not exist");
         $this->testPost(["parentPostTypeID" => "doesntexist"] + $this->record());
-    }
-
-    /**
-     * Test role ID validation.
-     *
-     * @return void
-     */
-    public function testPostWithInvalidRole()
-    {
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage("Invalid role id: 9999");
-        $this->testPost(["roleIDs" => [9999]]);
-    }
-
-    /**
-     * Test category ID validation.
-     *
-     * @return void
-     */
-    public function testPostWithInvalidCategory()
-    {
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage("The category 9999 is not a valid category.");
-        $this->testPost(["categoryIDs" => [9999]]);
     }
 }

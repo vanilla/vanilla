@@ -638,15 +638,14 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
      */
     private function getDigestEnabledUsersQuery(array $roleIDs): \Gdn_SQLDriver
     {
-        $userOnClause =
-            $this->config->get(DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE) == 1
-                ? 'u.UserID = um.UserID and um.QueryValue in ("Preferences.Email.DigestEnabled.1","Preferences.Email.DigestEnabled.3") AND u.Deleted = 0'
-                : 'u.UserID = um.UserID and um.QueryValue = "Preferences.Email.DigestEnabled.1" AND u.Deleted = 0';
         $query = $this->database
             ->createSql()
             ->from("UserMeta um")
-            // Here we are using the querying value so values can be pulled directly from the QueryValue_UserID index.
-            ->join("User u", $userOnClause)
+            // Here we are using the querying value so values can be pulled diretly from the QueryValue_UserID index.
+            ->join(
+                "User u",
+                'u.UserID = um.UserID and um.QueryValue = "Preferences.Email.DigestEnabled.1" AND u.Deleted = 0'
+            )
             // Exclude Deleted users
             ->join("UserRole ur", "ur.UserID = um.UserID")
             ->where([

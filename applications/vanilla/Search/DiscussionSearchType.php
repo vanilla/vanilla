@@ -222,11 +222,6 @@ class DiscussionSearchType extends AbstractSearchType
             if (!empty($excludedInsertUserRoleIDs)) {
                 $query->setFilter("insertUserRoleIDs", $excludedInsertUserRoleIDs, false, SearchQuery::FILTER_OP_NOT);
             }
-
-            $excludedInsertUserIDs = $query->getQueryParameter("excludedInsertUserIDs");
-            if (!empty($excludedInsertUserIDs)) {
-                $query->setFilter("insertUserID", $excludedInsertUserIDs, filterOp: SearchQuery::FILTER_OP_NOT);
-            }
         }
     }
 
@@ -279,11 +274,6 @@ class DiscussionSearchType extends AbstractSearchType
                 ],
             ],
             "excludedInsertUserRoleIDs:a?" => [
-                "items" => [
-                    "type" => "integer",
-                ],
-            ],
-            "excludedInsertUserIDs:a?" => [
                 "items" => [
                     "type" => "integer",
                 ],

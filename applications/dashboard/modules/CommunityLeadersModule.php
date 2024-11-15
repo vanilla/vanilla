@@ -172,7 +172,7 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule
 
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
-            self::widgetSubtitleSchema("subtitleContent"),
+            self::widgetSubtitleSchema(),
             self::widgetDescriptionSchema(),
             self::widgetColumnSchema(),
             $ownSchema

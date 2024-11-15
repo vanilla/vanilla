@@ -37,11 +37,6 @@ import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader
 import { MetaIcon } from "@library/metas/Metas";
 import AiEscalationMetaIcon from "@library/features/discussions/integrations/components/AiEscalationMetaIcon";
 import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
-import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
-
-if (getMeta("inputFormat.desktop")?.match(/rich2/i)) {
-    supportsFrames(true);
-}
 
 // App Setup
 logDebug("Boot layout app");

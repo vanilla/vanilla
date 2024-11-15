@@ -19,7 +19,6 @@ import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContex
 
 type ICommonProps = {
     errors?: IFieldError[];
-    wrapperClassName?: string;
 };
 
 type ILegacyProps = {
@@ -77,7 +76,7 @@ export function DashboardToggle(props: IProps) {
     );
 
     return (
-        <DashboardInputWrap className={cx(props.disabled ? classes.disabled : undefined, props.wrapperClassName)}>
+        <DashboardInputWrap className={props.disabled ? classes.disabled : undefined}>
             {toggle}
             {props.errors && <ErrorMessages errors={props.errors} />}
         </DashboardInputWrap>

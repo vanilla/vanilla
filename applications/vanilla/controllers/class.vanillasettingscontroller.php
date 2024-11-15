@@ -8,17 +8,7 @@
  * @since 2.0
  */
 
-use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
-use Vanilla\Forms\ApiFormChoices;
-use Vanilla\Forms\FieldMatchConditional;
-use Vanilla\Forms\FormOptions;
-use Vanilla\Forms\SchemaForm;
-use Vanilla\Forms\StaticFormChoices;
-use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Utility\ArrayUtils;
-use Vanilla\Utility\ModelUtils;
-use Vanilla\Utility\SchemaUtils;
 
 /**
  * Handles displaying the dashboard "settings" pages for Vanilla via /settings endpoint.
@@ -41,11 +31,6 @@ class VanillaSettingsController extends Gdn_Controller
 
     /** @var array An array of category records. */
     public $OtherCategories;
-
-    public function __construct(private PostTypeModel $postTypeModel)
-    {
-        parent::__construct();
-    }
 
     /**
      * Posting settings.
@@ -462,8 +447,6 @@ class VanillaSettingsController extends Gdn_Controller
         $this->fireEvent("AddEditCategory");
         $this->setupDiscussionTypes([]);
 
-        $this->setupAllowedPostTypes();
-
         $displayAsOptions = CategoryModel::getDisplayAsOptions();
 
         if ($this->Form->authenticatedPostBack()) {
@@ -720,70 +703,6 @@ class VanillaSettingsController extends Gdn_Controller
     }
 
     /**
-     * Set a category's allowed post types.
-     *
-     * @return void
-     */
-    protected function setupAllowedPostTypes(): void
-    {
-        if (!\Vanilla\FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
-            return;
-        }
-        $validPostTypes = $this->postTypeModel->getAvailablePostTypes();
-        $allowedPostTypesSchema = Schema::parse([
-            "hasRestrictedPostTypes:b?" => [
-                "x-control" => SchemaForm::toggle(new FormOptions("Has Restricted Post Types")),
-            ],
-            "allowedPostTypeIDs:a?" => [
-                "items" => [
-                    "type" => "string",
-                    "enum" => array_column($validPostTypes, "postTypeID"),
-                ],
-                "x-control" => SchemaForm::dropDown(
-                    new FormOptions("Allowed Post Types"),
-                    new StaticFormChoices(array_column($validPostTypes, "name", "postTypeID")),
-                    new FieldMatchConditional(
-                        "hasRestrictedPostTypes",
-                        Schema::parse([
-                            "type" => "boolean",
-                            "const" => true,
-                        ])
-                    ),
-                    multiple: true
-                ),
-            ],
-        ])
-            ->addFilter("", SchemaUtils::fieldRequirement("allowedPostTypeIDs", "hasRestrictedPostTypes"))
-            ->addFilter("", function ($data, \Garden\Schema\ValidationField $field) {
-                if (!ArrayUtils::isArray($data)) {
-                    return $data;
-                }
-
-                if (isset($data["hasRestrictedPostTypes"]) && !$data["hasRestrictedPostTypes"]) {
-                    // Make sure we clear associated post types.
-                    $data["allowedPostTypeIDs"] = [];
-                }
-                return $data;
-            });
-
-        Gdn::eventManager()->fire("VanillaSettingsController_allowedPostTypesSchema", $allowedPostTypesSchema);
-
-        $this->setData("postTypeProps.allowedPostTypeIDs", $this->Form->getValue("allowedPostTypeIDs"));
-        $this->setData("postTypeProps.formSchema", $allowedPostTypesSchema->getSchemaArray());
-
-        if ($this->Form->authenticatedPostBack()) {
-            try {
-                $data = $this->Form->formValues();
-                $validatedData = $allowedPostTypesSchema->validate($data);
-                $this->Form->setFormValue($validatedData);
-            } catch (ValidationException $exception) {
-                $validation = ModelUtils::validationExceptionToValidationResult($exception);
-                $this->Form->setValidationResults($validation->results());
-            }
-        }
-    }
-
-    /**
      * Set a Category's allowed discussion types.
      *
      * @param mixed $category
@@ -829,9 +748,6 @@ class VanillaSettingsController extends Gdn_Controller
         }
 
         // Get category data
-        $category = CategoryModel::categories($categoryID);
-        $categories = [&$category];
-        $this->CategoryModel::joinPostTypes($categories);
         $this->Category = CategoryModel::categories($categoryID);
         if (!$this->Category) {
             throw notFoundException("Category");
@@ -866,12 +782,6 @@ class VanillaSettingsController extends Gdn_Controller
 
         $this->fireAs("SettingsController");
         $this->fireEvent("AddEditCategory");
-
-        if (!$this->Form->authenticatedPostBack()) {
-            $this->Form->setData($this->Category);
-        }
-
-        $this->setupAllowedPostTypes();
 
         if ($this->Form->authenticatedPostBack()) {
             // _ExtendedFields are set during event handlers calls by plugins, if the category is idea category "IsIdea" will be set.
@@ -934,12 +844,12 @@ class VanillaSettingsController extends Gdn_Controller
                 }
             }
         } else {
+            $this->Form->setData($this->Category);
             // _ExtendedFields are set during event handlers calls by plugins, if the category is idea category "IsIdea" will be set.
             if (!key_exists("_ExtendedFields", $this->Data) || $this->Data["_ExtendedFields"]["IsIdea"] == null) {
                 //Get a list of possible Discussion Types to display in the category settings form.
                 $this->setupDiscussionTypes($this->Category);
             }
-
             $this->Form->setValue("CustomPoints", $this->Category->PointsCategoryID == $this->Category->CategoryID);
         }
 

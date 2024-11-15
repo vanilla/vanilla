@@ -1794,7 +1794,8 @@ class DiscussionsTest extends AbstractResourceTest
         $config = \Gdn::config();
         $config->set("Garden.InputFormatter", "Wysiwyg");
         $content = "<p><b>Et si on lançait un fil de discussion sur la gratitude?</b><br></p>\r\r
-<p>C’est l’idée qui vient de me passer par la tête, et alaquelle j’ai envie de donner vie.</p>";
+<p>C’est l’idée qui vient de me passer par la tête, et a
+laquelle j’ai envie de donner vie.</p>";
 
         $discussion = $this->createDiscussion([
             "name" => "Format test",

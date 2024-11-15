@@ -691,34 +691,6 @@ paths:
                                 - photo
                             type: object
                 required: true
-    /users/{id}/ignored:
-        x-addon: ignore
-        get:
-            summary: Get a user's ignored users.
-            tags:
-                - Users
-            parameters:
-                - description: The user ID.
-                  in: path
-                  name: id
-                  required: true
-                  schema:
-                      type: integer
-            responses:
-                "200":
-                    content:
-                        "application/json":
-                            schema:
-                                type: array
-                                items:
-                                    allOf:
-                                        - $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
-                                        - type: "object"
-                                          properties:
-                                              dateIgnored:
-                                                  type: string
-                                                  format: "date-time"
-                    description: Success
     /users/leaders:
         get:
             summary: Get user's leaderboard.

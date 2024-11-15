@@ -6,61 +6,60 @@
 import {
     ProfileFieldFormValues,
     ProfileField,
-    CreatableFieldDataType,
-    CreatableFieldFormType,
-    CreatableFieldType,
-    CreatableFieldMutability,
-    CreatableFieldVisibility,
+    ProfileFieldDataType,
+    ProfileFieldFormType,
+    ProfileFieldType,
+    ProfileFieldMutability,
+    ProfileFieldVisibility,
     ProfileFieldRegistrationOptions,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import pick from "lodash-es/pick";
 
-const DATA_TYPE_AND_FORM_TYPE_MAP: { [index in `${CreatableFieldType}`]: Pick<ProfileField, "dataType" | "formType"> } =
-    {
-        [CreatableFieldType.TEXT_INPUT]: {
-            dataType: CreatableFieldDataType.TEXT,
-            formType: CreatableFieldFormType.TEXT,
-        },
-        [CreatableFieldType.TEXT_BOX]: {
-            dataType: CreatableFieldDataType.TEXT,
-            formType: CreatableFieldFormType.TEXT_MULTILINE,
-        },
-        [CreatableFieldType.SINGLE_SELECT_DROPDOWN]: {
-            dataType: CreatableFieldDataType.TEXT,
-            formType: CreatableFieldFormType.DROPDOWN,
-        },
-        [CreatableFieldType.SINGLE_CHECKBOX]: {
-            dataType: CreatableFieldDataType.BOOLEAN,
-            formType: CreatableFieldFormType.CHECKBOX,
-        },
-        [CreatableFieldType.MULTI_SELECT_DROPDOWN]: {
-            dataType: CreatableFieldDataType.STRING_MUL,
-            formType: CreatableFieldFormType.TOKENS,
-        },
-        [CreatableFieldType.DATE_PICKER]: {
-            dataType: CreatableFieldDataType.DATE,
-            formType: CreatableFieldFormType.DATE,
-        },
-        [CreatableFieldType.NUMERIC_INPUT]: {
-            dataType: CreatableFieldDataType.NUMBER,
-            formType: CreatableFieldFormType.NUMBER,
-        },
-        [CreatableFieldType.NUMERIC_DROPDOWN]: {
-            dataType: CreatableFieldDataType.NUMBER_MUL,
-            formType: CreatableFieldFormType.TOKENS,
-        },
-    };
+const DATA_TYPE_AND_FORM_TYPE_MAP: { [index in `${ProfileFieldType}`]: Pick<ProfileField, "dataType" | "formType"> } = {
+    [ProfileFieldType.TEXT_INPUT]: {
+        dataType: ProfileFieldDataType.TEXT,
+        formType: ProfileFieldFormType.TEXT,
+    },
+    [ProfileFieldType.TEXT_BOX]: {
+        dataType: ProfileFieldDataType.TEXT,
+        formType: ProfileFieldFormType.TEXT_MULTILINE,
+    },
+    [ProfileFieldType.SINGLE_SELECT_DROPDOWN]: {
+        dataType: ProfileFieldDataType.TEXT,
+        formType: ProfileFieldFormType.DROPDOWN,
+    },
+    [ProfileFieldType.SINGLE_CHECKBOX]: {
+        dataType: ProfileFieldDataType.BOOLEAN,
+        formType: ProfileFieldFormType.CHECKBOX,
+    },
+    [ProfileFieldType.MULTI_SELECT_DROPDOWN]: {
+        dataType: ProfileFieldDataType.STRING_MUL,
+        formType: ProfileFieldFormType.TOKENS,
+    },
+    [ProfileFieldType.DATE_PICKER]: {
+        dataType: ProfileFieldDataType.DATE,
+        formType: ProfileFieldFormType.DATE,
+    },
+    [ProfileFieldType.NUMERIC_INPUT]: {
+        dataType: ProfileFieldDataType.NUMBER,
+        formType: ProfileFieldFormType.NUMBER,
+    },
+    [ProfileFieldType.NUMERIC_DROPDOWN]: {
+        dataType: ProfileFieldDataType.NUMBER_MUL,
+        formType: ProfileFieldFormType.TOKENS,
+    },
+};
 
-export function getTypeOptions(dataType?: CreatableFieldDataType) {
+export function getTypeOptions(dataType?: ProfileFieldDataType) {
     const allOptions = {
-        [CreatableFieldType.TEXT_INPUT]: "Single Textbox",
-        [CreatableFieldType.TEXT_BOX]: "Multi-line Textbox",
-        [CreatableFieldType.SINGLE_CHECKBOX]: "Single Checkbox",
-        [CreatableFieldType.SINGLE_SELECT_DROPDOWN]: "Single-select Dropdown",
-        [CreatableFieldType.MULTI_SELECT_DROPDOWN]: "Multi-select Dropdown",
-        [CreatableFieldType.DATE_PICKER]: "Date Picker",
-        [CreatableFieldType.NUMERIC_INPUT]: "Numeric Input",
-        [CreatableFieldType.NUMERIC_DROPDOWN]: "Numeric Dropdown",
+        [ProfileFieldType.TEXT_INPUT]: "Single Textbox",
+        [ProfileFieldType.TEXT_BOX]: "Multi-line Textbox",
+        [ProfileFieldType.SINGLE_CHECKBOX]: "Single Checkbox",
+        [ProfileFieldType.SINGLE_SELECT_DROPDOWN]: "Single-select Dropdown",
+        [ProfileFieldType.MULTI_SELECT_DROPDOWN]: "Multi-select Dropdown",
+        [ProfileFieldType.DATE_PICKER]: "Date Picker",
+        [ProfileFieldType.NUMERIC_INPUT]: "Numeric Input",
+        [ProfileFieldType.NUMERIC_DROPDOWN]: "Numeric Dropdown",
     };
 
     if (dataType) {
@@ -92,7 +91,7 @@ export function mapProfileFieldToFormValues(profileField: ProfileField): Profile
 
     const type = Object.entries(DATA_TYPE_AND_FORM_TYPE_MAP).find(([key, val]) => {
         return val.dataType === dataType && val.formType === formType;
-    })![0] as CreatableFieldType;
+    })![0] as ProfileFieldType;
 
     return {
         type,
@@ -130,16 +129,16 @@ export function mapProfileFieldFormValuesToProfileField(formValues: ProfileField
 
     const { dataType, formType } = DATA_TYPE_AND_FORM_TYPE_MAP[type];
     const requiresDropdownOptions = [
-        CreatableFieldType.MULTI_SELECT_DROPDOWN,
-        CreatableFieldType.NUMERIC_DROPDOWN,
-        CreatableFieldType.SINGLE_SELECT_DROPDOWN,
+        ProfileFieldType.MULTI_SELECT_DROPDOWN,
+        ProfileFieldType.NUMERIC_DROPDOWN,
+        ProfileFieldType.SINGLE_SELECT_DROPDOWN,
     ].includes(type);
 
     let dropdownOptionArray;
 
     if (requiresDropdownOptions) {
         dropdownOptionArray = dropdownOptions?.split("\n");
-        if (dataType === DATA_TYPE_AND_FORM_TYPE_MAP[CreatableFieldType.NUMERIC_DROPDOWN].dataType) {
+        if (dataType === DATA_TYPE_AND_FORM_TYPE_MAP[ProfileFieldType.NUMERIC_DROPDOWN].dataType) {
             dropdownOptionArray = dropdownOptionArray.map((opt) => parseFloat(opt));
         }
     }
@@ -169,11 +168,11 @@ export const EMPTY_PROFILE_FIELD_CONFIGURATION: ProfileField = {
     label: "",
     description: "",
     descriptionHtml: false,
-    dataType: CreatableFieldDataType.TEXT,
-    formType: CreatableFieldFormType.TEXT,
+    dataType: ProfileFieldDataType.TEXT,
+    formType: ProfileFieldFormType.TEXT,
     registrationOptions: ProfileFieldRegistrationOptions.OPTIONAL,
-    visibility: CreatableFieldVisibility.PUBLIC,
-    mutability: CreatableFieldMutability.ALL,
+    visibility: ProfileFieldVisibility.PUBLIC,
+    mutability: ProfileFieldMutability.ALL,
     displayOptions: { userCards: false, posts: false, search: true },
     enabled: true,
 };

@@ -7,7 +7,6 @@
 
 namespace Vanilla\Widgets;
 
-use Vanilla\Forms\FormPickerOptions;
 use Vanilla\Widgets\React\BannerFullWidget;
 
 /**
@@ -15,17 +14,14 @@ use Vanilla\Widgets\React\BannerFullWidget;
  */
 class DynamicContainerSchemaOptions
 {
-    public FormPickerOptions $titleChoices;
-    public FormPickerOptions $descriptionChoices;
-    public FormPickerOptions $imageSourceChoices;
+    /** @var array<string, string> */
+    private array $titleChoices = [];
 
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->reset();
-    }
+    /** @var array<string, string> */
+    private array $descriptionChoices = [];
+
+    /** @var array<string, string> */
+    private array $imageSourceChoices = [];
 
     /**
      * Add a dynamic choice to use in {@link HomeWidgetContainerSchemaTrait::widgetTitleSchema()}.
@@ -33,12 +29,10 @@ class DynamicContainerSchemaOptions
      * @param string $value
      * @param string $label
      * @return void
-     *
-     * @deprecated Use {@link self::$titleChoices}
      */
     public function addTitleChoice(string $value, string $label): void
     {
-        $this->titleChoices->option($label, $value);
+        $this->titleChoices[$value] = $label;
     }
 
     /**
@@ -47,28 +41,26 @@ class DynamicContainerSchemaOptions
      * @param string $value
      * @param string $label
      * @return void
-     *
-     * @deprecated Use {@link self::$descriptionChoices}
      */
     public function addDescriptionChoice(string $value, string $label): void
     {
-        $this->descriptionChoices->option($label, $value);
+        $this->descriptionChoices[$value] = $label;
     }
 
     /**
-     * @return FormPickerOptions
+     * @return array<string, string>
      */
-    public function getTitleChoices(): FormPickerOptions
+    public function getTitleChoices(): array
     {
-        return clone $this->titleChoices;
+        return $this->titleChoices;
     }
 
     /**
-     * @return FormPickerOptions
+     * @return array<string, string>
      */
-    public function getDescriptionChoices(): FormPickerOptions
+    public function getDescriptionChoices(): array
     {
-        return clone $this->descriptionChoices;
+        return $this->descriptionChoices;
     }
 
     /**
@@ -77,21 +69,20 @@ class DynamicContainerSchemaOptions
      * @param string $value
      * @param string $label
      * @return void
-     * @deprecated Use {@link self::$imageSourceChoices}
-     **/
+     */
     public function addImageSourceChoice(string $value, string $label): void
     {
-        $this->imageSourceChoices->option($label, $value);
+        $this->imageSourceChoices[$value] = $label;
     }
 
     /**
      * Get dynamic choices to be used in {@link BannerFullWidget::getBackgroundSchema()}.
      *
-     * @return FormPickerOptions
+     * @return array<string, string>
      */
-    public function getImageSourceChoices(): FormPickerOptions
+    public function getImageSourceChoices(): array
     {
-        return clone $this->imageSourceChoices;
+        return $this->imageSourceChoices;
     }
 
     /**
@@ -99,8 +90,7 @@ class DynamicContainerSchemaOptions
      */
     public function reset(): void
     {
-        $this->titleChoices = FormPickerOptions::create();
-        $this->descriptionChoices = FormPickerOptions::create();
-        $this->imageSourceChoices = FormPickerOptions::create();
+        $this->titleChoices = [];
+        $this->descriptionChoices = [];
     }
 }

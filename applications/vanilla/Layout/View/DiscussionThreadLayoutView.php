@@ -150,18 +150,12 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
      */
     public function getExpands(): array
     {
-        return ["tags", "insertUser", "breadcrumbs", "reactions", "attachments", "reportMeta", "category"];
+        return ["tags", "insertUser", "breadcrumbs", "reactions", "attachments", "reportMeta"];
     }
 
     public function getParamResolvedSchema(): Schema
     {
-        return Schema::parse([
-            "discussion:o",
-            "discussion/name:s?" => "Name of the discussion.",
-            "tags:a",
-            "breadcrumbs:a",
-            "discussionApiParams:o",
-        ]);
+        return Schema::parse(["discussion:o", "tags:a", "breadcrumbs:a", "discussionApiParams:o"]);
     }
 
     /**

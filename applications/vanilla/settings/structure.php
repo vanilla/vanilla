@@ -113,7 +113,6 @@ $Construct
     ->column("LastDateInserted", "datetime", null)
     ->column("AllowedDiscussionTypes", "varchar(255)", null)
     ->column("DefaultDiscussionType", "varchar(10)", null)
-    ->column("hasRestrictedPostTypes", "tinyint", 0)
     ->column("Featured", "tinyint", "0")
     ->column("SortFeatured", "int", "0", "index")
     ->set($Explicit, $Drop);
@@ -737,8 +736,6 @@ $Construct
     ->column("dateInserted", "datetime", false, ["index.recordType"])
     ->set();
 
-PostTypeModel::structure($Construct);
-
 // Add stub content
 include PATH_APPLICATIONS . DS . "vanilla" . DS . "settings" . DS . "stub.php";
 
@@ -796,5 +793,6 @@ UserDigestModel::structure($Construct);
 ReportModel::structure($Construct);
 ReportReasonModel::structure($Construct);
 EscalationModel::structure($Construct);
+PostTypeModel::structure($Construct);
 PostFieldModel::structure($Construct);
 PostMetaModel::structure($Construct);

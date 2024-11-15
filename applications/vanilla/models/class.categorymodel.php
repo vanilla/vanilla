@@ -10,10 +10,8 @@
 
 use Garden\Container\ContainerException;
 use Garden\EventManager;
-use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
-use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
@@ -24,9 +22,6 @@ use Vanilla\Dashboard\Models\AggregateCountableInterface;
 use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
 use Vanilla\Database\SetLiterals\RawExpression;
 use Vanilla\Events\LegacyDirtyRecordTrait;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Forum\Models\PostTypeModel;
-use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\ImageSrcSet\ImageSrcSet;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Layout\LayoutViewModel;
@@ -58,7 +53,6 @@ use Vanilla\Models\UserFragmentSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Formatting\DateTimeFormatter;
-use Vanilla\Formatting\Formats\TextFormat;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -255,8 +249,6 @@ class CategoryModel extends Gdn_Model implements
 
     private ?array $preferenceMap = null;
 
-    private ?PostTypeModel $postTypeModel = null;
-
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -424,37 +416,6 @@ class CategoryModel extends Gdn_Model implements
             ->fireEvent("AllowedDiscussionTypes");
 
         return $allowedTypes;
-    }
-
-    /**
-     * Return post type data array formatted for rendering the new post widget.
-     *
-     * @param array $category
-     * @return array
-     * @throws Exception
-     */
-    public function getAllowedPostTypeData(array $category): array
-    {
-        $postTypes = self::getPostTypeModel()->getAllowedPostTypes($category);
-
-        // Convert post types to expected format for new post widget.
-        $result = [];
-        foreach ($postTypes as $postType) {
-            $result[$postType["name"]] = $postType + [
-                "AddUrl" => "/post/{$postType["postTypeID"]}",
-                "AddText" => $postType["postButtonLabel"],
-                "AddIcon" => $postType["postButtonIcon"] ?? ($postType["parentPostType"]["postButtonIcon"] ?? null),
-            ];
-        }
-        return $result;
-    }
-
-    /**
-     * @return PostTypeModel
-     */
-    private static function getPostTypeModel(): PostTypeModel
-    {
-        return Gdn::getContainer()->get(PostTypeModel::class);
     }
 
     /**
@@ -865,18 +826,16 @@ class CategoryModel extends Gdn_Model implements
      */
     public function getDigestEnabledUserCountForCategory(int $categoryID): int
     {
-        $userOnClause =
-            Gdn::config()->get(DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE) == 1
-                ? 'u.UserID = um.UserID and um.QueryValue in ("Preferences.Email.DigestEnabled.1","Preferences.Email.DigestEnabled.3") AND u.Deleted = 0'
-                : 'u.UserID = um.UserID and um.QueryValue = "Preferences.Email.DigestEnabled.1" AND u.Deleted = 0';
-
         if (!self::categories($categoryID)) {
             return 0;
         }
         return $this->createSql()
             ->select("*", "count", "total")
             ->from("UserMeta um")
-            ->join("User u", $userOnClause)
+            ->join(
+                "User u",
+                'u.UserID = um.UserID and um.QueryValue = "Preferences.Email.DigestEnabled.1" AND u.Deleted = 0'
+            )
             ->join("UserCategory uc", "um.UserID = uc.UserID ")
             ->where(["uc.CategoryID" => $categoryID, "uc.DigestEnabled" => 1])
             ->get()
@@ -1344,14 +1303,6 @@ class CategoryModel extends Gdn_Model implements
     {
         if ((is_int($ID) || is_string($ID)) && empty(self::$Categories)) {
             $category = self::instance()->getOne($ID);
-            if (!empty($category)) {
-                $category["Name"] = $category["Name"]
-                    ? Gdn::formatService()->renderPlainText($category["Name"], TextFormat::FORMAT_KEY)
-                    : $category["Name"];
-                $category["Description"] = $category["Description"]
-                    ? Gdn::formatService()->renderPlainText($category["Description"], TextFormat::FORMAT_KEY)
-                    : $category["Description"];
-            }
             return $category;
         }
 
@@ -1376,35 +1327,12 @@ class CategoryModel extends Gdn_Model implements
 
             if (isset(self::$Categories[$ID])) {
                 $Result = self::$Categories[$ID];
-                if (!empty($Result["Name"])) {
-                    $Result["Name"] = Gdn::formatService()->renderPlainText($Result["Name"], TextFormat::FORMAT_KEY);
-                }
-                if (!empty($Result["Description"])) {
-                    $Result["Description"] = Gdn::formatService()->renderPlainText(
-                        $Result["Description"],
-                        TextFormat::FORMAT_KEY
-                    );
-                }
                 return $Result;
             } else {
                 return null;
             }
         } else {
             $Result = self::$Categories;
-            foreach ($Result as &$category) {
-                if (!empty($category["Name"])) {
-                    $category["Name"] = Gdn::formatService()->renderPlainText(
-                        $category["Name"],
-                        TextFormat::FORMAT_KEY
-                    );
-                }
-                if (!empty($category["Description"])) {
-                    $category["Description"] = Gdn::formatService()->renderPlainText(
-                        $category["Description"],
-                        TextFormat::FORMAT_KEY
-                    );
-                }
-            }
             return $Result;
         }
     }
@@ -1730,12 +1658,6 @@ class CategoryModel extends Gdn_Model implements
 
             if ($categoryID) {
                 $category = self::categories($categoryID);
-                $category["Name"] = $category["Name"]
-                    ? Gdn::formatService()->renderPlainText($category["Name"], TextFormat::FORMAT_KEY)
-                    : $category["Name"];
-                $category["Description"] = $category["Description"]
-                    ? Gdn::formatService()->renderPlainText($category["Description"], TextFormat::FORMAT_KEY)
-                    : $category["Description"];
                 if ($categoryID === -1) {
                     setValue($field, $row, $this->getRootCategoryForDisplay());
                 } elseif ($category) {
@@ -2581,35 +2503,6 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
-     * Join allowed post types on categories.
-     *
-     * @param array $categories
-     * @return void
-     */
-    public static function joinPostTypes(array &$categories)
-    {
-        $categoryIDs = array_column($categories, "CategoryID");
-        $postTypesByCategory = self::getPostTypeModel()->getPostTypesByCategory(["categoryID" => $categoryIDs]);
-
-        foreach ($categories as &$category) {
-            if (isset($postTypesByCategory[$category["CategoryID"]])) {
-                $category["allowedPostTypeIDs"] = $postTypesByCategory[$category["CategoryID"]];
-            }
-
-            if (isset($category["AllowedDiscussionTypes"]) && !isset($category["allowedPostTypeIDs"])) {
-                // If the category has legacy allowed discussion types and no explicitly set post type IDs,
-                // convert from the legacy types to post type IDs.
-                $category["allowedPostTypeIDs"] = [];
-                if (!empty($category["AllowedDiscussionTypes"])) {
-                    $category["allowedPostTypeIDs"] = PostTypeModel::convertFromLegacyTypes(
-                        $category["AllowedDiscussionTypes"]
-                    );
-                }
-            }
-        }
-    }
-
-    /**
      * Delete a category.
      *
      * {@inheritdoc}
@@ -2642,24 +2535,6 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
-     * Method used to format category data
-     *
-     * @param array $row
-     */
-    public function fixRow(array &$row): void
-    {
-        if (!empty($row["Name"])) {
-            $row["Name"] = Gdn::formatService()->renderPlainText($row["Name"], TextFormat::FORMAT_KEY);
-        }
-        if (!empty($row["Description"])) {
-            $row["Description"] = Gdn::formatService()->renderPlainText($row["Description"], TextFormat::FORMAT_KEY);
-        }
-        if (!empty($row["LastTitle"])) {
-            $row["LastTitle"] = Gdn::formatService()->renderPlainText($row["LastTitle"], TextFormat::FORMAT_KEY);
-        }
-    }
-
-    /**
      * Normalize a database record to match the Schema definition.
      *
      * @param array|object $dbRecord Database record.
@@ -2674,7 +2549,6 @@ class CategoryModel extends Gdn_Model implements
         if (is_object($dbRecord)) {
             $dbRecord = (array) $dbRecord;
         }
-        $this->fixRow($dbRecord);
         if ($dbRecord["CategoryID"] === -1) {
             $dbRecord["Url"] = url("/categories", true);
             $dbRecord["DisplayAs"] = "Discussions";
@@ -2702,10 +2576,7 @@ class CategoryModel extends Gdn_Model implements
                     $valid = false;
                     break;
                 }
-                $recentPost[$key] =
-                    $key == "name"
-                        ? Gdn::formatService()->renderPlainText($dbRecord[$mapping], TextFormat::FORMAT_KEY)
-                        : $dbRecord[$mapping];
+                $recentPost[$key] = $dbRecord[$mapping];
             }
             if ($valid) {
                 $dbRecord["lastPost"] = $recentPost;
@@ -4125,11 +3996,6 @@ class CategoryModel extends Gdn_Model implements
                         "JunctionID" => $CategoryID,
                     ]);
                 }
-
-                if (isset($formPostValues["allowedPostTypeIDs"])) {
-                    $postTypeModel = self::getPostTypeModel();
-                    $postTypeModel->putPostTypesForCategory($CategoryID, $formPostValues["allowedPostTypeIDs"]);
-                }
             }
 
             self::clearCache();
@@ -5484,10 +5350,6 @@ SQL;
                 "featured:b?" => "Featured category.",
                 "allowedDiscussionTypes:a",
             ]);
-
-            if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
-                $this->schemaInstance->merge(Schema::parse(["allowedPostTypeIDs:a?"]));
-            }
         }
         return $this->schemaInstance;
     }
@@ -5806,27 +5668,5 @@ SQL;
         }
 
         return $output;
-    }
-
-    /**
-     * Schema validator to validate that array contains valid category IDs.
-     *
-     * @return callable
-     */
-    public static function createCategoryIDsValidator(): callable
-    {
-        return function (array $categoryIDs, ValidationField $field) {
-            foreach ($categoryIDs as $categoryID) {
-                if (!CategoryModel::categories($categoryID)) {
-                    $field->addError("Invalid Category", [
-                        "code" => 403,
-                        "messageCode" => "The category {$categoryID} is not a valid category.",
-                    ]);
-
-                    return Invalid::value();
-                }
-            }
-            return true;
-        };
     }
 }

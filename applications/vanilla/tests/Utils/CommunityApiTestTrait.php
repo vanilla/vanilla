@@ -721,10 +721,9 @@ trait CommunityApiTestTrait
     public function createPostType(array $overrides = []): array
     {
         $params = $overrides + [
-            "postTypeID" => "posttypeid-" . VanillaTestCase::id("posttypeid"),
-            "name" => "posttypename-" . VanillaTestCase::id("posttypename"),
+            "postTypeID" => "posttypeid-" . VanillaTestCase::id("postType"),
+            "name" => "posttypename-" . VanillaTestCase::id("postType"),
             "parentPostTypeID" => "discussion",
-            "postButtonLabel" => "New Post " . VanillaTestCase::id("postbuttonlabel"),
             "isActive" => true,
             "isDeleted" => false,
         ];

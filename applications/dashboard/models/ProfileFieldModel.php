@@ -947,7 +947,6 @@ class ProfileFieldModel extends FullRecordCacheModel
             }
 
             $dataType = $fields[$name]["dataType"] ?? null;
-            $value = self::normnalizeDuplicatedFields($value, $dataType);
             switch ($dataType) {
                 case ProfileFieldModel::DATA_TYPE_BOOL:
                     $value = (bool) $value;
@@ -971,10 +970,9 @@ class ProfileFieldModel extends FullRecordCacheModel
                         $value = array_map("intval", $value);
                     }
                     break;
-                case ProfileFieldModel::DATA_TYPE_TEXT:
-                    $value = Gdn::formatService()->renderPlainText($value, "text");
-                    break;
             }
+
+            $value = self::normnalizeDuplicatedFields($value, $dataType);
         }
     }
 

@@ -95,7 +95,6 @@ global.console.warn = (...args) => {
     originalWarn(...args);
 };
 
-const suppressedErrors = ["", "Error: Could not parse CSS stylesheet"];
 const originalError = console.error;
 global.console.error = (...args) => {
     for (const arg of args) {

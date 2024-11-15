@@ -19,7 +19,6 @@ interface IProps extends IRadioGroupContext {
     labelID?: string;
     arrowBehaviour?: "moves-selection" | "moves-focus";
     labelType?: DashboardLabelType;
-    isPicker?: boolean;
 }
 
 export function DashboardRadioGroup(props: IProps) {
@@ -30,7 +29,7 @@ export function DashboardRadioGroup(props: IProps) {
     return (
         <RadioGroupContext.Provider value={props}>
             <DashboardInputWrap
-                className={cx({ isVertical: !props.isInline && !props.isGrid, isPicker: props.isPicker ?? false })}
+                className={cx({ isVertical: !props.isInline && !props.isGrid })}
                 isInline={props.isInline}
                 isGrid={props.isGrid}
                 ref={selfRef}

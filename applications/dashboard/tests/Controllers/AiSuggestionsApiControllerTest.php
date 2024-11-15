@@ -16,7 +16,6 @@ use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\OpenAI\OpenAIClient;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use VanillaTests\Dashboard\AiSuggestionsTestTrait;
 use VanillaTests\Fixtures\OpenAI\MockOpenAIClient;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -25,7 +24,6 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
 {
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
-    use AiSuggestionsTestTrait;
 
     const VALID_SETTINGS = [
         "enabled" => true,
@@ -68,12 +66,36 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         parent::setUpBeforeClass();
         $mockOpenAIClient = \Gdn::getContainer()->get(MockOpenAIClient::class);
         $mockOpenAIClient->addMockResponse("/This is how you do this./", [
+            "format" => "Vanilla",
+            "type" => "mockSuggestion",
+            "documentID" => 0,
+            "url" => "someplace.com/here",
+            "title" => "answer 1",
+            "summary" => "This is how you do this.",
+            "hidden" => false,
+            "sourceIcon" => "mock",
             "answerSource" => "This is how you do this.",
         ]);
         $mockOpenAIClient->addMockResponse("/This is how you do this a different way./", [
+            "format" => "Vanilla",
+            "type" => "mockSuggestion",
+            "documentID" => 1,
+            "url" => "someplace.com/else",
+            "title" => "answer 2",
+            "summary" => "This is how you do this a different way.",
+            "hidden" => false,
+            "sourceIcon" => "mock",
             "answerSource" => "This is how you do this a different way.",
         ]);
         $mockOpenAIClient->addMockResponse("/This is how you do this, a third way./", [
+            "format" => "Vanilla",
+            "type" => "mockSuggestion",
+            "documentID" => 2,
+            "url" => "someplace.com/else1",
+            "title" => "answer 3",
+            "summary" => "This is how you do this, a third way.",
+            "hidden" => false,
+            "sourceIcon" => "mock",
             "answerSource" => "This is how you do this, a third way.",
         ]);
         \Gdn::getContainer()->setInstance(OpenAIClient::class, $mockOpenAIClient);
@@ -642,7 +664,16 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
 
     public function setupConfigs()
     {
-        $this->setupAiSuggestions(["mockSuggestion"]);
+        $this->createUser();
+        \Gdn::config()->saveToConfig([
+            "Feature.AISuggestions.Enabled" => true,
+            "Feature.aiFeatures.Enabled" => true,
+            "aiSuggestions" => [
+                "enabled" => true,
+                "userID" => $this->lastUserID,
+                "sources" => ["mockSuggestion" => ["enabled" => true]],
+            ],
+        ]);
     }
 
     /**

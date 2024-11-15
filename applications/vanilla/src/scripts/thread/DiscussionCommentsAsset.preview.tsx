@@ -8,16 +8,30 @@ import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPr
 import { Widget } from "@library/layout/Widget";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
-import React, { useMemo } from "react";
+import React from "react";
 import { CommentFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Comment.Fixture";
+import { getMeta } from "@library/utility/appUtils";
+import { IThreadItemComment } from "@vanilla/addon-vanilla/thread/@types/CommentThreadTypes";
 import { CommentListSortOption } from "@dashboard/@types/api/comment";
-import toInteger from "lodash-es/toInteger";
 
 interface IProps extends Omit<React.ComponentProps<typeof DiscussionCommentsAsset>, "comments" | "discussion"> {}
 
 const discussion = LayoutEditorPreviewData.discussion();
 
 const comments = LayoutEditorPreviewData.comments(5);
+const commentsThreadFixture = CommentFixture.createMockThreadStructureResponse({
+    maxDepth: 3,
+    minCommentsPerDepth: 1,
+    includeHoles: true,
+    randomizeCommentContent: false,
+});
+const threadItem = commentsThreadFixture.threadStructure[0] as IThreadItemComment;
+threadItem.children?.splice(1, 1);
+((threadItem.children || [])[0] as IThreadItemComment).children?.splice(1, 1);
+const commentsThread = {
+    ...commentsThreadFixture,
+    threadStructure: [threadItem],
+};
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -25,33 +39,17 @@ const queryClient = new QueryClient({
             enabled: false,
             retry: false,
             staleTime: Infinity,
-            cacheTime: 0,
         },
     },
 });
 
 export function DiscussionCommentsAssetPreview(props: IProps) {
-    const { maxDepth, collapseChildDepth } = props.apiParams;
-    const commentsThread = useMemo(() => {
-        const commentsThreadFixture = CommentFixture.createMockThreadStructureResponse({
-            maxDepth: toInteger(maxDepth ?? 5),
-            collapseChildDepth: toInteger(collapseChildDepth ?? 3),
-            minCommentsPerDepth: 2,
-            includeHoles: true,
-            randomizeCommentContent: false,
-        });
-        return commentsThreadFixture;
-    }, [maxDepth, collapseChildDepth]);
-
-    const key = `${maxDepth}-${collapseChildDepth}`;
-
     return (
         <Widget>
             <QueryClientProvider client={queryClient}>
                 <DiscussionCommentsAsset
-                    key={key}
-                    {...(props as any)}
-                    threadStyle={maxDepth == 1 ? "flat" : "nested"}
+                    {...props}
+                    threadStyle={getMeta("threadStyle", "flat")}
                     comments={{
                         data: comments,
                         paging: LayoutEditorPreviewData.paging(props.apiParams?.limit ?? 30),
@@ -65,11 +63,9 @@ export function DiscussionCommentsAssetPreview(props: IProps) {
                         parentRecordID: discussion.discussionID,
                         limit: 30,
                         page: 1,
-                        discussionID: discussion.discussionID,
-                        expand: key, // Used to break the cache on this.
                     }}
                     discussion={discussion}
-                    defaultSort={props.apiParams?.sort ?? CommentListSortOption.OLDEST}
+                    defaultSort={props.apiParams.sort ?? CommentListSortOption.OLDEST}
                     isPreview
                 />
             </QueryClientProvider>

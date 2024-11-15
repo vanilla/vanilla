@@ -1083,10 +1083,6 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
                     unset($set[$key]);
                 }
             }
-            if ($tableName === "Comment" && isset($set["DiscussionID"])) {
-                $set["parentRecordType"] = "discussion";
-                $set["parentRecordID"] = $set["DiscussionID"];
-            }
         }
 
         switch ($log["Operation"]) {

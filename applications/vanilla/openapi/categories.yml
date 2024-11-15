@@ -122,12 +122,6 @@ paths:
                   schema:
                       minLength: 1
                       type: string
-                - description: Filter by allowed post type ID
-                  in: query
-                  name: postTypeID
-                  required: false
-                  schema:
-                      type: string
             responses:
                 "200":
                     content:
@@ -966,14 +960,6 @@ components:
                     items:
                         type: string
                         example: Discussion
-                allowedPostTypeIDs:
-                    description: Allowed post type IDs in this category.
-                    type: array
-                    items:
-                        type: string
-                hasRestrictedPostTypes:
-                    description: If the category has restricted post types.
-                    type: boolean
             required:
                 - name
                 - urlcode

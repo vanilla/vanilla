@@ -48,9 +48,6 @@ export interface IHomeWidgetContainerOptions {
     contentAlignment?: "flex-start" | "center";
     displayType?: WidgetContainerDisplayType;
 
-    // Determine whether the borderType should apply on the inner background or the outer background;
-    visualBackgroundType?: "outer" | "inner";
-
     // @deprecated
     isGrid?: boolean;
     // @deprecated
@@ -93,7 +90,6 @@ export const homeWidgetContainerVariables = useThemeCache(
                     displayType: ButtonTypes.TEXT_PRIMARY,
                     name: "View All",
                 },
-                visualBackgroundType: "inner",
                 maxColumnCount: [
                     HomeWidgetItemContentType.TITLE_BACKGROUND,
                     HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
@@ -144,13 +140,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                 ...options,
                 innerBackground: {
                     ...options.innerBackground,
-                    color:
-                        options.visualBackgroundType === "inner" &&
-                        ![BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN, BorderType.NONE].includes(
-                            options.borderType!,
-                        )
-                            ? globalVars.body.backgroundImage.color
-                            : undefined,
+                    color: options.borderType !== BorderType.NONE ? globalVars.body.backgroundImage.color : undefined,
                 },
             },
             optionOverrides,
@@ -219,23 +209,11 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const vars = homeWidgetContainerVariables(optionOverrides);
     const navLinkVars = navLinksVariables();
 
-    const fgColor = ColorsUtils.colorOut(globalVars.getFgForBg(vars.options.outerBackground!.color));
-    const hasSeparatorAndOuterBackground =
-        vars.options.borderType === BorderType.SEPARATOR &&
-        Variables.boxHasBackground(Variables.box({ background: vars.options.outerBackground }));
     const root = css(
         {
-            ...Mixins.box(
-                Variables.box({
-                    background: vars.options.outerBackground,
-                    borderType:
-                        !hasSeparatorAndOuterBackground && vars.options.visualBackgroundType === "outer"
-                            ? vars.options.borderType
-                            : undefined,
-                }),
-            ),
-            color: fgColor,
-            "--fg-contast-color": fgColor,
+            ...Mixins.background(vars.options.outerBackground ?? {}),
+            color: ColorsUtils.colorOut(globalVars.getFgForBg(vars.options.outerBackground!.color)),
+            width: "100%",
         },
         vars.options.borderType === "navLinks" &&
             Mixins.margin({
@@ -273,14 +251,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         ...vars.mobileMediaQuery(extendItemContainer(getPixelNumber(vars.itemSpacing.mobile.horizontal))),
     });
 
-    const itemWrapper = css({
-        ...Mixins.box(
-            Variables.box({
-                background: vars.options.innerBackground,
-                borderType: vars.options.visualBackgroundType === "inner" ? vars.options.borderType : undefined,
-            }),
-        ),
-    });
+    const itemWrapper = css(vars.hasVisibleContainer && Mixins.padding({ horizontal: halfHorizontalSpacing * 2 }));
 
     const borderStyling: CSSObject = (() => {
         switch (vars.options.borderType) {

@@ -78,42 +78,43 @@ export function DiscussionCommentsAssetFlat(props: IProps) {
     const hasComments = (commentListQuery?.data?.data?.length ?? 0) > 0;
 
     return (
-        <DiscussionCommentsAssetCommon
-            {...props}
-            topPager={topPager}
-            bottomPager={bottomPager}
-            hasComments={hasComments}
-        >
-            {commentListQuery.isLoading && (
-                <div style={{ display: "flex", width: "100%", padding: 16 }}>
-                    <ButtonLoader className={css({ transform: "scale(2)" })} />
-                </div>
-            )}
-            {commentListQuery.error && <ErrorMessages errors={[commentListQuery.error]} />}
-            {commentListQuery.data?.data &&
-                commentListQuery.data.data.map((comment) => {
-                    return (
-                        <CommentThreadItem
-                            threadStyle={"flat"}
-                            key={comment.commentID}
-                            comment={comment}
-                            discussion={discussion}
-                            onMutateSuccess={invalidateQueries}
-                            actions={
-                                ThreadItemActionsComponent ? (
-                                    <ThreadItemActionsComponent
-                                        comment={comment}
-                                        discussion={discussion}
-                                        onMutateSuccess={invalidateQueries}
-                                    />
-                                ) : undefined
-                            }
-                            showOPTag={props.showOPTag}
-                            isPreview={props.isPreview}
-                        />
-                    );
-                })}
-        </DiscussionCommentsAssetCommon>
+        <DiscussionThreadContextProvider discussion={discussion}>
+            <DiscussionCommentsAssetCommon
+                {...props}
+                topPager={topPager}
+                bottomPager={bottomPager}
+                hasComments={hasComments}
+            >
+                {commentListQuery.isLoading && (
+                    <div style={{ display: "flex", width: "100%", padding: 16 }}>
+                        <ButtonLoader className={css({ transform: "scale(2)" })} />
+                    </div>
+                )}
+                {commentListQuery.error && <ErrorMessages errors={[commentListQuery.error]} />}
+                {commentListQuery.data?.data &&
+                    commentListQuery.data.data.map((comment) => {
+                        return (
+                            <CommentThreadItem
+                                key={comment.commentID}
+                                comment={comment}
+                                discussion={discussion}
+                                onMutateSuccess={invalidateQueries}
+                                actions={
+                                    ThreadItemActionsComponent ? (
+                                        <ThreadItemActionsComponent
+                                            comment={comment}
+                                            discussion={discussion}
+                                            onMutateSuccess={invalidateQueries}
+                                        />
+                                    ) : undefined
+                                }
+                                showOPTag={props.showOPTag}
+                                isPreview={props.isPreview}
+                            />
+                        );
+                    })}
+            </DiscussionCommentsAssetCommon>
+        </DiscussionThreadContextProvider>
     );
 }
 

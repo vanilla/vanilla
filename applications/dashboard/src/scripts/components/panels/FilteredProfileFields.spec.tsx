@@ -1,7 +1,7 @@
 import React from "react";
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import { act, fireEvent, render, waitFor, screen, within } from "@testing-library/react";
-import { ProfileField, CreatableFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileField, ProfileFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { FilteredProfileFields, ProfileFieldValue } from "@dashboard/components/panels/FilteredProfileFields";
 import { vitest } from "vitest";
 
@@ -29,7 +29,7 @@ describe("FilteredProfileFields", () => {
         const mockProfileFieldValue: ProfileFieldValue = {
             mockField: values,
         };
-        const mockField = ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TOKENS, {
+        const mockField = ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TOKENS, {
             apiName: "mockField",
             label,
         });
@@ -45,7 +45,7 @@ describe("FilteredProfileFields", () => {
         const mockProfileFieldValue: ProfileFieldValue = {
             mockField: values,
         };
-        const mockField = ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.DATE, {
+        const mockField = ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.DATE, {
             apiName: "mockField",
             label,
         });
@@ -58,7 +58,7 @@ describe("FilteredProfileFields", () => {
         const mockProfileFieldValue: ProfileFieldValue = {
             mockField: values,
         };
-        const mockField = ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.DATE, {
+        const mockField = ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.DATE, {
             apiName: "mockField",
             label,
         });
@@ -71,7 +71,7 @@ describe("FilteredProfileFields", () => {
         const mockProfileFieldValue: ProfileFieldValue = {
             mockField: values,
         };
-        const mockField = ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.DATE, {
+        const mockField = ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.DATE, {
             apiName: "mockField",
             label,
         });
@@ -86,7 +86,7 @@ describe("FilteredProfileFields", () => {
         const mockProfileFieldValue: ProfileFieldValue = {
             mockField: values,
         };
-        const mockField = ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TOKENS, {
+        const mockField = ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TOKENS, {
             apiName: "mockField",
             label,
         });
@@ -111,7 +111,7 @@ describe("FilteredProfileFields", () => {
         const mockProfileFieldValue: ProfileFieldValue = {
             mockField: values,
         };
-        const mockField = ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.DATE, {
+        const mockField = ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.DATE, {
             apiName: "mockField",
             label,
         });

@@ -9,7 +9,6 @@ namespace VanillaTests\Vanilla\Forum\Digest;
 
 use Garden\Web\Exception\ServerException;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\Forum\Digest\EmailDigestGenerator;
 use Vanilla\Forum\Digest\UserDigestModel;
 use Vanilla\Utility\ModelUtils;
@@ -407,18 +406,6 @@ class EmailDigestGeneratorTest extends SiteTestCase
     }
 
     /**
-     * Autosubscribe a user to the digest.
-     *
-     * @param array $user
-     * @return void
-     */
-    private function enableAutosubscribeForUser(array $user)
-    {
-        $metaModel = \Gdn::userMetaModel();
-        $metaModel->setUserMeta($user["userID"], "Preferences.Email.DigestEnabled", 3);
-    }
-
-    /**
      * Set language preference for a user
      *
      * @param int $userID
@@ -515,43 +502,6 @@ class EmailDigestGeneratorTest extends SiteTestCase
             ])
         )[$digestUser["userID"]];
         $this->assertEquals("fr", $digestUserCategory["digestLanguage"]);
-    }
-
-    /**
-     * Test that a user who is auto-subscribed to the digest gets the digest, but only the default auto-subscribe preference is set.
-     *
-     * @return void
-     */
-    public function testAutosubscribedUserGetsDigest(): void
-    {
-        $this->resetTable("UserCategory");
-        $this->resetTable("UserMeta");
-
-        $cat1 = $this->createCategory(["name" => "Cat 1"]);
-        $this->createDiscussion(["name" => "Cat 1 discussion"]);
-        $cat2 = $this->createCategory(["name" => "Cat 2"]);
-        $this->createDiscussion(["name" => "Cat 2 discussion"]);
-
-        $digestUser = $this->createUser();
-        $this->enableAutosubscribeForUser($digestUser);
-        $this->setCategoryPreference($digestUser, $cat1, $this->followingPreferences(true));
-        $this->setCategoryPreference($digestUser, $cat2, $this->followingPreferences(true));
-
-        // Auto-subscribe is disabled. User should not get the digest even if they have the preference set to auto-subscribe.
-        $this->runWithConfig([DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE => 0], function () use ($digestUser) {
-            $action = $this->emailDigestGenerator->prepareWeeklyDigestAction(CurrentTimeStamp::getDateTime());
-            $result = $this->getLongRunner()->runImmediately($action);
-            $this->assertEquals(0, $result->getCountTotalIDs());
-            $this->assertEmailNotSentTo($digestUser["email"]);
-        });
-
-        // Auto-subscribe is enabled. User should get the digest.
-        $this->runWithConfig([DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE => 1], function () use ($digestUser) {
-            $action = $this->emailDigestGenerator->prepareWeeklyDigestAction(CurrentTimeStamp::getDateTime());
-            $result = $this->getLongRunner()->runImmediately($action);
-            $this->assertEquals(1, $result->getCountTotalIDs());
-            $this->assertEmailSentTo($digestUser["email"]);
-        });
     }
 
     /**

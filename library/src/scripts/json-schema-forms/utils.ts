@@ -11,7 +11,6 @@ import { FormikErrors } from "formik";
 import { ValidationResult, OutputUnit, Validator, Schema } from "@cfworker/json-schema";
 import cloneDeep from "lodash-es/cloneDeep";
 import merge from "lodash-es/merge";
-import isPlainObject from "lodash-es/isPlainObject";
 
 /**
  * Get a validation result
@@ -208,23 +207,32 @@ export function recursivelyCleanInstance(instance: Record<string, any>, schema?:
 }
 
 //get schema object with default values only as props for a widget in order to set them in widget previews
-export function extractSchemaDefaults(schema: JsonSchema) {
-    let result: any = "default" in schema ? schema.default : schema.type === "object" ? {} : undefined;
+export function extractDataByKeyLookup(schema: JsonSchema, keyToLookup: string, path?: string, currentData?: object) {
+    let generatedData = currentData ?? {};
+    if (schema && schema.type === "object" && schema !== null) {
+        Object.entries(schema.properties).map(([key, value]: [string, JsonSchema]) => {
+            if (value.type === "object") {
+                extractDataByKeyLookup(value, keyToLookup, path ? `${path}.${key}` : key, generatedData);
+            } else if (value[keyToLookup] !== undefined) {
+                //we have a path, value is nested somewhere in the object
+                if (path) {
+                    let keys = [...path.split("."), key],
+                        newObjectFromCurrentPath = {};
 
-    if (schema.properties) {
-        // We need to loop through these
-        if (!isPlainObject(result)) {
-            result = {};
-        } else {
-            result = { ...result };
-        }
+                    //new object creation logic from path
+                    let node = keys.slice(0, -1).reduce(function (memo, current) {
+                        return (memo[current] = {});
+                    }, newObjectFromCurrentPath);
 
-        for (const [key, value] of Object.entries(schema.properties ?? {})) {
-            const innerDefault = extractSchemaDefaults(value as JsonSchema);
-            if (innerDefault !== undefined) {
-                result[key] = innerDefault;
+                    //last key where we'll assign our value
+                    node[key] = value[keyToLookup];
+                    generatedData = merge(generatedData, newObjectFromCurrentPath);
+                } else {
+                    //its first level value, we just assign it to our object
+                    generatedData[key] = value[keyToLookup];
+                }
             }
-        }
+        });
     }
-    return result;
+    return generatedData;
 }

@@ -116,29 +116,6 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
                 }
                 $where = $automationRule["trigger"]["triggerValue"];
                 if ($triggerClass instanceof TimedAutomationTrigger) {
-                    // In case of long runner timeouts we get an array as value for lastRunDate
-                    if (is_array($params["lastRunDate"])) {
-                        if ($params["lastRunDate"]["date"] ?? null) {
-                            try {
-                                $params["lastRunDate"] = \DateTimeImmutable::createFromFormat(
-                                    "Y-m-d H:i:s.u",
-                                    $params["lastRunDate"]["date"]
-                                );
-                            } catch (\Exception $e) {
-                                // Error parsing the date, we need to re-fetch it
-                                $params["lastRunDate"] = $actionClass->calculateTimeInterval(
-                                    $automationRuleID,
-                                    $automationRule["automationRuleRevisionID"]
-                                );
-                            }
-                        } else {
-                            // `lastRunDate` got lost somehow. It needs to be re fetched.
-                            $params["lastRunDate"] = $actionClass->calculateTimeInterval(
-                                $automationRuleID,
-                                $automationRule["automationRuleRevisionID"]
-                            );
-                        }
-                    }
                     $lastRunDate = $params["lastRunDate"];
                     $where = $triggerClass->getWhereArray($automationRule["trigger"]["triggerValue"], $lastRunDate);
                     $where = $actionClass->addWhereArray($where, $actionValue);

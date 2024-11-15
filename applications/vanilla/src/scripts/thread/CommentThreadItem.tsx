@@ -42,7 +42,6 @@ interface IProps {
     isPreview?: boolean;
     readOnly?: boolean;
     hasActiveDraft?: boolean;
-    threadStyle: "flat" | "nested";
 }
 
 const CONTENT_REMOVED_STRING = getMeta("removedString", "This content has been removed.");
@@ -87,7 +86,6 @@ export function CommentThreadItem(props: IProps) {
 
     return (
         <ThreadItemContextProvider
-            threadStyle={props.threadStyle}
             recordType={"comment"}
             recordID={comment.commentID}
             recordUrl={comment.url}

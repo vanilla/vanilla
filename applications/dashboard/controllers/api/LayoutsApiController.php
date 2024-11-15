@@ -33,8 +33,6 @@ use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\Resolvers\ReactResolver;
 use Vanilla\Layout\Section\AbstractLayoutSection;
 use Vanilla\Logging\AuditLogger;
-use Vanilla\QnA\Layout\Assets\TabbedCommentListAsset;
-use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
@@ -164,8 +162,6 @@ class LayoutsApiController extends \AbstractApiController
             $widgetName = $widgetClass::getWidgetName();
             $schema = $resolver->getSchema();
 
-            SchemaUtils::fixObjectDefaultSerialization($schema);
-
             if (is_a($widgetClass, AbstractLayoutSection::class, true)) {
                 $sectionSchemas[$resolver->getType()] = [
                     '$reactComponent' => $componentName,
@@ -195,13 +191,9 @@ class LayoutsApiController extends \AbstractApiController
                 $iconUrl = empty($assetClass::getWidgetIconPath())
                     ? $assetClass::getWidgetIconPath()
                     : asset($assetClass::getWidgetIconPath(), true);
-
-                $schema = $resolver->getSchema();
-                SchemaUtils::fixObjectDefaultSerialization($schema);
-
                 $assetSchemas[$resolver->getType()] = [
                     '$reactComponent' => $assetClass::getComponentName(),
-                    "schema" => $schema,
+                    "schema" => $resolver->getSchema(),
                     "iconUrl" => $iconUrl,
                     "name" => $assetClass::getWidgetName(),
                 ];
@@ -225,7 +217,6 @@ class LayoutsApiController extends \AbstractApiController
         }
 
         $result = $out->validate($result);
-
         return new Data($result);
     }
 

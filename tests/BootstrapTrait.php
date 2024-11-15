@@ -131,12 +131,6 @@ trait BootstrapTrait
     public static function tearDownAfterClass(): void
     {
         Bootstrap::cleanup(self::$container);
-        self::$container = null;
-        \Gdn::setContainer(null);
-        self::$testCache = null;
-        self::$bessy = null;
-        self::$bootstrap = null;
-        self::$emails = [];
     }
 
     /**

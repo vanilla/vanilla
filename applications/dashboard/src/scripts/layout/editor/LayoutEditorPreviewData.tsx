@@ -579,9 +579,7 @@ export class LayoutEditorPreviewData {
                     .choices.staticOptions;
             const possibleTypesFromSchema = Object.keys(typeOptions ?? {});
             possibleTypesFromSchema.forEach((type) => {
-                if (allPostTypes.hasOwnProperty(type)) {
-                    postTypes[type] = allPostTypes[type];
-                }
+                postTypes[type] = allPostTypes[type];
             });
         } else {
             postTypes = allPostTypes;

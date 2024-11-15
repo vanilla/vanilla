@@ -111,7 +111,6 @@ export class Mixins {
             };
             extraSpacingCSS = extendItemContainer(extraSpacing);
         }
-
         const paddingCss: CSSObject = {
             ...debuggingProperties,
             padding: 0,
@@ -170,7 +169,6 @@ export class Mixins {
         return {
             ...otherCss,
             ...paddingCss,
-            ...extraSpacingCSS,
         };
     };
 
@@ -546,10 +544,6 @@ export class Mixins {
                 background: "none",
             };
         }
-
-        const globalVars = globalVariables();
-        const fgColor = vars?.color ? ColorsUtils.colorOut(globalVars.getFgForBg(vars.color)) : undefined;
-
         return {
             backgroundColor: vars.color ? ColorsUtils.colorOut(vars.color) : undefined,
             backgroundAttachment: vars.attachment,
@@ -558,8 +552,6 @@ export class Mixins {
             backgroundSize: vars.size || "cover",
             backgroundImage: image,
             opacity: vars.opacity,
-            "--fg-contrast-color": fgColor,
-            color: fgColor,
         };
     }
 

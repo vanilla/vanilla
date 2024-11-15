@@ -72,19 +72,6 @@ class ProfileFieldAddRemoveRoleTriggerTest extends SiteTestCase
     }
 
     /**
-     * Get a test registration record
-     *
-     * @param array $registerFields
-     * @param array $profileFields
-     * @return array
-     * @throws \Exception
-     */
-    public function getRegistrationRecord(array $registerFields, array $profileFields): array
-    {
-        return ProfileFieldUserFollowCategoryTriggerTest::getRegistrationRecord($registerFields, $profileFields);
-    }
-
-    /**
      * Test the action is not executed when the automation rule is not active.
      */
     public function testActionNotExecutedWhenRuleIsNotActive(): void
@@ -94,7 +81,7 @@ class ProfileFieldAddRemoveRoleTriggerTest extends SiteTestCase
 
         $this->createAutomationRule($record["trigger"], $record["action"], false);
 
-        $formFields = $this->getRegistrationRecord(
+        $formFields = self::getRegistrationRecord(
             ["Email" => "testUser1@example.com", "Name" => "testUser_1"],
             ["field-1" => "testValue"]
         );
@@ -123,7 +110,7 @@ class ProfileFieldAddRemoveRoleTriggerTest extends SiteTestCase
         $this->generateProfileField(["apiName" => "field-1", "label" => "Field 1"]);
         $record = $this->getAutomationRecord(["field-1" => "testValue"], 3);
         $automationRule = $this->createAutomationRule($record["trigger"], $record["action"]);
-        $formFields = $this->getRegistrationRecord(
+        $formFields = self::getRegistrationRecord(
             ["Email" => "testUser2@example.com", "Name" => "testUser_2"],
             ["field-1" => "someValue"]
         );
@@ -164,7 +151,7 @@ class ProfileFieldAddRemoveRoleTriggerTest extends SiteTestCase
         $record = $this->getAutomationRecord(["favourite-food" => "Pizza"], $foodRoleID, $testRoleID);
         $secondAutomationRule = $this->createAutomationRule($record["trigger"], $record["action"]);
 
-        $formFields = $this->getRegistrationRecord(
+        $formFields = self::getRegistrationRecord(
             ["Email" => "JohnDoe@example.com", "Name" => "JohnDoe"],
             ["favourite-sport" => "Tennis"]
         );
@@ -217,7 +204,7 @@ class ProfileFieldAddRemoveRoleTriggerTest extends SiteTestCase
         $data = $this->prepareMultiRuleTestData();
         $defaultRoleIds = [3, 8];
         $roles = $data["roleIDs"];
-        $formFields = $this->getRegistrationRecord(
+        $formFields = self::getRegistrationRecord(
             ["Email" => "JohnyWalker@example.com", "Name" => "JohnWalker"],
             ["favourite-sport" => "Tennis", "favourite-food" => "Pizza", "favourite-color" => "Red"]
         );

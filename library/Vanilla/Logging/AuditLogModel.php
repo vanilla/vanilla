@@ -144,7 +144,7 @@ class AuditLogModel extends PipelineModel
             "requestMethod:s",
             "requestPath:s",
             "requestQuery:o",
-            "context:o",
+            "context:o|a",
             "meta:o",
         ]);
 

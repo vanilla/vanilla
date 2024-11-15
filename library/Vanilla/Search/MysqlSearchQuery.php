@@ -19,6 +19,8 @@ class MysqlSearchQuery extends SearchQuery
     /** @var array $sql */
     private $sql;
 
+    protected bool $canOptimizeRecordTypes = false;
+
     /**
      * MysqlSearchQuery constructor.
      *

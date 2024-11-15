@@ -26,13 +26,13 @@ type FormValues = {
     type: string;
 };
 
-interface IProps {
+export interface ChangeTypeDiscussionFormProps {
     onCancel: () => void;
     onSuccess?: () => Promise<void>;
     discussion: IDiscussion;
 }
 
-export default function ChangeTypeDiscussionForm({ onCancel, onSuccess, discussion }: IProps) {
+export default function ChangeTypeDiscussionForm({ onCancel, onSuccess, discussion }: ChangeTypeDiscussionFormProps) {
     const { putDiscussionType } = useDiscussionPutType(discussion.discussionID);
     const formik = useFormik<FormValues>({
         initialValues: {

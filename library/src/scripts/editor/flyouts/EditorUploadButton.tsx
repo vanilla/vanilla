@@ -17,7 +17,6 @@ import React from "react";
 interface IProps {
     disabled?: boolean;
     type: "file" | "image";
-    legacyMode: boolean;
     onUpload: (files: File[]) => void;
 }
 
@@ -28,7 +27,7 @@ export default class EditorUploadButton extends React.Component<IProps, { upload
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
     public render() {
-        const classesRichEditor = richEditorClasses(this.props.legacyMode);
+        const classesRichEditor = richEditorClasses();
 
         const text = this.props.type === "image" ? t("Upload Image") : t("Upload File");
 

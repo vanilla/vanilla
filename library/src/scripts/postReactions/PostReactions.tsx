@@ -19,6 +19,7 @@ import snakeCase from "lodash/snakeCase";
 import startCase from "lodash/startCase";
 import { useEffect, useState } from "react";
 import { PostReactionTooltip } from "./PostReactionTooltip";
+import { useReactionLog } from "@library/postReactions/PostReactions.hooks";
 
 /**
  * Render reaction icons as buttons for display in discussion threads and comments
@@ -27,8 +28,9 @@ export function PostReactions(props: { reactions?: IReaction[] }) {
     const { reactions } = props;
     const classes = postReactionsClasses();
     const tagStyles = tagClasses();
-    const { toggleReaction, counts } = usePostReactionsContext();
+    const { toggleReaction, counts, recordType, recordID } = usePostReactionsContext();
     const { hasPermission } = usePermissionsContext();
+    const reactionLog = useReactionLog({ recordType, recordID });
     // reaction list needs to be in a state to properly update the counts
     const [list, setList] = useState<IReaction[]>();
 
@@ -72,8 +74,16 @@ export function PostReactions(props: { reactions?: IReaction[] }) {
         return null;
     }
 
+    const fetchUserReactionLog = () => {
+        reactionLog.isStale && reactionLog.refetch();
+    };
+
     return (
-        <div className={classes.root}>
+        <div
+            className={classes.root}
+            onMouseEnter={() => fetchUserReactionLog()}
+            onFocus={() => fetchUserReactionLog()}
+        >
             {list.map((reaction) => {
                 // get the icon type
                 const iconType = PostReactionIconType[snakeCase(reaction.urlcode).toUpperCase()];
@@ -99,9 +109,9 @@ export function PostReactions(props: { reactions?: IReaction[] }) {
                                 classes.button,
                                 reaction.hasReacted && classes.activeButton,
                             )}
-                            onClick={async () => {
+                            onClick={() => {
                                 if (toggleReaction) {
-                                    await toggleReaction({ reaction });
+                                    toggleReaction({ reaction });
                                 }
                             }}
                         >

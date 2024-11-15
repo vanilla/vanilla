@@ -13,12 +13,15 @@ import { LoadStatus } from "@library/@types/api/core";
 import { MetaItem } from "@library/metas/Metas";
 import { cx } from "@emotion/css";
 import DateTime from "@library/content/DateTime";
-import { AutomationRulesPreviewContent } from "@dashboard/automationRules/preview/AutomationRulesPreviewContent";
 import { loadingPlaceholder } from "@dashboard/automationRules/AutomationRules.utils";
 import { AutomationRulesPreviewContentHeader } from "@dashboard/automationRules/preview/AutomationRulesPreviewContentHeader";
 
-interface IProps extends Omit<React.ComponentProps<typeof AutomationRulesPreviewContent>, "formValues"> {
+interface IProps {
     query: IGetDiscussionListParams;
+    fromStatusToggle?: boolean;
+    onPreviewContentLoad?: (emptyResult: boolean) => void;
+    className?: string;
+    contentTypeAsDiscussions?: boolean;
 }
 
 export function AutomationRulesPreviewPostsContent(props: IProps) {
@@ -53,9 +56,9 @@ export function AutomationRulesPreviewPostsContent(props: IProps) {
     }, [discussionsData?.pagination?.currentPage, discussionsData?.pagination?.total]);
 
     return (
-        <>
+        <div className={props.className}>
             <AutomationRulesPreviewContentHeader
-                contentType="Posts"
+                contentType={props.contentTypeAsDiscussions ? "Discussions" : "Posts"}
                 totalResults={totalResults}
                 emptyResults={status === LoadStatus.SUCCESS && !discussionsData?.discussionList.length}
                 fromStatusToggle={props.fromStatusToggle}
@@ -104,6 +107,6 @@ export function AutomationRulesPreviewPostsContent(props: IProps) {
                         </li>
                     ))}
             </ul>
-        </>
+        </div>
     );
 }

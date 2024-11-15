@@ -32,10 +32,11 @@ export interface IAttachmentLayoutProps {
     dateUpdated?: string;
     user?: IUserFragment;
     metadata: IAttachment["metadata"];
+    metas?: React.ReactNode;
 }
 
 export default function AttachmentLayout(props: IAttachmentLayoutProps) {
-    const { icon, title, notice, url, id, idLabel, dateUpdated, user, metadata, attachmentTypeIcon } = props;
+    const { icon, title, notice, url, id, idLabel, dateUpdated, user, metadata, attachmentTypeIcon, metas } = props;
     const classes = AttachmentLayoutClasses();
 
     // TODO: small temporary dependency from attachmentTypeIcon here to hide the notice/status from the layout
@@ -64,7 +65,11 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                         })}
                     >
                         {!!title && <h5 className={classes.title}>{title}</h5>}
-                        {!!noticeContent && <Metas className={classes.inlineMetas}>{noticeContent}</Metas>}
+                        {(!!noticeContent || !!metas) && (
+                            <Metas className={classes.inlineMetas}>
+                                {noticeContent} {metas}
+                            </Metas>
+                        )}
 
                         <Metas className={classes.metasRow}>
                             {!!dateUpdated && !!user && (

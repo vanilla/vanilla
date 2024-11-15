@@ -1,10 +1,10 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { useRef, useEffect, useState, useDebugValue } from "react";
-import { useMeasure } from "./useMeasure";
+import { useRef, useDebugValue } from "react";
+import { useMeasure } from "@vanilla/react-utils";
 
 /**
  * Detect if the edges of 2 measures are overlapping.

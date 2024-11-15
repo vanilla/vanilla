@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Models;
 
+use Exception;
 use PermissionNotificationGenerator;
 use Ramsey\Uuid\Uuid;
 use RoleModel;
@@ -99,5 +100,79 @@ class PermissionNotificationGeneratorTest extends SiteTestCase
 
         $this->assertUserHasNoNotifications($member["userID"]);
         $this->assertUserHasNoEmails($member["userID"]);
+    }
+
+    /**
+     * Test that batching work and that more than one bat
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function testBatchLimit(): void
+    {
+        $user0 = $this->createUser(
+            notificationPreferences: [
+                "Mention" => ["Popup" => true, "email" => true],
+            ]
+        );
+        $user1 = $this->createUser(
+            overrides: ["roleID" => [RoleModel::ADMIN_ID]],
+            notificationPreferences: [
+                "Mention" => ["Popup" => true],
+            ]
+        );
+
+        $user2 = $this->createUser(
+            overrides: ["roleID" => [RoleModel::ADMIN_ID]],
+            notificationPreferences: [
+                "Mention" => ["Popup" => true, "email" => true],
+            ]
+        );
+
+        $user3 = $this->createUser(
+            overrides: ["roleID" => [RoleModel::ADMIN_ID]],
+            notificationPreferences: [
+                "Mention" => ["Popup" => true, "email" => true],
+            ]
+        );
+
+        $this->runWithConfig([PermissionNotificationGenerator::BATCH_SIZE_CONFIG_KEY => 2], function () {
+            $activity = [
+                "ActivityType" => "Default",
+                "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
+                "ActivityUserID" => 1,
+                "HeadlineFormat" => "The whole world must learn our peaceful ways...BY FORCE",
+                "PluralHeadlineFormat" => null,
+                "RecordType" => "test",
+                "RecordID" => "1",
+                "Data" => [
+                    "Reason" => "test",
+                ],
+            ];
+
+            $action = new LongRunnerAction(PermissionNotificationGenerator::class, "notificationGenerator", [
+                $activity,
+                "Garden.Settings.Manage",
+                "Mention",
+            ]);
+            $this->getLongRunner()->runImmediately($action);
+        });
+
+        $notification = new ExpectedNotification(
+            "Default",
+            ["The whole world must learn our peaceful ways...BY FORCE"],
+            "test"
+        );
+
+        $this->assertUserHasNoNotifications($user0);
+        $this->assertUserHasNoEmails($user0);
+
+        $this->assertUserHasNotificationsLike($user1, [$notification]);
+
+        $this->assertUserHasNotificationsLike($user2, [$notification]);
+        $this->assertUserHasEmailsLike($user2, \ActivityModel::SENT_OK, [$notification]);
+
+        $this->assertUserHasNotificationsLike($user3, [$notification]);
+        $this->assertUserHasEmailsLike($user3, \ActivityModel::SENT_OK, [$notification]);
     }
 }

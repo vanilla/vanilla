@@ -20,7 +20,8 @@ import {
 } from "@library/styles/cssUtilsTypes";
 import { useThemeCache } from "@library/styles/themeCache";
 import { ColorHelper, important, percent, px } from "csx";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { Property } from "csstype";
 import merge from "lodash-es/merge";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
@@ -110,6 +111,7 @@ export class Mixins {
             };
             extraSpacingCSS = extendItemContainer(extraSpacing);
         }
+
         const paddingCss: CSSObject = {
             ...debuggingProperties,
             padding: 0,
@@ -168,6 +170,7 @@ export class Mixins {
         return {
             ...otherCss,
             ...paddingCss,
+            ...extraSpacingCSS,
         };
     };
 
@@ -543,6 +546,10 @@ export class Mixins {
                 background: "none",
             };
         }
+
+        const globalVars = globalVariables();
+        const fgColor = vars?.color ? ColorsUtils.colorOut(globalVars.getFgForBg(vars.color)) : undefined;
+
         return {
             backgroundColor: vars.color ? ColorsUtils.colorOut(vars.color) : undefined,
             backgroundAttachment: vars.attachment,
@@ -551,6 +558,8 @@ export class Mixins {
             backgroundSize: vars.size || "cover",
             backgroundImage: image,
             opacity: vars.opacity,
+            "--fg-contrast-color": fgColor,
+            color: fgColor,
         };
     }
 

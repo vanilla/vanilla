@@ -15,7 +15,7 @@ import Translate from "@library/content/Translate";
 import UserContent from "@library/content/UserContent";
 import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { useToast } from "@library/features/toaster/ToastContext";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ListItem, ListItemContext } from "@library/lists/ListItem";
@@ -32,6 +32,9 @@ import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAt
 import { Icon } from "@vanilla/icons";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import BlurContainer from "@dashboard/moderation/components/BlurContainerUserContent";
+import { PermissionMode } from "@library/features/users/Permission";
 
 interface IProps {
     discussion: IDiscussion;
@@ -69,6 +72,8 @@ export function TriageListItem(props: IProps) {
     const escalation = discussion.attachments?.find((item) => item.attachmentType === "vanilla-escalation");
     const detailUrl = `/dashboard/content/triage/${discussion.discussionID}`;
 
+    const { hasPermission } = usePermissionsContext();
+
     return (
         <div className={classes.container}>
             <div className={classes.main}>
@@ -78,7 +83,15 @@ export function TriageListItem(props: IProps) {
                         url={detailUrl}
                         name={discussion.name}
                         nameClassName={communityManagementPageClasses().listItemLink}
-                        description={<UserContent className={classes.description} content={discussion.body!} />}
+                        description={
+                            <BlurContainer>
+                                <UserContent
+                                    className={classes.description}
+                                    content={discussion.body!}
+                                    moderateEmbeds
+                                />
+                            </BlurContainer>
+                        }
                         truncateDescription={false}
                         metas={
                             <>
@@ -168,20 +181,26 @@ export function TriageListItem(props: IProps) {
                     >
                         {t("Message Post Author")}
                     </Button>
-                    {!escalation ? (
-                        <Button
-                            buttonType={ButtonTypes.TEXT_PRIMARY}
-                            onClick={() => {
-                                onEscalate(discussion);
-                            }}
-                        >
-                            {t("Escalate")}
-                        </Button>
-                    ) : (
-                        <LinkAsButton buttonType={ButtonTypes.TEXT_PRIMARY} to={escalation.sourceUrl!}>
-                            {t("View Escalation")}
-                        </LinkAsButton>
-                    )}
+                    {(hasPermission("community.moderate") ||
+                        hasPermission("posts.moderate", {
+                            mode: PermissionMode.RESOURCE_IF_JUNCTION,
+                            resourceType: "category",
+                            resourceID: discussion.categoryID,
+                        })) &&
+                        (!escalation ? (
+                            <Button
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
+                                onClick={() => {
+                                    onEscalate(discussion);
+                                }}
+                            >
+                                {t("Escalate")}
+                            </Button>
+                        ) : (
+                            <LinkAsButton buttonType={ButtonTypes.TEXT_PRIMARY} to={escalation.sourceUrl!}>
+                                {t("View Escalation")}
+                            </LinkAsButton>
+                        ))}
                 </div>
             </footer>
         </div>

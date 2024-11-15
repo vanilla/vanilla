@@ -120,7 +120,7 @@ class ValidateAttachmentsCommand extends DatabaseCommand
                 $this->reportPath .
                 "/" .
                 "file_report_" .
-                $input->getOption("db-name") .
+                $input->getOption("dbname") .
                 "_" .
                 CurrentTimeStamp::get() .
                 ".csv";

@@ -302,6 +302,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
                 "escalationDelayUnit" => null,
                 "escalationDelayLength" => 0,
                 "writeableContentScope" => AttachmentProviderInterface::WRITEABLE_CONTENT_SCOPE_ALL,
+                "escalationStatusID" => null,
             ],
             "vanilla-escalation" => [
                 "recordTypes" => ["discussion", "comment"],
@@ -315,6 +316,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
                 "escalationDelayUnit" => null,
                 "escalationDelayLength" => 0,
                 "writeableContentScope" => "none",
+                "escalationStatusID" => null,
             ],
         ];
         $response = $this->api()->get("/attachments/catalog");

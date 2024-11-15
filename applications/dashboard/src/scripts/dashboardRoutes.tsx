@@ -7,6 +7,7 @@
 import { getDashboardUserManagementRoutes } from "@dashboard/users/userManagement/UserManagementRoutes";
 import RouteHandler from "@library/routing/RouteHandler";
 import { getAutomationRulesRoutes } from "@dashboard/automationRules/AutomationRules.routes";
+import { getPostTypeSettingsRoutes } from "@dashboard/postTypes/postTypeRoutes";
 
 const RoleApplicationsRoute = new RouteHandler(
     () => import("@dashboard/roleRequests/pages/RoleApplicationsPage"),
@@ -25,6 +26,7 @@ export function getDashboardRoutes() {
         RoleApplicationsRoute.route,
         ...getDashboardUserManagementRoutes(),
         ...getAutomationRulesRoutes(),
+        ...getPostTypeSettingsRoutes(),
         AuditLogsRoute.route,
     ];
 }

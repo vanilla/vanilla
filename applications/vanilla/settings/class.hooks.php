@@ -391,22 +391,49 @@ class VanillaHooks extends Gdn_Plugin
     public function discussionModel_afterSaveDiscussion_handler($sender)
     {
         $formPostValues = val("FormPostValues", $sender->EventArguments, []);
-        $discussionID = val("DiscussionID", $sender->EventArguments, 0);
-        $categoryID = valr("Fields.CategoryID", $sender->EventArguments, 0);
+        $categoryID = valr("Fields.CategoryID", $sender->EventArguments, false);
         $rawFormTags = val("Tags", $formPostValues, "");
         $newDiscussion = $formPostValues["IsNewDiscussion"] ?? false;
+
+        $this->restoreTags($formPostValues, $categoryID, $rawFormTags, $newDiscussion);
+    }
+
+    /**
+     * Handle saving tags when restoring a discussion.
+     *
+     * @param $sender
+     * @param $discussion
+     * @return void
+     */
+    public function discussionModel_afterRestoreDiscussion_handler(DiscussionModel $sender, array $discussion): void
+    {
+        $categoryID = $discussion["CategoryID"] ?? 0;
+        $rawFormTags = $discussion["Tags"] ?? "";
+        $this->restoreTags($discussion, $categoryID, $rawFormTags);
+    }
+
+    /**
+     * Save the tags for a restored discussion.
+     *
+     * @param array $discussion
+     * @param int $categoryID
+     * @param string $rawFormTags
+     * @param bool $newDiscussion
+     * @return void
+     */
+    private function restoreTags(
+        array $discussion,
+        int $categoryID,
+        string $rawFormTags,
+        bool $newDiscussion = false
+    ): void {
         $formTags = TagModel::splitTags($rawFormTags);
+        $discussionID = $discussion["DiscussionID"] ?? 0;
 
         // Don't change tags if there's no "Tags" field (this prevents tags from being lost when moving discussion to
         // a new category).
-        if (!isset($formPostValues["Tags"]) && !$newDiscussion) {
+        if (empty($formTags) && !$newDiscussion) {
             return;
-        }
-
-        // If we're associating with categories
-        $categorySearch = c("Vanilla.Tagging.CategorySearch", false);
-        if ($categorySearch) {
-            $categoryID = val("CategoryID", $formPostValues, false);
         }
 
         // Let plugins have their information getting saved.
@@ -417,7 +444,7 @@ class VanillaHooks extends Gdn_Plugin
         Gdn::pluginManager()
             ->fireAs("TaggingPlugin")
             ->fireEvent("SaveDiscussion", [
-                "Data" => $formPostValues,
+                "Data" => $discussion,
                 "Tags" => &$formTags,
                 "Types" => &$types,
                 "CategoryID" => $categoryID,
@@ -1016,17 +1043,16 @@ class VanillaHooks extends Gdn_Plugin
         [$offset, $limit] = offsetLimit($page, $pageSize);
 
         $commentModel = new CommentModel();
+
+        $where = [
+            "c.InsertUserID" => $sender->User->UserID,
+        ];
+        if ($lastCommentID = $sender->Request->get("lid")) {
+            $where["c.CommentID <"] = $lastCommentID;
+        }
         /** @var Gdn_DataSet $comments */
-        $comments = $commentModel->getByUser2(
-            $sender->User->UserID,
-            $limit,
-            $offset,
-            $sender->Request->get("lid"),
-            null,
-            "desc",
-            "PermsDiscussionsView"
-        );
-        $totalRecords = $offset + $commentModel->LastCommentCount + 1;
+        $comments = $commentModel->getWhere($where, "CommentID", "DESC", $limit, $offset);
+        $totalRecords = $offset + $comments->count() + 1;
 
         // Build a pager
         $pagerFactory = new Gdn_PagerFactory();
@@ -1048,7 +1074,7 @@ class VanillaHooks extends Gdn_Plugin
             $sender->View = "profilecomments";
         }
         $sender->setData("Comments", $comments);
-        $sender->setData("UnfilteredCommentsCount", $commentModel->LastCommentCount);
+        $sender->setData("UnfilteredCommentsCount", $comments->count());
 
         // Set the HandlerType back to normal on the profilecontroller so that it fetches it's own views
         $sender->HandlerType = HANDLER_TYPE_NORMAL;
@@ -1185,6 +1211,14 @@ class VanillaHooks extends Gdn_Plugin
                 $sort
             )
             ->addLinkIf(
+                ["Garden.Settings.Manage", "Feature.PostTypesAndPostFields.Enabled"],
+                t("Post Types"),
+                "/settings/post-types",
+                "forum.posting",
+                "nav-forum-posting",
+                $sort
+            )
+            ->addLinkIf(
                 "Garden.Community.Manage",
                 t("Reactions"),
                 "reactions",
@@ -1241,7 +1275,14 @@ class VanillaHooks extends Gdn_Plugin
             case "Discussion":
                 $discussionModel = new DiscussionModel();
                 $discussionModel->updateUserDiscussionCount($recordUserID, true);
-                break;
+
+                $discussionID = (int) $args["InsertID"] ?? ($args["Log"]["Data"]["RecordID"] ?? 0);
+                $discussionData = $args["Log"]["Data"] ?? [];
+                $discussionData["DiscussionID"] = $discussionID;
+                $categoryID = $args["Log"]["CategoryID"] ?? 0;
+                $rawFormTags = $args["Log"]["Data"]["Tags"] ?? "";
+
+                $this->restoreTags($discussionData, $categoryID, $rawFormTags, isset($args["InsertID"]));
         }
     }
 

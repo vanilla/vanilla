@@ -458,7 +458,7 @@ abstract class Gdn_Cache
      * Check if a value exists in the cache.
      *
      * @param string $key Cache key used for storage.
-     * @return array array(key => value) for existing key or false if not found.
+     * @return array|bool array(key => value) for existing key or false if not found.
      */
     abstract public function exists($key);
 

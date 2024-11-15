@@ -146,7 +146,7 @@ export function WidgetSettingsModal(props: IProps) {
     return (
         <Modal
             isVisible={isVisible}
-            size={ModalSizes.LARGE}
+            size={ModalSizes.XXL}
             exitHandler={handleClose}
             titleID={titleID}
             className={classes.container}

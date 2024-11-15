@@ -84,4 +84,17 @@ class FormOptions
     {
         return $this->tooltip;
     }
+
+    /**
+     * @return array
+     */
+    public function values(): array
+    {
+        return [
+            "description" => $this->getDescription(),
+            "label" => $this->getLabel(),
+            "placeholder" => $this->getPlaceHolder(),
+            "tooltip" => $this->getTooltip(),
+        ];
+    }
 }

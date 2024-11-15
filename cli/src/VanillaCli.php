@@ -92,6 +92,8 @@ class VanillaCli extends Console\Application
             Commands\ConvertToRich::class,
             Commands\ReparseRich2Quotes::class,
             Commands\SpawnSiteCommand::class,
+            Commands\ValidateDataCommand::class,
+            Commands\GenerateDataCommand::class,
         ];
     }
 

@@ -7,7 +7,7 @@
 import { IReport } from "@dashboard/moderation/CommunityManagementTypes";
 import { ReportRecordMeta } from "@dashboard/moderation/components/ReportRecordMeta";
 import UserContent from "@library/content/UserContent";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";

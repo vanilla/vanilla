@@ -124,21 +124,6 @@ export function useRevisionOptions() {
                     dateInserted: mostRecentRevision.dateUpdated ?? mostRecentRevision.dateInserted,
                 },
             ];
-            if (reports) {
-                // Append reports with unique recordHtml lengths
-                options = [
-                    ...options,
-                    ...new Map(
-                        reports.map((report) => [
-                            report.recordHtml.length,
-                            {
-                                value: report.reportID,
-                                dateInserted: report.dateInserted,
-                            },
-                        ]),
-                    ).values(),
-                ];
-            }
             // Format options for select component
             return options.map((option) => {
                 return {
@@ -173,7 +158,7 @@ export function useEscalationQuery(escalationID: IEscalation["escalationID"]) {
             const response = await apiv2.get(`/escalations/${escalationID}?expand=users`);
             return response.data;
         },
-        queryKey: ["escalation", escalationID],
+        queryKey: ["escalations", escalationID],
         keepPreviousData: true,
     });
     return escalation;
@@ -191,7 +176,7 @@ export function useEscalationMutation(escalationID?: IEscalation["escalationID"]
         },
         mutationKey: ["escalationPatch", escalationID],
         onSuccess: () => {
-            queryClient.invalidateQueries(["escalation", escalationID]);
+            queryClient.invalidateQueries(["escalations", escalationID]);
             queryClient.invalidateQueries(["escalations"]);
             toast.addToast({ body: t("Escalation Updated"), autoDismiss: true, dismissible: true });
         },

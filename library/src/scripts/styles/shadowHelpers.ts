@@ -9,7 +9,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { Property } from "csstype";
 import { ColorHelper } from "csx";
 import { TLength } from "@library/styles/styleShim";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { styleUnit } from "@library/styles/styleUnit";

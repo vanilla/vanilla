@@ -5,6 +5,7 @@
  */
 
 import { css } from "@emotion/css";
+import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { viewHeight } from "csx";
 
 export default function UserPreferencesClasses() {
@@ -16,12 +17,11 @@ export default function UserPreferencesClasses() {
             border: "none",
         }),
         tableWrap: css({
-            maxWidth: "100%",
             overflow: "auto",
+            ...extendItemContainer(16),
         }),
         table: css({
             border: "1px solid #f4f6fb",
-            marginBottom: 16,
             tableLayout: "fixed",
             width: "100%",
             minWidth: 600,

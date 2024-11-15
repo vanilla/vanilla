@@ -1,4 +1,4 @@
-import { css, CSSObject, cx } from "@emotion/css";
+import { css, cx } from "@emotion/css";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";

@@ -20,7 +20,7 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
 
     protected $pk = "apiName";
 
-    protected $patchFields = ["apiName", "label", "description", "enabled"];
+    protected $patchFields = ["apiName", "label", "description", "descriptionHtml", "enabled"];
 
     protected $editFields = [];
 
@@ -30,6 +30,7 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         "apiName" => "profile-field-test",
         "label" => "profile field test",
         "description" => "this is a test",
+        "descriptionHtml" => false,
         "dataType" => "text",
         "formType" => "text",
         "visibility" => "public",
@@ -136,6 +137,7 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         $patch = [
             "label" => "patch_test_updated",
             "description" => "updated",
+            "descriptionHtml" => true,
             "formType" => "text",
             "visibility" => "private",
             "mutability" => "restricted",

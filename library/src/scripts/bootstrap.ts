@@ -1,7 +1,7 @@
 /**
  * Primary bootstrapping of the frontend JS. This entrypoint should be the last once executed.
  *
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -27,7 +27,7 @@ import { translationDebug } from "@vanilla/i18n";
 import apiv2 from "@library/apiv2";
 import { onPageView } from "@library/pageViews/pageViewTracking";
 import { _mountComponents } from "@library/utility/componentRegistry";
-import { blotCSS } from "@rich-editor/quill/components/blotStyles";
+import { blotCSS } from "@rich-editor/editor/components/blotStyles";
 import { bootstrapLocales } from "@library/locales/localeBootstrap";
 import "@library/VanillaGlobals";
 
@@ -36,7 +36,7 @@ import "@library/gdn";
 import { initModernEmbed } from "@library/embed/modernEmbed.local";
 import { iconRegistry } from "@vanilla/icons";
 
-export function bootstrapVanilla() {
+export async function bootstrapVanilla() {
     performance.mark("Bootstrap - Start");
     if (!getMeta("featureFlags.useFocusVisible.Enabled", true)) {
         document.body.classList.add("hasNativeFocus");
@@ -50,7 +50,11 @@ export function bootstrapVanilla() {
 
     const translationDebugValue = getMeta("context.translationDebug", false);
     translationDebug(translationDebugValue);
-    bootstrapLocales();
+
+    await bootstrapLocales();
+    document.addEventListener("DOMContentLoaded", async () => {
+        await bootstrapLocales();
+    });
 
     // Export some globals to the window.
 

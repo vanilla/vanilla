@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -17,7 +17,7 @@ import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { TabHandler } from "@vanilla/dom-utils";
 import classNames from "classnames";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 interface IProps {
     activeRecord?: IActiveRecord;
@@ -25,11 +25,9 @@ interface IProps {
     className?: string;
     children: INavigationTreeItem[];
     collapsible: boolean;
-    bottomCTA?: React.ReactNode;
     onSelectItem?(item: INavigationTreeItem);
     onItemHover?(item: INavigationTreeItem);
     title?: string;
-    hiddenTitle?: boolean;
     clickableCategoryLabels?: boolean;
     siteNavNodeTypes?: SiteNavNodeTypes;
     initialOpenDepth?: number;
@@ -83,37 +81,34 @@ export function SiteNav(props: IProps) {
           })
         : null;
 
-    if (hasChildren) {
-        return (
-            <nav
+    return hasChildren ? (
+        <nav
+            aria-labelledby={titleID}
+            onKeyDownCapture={handleKeyDown}
+            className={classNames("siteNav", props.className, classes.root)}
+        >
+            {props.title ? (
+                <Heading
+                    id={titleID}
+                    title={props.title}
+                    className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
+                />
+            ) : (
+                <h2 id={titleID} className="sr-only">
+                    {t("Navigation")}
+                </h2>
+            )}
+            <ul
+                className={classNames("siteNav-children", "hasDepth-0", classes.children)}
+                role="tree"
                 aria-labelledby={titleID}
-                onKeyDownCapture={handleKeyDown}
-                className={classNames("siteNav", props.className, classes.root)}
             >
-                {props.title ? (
-                    <Heading
-                        id={titleID}
-                        title={props.title}
-                        className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
-                    />
-                ) : (
-                    <h2 id={titleID} className="sr-only">
-                        {t("Navigation")}
-                    </h2>
-                )}
-                <ul
-                    className={classNames("siteNav-children", "hasDepth-0", classes.children)}
-                    role="tree"
-                    aria-labelledby={titleID}
-                >
-                    {content}
-                </ul>
-                {props.bottomCTA}
-            </nav>
-        );
-    } else {
-        return <>{props.bottomCTA}</>;
-    }
+                {content}
+            </ul>
+        </nav>
+    ) : (
+        <></>
+    );
 }
 
 function gatherInitialRecords(records: INavigationTreeItem[], maxDepth: number): INavigationTreeItem[] {

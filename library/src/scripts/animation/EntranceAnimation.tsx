@@ -3,9 +3,9 @@
  * @license GPL-2.0-only
  */
 
+import { cx } from "@emotion/css";
 import React, { useMemo } from "react";
 import { animated, useTransition } from "react-spring";
-import classNames from "classnames";
 
 interface IProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
     // Whether or not the element has entered the screen and should be visible.
@@ -89,7 +89,7 @@ export const EntranceAnimation = React.forwardRef<HTMLDivElement, IProps>(functi
     return transitions.map(({ item, key, props: style }, i) => {
         const isFirst = i === 0;
         const isLast = i === transitions.length - 1;
-        const classes = classNames(
+        const classes = cx(
             divProps.className,
             isFirst && firstItemProps?.className,
             isLast && lastItemProps?.className,

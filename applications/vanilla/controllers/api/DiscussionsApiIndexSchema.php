@@ -9,6 +9,7 @@ namespace Vanilla\Forum\Controllers\Api;
 
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
+use RoleModel;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\DateFilterSchema;
@@ -28,7 +29,7 @@ class DiscussionsApiIndexSchema extends Schema
     /**
      * Setup the schema.
      *
-     * @param int $defaultLimit The default limit of items ot be returned.
+     * @param int $defaultLimit The default limit of items to be returned.
      */
     public function __construct(int $defaultLimit)
     {
@@ -191,8 +192,21 @@ class DiscussionsApiIndexSchema extends Schema
                 ],
                 "resolved:b?", // Legacy
                 "reactionType:s?",
+                "suggested:b?", //filter to the user interests
+                "roleIDs:a?" => [
+                    "items" => [
+                        "type" => "integer",
+                    ],
+                ],
+                "excerptLength:i?",
+                "excludedCategoryIDs:a?" => [
+                    "items" => ["type" => "integer"],
+                ],
             ])
         );
+        $this->addValidator("insertUserRoleID", function ($data, $field) {
+            RoleModel::roleViewValidator($data, $field);
+        });
         $this->addValidator("", function (array $value, ValidationField $field) {
             if (!ArrayUtils::isArray($value)) {
                 return $value;

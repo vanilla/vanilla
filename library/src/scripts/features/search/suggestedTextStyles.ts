@@ -9,7 +9,7 @@ import { metasVariables } from "@library/metas/Metas.variables";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { Mixins } from "@library/styles/Mixins";
 import { userSelect } from "@library/styles/styleHelpers";

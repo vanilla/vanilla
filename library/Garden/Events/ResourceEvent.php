@@ -6,6 +6,7 @@
 
 namespace Garden\Events;
 
+use Exception;
 use Garden\Web\RequestInterface;
 use Gdn;
 use Ramsey\Uuid\Uuid;
@@ -66,6 +67,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
      * @param string $action
      * @param array $payload
      * @param array|object|null $sender
+     * @throws Exception
      */
     public function __construct(string $action, array $payload, $sender = null)
     {

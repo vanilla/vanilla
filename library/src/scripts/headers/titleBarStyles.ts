@@ -34,11 +34,12 @@ import {
     viewWidth,
 } from "csx";
 import backLinkClasses from "@library/routing/links/BackLink.classes";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { oneColumnVariables } from "@library/layout/Section.variables";
-import { titleBarVariables } from "./TitleBar.variables";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export const titleBarClasses = useThemeCache(() => {
@@ -543,6 +544,16 @@ export const titleBarClasses = useThemeCache(() => {
         color: vars.count.fg.toString(),
     });
 
+    const desktopMeBoxSectionWrapper = (isSearchOpen?: boolean) =>
+        css({
+            display: "flex",
+            alignItems: "center",
+            height: px(vars.sizing.height),
+            ...(isSearchOpen && {
+                flex: 1,
+            }),
+        });
+
     const rightFlexBasis = css(
         {
             display: "flex",
@@ -744,6 +755,7 @@ export const titleBarClasses = useThemeCache(() => {
         dropDownContents,
         count,
         extraMeBoxIcons,
+        desktopMeBoxSectionWrapper,
         rightFlexBasis,
         leftFlexBasis,
         signIn,

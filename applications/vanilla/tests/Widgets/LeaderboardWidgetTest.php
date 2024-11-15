@@ -113,6 +113,8 @@ class LeaderboardWidgetTest extends SiteTestCase
             "subtitle" => "Leaderboard Subtitle",
             "containerOptions" => [
                 "borderType" => "shadow",
+                "headerAlignment" => "left",
+                "visualBackgroundType" => "inner",
             ],
             '$reactTestID' => "leaderboard",
             "descriptionType" => "none",

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Dashboard\Controllers\Api;
 
+use Vanilla\AutomationRules\Actions\AutomationAction;
 use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Garden\Container\ContainerException;
 use Garden\Schema\Schema;
@@ -96,15 +97,56 @@ class AutomationRulesApiController extends Controller
             }
         }
         foreach ($actions as $action) {
-            $schema = $action::getSchema();
-            $triggerActionSchema["actions"][$action::getType()] = $action::getBaseSchemaArray();
-            if (!empty($schema->getSchemaArray())) {
-                $triggerActionSchema["actions"][$action::getType()]["schema"] = $schema;
+            try {
+                $schema = $action::getSchema();
+                $triggerActionSchema["actions"][$action::getType()] = $action::getBaseSchemaArray();
+                if (!empty($schema->getSchemaArray())) {
+                    $triggerActionSchema["actions"][$action::getType()]["schema"] = $schema;
+                }
+            } catch (\Exception $e) {
+                // Don't break return available schema
+                unset($triggerActionSchema["actions"][$action::getType()]);
             }
         }
 
         $result = $out->validate($triggerActionSchema);
         return new Data($result);
+    }
+
+    /**
+     * Get meta data for a specific automation rule action.
+     *
+     * @param array $query
+     * @return Data
+     */
+    public function get_actionByType(array $query)
+    {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema(["type:s" => "Type used to look up automation action"], ["ActionByTypeGet", "in"]);
+
+        $query = $in->validate($query);
+
+        /** @var class-string<AutomationAction>|null $action */
+        $action = $this->automationRuleService->getAction($query["type"]);
+
+        if (is_null($action)) {
+            throw new NotFoundException("Action");
+        }
+
+        $actionSchema = $action::getBaseSchemaArray();
+        $schema = $action::getSchema();
+
+        $conditionalSettings = $action::getConditionalSettingsSchema($query);
+        if (!empty($conditionalSettings)) {
+            $schema->merge(Schema::parse(["conditionalSettings" => $conditionalSettings]));
+        }
+
+        if (!empty($schema->getSchemaArray())) {
+            $actionSchema["schema"] = $schema;
+        }
+
+        return new Data($actionSchema);
     }
 
     /**

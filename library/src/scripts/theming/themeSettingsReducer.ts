@@ -41,7 +41,7 @@ const DEFAULT_THEMES_STATE: IThemesState = {
     deleteThemeByID: {},
 };
 
-export const themeSettingsReducer = produce(
+export const themeSettingsReducer: any = produce(
     reducerWithInitialState<IThemesState>(DEFAULT_THEMES_STATE)
         .case(ThemeActions.getAllThemes_ACS.started, (nextState, payload) => {
             nextState.themes.status = LoadStatus.LOADING;

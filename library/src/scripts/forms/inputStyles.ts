@@ -16,7 +16,8 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { important, percent } from "csx";
 import merge from "lodash-es/merge";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { IBorderStyles, ISimpleBorderStyle, IMixedBorderStyles } from "@library/styles/cssUtilsTypes";
 
 export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -78,14 +79,7 @@ export const inputMixin = (vars?: {
 }): CSSObject => {
     const variables = inputMixinVars(vars);
     const globalVars = globalVariables();
-    const {
-        sizing,
-        font = Variables.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
-        }),
-        colors,
-        border,
-    } = variables;
+    const { sizing, font, colors, border } = variables;
 
     return {
         ...textInputSizingFromFixedHeight(sizing.height, font.size as number, border.width * 2),
@@ -94,7 +88,7 @@ export const inputMixin = (vars?: {
         ...Mixins.border(border),
         ...Mixins.font(font),
         outline: 0,
-        height: sizing.height,
+        height: "auto",
         ...placeholderStyles({
             color: ColorsUtils.colorOut(colors.placeholder),
         }),

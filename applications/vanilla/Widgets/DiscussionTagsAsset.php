@@ -35,16 +35,12 @@ class DiscussionTagsAsset extends AbstractLayoutAsset implements HydrateAwareInt
 
     public function getProps(): ?array
     {
-        $discussionID = $this->getHydrateParam("discussionID");
-        $tags = $this->getHydrateParam("discussion.tags");
-        if ($discussionID) {
-            $props =
-                [
-                    "tags" => $tags,
-                ] + $this->props;
-            return $props;
-        }
-        return $this->props;
+        $tags = $this->getHydrateParam("tags") ?? [];
+        $props =
+            [
+                "tags" => $tags,
+            ] + $this->props;
+        return $props;
     }
 
     public function renderSeoHtml(array $props): ?string
@@ -78,18 +74,21 @@ TWIG
         return "DiscussionTagAsset";
     }
 
+    /**
+     * @inheritDoc
+     */
     public static function getWidgetIconPath(): ?string
     {
-        return "";
+        return "/applications/dashboard/design/images/widgetIcons/Tag.svg";
     }
 
     public static function getWidgetSchema(): Schema
     {
         $schema = SchemaUtils::composeSchemas(
-            self::widgetTitleSchema("Type your title here", false, "Find more posts tagged with"),
-            self::widgetSubtitleSchema("Type your subtitle here"),
-            self::widgetDescriptionSchema(),
-            self::containerOptionsSchema("containerOptions", null, true)
+            self::widgetTitleSchema(defaultValue: "Find more posts tagged with", allowDynamic: false),
+            self::widgetSubtitleSchema(),
+            self::widgetDescriptionSchema(allowDynamic: false),
+            self::containerOptionsSchema("containerOptions", minimalProperties: true, visualBackgroundType: "outer")
         );
 
         return $schema;

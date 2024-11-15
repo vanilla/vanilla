@@ -53,10 +53,6 @@ trait MockSiteTestTrait
     {
         parent::configureContainerBeforeStartup($container);
         self::configureMockSiteContainer($container);
-
-        // No caching of models.
-        $container->rule(\Gdn_Model::class)->setShared(false);
-        $container->rule(Model::class)->setShared(false);
     }
 
     /**

@@ -6,34 +6,32 @@
 
 namespace Vanilla\AutomationRules\Actions;
 
-use CommentModel;
-use DiscussionModel;
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
 use Gdn;
 use RoleModel;
-use UserModel;
 use Vanilla\Dashboard\AutomationRules\Models\EscalationRuleDataType;
 use Vanilla\Dashboard\AutomationRules\Models\PostInterface;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
-use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\Forms\StaticFormChoices;
-use Vanilla\Forum\Models\CommunityManagement\CommunityManagementRecordModel;
+use Vanilla\Forum\Controllers\Api\EscalationsApiController;
+use Vanilla\Forum\Controllers\Api\ReportsApiController;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
-use Vanilla\Forum\Models\VanillaEscalationAttachmentProvider;
+use Vanilla\Forum\Models\CommunityManagement\ReportModel;
+use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Logger;
 use Vanilla\Models\Model;
 
-class CreateEscalationAction extends AutomationAction implements PostInterface
+class CreateEscalationAction extends ExternalAction implements PostInterface
 {
     public string $affectedRecordType = "Discussion";
 
-    private array $postRecord;
+    private const AUTOMATION_REPORT_BODY = '[{"children":[{"text":"Automation generated report"}],"type":"p"}]';
     /**
      * @inheridoc
      */
@@ -129,6 +127,12 @@ class CreateEscalationAction extends AutomationAction implements PostInterface
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
+        //check the type of object
+        if (!isset($object["recordID"]) && isset($object["DiscussionID"])) {
+            $object["recordID"] = $object["DiscussionID"];
+            $object["recordType"] = "discussion";
+            $object["recordName"] = $object["Name"] ?? "";
+        }
         $this->setPostRecord($object);
         return $this->execute();
     }
@@ -139,125 +143,261 @@ class CreateEscalationAction extends AutomationAction implements PostInterface
     public function execute(): bool
     {
         $object = $this->getPostRecord();
-        $recordID = $object["recordID"];
-        $recordType = $object["recordType"];
-        $createEscalationRule = $this->getAutomationRule();
-        $escalationsModel = \Gdn::getContainer()->get(EscalationModel::class);
-        // Make sure the post is not already escalated
-        $escalation =
-            $escalationsModel->queryEscalations([
-                "recordType" => $recordType,
-                "recordID" => $recordID,
-            ])[0] ?? null;
-        $escalationID = $escalation["escalationID"] ?? null;
-        $attributes = [
-            "affectedRecordType" => $recordType,
-            "estimatedRecordCount" => 1,
-            "affectedRecordCount" => 1,
-        ];
+        $longRunner = false;
         // Mark the dispatch as running
         if (!$this->dispatched) {
+            $attributes = [
+                "affectedRecordType" => $object["recordType"],
+                "estimatedRecordCount" => 1,
+                "affectedRecordCount" => 0,
+            ];
             $this->logDispatched(AutomationRuleDispatchesModel::STATUS_RUNNING, null, $attributes);
-        }
-        try {
-            if ($escalation === null) {
-                $record = [];
-                if ($recordType == "discussion") {
-                    $discussionModel = \Gdn::getContainer()->get(DiscussionModel::class);
-                    $record = $discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
-                } elseif ($recordType == "comment") {
-                    $commentModel = \Gdn::getContainer()->get(CommentModel::class);
-                    $record = $commentModel->getID($recordID, DATASET_TYPE_ARRAY);
-                }
-                $escalationID = $escalationsModel->insert([
-                    "name" => $object["recordName"],
-                    "status" => EscalationModel::STATUS_OPEN,
-                    "assignedUserID" => $createEscalationRule["action"]["actionValue"]["assignedModeratorID"] ?? null,
-                    "countComments" => 0,
-                    "recordType" => $recordType,
-                    "recordID" => $recordID,
-                    "recordUserID" => $record["InsertUserID"] ?? null,
-                    "recordDateInserted" => $record["DateInserted"] ?? null,
-                    "placeRecordType" => "category",
-                    "placeRecordID" => $object["placeRecordID"] ?? 0,
-                    "insertUserID" => GDN::userModel()->getSystemUserID(),
-                ]);
-            }
-            $escalationsModel->escalateReportsForEscalation($escalationID);
-            $recordIsLive = $createEscalationRule["action"]["actionValue"]["recordIsLive"];
-            if (!$recordIsLive) {
-                $communityManagementRecordModel = \Gdn::getContainer()->get(CommunityManagementRecordModel::class);
-                $communityManagementRecordModel->removeRecord($recordID, $recordType);
-            }
-
-            $rows = $escalationsModel->queryEscalations(
-                [
-                    "escalationID" => $escalationID,
-                ],
-                [Model::OPT_LIMIT => 1]
+        } else {
+            $longRunner = true;
+            $attributes = [
+                "affectedRecordType" => $object["recordType"],
+            ];
+            $this->automationRuleDispatchesModel->updateDispatchStatus(
+                $this->getDispatchUUID(),
+                AutomationRuleDispatchesModel::STATUS_RUNNING,
+                $attributes
             );
-            $result = $rows[0] ?? null;
-            $attachmentProvider = \Gdn::getContainer()->get(VanillaEscalationAttachmentProvider::class);
-            $attachmentProvider->createAttachmentFromEscalation($result);
-        } catch (\Exception $e) {
-            // Log the error
-            $this->logger->error("Error occurred while updating record Status", [
-                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
-                Logger::FIELD_TAGS => ["automationRules", "changeIdeationStatusAction"],
-                "error" => $e->getMessage(),
-                "recordID" => $recordID,
-                "recordType" => $recordType,
-                "automationRuleID" => $createEscalationRule["automationRuleID"],
-                "automationRuleRevisionID" => $createEscalationRule["automationRuleRevisionID"],
-            ]);
-            // Mark the dispatch as failed
-            if ($this->dispatchType == AutomationRuleDispatchesModel::TYPE_TRIGGERED) {
-                $attributes["affectedRecordCount"] = 0;
+        }
+        $reportModel = Gdn::getContainer()->get(ReportModel::class);
+        $automationRule = $this->getAutomationRule();
+
+        if (empty($object["reportID"])) {
+            if ($this->dispatchType === AutomationRuleDispatchesModel::TYPE_MANUAL) {
+                // For manual dispatches, we will create a report no matter what
+                $object["reportID"] = $this->createReport($object["recordID"], $object["recordType"]);
+            } else {
+                // This is not report post escalation we need to make sure if this was reported previously
+                $where = [
+                    "r.recordType" => $object["recordType"],
+                    "r.recordID" => $object["recordID"],
+                    "r.placeRecordType" => "category",
+                    "r.placeRecordID" => $object["CategoryID"],
+                ];
+                $report = $reportModel->selectVisibleReports($where, [Model::OPT_LIMIT => 1]);
+                if (!empty($report)) {
+                    $report = $report[0];
+                    // If report was already escalated there is no need to escalate it again, so we can log and skip this action
+                    if ($report["status"] != ReportModel::STATUS_NEW) {
+                        $this->addLog("info", "The report has been escalated previously.", [
+                            "recordID" => $object["recordID"],
+                            "recordType" => $object["recordType"],
+                            "reportID" => $report["reportID"],
+                            "status" => $report["status"],
+                        ]);
+                        $this->automationRuleDispatchesModel->updateDispatchStatus(
+                            $this->getDispatchUUID(),
+                            AutomationRuleDispatchesModel::STATUS_WARNING,
+                            [],
+                            "Skipping escalation as it was already escalated."
+                        );
+                        return true;
+                    }
+                    $object["reportID"] = $report["reportID"];
+                } else {
+                    // If the post was not reported, we need to create a new report and escalate it
+                    $object["reportID"] = $this->createReport($object["recordID"], $object["recordType"]);
+                }
+            }
+        }
+
+        if (!($object["reportID"] ?? false) || !$this->checkIfReportNeedsEscalation($object["reportID"])) {
+            if (!$longRunner) {
                 $this->automationRuleDispatchesModel->updateDispatchStatus(
                     $this->getDispatchUUID(),
-                    AutomationRuleDispatchesModel::STATUS_FAILED,
-                    $attributes,
-                    $e->getMessage()
+                    AutomationRuleDispatchesModel::STATUS_WARNING,
+                    [],
+                    "Skipped generating escalation."
                 );
             }
-            return false;
+            return true;
         }
-        $this->logger->info("Post escalated.", [
-            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
-            Logger::FIELD_TAGS => ["automation rules", "createEscalationAction"],
-            "recordID" => $recordID,
-            "recordType" => $recordType,
-            "automationRuleID" => $this->getAutomationRuleID(),
-            "dispatchUUID" => $this->getDispatchUUID(),
-        ]);
-
-        $logData = [
-            "DispatchUUID" => $this->getDispatchUUID(),
-        ];
+        //Escalate the record
+        $escalationID = $this->escalate($object, $longRunner);
+        //Log the data
         $log = [
-            "RecordType" => $recordType,
-            "RecordID" => $recordID,
-            "AutomationRuleRevisionID" => $createEscalationRule["automationRuleRevisionID"],
+            "RecordType" => $object["recordType"],
+            "RecordID" => $object["recordID"],
+            "AutomationRuleRevisionID" => $automationRule["automationRuleRevisionID"],
             "Data" => [
                 "createEscalationAction" => [
-                    "recordType" => $recordType,
-                    "recordID" => $recordID,
+                    "recordType" => $object["recordType"],
+                    "recordID" => $object["recordID"],
                     "escalationID" => $escalationID,
                 ],
             ],
             "DispatchUUID" => $this->getDispatchUUID(),
         ];
         $this->insertLogEntry($log);
-
-        if ($this->dispatchType === AutomationRuleDispatchesModel::TYPE_TRIGGERED) {
+        if (!$longRunner) {
+            //This is a single record dispatch mark this as success
             $this->automationRuleDispatchesModel->updateDispatchStatus(
                 $this->getDispatchUUID(),
                 AutomationRuleDispatchesModel::STATUS_SUCCESS,
-                $attributes
+                ["affectedRecordCount" => 1],
+                ""
             );
-            $this->automationRuleDispatchesModel->updateDateFinished($logData["DispatchUUID"]);
         }
         return true;
+    }
+
+    /**
+     * Check if the report needs to be escalated
+     *
+     * @param int $reportID
+     * @return bool
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws \Throwable
+     */
+    private function checkIfReportNeedsEscalation(int $reportID): bool
+    {
+        $sql = Gdn::sql();
+        $result = $sql
+            ->select([
+                "r.reportID",
+                "r.status as reportStatus",
+                "r.recordID",
+                "r.recordType",
+                "e.escalationID",
+                "e.status as escalationStatus",
+            ])
+            ->from("report r")
+            ->leftJoin("escalation e", "e.recordID = r.recordID AND e.recordType = r.recordType ")
+            ->where(["r.reportID" => $reportID, "e.status <>" => EscalationModel::STATUS_DONE])
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+        if (empty($result["escalationID"])) {
+            return true;
+        }
+        // There is an existing escalation in progress. Add the report to the escalation
+        $escalationsModel = \Gdn::getContainer()->get(EscalationModel::class);
+        $escalationsModel->escalateReportsForEscalation($result["escalationID"]);
+        return false;
+    }
+
+    /**
+     * Escalate a post or comment
+     *
+     * @param array $record
+     * @param bool $longRunningJob
+     */
+    private function escalate(array $record, bool $longRunningJob = false): int
+    {
+        $escalationsApiController = Gdn::getContainer()->get(EscalationsApiController::class);
+        $automationRule = $this->getAutomationRule();
+        $actionValue = $automationRule["action"]["actionValue"];
+        $escalationRecord = [
+            "recordIsLive" => $actionValue["recordIsLive"] ?? false,
+            "recordID" => $record["recordID"],
+            "recordType" => $record["recordType"],
+            "name" => $record["recordName"] ?? ($record["Name"] ?? ""),
+            "automation" => true,
+        ];
+        if (isset($actionValue["assignedModeratorID"])) {
+            $escalationRecord["assignedUserID"] = $actionValue["assignedModeratorID"];
+        }
+        if (isset($record["reportID"])) {
+            $escalationRecord["reportID"] = $record["reportID"];
+        } else {
+            $escalationRecord["noteBody"] = self::AUTOMATION_REPORT_BODY;
+            $escalationRecord["noteFormat"] = Rich2Format::FORMAT_KEY;
+            $escalationRecord["reportReasonIDs"] = [ReportReasonModel::INITIAL_REASON_AUTOMATION_RULE];
+        }
+
+        $exceptionData = [
+            "recordID" => $record["recordID"],
+            "recordType" => $record["recordType"],
+        ];
+        try {
+            $result = $escalationsApiController->post($escalationRecord);
+        } catch (\Throwable $e) {
+            $exceptionData["error"] = $e->getMessage();
+            $this->addLog("error", "Error occurred while escalating record", $exceptionData);
+            if (!$longRunningJob) {
+                $this->automationRuleDispatchesModel->updateDispatchStatus(
+                    $this->getDispatchUUID(),
+                    AutomationRuleDispatchesModel::STATUS_FAILED,
+                    [],
+                    $e->getMessage()
+                );
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            $exceptionData["error"] = $e->getMessage();
+            $this->addLog("error", "Error occurred while escalating record", $exceptionData);
+            if (!$longRunningJob) {
+                $this->automationRuleDispatchesModel->updateDispatchStatus(
+                    $this->getDispatchUUID(),
+                    AutomationRuleDispatchesModel::STATUS_FAILED,
+                    [],
+                    $e->getMessage()
+                );
+            }
+            throw $e;
+        }
+        $this->addLog("info", "Post escalated.", [
+            "recordID" => $record["recordID"],
+            "recordType" => $record["recordType"],
+            "automationRuleID" => $this->getAutomationRuleID(),
+        ]);
+        return $result["escalationID"];
+    }
+
+    /**
+     * create a report for particular record
+     *
+     * @param int $recordID
+     * @param string $recordType
+     * @return int
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws \Garden\Web\Exception\ClientException
+     * @throws \Garden\Web\Exception\NotFoundException
+     */
+    private function createReport(int $recordID, string $recordType): int
+    {
+        if (!in_array($recordType, ["discussion", "comment"])) {
+            throw new \InvalidArgumentException("Invalid record type");
+        }
+        $reportApiController = Gdn::getContainer()->get(ReportsApiController::class);
+        $report = [
+            "recordID" => $recordID,
+            "recordType" => $recordType,
+            "reportReasonIDs" => [ReportReasonModel::INITIAL_REASON_AUTOMATION_RULE],
+            "noteBody" => self::AUTOMATION_REPORT_BODY,
+            "noteFormat" => Rich2Format::FORMAT_KEY,
+            "automation" => true,
+        ];
+        $result = $reportApiController->post($report);
+        return $result["reportID"];
+    }
+
+    /**
+     * Add log entry
+     *
+     * @param $type
+     * @param $message
+     * @param $data
+     * @return void
+     */
+    private function addLog($type, $message, $data): void
+    {
+        $this->logger->$type(
+            $message,
+            array_merge(
+                [
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                    Logger::FIELD_TAGS => ["automationRules", "createEscalationAction"],
+                    "dispatchUUID" => $this->getDispatchUUID(),
+                ],
+                $data
+            )
+        );
     }
 
     /**
@@ -271,6 +411,7 @@ class CreateEscalationAction extends AutomationAction implements PostInterface
             ],
             "recordIsLive?" => [
                 "type" => "boolean",
+                "default" => false,
             ],
         ]);
 
@@ -300,10 +441,10 @@ class CreateEscalationAction extends AutomationAction implements PostInterface
                 ],
                 [Model::OPT_LIMIT => 1]
             );
-            $result = $rows[0] ?? null;
-            foreach ($result as $index => $tag) {
-                $isLastOrOnlyItem = count($result) === 1 || (count($result) > 1 && $index === count($result) - 1);
-                $result .= $tag["Name"] . ($isLastOrOnlyItem ? " " : ", ");
+            $rowResult = $rows[0] ?? null;
+            if ($rowResult !== null) {
+                $result .= "<div id='escalation'><b>" . t("Escalated {$rowResult["recordType"]}") . ":</b>";
+                $result .= $rowResult["name"] . "</div>";
             }
             $result .= "</div>";
         }

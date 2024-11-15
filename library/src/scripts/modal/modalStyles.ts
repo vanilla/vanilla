@@ -15,7 +15,8 @@ import { Mixins } from "@library/styles/Mixins";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent } from "csx";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export const modalVariables = useThemeCache(() => {
@@ -35,6 +36,7 @@ export const modalVariables = useThemeCache(() => {
 
     const sizing = makeThemeVars("sizing", {
         xl: 1022, // from legacy back-end modals
+        xxl: 1320,
         large: 720,
         medium: 516,
         small: 375,
@@ -94,7 +96,7 @@ export const modalClasses = useThemeCache(() => {
     //we'll give the zIndex to child elements to support the stacking behaviour
     const stackingZindex = useThemeCache((zIndex: number = 1050) =>
         css({
-            zIndex,
+            zIndex: zIndex + 1,
             position: "absolute",
         }),
     );
@@ -179,6 +181,11 @@ export const modalClasses = useThemeCache(() => {
                 height: percent(100),
                 maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
             },
+            "&.isXXL": {
+                width: styleUnit(vars.sizing.xxl),
+                height: percent(100),
+                maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
+            },
             "&.isLarge": {
                 width: styleUnit(vars.sizing.large),
                 maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
@@ -228,21 +235,6 @@ export const modalClasses = useThemeCache(() => {
                 ...shadows.dropDown(),
                 ...Mixins.border(globalVars.borderType.modals),
             },
-            ".form-group": {
-                marginLeft: styleUnit(-16),
-                marginRight: styleUnit(-16),
-                width: `calc(100% + (${styleUnit(16)} * 2))`,
-                "&.formGroup-radio": {
-                    alignItems: "start",
-                    "& + .formGroup-radio": {
-                        paddingTop: 16,
-                    },
-                    // to align the radio buttons with the labels
-                    "& .input-wrap > label:first-of-type": {
-                        paddingTop: 0,
-                    },
-                },
-            },
             "&.noTransform": {
                 transform: "none !important",
             },
@@ -256,11 +248,11 @@ export const modalClasses = useThemeCache(() => {
     });
 
     const scroll = style("scroll", {
-        // ...absolutePosition.fullSizeOfParent(),
         width: percent(100),
         height: percent(100),
         maxHeight: percent(100),
         overflow: "auto",
+        scrollPaddingTop: 80,
     });
 
     const content = style("content", shadows.modal());

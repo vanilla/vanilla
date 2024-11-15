@@ -26,7 +26,15 @@ const StoryTabbedCommentList = () => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <TabbedCommentListAssetPreview />
+            <TabbedCommentListAssetPreview
+                threadStyle={"nested"}
+                tabTitles={{
+                    all: "Comments",
+                    accepted: "Accepted Answers",
+                    rejected: "Rejected Answers",
+                }}
+                apiParams={{ collapseChildDepth: 4, discussionID: 4, limit: 10, page: 1 }}
+            />
         </QueryClientProvider>
     );
 };

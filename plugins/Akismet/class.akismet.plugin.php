@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2008-2022 Vanilla Forums, Inc.
+ * @copyright 2008-2024 Vanilla Forums, Inc.
  * @license GPLv2
  */
 
@@ -52,7 +52,7 @@ class AkismetPlugin extends Gdn_Plugin
      * Query the Akismet service.
      *
      * @param array $recordType The recordType.
-     * @param string $data The data being passed.
+     * @param array $data The data being passed.
      *
      * @return bool
      * @throws Exception Throws exception.
@@ -72,7 +72,11 @@ class AkismetPlugin extends Gdn_Plugin
         $akismet->setCommentAuthor($data["Username"]);
         $akismet->setCommentAuthorEmail($data["Email"]);
 
-        $body = concatSep("\n\n", val("Name", $data), val("Body", $data), val("Story", $data));
+        $bodyPlainText = isset($data["Body"], $data["Format"])
+            ? Gdn::formatService()->renderPlainText($data["Body"], $data["Format"])
+            : $data["Body"] ?? null;
+
+        $body = implode("\n\n", array_filter([$data["Name"] ?? null, $bodyPlainText]));
         $akismet->setCommentContent($body);
         $akismet->setUserIP($data["IPAddress"]);
 
@@ -131,6 +135,7 @@ class AkismetPlugin extends Gdn_Plugin
      *
      * @param Gdn_Controller $sender The controller firing the event.
      * @param array $args The arguments sent by the event.
+     * @throws Exception
      */
     public function base_checkSpam_handler($sender, $args)
     {
@@ -161,7 +166,6 @@ class AkismetPlugin extends Gdn_Plugin
             case "Activity":
             case "ActivityComment":
                 $result = $this->checkAkismet($recordType, $data);
-                //                $result = true;
                 if ($result) {
                     $data["Log_InsertUserID"] = $this->userID();
                 }

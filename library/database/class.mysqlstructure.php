@@ -172,7 +172,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure
         // Get the schema for this table
         $oldPrefix = $this->Database->DatabasePrefix;
         $this->Database->DatabasePrefix = $this->_DatabasePrefix;
-        $schema = $this->Database->sql()->fetchTableSchema($this->_TableName);
+        $schema = $this->Database->sql()->fetchTableSchema($this->_TableName, true);
         $this->Database->DatabasePrefix = $oldPrefix;
 
         // Get the definition for this column

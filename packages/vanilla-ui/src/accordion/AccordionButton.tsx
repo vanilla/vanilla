@@ -5,5 +5,7 @@
  */
 
 import * as Reach from "@reach/accordion";
+import React from "react";
 
-export const AccordionButton = Reach.AccordionButton;
+export const AccordionButton: React.ComponentType<{ children?: React.ReactNode; className?: string }> =
+    Reach.AccordionButton;

@@ -37,8 +37,6 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
     );
 
     const classes = rangePickerClasses();
-    const fromMonth = useMemo(() => moment(fromDate).add(1, "month").toDate(), [fromDate]);
-    const toMonth = useMemo(() => moment(toDate).subtract(1, "month").toDate(), [toDate]);
 
     const handleClick = (date: Date) => {
         if (!setRange) return;
@@ -90,7 +88,7 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
                     onDayClick={handleClick}
                     disabledDays={{ after: new Date() }}
                     navbarElement={DatePickerNav}
-                    toMonth={toMonth}
+                    toMonth={toDate}
                     captionElement={() => <></>}
                 />
                 <DayPicker
@@ -104,7 +102,7 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
                     disabledDays={{ after: new Date() }}
                     navbarElement={DatePickerNav}
                     toMonth={new Date()}
-                    fromMonth={fromMonth}
+                    fromMonth={fromDate}
                     captionElement={() => <></>}
                 />
             </section>

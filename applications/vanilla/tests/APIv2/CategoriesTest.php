@@ -12,6 +12,7 @@ use CategoryModel;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use UserModel;
+use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Scheduler\Job\LongRunnerJob;
 use Vanilla\Scheduler\LongRunner;
@@ -1261,5 +1262,62 @@ class CategoriesTest extends AbstractResourceTest
             ->get("/categories/$categoryID")
             ->getBody();
         self::assertEquals(1, $category["countFollowers"]);
+    }
+
+    /**
+     * Tests the `/api/v2/categories/suggested` endpoint.
+     *
+     * @return void
+     */
+    public function testCategoriesSuggested()
+    {
+        $this->enableFeature(InterestModel::SUGGESTED_CONTENT_FEATURE_FLAG);
+        $this->runWithConfig([InterestModel::CONF_SUGGESTED_CONTENT_ENABLED => true], function () {
+            $user = $this->createUser();
+            $testProfileField = $this->createProfileField(["dataType" => "boolean", "formType" => "checkbox"]);
+
+            $category1 = $this->createCategory();
+            $category2 = $this->createCategory();
+
+            // Create interest associated with profile fields.
+            $this->createInterest([
+                "name" => "test",
+                "apiName" => "test",
+                "categoryIDs" => [$category1["categoryID"]],
+                "profileFieldMapping" => [
+                    $testProfileField["apiName"] => true,
+                ],
+            ]);
+
+            // Create default interest.
+            $this->createInterest([
+                "name" => "test-2",
+                "apiName" => "test-2",
+                "categoryIDs" => [$category2["categoryID"]],
+                "isDefault" => true,
+            ]);
+
+            $this->runWithUser(function () use ($user, $testProfileField) {
+                $suggested = $this->api()
+                    ->get($this->baseUrl . "/suggested")
+                    ->getBody();
+
+                // Should have one category which is from the default interest.
+                $this->assertCount(1, $suggested);
+
+                $this->api()->patch("/users/{$user["userID"]}/profile-fields", [
+                    $testProfileField["apiName"] => true,
+                ]);
+
+                $suggested = $this->api()
+                    ->get($this->baseUrl . "/suggested")
+                    ->getBody();
+
+                // Should have the category for the default interest and the one based on filters.
+                $this->assertCount(2, $suggested);
+            }, $user);
+        });
+
+        $this->disableFeature(InterestModel::SUGGESTED_CONTENT_FEATURE_FLAG);
     }
 }

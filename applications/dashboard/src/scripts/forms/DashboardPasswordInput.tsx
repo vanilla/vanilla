@@ -14,9 +14,13 @@ import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import Button from "@library/forms/Button";
 import gdn from "@library/gdn";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
+import { cx } from "@emotion/css";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
+import { generateString } from "@vanilla/utils";
 
 interface IProps extends IInputTextProps {
-    onChange: (newValue: string) => void;
+    onChange?: (newValue: string) => void;
     errors?: IFieldError[];
     disabled?: boolean;
     renderGeneratePasswordButton?: boolean;
@@ -25,15 +29,16 @@ interface IProps extends IInputTextProps {
 export function DashboardPasswordInput(props: IProps) {
     const { inputProps, renderGeneratePasswordButton } = props;
     const { inputID } = useFormGroup();
+    const classes = dashboardFormGroupClasses();
 
     return (
-        <div className={"input-wrap"}>
+        <DashboardInputWrap>
             <InputBlock errors={props.errors} noMargin extendErrorMessage>
                 <PasswordInput
                     id={inputID}
                     showUnmask
                     onChange={(event) => {
-                        props.onChange(event.target.value);
+                        props.onChange?.(event.target.value);
                     }}
                     value={inputProps?.value}
                     aria-label={t(inputProps?.["aria-label"] ?? "Current Password")}
@@ -46,13 +51,13 @@ export function DashboardPasswordInput(props: IProps) {
                     <Button
                         buttonType={ButtonTypes.OUTLINE}
                         onClick={() => {
-                            props.onChange(gdn.generateString(inputProps?.minLength ?? 12));
+                            props.onChange?.(generateString(inputProps?.minLength ?? 12));
                         }}
                     >
                         {t("Generate Password")}
                     </Button>
                 </InputBlock>
             )}
-        </div>
+        </DashboardInputWrap>
     );
 }

@@ -22,6 +22,10 @@ export const triageListItemClasses = () => {
         justifyContent: "space-between",
         padding: 16,
         gap: 16,
+        container: "triageItem / inline-size",
+        "& .embedResponsive": {
+            maxWidth: "85cqw",
+        },
     });
 
     const metaLine = css({

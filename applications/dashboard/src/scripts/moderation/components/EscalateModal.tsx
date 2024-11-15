@@ -30,9 +30,14 @@ import { t } from "@vanilla/i18n";
 import { JSONSchemaType, JsonSchemaForm, PartialSchemaDefinition } from "@vanilla/json-schema-forms";
 import { useEffect, useMemo, useState } from "react";
 import { labelize } from "@vanilla/utils";
-import { IApiError } from "@library/@types/api/core";
+import { IApiError, IServerError } from "@library/@types/api/core";
 import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
+import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import { ErrorIcon } from "@library/icons/common";
+import Message from "@library/messages/Message";
+import { css } from "@emotion/css";
 
 interface IProps {
     escalationType: "report" | "record";
@@ -41,6 +46,7 @@ interface IProps {
     report?: IReport | null;
     isVisible: boolean;
     onClose: () => void;
+    onSuccess?: () => Promise<void>;
 }
 
 interface EscalateForm {
@@ -135,14 +141,19 @@ const initialFormValues: EscalateForm = {
     status: EscalationStatus.OPEN,
     removePost: false,
     removeMethod: "wipe",
-    initialCommentBody: JSON.stringify([{ children: [{ text: "" }], type: "p" }]),
+    initialCommentBody: JSON.stringify(EMPTY_RICH2_BODY),
     initialCommentFormat: "rich2",
 };
+
+const errorMessageSpacing = css({
+    marginBlockEnd: 16,
+});
 
 export function EscalateModal(props: IProps) {
     const { escalationType, report, record, recordType, isVisible, onClose } = props;
 
     const [values, setValues] = useState<EscalateForm>(initialFormValues);
+    const [serverErrors, setServerErrors] = useState<IServerError | null>(null);
     const toast = useToast();
 
     useEffect(() => {
@@ -154,20 +165,11 @@ export function EscalateModal(props: IProps) {
             }));
         }
         if (escalationType === "record" && record) {
-            if (recordType === "discussion") {
-                setValues((prev) => ({
-                    ...prev,
-                    name: (record as IDiscussion).name,
-                    status: "open",
-                }));
-            }
-            if (recordType === "comment") {
-                setValues((prev) => ({
-                    ...prev,
-                    name: (record as IComment).name,
-                    status: "open",
-                }));
-            }
+            setValues((prev) => ({
+                ...prev,
+                name: (record as IDiscussion).name,
+                status: "open",
+            }));
         }
     }, [escalationType, report, recordType, record, isVisible]);
 
@@ -208,6 +210,7 @@ export function EscalateModal(props: IProps) {
 
     const createEscalation = useMutation<IEscalation, IApiError, EscalateForm>({
         mutationFn: async (escalation) => {
+            setServerErrors(null);
             const makePayload = {
                 name: escalation.name,
                 status: escalation.status,
@@ -229,16 +232,17 @@ export function EscalateModal(props: IProps) {
                 ...(escalationType === "record" &&
                     record && {
                         recordID: record?.["discussionID"] ?? record?.["commentID"],
-                        recordType: recordType,
+                        recordType: recordType === "comment" ? "comment" : "discussion",
                         reportReasonIDs: escalation.reportReasonIDs,
                     }),
             };
             const response = await apiv2.post(`/escalations`, makePayload);
             return response.data;
         },
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
             toast.addToast({
                 autoDismiss: false,
+                dismissible: true,
                 body: (
                     <Translate
                         source={"Escalation created. Go to: <0/>"}
@@ -250,12 +254,17 @@ export function EscalateModal(props: IProps) {
                     />
                 ),
             });
+            await props.onSuccess?.();
             onClose();
+        },
+        onError: (error) => {
+            setServerErrors(error.response.data);
         },
     });
 
     const handleClose = () => {
         setValues(initialFormValues);
+        setServerErrors(null);
         onClose();
     };
 
@@ -265,6 +274,15 @@ export function EscalateModal(props: IProps) {
                 header={<FrameHeader title={t("Create Escalation")} closeFrame={handleClose} />}
                 body={
                     <FrameBody hasVerticalPadding>
+                        {serverErrors && (
+                            <Message
+                                type="error"
+                                stringContents={serverErrors.message ?? "Validation Error"}
+                                icon={<ErrorIcon />}
+                                contents={<ErrorMessages errors={[serverErrors]} />}
+                                className={errorMessageSpacing}
+                            />
+                        )}
                         <JsonSchemaForm
                             disabled={createEscalation.isLoading}
                             fieldErrors={createEscalation?.error?.response.data?.errors}

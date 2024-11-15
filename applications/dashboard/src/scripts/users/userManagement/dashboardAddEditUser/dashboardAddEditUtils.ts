@@ -9,7 +9,13 @@ import {
 } from "@dashboard/users/userManagement/dashboardAddEditUser/DashboardAddEditUser";
 import { IUser } from "@library/@types/api/users";
 import { t } from "@vanilla/i18n";
-import { PartialSchemaDefinition, JSONSchemaType, JsonSchema, ICustomControl } from "@vanilla/json-schema-forms";
+import {
+    PartialSchemaDefinition,
+    JSONSchemaType,
+    JsonSchema,
+    ICustomControl,
+    type IFormControl,
+} from "@vanilla/json-schema-forms";
 import { DashboardAddEditUserFormValues } from "./DashboardAddEditUserForm";
 
 /**
@@ -157,6 +163,7 @@ export const getUserSchema = (
                 "x-control": {
                     label: t("Show email publicly"),
                     inputType: "checkBox",
+                    fullSize: true,
                 },
             },
             private: {
@@ -165,6 +172,7 @@ export const getUserSchema = (
                 "x-control": {
                     label: t("Show profile publicly"),
                     inputType: "checkBox",
+                    fullSize: true,
                 },
             },
         },
@@ -270,15 +278,21 @@ export const getUserSchema = (
         const initialRolesSchema = rolesSchema;
         let newRolesSchema: any = {};
         newRolesSchema.type = "object";
-        newRolesSchema["x-control"] = { label: t("Roles") };
         newRolesSchema["properties"] = {
-            roles: initialRolesSchema,
+            roles: {
+                ...initialRolesSchema,
+                "x-control": {
+                    ...initialRolesSchema["x-control"],
+                    noBorder: true,
+                },
+            },
             banned: {
                 type: "number",
                 "x-control": {
                     label: t("Banned"),
                     inputType: "checkBox",
-                },
+                    isNested: true,
+                } as IFormControl,
             },
         };
         newRolesSchema["required"] = ["roles"];
@@ -295,9 +309,6 @@ export const getUserSchema = (
 
     const emailSchema: JSONSchemaType<IEmailJson> = {
         type: "object",
-        "x-control": {
-            label: t("Email"),
-        },
         properties: {
             email: {
                 type: "string",
@@ -307,6 +318,7 @@ export const getUserSchema = (
                     errorPathString: "/email",
                     label: t("Email"),
                     inputType: "textBox",
+                    noBorder: true,
                 },
             },
             ...(isOwnUser && {
@@ -328,6 +340,8 @@ export const getUserSchema = (
                 "x-control": {
                     label: t("Email is confirmed"),
                     inputType: "checkBox",
+                    noBorder: true,
+                    isNested: true,
                 },
             },
             bypassSpam: {
@@ -336,6 +350,7 @@ export const getUserSchema = (
                 "x-control": {
                     label: t("Verified: Bypasses spam and pre-moderation filters"),
                     inputType: "checkBox",
+                    isNested: true,
                 },
             },
         },

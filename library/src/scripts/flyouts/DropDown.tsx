@@ -14,7 +14,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { Icon } from "@vanilla/icons";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
-import { useMeasure } from "@vanilla/react-utils";
+import { useMeasure, useStackingContext } from "@vanilla/react-utils";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { cx } from "@emotion/css";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -145,6 +145,7 @@ export default function DropDown(props: IDropDownProps) {
     const contentID = props.contentID ?? ID + "-contents";
 
     const buttonContents = props.buttonContents || <Icon icon="navigation-ellipsis" />;
+    const { zIndex } = useStackingContext();
 
     return (
         <FlyoutToggle
@@ -201,6 +202,7 @@ export default function DropDown(props: IDropDownProps) {
                                         return {
                                             ...position,
                                             top: adjustedTop,
+                                            zIndex: zIndex,
                                         };
                                     },
                                 }}
@@ -305,9 +307,11 @@ const resolveOpenDirection = (data: IResolveDirectionProps): DropDownOpenDirecti
     // Early bailout if we aren't auto.
     if (props.openDirection === DropDownOpenDirection.AUTO || (!props.openDirection && (!renderAbove || !renderLeft))) {
         if (!renderAbove) {
-            const documentHeight = document.body.clientHeight;
-            const centerY = (buttonRect.top + buttonRect.bottom) / 2; // center Y position of button
-            renderAbove = centerY > documentHeight / 2;
+            // We only want to render upwards if we don't fit downwards.
+            const endOfScreen = window.scrollY + window.innerHeight;
+            const contentHeight = contentRect.height === 0 ? window.innerHeight * 0.3 : contentRect.height;
+            const endOfDropdownIfPositionedBelow = buttonRect.bottom + contentHeight;
+            renderAbove = endOfDropdownIfPositionedBelow >= endOfScreen;
         }
         if (!renderLeft) {
             const documentWidth = document.body.clientWidth;

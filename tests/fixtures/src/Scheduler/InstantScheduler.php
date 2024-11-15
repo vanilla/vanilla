@@ -6,6 +6,7 @@
 
 namespace VanillaTests\Fixtures\Scheduler;
 
+use Exception;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Scheduler\Descriptor\JobDescriptorInterface;
@@ -33,6 +34,14 @@ class InstantScheduler extends DeferredScheduler
     protected $logErrorsAsWarnings = false;
 
     private $scheduledJobs = [];
+
+    /**
+     * @inheritDoc
+     */
+    public function clear(): void
+    {
+        $this->scheduledJobs = [];
+    }
 
     /**
      * Assert a job type was scheduled with a specific message.
@@ -75,6 +84,7 @@ class InstantScheduler extends DeferredScheduler
      *
      * @param JobDescriptorInterface $jobDescriptor
      * @return TrackingSlipInterface
+     * @throws Exception
      */
     public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface
     {

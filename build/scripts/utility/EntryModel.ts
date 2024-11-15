@@ -183,9 +183,9 @@ if (enabledAddonKeys.includes("${addonKey}")) {
     })
     .join("\n")}
 
-Promise.all(addonPromises).then((resolved) => {
+Promise.all(addonPromises).then(async (resolved) => {
     console.log("addon dependencies loaded", resolved.length);
-    bootstrapVanilla();
+    await bootstrapVanilla();
 });
         `;
 

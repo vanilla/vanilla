@@ -9,7 +9,6 @@ import { useRouteChangePrompt } from "@vanilla/react-utils";
 import { JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { LoadStatus } from "@library/@types/api/core";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
@@ -24,8 +23,9 @@ import { MemoryRouter } from "react-router";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { getEmailSettingsSchemas } from "@dashboard/emailSettings/EmailSettings.utils";
-import { extractDataByKeyLookup } from "@vanilla/json-schema-forms/src/utils";
+import { extractSchemaDefaults } from "@vanilla/json-schema-forms/src/utils";
 import { useFormik } from "formik";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 
 const EMAIL_STYLES_SECTION = "Email Styles";
 const OUTGOING_EMAILS_SECTION = "Outgoing Emails";
@@ -39,7 +39,7 @@ export function EmailSettings() {
     const [showTestEmailModal, setShowTestEmailModal] = useState<boolean>(false);
     const [showPreviewEmailModal, setShowPreviewEmailModal] = useState<boolean>(false);
 
-    const defaultValues = extractDataByKeyLookup(emailSettingsSchema, "default");
+    const defaultValues = extractSchemaDefaults(emailSettingsSchema);
 
     const isReady = isLoaded && !!settings.data;
 
@@ -161,7 +161,7 @@ export function EmailSettings() {
                                 )}
                             </DashboardFormSubheading>
 
-                            <JsonSchemaForm
+                            <DashboardSchemaForm
                                 disabled={!isLoaded}
                                 fieldErrors={error?.errors ?? {}}
                                 schema={
@@ -174,8 +174,6 @@ export function EmailSettings() {
                                         : getEmailSettingsSchemas().emailStylesSchema
                                 }
                                 instance={values}
-                                FormControlGroup={DashboardFormControlGroup}
-                                FormControl={DashboardFormControl}
                                 onChange={setValues}
                             />
                         </div>

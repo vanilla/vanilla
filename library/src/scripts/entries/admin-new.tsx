@@ -28,6 +28,7 @@ import { FeaturedCollectionsWidgetPreview } from "@library/featuredCollections/F
 import { CategoryFollowWidgetPreview } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown.preview";
 import { BreadcrumbsWidgetPreview } from "@library/navigation/Breadcrumbs.preview";
 import SectionEvenColumns from "@library/layout/SectionEvenColumns";
+import { SuggestedContentWidgetPreview } from "@library/suggestedContent/SuggestedContentWidget.preview";
 
 registerWidgetOverviews({
     // Sections
@@ -55,4 +56,5 @@ registerWidgetOverviews({
     FeaturedCollectionsWidget: FeaturedCollectionsWidgetPreview,
     CategoryFollowWidget: CategoryFollowWidgetPreview,
     Breadcrumbs: BreadcrumbsWidgetPreview,
+    SuggestedContentWidget: SuggestedContentWidgetPreview,
 });

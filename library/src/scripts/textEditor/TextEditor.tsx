@@ -2,16 +2,16 @@ import React, { useState, useContext, useEffect } from "react";
 import Editor, { loader as monaco, OnChange, OnMount } from "@monaco-editor/react";
 import { DarkThemeIcon, LightThemeIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
-import { assetUrl, getMeta, siteUrl } from "@library/utility/appUtils";
-import { editor as Monaco } from "monaco-editor/esm/vs/editor/editor.api";
+import { getMeta, siteUrl } from "@library/utility/appUtils";
+import type { editor as Monaco } from "monaco-editor/esm/vs/editor/editor.api";
 import { cx } from "@emotion/css";
+import type { JsonSchema } from "@library/json-schema-forms";
 
 // FIXME: [VNLA-1206] https://higherlogic.atlassian.net/browse/VNLA-1206
 if (process.env.NODE_ENV !== "test") {
     monaco.config({
         paths: {
-            // @ts-ignore: DIST_NAME comes from webpack.
-            vs: assetUrl(`/dist/v2/monaco-editor-30-1/min/vs`),
+            vs: siteUrl(`/dist/v2/monaco-editor-52-0/min/vs`),
         },
     });
 }
@@ -19,6 +19,7 @@ export interface ITextEditorProps {
     language: string;
     // A URI pointing to a JSON schema to validate the document with.
     jsonSchemaUri?: string;
+    jsonSchema?: JsonSchema;
     typescriptDefinitions?: string;
     value?: string;
     onChange?: OnChange;
@@ -63,6 +64,13 @@ const minimalOptions: Monaco.IEditorConstructionOptions = {
     folding: false,
     lineDecorationsWidth: 12,
     lineNumbersMinChars: 3,
+    inlineSuggest: {
+        enabled: true,
+    },
+    suggest: {
+        showInlineDetails: true,
+        preview: true,
+    },
     wordWrap: "on",
 };
 
@@ -95,7 +103,7 @@ const overrideServices = {
 };
 
 export default function TextEditor(props: ITextEditorProps) {
-    const { language, value, onChange } = props;
+    const { language, value, onChange, jsonSchema } = props;
     const { theme, setTheme } = useTextEditorContext();
     const [useColorChangeOverlay, setColorChangeOverlay] = useState(false);
     const [isEditorReady, setIsEditorReady] = useState(false);
@@ -103,6 +111,10 @@ export default function TextEditor(props: ITextEditorProps) {
 
     useJsonSchema(props.jsonSchemaUri ?? null);
     useTypeDefinitions(props.typescriptDefinitions);
+
+    useEffect(() => {
+        applyJsonSchema(jsonSchema);
+    }, [jsonSchema]);
 
     const handleEditorDidMount: OnMount = () => {
         setIsEditorReady(true);
@@ -144,6 +156,35 @@ export default function TextEditor(props: ITextEditorProps) {
     );
 }
 
+function applyJsonSchema(schema: any, uri?: string): void {
+    monaco.init().then((monaco) => {
+        monaco.languages.json.jsonDefaults.setModeConfiguration({
+            colors: true,
+            completionItems: true,
+            diagnostics: true,
+            documentFormattingEdits: true,
+            documentRangeFormattingEdits: true,
+            documentSymbols: true,
+            foldingRanges: true,
+            hovers: true,
+            selectionRanges: true,
+            tokens: true,
+        });
+
+        monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+            validate: true,
+            enableSchemaRequest: true,
+            schemas: [
+                {
+                    uri: uri ?? "#",
+                    fileMatch: ["*"],
+                    schema: schema,
+                },
+            ],
+        });
+    });
+}
+
 function useJsonSchema(schemaUri: string | null) {
     useEffect(() => {
         if (!schemaUri) {
@@ -168,17 +209,7 @@ function useJsonSchema(schemaUri: string | null) {
             fetch(busterUrl)
                 .then((res) => res.json())
                 .then((json) => {
-                    monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-                        validate: true,
-                        enableSchemaRequest: true,
-                        schemas: [
-                            {
-                                uri: busterUrl,
-                                fileMatch: ["*"],
-                                schema: json,
-                            },
-                        ],
-                    });
+                    return applyJsonSchema(json, busterUrl);
                 });
         });
     }, [schemaUri]);

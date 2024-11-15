@@ -3,9 +3,13 @@ use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Forum\Digest\DigestContentModel;
 use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\Forum\Digest\UserDigestModel;
+use Vanilla\Forum\Models\CommentThreadModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportModel;
+use Vanilla\Forum\Models\PostFieldModel;
+use Vanilla\Forum\Models\PostMetaModel;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Premoderation\ApprovalPremoderator;
 
 if (!defined("APPLICATION")) {
@@ -109,6 +113,7 @@ $Construct
     ->column("LastDateInserted", "datetime", null)
     ->column("AllowedDiscussionTypes", "varchar(255)", null)
     ->column("DefaultDiscussionType", "varchar(10)", null)
+    ->column("hasRestrictedPostTypes", "tinyint", 0)
     ->column("Featured", "tinyint", "0")
     ->column("SortFeatured", "int", "0", "index")
     ->set($Explicit, $Drop);
@@ -178,6 +183,7 @@ $hotExists = $Construct->columnExists("hot");
 $Construct
     ->primaryKey("DiscussionID")
     ->column("Type", "varchar(10)", true, "index")
+    ->column("postTypeID", "varchar(100)", true, "index")
     ->column("ForeignID", "varchar(32)", true, "index") // For relating foreign records to discussions
     ->column("CategoryID", "int", false)
     ->column("statusID", "int(11)", 0)
@@ -390,6 +396,16 @@ if ($Construct->table("User")->tableExists()) {
         );
     }
     $Construct->createIndexIfNotExists("IX_User_CountPosts", ["CountPosts"]);
+}
+
+if ($Construct->table("User")->tableExists()) {
+    if (!$Construct->columnExists("Private")) {
+        $userTable = $SQL->prefixTable("User");
+        $Construct->executeQuery(
+            "alter table $userTable add `Private` tinyint(1) generated always as (case when JSON_VALID(Attributes) = 1 then Attributes->>\"$.Private\" else  null end);"
+        );
+    }
+    $Construct->createIndexIfNotExists("IX_User_Private", ["Private"]);
 }
 
 $Construct
@@ -721,6 +737,8 @@ $Construct
     ->column("dateInserted", "datetime", false, ["index.recordType"])
     ->set();
 
+PostTypeModel::structure($Construct);
+
 // Add stub content
 include PATH_APPLICATIONS . DS . "vanilla" . DS . "settings" . DS . "stub.php";
 
@@ -778,3 +796,5 @@ UserDigestModel::structure($Construct);
 ReportModel::structure($Construct);
 ReportReasonModel::structure($Construct);
 EscalationModel::structure($Construct);
+PostFieldModel::structure($Construct);
+PostMetaModel::structure($Construct);

@@ -16,6 +16,7 @@ import {
     usePagination,
     useSortBy,
     useTable,
+    UseTableCellProps,
 } from "react-table";
 import { DashboardPager } from "@dashboard/components/DashboardPager";
 import { cx } from "@emotion/css";
@@ -68,10 +69,9 @@ const TableHeader = (props: ITableHeaderProps) => {
                                 className={cx(
                                     classes.head,
                                     classes.basicColumn,
-                                    columnIndex === 0 && classes.leftAlignHead,
+                                    classes.leftAlignHead,
                                     sortable && !columnsNotSortable?.includes(column.id) && classes.isSortHead,
                                     column.isSorted && classes.isSortedHead,
-                                    valueTypeLookUp[`${column.Header}`] === "string" && classes.leftAlignHead,
                                 )}
                                 {...(column.isSorted && {
                                     "aria-sort": column.isSortedDesc ? "descending" : "ascending",
@@ -173,9 +173,11 @@ export interface ISortOption {
     desc: boolean;
 }
 
+export type ICustomCellProp = TableInstance<{}> & UseTableCellProps<any>;
+
 interface ICustomCellRender {
     columnName: string[];
-    component: ReactNode | ((props: TableInstance<{}>) => ReactNode);
+    component: ReactNode | ((props: ICustomCellProp) => ReactNode);
 }
 
 export interface ITableProps {
@@ -250,7 +252,7 @@ export const Table = (props: ITableProps) => {
                         accessor: (value) => value[`${key}`],
                         // Set the default cell render to format numbers
                         // https://react-table.tanstack.com/docs/api/useTable
-                        Cell: ({ row }: TableInstance) => {
+                        Cell: ({ row }: ICustomCellProp) => {
                             if (typeof row.original[key] === "number") {
                                 return new Intl.NumberFormat(getJSLocaleKey()).format(row.original[key]);
                             }
@@ -260,7 +262,7 @@ export const Table = (props: ITableProps) => {
                             sortType: customSortByFnPerColumn?.[key],
                         }),
                         sortDescFirst: true,
-                        ...customCell,
+                        ...(customCell as any),
                     };
                 });
         }

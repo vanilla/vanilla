@@ -20,23 +20,43 @@ import { IReaction } from "@dashboard/@types/api/reaction";
 import { PostReactionsProvider } from "@library/postReactions/PostReactionsContext";
 import { PostReactionsLogAsModal } from "@library/postReactions/PostReactionsLog";
 import ThreadItemShareMenu from "@vanilla/addon-vanilla/thread/ThreadItemShareMenu";
-import { ReportModal } from "@vanilla/addon-vanilla/thread/ReportModal";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { useMobile } from "@vanilla/react-utils";
+import { MetaButton } from "@library/metas/Metas";
 
-function QuoteButton(props: { scrapeUrl: string }) {
-    const { scrapeUrl } = props;
-    const classes = ThreadItemActionsClasses();
+export function QuoteButton(props: { scrapeUrl: string; categoryID: ICategory["categoryID"]; isClosed: boolean }) {
+    const { scrapeUrl, isClosed, categoryID } = props;
 
-    return (
-        <Button
-            buttonType={ButtonTypes.TEXT}
-            title={t("Quote")}
-            className={cx("js-quoteButton", classes.actionButton)}
-            data-scrape-url={scrapeUrl} //An event listener is attached to this attribute in the vanilla-editor.
-        >
-            <Icon icon="editor-quote" />
-            {t("Quote")}
-        </Button>
-    );
+    const { hasPermission } = usePermissionsContext();
+
+    const permissionOptions: IPermissionOptions = {
+        mode: PermissionMode.RESOURCE_IF_JUNCTION,
+        resourceType: "category",
+        resourceID: categoryID,
+    };
+
+    let canComment = hasPermission("comments.add", permissionOptions);
+
+    if (isClosed) {
+        const canClose = hasPermission("discussions.close", permissionOptions);
+        canComment = canClose;
+    }
+
+    if (canComment) {
+        return (
+            <MetaButton
+                icon={"editor-quote"}
+                buttonClassName={cx("js-quoteButton")}
+                title={t("Quote")}
+                aria-label={t("Quote")}
+                data-scrape-url={scrapeUrl} //An event listener is attached to this attribute in the vanilla-editor.
+                onClick={() => null}
+            />
+        );
+    }
+
+    return null;
 }
 
 interface IProps {
@@ -48,6 +68,7 @@ export default function ThreadItemActions(props: IProps) {
     const { recordUrl, recordType, recordID } = useThreadItemContext();
     const { discussion } = useDiscussionThreadContext();
     const { categoryID, closed } = discussion ?? {};
+    const isMobile = useMobile();
 
     const classes = ThreadItemActionsClasses();
 
@@ -64,23 +85,21 @@ export default function ThreadItemActions(props: IProps) {
         canComment = canClose;
     }
 
-    const canQuote = canComment;
-
     const canManageReactions = hasPermission("community.moderate");
 
     return (
-        <div className={classes.root}>
+        <>
             <PostReactionsProvider recordID={recordID} recordType={recordType}>
-                <PostReactions reactions={props.reactions} />
+                {canComment && (
+                    <div className={classes.reactionItemsContainer}>
+                        <PostReactions reactions={props.reactions} />
+                    </div>
+                )}
+
                 <div className={classes.actionItemsContainer}>
-                    {canManageReactions && (
+                    {canManageReactions && !isMobile && (
                         <div className={classes.actionItem}>
                             <PostReactionsLogAsModal className={classes.actionButton} />
-                        </div>
-                    )}
-                    {canQuote && (
-                        <div className={classes.actionItem}>
-                            <QuoteButton scrapeUrl={recordUrl} />
                         </div>
                     )}
 
@@ -89,7 +108,7 @@ export default function ThreadItemActions(props: IProps) {
                     </div>
                 </div>
             </PostReactionsProvider>
-        </div>
+        </>
     );
 }
 

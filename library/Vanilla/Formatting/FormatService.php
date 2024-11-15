@@ -149,7 +149,8 @@ class FormatService
         ]);
 
         try {
-            return $formatter->renderExcerpt($content, $length);
+            $excerpt = $formatter->renderExcerpt($content, $length);
+            return $formatter->applySanitizeProcessor($excerpt);
         } finally {
             $span->finish();
         }
@@ -169,7 +170,8 @@ class FormatService
             $format = $content->getFormatKey();
         }
         $formatter = $this->getFormatter($format);
-        return $formatter->renderPlainText($content);
+        $content = $formatter->renderPlainText($content);
+        return $formatter->applySanitizeProcessor($content);
     }
 
     /**

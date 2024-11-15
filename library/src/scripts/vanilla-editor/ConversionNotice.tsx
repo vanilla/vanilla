@@ -15,7 +15,7 @@ interface IProps {
 export function ConversionNotice(props: IProps) {
     const [showConversionNotice, setShowConversionNotice] = useState(props.showConversionNotice);
     const messageRef = useRef<HTMLDivElement | null>(null);
-    const classes = richEditorClasses(true);
+    const classes = richEditorClasses();
 
     function selectCancelButton(): HTMLButtonElement | undefined {
         const form = messageRef.current?.closest("form");

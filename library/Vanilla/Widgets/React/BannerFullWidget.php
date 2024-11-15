@@ -106,10 +106,10 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
         $titleFormChoices = $dynamicSchemas->getTitleChoices();
         $descriptionFormChoices = $dynamicSchemas->getDescriptionChoices();
 
-        $titleFormChoices["static"] = t("Custom");
-        $titleFormChoices = ["none" => t("None")] + $titleFormChoices;
-        $descriptionFormChoices["static"] = t("Custom");
-        $descriptionFormChoices = ["none" => t("None")] + $descriptionFormChoices;
+        $titleFormChoices->option("Custom", "static");
+        $titleFormChoices->option("None", "none");
+        $descriptionFormChoices->option("Custom", "static");
+        $descriptionFormChoices->option("None", "none");
 
         $titleSchema = Schema::parse([
             "showTitle:b?" => [
@@ -121,14 +121,14 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                 "type" => "string",
                 "description" => "The type of title to use (contextual or static)",
                 "default" => "siteSection/name",
-                "x-control" => SchemaForm::radio(
+                "x-control" => SchemaForm::radioPicker(
                     new FormOptions(
                         "Title Type",
                         "Select the kind of title",
                         "",
                         t("A contextual title depending on where this layout is applied.")
                     ),
-                    new StaticFormChoices($titleFormChoices)
+                    $titleFormChoices
                 ),
             ],
             "title:s?" => [
@@ -198,14 +198,14 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                 "type" => "string",
                 "description" => "The type of description to use (contextual or static)",
                 "default" => "siteSection/description",
-                "x-control" => SchemaForm::radio(
+                "x-control" => SchemaForm::radioPicker(
                     new FormOptions(
                         "Description Type",
                         "Select the kind of description",
                         "",
                         t("A contextual description depending on where this layout is applied.")
                     ),
-                    new StaticFormChoices($descriptionFormChoices)
+                    $descriptionFormChoices
                 ),
             ],
             "description:s?" => [
@@ -282,9 +282,9 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                 self::IMAGE_SOURCE_SITE_SECTION,
                 self::IMAGE_SOURCE_CATEGORY,
             ],
-            "x-control" => SchemaForm::radio(
+            "x-control" => SchemaForm::radioPicker(
                 new FormOptions("Image Source"),
-                new StaticFormChoices($dynamicSchemaOptions->getImageSourceChoices())
+                $dynamicSchemaOptions->getImageSourceChoices()
             ),
         ];
 

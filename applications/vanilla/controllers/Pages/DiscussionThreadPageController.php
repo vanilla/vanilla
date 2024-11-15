@@ -7,15 +7,9 @@
 
 namespace Vanilla\Forum\Controllers\Pages;
 
-use CommentModel;
-use DiscussionModel;
 use Garden\Container\NotFoundException;
-use Garden\Web\Exception\ResponseException;
-use Garden\Web\Redirect;
-use Gdn;
-use Vanilla\Contracts\Site\SiteSectionInterface;
+use Garden\Web\Exception\Pass;
 use Vanilla\Forum\Layout\View\DiscussionThreadLayoutView;
-use Vanilla\Http\InternalClient;
 use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\LayoutPage;
 use Vanilla\Site\SiteSectionModel;
@@ -40,6 +34,12 @@ class DiscussionThreadPageController extends PageDispatchController
         $this->siteSectionModel = $siteSectionModel;
     }
 
+    private function filterCommentIDFromPath(string $path): int|null
+    {
+        preg_match("/\/comment\/(?<recordID>\d+)/", $path, $matches);
+        return isset($matches["recordID"]) ? filter_var($matches["recordID"], FILTER_VALIDATE_INT) : null;
+    }
+
     public function index(string $path)
     {
         $page = $this->usePage(LayoutPage::class);
@@ -48,9 +48,13 @@ class DiscussionThreadPageController extends PageDispatchController
         $discussionID = StringUtils::parseIDFromPath($path, "\/");
 
         if (!$discussionID) {
-            $matches = [];
-            preg_match("/\/comment\/(?<recordID>\d+)/", $path, $matches);
-            $commentID = filter_var($matches["recordID"], FILTER_VALIDATE_INT);
+            // If the route is a discussion controller action route pass along to the discussion controller
+            if (preg_match("/^\/[a-z]+$/", $path)) {
+                throw new Pass("Re-route the request");
+            }
+
+            //Check if its a comment route
+            $commentID = $this->filterCommentIDFromPath($path);
             if (!$commentID) {
                 throw new NotFoundException("Comment");
             }

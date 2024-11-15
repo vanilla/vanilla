@@ -26,7 +26,7 @@ class Breadcrumb implements \JsonSerializable
      */
     public function __construct(string $name, string $url)
     {
-        $this->name = $name;
+        $this->name = \Gdn::formatService()->renderPlainText($name, "text");
         $this->url = $url;
     }
 

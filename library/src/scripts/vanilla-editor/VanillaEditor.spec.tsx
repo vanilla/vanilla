@@ -5,7 +5,11 @@
  */
 
 import { mockAPI } from "@library/__tests__/utility";
-import { LegacyVanillaEditor, deserializeHtml, emailLinkCheck } from "@library/vanilla-editor/VanillaEditor.loadable";
+import {
+    LegacyFormVanillaEditor,
+    deserializeHtml,
+    emailLinkCheck,
+} from "@library/vanilla-editor/VanillaEditor.loadable";
 import { act, fireEvent, render } from "@testing-library/react";
 
 describe("deserializeHtml", () => {
@@ -175,7 +179,7 @@ describe("VanillaEditor", () => {
 
     it("Editor content should be empty when comment is posted/event is fired", async () => {
         const { queryByText } = render(
-            <LegacyVanillaEditor legacyTextArea={form?.firstChild as HTMLInputElement} initialFormat={"rich2"} />,
+            <LegacyFormVanillaEditor legacyTextArea={form?.firstChild as HTMLInputElement} initialFormat={"rich2"} />,
         );
 
         // Assert that it exists

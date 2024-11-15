@@ -18,5 +18,7 @@ export interface IDiscussionSearchTypes {
     tagOperator?: "and" | "or";
     startDate?: string;
     endDate?: string;
+    startDateUpdated?: string;
+    endDateUpdated?: string;
     types?: string[];
 }

@@ -1,4 +1,4 @@
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { logError } from "@vanilla/utils";
 import {
     IAllSectionMediaQueries,

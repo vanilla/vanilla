@@ -477,6 +477,9 @@ class Gdn_Memcached extends Gdn_Cache
         $keySize = strlen(serialize($value));
         if ($this->hasFeature(Gdn_Cache::FEATURE_SHARD) && $keySize > Gdn_Cache::CACHE_SHARD_AUTO_SIZE) {
             $finalOptions[Gdn_Cache::FEATURE_SHARD] = true;
+        } elseif ($keySize < Gdn_Cache::CACHE_SHARD_MIN_SIZE) {
+            // Don't shard if the key is too small.
+            $finalOptions[Gdn_Cache::FEATURE_SHARD] = false;
         }
 
         $span = $this->timers->startCacheWrite();

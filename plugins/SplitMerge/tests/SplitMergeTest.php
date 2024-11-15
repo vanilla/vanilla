@@ -49,4 +49,79 @@ class SplitMergeTest extends AbstractAPIv2Test
             ->getBody();
         $this->assertSame($toIdeaCategoryID, $discussion["categoryID"]);
     }
+
+    /**
+     * Test the legacy merge functionality.
+     *
+     * @return void
+     */
+    public function testLegacyMerge()
+    {
+        $discussion1 = $this->createDiscussion(["body" => "Disc 1"]);
+        $discussion2 = $this->createDiscussion(["body" => "Disc 2"]);
+        $comment = $this->createComment(["body" => "Comment 1"]);
+        $discussion3 = $this->createDiscussion(["body" => "Disc 3"]);
+
+        $this->checkDiscussionLegacy($discussion1["discussionID"]);
+        $this->checkDiscussionLegacy($discussion2["discussionID"]);
+        $this->checkDiscussionLegacy($discussion3["discussionID"]);
+
+        // Assert that our checks are set
+        $this->assertEquals(
+            [$discussion1["discussionID"], $discussion2["discussionID"], $discussion3["discussionID"]],
+            \Gdn::userModel()->getAttribute(\Gdn::session()->User->UserID, "CheckedDiscussions", [])
+        );
+
+        $response = $this->bessy()->postJsonData("/moderation/merge-discussions", [
+            "DeliveryMethod" => "JSON",
+            "TransientKey" => $this->api()->getTransientKey(),
+            "RedirectLink" => true,
+            "MergeDiscussionID" => $discussion1["discussionID"],
+        ]);
+
+        $this->assertEquals(200, $response->getStatus());
+
+        $this->assertStringStartsWith(
+            "Merged:",
+            $this->api()
+                ->get("/discussions/{$discussion2["discussionID"]}")
+                ->getBody()["name"]
+        );
+        $this->assertStringStartsWith(
+            "Merged:",
+            $this->api()
+                ->get("/discussions/{$discussion3["discussionID"]}")
+                ->getBody()["name"]
+        );
+        $this->assertEquals(
+            3,
+            $this->api()
+                ->get("/discussions/{$discussion1["discussionID"]}")
+                ->getBody()["countComments"]
+        );
+        $this->assertEquals(
+            $discussion1["discussionID"],
+            $this->api()
+                ->get("/comments/{$comment["discussionID"]}")
+                ->getBody()["discussionID"]
+        );
+
+        // Assert that our checks are cleared
+        $this->assertEquals(
+            [],
+            \Gdn::userModel()->getAttribute(\Gdn::session()->User->UserID, "CheckedDiscussions", [])
+        );
+    }
+
+    /**
+     * @param int $discussionID
+     */
+    private function checkDiscussionLegacy(int $discussionID)
+    {
+        $this->bessy()->postJsonData("/moderation/checked-discussions", [
+            "CheckIDs" => [["checkId" => $discussionID, "checked" => true]],
+            "DeliveryMethod" => "JSON",
+            "TransientKey" => $this->api()->getTransientKey(),
+        ]);
+    }
 }

@@ -1,6 +1,10 @@
 <?php if (!defined("APPLICATION")) {
     exit();
 }
+/** @var Gdn_Form $form */
+$form = $this->Form;
+$formData = $form->formData();
+
 helpAsset(
     t("Need More Help?"),
     anchor(
@@ -8,11 +12,29 @@ helpAsset(
         "https://success.vanillaforums.com/kb/articles/561-security-settings-in-vanilla"
     )
 );
+//Check if the user has permission to export data and if the export is available for download
+if ($formData["hasExportPermission"] && ($formData["exportAvailableForDownload"] ?? false)) {
+    $expirationDate = $formData["exportExpirationDate"] ?? null;
+    $daysAvailable = "";
+    if ($expirationDate) {
+        $currentDate = \Vanilla\CurrentTimeStamp::getDateTime();
+        $interval = $currentDate->diff($expirationDate);
+        $daysAvailable = $interval->format("%a " . t("days"));
+    }
+    $message =
+        t("Your requested data export is ready and will be available for ") .
+        "($daysAvailable)." .
+        " " .
+        t("Once generated, the URL will be valid for 12 hours from time of generation.");
+    " " . t("Click below to generate a secure URL.");
+    $generateDataExportURL = \Vanilla\Web\TwigStaticRenderer::renderReactModule("GenerateDataExportURL", []);
+    $message = $message . Wrap($generateDataExportURL, "div");
+
+    helpAsset("", $message);
+}
 ?>
 <h1><?php echo t("Security"); ?></h1>
 <?php
-/** @var Gdn_Form $form */
-$form = $this->Form;
 echo $form->open();
 echo $form->errors();
 ?>

@@ -27,6 +27,7 @@ export enum BorderType {
     NONE = "none",
     SHADOW = "shadow",
     SHADOW_AS_BORDER = "shadow_as_border", // Note that is applied on a different element
+    NAV_LINKS = "navLinks",
 }
 
 export function borderTypeToLabel(type: BorderType): string {
@@ -41,6 +42,8 @@ export function borderTypeToLabel(type: BorderType): string {
             return t("Shadow");
         case BorderType.NONE:
             return t("None");
+        case BorderType.NAV_LINKS:
+            return t("Nav Links");
     }
 }
 

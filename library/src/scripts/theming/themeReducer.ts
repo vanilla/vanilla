@@ -106,7 +106,7 @@ export const INITIAL_THEME_STATE: IThemeState = {
     },
 };
 
-export const themeReducer = produce(
+export const themeReducer: any = produce(
     reducerWithInitialState(INITIAL_THEME_STATE)
         .case(ThemeActions.getAssets.started, (state) => {
             state.assets.status = LoadStatus.LOADING;

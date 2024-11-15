@@ -11,6 +11,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Models\LegacyModelUtils;
 use Vanilla\Exception\PermissionException;
 
 /**
@@ -109,16 +110,19 @@ class TagsApiController extends AbstractApiController
             ],
         ]);
 
+        $query = $in->validate($query);
+
         if (key_exists("limit", $query)) {
             $page = $query["page"] ?? 1;
             [$options["offset"], $options["limit"]] = offsetLimit("p{$page}", $query["limit"]);
         }
 
         if (key_exists("sort", $query)) {
-            $options["sort"] = $query["sort"];
+            if (str_contains($query["sort"], "name")) {
+                $query["sort"] = str_replace("name", "fullName", $query["sort"]);
+            }
+            [$options["sort"], $options["direction"]] = LegacyModelUtils::orderFieldDirection($query["sort"]);
         }
-
-        $query = $in->validate($query);
 
         if (key_exists("tagID", $query)) {
             $query["tagID"] = array_map("intval", $query["tagID"]);

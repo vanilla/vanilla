@@ -11,7 +11,7 @@ import { autoCompleteClasses } from "./AutoComplete.styles";
 import { useAutoCompleteContext } from "./AutoCompleteContext";
 import { Checkmark } from "../shared/Checkmark";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 
 export interface IAutoCompleteOption {
     value: any;

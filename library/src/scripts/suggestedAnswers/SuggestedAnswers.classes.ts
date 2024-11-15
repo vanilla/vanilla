@@ -66,6 +66,11 @@ export const suggestedAnswersClasses = useThemeCache(() => {
     const helperText = css({
         color: ColorsUtils.colorOut(rootFg.mix(rootBg, 0.75)),
         fontStyle: "italic",
+        fontWeight: globalVars.fonts.weights.bold,
+        "& > span": {
+            display: "block",
+            fontWeight: globalVars.fonts.weights.normal,
+        },
     });
 
     const loader = css({

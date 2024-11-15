@@ -7,7 +7,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\CurrentTimeStamp;
@@ -33,42 +32,62 @@ class DigestApiControllerTest extends AbstractAPIv2Test
     }
 
     /**
+     * Generates Mock Digest upcoming dates
+     * @param ?\DateTimeImmutable $nextScheduledDate
+     * @return array
+     */
+    public function generateUpcomingDates(?\DateTimeImmutable $nextScheduledDate = null): array
+    {
+        $currentDate = CurrentTimeStamp::mockTime("2021-05-05T09:05:30+05:00");
+        $scheduleTimeZone = $this->config->get(ScheduleWeeklyDigestJob::CONF_SCHEDULE_TIME_ZONE, "America/New_York");
+        $timezone = new \DateTimeZone($scheduleTimeZone);
+        $nextScheduledDate = $nextScheduledDate
+            ? $nextScheduledDate
+                ->setTimezone($timezone)
+                ->modify("+1 week")
+                ->setTimezone(new \DateTimeZone("UTC"))
+            : $currentDate
+                ->modify("next monday")
+                ->setTime(13, 0)
+                ->setTimezone(new \DateTimeZone("UTC"));
+        $upcomingDates = [];
+        $upcomingDates[] = $nextScheduledDate->format(DATE_ATOM);
+        for ($i = 1; $i <= 4; $i++) {
+            $nextScheduledDate = $nextScheduledDate->modify("+1 week");
+            $upcomingDates[] = $nextScheduledDate->format(DATE_ATOM);
+        }
+
+        return $upcomingDates;
+    }
+
+    /**
      * Test Generate Digest dates
      *
      * @return void
      */
     public function testGetDigestDates(): void
     {
-        //Without digest enabled
+        $upcomingDates = $this->generateUpcomingDates();
+
+        // Without digest enabled
         $response = $this->api()->get("{$this->baseUrl}/delivery-dates");
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $expected = [
             "sent" => [],
             "scheduled" => [],
-            "upcoming" => [],
+            "upcoming" => $upcomingDates,
         ];
 
         $this->assertEquals($expected, $body);
 
-        //With digest configs enabled
+        // With digest configs enabled
         $this->runWithConfig(
             [
                 "Garden.Digest.Enabled" => true,
                 "Garden.Digest.DayOfWeek" => 1.0,
             ],
-            function () {
-                $currentDate = CurrentTimeStamp::mockTime("2021-05-05T09:05:30+05:00");
-                $nextScheduledDate = $currentDate
-                    ->modify("next monday")
-                    ->setTime(13, 0)
-                    ->setTimezone(new \DateTimeZone("UTC"));
-                $upcomingDates = [];
-                $upcomingDates[] = $nextScheduledDate->format(DATE_ATOM);
-                for ($i = 1; $i <= 4; $i++) {
-                    $nextScheduledDate = $nextScheduledDate->modify("+1 week");
-                    $upcomingDates[] = $nextScheduledDate->format(DATE_ATOM);
-                }
+            function () use ($upcomingDates) {
                 $expectedData = [
                     "sent" => [],
                     "scheduled" => [],
@@ -136,7 +155,7 @@ class DigestApiControllerTest extends AbstractAPIv2Test
                 "dateScheduled" => $nextScheduleDate->format(DATE_ATOM),
                 "totalSubscribers" => 50,
             ],
-            "upcoming" => [],
+            "upcoming" => $this->generateUpcomingDates($nextScheduleDate),
         ];
         $this->assertEquals($expected, $result);
     }

@@ -8,7 +8,6 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { t } from "@library/utility/appUtils";
-import NextPrevious from "@library/navigation/NextPrevious";
 import Heading from "@library/layout/Heading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { typographyClasses } from "@library/styles/typographyStyles";

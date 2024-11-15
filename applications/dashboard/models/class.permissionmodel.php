@@ -1726,7 +1726,7 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
     ): array {
         $permissionsInc = \Gdn::userModel()->getPermissionsIncrement();
         return $this->modelCache->getCachedOrHydrate(
-            ["roleIDsByPermission", $permissionName, $junctionTable, $junctionID, "inc" => $permissionsInc],
+            ["roleIDsByPermissions", $permissionName, $junctionTable, $junctionID, "inc" => $permissionsInc],
             function () use ($permissionName, $junctionTable, $junctionID) {
                 $emptyPermissionInstance = $this->createPermissionInstance();
                 $resolvePermissionName = $emptyPermissionInstance->resolvePermissionName($permissionName);
@@ -1739,10 +1739,10 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
                     $resolveJunctionID = $emptyPermissionInstance->hasJunctionID($junctionTable, $junctionID)
                         ? $emptyPermissionInstance->resolveJuntionAlias($junctionTable, $junctionID)
                         : -1;
-                    $wheres = [
+                    $wheres = array_merge($wheres, [
                         "JunctionTable" => $junctionTable,
                         "JunctionID" => $resolveJunctionID,
-                    ];
+                    ]);
                 }
 
                 $roleIDs = $this->createSql()

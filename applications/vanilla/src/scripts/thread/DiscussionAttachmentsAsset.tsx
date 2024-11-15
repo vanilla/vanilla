@@ -15,10 +15,18 @@ import { IAttachment } from "@library/features/discussions/integrations/Integrat
 import AttachmentLayout from "@library/features/discussions/integrations/components/AttachmentLayout";
 import { Icon } from "@vanilla/icons";
 import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
+import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
+import type { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { PageBox } from "@library/layout/PageBox";
+import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 
 interface IProps {
     discussion: IDiscussion;
     discussionApiParams?: DiscussionsApi.GetParams;
+    containerOptions?: IHomeWidgetContainerOptions;
+    title?: string;
+    description?: string;
+    subtitle?: string;
 }
 
 export function DiscussionAttachmentsAsset(props: IProps) {
@@ -48,7 +56,18 @@ export function DiscussionAttachmentsAsset(props: IProps) {
     }, [refreshStaleDiscussionAttachments]);
 
     return (
-        <>
+        <PageBox
+            options={{
+                borderType: props.containerOptions?.borderType,
+                background: props.containerOptions?.outerBackground,
+            }}
+        >
+            <PageHeadingBox
+                options={{ alignment: props.containerOptions?.headerAlignment }}
+                title={props.title}
+                description={props.description}
+                subtitle={props.subtitle}
+            />
             {attachments?.map((attachment) => (
                 <ReadableIntegrationContextProvider
                     key={attachment.attachmentID}
@@ -61,21 +80,24 @@ export function DiscussionAttachmentsAsset(props: IProps) {
                     />
                 </ReadableIntegrationContextProvider>
             ))}
-        </>
+        </PageBox>
     );
 }
 
 export function DiscussionAttachment(props: { attachment: IAttachment; onSuccessfulRefresh?: () => Promise<void> }) {
-    const {
-        attachment: { state, status, sourceUrl, sourceID, dateUpdated, dateInserted, metadata, insertUser },
-    } = props;
+    const { attachment } = props;
 
+    const { state, status, sourceUrl, sourceID, dateUpdated, dateInserted, metadata, insertUser } = attachment;
     const integration = useReadableIntegrationContext();
 
     const title = integration?.title ?? "Unknown Integration";
     const externalIDLabel = integration?.externalIDLabel ?? "Unknown #";
     const logoIcon = integration?.logoIcon ?? "meta-external";
     const attachmentTypeIcon = integration?.attachmentTypeIcon;
+
+    const dynamicMetas = DiscussionAttachment.additionalMetaItems
+        .filter(({ shouldRender }) => shouldRender(attachment))
+        .map(({ component: MetaItemComponent }, index) => <MetaItemComponent key={index} attachment={attachment} />);
 
     return (
         <AttachmentLayout
@@ -89,8 +111,34 @@ export function DiscussionAttachment(props: { attachment: IAttachment; onSuccess
             dateUpdated={dateUpdated ?? dateInserted}
             user={insertUser}
             metadata={metadata}
+            metas={dynamicMetas.length > 0 ? dynamicMetas : undefined}
         />
     );
 }
+
+export type DiscussionAttachmentLayoutMetaItem = {
+    component: React.ComponentType<{ attachment: IAttachment }>;
+    shouldRender: (attachment?: IAttachment) => boolean;
+};
+
+DiscussionAttachment.additionalMetaItems = [] as DiscussionAttachmentLayoutMetaItem[];
+
+DiscussionAttachment.registerMetaItem = (
+    /**
+     * The component to render
+     *
+     */
+    component: DiscussionAttachmentLayoutMetaItem["component"],
+
+    /**
+     * shouldRender receives the attachment as an argument and should return a boolean.
+     */
+    shouldRender: DiscussionAttachmentLayoutMetaItem["shouldRender"],
+) => {
+    DiscussionAttachment.additionalMetaItems.push({
+        component,
+        shouldRender,
+    });
+};
 
 export default DiscussionAttachmentsAsset;

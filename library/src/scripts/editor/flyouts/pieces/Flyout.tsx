@@ -35,7 +35,6 @@ interface IProps {
     onCloseClick(event?: React.MouseEvent<any>);
     renderAbove?: boolean;
     renderLeft?: boolean;
-    legacyMode: boolean;
     headerClass?: string;
     bodyClass?: string;
     footerClass?: string;
@@ -53,7 +52,7 @@ export class Flyout extends React.Component<IProps, IState> {
 
     public render() {
         const { additionalClassRoot } = this.props;
-        const classesRichEditor = richEditorClasses(this.props.legacyMode);
+        const classesRichEditor = richEditorClasses();
         const classesFlyout = richEditorFlyoutClasses();
 
         let classes = classNames("richEditor-menu", "richEditorFlyout", classesFlyout.root, {

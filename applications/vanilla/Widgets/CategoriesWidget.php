@@ -125,6 +125,7 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
         $followedFilter = $apiParams["followed"] ?? null;
         $featuredFilter = $apiParams["filter"] === "featured";
 
+        $params = [];
         $params["followed"] = $followedFilter;
         $params["expand"] = "all";
 

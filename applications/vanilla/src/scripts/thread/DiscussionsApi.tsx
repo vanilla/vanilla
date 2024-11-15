@@ -8,7 +8,23 @@ import { IDiscussion } from "@dashboard/@types/api/discussion";
 import apiv2 from "@library/apiv2";
 import { RecordID } from "@vanilla/utils";
 
-const DiscussionsApi = {
+export namespace DiscussionsApi {
+    export interface IndexParams {}
+
+    export interface GetParams {
+        expand?: string[];
+    }
+
+    export interface PatchParams extends Omit<Partial<IDiscussion>, "discussionID" | "insertUserID"> {
+        insertUserID?: RecordID;
+    }
+
+    export interface DismissParams {
+        dismissed?: boolean;
+    }
+}
+
+export const DiscussionsApi = {
     get: async (
         discussionID: IDiscussion["discussionID"],
         apiParams: DiscussionsApi.GetParams,
@@ -37,5 +53,3 @@ const DiscussionsApi = {
         return result.data;
     },
 };
-
-export default DiscussionsApi;

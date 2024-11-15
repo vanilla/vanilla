@@ -122,6 +122,12 @@ paths:
                   schema:
                       minLength: 1
                       type: string
+                - description: Filter by allowed post type ID
+                  in: query
+                  name: postTypeID
+                  required: false
+                  schema:
+                      type: string
             responses:
                 "200":
                     content:
@@ -882,6 +888,31 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/CategoryPreferences"
                     description: "Success"
+    /categories/suggested:
+        get:
+            x-hidden: true
+            summary: List categories based on interests.
+            parameters:
+                - name: excludedCategoryIDs[]
+                  description: Category IDs to exclude.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: integer
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/CategorySchema"
+                    description: Success
+            tags:
+                - Categories
+
 components:
     requestBodies:
         CategoryPost:
@@ -935,6 +966,14 @@ components:
                     items:
                         type: string
                         example: Discussion
+                allowedPostTypeIDs:
+                    description: Allowed post type IDs in this category.
+                    type: array
+                    items:
+                        type: string
+                hasRestrictedPostTypes:
+                    description: If the category has restricted post types.
+                    type: boolean
             required:
                 - name
                 - urlcode

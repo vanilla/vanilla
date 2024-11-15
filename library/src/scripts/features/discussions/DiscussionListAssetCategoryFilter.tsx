@@ -9,11 +9,13 @@ import { t } from "@vanilla/i18n";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
+import { useCurrentUser } from "@library/features/users/userHooks";
+import { getMeta } from "@library/utility/appUtils";
 
-export type DiscussionsCategoryFollowFilter = "all" | "followed";
+export type DiscussionsCategoryFollowFilter = "all" | "followed" | "suggested";
 interface IProps {
     filter: DiscussionsCategoryFollowFilter;
-    onFilterChange: (newFilter: boolean) => void;
+    onFilterChange: (newFilter: string) => void;
     className?: string;
     isMobile?: boolean;
 }
@@ -23,12 +25,18 @@ interface IProps {
  */
 export default function DiscussionListAssetCategoryFilter(props: IProps) {
     const { filter, onFilterChange, isMobile } = props;
-    const [followFilter, setFollowFilter] = useState<DiscussionsCategoryFollowFilter>(props.filter);
 
-    const options: ISelectBoxItem[] = [
-        { name: t("All"), value: "all" },
-        { name: t("Following"), value: "followed" },
-    ];
+    const currentUser = useCurrentUser();
+    const suggestedContentEnabled = getMeta("suggestedContentEnabled", false);
+
+    let options: ISelectBoxItem[] = [{ name: t("All"), value: "all" }];
+
+    if (currentUser?.userID ?? 0 > 0) {
+        options.push({ name: t("Followed Categories"), value: "followed" });
+        if (suggestedContentEnabled) {
+            options.push({ name: t("Suggested Content"), value: "suggested" });
+        }
+    }
 
     const activeOption = useMemo(() => {
         return options.find((option) => option.value === filter);
@@ -37,26 +45,30 @@ export default function DiscussionListAssetCategoryFilter(props: IProps) {
     const id = uniqueIDFromPrefix("discussionCategoryFilter");
 
     return (
-        <div className={discussionListClasses().filterAndSortingContainer}>
-            {!isMobile && (
-                <span id={id} className={discussionListClasses().filterAndSortingLabel}>
-                    {t("Categories")}:
-                </span>
-            )}
-            <SelectBox
-                className={discussionListClasses().filterAndSortingDropdown}
-                buttonType={ButtonTypes.TEXT_PRIMARY}
-                options={options}
-                name={t("Categories")}
-                describedBy={id}
-                value={activeOption}
-                renderLeft={false}
-                horizontalOffset={true}
-                offsetPadding={true}
-                onChange={({ value }) => {
-                    onFilterChange(value === "followed" ? true : false);
-                }}
-            />
-        </div>
+        <>
+            {options.length > 1 ? (
+                <div className={discussionListClasses().filterAndSortingContainer}>
+                    {!isMobile && (
+                        <span id={id} className={discussionListClasses().filterAndSortingLabel}>
+                            {t("Categories")}:
+                        </span>
+                    )}
+                    <SelectBox
+                        className={discussionListClasses().filterAndSortingDropdown}
+                        buttonType={ButtonTypes.TEXT_PRIMARY}
+                        options={options}
+                        name={t("Categories")}
+                        describedBy={id}
+                        value={activeOption}
+                        renderLeft={false}
+                        horizontalOffset={true}
+                        offsetPadding={true}
+                        onChange={({ value }) => {
+                            onFilterChange(value);
+                        }}
+                    />
+                </div>
+            ) : null}
+        </>
     );
 }

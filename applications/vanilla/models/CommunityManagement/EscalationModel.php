@@ -37,6 +37,7 @@ use Vanilla\Models\Model;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Permissions;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
 
 /**
@@ -66,7 +67,8 @@ class EscalationModel extends PipelineModel
         private UserModel $userModel,
         private DiscussionModel $discussionModel,
         private CommentModel $commentModel,
-        private EventManager $eventManager
+        private EventManager $eventManager,
+        private \PermissionModel $permissionModel
     ) {
         parent::__construct("escalation");
 
@@ -86,6 +88,55 @@ class EscalationModel extends PipelineModel
     private function attachmentService(): AttachmentService
     {
         return \Gdn::getContainer()->get(AttachmentService::class);
+    }
+
+    /**
+     * Get a slot type based on the time since a discussion started.
+     *
+     * @param int $escalationID
+     * @return string
+     */
+    public function getAutoSlotType(int $escalationID): string
+    {
+        $dateInserted =
+            $this->createSql()
+                ->select("dateInserted")
+                ->from("escalation")
+                ->where("escalationID", $escalationID)
+                ->get()
+                ->firstRow()->dateInserted ?? null;
+        if ($dateInserted === null) {
+            throw new NotFoundException("Discussion", ["escalationID" => $escalationID]);
+        }
+        return ModelUtils::getDateBasedSlotType($dateInserted);
+    }
+
+    /**
+     * Get all the roleIDs that can view an escalation.
+     *
+     * @param ?int $escalationID If null, this will filter users that can view any escalation.
+     * @return array
+     */
+    public function selectRoleIDsCanViewEscalation(?int $escalationID): array
+    {
+        $categoryID = null;
+        if ($escalationID !== null) {
+            $escalation = $this->selectSingle(["escalationID" => $escalationID]);
+
+            if (!$escalation["placeRecordType"] === "category") {
+                throw new ServerException("Only category escalations are currently supported.");
+            }
+            $categoryID = $escalation["placeRecordID"];
+        }
+
+        $categoryModRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission(
+            "posts.moderate",
+            \CategoryModel::PERM_JUNCTION_TABLE,
+            $categoryID
+        );
+        $globalModRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission("community.moderate");
+
+        return array_unique(array_merge($categoryModRoleIDs, $globalModRoleIDs));
     }
 
     /**
@@ -570,13 +621,12 @@ class EscalationModel extends PipelineModel
         $preferences = $this->userNotificationPreferencesModel->getUserPrefs($assignedUserID);
         $popup = $preferences["Popup." . MyEscalationActivity::getPreference()] ?? false;
         $email = $preferences["Email." . MyEscalationActivity::getPreference()] ?? false;
-        $name = $this->processNotificationRecordName($escalation);
         $activity = [
             "ActivityType" => MyEscalationActivity::getActivityTypeID(),
             "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
             "ActivityUserID" => $escalation["insertUserID"],
-            "HeadlineFormat" => sprintf(MyEscalationActivity::getProfileHeadline(), $name),
-            "PluralHeadlineFormat" => sprintf(MyEscalationActivity::getPluralHeadline(), $name),
+            "HeadlineFormat" => sprintf(MyEscalationActivity::getProfileHeadline(), $escalation["name"]),
+            "PluralHeadlineFormat" => sprintf(MyEscalationActivity::getPluralHeadline(), $escalation["name"]),
             "RecordType" => "escalation",
             "RecordID" => $escalation["escalationID"],
             "Route" => $escalation["url"],
@@ -613,13 +663,12 @@ class EscalationModel extends PipelineModel
      */
     public function notifyNewEscalation(array $escalation): void
     {
-        $name = $this->processNotificationRecordName($escalation);
         $activity = [
             "ActivityType" => EscalationActivity::getActivityTypeID(),
             "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
             "ActivityUserID" => $escalation["insertUserID"],
-            "HeadlineFormat" => sprintf(EscalationActivity::getProfileHeadline(), $name),
-            "PluralHeadlineFormat" => sprintf(EscalationActivity::getPluralHeadline(), $name),
+            "HeadlineFormat" => sprintf(EscalationActivity::getProfileHeadline(), $escalation["name"]),
+            "PluralHeadlineFormat" => sprintf(EscalationActivity::getPluralHeadline(), $escalation["name"]),
             "RecordType" => "escalation",
             "RecordID" => $escalation["escalationID"],
             "Route" => $escalation["url"],
@@ -643,27 +692,5 @@ class EscalationModel extends PipelineModel
             preference: EscalationActivity::getPreference(),
             hasDefaultPreferences: true
         );
-    }
-
-    /**
-     * Generate a record name for the notification.
-     * - Discussion: Name of the discussion.
-     * - Comment: "Re: " + Name of the parent discussion.
-     *
-     * @param array $escalation
-     * @return string
-     */
-    private function processNotificationRecordName(array $escalation): string
-    {
-        $name = "unknown";
-        if ($escalation["recordType"] === "discussion") {
-            $record = $this->discussionModel->getID($escalation["recordID"], DATASET_TYPE_ARRAY);
-            $name = $record["Name"];
-        } elseif ($escalation["recordType"] === "comment") {
-            $record = $this->commentModel->getID($escalation["recordID"], DATASET_TYPE_ARRAY);
-            $name = "Re: " . $record["parentRecordName"];
-        }
-
-        return $name;
     }
 }

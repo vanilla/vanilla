@@ -9,29 +9,45 @@ import { AutomationRuleFormValues } from "@dashboard/automationRules/AutomationR
 import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { TokenItem } from "@library/metas/TokenItem";
-import { ProfileFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { CreatableFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import Message from "@library/messages/Message";
 import { Icon } from "@vanilla/icons";
 import { isTimeBasedTrigger } from "@dashboard/automationRules/AutomationRules.utils";
-import AutomationRulesSummaryQuery from "./AutomationRulesSummaryQuery";
+import AutomationRulesSummaryQuery from "@dashboard/automationRules/AutomationRulesSummaryQuery";
 import Translate from "@library/content/Translate";
-import { IDropdownControl } from "packages/vanilla-json-schema-forms/src/types";
+import { IDropdownControl } from "@library/json-schema-forms";
 
 interface IAutomationRulesSummaryProps {
     formValues: AutomationRuleFormValues;
     isLoading?: boolean;
     isEditing?: boolean;
     isRuleRunning?: boolean;
+    id?: string;
 }
 
 export default function AutomationRulesSummary(props: IAutomationRulesSummaryProps) {
     const { formValues, isEditing, isRuleRunning } = props;
     const classes = automationRulesClasses();
-    const { automationRulesCatalog, rolesByID, profileFields, tags, collections, categories, ideaStatusesByID, users } =
-        useAutomationRules();
+    const {
+        automationRulesCatalog,
+        rolesByID,
+        profileFields,
+        tags,
+        collections,
+        categories,
+        ideaStatusesByID,
+        users,
+        optionalDataSources,
+    } = useAutomationRules();
 
     const reportReasonsFromCatalog = (
         automationRulesCatalog?.triggers?.reportPostTrigger?.schema?.properties?.reportReasonID?.[
+            "x-control"
+        ] as IDropdownControl
+    )?.choices?.staticOptions as Record<string, string>;
+
+    const sentimentsFromCatalog = (
+        automationRulesCatalog?.triggers?.postSentimentTrigger?.schema?.properties?.sentiment?.[
             "x-control"
         ] as IDropdownControl
     )?.choices?.staticOptions as Record<string, string>;
@@ -48,31 +64,39 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
         : false;
 
     const summaryMessages = {
+        // Add new triggers, alphabetically.
         triggers: {
+            discussionReachesScoreTrigger: t("Post has received at least"),
             emailDomainTrigger: t("A user registers or logs in with email domain:"),
-            profileFieldTrigger: t("A user registers or updates a profile field:"),
-            staleDiscussionTrigger: t("A post has not received any comments"),
-            staleCollectionTrigger: t("A post has been added to a collection"),
-            lastActiveDiscussionTrigger: t("A post has not had any activity"),
-            timeSinceUserRegistrationTrigger: t("A user has been registered"),
             ideationVoteTrigger: t("An idea has received"),
-            postSentimentTrigger: t("A post has been created with a specific a sentiment"),
+            lastActiveDiscussionTrigger: t("A post has not had any activity"),
+            postSentimentTrigger: t("A post"),
+            profileFieldTrigger: t("A user registers or updates a profile field:"),
             reportPostTrigger: t("A post has received"),
+            staleDiscussionTrigger: t("A post"),
+            staleCollectionTrigger: t("A post has been added to a collection"),
+            timeSinceUserRegistrationTrigger: t("A user has been registered"),
+            unAnsweredQuestionTrigger: t("A question"),
         },
+        // Add new actions, alphabetically.
         actions: {
+            addDiscussionToCollectionAction: t("Add to collection:"),
             addRemoveRoleAction: t("Assign role:"),
-            categoryFollowAction: t("Follow categories:"),
-            closeDiscussionAction: t("Close the post"),
-            bumpDiscussionAction: t("Bump the post"),
-            moveToCategoryAction: t("Move to category:"),
             addTagAction: t("Add tags:"),
-            addToCollectionAction: t("Add to collection:"),
-            removeDiscussionFromCollectionAction: t("Remove from collection:"),
-            removeDiscussionFromTriggerCollectionAction: t("Remove from collection:"),
+            bumpDiscussionAction: t("Bump the post"),
+            categoryFollowAction: t("Follow categories:"),
             changeIdeationStatusAction: t("Change the status of the idea to"),
+            closeDiscussionAction: t("Close the post"),
             createEscalationAction: t("Escalate it"),
             escalateGithubIssueAction: t("Escalate to GitHub"),
+            escalateToJiraAction: t("Escalate to Jira"),
             escalateToZendeskAction: t("Escalate to Zendesk"),
+            escalateSalesforceCaseAction: t("Escalate a case to Salesforce"),
+            escalateSalesforceLeadAction: t("Escalate a lead to Salesforce"),
+            moveToCategoryAction: t("Move to category:"),
+            removeDiscussionFromCollectionAction: t("Remove from collection:"),
+            removeDiscussionFromTriggerCollectionAction: t("Remove from collection:"),
+            inviteToGroupAction: t("Invite to group:"),
         },
     };
 
@@ -84,18 +108,24 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
     const isProfileFieldValueCheckbox =
         hasProfileFieldValue &&
         profileFields?.find((field) => field.apiName === formValues.trigger?.triggerValue?.profileField)?.formType ===
-            ProfileFieldFormType.CHECKBOX;
+            CreatableFieldFormType.CHECKBOX;
 
     const isEmailDomainTrigger = formValues.trigger?.triggerType === "emailDomainTrigger";
+    const isIdeaVoteTrigger = formValues.trigger?.triggerType === "ideationVoteTrigger";
+    const isUnansweredQuestionTrigger = formValues.trigger?.triggerType === "unAnsweredQuestionTrigger";
+    const isStaleDiscussionTrigger = formValues.trigger?.triggerType === "staleDiscussionTrigger";
+    const isPostSentimentTrigger = formValues.trigger?.triggerType === "postSentimentTrigger";
 
-    const hasTriggerCollectionValue =
+    const hasCollectionTriggerValue =
         formValues.trigger?.triggerType === "staleCollectionTrigger" &&
         !!formValues.trigger?.triggerValue?.collectionID?.length;
 
-    const triggerCollectionValue = hasTriggerCollectionValue && formValues.trigger?.triggerValue?.collectionID;
+    const collectionTriggerValue = hasCollectionTriggerValue && formValues.trigger?.triggerValue?.collectionID;
 
-    const ideaScoreTriggerValue =
-        formValues.trigger?.triggerType === "ideationVoteTrigger" && formValues.trigger?.triggerValue?.score;
+    const discussionPointsTriggerValue =
+        (formValues.trigger?.triggerType === "discussionReachesScoreTrigger" ||
+            formValues.trigger?.triggerType === "ideationVoteTrigger") &&
+        formValues.trigger?.triggerValue.score;
 
     const countReportsTriggerValue =
         formValues.trigger?.triggerType === "reportPostTrigger" && formValues.trigger?.triggerValue?.countReports;
@@ -104,10 +134,30 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
         reportReasonsFromCatalog &&
         formValues.trigger?.triggerValue?.reportReasonID?.length > 0 &&
         formValues.trigger?.triggerValue?.reportReasonID;
-    const reportCategoryTriggerValue =
-        countReportsTriggerValue &&
+
+    const categoryTriggerValue =
+        (isStaleDiscussionTrigger ||
+            countReportsTriggerValue ||
+            isUnansweredQuestionTrigger ||
+            isPostSentimentTrigger) &&
         formValues.trigger?.triggerValue?.categoryID?.length > 0 &&
         formValues.trigger?.triggerValue?.categoryID;
+
+    const tagTriggerValue =
+        (isStaleDiscussionTrigger || isUnansweredQuestionTrigger) &&
+        formValues.trigger?.triggerValue?.tagID?.length > 0 &&
+        formValues.trigger?.triggerValue?.tagID;
+
+    const roleTriggerValue =
+        isPostSentimentTrigger &&
+        formValues.trigger?.triggerValue?.roleID?.length > 0 &&
+        formValues.trigger?.triggerValue?.roleID;
+
+    const sentimentTriggerValue =
+        isPostSentimentTrigger &&
+        sentimentsFromCatalog &&
+        formValues.trigger?.triggerValue?.sentiment?.length > 0 &&
+        formValues.trigger?.triggerValue?.sentiment;
 
     // action values
     const hasRoleActionValues = formValues.action?.actionType === "addRemoveRoleAction" && rolesByID;
@@ -121,7 +171,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
 
     const hasTagOrCollectionActionValue =
         (formValues.action?.actionType === "addTagAction" && !!formValues.action?.actionValue?.tagID?.length) ||
-        (["addToCollectionAction", "removeDiscussionFromCollectionAction"].includes(
+        (["addDiscussionToCollectionAction", "removeDiscussionFromCollectionAction"].includes(
             formValues.action?.actionType ?? "",
         ) &&
             !!formValues.action?.actionValue?.collectionID?.length);
@@ -134,10 +184,20 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
         formValues.action?.actionType === "createEscalationAction" &&
         formValues.action?.actionValue?.assignedModeratorID;
 
+    // groups
+    const groupsData = optionalDataSources?.["groups"]?.data;
+    const groupActionValue =
+        formValues.action?.actionType === "inviteToGroupAction" &&
+        formValues.action?.actionValue?.groupID?.length > 0 &&
+        groupsData &&
+        formValues.action?.actionValue?.groupID;
+
     // time duration values
     const isTimeDurationTriggerType = isTimeBasedTrigger(formValues.trigger?.triggerType, automationRulesCatalog);
     const triggerDelayValue =
-        isTimeDurationTriggerType && !Number.isNaN(formValues.trigger?.triggerValue?.triggerTimeDelay?.length)
+        isTimeDurationTriggerType &&
+        !Number.isNaN(formValues.trigger?.triggerValue?.triggerTimeDelay?.length) &&
+        formValues.trigger?.triggerValue?.triggerTimeDelay?.length > 0
             ? formValues.trigger?.triggerValue?.triggerTimeDelay?.length
             : false;
     const triggerDelayUnit = formValues.trigger?.triggerValue?.triggerTimeDelay?.unit;
@@ -167,7 +227,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
                         </TokenItem>
                     )}
                     {value.length > 1 && index !== value.length - 1 && (
-                        <span className={classes.rightGap(4)}>{`${t(valueSeparator)} `}</span>
+                        <span className={classes.leftGap(4)}>{`${t(valueSeparator)} `}</span>
                     )}
                 </span>
             ))
@@ -182,7 +242,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
 
     const summarySectionContent = (
         <>
-            <div>
+            <div id={props.id}>
                 {formValues.trigger?.triggerType && (
                     <div>
                         <div className={classes.summaryTitle}>{`${t("Trigger")}: `}</div>
@@ -216,10 +276,12 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
                         {isEmailDomainTrigger &&
                             formValues.trigger?.triggerValue?.emailDomain &&
                             valueAsTokenItem(formValues.trigger?.triggerValue?.emailDomain.split(","), "or")}
-                        {ideaScoreTriggerValue && (
+                        {discussionPointsTriggerValue && (
                             <>
-                                {valueAsTokenItem(ideaScoreTriggerValue)}
-                                {ideaScoreTriggerValue == 1 ? ` ${t("upvote")}` : ` ${t("upvotes")}`}
+                                {valueAsTokenItem(discussionPointsTriggerValue)}
+                                {discussionPointsTriggerValue == 1
+                                    ? `${isIdeaVoteTrigger ? t("upvote") : t("point")}`
+                                    : ` ${isIdeaVoteTrigger ? t("upvotes") : t("points")}`}
                             </>
                         )}
                         {countReportsTriggerValue && (
@@ -234,20 +296,40 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
                                 {valueAsTokenItem(reportReasonTriggerValue, "or", reportReasonsFromCatalog)}
                             </>
                         )}
-                        {reportCategoryTriggerValue && categories && (
+                        {sentimentTriggerValue && (
                             <>
-                                {!reportReasonTriggerValue && " "}
-                                {`${t("in")} `}
-                                {valueAsTokenItem(reportCategoryTriggerValue, "or", categories, "categoryID")}
-                                {t("category")}
+                                {` ${t("with")} `}
+                                {valueAsTokenItem(sentimentTriggerValue, "or", sentimentsFromCatalog)}
+                                {` ${t(" sentiment")} `}
                             </>
                         )}
-                        {hasTriggerCollectionValue && (
-                            <>{valueAsTokenItem(triggerCollectionValue, "or", collections, "collectionID")}</>
+                        {roleTriggerValue && (
+                            <>
+                                {` ${t("created by")} `}
+                                {valueAsTokenItem(roleTriggerValue, "or", Object.values(rolesByID ?? {}), "roleID")}
+                            </>
                         )}
+                        {categoryTriggerValue && categories && (
+                            <>
+                                {` ${t("in")} `}
+                                {valueAsTokenItem(categoryTriggerValue, "or", categories, "categoryID")}
+                                {` ${t("category")} `}
+                            </>
+                        )}
+                        {tagTriggerValue && (
+                            <>
+                                {` ${t("with tag")} `}
+                                {valueAsTokenItem(tagTriggerValue, "or", tags, "tagID")}
+                            </>
+                        )}
+                        {hasCollectionTriggerValue && (
+                            <>{valueAsTokenItem(collectionTriggerValue, "or", collections, "collectionID")}</>
+                        )}
+                        {isStaleDiscussionTrigger && <>{` ${t("has not received any comments")} `}</>}
+                        {isUnansweredQuestionTrigger && <>{` ${t("has been unanswered")} `}</>}
                         {triggerDelayValue && (
                             <>
-                                {`${t("for")}: `}
+                                {` ${t("for")}: `}
                                 <span className={classes.rightGap(4)}>{valueAsTokenItem(triggerDelayValue)}</span>
                                 {valueAsTokenItem(
                                     triggerDelayValue > 1 ? t(`${triggerDelayUnit}s`) : t(triggerDelayUnit),
@@ -292,14 +374,23 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
                                 <>
                                     {formValues.action?.actionType === "addTagAction" &&
                                         valueAsTokenItem(tagActionValue, "and", tags, "tagID")}
-                                    {["addToCollectionAction", "removeDiscussionFromCollectionAction"].includes(
-                                        formValues.action?.actionType ?? "",
-                                    ) && valueAsTokenItem(collectionActionValue, "and", collections, "collectionID")}
+                                    {[
+                                        "addDiscussionToCollectionAction",
+                                        "removeDiscussionFromCollectionAction",
+                                    ].includes(formValues.action?.actionType ?? "") &&
+                                        valueAsTokenItem(collectionActionValue, "and", collections, "collectionID")}
                                 </>
                             )}
                             {hasCategoryActionValues &&
                                 categories &&
                                 valueAsTokenItem(categoryActionValue, "and", categories, "categoryID")}
+                            {groupActionValue &&
+                                valueAsTokenItem(
+                                    groupActionValue,
+                                    "and",
+                                    optionalDataSources["groups"]?.data,
+                                    "groupID",
+                                )}
                             {ideaStatusActionValue &&
                                 ideaStatusesByID &&
                                 valueAsTokenItem(ideaStatusesByID[ideaStatusActionValue])}
@@ -331,9 +422,14 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
     );
 
     const shouldCheckAdditionalQuery =
-        (categories && (categoryActionValue || reportCategoryTriggerValue)) ||
+        (categories && (categoryActionValue || categoryTriggerValue)) ||
         (tags && tagActionValue) ||
+        groupActionValue ||
         (users && assignedModeratorActionValue);
+
+    const dataToLookupFromOptionalSource = groupActionValue
+        ? { currentValue: groupActionValue, queryKey: "groupID", sourceToLookup: "groups" }
+        : undefined;
 
     return isLoading ? (
         <>
@@ -345,17 +441,13 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
             {shouldCheckAdditionalQuery && (
                 <AutomationRulesSummaryQuery
                     categories={categories}
-                    categoryValue={
-                        categoryActionValue
-                            ? categoryActionValue
-                            : reportCategoryTriggerValue
-                            ? reportCategoryTriggerValue
-                            : false
-                    }
+                    categoryValue={categoryActionValue || categoryTriggerValue || false}
                     tags={tags}
-                    tagValue={tagActionValue}
+                    tagValue={tagActionValue || tagTriggerValue || false}
                     users={users}
                     userValue={assignedModeratorActionValue}
+                    optionalDataSources={optionalDataSources}
+                    dataToLookupFromOptionalSource={dataToLookupFromOptionalSource}
                 />
             )}
             {isEditing && isRuleRunning && (

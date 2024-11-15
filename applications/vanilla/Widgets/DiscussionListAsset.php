@@ -100,7 +100,6 @@ class DiscussionListAsset extends AbstractLayoutAsset implements HydrateAwareInt
             ArrayUtils::pluck($this->getHydrateParams(), $desiredHydrateParams)
         );
 
-        $categoryFollowing = Gdn::config()->get("Vanilla.EnableCategoryFollowing", 0);
         if ($layoutViewType === "discussionCategoryPage") {
             $categoryFollowing = false;
             $apiParams["layoutViewType"] = $layoutViewType;
@@ -136,7 +135,6 @@ class DiscussionListAsset extends AbstractLayoutAsset implements HydrateAwareInt
         $props["isAsset"] = true;
         $props["defaultSort"] = $this->props["apiParams"]["sort"];
         $props["noCheckboxes"] = false;
-        $props["categoryFollowEnabled"] = $categoryFollowing && $categoryFollowing !== "0";
         return $props;
     }
 
@@ -207,6 +205,7 @@ class DiscussionListAsset extends AbstractLayoutAsset implements HydrateAwareInt
             "type?",
             "sort?",
             "followed?",
+            "suggested?",
             "page?",
             "tagID?",
             "internalStatusID?",

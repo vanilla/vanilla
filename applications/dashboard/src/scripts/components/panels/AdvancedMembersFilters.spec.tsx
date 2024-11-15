@@ -9,8 +9,8 @@ import { RenderResult } from "@testing-library/react";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import {
     ProfileField,
-    ProfileFieldFormType,
-    ProfileFieldVisibility,
+    CreatableFieldFormType,
+    CreatableFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
@@ -53,71 +53,71 @@ describe("AdvancedMembersFilters", () => {
 
     // A mixture of public, internal and private fields: some configured to be searchable and others configure not to be searchable.
     const mockFields: ProfileField[] = [
-        ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TEXT_MULTILINE, {
+        ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TEXT_MULTILINE, {
             apiName: "public searchable text multiline",
             label: "public searchable text multiline",
             displayOptions: {
                 search: true,
             },
-            visibility: ProfileFieldVisibility.PUBLIC,
+            visibility: CreatableFieldVisibility.PUBLIC,
         }),
 
-        ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TEXT, {
+        ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TEXT, {
             apiName: "public searchable text box",
             label: "public searchable text box",
             displayOptions: {
                 search: true,
             },
-            visibility: ProfileFieldVisibility.PUBLIC,
+            visibility: CreatableFieldVisibility.PUBLIC,
         }),
 
-        ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.CHECKBOX, {
+        ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.CHECKBOX, {
             apiName: "public non-searchable checkbox",
             displayOptions: {
                 search: false,
             },
-            visibility: ProfileFieldVisibility.PUBLIC,
+            visibility: CreatableFieldVisibility.PUBLIC,
         }),
 
-        ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.CHECKBOX, {
+        ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.CHECKBOX, {
             apiName: "internal searchable checkbox",
             displayOptions: {
                 search: true,
             },
-            visibility: ProfileFieldVisibility.INTERNAL,
+            visibility: CreatableFieldVisibility.INTERNAL,
         }),
 
-        ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.TEXT, {
+        ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.TEXT, {
             apiName: "internal searchable text field",
             displayOptions: {
                 search: true,
             },
-            visibility: ProfileFieldVisibility.INTERNAL,
+            visibility: CreatableFieldVisibility.INTERNAL,
         }),
 
-        ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.CHECKBOX, {
+        ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.CHECKBOX, {
             apiName: "private searchable checkbox field",
             displayOptions: {
                 search: true,
             },
-            visibility: ProfileFieldVisibility.PRIVATE,
+            visibility: CreatableFieldVisibility.PRIVATE,
         }),
 
-        ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.DROPDOWN, {
+        ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.DROPDOWN, {
             apiName: "internal non-searchable text field",
             displayOptions: {
                 search: false,
             },
-            visibility: ProfileFieldVisibility.INTERNAL,
+            visibility: CreatableFieldVisibility.INTERNAL,
         }),
 
-        ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.DROPDOWN, {
+        ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.DROPDOWN, {
             apiName: "disabled public searchable text field",
             displayOptions: {
                 search: true,
             },
             enabled: false,
-            visibility: ProfileFieldVisibility.PUBLIC,
+            visibility: CreatableFieldVisibility.PUBLIC,
         }),
     ];
 
@@ -188,7 +188,7 @@ describe("AdvancedMembersFilters", () => {
         it("Has inputs for all the searchable profile fields, which the user is permitted to view.", () => {
             expect.hasAssertions();
             searchableProfileFields.forEach(({ label, visibility }) => {
-                if ([ProfileFieldVisibility.PRIVATE, ProfileFieldVisibility.PUBLIC].includes(visibility)) {
+                if ([CreatableFieldVisibility.PRIVATE, CreatableFieldVisibility.PUBLIC].includes(visibility)) {
                     expect(result.queryByText(label)).toBeInTheDocument();
                 }
             });
@@ -197,7 +197,7 @@ describe("AdvancedMembersFilters", () => {
         it("Does not contain inputs for searchable profile fields, if the user is not permitted to view them.", () => {
             expect.hasAssertions();
             searchableProfileFields.forEach(({ label, visibility }) => {
-                if (visibility === ProfileFieldVisibility.INTERNAL) {
+                if (visibility === CreatableFieldVisibility.INTERNAL) {
                     expect(result.queryByText(label)).not.toBeInTheDocument();
                 }
             });

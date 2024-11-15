@@ -22,6 +22,7 @@ export function DashboardCheckBox(props: IProps) {
         <>
             <CheckBox
                 {...props}
+                labelBold={props.labelBold ?? props.description != null}
                 excludeFromICheck={excludeFromICheck}
                 onChange={(e) => props.onChange && props.onChange(!!e.target.checked)}
                 isHorizontal={isInline}

@@ -14,6 +14,7 @@ use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
 use Garden\StaticCacheConfigTrait;
+use Garden\Utils\ContextException;
 use Garden\Web\Exception\ForbiddenException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -45,8 +46,11 @@ use Vanilla\Logging\AuditLogger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\Model;
+use Vanilla\Models\ModelCache;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Permissions;
+use Vanilla\Dashboard\Events\SsoStringAuditEvent;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerFailedID;
 use Vanilla\Scheduler\LongRunnerItemResultInterface;
@@ -441,12 +445,42 @@ class UserModel extends Gdn_Model implements
      *
      * @return int
      */
-    public function countEstimate()
+    public function countEstimate(): int
     {
-        $px = Gdn::database()->DatabasePrefix;
-        return Gdn::database()
-            ->query("show table status like '{$px}User'")
-            ->value("Rows", 0);
+        $key = "userModel_estimate_count";
+        $cache = \Gdn::cache();
+        $cached = $cache->get($key);
+        if ($cached === Gdn_Cache::CACHEOP_FAILURE) {
+            $px = Gdn::database()->DatabasePrefix;
+            $result = Gdn::database()
+                ->query("show table status like '{$px}User'")
+                ->value("Rows", 0);
+            $cache->store($key, $result, [Gdn_Cache::FEATURE_EXPIRY => 60 * 5]); // 5 minutes;
+            return $result;
+        } else {
+            return $cached;
+        }
+    }
+
+    /**
+     * @param int $limit
+     * @return int
+     */
+    public function getPagingCount(int $limit = 10000): int
+    {
+        $modelCache = new ModelCache("User", \Gdn::cache());
+
+        $result = $modelCache->getCachedOrHydrate(
+            ["limit" => $limit],
+            function () use ($limit) {
+                $count = $this->createSql()
+                    ->from("User")
+                    ->getPagingCount("UserID", $limit);
+                return $count;
+            },
+            [ModelCache::OPT_TTL => 60 * 5]
+        );
+        return $result;
     }
 
     /**
@@ -628,7 +662,7 @@ class UserModel extends Gdn_Model implements
     }
 
     /**
-     * Check whether a user has access to view discussions in a particular category.
+     * Check whether a user has access to view element in a particular category.
      *
      * @param int $userID
      * @param int $categoryID
@@ -644,7 +678,7 @@ class UserModel extends Gdn_Model implements
             $permission = "Vanilla.Discussions.View";
         }
 
-        if (empty($userID) || empty($categoryID)) {
+        if (empty($categoryID)) {
             return false;
         }
         $category = CategoryModel::categories($categoryID);
@@ -1121,6 +1155,10 @@ class UserModel extends Gdn_Model implements
         if ($pendingEmail) {
             $this->setField($userID, "Email", $pendingEmail);
         }
+        $updatedUser = $this->getID($userID, DATASET_TYPE_ARRAY);
+        // Dispatch an update event as the user is confirmed
+        $userEvent = $this->eventFromRow($updatedUser, UserEvent::ACTION_UPDATE, (array) $user);
+        $this->getEventManager()->dispatch($userEvent);
         return true;
     }
 
@@ -1145,48 +1183,37 @@ class UserModel extends Gdn_Model implements
         $timestamp = $parts[2] ?? "";
         $hashMethod = $parts[3] ?? "hmacsha1";
 
-        trace($string, "SSO String");
         $data = json_decode(base64_decode($string), true);
-        trace($data, "RAW SSO Data");
 
         if (empty($signature)) {
             $this->Validation->addValidationResult("sso", "Missing SSO signature.");
         }
         if (empty($timestamp)) {
             $this->Validation->addValidationResult("sso", "Missing SSO timestamp.");
-        }
-        if (!filter_var($timestamp, FILTER_VALIDATE_INT) || abs($timestamp - time()) > self::SSO_TIMEOUT) {
-            $this->Validation->addValidationResult("sso", "The timestamp is invalid.");
-        }
-        if (!in_array($hashMethod, ["hmacsha1"], true)) {
-            $this->Validation->addValidationResult("sso", "Invalid SSO hash method: $hashMethod.");
+        } elseif (!filter_var($timestamp, FILTER_VALIDATE_INT)) {
+            $this->Validation->addValidationResult("sso", "The SSO timestamp is invalid.");
+        } elseif (abs($timestamp - CurrentTimeStamp::get()) > self::SSO_TIMEOUT) {
+            $this->Validation->addValidationResult("sso", "The SSO timestamp has expired.");
         }
 
-        if (count($this->Validation->results()) > 0) {
-            $msg = $this->Validation->resultsText();
-            if ($throwError) {
-                throw new Gdn_UserException($msg, 400);
-            }
-            return false;
+        if (!in_array($hashMethod, ["hmacsha1"], true)) {
+            $this->Validation->addValidationResult("sso", "Invalid SSO hash method: $hashMethod.");
         }
 
         $clientID = val("client_id", $data);
         if (!$clientID) {
             $this->Validation->addValidationResult("sso", "Missing SSO client_id");
-            return false;
         }
 
         $provider = Gdn_AuthenticationProviderModel::getProviderByKey($clientID);
 
         if (!$provider) {
             $this->Validation->addValidationResult("sso", "Unknown SSO Provider: $clientID");
-            return false;
         }
 
         $secret = $provider["AssociationSecret"];
         if (!trim($secret, ".")) {
-            $this->Validation->addValidationResult("sso", "Missing client secret");
-            return false;
+            $this->Validation->addValidationResult("sso", "Missing SSO client secret");
         }
 
         // Check the signature.
@@ -1195,10 +1222,23 @@ class UserModel extends Gdn_Model implements
                 $calcSignature = hash_hmac("sha1", "$string $timestamp", $secret);
                 break;
             default:
-                return false;
+                throw new ContextException("Unknown sso-string hash method: $hashMethod");
+                break;
         }
-        if ($calcSignature !== $signature) {
+        if (!hash_equals($calcSignature, $signature)) {
             $this->Validation->addValidationResult("sso", "Invalid SSO signature: $signature");
+        }
+
+        if (count($this->Validation->results()) > 0) {
+            $msg = $this->Validation->resultsText();
+
+            AuditLogger::log(
+                new SsoStringAuditEvent("invalid", "Connection Failed", array_merge(["errorMessage" => $msg], $data))
+            );
+
+            if ($throwError) {
+                throw new Gdn_UserException($msg, 400);
+            }
             return false;
         }
 
@@ -1224,9 +1264,23 @@ class UserModel extends Gdn_Model implements
             unset($user["Roles"]);
         }
 
-        trace($user, "SSO User");
-
         $userID = $this->connect($uniqueID, $clientID, $user);
+        if ($userID) {
+            AuditLogger::log(new SsoStringAuditEvent("success", "Connection Succeeded", $data));
+        } else {
+            if (count($this->Validation->results()) > 0) {
+                AuditLogger::log(
+                    new SsoStringAuditEvent(
+                        "invalid_user",
+                        "Invalid User",
+                        array_merge(["errorMessage" => $this->Validation->resultsText()], $data)
+                    )
+                );
+            } else {
+                AuditLogger::log(new SsoStringAuditEvent("unknown_error", "Unknown Connection Error", $data));
+            }
+        }
+
         return $userID;
     }
 
@@ -1442,6 +1496,13 @@ class UserModel extends Gdn_Model implements
                     "UserID" => $userID,
                 ]);
             } else {
+                ErrorLogger::warning(
+                    "UserModel->Connect() - Unable to register user.",
+                    ["sso", "connect"],
+                    [
+                        "error" => trim($this->Validation->resultsText()) ?: "Unknown error.",
+                    ]
+                );
                 trace($this->Validation->resultsText(), TRACE_ERROR);
             }
         }
@@ -1742,7 +1803,7 @@ class UserModel extends Gdn_Model implements
      *
      * @param int[] $userIDs
      *
-     * @return array[]
+     * @return array<int, UserFragment>
      */
     public function getUserFragments(array $userIDs): array
     {
@@ -1778,12 +1839,16 @@ class UserModel extends Gdn_Model implements
                     setValue("Name", $user, "Unknown");
                 }
             }
-
+            $hasFullProfileViewPermission = $this->session->checkPermission(
+                ["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete", "Garden.PersonalInfo.View"],
+                false
+            );
             $user = !empty($user)
-                ? new UserFragment($user)
+                ? new UserFragment($user, $hasFullProfileViewPermission)
                 : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
             $userFragments[$userID] = $user;
         }
+
         return $userFragments;
     }
 
@@ -2256,7 +2321,11 @@ class UserModel extends Gdn_Model implements
                 throw new NoResultsException("No user found for ID: " . $id);
             }
         } else {
-            $userFragment = new UserFragment($record);
+            $hasFullProfileViewPermission = $this->session->checkPermission(
+                ["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete", "Garden.PersonalInfo.View"],
+                false
+            );
+            $userFragment = new UserFragment($record, $hasFullProfileViewPermission);
         }
         return $userFragment;
     }
@@ -2318,7 +2387,6 @@ class UserModel extends Gdn_Model implements
 
         $this->EventArguments["LoadedUser"] = &$user;
         $this->fireEvent("AfterGetID");
-
         return $user;
     }
 
@@ -3465,11 +3533,21 @@ class UserModel extends Gdn_Model implements
                 if ($userID) {
                     if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
                         if (array_key_exists("SuggestAnswers", $formPostValues)) {
-                            $this->userMetaModel->setUserMeta(
-                                $userID,
-                                "SuggestAnswers",
-                                forceBool($formPostValues["SuggestAnswers"], "1", "1", "0")
-                            );
+                            if (!$this->userMetaModel->hasUserAcceptedCookie($userID)) {
+                                $suggestionUser = AiSuggestionSourceService::getSuggestionUser();
+                                throw new Exception(
+                                    $suggestionUser["Name"] .
+                                        " " .
+                                        t("Answers is not available if you have not accepted cookies."),
+                                    400
+                                );
+                            } else {
+                                $this->userMetaModel->setUserMeta(
+                                    $userID,
+                                    "SuggestAnswers",
+                                    forceBool($formPostValues["SuggestAnswers"], "1", "1", "0")
+                                );
+                            }
                         }
                     }
                 }
@@ -3610,7 +3688,10 @@ class UserModel extends Gdn_Model implements
 
         $result = ArrayUtils::camelCase($row);
 
+        $result["url"] = $this->getProfileUrl($result);
+
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
+            $result["locale"] = "all";
             $result["canonicalID"] = "user_{$result["userID"]}";
             $result["excerpt"] = "";
             $result["scope"] = CrawlableRecordSchema::SCOPE_RESTRICTED;
@@ -3623,11 +3704,8 @@ class UserModel extends Gdn_Model implements
         if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
             $aiConfig = AiSuggestionSourceService::aiSuggestionConfigs();
             if ($aiConfig["enabled"]) {
-                $result["suggestAnswers"] = $this->userMetaModel->getUserMeta(
-                    $result["userID"],
-                    "SuggestAnswers",
-                    true
-                )["SuggestAnswers"];
+                $aiSuggestion = Gdn::getContainer()->get(AiSuggestionSourceService::class);
+                $result["suggestAnswers"] = $aiSuggestion->checkIfUserHasEnabledAiSuggestions($userID);
             }
         }
         return $result;
@@ -4283,10 +4361,7 @@ class UserModel extends Gdn_Model implements
                 $crawlableFields = array_keys(CrawlableRecordSchema::schema("")->getField("properties"));
                 $row = ArrayUtils::pluck(
                     $row,
-                    array_merge(
-                        ["userID", "name", "banned", "photoUrl", "dateInserted", "dateLastActive", "url"],
-                        $crawlableFields
-                    )
+                    array_merge(["userID", "name", "banned", "photoUrl", "url"], $crawlableFields)
                 );
             }
             if ($isUserPrivate) {
@@ -4445,7 +4520,34 @@ class UserModel extends Gdn_Model implements
      * @param int|bool $offset Offset for result rows.
      * @return Gdn_DataSet
      */
-    public function searchByName($name, $sortField = "name", $sortDirection = "asc", $limit = false, $offset = false)
+    public function searchByName(
+        $name,
+        $sortField = "name",
+        $sortDirection = "asc",
+        $limit = false,
+        $offset = false
+    ): Gdn_DataSet {
+        $results = $this->queryByName(
+            $name,
+            [],
+            options: [
+                Model::OPT_ORDER => $sortField,
+                Model::OPT_DIRECTION => $sortDirection,
+                Model::OPT_LIMIT => $limit,
+                Model::OPT_OFFSET => $offset,
+            ]
+        )->get();
+        return $results;
+    }
+
+    /**
+     * @param string $name
+     * @param array $where
+     * @param array $options
+     *
+     * @return Gdn_SQLDriver
+     */
+    public function queryByName(string $name, array $where = [], array $options = []): Gdn_SQLDriver
     {
         $wildcardSearch = substr($name, -1, 1) === "*";
 
@@ -4453,24 +4555,26 @@ class UserModel extends Gdn_Model implements
         $name = trim($name);
 
         // Avoid potential pollution by resetting.
-        $this->SQL->reset();
-        $this->SQL->from("User");
-        if ($wildcardSearch) {
-            $name = $this->escapeField($name);
-            $name = rtrim($name, "*");
-            $this->SQL
-                ->where("Name", $name)
-                ->orOp()
-                ->like("Name", $name, "right");
-        } else {
-            $this->SQL->where("Name", $name);
+        $sql = $this->createSql();
+        $sql->from("User u");
+
+        if (!empty($name)) {
+            if ($wildcardSearch) {
+                $name = $this->escapeField($name);
+                $name = rtrim($name, "*");
+                $sql->beginWhereGroup()
+                    ->where("u.Name", $name)
+                    ->orOp()
+                    ->like("u.Name", $name, "right")
+                    ->endWhereGroup();
+            } else {
+                $sql->where("u.Name", $name);
+            }
         }
-        $result = $this->SQL
-            ->where("Deleted", 0)
-            ->orderBy($sortField, $sortDirection)
-            ->limit($limit, $offset)
-            ->get();
-        return $result;
+        $sql->where("u.Deleted", 0)
+            ->where($where)
+            ->applyModelOptions($options);
+        return $sql;
     }
 
     /**
@@ -5814,6 +5918,11 @@ class UserModel extends Gdn_Model implements
         if ($userID == $session->UserID) {
             $session->setAttribute($attribute, $value);
         }
+        if (is_array($attribute) && array_key_exists("Private", $attribute)) {
+            $attribute["Private"] = forceBool($attribute["Private"], "0", "1", "0");
+        } elseif ($attribute === "Private") {
+            $value = forceBool($value, "0", "1", "0");
+        }
 
         return $this->saveToSerializedColumn("Attributes", $userID, $attribute, $value);
     }
@@ -6598,7 +6707,15 @@ SQL;
         if (!is_array($property)) {
             $property = [$property => $value];
         }
-
+        if (is_array($property) && array_key_exists("Private", $property)) {
+            $property["Private"] = forceBool($property["Private"], "0", "1", "0");
+        } elseif (is_array($property) && array_key_exists("Attributes", $property)) {
+            if (array_key_exists("Private", $property["Attributes"])) {
+                $property["Attributes"]["Private"] = forceBool($property["Attributes"]["Private"], "0", "1", "0");
+            }
+        } elseif ($property === "Private") {
+            $value = forceBool($value, "0", "1", "0");
+        }
         [$userSet, $userMetaSet] = $this->splitUserUserMetaFields($property);
 
         if (count($userSet) > 0) {

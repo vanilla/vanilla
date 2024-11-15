@@ -249,15 +249,17 @@ class QnaModel
 
     /**
      * Get question status data by its name
-     * @param string $name
+     * @param string|array $name
      * @return array
      * @throws NoResultsException
      * @throws \Garden\Schema\ValidationException
      */
-    public function getQuestionStatusByName(string $name): array
+    public function getQuestionStatusByName(string|array $name): array
     {
         $where = $this->getCondition(["name" => $name]);
-        return $this->recordStatusModel->selectSingle($where);
+        return is_array($name)
+            ? $this->recordStatusModel->select($where)
+            : $this->recordStatusModel->selectSingle($where);
     }
 
     /**

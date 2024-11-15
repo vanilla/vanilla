@@ -25,6 +25,7 @@ async function renderInProvider() {
     return render(
         <ToastProvider>
             <ThreadItemContextProvider
+                threadStyle={"flat"}
                 recordID={mockDiscussion.discussionID}
                 recordType="discussion"
                 recordUrl={mockDiscussion.url}
@@ -43,6 +44,8 @@ describe("ThreadItemPermalink", () => {
     let copyLinkButton: HTMLElement;
 
     beforeEach(async () => {
+        window.history.pushState = vitest.fn();
+
         result = await renderInProvider();
         copyLinkButton = await result.findByRole("button", { name: "Copy Link", exact: false });
     });

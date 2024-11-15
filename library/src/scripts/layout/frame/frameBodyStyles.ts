@@ -52,7 +52,7 @@ export const frameBodyClasses = useThemeCache(() => {
                 },
             },
         },
-        "& .form-group:last-child": {
+        "& .modernFormGroup:last-child": {
             marginBottom: 0,
             borderBottom: "none",
         },

@@ -40,9 +40,6 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
     /** @var ProfileFieldModel */
     public $profileFieldModel;
 
-    /** @var CategoryModel */
-    public $categoryModel;
-
     /** @var string Reusable username requirement error message. */
     public $UsernameError = "";
 
@@ -61,8 +58,10 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
      * @since 2.0.0
      * @access public
      */
-    public function __construct(ProfileFieldModel $profileFieldModel, CategoryModel $categoryModel)
-    {
+    public function __construct(
+        ProfileFieldModel $profileFieldModel,
+        \Vanilla\Dashboard\Models\UserNotificationPreferencesModel $userNotificationPreferencesModel
+    ) {
         parent::__construct();
         $this->internalMethods[] = "target";
 
@@ -78,7 +77,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         }
         $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
         $this->profileFieldModel = $profileFieldModel;
-        $this->categoryModel = $categoryModel;
+        $this->userNotificationPreferencesModel = $userNotificationPreferencesModel;
     }
 
     /**
@@ -649,9 +648,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 (bool) $this->Form->getFormValue("RememberMe", c("Garden.SSO.RememberMe", true)),
                 $stashID
             );
-            //when default followed is turned on  and the user has no default followed category,
-            // then assign them the default followed category
-            $this->categoryModel->setDefaultCategoryPreferences($userID, true);
+            // set default preferences
+            $this->userNotificationPreferencesModel->setInitialDefaults($userID, true);
             Gdn::userModel()->fireEvent("AfterSignIn");
 
             // Send them on their way.
@@ -744,9 +742,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                                 $stashID
                             );
                             Gdn::userModel()->fireEvent("AfterSignIn");
-                            //when default followed is turned on  and the user has no default followed category,
-                            // then assign them the default followed category
-                            $this->categoryModel->setDefaultCategoryPreferences($userID, true);
+                            // set initial default preferences
+                            $this->userNotificationPreferencesModel->setInitialDefaults($userID, true);
 
                             $this->_setRedirect(Gdn::request()->get("display") === "popup");
                             $this->render();
@@ -905,11 +902,16 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                             );
                             $userModel->sendWelcomeEmail($userID, "", "Connect", ["ProviderName" => $providerName]);
                         } catch (Exception $ex) {
-                            // Do nothing if emailing doesn't work.
+                            $this->logger->error("Error Sending Welcome Email.", [
+                                "error" => $ex->getMessage(),
+                                "trace" => $ex->getTrace(),
+                                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                                Logger::FIELD_EVENT => "syncConnect_welcome_email",
+                            ]);
                         }
                     }
-                    // add default category followed to the new user
-                    $this->categoryModel->setDefaultCategoryPreferences($userID);
+                    // add default preferences
+                    $this->userNotificationPreferencesModel->setInitialDefaults($userID);
 
                     // Move along.
                     $this->_setRedirect(Gdn::request()->get("display") === "popup");
@@ -1085,8 +1087,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     }
                     Gdn::userModel()->fireEvent("AfterSignIn");
 
-                    //Set default category follow to the user
-                    $this->categoryModel->setDefaultCategoryPreferences(val("UserID", $user), true);
+                    //Set default preferences
+                    $this->userNotificationPreferencesModel->setInitialDefaults(val("UserID", $user), true);
                     // Move along.
                     $this->_setRedirect(Gdn::request()->get("display") === "popup");
                 } else {
@@ -1491,9 +1493,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                                     (bool) $this->Form->getFormValue("RememberMe")
                                 );
 
-                                //when default followed is turned on  and the user has no default followed category,
-                                // then assign them the default followed category
-                                $this->categoryModel->setDefaultCategoryPreferences(val("UserID", $user), true);
+                                //set default preferences
+                                $this->userNotificationPreferencesModel->setInitialDefaults(val("UserID", $user), true);
 
                                 if (BanModel::isBanned($user->Banned, BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)) {
                                     AuditLogger::log(new UserSignInFailedEvent($user->Email, "User is banned."));
@@ -1721,9 +1722,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     // The user has been created successfully, so sign in now.
                     Gdn::session()->start($authUserID);
 
-                    //when default followed is turned on  and the user has no default followed category,
-                    // then assign them the default followed category
-                    $this->categoryModel->setDefaultCategoryPreferences($authUserID);
+                    //set default preferences
+                    $this->userNotificationPreferencesModel->setInitialDefaults($authUserID);
 
                     if ($this->Form->getFormValue("RememberMe")) {
                         Gdn::authenticator()->setIdentity($authUserID, true, Gdn::session()->SessionID);
@@ -1807,9 +1807,9 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 } else {
                     // The user has been created successfully, so sign in now.
                     Gdn::session()->start($authUserID);
-                    //when default followed is turned on  and the user has no default followed category,
-                    // then assign them the default followed category
-                    $this->categoryModel->setDefaultCategoryPreferences($authUserID);
+
+                    // set default preferences
+                    $this->userNotificationPreferencesModel->setInitialDefaults($authUserID);
 
                     if ($this->Form->getFormValue("RememberMe")) {
                         Gdn::authenticator()->setIdentity($authUserID, true, Gdn::session()->SessionID);
@@ -1820,8 +1820,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     } catch (Exception $ex) {
                         // Suppress exceptions from bubbling up.
                     }
-                    // add default category followed to the new user
-                    $this->categoryModel->setDefaultCategoryPreferences($authUserID);
+                    // add default preferences
+                    $this->userNotificationPreferencesModel->setInitialDefaults($authUserID);
 
                     $this->fireEvent("RegistrationSuccessful");
 
@@ -1957,9 +1957,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 } else {
                     // The user has been created successfully, so sign in now.
                     Gdn::session()->start($authUserID);
-                    //when default followed is turned on  and the user has no default followed category,
-                    // then assign them the default followed category
-                    $this->categoryModel->setDefaultCategoryPreferences($authUserID);
+                    // set default preferences
+                    $this->userNotificationPreferencesModel->setInitialDefaults($authUserID);
 
                     if ($this->Form->getFormValue("RememberMe")) {
                         Gdn::authenticator()->setIdentity($authUserID, true, Gdn::session()->SessionID);
@@ -2411,9 +2410,14 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             $options = [];
             $attributes = [];
 
-            $description = !empty($field["description"])
-                ? '<div class="Gloss">' . htmlspecialchars($field["description"]) . "</div>"
-                : null;
+            $description = null;
+
+            if (!empty($field["description"])) {
+                $descriptionContent = $field["descriptionHtml"]
+                    ? $field["description"]
+                    : htmlspecialchars($field["description"]);
+                $description = '<div class="Gloss">' . $descriptionContent . "</div>";
+            }
 
             if ($field["formType"] === "text-multiline") {
                 $options["MultiLine"] = true;

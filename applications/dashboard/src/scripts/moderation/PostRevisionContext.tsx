@@ -46,12 +46,13 @@ export function PostRevisionProvider(props: {
     const post = useQuery<IDiscussion, IError, IDiscussion>({
         queryFn: async () => {
             const response = await apiv2.get(
-                `/discussions/${recordID}?expand=users&expand=category&expand=attachments&expand=status.log`,
+                `/discussions/${recordID}?expand[]=category&expand[]=attachments&expand[]=status.log`,
             );
 
             return response.data;
         },
         queryKey: ["post", recordID],
+        enabled: !!recordID,
     });
 
     const reportsForID = useQuery<any, IError, IReport[]>({

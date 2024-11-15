@@ -34,9 +34,7 @@ class CommentSearchType extends DiscussionSearchType
     private $commentModel;
 
     /** @var ConfigurationInterface */
-    private $config;
-
-    protected $queryFullTextFields = ["bodyPlainText"];
+    protected $config;
 
     /**
      * @inheritdoc
@@ -71,6 +69,16 @@ class CommentSearchType extends DiscussionSearchType
     public function getRecordType(): string
     {
         return "comment";
+    }
+
+    /**
+     * We share an identical query with discussions. By claiming our query is the same we optimize the query.
+     *
+     * @return string
+     */
+    public function getOptimizedRecordType(): string
+    {
+        return "discussion";
     }
 
     /**
@@ -116,9 +124,9 @@ class CommentSearchType extends DiscussionSearchType
     /**
      * @return float|null
      */
-    protected function getBoostValue(): ?float
+    public function getBoostValue(): ?float
     {
-        return $this->config->get("Elastic.Boost.Comments", null);
+        return $this->config->get("Elastic.Boost.Comments", 0.4);
     }
 
     /**

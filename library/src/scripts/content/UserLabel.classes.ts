@@ -74,10 +74,16 @@ export const userLabelClasses = useThemeCache(() => {
         top: "-1px",
     });
 
+    const flexWrapper = css({
+        display: "flex",
+        gap: 4,
+    });
+
     return {
         root,
         rankLabel,
         userName,
         main,
+        flexWrapper,
     };
 });

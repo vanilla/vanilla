@@ -4,22 +4,34 @@
  * @license gpl-2.0-only
  */
 
+import type { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import React, { useContext } from "react";
 
-const DiscussionThreadContext = React.createContext<{
-    discussion?: IDiscussion;
-}>({
-    discussion: undefined,
+export type ThreadItemActionsComponent = React.ComponentType<{
+    comment: IComment;
+    discussion: IDiscussion;
+    onMutateSuccess?: () => Promise<void>;
+}>;
+
+type IContext = {
+    discussion: IDiscussion;
+    ThreadItemActionsComponent?: ThreadItemActionsComponent;
+};
+
+const DiscussionThreadContext = React.createContext<IContext>({
+    discussion: {} as any,
+    ThreadItemActionsComponent: undefined,
 });
 
-export function DiscussionThreadContextProvider(props: React.PropsWithChildren<{ discussion: IDiscussion }>) {
-    const { discussion, children } = props;
+export function DiscussionThreadContextProvider(props: React.PropsWithChildren<IContext>) {
+    const { discussion, ThreadItemActionsComponent, children } = props;
 
     return (
         <DiscussionThreadContext.Provider
             value={{
                 discussion,
+                ThreadItemActionsComponent,
             }}
         >
             {children}

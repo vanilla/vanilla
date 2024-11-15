@@ -151,6 +151,9 @@ class LogController extends DashboardController
             }
         }
 
+        $logs = $this->LogModel->getIDs($logIDs);
+        $this->LogModel->dispatchSpamEventsFromLogs(...$logs);
+
         // Grab the logs.
         $this->LogModel->deleteIDs($logIDs);
         $this->render("Blank", "Utility");

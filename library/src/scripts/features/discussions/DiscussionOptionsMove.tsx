@@ -13,10 +13,10 @@ import ModalSizes from "@library/modal/ModalSizes";
 import LazyMoveDiscussionForm from "@library/features/discussions/forms/LazyMoveDiscussionForm";
 import { StackingContextProvider } from "@vanilla/react-utils";
 
-const DiscussionOptionsMove: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
-    discussion,
-    onSuccess,
-}) => {
+const DiscussionOptionsMove: FunctionComponent<{
+    discussion: IDiscussion;
+    onSuccess?: () => Promise<void>;
+}> = ({ discussion, onSuccess }) => {
     const [isVisible, setIsVisible] = useState(false);
     const open = () => setIsVisible(true);
     const close = () => setIsVisible(false);

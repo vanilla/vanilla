@@ -30,7 +30,6 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { useMemo, useState } from "react";
-import { TableInstance } from "react-table";
 
 interface IProps {}
 
@@ -143,7 +142,7 @@ export function ReportReasonList(props: IProps) {
                             customCellRenderer={[
                                 {
                                     columnName: ["name"],
-                                    component: function NameDescriptionCell(props: TableInstance) {
+                                    component: function NameDescriptionCell(props) {
                                         return (
                                             <div className={classes.nameDescriptionCellRoot}>
                                                 <span className={classes.nameDescriptionCellName}>{props.value}</span>
@@ -156,7 +155,7 @@ export function ReportReasonList(props: IProps) {
                                 },
                                 {
                                     columnName: ["roles"],
-                                    component: function RoleTokenCell(props: TableInstance) {
+                                    component: function RoleTokenCell(props) {
                                         return (
                                             <div className={classes.roleCellRoot}>
                                                 {props.value && props.value.length > 0 ? (

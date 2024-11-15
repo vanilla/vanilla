@@ -1,10 +1,9 @@
 /**
  * @author Dominic Lacaille <dominic.lacaille@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import * as React from "react";
 import { t } from "@vanilla/i18n";
 import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
@@ -39,7 +38,12 @@ export function AuthenticatorTableRow(props: IProps) {
                     <Button className="btn-icon" onClick={onDeleteClick} buttonType={ButtonTypes.ICON_COMPACT}>
                         <DeleteIcon />
                     </Button>
-                    <DashboardToggle disabled={disableToggle} onChange={onChangeActive} checked={isActive} />
+                    <DashboardToggle
+                        disabled={disableToggle}
+                        onChange={onChangeActive}
+                        checked={isActive}
+                        labelID={clientID}
+                    />
                 </DashboardTableOptions>
             </td>
         </tr>

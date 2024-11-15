@@ -37,6 +37,8 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
             "name",
             "startDate",
             "endDate",
+            "startDateUpdated",
+            "endDateUpdated",
             "authors",
             "tagsOptions",
             "tagOperator",
@@ -104,6 +106,10 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
         query.dateInserted = dateRangeToString({ start: form.startDate, end: form.endDate });
         query.startDate = undefined;
         query.endDate = undefined;
+
+        query.dateUpdated = dateRangeToString({ start: form.startDateUpdated, end: form.endDateUpdated });
+        query.startDateUpdated = undefined;
+        query.endDateUpdated = undefined;
 
         return query;
     };

@@ -13,6 +13,7 @@ import { TabHandler } from "@vanilla/dom-utils/src";
 import SmartLink from "@library/routing/links/SmartLink";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { useHistory } from "react-router";
 
 /** How much time is elapsed before the menu is hidden, either from loss of focus or mouseout. */
 const HIDE_TIMEOUT_MS = 250;
@@ -128,7 +129,7 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
     }, [expanded]);
 
     function handleKeyPress(event: React.KeyboardEvent) {
-        if (containerRef.current === null || document.activeElement === null) {
+        if (containerRef.current === null) {
             return;
         }
 
@@ -136,9 +137,6 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
         const target = event.target as HTMLElement;
         const nextElement = tabHandler.getNext(target, false, false);
         const prevElement = tabHandler.getNext(target, true, false);
-        const parent = target.closest('div[class^="titleBarMegaMenu-menuItem"]');
-        const nextParentSibling = parent?.nextSibling as HTMLElement;
-        const previousParentSibling = parent?.previousSibling as HTMLElement;
 
         switch (event.key) {
             case "Escape": {
@@ -147,6 +145,13 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                 setIsMouseWithin(false);
                 break;
             }
+            case "ArrowRight":
+            case "ArrowLeft":
+                // No prevent default.
+                menuItem?.focus();
+                setIsMouseWithin(false);
+                menuItem?.dispatchEvent(new KeyboardEvent("keydown", { key: event.key, bubbles: true }));
+                break;
 
             case "ArrowDown": {
                 event.preventDefault();
@@ -164,24 +169,6 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                     prevElement?.focus();
                 }
 
-                break;
-            }
-
-            case "ArrowRight": {
-                if (!nextParentSibling) {
-                    return;
-                }
-                let parentSiblingFirstChild = nextParentSibling.querySelector("li a") as HTMLElement;
-                parentSiblingFirstChild?.focus();
-                break;
-            }
-
-            case "ArrowLeft": {
-                if (!previousParentSibling) {
-                    return;
-                }
-                let parentSiblingFirstChild = previousParentSibling.querySelector("li a") as HTMLElement;
-                parentSiblingFirstChild?.focus();
                 break;
             }
 
@@ -256,6 +243,11 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
             }}
             onFocus={() => setIsFocusWithin(true)}
             onBlur={() => setIsFocusWithin(false)}
+            onClick={(e) => {
+                // Ensure that the focus state is reset after a user clicks a menu item.
+                setIsFocusWithin(false);
+                e.stopPropagation();
+            }}
         >
             <Container
                 ref={containerRef}

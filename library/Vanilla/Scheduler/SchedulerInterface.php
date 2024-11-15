@@ -64,4 +64,11 @@ interface SchedulerInterface
      * @param JobExecutionType $executionType
      */
     public function setExecutionType(JobExecutionType $executionType): void;
+
+    /**
+     * Clear any stale data sitting in the scheduler.
+     *
+     * @return void
+     */
+    public function clear(): void;
 }

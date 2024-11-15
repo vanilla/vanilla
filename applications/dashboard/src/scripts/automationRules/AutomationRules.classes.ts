@@ -5,6 +5,7 @@
 
 import { css } from "@emotion/css";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { mixinListItemTitleLink } from "@library/lists/ListItem.styles";
 import { useThemeCache } from "@library/styles/themeCache";
 
 export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boolean) => {
@@ -40,10 +41,10 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         },
         ...(isEscalationRulesList && {
             "&& th:first-child": {
-                paddingLeft: 28,
+                paddingLeft: 18,
             },
             "&& td:first-child": {
-                paddingLeft: 22,
+                paddingLeft: 12,
             },
         }),
     });
@@ -87,13 +88,6 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         paddingBottom: 20,
     });
 
-    const filterForm = css({
-        "& .form-group": {
-            borderBottom: "none",
-            paddingTop: 0,
-        },
-    });
-
     const disabled = css({
         opacity: 0.5,
         pointerEvents: "none",
@@ -134,7 +128,6 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
 
     const summaryValue = css({
         fontWeight: 600,
-        marginRight: 8,
         marginTop: 2,
         marginBottom: 2,
     });
@@ -218,7 +211,6 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
 
     const previewPager = css({
         padding: 0,
-        paddingTop: 16,
         marginBottom: -16,
     });
 
@@ -259,6 +251,7 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         "& > span:last-of-Type": {
             width: "70%",
         },
+        ...(isEscalationRulesList && { paddingLeft: 16, paddingRight: 16 }),
     });
 
     const historyLoader = css({
@@ -285,7 +278,7 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         },
     });
 
-    const addEditForm = css({
+    const escalationRuleAddEditForm = css({
         "& li": {
             marginLeft: 0,
             marginRight: 0,
@@ -293,16 +286,18 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         },
     });
 
-    const addEditTitleBar = css({
+    const escalationRuleAddEditTitleBar = css({
         "& > div": {
             justifyContent: "normal",
         },
     });
 
-    const addEditTitleBarActionsWrapper = css({
+    const escalationRuleAddEditTitleBarActionsWrapper = css({
         width: "100%",
         justifyContent: "space-between",
     });
+
+    const clickableTitle = css({ ...mixinListItemTitleLink(), fontSize: 14, fontWeight: 400 });
 
     return {
         headerContainer,
@@ -314,7 +309,6 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         scrollTable,
         triggerAndActionCell,
         triggerAndActionLabels,
-        filterForm,
         disabled,
         sectionHeader,
         runningStatusWrapper,
@@ -347,8 +341,9 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         addEditLoader,
         historyLoader,
         previewLoader,
-        addEditForm,
-        addEditTitleBar,
-        addEditTitleBarActionsWrapper,
+        escalationRuleAddEditTitleBar,
+        escalationRuleAddEditTitleBarActionsWrapper,
+        escalationRuleAddEditForm,
+        clickableTitle,
     };
 });

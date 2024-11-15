@@ -86,12 +86,6 @@ export class VanillaEmbedElement extends HTMLElement {
         this.iframe = document.createElement("iframe");
         this.iframe.src = this.getFrameSource();
 
-        this.handleUpdate({
-            type: "embeddedHrefUpdate",
-            href: this.iframe.src,
-            force: true,
-        });
-
         // Basic visual styling.
         this.iframe.width = "100%";
         this.iframe.style.height = "100vh";

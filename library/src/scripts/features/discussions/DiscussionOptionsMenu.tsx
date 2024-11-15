@@ -39,6 +39,7 @@ import { ReportRecordOption } from "@library/features/discussions/ReportRecordOp
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DiscussionOptionsResolve } from "@library/features/discussions/DiscussionOptionsResolve";
+import { css } from "@emotion/css";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -61,9 +62,25 @@ interface IDiscussionOptionsMenuProps {
      * and need to invalidate certain queries when a mutation is successful.
      */
     onMutateSuccess?: () => Promise<void>;
+    onDiscussionPage?: boolean;
 }
 
-const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({ discussion, onMutateSuccess }) => {
+const reportButtonAlignment = css({
+    "&:not(:last-child)": {
+        marginInlineEnd: -8,
+    },
+    "@media (max-width: 806px)": {
+        "&:not(:last-child)": {
+            marginInlineEnd: "initial",
+        },
+    },
+});
+
+const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
+    discussion,
+    onMutateSuccess,
+    onDiscussionPage,
+}) => {
     const { hasPermission } = usePermissionsContext();
     const { canStillEdit, humanizedRemainingTime } = useUserCanStillEditDiscussionOrComment(discussion);
     const permOptions: IPermissionOptions = {
@@ -116,11 +133,24 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
     }
 
     if (canMove) {
-        firstGroupItems.push(<DiscussionOptionsMove discussion={discussion} onSuccess={onMutateSuccess} />);
+        firstGroupItems.push(
+            <DiscussionOptionsMove
+                discussion={discussion}
+                onSuccess={async () => {
+                    onMutateSuccess?.();
+                    if (onDiscussionPage) {
+                        // We may be getting redirected here.
+                        window.location.reload();
+                    }
+                }}
+            />,
+        );
     }
 
     if (canManageDiscussion) {
-        firstGroupItems.push(<DiscussionOptionsDelete discussion={discussion} />);
+        firstGroupItems.push(
+            <DiscussionOptionsDelete discussion={discussion} redirectAfterDelete={onDiscussionPage} />,
+        );
     }
 
     //FIXME: this looks like it should be a permission check
@@ -283,7 +313,11 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
                     customTrigger={(props) => {
                         return (
                             <ToolTip label={t("Report content")}>
-                                <Button buttonType={ButtonTypes.ICON} onClick={props.onClick}>
+                                <Button
+                                    buttonType={ButtonTypes.ICON}
+                                    onClick={props.onClick}
+                                    className={reportButtonAlignment}
+                                >
                                     <Icon icon="post-flag" />
                                 </Button>
                             </ToolTip>

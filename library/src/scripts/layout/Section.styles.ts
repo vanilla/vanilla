@@ -16,7 +16,8 @@ import { IMediaQueryFunction, IOneColumnVariables } from "@library/layout/types/
 import { logError } from "@vanilla/utils";
 import { Mixins } from "@library/styles/Mixins";
 import { oneColumnVariables } from "./Section.variables";
-import { css, CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 
 export type ISectionClasses = ReturnType<typeof generateSectionClasses>;
 

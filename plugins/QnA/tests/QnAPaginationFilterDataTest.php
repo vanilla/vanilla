@@ -42,6 +42,7 @@ class QnAPaginationFilterDataTest extends SiteTestCase
         $this->runWithConfig(
             [
                 "Vanilla.Discussions.PerPage" => 1,
+                "minify.html" => true,
             ],
             function () {
                 // Create questions.
@@ -52,12 +53,12 @@ class QnAPaginationFilterDataTest extends SiteTestCase
                 $deliveryOptions = ["deliveryType" => DELIVERY_TYPE_ALL];
 
                 // Test the /discussions/unanswered pagination codepath.
-                $expectedLink = 'href="/qnapaginationfilterdatatest/discussions/unanswered/p2"';
+                $expectedLink = "href=/qnapaginationfilterdatatest/discussions/unanswered/p2";
                 $view = $this->bessy()->getHtml("/discussions/unanswered", [], $deliveryOptions);
                 $view->assertContainsString($expectedLink);
                 $view->assertCssSelectorTextContains(".Next", "Next");
 
-                $expectedLink = 'href="/qnapaginationfilterdatatest/discussions/unanswered"';
+                $expectedLink = "href=/qnapaginationfilterdatatest/discussions/unanswered";
                 $view = $this->bessy()->getHtml("/discussions/unanswered/p2", [], $deliveryOptions);
                 $view->assertContainsString($expectedLink);
                 $view->assertCssSelectorExists(".Previous", "Previous");

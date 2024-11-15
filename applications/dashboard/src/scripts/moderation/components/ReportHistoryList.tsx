@@ -12,7 +12,7 @@ import DateTime from "@library/content/DateTime";
 import TruncatedText from "@library/content/TruncatedText";
 import UserContent from "@library/content/UserContent";
 import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
-import { deletedUserFragment } from "@library/features/__fixtures__/User.Deleted";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { useSection } from "@library/layout/LayoutContext";
 import FrameHeader from "@library/layout/frame/FrameHeader";

@@ -7,7 +7,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { ILocale, getLocales, onLocaleChange, getCurrentLocale } from "./localeStore";
 import { logWarning } from "@vanilla/utils";
 
-const LocaleContext = React.createContext<{
+export const LocaleContext = React.createContext<{
     locales: ILocale[];
     currentLocale: string | null;
 }>({

@@ -8,7 +8,7 @@ import React from "react";
 import { fireEvent, render, screen, within, act, waitFor } from "@testing-library/react";
 import { ProfileFieldsList } from "@dashboard/userProfiles/components/ProfileFieldsList";
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
-import { ProfileField, ProfileFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileField, CreatableFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { vitest } from "vitest";
 
 const onEdit = vitest.fn();
@@ -83,7 +83,7 @@ describe("ProfileFieldsList", () => {
     });
 
     it("Delete button is disabled for core fields", async () => {
-        const mockCoreField = ProfileFieldsFixtures.mockProfileField(ProfileFieldFormType.DROPDOWN, {
+        const mockCoreField = ProfileFieldsFixtures.mockProfileField(CreatableFieldFormType.DROPDOWN, {
             isCoreField: true,
         });
         await renderInProvider([mockCoreField]);

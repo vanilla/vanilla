@@ -5,12 +5,14 @@
 
 import React from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { cx } from "@emotion/css";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
+import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
 
 interface IProps extends IInputTextProps {
     errors?: IFieldError[];
@@ -21,11 +23,11 @@ interface IProps extends IInputTextProps {
 export const DashboardInput: React.FC<IProps> = (props: IProps) => {
     const { inputID, labelType } = useFormGroup();
     const classes = dashboardClasses();
-    const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
+    const formStyle = useDashboardFormStyle();
 
     return (
-        <div className={cx(rootClass, props.className)}>
-            <div className={classes.inputWrapper}>
+        <DashboardInputWrap>
+            <div className={cx(classes.inputWrapper, { isCompact: formStyle.compact })}>
                 <InputTextBlock
                     id={inputID}
                     inputProps={props.inputProps}
@@ -37,6 +39,6 @@ export const DashboardInput: React.FC<IProps> = (props: IProps) => {
             </div>
             {props.errors && <ErrorMessages errors={props.errors} />}
             {props.afterInput}
-        </div>
+        </DashboardInputWrap>
     );
 };

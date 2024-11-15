@@ -67,9 +67,10 @@ class UserFragmentSchema extends Schema
      * Normalize a user from the DB into a user fragment.
      *
      * @param array $dbRecord
+     * @param bool $hasFullProfileViewPermission True if the current user has full permission to view the users profile
      * @return array
      */
-    public static function normalizeUserFragment(array $dbRecord)
+    public static function normalizeUserFragment(array $dbRecord, bool $hasFullProfileViewPermission = true)
     {
         $photo = $dbRecord["Photo"] ?? ($dbRecord["photo"] ?? "");
         if ($photo) {
@@ -99,6 +100,11 @@ class UserFragmentSchema extends Schema
             "title" => $dbRecord["Title"] ?? null,
             "label" => $label,
         ];
+
+        if ($privateProfile && !$hasFullProfileViewPermission) {
+            unset($schemaRecord["dateLastActive"]);
+        }
+
         if (is_array($schemaRecord["title"])) {
             // Some old userMeta values were duplicated. The DB will fix itself when these values are updated
             // Until then just take the latest title.

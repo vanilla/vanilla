@@ -17,6 +17,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { FormTreeControl, IFormTreeControl } from "@library/tree/FormTreeControl";
 import { t } from "@vanilla/i18n";
 import { IControlProps, IModalControl } from "@vanilla/json-schema-forms";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 export const TABS_AS_MODAL = {
     condition: (props: IControlProps): boolean => {
@@ -40,11 +41,11 @@ export const TABS_AS_MODAL = {
 
         return (
             <>
-                <div className="input-wrap">
+                <DashboardInputWrap>
                     <Button onClick={openModal} buttonType={ButtonTypes.STANDARD}>
                         {control["modalTriggerLabel"]}
                     </Button>
-                </div>
+                </DashboardInputWrap>
 
                 <Modal isVisible={isOpen} size={ModalSizes.LARGE} exitHandler={closeModal}>
                     <Frame

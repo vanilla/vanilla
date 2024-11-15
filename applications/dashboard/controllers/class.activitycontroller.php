@@ -176,9 +176,16 @@ class ActivityController extends Gdn_Controller
         // Comment submission
         $session = Gdn::session();
         $comment = $this->Form->getFormValue("Comment");
-        $activities = $this->ActivityModel
-            ->getWhere(["NotifyUserID" => $notifyUserID], "", "", $limit, $offset)
-            ->resultArray();
+        $where = ["NotifyUserID" => $notifyUserID];
+        if (
+            !$session->checkPermission(
+                ["Garden.Users.Add", "Garden.Users.Edit", "Garden.Users.Delete", "Garden.PersonalInfo.View"],
+                false
+            )
+        ) {
+            $where["Private"] = true;
+        }
+        $activities = $this->ActivityModel->getWhere($where, "", "", $limit, $offset)->resultArray();
         $this->ActivityModel->joinComments($activities);
 
         $this->setData("Filter", strtolower($filter));

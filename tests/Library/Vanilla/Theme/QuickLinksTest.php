@@ -92,6 +92,8 @@ class QuickLinksTest extends SiteTestCase
             "titleType" => "static",
             "containerOptions" => [
                 "borderType" => "border",
+                "headerAlignment" => "left",
+                "visualBackgroundType" => "inner",
             ],
             "links" => [
                 [

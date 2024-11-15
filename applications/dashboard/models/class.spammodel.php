@@ -59,6 +59,7 @@ class SpamModel extends Gdn_Pluggable
      *  - Log: Log the record if it is found to be spam.
      *  - Operation: The log operation to use.
      * @return bool Returns **true** if the record is spam or **false** otherwise.
+     * @throws Exception
      */
     public static function isSpam($recordType, $data, $options = [])
     {

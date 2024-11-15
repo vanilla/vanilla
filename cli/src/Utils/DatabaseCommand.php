@@ -7,9 +7,10 @@
 
 namespace Vanilla\Cli\Utils;
 
+use Exception;
 use Gdn;
-use Gdn_Configuration;
 use Gdn_Database;
+use Gdn_UserException;
 use Symfony\Component\Console;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,8 +21,7 @@ use Vanilla\Schema\RangeExpression;
  */
 abstract class DatabaseCommand extends Console\Command\Command
 {
-    /** @var Gdn_Database */
-    private $database = null;
+    private Gdn_Database|NULL $database = null;
 
     protected int $batchSize = 1000;
 
@@ -35,20 +35,26 @@ abstract class DatabaseCommand extends Console\Command\Command
         return $this->database;
     }
 
+    /**
+     * Fetch the config values.
+     */
     protected function configure()
     {
         parent::configure();
         $this->setDefinition(
             new Console\Input\InputDefinition([
-                new Console\Input\InputOption("db-host", null, Console\Input\InputOption::VALUE_REQUIRED),
-                new Console\Input\InputOption("db-port", null, Console\Input\InputOption::VALUE_REQUIRED),
-                new Console\Input\InputOption("db-name", null, Console\Input\InputOption::VALUE_REQUIRED),
-                new Console\Input\InputOption("db-user", null, Console\Input\InputOption::VALUE_REQUIRED),
-                new Console\Input\InputOption("db-password", null, Console\Input\InputOption::VALUE_REQUIRED),
+                new Console\Input\InputOption("dbhost", null, Console\Input\InputOption::VALUE_REQUIRED),
+                new Console\Input\InputOption("dbport", null, Console\Input\InputOption::VALUE_OPTIONAL),
+                new Console\Input\InputOption("dbname", null, Console\Input\InputOption::VALUE_REQUIRED),
+                new Console\Input\InputOption("dbuser", null, Console\Input\InputOption::VALUE_REQUIRED),
+                new Console\Input\InputOption("dbpassword", "p", Console\Input\InputOption::VALUE_NONE),
             ])
         );
     }
 
+    /**
+     * Initialize the DB connection.
+     */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         parent::initialize($input, $output);
@@ -61,22 +67,28 @@ abstract class DatabaseCommand extends Console\Command\Command
             return $value;
         };
 
-        $host = $getRequiredOption("db-host");
-        $dbName = $getRequiredOption("db-name");
-        $port = $input->getOption("db-port") ?? 3306;
-        $user = $getRequiredOption("db-user");
-        $password = $input->getOption("db-password") ?? "";
-
-        $this->database = Gdn::getContainer()->get(Gdn_Database::class);
+        $host = $getRequiredOption("dbhost");
+        $dbName = $getRequiredOption("dbname");
+        $port = $input->getOption("dbport") ?? 3306;
+        $user = $getRequiredOption("dbuser");
         $dbInfo = [
             "Host" => $host,
             "Dbname" => $dbName,
             "User" => $user,
-            "Password" => $password,
             "Port" => $port,
             "Engine" => "MySQL",
             "Prefix" => "GDN_",
         ];
+
+        if ($input->getOption("dbpassword")) {
+            /** @var Console\Helper\QuestionHelper $helper */
+            $helper = $this->getHelper("question");
+            $question = new Console\Question\Question("Enter the password for the database" . PHP_EOL);
+            $dbInfo["Password"] = $helper->ask($input, $output, $question);
+        }
+
+        $this->database = Gdn::getContainer()->get(Gdn_Database::class);
+
         \Gdn::config()->saveToConfig("Database", $dbInfo);
         $this->database->init($dbInfo);
     }
@@ -84,11 +96,13 @@ abstract class DatabaseCommand extends Console\Command\Command
     /**
      * Fetch the posts based on a recordType and a cursor.
      *
-     * @param $record
-     * @param $offset
+     * @param array $record
+     * @param int $offset
+     * @param array $where
      * @return array|null
+     * @throws Exception
      */
-    protected function fetchPosts(array $record, int $offset, array $where = [])
+    protected function fetchPosts(array $record, int $offset, array $where = []): array|null
     {
         $sql = $this->getDatabase()->createSql();
 
@@ -134,9 +148,10 @@ abstract class DatabaseCommand extends Console\Command\Command
      *
      * @param string $recordID
      * @param string $recordTable
-     * @param array $where
      * @param int $to
+     * @param array $where
      * @return int
+     * @throws Exception
      */
     protected function getMaxID(string $recordID, string $recordTable, int $to, array $where = []): int
     {
@@ -149,5 +164,75 @@ abstract class DatabaseCommand extends Console\Command\Command
             ->firstRow(DATASET_TYPE_ARRAY);
 
         return min($result[$recordID], $to);
+    }
+
+    /**
+     * Determine if a table exists
+     *
+     * @param string $table
+     * @return bool
+     * @throws \Gdn_UserException
+     */
+    protected function tableExists(string $table): bool
+    {
+        $result = $this->getDatabase()
+            ->query("show tables like '$table'")
+            ->count();
+
+        return $result > 0;
+    }
+
+    /**
+     * Determine if a column exists in a table
+     *
+     * @param string $table
+     * @param string $column
+     * @return bool
+     * @throws Gdn_UserException
+     */
+    protected function columnExists(string $table, string $column): bool
+    {
+        $result = $this->getDatabase()
+            ->query(
+                "
+            select
+                column_name
+            from
+                information_schema.columns
+            where
+                table_schema = database()
+                and table_name = '$table'
+                and column_name = '$column'
+        "
+            )
+            ->count();
+        return $result > 0;
+    }
+
+    /**
+     * Do a get where on the specified table.
+     *
+     * @param $table
+     * @param null $where
+     * @param int|null $limit
+     * @return int
+     * @throws Gdn_UserException
+     */
+    protected function getCountWhere($table, $where = null, ?int $limit = null): int
+    {
+        $queryWhere = "";
+        $queryLimit = "";
+
+        if (isset($where)) {
+            $queryWhere = "where $where";
+        }
+
+        if (isset($limit)) {
+            $queryLimit = "limit $limit";
+        }
+
+        return $this->getDatabase()
+            ->query("select * from $table $queryWhere $queryLimit")
+            ->count();
     }
 }

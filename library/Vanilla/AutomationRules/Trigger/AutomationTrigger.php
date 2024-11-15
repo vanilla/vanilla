@@ -149,4 +149,13 @@ abstract class AutomationTrigger
     {
         return true;
     }
+
+    /**
+     * @param array $triggerValue
+     * @return array
+     */
+    public function getWhereArray(array $triggerValue): array
+    {
+        return $triggerValue;
+    }
 }

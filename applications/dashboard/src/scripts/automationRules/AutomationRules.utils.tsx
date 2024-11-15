@@ -400,8 +400,8 @@ export const sortDateColumn = (rowA, rowB, id, desc) => {
 /**
  *  Placeholder when loading automation rules table or preview
  */
-export function loadingPlaceholder(section?: string) {
-    const classes = automationRulesClasses();
+export function loadingPlaceholder(section?: string, isEcalationRulesMode?: boolean) {
+    const classes = automationRulesClasses(isEcalationRulesMode);
     if (section === "addEdit") {
         return (
             <>

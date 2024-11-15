@@ -6,17 +6,17 @@
 import { logWarning, RecordID } from "@vanilla/utils";
 import React, { useState, useContext } from "react";
 
-type RecordToggle = (recordType: string, recordID: RecordID) => void;
-type Record = {
+export type ISitNavToggleRecord = (recordType: string, recordID: RecordID) => void;
+export type ISiteNavRecord = {
     recordType: string;
     recordID: RecordID;
 };
-interface ISiteNavCtx {
+export interface ISiteNavCtx {
     categoryRecordType: string;
-    toggleItem: RecordToggle;
-    openItem: RecordToggle;
-    closeItem: RecordToggle;
-    setInitialOpenItems(initialOpenType: string | null, items: Record[]): void;
+    toggleItem: ISitNavToggleRecord;
+    openItem: ISitNavToggleRecord;
+    closeItem: ISitNavToggleRecord;
+    setInitialOpenItems(initialOpenType: string | null, items: ISiteNavRecord[]): void;
     initialOpenType: string | null;
     openRecords: {
         [recordType: string]: Set<RecordID>;
@@ -105,7 +105,7 @@ export default function SiteNavProvider(props: IProps) {
         }
     };
 
-    const setInitialOpenItems = (newInitialOpenType: string | null, initialOpenItems: Record[]): void => {
+    const setInitialOpenItems = (newInitialOpenType: string | null, initialOpenItems: ISiteNavRecord[]): void => {
         setInitialOpenType(newInitialOpenType);
         initialOpenItems.forEach((item) => {
             openItem(item.recordType, item.recordID);

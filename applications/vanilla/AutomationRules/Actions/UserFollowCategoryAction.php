@@ -25,7 +25,7 @@ use Vanilla\Logger;
 use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 
 /**
- * Action class for following a specific category
+ * Automation rule action to follow a specific category.
  */
 class UserFollowCategoryAction extends AutomationAction implements UserInterface, EventActionInterface
 {
@@ -246,6 +246,9 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
      * @param array $errorMessages
      * @param string $dispatchStatus
      * @return void
+     * @throws ContainerException
+     * @throws NoResultsException
+     * @throws \Garden\Container\NotFoundException
      */
     private function dispatch(
         array $errorMessages = [],

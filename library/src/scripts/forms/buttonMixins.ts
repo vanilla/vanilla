@@ -6,7 +6,7 @@
 
 import { userSelect } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { important, px } from "csx";
 import { paddingOffsetBasedOnBorderRadius } from "@library/forms/paddingOffsetFromBorderRadius";
 import { buttonGlobalVariables } from "./Button.variables";

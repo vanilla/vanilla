@@ -15,6 +15,7 @@ class SchemaForm
 {
     const DROPDOWN_TYPE = "dropDown";
     const RADIO_TYPE = "radio";
+    const RADIO_PICKER_TYPE = "radioPicker";
     const CHECKBOX_TYPE = "checkBox";
     const TEXT_TYPE = "textBox";
     const TOGGLE_TYPE = "toggle";
@@ -157,9 +158,7 @@ class SchemaForm
      */
     public static function checkBox(FormOptions $options, FieldMatchConditional $conditions = null, $labelType = null)
     {
-        $result = [
-            "description" => $options->getDescription(),
-            "label" => $options->getLabel(),
+        $result = $options->values() + [
             "inputType" => self::CHECKBOX_TYPE,
             "labelType" => $labelType,
         ];
@@ -187,9 +186,7 @@ class SchemaForm
         FieldMatchConditional $conditions = null,
         array $tooltipsPerOption = null
     ) {
-        $result = [
-            "description" => $options->getDescription(),
-            "label" => $options->getLabel(),
+        $result = $options->values() + [
             "inputType" => self::RADIO_TYPE,
             "choices" => $choices->getChoices(),
             "tooltipsPerOption" => $tooltipsPerOption,
@@ -199,6 +196,23 @@ class SchemaForm
             $result["conditions"] = [$conditions->getCondition()];
         }
 
+        return $result;
+    }
+
+    public static function radioPicker(
+        FormOptions $options,
+        FormPickerOptions $pickerOptions,
+        FieldMatchConditional $conditional = null
+    ): array {
+        $result = $options->values() + [
+            "inputType" => self::RADIO_PICKER_TYPE,
+            "options" => $pickerOptions->getOptions(),
+            "labelType" => "standard",
+        ];
+
+        if ($conditional) {
+            $result["conditions"] = [$conditional->getCondition()];
+        }
         return $result;
     }
 
@@ -212,10 +226,8 @@ class SchemaForm
      */
     public static function dragAndDrop(FormOptions $options, Schema $itemSchema): array
     {
-        return [
+        return $options->values() + [
             "inputType" => self::DRAG_AND_DROP_TYPE,
-            "description" => $options->getDescription(),
-            "label" => $options->getLabel(),
             "itemSchema" => $itemSchema,
             "fullSize" => true,
         ];

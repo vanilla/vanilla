@@ -19,11 +19,11 @@ import { LoadStatus } from "@library/@types/api/core";
 import capitalize from "lodash-es/capitalize";
 import {
     ProfileField,
-    ProfileFieldDataType,
-    ProfileFieldFormType,
-    ProfileFieldMutability,
+    CreatableFieldDataType,
+    CreatableFieldFormType,
+    CreatableFieldMutability,
     ProfileFieldRegistrationOptions,
-    ProfileFieldVisibility,
+    CreatableFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { IUserProfilesState } from "@dashboard/userProfiles/state/UserProfiles.slice";
 import { IConfigState } from "@library/config/configReducer";
@@ -70,34 +70,34 @@ const mockConfigReducer = createReducer(
  */
 export class ProfileFieldsFixtures {
     public static mockProfileField(
-        formType: ProfileFieldFormType,
+        formType: CreatableFieldFormType,
         data: DeepPartial<Omit<ProfileField, "formType">> = {},
     ): ProfileField {
-        let dataType: ProfileFieldDataType;
+        let dataType: CreatableFieldDataType;
 
         switch (formType) {
-            case ProfileFieldFormType.CHECKBOX:
-                dataType = ProfileFieldDataType.BOOLEAN;
+            case CreatableFieldFormType.CHECKBOX:
+                dataType = CreatableFieldDataType.BOOLEAN;
                 break;
 
-            case ProfileFieldFormType.DROPDOWN:
-                dataType = ProfileFieldDataType.TEXT;
+            case CreatableFieldFormType.DROPDOWN:
+                dataType = CreatableFieldDataType.TEXT;
                 break;
 
-            case ProfileFieldFormType.TOKENS:
-                dataType = ProfileFieldDataType.STRING_MUL;
+            case CreatableFieldFormType.TOKENS:
+                dataType = CreatableFieldDataType.STRING_MUL;
                 break;
 
-            case ProfileFieldFormType.DATE:
-                dataType = ProfileFieldDataType.DATE;
+            case CreatableFieldFormType.DATE:
+                dataType = CreatableFieldDataType.DATE;
                 break;
 
-            case ProfileFieldFormType.NUMBER:
-                dataType = ProfileFieldDataType.NUMBER;
+            case CreatableFieldFormType.NUMBER:
+                dataType = CreatableFieldDataType.NUMBER;
                 break;
 
             default:
-                dataType = ProfileFieldDataType.TEXT;
+                dataType = CreatableFieldDataType.TEXT;
                 break;
         }
 
@@ -119,8 +119,8 @@ export class ProfileFieldsFixtures {
                 isCoreField: data.isCoreField ?? false,
                 description: data.description ?? `Mock ${label} for testing purposes`,
                 registrationOptions: data.registrationOptions ?? ProfileFieldRegistrationOptions.OPTIONAL,
-                visibility: data.visibility ?? ProfileFieldVisibility.PUBLIC,
-                mutability: data.mutability ?? ProfileFieldMutability.ALL,
+                visibility: data.visibility ?? CreatableFieldVisibility.PUBLIC,
+                mutability: data.mutability ?? CreatableFieldMutability.ALL,
                 displayOptions: {
                     userCards: data.displayOptions?.userCards ?? false,
                     posts: data.displayOptions?.posts ?? false,
@@ -129,8 +129,8 @@ export class ProfileFieldsFixtures {
                 enabled: data.enabled ?? true,
                 dropdownOptions:
                     data.dropdownOptions ??
-                    [ProfileFieldFormType.TOKENS, ProfileFieldFormType.DROPDOWN].includes(formType)
-                        ? formType === ProfileFieldFormType.TOKENS
+                    [CreatableFieldFormType.TOKENS, CreatableFieldFormType.DROPDOWN].includes(formType)
+                        ? formType === CreatableFieldFormType.TOKENS
                             ? ["Token 1", "Token 2", "Token 3", "Token 4"]
                             : ["Option 1", "Option 2", "Option 3", "Option 4"]
                         : null,
@@ -139,8 +139,10 @@ export class ProfileFieldsFixtures {
         };
     }
 
-    public static mockProfileFields(mutability: ProfileFieldMutability = ProfileFieldMutability.ALL): ProfileField[] {
-        const formTypes = Object.values(ProfileFieldFormType); //Use the form types as unique API names
+    public static mockProfileFields(
+        mutability: CreatableFieldMutability = CreatableFieldMutability.ALL,
+    ): ProfileField[] {
+        const formTypes = Object.values(CreatableFieldFormType); //Use the form types as unique API names
 
         return formTypes.map((formType) => {
             return this.mockProfileField(formType, { mutability });
@@ -148,7 +150,7 @@ export class ProfileFieldsFixtures {
     }
 
     public static mockDisabledFields() {
-        return ProfileFieldsFixtures.mockProfileFields(ProfileFieldMutability.NONE);
+        return ProfileFieldsFixtures.mockProfileFields(CreatableFieldMutability.NONE);
     }
 
     static createMockProfileFieldsReducer(

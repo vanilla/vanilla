@@ -1,9 +1,8 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-import React, { useMemo } from "react";
 import { useSection } from "@library/layout/LayoutContext";
 import { Widget } from "@library/layout/Widget";
 import NewPostMenuFAB from "@library/newPostMenu/NewPostMenuFAB";
@@ -26,6 +25,7 @@ export interface IAddPost {
 }
 export interface INewPostMenuProps {
     title?: string;
+    titleType?: string;
     items: IAddPost[];
     borderRadius?: number;
     containerOptions?: DeepPartial<IHomeWidgetContainerOptions>;

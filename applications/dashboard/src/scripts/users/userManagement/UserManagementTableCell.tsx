@@ -24,7 +24,7 @@ import { DeleteIcon } from "@library/icons/common";
 import UserManagementSpoof from "@dashboard/users/userManagement/UserManagementSpoof";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { cx } from "@emotion/css";
-import { ProfileField, ProfileFieldDataType } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileField, CreatableFieldDataType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import TruncatedText from "@library/content/TruncatedText";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import { formatDateStringIgnoringTimezone } from "@library/editProfileFields/utils";
@@ -305,7 +305,7 @@ export function ProfileFieldCell(props: IProfileFieldCellProps) {
 
         switch (dataType) {
             // checkbox
-            case ProfileFieldDataType.BOOLEAN:
+            case CreatableFieldDataType.BOOLEAN:
                 content =
                     typeof userProfileFieldValue === "boolean" ? (
                         <span>{userProfileFieldValue === true ? t("Yes") : t("No")}</span>
@@ -313,7 +313,7 @@ export function ProfileFieldCell(props: IProfileFieldCellProps) {
                         <></>
                     );
                 break;
-            case ProfileFieldDataType.DATE:
+            case CreatableFieldDataType.DATE:
                 content = userProfileFieldValue ? (
                     <DateTime
                         isSameYear={moment(userProfileFieldValue).isSame(new Date(), "year")}
@@ -323,8 +323,8 @@ export function ProfileFieldCell(props: IProfileFieldCellProps) {
                     <></>
                 );
                 break;
-            case ProfileFieldDataType.STRING_MUL:
-            case ProfileFieldDataType.NUMBER_MUL:
+            case CreatableFieldDataType.STRING_MUL:
+            case CreatableFieldDataType.NUMBER_MUL:
                 content = userProfileFieldValue ? (
                     userProfileFieldValue.map((value, key) => (
                         <div key={key}>
@@ -341,7 +341,7 @@ export function ProfileFieldCell(props: IProfileFieldCellProps) {
         return (
             <div
                 className={cx(classes.multipleValuesCellContent, {
-                    [classes.alignRight]: dataType === ProfileFieldDataType.NUMBER && !wrappedVersion,
+                    [classes.alignRight]: dataType === CreatableFieldDataType.NUMBER && !wrappedVersion,
                 })}
             >
                 {wrappedVersion && <span className={classes.wrappedColumnLabel}>{`${columnName}: `}</span>}

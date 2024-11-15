@@ -26,18 +26,23 @@
             "@Zendesk/*": ["./cloud/plugins/Zendesk/src/scripts/*"],
             "@QnA/*": ["./plugins/QnA/src/scripts/*"],
             "@vanilla-ai/*": ["./cloud/plugins/vanilla-ai/src/scripts/*"],
+            "@vfdeploy/*": ["./cloud/plugins/vfdeploy/src/scripts/*"],
             "@zoom/*": ["./cloud/plugins/zoom/src/scripts/*"],
             "typestyle": ["./library/src/scripts/styles/styleShim.ts"],
-            "@vanilla/dom-utils": ["./packages/vanilla-dom-utils/*"],
-            "@vanilla/eslint-config": ["./packages/vanilla-eslint-config/*"],
-            "@vanilla/i18n": ["./packages/vanilla-i18n/*"],
-            "@vanilla/prettier-config": ["./packages/vanilla-prettier-config/*"],
-            "@vanilla/react-utils": ["./packages/vanilla-react-utils/*"],
-            "@vanilla/redux-utils": ["./packages/vanilla-redux-utils/*"],
-            "@vanilla/theme-core": ["./packages/vanilla-theme-core/*"],
-            "@vanilla/tsconfig": ["./packages/vanilla-tsconfig/*"],
-            "@vanilla/utils": ["./packages/vanilla-utils/*"],
-            "@vanilla/icons": ["./packages/vanilla-icons/*"]
+            "@vanilla/dom-utils": ["./packages/vanilla-dom-utils/src/index.ts"],
+            "@vanilla/eslint-config": ["./packages/vanilla-eslint-config"],
+            "@vanilla/i18n": ["./packages/vanilla-i18n/src/index.ts"],
+            "@vanilla/prettier-config": ["./packages/vanilla-prettier-config"],
+            "@vanilla/react-utils": ["./packages/vanilla-react-utils/src/index.ts"],
+            "@vanilla/redux-utils": ["./packages/vanilla-redux-utils"],
+            "@vanilla/theme-core": ["./packages/vanilla-theme-core"],
+            "@vanilla/tsconfig": ["./packages/vanilla-tsconfig"],
+            "@vanilla/utils": ["./packages/vanilla-utils/index.ts"],
+            "@vanilla/icons": ["./packages/vanilla-icons/index.ts"],
+            "@icons/*": ["./packages/vanilla-icons/src/*"],
+            "@vanilla/ui": ["./packages/vanilla-ui/src/index.ts"],
+            "@vanilla/json-schema-forms": ["./library/src/scripts/json-schema-forms/index.ts"],
+            "@vanilla/json-schema-forms/src/*": ["./library/src/scripts/json-schema-forms/*"]
         },
         // Turning incremental on add 10+ minutes of emit time (because it requires emitting declarations).
         // Our typecheck time is ~30 seconds. When we emit it takes much longer.
@@ -59,6 +64,10 @@
         "cloud/plugins/*/src/scripts/**/*.tsx",
         "cloud/applications/*/src/scripts/**/*.ts",
         "cloud/applications/*/src/scripts/**/*.tsx",
+        "packages/vanilla-ui-library/**/*.ts",
+        "packages/vanilla-ui-library/**/*.tsx",
+        "packages/vanilla-icons/**/*.ts",
+        "packages/vanilla-icons/**/*.tsx",
         "plugins/*/src/scripts/**/*.ts",
         "plugins/*/src/scripts/**/*.tsx",
         "themes/*/src/scripts/**/*.ts",
@@ -74,10 +83,11 @@
         "**/*.jsx",
         "node_modules/**/*",
         "node_modules",
-        "packages/*/src/*",
         "node_modules",
         "./node_modules",
         "./node_modules/*",
-        "./node_modules/@types/node/index.d.ts"
+        "./node_modules/@types/node/index.d.ts",
+        "packages/vanilla-ui-library/dist/**/*.ts",
+        "packages/vanilla-ui-library/dist/**/*.tsx"
     ]
 }

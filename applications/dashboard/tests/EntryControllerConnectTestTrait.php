@@ -11,6 +11,7 @@ use Garden\EventManager;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\APIv0\TestDispatcher;
+use VanillaTests\Fixtures\Html\TestHtmlDocument;
 
 /**
  * Common functionality for tests that need extensive entry/connect SSO tests.

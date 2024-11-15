@@ -12,6 +12,7 @@ import { t } from "@vanilla/i18n";
 interface IProps {
     children?: React.ReactNode;
     errorComponent?: React.ComponentType<any>;
+    isFixed?: boolean;
 }
 
 interface IState {
@@ -46,7 +47,7 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
                         window.location.reload();
                     }}
                     confirmText={t("Reload")}
-                    isFixed
+                    isFixed={this.props.isFixed ?? true}
                     icon={<ErrorIcon />}
                     stringContents={error.message}
                 />

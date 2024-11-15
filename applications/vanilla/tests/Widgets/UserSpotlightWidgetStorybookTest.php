@@ -64,6 +64,7 @@ class UserSpotlightWidgetStorybookTest extends StorybookGenerationTestCase
         ];
         $containerOptions = [
             "borderType" => "shadow",
+            "visualBackgroundType" => "inner",
         ];
         $spec = [
             '$hydrate' => "react.userspotlight",

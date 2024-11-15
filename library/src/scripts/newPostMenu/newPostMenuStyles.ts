@@ -222,7 +222,7 @@ export const newPostMenuClasses = useThemeCache(
             flexDirection: "column",
             ...Mixins.box({
                 ...Variables.box({
-                    borderType: containerOptions?.borderType as BorderType,
+                    borderType: containerOptions?.borderType,
                 }),
             }),
             backgroundColor: containerOptions?.outerBackground?.color
@@ -278,8 +278,6 @@ export const newPostMenuClasses = useThemeCache(
         const buttonLabel = css({
             ...Mixins.font(vars.button.font),
         });
-
-        const dropdownWidth = twoColumnVariables().panel.paddedWidth - globalVars.gutter.size;
 
         const buttonDropdownContents = css({
             ...Mixins.padding({ vertical: globalVars.gutter.half }),

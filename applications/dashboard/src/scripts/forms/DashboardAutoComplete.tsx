@@ -9,6 +9,7 @@ import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { AutoComplete } from "@vanilla/ui/src/forms/autoComplete";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 interface IProps extends React.ComponentProps<typeof AutoComplete> {
     errors?: IFieldError[];
@@ -17,15 +18,13 @@ interface IProps extends React.ComponentProps<typeof AutoComplete> {
 
 export function DashboardAutoComplete(props: IProps) {
     const { errors, afterInput, ...autoCompleteProps } = props;
-    const { inputID, labelType } = useFormGroup();
-
-    const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
+    const { inputID } = useFormGroup();
 
     return (
-        <div className={rootClass}>
-            <AutoComplete {...autoCompleteProps} id={inputID} />
+        <DashboardInputWrap>
+            <AutoComplete {...autoCompleteProps} id={inputID} size={"small"} />
             {props.errors && <ErrorMessages errors={props.errors} />}
             {props.afterInput}
-        </div>
+        </DashboardInputWrap>
     );
 }

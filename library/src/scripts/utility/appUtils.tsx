@@ -235,7 +235,7 @@ export function siteUrl(path: string): string {
  */
 export function getRelativeUrl(fullUrl: string): string {
     const urlBase = window.location.origin + getMeta("context.basePath", "");
-    return fullUrl.replace(urlBase, "");
+    return fullUrl.replace(urlBase, "").split("#")[0];
 }
 
 /**

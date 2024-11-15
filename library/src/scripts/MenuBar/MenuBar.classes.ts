@@ -25,6 +25,7 @@ export const menuBarClasses = useThemeCache(() => {
     const listSpacer = 4;
 
     const root = css({
+        marginTop: 4,
         position: "relative",
         display: "inline-flex",
         flexDirection: "column",
@@ -57,6 +58,19 @@ export const menuBarClasses = useThemeCache(() => {
     });
 
     const menuItemIconContent = buttonUtils.buttonIconMenuBar;
+
+    const floatingElementMenuButton = css({
+        ...shadowHelper().embed(),
+        background: `${ColorsUtils.colorOut(globalVars.mainColors.bg)} !important`,
+        borderRadius: "100%",
+        "&:hover, &:focus": {
+            ...shadowHelper().embedHover(),
+        },
+        "&:focus-visible": {
+            border: `1px solid ${ColorsUtils.colorOut(globalVars.mainColors.primary)}`,
+            ...shadowHelper().embedHover(),
+        },
+    });
 
     const menuItemTextContent = css({});
 
@@ -130,6 +144,7 @@ export const menuBarClasses = useThemeCache(() => {
         menuItemsList,
         menuItem,
         menuItemIconContent,
+        floatingElementMenuButton,
         menuItemTextContent,
         subMenuContainer,
         subMenuItemsList,

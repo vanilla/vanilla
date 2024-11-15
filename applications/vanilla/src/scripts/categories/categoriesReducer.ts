@@ -18,7 +18,7 @@ const INITIAL_STATE: ICategoriesState = {
     suggestionsByQuery: {},
 };
 
-export const categoriesReducer = produce(
+export const categoriesReducer: any = produce(
     reducerWithInitialState(clone(INITIAL_STATE))
         .case(CategorySuggestionActions.loadCategories.started, (nextState, payload) => {
             const { query } = payload;

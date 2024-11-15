@@ -29,6 +29,11 @@ class AnswerSearchType extends CommentSearchType
         return "answer";
     }
 
+    public function getBoostValue(): ?float
+    {
+        return $this->config->get("Elastic.Boost.Answers", 0.6);
+    }
+
     /**
      * @return string
      */

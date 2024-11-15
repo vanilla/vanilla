@@ -18,7 +18,7 @@ import { useIsMounted } from "@vanilla/react-utils";
 
 export interface ILookupApi {
     searchUrl: string;
-    singleUrl: string;
+    singleUrl: string | null;
     valueKey?: string;
     labelKey?: string;
     extraLabelKey?: string;
@@ -200,6 +200,11 @@ export function useApiLookup(
         }
 
         if (ignoreLookupOnMount) {
+            return;
+        }
+
+        if (singleUrl === null) {
+            handleSearch("");
             return;
         }
 

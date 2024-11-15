@@ -5,6 +5,7 @@
 
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import SelectOne, { ISelectOneProps } from "@library/forms/select/SelectOne";
 import classNames from "classnames";
@@ -13,10 +14,9 @@ import React from "react";
 interface IProps extends Omit<ISelectOneProps, "inputID" | "labelID" | "label"> {}
 
 export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
-    const { inputID, labelType, labelID } = useFormGroup();
-    const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
+    const { inputID, labelID } = useFormGroup();
     return (
-        <div className={classNames(rootClass)}>
+        <DashboardInputWrap>
             <SelectOne
                 {...props}
                 label={null}
@@ -25,6 +25,6 @@ export const DashboardSelect: React.FC<IProps> = (props: IProps) => {
                 inputClassName={classNames("form-control", props.inputClassName)}
             />
             {props.errors && <ErrorMessages errors={props.errors} />}
-        </div>
+        </DashboardInputWrap>
     );
 };

@@ -10,15 +10,19 @@ import { useToast } from "@library/features/toaster/ToastContext";
 import { MyValue } from "@library/vanilla-editor/typescript";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { DraftsApi } from "@vanilla/addon-vanilla/thread/DraftsApi";
 import { logError, RecordID } from "@vanilla/utils";
 import isEqual from "lodash-es/isEqual";
 import { useEffect, useRef, useState } from "react";
 import { IComment, IPremoderatedRecordResponse } from "@dashboard/@types/api/comment";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { NewCommentEditor } from "@vanilla/addon-vanilla/thread/components/NewCommentEditor";
+import { DraftIndicatorPosition, NewCommentEditor } from "@vanilla/addon-vanilla/thread/components/NewCommentEditor";
 import { t } from "@vanilla/i18n";
+import { getLocalStorageOrDefault } from "@vanilla/react-utils";
+import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
+import { Widget } from "@library/layout/Widget";
+import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
+import type { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 
 interface IDraftProps {
     draftID: number;
@@ -32,18 +36,24 @@ interface IProps {
     categoryID: number;
     draft?: IDraftProps;
     isPreview?: boolean;
+    title?: string;
+    description?: string;
+    subtitle?: string;
+    containerOptions?: IHomeWidgetContainerOptions;
 }
 
 export const EMPTY_DRAFT: MyValue = [{ type: "p", children: [{ text: "" }] }];
 
 export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "", categoryID: 0 }) {
     const { draft, discussionID } = props;
-    const [ownDraft, setDraft] = useState<IDraftProps | undefined>(draft);
+    const [ownDraft, setDraft] = useState<IDraftProps | undefined>();
     const { addToast } = useToast();
     const [value, setValue] = useState<MyValue | undefined>();
     const [editorKey, setEditorKey] = useState(0);
     const queryClient = useQueryClient();
     const lastSaved = useRef<Date | null>(draft ? new Date(draft.dateUpdated) : null);
+
+    const cacheDraftParentID = getLocalStorageOrDefault(`commentDraftParentID-${discussionID}`, null);
 
     const resetState = () => {
         setDraft(undefined);
@@ -51,6 +61,13 @@ export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "",
         setValue(EMPTY_DRAFT);
         setEditorKey((existing) => existing + 1);
     };
+
+    // FIXME: Need to integrate with the new draft system
+    useEffect(() => {
+        if (cacheDraftParentID === discussionID) {
+            setDraft(draft);
+        }
+    }, [draft, cacheDraftParentID]);
 
     const postMutation = useMutation({
         mutationFn: async (body: string) => {
@@ -75,8 +92,18 @@ export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "",
         resetState();
         await queryClient.invalidateQueries({ queryKey: ["discussion"] });
         await queryClient.invalidateQueries({ queryKey: ["commentList"] });
-        //FIXME: comment permalinks don't work in new thread view yet
-        // window.location.href = comment.url;
+        await queryClient.invalidateQueries({ queryKey: ["commentThread"] });
+
+        if ("url" in comment) {
+            // Navigate to the comment.
+            window.location.href = comment.url;
+        } else {
+            // The comment was premoderated.
+            addToast({
+                body: comment.message,
+                dismissible: true,
+            });
+        }
     }
 
     const draftMutation = useMutation({
@@ -137,23 +164,32 @@ export function DiscussionCommentEditorAsset(props: IProps = { discussionID: "",
     }, [debouncedComment]);
 
     return (
-        <NewCommentEditor
-            editorKey={editorKey}
-            value={value}
-            onValueChange={setValue}
-            onPublish={async (value) => {
-                const newComment = await postMutation.mutateAsync(JSON.stringify(value));
-                await handlePostCommentSuccess(newComment);
-            }}
-            publishLoading={postMutation.isLoading}
-            draft={ownDraft}
-            onDraft={() => {
-                draftMutation.mutate();
-            }}
-            draftLoading={draftMutation.isLoading}
-            draftLastSaved={lastSaved.current}
-            isPreview={props.isPreview}
-        />
+        <HomeWidgetContainer
+            title={props.title}
+            description={props.description}
+            subtitle={props.subtitle}
+            options={props.containerOptions}
+            depth={2}
+        >
+            <NewCommentEditor
+                editorKey={editorKey}
+                value={value}
+                onValueChange={setValue}
+                onPublish={async (value) => {
+                    const newComment = await postMutation.mutateAsync(JSON.stringify(value));
+                    await handlePostCommentSuccess(newComment);
+                }}
+                publishLoading={postMutation.isLoading}
+                draft={ownDraft}
+                onDraft={() => {
+                    draftMutation.mutate();
+                }}
+                draftLoading={draftMutation.isLoading}
+                draftLastSaved={lastSaved.current}
+                isPreview={props.isPreview}
+                draftIndicatorPosition={DraftIndicatorPosition.WITHIN}
+            />
+        </HomeWidgetContainer>
     );
 }
 

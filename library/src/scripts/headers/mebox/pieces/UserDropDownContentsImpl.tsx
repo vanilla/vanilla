@@ -52,7 +52,7 @@ const ADMIN_ITEMS: AdminItem[] = [
 /**
  * Implements User Drop down for header
  */
-function UserDropDownContentsImpl(props: IProps) {
+function UserDropDownContentsImpl(props: IUserDropDownContentsProps) {
     const { userInfo } = props;
     const signOutUrl = useSignOutLink();
     const siteSection = getSiteSection();
@@ -187,13 +187,15 @@ function UserDropDownContentsImpl(props: IProps) {
     );
 }
 
-interface IOwnProps {
+export interface IUserDropDownContentsOwnProps {
     className?: string;
 }
 
-type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+export type IUserDropDownContentsProps = IUserDropDownContentsOwnProps &
+    ReturnType<typeof mapStateToProps> &
+    ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: ICoreStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: ICoreStoreState, ownProps: IUserDropDownContentsOwnProps) {
     return {
         userInfo: state.users.current.data ? state.users.current.data : null,
         counts: state.users.countInformation.counts,

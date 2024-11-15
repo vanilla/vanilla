@@ -15,6 +15,8 @@ use Gdn_Validation;
 use Iterator;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\UserFragment;
+use Vanilla\Database\CallbackWhereExpression;
+use Vanilla\Database\Select;
 use Vanilla\Scheduler\LongRunner;
 
 /**
@@ -27,6 +29,14 @@ class ModelUtils
 
     // Expand field value to indicate expanding to a crawlable record.
     public const EXPAND_CRAWL = "crawl";
+
+    public const SORT_TRENDING = "experimentalTrending";
+
+    public const SLOT_TYPE_DAY = "d";
+    public const SLOT_TYPE_WEEK = "w";
+    public const SLOT_TYPE_MONTH = "m";
+    public const SLOT_TYPE_YEAR = "y";
+    public const SLOT_TYPE_ALL = "a";
 
     /**
      * Given an array of expand options, determine if a value matches any of them.
@@ -356,5 +366,142 @@ class ModelUtils
         }
         $return = $generator->getReturn();
         return $return;
+    }
+
+    /**
+     * Automatically determine a slot type based on a post date.
+     *
+     * If the post date is less than a day old, it will return "d" for day.
+     * If the post date is less than a week old, it will return "w" for week.
+     * If the post date is less than a month old, it will return "m" for month.
+     * If the post date is less than a year old, it will return "y" for year.
+     * If the post date is older than a year, it will return "a" for all.
+     *
+     * If the determined slot type is not in the valid slot types, it will return the default slot type.
+     *
+     * @param string|\DateTimeInterface $postDate
+     * @return string
+     */
+    public static function getDateBasedSlotType(
+        string|\DateTimeInterface $postDate,
+        \DateTimeInterface|string|null $now = null
+    ): string {
+        $postDate = $postDate instanceof \DateTimeInterface ? $postDate : new \DateTime($postDate);
+        $currentTime =
+            $now === null
+                ? CurrentTimeStamp::getDateTime()
+                : ($now instanceof \DateTimeInterface
+                    ? $now
+                    : new \DateTime($now));
+        $diff = $currentTime->diff($postDate);
+        $days = $diff->days;
+        if ($days < 1) {
+            return self::SLOT_TYPE_DAY;
+        } elseif ($days < 7) {
+            return self::SLOT_TYPE_WEEK;
+        } elseif ($days < 31) {
+            return self::SLOT_TYPE_MONTH;
+        } elseif ($days < 365) {
+            return self::SLOT_TYPE_YEAR;
+        } else {
+            return self::SLOT_TYPE_ALL;
+        }
+    }
+
+    /**
+     * @param string $dateField The date field to filter on.
+     * @param string $slotType This will also filter the results to this timeframe. "d" for day, "w" for week, "m" for month.
+     * @return CallbackWhereExpression
+     */
+    public static function slotTypeWhereExpression(string $dateField, string $slotType): CallbackWhereExpression
+    {
+        return new CallbackWhereExpression(function (\Gdn_MySQLDriver $sql) use ($dateField, $slotType) {
+            $currentTime = CurrentTimeStamp::getDateTime();
+            $filterTime = null;
+            switch ($slotType) {
+                case "d":
+                    $filterTime = $currentTime->modify("-1 day");
+                    break;
+                case "w":
+                    $filterTime = $currentTime->modify("-1 week");
+                    break;
+                case "m":
+                    $filterTime = $currentTime->modify("-1 month");
+                    break;
+                case "y":
+                    $filterTime = $currentTime->modify("-1 year");
+                    break;
+                case "a":
+                default:
+                    break;
+            }
+            if ($filterTime !== null) {
+                $sql->where("$dateField >", $filterTime);
+            }
+        });
+    }
+
+    /**
+     * Get a few {@link Select}s for usage in a trending sort. This will create a dynamic field for sorting that is
+     * based off of an exponential decay curve and some baseline score calculation.
+     *
+     * Experimental trending works on the following equation
+     * sc = score
+     * hc = Hours since creation
+     * he = Hour exponent - Make the time decay curve stronger. Size this to your time window.
+     * wo = Window offset hours - Offset all posts by a certain amount of the curve. Stronger lessens the effect of the curve over a time period.
+     * Our equation is
+     *
+     * sc / (hc + wo)^he
+     *
+     * The idea is that we take some aggregate score
+     * Then divide by a time factor that makes older posts require a higher score to come to the top
+     * Performance of this was tested to be reasonable for discussion datasets of up to ~10k rows
+     * Our biggest communities don't tend to make more posts than this in a month.
+     * Query time was similar to a DateInserted sort with that many posts.
+     *
+     * We can't index this easily for bigger datasets because of the time component so at
+     * the moment we are relying on the validation to prevent time windows greater than 1 month.
+     *
+     * @param string $scoreCalculation A SQL expression that calculates a score of a post.
+     * @param string $dateField The date field to use for the time decay curve.
+     * @param string $slotType A time frame for the exponential decay curve. This will also filter the results to this timeframe. "d" for day, "w" for week, "m" for month.
+     *
+     * @return array<Select> Returns an array of select statements to add to a query. Notably there will be a select with the value of {@link ModelUtils::SORT_TRENDING} to sort on..
+     */
+    public static function getTrendingSelects(string $dateField, string $scoreCalculation, string $slotType): array
+    {
+        switch ($slotType) {
+            case "d":
+                $windowOffsetHours = 2;
+                $hourExponent = 1.5;
+                break;
+            case "w":
+                $windowOffsetHours = 24 * 7;
+                $hourExponent = 1.15;
+                break;
+            case "m":
+            default:
+                $windowOffsetHours = 24 * 30;
+                $hourExponent = 1.1;
+                break;
+        }
+
+        // We need to add a select for our trending.
+        $selects = [
+            new Select("@rawTrendingScore := $scoreCalculation", "rawTrendingScore"),
+            new Select($windowOffsetHours, "trendingWindowHours"),
+            new Select($hourExponent, "trendingWindowExponent"),
+            new Select(
+                "@hoursSinceCreation := (UNIX_TIMESTAMP() - UNIX_TIMESTAMP($dateField)) / 60 / 24",
+                "hoursSinceCreation"
+            ),
+            new Select(
+                "@rawTrendingScore / POWER(@hoursSinceCreation + {$windowOffsetHours}, {$hourExponent})",
+                self::SORT_TRENDING
+            ),
+        ];
+
+        return $selects;
     }
 }

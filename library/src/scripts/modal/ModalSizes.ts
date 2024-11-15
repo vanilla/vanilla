@@ -11,6 +11,7 @@ enum ModalSizes {
     MODAL_AS_SIDE_PANEL_LEFT = "render as full screen side panel from left",
     MODAL_AS_DROP_DOWN = "render as drop down",
     XL = "xl",
+    XXL = "xxl",
     LARGE = "large",
     MEDIUM = "medium",
     SMALL = "small",

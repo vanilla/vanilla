@@ -28,7 +28,7 @@ import { Icon } from "@vanilla/icons";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 import { useEffect, useMemo, useState } from "react";
 
-interface IProps {
+export interface ReorderReportReasonModelProps {
     reportReasons: IReason[];
     isVisible: boolean;
     onVisibilityChange: (visible: boolean) => void;
@@ -62,7 +62,7 @@ const REASON_ITEM_SCHEMA: JsonSchema = {
     required: [],
 };
 
-export default function ReorderReportReasonModalImpl(props: IProps) {
+export default function ReorderReportReasonModalImpl(props: ReorderReportReasonModelProps) {
     const { isVisible, onVisibilityChange, reportReasons } = props;
     const classesFrameBody = frameBodyClasses();
     const classFrameFooter = frameFooterClasses();

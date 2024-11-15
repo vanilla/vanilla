@@ -4,7 +4,10 @@
  * @license Proprietary
  */
 
-import { INotificationPreferences } from "@library/notificationPreferences/NotificationPreferences.types";
+import {
+    INotificationPreferences,
+    NotificationType,
+} from "@library/notificationPreferences/NotificationPreferences.types";
 import { createContext, useContext } from "react";
 
 interface ICategoryNotificationPreferencesContextValue {
@@ -36,22 +39,7 @@ export type ICategoryPreferences = {
     "preferences.email.digest"?: boolean;
 };
 
-interface CategoryNotificationType {
-    /**
-     * The phrase returned should be translatable; it will be interpolated into a sentence like "Notify users of `${getDescription()}`".
-     * When adding a new category notification type, make sure to add a the phrase to the locales file.
-     */
-    getDescription(): string;
-
-    /**
-     * Return the default preferences for this category type.
-     * When available, the user's global notification preferences will be passed as an argument.
-     * Implementations should default to false for all properties.
-     */
-    getDefaultPreferences?(userPreferences?: INotificationPreferences): Partial<ICategoryPreferences>;
-}
-
-export const CATEGORY_NOTIFICATION_TYPES: Record<string, CategoryNotificationType> = {
+export const CATEGORY_NOTIFICATION_TYPES: Record<string, NotificationType> = {
     comments: {
         getDescription: () => "new comments",
         getDefaultPreferences: (userPreferences) => {
@@ -74,7 +62,7 @@ export const CATEGORY_NOTIFICATION_TYPES: Record<string, CategoryNotificationTyp
     },
 };
 
-export function registerCategoryNotificationType(id: string, type: CategoryNotificationType) {
+export function registerCategoryNotificationType(id: string, type: NotificationType) {
     CATEGORY_NOTIFICATION_TYPES[id] = type;
 }
 

@@ -8,5 +8,10 @@
         fonts: {
             size: 14
         }
+    },
+    input: {
+        font: {
+            size: 14,
+        }
     }
 }

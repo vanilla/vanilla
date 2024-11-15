@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css/types/create-instance";
 import { percent, px } from "csx";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";

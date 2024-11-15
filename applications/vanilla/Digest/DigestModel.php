@@ -18,6 +18,14 @@ class DigestModel extends PipelineModel
 
     public const DIGEST_TYPES = [self::DIGEST_TYPE_WEEKLY, self::DIGEST_TYPE_TEST_WEEKLY, self::DIGEST_TYPE_IMMEDIATE];
 
+    public const AUTOSUBSCRIBE_DEFAULT_PREFERENCE = "Preferences.Digest.Autosubscribe";
+
+    public const MANUAL_OPT_IN = 1;
+
+    public const MANUAL_OPT_OUT = 0;
+
+    public const AUTO_OPT_IN = 3;
+
     public function __construct()
     {
         parent::__construct("digest");

@@ -11,9 +11,14 @@ import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { cx } from "@emotion/css";
 import { t } from "@vanilla/i18n";
+import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
+import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
+import ReactMarkdown from "react-markdown";
+import { userContentClasses } from "@library/content/UserContent.styles";
 
 interface IProps {
     label: React.ReactNode;
+    metas?: React.ReactNode;
     description?: string | React.ReactNode;
     afterDescription?: React.ReactNode;
     inputType?: string;
@@ -21,12 +26,14 @@ interface IProps {
     tooltip?: string;
     fieldset?: boolean;
     required?: boolean;
+    checkPosition?: "left" | "right";
 }
 
 export enum DashboardLabelType {
     STANDARD = "standard",
     WIDE = "wide",
     VERTICAL = "vertical",
+    JUSTIFIED = "justified",
     NONE = "none", //for cases when component for inputType already has label code to render
 }
 
@@ -34,20 +41,35 @@ export const DashboardFormLabel: React.FC<IProps> = (props: IProps) => {
     const { inputID, labelID } = useFormGroup();
 
     const { labelType = DashboardLabelType.STANDARD, fieldset = false } = props;
+    const formStyle = useDashboardFormStyle();
+
+    if (labelType === DashboardLabelType.NONE) {
+        return <></>;
+    }
+
     const { required, tooltip, label, description, afterDescription } = props;
-    const rootClass = (() => {
+    const classes = dashboardFormGroupClasses();
+    let rootClass = (() => {
         switch (labelType) {
             case DashboardLabelType.WIDE:
-                return "label-wrap-wide";
+                return classes.labelWrapWide;
             case DashboardLabelType.STANDARD:
             default:
-                return "label-wrap";
+                return classes.labelWrap;
         }
     })();
 
-    if (props.inputType === "checkBox") {
+    rootClass = cx(rootClass, {
+        isCompact: formStyle.compact,
+        isVertical: labelType === DashboardLabelType.VERTICAL || formStyle.forceVerticalLabels,
+    });
+
+    if (props.inputType === "checkBox" && props.checkPosition !== "right") {
+        if (formStyle.compact) {
+            return <></>;
+        }
         // Just a spacer or no label element at all.
-        return labelType === DashboardLabelType.NONE ? <></> : <div className={rootClass} id={labelID} />;
+        return <div className={rootClass} id={labelID} />;
     }
 
     const LabelOrDiv = fieldset ? "div" : ("label" as ElementType);
@@ -66,17 +88,22 @@ export const DashboardFormLabel: React.FC<IProps> = (props: IProps) => {
                             *
                         </span>
                     )}
-                    {label}
-                    {tooltip && <InformationIcon className={dashboardClasses().labelIcon} />}
+                    <span>
+                        {label}
+                        {tooltip && <InformationIcon className={dashboardClasses().labelIcon} />}
+                    </span>
                 </LabelOrDiv>
             </ConditionalWrap>
+            {props.metas}
 
             {!!description && (
                 <>
                     {typeof description === "string" ? (
-                        <p className="info" dangerouslySetInnerHTML={{ __html: description }} />
+                        <ReactMarkdown className={cx(userContentClasses().root, classes.labelInfo)}>
+                            {description}
+                        </ReactMarkdown>
                     ) : (
-                        <p className="info">{description}</p>
+                        <div className={cx(userContentClasses().root, classes.labelInfo)}>{description}</div>
                     )}
                 </>
             )}

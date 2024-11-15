@@ -64,7 +64,7 @@ export interface IBackground {
 
 export interface IMixedBorderStyles extends IBorderStyles, ISimpleBorderStyle {}
 
-interface IRadiusFlex {
+export interface IRadiusFlex {
     radius?: IRadiusValue;
 }
 

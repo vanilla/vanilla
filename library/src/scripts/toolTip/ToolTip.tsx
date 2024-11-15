@@ -142,7 +142,6 @@ export function ToolTip(props: {
     customWidth?: number;
 }) {
     const { children, ...rest } = props;
-
     return <TriangleTooltip {...rest}>{children}</TriangleTooltip>;
 }
 

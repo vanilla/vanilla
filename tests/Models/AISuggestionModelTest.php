@@ -13,8 +13,11 @@ use Garden\Web\Exception\ClientException;
 use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\OpenAI\OpenAIClient;
 use Vanilla\Utility\ArrayUtils;
+use VanillaTests\Dashboard\AiSuggestionsTestTrait;
 use VanillaTests\ExpectedNotification;
+use VanillaTests\Fixtures\OpenAI\MockOpenAIClient;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\NotificationsApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -28,6 +31,7 @@ class AISuggestionModelTest extends SiteTestCase
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
     use NotificationsApiTestTrait;
+    use AiSuggestionsTestTrait;
 
     public static $addons = ["qna"];
 
@@ -45,19 +49,32 @@ class AISuggestionModelTest extends SiteTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $assistantUser = $this->createUser();
-        \Gdn::config()->saveToConfig([
-            "Feature.AISuggestions.Enabled" => true,
-            "aiSuggestions" => [
-                "enabled" => true,
-                "userID" => $assistantUser["userID"],
-                "sources" => ["mockSuggestion" => ["enabled" => true]],
-            ],
-        ]);
-        $this->assistantUser = $assistantUser;
+        $this->setupAiSuggestions(["mockSuggestion"]);
+        $this->assistantUser = $this->api()
+            ->get("/users/" . $this->lastUserID)
+            ->getBody();
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->suggestionSourceService = $this->container()->get(AiSuggestionSourceService::class);
         $this->aiSuggestionModel = \Gdn::getContainer()->get(AiSuggestionModel::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        $mockOpenAIClient = \Gdn::getContainer()->get(MockOpenAIClient::class);
+        $mockOpenAIClient->addMockResponse("/This is how you do this./", [
+            "answerSource" => "This is how you do this.",
+        ]);
+        $mockOpenAIClient->addMockResponse("/This is how you do this a different way./", [
+            "answerSource" => "This is how you do this a different way.",
+        ]);
+        $mockOpenAIClient->addMockResponse("/This is how you do this, a third way./", [
+            "answerSource" => "This is how you do this, a third way.",
+        ]);
+        \Gdn::getContainer()->setInstance(OpenAIClient::class, $mockOpenAIClient);
     }
 
     /**

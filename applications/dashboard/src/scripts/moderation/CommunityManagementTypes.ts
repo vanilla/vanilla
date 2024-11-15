@@ -196,6 +196,7 @@ export type IPostEscalation = {
  * }
  */
 export interface IEscalation extends ICommunityManagementRecord {
+    url: string;
     escalationID: RecordID;
     dateInserted: string;
     dateUpdated: string; // Updated by comments or new report being added.

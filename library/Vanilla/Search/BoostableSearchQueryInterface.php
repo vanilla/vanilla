@@ -22,17 +22,6 @@ interface BoostableSearchQueryInterface
     public function boostFieldRecency(string $fieldName);
 
     /**
-     * Boost ranking of a specific type.
-     *
-     * Boost values are relative to the default value of 1.0.
-     * A boost value between 0 and 1.0 decreases the type relevance. A value greater than 1.0 increases the relevance score.
-     *
-     * @param AbstractSearchType $type The type to boost.
-     * @param float|null $amount The amount to boost by.
-     */
-    public function boostType(AbstractSearchType $type, ?float $amount);
-
-    /**
      * Start a boosting query.
      *
      * All query calls made before calling endBoostQuery() will apply to the boost.

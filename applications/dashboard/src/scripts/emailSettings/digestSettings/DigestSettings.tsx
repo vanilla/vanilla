@@ -10,7 +10,6 @@ import { IEmailDigestSettings } from "@dashboard/emailSettings/EmailSettings.typ
 import { getDigestSettingsSchemas, getEmailSettingsSchemas } from "@dashboard/emailSettings/EmailSettings.utils";
 import DigestSchedule from "@dashboard/emailSettings/components/DigestSchedule";
 import TestDigestModal from "@dashboard/emailSettings/components/TestDigestModal";
-import { DashboardFormControlGroup, DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
@@ -30,6 +29,8 @@ import { useRouteChangePrompt } from "@vanilla/react-utils";
 import isEqual from "lodash/isEqual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MemoryRouter } from "react-router";
+import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 
 export function DigestSettings() {
     // Schemas
@@ -203,11 +204,7 @@ export function DigestSettings() {
                 <DashboardFormList>
                     {values &&
                         sections.map((section, index) => (
-                            <div
-                                key={index}
-                                ref={(ele) => addToRefs(ele, index)}
-                                className={cx(classes.section, { [classes.contentSection]: section === "Content" })}
-                            >
+                            <div key={index} ref={(ele) => addToRefs(ele, index)} className={cx(classes.section)}>
                                 <DashboardFormSubheading hasBackground>
                                     {t(section)}
                                     {section === "General" && (
@@ -223,7 +220,7 @@ export function DigestSettings() {
                                         </>
                                     )}
                                 </DashboardFormSubheading>
-                                <JsonSchemaForm
+                                <DashboardSchemaForm
                                     disabled={settings.status !== LoadStatus.SUCCESS}
                                     fieldErrors={error?.errors ?? fieldErrors ?? {}}
                                     schema={
@@ -232,22 +229,6 @@ export function DigestSettings() {
                                             : getDigestSettingsSchemas().emailDigestContentSchema
                                     }
                                     instance={normalizedValues}
-                                    FormControlGroup={DashboardFormControlGroup}
-                                    FormControl={DashboardFormControl}
-                                    FormGroupWrapper={(props) => {
-                                        return (
-                                            <li
-                                                className={cx("form-group", "meta-group-header", {
-                                                    [classes.hidden]: !props.rootInstance?.["emailDigest.enabled"],
-                                                })}
-                                            >
-                                                {props.header && (
-                                                    <span className={classes.metaGroupHeader}>{props.header}</span>
-                                                )}
-                                                {props.children}
-                                            </li>
-                                        );
-                                    }}
                                     ref={schemaFormRef}
                                     onChange={setValues}
                                 />

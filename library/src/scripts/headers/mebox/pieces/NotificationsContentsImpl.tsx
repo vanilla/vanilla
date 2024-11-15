@@ -35,7 +35,7 @@ interface INotificationsProps {
 /**
  * Implements Notifications Contents to be included in drop down or tabs
  */
-export class NotificationsContents extends React.Component<IProps> {
+export class NotificationsContents extends React.Component<INotificationContentsProps> {
     public render() {
         const { userSlug } = this.props;
         const title = t("Notifications");
@@ -121,12 +121,14 @@ export class NotificationsContents extends React.Component<IProps> {
 }
 
 // For clarity, I'm adding className separately because both the container and the content have className, but it's not applied to the same element.
-interface IOwnProps extends INotificationsProps, IDeviceProps {
+export interface INotificationContentsOwnProps extends INotificationsProps, IDeviceProps {
     className?: string;
     userSlug: string;
 }
 
-type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+export type INotificationContentsProps = INotificationContentsOwnProps &
+    ReturnType<typeof mapStateToProps> &
+    ReturnType<typeof mapDispatchToProps>;
 
 /**
  * Create action creators on the component, bound to a Redux dispatch function.

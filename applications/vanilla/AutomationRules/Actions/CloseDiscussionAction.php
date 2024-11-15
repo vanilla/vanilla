@@ -11,8 +11,6 @@ use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
 use Gdn;
-use Vanilla\AutomationRules\Triggers\LastActiveDiscussionTrigger;
-use Vanilla\AutomationRules\Triggers\StaleDiscussionTrigger;
 use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Exception\Database\NoResultsException;
 

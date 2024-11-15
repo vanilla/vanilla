@@ -158,4 +158,12 @@ interface FormatInterface
      * @return array Username mentioned in the post.
      */
     public function parseAllMentions($body): array;
+
+    /**
+     * Sanitize user data using existing processors.
+     *
+     * @param string $content
+     * @return string
+     */
+    public function applySanitizeProcessor(string $content): string;
 }

@@ -9,15 +9,13 @@ import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import {
-    useEscalationQuery,
     useEscalationCommentsQuery,
     useEscalationMutation,
+    useEscalationQuery,
     useRevisionOptions,
 } from "@dashboard/moderation/CommunityManagement.hooks";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 import { IEscalation } from "@dashboard/moderation/CommunityManagementTypes";
-import { detailPageClasses } from "@dashboard/moderation/DetailPage.classes";
-import { PostRevisionProvider, usePostRevision } from "@dashboard/moderation/PostRevisionContext";
 import { AssociatedReportMetas } from "@dashboard/moderation/components/AssosciatedReportMetas";
 import { EscalationActions } from "@dashboard/moderation/components/EscalationActions";
 import { EscalationAssignee } from "@dashboard/moderation/components/EscalationAssignee";
@@ -25,6 +23,8 @@ import { EscalationCommentEditor } from "@dashboard/moderation/components/Escala
 import { EscalationMetas } from "@dashboard/moderation/components/EscalationMetas";
 import { PostDetail } from "@dashboard/moderation/components/PostDetail";
 import { ReportHistoryList } from "@dashboard/moderation/components/ReportHistoryList";
+import { detailPageClasses } from "@dashboard/moderation/DetailPage.classes";
+import { PostRevisionProvider, usePostRevision } from "@dashboard/moderation/PostRevisionContext";
 import { cx } from "@emotion/css";
 import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
 import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
@@ -33,19 +33,15 @@ import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { PageBox } from "@library/layout/PageBox";
-import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
+import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import { Metas } from "@library/metas/Metas";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import BackLink from "@library/routing/links/BackLink";
 import { Sort } from "@library/sort/Sort";
 import { BorderType } from "@library/styles/styleHelpersBorders";
-import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { CommentThreadItem } from "@vanilla/addon-vanilla/thread/CommentThreadItem";
-import DiscussionAttachmentsAsset, {
-    DiscussionAttachment,
-} from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
-import DiscussionCommentEditorAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentEditorAsset";
-import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
+import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { useCollisionDetector } from "@vanilla/react-utils";
@@ -57,16 +53,6 @@ interface IProps extends RouteComponentProps<{ escalationID: string }> {
     escalationID: IEscalation["escalationID"];
     escalation?: IEscalation;
 }
-
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            enabled: false,
-            retry: false,
-            staleTime: Infinity,
-        },
-    },
-});
 
 const discussion = LayoutEditorPreviewData.discussion();
 
@@ -86,7 +72,7 @@ function EscalationsDetailPageImpl(props: IProps) {
     const queryClient = useQueryClient();
     const invalidateQueries = async () => {
         queryClient.invalidateQueries(["escalations"]);
-        queryClient.invalidateQueries(["escalation", escalationID]);
+        queryClient.invalidateQueries(["escalations", escalationID]);
         queryClient.invalidateQueries(["escalationComments", escalationID]);
     };
 
@@ -184,7 +170,7 @@ function EscalationsDetailPageImpl(props: IProps) {
                     <>
                         <section className={cx(cmdClasses.secondaryTitleBar, classes.secondaryTitleBarTop)}>
                             <span className={cmdClasses.secondaryTitleBarStart}>
-                                {postRevision.reports && postRevision.reports.length > 0 && (
+                                {options.length > 1 && (
                                     <Sort
                                         sortID={"postRevision"}
                                         sortLabel={t("Revision: ")}
@@ -250,6 +236,7 @@ function EscalationsDetailPageImpl(props: IProps) {
                                         {comments?.data?.map((comment) => {
                                             return (
                                                 <CommentThreadItem
+                                                    threadStyle={"flat"}
                                                     key={comment.commentID}
                                                     comment={comment}
                                                     discussion={discussion}
@@ -258,6 +245,7 @@ function EscalationsDetailPageImpl(props: IProps) {
                                                     boxOptions={{
                                                         borderType: BorderType.SEPARATOR,
                                                     }}
+                                                    isInternal
                                                 />
                                             );
                                         })}

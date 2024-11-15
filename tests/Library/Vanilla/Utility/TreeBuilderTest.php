@@ -197,6 +197,46 @@ class TreeBuilderTest extends VanillaTestCase
     }
 
     /**
+     * Tests the scenario when we have unreachable nodes with children and other unreachable nodes with
+     * the same parent. Unreachable nodes with the same parents should be sorted together.
+     * Any unreachable nodes that don't have a parent in common will be placed at the end.
+     *
+     * @return void
+     */
+    public function testUnreachableNonParentNodesSortedWithReachableNodesOfSameParent()
+    {
+        $input = [
+            $this->sourceItem("unreachableOneDifferentParent", 1, -2),
+            $this->sourceItem("unreachableTwoCommonParentWithChildren", 2, -1),
+            $this->sourceItem("unreachableThreeChild", 3, 2),
+            $this->sourceItem("unreachableFourCommonParent", 4, -1),
+        ];
+
+        $actual = TreeBuilder::create("recordID", "parentID")
+            ->setChildrenFieldName("childs")
+            ->setAllowUnreachableNodes(true)
+            ->setSorter(function ($a, $b) {
+                return $a["recordID"] <=> $b["recordID"];
+            })
+            ->buildTree($input);
+
+        // The unreachable node that doesn't have a common parent as the one with children should be placed at
+        // the end of the root array despite having a lower sort value.
+        // While the unreachable node that does have a common parent is sorted along with the one with children.
+        $this->assertRowsLike(
+            [
+                "name" => [
+                    "unreachableTwoCommonParentWithChildren",
+                    "unreachableFourCommonParent",
+                    "unreachableOneDifferentParent",
+                ],
+            ],
+            $actual,
+            count: 3
+        );
+    }
+
+    /**
      * Create a source item.
      *
      * @param string $name

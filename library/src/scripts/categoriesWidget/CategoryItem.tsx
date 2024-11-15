@@ -179,7 +179,7 @@ export default function CategoryItem(props: IProps) {
                         categoryName={category.name}
                         notificationPreferences={category.preferences}
                         emailDigestEnabled={getMeta("emails.digest", false)}
-                        isCompact
+                        iconOnly
                         preview={props.isPreview}
                         className={classes.listItemActionButton}
                         onPreferencesChange={onCategoryFollowChange}

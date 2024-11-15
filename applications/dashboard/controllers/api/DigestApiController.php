@@ -81,10 +81,7 @@ class DigestApiController extends Controller
                 $data["sent"] = array_reverse($recentScheduledDates);
             }
         }
-        $isDigestEnabled = $this->config->get("Garden.Digest.Enabled", false);
-        if ($isDigestEnabled) {
-            $data["upcoming"] = $this->getFutureScheduledDates($dayOfWeek ?? null);
-        }
+        $data["upcoming"] = $this->getFutureScheduledDates($dayOfWeek ?? null);
         $out = $this->schema($this->deliveryDateSchema(), "out");
         $result = $out->validate($data);
         return new Data($result);

@@ -1,0 +1,24 @@
+{
+    "name": "@vanilla/ui-library",
+    "description": "Portable UI components for Higher Logic Vanilla applications.",
+    "version": "1.0.0",
+    "license": "GPL-2.0-only",
+    "main": "dist/index.mjs",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "peerDependencies": {
+        "@tanstack/react-query": "*",
+        "react": "*",
+        "react-dom": "*"
+    },
+    "author": {
+        "name": "Adam (charrondev) Charron",
+        "email": "acharron@higherlogic.com"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

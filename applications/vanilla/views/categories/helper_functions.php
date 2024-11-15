@@ -558,7 +558,6 @@ if (!function_exists("followButton")):
                 "isFollowed" => $following,
                 "notificationPreferences" => $cleanNotificationPreferences,
                 "emailDigestEnabled" => $emailDigestEnabled,
-                
             ]);
         }
         return $output;

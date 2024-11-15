@@ -31,9 +31,9 @@ const MOCK_RECORD: IPostRecord = {
     recordID: 1,
 };
 
+const queryClient = new QueryClient();
 // Wrapper with QueryClientProvider for testing hooks
 function queryClientWrapper() {
-    const queryClient = new QueryClient();
     const Wrapper = ({ children }) => (
         <QueryClientProvider client={queryClient}>
             <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
@@ -43,6 +43,16 @@ function queryClientWrapper() {
     );
 
     return Wrapper;
+}
+
+function MockQueryClient(props: { children: ReactNode }) {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <CurrentUserContextProvider currentUser={UserFixture.adminAsCurrent.data}>
+                {props.children}
+            </CurrentUserContextProvider>
+        </QueryClientProvider>
+    );
 }
 
 const toggleReaction = vitest.fn();
@@ -73,13 +83,15 @@ function MockProvider(props: { children: ReactNode }) {
 describe("Post Reactions Component", () => {
     it("Renders reaction buttons as a member with counts. Promote should not be available", () => {
         render(
-            <MockProvider>
-                <PermissionsFixtures.SpecificPermissions
-                    permissions={["reactions.positive.add", "reactions.negative.add"]}
-                >
-                    <PostReactions reactions={STORY_REACTIONS} />
-                </PermissionsFixtures.SpecificPermissions>
-            </MockProvider>,
+            <MockQueryClient>
+                <MockProvider>
+                    <PermissionsFixtures.SpecificPermissions
+                        permissions={["reactions.positive.add", "reactions.negative.add"]}
+                    >
+                        <PostReactions reactions={STORY_REACTIONS} />
+                    </PermissionsFixtures.SpecificPermissions>
+                </MockProvider>
+            </MockQueryClient>,
         );
 
         STORY_REACTIONS.forEach((reaction) => {
@@ -99,11 +111,13 @@ describe("Post Reactions Component", () => {
 
     it("Renders all reaction buttons, including Promote, with proper permissions.", () => {
         render(
-            <MockProvider>
-                <PermissionsFixtures.AllPermissions>
-                    <PostReactions reactions={STORY_REACTIONS} />
-                </PermissionsFixtures.AllPermissions>
-            </MockProvider>,
+            <MockQueryClient>
+                <MockProvider>
+                    <PermissionsFixtures.AllPermissions>
+                        <PostReactions reactions={STORY_REACTIONS} />
+                    </PermissionsFixtures.AllPermissions>
+                </MockProvider>
+            </MockQueryClient>,
         );
 
         STORY_REACTIONS.forEach((reaction) => {
@@ -119,11 +133,13 @@ describe("Post Reactions Component", () => {
 
     it("Active state applied to current user's reacted choice.", () => {
         render(
-            <MockProvider>
-                <PermissionsFixtures.AllPermissions>
-                    <PostReactions reactions={STORY_REACTIONS} />
-                </PermissionsFixtures.AllPermissions>
-            </MockProvider>,
+            <MockQueryClient>
+                <MockProvider>
+                    <PermissionsFixtures.AllPermissions>
+                        <PostReactions reactions={STORY_REACTIONS} />
+                    </PermissionsFixtures.AllPermissions>
+                </MockProvider>
+            </MockQueryClient>,
         );
 
         STORY_REACTIONS.forEach((reaction) => {
@@ -183,12 +199,12 @@ describe("Post Reactions Component", () => {
 });
 
 describe("Post Reactions Hooks", () => {
-    it("Fetches the reaction log", async () => {
+    it("Fetches the reaction log when requested", async () => {
         mockAdapter = mockAPI();
         mockAdapter.onGet(REACTIONS_URL).replyOnce(200, reactionLog);
         const { result, waitFor } = renderHook(() => useReactionLog(MOCK_RECORD), { wrapper: queryClientWrapper() });
-        await waitFor(() => {
-            expect(result.current.reactionLog).toStrictEqual(reactionLog);
-        });
+        result.current.refetch();
+        await waitFor(() => result.current.isSuccess);
+        expect(result.current.data).toStrictEqual(reactionLog);
     });
 });

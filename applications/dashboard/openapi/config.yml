@@ -333,6 +333,15 @@ components:
                     x-key: Feature.DeferredLegacyScripts.Enabled
                     x-read: public
                     x-write: community.manage
+                "labs.automationRules":
+                    description: |
+                        Enable automation Rules.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.AutomationRules.Enabled
+                    x-read: public
+                    x-write: site.manage
                 "labs.newAnalytics":
                     description: |
                         Enable new analytics.
@@ -872,5 +881,20 @@ components:
                     type: string
                     default: ""
                     x-key: "premoderation.keywords"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.challengeNewUsers":
+                    description: |
+                        Toggle feature that requires new unverified users to complete a challenge.
+                    type: boolean
+                    default: false
+                    x-key: "premoderation.challengeNewUsers"
+                    x-read: community.moderate
+                    x-write: community.moderate
+                "premoderation.challengeAgeCutoffInDays":
+                    description: |
+                        Amount of time in days that a user account is considered new.
+                    type: integer
+                    x-key: "premoderation.challengeAgeCutoffInDays"
                     x-read: community.moderate
                     x-write: community.moderate

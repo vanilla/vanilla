@@ -4,7 +4,7 @@ Foundation is Vanilla's first asset-compatible theme. It defines the following a
 
 -   `variables.json` - Defines color variables for the forum and knowledge base.
 -   `footer.twig` - Footer of the theme.
--   `styles.(s)css` - Independantly scoped styles that apply to the footer (and header if it exists). See [Build instructions](#building-the-theme)
+-   `styles.(s)css` - Independently scoped styles that apply to the footer (and header if it exists). See [Build instructions](#building-the-theme)
 
 ## Building the theme
 

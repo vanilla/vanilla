@@ -9,6 +9,7 @@ namespace Vanilla;
 use CategoryModel;
 use DiscussionModel;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Forum\Models\PostMetaModel;
 
 /**
  * Class DiscussionTypeHandler
@@ -35,8 +36,12 @@ class DiscussionTypeHandler extends AbstractTypeHandler
      * @param \Gdn_Session $session
      * @param CategoryModel $categoryModel
      */
-    public function __construct(DiscussionModel $discussionModel, \Gdn_Session $session, CategoryModel $categoryModel)
-    {
+    public function __construct(
+        DiscussionModel $discussionModel,
+        \Gdn_Session $session,
+        CategoryModel $categoryModel,
+        private PostMetaModel $postMetaModel
+    ) {
         $this->discussionModel = $discussionModel;
         $this->session = $session;
         $this->setTypeHandlerName(self::HANDLER_TYPE);
@@ -48,22 +53,21 @@ class DiscussionTypeHandler extends AbstractTypeHandler
      *
      * @param array $from
      * @param string $to
-     * @throws ClientException If category doesn't allow record type.
+     * @param array|null $postFields
+     * @throws ClientException|\Throwable If category doesn't allow record type.
      */
-    public function handleTypeConversion(array $from, $to)
+    public function handleTypeConversion(array $from, $to, ?array $postFields)
     {
         $categoryID = $from["CategoryID"] ?? null;
         $category = $this->categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
-        $allowedTypes = $category["AllowedDiscussionTypes"] ?? [];
 
-        if (in_array(self::HANDLER_TYPE, $allowedTypes) || empty($allowedTypes)) {
+        if ($this->categoryModel->isPostTypeAllowed($category, $to)) {
             $permissionCategoryID = $from["PermissionCategoryID"] ?? null;
             $this->session->checkPermission("Vanilla.Discussions.Edit", true, "Category", $permissionCategoryID);
             $this->convertTo($from, $to);
+            $this->postMetaModel->updatePostFields($to, $from["DiscussionID"], $postFields ?? []);
         } else {
-            throw new ClientException(
-                "Category #{$categoryID} doesn't allow for" . self::HANDLER_TYPE . "type records"
-            );
+            throw new ClientException("Category #{$categoryID} doesn't allow for $to type records");
         }
     }
 
@@ -76,7 +80,7 @@ class DiscussionTypeHandler extends AbstractTypeHandler
     public function convertTo(array $record, $to)
     {
         $id = $record["DiscussionID"] ?? null;
-        $this->discussionModel->setField($id, "Type", null);
+        $this->discussionModel->setType($id, $to, true);
         $discussionStatusModel = \Gdn::getContainer()->get(\DiscussionStatusModel::class);
         $discussionStatusModel->determineAndUpdateDiscussionStatus($id);
     }
@@ -90,6 +94,11 @@ class DiscussionTypeHandler extends AbstractTypeHandler
      */
     public function cleanUpRelatedData(array $record, string $to)
     {
+        // Delete fields associated with the previous post type.
+        $this->postMetaModel->delete([
+            "recordType" => $record["postTypeID"] ?? null,
+            "recordID" => $record["DiscussionID"],
+        ]);
         return true;
     }
 }

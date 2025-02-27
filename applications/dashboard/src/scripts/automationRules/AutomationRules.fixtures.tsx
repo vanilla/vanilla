@@ -189,12 +189,19 @@ export const mockRecipesList: IAutomationRule[] = [
 export const mockDispatches: IAutomationRuleDispatch[] = [
     {
         automationRuleDispatchUUID: `some_uuid_${mockRecipesList[0].automationRuleID}`,
-        insertUser: { userID: 2, name: "test_user", dateLastActive: mockRecipesList[0].dateInserted, photoUrl: "" },
-        updateUser: { userID: 2, name: "test_user", dateLastActive: mockRecipesList[0].dateInserted, photoUrl: "#" },
         dateDispatched: mockRecipesList[0].dateLastRun,
         dateFinished: mockRecipesList[0].dateLastRun,
         dispatchStatus: "success",
-        automationRule: mockRecipesList[0],
+        automationRule: {
+            ...mockRecipesList[0],
+            insertUser: { userID: 2, name: "test_user", dateLastActive: mockRecipesList[0].dateInserted, photoUrl: "" },
+            updateUser: {
+                userID: 2,
+                name: "test_user",
+                dateLastActive: mockRecipesList[0].dateInserted,
+                photoUrl: "#",
+            },
+        },
         trigger: mockRecipesList[0].trigger,
         action: mockRecipesList[0].action,
         dispatchType: "triggered",
@@ -205,12 +212,19 @@ export const mockDispatches: IAutomationRuleDispatch[] = [
     },
     {
         automationRuleDispatchUUID: `some_uuid_${mockRecipesList[1].automationRuleID}`,
-        insertUser: { userID: 2, name: "test_user", dateLastActive: mockRecipesList[1].dateInserted, photoUrl: "" },
-        updateUser: { userID: 2, name: "test_user", dateLastActive: mockRecipesList[1].dateInserted, photoUrl: "#" },
         dateDispatched: mockRecipesList[1].dateLastRun,
         dateFinished: mockRecipesList[1].dateLastRun,
         dispatchStatus: "queued",
-        automationRule: mockRecipesList[1],
+        automationRule: {
+            ...mockRecipesList[1],
+            insertUser: { userID: 2, name: "test_user", dateLastActive: mockRecipesList[0].dateInserted, photoUrl: "" },
+            updateUser: {
+                userID: 2,
+                name: "test_user",
+                dateLastActive: mockRecipesList[0].dateInserted,
+                photoUrl: "#",
+            },
+        },
         trigger: mockRecipesList[1].trigger,
         action: mockRecipesList[1].action,
         dispatchType: "manual",
@@ -874,7 +888,74 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
             name: "Escalate to Jira",
             actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
             contentType: "posts",
+            dynamicSchemaParams: ["someTestActionValue"],
+            schema: {
+                type: "object",
+                properties: {
+                    someTestActionValue: {
+                        type: "string",
+                        description: "Some description.",
+                        required: true,
+                        "x-control": {
+                            inputType: "dropDown",
+                            label: "Some Test ActionValue",
+                            choices: {
+                                staticOptions: {
+                                    option1: "Option1",
+                                    option2: "Option2",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
+    },
+};
+
+export const mockActionwithDynamicSchema = {
+    actionType: "escalateToJiraAction",
+    name: "Escalate to Jira",
+    actionTriggers: ["staleDiscussionTrigger", "lastActiveDiscussionTrigger"],
+    contentType: "posts",
+    dynamicSchemaParams: ["someTestActionValue"],
+    schema: {
+        type: "object",
+        properties: {
+            someTestActionValue: {
+                type: "string",
+                description: "Some description.",
+                required: true,
+                "x-control": {
+                    inputType: "dropDown",
+                    label: "Some Test ActionValue",
+                    choices: {
+                        staticOptions: {
+                            option1: "Option1",
+                            option2: "Option2",
+                        },
+                    },
+                },
+            },
+        },
+    },
+    dynamicSchema: {
+        type: "object",
+        properties: {
+            customField: {
+                type: "string",
+                default: "dynamicSchema_defaultValue",
+                required: true,
+                disabled: false,
+                "x-control": {
+                    description: "",
+                    label: "Custom field from dynamic schema",
+                    inputType: "textBox",
+                    type: "string",
+                },
+            },
+        },
+        required: ["customField"],
     },
 };
 

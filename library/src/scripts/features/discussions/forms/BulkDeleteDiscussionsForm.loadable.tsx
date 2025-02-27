@@ -1,12 +1,12 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { css } from "@emotion/css";
 import Translate from "@library/content/Translate";
-import { IBulkActionForm } from "@library/features/discussions/BulkActionsModal";
+import { IBulkActionForm } from "@library/bulkActions/BulkActions.types";
 import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
 import { useBulkDelete, useDiscussionByIDs } from "@library/features/discussions/discussionHooks";
 import Button from "@library/forms/Button";
@@ -23,7 +23,7 @@ import Message from "@library/messages/Message";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@library/utility/appUtils";
 import { RecordID } from "@vanilla/utils";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 /**
  * Displays the bulk delete form

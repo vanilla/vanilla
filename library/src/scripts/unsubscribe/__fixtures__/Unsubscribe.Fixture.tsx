@@ -25,11 +25,11 @@ export class UnsubscribeFixture {
 
     public static FETCH_RESULT_TEMPLATE = {
         preferences: [],
-        followedCategory: undefined,
+        followedContent: undefined,
         hasMultiple: false,
         isAllProcessed: false,
         isEmailDigest: false,
-        isUnfollowCategory: false,
+        isUnfollowContent: false,
     };
 
     // Notification unsubscribe has already been processed
@@ -119,9 +119,11 @@ export class UnsubscribeFixture {
             category: "Test Category",
             reasons: ["participated"],
         },
-        followedCategory: {
-            categoryID: 1,
-            categoryName: "Test Category",
+        followedContent: {
+            contentID: 1,
+            contentName: "Test Category",
+            contentType: "category",
+            contentUrl: undefined,
             enabled: true,
             label: (
                 <p key="Preferences.Email.NewComment.1">
@@ -174,10 +176,12 @@ export class UnsubscribeFixture {
         activityData: {
             category: "Test Category",
         },
-        isUnfollowCategory: true,
-        followedCategory: {
-            categoryID: 1,
-            categoryName: "Test Category",
+        isUnfollowContent: true,
+        followedContent: {
+            contentID: 1,
+            contentName: "Test Category",
+            contentType: "category",
+            contentUrl: undefined,
             enabled: false,
             preferenceName: "follow",
             preferenceRaw: "Preferences.follow.1",
@@ -252,7 +256,7 @@ export class UnsubscribeFixture {
         },
         activityID: 0,
         isEmailDigest: false,
-        isUnfollowCategory: false,
+        isUnfollowContent: false,
         hasMultiple: true,
         preferences: [
             {
@@ -263,11 +267,62 @@ export class UnsubscribeFixture {
                 optionID: "Email||Digest",
             },
         ],
-        followedCategory: {
-            categoryID: 1,
-            categoryName: "Test Category",
+        followedContent: {
+            contentID: 1,
+            contentName: "Test Category",
+            contentType: "category",
+            contentUrl: undefined,
             enabled: true,
             label: <SmartLink to="/categories/test-category">Test Category</SmartLink>,
+            preferenceName: "Digest",
+            preferenceRaw: "Preferences.Email.Digest.1",
+            optionID: "Preferences||Email||Digest||1",
+        },
+    };
+
+    // Some mock data for other content following, e.g. groups
+
+    public static MOCK_DIGEST_HIDE_OTHER_CONTENT_TOKEN =
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VySUQiOjIsIk5hbWUiOiJUZXN0IFVzZXIiLCJQaG90b1VybCI6Imh0dHBzOi8vdXNlci1pbWFnZXMuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzE3NzAwNTYvNzQwOTgxMzMtNmY2MjUxMDAtNGFlMi0xMWVhLThhOWQtOTA4ZDcwMDMwNjQ3LnBuZyIsIkVtYWlsIjoidGVzdEBlbWFpbC5jb20iLCJBY3Rpdml0eVR5cGVzIjpbIkVtYWlsRGlnZXN0Il0sIkFjdGl2aXR5VHlwZSI6IkVtYWlsRGlnZXN0IiwiQWN0aXZpdHlJRCI6MCwiQWN0aXZpdHlEYXRhIjp7Ikdyb3VwTmFtZSI6Ik15IGN1c3RvbSBjb250ZW50IGFzIGdyb3VwIiwiR3JvdXBJRCI6MSwiVHlwZSI6Ikdyb3VwRGlnZXN0In19.9FeySLTPnnR8cGRP41IZGbtDj_7mZduSYCnFG1rcrTY" as IUnsubscribeToken;
+
+    public static MOCK_DIGEST_HIDE_OTHER_CONTENT_API_RESULT = {
+        preferences: [],
+        followContent: {
+            contentID: 1,
+            contentType: "group",
+            contentUrl: "/some-custom-content-url",
+            preference: "Preferences.Email.Digest.1",
+            name: "Test Other Content",
+            enabled: "1",
+            userID: 2,
+        },
+    };
+
+    public static MOCK_DIGEST_HIDE_OTHER_CONTENT_DATA = {
+        ...this.TOKEN_RESULT_TEMPLATE,
+        ...this.FETCH_RESULT_TEMPLATE,
+        activityTypes: ["EmailDigest"],
+        activityData: {
+            GroupID: 1,
+            GroupName: "My custom content as group",
+            Type: "GroupDigest",
+        },
+        activityID: 0,
+        isEmailDigest: false,
+        isUnfollowContent: false,
+        hasMultiple: false,
+        preferences: [],
+        followedContent: {
+            contentID: this.MOCK_DIGEST_HIDE_OTHER_CONTENT_API_RESULT.followContent.contentID,
+            contentName: this.MOCK_DIGEST_HIDE_OTHER_CONTENT_API_RESULT.followContent.name,
+            contentType: "group",
+            contentUrl: this.MOCK_DIGEST_HIDE_OTHER_CONTENT_API_RESULT.followContent.contentUrl,
+            enabled: true,
+            label: (
+                <SmartLink to={this.MOCK_DIGEST_HIDE_OTHER_CONTENT_API_RESULT.followContent.contentUrl}>
+                    {this.MOCK_DIGEST_HIDE_OTHER_CONTENT_API_RESULT.followContent.name}
+                </SmartLink>
+            ),
             preferenceName: "Digest",
             preferenceRaw: "Preferences.Email.Digest.1",
             optionID: "Preferences||Email||Digest||1",

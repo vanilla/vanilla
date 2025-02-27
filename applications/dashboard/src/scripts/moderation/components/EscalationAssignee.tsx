@@ -97,15 +97,16 @@ export function EscalationAssignee(props: IProps) {
                 };
             });
         },
-        initialOptions: escalation.assignedUser
-            ? [
-                  {
-                      value: escalation.assignedUser.userID,
-                      label: escalation.assignedUser.name,
-                      data: { icon: escalation.assignedUser.photoUrl },
-                  } as IAutoCompleteOption,
-              ]
-            : undefined,
+        initialOptions:
+            escalation.assignedUser && escalation.assignedUser.userID !== 0
+                ? [
+                      {
+                          value: escalation.assignedUser.userID,
+                          label: escalation.assignedUser.name,
+                          data: { icon: escalation.assignedUser.photoUrl },
+                      } as IAutoCompleteOption,
+                  ]
+                : undefined,
     };
 
     const queryClient = useQueryClient();
@@ -121,8 +122,8 @@ export function EscalationAssignee(props: IProps) {
                 autoDismiss: true,
                 body: t("Assignee updated"),
             });
-            queryClient.invalidateQueries(["escalation"]);
-            queryClient.invalidateQueries(["escalations"]);
+            void queryClient.invalidateQueries(["escalation"]);
+            void queryClient.invalidateQueries(["escalations"]);
         },
     });
 
@@ -136,9 +137,9 @@ export function EscalationAssignee(props: IProps) {
             <AutoComplete
                 resetOnBlur={true}
                 id={"assign-user"}
-                value={escalation.assignedUserID}
+                value={escalation.assignedUserID === 0 ? -4 : escalation.assignedUserID}
                 onChange={(assignedUserID) => {
-                    mutateEscalation.mutateAsync(assignedUserID);
+                    mutateEscalation.mutate(assignedUserID);
                 }}
                 optionProvider={
                     <AutoCompleteLookupOptions

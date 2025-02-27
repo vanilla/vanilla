@@ -1287,7 +1287,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface
      *
      * @return boolean
      */
-    public function has($id)
+    public function has($id): bool
     {
         return class_exists($id);
     }

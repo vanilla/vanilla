@@ -54,6 +54,6 @@ class SearchDiscussionEventProvider implements \Vanilla\Analytics\EventProviderI
     {
         $type = $body["type"] ?? null;
         $domain = $body["domain"] ?? null;
-        return strtolower($type) === "search" && strtolower($domain) === "discussions";
+        return $type && $domain && strtolower($type) === "search" && strtolower($domain) === "discussions";
     }
 }

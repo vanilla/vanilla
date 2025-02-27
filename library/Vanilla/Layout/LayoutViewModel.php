@@ -300,7 +300,7 @@ class LayoutViewModel extends FullRecordCacheModel
      *
      * Actually resolution is delegated to implementations of {@link LayoutViewRecordProviderInterface}
      *
-     * For example, if looking up LayoutQuery("discussionThread", "discussion", 56) this will perform the following resolutions:
+     * For example, if looking up LayoutQuery("discussion", "discussion", 56) this will perform the following resolutions:
      * - Ensure the discussion exists.
      * - Resolve the type of discussionThread Eg. (discussionThread, questionThread, or ideaThread)
      * - Look for layoutView assignements on the discussions category.

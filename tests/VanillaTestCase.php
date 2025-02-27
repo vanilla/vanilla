@@ -337,7 +337,7 @@ class VanillaTestCase extends TestCase
      * @param bool $strictOrder Should the items be strictly ordered.
      * @param int|null $count The expected count of rows.
      */
-    protected static function assertRowsLike(
+    public static function assertRowsLike(
         array $expectedFields,
         array $actualRows,
         bool $strictOrder = true,
@@ -418,6 +418,11 @@ class VanillaTestCase extends TestCase
     public static function markForSparseComparision(array $arr): array
     {
         $arr[self::KEY_SPARSE_COMPARISON] = true;
+        foreach ($arr as $key => &$value) {
+            if (is_array($value) && ArrayUtils::isAssociative($value)) {
+                $value = self::markForSparseComparision($value);
+            }
+        }
         return $arr;
     }
 

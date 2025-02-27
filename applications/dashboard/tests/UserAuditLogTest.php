@@ -68,29 +68,29 @@ class UserAuditLogTest extends SiteTestCase
      */
     public function testUserProfileFields(): void
     {
-        $this->createProfileField(["name" => "First Name", "apiName" => "first-name"]);
+        $this->createProfileField(["name" => "Special Name", "apiName" => "special-name"]);
         $this->createUser(["name" => "user2"]);
         $this->api()->patch("/users/{$this->lastUserID}", [
             "profileFields" => [
-                "first-name" => "hello",
+                "special-name" => "hello",
             ],
         ]);
         $this->assertAuditLogged(
             ExpectedAuditLog::create("user_update")
                 ->withMessage("User `user2` was updated by `circleci`.")
-                ->withModification("profileFields.first-name", null, "hello")
+                ->withModification("profileFields.special-name", null, "hello")
         );
 
         // We also track them being removed.
         $this->api()->patch("/users/{$this->lastUserID}", [
             "profileFields" => [
-                "first-name" => null,
+                "special-name" => null,
             ],
         ]);
         $this->assertAuditLogged(
             ExpectedAuditLog::create("user_update")
                 ->withMessage("User `user2` was updated by `circleci`.")
-                ->withModification("profileFields.first-name", "hello", null)
+                ->withModification("profileFields.special-name", "hello", null)
         );
     }
 

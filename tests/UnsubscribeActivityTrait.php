@@ -91,6 +91,8 @@ trait UnsubscribeActivityTrait
             "text"
         );
 
+        $this->assertStringContainsString("https", $unsubscribeLink);
+
         // Call the API endpoint.
         preg_match("~/unsubscribe/(.*)~", $unsubscribeLink, $token);
         $response = $this->api()->post("/unsubscribe/$token[1]}");

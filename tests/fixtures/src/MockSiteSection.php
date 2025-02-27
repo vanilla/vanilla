@@ -127,7 +127,7 @@ class MockSiteSection implements SiteSectionInterface
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return SiteSectionSchema::toArray($this);
     }

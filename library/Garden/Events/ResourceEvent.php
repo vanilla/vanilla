@@ -19,6 +19,7 @@ use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggerUtils;
 use Vanilla\Logging\ResourceEventLogger;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\StringUtils;
 
@@ -229,7 +230,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             "type" => $this->type,

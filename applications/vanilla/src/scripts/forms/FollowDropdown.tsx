@@ -55,6 +55,8 @@ interface IProps extends IFollowDropdownProps {
         recordUnfollowText: string;
         recordFollowedContentText: string;
     };
+    viewRecordUrl?: string;
+    viewRecordText?: string;
 }
 
 export function FollowDropdown(props: IProps) {
@@ -79,6 +81,8 @@ export function FollowDropdown(props: IProps) {
         unfollowAndResetPreferences,
         size = "default",
         categoryAsLabel,
+        viewRecordUrl,
+        viewRecordText,
     } = props;
 
     const classes = followDropdownClasses({
@@ -195,10 +199,22 @@ export function FollowDropdown(props: IProps) {
                         </FrameBody>
                     }
                     footer={
-                        isFollowed && (
-                            <FrameFooter forDashboard={true}>
+                        <FrameFooter forDashboard={true}>
+                            {viewRecordUrl && (
+                                <LinkAsButton
+                                    to={viewRecordUrl}
+                                    target="_blank"
+                                    className={cx(classes.fullWidth, classes.viewRecordButton)}
+                                >
+                                    {t(viewRecordText ?? "View Category")}
+                                </LinkAsButton>
+                            )}
+
+                            {isFollowed && (
                                 <Button
-                                    className={classes.fullWidth}
+                                    className={cx(classes.fullWidth, {
+                                        [classes.extraButtonMargin]: !!viewRecordUrl,
+                                    })}
                                     onClick={async () => {
                                         await unfollowAndResetPreferences();
                                         props.onPreferencesChange?.({
@@ -212,8 +228,8 @@ export function FollowDropdown(props: IProps) {
                                 >
                                     {t(recordDetails?.recordUnfollowText ?? "Unfollow Category")}
                                 </Button>
-                            </FrameFooter>
-                        )
+                            )}
+                        </FrameFooter>
                     }
                 />
             </DropDown>

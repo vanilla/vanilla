@@ -53,7 +53,7 @@ class ExtendedUsersExpander extends AbstractApiExpander
     /**
      * @inheritdoc
      */
-    public function resolveFragements(array $recordIDs): array
+    public function resolveFragments(array $recordIDs): array
     {
         if (FeatureFlagHelper::featureEnabled(ProfileFieldModel::FEATURE_FLAG)) {
             return $this->profileFieldModel->getUsersProfileFields($recordIDs);

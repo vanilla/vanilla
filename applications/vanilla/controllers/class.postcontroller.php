@@ -8,8 +8,11 @@
  * @since 2.0
  */
 
+use Garden\Schema\ValidationException;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Premoderation\PremoderationException;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Handles posting and editing comments, discussions, and drafts via /post endpoint.
@@ -17,15 +20,6 @@ use Vanilla\Premoderation\PremoderationException;
 class PostController extends VanillaController
 {
     use \Vanilla\Formatting\FormatCompatTrait;
-
-    /** @var DiscussionModel */
-    public $DiscussionModel;
-
-    /** @var CommentModel */
-    public $CommentModel;
-
-    /** @var DraftModel */
-    public $DraftModel;
 
     /** @var Gdn_Form */
     public $Form;
@@ -48,18 +42,72 @@ class PostController extends VanillaController
     /** @var null|array */
     public $Context = null;
 
-    /** @var FormatService */
-    private $formatService;
-
     /**
      * DI.
-     *
-     * @param FormatService $formatService
      */
-    public function __construct(FormatService $formatService)
-    {
+    public function __construct(
+        public DiscussionModel $DiscussionModel,
+        public CommentModel $CommentModel,
+        public DraftModel $DraftModel,
+        private ContentDraftModel $contentDraftModel,
+        private FormatService $formatService
+    ) {
         parent::__construct();
-        $this->formatService = $formatService;
+    }
+
+    /**
+     * @param int $draftID
+     * @return array
+     */
+    public function getDraftInLegacyFormat(int $draftID): array
+    {
+        if (ContentDraftModel::enabled()) {
+            $draft = $this->contentDraftModel->selectSingle(["draftID" => $draftID]);
+            $draft = $this->contentDraftModel->convertToLegacyDraft($draft);
+        } else {
+            $draft = $this->DraftModel->getID($draftID, DATASET_TYPE_ARRAY);
+        }
+        return $draft;
+    }
+
+    /**
+     * @param array $formValues
+     * @return int|false A draftID or false.
+     * @throws Exception
+     */
+    public function saveDraftFromLegacyFormat(array $formValues): int|false
+    {
+        $draftID = $formValues["DraftID"] ?? false;
+        if (ContentDraftModel::enabled()) {
+            $modernDraft = $this->contentDraftModel->normalizeLegacyDraft($formValues);
+            try {
+                if (!empty($draftID)) {
+                    $this->contentDraftModel->update(set: $modernDraft, where: ["draftID" => $draftID]);
+                } else {
+                    $draftID = $this->contentDraftModel->insert($modernDraft);
+                }
+            } catch (ValidationException $ex) {
+                $this->Form->setValidationResults(ModelUtils::validationExceptionToValidationResult($ex)->results());
+            }
+        } else {
+            $draftID = $this->DraftModel->save($formValues);
+            $this->Form->setValidationResults($this->DraftModel->validationResults());
+        }
+        return $draftID;
+    }
+
+    /**
+     * @param int $draftID
+     * @return void
+     * @throws Exception
+     */
+    public function removeDraft(int $draftID): void
+    {
+        if (ContentDraftModel::enabled()) {
+            $this->contentDraftModel->delete(where: ["draftID" => $draftID]);
+        } else {
+            $this->DraftModel->deleteID($draftID);
+        }
     }
 
     /**
@@ -116,16 +164,10 @@ class PostController extends VanillaController
             "0" => "@" . t("Don't announce."),
         ];
 
-        if (c("Vanilla.Categories.Use")) {
-            $result = array_replace($result, [
-                "2" => "@" . sprintf(t("In <b>%s.</b>"), t("the category")),
-                "1" => "@" . sprintf(sprintf(t("In <b>%s</b> and recent discussions."), t("the category"))),
-            ]);
-        } else {
-            $result = array_replace($result, [
-                "1" => "@" . t("In recent discussions."),
-            ]);
-        }
+        $result = array_replace($result, [
+            "2" => "@" . sprintf(t("In <b>%s.</b>"), t("the category")),
+            "1" => "@" . sprintf(sprintf(t("In <b>%s</b> and recent discussions."), t("the category"))),
+        ]);
 
         return $result;
     }
@@ -139,7 +181,7 @@ class PostController extends VanillaController
     public function discussion($categoryID = "")
     {
         // Override CategoryID if categories are disabled
-        $useCategories = $this->ShowCategorySelector = (bool) c("Vanilla.Categories.Use");
+        $useCategories = $this->ShowCategorySelector;
         if (!$useCategories) {
             $categoryID = "";
         }
@@ -262,7 +304,7 @@ class PostController extends VanillaController
             }
 
             // Decode HTML entities escaped by DiscussionModel::calculate() here.
-            $this->Form->setValue("Name", htmlspecialchars_decode($this->Form->getValue("Name")));
+            $this->Form->setValue("Name", htmlspecialchars_decode($this->Form->getValue("Name") ?? ""));
         } elseif ($this->Form->authenticatedPostBack(true)) {
             // Form was submitted
             // Save as a draft?
@@ -278,7 +320,7 @@ class PostController extends VanillaController
                         throw new Gdn_UserException("Invalid draft ID.");
                     }
 
-                    $draftObject = $this->DraftModel->getID($draftID, DATASET_TYPE_ARRAY);
+                    $draftObject = $this->getDraftInLegacyFormat($draftID);
                     if (!$draftObject) {
                         throw notFoundException("Draft");
                     } elseif (
@@ -382,8 +424,7 @@ class PostController extends VanillaController
                 if ($this->Form->errorCount() == 0) {
                     if ($draft) {
                         $formValues["Type"] = $formValues["Type"] ?? "Discussion";
-                        $draftID = $this->DraftModel->save($formValues);
-                        $this->Form->setValidationResults($this->DraftModel->validationResults());
+                        $draftID = $this->saveDraftFromLegacyFormat($formValues);
                     } else {
                         try {
                             $discussionID = $this->DiscussionModel->save($formValues);
@@ -394,7 +435,7 @@ class PostController extends VanillaController
 
                         if ($discussionID > 0) {
                             if ($draftID > 0) {
-                                $this->DraftModel->deleteID($draftID);
+                                $this->removeDraft($draftID);
                             }
                         }
                         if ($discussionID == SPAM || $discussionID == UNAPPROVED) {
@@ -514,7 +555,9 @@ class PostController extends VanillaController
     public function editDiscussion($discussionID = 0, $draftID = 0)
     {
         if ($draftID != 0) {
-            $record = $this->Draft = $this->DraftModel->getID($draftID);
+            $draft = (object) $this->getDraftInLegacyFormat($draftID);
+
+            $record = $this->Draft = $draft;
             $this->CategoryID = $this->Draft->CategoryID;
             $this->setData("Type", $record->Type ?? "Discussion");
             $this->setData("Discussion", $record, true);
@@ -701,9 +744,8 @@ class PostController extends VanillaController
 
         // Setup comment model, $CommentID, $DraftID
         $Session = Gdn::session();
-        $CommentID =
-            isset($this->Comment) && property_exists($this->Comment, "CommentID") ? $this->Comment->CommentID : "";
-        $DraftID = isset($this->Comment) && property_exists($this->Comment, "DraftID") ? $this->Comment->DraftID : "";
+        $CommentID = $this->Comment?->CommentID ?? "";
+        $DraftID = $this->Comment?->DraftID ?? "";
         if (!is_numeric($DraftID) && $DraftID !== "") {
             throw new Gdn_UserException("Invalid draft ID.");
         }
@@ -738,10 +780,10 @@ class PostController extends VanillaController
         $this->Form->addHidden("DraftID", $DraftID, true);
 
         // Check permissions
-        if ($Discussion && $Editing) {
+        if ($Discussion && $Editing && $CommentID) {
             // Make sure that content can (still) be edited.
             $editTimeout = 0;
-            if (!CommentModel::canEdit($this->Comment, $editTimeout, $Discussion)) {
+            if (!CommentModel::canEdit($this->Comment, $editTimeout)) {
                 throw permissionException("Vanilla.Comments.Edit");
             }
 
@@ -783,7 +825,7 @@ class PostController extends VanillaController
             if ((int) $DraftID == 0) {
                 $DraftID = $this->Form->getFormValue("DraftID", 0);
                 if ($DraftID) {
-                    $draft = $this->DraftModel->getID($DraftID, DATASET_TYPE_ARRAY);
+                    $draft = $this->getDraftInLegacyFormat($DraftID);
                     if (!$draft) {
                         throw notFoundException("Draft");
                     } elseif (
@@ -800,9 +842,8 @@ class PostController extends VanillaController
             $this->EventArguments["Draft"] = $Draft;
             $Preview = $Type == "Preview";
             if ($Draft) {
-                $DraftID = $this->DraftModel->save($FormValues);
+                $DraftID = $this->saveDraftFromLegacyFormat($FormValues);
                 $this->Form->addHidden("DraftID", $DraftID, true);
-                $this->Form->setValidationResults($this->DraftModel->validationResults());
             } elseif (!$Preview) {
                 // Fix an undefined title if we can.
                 if (
@@ -847,7 +888,7 @@ class PostController extends VanillaController
 
                 $this->Form->setValidationResults($this->CommentModel->validationResults());
                 if ($CommentID > 0 && $DraftID > 0) {
-                    $this->DraftModel->deleteID($DraftID);
+                    $this->removeDraft($DraftID);
                 }
             }
 
@@ -927,7 +968,7 @@ class PostController extends VanillaController
                             $OrderBy = valr("0.0", $this->CommentModel->orderBy());
 
                             if (is_numeric($CommentID)) {
-                                $this->Offset = $this->CommentModel->getDiscussionThreadOffset($CommentID);
+                                $this->Offset = $this->CommentModel->getCommentThreadOffset($CommentID);
                                 $Comments = new Gdn_DataSet([$this->CommentModel->getID($CommentID)]);
                             } else {
                                 $Comments = new Gdn_DataSet();
@@ -998,7 +1039,7 @@ class PostController extends VanillaController
                 if ($Comment) {
                     $Photo = $Comment["InsertPhoto"];
 
-                    if (strpos($Photo, "//") === false) {
+                    if ($Photo && strpos($Photo, "//") === false) {
                         $Photo = Gdn_Upload::url(changeBasename($Photo, "n%s"));
                     }
 
@@ -1029,7 +1070,7 @@ class PostController extends VanillaController
             $this->Comment = $this->CommentModel->getID($commentID);
         } else {
             $this->Form->setModel($this->DraftModel);
-            $this->Comment = $this->DraftModel->getID($draftID);
+            $this->Comment = (object) $this->getDraftInLegacyFormat($draftID);
         }
 
         // Normalize the edit data.

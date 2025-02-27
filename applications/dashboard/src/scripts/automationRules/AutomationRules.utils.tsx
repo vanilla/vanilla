@@ -9,6 +9,7 @@ import {
     AutomationRuleFormValues,
     AutomationRuleTriggerType,
     IAutomationRule,
+    IAutomationRuleAction,
     IAutomationRuleDispatch,
     IAutomationRulesCatalog,
 } from "@dashboard/automationRules/AutomationRules.types";
@@ -61,7 +62,7 @@ export const hasPostType = (
 };
 
 /**
- *  Checks if the trigger has additional settings
+ *  Returns additional settings from trigger schema
  */
 export const getTriggerAdditionalSettings = (
     triggerType?: AutomationRuleTriggerType | string,
@@ -69,6 +70,40 @@ export const getTriggerAdditionalSettings = (
 ) => {
     if (triggerType && catalog) {
         return Object.keys(catalog?.triggers[triggerType]?.schema?.properties?.additionalSettings ?? {});
+    }
+    return null;
+};
+
+/**
+ *  Checks if action has dynamic schema and returns dynamic schema params
+ */
+export const getActionDynamicSchemaParams = (
+    formValues: AutomationRuleFormValues,
+    catalog?: IAutomationRulesCatalog,
+) => {
+    const selectedActionType = formValues.action?.actionType as AutomationRuleActionType;
+    const dynamicSchemaParamKeys = catalog?.actions[selectedActionType]?.dynamicSchemaParams;
+
+    const actionDynamicSchemaParamsArr =
+        dynamicSchemaParamKeys &&
+        dynamicSchemaParamKeys.reduce((acc: any[], paramKey: string) => {
+            // find matching action value key, in some cases it might not exactly match the param key, but contain it
+            const actualActionValueKey = Object.keys(formValues.action?.actionValue ?? {}).find(
+                (value) => value === paramKey || value.includes(paramKey),
+            );
+            if (actualActionValueKey) {
+                acc.push([paramKey, formValues.action?.actionValue[actualActionValueKey]]);
+            }
+            return acc;
+        }, []);
+    const hasRequiredParamValues =
+        dynamicSchemaParamKeys?.length && dynamicSchemaParamKeys?.length === actionDynamicSchemaParamsArr?.length;
+
+    if (dynamicSchemaParamKeys && hasRequiredParamValues) {
+        return {
+            actionType: selectedActionType,
+            params: Object.fromEntries(actionDynamicSchemaParamsArr ?? []),
+        };
     }
     return null;
 };
@@ -197,6 +232,10 @@ export function getTriggerActionFormSchema(
     currentFormValues: AutomationRuleFormValues,
     profileFields?: ProfileField[],
     automationRulesCatalog?: IAutomationRulesCatalog,
+    dynamicSchema?: {
+        data: IAutomationRuleAction | undefined;
+        isFetching: boolean;
+    },
 ): JsonSchema {
     const profileFieldsSchema = profileFields && mapProfileFieldsToSchemaForFilterForm(profileFields);
 
@@ -374,6 +413,51 @@ export function getTriggerActionFormSchema(
         triggerActionSchema.properties.action.properties.actionValue["required"] = Object.keys(
             actionValueProperties,
         ).filter((field) => actionValueProperties[field].required);
+    }
+
+    // some actions have dynamic schemas to load depending on selected values, we need to adjust accordingly
+    if (dynamicSchema && selectedActionType) {
+        const dynamicSchemaProperties = dynamicSchema.isFetching
+            ? {
+                  loadingPlaceHolder: {
+                      type: "null",
+                      nullable: true,
+                      "x-control": {
+                          inputType: "custom",
+                          component: () => <LoadingRectangle height={32} />,
+                          componentProps: {},
+                      },
+                  },
+              }
+            : dynamicSchema.data
+            ? { ...dynamicSchema.data?.dynamicSchema?.properties }
+            : {};
+
+        return {
+            ...triggerActionSchema,
+            properties: {
+                ...triggerActionSchema.properties,
+                action: {
+                    ...triggerActionSchema.properties.action,
+                    properties: {
+                        ...triggerActionSchema.properties.action.properties,
+                        actionValue: {
+                            ...triggerActionSchema.properties.action.properties.actionValue,
+                            properties: {
+                                ...triggerActionSchema.properties.action.properties.actionValue.properties,
+                                ...dynamicSchemaProperties,
+                            },
+                            ...(dynamicSchema.data && {
+                                required: [
+                                    ...triggerActionSchema.properties.action.properties.actionValue["required"],
+                                    ...(dynamicSchema.data?.dynamicSchema?.["required"] ?? []),
+                                ],
+                            }),
+                        },
+                    },
+                },
+            },
+        };
     }
 
     return triggerActionSchema;

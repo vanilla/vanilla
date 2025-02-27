@@ -124,7 +124,7 @@ final class CronModel
         if ($cached instanceof \DateTimeImmutable) {
             return $cached;
         } else {
-            return (new \DateTimeImmutable())->modify("-1 day");
+            return CurrentTimeStamp::getDateTime()->modify("-1 day");
         }
     }
 }

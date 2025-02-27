@@ -3,6 +3,8 @@
  * @license GPL-2.0-only
  */
 
+import { IContributionItem } from "@library/contributionItems/ContributionItem";
+
 export interface IUserFragment {
     userID: number;
     name: string;
@@ -14,6 +16,14 @@ export interface IUserFragment {
     banned?: number;
     private?: boolean;
     email?: string;
+    badges?: Array<
+        IContributionItem & {
+            badgeID: number;
+        }
+    >;
+    signature?: {
+        body?: string;
+    };
 }
 
 export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}

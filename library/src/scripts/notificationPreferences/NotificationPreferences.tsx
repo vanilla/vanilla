@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -26,8 +26,8 @@ import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { Formik, useFormikContext } from "formik";
-import React, { PropsWithChildren, useMemo, useEffect } from "react";
-import { Column, Row, useTable } from "react-table";
+import React, { PropsWithChildren, useMemo } from "react";
+import { Column, useTable } from "react-table";
 import debounce from "lodash-es/debounce";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
@@ -37,6 +37,7 @@ import { notificationPreferencesFormClasses } from "@library/preferencesTable/Pr
 import { RecordID } from "@vanilla/utils";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { AccountConflict } from "@library/accountConflict/AccountConflict";
+import { FormControl, FormControlGroup } from "@library/forms/FormControl";
 
 export default function NotificationPreferences(props: { userID: RecordID }) {
     return (
@@ -205,7 +206,7 @@ const SubGroup: NonNullable<React.ComponentProps<typeof JsonSchemaForm>["FormSec
 const TableFormSection: NonNullable<React.ComponentProps<typeof JsonSchemaForm>["FormSection"]> = (props) => {
     const { instance, schema } = props;
 
-    const { submitForm, setFieldValue } = useFormikContext<INotificationPreferences>();
+    const { submitForm, setFieldValue, setValues } = useFormikContext<INotificationPreferences>();
 
     const formClasses = notificationPreferencesFormClasses();
 
@@ -236,7 +237,7 @@ const TableFormSection: NonNullable<React.ComponentProps<typeof JsonSchemaForm>[
                             checked={cellProps.cell.value}
                             className={formClasses.checkbox}
                             onChange={async function (event) {
-                                setFieldValue(cellProps.row.id, {
+                                void setFieldValue(cellProps.row.id, {
                                     ...instance[cellProps.row.id],
                                     popup: event.target.checked,
                                 });
@@ -271,7 +272,7 @@ const TableFormSection: NonNullable<React.ComponentProps<typeof JsonSchemaForm>[
                             checked={cellProps.cell.value}
                             className={formClasses.checkbox}
                             onChange={async function (event) {
-                                setFieldValue(cellProps.row.id, {
+                                void setFieldValue(cellProps.row.id, {
                                     ...instance[cellProps.row.id],
                                     email: event.target.checked,
                                 });
@@ -316,7 +317,24 @@ const TableFormSection: NonNullable<React.ComponentProps<typeof JsonSchemaForm>[
         getRowId: (row) => row.id,
     });
 
-    return <PreferencesTable table={table} />;
+    const containsFrequencyInput = Object.values(instance).some((value: object) => "frequency" in value);
+
+    return containsFrequencyInput ? (
+        <div className={formClasses.emailDigestSection}>
+            <JsonSchemaForm
+                instance={instance}
+                schema={schema}
+                FormControl={FormControl}
+                FormControlGroup={FormControlGroup}
+                onChange={async (values) => {
+                    await setValues(values);
+                    await submitForm();
+                }}
+            />
+        </div>
+    ) : (
+        <PreferencesTable table={table} />
+    );
 };
 
 function SkeletonTopLevelGroup(props: PropsWithChildren<{}>) {

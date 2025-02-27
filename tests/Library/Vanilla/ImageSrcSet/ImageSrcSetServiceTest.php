@@ -58,6 +58,7 @@ class ImageSrcSetServiceTest extends MinimalContainerTestCase
         $desiredOutput = null;
 
         $imageSrcSet = $imageSrcSetService->getResizedSrcSet($srcImageUrl);
+
         $this->assertSame($desiredOutput, $imageSrcSet->jsonSerialize());
     }
 }

@@ -1,0 +1,32 @@
+openapi: 3.1.0
+info:
+paths:
+    /digest/backfill-optin:
+        post:
+            x-hidden: true
+            description: |
+                Backfill opt-in for a user.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                dateLastActive:
+                                    format: date
+                                    type: string
+                                    description: The cutoff for opting users in. Users last active before this date will not be affected.
+                                    example: 2018-03-20
+            responses:
+                "200":
+                    description: Success
+                "202":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+                "403":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+                "408":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+            tags:
+                - Digest
+            summary: Opt users into receiving the email digest.

@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Web;
 
 use Garden\Web\Data;
+use Vanilla\Dashboard\Models\LegacyProfileFieldMigrator;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Models\UserAuthenticationModel;
 use Vanilla\Web\APIExpandMiddleware;
@@ -39,6 +40,19 @@ class APIExpandMiddlewareTest extends SiteTestCase
      * @var APIExpandMiddleware
      */
     protected $middleware;
+
+    /**
+     * @inheritDoc
+     */
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        // This test suite depends on fields created with profile extender. For now just force a migration so tests continue to work.
+        \Gdn::config()->saveToConfig(LegacyProfileFieldMigrator::CONF_ALREADY_RAN_MIGRATION, false, false);
+        $updateModel = self::container()->get(\UpdateModel::class);
+        $updateModel->runStructure();
+    }
 
     /**
      * Create a configured test middleware for each test.
@@ -368,8 +382,10 @@ EOT
                 "insertUser",
                 "updateUser",
                 "insertUser.ssoID",
+                "insertUser.profileFields",
                 "insertUser.extended",
                 "updateUser.ssoID",
+                "updateUser.profileFields",
                 "updateUser.extended"
               ],
               "type": "string"
@@ -436,8 +452,10 @@ EOT
               "insertUser",
               "updateUser",
               "insertUser.ssoID",
+              "insertUser.profileFields",
               "insertUser.extended",
               "updateUser.ssoID",
+              "updateUser.profileFields",
               "updateUser.extended"
             ],
             "type": "string"

@@ -47,7 +47,7 @@ class Pagination implements \JsonSerializable
         $this->webLinking = new WebLinking();
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $pageLinks = $this->getPageLinks();
         return [

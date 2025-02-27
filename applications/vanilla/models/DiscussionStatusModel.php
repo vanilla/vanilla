@@ -92,7 +92,11 @@ class DiscussionStatusModel
         $statusNotes = $statusNotes === "" ? null : $statusNotes;
         $this->discussionModel->saveToSerializedColumn("Attributes", $discussionID, "StatusNotes", $statusNotes);
 
-        $noReasonChange = strcmp($reason, $existingStatusNotes) === 0;
+        if ($reason && $existingStatusNotes) {
+            $noReasonChange = strcmp($reason, $existingStatusNotes ?? "") === 0;
+        } else {
+            $noReasonChange = true;
+        }
 
         if (!$noStatusChange || !$noReasonChange) {
             $recordLogData = [
@@ -114,6 +118,16 @@ class DiscussionStatusModel
             $statusLogId = $this->recordStatusLogModel->insert($recordLogData);
             if (!$statusLogId) {
                 throw new \Exception("failed saving record status log");
+            }
+            if (!$noStatusChange) {
+                //if status is changed update the changes to the post-modify event
+                $discussionEvent = $this->discussionModel->eventFromRow(
+                    $discussion,
+                    DiscussionEvent::ACTION_STATUS,
+                    $this->userModel->currentFragment(),
+                    $status["isInternal"] ?? false
+                );
+                $this->discussionModel->getEventManager()->dispatch($discussionEvent);
             }
         }
 

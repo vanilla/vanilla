@@ -177,14 +177,14 @@ HTML;
             "recordID" => 856,
             "recordType" => "comment",
             "body" =>
-                "<p><a href=\"https://dev.vanilla.localhost/discussion/157103/quote\">https://dev.vanilla.localhost/discussion/157103/quote</a></p><p>Inner quote</p>",
+                "<p><a href=\"https://dev.vanilla.local/discussion/157103/quote\">https://dev.vanilla.local/discussion/157103/quote</a></p><p>Inner quote</p>",
             "bodyRaw" =>
-                "[{\"type\":\"rich_embed_card\",\"children\":[{\"text\":\"\"}],\"dataSourceType\":\"url\",\"url\":\"https:\\/\\/dev.vanilla.localhost\\/discussion\\/157103\\/quote\",\"embedData\":{\"recordID\":157103,\"recordType\":\"discussion\",\"body\":\"<p>Original post<\\/p>\",\"bodyRaw\":\"[{\\\"type\\\":\\\"p\\\",\\\"children\\\":[{\\\"text\\\":\\\"Original post\\\"}]}]\",\"format\":\"rich2\",\"dateInserted\":\"2024-03-04T16:53:39+00:00\",\"insertUser\":{\"userID\":2,\"name\":\"admin\",\"url\":\"https:\\/\\/dev.vanilla.localhost\\/profile\\/admin\",\"photoUrl\":\"https:\\/\\/dev.vanilla.localhost\\/applications\\/dashboard\\/design\\/images\\/defaulticon.png\",\"dateLastActive\":\"2024-03-04T16:53:12+00:00\",\"banned\":0,\"punished\":0,\"private\":false,\"label\":\"Moderator\"},\"displayOptions\":{\"showUserLabel\":false,\"showCompactUserInfo\":true,\"showDiscussionLink\":true,\"showPostLink\":true,\"showCategoryLink\":false,\"renderFullContent\":false,\"expandByDefault\":false},\"url\":\"https:\\/\\/dev.vanilla.localhost\\/discussion\\/157103\\/quote\",\"embedType\":\"quote\",\"name\":\"Quote\"}},{\"type\":\"p\",\"children\":[{\"text\":\"Inner quote\"}]}]",
+                "[{\"type\":\"rich_embed_card\",\"children\":[{\"text\":\"\"}],\"dataSourceType\":\"url\",\"url\":\"https:\\/\\/dev.vanilla.local\\/discussion\\/157103\\/quote\",\"embedData\":{\"recordID\":157103,\"recordType\":\"discussion\",\"body\":\"<p>Original post<\\/p>\",\"bodyRaw\":\"[{\\\"type\\\":\\\"p\\\",\\\"children\\\":[{\\\"text\\\":\\\"Original post\\\"}]}]\",\"format\":\"rich2\",\"dateInserted\":\"2024-03-04T16:53:39+00:00\",\"insertUser\":{\"userID\":2,\"name\":\"admin\",\"url\":\"https:\\/\\/dev.vanilla.local\\/profile\\/admin\",\"photoUrl\":\"https:\\/\\/dev.vanilla.local\\/applications\\/dashboard\\/design\\/images\\/defaulticon.png\",\"dateLastActive\":\"2024-03-04T16:53:12+00:00\",\"banned\":0,\"punished\":0,\"private\":false,\"label\":\"Moderator\"},\"displayOptions\":{\"showUserLabel\":false,\"showCompactUserInfo\":true,\"showDiscussionLink\":true,\"showPostLink\":true,\"showCategoryLink\":false,\"renderFullContent\":false,\"expandByDefault\":false},\"url\":\"https:\\/\\/dev.vanilla.local\\/discussion\\/157103\\/quote\",\"embedType\":\"quote\",\"name\":\"Quote\"}},{\"type\":\"p\",\"children\":[{\"text\":\"Inner quote\"}]}]",
             "format" => "rich2",
             "dateInserted" => "2024-03-04T17:10:15+00:00",
             "insertUser" => $this->getMockUserProvider()->addMockUser(),
             "displayOptions" => QuoteEmbedDisplayOptions::minimal(false),
-            "url" => "https://dev.vanilla.localhost/discussion/comment/856#Comment_856",
+            "url" => "https://dev.vanilla.local/discussion/comment/856#Comment_856",
             "embedType" => "quote",
         ];
         $embed = new QuoteEmbed($nestedQuotes);

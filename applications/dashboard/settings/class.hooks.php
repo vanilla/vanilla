@@ -620,9 +620,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             ->addGroup(t("Discussions"), "forum", "", ["after" => "email"])
             ->addLinkIf("Garden.Settings.Manage", t("Tagging"), "settings/tagging", "forum.tagging", $sort)
             ->addLinkIf(
-                Gdn::config("Feature.AISuggestions.Enabled") &&
-                    Gdn::config("Feature.aiFeatures.Enabled") &&
-                    $session->checkPermission("Garden.Settings.Manage"),
+                Gdn::config("Feature.AISuggestions.Enabled") && $session->checkPermission("Garden.Settings.Manage"),
                 t("AI Suggested Answers"),
                 "/settings/ai-suggestions",
                 "forum.ai-suggestions",
@@ -790,7 +788,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
 
         $queryType = $type;
 
-        if (strtolower($type) == "all" || $search || $type === null) {
+        if (($type && strtolower($type) == "all") || $search || $type === null) {
             $queryType = false;
             $type = "";
         }

@@ -6,16 +6,18 @@
 
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
+import type { IComment } from "@dashboard/@types/api/comment";
+import type { IDiscussion } from "@dashboard/@types/api/discussion";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
-import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import {
     useEscalationCommentsQuery,
     useEscalationMutation,
     useEscalationQuery,
-    useRevisionOptions,
+    usePostRevisions,
+    useReportsQuery,
 } from "@dashboard/moderation/CommunityManagement.hooks";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
-import { IEscalation } from "@dashboard/moderation/CommunityManagementTypes";
+import { IEscalation, type IReport } from "@dashboard/moderation/CommunityManagementTypes";
 import { AssociatedReportMetas } from "@dashboard/moderation/components/AssosciatedReportMetas";
 import { EscalationActions } from "@dashboard/moderation/components/EscalationActions";
 import { EscalationAssignee } from "@dashboard/moderation/components/EscalationAssignee";
@@ -24,8 +26,9 @@ import { EscalationMetas } from "@dashboard/moderation/components/EscalationMeta
 import { PostDetail } from "@dashboard/moderation/components/PostDetail";
 import { ReportHistoryList } from "@dashboard/moderation/components/ReportHistoryList";
 import { detailPageClasses } from "@dashboard/moderation/DetailPage.classes";
-import { PostRevisionProvider, usePostRevision } from "@dashboard/moderation/PostRevisionContext";
+import { PostRevisionPicker } from "@dashboard/moderation/PostRevisionPicker";
 import { cx } from "@emotion/css";
+import apiv2 from "@library/apiv2";
 import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
 import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { AutoWidthInput } from "@library/forms/AutoWidthInput";
@@ -34,14 +37,16 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { PageBox } from "@library/layout/PageBox";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
+import { LoadingRectangle, LoadingSpacer } from "@library/loaders/LoadingRectangle";
+import { QueryLoader } from "@library/loaders/QueryLoader";
+import Message from "@library/messages/Message";
 import { Metas } from "@library/metas/Metas";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import BackLink from "@library/routing/links/BackLink";
-import { Sort } from "@library/sort/Sort";
 import { BorderType } from "@library/styles/styleHelpersBorders";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
-import { CommentThreadItem } from "@vanilla/addon-vanilla/thread/CommentThreadItem";
-import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { CommentItem } from "@vanilla/addon-vanilla/comments/CommentItem";
+import { ContentItemAttachment } from "@vanilla/addon-vanilla/contentItem/ContentItemAttachment";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { useCollisionDetector } from "@vanilla/react-utils";
@@ -51,29 +56,31 @@ import { RouteComponentProps } from "react-router";
 
 interface IProps extends RouteComponentProps<{ escalationID: string }> {
     escalationID: IEscalation["escalationID"];
-    escalation?: IEscalation;
 }
 
-const discussion = LayoutEditorPreviewData.discussion();
+interface IImplProps {
+    escalation: IEscalation;
+    reports: IReport[];
+    livePost: IDiscussion | IComment | null;
+}
 
-function EscalationsDetailPageImpl(props: IProps) {
-    const { escalationID, escalation } = props;
-    const cmdClasses = communityManagementPageClasses();
+function EscalationsDetailPageImpl(props: IImplProps) {
+    const { reports, escalation, livePost } = props;
+    const { escalationID } = escalation;
     const classes = detailPageClasses();
-    const postRevision = usePostRevision();
     const device = useTitleBarDevice();
     const { hasCollision } = useCollisionDetector();
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
-    const { options, selectedOption } = useRevisionOptions();
+    const postRevisions = usePostRevisions(reports, livePost);
 
     const escalationMutation = useEscalationMutation(escalationID);
-    const comments = useEscalationCommentsQuery(escalationID);
+    const commentsQuery = useEscalationCommentsQuery(escalationID);
 
     const queryClient = useQueryClient();
     const invalidateQueries = async () => {
-        queryClient.invalidateQueries(["escalations"]);
-        queryClient.invalidateQueries(["escalations", escalationID]);
-        queryClient.invalidateQueries(["escalationComments", escalationID]);
+        await queryClient.invalidateQueries(["escalations"]);
+        await queryClient.invalidateQueries(["escalations", escalationID]);
+        await queryClient.invalidateQueries(["escalationComments", escalationID]);
     };
 
     const editableRef = useRef<HTMLInputElement | null>();
@@ -108,6 +115,7 @@ function EscalationsDetailPageImpl(props: IProps) {
                                 <AutoWidthInput
                                     required
                                     onChange={(event) => setTitle(event.target.value)}
+                                    fontSize={22}
                                     className={cx(autoWidthInputClasses().themeInput, classes.editableTitleInput)}
                                     ref={(ref) => (editableRef.current = ref)}
                                     value={title}
@@ -143,6 +151,22 @@ function EscalationsDetailPageImpl(props: IProps) {
                         )}
                     </div>
                 }
+                secondaryBar={
+                    <>
+                        <PostRevisionPicker postRevisionOptions={postRevisions} />
+
+                        <label className={classes.assigneeDropdown}>
+                            <span>{t("Assignee: ")}</span>
+                            {escalation && (
+                                <EscalationAssignee
+                                    escalation={escalation}
+                                    className={classes.assigneeOverrides}
+                                    autoCompleteClasses={classes.autoCompleteOverrides}
+                                />
+                            )}
+                        </label>
+                    </>
+                }
                 description={
                     escalation && (
                         <>
@@ -163,44 +187,25 @@ function EscalationsDetailPageImpl(props: IProps) {
                 rightPanel={
                     <>
                         <EscalationActions escalationID={escalationID} />
-                        <ReportHistoryList />
+                        <ReportHistoryList
+                            reports={reports}
+                            activeReportIDs={postRevisions.selectedRevision?.reportIDs ?? []}
+                            onReportSelected={(report) => {
+                                postRevisions.setReportRevisionActive(report.reportID);
+                            }}
+                        />
                     </>
                 }
                 content={
                     <>
-                        <section className={cx(cmdClasses.secondaryTitleBar, classes.secondaryTitleBarTop)}>
-                            <span className={cmdClasses.secondaryTitleBarStart}>
-                                {options.length > 1 && (
-                                    <Sort
-                                        sortID={"postRevision"}
-                                        sortLabel={t("Revision: ")}
-                                        sortOptions={options}
-                                        selectedSort={selectedOption}
-                                        onChange={(revision) => {
-                                            postRevision.setActiveRevision(+revision.value);
-                                        }}
-                                    />
-                                )}
-                            </span>
-                            <span className={cmdClasses.secondaryTitleBarButtons}>
-                                <label className={classes.assigneeDropdown}>
-                                    <span>{t("Assignee: ")}</span>
-                                    {escalation && (
-                                        <EscalationAssignee
-                                            escalation={escalation}
-                                            className={classes.assigneeOverrides}
-                                            autoCompleteClasses={classes.autoCompleteOverrides}
-                                        />
-                                    )}
-                                </label>
-                            </span>
-                        </section>
                         <section className={classes.layout}>
-                            {postRevision.mostRecentRevision && (
-                                <div>
-                                    <PostDetail />
-                                </div>
-                            )}
+                            <div>
+                                {postRevisions.selectedRevision ? (
+                                    <PostDetail activeRevisionOption={postRevisions.selectedRevision} />
+                                ) : (
+                                    <Message error={{ message: t("No post revision could be found") }} />
+                                )}
+                            </div>
                             {escalation && (escalation.attachments ?? []).length > 0 && (
                                 <div>
                                     <DashboardFormSubheading>{t("Escalation Attachments")}</DashboardFormSubheading>
@@ -210,7 +215,7 @@ function EscalationsDetailPageImpl(props: IProps) {
                                             key={attachment.attachmentID}
                                             attachmentType={attachment.attachmentType}
                                         >
-                                            <DiscussionAttachment
+                                            <ContentItemAttachment
                                                 key={attachment.attachmentID}
                                                 attachment={attachment}
                                             />
@@ -218,46 +223,64 @@ function EscalationsDetailPageImpl(props: IProps) {
                                     ))}
                                 </div>
                             )}
-                            {escalation && (
-                                <div>
-                                    <DashboardFormSubheading>{t("Internal Comments")}</DashboardFormSubheading>
-                                    {comments.data && comments?.data?.length < 1 && (
-                                        <p>
-                                            {t(
-                                                "There are no internal comments yet. Create a comment from the box below.",
-                                            )}
-                                        </p>
-                                    )}
-                                    <PageBox
-                                        options={{
-                                            borderType: BorderType.NONE,
-                                        }}
-                                    >
-                                        {comments?.data?.map((comment) => {
-                                            return (
-                                                <CommentThreadItem
-                                                    threadStyle={"flat"}
-                                                    key={comment.commentID}
-                                                    comment={comment}
-                                                    discussion={discussion}
-                                                    onMutateSuccess={invalidateQueries}
-                                                    userPhotoLocation={"header"}
-                                                    boxOptions={{
-                                                        borderType: BorderType.SEPARATOR,
+                            <QueryLoader
+                                query={commentsQuery}
+                                loader={
+                                    <>
+                                        <LoadingRectangle height={20} width={180} />
+                                        <LoadingSpacer height={20} />
+                                        <LoadingRectangle height={60} />
+                                        <LoadingSpacer height={20} />
+                                        <LoadingRectangle height={60} />
+                                        <LoadingSpacer height={20} />
+                                        <LoadingRectangle height={60} />
+                                    </>
+                                }
+                                success={(comments) => {
+                                    return (
+                                        <>
+                                            <div>
+                                                <DashboardFormSubheading>
+                                                    {t("Internal Comments")}
+                                                </DashboardFormSubheading>
+                                                {comments.length < 1 && (
+                                                    <p>
+                                                        {t(
+                                                            "There are no internal comments yet. Create a comment from the box below.",
+                                                        )}
+                                                    </p>
+                                                )}
+                                                <PageBox
+                                                    options={{
+                                                        borderType: BorderType.NONE,
                                                     }}
-                                                    isInternal
-                                                />
-                                            );
-                                        })}
-                                    </PageBox>
-                                </div>
-                            )}
-                            <div>
-                                <DashboardFormSubheading>{t("Add a comment")}</DashboardFormSubheading>
-                                <div className={classes.commentsWrapper}>
-                                    <EscalationCommentEditor escalationID={escalationID} />
-                                </div>
-                            </div>
+                                                >
+                                                    {comments.map((comment) => {
+                                                        return (
+                                                            <CommentItem
+                                                                key={comment.commentID}
+                                                                comment={comment}
+                                                                onMutateSuccess={invalidateQueries}
+                                                                userPhotoLocation={"header"}
+                                                                boxOptions={{
+                                                                    borderType: BorderType.SEPARATOR,
+                                                                }}
+                                                                isInternal
+                                                            />
+                                                        );
+                                                    })}
+                                                </PageBox>
+                                            </div>
+                                            <div>
+                                                <DashboardFormSubheading>{t("Add a comment")}</DashboardFormSubheading>
+                                                <div className={classes.commentsWrapper}>
+                                                    <EscalationCommentEditor escalationID={escalationID} />
+                                                </div>
+                                            </div>
+                                        </>
+                                    );
+                                }}
+                            />
                         </section>
                     </>
                 }
@@ -269,15 +292,49 @@ function EscalationsDetailPageImpl(props: IProps) {
 function EscalationsDetailPage(props: IProps) {
     const escalationQuery = useEscalationQuery(props.match.params.escalationID);
     const { recordType, recordID } = escalationQuery.data ?? {};
+    const reportsQuery = useReportsQuery(recordType ?? null, recordID ?? null);
+    const livePostQuery = useQuery({
+        queryKey: ["livePost", recordType, recordID],
+        queryFn: async () => {
+            try {
+                switch (recordType) {
+                    case "discussion": {
+                        const discussion = await apiv2.get(`/discussions/${recordID}`, {
+                            params: {
+                                expand: ["category", "attachments", "status.log"],
+                            },
+                        });
+                        return discussion.data;
+                    }
+                    case "comment": {
+                        const comment = await apiv2.get(`/comments/${recordID}`, {
+                            params: {
+                                expand: ["attachments"],
+                                quoteParent: false,
+                            },
+                        });
+                        return comment.data;
+                    }
+                    default:
+                        return null;
+                }
+            } catch (error) {
+                // This is totally possible, post is likely deleted.
+                return null;
+            }
+        },
+        enabled: recordType != null && recordID != null,
+    });
+
     return (
-        <PostRevisionProvider recordType={recordType} recordID={recordID}>
-            <EscalationsDetailPageImpl
-                {...props}
-                escalationID={props.match.params.escalationID}
-                escalation={escalationQuery.data}
-            />
-            ;
-        </PostRevisionProvider>
+        <QueryLoader
+            query={escalationQuery}
+            query2={reportsQuery}
+            query3={livePostQuery}
+            success={(escalation, reports, livePost) => {
+                return <EscalationsDetailPageImpl escalation={escalation} reports={reports} livePost={livePost} />;
+            }}
+        />
     );
 }
 

@@ -393,7 +393,7 @@ EOT;
     /**
      * @return string
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array|string
     {
         return $this->__toString();
     }

@@ -89,7 +89,7 @@ class InternalRequest extends HttpRequest implements RequestInterface
      */
     public function getQuery()
     {
-        parse_str(parse_url($this->getUrl(), PHP_URL_QUERY), $query);
+        parse_str(parse_url($this->getUrl(), PHP_URL_QUERY) ?? "", $query);
         return $query;
     }
 
@@ -254,7 +254,12 @@ class InternalRequest extends HttpRequest implements RequestInterface
      */
     public function getRoot()
     {
-        $root = trim(parse_url($this->container->get("@baseUrl"), PHP_URL_PATH), "/");
+        $baseUrl = parse_url($this->container->get("@baseUrl"), PHP_URL_PATH);
+        if (is_null($baseUrl)) {
+            $baseUrl = "";
+        }
+
+        $root = trim($baseUrl, "/");
         $root = $root ? "/$root" : "";
         return $root;
     }

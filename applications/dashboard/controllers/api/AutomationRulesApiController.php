@@ -25,6 +25,7 @@ use Vanilla\Dashboard\AutomationRules\Schema\AutomationRuleInputSchema;
 use Vanilla\DateFilterSchema;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Web\APIExpandMiddleware;
 use Vanilla\Web\Controller;
 
 /**
@@ -137,9 +138,9 @@ class AutomationRulesApiController extends Controller
         $actionSchema = $action::getBaseSchemaArray();
         $schema = $action::getSchema();
 
-        $conditionalSettings = $action::getConditionalSettingsSchema($query);
-        if (!empty($conditionalSettings)) {
-            $schema->merge(Schema::parse(["conditionalSettings" => $conditionalSettings]));
+        $dynamicSchema = $action::getDynamicSchema($query);
+        if (!empty($dynamicSchema)) {
+            $actionSchema["dynamicSchema"] = $dynamicSchema;
         }
 
         if (!empty($schema->getSchemaArray())) {
@@ -431,7 +432,6 @@ class AutomationRulesApiController extends Controller
     {
         return $this->schema([
             "automationRuleID:i?" => "Filter by the automation Rule ID.",
-            //            "x-filter" => ["field" => "roleIDs"],
             "automationRuleDispatchUUID:s?" => "Filter by automationRuleDispatchUUID.",
             "actionType:s?" => "Filter by actionType.",
             "dispatchStatus:a?" => [
@@ -472,13 +472,6 @@ class AutomationRulesApiController extends Controller
                 "default" => 30,
                 "minimum" => 1,
                 "maximum" => 100,
-            ],
-            "expand:a?" => [
-                "description" => "Expand fields on the result.",
-                "items" => [
-                    "type" => "string",
-                    "enum" => ["insertUser", "updateUser", "all"],
-                ],
             ],
             "sort:a?" => [
                 "description" => "The results' sort order.",
@@ -532,6 +525,9 @@ class AutomationRulesApiController extends Controller
         // Fetch the results, limits & paginates as well as do the appropriate expands.
         $results = $this->automationRuleDispatchesModel->getAutomationRuleDispatches($query, $refinedWhere);
 
+        // Expand on the dispatch user data by default.
+        \Gdn::userModel()->expandUsers($results, ["dispatchUserID"]);
+
         $out = $this->schema(
             [
                 ":a" => $this->automationRuleDispatchesModel->getDispatchSchema(),
@@ -541,7 +537,10 @@ class AutomationRulesApiController extends Controller
         $results = $out->validate($results);
 
         $paging = ApiUtils::numberedPagerInfo($totalCount, "/api/v2/automation-rules/dispatches", $query, $in);
-        return new Data($results, ["paging" => $paging]);
+        return new Data($results, [
+            "paging" => $paging,
+            APIExpandMiddleware::META_EXPAND_PREFIXES => ["automationRule"],
+        ]);
     }
 
     /**

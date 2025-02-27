@@ -8,6 +8,7 @@ import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings
 import { slugify } from "@vanilla/utils";
 import ModalLoader from "@library/modal/ModalLoader";
 import AppearanceRoutePageLoader from "../components/AppearanceRoutePageLoader";
+import { getLayoutTypeSettingsUrl } from "../components/layoutViewUtils";
 
 type LayoutFragment = {
     layoutID: ILayoutDetails["layoutID"];
@@ -25,7 +26,7 @@ export const AppearanceRoute = new RouteHandler(
 export const LegacyLayoutsRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/LegacyLayoutsPage"),
     "/appearance/layouts/:layoutViewType/legacy",
-    (layoutViewType: LayoutViewType) => `/appearance/layouts/${layoutViewType}/legacy`,
+    (layoutViewType: LayoutViewType) => getLayoutTypeSettingsUrl(layoutViewType),
     AppearanceRoutePageLoader,
 );
 

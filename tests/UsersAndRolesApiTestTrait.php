@@ -13,9 +13,10 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Http\InternalClient;
 use Vanilla\Utility\ArrayUtils;
+use VanillaTests\Http\TestHttpClient;
 
 /**
- * @method InternalClient api()
+ * @method TestHttpClient api()
  */
 trait UsersAndRolesApiTestTrait
 {
@@ -154,6 +155,10 @@ trait UsersAndRolesApiTestTrait
         array $profileFields = []
     ): array {
         $salt = $this->generateSalt();
+
+        if (isset($overrides["roleID"]) && !is_array($overrides["roleID"])) {
+            $overrides["roleID"] = [$overrides["roleID"]];
+        }
 
         $body = $overrides + [
             "bypassSpam" => false,
@@ -466,5 +471,23 @@ trait UsersAndRolesApiTestTrait
 
         $result = $this->api()->post("/applicants", $body);
         return $result->getBody();
+    }
+
+    /**
+     * Track a user visit.
+     *
+     * @param array|int $userOrUserID
+     * @param string|null $ipAddress
+     * @return void
+     */
+    public function trackUserVisit(array|int $userOrUserID, string|null $ipAddress = null): void
+    {
+        if ($ipAddress !== null) {
+            \Gdn::request()->setIP($ipAddress);
+        }
+
+        $this->runWithUser(function () {
+            \Gdn::userModel()->updateVisit(\Gdn::session()->UserID);
+        }, $userOrUserID);
     }
 }

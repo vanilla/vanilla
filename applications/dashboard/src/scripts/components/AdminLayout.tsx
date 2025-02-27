@@ -24,6 +24,7 @@ type IProps = {
     contentClassNames?: string;
     /** Any other nodes that need to render within the container */
     children?: ReactNode;
+    secondaryBar?: ReactNode;
 } & (
     | {
           customTitleBar?: false;
@@ -74,6 +75,7 @@ export default function AdminLayout(props: IProps) {
         description,
         titleLabel,
         preTitle,
+        secondaryBar,
     } = props;
 
     const topTitleBar = useMemo(
@@ -92,6 +94,7 @@ export default function AdminLayout(props: IProps) {
                         actions={titleBarActions}
                         titleLabel={titleLabel}
                         actionsWrapperClassName={props.actionsWrapperClassName}
+                        secondaryBar={secondaryBar}
                     />
                 </>
             ),

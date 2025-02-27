@@ -265,6 +265,20 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
     }
 
     /**
+     * Get information about the current site section that applies to all layout queries.
+     *
+     * @return array
+     */
+    public function getCurrentLayoutParams(): array
+    {
+        $siteSection = SiteSectionSchema::toArray($this->getCurrentSiteSection());
+        return [
+            "locale" => $siteSection["contentLocale"],
+            "siteSectionID" => $siteSection["sectionID"],
+        ];
+    }
+
+    /**
      * Reset the current site section.
      */
     public function resetCurrentSiteSection()

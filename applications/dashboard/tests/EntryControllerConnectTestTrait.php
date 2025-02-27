@@ -120,10 +120,11 @@ trait EntryControllerConnectTestTrait
         $handlerOrUser,
         $body = [],
         string $subpath = self::PROVIDER_KEY,
-        bool $throw = true
+        bool $throw = true,
+        bool $skipLastHtml = false
     ): \EntryController {
         if (!empty($body)) {
-            if ($this->bessy()->hasLastHtml() && $throw) {
+            if ($this->bessy()->hasLastHtml() && $throw && !$skipLastHtml) {
                 $html = $this->bessy()->getLastHtml();
 
                 // Make sure that everything posted in the body is also in the form from before.

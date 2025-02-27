@@ -230,6 +230,7 @@ class DiscussionMergeModel implements SystemCallableInterface
             "Abuse",
         ]);
         $comment["DiscussionID"] = $destinationDiscussion["DiscussionID"];
+        $comment["parentRecordID"] = $destinationDiscussion["DiscussionID"];
         $commentID = $this->commentModel->save($comment);
         ModelUtils::validationResultToValidationException($this->commentModel);
         $comment["CommentID"] = $commentID;
@@ -293,7 +294,8 @@ class DiscussionMergeModel implements SystemCallableInterface
         $sourceCommentIDs = $this->database
             ->createSql()
             ->select("CommentID")
-            ->where("DiscussionID", $sourceDiscussionID)
+            ->where("parentRecordID", $sourceDiscussionID)
+            ->where("parentRecordType", "discussion")
             ->get("Comment")
             ->column("CommentID");
 
@@ -301,6 +303,7 @@ class DiscussionMergeModel implements SystemCallableInterface
             $this->commentModel->save([
                 "CommentID" => $sourceCommentID,
                 "DiscussionID" => $destinationDiscussionID,
+                "parentRecordID" => $destinationDiscussionID,
             ]);
             ModelUtils::validationResultToValidationException($this->commentModel);
             yield;

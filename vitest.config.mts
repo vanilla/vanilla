@@ -41,6 +41,11 @@ export default defineConfig(() => {
             setupFiles: path.resolve(VANILLA_ROOT, "build/vitest.setup.ts"),
             globalSetup: path.resolve(VANILLA_ROOT, "build/vitest.globalSetup.ts"),
             environment: "jsdom",
+            environmentOptions: {
+                jsdom: {
+                    url: "http://localhost",
+                },
+            },
             include: includes,
             exclude: [
                 "**/node_modules/**",

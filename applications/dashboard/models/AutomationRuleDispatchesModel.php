@@ -296,17 +296,6 @@ class AutomationRuleDispatchesModel extends PipelineModel
         }
 
         $results = $sql->get()->resultArray();
-        $userExpands = ["dispatchUserID"];
-        if (ModelUtils::isExpandOption("insertUser", $query["expand"] ?? false)) {
-            $userExpands[] = "insertUserID";
-        }
-        if (ModelUtils::isExpandOption("updateUser", $query["expand"] ?? false)) {
-            $userExpands[] = "updateUserID";
-        }
-        if (count($userExpands) > 0) {
-            $this->userModel->expandUsers($results, $userExpands);
-        }
-
         $results = AutomationRuleModel::normalizeTriggerActionValues($results);
         $results = $this->assembleAffectedRecordCounts($results);
         return $this->nestAutomationRuleValues($results);

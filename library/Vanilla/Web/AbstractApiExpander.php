@@ -36,7 +36,7 @@ abstract class AbstractApiExpander
      *     ]
      * ]
      */
-    abstract public function resolveFragements(array $recordIDs): array;
+    abstract public function resolveFragments(array $recordIDs): array;
 
     /**
      * Get a permission that a user must have on of in order to expand any of these.

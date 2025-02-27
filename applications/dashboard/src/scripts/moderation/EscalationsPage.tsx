@@ -134,24 +134,22 @@ function EscalationsPage(props: IProps) {
                         }
                     />
                 }
+                secondaryBar={
+                    <>
+                        <span>
+                            <Sort sortOptions={sortOptions} selectedSort={selectedSort} onChange={setSelectedSort} />
+                        </span>
+                        <NumberedPager
+                            className={cmdClasses.pager}
+                            isMobile={false}
+                            {...paginationProps}
+                            showNextButton={false}
+                            onChange={setPage}
+                        />
+                    </>
+                }
                 content={
                     <>
-                        <section className={cmdClasses.secondaryTitleBar}>
-                            <span>
-                                <Sort
-                                    sortOptions={sortOptions}
-                                    selectedSort={selectedSort}
-                                    onChange={setSelectedSort}
-                                />
-                            </span>
-                            <NumberedPager
-                                className={cmdClasses.pager}
-                                isMobile={false}
-                                {...paginationProps}
-                                showNextButton={false}
-                                onChange={setPage}
-                            />
-                        </section>
                         <section className={cmdClasses.content}>
                             {escalationsQuery.isLoading && (
                                 <div>

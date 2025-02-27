@@ -15,18 +15,23 @@ use Garden\Web\Exception\ClientException;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Database\CallbackWhereExpression;
+use Vanilla\Database\Operation;
 use Vanilla\Database\Operation\BooleanFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
+use Vanilla\Database\Operation\InsertProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\SchemaUtils;
 
 class PostTypeModel extends PipelineModel
 {
-    const FEATURE_POST_TYPES_AND_POST_FIELDS = "PostTypesAndPostFields";
+    const FEATURE_POST_TYPES_AND_POST_FIELDS = "customLayout.createPost";
+
+    const FEATURE_POST_TYPES = self::FEATURE_POST_TYPES_AND_POST_FIELDS; // Shorter alias
 
     const LEGACY_TYPE_MAP = [
         "Discussion" => "discussion",
@@ -37,8 +42,11 @@ class PostTypeModel extends PipelineModel
     /**
      * D.I.
      */
-    public function __construct(private \RoleModel $roleModel, private EventManager $eventManager)
-    {
+    public function __construct(
+        private \RoleModel $roleModel,
+        private EventManager $eventManager,
+        private PostFieldModel $postFieldModel
+    ) {
         parent::__construct("postType");
 
         $this->addPipelineProcessor(new CurrentDateFieldProcessor(["dateInserted", "dateUpdated"], ["dateUpdated"]));
@@ -48,6 +56,38 @@ class PostTypeModel extends PipelineModel
         $userProcessor->setInsertFields(["insertUserID", "updateUserID"])->setUpdateFields(["updateUserID"]);
         $this->addPipelineProcessor($userProcessor);
         $this->addPipelineProcessor(new JsonFieldProcessor(["attributes"]));
+    }
+
+    /**
+     * @param array $types
+     * @return array
+     */
+    public static function prepareTypeArray(array $types): array
+    {
+        return array_map("strtolower", $types);
+    }
+
+    /**
+     * Add join to the query for post types.
+     * @param \Gdn_SQLDriver $sql
+     * @param array $where
+     * @param string $joinType
+     * @return void
+     */
+    public static function addJoin(\Gdn_SQLDriver &$sql, array $whereType = null, string $joinType = ""): void
+    {
+        $sql->join(
+            "postType pt",
+            "d.postTypeID = pt.postTypeID and pt.isActive=true and pt.isDeleted = false",
+            $joinType
+        );
+        if (is_array($whereType)) {
+            $whereType = PostTypeModel::prepareTypeArray($whereType);
+            $sql->beginWhereGroup()
+                ->where("pt.postTypeID", $whereType)
+                ->orWhere("pt.parentPostTypeID", $whereType)
+                ->endWhereGroup();
+        }
     }
 
     /**
@@ -141,9 +181,11 @@ class PostTypeModel extends PipelineModel
             $row["isOriginal"] = (bool) $row["isOriginal"];
             $row["isActive"] = (bool) $row["isActive"];
             $row["isDeleted"] = (bool) $row["isDeleted"];
+            $row["baseType"] = $row["isOriginal"] ? $row["postTypeID"] : $row["parentPostTypeID"];
 
             $attributes = is_string($row["attributes"]) ? json_decode($row["attributes"], true) : null;
             $row["postButtonIcon"] = $attributes["postButtonIcon"] ?? null;
+            unset($row["attributes"]);
         }
     }
 
@@ -207,11 +249,26 @@ class PostTypeModel extends PipelineModel
                     "type" => "integer",
                 ],
             ],
+            "postFieldIDs:a?" => [
+                "items" => [
+                    "type" => "string",
+                ],
+            ],
             "isActive:b?" => ["default" => false],
             "isDeleted:b?" => ["default" => false],
         ])
             ->addValidator("categoryIDs", \CategoryModel::createCategoryIDsValidator())
-            ->addValidator("roleIDs", [$this->roleModel, "roleIDsValidator"]);
+            ->addValidator("roleIDs", [$this->roleModel, "roleIDsValidator"])
+            ->addValidator("postFieldIDs", function ($postFieldIDs, ValidationField $field) {
+                $existingPostFields = $this->postFieldModel->getWhere(["postFieldID" => $postFieldIDs]);
+                $existingPostFieldIDs = array_column($existingPostFields, "postFieldID");
+                $invalidPostFieldIDs = array_diff($postFieldIDs, $existingPostFieldIDs);
+                if (!empty($invalidPostFieldIDs)) {
+                    $field->addError("The following post fields are invalid: " . implode(",", $invalidPostFieldIDs));
+                    return Invalid::value();
+                }
+                return true;
+            });
         return $schema;
     }
 
@@ -230,6 +287,7 @@ class PostTypeModel extends PipelineModel
                     $field->addError("Whitespace, slashes, periods and uppercase letters are not allowed");
                     return Invalid::value();
                 }
+                return true;
             })
             ->addValidator("postTypeID", $this->createUniquePostTypeValidator())
             ->addValidator("parentPostTypeID", function ($value, ValidationField $field) {
@@ -239,6 +297,7 @@ class PostTypeModel extends PipelineModel
                     $field->addError("The selected parent post type does not exist");
                     return Invalid::value();
                 }
+                return true;
             });
 
         return $schema;
@@ -272,6 +331,7 @@ class PostTypeModel extends PipelineModel
                 );
                 return Invalid::value();
             }
+            return true;
         };
     }
 
@@ -286,6 +346,10 @@ class PostTypeModel extends PipelineModel
      */
     public function createInitialPostType(array $row): void
     {
+        if ($this->database->structure()->CaptureOnly) {
+            return;
+        }
+
         $hasExisting = $this->createSql()->getCount($this->getTable(), ["postTypeID" => $row["postTypeID"]]) > 0;
         if ($hasExisting) {
             $this->update($row, ["postTypeID" => $row["postTypeID"]]);
@@ -311,6 +375,7 @@ class PostTypeModel extends PipelineModel
             ->column("postHelperText", "varchar(100)", true)
             ->column("layoutViewType", "varchar(100)", true)
             ->column("isOriginal", "tinyint", 0)
+            ->column("isSystemHidden", "tinyint", 0)
             ->column("isActive", "tinyint", 0)
             ->column("isDeleted", "tinyint", 0)
             ->column("roleIDs", "json", true)
@@ -343,54 +408,53 @@ class PostTypeModel extends PipelineModel
     private static function createInitialPostTypes(): void
     {
         $postTypeModel = \Gdn::getContainer()->get(PostTypeModel::class);
-        $addonManager = \Gdn::getContainer()->get(AddonManager::class);
+        $postTypeModel->createInitialPostType([
+            "postTypeID" => "redirect",
+            "name" => "Redirect",
+            "postButtonLabel" => "",
+            "layoutViewType" => "",
+            "isOriginal" => true,
+            "isActive" => false,
+            "isSystemHidden" => true,
+            "attributes" => [],
+        ]);
+        $postTypeModel->createInitialPostType([
+            "postTypeID" => "page",
+            "name" => "Page",
+            "postButtonLabel" => "",
+            "layoutViewType" => "",
+            "isOriginal" => true,
+            "isActive" => false,
+            "isSystemHidden" => true,
+            "attributes" => [],
+        ]);
         $postTypeModel->createInitialPostType([
             "postTypeID" => "discussion",
             "name" => "Discussion",
             "postButtonLabel" => "New Discussion",
-            "layoutViewType" => "discussionThread",
+            "layoutViewType" => "discussion",
             "isOriginal" => true,
             "isActive" => true,
             "attributes" => [
                 "postButtonIcon" => "new-discussion",
             ],
         ]);
-        $postTypeModel->createInitialPostType([
-            "postTypeID" => "question",
-            "name" => "Question",
-            "postButtonLabel" => "Ask a Question",
-            "layoutViewType" => "questionThread",
-            "isOriginal" => true,
-            "isActive" => $addonManager->isEnabled("qna", Addon::TYPE_ADDON),
-            "attributes" => [
-                "postButtonIcon" => "new-discussion",
-            ],
-        ]);
-        $postTypeModel->createInitialPostType([
-            "postTypeID" => "idea",
-            "name" => "Idea",
-            "postButtonLabel" => "New Idea",
-            "layoutViewType" => "ideaThread",
-            "isOriginal" => true,
-            "isActive" => $addonManager->isEnabled("ideation", Addon::TYPE_ADDON),
-            "attributes" => [
-                "postButtonIcon" => "new-question",
-            ],
-        ]);
+
         $postTypeModel->createInitialPostType([
             "postTypeID" => "poll",
             "name" => "Poll",
             "isOriginal" => true,
+            "layoutViewType" => "discussion",
             "isActive" => false,
-            "attributes" => [
-                "postButtonIcon" => "new-idea",
-            ],
+            "attributes" => null,
         ]);
         $postTypeModel->createInitialPostType([
             "postTypeID" => "event",
             "name" => "Event",
+            "layoutViewType" => "event",
             "isOriginal" => true,
             "isActive" => false,
+            "attributes" => null,
         ]);
     }
 
@@ -402,9 +466,19 @@ class PostTypeModel extends PipelineModel
      */
     public static function ensurePostTypesFeatureEnabled()
     {
-        if (!FeatureFlagHelper::featureEnabled(self::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (!self::isPostTypesFeatureEnabled()) {
             throw new ClientException("Post Types & Post Fields is not enabled.");
         }
+    }
+
+    /**
+     * Checks if the post types feature is enabled.
+     *
+     * @return bool
+     */
+    public static function isPostTypesFeatureEnabled(): bool
+    {
+        return FeatureFlagHelper::featureEnabled(self::FEATURE_POST_TYPES_AND_POST_FIELDS);
     }
 
     /**
@@ -432,7 +506,7 @@ class PostTypeModel extends PipelineModel
      */
     public function getPostTypesByCategory(array $filters = []): array
     {
-        $enabledPostTypes = $this->getWhere(["isActive" => true, "isDeleted" => false]);
+        $enabledPostTypes = $this->getWhere(["isDeleted" => false]);
         $enabledPostTypes = array_column($enabledPostTypes, "postTypeID");
 
         $sql = $this->createSql()
@@ -450,6 +524,61 @@ class PostTypeModel extends PipelineModel
         $rows = array_map("json_decode", $rows);
 
         return $rows;
+    }
+
+    /**
+     * Override insert method to save associated record data.
+     *
+     * {@inheritDoc}
+     */
+    public function insert(array $set, array $options = [])
+    {
+        $return = parent::insert($set, $options);
+        $this->saveAssociatedRecords($set["postTypeID"], $set);
+        return $return;
+    }
+
+    /**
+     * Update a single record by post type ID and save associated record data.
+     *
+     * @param string $postTypeID
+     * @param array $body
+     * @return void
+     * @throws \Exception
+     */
+    public function updateByID(string $postTypeID, array $body): void
+    {
+        $this->update($body, ["postTypeID" => $postTypeID]);
+        $this->saveAssociatedRecords($postTypeID, $body);
+    }
+
+    /**
+     * Return a single record by post type ID.
+     *
+     * @param string $postTypeID
+     * @return array|null
+     * @throws \Exception
+     */
+    public function getByID(string $postTypeID): ?array
+    {
+        return $this->getWhere(["postTypeID" => $postTypeID], [self::OPT_LIMIT => 1])[0] ?? null;
+    }
+
+    /**
+     * Save associated data for creating and updating post types.
+     *
+     * @param string $postTypeID
+     * @param array $body
+     * @return void
+     */
+    public function saveAssociatedRecords(string $postTypeID, array $body = []): void
+    {
+        if (isset($body["categoryIDs"])) {
+            $this->putCategoriesForPostType($postTypeID, $body["categoryIDs"]);
+        }
+        if (isset($body["postFieldIDs"])) {
+            $this->putPostFieldsForPostType($postTypeID, $body["postFieldIDs"]);
+        }
     }
 
     /**
@@ -475,6 +604,31 @@ class PostTypeModel extends PipelineModel
     }
 
     /**
+     * Put associations between post fields and post types.
+     *
+     * @param string $postTypeID
+     * @param array $postFieldIDs
+     * @return void
+     */
+    public function putPostFieldsForPostType(string $postTypeID, array $postFieldIDs): void
+    {
+        $sql = $this->createSql();
+        $sql->delete("postTypePostFieldJunction", ["postTypeID" => $postTypeID]);
+
+        $rows = [];
+        $sort = 0;
+        foreach ($postFieldIDs as $postFieldID) {
+            $rows[] = [
+                "postFieldID" => $postFieldID,
+                "postTypeID" => $postTypeID,
+                "sort" => $sort++,
+            ];
+        }
+
+        $sql->insert("postTypePostFieldJunction", $rows);
+    }
+
+    /**
      * Save all categories that allow the given post type.
      *
      * @param string $postTypeID
@@ -493,7 +647,15 @@ class PostTypeModel extends PipelineModel
             ];
         }
 
-        $this->createSql()->insert("postTypeCategoryJunction", $rows);
+        $this->database->runWithTransaction(function () use ($categoryIDs, $rows) {
+            $this->createSql()
+                ->update("Category")
+                ->set("hasRestrictedPostTypes", true)
+                ->where("CategoryID", $categoryIDs)
+                ->put();
+
+            $this->createSql()->insert("postTypeCategoryJunction", $rows);
+        });
     }
 
     /**
@@ -521,6 +683,23 @@ class PostTypeModel extends PipelineModel
             $where + [
                 "isActive" => true,
                 "isDeleted" => false,
+                "isSystemHidden" => false,
+            ]
+        );
+    }
+
+    /**
+     * Get a list of all available post types.
+     *
+     * @param array $where
+     * @return array|null
+     * @throws \Exception
+     */
+    public function getAvailableSystemPostTypes(array $where = []): ?array
+    {
+        return $this->getWhere(
+            $where + [
+                "isSystemHidden" => true,
             ]
         );
     }
@@ -538,7 +717,7 @@ class PostTypeModel extends PipelineModel
         $currentUserRoles = \Gdn::userModel()->getRoleIDs(\Gdn::session()->UserID);
 
         return array_filter($postTypes, function ($postType) use ($category, $currentUserRoles) {
-            if (isset($postType["roleIDs"]) && empty(array_intersect($currentUserRoles, $postType["roleIDs"]))) {
+            if (!empty($postType["roleIDs"]) && empty(array_intersect($currentUserRoles, $postType["roleIDs"]))) {
                 return false;
             }
 

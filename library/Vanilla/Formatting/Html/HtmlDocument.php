@@ -139,16 +139,21 @@ class HtmlDocument implements TextDOMInterface
     {
         if ($this->wrap) {
             $content = $this->dom->getElementsByTagName("body");
-            $result = @$this->dom->saveXML($content[0], LIBXML_NOEMPTYTAG);
+            $result = @$this->dom->saveXML($content[0], LIBXML_NOEMPTYTAG | LIBXML_NOXMLDECL);
 
             // The DOM Document added starting body and ending tags. We need to remove them.
             $result = preg_replace("/^<body>/", "", $result);
             $result = preg_replace('/<\/body>$/', "", $result);
         } else {
-            $result = @$this->dom->saveXML(null, LIBXML_NOEMPTYTAG);
+            $result = @$this->dom->saveXML(null, LIBXML_NOEMPTYTAG | LIBXML_NOXMLDECL);
         }
         // saveXML adds closing <br> tags, which breaks formatting.
+
         $result = preg_replace("/<\/br>/", "", $result);
+        //make sure the current <br> tags are self-closing
+        $result = preg_replace("/<br>/", "<br/>", $result);
+        //make sure the current <br anything> tags are self-closing
+        $result = preg_replace("/<br (.*?)>/i", '<br \1/>', $result);
         return $result;
     }
 

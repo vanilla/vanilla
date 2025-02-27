@@ -30,7 +30,7 @@ class PostFieldModel extends PipelineModel
     /**
      * D.I.
      */
-    public function __construct(private PostTypeModel $postTypeModel)
+    public function __construct()
     {
         parent::__construct("postField");
 
@@ -44,16 +44,18 @@ class PostFieldModel extends PipelineModel
     }
 
     /**
-     * Get current max sort value from the table
+     * Get the max sort value for post fields of the given postTypeID.
      *
+     * @param string $postTypeID
      * @return int
      * @throws \Exception
      */
-    private function getMaxSort(): int
+    private function getMaxSort(string $postTypeID): int
     {
         return (int) $this->createSql()
             ->select("max(sort) as sortMax")
-            ->from($this->getTable())
+            ->from("postTypePostFieldJunction")
+            ->where("postTypeID", $postTypeID)
             ->get()
             ->value("sortMax");
     }
@@ -65,11 +67,16 @@ class PostFieldModel extends PipelineModel
      */
     public function insert(array $set, array $options = [])
     {
-        if (!isset($set["sort"])) {
-            // By default, set the sort value to the max sort value + 1;
-            $set["sort"] = $this->getMaxSort() + 1;
+        $result = parent::insert($set, $options);
+
+        if (isset($set["postTypeID"])) {
+            $this->createSql()->insert("postTypePostFieldJunction", [
+                "postTypeID" => $set["postTypeID"],
+                "postFieldID" => $set["postFieldID"],
+                "sort" => $this->getMaxSort($set["postTypeID"]) + 1,
+            ]);
         }
-        return parent::insert($set, $options);
+        return $result;
     }
 
     /**
@@ -84,7 +91,11 @@ class PostFieldModel extends PipelineModel
         try {
             $this->database->beginTransaction();
             foreach ($sorts as $postFieldID => $sort) {
-                $this->update(["sort" => $sort], ["postTypeID" => $postTypeID, "postFieldID" => $postFieldID]);
+                $this->createSql()->update(
+                    "postTypePostFieldJunction",
+                    ["sort" => $sort],
+                    ["postTypeID" => $postTypeID, "postFieldID" => $postFieldID]
+                );
             }
             $this->database->commitTransaction();
         } catch (\Exception $e) {
@@ -99,9 +110,27 @@ class PostFieldModel extends PipelineModel
      * @param array $where
      * @return \Gdn_SQLDriver
      */
-    private function getWhereQuery(array $where)
+    private function getWhereQuery(array $where = []): \Gdn_SQLDriver
     {
-        $sql = $this->createSql()->from($this->getTable());
+        $where = array_combine(
+            array_map(fn($k) => str_contains($k, ".") || $k === "postTypeID" ? $k : "pf.$k", array_keys($where)),
+            $where
+        );
+        $sql = $this->createSql()
+            ->select("pf.*")
+            ->select("ptpf.postTypeID", "JSON_ARRAYAGG", "postTypeIDs")
+            ->from("postField pf")
+            ->leftJoin("postTypePostFieldJunction ptpf", "ptpf.postFieldID = pf.postFieldID")
+            ->groupBy("pf.postFieldID");
+
+        if (isset($where["postTypeID"])) {
+            $sql->join("postTypePostFieldJunction ptpf2", "ptpf2.postFieldID = pf.postFieldID")
+                ->where("ptpf2.postTypeID", $where["postTypeID"])
+                ->groupBy("ptpf2.postTypePostFieldJunctionID")
+                ->orderBy("ptpf2.sort")
+                ->select(["ptpf2.postTypeID", "ptpf2.sort"]);
+            unset($where["postTypeID"]);
+        }
 
         $sql->where($where);
 
@@ -111,8 +140,8 @@ class PostFieldModel extends PipelineModel
     /**
      * Query post fields with filters.
      *
-     * @param array $where
-     * @param array $options
+     * @param array $where Conditions for the select query.
+     * @param array $options Keys should be constants from {@link Model::OPT_*}
      * @return array|null
      * @throws \Exception
      */
@@ -135,7 +164,7 @@ class PostFieldModel extends PipelineModel
      */
     public function getWhereCount(array $where): int
     {
-        return $this->getWhereQuery($where)->getPagingCount("postFieldID");
+        return $this->getWhereQuery($where)->getPagingCount("pf.postFieldID");
     }
 
     /**
@@ -145,6 +174,9 @@ class PostFieldModel extends PipelineModel
     private function normalizeRows(array &$rows): void
     {
         foreach ($rows as &$row) {
+            $row["postTypeIDs"] = isset($row["postTypeIDs"])
+                ? array_values(array_filter(json_decode($row["postTypeIDs"])))
+                : null;
             if (is_string($row["dropdownOptions"])) {
                 $row["dropdownOptions"] = json_decode($row["dropdownOptions"]);
             }
@@ -160,7 +192,7 @@ class PostFieldModel extends PipelineModel
     {
         return Schema::parse([
             "postFieldID",
-            "postTypeID",
+            "postTypeIDs",
             "label",
             "description",
             "dataType",
@@ -170,11 +202,11 @@ class PostFieldModel extends PipelineModel
             "dropdownOptions",
             "isRequired",
             "isActive",
-            "sort",
             "dateInserted",
             "dateUpdated",
             "insertUserID",
             "updateUserID",
+            "sort?",
         ]);
     }
 
@@ -189,7 +221,7 @@ class PostFieldModel extends PipelineModel
             ->merge(
                 Schema::parse([
                     "postFieldID:s",
-                    "postTypeID:s",
+                    "postTypeID:s?",
                     "dataType:s" => ["enum" => PostFieldModel::DATA_TYPES],
                     "formType" => ["enum" => PostFieldModel::FORM_TYPES],
                 ])
@@ -206,9 +238,10 @@ class PostFieldModel extends PipelineModel
                     $field->addError("The following values are not allowed: " . implode(",", $forbiddenNames));
                     return Invalid::value();
                 }
+                return true;
             })
-            ->addValidator("", function ($data, ValidationField $field) {
-                $where = ["postFieldID" => $data["postFieldID"], "postTypeID" => $data["postTypeID"]];
+            ->addValidator("postFieldID", function ($postFieldID, ValidationField $field) {
+                $where = ["postFieldID" => $postFieldID];
 
                 $count = $this->createSql()->getCount($this->getTable(), $where);
                 if ($count !== 0) {
@@ -218,9 +251,9 @@ class PostFieldModel extends PipelineModel
                 return true;
             })
             ->addValidator("postTypeID", function ($value, ValidationField $field) {
-                $postType = $this->postTypeModel->getWhere(["postTypeID" => $value], [self::OPT_LIMIT => 1]);
+                $postType = \Gdn::sql()->getCount("postType", ["postTypeID" => $value]);
 
-                if (empty($postType)) {
+                if ($postType === 0) {
                     $field->addError("The post type does not exist", 404);
                     return Invalid::value();
                 }
@@ -393,7 +426,7 @@ class PostFieldModel extends PipelineModel
      */
     public function valueSchema(string $postTypeID): Schema
     {
-        $rows = $this->select(["postTypeID" => $postTypeID, "isActive" => true]);
+        $rows = $this->getWhere(["postTypeID" => $postTypeID, "isActive" => true]);
 
         $schemaArray = [];
         foreach ($rows as $row) {
@@ -423,9 +456,30 @@ class PostFieldModel extends PipelineModel
     public static function structure(\Gdn_DatabaseStructure $structure)
     {
         $structure
+            ->table("postTypePostFieldJunction")
+            ->primaryKey("postTypePostFieldJunctionID")
+            ->column("postTypeID", "varchar(100)", keyType: "index")
+            ->column("postFieldID", "varchar(100)", keyType: "index")
+            ->column("sort", "int", 0)
+            ->set();
+
+        $structure->table("postField");
+
+        // We previously had postTypeID as part of the primary key.
+        // This block removes it and migrates the associations to a junction table.
+        if ($structure->tableExists() && $structure->columnExists("postTypeID")) {
+            // We need to keep the postTypeID here. We need to recreate the primary key before dropping it.
+            $structure->column("postTypeID", "varchar(100)", keyType: "primary");
+            self::migratePostFieldsWithPostTypeID($structure);
+
+            // We need to drop and add the primary key index in one statement for in place table alters.
+            $structure->modifyPrimaryKeyIndex(["postFieldID"]);
+            $structure->dropColumn("postTypeID");
+        }
+
+        $structure
             ->table("postField")
             ->column("postFieldID", "varchar(100)", keyType: "primary")
-            ->column("postTypeID", "varchar(100)", keyType: "primary")
             ->column("label", "varchar(100)")
             ->column("description", "varchar(500)", true)
             ->column("dataType", self::DATA_TYPES)
@@ -435,11 +489,48 @@ class PostFieldModel extends PipelineModel
             ->column("dropdownOptions", "json", true)
             ->column("isRequired", "tinyint", 0)
             ->column("isActive", "tinyint", 0)
-            ->column("sort", "tinyint", 0)
             ->column("dateInserted", "datetime")
             ->column("dateUpdated", "datetime", true)
             ->column("insertUserID", "int")
             ->column("updateUserID", "int", true)
             ->set(true);
+    }
+
+    /**
+     * Migrate post field associations from older table structure.
+     *
+     * @param \Gdn_DatabaseStructure $structure
+     * @return void
+     * @throws \Exception
+     */
+    private static function migratePostFieldsWithPostTypeID(\Gdn_DatabaseStructure $structure): void
+    {
+        if (!$structure->CaptureOnly) {
+            $sql = \Gdn::database()->createSql();
+            $existingRows = $sql
+                ->select(["postTypeID", "postFieldID", "sort"])
+                ->from("postField")
+                ->where("postTypeID<>", "")
+                ->get()
+                ->resultArray();
+
+            foreach ($existingRows as $existingRow) {
+                $countExists = $sql->getCount("postTypePostFieldJunction", [
+                    "postTypeID" => $existingRow["postTypeID"],
+                    "postFieldID" => $existingRow["postFieldID"],
+                ]);
+                if ($countExists == 0) {
+                    // Need to force an update on post field ID to guarantee uniqueness when the schema changes.
+                    $renamedPostField = $existingRow["postFieldID"] . "-" . bin2hex(random_bytes(5));
+                    $sql->insert("postTypePostFieldJunction", ["postFieldID" => $renamedPostField] + $existingRow);
+
+                    $sql->update(
+                        "postField",
+                        ["postFieldID" => $renamedPostField],
+                        ["postTypeID" => $existingRow["postTypeID"], "postFieldID" => $existingRow["postFieldID"]]
+                    )->put();
+                }
+            }
+        }
     }
 }

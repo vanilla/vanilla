@@ -12,7 +12,7 @@ import { renderHook } from "@testing-library/react-hooks";
 import { mockAPI } from "@library/__tests__/utility";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { LoadStatus } from "@library/@types/api/core";
-import { useStatusOptions, useTagOptions, useTypeOptions } from "./discussionListFilterHooks";
+import { useStatusOptions, useTypeOptions } from "./discussionListFilterHooks";
 import { stableObjectHash } from "@vanilla/utils";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { DeepPartial } from "redux";
@@ -241,15 +241,6 @@ describe("DiscussionListFilter", () => {
         await waitFor(() => {
             expect(result.current).toBeDefined();
             expect(result.current).toStrictEqual(MOCK_ADDONS_OPTIONS);
-        });
-    });
-
-    it("useTagOptions() hook returns tags as options", async () => {
-        const { result, waitFor } = renderHook(() => useTagOptions(), { wrapper: MockWrapper });
-
-        await vi.waitFor(() => {
-            expect(result.current).toBeDefined();
-            expect(result.current).toStrictEqual(MOCK_ALL_TAGS_OPTIONS);
         });
     });
 

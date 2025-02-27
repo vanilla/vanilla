@@ -14,7 +14,7 @@ services:
         environment:
             ELASTICSEARCH_URL: http://elasticsearch:9200
             ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-            SERVER_PUBLICBASEURL: https://kibana.vanilla.localhost
+            SERVER_PUBLICBASEURL: https://kibana.vanilla.local
             XPACK_APM_SERVICEMAPENABLED: "true"
             XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
         networks:

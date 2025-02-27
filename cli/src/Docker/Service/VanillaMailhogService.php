@@ -13,7 +13,7 @@ use Vanilla\Cli\Docker\ElasticSearchHttpClient;
 use Vanilla\Cli\Docker\KibanaHttpClient;
 
 /**
- * Service for mail.vanilla.localhost
+ * Service for mail.vanilla.local
  */
 class VanillaMailhogService extends AbstractService
 {
@@ -51,7 +51,7 @@ class VanillaMailhogService extends AbstractService
      */
     public function getHostname(): string
     {
-        return "mail.vanilla.localhost";
+        return "mail.vanilla.local";
     }
 
     /**

@@ -444,16 +444,21 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
         // The string to replace the corresponding pattern index
         $replacements = [];
 
+        $embedImagesInlineStyle =
+            'style="height: auto; display: inline-flex; position: relative; margin-left: auto; margin-right: auto; max-width: 100%; max-height: 100%;"';
+
         // replace the class embedImage-img with inline styles
         $patterns[] = '/class="embedImage-img"/';
-        $replacements[] =
-            'style="height: auto; display: inline-flex; position: relative; margin-left: auto; margin-right: auto; max-width: 100%; max-height: 100%;"';
+        $replacements[] = $embedImagesInlineStyle;
+
+        // replace the class "embedImage-img importedEmbed-img" with inline styles, this might come from event content body
+        $patterns[] = '/class="embedImage-img importedEmbed-img"/';
+        $replacements[] = $embedImagesInlineStyle;
 
         // replace the class embedImage-link with inline styles
         $patterns[] = '/class="embedImage-link"/';
         $replacements[] = 'style="display: inline-flex; flex-direction: column;"';
 
-        $embedImageStyle = "width: 100%; display: block;";
         // the different size options and styles
         $displayStyles = [
             "small" => "max-width: calc(33.333% - 1px);",

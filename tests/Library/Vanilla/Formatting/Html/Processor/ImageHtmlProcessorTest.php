@@ -71,9 +71,9 @@ class ImageHtmlProcessorTest extends VanillaTestCase
         $expectedOutput =
             "There is an image here! " .
             "<img " .
-            'src="/image/baconSlice.png" ' .
-            'alt="image" ' .
+            "alt=image " .
             'class="embedImage-img importedEmbed-img" ' .
+            "src=/image/baconSlice.png " .
             'srcset="' .
             "https://loremflickr.com/g/10/600/baconSlice 10w, " .
             "https://loremflickr.com/g/300/600/baconSlice 300w, " .

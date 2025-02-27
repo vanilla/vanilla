@@ -72,7 +72,7 @@ class ConvertToRich extends DatabaseCommand
                 "siteUrl",
                 null,
                 InputOption::VALUE_REQUIRED,
-                "Site to apply the conversion on. e.g. `http://dev.vanilla.localhost`"
+                "Site to apply the conversion on. e.g. `http://dev.vanilla.local`"
             )
         );
 

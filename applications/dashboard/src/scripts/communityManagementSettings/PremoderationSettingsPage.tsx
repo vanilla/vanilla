@@ -224,7 +224,7 @@ export function PremoderationSettingsPage() {
                             indeterminate={isChallengeNewUsersLoading}
                             enabled={isChallengeNewUsersEnabled}
                             onChange={(enabled) => {
-                                challengeNewUsersPatcher.patchConfig({
+                                void challengeNewUsersPatcher.patchConfig({
                                     [CONF_PREMOD_CHALLENGE_NEW_USERS]: enabled,
                                 });
                             }}
@@ -246,7 +246,7 @@ export function PremoderationSettingsPage() {
                                 className={classes.comboInputButton}
                                 title={t("Save challenge cutoff age")}
                                 onClick={() => {
-                                    challengeAgePatcher.patchConfig({
+                                    void challengeAgePatcher.patchConfig({
                                         [CONF_PREMOD_CHALLENGE_AGE]: challengeCutoffAge,
                                     });
                                 }}
@@ -462,7 +462,7 @@ function PremoderatedCategoriesModal(props: ModalProps) {
             onCancel={() => clearAndClose()}
             isConfirmDisabled={areConfigsLoading || configPatcher.isLoading}
             onConfirm={() => {
-                configPatcher.patchConfig(form ?? {}).then(() => {
+                void configPatcher.patchConfig(form ?? {}).then(() => {
                     clearAndClose();
                 });
             }}
@@ -508,7 +508,7 @@ function KeywordModal(props: ModalProps) {
             onCancel={() => clearAndClose()}
             isConfirmDisabled={areConfigsLoading || configPatcher.isLoading}
             onConfirm={() => {
-                configPatcher.patchConfig({ [CONF_PREMOD_KEYWORDS]: keywords }).then(() => {
+                void configPatcher.patchConfig({ [CONF_PREMOD_KEYWORDS]: keywords }).then(() => {
                     clearAndClose();
                 });
             }}

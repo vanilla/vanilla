@@ -51,6 +51,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
      */
     private $connectSynchronizeErrors = false;
 
+    private bool $welcomeEmailDebug = false;
+
     /**
      * Setup error message & override MasterView for popups.
      *
@@ -78,6 +80,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
         $this->profileFieldModel = $profileFieldModel;
         $this->userNotificationPreferencesModel = $userNotificationPreferencesModel;
+        $this->welcomeEmailDebug = Gdn::config()->get("WelcomeEmail.Debug", false);
     }
 
     /**
@@ -642,6 +645,18 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
             // Sign the user in.
             Gdn::userModel()->fireEvent("BeforeSignIn", ["UserID" => $userID]);
+
+            if ($this->welcomeEmailDebug) {
+                $this->logger->info(
+                    "User already exists in the UserAuthentication table, Logging in user with out sending welcome email",
+                    [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                        Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                        "UserID" => $userID,
+                    ]
+                );
+            }
+
             Gdn::session()->start(
                 $userID,
                 true,
@@ -696,7 +711,11 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             $canMatchEmail = strlen($submittedEmail) > 0 && !UserModel::noEmail();
 
             // Check to automatically link the user.
-            if ((forceBool($emailVerified) || ($emailVerified === null && $autoConnect)) && count($existingUsers) > 0) {
+            if (
+                !$userProvidedEmail &&
+                (forceBool($emailVerified) || ($emailVerified === null && $autoConnect)) &&
+                count($existingUsers) > 0
+            ) {
                 if ($isPostBack && $this->Form->getFormValue("ConnectName")) {
                     $this->Form->setFormValue("Name", $this->Form->getFormValue("ConnectName"));
                 }
@@ -735,6 +754,18 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                             // Sign the user in.
                             Gdn::userModel()->fireEvent("BeforeSignIn", ["UserID" => $userID]);
+
+                            if ($this->welcomeEmailDebug) {
+                                $this->logger->info(
+                                    "Matched user with an existing email address, Logging user with out sending welcome email",
+                                    [
+                                        Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                                        Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                                        "UserID" => $userID,
+                                    ]
+                                );
+                            }
+
                             Gdn::session()->start(
                                 $userID,
                                 true,
@@ -885,6 +916,14 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                     // Sign in as the new user.
                     Gdn::userModel()->fireEvent("BeforeSignIn", ["UserID" => $userID]);
+
+                    if ($this->welcomeEmailDebug) {
+                        $this->logger->info("Registering a new user with out custom profile fields", [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                            "UserID" => $userID,
+                        ]);
+                    }
                     Gdn::session()->start(
                         $userID,
                         true,
@@ -895,6 +934,13 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                     // Send the welcome email.
                     if (c("Garden.Registration.SendConnectEmail", false)) {
+                        if ($this->welcomeEmailDebug) {
+                            $this->logger->info("Entered the block in entry controller to send welcome email", [
+                                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                                Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                                "UserID" => $userID,
+                            ]);
+                        }
                         try {
                             $providerName = $this->Form->getFormValue(
                                 "ProviderName",
@@ -1039,6 +1085,14 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 $userID = $userModel->register($user, $registerOptions);
                 $user["UserID"] = $userID;
 
+                if ($this->welcomeEmailDebug) {
+                    $this->logger->info("Registering a new user with custom profile fields", [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                        Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                        "UserID" => $userID,
+                    ]);
+                }
+
                 $this->EventArguments["UserID"] = $userID;
                 $this->fireEvent("AfterConnectSave");
 
@@ -1046,11 +1100,27 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                 // Send the welcome email.
                 if ($userID && c("Garden.Registration.SendConnectEmail", false)) {
+                    if ($this->welcomeEmailDebug) {
+                        $this->logger->info("Entered the block in entry controller to sent out welcome email", [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                            "UserID" => $userID,
+                        ]);
+                    }
                     $providerName = $this->Form->getFormValue(
                         "ProviderName",
                         $this->Form->getFormValue("Provider", "Unknown")
                     );
-                    $userModel->sendWelcomeEmail($userID, "", "Connect", ["ProviderName" => $providerName]);
+                    try {
+                        $userModel->sendWelcomeEmail($userID, "", "Connect", ["ProviderName" => $providerName]);
+                    } catch (Exception $ex) {
+                        $this->logger->error("Error Sending Welcome Email.", [
+                            "error" => $ex->getMessage(),
+                            "trace" => $ex->getTrace(),
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_EVENT => "syncConnect_welcome_email",
+                        ]);
+                    }
                 }
             }
 

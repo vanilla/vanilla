@@ -9,6 +9,11 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const postTypeSettingsClasses = () => {
+    const sectionIndex = css({
+        position: "relative",
+        zIndex: 1,
+    });
+
     const headerClasses = css({
         borderTop: "none",
         th: {
@@ -114,6 +119,7 @@ export const postTypeSettingsClasses = () => {
     });
 
     return {
+        sectionIndex,
         headerClasses,
         rowClasses,
         toggleWrapper,

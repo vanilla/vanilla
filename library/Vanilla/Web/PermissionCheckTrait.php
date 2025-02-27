@@ -7,8 +7,10 @@
 
 namespace Vanilla\Web;
 
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\ServerException;
+use Gdn;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Permissions;
 
@@ -22,7 +24,35 @@ trait PermissionCheckTrait
      *
      * @return Permissions|null
      */
-    abstract protected function getPermissions(): ?Permissions;
+    protected function getPermissions(): ?Permissions
+    {
+        if (Gdn::session() === null) {
+            return null;
+        }
+        return Gdn::session()->getPermissions();
+    }
+
+    /**
+     * Run a callback and convert any ClientExceptions to a boolean if $throw is false.
+     *
+     * @param bool $throw
+     * @param callable $callback
+     *
+     * @return bool
+     */
+    protected function runPermissionCallback(bool $throw, callable $callback): bool
+    {
+        try {
+            $callback();
+            return true;
+        } catch (ClientException $ex) {
+            if ($throw) {
+                throw $ex;
+            } else {
+                return false;
+            }
+        }
+    }
 
     /**
      * Enforce the following permission(s) or throw an exception that the dispatcher can handle.

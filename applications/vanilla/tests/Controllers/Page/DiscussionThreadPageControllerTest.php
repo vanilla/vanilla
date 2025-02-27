@@ -15,6 +15,7 @@ use Vanilla\FeatureFlagHelper;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the custom layout discussion thread page.
@@ -22,6 +23,7 @@ use VanillaTests\SiteTestCase;
 class DiscussionThreadPageControllerTest extends SiteTestCase
 {
     use CommunityApiTestTrait;
+    use UsersAndRolesApiTestTrait;
 
     private ConfigurationInterface $config;
 
@@ -31,7 +33,7 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
     public function setUp(): void
     {
         $this->config = Gdn::getContainer()->get(ConfigurationInterface::class);
-        $this->enableFeature("customLayout.discussionThread");
+        $this->enableFeature("customLayout.post");
         $this->config->saveToConfig("Vanilla.Comments.PerPage", 2);
         parent::setUp();
     }
@@ -143,10 +145,10 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
 
                 $commentModel = \Gdn::getContainer()->get(\CommentModel::class);
 
-                $comment3_1Page = $commentModel->getDiscussionPage($comment3_1);
+                $comment3_1Page = $commentModel->getCommentThreadPage($comment3_1);
                 $this->assertEquals(3, $comment3_1Page);
 
-                $comment4Page = $commentModel->getDiscussionPage($comment4);
+                $comment4Page = $commentModel->getCommentThreadPage($comment4);
                 $this->assertEquals(4, $comment4Page);
 
                 // Comment 3 should be on the third page.
@@ -158,5 +160,78 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
                 $this->assertStringContainsString($comment3_1["body"], $html);
             }
         );
+    }
+
+    /**
+     * Test that redirect discussions redirect.
+     *
+     * @return void
+     * @throws NotFoundException
+     */
+    public function testRedirectDiscussion()
+    {
+        $cat1 = $this->createCategory();
+        $discussion1 = $this->createDiscussion();
+        $cat2 = $this->createCategory();
+        $this->api()->patch("/discussions/move", [
+            "discussionIDs" => [$discussion1["discussionID"]],
+            "addRedirects" => true,
+            "categoryID" => $cat2["categoryID"],
+        ]);
+
+        $this->api()
+            ->get("/discussions", ["categoryID" => $cat2["categoryID"]])
+            ->assertSuccess()
+            ->assertCount(1)
+            ->assertJsonArrayContains(
+                [
+                    "discussionID" => $discussion1["discussionID"],
+                ],
+                "Expected cat2 to contain discussion1 after it was moved."
+            );
+
+        $redirectDisc = $this->api()
+            ->get("/discussions", ["categoryID" => $cat1["categoryID"]])
+            ->assertSuccess()
+            ->assertCount(1)
+            ->assertJsonArray()
+            ->getBody()[0];
+
+        $this->assertEquals("redirect", $redirectDisc["type"]);
+
+        // Hydrating a layout for this discussion should result in a redirect.
+        $hydrateEndpoint = $this->api()
+            ->get("/layouts/lookup-hydrate", [
+                "layoutViewType" => "post",
+                "recordType" => "discussion",
+                "recordID" => $redirectDisc["discussionID"],
+                "params" => ["discussionID" => $redirectDisc["discussionID"]],
+            ])
+            ->assertJsonObject()
+            ->getBody();
+
+        $this->assertEquals($discussion1["url"], $hydrateEndpoint["redirectTo"]);
+    }
+
+    /**
+     * Fixes https://higherlogic.atlassian.net/browse/VANS-2459
+     *
+     * @return void
+     */
+    public function testGuestCanAccess()
+    {
+        $discussion = $this->createDiscussion();
+
+        $this->runWithUser(function () use ($discussion) {
+            $this->api()
+                ->get("/layouts/lookup-hydrate", [
+                    "layoutViewType" => "post",
+                    "recordType" => "discussion",
+                    "recordID" => $discussion["discussionID"],
+                    "params" => ["discussionID" => $discussion["discussionID"]],
+                ])
+                ->assertJsonObject()
+                ->assertSuccess();
+        }, \UserModel::GUEST_USER_ID);
     }
 }

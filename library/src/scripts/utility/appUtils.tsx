@@ -198,6 +198,11 @@ function tryInjectSiteSectionIntoAbsoluteUrl(url: string): string {
         }
     }
 
+    // KB links already have a sitesection slug, or shouldn't have one at all
+    if (path.startsWith("/kb/")) {
+        return url;
+    }
+
     // We don't have a site section slug.
     // Take our stripped path, and make a url out of it.
     return formatUrl(path, true);
@@ -296,7 +301,7 @@ export function _executeReady(before?: () => void | Promise<void>): Promise<any[
             return result;
         });
         const exec = () => {
-            before?.();
+            void before?.();
             return Promise.all(handlerPromises)
                 .then(resolve)
                 .finally(() => {

@@ -10,17 +10,17 @@ services:
             - "443:443"
         networks:
             vanilla-network:
-                aliases: # Allows (sso|dev).vanilla.localhost to be resolved internally from php-fpm
-                    - "sso.vanilla.localhost"
-                    - "dev.vanilla.localhost"
-                    - "e2e-tests.vanilla.localhost"
+                aliases: # Allows (sso|dev).vanilla.local to be resolved internally from php-fpm
+                    - "sso.vanilla.local"
+                    - "dev.vanilla.local"
+                    - "e2e-tests.vanilla.local"
                     - "vanilla.test"
-                    - "vanilla.localhost"
-                    - "queue.vanilla.localhost"
-                    - "elastic.vanilla.localhost"
-                    - "kibana.vanilla.localhost"
-                    - "search.vanilla.localhost"
-                    - "frontend.vanilla.localhost"
+                    - "vanilla.local"
+                    - "queue.vanilla.local"
+                    - "elastic.vanilla.local"
+                    - "kibana.vanilla.local"
+                    - "search.vanilla.local"
+                    - "frontend.vanilla.local"
         volumes:
             - "./images/nginx/certs:/usr/local/share/ca-certificates" # Mount self-signed certificates
 

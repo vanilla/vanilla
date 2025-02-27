@@ -13,14 +13,13 @@ use DiscussionModel;
 use Exception;
 use Garden\EventManager;
 use Garden\Events\BulkUpdateEvent;
+use Garden\Web\Exception\ClientException;
 use Gdn;
 use RoleModel;
-use UserMetaModel;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Formatting\Formats\MarkdownFormat;
-use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Scheduler\LongRunnerResult;
 use Vanilla\Utility\ArrayUtils;
@@ -651,9 +650,11 @@ class DiscussionModelTest extends SiteTestCase
      */
     public function testDeleteEventDispatched(): void
     {
+        $category = $this->createCategory();
         $discussionID = $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "Hello world.",
+            "CategoryID" => $category["categoryID"],
             "Format" => "markdown",
         ]);
         $this->discussionModel->deleteID($discussionID);
@@ -686,9 +687,11 @@ class DiscussionModelTest extends SiteTestCase
      */
     public function testSaveUpdateEventDispatched(): void
     {
+        $category = $this->createCategory();
         $discussionID = $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "Hello world.",
+            "CategoryID" => $category["categoryID"],
             "Format" => "markdown",
         ]);
         $this->discussionModel->save([
@@ -918,10 +921,10 @@ class DiscussionModelTest extends SiteTestCase
     public function testDiscussionTypes()
     {
         $discussionTypes = $this->discussionModel::discussionTypes();
-        $this->assertSame(
+        $this->assertArraySubsetRecursive(
             [
                 "Discussion" => [
-                    "layoutViewType" => "discussionThread",
+                    "layoutViewType" => "discussion",
                     "apiType" => "discussion",
                     "Singular" => "Discussion",
                     "Plural" => "Discussions",
@@ -1467,6 +1470,20 @@ class DiscussionModelTest extends SiteTestCase
                 ],
                 $discussions
             );
+        });
+    }
+
+    /**
+     * Test creating a post with a longer title than allowed.
+     *
+     * @return void
+     */
+    public function testMaxTitleLength(): void
+    {
+        $this->runWithConfig(["Vanilla.Discussion.Title.MaxLength" => 10], function () {
+            $this->expectException(ClientException::class);
+            $this->expectExceptionMessage("Name is 1 characters too long.");
+            $this->createDiscussion(["name" => "12345678901"]);
         });
     }
 }

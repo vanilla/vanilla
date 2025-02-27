@@ -125,7 +125,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
     const discussionPointsTriggerValue =
         (formValues.trigger?.triggerType === "discussionReachesScoreTrigger" ||
             formValues.trigger?.triggerType === "ideationVoteTrigger") &&
-        formValues.trigger?.triggerValue.score;
+        formValues.trigger?.triggerValue?.score;
 
     const countReportsTriggerValue =
         formValues.trigger?.triggerType === "reportPostTrigger" && formValues.trigger?.triggerValue?.countReports;

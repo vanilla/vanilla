@@ -17,7 +17,17 @@ import { IFormControl, JsonSchema } from "@vanilla/json-schema-forms";
  * The label on this section is normally "Display Options"
  */
 export function showDisplayOptions(description: string): boolean {
-    const widgets = ["Events", "Discussions", "Announcements", "Questions", "Ideas", "Articles", "Discussion List"];
+    const widgets = [
+        "Events",
+        "Discussions",
+        "Announcements",
+        "Questions",
+        "Ideas",
+        "Articles",
+        "Category Articles",
+        "Discussion List",
+        "Help Center Overview",
+    ];
     return widgets.includes(description);
 }
 
@@ -159,6 +169,13 @@ export function widgetsSchemaTransformer(
 } {
     let transformedSchema = schema;
     let value = initialValue;
+
+    if (!transformedSchema.type) {
+        transformedSchema = {
+            ...transformedSchema,
+            type: "object",
+        };
+    }
 
     /**
      * Quick Links specific transform

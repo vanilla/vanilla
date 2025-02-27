@@ -352,7 +352,8 @@ final class StringUtils
             return null;
         }
 
-        $urlCode = filter_var($matches["urlPath"], FILTER_SANITIZE_STRING);
+        $urlCode = preg_replace('/\x00|<[^>]*>?/', "", $matches["urlPath"]);
+        $urlCode = str_replace(["'", '"'], ["&#39;", "&#34;"], $urlCode);
 
         if ($urlCode === false) {
             return null;
@@ -455,5 +456,107 @@ final class StringUtils
             $results[$targetName] = $match;
         }
         return $results;
+    }
+
+    /**
+     * Given a partial or wildcard of an IPv4 or an IPv6 address, return a condensed version.
+     *
+     * @param string $ip4Or6
+     * @return string
+     */
+    public static function condenseIP(string $ip4Or6): string
+    {
+        if (str_contains(haystack: $ip4Or6, needle: ".")) {
+            return self::condenseIPv4($ip4Or6);
+        } elseif (str_contains(haystack: $ip4Or6, needle: ":")) {
+            return self::condenseIPv6($ip4Or6);
+        } else {
+            return $ip4Or6;
+        }
+    }
+
+    /**
+     * Given something like an IPv4 string simplify it down like database encoding would.
+     *
+     * Input doesn't have to be a valid IP. Partials/wildcards work too.
+     *
+     * Eg. 10.000.000.1 -> 10.0.0.1
+     *
+     * @param string $ipv4
+     * @return string
+     */
+    private static function condenseIPv4(string $ipv4): string
+    {
+        $pieces = explode(".", $ipv4);
+        foreach ($pieces as &$piece) {
+            $val = ltrim($piece, "0");
+            if (empty($val)) {
+                $val = "0";
+            }
+            $piece = $val;
+        }
+        return implode(".", $pieces);
+    }
+
+    /**
+     * Given something like an IPv6 string simplify it down like database encoding would.
+     *
+     * Input doesn't have to be valid IP. Partials/wildcards work too.
+     *
+     * Eg. 2001:1234:0000:0000:1b12:0000:0000:1a13 -> 2001:1234::1b12:0:0:1a13
+     *
+     * @param string $ipv6
+     * @return string
+     */
+    private static function condenseIPv6(string $ipv6): string
+    {
+        $pieces = explode(":", $ipv6);
+
+        $result = [];
+        $didCondenseEmpties = false;
+        $lastPieceWasEmpty = false;
+        foreach ($pieces as $i => $piece) {
+            $piece = ltrim($piece, "0");
+            $isLeadingPiece = $i === 0;
+            $isTrailingPiece = $i === count($pieces) - 1;
+            $thisPieceIsEmpty = empty($piece);
+
+            if ($didCondenseEmpties) {
+                if ($thisPieceIsEmpty) {
+                    $result[] = "0";
+                } else {
+                    $result[] = $piece;
+                }
+            } else {
+                if ($thisPieceIsEmpty) {
+                    if ($lastPieceWasEmpty) {
+                        // We are continuting a string of empties. Nothing to push.
+                        if ($isTrailingPiece) {
+                            // When we're at the trailing piece we need to push an empty to keep the trailing colon.
+                            $result[] = "";
+                        }
+                    } else {
+                        // We are starting a string of empties. Push the empty string.
+                        $result[] = "";
+
+                        if ($isLeadingPiece) {
+                            // When we're at the leading piece we need to push another empty to keep the leading colon.
+                            $result[] = "";
+                        }
+                    }
+                } else {
+                    if ($lastPieceWasEmpty) {
+                        // We are ending a string of empties.
+                        $didCondenseEmpties = true;
+                    }
+
+                    $result[] = $piece;
+                }
+            }
+
+            $lastPieceWasEmpty = $thisPieceIsEmpty;
+        }
+        $result = implode(":", $result);
+        return $result;
     }
 }

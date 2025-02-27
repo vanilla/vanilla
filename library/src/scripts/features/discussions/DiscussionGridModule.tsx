@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -7,11 +7,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { DiscussionGridView } from "@library/features/discussions/DiscussionGridView";
 import { useDiscussionList } from "@library/features/discussions/discussionHooks";
-import DiscussionListItem from "@library/features/discussions/DiscussionListItem";
 import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
-import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import { homeWidgetContainerClasses, WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { homeWidgetItemClasses } from "@library/homeWidget/HomeWidgetItem.styles";
 import Loader from "@library/loaders/Loader";
 import React from "react";
 

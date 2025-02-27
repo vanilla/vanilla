@@ -19,11 +19,13 @@ use Vanilla\AutomationRules\Models\AutomationRuleLongRunnerGenerator;
 use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
 use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Dashboard\AutomationRules\Models\EscalationRuleDataType;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Forum\Models\PostTypeModel;
 
 /**
  * Class StaleDiscussionTrigger
@@ -336,14 +338,19 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     {
         $sql = $this->getObjectModel()->SQL;
 
-        // We need to ensure that NULL are treated as discussions.
         if (!empty($where["Type"]) && in_array("discussion", $where["Type"])) {
-            $sql->beginWhereGroup()
-                ->where("Type", $where["Type"])
-                ->orWhere("Type is null")
-                ->endWhereGroup();
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
+                PostTypeModel::addJoin($sql, $where["Type"]);
+            } else {
+                // We need to ensure that NULL are treated as discussions.
+                $sql->beginWhereGroup()
+                    ->where("Type", $where["Type"])
+                    ->orWhere("Type is null")
+                    ->endWhereGroup();
+            }
             unset($where["Type"]);
         }
+
         if (!empty($where["TagID"])) {
             $where = $this->formatWhere($where);
             $sql->select("d.DiscussionID", "distinct")

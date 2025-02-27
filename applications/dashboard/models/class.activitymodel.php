@@ -1375,7 +1375,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
 
         $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
 
-        $linkUri = url("/unsubscribe/$token", true);
+        $linkUri = url("/unsubscribe/$token", "https");
         if ($format == "text") {
             $link = "<br />" . $linkText . ": " . $linkUri;
         } else {

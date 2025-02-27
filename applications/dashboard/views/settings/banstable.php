@@ -26,7 +26,7 @@ PagerModule::write(['Sender' => $this, 'Limit' => 20, 'CurrentRecords' => count(
                 <td><?php echo t($Row['BanType']); ?></td>
                 <td>
                     <?php
-                    echo anchor($Row['CountUsers'], '/dashboard/user/banned?Filter='.urlencode($this->_BanFilter($Row)));
+                    echo anchor($Row['CountUsers'], SettingsController::banRuleUsersUrl($Row));
                     ?>
                 </td>
                 <td>

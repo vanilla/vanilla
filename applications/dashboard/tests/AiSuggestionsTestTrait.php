@@ -25,9 +25,8 @@ trait AiSuggestionsTestTrait
         $assistantUser = $this->createUser();
 
         $config = [
-            "Feature.customLayout.discussionThread.Enabled" => true,
+            "Feature.customLayout.post.Enabled" => true,
             "Feature.AISuggestions.Enabled" => true,
-            "Feature.aiFeatures.Enabled" => true,
             "aiSuggestions" => [
                 "enabled" => true,
                 "userID" => $assistantUser["userID"],

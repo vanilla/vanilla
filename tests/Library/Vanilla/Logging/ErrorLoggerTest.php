@@ -180,7 +180,7 @@ class ErrorLoggerTest extends SiteTestCase
             /**
              * @inheritdoc
              */
-            public function jsonSerialize()
+            public function jsonSerialize(): string
             {
                 ErrorLogger::warning("level2", []);
                 return "serialized";

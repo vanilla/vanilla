@@ -1,16 +1,24 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import { LoadStatus } from "@library/@types/api/core";
 import MoveDiscussionForm from "./MoveDiscussionForm";
 import { configureStore, createReducer } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import { vitest } from "vitest";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: false,
+        },
+    },
+});
 
 const renderInProvider = () => {
     const discussion = { ...DiscussionFixture.fakeDiscussions[0], url: "/mockPath", name: "Mock Discussion" };
@@ -42,7 +50,9 @@ const renderInProvider = () => {
     const store = configureStore({ reducer: testReducer });
     render(
         <Provider store={store}>
-            <MoveDiscussionForm discussion={discussion} onCancel={vitest.fn} />
+            <QueryClientProvider client={queryClient}>
+                <MoveDiscussionForm discussion={discussion} onCancel={vitest.fn} />
+            </QueryClientProvider>
         </Provider>,
     );
 };

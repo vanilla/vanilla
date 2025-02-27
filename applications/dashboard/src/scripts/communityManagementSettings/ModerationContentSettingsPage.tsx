@@ -34,7 +34,7 @@ import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 const BETA_ENABLED = getMeta("featureFlags.CommunityManagementBeta.Enabled", false);
 export const CONF_ESCALATIONS_ENABLED = "escalations.enabled";
 const CONF_TRIAGE_ENABLED = "triage.enabled";
-const CONF_DISCUSSION_THREAD = "customLayout.discussionThread";
+const CONF_DISCUSSION_THREAD = "customLayout.post";
 
 const classes = {
     main: css({
@@ -65,7 +65,7 @@ export default function ModerationContentSettingsPage() {
     // Force escalations off if beta is disabled.
     useEffect(() => {
         if (!BETA_ENABLED && isEscalationsEnabled) {
-            escalationsPatcher
+            void escalationsPatcher
                 .patchConfig({
                     [CONF_ESCALATIONS_ENABLED]: false,
                 })
@@ -110,7 +110,7 @@ export default function ModerationContentSettingsPage() {
                                     isEscalationsLoading || (isCustomDiscussionThreadsEnabled && isEscalationsEnabled)
                                 }
                                 onChange={(enabled) => {
-                                    escalationsPatcher
+                                    void escalationsPatcher
                                         .patchConfig({
                                             [CONF_ESCALATIONS_ENABLED]: enabled,
                                         })
@@ -138,7 +138,7 @@ export default function ModerationContentSettingsPage() {
                             indeterminate={isTriageLoading}
                             enabled={isTriageEnabled}
                             onChange={(enabled) => {
-                                triagePatcher
+                                void triagePatcher
                                     .patchConfig({
                                         [CONF_TRIAGE_ENABLED]: enabled,
                                     })
@@ -193,7 +193,7 @@ function ResolveAllModal(props: { isVisible: boolean; setIsVisible: (isVisible: 
             isConfirmLoading={resolveAllMutation.isLoading}
             isConfirmDisabled={resolveAllMutation.isLoading}
             onConfirm={() => {
-                resolveAllMutation.mutateAsync().then(() => {
+                void resolveAllMutation.mutateAsync().then(() => {
                     props.setIsVisible(false);
                 });
             }}

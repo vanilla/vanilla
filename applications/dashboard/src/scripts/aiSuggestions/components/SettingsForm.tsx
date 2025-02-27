@@ -18,7 +18,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
-import { IFieldError, JsonSchemaForm } from "@vanilla/json-schema-forms";
+import { IFieldError } from "@vanilla/json-schema-forms";
 import { useFormik } from "formik";
 import { Fragment, useState } from "react";
 

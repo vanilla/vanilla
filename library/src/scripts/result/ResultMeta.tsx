@@ -47,6 +47,8 @@ export function ResultMeta(props: IProps) {
             />
         ) : type ? (
             t(capitalizeFirstLetter(type))
+        ) : updateUser?.userID != null ? (
+            <ProfileLink className={metasClasses().metaLink} userFragment={updateUser} />
         ) : null;
 
     const countMeta =

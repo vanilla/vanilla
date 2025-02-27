@@ -50,6 +50,9 @@ paths:
                                             - category.CountAllComments
                                             - category.ParentLastCommentID
                                             - category.ParentLastDateInserted
+                                            - comment.depth
+                                            - comment.countChildComments
+                                            - comment.scoreChildComments
                                 batchSize:
                                     type: integer
                                     description: The maximum number of items to process per batch.

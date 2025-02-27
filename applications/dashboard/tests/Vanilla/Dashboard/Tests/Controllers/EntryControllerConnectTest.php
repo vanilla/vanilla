@@ -1410,6 +1410,36 @@ class EntryControllerConnectTest extends SiteTestCase
     }
 
     /**
+     * Validate that the email field can't be set when AutoConnect is enabled.
+     *
+     * This can lead to account takeovers. See: https://higherlogic.atlassian.net/browse/VNLA-7854
+     */
+    public function testNoAutoConnectAccountTakeover(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", true);
+        $ssoUser = $this->insertDummyUser(["Name" => "Victim", "UniqueID" => "Victim"]);
+
+        $user = [
+            "ConnectName" => $ssoUser["Name"],
+            "Email" => $ssoUser["Email"],
+            "EmailVisible" => 1,
+            "UniqueID" => __FUNCTION__,
+        ];
+
+        $body = [
+            "ConnectName" => $ssoUser["Name"],
+            "Email" => $ssoUser["Email"],
+            "EmailVisible" => 1,
+        ];
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage(
+            "Password is required. You are trying to connect with a username that is already assigned to a user on this forum. If this is your account, please enter the account password."
+        );
+        $r = $this->entryConnect($user, $body, skipLastHtml: true);
+    }
+
+    /**
      * Extract the Profile field metatdata from an array of metadata.
      *
      * @param array $metaData

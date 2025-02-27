@@ -14,9 +14,9 @@ import {
     STORY_IPSUM_MEDIUM,
     STORY_IPSUM_SHORT,
 } from "@library/storybook/storyData";
-import { SuggestedAnswers } from "@library/suggestedAnswers/SuggestedAnswers";
 import { SuggestedAnswersProvider } from "@library/suggestedAnswers/SuggestedAnswers.context";
 import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
+import { SuggestedAnswers } from "@library/suggestedAnswers/SuggestedAnswersAsset";
 import { setMeta } from "@library/utility/appUtils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 

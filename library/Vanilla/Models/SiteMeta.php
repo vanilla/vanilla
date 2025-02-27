@@ -213,6 +213,11 @@ class SiteMeta implements \JsonSerializable
                     ),
                     "allowedExtensions" => $this->getAllowedExtensions(),
                 ],
+                "signatures" => [
+                    "enabled" => (bool) $this->config->get("EnabledPlugins.Signatures"),
+                    "hideMobile" => (bool) $this->config->get("Signatures.Hide.Mobile"),
+                    "imageMaxHeight" => (int) $this->config->get("Signatures.Images.MaxHeight", 0),
+                ],
 
                 // In case there is a some failure here we don't want the site to crash.
                 "registrationUrl" => $this->tryWithFallback("registerUrl", ""),

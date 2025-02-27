@@ -8,16 +8,25 @@
  * @since 2.0
  */
 
+use Vanilla\Models\ContentDraftModel;
+use Vanilla\Models\Model;
+
 /**
  * Handles displaying saved drafts of unposted comments via /drafts endpoint.
  */
 class DraftsController extends VanillaController
 {
-    /** @var array Models to include. */
-    public $Uses = ["Database", "DraftModel"];
+    public int $offset = 0;
+    public Gdn_DataSet|null $DraftData = null;
+    public PagerModule|null $Pager = null;
 
-    /** @var int $offset */
-    public $offset;
+    public function __construct(
+        private Gdn_Database $database,
+        private DraftModel $DraftModel,
+        private ContentDraftModel $contentDraftModel
+    ) {
+        parent::__construct();
+    }
 
     /**
      * Default all drafts view: chronological by time saved.
@@ -30,7 +39,7 @@ class DraftsController extends VanillaController
         Gdn_Theme::section("DiscussionList");
 
         // Setup head
-        $this->permission("Garden.SignIn.Allow");
+        $this->permission("session.valid");
         $this->addJsFile("jquery.gardenmorepager.js");
 
         $this->addJsFile("discussions.js");
@@ -44,13 +53,70 @@ class DraftsController extends VanillaController
         // Set criteria & get drafts data
         $limit = Gdn::config("Vanilla.Discussions.PerPage", 30);
         $session = Gdn::session();
-        $wheres = ["d.InsertUserID" => $session->UserID];
         $countDrafts = $this->DraftModel->getCountByUser($session->UserID);
         $offsetCalculated = (int) (($countDrafts - 2) / $limit) * $limit;
         if ($offset >= $offsetCalculated) {
             $this->offset = $offsetCalculated;
         }
-        $this->DraftData = $this->DraftModel->getByUser($session->UserID, $offset, $limit);
+
+        if (ContentDraftModel::enabled()) {
+            $rows = $this->contentDraftModel->select(
+                where: [
+                    "insertUserID" => $session->UserID,
+                    "recordType" => ["discussion", "comment"],
+                ],
+                options: [
+                    Model::OPT_LIMIT => $limit,
+                    Model::OPT_OFFSET => $offset,
+                    Model::OPT_ORDER => "dateUpdated",
+                    Model::OPT_DIRECTION => "desc",
+                ]
+            );
+
+            // Now we need to know if the discussions themselves are live.
+            foreach ($rows as &$row) {
+                $row = $this->contentDraftModel->convertToLegacyDraft($row);
+            }
+
+            $discussionIDs = array_filter(array_column($rows, "DiscussionID"));
+            $liveDiscussions = $this->database
+                ->createSql()
+                ->select(["DiscussionID", "Name"])
+                ->from("Discussion")
+                ->where("DiscussionID", $discussionIDs)
+                ->get()
+                ->resultArray();
+
+            $liveDiscussionIDs = array_column($liveDiscussions, "DiscussionID");
+
+            $discussionNamesByDiscussionID = array_column($liveDiscussions, "Name", "DiscussionID");
+            foreach ($rows as &$row) {
+                $discussionID = $row["DiscussionID"] ?? null;
+                $row["DiscussionExists"] = in_array($discussionID, $liveDiscussionIDs);
+                if (
+                    $discussionID !== null &&
+                    ($discussionName = $discussionNamesByDiscussionID[$discussionID] ?? null)
+                ) {
+                    $row["Name"] = sprintft("Re: %s", $discussionName);
+                }
+            }
+
+            // Let's convert the rows into the legacy format.
+
+            $data = new Gdn_DataSet($rows, DATASET_TYPE_ARRAY);
+        } else {
+            $data = $this->DraftModel->getByUser($session->UserID, $offset, $limit);
+            $rows = $data->resultArray();
+            foreach ($rows as &$row) {
+                if (isset($row["DiscussionID"]) && ($rowName = $row["Name"] ?? null)) {
+                    $row["Name"] = sprintft("Re: %s", $rowName);
+                }
+            }
+            $data = new Gdn_DataSet($rows, DATASET_TYPE_ARRAY);
+        }
+
+        $this->DraftData = $data;
+        $this->setData("Drafts", $data);
 
         // Build a pager
         $pagerFactory = new Gdn_PagerFactory();
@@ -92,7 +158,11 @@ class DraftsController extends VanillaController
         $form = Gdn::factory("Form");
         $session = Gdn::session();
         if (is_numeric($draftID) && $draftID > 0) {
-            $draft = $this->DraftModel->getID($draftID);
+            $draft = ContentDraftModel::enabled()
+                ? $this->contentDraftModel->convertToLegacyDraft(
+                    $this->contentDraftModel->selectSingle(["draftID" => $draftID])
+                )
+                : $this->DraftModel->getID($draftID);
         }
         if (!empty($draft)) {
             if (
@@ -100,8 +170,12 @@ class DraftsController extends VanillaController
                 (val("InsertUserID", $draft) == $session->UserID || checkPermission("Garden.Community.Manage"))
             ) {
                 // Delete the draft
-                if (!$this->DraftModel->deleteID($draftID)) {
-                    $form->addError("Failed to delete draft");
+                if (ContentDraftModel::enabled()) {
+                    $this->contentDraftModel->delete(where: ["draftID" => $draftID]);
+                } else {
+                    if (!$this->DraftModel->deleteID($draftID)) {
+                        $form->addError("Failed to delete draft");
+                    }
                 }
             } else {
                 throw permissionException("Garden.Community.Manage");

@@ -31,4 +31,12 @@ abstract class AbstractLayoutAsset implements
     use LayoutAssetAwareTrait;
     use PageHeadAwareTrait;
     use DefaultSectionTrait;
+
+    /**
+     * @return bool
+     */
+    public static function isRequired(): bool
+    {
+        return true;
+    }
 }

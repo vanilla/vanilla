@@ -13,6 +13,7 @@ import { DashboardDatePicker } from "@dashboard/forms/DashboardDatePicker";
 import { DashboardDurationPicker } from "@dashboard/forms/DashboardDurationPicker";
 import { DashboardColorPicker } from "@dashboard/forms/DashboardFormColorPicker";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardFormStaticText } from "@dashboard/forms/DashboardFormStaticText";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
@@ -218,6 +219,7 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                         options={control.options}
                         optionsLookup={control.optionsLookup}
                         createable={control.createable}
+                        createableLabel={control.createableLabel}
                     />
                 </DashboardInputWrap>
             );
@@ -275,6 +277,7 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                         name={inputName}
                         labelBold={control.labelBold}
                         hideLabel={useStandardLabel}
+                        errors={fieldErrors}
                     />
                 </DashboardInputWrap>
             );
@@ -356,6 +359,9 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     {control.label}
                 </DashboardFormSubheading>
             );
+        }
+        case "staticText": {
+            return <DashboardFormStaticText label={control.label} />;
         }
         case "custom": {
             return <DashboardCustomComponent {...(props as IControlProps<ICustomControl>)} />;

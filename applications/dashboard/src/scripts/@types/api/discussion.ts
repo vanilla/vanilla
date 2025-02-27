@@ -14,6 +14,7 @@ import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.var
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { RecordID } from "@vanilla/utils";
 import { IReason } from "@dashboard/moderation/CommunityManagementTypes";
+import type { IPostWarning } from "@vanilla/addon-vanilla/contentItem/ContentItemWarning";
 
 export interface IDiscussion {
     discussionID: RecordID;
@@ -41,12 +42,14 @@ export interface IDiscussion {
     // expands
     lastUser?: IUserFragment; // expand;
     insertUser?: IUserFragment; // expand;
+    updateUser?: IUserFragment; // expand;
     breadcrumbs?: ICrumb[];
     categoryID: number;
     category?: ICategoryFragment;
     excerpt?: string;
     body?: string;
     tags?: ITag[];
+    warning?: IPostWarning;
 
     pinLocation?: "recent" | "category";
 
@@ -65,6 +68,7 @@ export interface IDiscussion {
     reportMeta?: IReportMeta;
     suggestions?: ISuggestedAnswer[];
     showSuggestions?: boolean;
+    permissions?: Record<string, boolean>;
 }
 
 export interface IReportMeta {

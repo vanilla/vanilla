@@ -947,4 +947,33 @@ SQL;
         }
         return $result;
     }
+
+    /**
+     * Recreate a primary key index.
+     *
+     * @param string[] $columns The columns making up the index in order.
+     *
+     * @return $this
+     */
+    public function modifyPrimaryKeyIndex(array $columns)
+    {
+        $px = $this->Database->DatabasePrefix;
+        $tableName = $this->tableName();
+        $tableName = $px . $tableName;
+
+        $quotedColumns = array_map(function ($col) {
+            return "`$col`";
+        }, $columns);
+
+        $columnString = implode(",", $quotedColumns);
+        $sql = <<<SQL
+ALTER TABLE `$tableName`
+DROP PRIMARY KEY,
+ADD PRIMARY KEY ($columnString), ALGORITHM=INPLACE, LOCK=NONE
+SQL;
+
+        $this->executeQuery($sql, true);
+
+        return $this;
+    }
 }

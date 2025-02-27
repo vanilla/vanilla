@@ -10,7 +10,7 @@ namespace Vanilla\Forum\Controllers\Pages;
 use Garden\Web\Data;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Forum\Layout\View\DiscussionListLayoutView;
-use Vanilla\Forum\Layout\View\DiscussionThreadLayoutView;
+use Vanilla\Forum\Layout\View\DiscussionLayoutView;
 use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\LayoutPage;
 use Vanilla\Utility\StringUtils;
@@ -49,8 +49,6 @@ class DiscussionListPageController extends PageDispatchController
         $siteSection = $this->siteSectionModel->getCurrentSiteSection();
         $schema = $this->discussionListLayoutView->getParamInputSchema();
         $query = $schema->validate($query);
-        $query["siteSectionID"] = (string) $siteSection->getSectionID();
-        $query["locale"] = $siteSection->getContentLocale();
         $layoutFormAsset = new LayoutQuery(
             "discussionList",
             "siteSection",

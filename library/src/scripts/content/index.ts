@@ -24,6 +24,6 @@ export async function initAllUserContent() {
  * This is ideal for something like react's `componentDidMount`.
  */
 export function convertAllUserContent() {
-    mountAllEmbeds();
+    void mountAllEmbeds();
     initTables();
 }

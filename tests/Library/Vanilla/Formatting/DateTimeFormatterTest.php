@@ -51,7 +51,7 @@ class DateTimeFormatterTest extends MinimalContainerTestCase
     {
         $format = "Custom %m.%d.%y";
         $actual = self::getFormatter()->formatDate(self::NOW, false, $format);
-        $expected = "Custom 07.27.15";
+        $expected = "C0000000131201507 07.27.15";
         $this->assertEquals($expected, $actual);
     }
 
@@ -73,7 +73,7 @@ class DateTimeFormatterTest extends MinimalContainerTestCase
     {
         self::setTranslation("Date.DefaultDateTimeFormat", "Custom %m.%d.%y");
         $actual = self::getFormatter()->formatDate(self::NOW, false, DateTimeFormatter::FORCE_FULL_FORMAT);
-        $expected = "Custom 07.27.15";
+        $expected = "C0000000131201507 07.27.15";
         $this->assertEquals($expected, $actual);
     }
 

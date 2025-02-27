@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -305,8 +305,6 @@ export const siteNavNodeDashboardClasses = useThemeCache(
     (active = false, isFirstLevel = false, hasChildren = false) => {
         const globalVars = globalVariables();
         const vars = siteNavVariables();
-
-        const style = styleFactory(SiteNavNodeTypes.DASHBOARD);
 
         const link = css({
             ...(isFirstLevel

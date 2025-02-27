@@ -33,11 +33,18 @@ class AddonsTest extends AbstractAPIv2Test
         "googlesignin", // plugins
     ];
 
-    private $coreThemes = [
-        "keystone", // themes
-    ];
+    private $coreThemes = [];
 
-    private $hiddenAddons = ["dashboard", "vanilla", "googleplus", "EmbedFriendly", "bittersweet", "default", "mobile"];
+    private $hiddenAddons = [
+        "dashboard",
+        "vanilla",
+        "googleplus",
+        "EmbedFriendly",
+        "bittersweet",
+        "default",
+        "mobile",
+        "keystone",
+    ];
 
     /**
      * Test listing core addons.

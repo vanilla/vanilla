@@ -18,7 +18,7 @@ echo wrap(sprintf(
             echo $this->Form->textBox('Name');
             ?>
         </li>
-        <?php if ($this->ShowCategorySelector === TRUE) { ?>
+        <?php if (($this->ShowCategorySelector ?? true) === true) { ?>
             <li>
                 <?php
                 echo '<p><div class="Category">';

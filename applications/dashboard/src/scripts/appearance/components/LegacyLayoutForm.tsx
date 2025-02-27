@@ -183,7 +183,7 @@ export function LegacyLayoutFormPage(props: IProps) {
                     title={sprintf(t("Change %s"), props.radios.legendLabel)}
                     onCancel={() => setShowWarning(false)}
                     onConfirm={() => {
-                        configPatcher.patchConfig(configs);
+                        void configPatcher.patchConfig(configs);
                         setShowWarning(false);
                     }}
                 >
@@ -232,7 +232,7 @@ export function LegacyLayoutFormPage(props: IProps) {
                                     setShowWarning(true);
                                     return;
                                 }
-                                configPatcher.patchConfig(configs);
+                                void configPatcher.patchConfig(configs);
                             }}
                             disabled={configPatcher.isLoading}
                         >

@@ -4,13 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { useHashScrolling } from "@library/content/hashScrolling";
+import { scrollToCurrentHash, useHashScrolling } from "@library/content/hashScrolling";
 import { userContentClasses } from "@library/content/UserContent.styles";
 import React, { useEffect, useMemo } from "react";
 
 import { cx } from "@emotion/css";
 import { notEmpty } from "@vanilla/utils";
 import { mountAllEmbeds } from "@library/embeddedContent/embedService.mounting";
+import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 
 interface IProps {
     className?: string;
@@ -37,8 +38,13 @@ export default function UserContent(props: IProps) {
 
     const classes = userContentClasses();
 
+    const { temporarilyDisabledWatching, getCalcedHashOffset } = useScrollOffset();
+    const calcedOffset = getCalcedHashOffset();
+
     useEffect(() => {
-        mountAllEmbeds();
+        void mountAllEmbeds().then(() => {
+            scrollToCurrentHash(calcedOffset);
+        });
     }, [content]);
 
     return (

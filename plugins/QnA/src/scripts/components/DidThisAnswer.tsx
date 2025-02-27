@@ -12,20 +12,21 @@ import { usePermissionsContext } from "@library/features/users/PermissionsContex
 import { useCurrentUserID } from "@library/features/users/userHooks";
 import DidThisAnswerClasses from "@QnA/components/DidThisAnswer.classes";
 import { usePatchAnswerStatus } from "@QnA/hooks/usePatchAnswerStatus";
+import { useCommentThreadParentContext } from "@vanilla/addon-vanilla/comments/CommentThreadParentContext";
 
 interface IProps {
     comment: IComment;
-    discussion: IDiscussion;
     onMutateSuccess?: () => Promise<void>;
 }
 
 export default function DidThisAnswer(props: IProps) {
-    const { comment, discussion, onMutateSuccess } = props;
+    const { comment, onMutateSuccess } = props;
+    const commentParent = useCommentThreadParentContext();
 
     const classes = DidThisAnswerClasses();
 
     const currentUserID = useCurrentUserID();
-    const currentUserIsDiscussionAuthor = discussion.insertUserID === currentUserID;
+    const currentUserIsDiscussionAuthor = commentParent.insertUserID === currentUserID;
     const { hasPermission } = usePermissionsContext();
     const canChangeStatus = currentUserIsDiscussionAuthor || hasPermission("curation.manage");
 
@@ -33,7 +34,7 @@ export default function DidThisAnswer(props: IProps) {
 
     const patchAnswerStatus = usePatchAnswerStatus(comment);
 
-    if (canChangeStatus && status === QnAStatus.PENDING) {
+    if (!comment.isTroll && canChangeStatus && status === QnAStatus.PENDING) {
         return (
             <div className={classes.root}>
                 <span>{t("Did this answer the question?")}</span>

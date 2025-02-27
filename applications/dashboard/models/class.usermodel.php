@@ -2502,18 +2502,22 @@ class UserModel extends Gdn_Model implements
     public function getUserIDsForIPAddresses(array $ipAddresses): array
     {
         // Get a clean SQL object.
-        $sql = clone $this->SQL;
-        $sql->reset();
-
-        $ipAddresses = array_map("inet_pton", $ipAddresses);
+        $sql = $this->createSql();
 
         // Get all users that matches the IP address.
-        $sql->select("UserID")
-            ->from("UserIP")
-            ->where("IPAddress", $ipAddresses);
+        $query = $sql->select("UserID")->from("User");
 
-        $matchingUserIDs = $sql->get()->resultArray();
-        return array_column($matchingUserIDs, "UserID");
+        foreach ($ipAddresses as $ipAddress) {
+            $query->orOp();
+            $query->whereIpAddress("LastIPAddress", $ipAddress);
+        }
+
+        $result = $query
+            // For sanity.
+            ->limit(10000)
+            ->get()
+            ->column("UserID");
+        return $result;
     }
 
     /**
@@ -3532,8 +3536,18 @@ class UserModel extends Gdn_Model implements
 
                 if ($userID) {
                     if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
-                        if (array_key_exists("SuggestAnswers", $formPostValues)) {
-                            if (!$this->userMetaModel->hasUserAcceptedCookie($userID)) {
+                        $currentSuggestAnswers = $this->userMetaModel->getUserMeta($userID, "SuggestAnswers")[
+                            "SuggestAnswers"
+                        ];
+                        if (
+                            array_key_exists("SuggestAnswers", $formPostValues) &&
+                            ($currentSuggestAnswers === null ||
+                                $currentSuggestAnswers != $formPostValues["SuggestAnswers"])
+                        ) {
+                            if (
+                                $formPostValues["SuggestAnswers"] &&
+                                !$this->userMetaModel->hasUserAcceptedCookie($userID)
+                            ) {
                                 $suggestionUser = AiSuggestionSourceService::getSuggestionUser();
                                 throw new Exception(
                                     $suggestionUser["Name"] .
@@ -3842,10 +3856,8 @@ class UserModel extends Gdn_Model implements
         $formPostValues["Email"] = val("Email", $formPostValues, strtolower($name . "@" . Gdn_Url::host()));
         $formPostValues["ShowEmail"] = "0";
         $formPostValues["TermsOfService"] = "1";
-        $formPostValues["DateOfBirth"] = "1975-09-16";
         $formPostValues["DateLastActive"] = DateTimeFormatter::getCurrentDateTime();
         $formPostValues["DateUpdated"] = DateTimeFormatter::getCurrentDateTime();
-        $formPostValues["Gender"] = "u";
         $formPostValues["Admin"] = "1";
 
         $this->addInsertFields($formPostValues);
@@ -4325,17 +4337,17 @@ class UserModel extends Gdn_Model implements
     private function applyIpAddressesFilter(Gdn_MySQLDriver $sql, array &$where): void
     {
         $ipAddresses = $where["ipAddresses"] ?? [];
-        $ipAddresses = array_map("inet_pton", $ipAddresses);
-
         unset($where["ipAddresses"]);
 
         if (empty($ipAddresses)) {
             return;
         }
 
-        $sql->distinct()
-            ->join("UserIP ip1", "ip1.UserID=u.UserID")
-            ->where("ip1.IPAddress", $ipAddresses);
+        $sql->beginWhereGroup();
+        foreach ($ipAddresses as $ipAddress) {
+            $sql->orOp()->whereIpAddress("LastIPAddress", $ipAddress);
+        }
+        $sql->endWhereGroup();
     }
 
     /**
@@ -4730,7 +4742,7 @@ class UserModel extends Gdn_Model implements
             // Use RoleIDs from Invitation table, if any. They are stored as a
             // serialized array of the Role IDs.
             $invitationRoleIDs = $invitation->RoleIDs;
-            if (strlen($invitationRoleIDs)) {
+            if ($invitationRoleIDs && strlen($invitationRoleIDs)) {
                 $invitationRoleIDs = dbdecode($invitationRoleIDs);
 
                 if (is_array($invitationRoleIDs) && count(array_filter($invitationRoleIDs))) {
@@ -4872,8 +4884,8 @@ class UserModel extends Gdn_Model implements
             "ActivityType" => ApplicantActivity::getActivityTypeID(),
             "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
             "ActivityUserID" => $userID,
-            "HeadlineFormat" => sprintf(ApplicantActivity::getProfileHeadline(), $username),
-            "PluralHeadlineFormat" => sprintf(ApplicantActivity::getPluralHeadline(), $username),
+            "HeadlineFormat" => sprintf(ApplicantActivity::getProfileHeadline() ?? "", $username),
+            "PluralHeadlineFormat" => sprintf(ApplicantActivity::getPluralHeadline() ?? "", $username),
             "RecordType" => "user",
             "RecordID" => $userID,
             "Route" => "/dashboard/user/applicants",
@@ -6216,6 +6228,14 @@ SQL;
      */
     public function sendWelcomeEmail($userID, $password, $registerType = "Add", $additionalData = null)
     {
+        $welcomeEmailDebug = Gdn::config()->get("WelcomeEmail.Debug", false);
+        if ($welcomeEmailDebug) {
+            $this->logger->info("Started sending welcome email", [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                Logger::FIELD_TAGS => ["welcome-email"],
+                "UserID" => $userID,
+            ]);
+        }
         $session = $this->session;
         $sender = $this->getID($session->UserID);
         $user = $this->getID($userID);
@@ -6276,7 +6296,12 @@ SQL;
         try {
             $email->send();
         } catch (Exception $e) {
-            if (debug()) {
+            $this->logger->info("Failed Sending out a welcome email", [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                Logger::FIELD_TAGS => ["welcome-email"],
+                "UserID" => $userID,
+            ]);
+            if (debug() || $welcomeEmailDebug) {
                 throw $e;
             }
         }
@@ -6944,6 +6969,7 @@ SQL;
      *
      * @param int $userID Unique ID of the user.
      * @return Vanilla\Permissions
+     * @throws Exception
      */
     public function getPermissions($userID)
     {

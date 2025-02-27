@@ -6,31 +6,26 @@ paths:
         get:
             summary: List interests.
             parameters:
-                - name: apiName
-                  description: Filter by apiName.
-                  in: query
-                  schema:
-                      type: string
                 - name: name
                   description: Filter by name.
                   in: query
                   schema:
                       type: string
-                - name: categoryIDs[]
+                - name: categoryIDs
                   description: Filter by an array of category IDs.
                   in: query
                   schema:
                       items:
                           type: integer
                       type: array
-                - name: tagIDs[]
+                - name: tagIDs
                   description: Filter by an array of tag IDs.
                   in: query
                   schema:
                       items:
                           type: integer
                       type: array
-                - name: profileFields[]
+                - name: profileFields
                   description: Filter by an array of profile field API names.
                   in: query
                   schema:
@@ -42,7 +37,6 @@ paths:
                   in: query
                   schema:
                       type: boolean
-                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
             responses:
                 "200":
                     content:
@@ -216,7 +210,7 @@ paths:
                   in: query
                   schema:
                       type: integer
-                - name: excludedCategoryIDs[]
+                - name: excludedCategoryIDs
                   description: Category IDs to exclude.
                   in: query
                   schema:

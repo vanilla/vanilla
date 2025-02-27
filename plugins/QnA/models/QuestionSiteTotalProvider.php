@@ -10,6 +10,8 @@ namespace Vanilla\QnA\Models\Totals;
 use CategoryModel;
 use Vanilla\Contracts\Models\SiteSectionTotalProviderInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 
 /**
  * Provide site totals for questions.
@@ -39,11 +41,13 @@ class QuestionSiteTotalProvider implements SiteSectionTotalProviderInterface
      */
     public function calculateSiteTotalCount(?SiteSectionInterface $siteSection = null): int
     {
-        $sql = $this->database
-            ->createSql()
-            ->from($this->getTableName())
-            ->where("Type", "Question");
+        $sql = $this->database->createSql()->from($this->getTableName());
 
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            PostTypeModel::addJoin($sql, ["question"]);
+        } else {
+            $sql->where("Type", "Question");
+        }
         if ($siteSection !== null) {
             $rootCategoryID = $siteSection->getCategoryID();
             $categories = array_merge(

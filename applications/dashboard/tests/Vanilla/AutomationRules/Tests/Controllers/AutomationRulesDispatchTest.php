@@ -18,6 +18,7 @@ use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
+use Vanilla\Dashboard\Models\UserFragment;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\AutomationRules\AutomationRulesTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -82,6 +83,10 @@ class AutomationRulesDispatchTest extends AbstractAPIv2Test
                 ->getBody();
             $this->assertCount(10, $response);
             $this->assertSame($automationRule["automationRuleID"], $response[0]["automationRule"]["automationRuleID"]);
+
+            // Test that the dispatches response always expand on dispatch user
+            $this->assertArrayHasKey("dispatchUser", $response[0]);
+            $this->assertEquals($this->adminID, $response[0]["dispatchUser"]["userID"]);
         }, $this->adminID);
     }
 
@@ -123,9 +128,9 @@ class AutomationRulesDispatchTest extends AbstractAPIv2Test
         $firstRecord = $response[0];
 
         foreach ($has as $key) {
-            $this->assertArrayHasKey($key, $firstRecord);
-            $this->assertArrayHasKey("userID", $firstRecord[$key]);
-            $this->assertCount(7, $firstRecord[$key]);
+            $this->assertArrayHasKey($key, $firstRecord["automationRule"]);
+            $this->assertArrayHasKey("userID", $firstRecord["automationRule"][$key]);
+            $this->assertArrayHasKey("name", $firstRecord["automationRule"][$key]);
         }
 
         foreach ($hasNot as $key) {

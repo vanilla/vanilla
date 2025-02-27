@@ -86,7 +86,7 @@ export function useProfileFields(
 
     useEffect(() => {
         if (params && !profileFieldApiNames) {
-            dispatch(fetchProfileFields(params));
+            void dispatch(fetchProfileFields(params));
         }
     }, [profileFieldApiNames, params]);
 
@@ -115,7 +115,7 @@ export function useProfileField(profileFieldApiName?: ProfileField["apiName"]): 
 
     useEffect(() => {
         if (profileFieldApiName && !profileField) {
-            dispatch(fetchProfileField(profileFieldApiName));
+            void dispatch(fetchProfileField(profileFieldApiName));
         }
     }, [profileField, profileFieldApiName]);
 
@@ -158,7 +158,7 @@ export function useProfileFieldsByUserID(userID: RecordID): ILoadable<UserProfil
 
     useEffect(() => {
         if (userID && !userProfileFields) {
-            dispatch(fetchUserProfileFields({ userID }));
+            void dispatch(fetchUserProfileFields({ userID }));
         }
     }, [userProfileFields, userID]);
 

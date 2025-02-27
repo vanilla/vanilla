@@ -18,6 +18,7 @@ use Vanilla\Database\SetLiterals\RawExpression;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
 use Vanilla\Models\Model;
+use Vanilla\Schema\RangeExpression;
 use Webmozart\Assert\Assert;
 
 /**
@@ -26,6 +27,7 @@ use Webmozart\Assert\Assert;
 class CommentThreadModel
 {
     public const OPT_THREAD_STRUCTURE = "threadStructureOptions";
+    public const MAX_DEPTH = 5;
     private null|QuoteEmbedFilter $quoteEmbedFilter = null;
 
     /**
@@ -335,7 +337,7 @@ class CommentThreadModel
     }
 
     /**
-     * Handle aggegate counts if a comment is inserted or updated.
+     * Handle aggregate counts if a comment is inserted or updated.
      *
      * @param array $commentRow
      * @param array|null $prevCommentRow
@@ -409,6 +411,37 @@ class CommentThreadModel
         $query->put();
     }
 
+    public function updateChildrenRecursively(int $parentCommentID, array $set): void
+    {
+        $query = $this->db
+            ->createSql()
+            ->withRecursive(
+                "ParentCommentTree",
+                $this->db
+                    ->createSql()
+                    ->select("CommentID")
+                    ->select("parentCommentID")
+                    ->from("Comment")
+                    ->where("CommentID", $parentCommentID),
+                $this->db
+                    ->createSql()
+                    ->select("c2.CommentID")
+                    ->select("c2.parentCommentID")
+                    ->from("Comment c2")
+                    ->join("@ParentCommentTree c1", "c2.parentCommentID = c1.CommentID", "inner")
+            )
+            ->from("Comment c")
+            ->set($set)
+            ->whereInSubquery(
+                "CommentID",
+                $this->db
+                    ->createSql()
+                    ->select("CommentID")
+                    ->from("@ParentCommentTree")
+            );
+        $query->put();
+    }
+
     /**
      * Process a comment row to render a parent comment as an HTML quote.
      *
@@ -457,5 +490,138 @@ class CommentThreadModel
         }
 
         return $this->quoteEmbedFilter;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function counts(string $column, $from = false, $to = false, $max = false, array $where = []): array
+    {
+        $result = ["Complete" => true];
+
+        switch ($column) {
+            case "depth":
+                $this->recalculateDepth($where);
+                break;
+            case "countChildComments":
+            case "scoreChildComments":
+                // We need all the parent comment IDs for the given range of comments.
+                $parentsCommentIDs = $this->db
+                    ->createSql()
+                    ->select("parentCommentID")
+                    ->from("Comment")
+                    ->where($where)
+                    ->get()
+                    ->resultArray();
+                $parentCommentIDs = array_column($parentsCommentIDs, "parentCommentID");
+
+                // Loop through each level of depth and calculate the counts.
+                $depth = self::MAX_DEPTH;
+                while ($depth > 1) {
+                    $this->db
+                        ->createSql()
+                        ->with(
+                            "Aggregated",
+                            $this->db
+                                ->createSql()
+                                ->select(
+                                    new Select(
+                                        "SUM(countChildComments) + COUNT(CommentID)",
+                                        "calculatedCountChildComments"
+                                    )
+                                )
+                                ->select(
+                                    new Select(
+                                        "SUM(scoreChildComments) + SUM(if(Score IS NULL, 0, Score))",
+                                        "calculatedScoreChildComments"
+                                    )
+                                )
+                                ->select("parentCommentID")
+                                ->from("Comment c")
+                                ->where(["c.depth" => $depth])
+                                ->where(["c.parentCommentID" => $parentCommentIDs])
+                                ->groupBy("parentCommentID")
+                        )
+                        ->update("Comment c2")
+                        ->leftJoin("@Aggregated agg", "agg.parentCommentID = c2.CommentID")
+                        ->where(["c2.depth" => $depth - 1])
+                        ->where("agg.parentCommentID IS NOT NULL", null, false)
+                        ->set(
+                            "countChildComments",
+                            "IF(agg.calculatedCountChildComments IS NULL, 0, agg.calculatedCountChildComments)",
+                            false
+                        )
+                        ->set(
+                            "scoreChildComments",
+                            "IF(agg.calculatedScoreChildComments IS NULL, 0, agg.calculatedScoreChildComments)",
+                            false
+                        )
+                        ->put();
+                    $depth--;
+                }
+        }
+        return $result;
+    }
+
+    /**
+     * Recalculate the depth of the comments in the database.
+     *
+     * @param $where
+     * @return void
+     */
+    public function recalculateDepth($where = [])
+    {
+        $outerWhere = [];
+        if (isset($where["DiscussionID"])) {
+            $outerWhere["c.DiscussionID"] = $where["DiscussionID"];
+        }
+
+        if (isset($where["ParentRecordID"], $where["ParentRecordType"])) {
+            $outerWhere["c.ParentRecordID"] = $where["ParentRecordID"];
+            $outerWhere["c.ParentRecordType"] = $where["ParentRecordType"];
+        }
+
+        $this->db
+            ->createSql()
+            ->withRecursive(
+                // Build up the tree for all comments in the given range.
+                "ParentCommentTree",
+                $this->db
+                    ->createSql()
+                    ->select("CommentID")
+                    ->select("parentCommentID")
+                    ->select(new Select("1", "depth"))
+                    ->where($where)
+                    ->from("Comment"),
+                $this->db
+                    ->createSql()
+                    ->select("c.CommentID")
+                    ->select("c.parentCommentID")
+                    ->select(new Select("pct.depth + 1"))
+                    ->from("Comment c")
+                    ->join("@ParentCommentTree pct", "c.parentCommentID = pct.CommentID", "inner")
+            )
+            // Set the depth of the comments.
+            ->with(
+                "CommentsWithDepth",
+                $this->db
+                    ->createSql()
+                    ->select("CommentID")
+                    ->select("pct.depth", "max", "depth")
+                    ->from("@ParentCommentTree pct")
+                    ->groupBy([new RawExpression("1")])
+            )
+            ->update("Comment c")
+            ->where($outerWhere)
+            ->whereInSubquery(
+                "c.CommentID",
+                $this->db
+                    ->createSql()
+                    ->select("CommentID")
+                    ->from("@CommentsWithDepth")
+            )
+            ->join("@CommentsWithDepth cwd", "cwd.CommentID = c.CommentID")
+            ->set("c.depth", "cwd.depth", escapeString: false)
+            ->put();
     }
 }

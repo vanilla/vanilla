@@ -48,7 +48,7 @@ describe("unlinkRichLink", () => {
             editor.insertNode(linkVal);
             editor.select(selectLocation);
             setRichLinkAppearance(editor, RichLinkAppearance.INLINE);
-            unlinkRichLink(editor);
+            unlinkRichLink(editor, selectLocation);
 
             expect(editor.children).toStrictEqual(inlineVal);
         });

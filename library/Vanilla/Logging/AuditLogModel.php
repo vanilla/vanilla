@@ -123,7 +123,8 @@ class AuditLogModel extends PipelineModel
 
         $structure
             ->table("auditLog")
-            ->createIndexIfNotExists("auditLog_insertUserID", ["dateInserted", "insertUserID"]);
+            ->createIndexIfNotExists("auditLog_insertUserID", ["dateInserted", "insertUserID"])
+            ->createIndexIfNotExists("auditLog_insertUserID_dateInserted", ["insertUserID", "dateInserted"]);
 
         if (\Gdn::config("Garden.Installed")) {
             \Gdn::config()->touch(AuditLogger::CONF_ENABLED, true);

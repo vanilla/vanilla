@@ -28,9 +28,9 @@ export const frameBodyClasses = useThemeCache(() => {
         ...Mixins.padding({
             horizontal: vars.spacing.padding,
         }),
+        overflowX: "hidden",
         ...{
             "&.isSelfPadded": {
-                overflowX: "hidden",
                 ...Mixins.padding({
                     left: 0,
                     right: 0,

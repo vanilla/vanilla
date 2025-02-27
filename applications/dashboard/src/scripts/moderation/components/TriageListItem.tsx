@@ -28,13 +28,13 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@library/utility/appUtils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import { Icon } from "@vanilla/icons";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import BlurContainer from "@dashboard/moderation/components/BlurContainerUserContent";
 import { PermissionMode } from "@library/features/users/Permission";
+import { ContentItemAttachment } from "@vanilla/addon-vanilla/contentItem/ContentItemAttachment";
 
 interface IProps {
     discussion: IDiscussion;
@@ -50,22 +50,23 @@ export function TriageListItem(props: IProps) {
     const queryClient = useQueryClient();
     const { fetchDashboardSections } = useDashboardSectionActions();
     const resolveMutation = useMutation({
-        mutationFn: (options: {
+        mutationFn: async (options: {
             discussionID: IDiscussion["discussionID"];
             internalStatusID: TriageInternalStatus;
         }) => {
             const { discussionID, internalStatusID } = options;
-            return apiv2.put(`/discussions/${discussionID}/status`, {
+            const result = await apiv2.put(`/discussions/${discussionID}/status`, {
                 internalStatusID: internalStatusID,
             });
+            return result;
         },
         onSuccess() {
-            queryClient.invalidateQueries(["triageItems"]);
             fetchDashboardSections();
             toast.addToast({
                 autoDismiss: true,
                 body: "Post marked as resolved.",
             });
+            void queryClient.invalidateQueries(["triageItems"]);
         },
     });
 
@@ -165,7 +166,7 @@ export function TriageListItem(props: IProps) {
                             key={attachment.attachmentID}
                             attachmentType={attachment.attachmentType}
                         >
-                            <DiscussionAttachment key={attachment.attachmentID} attachment={attachment} />
+                            <ContentItemAttachment key={attachment.attachmentID} attachment={attachment} />
                         </ReadableIntegrationContextProvider>
                     ))}
             </div>

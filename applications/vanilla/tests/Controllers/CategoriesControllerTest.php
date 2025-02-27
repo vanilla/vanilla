@@ -34,7 +34,6 @@ class CategoriesControllerTest extends TestCase
         $this->useLegacyLayouts();
         /** @var \Gdn_Configuration $config */
         $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig("Vanilla.Categories.Use", true);
         $this->category = $this->insertCategories(2)[0];
     }
 

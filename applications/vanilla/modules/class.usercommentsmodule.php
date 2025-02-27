@@ -54,7 +54,7 @@ class UserCommentsModule extends Gdn_Module
 
         $userModel = new UserModel();
         $this->setData("User", $userModel->getID($this->userID));
-        $commentsModel = new CommentModel();
+        $commentsModel = Gdn::getContainer()->get(CommentModel::class);
         $this->setData("Comments", $commentsModel->getByUser($this->userID, $limit, 0));
     }
 

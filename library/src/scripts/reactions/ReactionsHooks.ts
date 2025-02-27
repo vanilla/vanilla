@@ -32,7 +32,7 @@ export function useUserReactions(
             dispatch(getUserReactions.fulfilled(prehydratedItems, paramHash.toString(), apiParams));
         } else {
             if (![LoadStatus.SUCCESS, LoadStatus.ERROR].includes(status)) {
-                dispatch(getUserReactions(apiParams));
+                void dispatch(getUserReactions(apiParams));
             }
         }
     }, [prehydratedItems, dispatch, status, paramHash]);

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Forum\Models;
 
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\StringUtils;
@@ -69,6 +70,9 @@ class PostMetaModel extends PipelineModel
      */
     public function updatePostFields(string $recordType, int $recordID, array $postFields)
     {
+        if (empty($postFields)) {
+            return;
+        }
         try {
             $this->database->beginTransaction();
             foreach ($postFields as $postFieldID => $postFieldValue) {
@@ -175,8 +179,18 @@ class PostMetaModel extends PipelineModel
         return $queryValue;
     }
 
-    public function joinPostFields(array &$rowOrRows)
+    /**
+     * Join post fields with an array of post records.
+     *
+     * @param array $rowOrRows
+     * @return void
+     * @throws \Exception
+     */
+    public function joinPostFields(array &$rowOrRows): void
     {
+        if (!PostTypeModel::isPostTypesFeatureEnabled()) {
+            return;
+        }
         reset($rowOrRows);
         $single = is_string(key($rowOrRows));
         if ($single) {
@@ -202,7 +216,7 @@ class PostMetaModel extends PipelineModel
         $postMetaRecords = array_map(fn($record) => $this->condensePostMeta($record), $postMetaRecords);
 
         // Get post field definitions indexed by postTypeID and postFieldID
-        $postFields = $this->postFieldModel->select(["postTypeID" => $recordTypesForLookup, "isActive" => true]);
+        $postFields = $this->postFieldModel->getWhere(["postTypeID" => $recordTypesForLookup, "isActive" => true]);
         $postFields = ArrayUtils::arrayColumnArrays($postFields, null, "postTypeID");
         $postFields = array_map(fn($field) => array_column($field, null, "postFieldID"), $postFields);
 
@@ -225,6 +239,41 @@ class PostMetaModel extends PipelineModel
             }
             $row["postFields"] = $recordPostFields;
         }
+    }
+
+    /**
+     * Get post fields for a single post record.
+     *
+     * @param array $record
+     * @param array $filters
+     * @return array|null
+     */
+    public function getPostFields(array $record, array $filters = []): ?array
+    {
+        $postTypeID = $record["postTypeID"] ?? null;
+        $recordID = $record["discussionID"] ?? null;
+
+        if (!isset($postTypeID, $recordID)) {
+            return null;
+        }
+
+        $postMetaRecords = $this->select(["recordType" => $postTypeID, "recordID" => $recordID]);
+        $postMetaRecords = $this->condensePostMeta($postMetaRecords);
+
+        $postFields = $this->postFieldModel->getWhere($filters + ["postTypeID" => $postTypeID, "isActive" => true]);
+        $postFields = array_column($postFields, null, "postFieldID");
+
+        $recordPostFields = [];
+        foreach ($postMetaRecords as $postFieldID => $value) {
+            $postField = $postFields[$postFieldID] ?? null;
+            if (!isset($postField)) {
+                continue;
+            }
+
+            $value = $this->normalizeValueForOutput($value, $postField["dataType"]);
+            $recordPostFields[$postFieldID] = $value;
+        }
+        return $recordPostFields;
     }
 
     /**

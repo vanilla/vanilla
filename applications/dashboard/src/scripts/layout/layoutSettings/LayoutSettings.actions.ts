@@ -56,6 +56,22 @@ export const fetchLayoutCatalogByViewType = createAsyncThunk(
         const response = await apiv2.get<ILayoutCatalog>(`/layouts/catalog`, {
             params: { layoutViewType },
         });
-        return response.data;
+
+        let catalog = response.data;
+
+        // FIXME: https://higherlogic.atlassian.net/browse/VNLA-7689: Allow registering widgets to specific layout view types
+        // This is a temporary fix to remove Article-specific widgets from the catalog on non-Article layouts.
+        if (layoutViewType && catalog?.widgets) {
+            if (!["guideArticle", "helpCenterArticle"].includes(layoutViewType)) {
+                delete catalog.widgets["react.article-related-articles"];
+                delete catalog.widgets["react.article-reactions"];
+                delete catalog.widgets["react.article-toc"];
+            }
+            if (layoutViewType !== "guideArticle") {
+                delete catalog.widgets["react.guide-pager"];
+            }
+        }
+
+        return catalog;
     },
 );

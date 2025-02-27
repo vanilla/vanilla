@@ -97,7 +97,7 @@ class DockerBuildCommand extends Console\Command\Command
 
             $process = new Process(array_filter($buildCommand), $dirName);
             $process->setTimeout(null);
-            $process->setIdleTimeout(120);
+            $process->setIdleTimeout(null);
             $this->logger()->runProcess($process, true);
         }
 

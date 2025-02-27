@@ -8,6 +8,7 @@
  * @since 2.0
  */
 use Vanilla\Addon;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\AddonModel;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Utility\ArrayUtils;
@@ -104,7 +105,7 @@ class SettingsController extends DashboardController
         $this->permission("Garden.Settings.Manage");
         $this->setHighlightRoute("/settings/post-types");
         $this->title(t("Post Types and Post Fields"));
-        if (Gdn::config("Feature.PostTypesAndPostFields.Enabled")) {
+        if (FeatureFlagHelper::featureEnabled("customLayout.createPost")) {
             $this->render("post-types");
         } else {
             $this->renderException(notFoundException());
@@ -289,16 +290,46 @@ class SettingsController extends DashboardController
      *    Valid keys are BanType and BanValue. BanValue is what is to be banned.
      *    Valid values for BanType are email, ipaddress or name.
      */
-    protected function _banFilter($ban)
+    private static function legacyUserPageBanFilter($ban)
     {
-        $banModel = $this->getBanModel();
+        $banModel = \Gdn::getContainer()->get(BanModel::class);
         $banWhere = $banModel->banWhere($ban, "u.");
         foreach ($banWhere as $name => $value) {
             if (!in_array($name, ["u.Admin", "u.Deleted"])) {
-                return "$name $value";
+                return ["Filter" => "$name $value"];
             }
         }
         return [];
+    }
+
+    /**
+     * @param array $banRow
+     * @return string
+     */
+    public static function banRuleUsersUrl(array $banRow): string
+    {
+        if (FeatureFlagHelper::featureEnabled("NewUserManagement")) {
+            $baseUrl = "/dashboard/user";
+
+            $query = [
+                "banned" => "true",
+            ];
+            $banType = strtolower($banRow["BanType"]);
+            switch ($banType) {
+                case "email":
+                case "name":
+                    $query["Keywords"] = $banRow["BanValue"];
+                    break;
+                case "ipaddress":
+                    $query["ipAddresses"][] = $banRow["BanValue"];
+                    break;
+            }
+        } else {
+            $baseUrl = "/dashboard/user/banned";
+            $query = self::legacyUserPageBanFilter($banRow);
+        }
+
+        return url($baseUrl . "?" . http_build_query($query), true);
     }
 
     /**
@@ -963,7 +994,7 @@ class SettingsController extends DashboardController
         $this->permission("Garden.Settings.Manage");
         $this->setHighlightRoute("settings/ai-suggestions");
         $this->title(t("AI Suggested Answers"));
-        if (Gdn::config("Feature.AISuggestions.Enabled") && Gdn::config("Feature.aiFeatures.Enabled")) {
+        if (Gdn::config("Feature.AISuggestions.Enabled")) {
             $this->render("ai-suggestions");
         } else {
             $this->renderException(notFoundException());

@@ -43,7 +43,7 @@ export function useAcceptSuggestion(discussionID: RecordID) {
             }
         },
         onSuccess: async () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ["commentList", { discussionID }],
             });
         },

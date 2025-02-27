@@ -48,6 +48,6 @@ class SearchAllEventProvider implements EventProviderInterface
     {
         $type = $body["type"] ?? null;
         $domain = $body["domain"] ?? null;
-        return strtolower($type) === "search" && strtolower($domain) === "all_content";
+        return $type && strtolower($type) === "search" && strtolower($domain) === "all_content";
     }
 }

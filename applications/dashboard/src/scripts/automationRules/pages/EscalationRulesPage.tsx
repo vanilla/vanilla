@@ -44,11 +44,7 @@ export default function EscalationRulesPage() {
                             </>
                         }
                         content={
-                            <AutomationRulesList
-                                isEscalationRulesList
-                                headerClassName={cmdClasses.secondaryTitleBar}
-                                onRulesMaxLimitReach={setRulesMaxLimitReached}
-                            />
+                            <AutomationRulesList isEscalationRulesList onRulesMaxLimitReach={setRulesMaxLimitReached} />
                         }
                         titleBarActions={
                             rulesMaxLimitReached ? (

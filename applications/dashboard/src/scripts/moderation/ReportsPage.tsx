@@ -6,28 +6,28 @@
 
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
+import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 import { IReport, IReportsData } from "@dashboard/moderation/CommunityManagementTypes";
+import { DisabledBanner } from "@dashboard/moderation/components/DisabledBanner";
+import { EmptyState } from "@dashboard/moderation/components/EmptyState";
 import { IReportFilters, ReportFilters } from "@dashboard/moderation/components/ReportFilters";
 import { ReportStatus } from "@dashboard/moderation/components/ReportFilters.constants";
 import { ReportListItem } from "@dashboard/moderation/components/ReportListItem";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
+import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
+import Loader from "@library/loaders/Loader";
+import SimplePagerModel from "@library/navigation/SimplePagerModel";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import { useQueryStringSync } from "@library/routing/QueryString";
+import { useQueryParam, useQueryParamPage } from "@library/routing/routingUtils";
+import { Sort } from "@library/sort/Sort";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
-import { useState } from "react";
-import Loader from "@library/loaders/Loader";
-import { useQueryParam, useQueryParamPage } from "@library/routing/routingUtils";
-import { useQueryStringSync } from "@library/routing/QueryString";
-import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
-import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
 import { useCollisionDetector } from "@vanilla/react-utils";
-import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { Sort } from "@library/sort/Sort";
-import SimplePagerModel from "@library/navigation/SimplePagerModel";
-import { EmptyState } from "@dashboard/moderation/components/EmptyState";
-import DocumentTitle from "@library/routing/DocumentTitle";
-import { DisabledBanner } from "@dashboard/moderation/components/DisabledBanner";
+import { useState } from "react";
 
 const defaultFilterValues = {
     statuses: [ReportStatus.NEW],
@@ -37,6 +37,8 @@ const defaultFilterValues = {
     recordUserID: [],
     sort: "-dateInserted",
     page: 1,
+    recordType: undefined,
+    recordID: undefined,
 };
 
 const sortOptions = [
@@ -51,18 +53,22 @@ export function ReportsPage() {
     const { hasCollision } = useCollisionDetector();
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
 
-    const initialStatuses = useQueryParam("statuses", defaultFilterValues.statuses);
+    const initialStatuses = useQueryParam<string | string[]>("statuses", defaultFilterValues.statuses);
     const initialReasons = useQueryParam("reportReasonID", defaultFilterValues.reportReasonID);
     const initialInsertUserID = useQueryParam("insertUserID", defaultFilterValues.insertUserID);
     const initialInsertUserRoleID = useQueryParam("insertUserRoleID", defaultFilterValues.insertUserRoleID);
     const initialRecordUserID = useQueryParam("recordUserID", defaultFilterValues.recordUserID);
+    const initialRecordType = useQueryParam("recordType", defaultFilterValues.recordType);
+    const initialRecordID = useQueryParam("recordID", defaultFilterValues.recordID);
 
     const [filters, setFilters] = useState<IReportFilters>({
-        statuses: initialStatuses,
+        statuses: initialStatuses === "none" ? [] : [ReportStatus.NEW],
         reportReasonID: initialReasons,
         insertUserID: initialInsertUserID,
         insertUserRoleID: initialInsertUserRoleID,
         recordUserID: initialRecordUserID,
+        recordType: initialRecordType,
+        recordID: initialRecordID,
     });
 
     const [selectedSort, setSelectedSort] = useState<ISelectBoxItem>();
@@ -73,6 +79,15 @@ export function ReportsPage() {
 
     const reports = useQuery<any, IError, IReportsData>({
         queryFn: async () => {
+            if (!filters.recordType) {
+                delete filters.recordType;
+                delete filters.recordID;
+            }
+
+            if (!filters.recordID) {
+                delete filters.recordID;
+            }
+
             const response = await apiv2.get("/reports", {
                 params: {
                     ...filters,
@@ -122,24 +137,22 @@ export function ReportsPage() {
                         }
                     />
                 }
+                secondaryBar={
+                    <>
+                        <span>
+                            <Sort sortOptions={sortOptions} selectedSort={selectedSort} onChange={setSelectedSort} />
+                        </span>
+                        <NumberedPager
+                            className={cmdClasses.pager}
+                            isMobile={false}
+                            showNextButton={false}
+                            onChange={setPage}
+                            {...paginationProps}
+                        />
+                    </>
+                }
                 content={
                     <>
-                        <section className={cmdClasses.secondaryTitleBar}>
-                            <span>
-                                <Sort
-                                    sortOptions={sortOptions}
-                                    selectedSort={selectedSort}
-                                    onChange={setSelectedSort}
-                                />
-                            </span>
-                            <NumberedPager
-                                className={cmdClasses.pager}
-                                isMobile={false}
-                                showNextButton={false}
-                                onChange={setPage}
-                                {...paginationProps}
-                            />
-                        </section>
                         <section className={cmdClasses.content}>
                             {reports.isLoading && (
                                 <div>

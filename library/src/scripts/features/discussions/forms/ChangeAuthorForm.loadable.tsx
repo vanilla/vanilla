@@ -20,10 +20,10 @@ import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useMutation } from "@tanstack/react-query";
 import { CommunityMemberInput } from "@vanilla/addon-vanilla/forms/CommunityMemberInput";
+import { DiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
 import { t } from "@vanilla/i18n";
 import { RecordID } from "@vanilla/utils";
 import React, { useState } from "react";
-import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
 
 export interface ChangeAuthorFormProps {
     discussion: IDiscussion;

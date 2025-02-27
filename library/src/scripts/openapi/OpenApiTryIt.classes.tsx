@@ -53,6 +53,9 @@ export const openApiTryItClasses = {
             paddingLeft: 8,
         },
     }),
+    jsonError: css({
+        marginBottom: 12,
+    }),
     header: css({
         position: "sticky",
         top: 0,

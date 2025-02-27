@@ -11,7 +11,7 @@ import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { LoadStatus } from "@library/@types/api/core";
 import { setMeta } from "@library/utility/appUtils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
 const queryClient = new QueryClient({
     defaultOptions: {

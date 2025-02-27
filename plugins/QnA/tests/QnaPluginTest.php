@@ -20,7 +20,7 @@ use VanillaTests\SiteTestCase;
 /**
  * Test QnA plugin class.
  */
-class QnAPluginTest extends SiteTestCase
+class QnaPluginTest extends SiteTestCase
 {
     use QnaApiTestTrait;
     use EventSpyTestTrait;
@@ -160,8 +160,7 @@ class QnAPluginTest extends SiteTestCase
             "Save_Draft" => true,
         ]);
         $draftID = $draft->Form->HiddenInputs["DraftID"];
-        $draftModel = $this->container()->get(\DraftModel::class);
-        $dbDraft = $draftModel->getID($draftID, DATASET_TYPE_ARRAY);
+        $dbDraft = $this->getLegacyDraft($draftID);
         $this->assertEquals("Question", $draft->Form->HiddenInputs["Type"]);
         $this->assertEquals("Question", $dbDraft["Type"]);
 

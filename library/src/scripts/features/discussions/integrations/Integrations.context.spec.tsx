@@ -18,12 +18,12 @@ import {
 } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
 import { setMeta } from "@library/utility/appUtils";
 import { RenderResult, act, renderHook } from "@testing-library/react-hooks";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 import DiscussionOptionsMenu from "@library/features/discussions/DiscussionOptionsMenu";
 import { fireEvent, render } from "@testing-library/react";
 import { RenderResult as ReactRenderResult } from "@testing-library/react";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { IMe } from "@library/@types/api/users";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
 beforeEach(() => {
     setMeta(INTEGRATIONS_META_KEY, undefined);

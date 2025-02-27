@@ -11,10 +11,12 @@ import {
     CreatableFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { IPickerOption } from "@library/json-schema-forms";
+import { getMeta } from "@library/utility/appUtils";
 import { Icon } from "@vanilla/icons";
 import { labelize } from "@vanilla/utils";
 
 export const originalPostTypes = ["discussion", "question", "idea", "poll", "event"] as const;
+const enabledPostTypes = getMeta("postTypes", originalPostTypes);
 export const formType: CreatableFieldFormType[] = [...Object.values(CreatableFieldFormType)] as const;
 export const fieldVisibility: CreatableFieldVisibility[] = [...Object.values(CreatableFieldVisibility)] as const;
 
@@ -26,7 +28,7 @@ function arrayToOptions(array: Readonly<string[]>): IPickerOption[] {
 }
 
 export function originalPostTypeAsOptions(): IPickerOption[] {
-    return arrayToOptions(originalPostTypes);
+    return arrayToOptions(originalPostTypes.filter((postType) => enabledPostTypes.includes(postType)));
 }
 
 export function formTypeAsOptions(): IPickerOption[] {

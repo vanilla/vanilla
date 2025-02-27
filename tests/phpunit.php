@@ -21,7 +21,7 @@ ini_set("log_errors", "0");
 
 // Make sure we have clean directories.
 \Vanilla\FileUtils::ensureCleanDirectory(PATH_CONF . "/vanilla.test");
-\Vanilla\FileUtils::ensureCleanDirectory(PATH_CONF . "/e2e-tests.vanilla.localhost");
+\Vanilla\FileUtils::ensureCleanDirectory(PATH_CONF . "/e2e-tests.vanilla.local");
 \Vanilla\FileUtils::ensureCleanDirectory(PATH_CACHE);
 \Vanilla\FileUtils::ensureCleanDirectory(PATH_CACHE . "/bootstrap");
 \Vanilla\FileUtils::ensureCleanDirectory(PATH_CACHE . "/vanilla.test");

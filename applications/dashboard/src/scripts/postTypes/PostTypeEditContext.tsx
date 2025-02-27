@@ -13,15 +13,21 @@ import {
     usePostTypeMutation,
     usePostTypeQuery,
 } from "@dashboard/postTypes/postType.hooks";
-import { PostType, PostField, PostTypePostParams } from "@dashboard/postTypes/postType.types";
+import { PostType, PostField, PostTypePostParams, PostFieldDeleteMethod } from "@dashboard/postTypes/postType.types";
+import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useToast } from "@library/features/toaster/ToastContext";
+import { Select } from "@library/json-schema-forms";
 import { useQueryClient, UseQueryResult } from "@tanstack/react-query";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { t } from "@vanilla/i18n";
+import { RecordID } from "@vanilla/utils";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 
-export type PostFieldSubmit = Omit<Partial<PostField>, "postTypeID"> & { postTypeID?: PostField["postTypeID"] | null };
+export type PostFieldSubmit = Omit<Partial<PostField>, "postTypeID"> & {
+    postTypeIDs?: PostField["postTypeIDs"] | null;
+};
 
 export interface IPostTypeEditContext {
     mode: "edit" | "copy" | "new";
@@ -30,10 +36,11 @@ export interface IPostTypeEditContext {
     allPostFields: PostField[];
     postFieldsByPostTypeID: Record<PostType["postTypeID"], PostField[]>;
     dirtyPostType: Partial<PostTypePostParams> | null;
+    initialOptionValues?: Record<string, Select.Option[]>;
     updatePostType: (newValue: Partial<PostTypePostParams>) => void;
     savePostType: () => Promise<void>;
     addPostField: (postField: PostFieldSubmit) => void;
-    removePostField: (postField: PostField) => void;
+    removePostField: (postField: PostField, deleteMethod: PostFieldDeleteMethod) => void;
     reorderPostFields: (postFields: Record<PostField["postFieldID"], number>) => void;
     isDirty: boolean;
     isLoading: boolean;
@@ -70,7 +77,7 @@ interface IProps extends React.PropsWithChildren<{}> {
 
 const INITIAL_VALUES: Partial<PostTypePostParams> = {
     postTypeID: "-1",
-    name: "Custom Discussion",
+    name: "",
     roleIDs: [],
 };
 
@@ -79,21 +86,41 @@ export function PostTypeEditProvider(props: IProps) {
     const queryClient = useQueryClient();
     const history = useHistory();
     const { addToast } = useToast();
-    const postTypesQuery = usePostTypeQuery({ postTypeID: props.postTypeID ?? -1 });
+    const postTypesQuery = usePostTypeQuery({ postTypeID: props.postTypeID ?? -1, expand: ["postFields"] });
     const mutatePostType = usePostTypeMutation();
     const allPostFieldsQuery = usePostFieldQuery();
     const postPostField = usePostFieldPostMutation();
     const patchPostField = usePostFieldPatchMutation();
-    const deletePostField = usePostFieldDelete(props.postTypeID);
+    const deletePostField = usePostFieldDelete();
     const putPostField = usePostFieldSortMutation(props.postTypeID ?? "-1");
 
     const [isDirty, setIsDirty] = useState(false);
     const [dirtyPostType, setDirtyPostType] = useState<Partial<PostTypePostParams> | null>(INITIAL_VALUES);
     const [dirtyPostFields, setDirtyFields] = useState<PostField[]>([]);
     const [dirtyPostFieldsOrder, setDirtyFieldsOrder] = useState<Record<PostField["postFieldID"], number>>({});
-    const [fieldsToDelete, setFieldsToDelete] = useState<PostField[]>([]);
+    const [fieldsToDelete, setFieldsToDelete] = useState<Array<PostField["postFieldID"]>>([]);
+    const [fieldsToUnlink, setFieldsToUnlink] = useState<Array<PostField["postFieldID"]>>([]);
     // We need to maintain this list to facilitate editing of existing fields without persisting them to the server
     const [allPostFields, setAllPostFields] = useState<PostField[]>(allPostFieldsQuery.data ?? []);
+    const [initialOptionValues, setInitialOptionValues] = useState<IPostTypeEditContext["initialOptionValues"]>({});
+
+    const [postFieldIDsByPostTypeID, setPostFieldIDsByPostTypeID] = useState<
+        Record<PostType["postTypeID"], Array<PostField["postFieldID"]>>
+    >({});
+
+    const getCategories = async (categoryIDs: RecordID[]) => {
+        const response = await apiv2.get("/categories", {
+            params: {
+                categoryID: categoryIDs,
+            },
+        });
+        return response.data;
+    };
+
+    const getRoles = async () => {
+        const response = await apiv2.get("/roles");
+        return response.data;
+    };
 
     useEffect(() => {
         if (props.mode === "edit" && postTypesQuery.data && postTypesQuery.data.length > 0) {
@@ -105,6 +132,38 @@ export function PostTypeEditProvider(props: IProps) {
                         typeof singularPostType?.roleIDs === "string"
                             ? JSON.parse(singularPostType.roleIDs)
                             : singularPostType.roleIDs ?? [],
+                });
+                const categoryIDs = singularPostType.categoryIDs ?? [];
+                if (categoryIDs && categoryIDs.length > 0) {
+                    void getCategories(categoryIDs).then((categories) => {
+                        setInitialOptionValues((prev) => ({
+                            ...prev,
+                            categoryIDs: categories.map((category: ICategory) => ({
+                                value: category.categoryID,
+                                label: category.name,
+                            })),
+                        }));
+                    });
+                }
+                const roleIDs = singularPostType.roleIDs ?? [];
+
+                void getRoles().then((roles) => {
+                    setInitialOptionValues((prev) => ({
+                        ...prev,
+                        roleIDs: roleIDs.map((roleID: RecordID) => ({
+                            value: roleID,
+                            label: roles.find((role) => role.roleID === roleID)?.name ?? "",
+                        })),
+                    }));
+                });
+
+                setPostFieldIDsByPostTypeID((prev) => {
+                    return {
+                        ...prev,
+                        [singularPostType.postTypeID]: (singularPostType?.postFields ?? []).map(
+                            (field) => field.postFieldID,
+                        ),
+                    };
                 });
             }
         }
@@ -124,12 +183,13 @@ export function PostTypeEditProvider(props: IProps) {
 
     useEffect(() => {
         const grouped = [...allPostFields, ...dirtyPostFields]?.reduce((acc, postField) => {
-            return {
-                ...acc,
-                [postField.postTypeID]: [...(acc[postField.postTypeID] ?? []), postField].sort((a, b) =>
-                    a.sort > b.sort ? 1 : -1,
-                ),
-            };
+            const IDs = postField.postTypeIDs ?? [];
+
+            IDs.forEach((postTypeID) => {
+                acc[postTypeID] = [...(acc[postTypeID] ?? []), postField].sort((a, b) => (a.sort > b.sort ? 1 : -1));
+            });
+
+            return acc;
         }, {});
         setPostFieldsByPostTypeID(grouped);
     }, [allPostFields, dirtyPostFields]);
@@ -165,14 +225,14 @@ export function PostTypeEditProvider(props: IProps) {
         }
         // If the field is new, add it to the dirty list
         if (!editedExistingServer && !editedExistingNew) {
-            const total = postFieldsByPostTypeID[postField.postTypeID]
-                ? Math.max(...postFieldsByPostTypeID[postField.postTypeID].map(({ sort }) => Number(sort)))
+            const total = postFieldsByPostTypeID[postField.postTypeIDs.length]
+                ? Math.max(...postFieldsByPostTypeID[postField.postTypeIDs.length].map(({ sort }) => Number(sort)))
                 : 0;
             setDirtyFields((prev) => [...prev, { ...postField, sort: total + 1 }]);
         }
     };
 
-    const removePostField = (postField: PostField) => {
+    const removePostField = (postField: PostField, deleteMethod: PostFieldDeleteMethod) => {
         setIsDirty(true);
         const { postFieldID } = postField;
         const editedExistingServer = allPostFields.find((field) => field.postFieldID === postFieldID);
@@ -183,25 +243,21 @@ export function PostTypeEditProvider(props: IProps) {
         if (editedExistingNew) {
             setDirtyFields((prev) => prev.filter((field) => field.postFieldID !== postFieldID));
         }
-        setFieldsToDelete((prev) => [...prev, postField]);
+        if (deleteMethod === "unlink") {
+            setFieldsToUnlink((prev) => [...prev, postField.postFieldID]);
+        } else {
+            setFieldsToDelete((prev) => [...prev, postField.postFieldID]);
+        }
     };
 
     const savePostType = async () => {
-        let postTypeIDCache = dirtyPostType?.postTypeID ?? "";
-        if (dirtyPostType) {
-            await mutatePostType.mutateAsync({
-                postTypeID: props.postTypeID,
-                body: dirtyPostType,
-            });
-        }
-        // Before we can persist the new order, we need to ensure any newly added fields are saved
+        // Iterate over all the post fields and determine if they are new or need updating
         if (dirtyPostFields.length > 0) {
             const existingIDs = allPostFieldsQuery.data?.map((field) => field.postFieldID) ?? [];
             await Promise.all(
                 dirtyPostFields.map(async (postField) => {
                     if (existingIDs.includes(postField.postFieldID)) {
                         await patchPostField.mutateAsync({
-                            postTypeID: postTypeIDCache,
                             postFieldID: postField.postFieldID,
                             body: postField,
                         });
@@ -209,26 +265,42 @@ export function PostTypeEditProvider(props: IProps) {
                         await postPostField.mutateAsync({
                             body: {
                                 ...postField,
-                                postTypeID: postTypeIDCache,
                             },
                         });
                     }
                 }),
             );
         }
+        if (fieldsToDelete.length > 0) {
+            await Promise.all(
+                fieldsToDelete.map(async (postFieldID) => {
+                    await deletePostField.mutateAsync(postFieldID);
+                }),
+            );
+        }
+        const postTypeIDCache = dirtyPostType?.postTypeID ?? "";
+        // Make list of post fields to apply to the post type and maintain their order
+        const dirtyPostFieldIDs = dirtyPostFields.map((field) => field.postFieldID);
+        const postFieldIDs = [
+            ...new Set([...(postFieldIDsByPostTypeID?.[postTypeIDCache] ?? []), ...dirtyPostFieldIDs]),
+        ].filter((id) => {
+            return ![...fieldsToUnlink, ...fieldsToDelete].includes(id);
+        });
+        // Persist updates to the post type, including added, linked and updated post fields
+        if (dirtyPostType) {
+            await mutatePostType.mutateAsync({
+                postTypeID: props.postTypeID,
+                body: { ...dirtyPostType, postFieldIDs },
+            });
+        }
+        // Ensure the order of the post fields is updated for that specific post type
         if (Object.keys(dirtyPostFieldsOrder).length > 0) {
             await putPostField.mutateAsync(dirtyPostFieldsOrder);
         }
-        if (fieldsToDelete.length > 0) {
-            await Promise.all(
-                fieldsToDelete.map(async (postField) => {
-                    await deletePostField.mutateAsync(postField.postFieldID);
-                }),
-            );
-            setFieldsToDelete([]);
-        }
-        queryClient.invalidateQueries(["postTypes"]);
-        queryClient.invalidateQueries(["postFields"]);
+        setFieldsToDelete([]);
+        setFieldsToUnlink([]);
+        void queryClient.invalidateQueries(["postTypes"]);
+        void queryClient.invalidateQueries(["postFields"]);
         setIsDirty(false);
         addToast({
             autoDismiss: true,
@@ -264,6 +336,7 @@ export function PostTypeEditProvider(props: IProps) {
                 allPostFields: allPostFieldsQuery.data ?? [],
                 postFieldsByPostTypeID,
                 dirtyPostType,
+                initialOptionValues,
                 updatePostType,
                 savePostType,
                 addPostField,

@@ -42,8 +42,7 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
             "authors",
             "tagsOptions",
             "tagOperator",
-            "categoryOption",
-            "categoryOptions",
+            "categoryIDs",
             "followedCategories",
             "includeChildCategories",
             "includeArchivedCategories",
@@ -83,15 +82,6 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
             query.tags = query.tagsOptions.map((tag: any) => tag?.tagCode ?? tag?.tagName).filter(notEmpty);
         }
 
-        if (query.categoryOptions) {
-            query.categoryIDs = query.categoryOptions.map((option) => option.value as number);
-            // These are not allowed parameters
-            delete query.categoryOptions;
-            delete query.categoryOption;
-        } else if (query.categoryOption) {
-            query.categoryID = query.categoryOption.value as number;
-        }
-
         const siteSection = getSiteSection();
         const siteSectionCategoryID = siteSection.attributes.categoryID;
         /**
@@ -99,7 +89,7 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
          */
         const hasCategoryIDs = !!(query["categoryIDs"] && query["categoryIDs"].length);
         if (!("categoryID" in query) && !hasCategoryIDs && siteSectionCategoryID > 0) {
-            query.categoryID = siteSectionCategoryID;
+            query.categoryIDs = [siteSectionCategoryID];
             query.includeChildCategories = true;
         }
 

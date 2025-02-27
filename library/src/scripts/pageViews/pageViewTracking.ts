@@ -18,7 +18,7 @@ const EVENT_NAME = "pageView";
 export function onPageView(handler: PageViewHandler) {
     const eventListener = (e: CustomEvent) => {
         const history = e.detail;
-        handler(history);
+        void handler(history);
     };
     document.addEventListener(EVENT_NAME, eventListener);
     return () => {

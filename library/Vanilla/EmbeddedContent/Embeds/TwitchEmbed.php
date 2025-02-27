@@ -86,7 +86,7 @@ class TwitchEmbed extends AbstractEmbed
     /**
      * @return array|mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();
         if (array_key_exists("twitchID", $data)) {

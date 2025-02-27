@@ -21,6 +21,6 @@ registerReducer("themePreviewToaster", themePreviewToastReducer);
 registerReducer("roles", roleReducer);
 
 addComponent("toaster", Toast);
-onReady(() => {
-    mountPortal(<ThemePreviewToast />, PREVIEW_CONTAINER);
+onReady(async () => {
+    void mountPortal(<ThemePreviewToast />, PREVIEW_CONTAINER);
 });

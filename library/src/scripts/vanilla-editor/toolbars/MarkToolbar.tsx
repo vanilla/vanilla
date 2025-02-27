@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { css } from "@emotion/css";
 import { MenuBar } from "@library/MenuBar/MenuBar";
 import { MenuBarItem } from "@library/MenuBar/MenuBarItem";
 import { BoldIcon, CodeIcon, ItalicIcon, StrikeIcon } from "@library/icons/editorIcons";
@@ -17,7 +18,7 @@ import { focusEditor, getPluginType, isMarkActive, someNode, toggleMark } from "
 import { arrow, shift } from "@udecode/plate-floating";
 import { ELEMENT_LINK, triggerFloatingLink, unwrapLink, useFloatingLinkSelectors } from "@udecode/plate-link";
 import { Icon } from "@vanilla/icons";
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 /**
  * Toolbar for applying "marks" to text. These are inline formats like bold, italic, etc.
@@ -53,7 +54,7 @@ export const MarkToolbar = () => {
 
     return !linkToolbarIsOpen ? (
         <Floating ref={arrowRef} {...floatingResult}>
-            <MenuBar>
+            <MenuBar className={css({ marginTop: 0 })}>
                 <MenuBarItem
                     accessibleLabel={t("Format as Bold")}
                     icon={<BoldIcon />}

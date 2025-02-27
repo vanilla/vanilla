@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Forum\Models\PostTypeModel;
+
 if (!defined("APPLICATION")) {
     exit();
 }
@@ -79,6 +81,21 @@ Gdn::sql()->replace(
     ["Name" => "AnswerAccepted"],
     true
 );
+
+$postTypeModel = Gdn::getContainer()->get(PostTypeModel::class);
+
+$postTypeModel->createInitialPostType([
+    "postTypeID" => "question",
+    "name" => "Question",
+    "postButtonLabel" => "Ask a Question",
+    "layoutViewType" => "question",
+    "isOriginal" => true,
+    "isActive" => true,
+    "attributes" => [
+        "postButtonIcon" => "new-question",
+        "postLayoutViewType" => "newQuestion",
+    ],
+]);
 
 if (!$DateAcceptedExists) {
     // Default the date accepted to the accepted answer's date.

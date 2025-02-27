@@ -1,12 +1,12 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 import { t } from "@library/utility/appUtils";
-import { IUnsubscribeCategory, IUnsubscribePreference } from "@library/unsubscribe/unsubscribePage.types";
+import { IUnsubscribeContent, IUnsubscribePreference } from "@library/unsubscribe/unsubscribePage.types";
 import SmartLink from "@library/routing/links/SmartLink";
 import Translate from "@library/content/Translate";
 
@@ -41,31 +41,40 @@ export function getUnsubscribeReason({ preferenceName, preferenceRaw }: IUnsubsc
     return <p key={preferenceRaw}>{reasonsDescriptions[preferenceName]}</p>;
 }
 
-export function getCategoryReason(
-    category: IUnsubscribeCategory,
-    isUnfollowCategory?: boolean,
-    isDigestHideCategory?: boolean,
+export function getFollowedContentReason(
+    content: IUnsubscribeContent,
+    isUnfollowContent?: boolean,
+    isDigestHideContent?: boolean,
+    isContentCategory?: boolean,
 ): ReactElement {
-    const { categoryName, preferenceName, preferenceRaw } = category;
-    const slug = categoryName.replace(/\s/g, "-").toLowerCase();
-    const categoryLink = <SmartLink to={`/categories/${slug}`}>{categoryName}</SmartLink>;
+    const { contentName, contentUrl, preferenceName, preferenceRaw } = content;
+    const contentLink = (
+        <SmartLink
+            to={isContentCategory ? `/categories/${contentName.replace(/\s/g, "-").toLowerCase()}` : contentUrl ?? ""}
+        >
+            {contentName}
+        </SmartLink>
+    );
 
-    if (isDigestHideCategory) {
-        return categoryLink;
+    if (isDigestHideContent) {
+        return contentLink;
     }
 
-    if (isUnfollowCategory) {
+    if (isUnfollowContent) {
         return (
             <p>
-                <Translate source="You are no longer following <0/>" c0={categoryLink} />
+                <Translate source="You are no longer following <0/>" c0={contentLink} />
             </p>
         );
     }
 
-    const description = preferenceName === "NewDiscussion" ? t("New posts") : t("New comments on posts");
+    const description =
+        preferenceName.includes("NewDiscussion") || preferenceName.includes("Posts")
+            ? t("New posts")
+            : t("New comments on posts");
     return (
         <p key={preferenceRaw}>
-            {categoryLink}
+            {contentLink}
             {` | ${description}`}
         </p>
     );

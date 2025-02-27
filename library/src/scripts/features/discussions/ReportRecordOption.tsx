@@ -5,13 +5,13 @@
  */
 
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
-import ReportModal from "@vanilla/addon-vanilla/thread/ReportModal";
+import ReportModal from "@vanilla/addon-vanilla/reporting/ReportModal";
 import { t } from "@vanilla/i18n";
 import { RecordID } from "@vanilla/utils";
 import { useState } from "react";
 
 interface IProps {
-    discussionName: string;
+    recordName: string;
     recordType: "discussion" | "comment";
     recordID: RecordID;
     placeRecordType: string;
@@ -20,6 +20,7 @@ interface IProps {
     onSuccess?: () => Promise<void>;
     initialVisibility?: boolean;
     isLegacyPage?: boolean;
+    onDiscussionPage?: boolean;
 }
 
 export interface CustomTriggerProps {
@@ -46,7 +47,7 @@ export function ReportRecordOption(props: IProps) {
                 <DropDownItemButton onClick={open}>{t("Report")}</DropDownItemButton>
             )}
             <ReportModal
-                discussionName={props.discussionName}
+                recordName={props.recordName}
                 recordID={props.recordID}
                 recordType={props.recordType}
                 placeRecordID={props.placeRecordID}
@@ -55,6 +56,7 @@ export function ReportRecordOption(props: IProps) {
                 onVisibilityChange={() => close()}
                 onSuccess={handleSuccess}
                 isLegacyPage={props.isLegacyPage}
+                onDiscussionPage={props.onDiscussionPage}
             />
         </>
     );

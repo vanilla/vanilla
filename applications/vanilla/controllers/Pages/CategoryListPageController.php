@@ -67,13 +67,12 @@ class CategoryListPageController extends PageDispatchController
 
         $siteSection = $this->siteSectionModel->getCurrentSiteSection();
         $query["locale"] = $siteSection->getContentLocale();
-        $query["siteSectionID"] = (string) $siteSection->getSectionID();
 
-        $layoutFormAsset = new LayoutQuery("categoryList", "siteSection", $siteSection->getSectionID(), $query);
+        $layoutQuery = new LayoutQuery("categoryList", "siteSection", $siteSection->getSectionID(), $query);
 
         $seoDescription = \Gdn::formatService()->renderPlainText(c("Garden.Description", ""), HtmlFormat::FORMAT_KEY);
 
-        return $this->assembleRenderData($layoutFormAsset, t("Categories"), $seoDescription);
+        return $this->assembleRenderData($layoutQuery, t("Categories"), $seoDescription);
     }
 
     /**
@@ -92,24 +91,18 @@ class CategoryListPageController extends PageDispatchController
     {
         // Get the category slug from the path.
         $categorySlug = StringUtils::parseUrlCodeFromPath($path);
-        $categoryID = $this->categoryModel->ensureCategoryID($categorySlug);
 
-        if (!$categoryID) {
+        if (!$categorySlug) {
             throw new \Garden\Web\Exception\NotFoundException("Category");
         }
         $pageNumber = StringUtils::parsePageNumberFromPath($path);
-        $siteSection = $this->siteSectionModel->getCurrentSiteSection();
-        $siteSectionID = $siteSection->getSectionID();
-        $siteSectionLocale = $siteSection->getContentLocale();
 
         $schema = $this->categoryListLayoutView->getParamInputSchema();
         $query = $schema->validate($query);
-        $query["locale"] = $siteSectionLocale;
-        $query["siteSectionID"] = $siteSectionID;
-        $query["categoryID"] = $categoryID;
-        $query["page"] = $pageNumber;
-        $layoutFormAsset = new LayoutQuery("categoryList", "category", $categoryID, $query);
-        return $this->assembleRenderData($layoutFormAsset);
+        $query["categoryID"] = $categorySlug;
+        $query["page"] = (string) $pageNumber;
+        $layoutQuery = new LayoutQuery("categoryList", "category", $categorySlug, $query);
+        return $this->assembleRenderData($layoutQuery);
     }
 
     /**
@@ -120,15 +113,12 @@ class CategoryListPageController extends PageDispatchController
      * @throws ContainerException
      * @throws NotFoundException
      */
-    private function assembleRenderData(
-        LayoutQuery $layoutFormAsset,
-        string $seoTitle = "",
-        string $seoDescription = ""
-    ) {
+    private function assembleRenderData(LayoutQuery $layoutQuery, string $seoTitle = "", string $seoDescription = "")
+    {
         return $this->usePage(LayoutPage::class)
             ->permission("discussions.view")
             ->setSeoRequired(false)
-            ->preloadLayout($layoutFormAsset)
+            ->preloadLayout($layoutQuery)
             ->render();
     }
 }

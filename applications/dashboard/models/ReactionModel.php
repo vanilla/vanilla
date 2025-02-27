@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use Garden\Container\ContainerException;
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
@@ -11,13 +12,10 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Vanilla\ApiUtils;
 use Vanilla\Community\Events\ReactionEvent;
-use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\CamelCaseScheme;
 use Garden\Schema\Schema;
-use Vanilla\Utility\ModelUtils;
 
 /**
  * Class ReactionModel
@@ -76,7 +74,8 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
     /**
      * ReactionModel constructor.
      *
-     * @param EventManager $eventManager
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function __construct()
     {
@@ -531,15 +530,15 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
 
         switch ($type) {
             case "Comment":
-                $model = new CommentModel();
+                $model = Gdn::getContainer()->get(CommentModel::class);
                 $row = $model->getID($recordID, DATASET_TYPE_ARRAY);
                 break;
             case "Discussion":
-                $model = new DiscussionModel();
+                $model = Gdn::getContainer()->get(DiscussionModel::class);
                 $row = $model->getID($recordID);
                 break;
             case "Activity":
-                $model = new ActivityModel();
+                $model = Gdn::getContainer()->get(ActivityModel::class);
                 $row = $model->getID($recordID, DATASET_TYPE_ARRAY);
                 $attrColumn = "Data";
                 break;
@@ -1121,6 +1120,12 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                     $categoryID = $this->SQL
                         ->getWhere("Discussion", ["DiscussionID" => $record["DiscussionID"]])
                         ->value("CategoryID");
+                } elseif (isset($record["CommentID"])) {
+                    $commentModel = Gdn::getContainer()->get(CommentModel::class);
+                    $categoryID = $commentModel->getCategoryIDByParentRecordType(
+                        $record["parentRecordID"],
+                        $record["parentRecordType"]
+                    );
                 }
 
                 CategoryModel::givePoints($record["InsertUserID"], $points, "Reactions", $categoryID);
@@ -2586,5 +2591,36 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                 ]);
             }
         }
+    }
+
+    /**
+     * Validate if a user can react to a record.
+     *
+     * @param string $reactionType
+     * @param bool $throw
+     * @return bool
+     * @throws Gdn_UserException
+     * @throws NotFoundException
+     */
+    public static function checkReactionPermissions(string $reactionType, bool $throw = true): bool
+    {
+        // Check if the user is a global moderator or site administrator.
+        if (Gdn::session()->checkPermission(["site.manage", "community.moderate"])) {
+            return true;
+        }
+
+        $reaction = self::reactionTypes($reactionType);
+        if (!$reaction) {
+            throw new NotFoundException("Reaction type $reactionType not found.");
+        }
+
+        $permission = "Reactions.{$reaction["Class"]}.Add";
+        $valid = Gdn::session()->checkPermission($permission);
+
+        if ($throw && !$valid) {
+            throw PermissionException($permission);
+        }
+
+        return $valid;
     }
 }

@@ -143,65 +143,160 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
 
     const enabledPostTypes = getEnabledPostTypes();
 
-    function makeDiscussionThreadItem() {
-        const isEnabled = getMeta("featureFlags.layoutEditor.discussionThread.Enabled", false);
-
-        // If the discussion thread layout editor is enabled, then we need to add the discussion thread item.
-        if (!isEnabled) {
-            return null;
-        }
-
+    function post() {
         let subTypes: INavigationTreeItem[] = [];
 
         if (enabledPostTypes.includes("discussion")) {
             subTypes.push({
-                name: getLayoutTypeLabel("discussionPage"),
-                parentID: "discussionThread",
+                name: getLayoutTypeLabel("discussion"),
+                parentID: "post",
                 recordID: "threadList",
                 recordType: "panelMenu",
-                children: [...getChildLayouts("discussionThread", "discussionThread")],
+                children: [...getChildLayouts("discussion", "post")],
             });
         }
 
         if (enabledPostTypes.includes("idea")) {
             subTypes.push({
-                name: getLayoutTypeLabel("ideaThread"),
-                parentID: "discussionThread",
-                recordID: "ideaThread",
+                name: getLayoutTypeLabel("idea"),
+                parentID: "post",
+                recordID: "idea",
                 recordType: "panelMenu",
-                children: [...getChildLayouts("ideaThread", "discussionThread")],
+                children: [...getChildLayouts("idea", "post")],
             });
         }
 
         if (enabledPostTypes.includes("question")) {
             subTypes.push({
-                name: getLayoutTypeLabel("questionThread"),
-                parentID: "discussionThread",
-                recordID: "questionThread",
+                name: getLayoutTypeLabel("question"),
+                parentID: "post",
+                recordID: "question",
                 recordType: "panelMenu",
-                children: [...getChildLayouts("questionThread", "discussionThread")],
+                children: [...getChildLayouts("question", "post")],
             });
         }
 
-        let discussionThreadItem: WithRequiredProperty<INavigationTreeItem, "children"> = {
-            name: getLayoutTypeGroupLabel("discussionThread"),
+        let postThreadItem: WithRequiredProperty<INavigationTreeItem, "children"> = {
+            name: getLayoutTypeGroupLabel("post"),
             parentID: ownID,
-            recordID: "discussionThread",
+            recordID: "post",
             recordType: "panelMenu",
             children: [
                 // Always needs the settings page
                 {
-                    name: getLayoutTypeSettingsLabel("discussionThread"),
-                    parentID: "discussionThread",
+                    name: getLayoutTypeSettingsLabel("post"),
+                    parentID: "post",
                     recordType: "appearanceNavItem",
-                    recordID: "discussionThreadLayoutSettings",
-                    url: getLayoutTypeSettingsUrl("discussionThread"),
+                    recordID: "postLayoutSettings",
+                    url: getLayoutTypeSettingsUrl("post"),
                 },
                 ...(subTypes.length === 1 ? subTypes[0].children! : subTypes),
             ],
         };
 
-        return discussionThreadItem;
+        return postThreadItem;
+    }
+
+    function eventDetails() {
+        const item: INavigationTreeItem = {
+            name: getLayoutTypeGroupLabel("event"),
+            parentID: ownID,
+            recordID: "event",
+            recordType: "panelMenu",
+            children: [
+                {
+                    name: getLayoutTypeSettingsLabel("event"),
+                    parentID: "event",
+                    recordType: "appearanceNavItem",
+                    recordID: "eventLayoutSettings",
+                    url: getLayoutTypeSettingsUrl("event"),
+                },
+                ...getChildLayouts("event"),
+            ],
+        };
+
+        return item;
+    }
+
+    function createPost() {
+        let createPostThreadItem: WithRequiredProperty<INavigationTreeItem, "children"> = {
+            name: getLayoutTypeGroupLabel("createPost"),
+            parentID: ownID,
+            recordID: "createPost",
+            recordType: "panelMenu",
+            children: [
+                // Always needs the settings page
+                {
+                    name: getLayoutTypeSettingsLabel("createPost"),
+                    parentID: "createPost",
+                    recordType: "appearanceNavItem",
+                    recordID: "createPostLayoutSettings",
+                    url: getLayoutTypeSettingsUrl("createPost"),
+                },
+                ...getChildLayouts("createPost"),
+            ],
+        };
+
+        return createPostThreadItem;
+    }
+
+    function knowledgeBase(): WithRequiredProperty<INavigationTreeItem, "children"> | null {
+        const isEnabled = getMeta("isKnowledgeEnabled", false);
+
+        if (!isEnabled) {
+            return null;
+        }
+
+        return {
+            name: getLayoutTypeGroupLabel("knowledgeBase"),
+            parentID: ownID,
+            recordID: "knowledgeBase",
+            recordType: "panelMenu",
+            children: [
+                {
+                    name: getLayoutTypeSettingsLabel("knowledgeBase"),
+                    parentID: "knowledgeBase",
+                    recordType: "appearanceNavItem",
+                    recordID: "knowledgeBaseLayoutSettings",
+                    url: getLayoutTypeSettingsUrl("knowledgeBase"),
+                },
+                {
+                    name: getLayoutTypeLabel("knowledgeHome"),
+                    parentID: "knowledgeBase",
+                    recordID: "knowledgeHome",
+                    recordType: "panelMenu",
+                    children: [...getChildLayouts("knowledgeHome", "knowledgeBase")],
+                },
+                {
+                    name: getLayoutTypeLabel("helpCenterKnowledgeBase"),
+                    parentID: "knowledgeBase",
+                    recordID: "helpCenterKnowledgeBase",
+                    recordType: "panelMenu",
+                    children: [...getChildLayouts("helpCenterKnowledgeBase", "knowledgeBase")],
+                },
+                {
+                    name: getLayoutTypeLabel("helpCenterCategory"),
+                    parentID: "knowledgeBase",
+                    recordID: "helpCenterCategory",
+                    recordType: "panelMenu",
+                    children: [...getChildLayouts("helpCenterCategory", "knowledgeBase")],
+                },
+                {
+                    name: getLayoutTypeLabel("helpCenterArticle"),
+                    parentID: "knowledgeBase",
+                    recordID: "helpCenterArticle",
+                    recordType: "panelMenu",
+                    children: [...getChildLayouts("helpCenterArticle", "knowledgeBase")],
+                },
+                {
+                    name: getLayoutTypeLabel("guideArticle"),
+                    parentID: "knowledgeBase",
+                    recordID: "guideArticle",
+                    recordType: "panelMenu",
+                    children: [...getChildLayouts("guideArticle", "knowledgeBase")],
+                },
+            ],
+        };
     }
 
     const navigationItems: INavigationTreeItem[] = [
@@ -277,38 +372,12 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
                 },
             ],
         },
-        makeDiscussionThreadItem(),
-        getMeta("featureFlags.layoutEditor.knowledgeBase.Enabled", false)
-            ? {
-                  name: getLayoutTypeGroupLabel("knowledgeBase"),
-                  parentID: ownID,
-                  recordID: "knowledgeBase",
-                  recordType: "panelMenu",
-                  children: [
-                      {
-                          name: getLayoutTypeSettingsLabel("knowledgeBase"),
-                          parentID: "knowledgeBase",
-                          recordType: "appearanceNavItem",
-                          recordID: "knowledgeBaseLayoutSettings",
-                          url: getLayoutTypeSettingsUrl("knowledgeBase"),
-                      },
-                      {
-                          name: getLayoutTypeLabel("guideArticle"),
-                          parentID: "knowledgeBase",
-                          recordID: "guideArticle",
-                          recordType: "panelMenu",
-                          children: [...getChildLayouts("guideArticle", "knowledgeBase")],
-                      },
-                      {
-                          name: getLayoutTypeLabel("helpCenterArticle"),
-                          parentID: "knowledgeBase",
-                          recordID: "helpCenterArticle",
-                          recordType: "panelMenu",
-                          children: [...getChildLayouts("helpCenterArticle", "knowledgeBase")],
-                      },
-                  ],
-              }
-            : null,
+        post(),
+        // Temporarily cut from 2025.001 as they are not ready yet.
+        // Will be back in 2025.002
+        // newPost(),
+        // eventDetails(),
+        knowledgeBase(),
     ].filter(notEmpty);
 
     const topLevelItem: INavigationTreeItem = {

@@ -113,6 +113,10 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
             $leaderQuery = $leaderQuery->where("`up`.`UserID` in", "({$roleSubQuery->getSelect(true)})", false, false);
         }
 
+        if (!empty($query->excludedUserIDs)) {
+            $leaderQuery->whereNotIn("up.UserID", $query->excludedUserIDs);
+        }
+
         $leaderQuery = $leaderQuery->orderBy("Points", "desc")->limit($query->limit);
 
         $results = $leaderQuery->get()->resultArray();

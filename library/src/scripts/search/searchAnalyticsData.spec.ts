@@ -133,19 +133,12 @@ describe("getSearchAnalyticsData", () => {
         expect(actual.tag.tagID).toEqual(expect.arrayContaining([1]));
         expect(actual.tag.tagName).toEqual(expect.arrayContaining(["Tag 1"]));
     });
+
     it("The category field is populated", () => {
-        const formWithCategories = SearchFixture.createMockSearchForm({
-            categoryOptions: [
-                {
-                    value: 0,
-                    label: "General",
-                },
-            ],
-        });
+        const formWithCategories = SearchFixture.createMockSearchForm({ categoryIDs: [0] });
         actual = getSearchAnalyticsData(formWithCategories, response);
         expect(actual.category.categoryID.length).toEqual(1);
         expect(actual.category.categoryID).toEqual(expect.arrayContaining([0]));
-        expect(actual.category.categoryName).toEqual(expect.arrayContaining(["General"]));
     });
     it("The knowledge base field is populated", () => {
         const formWithKnowledgeBase = SearchFixture.createMockSearchForm({

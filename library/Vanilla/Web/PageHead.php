@@ -448,7 +448,10 @@ final class PageHead implements PageHeadInterface
         // Apply the share image.
         if ($this->getOpenGraphTag("og:image") === null) {
             $defaultShareImage = $this->siteMeta->getShareImage() ?? $this->siteMeta->getLogo();
-            $this->addOpenGraphTag("og:image", \Gdn_Upload::url($defaultShareImage));
+
+            if (isset($defaultShareImage)) {
+                $this->addOpenGraphTag("og:image", \Gdn_Upload::url($defaultShareImage));
+            }
         }
 
         // Twitter specific tags

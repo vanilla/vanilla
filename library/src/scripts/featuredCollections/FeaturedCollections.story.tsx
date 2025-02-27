@@ -7,8 +7,8 @@
 import { FeaturedCollections } from "@library/featuredCollections/FeaturedCollections";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 import { CollectionRecordTypes, ICollection } from "@library/featuredCollections/Collections.variables";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
 export default {
     title: "Widgets/FeaturedCollections",

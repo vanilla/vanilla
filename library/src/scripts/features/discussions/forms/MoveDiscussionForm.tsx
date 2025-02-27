@@ -1,10 +1,10 @@
 /**
  * @author Raphaël Bergina <raphael.bergina@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { t } from "@library/utility/appUtils";
 import { useFormik } from "formik";
@@ -16,21 +16,18 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import FrameBody from "@library/layout/frame/FrameBody";
-import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
-import { CategoryDisplayAs, ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { useBulkDiscussionMove } from "@library/features/discussions/discussionHooks";
 import { bulkDiscussionsClasses } from "@library/features/discussions/forms/BulkDiscussions.classes";
 import Checkbox from "@library/forms/Checkbox";
 import { useToast } from "@library/features/toaster/ToastContext";
 import Translate from "@library/content/Translate";
+import { CategoryDropdown } from "@library/forms/nestedSelect/presets/CategoryDropdown";
 
 type FormValues = {
-    category?: {
-        label: ICategoryFragment["name"];
-        value: ICategoryFragment["categoryID"];
-    };
+    categoryID?: ICategoryFragment["categoryID"];
     addRedirects: boolean;
 };
 
@@ -48,12 +45,7 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
 
     const { values, setFieldValue, handleSubmit, dirty, isSubmitting, resetForm } = useFormik<FormValues>({
         initialValues: {
-            category: discussion.category
-                ? {
-                      label: discussion.category.name,
-                      value: discussion.category.categoryID,
-                  }
-                : undefined,
+            categoryID: discussion.category?.categoryID,
             addRedirects: false,
         },
         onSubmit: () => {
@@ -78,7 +70,7 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
 
     const { isSuccess, failedDiscussions, moveSelectedDiscussions } = useBulkDiscussionMove(
         [discussion.discussionID],
-        values.category?.value,
+        values.categoryID,
         values.addRedirects,
         true,
     );
@@ -86,7 +78,7 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
     useEffect(() => {
         if (moveIsTriggered) {
             if (isSuccess) {
-                !!onSuccess && onSuccess();
+                void onSuccess?.();
                 toast.addToast({
                     autoDismiss: true,
                     body: <>{t("Selected discussion has been moved successfully.")}</>,
@@ -120,20 +112,12 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
                     <FrameBody>
                         <div className={classesFrameBody.contents}>
                             <div className={classes.options.move}>
-                                <CommunityCategoryInput
-                                    displayAs={CategoryDisplayAs.DISCUSSIONS}
-                                    placeholder={t("Select...")}
-                                    label={t("Category")}
-                                    onChange={(option) => {
-                                        const selected = option[0];
-                                        setFieldValue("category", selected);
+                                <CategoryDropdown
+                                    onChange={(categoryID: number) => {
+                                        void setFieldValue("categoryID", categoryID);
                                     }}
-                                    value={values.category ? [values.category] : []}
-                                    /** FIXME: This maxHeight value prevents blur by stopping
-                                     * dropdowns from overflowing with the modal
-                                     * Remove with https://github.com/vanilla/vanilla-cloud/issues/3155
-                                     */
-                                    maxHeight={100}
+                                    value={values.categoryID}
+                                    label={t("Category")}
                                 />
                             </div>
                             <div className={bulkDiscussionsClasses().separatedSection}>
@@ -158,7 +142,7 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
                         </Button>
                         <Button
                             submit
-                            disabled={values.category?.value === undefined || !dirty || isSubmitting}
+                            disabled={values.categoryID === undefined || !dirty || isSubmitting}
                             buttonType={ButtonTypes.TEXT_PRIMARY}
                             className={classFrameFooter.actionButton}
                         >

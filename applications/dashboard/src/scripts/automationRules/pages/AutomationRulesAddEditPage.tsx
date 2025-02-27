@@ -13,10 +13,15 @@ import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import SmartLink from "@library/routing/links/SmartLink";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
 import Button from "@library/forms/Button";
-import { EditIcon, ErrorIcon, LeftChevronIcon } from "@library/icons/common";
+import { EditIcon, ErrorIcon } from "@library/icons/common";
 import { RouteComponentProps, useHistory } from "react-router";
-import { useAddRecipe, useRecipe, useUpdateRecipe } from "@dashboard/automationRules/AutomationRules.hooks";
-import { AutomationRuleFormValues } from "@dashboard/automationRules/AutomationRules.types";
+import {
+    useAddRecipe,
+    useGetActionDynamicSchema,
+    useRecipe,
+    useUpdateRecipe,
+} from "@dashboard/automationRules/AutomationRules.hooks";
+import { AutomationRuleActionType, AutomationRuleFormValues } from "@dashboard/automationRules/AutomationRules.types";
 import AutomationRulesSummary from "@dashboard/automationRules/AutomationRulesSummary";
 import { useToast } from "@library/features/toaster/ToastContext";
 import ModalConfirm from "@library/modal/ModalConfirm";
@@ -27,8 +32,9 @@ import {
     mapFormValuesToApiValues,
     getTriggerAdditionalSettings,
     hasPostType,
+    getActionDynamicSchemaParams,
 } from "@dashboard/automationRules/AutomationRules.utils";
-import { IFieldError, JsonSchemaForm } from "@vanilla/json-schema-forms";
+import { IFieldError } from "@vanilla/json-schema-forms";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { cx } from "@emotion/css";
 import { IError } from "@library/errorPages/CoreErrorMessages";
@@ -40,7 +46,7 @@ import { AutoWidthInput } from "@library/forms/AutoWidthInput";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { AutomationRulesDeleteRule } from "@dashboard/automationRules/AutomationRulesDeleteRule";
 import { AutomationRulesPreviewModal } from "@dashboard/automationRules/preview/AutomationRulesPreviewModal";
-import { useCollisionDetector, useLastValue } from "@vanilla/react-utils";
+import { useLastValue } from "@vanilla/react-utils";
 import isEqual from "lodash/isEqual";
 import { Icon } from "@vanilla/icons";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -57,8 +63,8 @@ import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarCont
 import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
 import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 
-export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEcalationRulesMode?: boolean }) {
-    const { automationRuleID, isEcalationRulesMode } = props;
+export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEscalationRulesMode?: boolean }) {
+    const { automationRuleID, isEscalationRulesMode } = props;
     const [showConfirmExit, setShowConfirmExit] = useState(false);
     const [ruleName, setRuleName] = useState(automationRuleID ? "" : t("Rule Name"));
     const classes = automationRulesClasses();
@@ -67,8 +73,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
     const editableRef = useRef<HTMLInputElement | null>();
 
     const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
+    const isCompact = device === TitleBarDevices.COMPACT;
 
     const [topLevelErrors, setTopLevelErrors] = useState<IError[]>([]);
     const [fieldErrors, setFieldErrors] = useState<Record<string, IFieldError[]>>({});
@@ -118,9 +123,8 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                 }
 
                 // let's adjust the error path if the field is in additionalSettings
-                // TODO: we should do a generic function to handle all keys from additionalSettings
-                if (key === "triggerTimeLookBackLimit") {
-                    err.errors["triggerTimeLookBackLimit"] = err.errors[key].map((e) => {
+                if (["triggerTimeLookBackLimit", "applyToNewContentOnly"].includes(key)) {
+                    err.errors[key] = err.errors[key].map((e) => {
                         return {
                             ...e,
                             path: "additionalSettings.triggerValue",
@@ -131,7 +135,6 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
         }
         setFieldErrors(err.errors ?? []);
     };
-
     const { profileFields, automationRulesCatalog } = useAutomationRules();
 
     const { recipe, isLoading } = useRecipe(parseInt(automationRuleID ?? ""), isEditing);
@@ -176,6 +179,10 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
 
     const lastActionType = useLastValue(values.action?.actionType);
 
+    // dynamic schema for action
+    const dynamicSchemaParams = getActionDynamicSchemaParams(values, automationRulesCatalog);
+    const dynamicSchema = useGetActionDynamicSchema(dynamicSchemaParams);
+
     // small adjustment for trigger/action cross dependency, applying default values for some fields, resetting some action/trigger values if type is changed
     useEffect(() => {
         // reset actionType if not in trigger's triggerActions
@@ -187,7 +194,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                 values.action?.actionType,
             );
         if (shouldResetActionType) {
-            setFieldValue("action.actionType", "");
+            void setFieldValue("action.actionType", "");
         }
 
         // Apply the default value postType if no value is set for time based triggers with postType
@@ -196,7 +203,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
             const triggerPostTypeDefaultValue =
                 automationRulesCatalog?.triggers?.[values.trigger?.triggerType].schema?.properties?.postType?.default;
             if (!values.trigger?.triggerValue.postType) {
-                setFieldValue("trigger.triggerValue.postType", triggerPostTypeDefaultValue);
+                void setFieldValue("trigger.triggerValue.postType", triggerPostTypeDefaultValue);
             } else if (
                 triggerPostTypeDefaultValue &&
                 values.trigger?.triggerValue.postType?.length &&
@@ -204,7 +211,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                     (postType) => !triggerPostTypeDefaultValue.includes(postType),
                 )
             ) {
-                setFieldValue(
+                void setFieldValue(
                     "trigger.triggerValue.postType",
                     values.trigger?.triggerValue.postType.filter((postType) =>
                         triggerPostTypeDefaultValue.includes(postType),
@@ -228,13 +235,26 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                         )));
 
             if (shouldSetDefaultAdditionalSettings) {
-                setFieldValue("additionalSettings", {
+                void setFieldValue("additionalSettings", {
                     triggerValue: {
                         applyToNewContentOnly: false,
                         triggerTimeLookBackLimit: undefined,
                     },
                 });
             }
+        }
+
+        // action dynamic schema defaults
+        if (!isEditing && dynamicSchemaParams && dynamicSchema.data) {
+            const dynamicSchemaProperties = Object.keys(dynamicSchema.data.dynamicSchema?.properties ?? {});
+            dynamicSchemaProperties.forEach((key) => {
+                if (values.action?.actionValue[key] === undefined) {
+                    void setFieldValue(
+                        `action.actionValue.${key}`,
+                        dynamicSchema.data?.dynamicSchema?.properties[key]?.default,
+                    );
+                }
+            });
         }
 
         // special case when action value is categoryID, for both categoryFollowAction and moveToCategoryAction it is the same, so we need to reset the value when action type is changed
@@ -244,7 +264,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
             (values.action?.actionType === "categoryFollowAction" ||
                 values.action?.actionType === "moveToCategoryAction")
         ) {
-            setFieldValue(
+            void setFieldValue(
                 "action.actionValue.categoryID",
                 values.action?.actionType === "categoryFollowAction" ? [] : "",
             );
@@ -257,11 +277,18 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
         initialValues,
         recipe,
         isEditing,
+        dynamicSchema.data,
+        dynamicSchemaParams,
     ]);
 
     const schema = useMemo(() => {
-        return getTriggerActionFormSchema(values, profileFields, automationRulesCatalog);
-    }, [values, profileFields, automationRulesCatalog]);
+        return getTriggerActionFormSchema(
+            values,
+            profileFields,
+            automationRulesCatalog,
+            dynamicSchemaParams ? dynamicSchema : undefined,
+        );
+    }, [values, profileFields, automationRulesCatalog, dynamicSchemaParams, dynamicSchema.data]);
 
     const disabledDropdownItem = (name: string) => (
         <ToolTip
@@ -281,7 +308,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
 
     const rightPanelContent = (
         <>
-            {isEcalationRulesMode ? (
+            {isEscalationRulesMode ? (
                 <h3>{t("Create/Edit Escalation Rule").toLocaleUpperCase()}</h3>
             ) : (
                 <h3>{t("Create/Edit Automation Rule").toLocaleUpperCase()}</h3>
@@ -303,7 +330,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                 <BackLink
                     visibleLabel={true}
                     onClick={dirty ? () => setShowConfirmExit(true) : undefined}
-                    className={classes.leftGap(isEcalationRulesMode ? -20 : -4)}
+                    className={classes.leftGap(isEscalationRulesMode ? -20 : -4)}
                 />
             </div>
             <ConditionalWrap
@@ -371,12 +398,14 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                 >
                     <span>
                         <Button
-                            buttonType={isEcalationRulesMode ? ButtonTypes.OUTLINE : ButtonTypes.DASHBOARD_PRIMARY}
+                            buttonType={isEscalationRulesMode ? ButtonTypes.OUTLINE : ButtonTypes.DASHBOARD_PRIMARY}
                             onClick={() => {
-                                submitForm();
+                                void submitForm();
                             }}
-                            disabled={isRuleRunning}
-                            className={cx({ [classes.disabled]: isRuleRunning })}
+                            disabled={isRuleRunning || (Boolean(dynamicSchemaParams) && dynamicSchema.isFetching)}
+                            className={cx({
+                                [classes.disabled]: isRuleRunning || (dynamicSchemaParams && dynamicSchema.isFetching),
+                            })}
                         >
                             {isSubmitting ? <ButtonLoader /> : t("Save")}
                         </Button>
@@ -405,7 +434,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                 )}
             </ModalConfirm>
             {topLevelErrors && topLevelErrors.length > 0 && (
-                <div className={classes.padded(!isEcalationRulesMode)}>
+                <div className={classes.padded(!isEscalationRulesMode)}>
                     <Message
                         type="error"
                         stringContents={topLevelErrors[0].message}
@@ -414,7 +443,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                     />
                 </div>
             )}
-            <section className={cx({ [dashboardClasses().extendRow]: !isEcalationRulesMode })}>
+            <section className={cx({ [dashboardClasses().extendRow]: !isEscalationRulesMode })}>
                 <div className={cx(classes.sectionHeader, classes.noBorderTop)}>
                     {t("Summary")}
                     {recipe && isRuleRunning && (
@@ -438,13 +467,13 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                 </div>
             </section>
             {isLoading && isEditing ? (
-                loadingPlaceholder("addEdit", isEcalationRulesMode)
+                loadingPlaceholder("addEdit", isEscalationRulesMode)
             ) : (
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
                     }}
-                    className={cx({ [classes.escalationRuleAddEditForm]: isEcalationRulesMode })}
+                    className={cx({ [classes.escalationRuleAddEditForm]: isEscalationRulesMode })}
                 >
                     <DashboardSchemaForm
                         fieldErrors={fieldErrors}
@@ -455,7 +484,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
                                 <>
                                     {props.header && (
                                         <section
-                                            className={cx({ [dashboardClasses().extendRow]: !isEcalationRulesMode })}
+                                            className={cx({ [dashboardClasses().extendRow]: !isEscalationRulesMode })}
                                         >
                                             <div
                                                 className={cx(classes.sectionHeader, {
@@ -478,7 +507,7 @@ export function AutomationRulesAddEdit(props: { automationRuleID?: string; isEca
         </>
     );
 
-    return isEcalationRulesMode ? (
+    return isEscalationRulesMode ? (
         <AdminLayout
             titleBarContainerClassName={classes.escalationRuleAddEditTitleBar}
             actionsWrapperClassName={classes.escalationRuleAddEditTitleBarActionsWrapper}
@@ -507,7 +536,7 @@ export default function AutomationRulesAddEditPage(
 
     return (
         <AutomationRulesProvider isEscalationRulesMode={isEscalationRulesMode}>
-            <AutomationRulesAddEdit automationRuleID={automationRuleID} isEcalationRulesMode={isEscalationRulesMode} />
+            <AutomationRulesAddEdit automationRuleID={automationRuleID} isEscalationRulesMode={isEscalationRulesMode} />
         </AutomationRulesProvider>
     );
 }

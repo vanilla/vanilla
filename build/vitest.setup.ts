@@ -9,6 +9,7 @@ import MockAdapter from "axios-mock-adapter";
 import Axios from "axios";
 import { cleanup as cleanupReactHooks } from "@testing-library/react-hooks";
 import { resetGlobalValues } from "@vanilla/utils";
+import "vitest-canvas-mock";
 
 let mockApi: MockAdapter;
 
@@ -31,7 +32,7 @@ beforeEach(() => {
 
 afterEach(() => {
     cleanupReactTesting();
-    cleanupReactHooks();
+    void cleanupReactHooks();
 });
 
 enzyme.configure({ adapter: new Adapter() });
@@ -95,12 +96,15 @@ global.console.warn = (...args) => {
     originalWarn(...args);
 };
 
-const suppressedErrors = ["", "Error: Could not parse CSS stylesheet"];
 const originalError = console.error;
 global.console.error = (...args) => {
     for (const arg of args) {
-        if (typeof arg === "string" && arg.includes("state update on an unmounted component")) {
-            return;
+        if (typeof arg === "string") {
+            if (
+                arg.includes("state update on an unmounted component") ||
+                arg.includes("Could not parse CSS stylesheet")
+            )
+                return;
         }
     }
 

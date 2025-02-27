@@ -70,7 +70,7 @@ class CloudflareChallengeMiddlewareTest extends SiteTestCase
         $user = $this->createUser(["bypassSpam" => $verified, "roleID" => [$this->lastRoleID]]);
         CurrentTimeStamp::clearMockTime();
 
-        $config = ["premoderation.challengeNewUsers" => true];
+        $config = ["premoderation.challengeNewUsers" => true, "Feature.customLayout.home.Enabled" => false];
         if (isset($challengeAgeCutoffInDays)) {
             $config["premoderation.challengeAgeCutoffInDays"] = $challengeAgeCutoffInDays;
         }

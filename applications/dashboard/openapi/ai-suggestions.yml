@@ -235,8 +235,6 @@ components:
             required:
                 - enabled
                 - name
-                - toneOfVoice
-                - levelOfTech
                 - sources
 
         AISuggestionsSettingsResponse:

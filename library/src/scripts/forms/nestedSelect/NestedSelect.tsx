@@ -27,6 +27,7 @@ import { t } from "@vanilla/i18n";
 import { RecordID, stableObjectHash } from "@vanilla/utils";
 import { ChangeEventHandler, KeyboardEventHandler, RefObject, useEffect, useMemo, useRef, useState } from "react";
 import type { Select } from "@vanilla/json-schema-forms";
+import classNames from "classnames";
 
 export function NestedSelect(props: INestedSelectProps) {
     const {
@@ -41,6 +42,10 @@ export function NestedSelect(props: INestedSelectProps) {
         value,
         defaultValue,
         createable,
+        createableLabel,
+        onInputValueChange,
+        withOptionCache,
+        initialValues,
     } = props;
     const [isFocused, setIsFocused] = useState<boolean>(props.autoFocus ?? false);
     const [inputValue, setInputValue] = useState<string>("");
@@ -68,13 +73,22 @@ export function NestedSelect(props: INestedSelectProps) {
     const optionID = `${id}-option`;
     const [createdOptions, setCreatedOptions] = useState<Select.Option[]>([]);
 
+    // Keep initial values stable between state update and renders here
+    const _initialValues = useRef(props.initialValues ?? props.value);
+
     let { options, optionsByValue, optionsByGroup } = useNestedOptions({
         searchQuery: inputValue,
         options: props.options,
         optionsLookup: props.optionsLookup,
+        initialValues: _initialValues.current,
         createable,
         createdOptions,
+        withOptionCache,
     });
+
+    useEffect(() => {
+        onInputValueChange && onInputValueChange(inputValue);
+    }, [inputValue, onInputValueChange]);
 
     // Set and unset event listeners clicking outside when the component mounts and unmounts
     useEffect(() => {
@@ -153,7 +167,7 @@ export function NestedSelect(props: INestedSelectProps) {
 
         // Pressing enter key should select the highlighted option
         if (event.key === "Enter" && highlightedValue) {
-            handleOnSelect(highlightedValue);
+            void handleOnSelect(highlightedValue);
             event.preventDefault();
         }
 
@@ -161,7 +175,7 @@ export function NestedSelect(props: INestedSelectProps) {
         if (event.key === "Backspace" && multiple && selectedTokens.length && !inputValue.length) {
             const lastToken = selectedTokens.pop();
             if (lastToken?.value) {
-                handleOnSelect(lastToken.value);
+                void handleOnSelect(lastToken.value);
             }
         }
 
@@ -315,9 +329,14 @@ export function NestedSelect(props: INestedSelectProps) {
         setIsClearable(false);
     };
 
+    const checkRequirement = {
+        ...(!multiple && { required: props.required }),
+        ...(multiple && selectedTokens.length === 0 && { required: props.required }),
+    };
+
     return (
         <>
-            <div id={id} className={cx(classesInputBlock.root, classes.root, classOverrides?.root)}>
+            <div id={id} className={classNames(classesInputBlock.root, cx(classes.root, classOverrides?.root))}>
                 {label && (
                     <label
                         id={labelID}
@@ -374,11 +393,15 @@ export function NestedSelect(props: INestedSelectProps) {
                                 type="text"
                                 id={inputID}
                                 aria-label={props.ariaLabel ?? label}
-                                aria-labelledby={labelID}
-                                aria-describedby={errorID ?? props.ariaDescribedBy}
+                                aria-labelledby={label ? labelID : undefined}
+                                aria-describedby={errors ? errorID : props.ariaDescribedBy}
                                 onChange={handleOnInputChange}
                                 onKeyDown={handleOnKeyDown}
-                                value={inputValue}
+                                value={
+                                    !multiple && inputValue.length === 0 && selectedOption?.label
+                                        ? selectedOption.label
+                                        : inputValue
+                                }
                                 tabIndex={props.tabIndex}
                                 disabled={props.disabled}
                                 autoComplete="off"
@@ -394,10 +417,8 @@ export function NestedSelect(props: INestedSelectProps) {
                                         ? undefined
                                         : props.placeholder
                                 }
+                                {...checkRequirement}
                             />
-                            {!multiple && inputValue.length === 0 && selectedOption?.label && (
-                                <span className={classes.selectedValue}>{selectedOption.label}</span>
-                            )}
                         </div>
                         <div className={classes.inputIcon}>
                             <DownTriangleIcon />
@@ -428,12 +449,13 @@ export function NestedSelect(props: INestedSelectProps) {
                                             id={optionID}
                                             isNested={Object.keys(optionsByGroup).length > 0}
                                             onClick={(selectedID) => {
-                                                handleOnSelect(selectedID);
+                                                void handleOnSelect(selectedID);
                                             }}
                                             isSelected={isSelected}
                                             classes={classes}
                                             searchQuery={inputValue}
                                             highlighted={highlightedValue === option.value}
+                                            createableLabel={createableLabel}
                                         />
                                     );
                                 })

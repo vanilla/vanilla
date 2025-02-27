@@ -1,14 +1,19 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forum Inc
+ * @copyright 2009-2025 Vanilla Forum Inc
  * @license Proprietary
  */
 
-import React, { useMemo } from "react";
-import { Tokens } from "@library/forms/select/Tokens";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
-import { useTagOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
-import { useIsInModal } from "@library/modal/Modal.context";
+import {
+    AutoComplete,
+    AutoCompleteLookupOptions,
+    FormGroup,
+    FormGroupInput,
+    FormGroupLabel,
+    ILookupApi,
+} from "@vanilla/ui";
+import { t } from "@vanilla/i18n";
 
 export interface ISelectTagsProps {
     value: string;
@@ -17,32 +22,35 @@ export interface ISelectTagsProps {
 }
 
 export function SelectTags(props: ISelectTagsProps) {
-    const isInModal = useIsInModal();
     const { value: valueFromProps, onChange, label } = props;
-    const options = useTagOptions();
-
-    const value = useMemo<IComboBoxOption[]>(() => {
-        return valueFromProps
-            .split(",")
-            .map((val) => {
-                return options.find((opt) => opt.value === val);
-            })
-            .filter((opt) => Boolean(opt)) as IComboBoxOption[];
-    }, [valueFromProps, options]);
-
-    const handleChange = (newValue: IComboBoxOption[] = []) => {
-        const valueArray = newValue.map((opt) => opt.value);
-        onChange(valueArray.join(","));
-    };
 
     return (
-        <Tokens
-            value={value}
-            label={label}
-            onChange={handleChange}
-            options={options}
-            inModal={isInModal}
-            showIndicator
-        />
+        <FormGroup>
+            <FormGroupLabel>{t(label ?? "Tags")}</FormGroupLabel>
+            <FormGroupInput>
+                <AutoComplete
+                    value={valueFromProps && valueFromProps !== "" ? valueFromProps.split(",") : undefined}
+                    onChange={(newValue) => onChange(Array.isArray(newValue) ? newValue.join(",") : newValue)}
+                    optionProvider={
+                        <AutoCompleteLookupOptions
+                            lookup={{
+                                searchUrl: "/api/v2/tags?type=User&limit=30&query=%s",
+                                singleUrl: "/api/v2/tags/%s",
+                                labelKey: "name",
+                                valueKey: "tagID",
+                                processOptions: (options: IComboBoxOption[]) => {
+                                    return options.map((option) => {
+                                        return {
+                                            ...option,
+                                            value: option.value.toString(),
+                                        };
+                                    });
+                                },
+                            }}
+                        />
+                    }
+                />
+            </FormGroupInput>
+        </FormGroup>
     );
 }

@@ -4,32 +4,30 @@
  * @license GPL-2.0-only
  */
 
+namespace Vanilla\Forum\Controllers\Api;
+
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Exception\PermissionException;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Models\ContentDraftModel;
+use Vanilla\Models\Model;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * API Controller for the `/drafts` resource.
  */
-class DraftsApiController extends AbstractApiController
+class DraftsApiController extends \AbstractApiController
 {
-    use \Vanilla\Formatting\FormatCompatTrait;
-
-    /** @var DraftModel */
-    private $draftModel;
-
-    /** @var Schema */
-    private $draftSchema;
-
     /**
      * DraftsApiController constructor.
      *
-     * @param DraftModel $draftModel
      */
-    public function __construct(DraftModel $draftModel)
+    public function __construct(private ContentDraftModel $draftModel, private \DraftModel $legacyDraftModel)
     {
-        $this->draftModel = $draftModel;
     }
 
     /**
@@ -37,83 +35,17 @@ class DraftsApiController extends AbstractApiController
      *
      * @param int $id The unique ID of the draft.
      */
-    public function delete($id)
+    public function delete(int $id)
     {
-        $this->permission("Garden.SignIn.Allow");
-
-        $in = $this->idParamSchema("in")->setDescription("Delete a draft.");
-        $out = $this->schema([], "out");
+        $this->permission("session.valid");
 
         $row = $this->draftByID($id);
-        if ($row["InsertUserID"] !== $this->getSession()->UserID) {
-            $this->permission("Garden.Moderation.Manage");
+
+        if (ContentDraftModel::enabled()) {
+            $this->draftModel->delete(["draftID" => $id]);
+        } else {
+            $this->legacyDraftModel->deleteID($id);
         }
-        $this->draftModel->deleteID($id);
-    }
-
-    /**
-     * Get a draft by its unique ID.
-     *
-     * @param int $id
-     * @throws
-     * @return array
-     */
-    public function draftByID($id)
-    {
-        $row = $this->draftModel->getID($id, DATASET_TYPE_ARRAY);
-        if (!$row) {
-            throw new NotFoundException("Draft");
-        }
-        return $row;
-    }
-
-    /**
-     * Get a draft schema with minimal add/edit fields.
-     *
-     * @param string $type The type of schema.
-     * @return Schema Returns a schema object.
-     */
-    public function draftPostSchema($type)
-    {
-        static $draftPostSchema;
-
-        if (!isset($draftPostSchema)) {
-            $draftPostSchema = $this->schema(
-                Schema::parse(["recordType", "parentRecordID?", "attributes"])->add($this->fullSchema()),
-                "DraftPost"
-            );
-        }
-
-        return $this->schema($draftPostSchema, $type);
-    }
-
-    /**
-     * Get a schema instance comprised of all available draft fields.
-     *
-     * @return Schema Returns a schema object.
-     */
-    protected function fullSchema()
-    {
-        static $schema;
-
-        if (!isset($schema)) {
-            $schema = Schema::parse([
-                "draftID:i" => "The unique ID of the draft.",
-                "recordType:s" => [
-                    "description" => "The type of record associated with this draft.",
-                    "enum" => ["comment", "discussion"],
-                ],
-                "type:s" => "discussion type",
-                "parentRecordID:i|n" => "The unique ID of the intended parent to this record.",
-                "attributes:o" => "A free-form object containing all custom data for this draft.",
-                "insertUserID:i" => "The unique ID of the user who created this draft.",
-                "dateInserted:dt" => "When the draft was created.",
-                "updateUserID:i|n" => "The unique ID of the user who updated this draft.",
-                "dateUpdated:dt|n" => "When the draft was updated.",
-            ]);
-        }
-
-        return $schema;
     }
 
     /**
@@ -122,21 +54,12 @@ class DraftsApiController extends AbstractApiController
      * @param int $id The unique ID of the draft.
      * @return array
      */
-    public function get($id)
+    public function get(int $id): array
     {
-        $this->permission("Garden.SignIn.Allow");
-
-        $in = $this->idParamSchema("in")->setDescription("Get a draft.");
-        $out = $this->schema($this->draftSchema(), "out");
-
-        $row = $this->draftByID($id);
-        if ($row["InsertUserID"] !== $this->getSession()->UserID) {
-            $this->permission("Garden.Moderation.Manage");
-        }
-        $row = $this->normalizeOutput($row);
-
-        $result = $out->validate($row);
-        return $result;
+        $this->permission("session.valid");
+        // Already validated.
+        $draft = $this->draftByID($id);
+        return $draft;
     }
 
     /**
@@ -147,40 +70,14 @@ class DraftsApiController extends AbstractApiController
      */
     public function get_edit($id)
     {
-        $this->permission("Garden.SignIn.Allow");
+        $this->permission("session.valid");
 
-        $in = $this->idParamSchema("in")->setDescription("Get a draft for editing.");
-        $out = $this->schema(
-            Schema::parse(["draftID", "parentRecordID", "attributes"])->add($this->draftSchema()),
-            "out"
-        );
+        $out = Schema::parse(["draftID", "parentRecordID?", "attributes"])->add($this->fullSchema());
 
-        $row = $this->draftByID($id);
-        if ($row["InsertUserID"] !== $this->getSession()->UserID) {
-            $this->permission("Garden.Moderation.Manage");
-        }
-        $row = $this->normalizeOutput($row);
+        $draft = $this->draftByID($id);
 
-        $result = $out->validate($row);
-        $this->applyFormatCompatibility($result, "body", "format");
+        $result = $out->validate($draft);
         return $result;
-    }
-
-    /**
-     * Get an ID-only draft record schema.
-     *
-     * @param string $type The type of schema.
-     * @return Schema Returns a schema object.
-     */
-    public function idParamSchema($type = "in")
-    {
-        static $schema;
-
-        if (!isset($schema)) {
-            $schema = $this->schema(Schema::parse(["id:i" => "The draft ID."]), $type);
-        }
-
-        return $this->schema($schema, $type);
     }
 
     /**
@@ -191,77 +88,79 @@ class DraftsApiController extends AbstractApiController
      */
     public function index(array $query)
     {
-        $this->permission("Garden.SignIn.Allow");
+        $this->permission("session.valid");
 
-        $in = $this->schema(
-            [
-                "recordType:s?" => [
-                    "description" => "Filter drafts by record type.",
-                    "enum" => ["comment", "discussion"],
-                ],
-                "parentRecordID:i|n?" => [
-                    "description" => "Filter by the unique ID of the parent for a draft. Used with recordType.",
-                    "default" => null,
-                ],
-                "page:i?" => [
-                    "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
-                    "default" => 1,
-                    "minimum" => 1,
-                ],
-                "limit:i?" => [
-                    "description" => "Desired number of items per page.",
-                    "default" => 30,
-                    "minimum" => 1,
-                    "maximum" => 100,
-                ],
+        $in = Schema::parse([
+            "recordType:s?" => [
+                "x-filter" => true,
             ],
-            "in"
-        )->setDescription("List drafts created by the current user.");
-        $out = $this->schema([":a" => $this->draftSchema()], "out");
+            "parentRecordType:s?" => [
+                "x-filter" => true,
+            ],
+            "parentRecordID:i?" => [
+                "x-filter" => true,
+            ],
+            "page:i?" => [
+                "default" => 1,
+                "minimum" => 1,
+            ],
+            "limit:i?" => [
+                "default" => 30,
+                "minimum" => 1,
+                "maximum" => 500,
+            ],
+        ]);
+        $out = Schema::parse([":a" => $this->fullSchema()]);
 
         $query = $in->validate($query);
 
-        $where = ["InsertUserID" => $this->getSession()->UserID];
-        if (array_key_exists("recordType", $query)) {
-            switch ($query["recordType"]) {
-                case "comment":
-                    if ($query["parentRecordID"] !== null) {
-                        $where["DiscussionID"] = $query["parentRecordID"];
-                        $orderFields = "DateUpdated";
-                        $orderDirection = "desc";
-                        $commentDraft = true;
-                    } else {
-                        $where["DiscussionID >"] = 0;
-                    }
-                    break;
-                case "discussion":
-                    if ($query["parentRecordID"] !== null) {
-                        $where["CategoryID"] = $query["parentRecordID"];
-                    }
-                    $where["DiscussionID"] = null;
-                    break;
+        [$offset, $limit] = ApiUtils::offsetLimit($query);
+
+        if (!ContentDraftModel::enabled()) {
+            $where = ["InsertUserID" => $this->getSession()->UserID];
+            if (array_key_exists("recordType", $query)) {
+                switch ($query["recordType"]) {
+                    case "comment":
+                        if ($query["parentRecordID"] !== null) {
+                            $where["DiscussionID"] = $query["parentRecordID"];
+                        } else {
+                            $where["DiscussionID >"] = 0;
+                        }
+                        break;
+                    case "discussion":
+                        if ($query["parentRecordID"] !== null) {
+                            $where["CategoryID"] = $query["parentRecordID"];
+                        }
+                        $where["DiscussionID"] = null;
+                        break;
+                }
             }
-        }
 
-        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
-        $rows = $this->draftModel
-            ->getWhere($where, $orderFields ?? "", $orderDirection ?? "asc", $limit, $offset)
-            ->resultArray();
-
-        // If there are multiple drafts for the same comment, only return the first one.
-        if ($commentDraft ?? false) {
-            if (count($rows) > 0) {
-                $rows = [$rows[0]];
+            $rows = $this->legacyDraftModel->getWhere($where, "DateUpdated", "desc", $limit, $offset)->resultArray();
+            foreach ($rows as &$row) {
+                $row = $this->draftModel->normalizeLegacyDraft($row);
             }
-        }
 
-        foreach ($rows as &$row) {
-            $row = $this->normalizeOutput($row);
+            $count = $this->legacyDraftModel->getCount($where);
+        } else {
+            $where = ["insertUserID" => $this->getSession()->UserID];
+            $where += ApiUtils::queryToFilters($in, $query);
+
+            $rows = $this->draftModel->select(
+                where: $where,
+                options: [
+                    Model::OPT_LIMIT => $limit,
+                    Model::OPT_OFFSET => $offset,
+                    Model::OPT_ORDER => "dateUpdated",
+                    Model::OPT_DIRECTION => "desc",
+                ]
+            );
+            $count = $this->draftModel->selectPagingCount($where, 1000);
         }
 
         $result = $out->validate($rows);
 
-        $paging = ApiUtils::numberedPagerInfo($this->draftModel->getCount($where), "/api/v2/drafts", $query, $in);
+        $paging = ApiUtils::numberedPagerInfo($count, "/api/v2/drafts", $query, $in);
 
         return new Data($result, ["paging" => $paging]);
     }
@@ -273,34 +172,29 @@ class DraftsApiController extends AbstractApiController
      * @param array $body The request body.
      * @return array
      */
-    public function patch($id, array $body)
+    public function patch(int $id, array $body)
     {
-        $this->permission("Garden.SignIn.Allow");
+        $this->permission("session.valid");
 
-        $this->idParamSchema();
-        $in = $this->draftPostSchema("in")->setDescription("Update a draft.");
-        $out = $this->schema(
-            Schema::parse(["draftID", "parentRecordID", "attributes"])->add($this->draftSchema()),
-            "out"
-        );
+        $in = $this->draftPostSchema();
 
+        // Ensure it exists and we have permission to edit it.
         $row = $this->draftByID($id);
-        if ($row["InsertUserID"] !== $this->getSession()->UserID) {
-            $this->permission("Garden.Moderation.Manage");
-        }
 
         $body = $in->validate($body, true);
-        $recordType = !empty($row["DiscussionID"]) ? "comment" : "discussion";
-        $draftData = $this->normalizeInput($body, $recordType);
-        $draftData["DraftID"] = $id;
-        $this->draftModel->save($draftData);
-        $this->validateModel($this->draftModel);
+
+        if (ContentDraftModel::enabled()) {
+            $this->draftModel->update(set: $body, where: ["draftID" => $id]);
+        } else {
+            $recordType = $row["recordType"];
+            $draftData = $this->draftModel->convertToLegacyDraft($body, $recordType);
+            $draftData["DraftID"] = $id;
+            $this->legacyDraftModel->save($draftData);
+            $this->validateModel($this->legacyDraftModel);
+        }
 
         $updatedRow = $this->draftByID($id);
-        $updatedRow = $this->normalizeOutput($updatedRow);
-
-        $result = $out->validate($updatedRow);
-        return $result;
+        return $updatedRow;
     }
 
     /**
@@ -311,118 +205,91 @@ class DraftsApiController extends AbstractApiController
      */
     public function post(array $body)
     {
-        $this->permission("Garden.SignIn.Allow");
+        $this->permission("session.valid");
 
-        $in = $this->draftPostSchema("in")->setDescription("Create a draft.");
-        $out = $this->schema($this->draftSchema(), "out");
+        $in = $this->draftPostSchema();
 
         $body = $in->validate($body);
         $body["attributes"]["format"] = $body["attributes"]["format"] ?? "Text";
 
-        $draftData = $this->normalizeInput($body);
-        $draftID = $this->draftModel->save($draftData);
-        $this->validateModel($this->draftModel);
-
-        $row = $this->draftByID($draftID);
-        $row = $this->normalizeOutput($row);
-
-        $result = $out->validate($row);
-        return $result;
-    }
-
-    /**
-     * Normalize a database record to match the Schema definition.
-     *
-     * @param array $dbRecord Database record.
-     * @return array Return a Schema record.
-     */
-    public function normalizeOutput(array $dbRecord)
-    {
-        $parentRecordID = null;
-
-        $commentAttributes = ["Body", "Format"];
-        $discussionAttributes = ["Announce", "Body", "Closed", "Format", "Name", "Sink", "Tags"];
-        if (array_key_exists("DiscussionID", $dbRecord) && !empty($dbRecord["DiscussionID"])) {
-            $dbRecord["RecordType"] = "comment";
-            $parentRecordID = $dbRecord["DiscussionID"];
-            $attributes = $commentAttributes;
+        if (ContentDraftModel::enabled()) {
+            $draftID = $this->draftModel->insert(set: $body);
         } else {
-            if (array_key_exists("CategoryID", $dbRecord) && !empty($dbRecord["CategoryID"])) {
-                $parentRecordID = $dbRecord["CategoryID"];
-            }
-            $dbRecord["RecordType"] = "discussion";
-            $attributes = $discussionAttributes;
-        }
-        $dbRecord["ParentRecordID"] = $parentRecordID;
-        $dbRecord["Attributes"] = array_intersect_key($dbRecord, array_flip($attributes));
-
-        // Remove redundant attribute columns on the row.
-        foreach (array_merge($commentAttributes, $discussionAttributes) as $col) {
-            unset($dbRecord[$col]);
+            $draftData = $this->draftModel->convertToLegacyDraft($body);
+            $draftID = $this->legacyDraftModel->save($draftData);
+            $this->validateModel($this->legacyDraftModel);
         }
 
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        return $schemaRecord;
-    }
-
-    /**
-     * Normalize a Schema record to match the database definition.
-     *
-     * @param array $schemaRecord Schema record.
-     * @param string|null $recordType
-     * @return array Return a database record.
-     */
-    private function normalizeInput(array $schemaRecord, $recordType = null)
-    {
-        // If the record type is not explicitly defined by the parameters, try to extract it from $body.
-        if ($recordType === null && array_key_exists("recordType", $schemaRecord)) {
-            $recordType = $schemaRecord["recordType"];
-        }
-
-        if (array_key_exists("attributes", $schemaRecord)) {
-            $columns = ["announce", "body", "categoryID", "closed", "format", "name", "sink", "tags"];
-            $attributes = array_intersect_key($schemaRecord["attributes"], array_flip($columns));
-            $schemaRecord = array_merge($schemaRecord, $attributes);
-            unset($schemaRecord["attributes"]);
-        }
-
-        if (array_key_exists("tags", $schemaRecord)) {
-            if (empty($schemaRecord["tags"])) {
-                $schemaRecord["tags"] = null;
-            } elseif (is_array($schemaRecord["tags"])) {
-                $schemaRecord["tags"] = implode(",", $schemaRecord["tags"]);
-            }
-        }
-        $schemaRecord["Type"] = $recordType;
-        switch ($recordType) {
-            case "comment":
-                if (array_key_exists("parentRecordID", $schemaRecord)) {
-                    $schemaRecord["DiscussionID"] = $schemaRecord["parentRecordID"];
-                }
-                break;
-            case "discussion":
-                if (array_key_exists("parentRecordID", $schemaRecord)) {
-                    $schemaRecord["CategoryID"] = $schemaRecord["parentRecordID"];
-                }
-                $schemaRecord["DiscussionID"] = null;
-        }
-        unset($schemaRecord["recordType"], $schemaRecord["parentRecordID"]);
-
-        $result = ApiUtils::convertInputKeys($schemaRecord);
+        $result = $this->draftByID($draftID);
         return $result;
     }
 
     /**
-     * Get the full draft schema.
+     * Get a draft by its unique ID.
      *
-     * @param string $type The type of schema.
+     * @param int $id
+     *
+     * @throws NotFoundException
+     * @throws PermissionException
+     *
+     * @return array{draftID: int, insertUserID: int, parentRecordID: int|null, attributes: array}
+     */
+    private function draftByID(int $id): array
+    {
+        if (ContentDraftModel::enabled()) {
+            try {
+                $row = $this->draftModel->selectSingle(["draftID" => $id]);
+                $draft = $row;
+            } catch (NoResultsException $ex) {
+                throw new NotFoundException("Draft", previous: $ex);
+            }
+        } else {
+            $row = $this->legacyDraftModel->getID($id, DATASET_TYPE_ARRAY);
+            if (!$row) {
+                throw new NotFoundException("Draft");
+            }
+
+            $draft = $this->draftModel->normalizeLegacyDraft($row);
+        }
+
+        $draft = $this->fullSchema()->validate($draft);
+
+        if ($draft["insertUserID"] !== $this->getSession()->UserID) {
+            $this->permission("community.moderate");
+        }
+
+        return $draft;
+    }
+
+    /**
+     * Get a draft schema with minimal add/edit fields.
+     *
      * @return Schema Returns a schema object.
      */
-    public function draftSchema($type = "")
+    public function draftPostSchema(): Schema
     {
-        if ($this->draftSchema === null) {
-            $this->draftSchema = $this->schema($this->fullSchema(), "Draft");
-        }
-        return $this->schema($this->draftSchema, $type);
+        return Schema::parse(["recordType", "parentRecordType?", "parentRecordID?", "attributes"])->add(
+            $this->fullSchema()
+        );
+    }
+
+    /**
+     * Get a schema instance comprised of all available draft fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    protected function fullSchema(): Schema
+    {
+        return Schema::parse([
+            "draftID:i",
+            "recordType:s",
+            "parentRecordType:s?",
+            "parentRecordID:i?",
+            "attributes:o" => "A free-form object containing all custom data for this draft.",
+            "insertUserID:i",
+            "dateInserted:dt",
+            "updateUserID:i|n",
+            "dateUpdated:dt|n",
+        ]);
     }
 }

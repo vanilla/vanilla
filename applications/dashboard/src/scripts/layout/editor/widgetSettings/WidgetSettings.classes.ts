@@ -74,6 +74,12 @@ export const widgetSettingsClasses = useThemeCache(() => {
             width: "100%",
             height: "60%",
         },
+
+        // Special override for the Article Reactions widget, see note in ArticleReactionsWidgetPreview
+        "&.article-reactions": {
+            border: "none",
+            margin: 0,
+        },
     });
 
     const previewContent = css({
@@ -81,6 +87,11 @@ export const widgetSettingsClasses = useThemeCache(() => {
         ...Mixins.margin({ vertical: 0 }),
         "& > div": {
             ...Mixins.margin({ vertical: 0 }),
+        },
+
+        // Special override for the Article Reactions widget, see note in ArticleReactionsWidgetPreview
+        "& .articleReactionsPage": {
+            display: "none",
         },
     });
 

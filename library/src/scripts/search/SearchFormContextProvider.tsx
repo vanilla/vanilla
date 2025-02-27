@@ -105,7 +105,7 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
 
     useEffect(() => {
         if (!ready) {
-            loadDomainsAndSetReady();
+            void loadDomainsAndSetReady();
         }
     }, [ready]);
 
@@ -313,7 +313,7 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
                 currentDomain.key === ALL_CONTENT_DOMAIN.key &&
                 currentSourceDomains.some((domain) => domain.key == PLACES_SEARCH_DOMAIN.key)
             ) {
-                searchInDomain(PLACES_SEARCH_DOMAIN.key);
+                void searchInDomain(PLACES_SEARCH_DOMAIN.key);
             }
 
             try {

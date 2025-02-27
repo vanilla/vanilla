@@ -312,15 +312,16 @@ components:
                 attributes:
                     description: A free-form object containing all custom data for this draft.
                     type: object
+                parentRecordType:
+                    description: The type of record associated with this draft.
+                    minLength: 1
+                    type: string
                 parentRecordID:
                     description: The unique ID of the intended parent to this record.
                     nullable: true
                     type: integer
                 recordType:
                     description: The type of record associated with this draft.
-                    enum:
-                        - comment
-                        - discussion
                     minLength: 1
                     type: string
             required:

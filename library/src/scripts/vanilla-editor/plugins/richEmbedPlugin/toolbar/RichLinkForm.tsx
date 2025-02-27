@@ -14,6 +14,11 @@ import { floatingLinkActions, submitFloatingLink, useFloatingLinkSelectors } fro
 import { t } from "@vanilla/i18n";
 import { useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { richLinkFormClasses } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/RichLinkForm.classes";
+import { cx } from "@emotion/css";
 
 export default function LinkForm() {
     const editor = useMyEditorRef();
@@ -80,7 +85,7 @@ export default function LinkForm() {
                 e.preventDefault();
                 e.stopPropagation();
                 e.nativeEvent.stopImmediatePropagation();
-                submitForm();
+                void submitForm();
             }}
             // This as well as the button click handler are wired up
             // For the old /post/discussion page which has a jquery form handler runs before our submit handler
@@ -91,7 +96,7 @@ export default function LinkForm() {
                     e.preventDefault();
                     e.stopPropagation();
                     e.nativeEvent.stopImmediatePropagation();
-                    submitForm();
+                    void submitForm();
                 }
             }}
         >
@@ -100,7 +105,7 @@ export default function LinkForm() {
                 inputProps={{
                     inputRef: firstInputRef,
                     onChange: (e) => {
-                        setFieldValue("url", e.target.value);
+                        void setFieldValue("url", e.target.value);
                         floatingLinkActions.url(normalizeUrl(e.target.value));
                     },
                     value: values.url,
@@ -116,7 +121,7 @@ export default function LinkForm() {
                     label={t("Text to Display")}
                     inputProps={{
                         onChange: (e) => {
-                            setFieldValue("text", e.target.value);
+                            void setFieldValue("text", e.target.value);
                             floatingLinkActions.text(e.target.value);
                         },
                         value: values.text,
@@ -124,16 +129,21 @@ export default function LinkForm() {
                 />
             )}
 
-            <button
+            <hr className={cx(dropDownClasses().separator, richLinkFormClasses().separator)} />
+
+            <Button
+                buttonType={ButtonTypes.TEXT_PRIMARY}
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     e.nativeEvent.stopImmediatePropagation();
-                    submitForm();
+                    void submitForm();
                 }}
                 type="submit"
-                style={{ display: "none" }}
-            />
+                className={richLinkFormClasses().addLinkButton}
+            >
+                {t("Add Link")}
+            </Button>
         </form>
     );
 }

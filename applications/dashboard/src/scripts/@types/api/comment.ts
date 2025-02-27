@@ -8,8 +8,9 @@ import { IReaction } from "@dashboard/@types/api/reaction";
 import { IUserFragment } from "@library/@types/api/users";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
-import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import { t } from "@vanilla/i18n";
+import { ICategory, type ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import type { IPostWarning } from "@vanilla/addon-vanilla/contentItem/ContentItemWarning";
+import type { RecordID } from "@vanilla/utils";
 
 export interface IPremoderatedRecordResponse {
     status: 202;
@@ -20,12 +21,16 @@ export interface IPremoderatedRecordResponse {
 export interface IComment {
     name: string;
     commentID: number;
-    discussionID: IDiscussion["discussionID"];
-    categoryID?: ICategory["categoryID"];
+    parentRecordType: string;
+    parentRecordID: RecordID;
+    categoryID: ICategory["categoryID"];
+    category?: ICategoryFragment;
     body: string;
     dateInserted: string;
     dateUpdated: string | null;
     insertUserID: number;
+    updateUserID?: number;
+    updateUser?: IUserFragment;
     score: number | null;
     insertUser: IUserFragment;
     url: string;
@@ -45,13 +50,14 @@ export interface IComment {
             equation: string;
         };
     };
-    // Troll Management
     isTroll?: boolean;
+    warning?: IPostWarning;
 }
 
 export interface ICommentEdit {
     commentID: number;
-    discussionID: IDiscussion["discussionID"];
+    parentRecordType: string;
+    parentRecordID: RecordID;
     body: string;
     format: string;
 }
@@ -74,9 +80,14 @@ export enum QnAStatus {
     PENDING = "pending",
 }
 
-export enum CommentListSortOption {
+export enum CommentThreadSortOption {
     OLDEST = "dateInserted",
     NEWEST = "-dateInserted",
     TOP = "-score",
     TRENDING = "-experimentalTrending",
+}
+
+export enum CommentDeleteMethod {
+    FULL = "full",
+    TOMBSTONE = "tombstone",
 }

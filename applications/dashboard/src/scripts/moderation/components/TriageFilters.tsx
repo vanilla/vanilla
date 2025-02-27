@@ -43,7 +43,9 @@ interface IProps {
 
 export function TriageFilters(props: IProps) {
     return (
-        <FilterFrame title={t("Filter")} hideFooter>
+        <>
+            <h3>{t("Filter")}</h3>
+
             <FilterBlock
                 apiName={"internalStatusID"}
                 label={"Status"}
@@ -72,6 +74,6 @@ export function TriageFilters(props: IProps) {
                 dynamicOptionApi={categoryLookup}
                 onFilterChange={props.onFilter}
             />
-        </FilterFrame>
+        </>
     );
 }

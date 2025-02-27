@@ -21,12 +21,12 @@ import PageHeading from "@library/layout/PageHeading";
 import { Metas } from "@library/metas/Metas";
 import SmartLink from "@library/routing/links/SmartLink";
 import { useQueryClient } from "@tanstack/react-query";
-import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { StackingContextProvider } from "@vanilla/react-utils";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { IAttachmentIntegration } from "@library/features/discussions/integrations/Integrations.types";
+import { ContentItemAttachment } from "@vanilla/addon-vanilla/contentItem/ContentItemAttachment";
 
 export function EscalationListItem(props: {
     escalation: IEscalation;
@@ -91,7 +91,7 @@ export function EscalationListItem(props: {
                                                     <IntegrationButtonAndModal
                                                         onSuccess={() => {
                                                             props.onAttachmentCreated?.(attachmentCatalog);
-                                                            queryClient.invalidateQueries(["escalations"]);
+                                                            void queryClient.invalidateQueries(["escalations"]);
                                                             return Promise.resolve();
                                                         }}
                                                     />
@@ -122,7 +122,7 @@ export function EscalationListItem(props: {
                             key={attachment.attachmentID}
                             attachmentType={attachment.attachmentType}
                         >
-                            <DiscussionAttachment key={attachment.attachmentID} attachment={attachment} />
+                            <ContentItemAttachment key={attachment.attachmentID} attachment={attachment} />
                         </ReadableIntegrationContextProvider>
                     ))}
             </div>

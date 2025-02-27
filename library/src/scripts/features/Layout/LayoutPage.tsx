@@ -13,6 +13,7 @@ import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOvervie
 import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
 import { useEmailConfirmationToast } from "@library/features/Layout/EmailConfirmation.hook";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import { getSiteSection } from "@library/utility/appUtils";
 
 interface IProps {
     layoutQuery: ILayoutQuery;
@@ -27,6 +28,8 @@ export function LayoutPage(props: IProps) {
         recordID: layoutQuery.recordID ?? -1,
         recordType: layoutQuery.recordType ?? "global",
         params: {
+            locale: getSiteSection().contentLocale,
+            siteSectionID: getSiteSection().sectionID,
             ...layoutQuery.params,
         },
     });
@@ -48,7 +51,7 @@ export function LayoutPage(props: IProps) {
                 data={layoutQuery}
             />
             <PageBoxDepthContextProvider depth={0}>
-                <LayoutRenderer layout={layout.data.layout} />
+                <LayoutRenderer layout={layout.data.layout} contexts={layout.data.contexts} />
             </PageBoxDepthContextProvider>
         </WidgetLayout>
     );

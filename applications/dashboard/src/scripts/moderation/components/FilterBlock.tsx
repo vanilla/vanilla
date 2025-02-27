@@ -65,7 +65,7 @@ export function FilterBlock(props: FilterBlockProps) {
             return { ...prevFilters, ...initial };
         });
         if (props.initialFilters && props.dynamicOptionApi) {
-            setInitialDynamicState(props.initialFilters);
+            void setInitialDynamicState(props.initialFilters);
         }
     }, []);
 

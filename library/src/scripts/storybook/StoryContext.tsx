@@ -126,7 +126,7 @@ export function StoryContextProvider(props: {
     useLayoutEffect(() => {
         addComponent("HomeWidget", HomeWidget, { overwrite: true });
         addComponent("CallToAction", CallToAction, { overwrite: true });
-        _mountComponents(document.body);
+        void _mountComponents(document.body);
     });
 
     const updateContext = useCallback(

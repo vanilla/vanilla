@@ -8,7 +8,9 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Message;
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Models\DiscussionJsonLD;
 use Vanilla\Formatting\FormatConfig;
 use Vanilla\Formatting\Formats\TextFormat;
@@ -122,16 +124,10 @@ class DiscussionController extends VanillaController
         $Category = CategoryModel::categories($this->Discussion->CategoryID);
         $this->categoryPermission($Category, "Vanilla.Discussions.View");
 
-        if (c("Vanilla.Categories.Use", true)) {
-            $this->CategoryID = $this->Discussion->CategoryID;
-        } else {
-            $this->CategoryID = null;
-        }
+        $this->CategoryID = $this->Discussion->CategoryID;
         $this->setData("CategoryID", $this->CategoryID);
 
-        if (strcasecmp(val("Type", $this->Discussion), "redirect") === 0) {
-            $this->redirectDiscussion($this->Discussion);
-        }
+        $this->DiscussionModel->tryRedirectFromDiscussion((array) $this->Discussion);
 
         $this->setData("Category", $Category);
         $this->setData("Editor.BackLink", anchor(htmlspecialchars($Category["Name"]), categoryUrl($Category)));
@@ -236,29 +232,29 @@ class DiscussionController extends VanillaController
         $PageNumber = pageNumber($this->Offset, $Limit);
         $this->setData("Page", $PageNumber);
         $this->_SetOpenGraph();
+        $ogImage = null;
         if ($PageNumber == 1) {
-            $this->description(
-                sliceParagraph(Gdn_Format::plainText($this->Discussion->Body, $this->Discussion->Format), 160)
-            );
+            $format = $this->Discussion->Format ?? HtmlFormat::FORMAT_KEY;
+            $plainText = Gdn::formatService()->renderPlainText($this->Discussion->Body, $format);
+            $this->description(sliceParagraph($plainText, 160));
             // Add images to head for open graph
-            $Dom = pQuery::parseStr(Gdn_Format::to($this->Discussion->Body, $this->Discussion->Format));
+            $ogImage =
+                \Gdn::formatService()->parseMainImage($this->Discussion->Body ?? "", $this->Discussion->Format)[
+                    "url"
+                ] ?? null;
         } else {
             $this->Data["Title"] .= sprintf(t(" - Page %s"), pageNumber($this->Offset, $Limit));
 
             $FirstComment = $this->data("Comments")->firstRow();
             $FirstBody = val("Body", $FirstComment);
             $FirstFormat = val("Format", $FirstComment);
-            $this->description(sliceParagraph(Gdn_Format::plainText($FirstBody, $FirstFormat), 160));
+            $this->description(sliceParagraph(Gdn::formatService()->renderPlainText($FirstBody, $FirstFormat), 160));
             // Add images to head for open graph
-            $Dom = pQuery::parseStr(Gdn_Format::to($FirstBody, $FirstFormat));
+            $ogImage = \Gdn::formatService()->parseMainImage($FirstBody ?? "", $FirstFormat)["url"] ?? null;
         }
 
-        if ($Dom) {
-            foreach ($Dom->query("img") as $img) {
-                if ($img->attr("src")) {
-                    $this->image($img->attr("src"));
-                }
-            }
+        if ($ogImage) {
+            $this->image($ogImage);
         }
 
         // Save the insert date of the last comment viewed to set in the user's discussion watch table.
@@ -303,16 +299,16 @@ class DiscussionController extends VanillaController
 
         // Retrieve & apply the draft if there is one:
         if (Gdn::session()->UserID) {
-            $DraftModel = new DraftModel();
-            $Draft = $DraftModel->getByUser($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->firstRow();
-            $this->Form->addHidden("DraftID", $Draft ? $Draft->DraftID : "");
+            $Draft = $this->getInitialLegacyDraft($this->Discussion->DiscussionID);
+
+            $this->Form->addHidden("DraftID", $Draft ? $Draft["DraftID"] : "");
             if ($Draft && !$this->Form->isPostBack()) {
                 // We don't want to apply draft format to the current editor, if current input format is changed after draft save
                 $formatConfig = Gdn::getContainer()->get(FormatConfig::class);
                 $defaultFormat = $formatConfig->getDefaultFormat();
-                if ($Draft->Format === $defaultFormat) {
-                    $this->Form->setValue("Body", $Draft->Body);
-                    $this->Form->setValue("Format", $Draft->Format);
+                if ($Draft["Format"] === $defaultFormat) {
+                    $this->Form->setValue("Body", $Draft["Body"]);
+                    $this->Form->setValue("Format", $Draft["Format"]);
                 }
             }
         }
@@ -360,6 +356,41 @@ class DiscussionController extends VanillaController
     }
 
     /**
+     * Get the initial comment draft for the current discussion if there is one.
+     *
+     * @param int|null $discussionID
+     *
+     * @return array|null
+     */
+    private function getInitialLegacyDraft(int|null $discussionID): array|null
+    {
+        if ($discussionID === null) {
+            return null;
+        }
+        if (ContentDraftModel::enabled()) {
+            $contentDraftModel = \Gdn::getContainer()->get(ContentDraftModel::class);
+            $draft =
+                $contentDraftModel->select(
+                    where: [
+                        "insertUserID" => \Gdn::session()->UserID,
+                        "recordType" => "comment",
+                        "parentRecordType" => "discussion",
+                        "parentRecordID" => $discussionID,
+                    ],
+                    options: [
+                        "limit" => 1,
+                    ]
+                )[0] ?? null;
+
+            $draft = $draft ? $contentDraftModel->convertToLegacyDraft($draft) : null;
+        } else {
+            $draftModel = new DraftModel();
+            $draft = $draftModel->getByUser(\Gdn::session()->UserID, 0, 1, $discussionID)->firstRow(DATASET_TYPE_ARRAY);
+        }
+        return $draft ?: null;
+    }
+
+    /**
      * Get current messages.
      *
      * @return array
@@ -380,7 +411,7 @@ class DiscussionController extends VanillaController
         $this->addDefinition("ConfirmDeleteCommentHeading", t("ConfirmDeleteCommentHeading", "Delete Comment"));
         $this->addDefinition(
             "ConfirmDeleteCommentText",
-            t("ConfirmDeleteCommentText", "Are you sure you want to delete this comment?")
+            t("ConfirmDeleteCommentText", "Are you sure you want to delete this comment 1 1 1 ?")
         );
         $this->Menu->highlightRoute("/discussions");
     }
@@ -393,18 +424,17 @@ class DiscussionController extends VanillaController
     public function comment($commentID)
     {
         // Get the discussionID
-        $comment = $this->CommentModel->getID($commentID);
+        $comment = $this->CommentModel->getID($commentID, DATASET_TYPE_ARRAY);
         if (!$comment) {
             throw notFoundException("Comment");
         }
 
-        $discussionID = $comment->DiscussionID;
+        $discussionID = $comment["DiscussionID"];
 
         // Figure out how many comments are before this one
-        $offset = $this->CommentModel->getDiscussionThreadOffset($comment);
-        $limit = Gdn::config("Vanilla.Comments.PerPage", 30);
+        $pageNumber = $this->CommentModel->getCommentThreadPage($comment);
 
-        $pageNumber = pageNumber($offset, $limit, true);
+        $pageNumber = "p{$pageNumber}";
         $this->setData("Page", $pageNumber);
 
         $this->View = "index";
@@ -566,11 +596,12 @@ class DiscussionController extends VanillaController
         $this->categoryPermission($discussion->CategoryID, "Vanilla.Discussions.Announce");
 
         if ($this->Form->authenticatedPostBack()) {
-            $this->DiscussionModel->setProperty(
-                $discussionID,
-                "Announce",
-                (int) $this->Form->getFormValue("Announce", 0)
-            );
+            $announced = (int) $this->Form->getFormValue("Announce", 0);
+            $this->DiscussionModel->setProperty($discussionID, "Announce", $announced);
+            // Only Announce if it wasn't already announced.
+            if ($announced && !$discussion->Announce) {
+                Gdn::eventManager()->fire("discussionAnnounced", (array) $discussion);
+            }
 
             if ($target) {
                 $this->setRedirectTo($target);
@@ -802,7 +833,7 @@ class DiscussionController extends VanillaController
 
                 // Make sure that content can (still) be edited.
                 $editTimeout = 0;
-                if (!CommentModel::canEdit($comment, $editTimeout, $discussion) && !$groupDelete) {
+                if (!CommentModel::canEdit($comment, $editTimeout) && !$groupDelete) {
                     $this->categoryPermission($discussion->CategoryID, "Vanilla.Comments.Delete");
                 }
 
@@ -1012,13 +1043,12 @@ body { background: transparent !important; }
         // Retrieve & apply the draft if there is one:
         $draft = false;
         if (Gdn::session()->UserID && $discussion) {
-            $draftModel = new DraftModel();
-            $draft = $draftModel->getByUser(Gdn::session()->UserID, 0, 1, $discussion->DiscussionID)->firstRow();
-            $this->Form->addHidden("DraftID", $draft ? $draft->DraftID : "");
+            $draft = $this->getInitialLegacyDraft($discussion->DiscussionID);
+            $this->Form->addHidden("DraftID", $draft ? $draft["DraftID"] : "");
         }
 
         if ($draft) {
-            $this->Form->setFormValue("Body", $draft->Body);
+            $this->Form->setFormValue("Body", $draft["Body"]);
         } else {
             // Look in the session stash for a comment
             $stashComment = Gdn::session()->getPublicStash(
@@ -1051,19 +1081,6 @@ body { background: transparent !important; }
 
         $this->fireEvent("BeforeDiscussionRender");
         $this->render();
-    }
-
-    /**
-     * Redirect to the url specified by the discussion.
-     * @param array|object $discussion
-     */
-    protected function redirectDiscussion($discussion)
-    {
-        $body = Gdn_Format::to(val("Body", $discussion), val("Format", $discussion));
-        if (preg_match('`href="([^"]+)"`i', $body, $matches)) {
-            $url = $matches[1];
-            redirectTo($url, 301);
-        }
     }
 
     /**

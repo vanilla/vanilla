@@ -887,7 +887,7 @@ class ProfileFieldModel extends FullRecordCacheModel
             $userModel = Gdn::getContainer()->get(\UserModel::class);
             $user = $userModel->getID($userID, DATASET_TYPE_ARRAY);
             // Loading public account with profile view permissions
-            if (($user["Private"] ?? 0) === 0 && $session->checkPermission(["Garden.Profiles.View"], false)) {
+            if (!($user["Private"] ?? 0) && $session->checkPermission(["Garden.Profiles.View"], false)) {
                 $values = $this->userMetaModel->getUserMeta($userID, "Profile.%", null, "Profile.");
                 $this->processUserProfileFields($userID, $values, $ignoreVisibility);
             }

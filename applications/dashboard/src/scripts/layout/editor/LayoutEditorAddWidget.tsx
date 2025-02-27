@@ -33,9 +33,6 @@ export function LayoutEditorAddWidget(props: IProps) {
     const [widgetSettingsModalOpen, setWidgetSettingsModalOpen] = useState(false);
     const [selectedWidgetID, setSelectedWidgetID] = useState<string | undefined>(undefined);
 
-    const widgetSchema = selectedWidgetID ? catalog?.widgets[selectedWidgetID]?.schema : undefined;
-    const widgetName = selectedWidgetID ? catalog?.widgets[selectedWidgetID]?.name : undefined;
-
     const isSelected =
         LayoutEditorPath.areWidgetPathsEqual(props.path, editorSelection.getPath()) &&
         editorSelection.getMode() === LayoutEditorSelectionMode.WIDGET;
@@ -45,10 +42,10 @@ export function LayoutEditorAddWidget(props: IProps) {
     const currentSectionAllowedItems = catalog?.sections?.[currentSectionID].allowedWidgetIDs ?? null;
     // Breadcrumbs are special in this iteration. They are added to a specific section region and have no config.
     const allowedWidgetIDs = currentSectionAllowedItems?.filter((id) => id !== "react.breadcrumbs") ?? [];
-    let allowedWidgets = catalog?.widgets ?? {};
+    let allowedWidgetCatalog = catalog?.widgets ?? {};
     if (currentSectionAllowedItems != null) {
-        allowedWidgets = Object.fromEntries(
-            Object.entries(allowedWidgets).filter(([widgetID, widget]) => {
+        allowedWidgetCatalog = Object.fromEntries(
+            Object.entries(allowedWidgetCatalog).filter(([widgetID, widget]) => {
                 if (allowedWidgetIDs.includes(widgetID)) {
                     return true;
                 } else {
@@ -57,6 +54,17 @@ export function LayoutEditorAddWidget(props: IProps) {
             }),
         );
     }
+
+    // Add non-required assets as well
+    for (const [assetID, asset] of Object.entries(catalog?.assets ?? {})) {
+        if (!asset.isRequired) {
+            allowedWidgetCatalog[assetID] = asset;
+        }
+    }
+
+    const widgetSchema = selectedWidgetID ? allowedWidgetCatalog[selectedWidgetID]?.schema : undefined;
+    const widgetName = selectedWidgetID ? allowedWidgetCatalog[selectedWidgetID]?.name : undefined;
+
     return (
         <>
             <Button
@@ -80,12 +88,11 @@ export function LayoutEditorAddWidget(props: IProps) {
             <LayoutThumbnailsModal
                 title="Choose your Widget"
                 exitHandler={() => {
-                    if (!widgetSettingsModalOpen) {
-                        setWidgetSelectionModalOpen(false);
-                        editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
-                    }
+                    setWidgetSettingsModalOpen(false);
+                    setWidgetSelectionModalOpen(false);
+                    editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
                 }}
-                sections={allowedWidgets}
+                sections={allowedWidgetCatalog}
                 onAddSection={(widgetID) => {
                     setWidgetSettingsModalOpen(true);
                     setSelectedWidgetID(widgetID);
@@ -113,7 +120,7 @@ export function LayoutEditorAddWidget(props: IProps) {
                     name={widgetName!}
                     initialValues={extractSchemaDefaults(widgetSchema)}
                     widgetID={selectedWidgetID!}
-                    widgetCatalog={catalog?.widgets ?? {}}
+                    widgetCatalog={allowedWidgetCatalog ?? {}}
                     middlewaresCatalog={catalog?.middlewares ?? {}}
                 />
             )}

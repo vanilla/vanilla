@@ -280,10 +280,6 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                 ),
                 "default" => array_values(self::getDefaultOptions()),
             ],
-            "options?" => [
-                "type" => "object",
-                "default" => $choices,
-            ],
         ];
 
         if ($siteSectionSchema !== null) {

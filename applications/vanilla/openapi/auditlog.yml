@@ -1,0 +1,108 @@
+openapi: 3.0.2
+info:
+paths:
+    /audit-logs:
+        get:
+            parameters:
+                - name: insertUserID
+                  description: The user that performed the action.
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                - name: insertIPAddress
+                  description: IP address of the user that performed the action.
+                  in: query
+                  required: false
+                  schema:
+                      type: string
+                - name: eventType
+                  description: Type of event logged.
+                  in: query
+                  required: false
+                  schema:
+                      type: string
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/DateInserted"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+                - name: limit
+                  description: >
+                      Desired number of log records.
+                  in: query
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 500
+                      minimum: 1
+                - name: onlySpoofedActions
+                  description: Only fetch spoofed actions.
+                  in: query
+                  required: false
+                  schema:
+                      type: boolean
+                      default: false
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/AuditLog"
+            tags:
+                - Audit Logs
+            summary: List the autit logs records.
+    /audit-logs/{id}:
+        get:
+            parameters:
+                - name: id
+                  description: ID of the audit log record.
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      format: uuid
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/AuditLog"
+            tags:
+                - Audit Logs
+            summary: Get a specific autit log record.
+components:
+    schemas:
+        AuditLog:
+            type: object
+            properties:
+                auditLogID:
+                    type: string
+                eventType:
+                    type: string
+                message:
+                    type: string
+                requestMethod:
+                    type: string
+                requestPath:
+                    type: string
+                requestQuery:
+                    type: string
+                context:
+                    type: string
+                meta:
+                    type: array
+                    items:
+                        type: string
+                insertUserID:
+                    type: integer
+                dateInserted:
+                    type: string
+                    format: date-time
+                insertIPAddress:
+                    type: string
+                    format: ipv4
+                spoofUserID:
+                    type: integer
+                orcUserEmail:
+                    type: string
+                    format: email

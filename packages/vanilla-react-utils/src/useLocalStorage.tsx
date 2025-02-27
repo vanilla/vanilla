@@ -31,7 +31,11 @@ export function useLocalStorage<T>(key: string, defaultValue: T): [T, React.Disp
     // This effect ensures memory state is pushed to local storage
     useEffect(() => {
         // Set the localStorage value
-        localStorage.setItem(key, JSON.stringify(value));
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+            console.error("Error setting localStorage", error);
+        }
     }, [key, value]);
 
     return [value, setValue];

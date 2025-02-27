@@ -100,7 +100,7 @@ class NewPostWidget implements
         $excludedButtons = $this->props["excludedButtons"] ?? [];
 
         $layoutViewType = $this->getHydrateParam("layoutViewType");
-        $categoryID = $this->getHydrateParam("category.categoryID");
+        $categoryID = $this->getHydrateParam("category.categoryID") ?? $this->getHydrateParam("categoryID");
         $permissionCategory = $this->categoryModel::permissionCategory($categoryID);
         $category = CategoryModel::categories($categoryID);
 
@@ -118,7 +118,7 @@ class NewPostWidget implements
         }
 
         // Get allowed discussion types.
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
             $allowedDiscussionTypes = $this->categoryModel->getAllowedPostTypeData($category);
             $postableDiscussionTypes = null;
         } else {
@@ -144,13 +144,15 @@ class NewPostWidget implements
 
             $url = $discussionType["AddUrl"];
 
-            if ($layoutViewType === "discussionCategoryPage" && $categoryID !== -1) {
+            $categorySpecificPages = ["discussionCategoryPage", "discussion", "question", "idea", "event"];
+
+            if (in_array($layoutViewType, $categorySpecificPages) && $categoryID !== -1) {
                 $urlCode = rawurlencode($category["UrlCode"]);
                 $url .= !str_contains($url, "?") ? "/" . $urlCode : "";
             }
 
             $this->props["items"][] = [
-                "label" => $customLabels[strtolower($discussionTypeKey)] ?? $discussionType["AddText"],
+                "label" => $customLabels[strtolower($discussionTypeKey)] ?? ($discussionType["AddText"] ?? ""),
                 "action" => $url,
                 "type" => "link",
                 "id" => str_replace(" ", "-", strtolower($discussionType["AddText"])),
@@ -211,7 +213,7 @@ class NewPostWidget implements
         $permissionCategory = CategoryModel::permissionCategory(false);
         $globalAllowedDiscussions = CategoryModel::getAllowedDiscussionData($permissionCategory, []);
 
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
             $postTypeModel = Gdn::getContainer()->get(PostTypeModel::class);
             $postTypes = $postTypeModel->getAvailablePostTypes();
             $asOwnButtonFormChoices = array_column($postTypes, "name", "postTypeID");
@@ -262,7 +264,7 @@ class NewPostWidget implements
             ],
         ]);
 
-        if (!FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (!PostTypeModel::isPostTypesFeatureEnabled()) {
             // Hiding for post types. The display name of post types can be changed in Post Types settings.
             $schema->merge(Schema::parse(["customLabels:?" => self::labelsSchema($globalAllowedDiscussions)]));
         }

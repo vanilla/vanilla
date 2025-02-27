@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Addons\ProfileExtender;
 
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\Storybook\StorybookGenerationTestCase;
 
 /**
@@ -31,13 +32,15 @@ class ProfileExtendStorybookTest extends StorybookGenerationTestCase
      */
     public function testEditProfile()
     {
-        $this->getProfileExtenderPlugin()->updateUserFields(\Gdn::session()->User->UserID, [
-            "text" => "This is a text field",
-            "dropdown" => "Option2",
-            "check" => true,
-        ]);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $this->getProfileExtenderPlugin()->updateUserFields(\Gdn::session()->User->UserID, [
+                "text" => "This is a text field",
+                "dropdown" => "Option2",
+                "check" => true,
+            ]);
 
-        $encodedName = rawurlencode(\Gdn::session()->User->Name);
-        $this->generateStoryHtml("/profile/edit/$encodedName", "Edit Profile (Extended)");
+            $encodedName = rawurlencode(\Gdn::session()->User->Name);
+            $this->generateStoryHtml("/profile/edit/$encodedName", "Edit Profile (Extended)");
+        });
     }
 }

@@ -3,6 +3,7 @@ import { mergeConfig, UserConfig } from "vite";
 import { VANILLA_ROOT } from "./scripts/env";
 import reactPlugin from "@vitejs/plugin-react-swc";
 import { getAddonKeyFromChunkID, isEntryChunk, isLibraryChunk, makeViteCommonConfig } from "./vite.commonConfig";
+import fse from "fs-extra";
 
 export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
     const buildConfig: UserConfig = {
@@ -101,16 +102,16 @@ export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
         },
         server: {
             host: "0.0.0.0",
-            origin: "https://dev.vanilla.localhost",
+            origin: "https://dev.vanilla.local",
             port: 3030,
-            open: "https://dev.vanilla.localhost",
+            open: "https://dev.vanilla.local",
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
                 "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE, OPTIONS",
             },
             hmr: {
-                host: "frontend.vanilla.localhost",
+                host: "127.0.0.1",
             },
             watch: {
                 ignored: [

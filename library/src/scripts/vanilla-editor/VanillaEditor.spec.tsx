@@ -49,7 +49,7 @@ describe("deserializeHtml", () => {
             ],
         },
     ];
-    const MOCK_HTML_EMOJI = `This is HTML formatted with emoji <img class="emoji" src="https://dev.vanilla.localhost/resources/emoji/smile.png" title=":)" alt=":)" height="20" loading="lazy"></img> from another format. The emoji <img class="emoji" src="https://dev.vanilla.localhost/resources/emoji/frowning.png" title=":(" alt=":(" height="20" loading="lazy"></img> should remain on the same line.`;
+    const MOCK_HTML_EMOJI = `This is HTML formatted with emoji <img class="emoji" src="https://dev.vanilla.local/resources/emoji/smile.png" title=":)" alt=":)" height="20" loading="lazy"></img> from another format. The emoji <img class="emoji" src="https://dev.vanilla.local/resources/emoji/frowning.png" title=":(" alt=":(" height="20" loading="lazy"></img> should remain on the same line.`;
     const EXPECTED_HTML_EMOJI = [
         {
             type: "p",
@@ -61,7 +61,7 @@ describe("deserializeHtml", () => {
                     attributes: {
                         alt: ":)",
                         title: ":)",
-                        src: "https://dev.vanilla.localhost/resources/emoji/smile.png",
+                        src: "https://dev.vanilla.local/resources/emoji/smile.png",
                         height: 16,
                         width: 16,
                     },
@@ -73,7 +73,7 @@ describe("deserializeHtml", () => {
                     attributes: {
                         alt: ":(",
                         title: ":(",
-                        src: "https://dev.vanilla.localhost/resources/emoji/frowning.png",
+                        src: "https://dev.vanilla.local/resources/emoji/frowning.png",
                         height: 16,
                         width: 16,
                     },

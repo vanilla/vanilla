@@ -55,6 +55,8 @@ export interface IHomeWidgetItemOptions {
     imagePlacement: "top" | "left";
     imagePlacementMobile: "top" | "left";
     callToActionText: string;
+    fallbackIcon?: string;
+    fallbackImage?: string;
     /** @deprecated */
     iconProps?: any;
 }

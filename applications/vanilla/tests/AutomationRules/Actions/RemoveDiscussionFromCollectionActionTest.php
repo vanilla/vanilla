@@ -37,6 +37,9 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
         $this->collectionRecordModel = $this->container()->get(CollectionRecordModel::class);
         $this->automationRuleDispatchesModel = $this->container()->get(AutomationRuleDispatchesModel::class);
         $this->logModel = $this->container()->get(LogModel::class);
+        self::resetTable("collection");
+        self::resetTable("collectionRecord");
+        self::resetTable("Discussion");
     }
 
     /**
@@ -46,9 +49,7 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
      */
     public function testStaleDiscussionRemoveFromCollection(): void
     {
-        // Move back time 2 day
-        $now = time() - 3600 * 24 * 2;
-        CurrentTimeStamp::mockTime($now);
+        CurrentTimeStamp::mockTime("2020-01-01");
 
         //create  category
         $this->createCategory();
@@ -67,7 +68,8 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
         $this->assertEquals(5, $this->collectionRecordModel->getCount(["CollectionID" => $collection["collectionID"]]));
 
         //set current time to now
-        CurrentTimeStamp::clearMockTime();
+        // Now move time forward by 2.5 days
+        CurrentTimeStamp::mockTime("2020-01-03 12:00:00");
 
         //Create stale Discussion Trigger rule
         $automationRecord = [
@@ -118,7 +120,7 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
      */
     public function testRemoveDiscussionFromCollectionAction()
     {
-        CurrentTimeStamp::mockTime(strtotime("-10 days"));
+        CurrentTimeStamp::mockTime("2020-01-01");
 
         $category = $this->createCategory();
         // Create 3 Discussions
@@ -143,6 +145,9 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
             ["RecordID" => $discussion2["discussionID"], "RecordType" => "discussion"],
         ]);
         // Discusssion 3 is not part of any collection
+
+        // Move time forwards 10 days
+        CurrentTimeStamp::mockTime("2020-01-11");
 
         // Create the automation rule
         $automationRecord = [
@@ -217,8 +222,7 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
     public function testLastActiveDiscussionRemoveFromCollection()
     {
         // Move back time to a month ago
-        $now = strtotime("-1 month");
-        CurrentTimeStamp::mockTime($now);
+        CurrentTimeStamp::mockTime("2020-01-01");
         //create  category
         $this->createCategory();
 
@@ -252,8 +256,8 @@ class RemoveDiscussionFromCollectionActionTest extends SiteTestCase
         $collection = $this->createCollection($records);
         $this->assertEquals(5, $this->collectionRecordModel->getCount(["CollectionID" => $collection["collectionID"]]));
 
-        //set current time to now
-        CurrentTimeStamp::clearMockTime();
+        // Move time forwards a month
+        CurrentTimeStamp::mockTime("2020-02-01");
 
         //Create Last Active Discussion Trigger rule
         $automationRecord = [

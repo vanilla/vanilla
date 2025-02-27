@@ -11,6 +11,7 @@
 use Ramsey\Uuid\Uuid;
 use Vanilla\Addon;
 use Vanilla\Dashboard\AiSuggestionModel;
+use Vanilla\Dashboard\Models\ActivityService;
 use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\Dashboard\Models\ModerationMessageStructure;
 use Vanilla\Dashboard\Models\QueuedJobModel;
@@ -22,6 +23,7 @@ use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Logging\AuditLogger;
 use Vanilla\Logging\AuditLogModel;
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Models\DeveloperProfileModel;
 use Vanilla\Models\InstallModel;
 use Vanilla\Scheduler\CronModel;
@@ -471,7 +473,7 @@ $Construct
     ->column("TimeSlot", "datetime", false, ["primary", "index.Points"])
     ->column("Source", "varchar(10)", "Total", ["primary", "index.Points"])
     ->column("CategoryID", "int", 0, ["primary", "index.Points"])
-    ->column("UserID", "int", false, "primary")
+    ->column("UserID", "int", false, ["primary", "index.user"])
     ->column("Points", "int", 0, "index.Points")
     ->set($Explicit, $Drop);
 
@@ -752,6 +754,9 @@ if (!$PluralHeadline) {
     $SQL->put("ActivityType", ["PluralHeadline" => null]);
 }
 
+$activityService = \Gdn::getContainer()->get(ActivityService::class);
+$activityService->structure();
+
 // Activity Table
 // column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
 
@@ -791,8 +796,8 @@ $Construct
     ->column("Story", "text", true)
     ->column("Format", "varchar(10)", true)
     ->column("Route", "text", true)
-    ->column("RecordType", "varchar(20)", true)
-    ->column("RecordID", "int", true)
+    ->column("RecordType", "varchar(20)", true, "index.Record")
+    ->column("RecordID", "int", true, "index.Record")
     ->column("ParentRecordID", "int", true)
     ->column("BatchID", "varchar(20)", true)
     //   ->column('CountComments', 'int', '0')
@@ -1315,18 +1320,7 @@ $Construct
     ->column("UpdateIPAddress", "ipaddress", true)
     ->set($Explicit, $Drop);
 
-$Construct
-    ->table("contentDraft")
-    ->primaryKey("draftID")
-    ->column("recordType", "varchar(64)", false, ["index", "index.record", "index.parentRecord"])
-    ->column("recordID", "int", true, "index.record")
-    ->column("parentRecordID", "int", true, "index.parentRecord")
-    ->column("attributes", "mediumtext")
-    ->column("insertUserID", "int", false, "index")
-    ->column("dateInserted", "datetime")
-    ->column("updateUserID", "int")
-    ->column("dateUpdated", "datetime")
-    ->set($Explicit, $Drop);
+ContentDraftModel::structure($Construct);
 
 $Construct
     ->table("reaction")
@@ -1368,8 +1362,6 @@ RecordStatusModel::structure($Database);
 RecordStatusLogModel::structure($Database, $Explicit, $Drop);
 LayoutModel::structure($Database, $Explicit, $Drop);
 LayoutViewModel::structure($Database, $Explicit, $Drop);
-LayoutModel::migrateLegacyConfigs_2022_011(\Gdn::config());
-LayoutViewModel::clearCategoryLayouts_2023_019(\Gdn::config(), $Database);
 
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.
@@ -1460,3 +1452,18 @@ InterestModel::structure($Construct, $Explicit, $Drop);
 
 // Remove legacy Plugins
 Gdn::config()->removeFromConfig($LEGACYADDON);
+
+// Default configs for new sites.
+if (!Gdn::config()->get("Garden.Installed")) {
+    Gdn::config()->saveToConfig([
+        "Feature.customLayout.home.Enabled" => true,
+        "Feature.customLayout.discussionList.Enabled" => true,
+        "Feature.customLayout.categoryList.Enabled" => true,
+        "Feature.customLayout.nestedCategoryList.Enabled" => true,
+        "Feature.customLayout.post.Enabled" => false,
+        "Feature.customLayout.discussionCategoryPage.Enabled" => true,
+        "Feature.customLayout.subcommunityHome.Enabled" => true,
+        "Feature.customLayout.knowledgeBase.Enabled" => true,
+        "Feature.CommunityManagementBeta.Enabled" => true,
+    ]);
+}

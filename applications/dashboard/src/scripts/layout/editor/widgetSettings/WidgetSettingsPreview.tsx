@@ -3,7 +3,7 @@
  * @license gpl-2.0-only
  */
 
-import React from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import SmartLink from "@library/routing/links/SmartLink";
 import { widgetSettingsClasses } from "@dashboard/layout/editor/widgetSettings/WidgetSettings.classes";
 import Translate from "@library/content/Translate";
@@ -18,6 +18,8 @@ import { MemoryRouter } from "react-router-dom";
 import { resolveFieldParams } from "@dashboard/layout/editor/widgetSettings/resolveFieldParams";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { cx } from "@emotion/css";
+import WidgetPreviewNoPointerEventsWrapper from "@library/layout/WidgetPreviewNoPointerEventsWrapper";
+import throttle from "lodash/throttle";
 
 interface IWidgetSettingsPreviewProps {
     widgetCatalog: IWidgetCatalog;
@@ -26,13 +28,15 @@ interface IWidgetSettingsPreviewProps {
     assetCatalog?: IWidgetCatalog;
 }
 
+type IRendererConfig = React.ComponentProps<typeof LayoutRenderer>;
+
 export function WidgetSettingsPreview(props: IWidgetConfigurationComponentProps & IWidgetSettingsPreviewProps) {
     const schemaIncludesHtml = props.schema.properties && "html" in props.schema.properties;
 
-    const classes = widgetSettingsClasses();
     const { widgetCatalog, assetCatalog, widgetID, config } = props;
+    const widgetClassName = `${widgetID.split(".")[1]}`;
 
-    LayoutEditorPreviewData.setCurrentWidgetCatalog(widgetCatalog);
+    LayoutEditorPreviewData.addExternalData(widgetCatalog);
 
     const reactComponent = widgetCatalog[widgetID]
         ? widgetCatalog[widgetID].$reactComponent
@@ -40,7 +44,7 @@ export function WidgetSettingsPreview(props: IWidgetConfigurationComponentProps 
         ? assetCatalog[widgetID].$reactComponent
         : "";
 
-    const rendererConfig = {
+    const [rendererConfig, setRendererConfig] = useState<IRendererConfig>({
         layout: [
             {
                 $reactComponent: reactComponent,
@@ -50,7 +54,25 @@ export function WidgetSettingsPreview(props: IWidgetConfigurationComponentProps 
                 },
             },
         ],
-    };
+    });
+
+    const throttledSetRendererConfig = useRef(throttle(setRendererConfig, 250));
+
+    useEffect(() => {
+        throttledSetRendererConfig.current({
+            layout: [
+                {
+                    $reactComponent: reactComponent,
+                    $reactProps: {
+                        $hydrate: widgetID,
+                        ...resolveFieldParams(config),
+                    },
+                },
+            ],
+        });
+    }, [reactComponent, config, widgetID]);
+
+    const classes = widgetSettingsClasses();
 
     return (
         <div className={classes.preview}>
@@ -70,38 +92,51 @@ export function WidgetSettingsPreview(props: IWidgetConfigurationComponentProps 
                     onChange={(newValue) => props.onChange({ ...props.value, ...newValue })}
                 />
             ) : (
-                <div className={cx(classes.previewBody, "widgetSettingsPreview")}>
-                    <WidgetContextProvider
-                        // To override outer context
-                        extraClasses={classes.previewContent}
-                    >
-                        <MemoryRouter>
-                            <LinkContext.Provider
-                                value={{
-                                    linkContexts: [""],
-                                    isDynamicNavigation: () => {
-                                        return true;
-                                    },
-                                    pushSmartLocation: () => {},
-                                    makeHref: () => {
-                                        return "";
-                                    },
-                                    areLinksDisabled: false,
-                                }}
-                            >
-                                <LayoutLookupContext.Provider
-                                    value={{
-                                        componentFetcher: fetchOverviewComponent,
-                                        fallbackWidget: FauxWidget,
-                                    }}
-                                >
-                                    <LayoutRenderer {...rendererConfig} />
-                                </LayoutLookupContext.Provider>
-                            </LinkContext.Provider>
-                        </MemoryRouter>
-                    </WidgetContextProvider>
-                </div>
+                <WidgetSettingsPreviewImpl widgetClassName={widgetClassName} {...rendererConfig} />
             )}
         </div>
     );
 }
+
+const WidgetSettingsPreviewImpl = memo(function WidgetSettingsPreview(
+    props: React.ComponentProps<typeof LayoutRenderer> & { widgetClassName: string },
+) {
+    const { widgetClassName, ...rendererConfig } = props;
+    const classes = widgetSettingsClasses();
+
+    return (
+        <div className={cx(classes.previewBody, "widgetSettingsPreview", widgetClassName)}>
+            <WidgetContextProvider
+                // To override outer context
+                extraClasses={classes.previewContent}
+            >
+                <WidgetPreviewNoPointerEventsWrapper>
+                    <MemoryRouter>
+                        <LinkContext.Provider
+                            value={{
+                                linkContexts: [""],
+                                isDynamicNavigation: () => {
+                                    return true;
+                                },
+                                pushSmartLocation: () => {},
+                                makeHref: () => {
+                                    return "";
+                                },
+                                areLinksDisabled: false,
+                            }}
+                        >
+                            <LayoutLookupContext.Provider
+                                value={{
+                                    componentFetcher: fetchOverviewComponent,
+                                    fallbackWidget: FauxWidget,
+                                }}
+                            >
+                                <LayoutRenderer {...rendererConfig} />
+                            </LayoutLookupContext.Provider>
+                        </LinkContext.Provider>
+                    </MemoryRouter>
+                </WidgetPreviewNoPointerEventsWrapper>
+            </WidgetContextProvider>
+        </div>
+    );
+});

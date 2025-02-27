@@ -35,6 +35,7 @@
         "dist": true,
         "legacy-dist": true,
         "coverage": true,
+        "cloud/applications/groups": true,
         "plugins/AdvancedRedirector": true,
         "plugins/AdvancedSearch": true,
         "plugins/AgeGate": true,

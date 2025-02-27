@@ -67,6 +67,13 @@ class IFrameEmbed extends AbstractEmbed
         }
 
         $url = $this->data["url"] ?? null;
+        // Make sure the URL has a valid protocol.
+        $protocol = parse_url($url, PHP_URL_SCHEME) ?: "";
+        $isSafeProtocol = in_array($protocol, ["http", "https"], true);
+        if (!$isSafeProtocol) {
+            return "";
+        }
+
         if (($url && isTrustedDomain($url)) || $this->data["isKnowledge"]) {
             return parent::renderHtml();
         }

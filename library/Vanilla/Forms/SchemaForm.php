@@ -18,12 +18,15 @@ class SchemaForm
     const RADIO_PICKER_TYPE = "radioPicker";
     const CHECKBOX_TYPE = "checkBox";
     const TEXT_TYPE = "textBox";
+    const RICHEDITOR_TYPE = "richeditor";
     const TOGGLE_TYPE = "toggle";
     const DRAG_AND_DROP_TYPE = "dragAndDrop";
     const CODE_EDITOR_TYPE = "codeBox";
     const COLOR_TYPE = "color";
     const UPLOAD = "upload";
     const TIME_DURATION = "timeDuration";
+
+    const RADIO_PICKER = "radioPicker";
 
     /**
      * Create a "section" of the form on an object type.
@@ -91,6 +94,35 @@ class SchemaForm
             "inputType" => self::TEXT_TYPE,
             "placeholder" => $options->getPlaceHolder(),
             "type" => $type,
+            "tooltip" => $options->getTooltip(),
+        ];
+
+        if ($conditions) {
+            $result["conditions"] = [$conditions->getCondition()];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Rich text box form element schema.
+     *
+     * @param FormOptions $options
+     * @param string $legend
+     * @param FieldMatchConditional|null $conditions
+     * @return array
+     */
+    public static function richTextBox(
+        FormOptions $options,
+        string $legend = "",
+        FieldMatchConditional $conditions = null
+    ): array {
+        $result = [
+            "description" => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "inputType" => self::RICHEDITOR_TYPE,
+            "placeholder" => $options->getPlaceHolder(),
+            "legend" => $legend,
             "tooltip" => $options->getTooltip(),
         ];
 
@@ -199,6 +231,15 @@ class SchemaForm
         return $result;
     }
 
+    /**
+     * Radio form element as dropdown picker.
+     *
+     * @param FormOptions $options
+     * @param FormPickerOptions $pickerOptions
+     * @param ?FieldMatchConditional $conditional
+     *
+     * @return array
+     */
     public static function radioPicker(
         FormOptions $options,
         FormPickerOptions $pickerOptions,

@@ -327,4 +327,33 @@ class StringUtilsTest extends TestCase
         $this->assertEquals(null, StringUtils::parseIDFromPath($pathWithoutID, "\/"));
         $this->assertEquals(null, StringUtils::parseIDFromPath(null));
     }
+
+    /**
+     * @param string $input
+     * @param string $expected
+     * @return void
+     *
+     * @dataProvider provideCondensedIPs
+     */
+    public function testCondenseIPs(string $input, string $expected): void
+    {
+        $this->assertEquals($expected, StringUtils::condenseIP($input));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function provideCondensedIPs(): array
+    {
+        return [
+            "Not an IP" => ["random string", "random string"],
+            "IPv4 full" => ["10.000.000.534", "10.0.0.534"],
+            "IPv4 wildcard" => ["10.05.*", "10.5.*"],
+            "IPv6 full" => ["2001:1234:0000:0000:1b12:0000:0000:1a13", "2001:1234::1b12:0:0:1a13"],
+            "IPv6 extreme" => ["0000:0000:0000:0000:0000:0000:0000:0001", "::1"],
+            "IPv6 wildcard" => ["2001:004:0000:0000:*", "2001:4::*"],
+            "IPv6 wildcard 2" => ["2001:0db8:85a3:0000:*", "2001:db8:85a3::*"],
+            "IPv6 shortest" => ["0:0:0:0:0:0:0:0", "::"],
+        ];
+    }
 }

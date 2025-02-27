@@ -37,7 +37,7 @@ export function SuggestedAnswerItem(props: ISuggestedAnswer) {
                 suggestion: props.aiSuggestionID,
                 accept: true,
             });
-            onMutateSuccess?.();
+            await onMutateSuccess?.();
         } catch (err) {
             toastError(err);
             setDisableButtons(false);
@@ -49,7 +49,7 @@ export function SuggestedAnswerItem(props: ISuggestedAnswer) {
 
         try {
             await dismissAnswer(props.aiSuggestionID);
-            onMutateSuccess?.();
+            await onMutateSuccess?.();
         } catch (err) {
             toastError(err);
             setDisableButtons(false);

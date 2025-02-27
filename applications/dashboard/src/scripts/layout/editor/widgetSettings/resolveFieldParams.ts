@@ -9,6 +9,12 @@ export const RESOLVE_MAP = {
     "siteSection/description": "Contextual Description",
     "category/name": "Category Title",
     "category/description": "Category Description",
+
+    "knowledgeCategory/name": "Contextual Title",
+    "knowledgeBase/name": "Contextual Title",
+    "knowledgeBase/description": "Contextual Description",
+    knowledgeTitle: "Contextual Title",
+    knowledgeDescription: "Contextual Description",
 };
 
 /**

@@ -9,10 +9,15 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use Gdn_Upload;
 use Garden\Http\HttpResponse;
+use PHPUnit\Framework\TestCase;
 use Vanilla\UploadedFile;
+use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Fixtures\TestUploader;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SchedulerTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -21,6 +26,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class MediaTest extends AbstractAPIv2Test
 {
+    use CommunityApiTestTrait;
+    use ExpectExceptionTrait;
     public static $addons = ["stubcontent"];
     use UsersAndRolesApiTestTrait;
     use SchedulerTestTrait;
@@ -401,5 +408,47 @@ class MediaTest extends AbstractAPIv2Test
         }
 
         return $result;
+    }
+
+    /**
+     * Test that the download endpoint returns a redirect response to the target file.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testMediaDownload()
+    {
+        $media = $this->createMedia();
+
+        $caught = null;
+        try {
+            $this->api()->get("$this->baseUrl/{$media["mediaID"]}/download");
+        } catch (\Throwable $e) {
+            $caught = $e;
+        }
+        TestCase::assertNotNull($caught, "Expected to catch an exception, but none was thrown.");
+
+        TestCase::assertInstanceOf(ResponseException::class, $caught);
+        $response = $caught->getResponse();
+        TestCase::assertInstanceOf(Redirect::class, $response);
+        $this->assertEquals($media["url"], $response->getUrl());
+    }
+
+    /**
+     * Test that Guest can download files.
+     *
+     * @return void
+     */
+    public function testDownloadFileAsGuest(): void
+    {
+        $this->createUser(["roleID" => [\RoleModel::GUEST_ID]]);
+        $media = $this->createMedia();
+
+        try {
+            $this->api()->get("$this->baseUrl/{$media["mediaID"]}/download", options: ["throw" => false]);
+        } catch (ResponseException $e) {
+            $response = $e->getResponse();
+        }
+        $this->assertEquals($media["url"], $response->getUrl());
     }
 }

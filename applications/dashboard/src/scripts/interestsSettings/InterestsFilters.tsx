@@ -27,39 +27,25 @@ export function InterestsFilters(props: IProps) {
     const [defaultInterestsOnly, setDefaultInterestsOnly] = useState<boolean>(false);
     const [excludeDefaultInterests, setExcludeDefaultInterests] = useState<boolean>(false);
 
-    // Only one of the checkboxes can be checked at a time
-    const filterDefaultInterests = (evt: ChangeEvent<HTMLInputElement>, exclude: boolean) => {
-        const {
-            target: { checked },
-        } = evt;
-        if (exclude) {
-            setDefaultInterestsOnly(false);
-            setExcludeDefaultInterests(checked);
-        } else {
-            setExcludeDefaultInterests(false);
-            setDefaultInterestsOnly(checked);
-        }
-    };
-
-    // Update the filters when either checkbox is updated. `undefined` should be assigned if neither box is checked
+    // Weird UI choice for checkboxes here
     useEffect(() => {
-        const tmpFilters = { ...filters };
-        if (defaultInterestsOnly) {
-            tmpFilters.isDefault = true;
-        } else if (excludeDefaultInterests) {
-            tmpFilters.isDefault = false;
-        } else {
-            delete tmpFilters.isDefault;
-        }
-
-        updateFilters(tmpFilters);
+        updateFilters({
+            ...filters,
+            ...(defaultInterestsOnly && { isDefault: true }),
+            ...(excludeDefaultInterests && { isDefault: false }),
+            ...(!defaultInterestsOnly && !excludeDefaultInterests && { isDefault: undefined }),
+        });
     }, [defaultInterestsOnly, excludeDefaultInterests]);
 
     // Reset the default interests values when the filters are cleared
     useEffect(() => {
-        if (!filters.isDefault) {
+        if (!filters.hasOwnProperty("isDefault")) {
             setDefaultInterestsOnly(false);
             setExcludeDefaultInterests(false);
+        }
+        if (filters.hasOwnProperty("isDefault")) {
+            setDefaultInterestsOnly(filters.isDefault === true);
+            setExcludeDefaultInterests(filters.isDefault === false);
         }
     }, [filters]);
 
@@ -131,13 +117,23 @@ export function InterestsFilters(props: IProps) {
                     label={t("Default Interests Only")}
                     labelBold={false}
                     checked={defaultInterestsOnly}
-                    onChange={(evt) => filterDefaultInterests(evt, false)}
+                    onChange={(evt) => {
+                        setDefaultInterestsOnly(evt.target.checked);
+                        if (excludeDefaultInterests) {
+                            setExcludeDefaultInterests(false);
+                        }
+                    }}
                 />
                 <CheckBox
                     label={t("Exclude Default Interests")}
                     labelBold={false}
                     checked={excludeDefaultInterests}
-                    onChange={(evt) => filterDefaultInterests(evt, true)}
+                    onChange={(evt) => {
+                        setExcludeDefaultInterests(evt.target.checked);
+                        if (defaultInterestsOnly) {
+                            setDefaultInterestsOnly(false);
+                        }
+                    }}
                 />
             </CheckboxGroup>
         </>

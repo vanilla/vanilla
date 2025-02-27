@@ -65,7 +65,7 @@ class PageScraperTest extends BootstrapTestCase
                             "insertUser" => [
                                 "name" => "Vanilla Forums",
                                 "photoUrl" => "https://images.v-cdn.net/stubcontent/vanilla_avatar.jpg",
-                                "url" => "https://vanilla.localhost/profile/Vanilla%20Forums",
+                                "url" => "https://vanilla.local/profile/Vanilla%20Forums",
                             ],
                             "dateInserted" => "2018-04-20T21:06:41+00:00",
                         ],

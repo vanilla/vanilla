@@ -7,6 +7,7 @@
 namespace Vanilla;
 
 use Garden\Web\Exception\ClientException;
+use Vanilla\Forum\Models\PostTypeModel;
 
 /**
  * Class RecordTypeConverter
@@ -23,6 +24,10 @@ class DiscussionTypeConverter
 
     /** @var AbstractTypeHandler[] */
     private $typeHandlers = [];
+
+    public function __construct(private PostTypeModel $postTypeModel)
+    {
+    }
 
     /**
      * Add type handlers.
@@ -54,27 +59,43 @@ class DiscussionTypeConverter
     /**
      * Convert a record.
      *
-     * @param array $from
-     * @param string $to
+     * @param array $from The record we are converting.
+     * @param string $to The identifier of the type we are converting this record to.
+     * @param array|null $postFields Optional array of post fields (used for custom post types).
+     * @param bool $isCustomPostType Whether this is a custom post type.
      * @throws ClientException If record type is restricted or unavailable.
      */
-    public function convert(array $from, string $to)
+    public function convert(array $from, string $to, ?array $postFields = null, bool $isCustomPostType = false)
     {
         if (in_array($to, self::RESTRICTED_TYPES)) {
             throw new ClientException("{$to} record type conversion are restricted.");
         }
 
-        // for DB compatibility
-        $to = ucfirst($to);
-        $toHandler = $this->getTypeHandlers($to);
+        if ($isCustomPostType) {
+            // Look up the base type of this custom post type.
+            $toPostType = $this->postTypeModel->getByID($to);
+            $toBaseType = ucfirst($toPostType["baseType"]);
+        } else {
+            // for DB compatibility
+            $toBaseType = $to = ucfirst($to);
+        }
+
+        $toHandler = $this->getTypeHandlers($toBaseType);
         if (!$toHandler) {
             throw new ClientException("record type unavailable");
         }
 
-        $toHandler->handleTypeConversion($from, $to);
+        $toHandler->handleTypeConversion($from, $to, $postFields);
 
-        $type = $from["Type"] ?? "Discussion";
-        $fromHandler = $this->getTypeHandlers($type);
+        if (isset($from["postTypeID"])) {
+            // We are converting from a record with a custom post type.
+            $fromPostType = $this->postTypeModel->getByID($to);
+            $fromBaseType = $fromPostType["baseType"];
+        } else {
+            $fromBaseType = $from["Type"] ?? "Discussion";
+        }
+
+        $fromHandler = $this->getTypeHandlers($fromBaseType);
         if ($fromHandler) {
             $fromHandler->cleanUpRelatedData($from, $to);
         }

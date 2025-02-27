@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Core;
 
+use Exception;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 use VanillaTests\MinimalContainerTestCase;
 use Gdn;
@@ -37,6 +38,19 @@ class FormTest extends MinimalContainerTestCase
         $this->form = new \Gdn_Form("", "bootstrap");
         $this->form->ErrorClass = "test-error";
         \Gdn_Form::resetIDs();
+
+        set_error_handler(static function ($errno, $errstr) {
+            throw new \Exception($errstr, $errno);
+        }, E_ALL);
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        restore_error_handler();
     }
 
     /**
@@ -153,7 +167,8 @@ HTML;
      */
     public function testInputPrefixDeprecation(): void
     {
-        $this->expectDeprecation();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("Gdn_Form->InputPrefix is deprecated");
         $this->form->InputPrefix = "foo";
 
         @$this->form->InputPrefix = "bar";

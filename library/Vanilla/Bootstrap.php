@@ -24,6 +24,7 @@ use Vanilla\Analytics\AnalyticsActionsProvider;
 use Vanilla\Analytics\TrackableDecoratorInterface;
 use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
+use Vanilla\Forum\Models\ResourceModel;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\Providers\DefaultImageResizeProvider;
 use Vanilla\Layout\GlobalLayoutRecordProvider;

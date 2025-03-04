@@ -88,22 +88,6 @@ export const interestsClasses = useThemeCache(() => {
         gap: 4,
     });
 
-    const interestWrapped = css({
-        flexDirection: "column",
-        [`& .${defaultInterestIcon}`]: {
-            padding: 0,
-            width: "auto",
-            height: "auto",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            gap: 4,
-            fontSize: globalVars.fonts.size.small,
-            lineHeight: 1,
-        },
-    });
-
     const cellWrapped = css({
         margin: 0,
         marginBlockStart: 6,
@@ -159,6 +143,11 @@ export const interestsClasses = useThemeCache(() => {
         ...Mixins.padding({ vertical: 14 }),
     });
 
+    const defaultInterestTooltip = css({
+        display: "inline-flex",
+        alignItems: "center",
+    });
+
     return {
         defaultInterestCheckbox,
         table,
@@ -170,7 +159,6 @@ export const interestsClasses = useThemeCache(() => {
         interestName,
         interestApiName,
         cellFlexBox,
-        interestWrapped,
         cellWrapped,
         cellWrappedTitle,
         cellWrappedProfileField,
@@ -181,5 +169,6 @@ export const interestsClasses = useThemeCache(() => {
         filterField,
         filterButtons,
         interestsHeader,
+        defaultInterestTooltip,
     };
 });

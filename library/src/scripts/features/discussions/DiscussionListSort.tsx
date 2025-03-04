@@ -45,7 +45,7 @@ export function DiscussionListSort(props: IDiscussionListSortProps) {
         selectSort(newValue.value as DiscussionListSortOptions);
     };
 
-    const iconButton = isMobile ? <Icon icon="data-sort-dropdown" /> : null;
+    const iconButton = isMobile ? <Icon icon="sort-by" /> : null;
 
     return (
         <div className={classes.filterAndSortingContainer}>

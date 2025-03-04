@@ -307,4 +307,39 @@ class LocaleModel
         }
         return in_array($selectedLocale, $enabledLocales);
     }
+
+    /**
+     * Get the locale prefered by the user.
+     *
+     * @return string|null
+     */
+    public static function getUserPreferedLocale(): ?string
+    {
+        $locale = Gdn::session()->getPreference("NotificationLanguage", null);
+        return $locale;
+    }
+
+    /**
+     * Get translatable locales.
+     *
+     * @return array
+     */
+    public function getTranslatableLocales(): array
+    {
+        $locales = Gdn::config()->get("JustInTimeTranslated.languageSelected", []);
+        $locales[] = Gdn::locale()->getSiteLocale();
+        return $locales;
+    }
+
+    /**
+     * Check if a language is translatable.
+     *
+     * @param string $locale
+     * @return bool
+     */
+    public function isTranslatableLocale(string $locale): bool
+    {
+        $locales = $this->getTranslatableLocales();
+        return in_array($locale, $locales);
+    }
 }

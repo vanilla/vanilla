@@ -37,18 +37,15 @@ class ActivityService
      * Register an activity.
      *
      * @param class-string<Activity> $activity
-     * @param bool $insertActivityType
+     *
      * @return void
      * @throws ContainerException
      * @throws NotFoundException
      */
-    public function registerActivity(string $activity, bool $insertActivityType = true): void
+    public function registerActivity(string $activity): void
     {
         $this->activities[] = $activity;
         $this->activityTypeIDs[] = $activity::getActivityTypeID();
-        if ($insertActivityType) {
-            $this->insertActivityType($activity);
-        }
     }
 
     /**
@@ -195,6 +192,7 @@ class ActivityService
                     ],
                     "type" => "object",
                     "properties" => $properties,
+                    "required" => $activity::getPreferenceSchemaRequiredProperties(),
                 ]);
             }
         }
@@ -294,6 +292,21 @@ class ActivityService
     }
 
     /**
+     * Insert activity types into the DB.
+     *
+     * @return void
+     */
+    public function structure(): void
+    {
+        if (\Gdn::structure()->CaptureOnly) {
+            return;
+        }
+        foreach ($this->activities as $activity) {
+            $this->ensureInserted($activity);
+        }
+    }
+
+    /**
      * Insert an ActivityType into GDN_ActivityType is it doesn't exist.
      *
      * @param string $activityType
@@ -301,7 +314,7 @@ class ActivityService
      * @throws ContainerException
      * @throws NotFoundException
      */
-    private function insertActivityType(string $activityType): void
+    private function ensureInserted(string $activityType): void
     {
         /** @var Activity $activity */
         $activity = Gdn::getContainer()->get($activityType);

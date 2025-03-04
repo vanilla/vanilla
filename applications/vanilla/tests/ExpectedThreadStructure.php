@@ -65,7 +65,7 @@ class ExpectedThreadStructure implements \JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         // Make sure depths are normalized.
         $this->setDepth($this->depth);

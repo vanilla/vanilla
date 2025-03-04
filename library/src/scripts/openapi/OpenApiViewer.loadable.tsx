@@ -24,12 +24,14 @@ import { PropertySchema } from "@library/openapi/PropertySchema";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { createLoadableComponent } from "@vanilla/react-utils";
-import { useState } from "react";
+import { use } from "chai";
+import { useEffect, useState } from "react";
 
 interface IProps {
     spec: IOpenApiSpec;
     tryItEnabled?: boolean;
     initialFocusedRoute?: IOpenApiRoute;
+    onMount?: () => void;
 }
 
 const TryItModal = createLoadableComponent({
@@ -39,6 +41,10 @@ const TryItModal = createLoadableComponent({
 
 export function OpenApiViewerImpl(props: IProps) {
     const [tryItRoute, setTryItRoute] = useState<IOpenApiRoute | null>(null);
+
+    useEffect(() => {
+        props.onMount?.();
+    }, []);
 
     return (
         <OpenApiContextProvider spec={props.spec} initialFocusedRoute={props.initialFocusedRoute}>

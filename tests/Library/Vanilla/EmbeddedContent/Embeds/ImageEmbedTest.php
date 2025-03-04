@@ -24,7 +24,7 @@ class ImageEmbedTest extends MinimalContainerTestCase
     {
         $oldDataJSON = <<<JSON
 {
-    "url":"http:\/\/dev.vanilla.localhost\/uploads\/HOM6P5MDM3BH\/img-2980.jpg",
+    "url":"http:\/\/dev.vanilla.local\/uploads\/HOM6P5MDM3BH\/img-2980.jpg",
     "embedType":"image"
 }
 JSON;
@@ -34,7 +34,7 @@ JSON;
         $this->assertInstanceOf(ImageEmbed::class, $dataEmbed);
         $this->assertEquals(
             [
-                "url" => "http://dev.vanilla.localhost/uploads/HOM6P5MDM3BH/img-2980.jpg",
+                "url" => "http://dev.vanilla.local/uploads/HOM6P5MDM3BH/img-2980.jpg",
                 "name" => "img-2980.jpg",
                 "type" => "unknown",
                 "size" => 0,

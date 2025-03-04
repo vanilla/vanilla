@@ -11,7 +11,7 @@ import DiscussionOptionsMenu, { addDiscussionOption } from "@library/features/di
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
 const renderInProvider = async (permissions?: string[]) => {
     const queryClient = new QueryClient({

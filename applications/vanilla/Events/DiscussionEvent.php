@@ -27,6 +27,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     const ACTION_CLOSE = "close";
     const ACTION_MERGE = "merge";
     const ACTION_SPLIT = "split";
+    const ACTION_STATUS = "status";
 
     /** @var int|null */
     private $sourceDiscussionID = null;
@@ -126,6 +127,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
             case self::ACTION_MOVE:
             case self::ACTION_MERGE:
             case self::ACTION_SPLIT:
+            case self::ACTION_STATUS:
                 return "post-modify";
             default:
                 return null;
@@ -200,6 +202,8 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
                 return "discussion_merge";
             case self::ACTION_SPLIT:
                 return "comment_split";
+            case self::ACTION_STATUS:
+                return "discussion_status";
             default:
                 return $this->getAction();
         }

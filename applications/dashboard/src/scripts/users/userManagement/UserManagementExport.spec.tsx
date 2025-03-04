@@ -81,7 +81,7 @@ function MiniUserExport(props: { downloader: typeof downloadAsFile; query: IGetU
             <button
                 type="submit"
                 onClick={() => {
-                    userExport.exportUsers(props.query);
+                    void userExport.exportUsers(props.query);
                 }}
             >
                 Export

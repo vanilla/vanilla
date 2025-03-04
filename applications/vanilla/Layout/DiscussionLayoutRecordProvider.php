@@ -9,6 +9,9 @@ namespace Vanilla\Layout;
 
 use CategoryModel;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Database\Select;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\Providers\LayoutViewRecordProviderInterface;
 use Vanilla\Site\SiteSectionModel;
@@ -71,10 +74,17 @@ class DiscussionLayoutRecordProvider implements LayoutViewRecordProviderInterfac
      */
     public function resolveLayoutQuery(LayoutQuery $query): LayoutQuery
     {
-        $discussion = $this->discussionModel
+        $sql = $this->discussionModel
             ->createSql()
-            ->from("Discussion")
-            ->select(["CategoryID", "Type"])
+            ->from("Discussion d")
+            ->select(["CategoryID", "Type"]);
+
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $sql->leftJoin("postType pt", "d.postTypeID = pt.postTypeID")->select(
+                new Select("COALESCE(pt.name, d.Type) as Type")
+            );
+        }
+        $discussion = $sql
             ->where("DiscussionID", $query->getRecordID())
             ->limit(1)
             ->get()
@@ -94,6 +104,9 @@ class DiscussionLayoutRecordProvider implements LayoutViewRecordProviderInterfac
         return $query
             ->withRecordType(CategoryLayoutRecordProvider::RECORD_TYPE)
             ->withRecordID($categoryID)
+            ->withAdditionalParams([
+                "discussionID" => $query->getRecordID(),
+            ])
             ->withLayoutViewType($layoutViewType);
     }
 

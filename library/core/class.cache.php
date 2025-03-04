@@ -432,7 +432,7 @@ abstract class Gdn_Cache
 
         if ($usePrefix) {
             $forcePrefix = $options[Gdn_Cache::FEATURE_FORCEPREFIX] ?? null;
-            $key = substr($key, strlen($this->getPrefix($forcePrefix)) + 1);
+            $key = substr($key, strlen($this->getPrefix($forcePrefix) ?: "") + 1);
         }
         return $key;
     }

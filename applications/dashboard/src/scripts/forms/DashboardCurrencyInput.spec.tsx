@@ -4,11 +4,22 @@ import DashboardCurrencyInput from "@dashboard/forms/DashboardCurrencyInput";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 
-function MockForm() {
+interface IMockFormProps {
+    minimumFractionDigits?: number;
+    maximumFractionDigits?: number;
+}
+
+function MockForm({ minimumFractionDigits = 2, maximumFractionDigits = 2 }: IMockFormProps) {
     const [value, setValue] = useState<string | number>("0.00");
     return (
         <DashboardFormGroup labelType={DashboardLabelType.VERTICAL} label={"Currency"}>
-            <DashboardCurrencyInput value={value} onChange={(newValue) => setValue(newValue)} onBlur={async () => {}} />
+            <DashboardCurrencyInput
+                value={value}
+                onChange={(newValue) => setValue(newValue)}
+                onBlur={async () => {}}
+                minimumFractionDigits={minimumFractionDigits}
+                maximumFractionDigits={maximumFractionDigits}
+            />
         </DashboardFormGroup>
     );
 }
@@ -17,8 +28,10 @@ describe("DashboardCurrencyInput", () => {
     let result: RenderResult;
     let input: HTMLInputElement;
 
-    async function renderDashboardCurrencyInput() {
-        result = render(<MockForm />);
+    async function renderDashboardCurrencyInput(minimumFractionDigits = 2, maximumFractionDigits = 2) {
+        result = render(
+            <MockForm minimumFractionDigits={minimumFractionDigits} maximumFractionDigits={maximumFractionDigits} />,
+        );
         await vi.dynamicImportSettled();
     }
 
@@ -27,13 +40,12 @@ describe("DashboardCurrencyInput", () => {
     });
 
     function selectCurrencyInput(): HTMLInputElement {
-        // I know this is very weird but spinbutton is the role of a number input
-        return result.getByRole("spinbutton") as HTMLInputElement;
+        return result.getByRole("textbox") as HTMLInputElement;
     }
 
     describe("when the input is rendered", () => {
-        it("renders the input with default value 0.00", () => {
-            renderDashboardCurrencyInput();
+        it("renders the input with default value 0.00", async () => {
+            await renderDashboardCurrencyInput();
             expect(result.getByDisplayValue("0.00")).toBeInTheDocument();
         });
 
@@ -92,6 +104,27 @@ describe("DashboardCurrencyInput", () => {
             fireEvent.blur(input);
 
             expect(input).toHaveDisplayValue("0.00");
+        });
+    });
+
+    describe("when the fractional digits are zero", () => {
+        beforeEach(async () => {
+            await renderDashboardCurrencyInput(0, 0);
+            input = selectCurrencyInput();
+        });
+
+        it("doesn't show decimal places", async () => {
+            fireEvent.change(input, { target: { value: "1.23" } });
+            fireEvent.blur(input);
+
+            expect(input).toHaveDisplayValue("1");
+        });
+
+        it("replaces the empty string with 0", async () => {
+            fireEvent.change(input, { target: { value: "" } });
+            fireEvent.blur(input);
+
+            expect(input).toHaveDisplayValue("0");
         });
     });
 });

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=home&cacheBuster=4",
+    "$schema": "https://dev.vanilla.local/api/v2/layouts/schema?layoutViewType=home&cacheBuster=4",
     "dateInserted": "2022-01-01T00:00:00Z",
     "layoutViewType": "home",
     "layoutID": "home",

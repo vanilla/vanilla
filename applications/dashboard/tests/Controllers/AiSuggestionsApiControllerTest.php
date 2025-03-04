@@ -54,9 +54,8 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
     {
         parent::setUp();
         self::enableFeature("AISuggestions");
-        self::enableFeature("aiFeatures");
         \Gdn::config()->saveToConfig("VanillaAnalytics.AnonymizeData", false);
-        self::enableFeature("customLayout.discussionThread");
+        self::enableFeature("customLayout.post");
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->aiSuggestionModel = $this->container()->get(AiSuggestionModel::class);
         $this->clearSettings();

@@ -62,7 +62,7 @@ class UserProfileFieldsExpander extends \Vanilla\Web\AbstractApiExpander
     /**
      * @inheritDoc
      */
-    public function resolveFragements(array $recordIDs): array
+    public function resolveFragments(array $recordIDs): array
     {
         $fragmentsByUserIDs = $this->profileFieldModel->getUsersProfileFields($recordIDs);
         foreach ($fragmentsByUserIDs as $key => $fragmentByUserID) {

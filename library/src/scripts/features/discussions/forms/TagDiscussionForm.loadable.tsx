@@ -15,15 +15,15 @@ import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@library/utility/appUtils";
-import { TagsInput } from "@library/features/tags/TagsInput";
-import { IComboBoxOption } from "@library/features/search/SearchBar";
-import { usePutDiscussionTags } from "@library/features/discussions/discussionHooks";
 import { tagDiscussionFormClasses } from "@library/features/discussions/forms/TagDiscussionForm.loadable.styles";
-import { useFormik } from "formik";
+import { useState } from "react";
+import { ITag } from "@library/features/tags/TagsReducer";
+import { useMutation } from "@tanstack/react-query";
+import { slugify } from "@vanilla/utils";
+import apiv2 from "@library/apiv2";
+import { IError } from "@library/errorPages/CoreErrorMessages";
+import { TagPostUI } from "@library/features/discussions/forms/TagPostUI";
 
-type FormValues = {
-    tagIDs: IComboBoxOption[];
-};
 export interface IProps {
     onCancel: () => void;
     onSuccess?: () => Promise<void>;
@@ -35,37 +35,59 @@ export interface IProps {
  * @deprecated Do not import this component, import TagDiscussionForm instead
  */
 export default function TagDiscussionFormLoadable(props: IProps) {
-    const { onCancel, onSuccess, discussion } = props;
+    const { onCancel, discussion } = props;
 
     const classesFrameBody = frameBodyClasses();
     const classFrameFooter = frameFooterClasses();
     const classes = tagDiscussionFormClasses();
-    const putDiscussionTags = usePutDiscussionTags(discussion.discussionID);
 
-    const { handleSubmit, setFieldValue, values, isSubmitting, errors } = useFormik<FormValues>({
-        initialValues: {
-            tagIDs:
-                discussion.tags
-                    ?.filter((tag) => tag.type === "User")
-                    ?.map(
-                        ({ tagID, urlcode, name }): IComboBoxOption => ({
-                            value: tagID,
-                            label: name,
-                            data: urlcode,
-                        }),
-                    ) ?? [],
-        },
-        onSubmit: async function ({ tagIDs }, { setErrors }) {
-            if (tagIDs) {
-                try {
-                    await putDiscussionTags(tagIDs.map(({ value }) => value as number));
-                    !!onSuccess && (await onSuccess());
-                } catch (error) {
-                    setErrors({ tagIDs: error.message });
-                }
+    const initialValues = discussion.tags?.filter((tag) => tag.type === "User").map((tag) => tag.tagID);
+    const [tagsToAssign, setTagsToAssign] = useState<number[]>();
+    const [tagsToCreate, setTagsToCreate] = useState<string[]>();
+
+    const makeTag = async (tagName: ITag["name"]): Promise<ITag> => {
+        const createTagBody = {
+            name: tagName,
+            url: slugify(tagName),
+        };
+        const response = await apiv2.post("/tags", createTagBody);
+        return response.data;
+    };
+
+    const tagDiscussionMutation = useMutation<ITag | ITag, IError>({
+        mutationFn: async () => {
+            // First create all the new tags
+            let newlyCreatedTagIDs: Array<ITag["tagID"]> = [];
+            if (tagsToCreate) {
+                const newTags = await Promise.all(
+                    tagsToCreate.map(async (tagName) => {
+                        const response = await makeTag(tagName);
+                        return response;
+                    }),
+                );
+                newlyCreatedTagIDs = newTags.map((tag) => tag.tagID);
             }
+            // Not merge list of created and existing tags before saving to the discussion
+            const allTagIDs = [...(tagsToAssign ?? []), ...newlyCreatedTagIDs];
+            const response = await apiv2.put(`/discussions/${discussion.discussionID}/tags`, {
+                tagIDs: allTagIDs,
+            });
+            return response.data;
+        },
+        onSuccess: async () => {
+            !!props.onSuccess && (await props.onSuccess());
+        },
+        onError: (error) => {
+            console.error(error);
+            return error.response.data;
         },
     });
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        tagDiscussionMutation.mutate();
+    };
 
     return (
         <form onSubmit={handleSubmit}>
@@ -75,16 +97,13 @@ export default function TagDiscussionFormLoadable(props: IProps) {
                 body={
                     <FrameBody>
                         <div className={classesFrameBody.contents}>
-                            <TagsInput
-                                id="tagIDs"
-                                type="User"
-                                label={null}
-                                value={values.tagIDs}
-                                onChange={(options: IComboBoxOption[]) => {
-                                    setFieldValue("tagIDs", options);
-                                }}
+                            <TagPostUI
+                                initialTagIDs={initialValues}
+                                onSelectedExistingTag={setTagsToAssign}
+                                onSelectedNewTag={setTagsToCreate}
+                                fieldErrors={tagDiscussionMutation?.error}
+                                showPopularTags
                             />
-                            {errors.tagIDs && <div className={classes.error}>{errors.tagIDs}</div>}
                         </div>
                     </FrameBody>
                 }
@@ -98,12 +117,12 @@ export default function TagDiscussionFormLoadable(props: IProps) {
                             {t("Cancel")}
                         </Button>
                         <Button
-                            disabled={isSubmitting}
+                            disabled={tagDiscussionMutation.isLoading}
                             buttonType={ButtonTypes.TEXT_PRIMARY}
                             className={classFrameFooter.actionButton}
                             submit
                         >
-                            {isSubmitting ? <ButtonLoader /> : t("Save")}
+                            {tagDiscussionMutation.isLoading ? <ButtonLoader /> : t("Save")}
                         </Button>
                     </FrameFooter>
                 }

@@ -42,7 +42,7 @@ final class SearchTypeCollection implements \IteratorAggregate
     /**
      * @return \Iterator
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new \ArrayIterator($this->getAllTypes());
     }

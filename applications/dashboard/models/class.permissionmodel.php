@@ -276,6 +276,8 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Garden.Email.View" => 1,
             "Garden.Uploads.Add" => 1,
             "Reactions.Flag.Add" => 1,
+            "Reactions.Positive.Add" => 1,
+            "Reactions.Negative.Add" => 1,
         ]);
         $this->addDefault(RoleModel::TYPE_ADMINISTRATOR, [
             "Garden.SignIn.Allow" => 1,
@@ -301,6 +303,8 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Garden.Reactions.View" => 1,
             "Garden.Uploads.Add" => 1,
             "Reactions.Flag.Add" => 1,
+            "Reactions.Positive.Add" => 1,
+            "Reactions.Negative.Add" => 1,
         ]);
         $this->addDefault(RoleModel::TYPE_MEMBER, [
             "Garden.SignIn.Allow" => 1,
@@ -311,6 +315,8 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Garden.Uploads.Add" => 1,
             "Garden.Reactions.View" => 1,
             "Reactions.Flag.Add" => 1,
+            "Reactions.Positive.Add" => 1,
+            "Reactions.Negative.Add" => 1,
         ]);
 
         // Allow the ability for other applications and plug-ins to speak up with their own default permissions.
@@ -1583,7 +1589,7 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
         // Check to see if the permission is disabled.
         if (c("Garden.Permission.Disabled." . $junctionTable)) {
             if (!$session->checkPermission($permissions)) {
-                $sQL->where("1", "0", false, false);
+                $sQL->whereAlwaysFalse();
             }
         } elseif ($session->UserID <= 0 || (is_object($session->User) && $session->User->Admin != "1")) {
             $sQL->distinct()
@@ -1604,7 +1610,7 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
         } else {
             // Force this method to play nice in case it is used in an or clause
             // (ie. it returns true in a sql sense by doing 1 = 1)
-            $sQL->where("1", "1", false, false);
+            $sQL->whereAlwaysTrue();
         }
 
         return $sQL;

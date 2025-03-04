@@ -94,7 +94,7 @@ export default function DiscussionListItem(props: IProps) {
                     <DiscussionOptionsMenu
                         discussion={discussion}
                         onMutateSuccess={async () => {
-                            await dispatch(getDiscussionByIDs({ discussionIDs: [discussionID] }));
+                            await dispatch(getDiscussionByIDs({ discussionIDs: [discussionID], expand: ["tags"] }));
                         }}
                     />
                 </>

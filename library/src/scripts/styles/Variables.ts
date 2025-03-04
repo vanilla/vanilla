@@ -102,7 +102,7 @@ export class Variables {
     static box = (vars: IPartialBoxOptions): IBoxOptions => {
         return {
             borderType: vars?.borderType ?? BorderType.NONE,
-            background: Variables.background(vars?.background ?? {}),
+            background: vars?.background ? Variables.background(vars.background) : Variables.background({}),
             spacing: Variables.spacing(vars?.spacing ?? {}),
             border: Variables.border(vars?.border ?? {}),
             itemSpacing: vars?.itemSpacing ?? 0,

@@ -47,7 +47,7 @@ class TextFragmentCollection implements ArrayAccess, TextFragmentCollectionInter
      * @param mixed $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->fragments[$offset]);
     }
@@ -58,7 +58,7 @@ class TextFragmentCollection implements ArrayAccess, TextFragmentCollectionInter
      * @param mixed $offset
      * @return TextFragmentInterface|null
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->fragments[$offset] ?? null;
     }
@@ -69,7 +69,7 @@ class TextFragmentCollection implements ArrayAccess, TextFragmentCollectionInter
      * @param mixed $offset
      * @param mixed $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (!($value instanceof TextFragmentInterface)) {
             throw new InvalidArgumentException("Value must be an instance of " . TextFragmentInterface::class);
@@ -82,7 +82,7 @@ class TextFragmentCollection implements ArrayAccess, TextFragmentCollectionInter
      *
      * @param mixed $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->fragments[$offset]);
     }

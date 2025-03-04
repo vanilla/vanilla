@@ -4,9 +4,9 @@
  * @license Proprietary
  */
 
-import { useAISuggestionsSettings, useDependenciesEnabled } from "@dashboard/aiSuggestions/AISuggestions.hooks";
+import { useAISuggestionsSettings } from "@dashboard/aiSuggestions/AISuggestions.hooks";
 import { SettingsForm } from "@dashboard/aiSuggestions/components/SettingsForm";
-import { getSettingsSchema } from "@dashboard/aiSuggestions/settingsSchemaUtils";
+import { getSettingsSchemaSections } from "@dashboard/aiSuggestions/settingsSchemaUtils";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import Translate from "@library/content/Translate";
@@ -14,13 +14,14 @@ import { ErrorPageBoundary } from "@library/errorPages/ErrorPageBoundary";
 import { LoadingRectangle, LoadingSpacer } from "@library/loaders/LoadingRectangle";
 import Message from "@library/messages/Message";
 import SmartLink from "@library/routing/links/SmartLink";
-import { t } from "@library/utility/appUtils";
+import { getMeta, t } from "@library/utility/appUtils";
 import { MemoryRouter } from "react-router";
 
 export function AISuggestions() {
-    const dependenciesEnabled = useDependenciesEnabled();
+    const postTypesMap = getMeta("postTypesMap", []);
+    const dependenciesEnabled = Object.values(postTypesMap).includes("question");
     const { data: settings, error } = useAISuggestionsSettings();
-    const sections = getSettingsSchema(settings);
+    const sections = settings ? getSettingsSchemaSections(settings) : undefined;
     const title = t("AI Suggested Answers");
 
     return (

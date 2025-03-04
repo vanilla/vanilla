@@ -9,6 +9,7 @@
 use Garden\Web\Exception\ResponseException;
 use Garden\Web\Redirect;
 use JetBrains\PhpStorm\NoReturn;
+use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Logging\TraceCollector;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Theme\ThemeService;
@@ -418,28 +419,25 @@ if (!function_exists("fetchPageInfo")) {
                 throw new Exception('Couldn\'t connect to host.', 400);
             }
 
-            $dom = pQuery::parseStr($pageHtml);
-            if (!$dom) {
-                throw new Exception("Failed to load page for parsing.");
-            }
+            $htmlDocument = new HtmlDocument($pageHtml, false);
 
             /**
              * Parse a page for OpenGraph media information.
              *
              * @param array $pageInfo
              */
-            $getOpenGraphMedia = function (array &$pageInfo) use ($dom) {
+            $getOpenGraphMedia = function (array &$pageInfo) use ($htmlDocument) {
                 $pageInfo["Media"] = [];
 
                 // Only target og:image and og:video tags.
                 $mediaTypes = ["image", "video"];
                 foreach ($mediaTypes as $mediaType) {
-                    $tags = $dom->query('meta[property ^= "og:' . $mediaType . '"]');
+                    $tags = $htmlDocument->queryCssSelector('meta[property ^= "og:' . $mediaType . '"]');
 
-                    /** @var pQuery\DomNode $node */
+                    /** @var DOMElement $node */
                     foreach ($tags as $node) {
-                        $property = $node->attr("property");
-                        $content = $node->attr("content");
+                        $property = $node->getAttribute("property");
+                        $content = $node->getAttribute("content");
 
                         // If this is a root type element, save any existing type row data and start a new row.
                         if ($property == "og:{$mediaType}") {
@@ -473,33 +471,35 @@ if (!function_exists("fetchPageInfo")) {
             };
 
             // FIRST PASS: Look for open graph title, desc, images
-            $pageInfo["Title"] = domGetContent($dom, 'meta[property="og:title"]');
+            $pageInfo["Title"] = $htmlDocument->queryTextContent('meta[property="og:title"]', "");
 
             trace("Getting og:description");
-            $pageInfo["Description"] = domGetContent($dom, 'meta[property="og:description"]');
-            foreach ($dom->query('meta[property="og:image"]') as $image) {
-                if ($image->attr("content")) {
-                    $pageInfo["Images"][] = $image->attr("content");
+            $pageInfo["Description"] = $htmlDocument->queryTextContent('meta[property="og:description"]', "");
+            /** @var DOMElement $image */
+            foreach ($htmlDocument->queryCssSelector('meta[property="og:image"]') as $image) {
+                if ($content = $image->getAttribute("content")) {
+                    $pageInfo["Images"][] = $content;
                 }
             }
 
             // SECOND PASS: Look in the page for title, desc, images
             if ($pageInfo["Title"] == "") {
-                $pageInfo["Title"] = $dom->query("title")->text();
+                $pageInfo["Title"] = $htmlDocument->queryTextContent("title", "");
             }
 
             if ($pageInfo["Description"] == "") {
                 trace("Getting meta description");
-                $pageInfo["Description"] = domGetContent($dom, 'meta[name="description"]');
+                $pageInfo["Description"] = $htmlDocument->queryTextContent('meta[name="description"]', "");
             }
 
             // THIRD PASS: Look in the page contents
             if ($pageInfo["Description"] == "") {
-                foreach ($dom->query("p") as $element) {
+                /** @var DOMElement $element */
+                foreach ($htmlDocument->queryCssSelector("p") as $element) {
                     trace("Looking at p for description.");
 
-                    if (strlen($element->plaintext) > 150) {
-                        $pageInfo["Description"] = $element->text();
+                    if (strlen($element->textContent) > 150) {
+                        $pageInfo["Description"] = $element->textContent;
                         break;
                     }
                 }
@@ -510,19 +510,14 @@ if (!function_exists("fetchPageInfo")) {
 
             // Final: Still nothing? remove limitations
             if ($pageInfo["Description"] == "") {
-                foreach ($dom->query("p") as $element) {
+                /** @var DOMElement $element */
+                foreach ($htmlDocument->queryCssSelector("p") as $element) {
                     trace("Looking at p for description (no restrictions)");
-                    if (trim($element->text()) != "") {
-                        $pageInfo["Description"] = $element->text();
+                    if (trim($element->textContent) != "") {
+                        $pageInfo["Description"] = $element->textContent;
                         break;
                     }
                 }
-            }
-
-            // Page Images
-            if (count($pageInfo["Images"]) == 0) {
-                $images = domGetImages($dom, $url);
-                $pageInfo["Images"] = array_values($images);
             }
 
             $pageInfo["Title"] = htmlEntityDecode($pageInfo["Title"]);
@@ -857,7 +852,7 @@ if (!function_exists("getMentions")) {
         }
 
         $regex = "`([<>])`i";
-        $parts = preg_split($regex, $html, null, PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split($regex, $html, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         $inTag = false;
         $inAnchor = false;
@@ -1054,7 +1049,12 @@ if (!function_exists("isTrustedDomain")) {
                 if (strpos($domain, "//") === false) {
                     $domain = "//" . $domain;
                 }
-                $host = preg_replace("`^(\*?\.)`", "", parse_url($domain, PHP_URL_HOST));
+                $host = preg_replace("`^(\*?\.)`", "", parse_url($domain, PHP_URL_HOST) ?? "");
+                if (is_null($host)) {
+                    continue;
+                }
+
+                $host = preg_replace("`^(\*?\.)`", "", parse_url($domain, PHP_URL_HOST) ?? "");
                 $trusted[$host] = $domain;
             }
         }
@@ -1649,7 +1649,7 @@ if (!function_exists("trace")) {
      */
     function trace($value = null, $type = TRACE_INFO)
     {
-        if (!debug()) {
+        if (!debug() || DebugUtils::isTestMode()) {
             return [];
         }
         $traceCollector = \Gdn::getContainer()->get(TraceCollector::class);

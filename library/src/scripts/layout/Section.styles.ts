@@ -278,6 +278,9 @@ export const generateSectionClasses = (props: {
 
     const secondaryPanelHeadingBlock = css({
         marginBottom: 0,
+        "& .pageHeadingDescription": {
+            marginBottom: globalVars.spacer.headingBoxCompact,
+        },
     });
 
     return {

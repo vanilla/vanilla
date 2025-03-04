@@ -20,8 +20,9 @@ abstract class AbstractTypeHandler
      *
      * @param array $from
      * @param string $to
+     * @param array|null $postFields Optional array of custom post fields.
      */
-    abstract public function handleTypeConversion(array $from, string $to);
+    abstract public function handleTypeConversion(array $from, string $to, ?array $postFields);
 
     /**
      * Convert the handlers type.

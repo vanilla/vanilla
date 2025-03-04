@@ -12,6 +12,8 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Events\DiscussionTagEvent;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Models\ModelCache;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
@@ -1546,15 +1548,20 @@ class TagModel extends Gdn_Model
         $offset = 0;
         while (true) {
             $sql = $this->createSql();
-            if (
-                is_array($where["d.Type"]) &&
-                (in_array("discussion", $where["d.Type"]) || in_array("Discussion", $where["d.Type"]))
-            ) {
-                $sql->beginWhereGroup()
-                    ->where("d.Type", $where["d.Type"])
-                    ->orWhere("d.Type is null")
-                    ->endWhereGroup();
-                unset($where["d.Type"]);
+            if (isset($where["d.Type"])) {
+                if (!is_array($where["d.Type"])) {
+                    $where["d.Type"] = [$where["d.Type"]];
+                }
+                if (PostTypeModel::isPostTypesFeatureEnabled()) {
+                    PostTypeModel::addJoin($sql, $where["d.Type"]);
+                    unset($where["d.Type"]);
+                } elseif (in_array("discussion", $where["d.Type"]) || in_array("Discussion", $where["d.Type"])) {
+                    $sql->beginWhereGroup()
+                        ->where("d.Type", $where["d.Type"])
+                        ->orWhere("d.Type is null")
+                        ->endWhereGroup();
+                    unset($where["d.Type"]);
+                }
             }
             $results = $sql
                 ->select(["d.*"])

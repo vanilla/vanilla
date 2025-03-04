@@ -35,6 +35,7 @@ import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
 import { DeepPartial } from "redux";
 import "../../scss/_base.scss";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -112,6 +113,17 @@ const INITIAL_STORY_STATE = {
 
 const defaultState = createRootReducer()(INITIAL_STORY_STATE, { type: "initial" });
 
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: false,
+        },
+        mutations: {
+            retry: false,
+        },
+    },
+});
+
 export function StoryContextProvider(props: {
     children?: React.ReactNode;
     noWrappers?: boolean;
@@ -126,7 +138,7 @@ export function StoryContextProvider(props: {
     useLayoutEffect(() => {
         addComponent("HomeWidget", HomeWidget, { overwrite: true });
         addComponent("CallToAction", CallToAction, { overwrite: true });
-        _mountComponents(document.body);
+        void _mountComponents(document.body);
     });
 
     const updateContext = useCallback(
@@ -184,19 +196,21 @@ export function StoryContextProvider(props: {
 
     return (
         <StoryContext.Provider value={{ ...contextState, updateContext, refreshKey: themeKey }}>
-            <Provider store={store}>
-                <MemoryRouter>
-                    <ThemeProvider disabled errorComponent={<ErrorComponent />} themeKey={themeKey}>
-                        <ScrollOffsetProvider>
-                            <DeviceProvider>
-                                <LiveAnnouncer>
-                                    <TitleBarDeviceProvider>{content}</TitleBarDeviceProvider>
-                                </LiveAnnouncer>
-                            </DeviceProvider>
-                        </ScrollOffsetProvider>
-                    </ThemeProvider>
-                </MemoryRouter>
-            </Provider>
+            <QueryClientProvider client={queryClient}>
+                <Provider store={store}>
+                    <MemoryRouter>
+                        <ThemeProvider disabled errorComponent={<ErrorComponent />} themeKey={themeKey}>
+                            <ScrollOffsetProvider>
+                                <DeviceProvider>
+                                    <LiveAnnouncer>
+                                        <TitleBarDeviceProvider>{content}</TitleBarDeviceProvider>
+                                    </LiveAnnouncer>
+                                </DeviceProvider>
+                            </ScrollOffsetProvider>
+                        </ThemeProvider>
+                    </MemoryRouter>
+                </Provider>
+            </QueryClientProvider>
         </StoryContext.Provider>
     );
 }

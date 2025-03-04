@@ -10,10 +10,9 @@ import { setMeta } from "@library/utility/appUtils";
 import { insertRichEmbed } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichEmbed";
 import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 import { createVanillaEditor, LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
-import { getByRole, render, screen } from "@testing-library/react";
+import { getByRole, render, screen, within, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { focusEditor, select } from "@udecode/plate-common";
-import React from "react";
 import { act } from "react-dom/test-utils";
 
 describe("<RichLinkToolbar />", () => {
@@ -26,7 +25,7 @@ describe("<RichLinkToolbar />", () => {
             mockAdapter.reset();
         });
 
-        it("The toolbar can be triggered with a hotkey to create links", async () => {
+        it("The toolbar can be triggered with a hotkey to create links. The link form includes an accessible submit button", async () => {
             const user = userEvent.setup();
             const editor = createVanillaEditor();
 
@@ -36,7 +35,7 @@ describe("<RichLinkToolbar />", () => {
                 </TestReduxProvider>,
             );
 
-            act(() => {
+            await act(async () => {
                 focusEditor(editor);
             });
 
@@ -52,7 +51,16 @@ describe("<RichLinkToolbar />", () => {
             const displayTextInput = await screen.findByRole("textbox", { name: "Text to Display" });
             displayTextInput.focus();
             await user.keyboard("My Link!");
-            await user.keyboard("{Enter}");
+
+            const form = displayTextInput.closest("form")!;
+
+            const submitButton = await within(form).findByRole<HTMLButtonElement>("button", { name: "Add Link" });
+
+            expect((submitButton as HTMLButtonElement).type).toBe("submit");
+
+            await act(async () => {
+                fireEvent.submit(form);
+            });
 
             // We should now have a link.
             const newLink = await screen.findByRole("link", { name: "My Link!" });

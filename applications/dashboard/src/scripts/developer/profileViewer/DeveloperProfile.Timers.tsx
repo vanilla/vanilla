@@ -78,7 +78,7 @@ export function DeveloperProfilerTimers(props: IProps) {
                                         <MetaIcon icon="meta-time" style={{ marginLeft: -4 }}>
                                             {group.totalElapsedMs.toFixed(2)}ms
                                         </MetaIcon>
-                                        <MetaIcon icon="search-categories">{group.spans.length} Items</MetaIcon>
+                                        <MetaIcon icon="meta-categories">{group.spans.length} Items</MetaIcon>
                                     </>
                                 }
                                 description={

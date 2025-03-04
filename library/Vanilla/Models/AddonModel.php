@@ -134,13 +134,13 @@ class AddonModel implements LoggerAwareInterface
         try {
             $this->addonManager->checkRequirements($addon, true);
         } catch (\Exception $ex) {
-            $validation->addError("requirements", $ex->getMessage(), $ex->getCode());
+            $validation->addError("requirements", $ex->getMessage(), ["code" => $ex->getCode()]);
         }
 
         try {
             $this->addonManager->checkConflicts($addon, true);
         } catch (\Exception $ex) {
-            $validation->addError("conflicts", $ex->getMessage(), $ex->getCode());
+            $validation->addError("conflicts", $ex->getMessage(), ["code" => $ex->getCode()]);
         }
 
         if (!$validation->isValid()) {

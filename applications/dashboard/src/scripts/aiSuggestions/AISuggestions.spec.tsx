@@ -9,15 +9,16 @@ import { INITIAL_AISUGGESTION_SETTINGS } from "@dashboard/aiSuggestions/AISugges
 import {
     AISuggestionSectionSchema,
     getInitialSettings,
-    getSettingsSchema,
+    getSettingsSchemaSections,
 } from "@dashboard/aiSuggestions/settingsSchemaUtils";
 import { mockAPI } from "@library/__tests__/utility";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { setMeta } from "@library/utility/appUtils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render } from "@testing-library/react";
+import { act, render, RenderResult } from "@testing-library/react";
 import MockAdapter from "axios-mock-adapter/types";
+import { LiveAnnouncer } from "react-aria-live";
 
 const MOCK_SOURCES = {
     category: {
@@ -49,10 +50,21 @@ function queryClientWrapper() {
 
 describe("AISuggestions Settings", () => {
     let mockAdapter: MockAdapter;
+    let result: RenderResult;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         mockAdapter = mockAPI();
         setMeta("suggestionSources", MOCK_SOURCES);
+        const QueryClientWrapper = queryClientWrapper();
+        await act(async () => {
+            result = render(
+                <QueryClientWrapper>
+                    <LiveAnnouncer>
+                        <AISuggestions />
+                    </LiveAnnouncer>
+                </QueryClientWrapper>,
+            );
+        });
     });
 
     afterEach(() => {
@@ -60,38 +72,16 @@ describe("AISuggestions Settings", () => {
     });
 
     it("Renders error that Q&A addon is not enabled", async () => {
-        const QueryClientWrapper = queryClientWrapper();
-        const result = await render(
-            <QueryClientWrapper>
-                <AISuggestions />
-            </QueryClientWrapper>,
-        );
-        const warningTitle = result.getByText(/Feature is not configured/);
+        const warningTitle = await result.findByText(/Feature is not configured/);
         expect(warningTitle).toBeInTheDocument();
     });
 
-    it("Creates the schema from the settings and sources in meta", () => {
-        const sections = getSettingsSchema(INITIAL_AISUGGESTION_SETTINGS);
-        expect(sections).toBeDefined();
-        expect(sections?.length).toEqual(3);
-        sections?.forEach(({ schema }) => {
-            expect(schema.properties).toBeDefined();
-        });
-        const sources = sections?.[2].schema.properties.sources.properties;
-        expect(sources).toBeDefined();
-        expect(sources.enabled).toBeDefined();
-        expect(sources.enabled.default).toContain("category");
-        expect(sources.exclusions).toBeDefined();
-        expect(sources.exclusions.properties.category).toBeDefined();
-    });
-
-    it("Creates intial values from schema", () => {
-        const sections = getSettingsSchema({
+    it("Creates initial values from schema", () => {
+        const sections = getSettingsSchemaSections({
             ...INITIAL_AISUGGESTION_SETTINGS,
             name: "Scuppy",
         });
         const initialValues = getInitialSettings(sections as AISuggestionSectionSchema[]);
-        expect(initialValues.toneOfVoice).toBe("friendly");
         expect(initialValues.name).toBe("Scuppy");
         expect(initialValues.sources.enabled).toContain("category");
     });

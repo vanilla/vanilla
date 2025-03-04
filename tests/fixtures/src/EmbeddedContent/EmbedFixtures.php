@@ -42,7 +42,7 @@ class EmbedFixtures
     public static function discussion(string $username = "DiscussionQuote Username"): array
     {
         return [
-            "url" => "https://dev.vanilla.localhost/discussion/8/test-file-upload",
+            "url" => "https://dev.vanilla.local/discussion/8/test-file-upload",
             "embedType" => QuoteEmbed::TYPE,
             "recordType" => "discussion",
             "recordID" => 8,
@@ -69,7 +69,7 @@ class EmbedFixtures
     public static function comment(string $username = "CommentQuote Username"): array
     {
         return [
-            "url" => "https://dev.vanilla.localhost/discussion/comment/5",
+            "url" => "https://dev.vanilla.local/discussion/comment/5",
             "embedType" => QuoteEmbed::TYPE,
             "recordType" => "comment",
             "recordID" => 8,

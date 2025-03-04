@@ -172,7 +172,7 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
     }
 
     const classes = formTreeClasses();
-    const iconType = treeContext.getRowIcon ? treeContext.getRowIcon(item) : "data-folder-tabs";
+    const iconType = treeContext.getRowIcon ? treeContext.getRowIcon(item) : "folder";
 
     const cancelAction = isEditable && (
         <Button
@@ -216,7 +216,7 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
                 We display an icon on mobile in the row.
             */}
             <span className={isCompact ? visibility().visuallyHidden : ""}>{t("Edit")}</span>
-            {isCompact && <Icon icon="data-pencil" />}
+            {isCompact && <Icon icon="edit" />}
         </Button>
     );
 
@@ -238,7 +238,7 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
             <span className={isCompact || forceCompactDeleteAction ? visibility().visuallyHidden : ""}>
                 {t("Delete")}
             </span>
-            {(isCompact || forceCompactDeleteAction) && <Icon icon={"data-trash"} />}
+            {(isCompact || forceCompactDeleteAction) && <Icon icon={"delete"} />}
         </Button>
     );
 
@@ -258,7 +258,7 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
                 We display an icon on mobile in the row.
             */}
             <span className={isCompact ? visibility().visuallyHidden : ""}>{isHidden ? t("Show") : t("Hide")}</span>
-            {isCompact && <Icon icon={isHidden ? "editor-eye-slash" : "editor-eye"} />}
+            {isCompact && <Icon icon={isHidden ? "hide-content" : "show-content"} />}
         </Button>
     );
 

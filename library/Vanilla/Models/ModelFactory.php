@@ -146,7 +146,7 @@ class ModelFactory implements ContainerInterface
      * @param string $id
      * @return bool
      */
-    public function has($id)
+    public function has($id): bool
     {
         return $this->container->has(self::key($id));
     }

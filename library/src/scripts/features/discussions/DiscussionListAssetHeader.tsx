@@ -38,6 +38,10 @@ export function DiscussionListAssetHeader(props: IProps) {
     const measure = useMeasure(selfRef);
     const isMobile = measure.width < 600;
 
+    const hasFollowedCategoriesFilter = !apiParams.categoryID;
+    const hasSuggestedContentFilter = getMeta("suggestedContentEnabled", false);
+    const shouldShowCategoryFilter = hasFollowedCategoriesFilter || hasSuggestedContentFilter;
+
     return (
         <div className={cx(classes.assetHeader, { [classes.disablePointerEvents]: isPreview })} ref={selfRef}>
             <div>
@@ -47,13 +51,23 @@ export function DiscussionListAssetHeader(props: IProps) {
                         discussionIDs={props.discussionIDs ?? []}
                     />
                 )}
-                <DiscussionListAssetCategoryFilter
-                    filter={apiParams.followed ? "followed" : apiParams.suggested ? "suggested" : "all"}
-                    onFilterChange={(filter: string) => {
-                        updateApiParams({ followed: filter === "followed", suggested: filter === "suggested" });
-                    }}
-                    isMobile={isMobile}
-                />
+                {shouldShowCategoryFilter && (
+                    <DiscussionListAssetCategoryFilter
+                        filter={
+                            hasFollowedCategoriesFilter && apiParams.followed
+                                ? "followed"
+                                : hasSuggestedContentFilter && apiParams.suggested
+                                ? "suggested"
+                                : "all"
+                        }
+                        onFilterChange={(filter: string) => {
+                            updateApiParams({ followed: filter === "followed", suggested: filter === "suggested" });
+                        }}
+                        isMobile={isMobile}
+                        hasFollowedCategoriesFilter={hasFollowedCategoriesFilter}
+                        hasSuggestedContentFilter={hasSuggestedContentFilter}
+                    />
+                )}
                 <DiscussionListSort
                     currentSort={apiParams.sort ?? DiscussionListSortOptions.RECENTLY_COMMENTED}
                     selectSort={(sort: DiscussionListSortOptions) => updateApiParams({ sort })}

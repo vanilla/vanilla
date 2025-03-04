@@ -4,15 +4,24 @@
  */
 
 import { registerLayoutPage } from "@library/features/Layout/LayoutPage.registry";
+import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
 import { getMeta, getSiteSection } from "@library/utility/appUtils";
-import { registerDiscussionThreadPage } from "@vanilla/addon-vanilla/thread/registerDiscussionThreadPage";
+import { DraftContextProvider } from "@vanilla/addon-vanilla/drafts/DraftContext";
+import { CreatePostParams, EditExistingPostParams, PostPageParams } from "@vanilla/addon-vanilla/drafts/types";
+import { getParamsFromPath, isCreatePostParams } from "@vanilla/addon-vanilla/drafts/utils";
 import QueryStringParams from "qs";
+import { addComponent, registerLoadableWidgets } from "@library/utility/componentRegistry";
+import { CommentThreadParentContext } from "@vanilla/addon-vanilla/comments/CommentThreadParentContext";
+import qs from "qs";
+import { PostPageContextProvider } from "@vanilla/addon-vanilla/posts/PostPageContext";
+import { CreateCommentProvider } from "@vanilla/addon-vanilla/posts/CreateCommentContext";
+import { ParentRecordContextProvider } from "@vanilla/addon-vanilla/posts/ParentRecordContext";
 
-const discussionThreadEnabled = getMeta("featureFlags.customLayout.discussionThread.Enabled", false);
-const discussionListEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
+const postPageEnabled = getMeta("featureFlags.customLayout.post.Enabled", false);
+const postListEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
 const categoryListEnabled = getMeta("featureFlags.customLayout.categoryList.Enabled", false);
 
-discussionListEnabled &&
+postListEnabled &&
     registerLayoutPage("/discussions", (routeParams) => {
         const { location } = routeParams;
         const urlQuery = QueryStringParams.parse(location.search.substring(1));
@@ -22,8 +31,6 @@ discussionListEnabled &&
             recordType: "siteSection",
             recordID: getSiteSection().sectionID,
             params: {
-                siteSectionID: getSiteSection().sectionID,
-                locale: getSiteSection().contentLocale,
                 ...urlQuery,
             },
         };
@@ -41,8 +48,6 @@ categoryListEnabled &&
             recordType: "siteSection",
             recordID: getSiteSection().sectionID,
             params: {
-                siteSectionID: getSiteSection().sectionID,
-                locale: getSiteSection().contentLocale,
                 ...urlQuery,
             },
         };
@@ -68,8 +73,6 @@ categoryListEnabled &&
                 recordID: params.match.params.id,
                 params: {
                     ...urlQuery,
-                    siteSectionID: getSiteSection().sectionID,
-                    locale: getSiteSection().contentLocale,
                     categoryID: params.match.params.id,
                     page: (params.match.params.page ?? urlQuery.page ?? 1).toString(),
                 },
@@ -77,4 +80,94 @@ categoryListEnabled &&
         },
     );
 
-discussionThreadEnabled && registerDiscussionThreadPage();
+type IPostPageParams =
+    | {
+          discussionID: string;
+          page: string;
+      }
+    | {
+          commentID: string;
+          page: string;
+      };
+
+postPageEnabled &&
+    registerLayoutPage<IPostPageParams>(
+        [
+            "/discussion/:discussionID(\\d+)(/[^/]+)?/p:page(\\d+)",
+            "/discussion/:discussionID(\\d+)(/[^/]+)?",
+            "/discussion/comment/:commentID(\\d+)",
+        ],
+        (params) => {
+            const { location } = params;
+            const urlQuery = qs.parse(location.search.substring(1));
+            const sort = urlQuery.sort ?? null;
+
+            if ("commentID" in params.match.params) {
+                const commentID = parseInt(params.match.params.commentID);
+                return {
+                    layoutViewType: "post",
+                    recordType: "comment",
+                    recordID: commentID,
+                    params: {
+                        commentID,
+                        sort,
+                    },
+                };
+            } else {
+                const discussionID = parseInt(params.match.params.discussionID);
+                const page = parseInt(params.match.params.page ?? 1);
+                return {
+                    layoutViewType: "post",
+                    recordType: "discussion",
+                    recordID: discussionID,
+                    params: {
+                        discussionID,
+                        page,
+                        sort,
+                    },
+                };
+            }
+        },
+    );
+
+const customCreatePostEnabled = getMeta("featureFlags.customLayout.createPost.Enabled", false);
+
+if (customCreatePostEnabled) {
+    // We will handle all the new post route here on the FE
+    registerLayoutPage(["/post/*"], (routeParams) => {
+        const { location } = routeParams;
+        const { pathname, search } = location;
+        const parameters = getParamsFromPath(pathname, search);
+        const urlQuery = QueryStringParams.parse(location.search.substring(1));
+        let layoutViewType = `createPost`;
+
+        return {
+            layoutViewType,
+            recordType: "siteSection",
+            recordID: getSiteSection().sectionID,
+            params: {
+                siteSectionID: getSiteSection().sectionID,
+                locale: getSiteSection().contentLocale,
+                ...parameters,
+                ...urlQuery,
+            },
+        };
+    });
+}
+
+addComponent("PostPageContextProvider", PostPageContextProvider);
+addComponent("CommentThreadParentContext", CommentThreadParentContext);
+addComponent("DraftContextProvider", DraftContextProvider);
+addComponent("CreateCommentProvider", CreateCommentProvider);
+addComponent("ParentRecordContextProvider", ParentRecordContextProvider);
+
+registerLoadableWidgets({
+    OriginalPostAsset: () => import("@vanilla/addon-vanilla/posts/OriginalPostAsset"),
+    CommentThreadAsset: () => import("@vanilla/addon-vanilla/comments/CommentThreadAsset"),
+    PostAttachmentsAsset: () => import("@vanilla/addon-vanilla/posts/PostAttachmentsAsset"),
+    PostMetaAsset: () => import("@vanilla/addon-vanilla/posts/PostMetaAsset"),
+    CreateCommentAsset: () => import("@vanilla/addon-vanilla/comments/CreateCommentAsset"),
+    PostTagsAsset: () => import("@vanilla/addon-vanilla/posts/PostTagsAsset"),
+    SuggestedAnswersAsset: () => import("@library/suggestedAnswers/SuggestedAnswersAsset"),
+    CreatePostFormAsset: () => import("@vanilla/addon-vanilla/createPost/CreatePostFormAsset"),
+});

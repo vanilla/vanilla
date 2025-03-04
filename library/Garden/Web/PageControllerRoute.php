@@ -36,7 +36,7 @@ class PageControllerRoute extends ResourceRoute
      * Configure the container with some routes.
      *
      * @param ContainerConfigurationInterface $dic The container.
-     * @param array{string, class-string<PageDispatchController>} $definitions A mapping of prefix => classname.
+     * @param array<string, class-string<PageDispatchController>> $definitions A mapping of prefix => classname.
      * @param string|null $featureFlag A theme feature flag or feature flag to lock the controller definition behind.
      * @param int $priority Priority for the route. Defaults to 0. Higher priorities match first.
      *

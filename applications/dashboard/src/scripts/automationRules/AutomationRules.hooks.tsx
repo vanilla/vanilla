@@ -8,9 +8,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiv2 from "@library/apiv2";
 import {
     AddEditAutomationRuleParams,
+    AutomationRuleActionType,
     AutomationRuleStatusType,
     AutomationRulesAdditionalDataQuery,
     IAutomationRule,
+    IAutomationRuleAction,
     IAutomationRuleDispatch,
     IAutomationRulesCatalog,
     IGetAutomationRuleDispatchesParams,
@@ -19,10 +21,8 @@ import { IGetCategoryListResponse, useCategoryList } from "@library/categoriesWi
 import { useEffect } from "react";
 import { useTagList } from "@library/features/tags/TagsHooks";
 import { ITag } from "@library/features/tags/TagsReducer";
-import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { AxiosResponseHeaders } from "axios";
 import { IGetUsersResponse, useGetUsers } from "@dashboard/users/userManagement/UserManagement.hooks";
-import { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 export function useRecipes(continiousFetch: boolean = true, escalationActionsFilter?: boolean) {
     const queryParams = escalationActionsFilter ? { escalations: true } : {};
@@ -69,7 +69,7 @@ export function useAddRecipe() {
             return data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(["automationRules"]);
+            void queryClient.invalidateQueries(["automationRules"]);
         },
     });
 }
@@ -83,7 +83,7 @@ export function useUpdateRecipe(automationRuleID: AddEditAutomationRuleParams["a
         },
         mutationKey: ["update_automationRule", automationRuleID],
         onSuccess: () => {
-            queryClient.invalidateQueries(["automationRules"]);
+            void queryClient.invalidateQueries(["automationRules"]);
         },
     });
 }
@@ -97,7 +97,7 @@ export function useUpdateRecipeStatus(automationRuleID: AddEditAutomationRulePar
         },
         mutationKey: ["update_automationRule", automationRuleID],
         onSuccess: () => {
-            queryClient.invalidateQueries(["automationRule", automationRuleID]);
+            void queryClient.invalidateQueries(["automationRule", automationRuleID]);
         },
     });
 }
@@ -111,7 +111,7 @@ export function useDeleteRecipe(automationRuleID: AddEditAutomationRuleParams["a
         },
         mutationKey: ["delete_automationRule", automationRuleID],
         onSuccess: () => {
-            queryClient.invalidateQueries(["automationRules"]);
+            void queryClient.invalidateQueries(["automationRules"]);
         },
     });
 }
@@ -125,7 +125,7 @@ export function useRunAutomationRule(automationRuleID: AddEditAutomationRulePara
             return data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(["automationRule", automationRuleID]);
+            void queryClient.invalidateQueries(["automationRule", automationRuleID]);
         },
     });
 }
@@ -175,7 +175,9 @@ export function useGetAdditionalData(query: AutomationRulesAdditionalDataQuery, 
 
     const { data: additionalCategories } = useCategoryList(
         query?.categoriesQuery ?? {},
-        Boolean(query?.categoriesQuery?.categoryID?.length),
+        Array.isArray(query?.categoriesQuery?.categoryID)
+            ? Boolean(query?.categoriesQuery?.categoryID?.length)
+            : !!query?.categoriesQuery?.categoryID,
     );
 
     const { data: additionalTags } = useTagList(query?.tagsQuery ?? {}, Boolean(query?.tagsQuery?.tagID?.length));
@@ -208,4 +210,20 @@ export function useGetAdditionalData(query: AutomationRulesAdditionalDataQuery, 
             });
         }
     }, [additionalCategories, additionalTags, additionalUsersData]);
+}
+
+export function useGetActionDynamicSchema(queryParams: { actionType?: AutomationRuleActionType; params?: any } | null) {
+    const { data, isFetching } = useQuery<any, IApiError, IAutomationRuleAction>({
+        queryFn: async () => {
+            const response = await apiv2.get(`/automation-rules/action-by-type?type=${queryParams?.actionType}`, {
+                params: queryParams?.params,
+            });
+            return response.data;
+        },
+        queryKey: ["automationRules_action_dynamicSchema", queryParams?.actionType, queryParams?.params],
+        enabled: Boolean(queryParams),
+        staleTime: 0,
+    });
+
+    return { data, isFetching };
 }

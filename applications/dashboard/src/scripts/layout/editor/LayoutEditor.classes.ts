@@ -61,7 +61,7 @@ export const layoutEditorClasses = useThemeCache(() => {
         position: "relative",
         display: "flex",
         flexDirection: "column",
-        "&:focus": {
+        "&:focus, &:focus-visible": {
             outline: "none",
             boxShadow: focusShadow,
         },
@@ -244,6 +244,7 @@ export const layoutEditorClasses = useThemeCache(() => {
             },
             "&.isActive:focus": {
                 "&:before": {
+                    outline: "none",
                     boxShadow: focusShadow,
                     border: "none",
                 },
@@ -254,16 +255,22 @@ export const layoutEditorClasses = useThemeCache(() => {
     const widget = css({
         position: "relative",
         userSelect: "none",
+        outline: "none",
+
+        // Special override for the Article Reactions widget, see note in ArticleReactionsWidgetPreview
+        "& .articleReactionsModal": {
+            display: "none",
+        },
     });
 
     const widgetBorder = css({
         pointerEvents: "none",
         content: "''",
         position: "absolute",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
+        top: -4,
+        bottom: -4,
+        left: -4,
+        right: -4,
         boxShadow: focusShadow,
         borderRadius: 2,
 

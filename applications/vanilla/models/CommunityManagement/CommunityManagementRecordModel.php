@@ -7,10 +7,12 @@
 
 namespace Vanilla\Forum\Models\CommunityManagement;
 
+use CommentModel;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Dashboard\Models\RecordStatusModel;
+use Vanilla\Database\Select;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\SchemaUtils;
 
@@ -104,26 +106,33 @@ class CommunityManagementRecordModel
                 }
                 return $fragments;
             case "comment":
-                $rows = $this->db
+                $parentName = $this->commentModel->getParentRecordField("getParentNameField");
+                $parentPlaceID = $this->commentModel->getParentRecordField("getPlaceIDField");
+                $parentPlaceRecordType = $this->commentModel->getParentRecordField("getPlaceRecordTypeField");
+
+                $query = $this->db
                     ->createSql()
                     ->select([
-                        "c.DiscussionID",
                         "c.CommentID",
-                        "d.Name",
-                        "d.CategoryID",
                         "c.InsertUserID",
                         "c.DateInserted",
                         "c.DateUpdated",
+                        "c.parentRecordType",
+                        "c.parentRecordID",
                     ])
+                    ->select($parentName, "coalesce", "parentName")
+                    ->select($parentPlaceID, "coalesce", "placeRecordID")
+                    ->select($parentPlaceID, "coalesce", "CategoryID")
+                    ->select($parentPlaceRecordType, "coalesce", "placeRecordType")
                     ->from("Comment c")
-                    ->join("Discussion d", "c.DiscussionID = d.DiscussionID")
-                    ->where(["CommentID" => $recordIDs])
-                    ->get()
-                    ->resultArray();
+                    ->where(["CommentID" => $recordIDs]);
+
+                $this->commentModel->addParentRecordTable($query);
+                $rows = $query->get()->resultArray();
                 $fragments = [];
                 foreach ($rows as $row) {
                     $fragments[$row["CommentID"]] = [
-                        "name" => $row["Name"],
+                        "name" => $row["parentName"],
                         "url" => \CommentModel::commentUrl($row),
                         "dateUpdated" => $row["DateUpdated"] ?? $row["DateInserted"],
                     ];
@@ -170,13 +179,21 @@ class CommunityManagementRecordModel
                     throw new ClientException("Escalation comments cannot be reported.");
                 }
 
-                $discussion = $this->discussionModel->getID($comment["DiscussionID"], DATASET_TYPE_ARRAY);
-                if (!$discussion) {
-                    return $discussion;
+                $parentRecord = $this->commentModel->getParentRecord(
+                    $comment["parentRecordID"],
+                    $comment["parentRecordType"]
+                );
+                $categoryID = $this->commentModel->getCategoryIDByParentRecordType(
+                    $comment["parentRecordID"],
+                    $comment["parentRecordType"]
+                );
+
+                if (!$parentRecord) {
+                    return $parentRecord;
                 }
                 return array_merge($comment, [
-                    "Name" => \CommentModel::generateCommentName($discussion["Name"]),
-                    "CategoryID" => $discussion["CategoryID"],
+                    "Name" => CommentModel::generateCommentName($parentRecord["Name"]),
+                    "CategoryID" => $categoryID,
                 ]);
 
             default:
@@ -205,6 +222,14 @@ class CommunityManagementRecordModel
         ]);
     }
 
+    /**
+     * Remove the escalated record.
+     *
+     * @param string $recordType
+     * @param int $recordID
+     * @return void
+     * @throws \Exception
+     */
     public function removeRecord(string $recordType, int $recordID): void
     {
         switch ($recordType) {
@@ -219,6 +244,15 @@ class CommunityManagementRecordModel
         }
     }
 
+    /**
+     * Restore the escalated record.
+     *
+     * @param string $recordType
+     * @param int $recordID
+     * @return void
+     * @throws ClientException
+     * @throws \Gdn_UserException
+     */
     public function restoreRecord(string $recordType, int $recordID): void
     {
         $logRecord =
@@ -239,6 +273,9 @@ class CommunityManagementRecordModel
         $this->logModel->restore($logRecord, true);
     }
 
+    /**
+     * @return Schema
+     */
     public static function fullRecordSchema(): Schema
     {
         return SchemaUtils::composeSchemas(

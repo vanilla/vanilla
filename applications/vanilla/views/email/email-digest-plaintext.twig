@@ -4,10 +4,11 @@
 {{ email.introduction }}
 {% endif %}
 
-{% for category in email.categories %}
-{{ category.name }} ({% if email.utmParams|default(false) %}{{ category.url ~ '?' ~ email.utmParams }}"{% else %}{{ category.url }}{% endif %})
+{% for contentType, sections in email.contents %}
+{% for sectionID, section in sections %}
+{{ section.name }} ({% if email.utmParams|default(false) %}{{ section.url ~ '?' ~ email.utmParams }}"{% else %}{{ section.url }}{% endif %})
 
-{% for discussion in category.discussions %}
+{% for discussion in section.discussions %}
 {{ discussion.name }} ({% if email.utmParams|default(false) %}{{ discussion.url ~ '?' ~ email.utmParams }}"{% else %}{{ discussion.url }}{% endif %})
 {{ discussion.excerpt }}
 {%-set metas %}
@@ -23,6 +24,7 @@
 {{sprintf(t("Started by %s"), discussion.insertUser.name)}}
 {% endif %}
 
+{% endfor %}
 {% endfor %}
 {% endfor %}
 

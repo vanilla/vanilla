@@ -123,12 +123,14 @@ HTML
                 "containerBackgroundColor" => "#dddddd",
                 "buttonTextColor" => "#ffffff",
                 "buttonBackgroundColor" => "#22a3db",
-                "categories" => [
-                    $category1 + [
-                        "discussions" => [$discussion1, $discussion2, $discussion3],
-                    ],
-                    $category2 + [
-                        "discussions" => [$discussion4, $discussion5],
+                "contents" => [
+                    "category" => [
+                        $category1 + [
+                            "discussions" => [$discussion1, $discussion2, $discussion3],
+                        ],
+                        $category2 + [
+                            "discussions" => [$discussion4, $discussion5],
+                        ],
                     ],
                 ],
                 "digestUnsubscribeLink" => "https://demo.vanillawip.com/unsubscribe/token",
@@ -170,12 +172,13 @@ HTML
         $renderedTemplate = $this->renderTwig("@vanilla/email/email-digest.twig", $data);
         $renderedPlainText = $this->renderTwig("@vanilla/email/email-digest-plaintext.twig", $data);
         $html = new TestHtmlDocument($renderedTemplate, false);
-        $cat1url = $data["email"]["categories"][0]["url"] . "?" . $data["email"]["utmParams"];
-        $html->assertContainsLink($cat1url, $data["email"]["categories"][0]["name"]);
+        $cat1url = $data["email"]["contents"]["category"][0]["url"] . "?" . $data["email"]["utmParams"];
+        $html->assertContainsLink($cat1url, $data["email"]["contents"]["category"][0]["name"]);
         $this->assertStringContainsString($cat1url, $renderedPlainText);
-        $cat1UnsubscribeLink = $data["email"]["categories"][0]["unsubscribeLink"] . "?" . $data["email"]["utmParams"];
+        $cat1UnsubscribeLink =
+            $data["email"]["contents"]["category"][0]["unsubscribeLink"] . "?" . $data["email"]["utmParams"];
         $html->assertContainsLink($cat1UnsubscribeLink, "Hide category");
-        foreach ($data["email"]["categories"][0]["discussions"] as $discussion) {
+        foreach ($data["email"]["contents"]["category"][0]["discussions"] as $discussion) {
             $discussionUrl = $discussion["url"] . "?" . $data["email"]["utmParams"];
             $html->assertContainsLink($discussionUrl, $discussion["name"]);
             $this->assertStringContainsString($discussionUrl, $renderedPlainText);

@@ -22,9 +22,11 @@ export interface IUnsubscribePreference {
     optionID: string;
 }
 
-export interface IUnsubscribeCategory extends IUnsubscribePreference {
-    categoryID: number;
-    categoryName: string;
+export interface IUnsubscribeContent extends IUnsubscribePreference {
+    contentID: number;
+    contentName: string;
+    contentType?: string;
+    contentUrl?: string;
 }
 
 export interface IDecodedToken {
@@ -44,8 +46,8 @@ export interface IUnsubscribeData extends IDecodedToken {
     hasMultiple?: boolean;
     isAllProcessed?: boolean;
     isEmailDigest?: boolean;
-    isUnfollowCategory?: boolean;
-    followedCategory?: IUnsubscribeCategory;
+    isUnfollowContent?: boolean;
+    followedContent?: IUnsubscribeContent;
 }
 
 // The data type structure of the data returned from each API call
@@ -59,7 +61,15 @@ interface IFollowCategoryResult extends IPreferenceResult {
     name: string;
 }
 
+interface IFollowContentResult extends IPreferenceResult {
+    contentType: string;
+    contentID: number;
+    name: string;
+    userID?: number;
+}
+
 export interface IUnsubscribeResult {
     preferences: IPreferenceResult[];
-    followCategory?: IFollowCategoryResult | any[];
+    followCategory?: IFollowCategoryResult;
+    followContent?: IFollowContentResult;
 }

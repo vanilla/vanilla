@@ -39,14 +39,18 @@ use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Forum\Jobs\DeferredResourceEventJob;
 use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\Forum\Models\PostMetaModel;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\MainImageSchema;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Logger;
 use Vanilla\Permissions;
 use Vanilla\Premoderation\PremoderationException;
 use Vanilla\Premoderation\PremoderationItem;
@@ -69,6 +73,7 @@ use Vanilla\Search\SearchTypeQueryExtenderInterface;
 use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\Deprecation;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
@@ -124,9 +129,6 @@ class DiscussionModel extends Gdn_Model implements
     /** @var string for type stub */
     const STUB_TYPE = "stub";
 
-    /** @var string for type discussion */
-    const DISCUSSION_TYPE = "Discussion";
-
     /** @var string announced discussion */
     const ANNOUNCEMENT_LABEL = "Announcement";
 
@@ -165,6 +167,9 @@ class DiscussionModel extends Gdn_Model implements
 
     /** @var array */
     private static $discussionTypes = null;
+
+    /** @var array */
+    public static $dicussionPostType = null;
 
     // Maximum number of seconds a batch of deletes should last before a new batch needs to be scheduled.
     public const MAX_TIME_BATCH = 10;
@@ -271,6 +276,8 @@ class DiscussionModel extends Gdn_Model implements
 
     private PostMetaModel $postMetaModel;
 
+    private PostTypeModel $postTypeModel;
+
     /**
      * Clear out the statically cached values for tests.
      */
@@ -302,7 +309,8 @@ class DiscussionModel extends Gdn_Model implements
             UserMentionsModel $userMentionsModel,
             DiscussionStatusModel $discussionStatusModel,
             AiSuggestionModel $aiSuggestionModel,
-            PostMetaModel $postMetaModel
+            PostMetaModel $postMetaModel,
+            PostTypeModel $postTypeModel
         ) {
             $this->categoryModel = $categoryModel;
             $this->userModel = $userModel;
@@ -312,6 +320,7 @@ class DiscussionModel extends Gdn_Model implements
             $this->discussionStatusModel = $discussionStatusModel;
             $this->aiSuggestionModel = $aiSuggestionModel;
             $this->postMetaModel = $postMetaModel;
+            $this->postTypeModel = $postTypeModel;
         });
         $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
@@ -330,6 +339,23 @@ class DiscussionModel extends Gdn_Model implements
         $this->reactionModel = Gdn::getContainer()->get(ReactionModel::class);
     }
 
+    /**
+     * Set main default discussion type
+     *
+     * @return array|string[]|null
+     * @throws Exception
+     */
+    public static function getDiscussionPostType()
+    {
+        if (self::$dicussionPostType === null) {
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
+                self::$dicussionPostType = "discussion";
+            } else {
+                self::$dicussionPostType = "Discussion";
+            }
+        }
+        return self::$dicussionPostType;
+    }
     /**
      * @inheritdoc
      */
@@ -417,7 +443,11 @@ class DiscussionModel extends Gdn_Model implements
                 ->get()
                 ->firstRow()->CategoryID ?? null;
         if ($categoryID === null) {
-            throw new NotFoundException("Discussion", ["discussionID" => $discussionID]);
+            if ($throw) {
+                throw new NotFoundException("Discussion", ["discussionID" => $discussionID]);
+            } else {
+                return false;
+            }
         }
 
         return $this->categoryPermission("discussions.view", $categoryID, $throw);
@@ -807,7 +837,7 @@ class DiscussionModel extends Gdn_Model implements
         $discussionTypes = self::discussionTypes();
         $layoutViewTypesByDiscussionType = array_column($discussionTypes, "layoutViewType", "apiType");
 
-        return $layoutViewTypesByDiscussionType[$discussionType] ?? "discussionThread";
+        return $layoutViewTypesByDiscussionType[$discussionType] ?? "discussion";
     }
 
     /**
@@ -817,28 +847,49 @@ class DiscussionModel extends Gdn_Model implements
      * @return array Returns an array of discussion type definitions.
      * @throws ContainerException
      */
-    public static function discussionTypes($category = null)
+    public static function discussionTypes($category = null): array
     {
         if (self::$discussionTypes === null) {
-            $discussionTypes = [
-                "Discussion" => [
-                    "layoutViewType" => "discussionThread",
-                    "apiType" => "discussion",
-                    "Singular" => "Discussion",
-                    "Plural" => "Discussions",
-                    "AddUrl" => "/post/discussion",
-                    "AddText" => "New Discussion",
-                    "AddIcon" => "new-discussion",
-                ],
-            ];
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
+                $postTypeModel = Gdn::getContainer()->get(PostTypeModel::class);
+                $discussionTypes = array_column(
+                    $category == null
+                        ? $postTypeModel->getAvailablePostTypes()
+                        : $postTypeModel->getAllowedPostTypesByCategory((array) $category),
+                    null,
+                    "name"
+                );
 
-            Gdn::pluginManager()->EventArguments["Category"] = &$category;
-            Gdn::pluginManager()->EventArguments["Types"] = &$discussionTypes;
-            Gdn::pluginManager()
-                ->fireAs("DiscussionModel")
-                ->fireEvent("DiscussionTypes");
+                $discussionTypes = array_map(function ($type) {
+                    $type["apiType"] = $type["postTypeID"];
+                    $type["Singular"] = $type["name"];
+                    $type["Plural"] = $type["name"];
+                    $type["AddText"] = $type["postButtonLabel"];
+                    $type["AddUrl"] = "/post/{$type["postTypeID"]}";
+                    $type["AddIcon"] = $type["postButtonIcon"];
+
+                    return $type;
+                }, $discussionTypes);
+            } else {
+                $discussionTypes = [
+                    "Discussion" => [
+                        "layoutViewType" => "discussion",
+                        "apiType" => "discussion",
+                        "Singular" => "Discussion",
+                        "Plural" => "Discussions",
+                        "AddUrl" => "/post/discussion",
+                        "AddText" => "New Discussion",
+                        "AddIcon" => "create-discussion",
+                    ],
+                ];
+
+                Gdn::pluginManager()->EventArguments["Category"] = &$category;
+                Gdn::pluginManager()->EventArguments["Types"] = &$discussionTypes;
+                Gdn::pluginManager()
+                    ->fireAs("DiscussionModel")
+                    ->fireEvent("DiscussionTypes");
+            }
             self::$discussionTypes = $discussionTypes;
-            unset(Gdn::pluginManager()->EventArguments["Types"]);
         }
 
         return self::$discussionTypes;
@@ -1095,27 +1146,6 @@ class DiscussionModel extends Gdn_Model implements
     }
 
     /**
-     * Get a slot type based on the time since a discussion started.
-     *
-     * @param int $discussionID
-     * @return string
-     */
-    public function getAutoSlotType(int $discussionID): string
-    {
-        $dateInserted =
-            $this->createSql()
-                ->select("DateInserted")
-                ->from("Discussion")
-                ->where("DiscussionID", $discussionID)
-                ->get()
-                ->firstRow()->DateInserted ?? null;
-        if ($dateInserted === null) {
-            throw new NotFoundException("Discussion", ["discussionID" => $discussionID]);
-        }
-        return ModelUtils::getDateBasedSlotType($dateInserted);
-    }
-
-    /**
      * Get a list of discussions.
      *
      * @param array $where The where condition of the get.
@@ -1246,13 +1276,25 @@ class DiscussionModel extends Gdn_Model implements
             unset($where["d.Followed"]);
         }
 
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $type = null;
+            if (isset($where["d.Type"]) && !is_array($where["d.Type"])) {
+                $type = [$where["d.Type"]];
+                unset($where["d.Type"]);
+            }
+            PostTypeModel::addJoin($sql, $type, "left");
+            $sql->select("pt.name, d.Type", "coalesce", "Type");
+        }
         // Ensure NULL are treated as discussions.
         if (isset($where["d.Type"])) {
             if (!is_array($where["d.Type"])) {
                 $where["d.Type"] = [$where["d.Type"]];
             }
 
-            if (in_array("discussion", $where["d.Type"]) || in_array("Discussion", $where["d.Type"])) {
+            if (
+                (!PostTypeModel::isPostTypesFeatureEnabled() && in_array("discussion", $where["d.Type"])) ||
+                in_array("Discussion", $where["d.Type"])
+            ) {
                 $sql->beginWhereGroup()
                     ->where("d.Type", $where["d.Type"])
                     ->orWhere("d.Type is null")
@@ -2331,7 +2373,12 @@ class DiscussionModel extends Gdn_Model implements
             ->where("d.ForeignID", $hash);
 
         if ($type != "") {
-            $this->SQL->where("d.Type", $type);
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
+                $type = PostTypeModel::prepareTypeArray([$type]);
+                PostTypeModel::addJoin($this->SQL, $type);
+            } else {
+                $this->SQL->where("d.Type", $type);
+            }
         }
 
         $discussion = $this->SQL->get()->firstRow();
@@ -2374,6 +2421,10 @@ class DiscussionModel extends Gdn_Model implements
         // Add select of additional fields to the SQL object.
         foreach ($selects as $select) {
             $this->SQL->select($select);
+        }
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            PostTypeModel::addJoin($this->SQL, null, "left");
+            $this->SQL->select("pt.name, d.Type", "coalesce", "Type");
         }
 
         $data = $this->SQL
@@ -2580,6 +2631,11 @@ class DiscussionModel extends Gdn_Model implements
             // update hot column value
             $this->updateColumnHot(["DiscussionID" => $rowID]);
         }
+
+        if (isset($property["Type"]) && !isset($property["postTypeID"])) {
+            // For legacy compatibility, null out the postTypeID if type is being updated without postTypeID.
+            $this->update(["postTypeID" => null], ["DiscussionID" => $rowID]);
+        }
         $this->fireEvent("AfterSetField");
     }
 
@@ -2644,14 +2700,10 @@ class DiscussionModel extends Gdn_Model implements
         $settings = is_array($settings) ? $settings : [];
         $this->defineSchema();
 
-        // If the site isn't configured to use categories, don't allow one to be set.
-        if (!c("Vanilla.Categories.Use", true)) {
-            unset($formPostValues["CategoryID"]);
-        }
-
         // Get the DiscussionID from the form to know if we are inserting or updating a record.
         $discussionID = val("DiscussionID", $formPostValues, "");
         $insert = $discussionID == "" ? true : false;
+        $currentDiscussionData = $insert ? [] : $this->getID($discussionID, DATASET_TYPE_ARRAY);
 
         // Avoid polluting validation rules between operation types (e.g. persisting insert rules for an update).
         $this->Validation->reset();
@@ -2679,6 +2731,15 @@ class DiscussionModel extends Gdn_Model implements
                     $validation->setSchemaProperty("Body", "MinTextLength", 1);
                     $validation->applyRule("Body", "MinTextLength");
                 }
+            }
+        }
+
+        // Add title length validation
+        $maxTitleLength = Gdn::config("Vanilla.Discussion.Title.MaxLength");
+        if ($maxTitleLength && array_key_exists("Name", $formPostValues)) {
+            if (is_numeric($maxTitleLength) && $maxTitleLength > 0) {
+                $validation->setSchemaProperty("Name", "maxPlainTextLength", $maxTitleLength);
+                $validation->applyRule("Name", "plainTextLength");
             }
         }
 
@@ -2719,10 +2780,6 @@ class DiscussionModel extends Gdn_Model implements
 
         if ($insert) {
             unset($formPostValues["DiscussionID"]);
-            // If no category ID is defined, grab the first available.
-            if (!val("CategoryID", $formPostValues) && !c("Vanilla.Categories.Use")) {
-                $formPostValues["CategoryID"] = val("CategoryID", CategoryModel::defaultCategory(), -1);
-            }
 
             $this->addInsertFields($formPostValues);
 
@@ -2816,7 +2873,7 @@ class DiscussionModel extends Gdn_Model implements
 
                 // Check for spam.
                 if (!FeatureFlagHelper::featureEnabled("escalations")) {
-                    $spam = SpamModel::isSpam("Discussion", $fields);
+                    $spam = SpamModel::isSpam("Discussion", $fields, ["action" => "update"]);
                     if ($spam) {
                         return SPAM;
                     }
@@ -2912,6 +2969,15 @@ class DiscussionModel extends Gdn_Model implements
                     if (!$format || c("Garden.ForceInputFormatter")) {
                         $fields["Format"] = $forcedFormat && $format ? $format : c("Garden.InputFormatter", "");
                     }
+                    if (PostTypeModel::isPostTypesFeatureEnabled() && !isset($fields["postTypeID"])) {
+                        $fields["Type"] ??= "Discussion";
+                        $postTypes = self::discussionTypes();
+                        foreach ($postTypes as $postType) {
+                            if ($postType["name"] === $fields["Type"]) {
+                                $fields["postTypeID"] = $postType["postTypeID"];
+                            }
+                        }
+                    }
 
                     // Check for approval
                     if (!($settings["skipSpamCheck"] ?? false)) {
@@ -2986,6 +3052,11 @@ class DiscussionModel extends Gdn_Model implements
                         );
                         $notificationGenerator->notifyNewDiscussion($discussion);
                     }
+                }
+                if (!$insert && !empty($formPostValues["Announce"]) && !$currentDiscussionData["Announce"]) {
+                    // If we are updating `announce` via update , make sure we send a notification.
+                    $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+                    $this->getEventManager()->fire("discussionAnnounced", $discussion);
                 }
 
                 $discussion = $discussion ?? $this->getID($discussionID, DATASET_TYPE_ARRAY);
@@ -4293,7 +4364,7 @@ SQL;
      * @param array $options
      * @return array
      * @throws ContainerException
-     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Container\NotFoundException|FormatterNotFoundException
      */
     public function normalizeRow(array $row, $expand = [], array $options = []): array
     {
@@ -4302,11 +4373,12 @@ SQL;
         $session = \Gdn::session();
         $discussionMoved = $row["Type"] === self::REDIRECT_TYPE && $row["Closed"];
         if ($session->User && !$discussionMoved) {
+            $dateFirstVisit = val("DateFirstVisit", $session->User);
             $row["unread"] =
                 isset($row["CountUnreadComments"]) &&
                 $row["CountUnreadComments"] !== 0 &&
                 ($row["CountUnreadComments"] !== true ||
-                    dateCompare(val("DateFirstVisit", $session->User), $row["DateInserted"]) <= 0);
+                    ($dateFirstVisit && dateCompare($dateFirstVisit, $row["DateInserted"]) <= 0));
             if (
                 isset($row["CountUnreadComments"]) &&
                 $row["CountUnreadComments"] !== true &&
@@ -4404,15 +4476,22 @@ SQL;
 
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
             $row["canonicalID"] = "discussion_{$row["DiscussionID"]}";
-            $row["recordCollapseID"] = "site{$this->ownSite->getSiteID()}_discussion{$row["DiscussionID"]}";
+            $row[
+                "recordCollapseID"
+            ] = "site{$this->ownSite->getSiteID()}_parentRecordType_discussion_parentRecordID{$row["DiscussionID"]}";
             $row["excerpt"] = $row["excerpt"] ?? $this->formatterService->renderExcerpt($bodyParsed, $format);
             $row["bodyPlainText"] = $row["Name"] . " \n " . Gdn::formatService()->renderPlainText($bodyParsed, $format);
 
             $row["image"] = $this->formatterService->parseImageUrls($bodyParsed, $format)[0] ?? null;
             $row["scope"] = $this->categoryModel->getRecordScope($row["CategoryID"]);
             $row["score"] = $row["Score"] ?? 0;
-            $type = $row["Type"] ?? "";
-            $row["Type"] = $type === self::REDIRECT_TYPE ? self::DISCUSSION_TYPE : $type;
+
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
+                $type = $row["Type"] ?? self::RECORD_TYPE;
+                $row["Type"] = $type === self::REDIRECT_TYPE ? self::getDiscussionPostType() : $type;
+
+                $row["postTypeID"] = $row["postTypeID"] ?? self::$discussionTypes[$type]["apiKey"];
+            }
             $siteSection = $this->siteSectionModel->getSiteSectionForAttribute("allCategories", $row["CategoryID"]);
             $row["locale"] = $siteSection->getContentLocale();
 
@@ -4470,7 +4549,7 @@ SQL;
     public static function normalizeDiscussionType(?string $discussionType): string
     {
         if (!empty($discussionType)) {
-            $discussionType = $discussionType === self::STUB_TYPE ? self::DISCUSSION_TYPE : $discussionType;
+            $discussionType = $discussionType === self::STUB_TYPE ? self::getDiscussionPostType() : $discussionType;
             return lcfirst($discussionType);
         } else {
             return "discussion";
@@ -4611,6 +4690,7 @@ SQL;
             "suggestions:a?",
             "showSuggestions:b?",
             "postFields?",
+            "permissions:o?",
         ];
         if (\Gdn::session()->checkPermission("staff.allow")) {
             $schema["internalStatusID:i"] = ["default" => RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED];
@@ -5091,7 +5171,11 @@ SQL;
         // Fire of an action indicating the record was deleted.
         $dataObject = (object) $existingDiscussion;
         $this->calculate($dataObject);
-
+        $this->logger->info("Deleting Discussion", [
+            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+            Logger::FIELD_TAGS => ["delete", "discussion"],
+            "stackTrace" => DebugUtils::stackTraceString(debug_backtrace()),
+        ]);
         $discussionEvent = $this->eventFromRow(
             (array) $dataObject,
             ResourceEvent::ACTION_DELETE,
@@ -5150,14 +5234,19 @@ SQL;
      * @param array|int $discussionOrDiscussionID What discussion or discussionID should we move the discussion into.
      * @param array|int $categoryOrCategoryID What category or categoryID should we move the discussion into.
      * @param bool $addRedirects Should we create a redirect from this discussion.
+     * @param string|null $postTypeID
      * @return bool True on success. Throws on failures.
      *
      * @throws ValidationException If saving didn't work.
      * @throws ClientException If the discussion can't be moved to that category.
      * @throws NotFoundException If the discussion or category didn't exist.
      */
-    public function moveDiscussion($discussionOrDiscussionID, $categoryOrCategoryID, bool $addRedirects): bool
-    {
+    public function moveDiscussion(
+        $discussionOrDiscussionID,
+        $categoryOrCategoryID,
+        bool $addRedirects,
+        ?string $postTypeID = null
+    ): bool {
         $newCategory = is_numeric($categoryOrCategoryID)
             ? CategoryModel::categories($categoryOrCategoryID)
             : $categoryOrCategoryID;
@@ -5172,16 +5261,16 @@ SQL;
             throw new NotFoundException("Discussion", ["discussionID" => $discussionOrDiscussionID]);
         }
         // Default/Empty/Null discussion type is a discussion.
-        $discussion["Type"] = $discussion["Type"] ?? DiscussionModel::DISCUSSION_TYPE;
-
+        $discussion["Type"] = $discussion["Type"] ?? self::getDiscussionPostType();
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $discussion["postTypeID"] = $discussion["postTypeID"] ?? self::getDiscussionPostType();
+        }
         $discussionID = $discussion["DiscussionID"];
         $newCategoryID = $newCategory["CategoryID"];
 
-        // Discussion is already in the correct category, skip.
+        // Only do category update if the target category is different.
         $discussionCategoryID = $discussion["CategoryID"] ?? null;
-        if ($discussionCategoryID === $newCategory["CategoryID"]) {
-            return true;
-        } else {
+        if ($discussionCategoryID !== $newCategoryID) {
             $postingCategory = CategoryModel::doesCategoryAllowPosts($newCategoryID);
 
             if (!$postingCategory) {
@@ -5190,67 +5279,72 @@ SQL;
                     "destinationCategoryID" => $newCategoryID,
                 ]);
             }
-        }
 
-        $allowedDiscussionTypes = $newCategory["AllowedDiscussionTypes"];
+            $allowedDiscussionTypes = $newCategory["AllowedDiscussionTypes"];
 
-        $allowedDiscussionTypes = is_array($allowedDiscussionTypes)
-            ? $allowedDiscussionTypes
-            : array_keys(\DiscussionModel::discussionTypes());
+            $allowedDiscussionTypes = is_array($allowedDiscussionTypes)
+                ? $allowedDiscussionTypes
+                : array_keys(\DiscussionModel::discussionTypes());
 
-        $eventManager = $this->getEventManager();
-        $allowedDiscussionTypes = $eventManager->fireFilter(
-            "discussionModel_moveAllowedTypes",
-            $allowedDiscussionTypes,
-            $newCategory
-        );
+            $eventManager = $this->getEventManager();
+            $allowedDiscussionTypes = $eventManager->fireFilter(
+                "discussionModel_moveAllowedTypes",
+                $allowedDiscussionTypes,
+                $newCategory
+            );
 
-        $allowedDiscussionTypes = array_map("strtolower", $allowedDiscussionTypes);
+            $allowedDiscussionTypes = array_map("strtolower", $allowedDiscussionTypes);
 
-        if (
-            isset($discussion["Type"]) &&
-            !empty($allowedDiscussionTypes) &&
-            !in_array(strtolower($discussion["Type"]), $allowedDiscussionTypes)
-        ) {
-            throw new ClientException("Discussion type is not allowed in the destination category.", 400, [
-                "discussionID" => $discussionID,
-                "discussionType" => $discussion["Type"],
-                "allowedDiscussionTypes" => $allowedDiscussionTypes,
-            ]);
-        }
+            if (
+                isset($discussion["Type"]) &&
+                !empty($allowedDiscussionTypes) &&
+                !in_array(strtolower($discussion["Type"]), $allowedDiscussionTypes)
+            ) {
+                throw new ClientException("Discussion type is not allowed in the destination category.", 400, [
+                    "discussionID" => $discussionID,
+                    "discussionType" => $discussion["Type"],
+                    "allowedDiscussionTypes" => $allowedDiscussionTypes,
+                ]);
+            }
 
-        // Create the redirect.
-        if ($addRedirects) {
-            $this->createRedirect($discussion);
+            // Create the redirect.
+            if ($addRedirects) {
+                $this->createRedirect($discussion);
+                ModelUtils::validationResultToValidationException($this);
+            }
+
+            $save = [
+                "CategoryID" => $newCategory["CategoryID"],
+                "DiscussionID" => $discussionID,
+            ];
+            // Fire event in case some addon needs to change other data during the move.
+            $this->EventArguments = [
+                "discussion" => &$discussion,
+                "save" => &$save,
+            ];
+            $this->fireEvent("beforeDiscussionMoveSave");
+
+            // Move the discussion.
+            $this->save($this->EventArguments["save"]);
+
+            // throw any validation errors.
             ModelUtils::validationResultToValidationException($this);
+
+            // Dispatch a Discussion event (move)
+            $senderUserID = Gdn::session()->UserID;
+            $sender = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
+
+            $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+            $discussionEvent = $this->eventFromRow($discussion, DiscussionEvent::ACTION_MOVE, $sender);
+            $discussionEvent->setSourceCategoryID($discussionCategoryID);
+            $this->getEventManager()->dispatch($discussionEvent);
         }
 
-        $save = [
-            "CategoryID" => $newCategory["CategoryID"],
-            "DiscussionID" => $discussionID,
-        ];
-        // Fire event in case some addon needs to change other data during the move.
-        $this->EventArguments = [
-            "discussion" => &$discussion,
-            "save" => &$save,
-        ];
-        $this->fireEvent("beforeDiscussionMoveSave");
-
-        // Move the discussion.
-        $this->save($this->EventArguments["save"]);
-
-        // throw any validation errors.
-        ModelUtils::validationResultToValidationException($this);
-
-        // Dispatch a Discussion event (move)
-        $senderUserID = Gdn::session()->UserID;
-        $sender = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
-
-        $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
-        $discussionEvent = $this->eventFromRow($discussion, DiscussionEvent::ACTION_MOVE, $sender);
-        $discussionEvent->setSourceCategoryID($discussionCategoryID);
-        $this->getEventManager()->dispatch($discussionEvent);
-
+        // Update the post type using the DiscussionTypeConverter if we are changing the post type.
+        if (isset($postTypeID) && $discussion["postTypeID"] !== $postTypeID) {
+            $discussionTypeConverter = Gdn::getContainer()->get(\Vanilla\DiscussionTypeConverter::class);
+            $discussionTypeConverter->convert($discussion, $postTypeID, isCustomPostType: true);
+        }
         return true;
     }
 
@@ -5269,17 +5363,41 @@ SQL;
     }
 
     /**
+     * Redirect to the url specified by the discussion if it's a redirect.
+     *
+     * @param array $discussionRow
+     */
+    public function tryRedirectFromDiscussion(array $discussionRow): void
+    {
+        $type = $discussionRow["type"] ?? ($discussionRow["Type"] ?? null);
+        $body = $discussionRow["body"] ?? ($discussionRow["Body"] ?? "");
+        $format = $discussionRow["format"] ?? ($discussionRow["Format"] ?? null);
+
+        if ($type && strtolower($type) === "redirect") {
+            $renderedBody = \Gdn::formatService()->renderHTML($body, $format ?? null);
+            if (preg_match('`href="([^"]+)"`i', $renderedBody, $matches)) {
+                $url = $matches[1];
+                redirectTo(htmlspecialchars_decode($url), 301);
+            }
+        }
+    }
+
+    /**
      * Create an iterable for moving discussions.
      *
      * @param array $discussionIDs DiscussionIDs to move.
      * @param int $categoryID CategoryID to move discussions into.
      * @param bool $addRedirects If a redirect needs to be created.
+     * @param string|null $postTypeID
      *
      * @return Generator<int, LongRunnerItemResultInterface, null, string|LongRunnerNextArgs>
-     *
      */
-    public function moveDiscussionsIterator(array $discussionIDs, int $categoryID, bool $addRedirects): Generator
-    {
+    public function moveDiscussionsIterator(
+        array $discussionIDs,
+        int $categoryID,
+        bool $addRedirects,
+        ?string $postTypeID = null
+    ): Generator {
         $discussionIDs = array_unique($discussionIDs);
         $handledDiscussionIDs = [];
         try {
@@ -5287,7 +5405,7 @@ SQL;
 
             foreach ($discussionIDs as $discussionID) {
                 try {
-                    $this->moveDiscussion($discussionID, $categoryID, $addRedirects);
+                    $this->moveDiscussion($discussionID, $categoryID, $addRedirects, $postTypeID);
                     $handledDiscussionIDs[] = $discussionID;
                     yield new LongRunnerSuccessID($discussionID);
                 } catch (Exception $e) {
@@ -5301,7 +5419,7 @@ SQL;
             }
         } catch (LongRunnerTimeoutException $e) {
             $remainingDiscussionIDs = array_diff($discussionIDs, $handledDiscussionIDs);
-            return new LongRunnerNextArgs([$remainingDiscussionIDs, $categoryID, $addRedirects]);
+            return new LongRunnerNextArgs([$remainingDiscussionIDs, $categoryID, $addRedirects, $postTypeID]);
         }
     }
 
@@ -5426,7 +5544,7 @@ SQL
         if (
             $this->getSessionInterface()
                 ->getPermissions()
-                ->isAdmin()
+                ->has("site.manage")
         ) {
             $sql->where("d.DiscussionID IS NOT NULL");
             return;
@@ -5445,6 +5563,50 @@ SQL
 
         $event = new DiscussionPermissionQueryEvent($sql, $whereGroups);
         $this->getEventManager()->dispatch($event);
-        $event->applyWheresToQuery();
+        $sql->applyWheresToQuery($event->getWhereGroups());
+    }
+
+    /**
+     * Update either the Type column or postTypeID (if custom post types is enabled).
+     *
+     * @param int $id
+     * @param string|null $to
+     * @return void
+     */
+    public function setType(int $id, ?string $to, bool $forceNullDiscussion = false): void
+    {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            // If Post Types is on, then we are converting to a custom post type.
+
+            if (isset(PostTypeModel::LEGACY_TYPE_MAP[$to])) {
+                // If this is a legacy type name, convert to post type ID first.
+                $to = PostTypeModel::LEGACY_TYPE_MAP[$to];
+            }
+            $postType = $this->postTypeModel->getByID($to);
+            if (!isset($postType)) {
+                ErrorLogger::error("Failed to lookup post type named '$to'", ["discussions"]);
+                return;
+            }
+
+            try {
+                $this->SQL->Database->beginTransaction();
+                $discussion = $this->getID($id, DATASET_TYPE_ARRAY);
+                $fromType = $discussion["postTypeID"] ?? lcfirst($discussion["Type"]);
+                $this->postMetaModel->movePostFields($id, $fromType, $to);
+                $this->setField($id, [
+                    "postTypeID" => $postType["postTypeID"],
+                    "Type" =>
+                        $postType["baseType"] === "discussion" && $forceNullDiscussion
+                            ? null
+                            : ucfirst($postType["baseType"]),
+                ]);
+                $this->SQL->Database->commitTransaction();
+            } catch (Throwable $e) {
+                $this->SQL->Database->rollbackTransaction();
+                throw $e;
+            }
+        } else {
+            $this->setField($id, "Type", $to === "Discussion" && $forceNullDiscussion ? null : $to);
+        }
     }
 }

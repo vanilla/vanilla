@@ -1,5 +1,5 @@
 {
-    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=discussionList&cacheBuster=5",
+    "$schema": "http://dev.vanilla.local/api/v2/layouts/schema?layoutViewType=discussionList&cacheBuster=5",
     "dateInserted": "2022-01-01T00:00:00Z",
     "layoutViewType": "discussionList",
     "layoutID": "discussionList",

@@ -36,6 +36,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface
     }
 
     /**
+     * @param string|null $locale
      * @return SiteSectionInterface|null
      */
     public function getDefaultSiteSection(): ?SiteSectionInterface
@@ -122,6 +123,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface
     }
 
     /**
+     * @param string|null $locale
      * @inheritdoc
      */
     public function getCurrentSiteSection(): ?SiteSectionInterface

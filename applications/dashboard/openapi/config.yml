@@ -214,64 +214,6 @@ components:
                     x-key: Garden.Title
                     x-read: public
                     x-write: community.manage
-                "labs.layoutEditor":
-                    description: Create and manage layouts for your community through the layout editor.
-                    type: boolean
-                    default: false
-                    example: false
-                    x-key: Feature.layoutEditor.Enabled
-                    x-read: public
-                    x-write: community.manage
-                "layoutEditor.home":
-                    description: Should the layout editor be displayed for the home page.
-                    type: boolean
-                    default: true
-                    example: true
-                    x-key: Feature.layoutEditor.home.Enabled
-                    x-read: site.manage
-                    x-write: site.manage
-                "layoutEditor.discussionList":
-                    description: Should the layout editor be displayed for the discussionList page.
-                    type: boolean
-                    default: true
-                    example: true
-                    x-key: Feature.layoutEditor.discussionList.Enabled
-                    x-read: site.manage
-                    x-write: site.manage
-                "layoutEditor.discussionThread":
-                    description: Should the layout editor be displayed for the discussionThread page.
-                    type: boolean
-                    default: true
-                    example: true
-                    x-key: Feature.layoutEditor.discussionThread.Enabled
-                    x-read: site.manage
-                    x-write: site.manage
-                "layoutEditor.categoryList":
-                    description: Should the layout editor be displayed for the categoryList page.
-                    type: boolean
-                    default: false
-                    example: true
-                    x-key: Feature.layoutEditor.categoryList.Enabled
-                    x-read: site.manage
-                    x-write: site.manage
-                "layoutEditor.discussionCategoryPage":
-                    description: Should the layout editor be displayed for the discussionCategoryPage page.
-                    type: boolean
-                    default: false
-                    example: true
-                    x-key: Feature.layoutEditor.discussionCategoryPage.Enabled
-                    x-feature: Feature.layoutEditor.categoryList.Enabled
-                    x-read: site.manage
-                    x-write: site.manage
-                "layoutEditor.nestedCategoryList":
-                    description: Should the layout editor be displayed for the nestedCategoryList page.
-                    type: boolean
-                    default: false
-                    example: true
-                    x-key: Feature.layoutEditor.nestedCategoryList.Enabled
-                    x-feature: Feature.layoutEditor.categoryList.Enabled
-                    x-read: site.manage
-                    x-write: site.manage
                 "customLayout.home":
                     description: Should custom layouts be rendered on the home page.
                     type: boolean
@@ -288,12 +230,20 @@ components:
                     x-key: Feature.customLayout.discussionList.Enabled
                     x-read: public
                     x-write: site.manage
-                "customLayout.discussionThread":
+                "customLayout.post":
                     description: Should custom layouts be rendered on the discussionThread page.
                     type: boolean
                     default: false
                     example: false
-                    x-key: Feature.customLayout.discussionThread.Enabled
+                    x-key: Feature.customLayout.post.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "customLayout.createPost":
+                    description: Should custom layouts be rendered on the create post page.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.customLayout.createPost.Enabled
                     x-read: public
                     x-write: site.manage
                 "customLayout.categoryList":
@@ -320,6 +270,22 @@ components:
                     example: false
                     x-key: Feature.customLayout.categoryList.Enabled
                     x-feature: Feature.layoutEditor.categoryList.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "customLayout.newPost":
+                    description: Should custom layouts be rendered on the new posting page.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.customLayout.newPost.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "customLayout.event":
+                    description: Should custom layouts be rendered on the event details page.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.customLayout.event.Enabled
                     x-read: public
                     x-write: site.manage
                 "labs.deferredLegacyScripts":
@@ -421,6 +387,24 @@ components:
                     default: false
                     example: true
                     x-key: Feature.CustomProfileFields.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.sentimentAnalysis":
+                    description: |
+                        Enable sentiment analysis.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: EnabledPlugins.sentimentAnalysis
+                    x-read: public
+                    x-write: site.manage
+                "labs.aiSuggestions":
+                    description: |
+                        Enable AI suggested answers
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.AISuggestions.Enabled
                     x-read: public
                     x-write: site.manage
                 "embed.enabled":
@@ -710,6 +694,14 @@ components:
                     x-key: "Garden.Digest.Enabled"
                     x-read: community.manage
                     x-write: community.manage
+                "emailDigest.autosubscribe.enabled":
+                    description: |
+                        Is auto subscribe to digest enabled for new users
+                    type: boolean
+                    default: false
+                    x-key: "Garden.Digest.Autosubscribe.Enabled"
+                    x-read: community.manage
+                    x-write: community.manage
                 "emailDigest.logo":
                     description: |
                         Digest logo
@@ -718,9 +710,18 @@ components:
                     x-key: "Garden.Digest.Logo"
                     x-read: community.manage
                     x-write: community.manage
+                "emailDigest.defaultFrequency":
+                    enum:
+                        - "daily"
+                        - "weekly"
+                        - "monthly"
+                    default: "weekly"
+                    x-key: "Garden.Digest.DefaultFrequency"
+                    x-read: community.manage
+                    x-write: community.manage
                 "emailDigest.dayOfWeek":
                     description: |
-                        Email digests will be sent on the selected day every week.
+                        The Digest will be delivered on the set day of the week.
                         1 - Monday
                         2 - Tuesday
                         3 - Wednesday
@@ -731,6 +732,27 @@ components:
                     type: integer
                     default: 1
                     x-key: "Garden.Digest.DayOfWeek"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.monthly.dayOfWeek":
+                    description: |
+                        The digest will be delivered on the set day of the week, once per month.
+                        Used together with emailDigest.monthly.setPosition.
+                    type: integer
+                    default: 1
+                    x-key: "Garden.Digest.Monthly.DayOfWeek"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.monthly.setPosition":
+                    description: |
+                        Specifies that the digest should be delivered on the first or last occurence of the selected weekday of each month.
+                        Used together with emailDigest.monthly.dayOfWeek.
+                    type: string
+                    enum:
+                        - first
+                        - last
+                    default: first
+                    x-key: "Garden.Digest.Monthly.SetPosition"
                     x-read: community.manage
                     x-write: community.manage
                 "emailDigest.postCount":
@@ -894,6 +916,7 @@ components:
                 "premoderation.challengeAgeCutoffInDays":
                     description: |
                         Amount of time in days that a user account is considered new.
+                    default: 7
                     type: integer
                     x-key: "premoderation.challengeAgeCutoffInDays"
                     x-read: community.moderate

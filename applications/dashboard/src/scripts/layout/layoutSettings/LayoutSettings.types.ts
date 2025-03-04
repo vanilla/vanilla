@@ -48,14 +48,18 @@ export const LAYOUT_VIEW_TYPES = [
     "categoryList",
     "nestedCategoryList",
     "discussionCategoryPage",
-    "discussionThread",
-    "discussionPage",
-    "ideaThread",
-    "questionThread",
+    "post",
+    "discussion",
+    "idea",
+    "question",
     "knowledgeBase",
-    "article",
     "guideArticle",
     "helpCenterArticle",
+    "createPost",
+    "helpCenterCategory",
+    "knowledgeHome",
+    "helpCenterKnowledgeBase",
+    "event",
 ] as const;
 export type LayoutViewType = (typeof LAYOUT_VIEW_TYPES)[number];
 
@@ -95,6 +99,8 @@ export enum LayoutRecordType {
     SUBCOMMUNITY = "subcommunity",
     // Used to apply a layout to a specific category.
     CATEGORY = "category",
+    // Used to apply a layout to a specific knowledge base.
+    KNOWLEDGE_BASE = "knowledgeBase",
 }
 
 export interface ILayoutView {
@@ -172,6 +178,7 @@ export type IWidgetCatalog = Record<
         allowedWidgetIDs?: string[];
         iconUrl?: string;
         name: string;
+        isRequired?: boolean;
     }
 >;
 

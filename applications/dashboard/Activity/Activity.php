@@ -117,6 +117,16 @@ abstract class Activity
     }
 
     /**
+     * Get the schema's required properties
+     *
+     * @return array[]
+     */
+    public static function getPreferenceSchemaRequiredProperties(): array
+    {
+        return [];
+    }
+
+    /**
      * Get any permissions required for receiving notifications related to this activity.
      *
      * @return array

@@ -76,7 +76,7 @@ export default function ChangeTypeDiscussionForm({ onCancel, onSuccess, discussi
                                 value={{
                                     value: formik.values.type,
                                     onChange: (value) => {
-                                        formik.setFieldValue("type", value);
+                                        void formik.setFieldValue("type", value);
                                     },
                                 }}
                             >

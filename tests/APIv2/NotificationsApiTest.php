@@ -42,8 +42,8 @@ class NotificationsApiTest extends AbstractAPIv2Test
             array_merge(
                 [
                     "ActivityTypeID" => self::ACTIVITY_TYPE_ID,
-                    "DateInserted" => date("Y-m-d H:i:s", now()),
-                    "DateUpdated" => date("Y-m-d H:i:s", now()),
+                    "DateInserted" => date("Y-m-d H:i:s"),
+                    "DateUpdated" => date("Y-m-d H:i:s"),
                     "Emailed" => ActivityModel::SENT_PENDING,
                     "NotifyUserID" => $this->api()->getUserID(),
                     "Notified" => ActivityModel::SENT_PENDING,

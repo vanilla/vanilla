@@ -20,11 +20,30 @@ export const AnalyticsData: FC<IProps> = (props: IProps) => {
     useEffect(() => {
         let detail = data?.layoutViewType ? null : data;
 
-        if (data?.layoutViewType === "discussionThread") {
-            detail = {
-                type: ViewType.DISCUSSION,
-                discussionID: data.recordID,
-            };
+        switch (data?.layoutViewType) {
+            case "post":
+                detail = {
+                    type: ViewType.DISCUSSION,
+                    discussionID: data.recordID,
+                };
+                break;
+            case "article":
+                detail = {
+                    type: ViewType.KB_ARTICLE,
+                    articleID: parseInt(data.recordID),
+                };
+                break;
+            case "knowledgeCategory":
+                detail = {
+                    type: ViewType.KB_CATEGORY,
+                    knowledgeCategoryID: parseInt(data.recordID),
+                };
+                break;
+            // TODO add handling for KB_DEFAULT when available
+            // KB home: https://higherlogic.atlassian.net/browse/VNLA-6724
+            // Help center home: https://higherlogic.atlassian.net/browse/VNLA-6726
+            default:
+                detail = data;
         }
 
         document.dispatchEvent(new CustomEvent("pageViewWithContext", { detail }));

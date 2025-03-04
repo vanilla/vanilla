@@ -5,6 +5,7 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Dashboard\Models\UnsubscribeModel;
 use Vanilla\Web\Controller;
@@ -33,6 +34,8 @@ class UnsubscribeApiController extends Controller
      * @param string $token String token.
      * @return array
      * @throws NotFoundException
+     * @throws Throwable
+     * @throws ForbiddenException
      */
     public function post(string $token): array
     {
@@ -42,7 +45,9 @@ class UnsubscribeApiController extends Controller
         }
         $count = count($result);
         $follow = $result["FollowedCategory"] ?? [];
-        unset($result["FollowedCategory"]);
+        // Check for any follow content from plugins
+        $followContent = $result["followContent"] ?? [];
+        unset($result["FollowedCategory"], $result["followContent"]);
         $result = array_values($result);
         // Unset permissions if there is only 1 reason for email notification.
         if ($count == 1) {
@@ -53,7 +58,16 @@ class UnsubscribeApiController extends Controller
                 $result[0] = $this->unsubscribeModel->updateNotificationPreferences($result[0], "0");
             }
         }
-        return ["preferences" => $result, "followCategory" => $follow];
+        // Assemble the data to be returned
+        $data = [
+            "preferences" => $result,
+        ];
+        if (!empty($followContent)) {
+            $data["followContent"] = $followContent;
+        } else {
+            $data["followCategory"] = $follow;
+        }
+        return $data;
     }
 
     /**
@@ -61,7 +75,9 @@ class UnsubscribeApiController extends Controller
      *
      * @param string $token String token.
      * @return array
+     * @throws ForbiddenException
      * @throws NotFoundException
+     * @throws Throwable
      */
     public function post_resubscribe(string $token): array
     {
@@ -110,20 +126,24 @@ class UnsubscribeApiController extends Controller
     public function patch(string $token, array $body): array
     {
         $reasons = $this->unsubscribeModel->validateAccess($token);
-        $result = [];
         $in = $this->schema(
             [
                 "preferences:a?" => ["preference:s", "enabled:s"],
                 "followCategory:o?" => ["categoryID:i", "preference:s", "name:s?", "enabled:s"],
             ],
-            "in"
+            ["UnsubscribePatch", "in"]
         )->setDescription("Update a notification.");
 
         $body = $in->validate($body);
+        $data = [];
         $sentPreferences = $body["preferences"] ?? null;
         $followCategory = $body["followCategory"] ?? null;
         $follow = $reasons["FollowedCategory"] ?? [];
-        unset($reasons["FollowedCategory"]);
+        if (!empty($body["followContent"])) {
+            $followContent = $body["followContent"];
+            $data = $this->getEventManager()->fireFilter("unsubscribe_patch", $data, $followContent);
+        }
+        unset($reasons["FollowedCategory"], $reasons["followContent"]);
         $reasons = array_values($reasons);
         if ($followCategory != null && count($follow) > 1 && $follow["enabled"] != $followCategory["enabled"]) {
             $follow["enabled"] = $followCategory["enabled"];
@@ -138,7 +158,11 @@ class UnsubscribeApiController extends Controller
                 }
             }
         }
-        return ["preferences" => $reasons, "followCategory" => $follow];
+        $data["preferences"] = $reasons;
+        if (!empty($follow)) {
+            $data["followCategory"] = $follow;
+        }
+        return $data;
     }
 
     /**

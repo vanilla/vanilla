@@ -14,6 +14,8 @@ use Gdn;
 use Vanilla\AutomationRules\Models\AutomationRuleLongRunnerGenerator;
 use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
 use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 
 /**
  * Class StaleDiscussionTrigger
@@ -117,10 +119,14 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
         $sql = $this->getObjectModel()->SQL;
         // We need to ensure that NULL are treated as discussions.
         if (!empty($where["Type"]) && in_array("discussion", $where["Type"])) {
-            $sql->beginWhereGroup()
-                ->where("Type", $where["Type"])
-                ->orWhere("Type is null")
-                ->endWhereGroup();
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
+                PostTypeModel::addJoin($sql, $where["Type"]);
+            } else {
+                $sql->beginWhereGroup()
+                    ->where("Type", $where["Type"])
+                    ->orWhere("Type is null")
+                    ->endWhereGroup();
+            }
             unset($where["Type"]);
         }
         return $sql->getCount("Discussion", $where);

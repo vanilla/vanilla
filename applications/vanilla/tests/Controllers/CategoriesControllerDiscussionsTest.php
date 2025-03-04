@@ -31,7 +31,6 @@ class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test
         $this->useLegacyLayouts();
         $this->configuration = static::container()->get("Config");
         $this->configuration->set("Vanilla.Categories.Layout", "mixed");
-        $this->configuration->set("Vanilla.Categories.Use", true);
     }
 
     /**

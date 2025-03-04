@@ -56,7 +56,7 @@ class ModelUtils
         if ($value === self::EXPAND_CRAWL) {
             // Specific handling for crawl.
             // It does not match all, or true.
-            return is_array($options) && in_array(self::EXPAND_CRAWL, $options);
+            return (is_array($options) && in_array(self::EXPAND_CRAWL, $options)) || $options === self::EXPAND_CRAWL;
         }
         $isStartWithMinus = str_starts_with($value, "-");
         $expandAllValues = [self::EXPAND_ALL, "true", true, "1"];
@@ -208,7 +208,9 @@ class ModelUtils
     {
         $idFields = self::parseJoinFragmentFields($idFields);
 
-        reset($dataset);
+        if (is_array($dataset)) {
+            reset($dataset);
+        }
         $isSingleRow = is_array($dataset) && is_string(key($dataset));
 
         // Gather all the IDs.

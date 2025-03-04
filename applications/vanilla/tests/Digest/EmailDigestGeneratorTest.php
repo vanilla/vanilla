@@ -7,6 +7,9 @@
 
 namespace VanillaTests\Vanilla\Forum\Digest;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Forum\Digest\DigestModel;
@@ -37,11 +40,14 @@ class EmailDigestGeneratorTest extends SiteTestCase
     private EmailDigestGenerator $emailDigestGenerator;
     private \CategoryModel $categoryModel;
 
+    private DigestModel $digestModel;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->userDigestModel = \Gdn::getContainer()->get(UserDigestModel::class);
         $this->categoryModel = \Gdn::getContainer()->get(\CategoryModel::class);
+        $this->digestModel = $this->container()->get(DigestModel::class);
         $this->emailDigestGenerator = \Gdn::getContainer()->get(EmailDigestGenerator::class);
         $config = [
             "Garden.Email.Disabled" => false,
@@ -152,7 +158,7 @@ class EmailDigestGeneratorTest extends SiteTestCase
                 "um.userID" => $userID,
             ])
         )[$userID];
-        $digestCategoryData = $this->emailDigestGenerator->getDigestCategoryData($digestUserCategory);
+        $digestCategoryData = $this->emailDigestGenerator->getDigestData($digestUserCategory);
 
         if (isset($expectedCategoryIDs[0]["categoryID"])) {
             $expectedCategoryIDs = array_column($expectedCategoryIDs, "categoryID");
@@ -232,7 +238,7 @@ class EmailDigestGeneratorTest extends SiteTestCase
      */
     public function testTrendingDiscussionForCategories(array $data): array
     {
-        $this->assertEmpty($this->emailDigestGenerator->getTopWeeklyDiscussions([999]));
+        $this->assertEmpty($this->emailDigestGenerator->getTopDiscussions([999]));
         $categoryIDs = array_column($data["categories"], "categoryID");
         //add some discussions and comments to these categories
 
@@ -268,16 +274,16 @@ class EmailDigestGeneratorTest extends SiteTestCase
             }
         }
         //
-        $trendingDiscussionWithoutUnsubscribeLink = $this->emailDigestGenerator->getTopWeeklyDiscussions(
+        $trendingDiscussionWithoutUnsubscribeLink = $this->emailDigestGenerator->getTopDiscussions(
             [$categoryIDs[0]],
             false
         );
         $this->assertArrayNotHasKey("unsubscribeLink", $trendingDiscussionWithoutUnsubscribeLink);
-        $trendingDiscussion = $this->emailDigestGenerator->getTopWeeklyDiscussions($categoryIDs);
+        $trendingDiscussion = $this->emailDigestGenerator->getTopDiscussions($categoryIDs);
         $countDiscussions = 0;
         $c = 1;
         $categoryColumns = ["name", "url", "iconUrl", "unsubscribeLink", "discussions"];
-        foreach ($trendingDiscussion as $categoryID => $categoryData) {
+        foreach ($trendingDiscussion["Category"] as $categoryID => $categoryData) {
             if ($c = 1) {
                 foreach ($categoryData as $column => $value) {
                     $this->assertContains($column, $categoryColumns);
@@ -343,7 +349,10 @@ class EmailDigestGeneratorTest extends SiteTestCase
 
         $digestDisabledUser = $this->createUser();
 
-        $action = $this->emailDigestGenerator->prepareWeeklyDigestAction(CurrentTimeStamp::getDateTime());
+        $action = $this->emailDigestGenerator->prepareDigestAction(
+            CurrentTimeStamp::getDateTime(),
+            DigestModel::DIGEST_TYPE_WEEKLY
+        );
         $this->getLongRunner()->setMaxIterations(2);
         $result = $this->getLongRunner()->runImmediately($action);
 
@@ -404,6 +413,24 @@ class EmailDigestGeneratorTest extends SiteTestCase
     {
         $metaModel = \Gdn::userMetaModel();
         $metaModel->setUserMeta($user["userID"], "Preferences.Email.DigestEnabled", 1);
+    }
+
+    /**
+     * Disable all current users Digest preference
+     *
+     * @return void
+     * @throws \Throwable
+     */
+    private function disableDigestForCurrentUsers(): void
+    {
+        $metaModel = \Gdn::userMetaModel();
+        $UserIDs = $this->userModel
+            ->createSql()
+            ->select("UserID")
+            ->from("User")
+            ->get()
+            ->column("UserID");
+        $metaModel->setUserMeta($UserIDs, "Preferences.Email.DigestEnabled", null);
     }
 
     /**
@@ -539,7 +566,10 @@ class EmailDigestGeneratorTest extends SiteTestCase
 
         // Auto-subscribe is disabled. User should not get the digest even if they have the preference set to auto-subscribe.
         $this->runWithConfig([DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE => 0], function () use ($digestUser) {
-            $action = $this->emailDigestGenerator->prepareWeeklyDigestAction(CurrentTimeStamp::getDateTime());
+            $action = $this->emailDigestGenerator->prepareDigestAction(
+                CurrentTimeStamp::getDateTime(),
+                DigestModel::DIGEST_TYPE_WEEKLY
+            );
             $result = $this->getLongRunner()->runImmediately($action);
             $this->assertEquals(0, $result->getCountTotalIDs());
             $this->assertEmailNotSentTo($digestUser["email"]);
@@ -547,7 +577,10 @@ class EmailDigestGeneratorTest extends SiteTestCase
 
         // Auto-subscribe is enabled. User should get the digest.
         $this->runWithConfig([DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE => 1], function () use ($digestUser) {
-            $action = $this->emailDigestGenerator->prepareWeeklyDigestAction(CurrentTimeStamp::getDateTime());
+            $action = $this->emailDigestGenerator->prepareDigestAction(
+                CurrentTimeStamp::getDateTime(),
+                DigestModel::DIGEST_TYPE_WEEKLY
+            );
             $result = $this->getLongRunner()->runImmediately($action);
             $this->assertEquals(1, $result->getCountTotalIDs());
             $this->assertEmailSentTo($digestUser["email"]);
@@ -608,5 +641,352 @@ class EmailDigestGeneratorTest extends SiteTestCase
             $discussionMetaSettings = $this->emailDigestGenerator->getDiscussionMetaSettings();
             $this->assertEquals($expected, $discussionMetaSettings);
         });
+    }
+
+    /**
+     * Test we get proper digest user count
+     *
+     * @return void
+     */
+    public function testDigestEnabledUserCount()
+    {
+        $this->disableDigestForCurrentUsers();
+        $this->runWithConfig(
+            [
+                DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE => 1,
+                DigestModel::DEFAULT_DIGEST_FREQUENCY_KEY => DigestModel::DIGEST_TYPE_WEEKLY,
+            ],
+            function () {
+                $preferences = [
+                    "DigestEnabled" => ["Email" => 1, "Frequency" => DigestModel::DIGEST_TYPE_WEEKLY],
+                ];
+                $this->createUser(["name" => "UserA"], [], $preferences);
+                $preferences["DigestEnabled"]["Frequency"] = DigestModel::DIGEST_TYPE_DAILY;
+                $this->createUser(["name" => "UserB"], [], $preferences);
+                $preferences["DigestEnabled"]["Frequency"] = DigestModel::DIGEST_TYPE_MONTHLY;
+                $this->createUser(["name" => "UserC"], [], $preferences);
+                $preferences = [
+                    "DigestEnabled" => ["Email" => 3, "Frequency" => DigestModel::DIGEST_TYPE_MONTHLY],
+                ];
+                $this->createUser(["name" => "UserD"], [], $preferences);
+
+                // Now create some users with no digest frequency preference.
+                for ($i = 1; $i <= 5; $i++) {
+                    $this->createUser(["name" => "User-{$i}"], [], ["DigestEnabled" => ["Email" => 1]]);
+                }
+
+                $this->assertEquals(9, $this->emailDigestGenerator->getDigestEnabledUsersCount());
+                $this->assertEquals(
+                    6,
+                    $this->emailDigestGenerator->getDigestEnabledUsersCount(DigestModel::DIGEST_TYPE_WEEKLY)
+                );
+                $this->assertEquals(
+                    1,
+                    $this->emailDigestGenerator->getDigestEnabledUsersCount(DigestModel::DIGEST_TYPE_DAILY)
+                );
+                $this->assertEquals(
+                    2,
+                    $this->emailDigestGenerator->getDigestEnabledUsersCount(DigestModel::DIGEST_TYPE_MONTHLY)
+                );
+            }
+        );
+    }
+
+    /**
+     * Test sending email digests to users with different frequency preferences.
+     *
+     * @return void
+     */
+    public function testGenerateEmailFrequency(): void
+    {
+        $this->runWithConfig(
+            [
+                DigestModel::DEFAULT_DIGEST_FREQUENCY_KEY => DigestModel::DIGEST_TYPE_MONTHLY,
+            ],
+            function () {
+                // Set up 4 users with different digest frequencies who all follow a certain category.
+                $followedCat = $this->createCategory();
+                $preferences = [
+                    "DigestEnabled" => ["Email" => 1, "Frequency" => DigestModel::DIGEST_TYPE_DAILY],
+                ];
+                $dailyUser = $this->createUser([], [], $preferences);
+                $this->setCategoryPreference($dailyUser, $followedCat, self::followingPreferences());
+
+                $preferences["DigestEnabled"]["Frequency"] = DigestModel::DIGEST_TYPE_WEEKLY;
+                $weeklyUser = $this->createUser([], [], $preferences);
+                $this->setCategoryPreference($weeklyUser, $followedCat, self::followingPreferences());
+
+                $preferences["DigestEnabled"]["Frequency"] = DigestModel::DIGEST_TYPE_MONTHLY;
+                $monthlyUser = $this->createUser([], [], $preferences);
+                $this->setCategoryPreference($monthlyUser, $followedCat, self::followingPreferences());
+
+                unset($preferences["DigestEnabled"]["Frequency"]);
+                $defaultUser = $this->createUser([], [], $preferences);
+                $this->setCategoryPreference($defaultUser, $followedCat, self::followingPreferences());
+
+                $todayDiscussion = $this->createDiscussion(["categoryID" => $followedCat["categoryID"]]);
+
+                CurrentTimeStamp::mockTime(strtotime("-2 days"));
+                $twoDaysAgoDiscussion = $this->createDiscussion(["categoryID" => $followedCat["categoryID"]]);
+
+                CurrentTimeStamp::mockTime(strtotime("-2 weeks"));
+                $twoWeeksAgoDiscussion = $this->createDiscussion(["categoryID" => $followedCat["categoryID"]]);
+
+                CurrentTimeStamp::clearMockTime();
+
+                // A user with the daily digest preference should only see the most recent discussion.
+                $dailyDigest = $this->emailDigestGenerator->prepareSingleUserDigest($dailyUser["userID"]);
+                $this->assertStringContainsString($todayDiscussion["url"], $dailyDigest->getTextContent());
+                $this->assertStringNotContainsString($twoDaysAgoDiscussion["url"], $dailyDigest->getTextContent());
+                $this->assertStringNotContainsString($twoWeeksAgoDiscussion["url"], $dailyDigest->getTextContent());
+                // The title should reflect the correct frequency.
+                $this->assertStringContainsString("Today's trending content", $dailyDigest->getTextContent());
+
+                // A user with the weekly digest preference should see the most recent two discussions, because
+                // they were sent within the last week, but not the third.
+                $weeklyDigest = $this->emailDigestGenerator->prepareSingleUserDigest($weeklyUser["userID"]);
+                $this->assertStringContainsString($todayDiscussion["url"], $weeklyDigest->getTextContent());
+                $this->assertStringContainsString($twoDaysAgoDiscussion["url"], $weeklyDigest->getTextContent());
+                $this->assertStringNotContainsString($twoWeeksAgoDiscussion["url"], $weeklyDigest->getTextContent());
+                // The title should reflect the correct frequency.
+                $this->assertStringContainsString("This week's trending content", $weeklyDigest->getTextContent());
+
+                // A user with the monthly digest preference should see all three discussions.
+                $monthlyDigest = $this->emailDigestGenerator->prepareSingleUserDigest($monthlyUser["userID"]);
+                $this->assertStringContainsString($todayDiscussion["url"], $monthlyDigest->getTextContent());
+                $this->assertStringContainsString($twoDaysAgoDiscussion["url"], $monthlyDigest->getTextContent());
+                $this->assertStringContainsString($twoWeeksAgoDiscussion["url"], $monthlyDigest->getTextContent());
+                // The title should reflect the correct frequency.
+                $this->assertStringContainsString("This month's trending content", $monthlyDigest->getTextContent());
+
+                // A user with the default digest preference should see all three discussions because the default is set to monthly.
+                $defaultDigest = $this->emailDigestGenerator->prepareSingleUserDigest($defaultUser["userID"]);
+                $this->assertStringContainsString($todayDiscussion["url"], $defaultDigest->getTextContent());
+                $this->assertStringContainsString($twoDaysAgoDiscussion["url"], $defaultDigest->getTextContent());
+                $this->assertStringContainsString($twoWeeksAgoDiscussion["url"], $defaultDigest->getTextContent());
+                // The title should reflect the default frequency.
+                $this->assertStringContainsString("This month's trending content", $defaultDigest->getTextContent());
+            }
+        );
+    }
+
+    /*
+     * Test that a user with an unconfirmed email won't get the digest.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testUnconfirmedEmailUser(): void
+    {
+        $this->disableDigestForCurrentUsers();
+        $category = $this->createCategory();
+        $this->createDiscussion();
+
+        $unconfirmedUser = $this->createUser();
+        $this->enableDigestForUser($unconfirmedUser);
+        $this->setCategoryPreference($unconfirmedUser, $category, $this->followingPreferences());
+        $this->api()->patch("/users/{$unconfirmedUser["userID"]}", ["emailConfirmed" => false]);
+
+        $confirmedUser = $this->createUser();
+        $this->enableDigestForUser($confirmedUser);
+        $this->setCategoryPreference($confirmedUser, $category, $this->followingPreferences());
+
+        $action = $this->emailDigestGenerator->prepareDigestAction(
+            CurrentTimeStamp::getDateTime(),
+            DigestModel::DIGEST_TYPE_WEEKLY
+        );
+        $result = $this->getLongRunner()->runImmediately($action);
+        $this->assertEquals(1, $result->getCountTotalIDs());
+        $this->assertEmailNotSentTo($unconfirmedUser["email"]);
+        $this->assertEmailSentTo($confirmedUser["email"]);
+    }
+
+    /**
+     * Test daily digest scheduled action
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testPrepareDailyDigestAction(): void
+    {
+        $this->resetTable("UserCategory");
+        $this->runWithConfig(
+            [
+                DigestModel::DEFAULT_DIGEST_FREQUENCY_KEY => DigestModel::DIGEST_TYPE_WEEKLY,
+            ],
+            function () {
+                // Create some categories and discussions.
+                $cat1 = $this->createCategory(["name" => "Digest Category A"]);
+                $this->createDiscussion([
+                    "name" => "Digest Discussion A",
+                    "categoryID" => $cat1["categoryID"],
+                    "body" => "This is a discussion happening in Digest Category A",
+                ]);
+                $cat2 = $this->createCategory(["name" => "Digest Category B"]);
+                $this->createDiscussion([
+                    "name" => "Digest Discussion B",
+                    "categoryID" => $cat2["categoryID"],
+                    "body" => "This is a discussion happening in Digest Category B",
+                ]);
+                $cat3 = $this->createCategory(["name" => "Digest Category C"]);
+                $this->createDiscussion([
+                    "name" => "Digest Discussion C",
+                    "categoryID" => $cat3["categoryID"],
+                    "body" => "This is a discussion happening in Digest Category C",
+                ]);
+                $cat4 = $this->createCategory(["name" => "Digest Category D"]);
+
+                // Create some users with frequency preferences.
+                $userPreferences = [
+                    "DigestEnabled" => ["Email" => 1, "Frequency" => DigestModel::DIGEST_TYPE_DAILY],
+                ];
+                $dailyUserA = $this->createUser(["name" => "DigestUserA"], [], $userPreferences);
+                $this->setCategoryPreference($dailyUserA, $cat1, self::followingPreferences());
+                $this->setCategoryPreference($dailyUserA, $cat2, self::followingPreferences());
+
+                $dailyUserB = $this->createUser(["name" => "DigestUserB"], [], $userPreferences);
+                $this->setCategoryPreference($dailyUserB, $cat3, self::followingPreferences());
+
+                $dailyUserC = $this->createUser(["name" => "DigestUserC"], [], $userPreferences);
+                $this->setCategoryPreference($dailyUserC, $cat4, self::followingPreferences());
+
+                // Create a user with no frequency preference.
+                unset($userPreferences["DigestEnabled"]["Frequency"]);
+                $defaultUser = $this->createUser(["name" => "DigestUserD"], [], $userPreferences);
+
+                $currentTimeStamp = CurrentTimeStamp::getDateTime();
+
+                $action = $this->emailDigestGenerator->prepareDigestAction(
+                    $currentTimeStamp,
+                    DigestModel::DIGEST_TYPE_DAILY
+                );
+
+                $this->assertTrue($this->digestModel->checkIfDigestScheduledForDay($currentTimeStamp));
+                $digestData = $this->digestModel->selectSingle(
+                    [
+                        "digestType" => DigestModel::DIGEST_TYPE_DAILY,
+                    ],
+                    [DigestModel::OPT_ORDER => "dateInserted", DigestModel::OPT_DIRECTION => "desc"]
+                );
+                $this->assertEquals(3, $digestData["totalSubscribers"]);
+                $result = $this->getLongRunner()->runImmediately($action);
+                $this->assertEquals(3, $result->getCountTotalIDs());
+                // Test email sent to users with daily digest preference.
+                $digestEmailA = $this->assertEmailSentTo($dailyUserA["email"]);
+                $emailHtml = $digestEmailA->getHtmlDocument();
+                $emailHtml->assertContainsString($cat1["name"]);
+                $emailHtml->assertContainsString($cat2["name"]);
+                $digestEmailB = $this->assertEmailSentTo($dailyUserB["email"]);
+                $emailHtml = $digestEmailB->getHtmlDocument();
+                $emailHtml->assertContainsString($cat3["name"]);
+                $this->assertEmailNotSentTo($dailyUserC["email"]);
+                $log = $this->assertLog(["event" => "user_digest_skip"]);
+                $this->assertEquals($dailyUserC["userID"], $log["data"]["UserID"]);
+                $this->assertEquals(
+                    "Skipped generating digest for user because there was no discussions visible to them.",
+                    $log["message"]
+                );
+            }
+        );
+    }
+
+    /**
+     *  Test Monthly digest scheduled action
+     */
+    public function testPrepareMonthlyDigestAction()
+    {
+        $this->resetTable("UserCategory");
+        $this->runWithConfig(
+            [
+                DigestModel::DEFAULT_DIGEST_FREQUENCY_KEY => DigestModel::DIGEST_TYPE_WEEKLY,
+            ],
+            function () {
+                $currentTimeStamp = CurrentTimeStamp::getDateTime();
+
+                //Get a time stamp 1 month and 5 days back
+                $lastMonthTimeStamp = $currentTimeStamp->modify("-1 month -5 day");
+
+                // Set the time stamp to create discussion so that they don't show up in the monthly digest
+                CurrentTimeStamp::mockTime($lastMonthTimeStamp);
+                // create some categories and discussions
+                $cat1 = $this->createCategory(["name" => "Digest Monthly Category A"]);
+                $this->createDiscussion([
+                    "name" => "Digest Monthly Discussion A",
+                    "categoryID" => $cat1["categoryID"],
+                    "body" => "This is a discussion happening in Digest Monthly Category A",
+                ]);
+                $cat2 = $this->createCategory(["name" => "Digest Monthly Category B"]);
+                $this->createDiscussion([
+                    "name" => "Digest Monthly Discussion B",
+                    "categoryID" => $cat2["categoryID"],
+                    "body" => "This is a discussion happening in Digest Monthly Category B",
+                ]);
+                $userPreferences = [
+                    "DigestEnabled" => ["Email" => 1, "Frequency" => DigestModel::DIGEST_TYPE_MONTHLY],
+                ];
+                $userA = $this->createUser(["name" => "DigestMonthlyUserA"], [], $userPreferences);
+                $this->setCategoryPreference($userA, $cat1, self::followingPreferences());
+                $this->setCategoryPreference($userA, $cat2, self::followingPreferences());
+
+                $userB = $this->createUser(["name" => "DigestMonthlyUserB"], [], $userPreferences);
+                $this->setCategoryPreference($userB, $cat2, self::followingPreferences());
+
+                $userC = $this->createUser(["name" => "DigestMonthlyUserC"], [], $userPreferences);
+                $this->setCategoryPreference($userC, $cat1, self::followingPreferences(false));
+
+                // 10 days back
+                CurrentTimeStamp::mockTime($currentTimeStamp->modify("-10 days"));
+                $this->createDiscussion([
+                    "name" => "Latest Digest Monthly Discussion",
+                    "categoryID" => $cat1["categoryID"],
+                    "body" => "This is the very latest discussion happening in Digest Monthly Category A",
+                ]);
+
+                CurrentTimeStamp::clearMockTime();
+                $currentTime = CurrentTimeStamp::getDateTime();
+                $action = $this->emailDigestGenerator->prepareDigestAction(
+                    $currentTime,
+                    DigestModel::DIGEST_TYPE_MONTHLY
+                );
+                $this->assertTrue(
+                    $this->digestModel->checkIfDigestScheduledForDay($currentTime, DigestModel::DIGEST_TYPE_MONTHLY)
+                );
+                $digestData = $this->digestModel->selectSingle(
+                    [
+                        "digestType" => DigestModel::DIGEST_TYPE_MONTHLY,
+                    ],
+                    [DigestModel::OPT_ORDER => "dateInserted", DigestModel::OPT_DIRECTION => "desc"]
+                );
+                $digestID = $digestData["digestID"];
+                $this->assertEquals(3, $digestData["totalSubscribers"]);
+                $result = $this->getLongRunner()->runImmediately($action);
+                $this->assertEquals(3, $result->getCountTotalIDs());
+
+                $digestResult = $this->userDigestModel->select(["digestID" => $digestID]);
+                $this->assertEquals(3, count($digestResult));
+                $digestResult = array_column($digestResult, "status", "userID");
+                $this->assertEquals("sent", $digestResult[$userA["userID"]]);
+                $this->assertEquals("skipped", $digestResult[$userB["userID"]]);
+                $this->assertEquals("sent", $digestResult[$userC["userID"]]);
+
+                $digestEmailA = $this->assertEmailSentTo($userA["email"]);
+                $this->assertEmailNotSentTo($userB["email"]);
+                $this->assertEmailSentTo($userC["email"]);
+
+                $emailHtml = $digestEmailA->getHtmlDocument();
+                $emailHtml->assertContainsString($cat1["name"]);
+                $emailHtml->assertNotContainsString($cat2["name"]);
+                $emailHtml->assertNotContainsString("Digest Monthly Discussion A");
+                $emailHtml->assertNotContainsString("Digest Monthly Discussion B");
+                $emailHtml->assertContainsString("Latest Digest Monthly Discussion");
+
+                $log = $this->assertLog(["event" => "user_digest_skip"]);
+                $this->assertEquals($userB["userID"], $log["data"]["UserID"]);
+            }
+        );
     }
 }

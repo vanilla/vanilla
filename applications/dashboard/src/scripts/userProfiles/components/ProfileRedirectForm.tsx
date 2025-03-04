@@ -125,7 +125,7 @@ export function ProfileRedirectForm() {
     // Patch it!
     const handleSubmit = () => {
         if (!isEmpty(touchedSettings)) {
-            patchConfig(touchedSettings).then(() => {
+            void patchConfig(touchedSettings).then(() => {
                 toast.addToast({
                     dismissible: true,
                     autoDismiss: true,

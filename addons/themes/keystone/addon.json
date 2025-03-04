@@ -15,6 +15,7 @@
             "homepage": "http://vanillaforums.com"
         }
     ],
+    "hidden": true,
     "isResponsive": true,
     "license": "GPL-2.0-only",
     "sites": [],

@@ -30,7 +30,7 @@ trait ArrayAccessTrait
      * The return value will be casted to boolean if non-boolean was returned.
      * @link http://php.net/manual/en/arrayaccess.offsetexists.php
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         $source = $this->getArrayAccessSource();
         return is_array($source) ? isset($source[$offset]) : isset($source->$offset);
@@ -43,7 +43,7 @@ trait ArrayAccessTrait
      * @return mixed Can return all value types.
      * @link http://php.net/manual/en/arrayaccess.offsetget.php
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         $source = $this->getArrayAccessSource();
         return is_array($source) ? $source[$offset] : $source->$offset;
@@ -56,7 +56,7 @@ trait ArrayAccessTrait
      * @param mixed $value The value to set.
      * @link http://php.net/manual/en/arrayaccess.offsetset.php
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $source = &$this->getArrayAccessSource();
         if (is_array($source)) {
@@ -72,7 +72,7 @@ trait ArrayAccessTrait
      * @param mixed $offset The offset to unset.
      * @link http://php.net/manual/en/arrayaccess.offsetunset.php
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $source = $this->getArrayAccessSource();
         if (is_array($source)) {

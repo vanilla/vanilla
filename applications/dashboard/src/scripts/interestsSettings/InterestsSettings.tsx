@@ -9,24 +9,20 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
-import { AddInterest } from "@dashboard/interestsSettings/AddInterest";
+import { AddInterest, EditInterest } from "@dashboard/interestsSettings/AddInterest";
+import { DeleteInterest } from "@dashboard/interestsSettings/DeleteInterest";
 import { interestsClasses } from "@dashboard/interestsSettings/Interests.styles";
-import { IInterest, InterestFilters, InterestQueryParams } from "@dashboard/interestsSettings/Interests.types";
+import { InterestFilters, InterestQueryParams } from "@dashboard/interestsSettings/Interests.types";
 import { InterestsFilters } from "@dashboard/interestsSettings/InterestsFilters";
-import {
-    useDeleteInterest,
-    useInterests,
-    useToggleSuggestedContent,
-} from "@dashboard/interestsSettings/InterestsSettings.hooks";
+import { useInterests, useToggleSuggestedContent } from "@dashboard/interestsSettings/InterestsSettings.hooks";
 import StackableTable from "@dashboard/tables/StackableTable/StackableTable";
 import { cx } from "@emotion/css";
+import { LoadStatus } from "@library/@types/api/core";
 import Translate from "@library/content/Translate";
 import { ErrorPageBoundary } from "@library/errorPages/ErrorPageBoundary";
-import NumberedPager from "@library/features/numberedPager/NumberedPager";
 import { useToast, useToastErrorHandler } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
@@ -35,7 +31,6 @@ import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { TokenItem } from "@library/metas/TokenItem";
 import Modal from "@library/modal/Modal";
-import ModalConfirm from "@library/modal/ModalConfirm";
 import ModalSizes from "@library/modal/ModalSizes";
 import SmartLink from "@library/routing/links/SmartLink";
 import { ToolTip } from "@library/toolTip/ToolTip";
@@ -55,77 +50,38 @@ function InterestsSettingsImpl() {
     const { mutateAsync: toggleSuggestedContent } = useToggleSuggestedContent();
     const toast = useToast();
     const toastError = useToastErrorHandler();
-    const [openModal, setOpenModal] = useState<boolean>(false);
-    const [selectedInterest, setSelectedInterest] = useState<IInterest>();
     const [filters, setFilters] = useState<InterestFilters>({});
-    const [queryParams, setQueryParams] = useState<InterestQueryParams>({ page: 1 });
-    const { data, isLoading, refetch } = useInterests(queryParams);
-    const { mutateAsync: deleteInterest } = useDeleteInterest(queryParams);
+    const [queryParams, setQueryParams] = useState<InterestQueryParams>({});
+    const {
+        query: { data, status },
+        invalidate: invalidateInterestsQuery,
+    } = useInterests(queryParams);
+    const isLoading = status === LoadStatus.LOADING;
+
     const device = useDevice();
     const isMobile = [Devices.MOBILE, Devices.XS].includes(device);
     const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
-    const { interestsList = [], pagination } = data ?? {};
+    const { interestsList = [] } = data ?? {};
     const [isFiltered, setIsFiltered] = useState<boolean>(false);
-    const [openDeleteConfirm, setOpenDeleteConfirm] = useState<boolean>(false);
 
-    const openAddEditModal = (interest?: IInterest) => {
-        setSelectedInterest(interest);
-        setOpenModal(true);
+    const clearFilters = () => {
+        setFilters({});
+        void invalidateInterestsQuery();
     };
-
-    const closeAddEditModal = () => {
-        setSelectedInterest(undefined);
-        setOpenModal(false);
-        refetch();
-    };
-
-    const clearFilters = () => setFilters({});
 
     const saveFilters = () => {
         setQueryParams({
-            page: queryParams.page,
             ...filters,
         });
         setOpenFilterModal(false);
         setIsFiltered(!isEmpty(filters));
     };
 
-    const updatePage = (page: number) => {
-        setQueryParams({
-            ...filters,
-            page,
-        });
-    };
-
-    const handleDeleteInterest = async () => {
-        if (selectedInterest) {
-            try {
-                await deleteInterest(selectedInterest.interestID);
-                setOpenDeleteConfirm(false);
-                toast.addToast({
-                    autoDismiss: true,
-                    body: (
-                        <Translate source="You have successfully deleted interest: <0/>" c0={selectedInterest.name} />
-                    ),
-                });
-                setSelectedInterest(undefined);
-            } catch (err) {
-                toastError(err);
-            }
-        }
-    };
-
     return (
         <>
             <DashboardHeaderBlock
                 title={t("Interests & Suggested Content")}
-                actionButtons={
-                    suggestedContentEnabled ? (
-                        <Button buttonType={ButtonTypes.DASHBOARD_PRIMARY} onClick={() => openAddEditModal()}>
-                            {t("Add Interest")}
-                        </Button>
-                    ) : null
-                }
+                actionButtons={suggestedContentEnabled ? <AddInterest onSuccess={invalidateInterestsQuery} /> : null}
             />
             <DashboardFormGroup
                 label={t("Enable Suggested Content and Interest Mapping")}
@@ -165,18 +121,9 @@ function InterestsSettingsImpl() {
                                 onClick={() => setOpenFilterModal(true)}
                                 title={t("Filter")}
                             >
-                                <Icon icon={isFiltered ? "search-filter-applied" : "search-filter"} />
+                                <Icon icon={isFiltered ? "filter-applied" : "filter"} />
                             </Button>
                         )}
-                        <NumberedPager
-                            showNextButton={false}
-                            isMobile={isMobile}
-                            totalResults={pagination?.total}
-                            currentPage={pagination?.currentPage ?? 1}
-                            pageLimit={pagination?.limit}
-                            onChange={updatePage}
-                            className={classes.pager}
-                        />
                     </div>
                     <StackableTable
                         data={interestsList ?? []}
@@ -186,26 +133,10 @@ function InterestsSettingsImpl() {
                         onHeaderClick={() => null}
                         CellRenderer={InterestTableCell}
                         WrappedCellRenderer={InterestTableCellWrapper}
-                        ActionsCellRenderer={(props) => (
+                        ActionsCellRenderer={({ data: interest }) => (
                             <div className={classes.tableActions}>
-                                <Button
-                                    buttonType={ButtonTypes.ICON_COMPACT}
-                                    onClick={() => {
-                                        setSelectedInterest(props.data);
-                                        setOpenModal(true);
-                                    }}
-                                >
-                                    <Icon icon="data-pencil" />
-                                </Button>
-                                <Button
-                                    buttonType={ButtonTypes.ICON_COMPACT}
-                                    onClick={() => {
-                                        setSelectedInterest(props.data);
-                                        setOpenDeleteConfirm(true);
-                                    }}
-                                >
-                                    <Icon icon="data-trash" />
-                                </Button>
+                                <EditInterest interest={interest} onSuccess={invalidateInterestsQuery} />
+                                <DeleteInterest interest={interest} onSuccess={invalidateInterestsQuery} />
                             </div>
                         )}
                         actionsColumnWidth={50}
@@ -236,29 +167,13 @@ function InterestsSettingsImpl() {
                         }}
                         headerWrappers={{
                             Interest: (props) => {
-                                return (
-                                    <div className={classes.interestsHeader}>
-                                        {!props.firstColumnWrapped && (
-                                            <ToolTip label={t("Default Interest")}>
-                                                <span className={classes.defaultInterestIcon}>
-                                                    <Icon
-                                                        icon="event-interested-filled"
-                                                        size="compact"
-                                                        className={classes.defaultInterestIconHeader}
-                                                    />
-                                                </span>
-                                            </ToolTip>
-                                        )}
-                                        {props.children}
-                                    </div>
-                                );
+                                return <div className={classes.interestsHeader}>{props.children}</div>;
                             },
                         }}
                     />
                     {!isLoading && interestsList?.length === 0 && <p>{t("No Results.")}</p>}
                 </>
             )}
-            <AddInterest interest={selectedInterest} isVisible={openModal} onClose={closeAddEditModal} />
             <DashboardHelpAsset>
                 <h2>{t("About")}</h2>
                 <p>
@@ -324,17 +239,6 @@ function InterestsSettingsImpl() {
                     />
                 </form>
             </Modal>
-            <ModalConfirm
-                isVisible={openDeleteConfirm}
-                title={t("Delete Interest")}
-                onCancel={() => {
-                    setSelectedInterest(undefined);
-                    setOpenDeleteConfirm(false);
-                }}
-                onConfirm={handleDeleteInterest}
-            >
-                <Translate source="Do you wish to delete interest: <0/>" c0={selectedInterest?.name} />
-            </ModalConfirm>
         </>
     );
 }
@@ -346,27 +250,7 @@ function InterestTableCell(props) {
     switch (columnName) {
         case "Interest":
             return (
-                <div
-                    className={cx(classes.cellFlexBox, {
-                        [classes.interestWrapped]: props.wrappedVersion,
-                    })}
-                >
-                    <div className={classes.defaultInterestIcon}>
-                        {data.isDefault && (
-                            <>
-                                <ConditionalWrap
-                                    condition={!props.wrappedVersion}
-                                    component={ToolTip}
-                                    componentProps={{ label: t("Default Interest") }}
-                                >
-                                    <span>
-                                        <Icon icon="event-interested-filled" size="compact" />
-                                    </span>
-                                </ConditionalWrap>
-                                {props.wrappedVersion && <span>{t("Default Interest")}</span>}
-                            </>
-                        )}
-                    </div>
+                <div className={classes.cellFlexBox}>
                     <div>
                         <p className={classes.interestName}>{data.name}</p>
                         <p className={classes.interestApiName}>{data.apiName}</p>
@@ -375,6 +259,16 @@ function InterestTableCell(props) {
             );
 
         case "Profile Fields":
+            if (data.isDefault) {
+                return (
+                    <ToolTip label={t("Default Interests target all users regardless of profile fields.")}>
+                        <span className={classes.defaultInterestTooltip}>
+                            <Icon icon={"info"} />
+                            <span>{t("Default Interest")}</span>
+                        </span>
+                    </ToolTip>
+                );
+            }
             if (data.profileFields?.length) {
                 if (props.wrappedVersion) {
                     return (

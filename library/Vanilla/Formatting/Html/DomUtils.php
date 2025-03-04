@@ -9,6 +9,8 @@
 namespace Vanilla\Formatting\Html;
 
 use DOMDocument;
+use Garden\Web\Exception\ClientException;
+use Vanilla\Logging\ErrorLogger;
 
 /**
  * Class for stripping images and truncating text from a Dom.

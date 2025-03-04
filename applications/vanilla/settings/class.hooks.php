@@ -11,7 +11,9 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\DiscussionTypeHandler;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Menu\CommunityManagementCounterProvider;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Theme\ThemeSectionModel;
 
@@ -114,6 +116,7 @@ class VanillaHooks extends Gdn_Plugin
                 "CountAllComments",
                 "LastPost",
             ],
+            "Comment" => ["depth", "countChildComments", "scoreChildComments"],
             "Tag" => ["CountDiscussions"],
             "User" => ["CountDiscussions", "CountComments"],
         ];
@@ -1211,11 +1214,11 @@ class VanillaHooks extends Gdn_Plugin
                 $sort
             )
             ->addLinkIf(
-                ["Garden.Settings.Manage", "Feature.PostTypesAndPostFields.Enabled"],
+                Gdn::session()->checkPermission("Garden.Settings.Manage") && PostTypeModel::isPostTypesFeatureEnabled(),
                 t("Post Types"),
                 "/settings/post-types",
-                "forum.posting",
-                "nav-forum-posting",
+                "forum.post-types",
+                "",
                 $sort
             )
             ->addLinkIf(

@@ -9,11 +9,14 @@ namespace Vanilla\Forum\Tests\Controllers;
 
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Models\ContentDraftModel;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestCategoryModelTrait;
 use VanillaTests\Models\TestCommentModelTrait;
@@ -49,10 +52,8 @@ class PostAndDraftsControllerTest extends TestCase
      */
     private $commentDraft;
 
-    /**
-     * @var \DraftModel
-     */
-    private $draftModel;
+    private \DraftModel $draftModel;
+    private ContentDraftModel $contentDraftModel;
 
     /**
      * @var array
@@ -64,10 +65,9 @@ class PostAndDraftsControllerTest extends TestCase
      */
     private $comment;
 
-    /**
-     * @var \Gdn_Configuration
-     */
-    private $config;
+    private \Gdn_Configuration $config;
+
+    protected bool $useFeatureFlag = false;
 
     /**
      * @inheritDoc
@@ -85,14 +85,22 @@ class PostAndDraftsControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTestTraits();
+        if ($this->useFeatureFlag) {
+            $this->enableFeature(ContentDraftModel::FEATURE);
+        } else {
+            $this->disableFeature(ContentDraftModel::FEATURE);
+        }
         $this->createUserFixtures();
         $this->useLegacyLayouts();
-        $this->container()->call(function (\DraftModel $draftModel, \Gdn_Configuration $config) {
+        $this->container()->call(function (
+            \DraftModel $draftModel,
+            \Gdn_Configuration $config,
+            ContentDraftModel $contentDraftModel
+        ) {
             $this->draftModel = $draftModel;
             $this->config = $config;
+            $this->contentDraftModel = $contentDraftModel;
         });
-        // This is a bit of a kluge because our test harness does not load addon config defaults.
-        $this->config->set("Vanilla.Categories.Use", true);
 
         \Gdn::session()->start($this->memberID);
         $this->discussion = $this->insertDiscussions(1)[0];
@@ -102,6 +110,26 @@ class PostAndDraftsControllerTest extends TestCase
 
         // Save a sample draft comment for the discussion.
         $this->commentDraft = $this->postCommentDraft();
+    }
+
+    /**
+     * @param int $draftID
+     * @return array|false
+     */
+    private function getLegacyDraft(int $draftID): array|false
+    {
+        if ($this->useFeatureFlag) {
+            try {
+                $draft = $this->contentDraftModel->selectSingle(where: ["draftID" => $draftID]);
+                $draft = $this->contentDraftModel->convertToLegacyDraft($draft);
+                return $draft;
+            } catch (NoResultsException $ex) {
+                return false;
+            }
+        } else {
+            $draft = $this->draftModel->getID($draftID, DATASET_TYPE_ARRAY);
+            return $draft;
+        }
     }
 
     /**
@@ -117,7 +145,9 @@ class PostAndDraftsControllerTest extends TestCase
             ])
             ->getJson();
 
-        return $this->draftModel->getID($r["DraftID"], DATASET_TYPE_ARRAY);
+        $draftID = $r["DraftID"];
+        $this->assertIsInt($draftID, "A draft should have been saved.");
+        return $this->getLegacyDraft($draftID);
     }
 
     /**
@@ -155,7 +185,9 @@ class PostAndDraftsControllerTest extends TestCase
             )
             ->getJson();
 
-        return $this->draftModel->getID($r["DraftID"], DATASET_TYPE_ARRAY);
+        $draftID = $r["DraftID"];
+        $this->assertIsInt($draftID, "A draft should have been saved.");
+        return $this->getLegacyDraft($r["DraftID"]);
     }
 
     /**
@@ -191,11 +223,11 @@ class PostAndDraftsControllerTest extends TestCase
     public function testSetUpFixtures(): void
     {
         $id = (int) $this->discussionDraft["DraftID"];
-        $draft = $this->draftModel->getID($id, DATASET_TYPE_ARRAY);
+        $draft = $this->getLegacyDraft($id);
         $this->assertEquals($this->discussion["CategoryID"], $draft["CategoryID"]);
 
         $id = (int) $this->commentDraft["DraftID"];
-        $draft = $this->draftModel->getID($id, DATASET_TYPE_ARRAY);
+        $draft = $this->getLegacyDraft($id);
         $this->assertEquals($this->discussion["DiscussionID"], $draft["DiscussionID"]);
     }
 
@@ -300,7 +332,7 @@ HTML
                 ["deliveryMethod" => DELIVERY_METHOD_JSON]
             )
             ->getJson();
-        $draft = $this->draftModel->getID($this->discussionDraft["DraftID"], DATASET_TYPE_ARRAY);
+        $draft = $this->getLegacyDraft($this->discussionDraft["DraftID"]);
 
         $this->assertSame("Test Discussion", $draft["Name"]);
         $this->assertSame(__FUNCTION__, $draft["Body"]);
@@ -321,7 +353,7 @@ HTML
                 ["deliveryMethod" => DELIVERY_METHOD_JSON]
             )
             ->getJson();
-        $draft = $this->draftModel->getID($this->discussionDraft["DraftID"], DATASET_TYPE_ARRAY);
+        $draft = $this->getLegacyDraft($this->discussionDraft["DraftID"]);
         $this->assertFalse($draft);
 
         $discussion = $this->discussionModel->getID($updated["DiscussionID"], DATASET_TYPE_ARRAY);
@@ -370,7 +402,7 @@ HTML
                 ["deliveryMethod" => DELIVERY_METHOD_JSON]
             )
             ->getJson();
-        $draft = $this->draftModel->getID($this->commentDraft["DraftID"], DATASET_TYPE_ARRAY);
+        $draft = $this->getLegacyDraft($this->commentDraft["DraftID"]);
 
         $this->assertSame(__FUNCTION__, $draft["Body"]);
     }
@@ -459,7 +491,8 @@ HTML
                 http_build_query([
                     "allowTrusted" => 1,
                     "target" => "http://example.com",
-                ])
+                ]),
+            true
         );
         $r->assertCssSelectorExists('a[href="' . $expectedHref . '"]');
     }
@@ -481,7 +514,8 @@ HTML
                 http_build_query([
                     "allowTrusted" => 1,
                     "target" => "http://example.com",
-                ])
+                ]),
+            true
         );
         $r->assertCssSelectorExists('a[href="' . $expectedHref . '"]');
     }
@@ -638,23 +672,17 @@ HTML
         \Gdn::themeFeatures()->forceFeatures([
             "NewCategoryDropdown" => false,
         ]);
-        $this->runWithConfig(
-            [
-                "Vanilla.Categories.Use" => true,
-            ],
-            function () {
-                $this->api()->setUserID(self::$siteInfo["adminUserID"]);
-                // Create a non-discussion type category.
-                $newCat = $this->createCategory(["displayAs" => "heading"]);
-                $content = $this->bessy()->getHtml("post/discussion/{$newCat["urlcode"]}", [
-                    "deliveryType" => DELIVERY_TYPE_ALL,
-                ]);
-                // We should have the default text, meaning no category is pre-selected.
-                $content->assertContainsString("Select a category...");
-                // The heading category should not be an available option.
-                $content->assertCssSelectorText("option[disabled]", $newCat["name"]);
-            }
-        );
+
+        $this->api()->setUserID(self::$siteInfo["adminUserID"]);
+        // Create a non-discussion type category.
+        $newCat = $this->createCategory(["displayAs" => "heading"]);
+        $content = $this->bessy()->getHtml("post/discussion/{$newCat["urlcode"]}", [
+            "deliveryType" => DELIVERY_TYPE_ALL,
+        ]);
+        // We should have the default text, meaning no category is pre-selected.
+        $content->assertContainsString("Select a category...");
+        // The heading category should not be an available option.
+        $content->assertCssSelectorText("option[disabled]", $newCat["name"]);
     }
 
     /**
@@ -715,6 +743,9 @@ HTML
         // if draft format is the same as current input format, we assign the draft to the form
         $this->runWithConfig(["Garden.InputFormatter" => "markdown"], function () {
             $r = $this->bessy()->get("/discussion/{$this->discussion["DiscussionID"]}");
+            /** @var \Gdn_Form $form */
+            $form = $r->Form;
+
             $this->assertSame($this->commentDraft["Body"], $r->Form->getValue("Body"));
             $this->assertSame($this->commentDraft["Format"], $r->Form->getValue("Format"));
         });
@@ -730,13 +761,17 @@ HTML
         // Disable editing of posts.
         $this->config->saveToConfig("Garden.EditContentTimeout", "0");
         $this->api()->setUserID($this->memberID);
-        $draftID = $this->draftModel->save([
-            "Name" => __FUNCTION__,
-            "Body" => __FUNCTION__,
-            "Format" => "Text",
-            "Type" => "Discussion",
-            "CategoryID" => -1,
+        $response = $this->api()->post("/drafts", [
+            "recordType" => "discussion",
+            "attributes" => [
+                "name" => __FUNCTION__,
+                "body" => __FUNCTION__,
+                "format" => "Text",
+                "type" => "Discussion",
+                "categoryID" => -1,
+            ],
         ]);
+        $draftID = $response["draftID"];
 
         /** @var \PostController $response */
         $response = $this->bessy()->get("/post/editdiscussion/0/$draftID");
@@ -750,19 +785,52 @@ HTML
      */
     public function testEditingAnotherUserDraft(): void
     {
-        $this->expectException(ForbiddenException::class);
-        $user = $this->createUserFixture(VanillaTestCase::ROLE_MEMBER);
-        $this->api()->setUserID($user["UserID"]);
-        $draftID = $this->draftModel->save([
-            "Name" => __FUNCTION__,
-            "Body" => __FUNCTION__,
-            "Format" => "Text",
-            "Type" => "Discussion",
-            "CategoryID" => -1,
+        $this->api()->setUserID($this->moderatorID);
+        $response = $this->api()->post("/drafts", [
+            "recordType" => "discussion",
+            "attributes" => [
+                "name" => __FUNCTION__,
+                "body" => __FUNCTION__,
+                "format" => "Text",
+                "type" => "Discussion",
+                "categoryID" => -1,
+            ],
         ]);
+        $draftID = $response["draftID"];
 
         $this->api()->setUserID($this->memberID);
+        $this->expectExceptionCode(403);
+
         /** @var \PostController $response */
         $this->bessy()->get("/post/editdiscussion/0/$draftID");
+    }
+
+    /**
+     * Test that posting a discussion without a categoryID throws a validation error.
+     *
+     * @return void
+     */
+    public function testPostingDiscussionWithNoCategoryID(): void
+    {
+        $this->api()->setUserID($this->adminID);
+        $this->createCategory();
+        $discussionData = $this->discussion();
+        unset($discussionData["CategoryID"]);
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage("categoryID is required");
+        $_r = $this->bessy()->post("/post/discussion", $discussionData);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCommentsHaveDiscussionTitleOnDraftsPage(): void
+    {
+        $commentDraft = $this->postCommentDraft();
+        $drafts = $this->bessy()->getJsonData("/drafts")["Drafts"];
+        VanillaTestCase::assertDatasetHasRow($drafts, [
+            "DraftID" => $commentDraft["DraftID"],
+            "Name" => "Re: {$this->discussion["Name"]}",
+        ]);
     }
 }

@@ -127,7 +127,7 @@ class MockSiteSection implements SiteSectionInterface
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return SiteSectionSchema::toArray($this);
     }
@@ -209,7 +209,7 @@ class MockSiteSection implements SiteSectionInterface
     /**
      * @inheritDoc
      */
-    public function getLayoutRecordID()
+    public function getLayoutRecordID(): int|string
     {
         return GlobalLayoutRecordProvider::RECORD_ID;
     }

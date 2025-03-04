@@ -215,7 +215,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * which is a value of any type other than a resource.
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         $data = $this->getData();
         if (isset($this->beforeJsonSerialize)) {
@@ -232,7 +232,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      *
      * @return mixed
      */
-    public function getSerializedData()
+    public function getSerializedData(): mixed
     {
         return json_decode(json_encode($this), true);
     }
@@ -521,7 +521,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * The return value will be casted to boolean if non-boolean was returned.
      * @link http://php.net/manual/en/arrayaccess.offsetexists.php
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->data[$offset]);
     }
@@ -533,7 +533,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @return mixed Can return all value types.
      * @link http://php.net/manual/en/arrayaccess.offsetget.php
      */
-    public function &offsetGet($offset)
+    public function &offsetGet($offset): mixed
     {
         return $this->getDataItem($offset);
     }
@@ -545,7 +545,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $value The value to set.
      * @link http://php.net/manual/en/arrayaccess.offsetset.php
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->setDataItem($offset, $value);
     }
@@ -556,7 +556,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $offset The offset to unset.
      * @link http://php.net/manual/en/arrayaccess.offsetunset.php
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->data[$offset]);
     }
@@ -567,7 +567,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @link http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
      */
-    public function count()
+    public function count(): int
     {
         return count($this->data);
     }
@@ -578,7 +578,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @return Traversable An instance of an object implementing <b>Iterator</b> or <b>Traversable</b>.
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new \ArrayIterator($this->data);
     }

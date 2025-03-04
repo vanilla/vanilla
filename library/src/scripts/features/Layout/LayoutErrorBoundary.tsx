@@ -11,7 +11,7 @@ import Message from "@library/messages/Message";
 import { messagesVariables } from "@library/messages/messageStyles";
 import { t } from "@vanilla/i18n";
 import { debug, logError, RecordID } from "@vanilla/utils";
-import React, { Component } from "react";
+import { Component } from "react";
 
 export interface ILayoutErrorBoundaryProps {
     key?: RecordID;
@@ -31,6 +31,9 @@ interface ILayoutErrorProps {
 
 export function LayoutError(props: ILayoutErrorProps) {
     const error = `There was a problem loading "${props.componentName ?? t("Invalid component name")}"`;
+    if (!debug()) {
+        return null;
+    }
     return (
         <Container>
             <div style={{ width: "100%", height: "100%", padding: "16px" }}>

@@ -118,6 +118,9 @@ class UserModelExpandUserFragmentTest extends SiteTestCase
      */
     public function testExpandUserCorruptedTitle()
     {
+        // With custom profile fields enabled by default, we need to enable the "Title" field.
+        $this->api()->patch("/profile-fields/Title", ["enabled" => true]);
+
         $user = $this->createUser();
         // When using the users APIs this can't happen anymore.
         // However some dbs have duped records.

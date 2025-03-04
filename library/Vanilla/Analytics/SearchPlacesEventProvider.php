@@ -41,6 +41,6 @@ class SearchPlacesEventProvider implements EventProviderInterface
     {
         $type = $body["type"] ?? null;
         $domain = $body["domain"] ?? null;
-        return strtolower($type) === "search" && strtolower($domain) === "places";
+        return $type && $domain && strtolower($type) === "search" && strtolower($domain) === "places";
     }
 }

@@ -350,7 +350,7 @@ class ApiUtils
     public static function jsonFilter($value)
     {
         $fn = function (&$value, $key = "") use (&$fn) {
-            if (is_array($value) || $value instanceof \ArrayAccess) {
+            if (is_array($value) || ($value instanceof \ArrayAccess && $value instanceof \Traversable)) {
                 array_walk($value, function (&$childValue, $childKey) use ($fn, $key) {
                     $fn($childValue, $childKey, $key);
                 });

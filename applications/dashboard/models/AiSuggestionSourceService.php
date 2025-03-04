@@ -92,7 +92,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      */
     private function aiSuggestionFeatureEnabled(): bool
     {
-        return FeatureFlagHelper::featureEnabled("aiFeatures") && FeatureFlagHelper::featureEnabled("AISuggestions");
+        return FeatureFlagHelper::featureEnabled("AISuggestions");
     }
 
     /**
@@ -147,7 +147,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         return $this->aiSuggestionFeatureEnabled() &&
             $this->checkIfUserHasEnabledAiSuggestions() === true &&
             $aiConfig["enabled"] &&
-            FeatureFlagHelper::featureEnabled("customLayout.discussionThread");
+            FeatureFlagHelper::featureEnabled("customLayout.post");
     }
 
     /**

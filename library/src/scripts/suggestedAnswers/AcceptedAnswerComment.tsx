@@ -5,7 +5,6 @@
  */
 
 import { IComment } from "@dashboard/@types/api/comment";
-import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { useToastErrorHandler } from "@library/features/toaster/ToastContext";
 import { IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
@@ -17,30 +16,32 @@ import { suggestedAnswersClasses } from "@library/suggestedAnswers/SuggestedAnsw
 import { useAcceptSuggestion } from "@library/suggestedAnswers/SuggestedAnswers.hooks";
 import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
 import { t } from "@library/utility/appUtils";
+import type { ICommentParent } from "@vanilla/addon-vanilla/comments/CommentThreadParentContext";
 import { Icon } from "@vanilla/icons";
 
 export interface IAcceptedAnswerProps {
     suggestion: ISuggestedAnswer;
-    discussion: IDiscussion;
+    commentParent: ICommentParent & { recordType: "discussion" };
+    comment: IComment;
     commentID: IComment["commentID"];
     className?: string;
     onMutateSuccess?: () => Promise<void>;
 }
 
 export function AcceptedAnswerComment(props: IAcceptedAnswerProps) {
-    const { suggestion, className, discussion, onMutateSuccess, commentID } = props;
+    const { suggestion, className, comment, commentParent, onMutateSuccess, commentID } = props;
     const classes = suggestedAnswersClasses();
-    const acceptAnswer = useAcceptSuggestion(discussion.discussionID);
+    const acceptAnswer = useAcceptSuggestion(commentParent.recordID);
     const toastError = useToastErrorHandler();
     const currentUser = useCurrentUser();
     const { hasPermission } = usePermissionsContext();
     const permissionOptions: IPermissionOptions = {
         mode: PermissionMode.RESOURCE_IF_JUNCTION,
         resourceType: "category",
-        resourceID: discussion.categoryID,
+        resourceID: comment.categoryID,
     };
     const canUndo =
-        hasPermission("comments.delete", permissionOptions) || currentUser?.userID === discussion.insertUserID;
+        hasPermission("comments.delete", permissionOptions) || currentUser?.userID === commentParent.insertUserID;
 
     const handleUndoAcceptAnswer = async () => {
         try {
@@ -49,7 +50,7 @@ export function AcceptedAnswerComment(props: IAcceptedAnswerProps) {
                 accept: false,
                 commentID: suggestion.commentID,
             });
-            onMutateSuccess?.();
+            await onMutateSuccess?.();
         } catch (err) {
             toastError(err);
         }
@@ -64,7 +65,7 @@ export function AcceptedAnswerComment(props: IAcceptedAnswerProps) {
                     className={classes.answerButton}
                     onClick={handleUndoAcceptAnswer}
                 >
-                    <Icon icon="data-undo" size="compact" />
+                    <Icon icon="undo" size="compact" />
                     {t("Undo Accept Answer")}
                 </Button>
             )}

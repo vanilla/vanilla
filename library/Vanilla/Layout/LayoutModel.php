@@ -267,7 +267,15 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      */
     public function getHydratedSchema(): Schema
     {
-        return Schema::parse(["layoutID:i|s", "name:s", "layoutViewType:s", "isDefault:b", "layout:a", "seo:o"]);
+        return Schema::parse([
+            "layoutID:i|s",
+            "name:s",
+            "layoutViewType:s",
+            "isDefault:b",
+            "layout:a",
+            "seo:o",
+            "contexts:a?",
+        ]);
     }
 
     /**

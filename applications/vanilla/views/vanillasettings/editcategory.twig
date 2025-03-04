@@ -32,13 +32,13 @@ dashboardHeading({
         </div>
         <div id="UrlCode" class="input-wrap category-url-code">
             {% apply spaceless %}
-                <div class="category-url">
-                    {{ url('/categories', true) }}{{- '/' -}}
-                    <span>{{ form.getValue('UrlCode') }}</span>
-                </div>
-                {{- form.textBox('UrlCode') -}}
-                {{- form.getValue('UrlCode') ? '/' : '' -}}
-                <a class="Edit btn btn-link" href="#">{{ t('edit') }}</a>&nbsp;<a class="Save btn btn-primary" href="#">{{ t('OK') }}</a>&nbsp;
+            <div class="category-url">
+                {{ url('/categories', true) }}{{- '/' -}}
+                <span>{{ form.getValue('UrlCode') }}</span>
+            </div>
+            {{- form.textBox('UrlCode') -}}
+            {{- form.getValue('UrlCode') ? '/' : '' -}}
+            <a class="Edit btn btn-link" href="#">{{ t('edit') }}</a>&nbsp;<a class="Save btn btn-primary" href="#">{{ t('OK') }}</a>&nbsp;
             {% endapply %}
         </div>
     </li>
@@ -77,9 +77,9 @@ dashboardHeading({
             {{ form.dropDown('DisplayAs', DisplayAsOptions, {'Wrap': true}) }}
         </div>
     </li>
-    {#
-        // Extended fields may be defined through some addon.
-     #}
+    {% if featureEnabled(constant("Vanilla\\Forum\\Models\\PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS")) %}
+        {{ form.react("allowedPostTypeIDs", "CategoryPostTypes", postTypeProps) }}
+    {% endif %}
     {% if _ExtendedFields is defined %}
         {{ form.simple(_ExtendedFields, []) }}
     {% endif %}
@@ -103,9 +103,8 @@ dashboardHeading({
     </li>
 
 </ul>
-{% if featureEnabled(constant("Vanilla\\Forum\\Models\\PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS")) %}
-    {{ form.react("stub", "CategoryPostTypes", postTypeProps) }}
-{% else %}
+<div class="CategoryPermissions">
+{% if not featureEnabled(constant("Vanilla\\Forum\\Models\\PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS")) %}
     {% if AllowedDiscussionTypes is defined and AllowedDiscussionTypes|length > 1 %}
         <div class="P DiscussionTypes form-group">
             <div class="label-wrap">
@@ -119,7 +118,7 @@ dashboardHeading({
         </div>
     {% endif %}
 {% endif %}
-<div class="CategoryPermissions">
+
 
     {% if _PermissionFields is defined %}
     {{ form.simple(_PermissionFields, []) }}

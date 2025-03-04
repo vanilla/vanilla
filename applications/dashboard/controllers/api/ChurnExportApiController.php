@@ -43,7 +43,7 @@ class ChurnExportApiController extends Controller
         $this->ownSite = $ownSite;
         $this->managementDashboard = !$isTestMode
             ? \Communication::managementDashboard()
-            : new HttpClient("https://management-dashboard.vanilla.localhost");
+            : new HttpClient("https://management-dashboard.vanilla.local");
     }
 
     /**

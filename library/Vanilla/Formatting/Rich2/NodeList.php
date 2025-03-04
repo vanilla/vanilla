@@ -31,6 +31,16 @@ class NodeList implements \JsonSerializable, TextDOMInterface
     }
 
     /**
+     * Get all nodes.
+     *
+     * @return AbstractNode[]
+     */
+    public function getNodes(): array
+    {
+        return $this->nodes;
+    }
+
+    /**
      * Add a node to the list.
      *
      * @param AbstractNode $node

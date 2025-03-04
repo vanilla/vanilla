@@ -5,7 +5,6 @@
  */
 
 import { IReport } from "@dashboard/moderation/CommunityManagementTypes";
-import { usePostRevision } from "@dashboard/moderation/PostRevisionContext";
 import { reportHistoryListClasses } from "@dashboard/moderation/components/ReportHistoryList.classes";
 import { cx } from "@emotion/css";
 import DateTime from "@library/content/DateTime";
@@ -25,38 +24,39 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { useMemo } from "react";
 
-interface IProps {}
+interface IProps {
+    reports: IReport[];
+    onReportSelected?: (report: IReport) => void;
+    activeReportIDs: number[];
+}
 
-interface reportGroup {
+interface IReportGroup {
     date: string;
     reports: IReport[];
 }
 
 export function ReportHistoryList(props: IProps) {
-    const { reports, activeReport, setActiveRevision } = usePostRevision();
+    const { reports, activeReportIDs, onReportSelected } = props;
     const frameClasses = filterPanelClasses(useSection().mediaQueries);
     const classes = reportHistoryListClasses();
 
-    const groupedReports = useMemo<reportGroup[]>(() => {
-        if (reports) {
-            return reports.reduce((acc: reportGroup[], report: IReport) => {
-                const date = new Date(report.dateInserted).toLocaleDateString();
-                const groupingIndex = acc.findIndex((group) => group.date === date);
-                if (groupingIndex < 0) {
-                    return [
-                        ...acc,
-                        {
-                            date,
-                            reports: [report],
-                        },
-                    ];
-                } else {
-                    acc[groupingIndex].reports.push(report);
-                    return acc;
-                }
-            }, []);
-        }
-        return [];
+    const groupedReports = useMemo<IReportGroup[]>(() => {
+        return reports.reduce((acc: IReportGroup[], report: IReport) => {
+            const date = new Date(report.dateInserted).toLocaleDateString();
+            const groupingIndex = acc.findIndex((group) => group.date === date);
+            if (groupingIndex < 0) {
+                return [
+                    ...acc,
+                    {
+                        date,
+                        reports: [report],
+                    },
+                ];
+            } else {
+                acc[groupingIndex].reports.push(report);
+                return acc;
+            }
+        }, []);
     }, [reports]);
 
     return (
@@ -85,8 +85,10 @@ export function ReportHistoryList(props: IProps) {
                                         <ReportHistoryListItem
                                             key={report.reportID}
                                             report={report}
-                                            isActive={activeReport?.reportID === report.reportID}
-                                            setActive={() => setActiveRevision(report.reportID)}
+                                            isActive={activeReportIDs.includes(report.reportID)}
+                                            setActive={() => {
+                                                onReportSelected?.(report);
+                                            }}
                                         />
                                     ))}
                                 </ol>

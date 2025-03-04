@@ -69,6 +69,9 @@ export default function UserManagementFilter(props: IProps) {
 
         if (hasFilters) {
             return Object.keys(filters).some((filter) => {
+                if (filter === "banFilter") {
+                    return filters["banFilter"] !== "none";
+                }
                 if (filter !== "profileFields") {
                     return Array.isArray(filters[filter]) ? filters[filter].length : !!filters[filter];
                 } else {
@@ -141,7 +144,7 @@ export function FilterModalTriggerButton(props: { onClick: () => void; dirty: bo
                     }}
                     className={classes.actionButton}
                 >
-                    <Icon icon={`search-filter${props.dirty ? "-applied" : ""}`} />
+                    <Icon icon={`filter${props.dirty ? "-applied" : ""}`} />
                 </Button>
             </span>
         </ToolTip>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,9 +8,8 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
-use Garden\Web\Exception\ServerException;
+use Garden\Container\NotFoundException;
 use Gdn;
-use UserMetaModel;
 use UserModel;
 use CategoryModel;
 use UsersApiController;
@@ -20,7 +19,6 @@ use Vanilla\Events\EventAction;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\PrivateCommunityMiddleware;
-use VanillaTests\Dashboard\Controllers\AiSuggestionsApiControllerTest;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Fixtures\TestUploader;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -223,6 +221,16 @@ class UsersTest extends AbstractResourceTest
     }
 
     /**
+     * Test that an error is thrown when we try to give points to a user that doesn't exist.
+     */
+    public function testGivePointsToNonExistentUser()
+    {
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage("Unable to give points. User not found.");
+        $this->givePoints(["userID" => 9999], 10);
+    }
+
+    /**
      * Test removing a user's photo.
      */
     public function testDeletePhoto()
@@ -314,6 +322,8 @@ class UsersTest extends AbstractResourceTest
             "email" => null,
             "ssoID" => null,
             "emailConfirmed" => false,
+            "profileFields" => [],
+            "extended" => [],
         ];
         $actual = $response->getBody();
 
@@ -384,6 +394,8 @@ class UsersTest extends AbstractResourceTest
                 "profile.editusernames",
                 "profiles.edit",
                 "profiles.view",
+                "reactions.negative.add",
+                "reactions.positive.add",
                 "reactions.view",
                 "session.valid",
                 "settings.view",
@@ -644,57 +656,6 @@ class UsersTest extends AbstractResourceTest
         $user = $this->createUser(["name" => __FUNCTION__]);
         $response = $this->api()->patch("/users/{$user["userID"]}", ["private" => true]);
         $this->assertTrue($response->getBody()["private"]);
-    }
-
-    /**
-     * Test that the private field can be patched.
-     */
-    public function testPatchSuggestAnswersField()
-    {
-        $user = $this->createUser(["name" => __FUNCTION__]);
-        $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
-        $this->assertArrayNotHasKey("suggestAnswers", $response->getBody());
-        $this->runWithConfig(
-            [
-                "Feature.AISuggestions.Enabled" => true,
-                "Feature.aiFeatures.Enabled" => true,
-                "aiSuggestions.enabled" => true,
-            ],
-            function () use ($user) {
-                $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
-                $this->assertSame(false, $response->getBody()["suggestAnswers"]);
-                $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => true]);
-                $this->assertSame(true, $response->getBody()["suggestAnswers"]);
-            }
-        );
-    }
-
-    /**
-     * Test that the private field can be patched.
-     */
-    public function testPatchSuggestAnswersFieldError()
-    {
-        $user = $this->createUser(["name" => __FUNCTION__]);
-        \Gdn::userMetaModel()->setUserMeta($user["userID"], UserMetaModel::ANONYMIZE_DATA_USER_META, 1);
-        $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => false]);
-        $this->assertArrayNotHasKey("suggestAnswers", $response->getBody());
-        $this->expectExceptionMessage(
-            AiSuggestionsApiControllerTest::VALID_SETTINGS["name"] .
-                " Answers is not available if you have not accepted cookies."
-        );
-
-        $this->runWithConfig(
-            [
-                "Feature.AISuggestions.Enabled" => true,
-                "Feature.aiFeatures.Enabled" => true,
-                "aiSuggestions.enabled" => true,
-            ],
-            function () use ($user) {
-                $this->api()->patch("/ai-suggestions/settings", AiSuggestionsApiControllerTest::VALID_SETTINGS);
-                $response = $this->api()->patch("/users/{$user["userID"]}", ["SuggestAnswers" => true]);
-                $this->assertSame(true, $response->getBody()["suggestAnswers"]);
-            }
-        );
     }
 
     /**
@@ -1129,121 +1090,6 @@ class UsersTest extends AbstractResourceTest
     public function testRequestPasswordPrivateCommunity()
     {
         $this->runWithPrivateCommunity([$this, "testRequestPassword"]);
-    }
-
-    /**
-     * A moderator should be able to ban a member through the PUT /users/{id}/ban endpoint.
-     */
-    public function testPutBanWithPermission()
-    {
-        $this->createUserFixtures("testPutBanWithPermission");
-        $this->api()->setUserID($this->moderatorID);
-        $r = $this->api()->put("{$this->baseUrl}/{$this->memberID}/ban", ["banned" => true]);
-        $this->assertTrue($r["banned"]);
-
-        // Make sure the user has the banned photo.
-        $user = $this->api()
-            ->get("{$this->baseUrl}/{$this->memberID}")
-            ->getBody();
-        $this->assertStringEndsWith(UserModel::PATH_BANNED_AVATAR, $user["photoUrl"]);
-        $this->assertSame($user["photoUrl"], $user["profilePhotoUrl"]);
-    }
-
-    /**
-     * A user with the right permission should be able to ban a user with lower permissions through the PATCH /users/{id} endpoint.
-     */
-    public function testPatchBanWithPermission(): void
-    {
-        $this->createUserFixtures("testPatchBanWithPermission");
-        $this->api()->setUserID($this->adminID);
-        $r = $this->api()->patch("{$this->baseUrl}/{$this->memberID}", ["banned" => true]);
-        $this->assertSame(1, $r["banned"]);
-
-        // Make sure the user has the banned photo.
-        $user = $this->api()
-            ->get("{$this->baseUrl}/{$this->memberID}")
-            ->getBody();
-        $this->assertStringEndsWith(UserModel::PATH_BANNED_AVATAR, $user["photoUrl"]);
-        $this->assertSame($user["photoUrl"], $user["profilePhotoUrl"]);
-    }
-
-    /**
-     * A moderator should not be able to ban an administrator through the PUT /users/{id}/ban endpoint.
-     */
-    public function testPutBanWithoutPermission()
-    {
-        $this->createUserFixtures("testPutBanWithoutPermission");
-        $this->api()->setUserID($this->moderatorID);
-        $this->expectException(ForbiddenException::class);
-        $this->expectExceptionMessage("You are not allowed to ban a user that has higher permissions than you.");
-        $r = $this->api()->put("/users/{$this->adminID}/ban", ["banned" => true]);
-    }
-
-    /**
-     * A user with the "users.edit" permission should not be allowed to ban an admin through the PATCH /users/{id} endpoint.
-     */
-    public function testPatchBanWithoutPermission(): void
-    {
-        $this->createUserFixtures("testPatchBanWithoutPermission");
-        $this->runWithPermissions(
-            function () {
-                $this->expectException(ForbiddenException::class);
-                $this->expectExceptionMessage(UsersApiController::ERROR_PATCH_HIGHER_PERMISSION_USER);
-                $r = $this->api()->patch("/users/{$this->adminID}", ["banned" => true]);
-            },
-            ["users.edit" => true]
-        );
-    }
-
-    /**
-     * A moderator should not be able to ban another moderator through the PUT /users/{id}/ban endpoint.
-     */
-    public function testPutBanSamePermissionRank()
-    {
-        $this->createUserFixtures("testBanSamePermissionRank");
-        $moderatorID = $this->moderatorID;
-        $this->createUserFixtures("testBanSamePermissionRank2");
-        $this->api()->setUserID($this->moderatorID);
-        $this->expectException(ForbiddenException::class);
-        $this->expectExceptionMessage("You are not allowed to ban a user with the same permission level as you.");
-        $r = $this->api()->put("/users/{$moderatorID}/ban", ["banned" => true]);
-    }
-
-    /**
-     * A user should not be able to ban another user with identical permissions through the PATCH /users/{id} endpoint.
-     */
-    public function testPatchBanSamePermissionRank(): void
-    {
-        $usersEditRole = $this->createRole([], ["session.valid" => true, "users.edit" => true]);
-        $user1ID = $this->createUserFixture($usersEditRole["name"]);
-        $user2ID = $this->createUserFixture($usersEditRole["name"]);
-        $this->api()->setUserID($user1ID);
-        $this->expectException(ForbiddenException::class);
-        $this->expectExceptionMessage("You are not allowed to ban a user with the same permission level as you.");
-        $r = $this->api()->patch("/users/{$user2ID}", ["banned" => true]);
-    }
-
-    /**
-     * Test that we can patch a ban with the same value that already exists.
-     */
-    public function testPatchBanSameBanValue()
-    {
-        $this->createUserFixtures(__FUNCTION__);
-        $this->api()->setUserID($this->adminID);
-        $r = $this->api()->patch("{$this->baseUrl}/{$this->memberID}", ["banned" => true]);
-        $this->assertSame(1, $r["banned"]);
-
-        // And we can do it again but nothing changes.
-        $r = $this->api()->patch("{$this->baseUrl}/{$this->memberID}", ["banned" => true]);
-        $this->assertSame(1, $r["banned"]);
-
-        // And we can do the inverse.
-        $r = $this->api()->patch("{$this->baseUrl}/{$this->memberID}", ["banned" => false]);
-        $this->assertSame(0, $r["banned"]);
-
-        // And again no change.
-        $r = $this->api()->patch("{$this->baseUrl}/{$this->memberID}", ["banned" => false]);
-        $this->assertSame(0, $r["banned"]);
     }
 
     /**
@@ -2519,20 +2365,37 @@ class UsersTest extends AbstractResourceTest
     public function testIpAddressesFilter()
     {
         $user1 = $this->createUser();
-        $this->userModel->saveIP($user1["userID"], "5.6.7.8");
+        $this->trackUserVisit($user1, "5.6.7.8");
 
         $user2 = $this->createUser();
-        $this->userModel->saveIP($user2["userID"], "2001:0db8:85a3:0000:0000:8a2e:0370:7334");
+        $this->trackUserVisit($user2, "2001:0db8:85a3:0000:0000:8a2e:0370:7334");
 
-        $result = $this->api()->get("/users", [
-            "ipAddresses" => ["5.6.7.8", "2001:0db8:85a3:0000:0000:8a2e:0370:7334"],
-        ]);
-        $body = $result->getBody();
-        $this->assertCount(2, $body);
+        $this->api()
+            ->get("/users", [
+                "ipAddresses" => ["5.6.7.8", "2001:0db8:85a3:0000:0000:8a2e:0370:7334"],
+            ])
+            ->assertSuccess()
+            ->assertCount(2, "Expected 2 users to be found")
+            ->assertJsonArrayValues(["userID" => [$user1["userID"], $user2["userID"]]]);
 
-        $userIDs = array_column($body, "userID");
-        $this->assertContains($user1["userID"], $userIDs);
-        $this->assertContains($user2["userID"], $userIDs);
+        // We can filter by wildcards too.
+        $this->api()
+            ->get("/users", [
+                "ipAddresses" => ["5.6.*"],
+            ])
+            ->assertSuccess()
+            ->assertCount(1, "Expected 1 user to be found")
+            ->assertJsonArrayValues(["userID" => [$user1["userID"]]]);
+
+        // Now let's try IPv6
+        // We can filter by wildcards too.
+        $this->api()
+            ->get("/users", [
+                "ipAddresses" => ["2001:0db8:85a3:0000:*"],
+            ])
+            ->assertSuccess()
+            ->assertCount(1, "Expected 1 user to be found")
+            ->assertJsonArrayValues(["userID" => [$user2["userID"]]]);
     }
 
     /**

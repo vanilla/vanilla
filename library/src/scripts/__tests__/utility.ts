@@ -6,6 +6,7 @@
 
 import MockAdapter from "axios-mock-adapter";
 import apiv2 from "@library/apiv2";
+import { useEffect, useLayoutEffect } from "react";
 
 /**
  * Utility for importing everything from a wepback require.context
@@ -26,6 +27,18 @@ export function mockAPI(options?: any) {
     }
     mock = new MockAdapter(apiv2, { ...options });
     return mock;
+}
+
+export function useMockedApi(callback: (mock: MockAdapter) => void) {
+    useLayoutEffect(() => {
+        const mock = mockAPI();
+        callback(mock);
+        return () => {
+            if (mock !== null) {
+                mock.restore();
+            }
+        };
+    });
 }
 
 /**

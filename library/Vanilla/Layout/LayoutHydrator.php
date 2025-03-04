@@ -18,6 +18,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn;
+use Vanilla\Addon;
 use Vanilla\Layout\Resolvers\TranslateResolver;
 use Vanilla\Layout\Resolvers\ApiResolver;
 use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
@@ -113,10 +114,8 @@ final class LayoutHydrator
         $this->addReactResolver(HtmlReactWidget::class)
             ->addReactResolver(SectionOneColumn::class)
             ->addReactResolver(SectionFullWidth::class)
-
             ->addReactResolver(SectionTwoColumns::class)
             ->addReactResolver(SectionTwoColumnsEven::class)
-
             ->addReactResolver(SectionThreeColumns::class)
             ->addReactResolver(SectionThreeColumnsEven::class)
             ->addReactResolver(QuickLinksWidget::class)
@@ -312,6 +311,12 @@ final class LayoutHydrator
                 "json-ld" => $cleanPageHead->getJsonLDScriptContent(),
             ];
         }
+
+        $layoutView = $this->getLayoutViewType($layoutViewType);
+        $contexts = $layoutView?->getContexts($params) ?? [];
+        if (!empty($contexts)) {
+            $result["contexts"] = $contexts;
+        }
         return $result;
     }
 
@@ -374,6 +379,7 @@ final class LayoutHydrator
         $layoutView = $this->getLayoutViewType($layoutViewType);
         $inputSchema = $this->getViewParamSchema($layoutView);
         $inputParams = $inputSchema->validate($inputParams);
+        $inputParams["layoutViewType"] = $layoutViewType;
 
         $resolvedParamSchema = $this->getViewParamSchema($layoutView, true);
         $resolvers = array_filter([$this->commonLayout, $layoutView]);
@@ -473,6 +479,7 @@ final class LayoutHydrator
     private function applyDynamicSchemas(?string $layoutViewType)
     {
         $this->dynamicSchemaOptions->reset();
+        $this->dynamicSchemaOptions->setLayoutViewType($layoutViewType);
         if ($layoutViewType !== "home") {
             $this->dynamicSchemaOptions->addDescriptionChoice("siteSection/description", "Subcommunity Description");
             $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Subcommunity Title");
@@ -485,8 +492,28 @@ final class LayoutHydrator
             $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Banner Title");
         }
 
-        $hasDiscussion = in_array($layoutViewType, ["discussionThread", "questionThread", "ideaThread"]);
-        $hasCategory = in_array($layoutViewType, ["discussionCategoryPage", "nestedCategoryList"]) || $hasDiscussion;
+        $hasCategory = in_array($layoutViewType, ["discussionCategoryPage", "nestedCategoryList"]);
+        $hasDiscussion = in_array($layoutViewType, ["discussion", "question", "idea"]);
+        $hasPlace = $hasDiscussion || $layoutViewType === "event";
+
+        $isGroupsEnabled = \Gdn::addonManager()->isEnabled("groups", Addon::TYPE_ADDON);
+        if ($hasPlace) {
+            $this->dynamicSchemaOptions->titleChoices->option(
+                $isGroupsEnabled ? "Place Name" : "Category Name",
+                "place/name",
+                description: $isGroupsEnabled ? "Either the Group or Category name." : null
+            );
+            $this->dynamicSchemaOptions->descriptionChoices->option(
+                $isGroupsEnabled ? "Place Description" : "Category Description",
+                "place/description",
+                description: $isGroupsEnabled ? "Either the Group or Category description." : null
+            );
+            $this->dynamicSchemaOptions->imageSourceChoices->option(
+                $isGroupsEnabled ? "Place Banner" : "Category Banner",
+                BannerFullWidget::IMAGE_SOURCE_PLACE,
+                description: $isGroupsEnabled ? "Either the Group or Category banner image." : null
+            );
+        }
 
         if ($hasCategory) {
             $this->dynamicSchemaOptions->addDescriptionChoice("category/description", "Category Description");
@@ -499,6 +526,27 @@ final class LayoutHydrator
 
         if ($hasDiscussion) {
             $this->dynamicSchemaOptions->addTitleChoice("discussion/name", "Discussion Name");
+        }
+
+        switch ($layoutViewType) {
+            case "helpCenterCategory":
+            case "helpCenterArticle":
+            case "helpCenterKnowledgeBase":
+            case "knowledgeBase":
+            case "guideArticle":
+                $this->dynamicSchemaOptions->addTitleChoice("knowledgeBase/name", "Knowledge Base Name");
+                $this->dynamicSchemaOptions->addDescriptionChoice(
+                    "knowledgeBase/description",
+                    "Knowledge Base Description"
+                );
+                $this->dynamicSchemaOptions->addTitleChoice("knowledgeCategory/name", "Knowledge Category Name");
+                $this->dynamicSchemaOptions->addImageSourceChoice("knowledgeBase/bannerImage", "Knowledge Base Banner");
+                break;
+            case "knowledgeHome":
+                $this->dynamicSchemaOptions->addTitleChoice("knowledgeTitle", "Knowledge Home Title");
+                $this->dynamicSchemaOptions->addDescriptionChoice("knowledgeDescription", "Knowledge Home Description");
+                $this->dynamicSchemaOptions->addImageSourceChoice("knowledgeImage", "Knowledge Home Banner");
+                break;
         }
 
         $this->dynamicSchemaOptions->addImageSourceChoice(
@@ -520,7 +568,9 @@ final class LayoutHydrator
     {
         $layoutView = $this->layoutViews[$layoutViewType] ?? null;
         if ($layoutViewType !== null && $layoutView === null) {
-            throw new NotFoundException("LayoutViewType", ["layoutViewType" => $layoutViewType]);
+            throw new NotFoundException("LayoutViewType '$layoutViewType' not found", [
+                "layoutViewType" => $layoutViewType,
+            ]);
         }
         return $layoutView;
     }

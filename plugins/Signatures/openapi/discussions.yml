@@ -1,0 +1,13 @@
+openapi: 3.0.3
+info:
+components:
+    parameters:
+        expand:
+            name: expand
+            in: query
+            schema:
+                type: array
+                items:
+                    type: string
+                    enum:
+                        - insertUser.signature

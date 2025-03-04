@@ -32,7 +32,8 @@ export function EscalationFilters(props: IProps) {
     });
 
     return (
-        <FilterFrame title={t("Filter")} hideFooter>
+        <>
+            <h3>{t("Filters")}</h3>
             <FilterBlock
                 apiName={"statuses"}
                 label={"Status"}
@@ -71,6 +72,6 @@ export function EscalationFilters(props: IProps) {
                 dynamicOptionApi={roleLookUp}
                 onFilterChange={props.onFilter}
             />
-        </FilterFrame>
+        </>
     );
 }

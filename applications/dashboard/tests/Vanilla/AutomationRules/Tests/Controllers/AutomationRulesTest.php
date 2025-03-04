@@ -744,6 +744,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     true
                 ),
                 "contentType" => "users",
+                "dynamicSchemaParams" => null,
             ],
             "moveToCategoryAction" => [
                 "actionType" => "moveToCategoryAction",
@@ -758,6 +759,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "Category settings are respected by automation rules. Posts will only be moved into categories that accept that post type."
                 ),
                 "contentType" => "posts",
+                "dynamicSchemaParams" => null,
             ],
             "closeDiscussionAction" => [
                 "actionType" => "closeDiscussionAction",
@@ -768,6 +770,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "staleDiscussionTrigger",
                 ],
                 "contentType" => "posts",
+                "dynamicSchemaParams" => null,
             ],
             "bumpDiscussionAction" => [
                 "actionType" => "bumpDiscussionAction",
@@ -778,6 +781,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "staleDiscussionTrigger",
                 ],
                 "contentType" => "posts",
+                "dynamicSchemaParams" => null,
             ],
             "addTagAction" => [
                 "actionType" => "addTagAction",
@@ -818,6 +822,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "required" => ["tagID"],
                 ],
                 "contentType" => "posts",
+                "dynamicSchemaParams" => null,
             ],
             "addDiscussionToCollectionAction" => [
                 "actionType" => "addDiscussionToCollectionAction",
@@ -829,6 +834,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 ],
                 "schema" => $this->getCollectionSchema("Collection to add to"),
                 "contentType" => "posts",
+                "dynamicSchemaParams" => null,
             ],
             "removeDiscussionFromCollectionAction" => [
                 "actionType" => "removeDiscussionFromCollectionAction",
@@ -840,6 +846,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 ],
                 "schema" => $this->getCollectionSchema("Collection to remove from"),
                 "contentType" => "posts",
+                "dynamicSchemaParams" => null,
             ],
             "addRemoveRoleAction" => [
                 "actionType" => "addRemoveRoleAction",
@@ -893,12 +900,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "required" => ["addRoleID"],
                 ],
                 "contentType" => "users",
+                "dynamicSchemaParams" => null,
             ],
             "removeDiscussionFromTriggerCollectionAction" => [
                 "actionType" => "removeDiscussionFromTriggerCollectionAction",
                 "name" => "Remove from trigger collection",
                 "actionTriggers" => ["staleCollectionTrigger"],
                 "contentType" => "posts",
+                "dynamicSchemaParams" => null,
             ],
             "createEscalationAction" => [
                 "actionType" => "createEscalationAction",
@@ -942,6 +951,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     ],
                 ],
                 "contentType" => "posts",
+                "dynamicSchemaParams" => null,
             ],
         ];
     }
@@ -1019,6 +1029,7 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     ],
                 ],
                 "contentType" => "posts",
+                "dynamicSchemaParams" => null,
             ],
         ];
     }
@@ -1174,20 +1185,20 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 "You should provide at least one email domain.",
             ],
             "test invalid emailDomain value" => [
-                $this->modifyRecord($body, ["triggerValue" => ["emailDomain" => "test.co.eu"]]),
-                "Could not resolve domain test.co.eu.",
+                $this->modifyRecord($body, ["triggerValue" => ["emailDomain" => "test.c"]]),
+                "Domain test.c is not valid.",
             ],
             "test with multiple emailDomain value" => [
-                $this->modifyRecord($body, ["triggerValue" => ["emailDomain" => "yahoo.com, invalid.com"]]),
-                "Could not resolve domain invalid.com.",
+                $this->modifyRecord($body, ["triggerValue" => ["emailDomain" => "yahoo.com, com.g"]]),
+                "Domain com.g is not valid.",
             ],
             "test with integer value" => [
                 $this->modifyRecord($body, ["triggerValue" => ["emailDomain" => "123"]]),
-                "Could not resolve domain 123.",
+                "Domain 123 is not valid.",
             ],
             "test with ip address" => [
                 $this->modifyRecord($body, ["triggerValue" => ["emailDomain" => "123.0.0.1"]]),
-                "You should provide a domain name, not an IP address.",
+                "Domain 123.0.0.1 is not valid",
             ],
         ];
     }

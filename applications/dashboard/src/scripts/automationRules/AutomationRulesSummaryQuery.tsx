@@ -103,7 +103,7 @@ export default function AutomationRulesSummaryQuery(props: IAutomationRulesSumma
         ) {
             setAdditionalDataQuery?.(additionalDataQuery);
         } else if (Object.keys(additionalDataQuery).length > 0) {
-            updateDataFromOptionalSource(additionalDataQuery);
+            void updateDataFromOptionalSource(additionalDataQuery);
         }
     }, [
         additionalDataQuery.categoriesQuery?.categoryID,

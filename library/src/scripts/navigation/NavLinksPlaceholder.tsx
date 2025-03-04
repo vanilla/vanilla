@@ -17,7 +17,7 @@ import { t } from "@vanilla/i18n/src";
 interface IProps {
     sectionsCount?: number;
     className?: string;
-    title: string;
+    title?: string;
     showTitle?: boolean;
 }
 
@@ -33,15 +33,17 @@ export const NavLinksPlaceholder = React.memo(function NavLinksPlaceholder(props
     return (
         <Container fullGutter narrow className={props.className}>
             <nav className={classNames(classes.linksWithHeadings)}>
-                <Heading
-                    title={props.title}
-                    depth={2}
-                    className={classNames(
-                        classes.title,
-                        classes.topTitle,
-                        !props.showTitle && visibility().visuallyHidden,
-                    )}
-                />
+                {!!props.title && (
+                    <Heading
+                        title={props.title}
+                        depth={2}
+                        className={classNames(
+                            classes.title,
+                            classes.topTitle,
+                            !props.showTitle && visibility().visuallyHidden,
+                        )}
+                    />
+                )}
                 {Array.from(Array(sectionsCount)).map((_, i) => {
                     return (
                         <React.Fragment key={i}>

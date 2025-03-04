@@ -109,32 +109,6 @@ export const discussionListClasses = useThemeCache(
             }),
         });
 
-        const bulkActionsToast = css({
-            width: "fit-content",
-        });
-
-        const bulkActionsText = css({
-            display: "block",
-            marginBottom: 12,
-            fontSize: globalVars.fonts.size.medium,
-            color: "#838691",
-        });
-
-        const bulkActionsButtons = css({
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "start",
-
-            "& > *": {
-                ...Mixins.margin({
-                    horizontal: 6,
-                }),
-                "&:first-child": {
-                    marginLeft: 0,
-                },
-            },
-        });
-
         // Used to make sure the legacy checkbox aligns properly.
         const legacySelectAllCheckbox = css({
             paddingTop: 0,
@@ -234,9 +208,6 @@ export const discussionListClasses = useThemeCache(
             checkedboxRowStyle,
             options,
             resolved,
-            bulkActionsToast,
-            bulkActionsButtons,
-            bulkActionsText,
             legacySelectAllCheckbox,
             fullWidth,
             userIcon,

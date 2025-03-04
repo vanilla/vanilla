@@ -22,12 +22,6 @@ use Vanilla\Scheduler\SchedulerInterface;
  */
 class ForumAggregateModel
 {
-    private \Gdn_Database $db;
-    private \DiscussionModel $discussionModel;
-    private \CategoryModel $categoryModel;
-    private ConfigurationInterface $configuration;
-    private SchedulerInterface $scheduler;
-    private EventManager $eventManager;
     private array $deferredRecentPostUpdates = [];
 
     /**
@@ -39,19 +33,14 @@ class ForumAggregateModel
      * @param EventManager $eventManager
      */
     public function __construct(
-        \Gdn_Database $db,
-        \DiscussionModel $discussionModel,
-        \CategoryModel $categoryModel,
-        ConfigurationInterface $configuration,
-        SchedulerInterface $scheduler,
-        EventManager $eventManager
+        private \Gdn_Database $db,
+        private \DiscussionModel $discussionModel,
+        private \CategoryModel $categoryModel,
+        private ConfigurationInterface $configuration,
+        private SchedulerInterface $scheduler,
+        private EventManager $eventManager,
+        private CommentThreadModel $threadModel
     ) {
-        $this->db = $db;
-        $this->discussionModel = $discussionModel;
-        $this->categoryModel = $categoryModel;
-        $this->configuration = $configuration;
-        $this->scheduler = $scheduler;
-        $this->eventManager = $eventManager;
     }
 
     /**
@@ -127,6 +116,10 @@ class ForumAggregateModel
                 ] +
                 $staticUpdates
         );
+
+        $this->threadModel->recalculateDepth(["DiscussionID" => $discussion["DiscussionID"]]);
+        $this->threadModel->counts("countChildComments", where: ["DiscussionID" => $discussion["DiscussionID"]]);
+        $this->threadModel->counts("scoreChildComments", where: ["DiscussionID" => $discussion["DiscussionID"]]);
 
         $this->eventManager->fire("forumAggregateModel_commentInsert", [
             "comment" => $newLastComment,

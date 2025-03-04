@@ -54,6 +54,10 @@ export const dashboardFormGroupClasses = useThemeCache((compact?: boolean) => {
         ":not(.formGroup-checkBox) + .formGroup-checkBox": {
             marginTop: 0,
         },
+        "&.formGroup-staticText": {
+            padding: "14px 0 0",
+            border: "none",
+        },
     });
 
     const labelWrap = css({
@@ -195,6 +199,7 @@ export const dashboardFormGroupClasses = useThemeCache((compact?: boolean) => {
         minHeight: 1,
         paddingLeft: 18,
         paddingRight: 18,
+        width: "100%",
     });
 
     const labelInfo = css({

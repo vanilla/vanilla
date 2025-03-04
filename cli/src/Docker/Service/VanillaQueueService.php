@@ -11,7 +11,7 @@ use Vanilla\Cli\Utils\DockerUtils;
 use Webmozart\PathUtil\Path;
 
 /**
- * Service for queue.vanilla.localhost
+ * Service for queue.vanilla.local
  */
 class VanillaQueueService extends AbstractLaravelService
 {
@@ -66,7 +66,7 @@ class VanillaQueueService extends AbstractLaravelService
      */
     function getHostname(): string
     {
-        return "queue.vanilla.localhost";
+        return "queue.vanilla.local";
     }
 
     /**
@@ -84,7 +84,7 @@ class VanillaQueueService extends AbstractLaravelService
     {
         return [
             "EnabledPlugins.vanilla-queue" => true,
-            "VanillaQueue.BaseUrl" => "http://queue.vanilla.localhost",
+            "VanillaQueue.BaseUrl" => "http://queue.vanilla.local",
         ];
     }
 }

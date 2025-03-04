@@ -20,6 +20,7 @@ export interface IProps {
     description?: ReactNode;
     titleLabel?: ReactNode;
     useTwoColumnContainer?: boolean;
+    secondaryBar?: ReactNode;
 }
 
 export default function AdminTitleBar(props: IProps) {
@@ -56,6 +57,7 @@ export default function AdminTitleBar(props: IProps) {
                     )}
                 </div>
             </div>
+            {props.secondaryBar && <div className={classes.secondaryTitleBar}>{props.secondaryBar}</div>}
         </div>
     );
 }

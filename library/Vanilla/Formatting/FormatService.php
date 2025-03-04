@@ -1,12 +1,14 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Formatting;
 
 use Garden\Container\Container;
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Contracts\Formatting\FormatParsedInterface;
 use Vanilla\Contracts\Formatting\Heading;
@@ -35,7 +37,7 @@ class FormatService
     /**
      * DI.
      */
-    public function __construct(ImageSrcSetService $imageSrcSetService, Timers $timers)
+    public function __construct(ImageSrcSetService $imageSrcSetService, Timers $timers, private FormatConfig $config)
     {
         $this->imageSrcSetService = $imageSrcSetService;
         $this->timers = $timers;
@@ -49,6 +51,7 @@ class FormatService
      * @param array|null $context context for logging.
      *
      * @return FormatParsedInterface
+     * @throws FormatterNotFoundException
      */
     public function parse(string $content, ?string $format = null, ?array $context = null): FormatParsedInterface
     {
@@ -76,6 +79,7 @@ class FormatService
      * @param array|null $context context for logging.
      *
      * @return string
+     * @throws FormatterNotFoundException
      */
     public function renderHTML($content, ?string $format = null, ?array $context = null): string
     {
@@ -131,6 +135,7 @@ class FormatService
      * @param int|null $length The max-length for the excerpt
      *
      * @return string
+     * @throws FormatterNotFoundException
      */
     public function renderExcerpt($content, ?string $format, ?int $length = null): string
     {
@@ -163,6 +168,7 @@ class FormatService
      * @param string|null $format The format of the content.
      *
      * @return string
+     * @throws FormatterNotFoundException
      */
     public function renderPlainText($content, ?string $format): string
     {
@@ -181,6 +187,7 @@ class FormatService
      * @param string|null $format The format of the content.
      *
      * @return int The number of visible characters in $content.
+     * @throws FormatterNotFoundException
      */
     public function getPlainTextLength($content, ?string $format): int
     {
@@ -197,6 +204,7 @@ class FormatService
      * @param string|null $format The format of the content.
      *
      * @return string
+     * @throws FormatterNotFoundException
      */
     public function renderQuote($content, ?string $format): string
     {
@@ -213,6 +221,7 @@ class FormatService
      * @param string|null $format The format of the content.
      *
      * @return Attachment[]
+     * @throws FormatterNotFoundException
      */
     public function parseAttachments($content, ?string $format): array
     {
@@ -249,12 +258,18 @@ class FormatService
      * @param string|null $format The format of the content.
      *
      * @return string[]
+     * @throws FormatterNotFoundException
      */
     public function parseImageUrls($content, ?string $format): array
     {
         if ($content instanceof FormatParsedInterface) {
             $format = $content->getFormatKey();
         }
+
+        if (is_null($format)) {
+            $format = $this->config->getDefaultFormat();
+        }
+
         return $this->getFormatter($format)->parseImageUrls($content);
     }
 
@@ -281,6 +296,7 @@ class FormatService
      * @param string|null $format The format of the content.
      *
      * @return Heading[]
+     * @throws FormatterNotFoundException
      */
     public function parseHeadings($content, ?string $format): array
     {
@@ -297,6 +313,7 @@ class FormatService
      * @param string|null $format The format of the content.
      *
      * @return string[] A list of usernames.
+     * @throws FormatterNotFoundException
      */
     public function parseMentions($content, ?string $format, bool $skipTaggedContent = true): array
     {
@@ -369,7 +386,10 @@ class FormatService
      */
     public function getFormatter(?string $formatKey, $throw = false): FormatInterface
     {
-        $formatKey = strtolower($formatKey) ?? null;
+        if ($formatKey) {
+            $formatKey = strtolower($formatKey) ?? null;
+        }
+
         $instance = $this->formatInstances[$formatKey] ?? null;
 
         if ($instance === null) {
@@ -395,6 +415,8 @@ class FormatService
      * @param string $formatClass
      *
      * @return FormatInterface
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     protected function constructFormat(string $formatClass): FormatInterface
     {
@@ -410,6 +432,7 @@ class FormatService
      * @param string|null $format The format of the content.
      *
      * @return string
+     * @throws FormatterNotFoundException
      */
     public function removeUserPII(string $username, string $body, ?string $format): string
     {
@@ -421,6 +444,7 @@ class FormatService
      *
      * @param string|FormatParsedInterface $body
      * @return array Username mentioned in the post.
+     * @throws FormatterNotFoundException
      */
     public function parseAllMentions($body, ?string $format): array
     {

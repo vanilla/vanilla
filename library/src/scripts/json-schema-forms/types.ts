@@ -69,6 +69,8 @@ export interface IDropdownControl extends ICommonControl {
 
 export interface ISelectControl extends Select.SelectConfig, ICommonControl {
     inputType: "select";
+    createableLabel?: string;
+    choices?: Select.SelectConfig["options"];
 }
 
 export interface IRadioControl extends ICommonControl {
@@ -148,7 +150,7 @@ export interface IDatePickerControl extends ICommonControl {
 }
 
 export interface IPickerOption {
-    label: string;
+    label: string | React.ReactNode;
     value: string;
     description?: React.ReactNode;
     tooltip?: string;
@@ -189,6 +191,12 @@ export type ISubheadingControl = ICommonControl & {
     actions?: string;
 };
 
+export type IStaticTextControl = ICommonControl & {
+    inputType: "staticText";
+    label: React.ReactNode;
+    actions?: string;
+};
+
 export interface ICustomControl<
     P extends React.ComponentType<object> = React.ComponentType<
         React.PropsWithChildren<{ value?: any; onChange?: (val: any) => void; errors: IFieldError[] }>
@@ -222,6 +230,7 @@ export type IFormControl =
     | IEmptyControl
     | IModalControl
     | ISubheadingControl
+    | IStaticTextControl
     | ICustomControl<any>
     | ISelectControl;
 

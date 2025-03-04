@@ -16,6 +16,7 @@ export type NotificationPreferencesSchemaType = JSONSchemaType<{
 export interface INotificationPreference {
     email?: boolean;
     popup?: boolean;
+    frequency?: string;
 }
 
 export interface INotificationPreferences {

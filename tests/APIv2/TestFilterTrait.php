@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 
 use PHPUnit\Framework\TestCase;
 use VanillaTests\BootstrapTrait;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Allows an `AbstractResourceTest` to test API filtering.
@@ -33,7 +34,7 @@ trait TestFilterTrait
             $rows = $this->api()
                 ->get($this->baseUrl, $query)
                 ->getBody();
-            BootstrapTrait::assertArrayMatchesFilter($rows, $query);
+            VanillaTestCase::assertDatasetMatchesFilter($rows, $query);
         }
     }
 }

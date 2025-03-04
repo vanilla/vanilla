@@ -50,6 +50,8 @@ abstract class AutomationAction
     const ACTION_TRIGGERS = "actionTriggers";
     const ACTION_CONTENT_TYPE = "contentType";
 
+    const ACTION_DYNAMIC_SCHEMA_PARAMS = "dynamicSchemaParams";
+
     /**
      * @param int $automationRuleID
      * @param string $dispatchType
@@ -108,6 +110,7 @@ abstract class AutomationAction
             self::ACTION_NAME => static::getName(),
             self::ACTION_TRIGGERS => $triggerTypes,
             self::ACTION_CONTENT_TYPE => static::getContentType(),
+            self::ACTION_DYNAMIC_SCHEMA_PARAMS => static::getDynamicSchemaParams(),
         ];
     }
 
@@ -547,12 +550,22 @@ abstract class AutomationAction
     }
 
     /**
-     * Get conditional form schema that depend on query parameters.
+     * Get the dynamic schema that depends on the dynamic schema params.
      *
      * @param array $query
      * @return Schema|null
      */
-    public static function getConditionalSettingsSchema(array $query): ?Schema
+    public static function getDynamicSchema(array $query): ?Schema
+    {
+        return null;
+    }
+
+    /**
+     * Return any required dynamic properties.
+     *
+     * @return array|null
+     */
+    public static function getDynamicSchemaParams(): ?array
     {
         return null;
     }

@@ -11,7 +11,7 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
+import { DiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
 
 const DiscussionOptionsBump: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
     discussion,

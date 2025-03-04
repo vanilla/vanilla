@@ -45,7 +45,7 @@ interface IDiscussionOptionItem {
     permission?: IPermission;
     component: React.ComponentType<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }>;
     sort?: number;
-    group?: "firstGroup" | "moderationGroup" | "statusGroup";
+    group?: "firstGroup" | "moderationGroup" | "statusGroup" | "flagGroup";
 }
 
 const additionalDiscussionOptions: IDiscussionOptionItem[] = [];
@@ -137,7 +137,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
             <DiscussionOptionsMove
                 discussion={discussion}
                 onSuccess={async () => {
-                    onMutateSuccess?.();
+                    await onMutateSuccess?.();
                     if (onDiscussionPage) {
                         // We may be getting redirected here.
                         window.location.reload();
@@ -211,6 +211,10 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
     }
 
     let permissionCheckedAndIntegrationItems: React.ReactNode[] = [];
+
+    // these items appear in the end if the dropdown with report
+    const extraFlagItems: React.ReactNode[] = [];
+
     if (additionalDiscussionOptions.length) {
         // Do the extras
         additionalDiscussionOptions
@@ -236,6 +240,11 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
                             statusItems.splice(
                                 option.sort ?? statusItems.length,
                                 0,
+                                <option.component discussion={discussion} onSuccess={onMutateSuccess} />,
+                            );
+                            break;
+                        case "flagGroup": // this ones will go with report
+                            extraFlagItems.push(
                                 <option.component discussion={discussion} onSuccess={onMutateSuccess} />,
                             );
                             break;
@@ -290,21 +299,23 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         items.push(<DropDownItemSeparator />);
         items.push(
             <ReportRecordOption
-                discussionName={discussion.name}
+                recordName={discussion.name}
                 recordType={"discussion"}
                 recordID={discussion.discussionID}
                 onSuccess={onMutateSuccess}
                 placeRecordType="category"
                 placeRecordID={discussion.categoryID}
+                onDiscussionPage={onDiscussionPage}
             />,
         );
+        items.push(...extraFlagItems);
     }
 
     return (
         <>
             {canReport ? (
                 <ReportRecordOption
-                    discussionName={discussion.name}
+                    recordName={discussion.name}
                     recordType={"discussion"}
                     recordID={discussion.discussionID}
                     onSuccess={onMutateSuccess}
@@ -318,16 +329,17 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
                                     onClick={props.onClick}
                                     className={reportButtonAlignment}
                                 >
-                                    <Icon icon="post-flag" />
+                                    <Icon icon="report-content" />
                                 </Button>
                             </ToolTip>
                         );
                     }}
+                    onDiscussionPage={onDiscussionPage}
                 />
             ) : null}
             {items.length > 0 && (
                 <DropDown
-                    buttonContents={<Icon icon="navigation-circle-ellipsis" />}
+                    buttonContents={<Icon icon="options-menu" />}
                     name={t("Discussion Options")}
                     flyoutType={FlyoutType.LIST}
                     asReachPopover

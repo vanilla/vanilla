@@ -512,6 +512,23 @@ paths:
             tags:
                 - Media
             summary: Delete a list of media by their URL's.
+    "/media/{id}/download":
+        x-hidden: true
+        get:
+            parameters:
+                - description: |
+                      The media ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "302":
+                    description: Redirect to the file associated with the media record.
+                "404":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
+
 components:
     schemas:
         MediaItemPatch:

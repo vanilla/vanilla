@@ -15,6 +15,8 @@ use Garden\Web\ControllerDispatchedEvent;
 use Garden\Web\Data;
 use Garden\Web\Dispatcher;
 use Garden\Web\DispatcherExceptionEvent;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
@@ -382,6 +384,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable
             // Try and dispatch with the new dispatcher.
             // This is temporary. We will eventually just have the new dispatcher.
             $response = $this->dispatcher->dispatch($request);
+
+            if ($request->getMeta("throwRedirects") && $response instanceof Redirect) {
+                throw new ResponseException($response);
+            }
 
             // If we received a matched response with the new dispatcher
             // Use that.

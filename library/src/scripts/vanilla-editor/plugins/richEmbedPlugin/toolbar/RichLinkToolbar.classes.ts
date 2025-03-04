@@ -14,6 +14,7 @@ export const linkToolbarClasses = useThemeCache(() => {
 
     const menuBar = css({
         maxWidth: vars.menuBar.maxWidth,
+        marginTop: 0,
     });
 
     const linkPreviewMenuBarItem = css({

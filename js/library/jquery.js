@@ -16,6 +16,7 @@
  * L610: Disable globalEval function
  * L8405: Resolve CVE-2015-9251
  * L9813: Resolve CVE-2020-11022
+ * L9813: Resolve CVE-2020-11023
  *
  */
 !function(h,w){var O,F,

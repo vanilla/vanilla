@@ -15,6 +15,7 @@ use Gdn;
 use DiscussionModel;
 use RoleModel;
 use UserModel;
+use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Events\TrackableDiscussionAnalyticsEvent;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 
@@ -23,12 +24,6 @@ use Vanilla\Dashboard\Models\AiSuggestionSourceService;
  */
 class QnaEventHandler implements PsrEventHandlersInterface
 {
-    private CommentModel $commentModel;
-
-    private UserModel $userModel;
-
-    private AiSuggestionSourceService $aiSuggestionSourceService;
-
     /**
      * D.I.
      *
@@ -37,13 +32,10 @@ class QnaEventHandler implements PsrEventHandlersInterface
      * @param AiSuggestionSourceService $aiSuggestionSourceService
      */
     public function __construct(
-        CommentModel $commentModel,
-        UserModel $userModel,
-        AiSuggestionSourceService $aiSuggestionSourceService
+        private CommentModel $commentModel,
+        private UserModel $userModel,
+        private AiSuggestionSourceService $aiSuggestionSourceService
     ) {
-        $this->commentModel = $commentModel;
-        $this->userModel = $userModel;
-        $this->aiSuggestionSourceService = $aiSuggestionSourceService;
     }
 
     /**
@@ -51,7 +43,21 @@ class QnaEventHandler implements PsrEventHandlersInterface
      */
     public static function getPsrEventHandlerMethods(): array
     {
-        return ["handleTrackableDiscussionAnalyticsEvent"];
+        return ["handleTrackableDiscussionAnalyticsEvent", "handleDiscussionEvent"];
+    }
+
+    /**
+     * If tags have been applied to a discussion, create and dispatch a TagEvent for each tag.
+     *
+     * @param DiscussionEvent $event
+     * @return DiscussionEvent
+     */
+    public function handleDiscussionEvent(DiscussionEvent $event): DiscussionEvent
+    {
+        if (!c("QnA.Points.Enabled", false)) {
+            return $event;
+        }
+        return $event;
     }
 
     /**

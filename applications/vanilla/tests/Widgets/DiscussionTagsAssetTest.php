@@ -36,32 +36,21 @@ class DiscussionTagsAssetTest extends SiteTestCase
         ]);
 
         $spec = [
-            '$hydrate' => "react.asset.discussionTagsAsset",
+            '$hydrate' => "react.asset.postTags",
             "title" => "My Discussion Tags",
             "titleType" => "static",
             "descriptionType" => "none",
             '$reactTestID' => "discussionTags",
         ];
 
-        $expectedTags = [];
-        foreach ([$testTagOne, $testTagTwo, $testTagThree] as $tag) {
-            $expectedTags[] = [
-                "tagID" => $tag["tagID"],
-                "name" => $tag["name"],
-                "urlcode" => $tag["urlcode"],
-                "type" => "User",
-            ];
-        }
-
         $expected = [
-            '$reactComponent' => "DiscussionTagAsset",
+            '$reactComponent' => "PostTagsAsset",
             '$reactProps' => [
                 "title" => "My Discussion Tags",
-                "tags" => $expectedTags,
             ],
             '$reactTestID' => "discussionTags",
         ];
 
-        $this->assertHydratesTo($spec, ["discussionID" => $discussion["discussionID"]], $expected, "discussionThread");
+        $this->assertHydratesTo($spec, ["discussionID" => $discussion["discussionID"]], $expected, "discussion");
     }
 }

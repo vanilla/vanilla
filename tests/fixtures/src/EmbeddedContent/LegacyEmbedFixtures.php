@@ -19,7 +19,7 @@ class LegacyEmbedFixtures
     {
         return <<<JSON
 {
-    "url": "https://dev.vanilla.localhost/discussion/8/test-file-upload",
+    "url": "https://dev.vanilla.local/discussion/8/test-file-upload",
     "type": "quote",
     "name": null,
     "body": null,
@@ -38,7 +38,7 @@ class LegacyEmbedFixtures
             "photoUrl": "https://images.v-cdn.net/stubcontent/avatar_01.png",
             "dateLastActive": "2019-06-14T18:32:27+00:00"
         },
-        "url": "https://dev.vanilla.localhost/discussion/8/test-file-upload",
+        "url": "https://dev.vanilla.local/discussion/8/test-file-upload",
         "format": "Rich"
     }
 }
@@ -52,7 +52,7 @@ JSON;
     {
         return <<<JSON
 {
-    "url": "https://dev.vanilla.localhost/discussion/comment/5#Comment_5",
+    "url": "https://dev.vanilla.local/discussion/comment/5#Comment_5",
     "type": "quote",
     "name": null,
     "body": null,
@@ -67,10 +67,10 @@ JSON;
         "insertUser": {
             "userID": 2,
             "name": "admin",
-            "photoUrl": "https://dev.vanilla.localhost/uploads/userpics/022/nWZ7BPS4F5HHQ.png",
+            "photoUrl": "https://dev.vanilla.local/uploads/userpics/022/nWZ7BPS4F5HHQ.png",
             "dateLastActive": "2019-06-17T15:09:52+00:00"
         },
-        "url": "https://dev.vanilla.localhost/discussion/comment/5#Comment_5",
+        "url": "https://dev.vanilla.local/discussion/comment/5#Comment_5",
         "format": "Rich"
     }
 }

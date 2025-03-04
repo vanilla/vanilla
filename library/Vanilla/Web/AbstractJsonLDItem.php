@@ -24,6 +24,7 @@ abstract class AbstractJsonLDItem implements \JsonSerializable
     /**
      * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->calculateValue();

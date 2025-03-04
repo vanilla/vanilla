@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2025 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 import Floating from "@library/vanilla-editor/toolbars/Floating";
 import {
     Data,
@@ -15,8 +20,10 @@ import { useVirtualFloating } from "@udecode/plate-floating";
 import { findMentionInput } from "@udecode/plate-mention";
 import { t } from "@vanilla/i18n";
 import { EMPTY_RECT } from "@vanilla/react-utils";
-import React, { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { ComboboxProps } from "./Combobox.types";
+import { Node as editorNode } from "slate";
+import isEqual from "lodash-es/isEqual";
 
 const ComboboxContent = <TData extends Data = NoData>(
     props: Omit<
@@ -79,6 +86,14 @@ const ComboboxContent = <TData extends Data = NoData>(
         placement: "bottom-start",
         getBoundingClientRect,
     });
+
+    // This is a case when we type something and then try to mention in the beginning of typed text,
+    // For some reason the useComboboxSelectors.targetRange() is not set correctly, so we need to force-correct it manually to match our actual editor selection
+    useEffect(() => {
+        if (targetRange?.anchor.path && !isEqual(editor.selection?.anchor.path, targetRange?.anchor.path)) {
+            comboboxActions.targetRange(editor.selection);
+        }
+    }, [targetRange?.anchor.path, editor.selection?.anchor.path]);
 
     const menuProps = getMenuProps ? getMenuProps({}, { suppressRefError: true }) : { ref: null };
 

@@ -290,7 +290,6 @@ if (!function_exists("WriteDiscussion")):
                     if (
                         $sender->data("_ShowCategoryLink", true) &&
                         $category &&
-                        c("Vanilla.Categories.Use") &&
                         CategoryModel::checkPermission($category, "Vanilla.Discussions.View")
                     ) {
                         $accessibleAttributes = [

@@ -13,6 +13,7 @@ import { ILeader } from "@library/leaderboardWidget/LeaderboardWidget";
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { IPostReaction } from "@library/postReactions/PostReactions.types";
 import STORY_IMAGE from "./storyDataImage.png";
+import type { IComment } from "@dashboard/@types/api/comment";
 
 export { STORY_IMAGE };
 export const STORY_ICON = STORY_IMAGE;
@@ -198,10 +199,10 @@ export const StoryTextContent = (props: { firstTitle?: string }) => {
 };
 
 export const STORY_CRUMBS: ICrumb[] = [
-    { name: "Success", url: "https://dev.vanilla.localhost/en-hutch/kb/success" },
+    { name: "Success", url: "https://dev.vanilla.local/en-hutch/kb/success" },
     {
         name: "Appearance (Theming)",
-        url: "https://dev.vanilla.localhost/en-hutch/kb/categories/37-appearance-theming",
+        url: "https://dev.vanilla.local/en-hutch/kb/categories/37-appearance-theming",
     },
 ];
 
@@ -210,21 +211,25 @@ export const STORY_TAGS: ITag[] = [
         tagID: 1,
         name: "UserTag",
         urlcode: "usertag",
+        type: "User",
     },
     {
         tagID: 2,
         name: "User Tag2",
         urlcode: "usertag2",
+        type: "User",
     },
     {
         tagID: 3,
         name: "User Tag 3",
         urlcode: "usertag3",
+        type: "User",
     },
     {
         tagID: 3,
         name: "UserTag4",
         urlcode: "usertag4",
+        type: "User",
     },
 ];
 
@@ -238,26 +243,11 @@ export const storyTitleGenerator = function (length = 100) {
     return phrases[random(0, 3)].slice(0, length).trim();
 };
 
-export const getArticlesStub = function (limit = 9, host = "#") {
-    const stub = [] as any;
-
-    for (let i = 0; i < limit; i++) {
-        const title = STORY_IPSUM_SHORT;
-        const slug = slugify(title);
-        stub.push({
-            id: `article-${i}`,
-            to: `${host}/kb/articles/${slug}`,
-            name: title,
-            description: STORY_IPSUM_MEDIUM,
-        });
-    }
-
-    return stub;
-};
-
-export const STORY_COMMENT = {
+export const STORY_COMMENT: IComment = {
     commentID: 999999,
-    discussionID: 999999,
+    parentRecordType: "discussion",
+    parentRecordID: 999999,
+    categoryID: 1,
     insertUser: {
         ...STORY_USER,
         userID: 13,

@@ -43,7 +43,7 @@ export function useAuthenticators(params?: IGetAllAuthenticatorsParams): ILoadab
 
     useEffect(() => {
         if (params && !authenticatorIDs) {
-            dispatch(getAllAuthenticators(params));
+            void dispatch(getAllAuthenticators(params));
         }
     }, [dispatch, authenticatorIDs, params]);
 
@@ -94,7 +94,7 @@ export function useEditAuthenticator(authenticatorID: IAuthenticator["authentica
 
     useEffect(() => {
         if (authenticatorID) {
-            dispatch(getAuthenticator(authenticatorID));
+            void dispatch(getAuthenticator(authenticatorID));
         }
     }, [dispatch, authenticatorID]);
 

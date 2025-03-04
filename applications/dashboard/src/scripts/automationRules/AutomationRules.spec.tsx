@@ -5,13 +5,14 @@
 
 import { mockAPI } from "@library/__tests__/utility";
 import {
+    mockActionwithDynamicSchema,
     mockAutomationRulesCatalog,
     mockCategoriesData,
     mockProfileField,
     mockRecipesList,
 } from "@dashboard/automationRules/AutomationRules.fixtures";
 import { AutomationRulesList } from "@dashboard/automationRules/AutomationRulesList";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { AutomationRulesContext, IAutomationRulesContext } from "@dashboard/automationRules/AutomationRules.context";
@@ -73,6 +74,7 @@ describe("AutomationRules", () => {
             const category = mockCategoriesData.find((category) => category.categoryID === parseInt(id!))!;
             return [200, category];
         });
+        mockAdapter.onGet(/automation-rules\/action-by-type/).reply(200, mockActionwithDynamicSchema);
     });
 
     it("Automation Rules List Page - Add Rule Button, Table, Search and Filter are on place", async () => {
@@ -236,6 +238,48 @@ describe("AutomationRules", () => {
         expect(previouslySelectedCategory).toHaveLength(1);
     });
 
+    it("Automation Rules Add/Edit - Chosen actionType has dynamic schema, making sure we load it correctly", async () => {
+        renderInProvider(<AutomationRulesAddEdit />, {
+            automationRulesCatalog: mockAutomationRulesCatalog,
+            rolesByID: mockRolesState.rolesByID?.data,
+            categories: mockCategoriesData,
+        });
+
+        const dropDowns = await screen.findAllByRole("combobox");
+        expect(dropDowns).toHaveLength(2);
+
+        const actionDropDown = dropDowns[1];
+        fireEvent.click(actionDropDown);
+
+        const actionWithDynamicSchema = await screen.findByText(
+            mockAutomationRulesCatalog.actions.escalateToJiraAction.name,
+        );
+        expect(actionWithDynamicSchema).toBeInTheDocument();
+
+        fireEvent.click(actionWithDynamicSchema);
+
+        const fieldAsParamForDynamicSchema = await screen.findByText("Some Test ActionValue");
+        expect(fieldAsParamForDynamicSchema).toBeInTheDocument();
+
+        const newDropDowns = await screen.findAllByRole("combobox");
+
+        // our field triggering dynamic schema fetch is rendered
+        const fieldAsParamForDynamicSchemaDropDown = newDropDowns[2];
+        fireEvent.click(fieldAsParamForDynamicSchemaDropDown);
+
+        // select first option
+        const option1 = await screen.findByText("Option1");
+        expect(option1).toBeInTheDocument();
+        fireEvent.click(option1);
+
+        // field from dynamic schema should appear
+        const loadedDynamicField = await screen.findByText(
+            mockActionwithDynamicSchema.dynamicSchema.properties.customField["x-control"].label,
+        );
+
+        expect(loadedDynamicField).toBeInTheDocument();
+    });
+
     it("Automation Rules Add/Edit - Recipe data (profileFieldTrigger-addRemoveRoleAction) is correctly populated in form values", async () => {
         renderInProvider(<AutomationRulesAddEdit automationRuleID="3" />, {
             automationRulesCatalog: mockAutomationRulesCatalog,
@@ -284,6 +328,7 @@ describe("AutomationRules", () => {
         const textFieldValues = textFields.map((element) => element["value"]);
         expect(textFieldValues.includes(mockRecipesList[3].trigger?.triggerValue?.emailDomain)).toBe(true);
     });
+
     it("Automation Rules Add/Edit - Editing a rule when its running - Disabled view", async () => {
         renderInProvider(<AutomationRulesAddEdit automationRuleID="2" />, {
             automationRulesCatalog: mockAutomationRulesCatalog,

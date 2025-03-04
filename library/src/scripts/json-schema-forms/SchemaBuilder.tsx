@@ -45,11 +45,13 @@ export class SchemaFormBuilder {
         });
     }
 
-    public checkBoxRight(property: string, label: string, description: string | null) {
+    public checkBoxRight(property: string, label: string, description: string | null, disabled?: boolean) {
         return this.custom(property, {
             type: "boolean",
+            disabled,
             "x-control": {
                 label,
+                disabled,
                 inputType: "checkBox",
                 labelType: "wide",
                 checkPosition: "right",
@@ -165,6 +167,17 @@ export class SchemaFormBuilder {
             "x-control": {
                 labelType: "none",
                 inputType: "subheading",
+                label,
+            },
+        });
+    }
+
+    public staticText(label: string) {
+        return this.custom(`staticText`, {
+            type: "null",
+            "x-control": {
+                labelType: "none",
+                inputType: "staticText",
                 label,
             },
         });

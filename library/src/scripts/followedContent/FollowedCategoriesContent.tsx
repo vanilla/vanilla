@@ -95,6 +95,7 @@ function FollowedCategoryRow(props: IFollowedContentRow) {
                         notificationPreferences={preferences}
                         emailDigestEnabled={emailDigestEnabled}
                         iconOnly
+                        categoryUrl={url}
                     />
                 </div>
             }

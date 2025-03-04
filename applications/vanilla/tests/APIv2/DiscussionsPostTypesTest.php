@@ -8,6 +8,8 @@
 namespace APIv2;
 
 use Garden\Web\Exception\ClientException;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostFieldModel;
 use Vanilla\Forum\Models\PostTypeModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -21,6 +23,19 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
     use UsersAndRolesApiTestTrait;
     use CommunityApiTestTrait;
 
+    /** @var \DiscussionModel */
+    private $discussionModel;
+
+    /**
+     * @inheritDoc
+     */
+    public static function getAddons(): array
+    {
+        $addons = parent::getAddons();
+        $addons[] = "qna";
+        return $addons;
+    }
+
     /**
      * @inheritDoc
      */
@@ -28,7 +43,9 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
     {
         parent::setUp();
         $this->enableFeature(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS);
-        \Gdn::sql()->truncate("postField");
+        $this->discussionModel = \Gdn::getContainer()->get(\DiscussionModel::class);
+
+        $this->container()->setInstance(\CategoriesApiController::class, null);
     }
 
     /**
@@ -122,10 +139,11 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
     {
         $this->expectNotToPerformAssertions();
 
-        $postField = $this->createPostField(["postTypeID" => "discussion", "isRequired" => true]);
+        $postType = $this->createPostType();
+        $postField = $this->createPostField(["postTypeID" => $postType["postTypeID"], "isRequired" => true]);
 
         $discussion = $this->createDiscussion([
-            "postTypeID" => "discussion",
+            "postTypeID" => $postType["postTypeID"],
             "postFields" => [$postField["postFieldID"] => "abcd"],
         ]);
 
@@ -155,14 +173,15 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
      */
     public function testGetDiscussionWithPostFieldsExpand()
     {
-        $postField = $this->createPostField(["postTypeID" => "discussion", "isRequired" => true]);
+        $postType = $this->createPostType();
+        $postField = $this->createPostField(["postTypeID" => $postType["postTypeID"], "isRequired" => true]);
 
         $discussion = $this->createDiscussion([
-            "postTypeID" => "discussion",
+            "postTypeID" => $postType["postTypeID"],
             "postFields" => [$postField["postFieldID"] => "abcdef"],
         ]);
         $discussion = $this->api()
-            ->get("/discussions/{$discussion["discussionID"]}", ["expand" => "postFields"])
+            ->get("/discussions/{$discussion["discussionID"]}", ["expand" => "postMeta"])
             ->getBody();
         $this->assertArrayHasKey("postFields", $discussion);
         $this->assertIsArray($discussion["postFields"]);
@@ -197,22 +216,211 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
      */
     public function testValidationOfPostFields($dataType, $formType, $value, $responseValue)
     {
+        $postType = $this->createPostType();
         $postField = $this->createPostField([
-            "postTypeID" => "discussion",
+            "postTypeID" => $postType["postTypeID"],
             "dataType" => $dataType,
             "formType" => $formType,
         ]);
 
         $discussion = $this->createDiscussion([
-            "postTypeID" => "discussion",
+            "postTypeID" => $postType["postTypeID"],
             "postFields" => [$postField["postFieldID"] => $value],
         ]);
 
         $discussion = $this->api()
-            ->get("/discussions/{$discussion["discussionID"]}", ["expand" => "postFields"])
+            ->get("/discussions/{$discussion["discussionID"]}", ["expand" => "postMeta"])
             ->getBody();
         $this->assertArrayHasKey("postFields", $discussion);
         $this->assertArrayHasKey($postField["postFieldID"], $discussion["postFields"]);
         $this->assertEquals($responseValue, $discussion["postFields"][$postField["postFieldID"]]);
+    }
+
+    /**
+     * Test validation that `postTypeID` cannot be used with `type`.
+     *
+     * @return void
+     */
+    public function testPutDiscussionTypeWithTypeAndPostType()
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage("Only one of type, postTypeID are allowed");
+        $discussion = $this->createDiscussion();
+        $this->api()
+            ->put("/discussions/{$discussion["discussionID"]}/type", [
+                "postTypeID" => "question",
+                "type" => "discussion",
+            ])
+            ->getBody();
+    }
+
+    /**
+     * Test converting a post that was created before custom post types.
+     *
+     * @return mixed|string
+     */
+    public function testPutDiscussionTypeFromLegacy()
+    {
+        $discussion = $this->runWithConfig(
+            [FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES) => false],
+            fn() => $this->createDiscussion(["type" => "question"])
+        );
+
+        $postType = $this->createPostType();
+
+        $convertedDiscussion = $this->api()
+            ->put("/discussions/{$discussion["discussionID"]}/type", ["postTypeID" => $postType["postTypeID"]])
+            ->getBody();
+        $this->assertEquals($postType["postTypeID"], $convertedDiscussion["postTypeID"]);
+
+        $this->assertEquals($postType["name"], $convertedDiscussion["type"]);
+
+        $discussion = $this->runWithConfig(
+            [FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES) => false],
+            fn() => $this->api()
+                ->get("/discussions/{$convertedDiscussion["discussionID"]}")
+                ->getBody()
+        );
+        // To retain backward compatibility, the type property is being set as the parent post type.
+        $this->assertEquals("discussion", $discussion["type"]);
+        return $convertedDiscussion;
+    }
+
+    /**
+     * If something directly updates the type of the discussion, postTypeID is removed.
+     *
+     * @return void
+     * @depends testPutDiscussionTypeFromLegacy
+     */
+    public function testLegacySetTypeNullsPostType(array $discussion)
+    {
+        $this->discussionModel->setField($discussion["discussionID"], "Type", "poll");
+        $discussion = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}")
+            ->getBody();
+        $this->assertEquals("poll", $discussion["type"]);
+
+        // Post type ID was cleared out.
+        $this->assertArrayNotHasKey("postTypeID", $discussion);
+    }
+
+    /**
+     * Test successfully converting from one post type to another with the `PUT /api/v2/discussions/{id}/type` endpoint.
+     *
+     * @return void
+     */
+    public function testConvertPostType()
+    {
+        $commonPostField = $this->createPostField(["isRequired" => true]);
+        $originOnlyPostField = $this->createPostField(["visibility" => "private"]);
+        $fromPostType = $this->createPostType([
+            "postFieldIDs" => [$commonPostField["postFieldID"], $originOnlyPostField["postFieldID"]],
+        ]);
+
+        $discussion = $this->createDiscussion([
+            "postTypeID" => $fromPostType["postTypeID"],
+            "postFields" => [
+                $commonPostField["postFieldID"] => "my custom post field",
+                $originOnlyPostField["postFieldID"] => "my private data",
+            ],
+        ]);
+
+        $toPostType = $this->createPostType([
+            "postFieldIDs" => [$commonPostField["postFieldID"]],
+        ]);
+
+        $this->api()->put("/discussions/{$discussion["discussionID"]}/type", [
+            "postTypeID" => $toPostType["postTypeID"],
+        ]);
+
+        $discussion = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}", ["expand" => "postMeta"])
+            ->getBody();
+        $this->assertEquals($toPostType["postTypeID"], $discussion["postTypeID"]);
+        $this->assertEquals($toPostType["name"], $discussion["type"]);
+        $this->assertArrayHasKey("postFields", $discussion);
+        $this->assertArrayHasKey($commonPostField["postFieldID"], $discussion["postFields"]);
+        $this->assertArrayHasKey(PostFieldModel::PRIVATE_DATA_FIELD_ID, $discussion["postFields"]);
+
+        $this->assertEquals("my custom post field", $discussion["postFields"][$commonPostField["postFieldID"]]);
+        $this->assertEquals(
+            "{$originOnlyPostField["label"]}: my private data",
+            $discussion["postFields"][PostFieldModel::PRIVATE_DATA_FIELD_ID]
+        );
+    }
+
+    /**
+     * Test that we cannot convert to a postTypeID that is not allowed in the category.
+     *
+     * @return void
+     */
+    public function testConvertPostTypeInRestrictedCategory()
+    {
+        // Make sure question post type is active.
+        $this->api()->patch("/post-types/question", ["isActive" => true]);
+
+        $category = $this->createCategory(["hasRestrictedPostTypes" => true, "allowedPostTypeIDs" => ["question"]]);
+        $discussion = $this->createDiscussion(["postTypeID" => "question"]);
+
+        $discussionPostType = $this->createPostType(["parentPostType" => "discussion"]);
+
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage(
+            "Category #{$category["categoryID"]} doesn't allow for {$discussionPostType["postTypeID"]} type records"
+        );
+
+        $this->api()->put("/discussions/{$discussion["discussionID"]}/type", [
+            "postTypeID" => $discussionPostType["postTypeID"],
+        ]);
+    }
+
+    /**
+     * Similar test as `testConvertPostType()`, but using the `PATCH /api/v2/discussions/move` endpoint.
+     *
+     * @return void
+     */
+    public function testMoveWithPostType()
+    {
+        $commonPostField = $this->createPostField(["isRequired" => true]);
+        $originOnlyPostField = $this->createPostField(["visibility" => "internal"]);
+        $fromPostType = $this->createPostType([
+            "postFieldIDs" => [$commonPostField["postFieldID"], $originOnlyPostField["postFieldID"]],
+        ]);
+
+        $category = $this->createCategory();
+
+        $discussion = $this->createDiscussion([
+            "postTypeID" => $fromPostType["postTypeID"],
+            "postFields" => [
+                $commonPostField["postFieldID"] => "my custom post field",
+                $originOnlyPostField["postFieldID"] => "my internal data",
+            ],
+        ]);
+
+        $toPostType = $this->createPostType([
+            "postFieldIDs" => [$commonPostField["postFieldID"]],
+        ]);
+
+        $this->api()->patch("/discussions/move", [
+            "discussionIDs" => [$discussion["discussionID"]],
+            "categoryID" => $category["categoryID"],
+            "postTypeID" => $toPostType["postTypeID"],
+        ]);
+
+        $discussion = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}", ["expand" => "postMeta"])
+            ->getBody();
+        $this->assertEquals($category["categoryID"], $discussion["categoryID"]);
+        $this->assertEquals($toPostType["postTypeID"], $discussion["postTypeID"]);
+        $this->assertEquals($toPostType["name"], $discussion["type"]);
+        $this->assertArrayHasKey("postFields", $discussion);
+        $this->assertArrayHasKey($commonPostField["postFieldID"], $discussion["postFields"]);
+        $this->assertArrayHasKey(PostFieldModel::INTERNAL_DATA_FIELD_ID, $discussion["postFields"]);
+
+        $this->assertEquals("my custom post field", $discussion["postFields"][$commonPostField["postFieldID"]]);
+        $this->assertEquals(
+            "{$originOnlyPostField["label"]}: my internal data",
+            $discussion["postFields"][PostFieldModel::INTERNAL_DATA_FIELD_ID]
+        );
     }
 }

@@ -58,11 +58,11 @@ describe("FilterBlock", () => {
         expect(screen.getByText("Option 1")).toBeInTheDocument();
         expect(screen.getByText("Option 2")).toBeInTheDocument();
     });
-    it("Calls onFilterChange when a filter is selected", () => {
+    it("Calls onFilterChange when a filter is selected", async () => {
         const onFilterChange = vi.fn();
         renderFilterBlock({ onFilterChange });
         fireEvent.click(screen.getByText("Mock Option"));
-        waitFor(() => expect(onFilterChange).toHaveBeenCalled());
+        await waitFor(() => expect(onFilterChange).toHaveBeenCalled());
     });
     it("Displays initial selected static filters", async () => {
         renderFilterBlock({

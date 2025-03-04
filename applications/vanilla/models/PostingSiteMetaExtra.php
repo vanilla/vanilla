@@ -42,8 +42,17 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
         $autosaveEnabled = $this->config->get("Vanilla.Drafts.Autosave", true);
         $trustedDomains = $this->config->get("Garden.TrustedDomains");
         $disableUrlEmbeds = $this->config->get("Garden.Format.DisableUrlEmbeds");
-
         $postTypes = array_values(array_filter(array_column(\DiscussionModel::discussionTypes(), "apiType")));
+        $postTypeModel = \Gdn::getContainer()->get(PostTypeModel::class);
+        $availablePostTypes = $postTypeModel->getAvailablePostTypes();
+        $postTypesMap = [];
+        foreach ($availablePostTypes as $postType) {
+            if (isset($postType["parentPostTypeID"])) {
+                $postTypesMap[$postType["postTypeID"]] = $postType["parentPostTypeID"];
+            } else {
+                $postTypesMap[$postType["postTypeID"]] = $postType["postTypeID"];
+            }
+        }
 
         return [
             "community" => [
@@ -56,6 +65,7 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
             ],
             "trustedDomains" => $trustedDomains,
             "disableUrlEmbeds" => $disableUrlEmbeds,
+            "postTypesMap" => $postTypesMap,
             "postTypes" => $postTypes,
             "escalation" => [
                 "statuses" => $this->escalationModel->getStatuses(),

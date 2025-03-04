@@ -3,6 +3,7 @@ import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
+import { singleBorder } from "@library/styles/styleHelpersBorders";
 import { sticky } from "@library/styles/styleHelpersPositioning";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { Variables } from "@library/styles/Variables";
@@ -66,7 +67,9 @@ export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperti
         },
     });
 
-    const titleAndDescriptionContainer = css({});
+    const titleAndDescriptionContainer = css({
+        width: "100%",
+    });
 
     const titleWrap = css({
         fontSize: "18px",
@@ -101,6 +104,7 @@ export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperti
     });
 
     const description = css({
+        width: "100%",
         ...Mixins.font({
             ...globalVariables().fontSizeAndWeightVars("medium", "normal"),
             lineHeight: 24 / 14,
@@ -113,6 +117,16 @@ export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperti
         },
     });
 
+    const secondaryTitleBar = css({
+        borderTop: singleBorder(),
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
+        padding: "4px 18px",
+        minHeight: 45,
+    });
+
     return {
         root,
         container,
@@ -123,6 +137,7 @@ export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperti
         actionsWrapper,
         descriptionWrapper,
         description,
+        secondaryTitleBar,
     };
 });
 

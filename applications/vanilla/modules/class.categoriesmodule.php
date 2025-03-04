@@ -35,7 +35,7 @@ class CategoriesModule extends Gdn_Module
         parent::__construct($sender);
         $this->_ApplicationFolder = "vanilla";
 
-        $this->Visible = c("Vanilla.Categories.Use") && !c("Vanilla.Categories.HideModule");
+        $this->Visible = !c("Vanilla.Categories.HideModule");
     }
 
     public function assetTarget()

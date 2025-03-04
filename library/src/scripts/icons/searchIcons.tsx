@@ -12,7 +12,7 @@ import { t } from "@vanilla/i18n/src";
 import { Icon } from "@vanilla/icons";
 
 export function TypeAllIcon() {
-    return <Icon size="compact" icon="search-search" />;
+    return <Icon size="compact" icon="search" />;
 }
 
 export function TypeDiscussionsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {

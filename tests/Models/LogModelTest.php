@@ -7,10 +7,13 @@
 
 namespace VanillaTests\Models;
 
+use DiscussionModel;
 use Garden\EventManager;
 use Gdn;
 use LogModel;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\AutomationRuleRevisionModel;
+use VanillaTests\DatabaseTestTrait;
 use VanillaTests\ExpectedNotification;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\NotificationsApiTestTrait;
@@ -26,6 +29,7 @@ class LogModelTest extends SiteTestCase
     use UsersAndRolesApiTestTrait;
     use CommunityApiTestTrait;
     use NotificationsApiTestTrait;
+    use DatabaseTestTrait;
 
     /**
      * @var \Gdn_Session
@@ -49,6 +53,55 @@ class LogModelTest extends SiteTestCase
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
         $this->logModel = Gdn::getContainer()->get(LogModel::class);
         $this->reactionModel = Gdn::getContainer()->get(\ReactionModel::class);
+    }
+
+    /**
+     * Test that logs common logs are pruned after 3 months.
+     *
+     * @return void
+     */
+    public function testPruneCommon()
+    {
+        self::resetTable("Log");
+
+        CurrentTimeStamp::mockTime("2024-01-01");
+        $logID = LogModel::insert("Edit", "Discussion", []);
+        // We found it.
+        self::assertRecordsFound("Log", ["LogID" => $logID]);
+        // Just less than 3 months later
+        CurrentTimeStamp::mockTime("2024-03-31");
+        $this->logModel->prune();
+        // It's still here.
+        self::assertRecordsFound("Log", ["LogID" => $logID]);
+        // But > 3 months later and it's gone.
+        CurrentTimeStamp::mockTime("2024-04-02");
+        $this->logModel->prune();
+        self::assertNoRecordsFound("Log", ["LogID" => $logID]);
+    }
+
+    /**
+     * Test that logs automation logs are pruned after 1 year
+     *
+     * @return void
+     */
+    public function testPruneDeletes()
+    {
+        self::resetTable("Log");
+
+        CurrentTimeStamp::mockTime("2024-01-01");
+        $logID = LogModel::insert("Delete", "Discussion", []);
+        // We found it.
+        self::assertRecordsFound("Log", ["LogID" => $logID]);
+        // Just less than 1 year later
+        CurrentTimeStamp::mockTime("2024-12-31");
+        $this->logModel->prune();
+        // It's still here.
+        self::assertRecordsFound("Log", ["LogID" => $logID]);
+
+        // But > 1 year later and it's gone.
+        CurrentTimeStamp::mockTime("2025-01-02");
+        $this->logModel->prune();
+        self::assertNoRecordsFound("Log", ["LogID" => $logID]);
     }
 
     /**
@@ -111,6 +164,56 @@ class LogModelTest extends SiteTestCase
                     "mine, participated"
                 ),
             ]);
+        }, $commentAuthor);
+        $this->eventManager->unbind("base_checkSpam", $fn);
+    }
+
+    /**
+     * This tests that announcement discussions that where flagged, and restored correctly.
+     *
+     * @return void
+     */
+    public function testRestorePostAnnoucenments()
+    {
+        $discussionAuthor = $this->createUser();
+        Gdn::userModel()->savePreference($discussionAuthor["userID"], "Popup.DiscussionComment", true);
+        $discussion = $this->runWithUser(function () {
+            return $this->createDiscussion();
+        }, $discussionAuthor);
+
+        $fn = function (\SpamModel $sender, $args) {
+            $sender->EventArguments["IsSpam"] = true;
+        };
+
+        $this->eventManager->bind("base_checkSpam", $fn);
+
+        $commentAuthor = $this->createUser();
+        $this->runWithUser(function () use ($commentAuthor, $discussionAuthor) {
+            // This comment will be auto-moderated and sent to the spam queue.
+            $this->createDiscussion(["Name" => "test Discussion", "Announce" => 1]);
+
+            // Auto-moderated posts don't cause notifications to be sent.
+            $this->assertUserHasNoNotifications($discussionAuthor);
+
+            $logs = $this->logModel->getWhere([
+                "RecordType" => "Discussion",
+                "RecordUserID" => $commentAuthor["userID"],
+            ]);
+
+            $this->assertCount(1, $logs);
+            $logs[0]["Data"]["Announce"] = 2;
+            Gdn::sql()
+                ->update("Log")
+                ->set(["Data" => dbencode($logs[0]["Data"])])
+                ->where("LogID", $logs[0]["LogID"])
+                ->put();
+
+            $this->logModel->restore($logs[0]);
+
+            // Restoring the post causes the appropriate notifications to be sent out.
+            $discussionModel = $this->container()->get(DiscussionModel::class);
+            $restoredDiscussion = $discussionModel->getWhere(["Announce" => "2"]);
+            $this->assertCount(1, $restoredDiscussion);
         }, $commentAuthor);
         $this->eventManager->unbind("base_checkSpam", $fn);
     }

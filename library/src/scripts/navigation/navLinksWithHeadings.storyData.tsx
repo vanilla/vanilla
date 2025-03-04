@@ -1,11 +1,10 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 export const navLinksWithHeadingsData = {
-    title: "Browse Articles by Category",
     accessibleViewAllMessage: 'View all articles from category: "<0/>".',
     data: {
         groups: [

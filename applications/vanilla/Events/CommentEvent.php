@@ -8,6 +8,7 @@ namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
 use Garden\Events\TrackingEventInterface;
+use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LogLevel;
 use Vanilla\Analytics\TrackableCommunityModel;
 use Vanilla\Logging\LogEntry;
@@ -125,6 +126,23 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
     public function getInsertUserID(): int
     {
         return $this->payload["comment"]["insertUserID"];
+    }
+
+    /**
+     * Determine if the comment is searchable. Some parent types aren't implemented yet.
+     *
+     * @return bool
+     */
+    public function isSearchable(): bool
+    {
+        $parentRecordType = $this->payload["comment"]["parentRecordType"];
+        $commentModel = \Gdn::getContainer()->get(\CommentModel::class);
+        $handler = $commentModel->getParentHandler($parentRecordType);
+        if (!$handler) {
+            return false;
+        }
+
+        return $handler->isSearchable();
     }
 
     /**

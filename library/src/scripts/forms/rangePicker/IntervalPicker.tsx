@@ -106,7 +106,7 @@ export function IntervalPicker(props: IProps) {
                 <Message
                     className={wrapper}
                     type="info"
-                    icon={<Icon icon={"data-information"} />}
+                    icon={<Icon icon={"info"} />}
                     stringContents={t(
                         "Exportable data available, but charts may not be visually optimized for this time and date range.",
                     )}

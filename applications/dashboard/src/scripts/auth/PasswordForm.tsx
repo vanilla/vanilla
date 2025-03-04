@@ -80,7 +80,7 @@ export function PasswordForm(props: IProps) {
             onSubmit={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                loginWithPassword({
+                void loginWithPassword({
                     username: formState.username,
                     password: formState.password,
                     persist: formState.rememberMe,

@@ -123,19 +123,19 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
         $recordMap = [
             "accepted" => [
                 "label" => "Questions Answered",
-                "iconName" => "search-answered",
+                "iconName" => "meta-answered",
             ],
             "article" => [
                 "label" => "Articles",
-                "iconName" => "data-article",
+                "iconName" => "meta-article",
             ],
             "category" => [
                 "label" => "Categories",
-                "iconName" => "search-categories",
+                "iconName" => "meta-categories",
             ],
             "comment" => [
                 "label" => "Comments",
-                "iconName" => "search-discussion",
+                "iconName" => "meta-discussions",
             ],
             "discussion" => [
                 "label" => "Discussions",
@@ -143,35 +143,35 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
             ],
             "event" => [
                 "label" => "Events",
-                "iconName" => "search-events",
+                "iconName" => "meta-events",
             ],
             "group" => [
                 "label" => "Groups",
-                "iconName" => "search-groups",
+                "iconName" => "meta-groups",
             ],
             "knowledgeBase" => [
                 "label" => "Knowledge Bases",
-                "iconName" => "search-kb",
+                "iconName" => "meta-knowledge-bases",
             ],
             "onlineUser" => [
                 "label" => "Online Users",
-                "iconName" => "data-online",
+                "iconName" => "whos-online",
             ],
             "onlineMember" => [
                 "label" => "Online Members",
-                "iconName" => "search-members",
+                "iconName" => "meta-users",
             ],
             "post" => [
                 "label" => "Posts",
-                "iconName" => "search-post-count",
+                "iconName" => "meta-posts",
             ],
             "question" => [
                 "label" => "Questions",
-                "iconName" => "search-questions",
+                "iconName" => "meta-questions",
             ],
             "user" => [
                 "label" => "Members",
-                "iconName" => "search-members",
+                "iconName" => "meta-users",
             ],
         ];
 
@@ -279,10 +279,6 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                     $itemSchema
                 ),
                 "default" => array_values(self::getDefaultOptions()),
-            ],
-            "options?" => [
-                "type" => "object",
-                "default" => $choices,
             ],
         ];
 

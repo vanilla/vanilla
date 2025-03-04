@@ -84,7 +84,9 @@ export function useConfigMutation() {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(["getConfigs"]);
+            setTimeout(() => {
+                void queryClient.invalidateQueries(["getConfigs"]);
+            }, 50);
             toast.addToast({ body: t("Configuration changes saved."), autoDismiss: true, dismissible: true });
         },
         onError: () => {
@@ -190,7 +192,7 @@ export const useDefaultLocales = () => {
     const [defaultLocale, setDefault] = useState<IComboBoxOption | undefined>();
 
     const setDefaultLocale = (option: IComboBoxOption) => {
-        patchConfig({
+        void patchConfig({
             [LOCALE_KEY]: option.value,
         });
     };

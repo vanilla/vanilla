@@ -9,7 +9,7 @@ trait SerializedPublicPropertiesToJsonTrait
     /**
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $fn = function ($fragment) {
             // We're doing this in a closure so we don't have access to the private/protected properties.

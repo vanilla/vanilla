@@ -1,5 +1,5 @@
 {
-    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=categoryList&cacheBuster=5",
+    "$schema": "http://dev.vanilla.local/api/v2/layouts/schema?layoutViewType=categoryList&cacheBuster=5",
     "dateInserted": "2023-08-13T00:00:00Z",
     "layoutViewType": "categoryList",
     "layoutID": "categoryList",

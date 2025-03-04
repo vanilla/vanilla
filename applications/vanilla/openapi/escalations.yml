@@ -356,6 +356,19 @@ components:
                     description: The date of the most recent report made about this record.
                     type: string
                     format: date-time
+                lastCommentID:
+                    description: The ID of the last comment.
+                    type: integer
+                dateLastComment:
+                    description: The date of the last comment.
+                    format: date-time
+                    type: string
+                lastCommentUserID:
+                    description: The ID of the user who made the last comment.
+                    type: integer
+                lastCommentUser:
+                    description: The user who made the last comment.
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
             required:
                 - name
                 - status

@@ -35,8 +35,6 @@ class DateTimeFormatter
     /**
      * Format a MySQL DateTime string in the specified format.
      *
-     * @link http://us.php.net/manual/en/function.strftime.php
-     *
      * @param string|int $timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
      * @param bool $isHtml Whether or not to output this as an HTML string.
      * @param string $format The format string to use. Defaults to the application's default format.
@@ -61,15 +59,17 @@ class DateTimeFormatter
         } elseif ($format === self::FORCE_FULL_FORMAT) {
             $format = $this->dateConfig->getDefaultDateTimeFormat();
             $format = $this->normalizeFormatForTimeStamp($format, $timestamp);
+        } else {
+            $format = $this->convertStrftimeToDateFormat($format);
         }
 
-        $result = strftime($format, $timestamp);
+        $result = date($format, $timestamp);
 
         if ($isHtml) {
             $fullFormat = $this->dateConfig->getDefaultDateTimeFormat();
             $fullFormat = $this->normalizeFormatForTimeStamp($fullFormat, $timestamp);
             $result = wrap($result, "time", [
-                "title" => strftime($fullFormat, $timestamp),
+                "title" => date($fullFormat, $timestamp),
                 "datetime" => gmdate("c", $gmTimestamp),
             ]);
         }
@@ -376,12 +376,67 @@ class DateTimeFormatter
     private function normalizeFormatForTimeStamp(string $format, int $timestamp): string
     {
         if (strpos($format, "%l") !== false) {
-            $format = str_replace("%l", ltrim(strftime("%I", $timestamp), "0"), $format);
+            $format = str_replace("%l", ltrim(date("h", $timestamp), "0"), $format);
+        }
+        if (strpos($format, "g") !== false) {
+            $format = str_replace("g", ltrim(date("h", $timestamp), "0"), $format);
         }
         if (strpos($format, "%e") !== false) {
-            $format = str_replace("%e", ltrim(strftime("%d", $timestamp), "0"), $format);
+            $format = str_replace("%e", ltrim(date("d", $timestamp), "0"), $format);
         }
+        if (strpos($format, "j") !== false) {
+            $format = str_replace("j", ltrim(date("d", $timestamp), "0"), $format);
+        }
+        $format = self::convertStrftimeToDateFormat($format);
         return $format;
+    }
+
+    /**
+     * Given a date format for the deprecated {@link strftime()} function
+     * convert it into a format for the {@link date} function.
+     *
+     * @param string $originalFormat
+     * @return string
+     */
+    public static function convertStrftimeToDateFormat(string $originalFormat): string
+    {
+        $placeholders = [
+            "%r" => "%I:%M:%S %p",
+            "%R" => "%H:%M",
+            "%D" => "%m/%d/%y",
+            "%F" => "%Y-%m-%d",
+        ];
+        $originalFormat = str_replace(array_keys($placeholders), array_values($placeholders), $originalFormat);
+
+        $conversions = [
+            "%a" => "D", // 	Mon through Sun
+            "%A" => "l", // 	Monday through Sunday
+            "%d" => "d", // 	01 to 31
+            "%e" => "j", // 	1 to 31
+            "%j" => "z", // 	0 to 365 (day of the year)
+            "%u" => "N", // 	1 (for Monday) through 7 (for Sunday)
+            "%w" => "w", // 	0 (for Sunday) through 6 (for Saturday)
+            "%W" => "W", // 	e.g. 42 (for the 42nd full week of the year, starting with the first Monday as the first week)
+            "%b" => "M", // 	Jan through Dec
+            "%h" => "M", // 	Jan through Dec
+            "%B" => "F", // 	January through December
+            "%m" => "m", // 	01 (for January) through 12 (for December)
+            "%G" => "o", // 	The full four-digit version of %g
+            "%y" => "y", // 	Two digit representation of the year, e.g. 14 for 2014
+            "%Y" => "Y", // 	Four digit representation of the year, e.g. 2014
+            "%H" => "H", // 	00 through 23 (two digit representation of the hour in 24-hour format)
+            "%I" => "h", // 	01 through 23 (two digit representation of the hour in 12-hour format)
+            "%l" => "g", // 	1 through 12 (hour in 12-hour format)
+            "%P" => "a", // 	am or pm
+            "%p" => "A", // 	AM or PM
+            "%M" => "i", // 	00 through 59 (minutes)
+            "%S" => "s", // 	00 through 59 (seconds)
+            "%s" => "U", // 	Unix Epoch Time timestamp (same as the time() function)
+            "%z" => "O", // 	Timezone offset, e.g. -0500 for US Eastern Time
+            "%Z" => "T", // 	Timezone abbreviation, e.g. EST for US Eastern Time
+        ];
+        $result = str_replace(array_keys($conversions), array_values($conversions), $originalFormat);
+        return $result;
     }
 
     /**

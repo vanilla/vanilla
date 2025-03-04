@@ -6,6 +6,8 @@
 
 namespace VanillaTests\APIv2;
 
+use Exception;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use ReactionModel;
 use VanillaTests\ExpectExceptionTrait;
@@ -732,5 +734,27 @@ class ReactionsReactTest extends AbstractAPIv2Test
         // APIV1 Call.
         $this->expectExceptionMessage("Record is not found");
         $this->bessy()->post($reactionEndpoint . "00000");
+    }
+
+    /**
+     * Test reacting on a comment without the proper permissions.
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function testReactingNoPermission(): void
+    {
+        $this->createCategory(["customPermissions" => true]);
+        $this->createDiscussion($this->lastInsertedCategoryID, __FUNCTION__);
+        $comment = $this->createComment();
+        $user = $this->createUser();
+
+        $this->runWithUser(function () use ($comment) {
+            $this->expectException(ForbiddenException::class);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->api()->post("/comments/{$comment["commentID"]}/reactions", [
+                "reactionType" => "like",
+            ]);
+        }, $user);
     }
 }

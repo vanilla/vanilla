@@ -30,6 +30,6 @@ class SearchMembersEventProvider implements EventProviderInterface
     {
         $type = $body["type"] ?? null;
         $domain = $body["domain"] ?? null;
-        return strtolower($type) === "search" && strtolower($domain) === "members";
+        return $type && $domain && strtolower($type) === "search" && strtolower($domain) === "members";
     }
 }

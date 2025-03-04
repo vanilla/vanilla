@@ -53,7 +53,7 @@ class LongRunnerAction implements \JsonSerializable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             "className" => $this->className,

@@ -12,6 +12,9 @@ import { themePreviewToastReducer } from "@library/features/toaster/themePreview
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { mountPortal } from "@vanilla/react-utils";
 import { roleReducer } from "@dashboard/roles/roleReducer";
+import { ContentTranslationProvider } from "@vanilla/i18n";
+import { ContentTranslator } from "@dashboard/translator/ContentTranslator";
+import { translationReducer } from "@dashboard/translator/translationReducer";
 
 const PREVIEW_CONTAINER = "previewContainer";
 
@@ -21,6 +24,9 @@ registerReducer("themePreviewToaster", themePreviewToastReducer);
 registerReducer("roles", roleReducer);
 
 addComponent("toaster", Toast);
-onReady(() => {
-    mountPortal(<ThemePreviewToast />, PREVIEW_CONTAINER);
+onReady(async () => {
+    void mountPortal(<ThemePreviewToast />, PREVIEW_CONTAINER);
 });
+
+ContentTranslationProvider.setTranslator(ContentTranslator);
+registerReducer("translations", translationReducer);

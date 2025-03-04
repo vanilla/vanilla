@@ -7,7 +7,6 @@
 
 use Garden\Container\ContainerException;
 use Garden\Schema\Schema;
-use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
@@ -21,13 +20,15 @@ use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
-use Vanilla\Database\Select;
 use Vanilla\DiscussionTypeConverter;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Forum\Models\DiscussionMergeModel;
+use Vanilla\Forum\Models\DiscussionPermissions;
+use Vanilla\Forum\Models\DiscussionSplitModel;
 use Vanilla\Forum\Models\PostFieldModel;
 use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
@@ -86,7 +87,8 @@ class DiscussionsApiController extends AbstractApiController
         private Gdn_Database $db,
         private InterestModel $interestModel,
         private PostTypeModel $postTypeModel,
-        private PostFieldModel $postFieldModel
+        private PostFieldModel $postFieldModel,
+        private DiscussionPermissions $discussionPermissions
     ) {
     }
 
@@ -318,10 +320,15 @@ class DiscussionsApiController extends AbstractApiController
                 "default" => false,
             ],
         ]);
+
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $in->merge(Schema::parse(["postTypeID:s?"]));
+        }
         $body = $in->validate($body);
 
         $discussionIDs = $body["discussionIDs"];
         $categoryID = $body["categoryID"];
+        $postTypeID = $body["postTypeID"] ?? null;
 
         // Check new category permission.
         $this->permission("Vanilla.Discussions.Edit", $categoryID);
@@ -339,6 +346,7 @@ class DiscussionsApiController extends AbstractApiController
                 $discussionIDs,
                 $categoryID,
                 $body["addRedirects"],
+                $postTypeID,
             ])
         );
         return $result;
@@ -443,6 +451,135 @@ class DiscussionsApiController extends AbstractApiController
     }
 
     /**
+     * Split comments into a new discussion.
+     *
+     * @param array $body The request's body.
+     *
+     * @return Data
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws PermissionException
+     * @throws ValidationException
+     */
+    public function post_split(array $body): Data
+    {
+        $this->permission();
+
+        $in = Schema::parse([
+            "newPost:o" => Schema::parse([
+                "name:s",
+                "body:s?",
+                "format:s?",
+                "categoryID:i",
+                PostTypeModel::isPostTypesFeatureEnabled() ? "postTypeID:i" : "postType:s",
+                "authorType" => [
+                    "type" => "string",
+                    "enum" => ["me", "system"],
+                ],
+            ]),
+            "commentIDs:a" => [
+                "items" => [
+                    "type" => "integer",
+                ],
+                "minItems" => 1,
+            ],
+        ]);
+        $body = $in->validate($body);
+        $newPost = $body["newPost"];
+
+        $commentIDs = $body["commentIDs"];
+        $discussionIDs = $this->commentModel->getDiscussionIDFromCommentIDs($commentIDs);
+        if (count($discussionIDs) === 0) {
+            throw new ClientException("Comments not found.");
+        }
+        //Only allow split comments from 1 discussion at a time.
+        if (count($discussionIDs) > 1) {
+            throw new ClientException("Comments from multiple discussions selected.");
+        }
+        $sourceDiscussionID = $discussionIDs[0];
+        $discussion = $this->discussionModel->getID($sourceDiscussionID, DATASET_TYPE_ARRAY);
+        if (!array_key_exists("body", $newPost)) {
+            $newPost["body"] = sprintf(
+                t("This discussion was created from comments split from: %s."),
+                anchor(
+                    Gdn_Format::text($discussion["Name"]),
+                    "discussion/" . $discussion["DiscussionID"] . "/" . Gdn_Format::url($discussion["Name"]) . "/"
+                )
+            );
+            $newPost["format"] = "Html";
+        }
+        //Either have curation manage or add on this category and edit on origin discussion.
+        if (!\Gdn::session()->checkPermission("curation.manage")) {
+            $this->permission("discussions.add", $newPost["categoryID"]);
+
+            // Make sure we have permission to take action on all discussions.
+            $checked = $this->discussionModel->checkCategoryPermission(
+                [$sourceDiscussionID],
+                "Vanilla.Discussions.Edit"
+            );
+            if (!empty($checked["nonexistentIDs"])) {
+                throw new NotFoundException("Discussion", ["recordIDs" => $checked["nonexistentIDs"]]);
+            }
+            if (!empty($checked["noPermissionIDs"])) {
+                throw new PermissionException("Vanilla.Discussions.Edit", ["recordIDs" => $checked["noPermissionIDs"]]);
+            }
+        }
+
+        $newCategory = CategoryModel::categories($newPost["categoryID"]);
+        $permissionCategory = $this->categoryModel::permissionCategory($newPost["categoryID"]);
+
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $allowedDiscussionTypes = $this->categoryModel->getAllowedPostTypeData($newCategory);
+            $postableDiscussionTypes = null;
+        } else {
+            $allowedDiscussionTypes = $this->categoryModel::getAllowedDiscussionData($permissionCategory, $newCategory);
+            $postableDiscussionTypes = CategoryModel::instance()->getPostableDiscussionTypes();
+        }
+
+        $allowedDiscussionTypes = array_map("strtolower", array_column($allowedDiscussionTypes, "apiType"));
+        if (
+            isset($newPost["postType"]) &&
+            !empty($allowedDiscussionTypes) &&
+            !in_array(strtolower($newPost["postType"]), $allowedDiscussionTypes)
+        ) {
+            throw new ClientException("Selected post type is not allowed in this category.", 400, [
+                "discussionType" => $discussion["Type"],
+                "allowedDiscussionTypes" => $allowedDiscussionTypes,
+            ]);
+        }
+
+        $newPost["author"] =
+            $newPost["authorType"] == "me" ? \Gdn::session()->UserID : Gdn::userModel()->getSystemUserID();
+
+        $newDiscussionData = [
+            "InsertUserID" => $newPost["author"],
+            "DateInserted" => Gdn_Format::toDateTime(),
+            "DateUpdated" => Gdn_Format::toDateTime(),
+            "CategoryID" => $newPost["categoryID"],
+            "Type" => $newPost["postType"],
+            "Name" => $newPost["name"],
+            "Body" => $newPost["body"],
+            "Format" => $newPost["format"],
+        ];
+        $destinationDiscussionID = $this->discussionModel->save($newDiscussionData);
+        if (!$destinationDiscussionID) {
+            throw new NotFoundException("Discussion", ["discussionID" => $destinationDiscussionID]);
+        }
+
+        // Defer to the LongRunner for execution.
+        $result = $this->longRunner->runApi(
+            new LongRunnerAction(DiscussionSplitModel::class, "splitDiscussionsIterator", [
+                $commentIDs,
+                $destinationDiscussionID,
+                $sourceDiscussionID,
+            ])
+        );
+        $destinationDiscussion = $this->discussionByID($destinationDiscussionID);
+        $result["newPostUrl"] = $destinationDiscussion["Url"];
+        return $result;
+    }
+
+    /**
      * Update a discussion's DateLastComment value to the current time to bump the discussion up in the list.
      *
      * @param int $id The discussion ID.
@@ -519,7 +656,7 @@ class DiscussionsApiController extends AbstractApiController
             if ($this->getPermissions()->has("staff.allow")) {
                 $this->discussionPostSchema->merge(Schema::parse(["resolved:b?"]));
             }
-            if (\Vanilla\FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
                 $this->discussionPostSchema
                     ->merge(Schema::parse(["postTypeID?", "postFields?"]))
                     ->addFilter("", function ($data, \Garden\Schema\ValidationField $field) {
@@ -527,8 +664,8 @@ class DiscussionsApiController extends AbstractApiController
                             return $data;
                         }
                         if (isset($data["postTypeID"])) {
-                            $category = CategoryModel::categories($data["categoryID"]);
-                            $allowedPostTypes = $this->postTypeModel->getAllowedPostTypes($category);
+                            $category = \CategoryModel::categories($data["categoryID"]);
+                            $allowedPostTypes = $this->postTypeModel->getAllowedPostTypesByCategory($category);
                             if (!in_array($data["postTypeID"], array_column($allowedPostTypes, "postTypeID"))) {
                                 $field->addError("{$data["postTypeID"]} is not a valid post type");
                                 return \Garden\Schema\Invalid::value();
@@ -568,11 +705,13 @@ class DiscussionsApiController extends AbstractApiController
                 ->add(DiscussionExpandSchema::commonExpandSchema())
                 ->add($this->fullSchema()),
             "DiscussionPatch"
-        );
+        )->addValidator("insertUserID", function () {
+            $this->permission("site.manage");
+        });
         if ($this->getPermissions()->has("staff.allow")) {
             $schema->merge(Schema::parse(["resolved:b?"]));
         }
-        if (\Vanilla\FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
             $schema
                 ->merge(Schema::parse(["postFields?"]))
                 ->addFilter("", function ($data) use ($row) {
@@ -721,7 +860,7 @@ class DiscussionsApiController extends AbstractApiController
      * @return array Return a Schema record.
      * @throws ContainerException
      * @throws \Garden\Container\NotFoundException
-     * @throws BreadcrumbProviderNotFoundException
+     * @throws BreadcrumbProviderNotFoundException|FormatterNotFoundException
      */
     public function normalizeOutput(array $dbRecord, $expand = [], array $options = [])
     {
@@ -1772,6 +1911,12 @@ class DiscussionsApiController extends AbstractApiController
             ],
             "in"
         )->setDescription("Change a discussions type. ie. idea, question");
+
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $in["required"] = [];
+            $in->merge(Schema::parse(["postTypeID?"]))->addFilter("", SchemaUtils::onlyOneOf(["type", "postTypeID"]));
+        }
+
         $out = $this->schema($this->discussionSchema(), "out");
         $body = $in->validate($body);
 
@@ -1780,8 +1925,9 @@ class DiscussionsApiController extends AbstractApiController
             throw new ClientException("Record not found.");
         }
 
-        $fromType = strtolower($from["Type"]) ?? "";
-        $toType = strtolower($body["type"]) ?? null;
+        $fromType = $from["postTypeID"] ?? (strtolower($from["Type"] ?? "") ?? "");
+        $toType = $body["postTypeID"] ?? (strtolower($body["type"] ?? "") ?? null);
+
         $isDiscussionType = empty($fromType);
         $noChange = $fromType === $toType || ($isDiscussionType && $toType === "discussion");
 
@@ -1791,7 +1937,7 @@ class DiscussionsApiController extends AbstractApiController
         }
         // We need to fetch it now rather than at the initialization to prevent load order problems.
         $discussionTypeConverter = Gdn::getContainer()->get(DiscussionTypeConverter::class);
-        $discussionTypeConverter->convert($from, $toType);
+        $discussionTypeConverter->convert($from, $toType, isCustomPostType: isset($body["postTypeID"]));
         $record = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
         $result = $this->normalizeOutput($record);
         $result = $out->validate($result);
@@ -2085,6 +2231,7 @@ class DiscussionsApiController extends AbstractApiController
         $this->reactionModel->canViewDiscussion($discussion, $session);
         $body = $in->validate($body);
 
+        ReactionModel::checkReactionPermissions($body["reactionType"]);
         $this->reactionModel->react("Discussion", $id, $body["reactionType"], null, false, ReactionModel::FORCE_ADD);
 
         // Refresh the discussion to grab its updated attributes.
@@ -2123,6 +2270,7 @@ class DiscussionsApiController extends AbstractApiController
         $reaction = $this->reactionModel->getUserReaction($userID, "Discussion", $id);
         if ($reaction) {
             $urlCode = $reaction["UrlCode"];
+            ReactionModel::checkReactionPermissions($urlCode);
             $this->reactionModel->react("Discussion", $id, $urlCode, $userID, false, ReactionModel::FORCE_REMOVE);
         }
     }

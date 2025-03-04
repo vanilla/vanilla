@@ -14,6 +14,7 @@ use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Database\CallbackWhereExpression;
 use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\DiscussionPermissions;
 use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Scheduler\LongRunner;
@@ -86,7 +87,8 @@ class CategoriesApiController extends AbstractApiController
         private LongRunner $runner,
         private SiteSectionModel $siteSectionModel,
         private InterestModel $interestModel,
-        private PostTypeModel $postTypeModel
+        private PostTypeModel $postTypeModel,
+        private DiscussionPermissions $discussionPermissions
     ) {
     }
 
@@ -129,7 +131,7 @@ class CategoriesApiController extends AbstractApiController
                     ]);
                 }
             });
-            if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
                 $validPostTypes = $this->postTypeModel->getAvailablePostTypes();
                 $this->categoryPostSchema
                     ->merge(
@@ -189,7 +191,7 @@ class CategoriesApiController extends AbstractApiController
         if (empty($category)) {
             throw new NotFoundException("Category");
         }
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
             $categories = [&$category];
             CategoryModel::joinPostTypes($categories);
         }
@@ -461,7 +463,7 @@ class CategoriesApiController extends AbstractApiController
             $this->idParamSchema = $this->schema(
                 Schema::parse([
                     "id:i" => "The category ID.",
-                    "expand?" => ApiUtils::getExpandDefinition(["lastPost"]),
+                    "expand?" => ApiUtils::getExpandDefinition(["lastPost", "permissions"]),
                 ]),
                 $type
             );
@@ -499,7 +501,7 @@ class CategoriesApiController extends AbstractApiController
                     "minimum" => 1,
                     "maximum" => ApiUtils::getMaxLimit(),
                 ],
-                "expand?" => ApiUtils::getExpandDefinition(["lastPost", "preferences"]),
+                "expand?" => ApiUtils::getExpandDefinition(["lastPost", "preferences", "permissions"]),
                 "featured:b?",
                 "dirtyRecords:b?",
                 "outputFormat:s?" => [
@@ -691,10 +693,11 @@ class CategoriesApiController extends AbstractApiController
 
         // Additional filtering by post type
         if (!empty($query["postTypeID"])) {
-            $postTypesByCategory = $this->postTypeModel->getPostTypesByCategory([
-                "ptcj.postTypeID" => $query["postTypeID"],
-            ]);
-            $categoryIDs = $categoryIDs->withFilteredValue("=", array_keys($postTypesByCategory));
+            $allowedCategoriesByPostType = $this->postTypeModel->getAllowedCategoriesByPostTypeID($query["postTypeID"]);
+            $categoryIDs = $categoryIDs->withFilteredValue(
+                "=",
+                array_column($allowedCategoriesByPostType, "CategoryID")
+            );
         }
 
         $where["CategoryID"] = $categoryIDs;
@@ -769,6 +772,13 @@ class CategoriesApiController extends AbstractApiController
                         $userPreferences[$row["CategoryID"]]["preferences"]
                     );
                 }
+            }
+        }
+
+        if (ModelUtils::isExpandOption("permissions", $expand)) {
+            foreach ($rows as &$row) {
+                $categoryID = $row["CategoryID"];
+                $row["permissions"] = $this->discussionPermissions->getForCategory($categoryID);
             }
         }
     }
@@ -1313,7 +1323,7 @@ class CategoriesApiController extends AbstractApiController
             CategoryModel::calculate($category);
         }
 
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
             CategoryModel::joinPostTypes($categories);
         }
 

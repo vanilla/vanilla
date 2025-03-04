@@ -124,19 +124,30 @@ class CategoriesAllowedPostTypesTest extends AbstractAPIv2Test
      */
     public function testIndexFilterByPostType()
     {
-        $postType = $this->createPostType();
-        $this->createCategory(["parentCategoryID" => null]);
-        $this->createCategory(["parentCategoryID" => null]);
-        $category = $this->createCategory([
+        $postType1 = $this->createPostType(["postTypeID" => "abcd1"]);
+        $postType2 = $this->createPostType(["postTypeID" => "efgh2"]);
+
+        $category1 = $this->createCategory([
             "hasRestrictedPostTypes" => true,
             "parentCategoryID" => null,
-            "allowedPostTypeIDs" => [$postType["postTypeID"]],
+            "allowedPostTypeIDs" => [$postType1["postTypeID"]],
+        ]);
+        $category2 = $this->createCategory(["parentCategoryID" => null]);
+        $category3 = $this->createCategory([
+            "hasRestrictedPostTypes" => true,
+            "parentCategoryID" => null,
+            "allowedPostTypeIDs" => [$postType2["postTypeID"]],
         ]);
 
+        // When filtering by $postType1
+        // We should only get $category1 because we have an explicit association there.
         $categories = $this->api()
-            ->get("categories", ["postTypeID" => $postType["postTypeID"]])
+            ->get("categories", [
+                "postTypeID" => $postType1["postTypeID"],
+                "categoryID" => "{$category1["categoryID"]},{$category2["categoryID"]},{$category3["categoryID"]}",
+            ])
             ->getBody();
-        $this->assertCount(1, $categories);
-        $this->assertEquals($category["categoryID"], $categories[0]["categoryID"]);
+
+        $this->assertRowsLike(["categoryID" => [$category1["categoryID"]]], $categories, false, 1);
     }
 }

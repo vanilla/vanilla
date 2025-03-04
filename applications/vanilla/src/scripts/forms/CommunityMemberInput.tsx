@@ -118,9 +118,10 @@ export function useMember(query: string) {
         } else {
             // If the query is empty, offer some suggestions in the dropdown
             if (query === "") {
-                fetchMemberByName("");
+                void fetchMemberByName("");
+            } else if (!!query && query.length > 0) {
+                void fetchMemberByName(query);
             }
-            !!query && query.length > 0 && fetchMemberByName(query);
         }
     }, [resultsByQuery, query, resultsCached]);
 

@@ -90,7 +90,7 @@ export function MembersSearchFilterPanel() {
                         schema={combinedSchema}
                         values={values}
                         onSubmit={async (newValues) => {
-                            setValues(newValues);
+                            await setValues(newValues);
                             await submitForm();
                         }}
                     />
@@ -98,7 +98,7 @@ export function MembersSearchFilterPanel() {
                     <FilteredProfileFields
                         values={values.profileFields}
                         onChange={(values) => {
-                            setFieldValue("profileFields", values);
+                            void setFieldValue("profileFields", values);
                         }}
                     />
                 </InputBlock>

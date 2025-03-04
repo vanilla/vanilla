@@ -18,26 +18,28 @@ use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Forum\Models\CommentDeleteModel;
 use Vanilla\Forum\Models\CommentThreadModel;
 use Vanilla\Forum\Models\CommentThreadStructureOptions;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
-use Vanilla\Forum\Widgets\DiscussionCommentsAsset;
-use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutViewModel;
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\LegacyModelUtils;
 use Vanilla\Models\Model;
 use Vanilla\Permissions;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchResultItem;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 use Garden\Web\Pagination;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Web\APIExpandMiddleware;
 
 /**
  * API Controller for the `/comments` resource.
@@ -66,7 +68,10 @@ class CommentsApiController extends AbstractApiController
         private EscalationModel $escalationModel,
         private ConfigurationInterface $config,
         private LayoutViewModel $layoutViewModel,
-        private LayoutModel $layoutModel
+        private LayoutModel $layoutModel,
+        private ContentDraftModel $contentDraftModel,
+        private LongRunner $longRunner,
+        private CategoryModel $categoryModel
     ) {
     }
 
@@ -100,6 +105,7 @@ class CommentsApiController extends AbstractApiController
             "parentRecordType",
             "parentRecordID",
             "draftID?",
+            "insertUserID:i?",
         ];
 
         if (!$isPatch) {
@@ -113,6 +119,9 @@ class CommentsApiController extends AbstractApiController
                     $row["parentRecordID"] = $row["discussionID"];
                 }
                 return $row;
+            })
+            ->addValidator("insertUserID", function () {
+                $this->permission("Site.Manage");
             });
         return $schema;
     }
@@ -136,17 +145,68 @@ class CommentsApiController extends AbstractApiController
      *
      * @param int $id The ID of the comment.
      * @throws PermissionException
-     * @throws HttpException
-     * @throws \Vanilla\Exception\Database\NoResultsException
+     * @throws NotFoundException
      */
     public function delete(int $id)
     {
         $this->permission("Garden.SignIn.Allow");
 
-        // Throws if the user can't delete.
-        $this->validateCanDelete(commentID: $id);
+        $comment = $this->commentByID($id);
+        $parentHandler = $this->commentModel->getParentHandler($comment["parentRecordType"]);
+        $parentHandler->hasViewPermission($comment["parentRecordID"], throw: true);
+        $parentHandler->hasDeletePermission($comment);
 
         $this->commentModel->deleteID($id);
+    }
+
+    /**
+     * Delete a list of comments.
+     *
+     * @param array $body The request body.
+     * @return Data
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws ValidationException
+     */
+    public function delete_list(array $body)
+    {
+        $this->permission("Vanilla.Comments.Delete");
+        $in = Schema::parse([
+            "commentIDs:a" => [
+                "items" => [
+                    "type" => "integer",
+                ],
+                "description" => "List of comments IDs to delete.",
+                "maxItems" => 50,
+            ],
+            "deleteMethod" => [
+                "type" => "string",
+                "enum" => ["tombstone", "full"],
+            ],
+        ]);
+        $body = $in->validate($body);
+
+        // Make sure we filter out duplicates.
+        $commentIDs = array_unique($body["commentIDs"]);
+
+        // Check permissions.
+        $parents = $this->commentModel->getDistinctParents($commentIDs);
+        if (count($parents) > 1) {
+            throw new ClientException("Comments must belong to the same parent record.");
+        }
+        $firstComment = $this->commentByID($commentIDs[0]);
+        $this->commentModel
+            ->getParentHandler($firstComment["parentRecordType"])
+            ->hasDeletePermission($firstComment, throw: true);
+
+        // Defer to the LongRunner for execution.
+        $result = $this->longRunner->runApi(
+            new LongRunnerAction(CommentDeleteModel::class, "deleteCommentsIterator", [
+                $commentIDs,
+                $body["deleteMethod"],
+            ])
+        );
+        return $result;
     }
 
     /**
@@ -212,10 +272,8 @@ class CommentsApiController extends AbstractApiController
                 $query
             );
         }
-        if ($comment["InsertUserID"] !== $this->getSession()->UserID) {
-            $discussion = $this->discussionByID($comment["DiscussionID"]);
-            $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $discussion["CategoryID"]);
-        }
+
+        $this->commentModel->hasViewPermission($comment["parentRecordType"], $comment["parentRecordID"]);
 
         $this->userModel->expandUsers($comment, $this->resolveExpandFields($query, ["insertUser" => "InsertUserID"]));
 
@@ -224,6 +282,10 @@ class CommentsApiController extends AbstractApiController
             $attachmentModel->joinAttachments($comment);
         }
         $comment = $this->normalizeOutput($comment, $query["expand"]);
+
+        if (ModelUtils::isExpandOption("category", $query["expand"])) {
+            $this->categoryModel->expandCategories($comment);
+        }
 
         $quoteParent = $query["quoteParent"] ?? true;
         $parentID = $comment["parentCommentID"] ?? null;
@@ -340,10 +402,9 @@ class CommentsApiController extends AbstractApiController
         $comment["Url"] = commentUrl($comment);
         $this->getEventManager()->fireFilter("commentsApiController_getFilters", $this, $comment["DiscussionID"], []);
 
-        if ($comment["InsertUserID"] !== $this->getSession()->UserID) {
-            $discussion = $this->discussionByID($comment["DiscussionID"]);
-            $this->discussionModel->categoryPermission("Vanilla.Comments.Edit", $discussion["CategoryID"]);
-        }
+        $event = new BeforeCommentPostEvent($comment["parentRecordType"], $comment["parentRecordID"]);
+        $this->getEventManager()->dispatch($event);
+        $this->commentModel->getParentHandler($comment["parentRecordType"])->hasEditPermission($comment, throw: true);
 
         $result = $out->validate($comment);
         $this->applyFormatCompatibility($result, "body", "format");
@@ -369,6 +430,7 @@ class CommentsApiController extends AbstractApiController
                         "reportMeta",
                         "countReports",
                         "warnings",
+                        "category",
                     ]),
                     "quoteParent:b?" => [
                         "description" => "Include the parent comment in the quote data.",
@@ -387,6 +449,7 @@ class CommentsApiController extends AbstractApiController
     {
         return ApiUtils::getExpandDefinition([
             "insertUser",
+            "-insertUser",
             "-body",
             "attachments",
             "reactions",
@@ -413,7 +476,7 @@ class CommentsApiController extends AbstractApiController
 
         $in = Schema::parse([
             "parentRecordType:s" => [
-                "enum" => ["discussion", "escalation"],
+                "enum" => $this->commentModel->getParentRecordTypes(),
                 "x-filter" => true,
             ],
             "parentRecordID:i" => [
@@ -482,7 +545,13 @@ class CommentsApiController extends AbstractApiController
             ),
         ]);
 
-        $threadStructure->applyApiUrlsToHoles(\Gdn::request()->getSimpleUrl("/api/v2/comments/thread"), $query);
+        $metaExpands = Gdn::request()->getMeta("expand");
+        $requestQuery = $query;
+        if (is_array($metaExpands) && count($metaExpands)) {
+            $requestQuery["expand"] = array_merge($query["expand"] ?? [], $metaExpands);
+        }
+
+        $threadStructure->applyApiUrlsToHoles(\Gdn::request()->getSimpleUrl("/api/v2/comments/thread"), $requestQuery);
 
         $preloadIDs = $threadStructure->getPreloadCommentIDs();
         $preloadComments = $this->index([
@@ -505,7 +574,7 @@ class CommentsApiController extends AbstractApiController
                 "threadStructure" => $threadStructure,
                 "commentsByID" => $preloadComments,
             ],
-            ["paging" => $paging]
+            ["paging" => $paging, APIExpandMiddleware::META_EXTRA_ITERABLES => ["commentsByID"]]
         );
     }
 
@@ -560,7 +629,7 @@ class CommentsApiController extends AbstractApiController
                         },
                     ]),
                 "parentRecordType:s?" => [
-                    "enum" => ["discussion", "escalation"],
+                    "enum" => $this->commentModel->getParentRecordTypes(),
                     "x-filter" => true,
                 ],
                 "parentRecordID:i?" => [
@@ -623,7 +692,7 @@ class CommentsApiController extends AbstractApiController
             "comment",
             $query["expand"]
         );
-        $this->getEventManager()->fireFilter("commentsApiController_getOutSchema", $commentSchema);
+        $commentSchema = $this->getEventManager()->fireFilter("commentsApiController_getOutSchema", $commentSchema);
 
         $out = $this->schema([":a" => $commentSchema], "out");
 
@@ -805,10 +874,11 @@ class CommentsApiController extends AbstractApiController
         $commentData = ApiUtils::convertInputKeys($body);
         $commentData["CommentID"] = $id;
         $row = $this->commentByID($id);
-        $canEdit = CommentModel::canEdit($row);
-        if (!$canEdit) {
-            throw new ClientException("Editing comments is not allowed.");
-        }
+
+        $event = new BeforeCommentPostEvent($row["parentRecordType"], $row["parentRecordID"]);
+        $this->getEventManager()->dispatch($event);
+
+        $this->commentModel->getParentHandler($row["parentRecordType"])->hasEditPermission($row, throw: true);
 
         // If we are moving a comment betweend discussions we need to be able to also add comments to the new discussion.
         if (array_key_exists("DiscussionID", $commentData) && $row["DiscussionID"] !== $commentData["DiscussionID"]) {
@@ -851,10 +921,10 @@ class CommentsApiController extends AbstractApiController
         $event = new BeforeCommentPostEvent($parentRecordType, $parentRecordID);
         $this->getEventManager()->dispatch($event);
 
-        $this->validateCanPost($parentRecordType, $parentRecordID);
+        $this->commentModel->getParentHandler($parentRecordType)->hasAddPermission($parentRecordID, throw: true);
 
         if (isset($body["parentCommentID"])) {
-            if (!FeatureFlagHelper::featureEnabled("customLayout.discussionThread")) {
+            if (!FeatureFlagHelper::featureEnabled("customLayout.post")) {
                 throw new ClientException("Parent comments are not allowed without custom discussion threads.", 400);
             }
 
@@ -879,7 +949,7 @@ class CommentsApiController extends AbstractApiController
             }
 
             // Validate that we didn't exceed our maximum depth
-            $maxDepth = $this->resolveCommentMaxDepth($parentRecordID);
+            $maxDepth = $this->commentModel->resolveCommentMaxDepth($body["parentCommentID"]);
             if ($parentComment["depth"] + 1 > $maxDepth) {
                 throw new ClientException("Comment exceeds maximum depth.", 400, [
                     "maxDepth" => $maxDepth,
@@ -897,15 +967,8 @@ class CommentsApiController extends AbstractApiController
         $this->validateModel($this->commentModel);
 
         // Comments drafts should be deleted after the comment is made
-        if (isset($body["draftID"])) {
-            $draftID = $body["draftID"];
-            $draftModel = Gdn::getContainer()->get(DraftModel::class);
-            //Ensure draft exists
-            $draft = $draftModel->getID($draftID);
-            if ($draft) {
-                $draftModel->deleteID($draftID);
-                $this->validateModel($draftModel);
-            }
+        if ($draftID = $body["draftID"] ?? null) {
+            $this->contentDraftModel->deleteDraftWithPermissionCheck($draftID);
         }
 
         ModelUtils::validateSaveResultPremoderation($id, "comment");
@@ -918,152 +981,6 @@ class CommentsApiController extends AbstractApiController
 
         $result = $out->validate($row);
         return $result;
-    }
-
-    /**
-     * @param int $parentCommentID
-     * @return int
-     */
-    private function resolveCommentMaxDepth(int $parentCommentID): int
-    {
-        if (!FeatureFlagHelper::featureEnabled("customLayout.discussionThread")) {
-            // No nesting allowed.
-            return 1;
-        }
-
-        [$layoutID, $resolvedQuery] = $this->layoutViewModel->queryLayout(
-            new LayoutQuery("discussionThread", "comment", $parentCommentID)
-        );
-
-        try {
-            $layout = $this->layoutModel->selectSingle(["layoutID" => $layoutID]);
-        } catch (NoResultsException $ex) {
-            // Default layout is applied.
-            return 5;
-        }
-
-        // Now let's loop through the layout
-        $maxDepth = 1;
-        ArrayUtils::walkRecursiveArray($layout["layout"], function (array $value) use (&$maxDepth) {
-            $hydrateKey = $value["\$hydrate"] ?? null;
-            $validHydrateKeys = ["react.asset.discussionComments", "react.asset.tabbed-comment-list"];
-            if (in_array($hydrateKey, $validHydrateKeys)) {
-                // This is it.
-                $maxDepth = $value["apiParams"]["maxDepth"] ?? 5;
-            }
-        });
-
-        return $maxDepth;
-    }
-
-    /**
-     * Validate that the currently sessioned user can create a
-     *
-     * @param string $parentRecordType
-     * @param int $parentRecordID
-     *
-     * @return void
-     */
-    private function validateCanPost(string $parentRecordType, int $parentRecordID)
-    {
-        $session = $this->getSession();
-        $isGlobalMod = $session->getPermissions()->hasAny(["site.manage", "community.moderate"]);
-
-        switch ($parentRecordType) {
-            case "discussion":
-                $discussion = $this->discussionByID($parentRecordID);
-                if ($isGlobalMod) {
-                    // We only need to validate that the discussion exists.
-                    return;
-                }
-
-                $categoryID = $discussion["CategoryID"];
-                $isCategoryMod = $session
-                    ->getPermissions()
-                    ->has(
-                        "posts.moderate",
-                        $categoryID,
-                        Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION,
-                        CategoryModel::PERM_JUNCTION_TABLE
-                    );
-
-                if ($isCategoryMod) {
-                    return;
-                }
-
-                // Make sure we can view the discussion.
-                $this->permission("discussions.view", $categoryID);
-
-                if ($discussion["Closed"]) {
-                    throw new ClientException(t("This discussion has been closed."));
-                }
-                $this->permission("comments.add", $categoryID);
-
-                break;
-            case "escalation":
-                $this->escalationModel->hasViewPermission(escalationID: $parentRecordID, throw: true);
-                break;
-            default:
-                throw new ClientException("Invalid parentRecordType '$parentRecordType'");
-        }
-    }
-
-    /**
-     * Check if the user has the correct permissions to delete a comment. Throws an error if not.
-     *
-     * @param int $commentID
-     *
-     * @throws NoResultsException If the record wasn't found.
-     * @throws PermissionException If the user doesn't have permission to delete.
-     */
-    public function validateCanDelete(int $commentID)
-    {
-        $session = $this->getSession();
-        $isGlobalMod = $session->getPermissions()->hasAny(["site.manage", "community.moderate"]);
-
-        $comment = $this->commentByID($commentID);
-        $parentRecordType = $comment["parentRecordType"];
-        $parentRecordID = $comment["parentRecordID"];
-
-        switch ($parentRecordType) {
-            case "discussion":
-                $discussion = $this->discussionByID($parentRecordID);
-                if ($isGlobalMod) {
-                    // We only need to validate that the discussion exists.
-                    return;
-                }
-
-                $categoryID = $discussion["CategoryID"];
-                $isCategoryMod = $session
-                    ->getPermissions()
-                    ->has(
-                        "posts.moderate",
-                        $categoryID,
-                        Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION,
-                        CategoryModel::PERM_JUNCTION_TABLE
-                    );
-
-                if ($isCategoryMod) {
-                    return;
-                }
-
-                // Make sure we can view the discussion.
-                $this->permission("discussions.view", $categoryID);
-                $allowsSelfDelete = Gdn::config("Vanilla.Comments.AllowSelfDelete");
-                $isOwnPost = $comment["InsertUserID"] === $session->UserID;
-
-                if (!$allowsSelfDelete || !$isOwnPost) {
-                    // Either self-delete isn't allowed, or the user isn't the author.
-                    $this->permission("comments.delete", $categoryID);
-                }
-
-                break;
-            case "escalation":
-                $this->escalationModel->hasViewPermission(escalationID: $parentRecordID, throw: true);
-                break;
-            default:
-                throw new ClientException("Invalid parentRecordType '$parentRecordType'");
-        }
     }
 
     /**
@@ -1153,8 +1070,9 @@ class CommentsApiController extends AbstractApiController
         );
 
         $comment = $this->commentByID($id);
-        $discussion = $this->discussionByID($comment["DiscussionID"]);
-        $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $discussion["CategoryID"]);
+        if (!$this->commentModel->hasViewPermission($comment["parentRecordType"], $comment["parentRecordID"])) {
+            throw new PermissionException("discussions.view");
+        }
 
         $query = $in->validate($query);
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
@@ -1190,11 +1108,9 @@ class CommentsApiController extends AbstractApiController
         $out = $this->schema($this->reactionModel->getReactionSummaryFragment(), "out");
 
         $comment = $this->commentByID($id);
-        $discussion = $this->discussionByID($comment["DiscussionID"]);
-        $session = $this->getSession();
-        $this->reactionModel->canViewDiscussion($discussion, $session);
+        $this->commentModel->hasViewPermission($comment["parentRecordType"], $comment["parentRecordID"], throw: true);
         $body = $in->validate($body);
-
+        ReactionModel::checkReactionPermissions($body["reactionType"]);
         $this->reactionModel->react("Comment", $id, $body["reactionType"], null, false, ReactionModel::FORCE_ADD);
 
         // Refresh the comment to grab its updated attributes.
@@ -1237,6 +1153,7 @@ class CommentsApiController extends AbstractApiController
         $reaction = $this->reactionModel->getUserReaction($userID, "Comment", $id);
         if ($reaction) {
             $urlCode = $reaction["UrlCode"];
+            ReactionModel::checkReactionPermissions($urlCode);
             $this->reactionModel->react("Comment", $id, $urlCode, $userID, false, ReactionModel::FORCE_REMOVE);
         } else {
             new NotFoundException("Reaction");

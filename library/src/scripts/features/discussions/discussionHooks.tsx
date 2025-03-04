@@ -28,6 +28,8 @@ import { usePermissionsContext } from "@library/features/users/PermissionsContex
 import { IComment } from "@dashboard/@types/api/comment";
 import { humanizedRelativeTime } from "@library/content/DateTimeHelpers";
 import { sprintf } from "sprintf-js";
+import { useQuery } from "@tanstack/react-query";
+import apiv2 from "@library/apiv2";
 
 export const DISCUSSIONS_MAX_PAGE_COUNT = 10000;
 
@@ -52,6 +54,16 @@ export function useDiscussion(discussionID: IGetDiscussionByID["discussionID"]):
     }, [status, actions, discussionID]);
 
     return existingResult;
+}
+
+export function useDiscussionQuery(discussionID: RecordID, expand?: string[]) {
+    return useQuery({
+        queryKey: ["discussion", discussionID, expand],
+        queryFn: async () => {
+            const { data } = await apiv2.get("/discussions/" + discussionID, { params: { expand } });
+            return data;
+        },
+    });
 }
 
 export function useToggleDiscussionBookmarked(discussionID: IPutDiscussionBookmarked["discussionID"]) {
@@ -183,25 +195,21 @@ export function useDiscussionList(
     };
 }
 
-function useUserCanEditDiscussionOrComment(
-    discussion: IDiscussion,
-    comment?: IComment,
-): {
+function useUserCanEditDiscussionOrComment(resource: IDiscussion | (IComment & { closed: boolean })): {
     canEdit: boolean;
     getRemainingTime: () => number;
     cutoffTimestamp: number;
 } {
     const { hasPermission } = usePermissionsContext();
+    const currentUserID = useCurrentUserID();
 
-    const resource = comment ?? discussion;
-    const permissionName = comment ? "comments.edit" : "discussions.edit";
+    const permissionName = "commentID" in resource ? "comments.edit" : "discussions.edit";
     const permissionOptions: IPermissionOptions = {
         mode: PermissionMode.RESOURCE_IF_JUNCTION,
         resourceType: "category",
         resourceID: resource.categoryID,
     };
 
-    const currentUserID = useCurrentUserID();
     const currentUserIsAuthor = resource.insertUserID === currentUserID;
 
     const cutoffDate =
@@ -219,7 +227,7 @@ function useUserCanEditDiscussionOrComment(
         if (hasPermission("community.moderate") || hasPermission(permissionName, permissionOptions)) {
             timeUntilEditingCutoff = Infinity;
         } else {
-            if (currentUserIsAuthor && !discussion.closed) {
+            if (currentUserIsAuthor && !resource?.closed) {
                 if (cutoffDate !== null) {
                     timeUntilEditingCutoff = Math.max(0, Math.round(cutoffTimestamp - now.getTime()));
                 } else {
@@ -240,14 +248,11 @@ function useUserCanEditDiscussionOrComment(
     };
 }
 
-export function useUserCanStillEditDiscussionOrComment(
-    discussion: IDiscussion,
-    comment?: IComment,
-): {
+export function useUserCanStillEditDiscussionOrComment(resource: IDiscussion | (IComment & { closed: boolean })): {
     canStillEdit: boolean;
     humanizedRemainingTime: string;
 } {
-    const { canEdit, cutoffTimestamp, getRemainingTime } = useUserCanEditDiscussionOrComment(discussion, comment);
+    const { canEdit, cutoffTimestamp, getRemainingTime } = useUserCanEditDiscussionOrComment(resource);
     const initialRemainingTime = getRemainingTime();
     const [remainingTime, setRemainingTime] = useState<number>(initialRemainingTime);
 
@@ -422,7 +427,7 @@ export function useDiscussionByIDs(
 
     useEffect(() => {
         // If there is are any missing discussions, fetch those specific discussions
-        missingDiscussions.length > 0 && dispatch(getDiscussionByIDs({ discussionIDs: missingDiscussions }));
+        missingDiscussions.length > 0 && void dispatch(getDiscussionByIDs({ discussionIDs: missingDiscussions }));
     }, [missingDiscussions]);
 
     return discussions;

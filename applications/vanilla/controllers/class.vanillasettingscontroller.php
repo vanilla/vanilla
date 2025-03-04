@@ -16,6 +16,7 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Forum\Models\PostTypeModel;
+use Vanilla\Http\InternalClient;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
@@ -604,10 +605,10 @@ class VanillaSettingsController extends Gdn_Controller
     /**
      * Deleting a category.
      *
+     * @param int|bool $categoryID Unique ID of the category to be deleted.
      * @since 2.0.0
      * @access public
      *
-     * @param int|bool $categoryID Unique ID of the category to be deleted.
      */
     public function deleteCategory($categoryID = false)
     {
@@ -700,10 +701,10 @@ class VanillaSettingsController extends Gdn_Controller
     /**
      * Delete a category photo.
      *
+     * @param String $categoryID Unique ID of the category to have its photo deleted.
      * @since 2.1
      * @access public
      *
-     * @param String $categoryID Unique ID of the category to have its photo deleted.
      */
     public function deleteCategoryPhoto($categoryID = "")
     {
@@ -720,28 +721,67 @@ class VanillaSettingsController extends Gdn_Controller
     }
 
     /**
+     * Get group name
+     * @param $parentPostTypeID
+     * @param $allPostTypes
+     * @return mixed|string
+     */
+    private function getGroupName($parentPostTypeID, $allPostTypes)
+    {
+        $parentPostType = array_values(
+            array_filter($allPostTypes, fn($postType) => $postType["postTypeID"] === $parentPostTypeID)
+        );
+        return $parentPostType ? $parentPostType[0]["name"] : "Discussion";
+    }
+
+    /**
      * Set a category's allowed post types.
      *
-     * @return void
+     * @return array
      */
     protected function setupAllowedPostTypes(): void
     {
-        if (!\Vanilla\FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (!PostTypeModel::isPostTypesFeatureEnabled()) {
             return;
         }
-        $validPostTypes = $this->postTypeModel->getAvailablePostTypes();
+
+        // Get all available post types.
+        $availablePostTypes = \Gdn::getContainer()
+            ->get(InternalClient::class)
+            ->get("/post-types")
+            ->getBody();
+
+        // Make a list of top-level post types.
+        $nestedOptions = array_map(
+            fn($postType) => !$postType["parentPostTypeID"]
+                ? ["value" => $postType["postTypeID"], "label" => $postType["name"], "group" => $postType["name"]]
+                : [
+                    "value" => $postType["postTypeID"],
+                    "label" => $postType["name"],
+                    "group" => $this->getGroupName($postType["parentPostTypeID"], $availablePostTypes),
+                ],
+            $availablePostTypes
+        );
+
+        $categoryID = null;
+        if ($this->Category) {
+            $categoryID = $this->Category->CategoryID;
+        }
+        $postTypesByCategory = $categoryID ? $this->postTypeModel->getPostTypesByCategoryID($categoryID) : null;
         $allowedPostTypesSchema = Schema::parse([
             "hasRestrictedPostTypes:b?" => [
+                "default" => false,
                 "x-control" => SchemaForm::toggle(new FormOptions("Has Restricted Post Types")),
             ],
             "allowedPostTypeIDs:a?" => [
+                "default" => [],
                 "items" => [
                     "type" => "string",
-                    "enum" => array_column($validPostTypes, "postTypeID"),
+                    "enum" => array_column($availablePostTypes, "postTypeID"),
                 ],
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Allowed Post Types"),
-                    new StaticFormChoices(array_column($validPostTypes, "name", "postTypeID")),
+                    new StaticFormChoices($nestedOptions),
                     new FieldMatchConditional(
                         "hasRestrictedPostTypes",
                         Schema::parse([
@@ -768,12 +808,32 @@ class VanillaSettingsController extends Gdn_Controller
 
         Gdn::eventManager()->fire("VanillaSettingsController_allowedPostTypesSchema", $allowedPostTypesSchema);
 
-        $this->setData("postTypeProps.allowedPostTypeIDs", $this->Form->getValue("allowedPostTypeIDs"));
-        $this->setData("postTypeProps.formSchema", $allowedPostTypesSchema->getSchemaArray());
+        $this->setData("postTypeProps.schema", $allowedPostTypesSchema->getSchemaArray());
+
+        $instance = val("instance", $this->Data, []);
+
+        $instance = array_merge($instance, [
+            "hasRestrictedPostTypes" => false,
+            "allowedPostTypeIDs" => [],
+        ]);
+        if (!empty($postTypesByCategory)) {
+            $instance = array_merge($instance, [
+                "hasRestrictedPostTypes" => true,
+                "allowedPostTypeIDs" => array_column($postTypesByCategory, "postTypeID"),
+            ]);
+        }
+        $this->setData("postTypeProps.instance", $instance);
 
         if ($this->Form->authenticatedPostBack()) {
             try {
                 $data = $this->Form->formValues();
+                if (array_key_exists("allowedPostTypeIDs", $data)) {
+                    $decodedValues = is_string($data["allowedPostTypeIDs"])
+                        ? json_decode($data["allowedPostTypeIDs"])
+                        : $data["allowedPostTypeIDs"];
+                    $decodedAllowedPostTypes = ["allowedPostTypeIDs" => $decodedValues];
+                    $data = array_merge($data, $decodedAllowedPostTypes);
+                }
                 $validatedData = $allowedPostTypesSchema->validate($data);
                 $this->Form->setFormValue($validatedData);
             } catch (ValidationException $exception) {
@@ -808,9 +868,9 @@ class VanillaSettingsController extends Gdn_Controller
     /**
      * Editing a category.
      *
-     * @since 2.0.0
      * @param int|string $categoryID Unique ID of the category to be updated.
      * @throws Exception when category cannot be found.
+     * @since 2.0.0
      */
     public function editCategory($categoryID = "")
     {
@@ -1205,31 +1265,6 @@ class VanillaSettingsController extends Gdn_Controller
         }
 
         $this->render();
-    }
-
-    /**
-     * Enable or disable the use of categories in Vanilla.
-     *
-     * @param bool $enabled Whether or not to enable/disable categories.
-     * @throws Exception Throws an exception if accessed through an invalid post back.
-     */
-    public function enableCategories($enabled)
-    {
-        $this->permission("Garden.Settings.Manage");
-
-        if ($this->Form->authenticatedPostBack()) {
-            $enabled = (bool) $enabled;
-            saveToConfig("Vanilla.Categories.Use", $enabled);
-            $this->setData("Enabled", $enabled);
-
-            if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
-                $this->setRedirectTo("/vanilla/settings/categories");
-            }
-        } else {
-            throw forbiddenException("GET");
-        }
-
-        return $this->render("Blank", "Utility", "Dashboard");
     }
 
     /**

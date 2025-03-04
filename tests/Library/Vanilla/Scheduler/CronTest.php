@@ -127,10 +127,14 @@ class CronTest extends SchedulerTestCase
         $lock = $this->container()
             ->get(CronModel::class)
             ->createLock();
-        $this->assertTrue($lock->acquire());
+        try {
+            $this->assertTrue($lock->acquire());
 
-        // This will not run and the jobs will be abandoned.
-        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
+            // This will not run and the jobs will be abandoned.
+            $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
+        } finally {
+            $lock->release();
+        }
     }
 
     /**
@@ -258,7 +262,6 @@ class CronTest extends SchedulerTestCase
         $cronModel = $this->container()->get(CronModel::class);
         // We've tracked our last run time.
         $cronModel->trackRun(true);
-        CurrentTimeStamp::clearMockTime();
         return $time;
     }
 

@@ -13,6 +13,8 @@ import { UserSortParams, USERS_LIMIT_PER_PAGE } from "@dashboard/users/userManag
 import { IApiError, IFieldError } from "@library/@types/api/core";
 export interface IGetUsersQueryParams {
     userID?: Array<IUser["userID"]>;
+    // When fetching a user it returns a numeric `banned` field that should be interpretted as more of a `banType` field. When filtering we can only filter by banned or not banned.
+    isBanned?: boolean;
     query?: string;
     name?: string;
     email?: string;
@@ -89,7 +91,7 @@ export function useAddUser() {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries();
+            void queryClient.invalidateQueries();
         },
         onError: (error) => {
             throw error;
@@ -107,7 +109,7 @@ export function useUpdateUser(userID: IUser["userID"]) {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries();
+            void queryClient.invalidateQueries();
         },
         onError: (error) => {
             throw error;

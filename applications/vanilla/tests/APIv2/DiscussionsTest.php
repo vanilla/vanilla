@@ -9,6 +9,8 @@ namespace VanillaTests\APIv2;
 
 use CategoryModel;
 use DiscussionModel;
+use Garden\Container\ContainerException;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
@@ -24,6 +26,7 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
 use VanillaTests\SchedulerTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
+use function Symfony\Component\String\u;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -2248,7 +2251,8 @@ facilisis luctus, metus</p>";
         ]);
 
         $this->runWithUser(function () use ($personalRole) {
-            $this->expectExceptionMessage("Role 33 is personal info.");
+            $roleID = $personalRole["roleID"];
+            $this->expectExceptionMessage("Role {$roleID} is personal info.");
             $this->expectExceptionCode(400);
             $this->api()->get("/discussions", ["insertUserRoleID" => [$personalRole["roleID"]]]);
         }, $memberUser);
@@ -2277,5 +2281,179 @@ facilisis luctus, metus</p>";
             ->getBody();
         $this->assertCount(1, $discussions);
         $this->assertEquals($discussionNotInExcludedCategory["discussionID"], $discussions[0]["discussionID"]);
+    }
+
+    /**
+     * Test that regular users are not able to change the `insertUserID` of an existing discussion.
+     *
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function testPatchInsertUserIDPermission(): void
+    {
+        $this->expectExceptionMessage("Permission Problem");
+        $this->expectExceptionCode(403);
+        $discussion = $this->createDiscussion();
+
+        // Try as an admin
+        $this->api()->patch("{$this->baseUrl}/{$discussion["discussionID"]}", [
+            "insertUserID" => 42,
+        ]);
+        $discussion = $this->api()->get("{$this->baseUrl}/{$discussion["discussionID"]}");
+        $this->assertEquals(42, $discussion["insertUserID"]);
+
+        // Try as a member
+        $member = $this->createUser();
+        $this->runWithUser(function () use ($discussion) {
+            $this->api()->patch("{$this->baseUrl}/{$discussion["discussionID"]}", [
+                "insertUserID" => 1,
+            ]);
+        }, $member);
+    }
+
+    /**
+     * Test that users with `Garden.Discussions.Edit` permission can patch a discussion.
+     *
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function testPatchDiscussionPermissions(): void
+    {
+        $discussion = $this->createDiscussion();
+        $this->runWithPermissions(
+            function () use ($discussion) {
+                $this->api()->patch("{$this->baseUrl}/{$discussion["discussionID"]}", [
+                    "body" => "Edited body",
+                    "format" => "text",
+                ]);
+            },
+            [],
+            $this->categoryPermission(-1, ["discussions.edit" => true])
+        );
+
+        $discussion = $this->api()->get("{$this->baseUrl}/{$discussion["discussionID"]}");
+        $this->assertEquals("Edited body", $discussion["body"]);
+    }
+
+    /**
+     * Test reacting on a discussion without the proper permissions.
+     *
+     * @param string $reaction
+     * @param string $permission
+     * @param string $message
+     * @return void
+     * @dataProvider provideReactionPermissionData
+     */
+    public function testPostReactionNoPermission(string $reaction, string $permission, string $message): void
+    {
+        $this->expectException(ServerException::class);
+        $this->expectExceptionMessage($message);
+
+        $user = $this->createUser();
+        $this->createCategory();
+
+        $this->runWithUser(function () {
+            $this->createDiscussion();
+        }, $user);
+
+        $this->runWithPermissions(
+            function () use ($reaction) {
+                $this->api()->post("/discussions/{$this->lastInsertedDiscussionID}/reactions", [
+                    "reactionType" => $reaction,
+                ]);
+            },
+            [$permission => false],
+            [
+                "type" => "category",
+                "id" => $this->lastInsertedCategoryID,
+                "permissions" => ["discussions.view" => true],
+            ]
+        );
+    }
+
+    /**
+     * Test deleting a reaction on a discussion without the proper permissions.
+     *
+     * @param string $reaction
+     * @param string $permission
+     * @param string $message
+     * @return void
+     * @dataProvider provideReactionPermissionData
+     */
+    public function testDeleteReactionNoPermission(string $reaction, string $permission, string $message): void
+    {
+        $this->expectException(ServerException::class);
+        $this->expectExceptionMessage($message);
+        $this->createCategory();
+
+        $author = $this->createUser();
+        $this->runWithUser(function () {
+            $this->createDiscussion();
+        }, $author);
+
+        // Add a reaction as the user.
+        $role = $this->createRole(
+            ["Name" => __FUNCTION__ . $reaction],
+            [$permission => true, "session.valid" => true],
+            [
+                "type" => "category",
+                "id" => $this->lastInsertedCategoryID,
+                "permissions" => ["discussions.view" => true],
+            ]
+        );
+        $user = $this->createUser(["roleID" => $role["roleID"]]);
+        $this->runWithUser(function () use ($reaction) {
+            $this->api()->post("/discussions/{$this->lastInsertedDiscussionID}/reactions", [
+                "reactionType" => $reaction,
+            ]);
+        }, $user);
+
+        // Remove the permission
+        $this->api()->patch("roles/{$role["roleID"]}", [
+            "permissions" => [
+                [
+                    "type" => "global",
+                    "permissions" => [
+                        $permission => false,
+                        "session.valid" => true,
+                    ],
+                ],
+                [
+                    "type" => "category",
+                    "id" => $this->lastInsertedCategoryID,
+                    "permissions" => ["discussions.view" => true],
+                ],
+            ],
+        ]);
+
+        $this->runWithUser(function () use ($reaction) {
+            $this->api()->delete("/discussions/{$this->lastInsertedDiscussionID}/reactions");
+        }, $user);
+    }
+
+    /**
+     * Provide reaction data to test permissions.
+     *
+     * @return array[]
+     */
+    public static function provideReactionPermissionData(): array
+    {
+        return [
+            "positive" => [
+                "like",
+                "reactions.positive.add",
+                "You need the Reactions.Positive.Add permission to do that.",
+            ],
+            "negative" => [
+                "disagree",
+                "reactions.negative.add",
+                "You need the Reactions.Negative.Add permission to do that.",
+            ],
+            "flags" => ["abuse", "flag.add", "You need the Reactions.Flag.Add permission to do that"],
+        ];
     }
 }

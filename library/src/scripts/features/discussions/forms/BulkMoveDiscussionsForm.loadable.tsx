@@ -1,15 +1,14 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import Translate from "@library/content/Translate";
-import { IBulkActionForm } from "@library/features/discussions/BulkActionsModal";
+import { IBulkActionForm } from "@library/bulkActions/BulkActions.types";
 import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
-import { useBulkDiscussionMove, useDiscussionByIDs } from "@library/features/discussions/discussionHooks";
+import { useBulkDiscussionMove } from "@library/features/discussions/discussionHooks";
 import { bulkDiscussionsClasses } from "@library/features/discussions/forms/BulkDiscussions.classes";
-import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Checkbox from "@library/forms/Checkbox";
@@ -23,10 +22,9 @@ import FrameHeader from "@library/layout/frame/FrameHeader";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import Message from "@library/messages/Message";
 import { t } from "@library/utility/appUtils";
-import { CategoryDisplayAs } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { RecordID } from "@vanilla/utils";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { CategoryDropdown } from "@library/forms/nestedSelect/presets/CategoryDropdown";
 
 /**
  * Displays the bulk move form
@@ -42,18 +40,13 @@ export default function BulkMoveDiscussionsForm(props: IBulkActionForm) {
     // Caching IDs because checkedDiscussionIDs will change during deletion process
     const [cachedActionIDs, setCachedIDs] = useState<RecordID[]>([]);
     // State for the combobox (the category which discussions will be moved to)
-    const [moveTarget, setMoveTarget] = useState<IComboBoxOption[] | null>();
+    const [moveTarget, setMoveTarget] = useState<RecordID>();
     // State for the checkbox (if a redirect link should be left in moved discussions)
     const [addRedirects, setAddRedirects] = useState<boolean>(false);
 
-    // This state needs to hold the category ID to be used in the hook below
-    // so that we can fetch the category early to update the discussion list
-    // upon successful move
-    const targetCategoryID = moveTarget?.[0]?.value;
-
     const { isSuccess, isPending, failedDiscussions, moveSelectedDiscussions } = useBulkDiscussionMove(
         cachedActionIDs,
-        targetCategoryID,
+        moveTarget,
         addRedirects,
     );
 
@@ -73,7 +66,7 @@ export default function BulkMoveDiscussionsForm(props: IBulkActionForm) {
 
     // Reset the redirect option if target discussion is cleared
     useEffect(() => {
-        if (!moveTarget || !moveTarget.length) {
+        if (!moveTarget) {
             setAddRedirects(false);
         }
     }, [moveTarget]);
@@ -100,25 +93,24 @@ export default function BulkMoveDiscussionsForm(props: IBulkActionForm) {
                                 <Translate source={"Selected discussions have been moved successfully."} />
                             ) : (
                                 <>
-                                    <Translate
-                                        source={"Are you sure you would like to move <0/> discussions?"}
-                                        c0={cachedActionIDs.length}
-                                    />
-                                    <CommunityCategoryInput
-                                        displayAs={CategoryDisplayAs.DISCUSSIONS}
-                                        placeholder={t("Select a category")}
-                                        label={""}
-                                        onChange={(option) => {
-                                            setMoveTarget(() => (option[0] ? option : null));
+                                    <div className={classes.bottomSpace}>
+                                        <Translate
+                                            source={"Are you sure you would like to move <0/> discussions?"}
+                                            c0={cachedActionIDs.length}
+                                        />
+                                    </div>
+                                    <CategoryDropdown
+                                        onChange={(categoryID: number) => {
+                                            setMoveTarget(categoryID);
                                         }}
-                                        value={moveTarget ?? []}
-                                        maxHeight={80}
+                                        value={moveTarget}
+                                        placeholder={t("Select a category")}
                                     />
                                     <div className={classes.separatedSection}>
                                         <Checkbox
                                             className={classes.checkboxLabel}
                                             label={t("Leave a redirect link")}
-                                            disabled={!moveTarget || !moveTarget.length}
+                                            disabled={!moveTarget}
                                             checked={addRedirects}
                                             onChange={(e) => setAddRedirects(e.target.checked)}
                                         />
@@ -139,7 +131,7 @@ export default function BulkMoveDiscussionsForm(props: IBulkActionForm) {
                         </Button>
                         {!isSuccess && (
                             <Button
-                                disabled={isPending || !moveTarget || !moveTarget.length}
+                                disabled={isPending || !moveTarget}
                                 buttonType={ButtonTypes.TEXT_PRIMARY}
                                 className={classFrameFooter.actionButton}
                                 onClick={() => handleBulkMove()}

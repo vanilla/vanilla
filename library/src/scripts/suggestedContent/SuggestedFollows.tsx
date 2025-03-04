@@ -66,6 +66,7 @@ export function SuggestedFollows(props: ISuggestedFollowsProps) {
                                 emailDigestEnabled={emailEnabled}
                                 size={"compact"}
                                 categoryAsLabel
+                                categoryUrl={category.url}
                             />
                         ))}
                 </div>

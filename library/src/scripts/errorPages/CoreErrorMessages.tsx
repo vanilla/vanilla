@@ -19,7 +19,7 @@ import Paragraph from "@library/layout/Paragraph";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { t } from "@library/utility/appUtils";
 import { escapeHTML } from "@vanilla/dom-utils";
-import { debug } from "@vanilla/utils";
+import { debug, logError } from "@vanilla/utils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
 
@@ -139,6 +139,23 @@ export function getErrorCode(errorMessageProps: IErrorMessageProps) {
     } else {
         return errorMessageProps.defaultError;
     }
+}
+
+export function extractErrorMessage(throwable: unknown): string {
+    if (throwable instanceof Error) {
+        return throwable.message;
+    }
+
+    if (typeof throwable === "string") {
+        return throwable;
+    }
+
+    if (throwable && typeof throwable === "object" && "message" in throwable && typeof throwable.message === "string") {
+        return throwable.message;
+    }
+
+    logError(throwable);
+    return "Something went wrong.";
 }
 
 export interface IAPIErrorFragment {

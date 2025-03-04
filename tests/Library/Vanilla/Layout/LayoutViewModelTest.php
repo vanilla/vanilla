@@ -230,7 +230,7 @@ class LayoutViewModelTest extends SiteTestCase
         $disc2 = $this->createDiscussion();
 
         $categoryLayoutID = $this->layoutModel->insert([
-            "layoutViewType" => "discussionThread",
+            "layoutViewType" => "discussion",
             "name" => "discussionTest",
             "layout" => "test",
         ]);
@@ -238,23 +238,23 @@ class LayoutViewModelTest extends SiteTestCase
             "layoutID" => $categoryLayoutID,
             "recordID" => $cat1["categoryID"],
             "recordType" => "category",
-            "layoutViewType" => "discussionThread",
+            "layoutViewType" => "discussion",
         ]);
 
         $this->assertLayoutQueryID(
-            "discussionThread",
-            new LayoutQuery("discussionThread", "discussion", $disc2["discussionID"]),
+            "discussion",
+            new LayoutQuery("post", "discussion", $disc2["discussionID"]),
             "Failed to lookup template fallback"
         );
 
         $this->assertLayoutQueryID(
             $categoryLayoutID,
-            new LayoutQuery("discussionThread", "discussion", $disc1["discussionID"]),
+            new LayoutQuery("post", "discussion", $disc1["discussionID"]),
             "Failed category discussion lookup"
         );
 
         $globalLayoutID = $this->layoutModel->insert([
-            "layoutViewType" => "discussionThread",
+            "layoutViewType" => "discussion",
             "name" => "discussionTest",
             "layout" => "test",
         ]);
@@ -262,7 +262,7 @@ class LayoutViewModelTest extends SiteTestCase
             "layoutID" => $globalLayoutID,
             "recordID" => 1,
             "recordType" => "global",
-            "layoutViewType" => "discussionThread",
+            "layoutViewType" => "discussion",
         ]);
     }
 

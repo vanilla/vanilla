@@ -165,7 +165,7 @@ const SpoilerElement = (props: PlateRenderElementProps<any, TCodeBlockElement>) 
                 <button className="iconButton button-spoiler" disabled>
                     <span className="spoiler-warning">
                         <span className="spoiler-warningMain">
-                            <Icon icon="editor-eye-slash" className="spoiler-icon" />
+                            <Icon icon="hide-content" className="spoiler-icon" />
                             <span className="spoiler-warningLabel">{t("Spoiler Warning")}</span>
                         </span>
                     </span>

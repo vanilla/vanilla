@@ -3,11 +3,12 @@
 namespace CivilTongueEx\Library\Processor;
 
 use CivilTongueEx\Library\ContentFilter;
+use Gdn;
 use Vanilla\Formatting\Html\DomUtils;
 use Vanilla\Formatting\Html\HtmlDocument;
-use Vanilla\Formatting\Html\Processor\HtmlProcessor;
 use Vanilla\Formatting\Html\Processor\HtmlProcessorTrait;
 use Vanilla\Formatting\SanitizeInterface;
+use Vanilla\Utility\ModelUtils;
 
 class CivilTongueProcessor implements SanitizeInterface
 {
@@ -31,10 +32,16 @@ class CivilTongueProcessor implements SanitizeInterface
      */
     public function sanitizeHtml(HtmlDocument $document): HtmlDocument
     {
-        $dom = $document->getDom();
-        $content = $this->contentFilter->replace($document->getInnerHtml());
-        DomUtils::setInnerHTML($dom->getElementsByTagName("body")[0], $content);
+        $meta = Gdn::request()->getMetaArray();
+        if (isset($meta["expand"]) && ModelUtils::isExpandOption("crawl", $meta["expand"])) {
+            return $document;
+        }
 
+        $rootElement = $document->getRoot();
+        $content = $document->getInnerHtml();
+        $content = $this->contentFilter->replace($content);
+        // We need proper HTML, to be passed along here
+        DomUtils::setInnerHTML($rootElement, $content);
         return $document;
     }
 

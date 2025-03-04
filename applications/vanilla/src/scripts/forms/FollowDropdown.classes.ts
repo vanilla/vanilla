@@ -93,6 +93,14 @@ export const followDropdownClasses = useThemeCache((params: IFollowClassParams) 
         width: "100%",
     });
 
+    const extraButtonMargin = css({
+        marginBottom: 8,
+    });
+
+    const viewRecordButton = css({
+        margin: "8px 0",
+    });
+
     const inset = css({
         marginLeft: 26,
     });
@@ -112,6 +120,8 @@ export const followDropdownClasses = useThemeCache((params: IFollowClassParams) 
         heading,
         checkBox,
         fullWidth,
+        extraButtonMargin,
+        viewRecordButton,
         inset,
         errorBlock,
         unClickable,

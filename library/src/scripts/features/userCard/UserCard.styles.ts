@@ -22,7 +22,11 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
     // Global for reach
     injectGlobal({
         "[data-reach-popover]": {
-            zIndex: props.zIndex ?? 1050, // Just like our modals.
+            zIndex: 1050, // Just like our modals.
+        },
+        // we don't want all the popovers appear on top on the same level if there are many, but only the last one
+        "reach-portal:last-child [data-reach-popover]": {
+            ...(props.zIndex && { zIndex: props.zIndex }),
         },
     });
 

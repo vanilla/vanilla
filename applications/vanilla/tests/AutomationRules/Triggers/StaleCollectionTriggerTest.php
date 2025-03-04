@@ -179,15 +179,13 @@ class StaleCollectionTriggerTest extends SiteTestCase
      */
     public function testStaleCollectionAutomationRule(): void
     {
+        $dateNow = CurrentTimeStamp::mockTime("2020-03-04");
+
         $collectionRecord = $this->getRecord("Stale Collection", 5);
+
         $collection = $this->createCollection($collectionRecord);
+        CurrentTimeStamp::mockTime($dateNow->modify("+ 12 hours"));
         $collectionID = $collection["collectionID"];
-        $dateNow = CurrentTimeStamp::mockTime(time());
-        // Set the dateInserted to 1 day before
-        $this->collectionRecordModel->update(
-            ["dateInserted" => $dateNow->modify("-1 day")->format(CurrentTimeStamp::MYSQL_DATE_FORMAT)],
-            ["collectionID" => $collectionID]
-        );
 
         // Create a new automation rule for stale collection
         $automationRuleRecord = $this->automationRuleRecord([

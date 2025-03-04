@@ -6,6 +6,8 @@
  */
 
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Models\LegacyModelUtils;
 use Vanilla\Models\ModelCache;
 use Vanilla\Dashboard\Models\RecordStatusModel;
@@ -214,13 +216,19 @@ class QnaModel
 
         $totalBatches = ceil($totalQuestion / $perBatch);
 
-        $currentBatch = Gdn::sql()
+        $sql = Gdn::sql()
             ->select("DiscussionID")
-            ->from("Discussion")
-            ->where([
-                "DiscussionID >" => $latestID,
-                "Type" => "Question",
-            ])
+            ->from("Discussion");
+
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            PostTypeModel::addJoin($sql, "question");
+        } else {
+            $where = ["Type" => "Question"];
+        }
+
+        $where["DiscussionID >"] = $latestID;
+        $currentBatch = $sql
+            ->where($where)
             ->orderBy("DiscussionID")
             ->limit($perBatch)
             ->get()

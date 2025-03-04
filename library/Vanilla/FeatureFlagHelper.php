@@ -17,12 +17,13 @@ class FeatureFlagHelper
      * Is a feature enabled?
      *
      * @param string $feature The config-friendly name of the feature.
+     * @param bool $default
      * @return bool
      */
-    public static function featureEnabled(string $feature): bool
+    public static function featureEnabled(string $feature, bool $default = false): bool
     {
         // We're going to enforce the root "Feature" namespace.
-        $configValue = self::c(self::featureConfigKey($feature));
+        $configValue = self::c(self::featureConfigKey($feature), $default);
         // Force a true boolean.
         $result = filter_var($configValue, FILTER_VALIDATE_BOOLEAN);
         return $result;

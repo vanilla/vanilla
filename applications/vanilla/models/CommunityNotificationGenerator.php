@@ -165,6 +165,9 @@ class CommunityNotificationGenerator implements SystemCallableInterface
             "Category",
             $categoryID,
         ]);
+
+        // Now fire an event handler to get any additional notification action to be taken.
+        $actions = Gdn::eventManager()->fireFilter("notifyNewDiscussion", $actions, $discussion, $activity);
         $actions = array_values(array_filter($actions));
 
         $finalAction = count($actions) === 1 ? $actions[0] : new LongRunnerMultiAction($actions);
@@ -261,6 +264,9 @@ class CommunityNotificationGenerator implements SystemCallableInterface
             "Category",
             $categoryID,
         ]);
+
+        // Fire a filter to add notification actions to be taken.
+        $actions = Gdn::eventManager()->fireFilter("notifyNewComment", $actions, $comment, $discussion, $activity);
         $actions = array_values(array_filter($actions));
 
         $multiAction = new LongRunnerMultiAction($actions);

@@ -11,10 +11,10 @@ import { DISCUSSIONS_MAX_PAGE_COUNT } from "@library/features/discussions/discus
 import { MetaItem } from "@library/metas/Metas";
 import DateTime from "@library/content/DateTime";
 import { AutomationRulesPreviewContentHeader } from "@dashboard/automationRules/preview/AutomationRulesPreviewContentHeader";
-import { useCommentListQuery } from "@vanilla/addon-vanilla/thread/Comments.hooks";
+import { useCommentListQuery } from "@vanilla/addon-vanilla/comments/Comments.hooks";
 import SmartLink from "@library/routing/links/SmartLink";
 import { cx } from "@emotion/css";
-import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
+import { CommentsApi } from "@vanilla/addon-vanilla/comments/CommentsApi";
 
 interface IProps {
     query: CommentsApi.IndexParams;

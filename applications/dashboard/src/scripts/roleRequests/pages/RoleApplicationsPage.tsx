@@ -201,7 +201,7 @@ function RoleRequestButtons({ roleRequest, onClick }: { roleRequest: IRoleReques
     }
 
     const handleClick = (status: RoleRequestStatus) => {
-        patchRoleRequest({ roleRequestID: roleRequest.roleRequestID, status });
+        void patchRoleRequest({ roleRequestID: roleRequest.roleRequestID, status });
         if (onClick) {
             onClick(roleRequest.roleRequestID, status);
         }

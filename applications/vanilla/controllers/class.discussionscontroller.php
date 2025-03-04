@@ -8,7 +8,9 @@
  * @since 2.0
  */
 
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Forum\Models\PostTypeModel;
 
 /**
  * Handles displaying discussions in most contexts via /discussions endpoint.
@@ -568,10 +570,17 @@ class DiscussionsController extends VanillaController
         }
 
         if (sizeof($misses)) {
-            $countData = Gdn::sql()
+            $query = Gdn::sql()
                 ->select("ForeignID, CountComments")
-                ->from("Discussion")
-                ->where("Type", "page")
+                ->from("Discussion");
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
+                $where = ["postTypeID" => "page"];
+            } else {
+                $where = ["Type" => "page"];
+            }
+
+            $countData = $query
+                ->where($where)
                 ->whereIn("ForeignID", $misses)
                 ->get()
                 ->resultArray();

@@ -31,6 +31,7 @@ export function DashboardColorPicker(props: IProps) {
                     inputClassName={cx(inputClassNames.inputText, dashboardClassNames.colorInput)}
                     swatchClassName={cx(dashboardClassNames.swatch, { [dashboardClassNames.disabled]: props.disabled })}
                     {...props}
+                    defaultBackground={props.defaultBackground ?? props.placeholder}
                 />
             </InputBlock>
         </DashboardInputWrap>

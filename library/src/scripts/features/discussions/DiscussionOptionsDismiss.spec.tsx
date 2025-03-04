@@ -10,10 +10,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionOptionsDismiss from "@library/features/discussions/DiscussionOptionsDismiss";
 import { mockAPI } from "@library/__tests__/utility";
 import { ToastProvider } from "@library/features/toaster/ToastContext";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 import { vitest } from "vitest";
 import MockAdapter from "axios-mock-adapter/types";
-import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
+import type { DiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
 
 const discussion = {
     ...DiscussionFixture.mockDiscussion,
@@ -33,13 +33,15 @@ async function renderInProvider() {
         },
     });
 
-    return render(
+    const result = render(
         <ToastProvider>
             <QueryClientProvider client={queryClient}>
                 <DiscussionOptionsDismiss discussion={discussion} onSuccess={onMutateSuccess} />
             </QueryClientProvider>
         </ToastProvider>,
     );
+    await vitest.dynamicImportSettled();
+    return result;
 }
 
 let mockAdapter: MockAdapter;
@@ -63,9 +65,7 @@ describe("DiscussionOptionsDismiss", () => {
                     ];
                 });
 
-            await act(async () => {
-                renderInProvider();
-            });
+            await renderInProvider();
 
             const button = await screen.findByText("Dismiss", { exact: false });
             await act(async () => {
@@ -95,10 +95,7 @@ describe("DiscussionOptionsDismiss", () => {
                 .onPut(`/discussions/${discussion.discussionID}/dismiss`)
                 .replyOnce(500, { message: fakeErrorMessage });
 
-            await act(async () => {
-                renderInProvider();
-            });
-
+            await renderInProvider();
             const button = await screen.findByText("Dismiss", { exact: false });
             await act(async () => {
                 fireEvent.click(button);

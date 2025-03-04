@@ -207,7 +207,7 @@ HTML
                         "action" => "/post/{$postType1["postTypeID"]}/{$category["urlcode"]}",
                         "type" => "link",
                         "id" => str_replace(" ", "-", strtolower($postType1["postButtonLabel"])),
-                        "icon" => "new-discussion",
+                        "icon" => "create-discussion",
                         "asOwnButton" => false,
                     ],
                     [
@@ -215,7 +215,7 @@ HTML
                         "action" => "/post/{$postType2["postTypeID"]}/{$category["urlcode"]}",
                         "type" => "link",
                         "id" => str_replace(" ", "-", strtolower($postType2["postButtonLabel"])),
-                        "icon" => "new-discussion",
+                        "icon" => "create-discussion",
                         "asOwnButton" => false,
                     ],
                 ]),

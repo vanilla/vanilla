@@ -9,7 +9,7 @@ namespace Vanilla\Forum\Navigation;
 use Vanilla\Contracts\RecordInterface;
 
 /**
- * An instance of a knowledge category.
+ * An instance of a forum category.
  */
 class ForumCategoryRecordType implements RecordInterface
 {

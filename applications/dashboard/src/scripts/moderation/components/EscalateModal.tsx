@@ -29,7 +29,7 @@ import { useMutation } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
 import { JSONSchemaType, JsonSchemaForm, PartialSchemaDefinition } from "@vanilla/json-schema-forms";
 import { useEffect, useMemo, useState } from "react";
-import { labelize } from "@vanilla/utils";
+import { labelize, type RecordID } from "@vanilla/utils";
 import { IApiError, IServerError } from "@library/@types/api/core";
 import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
@@ -41,8 +41,9 @@ import { css } from "@emotion/css";
 
 interface IProps {
     escalationType: "report" | "record";
-    recordType?: string;
-    record?: IDiscussion | IComment | null;
+    recordType: string;
+    recordID?: RecordID | null;
+    record?: IDiscussion | IComment | IReport | null;
     report?: IReport | null;
     isVisible: boolean;
     onClose: () => void;
@@ -150,7 +151,7 @@ const errorMessageSpacing = css({
 });
 
 export function EscalateModal(props: IProps) {
-    const { escalationType, report, record, recordType, isVisible, onClose } = props;
+    const { escalationType, report, record, recordType, recordID, isVisible, onClose } = props;
 
     const [values, setValues] = useState<EscalateForm>(initialFormValues);
     const [serverErrors, setServerErrors] = useState<IServerError | null>(null);
@@ -231,8 +232,8 @@ export function EscalateModal(props: IProps) {
                     }),
                 ...(escalationType === "record" &&
                     record && {
-                        recordID: record?.["discussionID"] ?? record?.["commentID"],
-                        recordType: recordType === "comment" ? "comment" : "discussion",
+                        recordID,
+                        recordType,
                         reportReasonIDs: escalation.reportReasonIDs,
                     }),
             };
@@ -301,7 +302,7 @@ export function EscalateModal(props: IProps) {
                         </Button>
                         <Button
                             onClick={() => {
-                                createEscalation.mutateAsync(values);
+                                createEscalation.mutate(values);
                             }}
                             buttonType={ButtonTypes.TEXT_PRIMARY}
                         >

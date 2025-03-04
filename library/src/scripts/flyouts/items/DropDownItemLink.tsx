@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -20,6 +20,7 @@ export interface IDropDownItemLink {
     lang?: string;
     isChecked?: boolean;
     isActive?: boolean;
+    isBasicLink?: boolean;
 }
 
 /**
@@ -27,20 +28,31 @@ export interface IDropDownItemLink {
  */
 export default class DropDownItemLink extends React.Component<IDropDownItemLink> {
     public render() {
-        const { children, name, className, to } = this.props;
+        const { children, name, className, to, isBasicLink } = this.props;
         const linkContents = children ? children : name;
         const classes = dropDownClasses();
+
         return (
             <DropDownItem className={classNames(className, classes.item)}>
-                <SmartLink
-                    to={to}
-                    title={name}
-                    lang={this.props.lang}
-                    className={classNames(classes.action, this.props.isActive && classes.actionActive)}
-                >
-                    {linkContents}
-                    {this.props.isChecked && <CheckCompactIcon className={classes.check} aria-hidden={true} />}
-                </SmartLink>
+                {isBasicLink ? (
+                    <a
+                        href={to as string}
+                        className={classNames(classes.action, this.props.isActive && classes.actionActive)}
+                    >
+                        {linkContents}
+                        {this.props.isChecked && <CheckCompactIcon className={classes.check} aria-hidden={true} />}
+                    </a>
+                ) : (
+                    <SmartLink
+                        to={to}
+                        title={name}
+                        lang={this.props.lang}
+                        className={classNames(classes.action, this.props.isActive && classes.actionActive)}
+                    >
+                        {linkContents}
+                        {this.props.isChecked && <CheckCompactIcon className={classes.check} aria-hidden={true} />}
+                    </SmartLink>
+                )}
             </DropDownItem>
         );
     }

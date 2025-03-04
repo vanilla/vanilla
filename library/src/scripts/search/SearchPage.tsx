@@ -86,7 +86,7 @@ export function SearchPageContent() {
     const { needsResearch } = form;
     useEffect(() => {
         if (needsResearch || (lastScope && lastScope !== scope)) {
-            search();
+            void search();
         }
     });
 
@@ -159,7 +159,7 @@ export function SearchPageContent() {
                 mainTop={
                     <>
                         <PanelWidget>
-                            <PageHeading title={t("Search")} includeBackLink={true} />
+                            <PageHeading title={t("Search")} includeBackLink={false} />
                             <ConditionalWrap
                                 condition={currentDomain.isIsolatedType}
                                 component={EmptySearchScopeProvider}

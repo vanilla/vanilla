@@ -7,6 +7,8 @@
 
 namespace VanillaTests\APIv0;
 
+use Vanilla\Dashboard\Models\ProfileFieldModel;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 
 /**
@@ -14,6 +16,7 @@ use VanillaTests\SiteTestCase;
  */
 class SmokeTest extends SiteTestCase
 {
+    use CommunityApiTestTrait;
     public static $addons = ["stubcontent"];
 
     /** @var  int */
@@ -202,13 +205,15 @@ class SmokeTest extends SiteTestCase
      */
     public function testSetPhoto()
     {
-        $this->getSession()->start($this->adminID);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $this->getSession()->start($this->adminID);
 
-        $photo = "http://example.com/u.gif";
-        $r = $this->bessy()->postJsonData("/profile/edit.json?userid=" . $this->memberID, ["Photo" => $photo]);
+            $photo = "http://example.com/u.gif";
+            $r = $this->bessy()->postJsonData("/profile/edit.json?userid=" . $this->memberID, ["Photo" => $photo]);
 
-        $dbUser = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
-        $this->assertSame($photo, $dbUser["Photo"]);
+            $dbUser = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
+            $this->assertSame($photo, $dbUser["Photo"]);
+        });
     }
 
     /**
@@ -216,13 +221,15 @@ class SmokeTest extends SiteTestCase
      */
     public function testSetInvalidPhoto()
     {
-        $this->getSession()->start($this->adminID);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $this->getSession()->start($this->adminID);
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("Invalid photo URL.");
+            $this->expectException(\Exception::class);
+            $this->expectExceptionMessage("Invalid photo URL.");
 
-        $photo = 'javascript: alert("Xss");';
-        $r = $this->bessy()->postJsonData("/profile/edit.json?userid=" . $this->memberID, ["Photo" => $photo]);
+            $photo = 'javascript: alert("Xss");';
+            $r = $this->bessy()->postJsonData("/profile/edit.json?userid=" . $this->memberID, ["Photo" => $photo]);
+        });
     }
 
     /**
@@ -230,16 +237,18 @@ class SmokeTest extends SiteTestCase
      */
     public function testSetPhotoPermission()
     {
-        $this->getSession()->start($this->memberID);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $this->getSession()->start($this->memberID);
 
-        $dbUser = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
+            $dbUser = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
 
-        $photo = "http://foo.com/bar.png";
-        $r = $this->bessy()->post("/profile/edit.json?userid=" . $this->memberID, ["Photo" => $photo]);
+            $photo = "http://foo.com/bar.png";
+            $r = $this->bessy()->post("/profile/edit.json?userid=" . $this->memberID, ["Photo" => $photo]);
 
-        $dbUser2 = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
-        $this->assertNotEquals($photo, $dbUser2["Photo"]);
-        $this->assertSame($dbUser["Photo"], $dbUser2["Photo"]);
+            $dbUser2 = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
+            $this->assertNotEquals($photo, $dbUser2["Photo"]);
+            $this->assertSame($dbUser["Photo"], $dbUser2["Photo"]);
+        });
     }
 
     /**
@@ -247,18 +256,20 @@ class SmokeTest extends SiteTestCase
      */
     public function testSetPhotoPermissionLocal()
     {
-        $this->getSession()->start($this->memberID);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $this->getSession()->start($this->memberID);
 
-        $dbUser = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
+            $dbUser = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
 
-        // This is a valid upload URL and should be allowed.
-        $photo = "userpics/679/FPNH7GFCMGBA.jpg";
-        $this->assertNotEquals($dbUser["Photo"], $photo);
-        $r = $this->bessy()->post("/profile/edit.json?userid=" . $this->memberID, ["Photo" => $photo]);
+            // This is a valid upload URL and should be allowed.
+            $photo = "userpics/679/FPNH7GFCMGBA.jpg";
+            $this->assertNotEquals($dbUser["Photo"], $photo);
+            $r = $this->bessy()->post("/profile/edit.json?userid=" . $this->memberID, ["Photo" => $photo]);
 
-        $dbUser2 = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
-        $this->assertSame($photo, $dbUser2["Photo"]);
-        $this->assertNotEquals($dbUser["Photo"], $dbUser2["Photo"]);
+            $dbUser2 = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
+            $this->assertSame($photo, $dbUser2["Photo"]);
+            $this->assertNotEquals($dbUser["Photo"], $dbUser2["Photo"]);
+        });
     }
 
     /**
@@ -321,7 +332,7 @@ class SmokeTest extends SiteTestCase
     public function testPostRestrictedDiscussion()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage("You do not have permission to post in this category.");
+        $this->expectExceptionMessage("You do not have permission to start discussions in this category");
 
         $categoryID = $this->getRestrictedCategoryID();
 
@@ -363,8 +374,7 @@ class SmokeTest extends SiteTestCase
 
         $responseBody = $this->bessy()->postJsonData("/post/discussion.json", $draft);
 
-        $draftModel = new \DraftModel();
-        $postedDraft = $draftModel->getWhere(["DraftID" => $responseBody["DraftID"]])->firstRow(DATASET_TYPE_ARRAY);
+        $postedDraft = $this->getLegacyDraft($responseBody["DraftID"]);
 
         $this->assertEquals($postedDraft["Name"], $draft["Name"]);
         $this->assertEquals($postedDraft["Body"], $draft["Body"]);
@@ -414,8 +424,7 @@ class SmokeTest extends SiteTestCase
 
         $r2 = $this->bessy()->getJsonData("drafts/delete/{$draft["DraftID"]}/$tk");
 
-        $draftModel = new \DraftModel();
-        $draft = $draftModel->getID($draft["DraftID"]);
+        $draft = $this->getLegacyDraft($draft["DraftID"]);
         $this->assertFalse($draft);
     }
 
@@ -440,9 +449,8 @@ class SmokeTest extends SiteTestCase
             "Save_Draft" => "Save Draft",
         ];
 
-        $draftModel = new \DraftModel();
         $responseBody = $this->bessy()->postJsonData("/post/editdiscussion/0/{$draft["DraftID"]}.json", $draftUpdate);
-        $modifiedDraft = $draftModel->getWhere(["DraftID" => $responseBody["DraftID"]])->firstRow(DATASET_TYPE_ARRAY);
+        $modifiedDraft = $this->getLegacyDraft($responseBody["DraftID"]);
 
         $this->assertEquals($category["Category"]["CategoryID"], $modifiedDraft["CategoryID"]);
     }
@@ -474,8 +482,7 @@ class SmokeTest extends SiteTestCase
 
         $responseBody = $this->bessy()->postJsonData("/post/comment/?discussionid={$discussionID}.json", $comment);
 
-        $draftModel = new \DraftModel();
-        $postedComment = $draftModel->getWhere(["DraftID" => $responseBody["DraftID"]])->firstRow(DATASET_TYPE_ARRAY);
+        $postedComment = $this->getLegacyDraft($responseBody["DraftID"]);
         $this->assertEquals($postedComment["DiscussionID"], $comment["DiscussionID"]);
         $this->assertEquals($postedComment["Body"], $comment["Body"]);
 

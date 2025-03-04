@@ -278,8 +278,8 @@ class CollectionsApiController extends \AbstractApiController
         // When crawling the endpoint use a more pager.
         $paging =
             $totalRecordCount === 0
-                ? ApiUtils::morePagerInfo($results, "/api/v2/collections/contents", $query, $in)
-                : ApiUtils::numberedPagerInfo($totalRecordCount, "/api/v2/collections/contents", $query, $in);
+                ? ApiUtils::morePagerInfo($results, "/api/v2/collections/contents/$locale", $query, $in)
+                : ApiUtils::numberedPagerInfo($totalRecordCount, "/api/v2/collections/contents/$locale", $query, $in);
         $pagingObject = Pagination::tryCursorPagination($paging, $query, $results, "");
         return new Data($results, $pagingObject);
     }

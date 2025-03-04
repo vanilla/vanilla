@@ -13,11 +13,11 @@ call_user_func(function () {
     [$host, $port] = explode(":", $host, 2) + ["", ""];
 
     // Whitelist to a domain. This can probably get removed at some point.
-    if (in_array($host, ["dev.vanilla.localhost"], true)) {
+    if (in_array($host, ["dev.vanilla.local"], true)) {
         // This is the default conf/config.php based install.
         define("FORCE_CACHE_PREFIX", "dev-vanilla-localhost");
         return;
-    } elseif (!in_array($host, ["vanilla.localhost", "e2e-tests.vanilla.localhost"], true)) {
+    } elseif (!in_array($host, ["vanilla.local", "e2e-tests.vanilla.local"], true)) {
         // This is a conf/{$host}.php based install.
         $configPath = PATH_ROOT . "/conf/$host.php";
         define("FORCE_CACHE_PREFIX", slugify($host));
@@ -27,7 +27,7 @@ call_user_func(function () {
     } else {
         // This domain treats the root directory as its own virtual root.
         [$root, $_] = explode("/", ltrim($_SERVER["SCRIPT_NAME"], "/"), 2) + ["", ""];
-        // Exclusion for vanilla.localhost/dev
+        // Exclusion for vanilla.local/dev
         if ($root === "dev") {
             return;
         }

@@ -9,7 +9,6 @@ import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { postTypeSettingsClasses } from "@dashboard/postTypes/pages/postTypeSettings.classes";
-import { PostTypesSettingsProvider, usePostTypesSettings } from "@dashboard/postTypes/PostTypeSettingsContext";
 import StackableTable, {
     CellRendererProps,
     StackableTableColumnsConfig,
@@ -22,7 +21,6 @@ import Heading from "@library/layout/Heading";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@library/utility/appUtils";
 import { useEffect, useMemo, useState } from "react";
-import { MemoryRouter } from "react-router";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { getIconForPostType, originalPostTypes } from "@dashboard/postTypes/utils";
 import LinkAsButton from "@library/routing/LinkAsButton";
@@ -30,19 +28,85 @@ import { CategoryListModal } from "@dashboard/postTypes/components/CategoryListM
 import { PostType } from "@dashboard/postTypes/postType.types";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { css } from "@emotion/css";
-import { usePostTypeDelete } from "@dashboard/postTypes/postType.hooks";
+import { usePostTypeDelete, usePostTypeQuery } from "@dashboard/postTypes/postType.hooks";
 import ButtonLoader from "@library/loaders/ButtonLoader";
+import apiv2 from "@library/apiv2";
+import { queryClient } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@library/features/toaster/ToastContext";
 
 interface IProps {}
 
-/**
- * @deprecated
- */
-export function PostTypeSettingsImpl(props: IProps) {
-    const { status, postTypes, postTypesByPostTypeID, toggleActive } = usePostTypesSettings();
+export function PostTypeSettings(props: IProps) {
     const postTypeDelete = usePostTypeDelete();
+    const [postTypesByPostTypeID, setPostTypesByPostTypeID] = useState<Record<PostType["postTypeID"], PostType>>({});
     const [categoriesModal, setCategoriesModal] = useState<string | null>(null);
     const [postTypeToDelete, setPostTypeToDelete] = useState<PostType["postTypeID"] | null>(null);
+
+    const { addToast } = useToast();
+
+    interface IPostTypeActiveMutationArgs {
+        postTypeID: PostType["postTypeID"];
+        isActive: boolean;
+    }
+
+    const mutatePostTypeActive = useMutation({
+        mutationFn: async (mutationArgs: IPostTypeActiveMutationArgs) => {
+            const response = await apiv2.patch<PostType[]>(`/post-types/${mutationArgs.postTypeID}`, {
+                isActive: mutationArgs.isActive,
+            });
+            return response;
+        },
+        onSuccess: () => {
+            addToast({
+                autoDismiss: true,
+                body: <>{t("Changes successfully saved")}</>,
+            });
+        },
+        onSettled: (data) => {
+            void queryClient.invalidateQueries(["postTypes"]);
+        },
+    });
+
+    // Get the value from the server
+    const postTypesQuery = usePostTypeQuery();
+    // Create our own local cache
+    const [postTypes, setPostTypes] = useState(postTypesQuery.data ?? []);
+    // When changes are made, update the local cache immediately
+    const setActive = async (postTypeID: PostType["postTypeID"], isActive: boolean) => {
+        // Make new cache state
+        setPostTypes((prev) => {
+            return prev.map((postType) => {
+                if (postType.postTypeID === postTypeID) {
+                    return {
+                        ...postType,
+                        isActive: isActive,
+                    };
+                }
+                return postType;
+            });
+        });
+        // Make the request to the server to update the changes
+        mutatePostTypeActive.mutate({
+            postTypeID,
+            isActive,
+        });
+    };
+    // When the server responds, update the local cache with the server response and
+    useEffect(() => {
+        if (postTypesQuery.data) {
+            setPostTypes(postTypesQuery.data);
+            setPostTypesByPostTypeID((prev) => {
+                const newPostTypesByPostTypeID = postTypesQuery.data?.reduce((acc, postType) => {
+                    return {
+                        ...acc,
+                        [postType.postTypeID]: postType,
+                    };
+                }, {});
+                return newPostTypesByPostTypeID ?? prev;
+            });
+        }
+    }, [postTypesQuery.data]);
 
     const classes = postTypeSettingsClasses();
 
@@ -82,13 +146,6 @@ export function PostTypeSettingsImpl(props: IProps) {
 
     function CellRenderer(props: CellRendererProps) {
         const { data, columnName, wrappedVersion } = props;
-        const enabled = data["active"];
-        const [ownEnabled, setOwnEnabled] = useState(enabled);
-        useEffect(() => {
-            if (enabled !== ownEnabled) {
-                setOwnEnabled(enabled);
-            }
-        }, [enabled]);
         switch (columnName) {
             case "post label": {
                 const postType = postTypesByPostTypeID[data["api label"]];
@@ -124,10 +181,9 @@ export function PostTypeSettingsImpl(props: IProps) {
                         <DashboardToggle
                             wrapperClassName={classes.toggleWrapper}
                             labelID={data["api label"]}
-                            enabled={ownEnabled}
-                            onChange={async (newState) => {
-                                setOwnEnabled(newState);
-                                toggleActive(data["api label"]);
+                            enabled={data["active"]}
+                            onChange={() => {
+                                void setActive(data["api label"], !data["active"]);
                             }}
                         />
                     </>
@@ -154,7 +210,7 @@ export function PostTypeSettingsImpl(props: IProps) {
                             buttonType={ButtonTypes.ICON}
                             ariaLabel={t("Edit Post Type")}
                         >
-                            <Icon icon={"data-pencil"} />
+                            <Icon icon={"edit"} />
                         </LinkAsButton>
                     </span>
                 </ToolTip>
@@ -172,7 +228,7 @@ export function PostTypeSettingsImpl(props: IProps) {
                             ariaLabel={t("Delete Post Type")}
                             disabled={originalPostTypes.includes(props.data["api label"])}
                         >
-                            <Icon icon={"data-trash"} />
+                            <Icon icon={"delete"} />
                         </Button>
                     </span>
                 </ToolTip>
@@ -217,7 +273,7 @@ export function PostTypeSettingsImpl(props: IProps) {
                         data={data}
                         headerClassNames={classes.headerClasses}
                         rowClassNames={classes.rowClasses}
-                        isLoading={status.postTypes === "loading"}
+                        isLoading={postTypesQuery.isLoading}
                         loadSize={5}
                         hiddenHeaders={["actions"]}
                         columnsConfiguration={columnsConfiguration}
@@ -239,6 +295,7 @@ export function PostTypeSettingsImpl(props: IProps) {
                 isVisible={!!categoriesModal}
                 onVisibilityChange={() => setCategoriesModal(null)}
                 postTypeID={categoriesModal}
+                postTypeName={categoriesModal ? postTypesByPostTypeID[categoriesModal]?.name : null}
             />
             <ModalConfirm
                 isVisible={!!postTypeToDelete}
@@ -263,14 +320,6 @@ export function PostTypeSettingsImpl(props: IProps) {
                 {t("Are you sure you want to delete?")}
             </ModalConfirm>
         </>
-    );
-}
-
-export function PostTypeSettings(props: IProps) {
-    return (
-        <PostTypesSettingsProvider>
-            <PostTypeSettingsImpl {...props} />
-        </PostTypesSettingsProvider>
     );
 }
 

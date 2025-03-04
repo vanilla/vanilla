@@ -97,7 +97,7 @@ class ThemeFeatures implements \JsonSerializable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->allFeatures();
     }

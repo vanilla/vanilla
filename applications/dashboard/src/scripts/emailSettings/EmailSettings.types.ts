@@ -1,25 +1,54 @@
 /**
  * @author Sooraj Francis <sfrancis@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 /** Digest types */
-export interface IEmailDigestSettings {
+import { JSONSchemaType } from "@vanilla/json-schema-forms";
+
+export enum RecurrenceFrequency {
+    DAILY = "daily",
+    WEEKLY = "weekly",
+    MONTHLY = "monthly",
+}
+
+export enum RecurrenceSetPosition {
+    FIRST = "first",
+    LAST = "last",
+}
+
+export interface IEmailDigestSettingsConfigValues {
+    "emailDigest.defaultFrequency": RecurrenceFrequency;
     "emailDigest.enabled": boolean;
+    "emailDigest.dayOfWeek"?: number; //for the weekly digest
+    "emailDigest.monthly.dayOfWeek"?: number;
+    "emailDigest.monthly.setPosition"?: RecurrenceSetPosition;
+    "emailDigest.autosubscribe.enabled": boolean;
+    "emailDigest.optInTimeFrame": any;
     "emailDigest.logo": string;
-    "emailDigest.dayOfWeek": number;
     "emailDigest.postCount": number;
     "emailDigest.title": string;
     "emailDigest.includeCommunityName": boolean;
-    "emailDigest.introduction": string;
-    "emailDigest.footer": string;
-    "emailDigest.metaOptions": object; // this one serves only for the UI, it's not used in the backend and only renders a title header for metas section
+    "emailDigest.introduction": MyValue;
+    "emailDigest.footer": MyValue;
     "emailDigest.imageEnabled": boolean;
     "emailDigest.authorEnabled": boolean;
     "emailDigest.viewCountEnabled": boolean;
     "emailDigest.commentCountEnabled": boolean;
     "emailDigest.scoreCountEnabled": boolean;
+}
+
+export interface IEmailDigestSettingsFormValues
+    extends Omit<
+        IEmailDigestSettingsConfigValues,
+        "emailDigest.monthly.dayOfWeek" | "emailDigest.monthly.setPosition"
+    > {
+    "emailDigest.monthly": {
+        dayOfWeek: IEmailDigestSettingsConfigValues["emailDigest.monthly.dayOfWeek"];
+        setPosition: IEmailDigestSettingsConfigValues["emailDigest.monthly.setPosition"];
+    };
+    "emailDigest.metaOptions"?: object; // this one serves only for the UI, it's not used in the backend and only renders a title header for metas section
 }
 
 export interface ISentDigest {
@@ -32,8 +61,6 @@ export interface IEmailDigestDeliveryDates {
     scheduled: string;
     upcoming: string[];
 }
-
-/** Notification Types */
 
 import { MyValue } from "@library/vanilla-editor/typescript";
 
@@ -85,3 +112,11 @@ export interface ITestEmailPayload extends IEmailPreviewPayload {
         supportAddress: string;
     };
 }
+
+export enum IEmailDigestAdditionalSettingPosition {
+    AFTER_POST_COUNT = "afterPostCount",
+}
+
+export type IEmailDigestAdditionalSetting =
+    | Record<IEmailDigestAdditionalSettingPosition, Record<string, JSONSchemaType<any>>>
+    | {};

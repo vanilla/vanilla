@@ -45,49 +45,6 @@ class WeeklyDigestJobTest extends SiteTestCase
         $this->resetTable("userDigest");
     }
 
-    public function provideConfigDisabled(): iterable
-    {
-        yield "Email disabled" => [
-            [
-                "Garden.Digest.Enabled" => true,
-                "Garden.Email.Disabled" => true,
-            ],
-        ];
-
-        yield "Digest config disabled" => [
-            [
-                "Garden.Digest.Enabled" => true,
-                "Garden.Email.Disabled" => false,
-            ],
-        ];
-
-        yield "Feature disabled" => [
-            [
-                "Garden.Digest.Enabled" => false,
-                "Garden.Email.Disabled" => false,
-            ],
-        ];
-    }
-
-    /**
-     * Test configuration conditions that cause a digest not to be scheduled.
-     *
-     * @param array $config Configuration to run with.
-     *
-     * @dataProvider provideConfigDisabled
-     */
-    public function testConfigDisabledAbandonsDigestScheduling(array $config): void
-    {
-        $this->runWithConfig($config, function () {
-            $trackingSlip = $this->getScheduler()->addJob(ScheduleWeeklyDigestJob::class);
-            $this->assertEquals(JobExecutionStatus::abandoned(), $trackingSlip->getStatus());
-            $this->assertLog([
-                Logger::FIELD_EVENT => "weekly_digest_skip",
-            ]);
-            $this->assertNoRecordsFound("digest", []);
-        });
-    }
-
     /**
      * Test scheduling of the weekly digest emails.
      *
@@ -174,5 +131,42 @@ class WeeklyDigestJobTest extends SiteTestCase
             Logger::FIELD_EVENT => "weekly_digest_scheduled",
         ]);
         $this->assertLogMessage("Weekly digest has been scheduled");
+    }
+
+    /**
+     * Test next schedule date calculation for the weekly digest
+     *
+     * @return void
+     */
+    public function testNextScheduledDate(): void
+    {
+        $this->runWithConfig(
+            [
+                ScheduleWeeklyDigestJob::CONF_DIGEST_GENERATION_OFFSET => "-1 hours",
+                ScheduleWeeklyDigestJob::CONF_SCHEDULE_DAY_OF_WEEK => 3, // Wednesday,
+                ScheduleWeeklyDigestJob::CONF_SCHEDULE_TIME => "09:00",
+                ScheduleWeeklyDigestJob::CONF_SCHEDULE_TIME_ZONE => "America/New_York",
+            ],
+            function () {
+                CurrentTimeStamp::mockTime("2024/12/30 05:00:00"); // This is a Monday and the week day is shared with the next year.
+                $job = $this->container()->get(ScheduleWeeklyDigestJob::class);
+                $nextScheduledDate = $job->getNextScheduledDate(1);
+                //This should give back the current day's schedule time
+                $this->assertEquals("2024-12-30 14:00:00", $nextScheduledDate->format("Y-m-d H:i:s"));
+
+                $nextScheduledDate = $job->getNextScheduledDate(2);
+                //This should give back the date of the next day's schedule time
+                $this->assertEquals("2024-12-31 14:00:00", $nextScheduledDate->format("Y-m-d H:i:s"));
+
+                $nextScheduledDate = $job->getNextScheduledDate(3);
+                //This should bleed to the start of next year
+                $this->assertEquals("2025-01-01 14:00:00", $nextScheduledDate->format("Y-m-d H:i:s"));
+
+                CurrentTimeStamp::mockTime("2024/12/31 05:00:00"); // Tuesday
+                $nextScheduledDate = $job->getNextScheduledDate(1);
+                //This should give us back the first monday for the next year
+                $this->assertEquals("2025-01-06 14:00:00", $nextScheduledDate->format("Y-m-d H:i:s"));
+            }
+        );
     }
 }

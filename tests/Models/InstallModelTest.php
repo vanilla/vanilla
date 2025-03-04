@@ -7,26 +7,17 @@
 
 namespace VanillaTests\Model;
 
-use PHPUnit\Framework\TestCase;
-use VanillaTests\BootstrapTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\TestInstallModel;
 
 /**
  * Test basic Vanilla installation.
  */
-class InstallTest extends TestCase
+class InstallModelTest extends SiteTestCase
 {
-    use BootstrapTrait {
-        setupBeforeClass as private bootstrapBeforeClass;
-        teardownAfterClass as private bootstrapAfterClass;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function setUpBeforeClass(): void
+    public function setUp(): void
     {
-        self::bootstrapBeforeClass();
+        parent::setUp();
     }
 
     /**
@@ -37,8 +28,6 @@ class InstallTest extends TestCase
         /* @var TestInstallModel $installer */
         $installer = self::container()->get(TestInstallModel::class);
         $installer->uninstall();
-
-        self::bootstrapAfterClass();
     }
 
     /**

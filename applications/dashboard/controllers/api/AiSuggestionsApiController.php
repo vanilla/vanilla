@@ -121,8 +121,8 @@ class AiSuggestionsApiController extends \AbstractApiController
                 "enabled:b" => ["default" => false],
                 "name:s" => ["default" => ""],
                 "icon:s?",
-                "toneOfVoice:s" => ["enum" => self::TONES, "default" => self::TONE_FRIENDLY],
-                "levelOfTech:s" => ["enum" => self::LEVELS, "default" => self::LEVEL_LAYMAN],
+                "toneOfVoice:s?" => ["enum" => self::TONES, "default" => self::TONE_FRIENDLY],
+                "levelOfTech:s?" => ["enum" => self::LEVELS, "default" => self::LEVEL_LAYMAN],
                 "useBrEnglish:b?" => ["default" => false],
                 "sources?" => $this->suggestionSourceService->getSettingsSchema(),
             ],
@@ -159,8 +159,8 @@ class AiSuggestionsApiController extends \AbstractApiController
                 Schema::parse([
                     "name:s",
                     "icon:s?",
-                    "toneOfVoice:s" => ["enum" => self::TONES],
-                    "levelOfTech:s" => ["enum" => self::LEVELS],
+                    "toneOfVoice:s?" => ["enum" => self::TONES],
+                    "levelOfTech:s?" => ["enum" => self::LEVELS],
                     "useBrEnglish:b?" => ["default" => false],
                     "sources?" => $this->suggestionSourceService->getSettingsSchema(),
                 ])

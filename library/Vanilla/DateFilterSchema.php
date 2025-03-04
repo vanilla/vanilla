@@ -92,7 +92,7 @@ class DateFilterSchema extends Schema
      *
      * @return array Returns the schema array.
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             "type" => "string",

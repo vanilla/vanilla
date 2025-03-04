@@ -18,7 +18,9 @@ use Vanilla\Dashboard\Controllers\API\LayoutsApiController;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Http\InternalClient;
 use Vanilla\Layout\Asset\LayoutQuery;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Asset\WebAsset;
+use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\RawReduxAction;
 use Vanilla\Web\ThemedPage;
 
@@ -27,19 +29,15 @@ use Vanilla\Web\ThemedPage;
  */
 class LayoutPage extends ThemedPage
 {
-    /** @var LayoutsApiController */
-    public LayoutsApiController $layoutsApiController;
-
-    private InternalClient $internalClient;
-
     /**
      * @param LayoutsApiController $layoutsApiController
      * @param InternalClient $internalClient
      */
-    public function __construct(LayoutsApiController $layoutsApiController, InternalClient $internalClient)
-    {
-        $this->layoutsApiController = $layoutsApiController;
-        $this->internalClient = $internalClient;
+    public function __construct(
+        private LayoutsApiController $layoutsApiController,
+        private InternalClient $internalClient,
+        private SiteSectionModel $siteSectionModel
+    ) {
     }
 
     /**
@@ -65,7 +63,7 @@ class LayoutPage extends ThemedPage
     /**
      * Preload layout.
      *
-     * @param LayoutQuery $layoutFormAsset Contains all the parameters for hydration.
+     * @param LayoutQuery $layoutQuery Contains all the parameters for hydration.
      *
      * @return $this
      * @throws ClientException Client Exception.
@@ -76,9 +74,10 @@ class LayoutPage extends ThemedPage
      * @throws \Garden\Container\NotFoundException
      * @throws PermissionException
      */
-    public function preloadLayout(LayoutQuery $layoutFormAsset): self
+    public function preloadLayout(LayoutQuery $layoutQuery): self
     {
-        $query = (array) $layoutFormAsset;
+        $layoutQuery = $layoutQuery->withAdditionalParams($this->siteSectionModel->getCurrentLayoutParams());
+        $query = (array) $layoutQuery;
 
         $layoutData = $this->internalClient
             ->get("/layouts/lookup-hydrate", $query + ["includeNoScript" => true])
@@ -124,22 +123,14 @@ class LayoutPage extends ThemedPage
             $this->addLinkTag($link);
         }
 
-        $reduxActionPending = new RawReduxAction([
-            "type" => "@@layouts/lookup/pending",
-            "meta" => [
-                "arg" => $layoutFormAsset->getArgs(),
-            ],
-        ]);
-
-        $reduxAction = new RawReduxAction([
-            "type" => "@@layouts/lookup/fulfilled",
-            "payload" => $layoutData,
-            "meta" => [
-                "arg" => $layoutFormAsset->getArgs(),
-            ],
-        ]);
-        $this->addReduxAction($reduxActionPending);
-        $this->addReduxAction($reduxAction);
+        $this->addInlineScript(
+            new PhpAsJsVariable([
+                "vanillaInitialLayout" => [
+                    "query" => $query,
+                    "data" => $layoutData,
+                ],
+            ])
+        );
 
         return $this;
     }

@@ -29,6 +29,8 @@ class InterestsTest extends AbstractResourceTest
 
     private static int $counter = 0;
 
+    protected $testPagingOnIndex = false;
+
     /**
      * @inheritDoc
      */
@@ -61,7 +63,7 @@ class InterestsTest extends AbstractResourceTest
             "tagIDs" => isset($this->tag) ? [$this->tag["tagID"]] : [],
             "profileFieldMapping" => isset($this->profileField)
                 ? [
-                    $this->profileField["apiName"] => true,
+                    $this->profileField["apiName"] => [true],
                 ]
                 : [],
             "isDefault" => false,
@@ -135,7 +137,7 @@ class InterestsTest extends AbstractResourceTest
     {
         $this->expectExceptionCode(400);
         $this->expectExceptionMessage("Profile fields not found: doesNotExist");
-        $this->testPost(["profileFieldMapping" => ["doesNotExist" => true]] + $this->record());
+        $this->testPost(["profileFieldMapping" => ["doesNotExist" => [true]]] + $this->record());
     }
 
     /**
@@ -152,36 +154,38 @@ class InterestsTest extends AbstractResourceTest
     }
 
     /**
+     * Provides data for testing index filters.
+     *
+     * @return \Generator
+     */
+    public function provideIndexWithFilterTestData(): \Generator
+    {
+        yield "positive test" => [[], 1];
+
+        yield "negative tag test" => [["tagIDs" => [9000]], 0];
+        yield "negative category test" => [["categoryIDs" => [9000]], 0];
+        yield "negative profile field test" => [["profileFields" => ["doesnt-exist"]], 0];
+        yield "negative isDefault test" => [["isDefault" => true], 0];
+        yield "negative name test" => [["name" => "doesnt-exist"], 0];
+    }
+
+    /**
      * Tests the index endpoint with various filters applied.
      *
+     * @param array $filters
+     * @param int $expectedResultCount
      * @return void
+     * @dataProvider provideIndexWithFilterTestData
      */
-    public function testIndexWithFilters()
+    public function testIndexWithFilters(array $filters, int $expectedResultCount)
     {
-        $profileField = $this->createProfileField();
-        $category = $this->createCategory();
-        $tag = $this->createTag();
-        $newInterest = $this->testPost(
-            [
-                "profileFieldMapping" => [$profileField["apiName"] => true],
-                "categoryIDs" => [$category["categoryID"]],
-                "tagIDs" => [$tag["tagID"]],
-                "isDefault" => true,
-            ] + $this->record()
-        );
+        $newInterest = $this->testPost();
 
         $indexBody = $this->api()
-            ->get($this->baseUrl, [
-                "apiName" => $newInterest["apiName"],
-                "name" => $newInterest["name"],
-                "profileFields" => [$profileField["apiName"]],
-                "categoryIDs" => [$category["categoryID"]],
-                "tagIDs" => [$tag["tagID"]],
-                "isDefault" => true,
-            ])
+            ->get($this->baseUrl, $filters + ["name" => $newInterest["name"]])
             ->getBody();
 
-        $this->assertCount(1, $indexBody);
+        $this->assertCount($expectedResultCount, $indexBody);
     }
 
     /**
@@ -201,7 +205,7 @@ class InterestsTest extends AbstractResourceTest
 
         $payload = [
             "name" => $interest["name"] . "updated",
-            "profileFieldMapping" => [$profileField["apiName"] => true],
+            "profileFieldMapping" => [$profileField["apiName"] => [true]],
             "categoryIDs" => [$category["categoryID"]],
             "tagIDs" => [$tag["tagID"]],
             "isDefault" => true,
@@ -225,6 +229,9 @@ class InterestsTest extends AbstractResourceTest
             $profileField["apiName"] => true,
         ]);
 
+        // Create a discussion not in any interests. The purpose of this is to do a negative test.
+        // We should only have 1 discussion returned despite 2 created in the trending period.
+        $this->createDiscussion();
         $category = $this->createCategory();
         $discussion = $this->createDiscussion();
 
@@ -236,7 +243,7 @@ class InterestsTest extends AbstractResourceTest
         // Create interest associated with profile fields.
         $this->createInterest([
             "profileFieldMapping" => [
-                $profileField["apiName"] => true,
+                $profileField["apiName"] => [true],
             ],
             "tagIDs" => [$tag["tagID"]],
         ]);
@@ -256,6 +263,41 @@ class InterestsTest extends AbstractResourceTest
             $this->assertCount(1, $suggested["discussions"]);
             $this->assertEquals($category["categoryID"], $suggested["categories"][0]["categoryID"]);
             $this->assertEquals($discussion["discussionID"], $suggested["discussions"][0]["discussionID"]);
+        }, $user);
+    }
+
+    /**
+     * Test that if a checkbox profile field is expected to be false for an interest,
+     * then we should match users who never submitted any value for the checkbox.
+     *
+     * @return void
+     */
+    public function testGetSuggestedContentBeforeCheckboxValueSubmitted()
+    {
+        $category = $this->createCategory();
+        $profileField = $this->createProfileField(["dataType" => "boolean", "formType" => "checkbox"]);
+
+        $this->createInterest([
+            "profileFieldMapping" => [
+                $profileField["apiName"] => [false],
+            ],
+            "categoryIDs" => [$category["categoryID"]],
+        ]);
+
+        $user = $this->createUser();
+
+        $this->runWithUser(function () use ($category) {
+            $suggested = $this->api()
+                ->get($this->baseUrl . "/suggested-content", [
+                    "suggestedFollowsLimit" => 3,
+                    "suggestedContentLimit" => 3,
+                ])
+                ->getBody();
+
+            $this->assertArrayHasKey("categories", $suggested);
+
+            $this->assertCount(1, $suggested["categories"]);
+            $this->assertEquals($category["categoryID"], $suggested["categories"][0]["categoryID"]);
         }, $user);
     }
 }

@@ -10,11 +10,12 @@ import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
 import { LayoutPage } from "./LayoutPage";
 import { RouterRegistry } from "@library/Router.registry";
-import { addLayoutPaths, IPathLayoutQueryMapper } from "./LayoutPage.paths";
+import { addLayoutPaths, excludeLayoutPaths, IPathLayoutQueryMapper } from "./LayoutPage.paths";
 
 export function registerLayoutPage<T extends object>(
     path: string | string[],
     pathMapper: IPathLayoutQueryMapper<T>,
+    excludePaths?: string | string[],
     render?: (layoutQuery: ILayoutQuery<T>, page: React.ReactNode) => JSX.Element,
 ) {
     if (Array.isArray(path)) {
@@ -22,6 +23,11 @@ export function registerLayoutPage<T extends object>(
     } else {
         addLayoutPaths([path]);
     }
+
+    if (excludePaths) {
+        excludeLayoutPaths([excludePaths].flat());
+    }
+
     RouterRegistry.addRoutes([
         <Route
             key={[path].flat().join("-")}

@@ -16,7 +16,12 @@ const queryClient = new QueryClient();
 export function EscalateModal() {
     return (
         <QueryClientProvider client={queryClient}>
-            <EscalateModalComponent escalationType={"report"} isVisible={true} onClose={() => null} />
+            <EscalateModalComponent
+                recordType={"discussion"}
+                escalationType={"report"}
+                isVisible={true}
+                onClose={() => null}
+            />
         </QueryClientProvider>
     );
 }

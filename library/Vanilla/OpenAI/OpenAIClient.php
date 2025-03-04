@@ -153,7 +153,7 @@ class OpenAIClient
             "top_p" => 0.3,
             "frequency_penalty" => 0.2,
             "presence_penalty" => 0.35,
-            "max_tokens" => 400,
+            "max_tokens" => 4000,
         ];
 
         if ($model === self::MODEL_GPT4) {

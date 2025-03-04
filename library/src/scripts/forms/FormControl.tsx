@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { IControlGroupProps, IControlProps, ICustomControl, IRichEditorControl } from "@vanilla/json-schema-forms";
 import InputBlock from "@library/forms/InputBlock";
 import { TextInput } from "@library/forms/TextInput";
@@ -25,6 +25,8 @@ import { RadioGroupContext } from "@library/forms/RadioGroupContext";
 import { useIsInModal } from "@library/modal/Modal.context";
 import { AutoComplete, AutoCompleteLookupOptions } from "@vanilla/ui";
 import apiv2 from "@library/apiv2";
+import { RadioPicker } from "@library/forms/RadioPicker";
+import { NestedSelect } from "@library/forms/nestedSelect";
 
 const createOptionsFromRecord = (options?: Record<string, React.ReactNode>): IComboBoxOption[] => {
     return options
@@ -183,9 +185,38 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                     )}
                 </RadioGroupContext.Provider>
             );
+        case "select": {
+            return (
+                <NestedSelect
+                    defaultValue={control.default}
+                    multiple={control.multiple}
+                    value={value}
+                    required={required}
+                    disabled={props.disabled}
+                    isClearable={control.isClearable ?? !required}
+                    placeholder={control.placeholder}
+                    onChange={onChange}
+                    options={control.choices}
+                    optionsLookup={control.optionsLookup}
+                    createable={control.createable}
+                    createableLabel={control.createableLabel}
+                    // See note above in createOptionsFromRecord, label can technically be a ReactNode
+                    ariaLabel={
+                        typeof control.inputAriaLabel === "string"
+                            ? control.inputAriaLabel
+                            : typeof control.label === "string"
+                            ? control.label
+                            : undefined
+                    }
+                />
+            );
+        }
         case "dropDown": {
             const options = createOptionsFromRecord(control.choices.staticOptions);
             const currentValue = options.find((opt) => `${opt.value}` === `${value}`);
+            const hasValue = props.useNewDropdown
+                ? Boolean(Array.isArray(value) ? value.length : value)
+                : Boolean(currentValue);
             return (
                 <>
                     {props.useNewDropdown ? (
@@ -218,7 +249,7 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                             isClearable={!required}
                         />
                     )}
-                    {!!required && (
+                    {!!required && !hasValue && (
                         <input
                             tabIndex={-1}
                             autoComplete="off"
@@ -308,6 +339,16 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                 />
             );
         }
+        case "radioPicker":
+            return (
+                <RadioPicker
+                    value={value}
+                    onChange={onChange}
+                    options={control.options}
+                    pickerTitle={control.pickerTitle}
+                    dropdownContentsFullWidth
+                />
+            );
         case "custom": {
             return (
                 <control.component

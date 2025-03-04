@@ -1,5 +1,6 @@
 <?php
 
+use Garden\Container\Reference;
 use IPBFormatter\Formats\IPBFormat;
 use IPBFormatter\Formatter;
 use Vanilla\Contracts\Formatting\FormatInterface;

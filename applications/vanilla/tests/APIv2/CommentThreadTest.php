@@ -11,7 +11,7 @@ use CommentModel;
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Schema\ValidationException;
-use Vanilla\Forum\Widgets\DiscussionCommentsAsset;
+use Vanilla\Forum\Widgets\PostCommentThreadAsset;
 use Vanilla\Utility\ModelUtils;
 use VanillaTests\Forum\ExpectedThreadStructure;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -34,7 +34,7 @@ class CommentThreadTest extends SiteTestCase
     public function setUp(): void
     {
         $this->commentModel = $this->container()->get(CommentModel::class);
-        $this->enableFeature("customLayout.discussionThread");
+        $this->enableFeature("customLayout.post");
         parent::setUp();
     }
 
@@ -131,7 +131,7 @@ class CommentThreadTest extends SiteTestCase
         // Make sure we've made apiUrls for our holes.
         $hole = $thread["threadStructure"][1];
         $expectedUrl = url(
-            "/api/v2/comments/thread?parentRecordType=discussion&parentRecordID={$discussion["discussionID"]}&parentCommentID={$comment1["commentID"]}&sort=dateInserted&page=3&limit=1&expand%5B0%5D=body",
+            "/api/v2/comments/thread?parentRecordType=discussion&parentRecordID={$discussion["discussionID"]}&parentCommentID={$comment1["commentID"]}&sort=dateInserted&page=3&limit=1&expand%5B0%5D=insertUser&expand%5B1%5D=body",
             true
         );
         $this->assertEquals($expectedUrl, $hole["apiUrl"]);
@@ -163,7 +163,7 @@ class CommentThreadTest extends SiteTestCase
     public function testCommentExceedsMaxDepthNoCustomLayouts(): void
     {
         // Comments can't be nested because custom layouts is disabled.
-        $this->runWithConfig(["Feature.customLayout.discussionThread.Enabled" => false], function () {
+        $this->runWithConfig(["Feature.customLayout.post.Enabled" => false], function () {
             $discussion = $this->createDiscussion();
             $comment1 = $this->createComment();
             $this->expectExceptionMessage("Parent comments are not allowed without custom discussion threads.");
@@ -237,7 +237,7 @@ class CommentThreadTest extends SiteTestCase
         $this->reactComment($comment1_1_1, "like");
 
         $comments = $this->api()
-            ->get("/comments", ["discussionID" => $discussion["discussionID"]])
+            ->get("/comments", ["discussionID" => $discussion["discussionID"], "sort" => "commentID"])
             ->getBody();
         $this->assertRowsLike(
             [
@@ -258,7 +258,7 @@ class CommentThreadTest extends SiteTestCase
         // Make sure we can reverse a reaction
         $this->reactComment($comment1_1, "Undo-like");
         $comments = $this->api()
-            ->get("/comments", ["discussionID" => $discussion["discussionID"]])
+            ->get("/comments", ["discussionID" => $discussion["discussionID"], "sort" => "commentID"])
             ->getBody();
         $this->assertRowsLike(
             [
@@ -400,6 +400,7 @@ class CommentThreadTest extends SiteTestCase
         $results = $this->api()
             ->get("/comments", ["discussionID" => $this->lastInsertedDiscussionID])
             ->getBody();
+
         $this->assertEquals($childComment["body"], $results[0]["body"]);
 
         // Test for `/api/v2/comments/{id}`
@@ -420,22 +421,25 @@ class CommentThreadTest extends SiteTestCase
     public function testLegacyControllerFallback(): void
     {
         $this->createDiscussion();
+        $firstComment = $this->createComment(["body" => "Parent Comment old"]);
+        $this->createComment(["body" => "Parent Comment old1"]);
+        $this->createComment(["body" => "Parent Comment old2 to get to page 2"]);
         $parentComment = $this->createComment(["body" => "Parent Comment"]);
         $childComment = $this->createComment([
             "parentCommentID" => $parentComment["commentID"],
             "body" => "Child Comment",
         ]);
 
-        $this->runWithConfig(["Feature.customLayout.discussionThread.Enabled" => false], function () use (
-            $childComment,
+        $this->runWithConfig(["Feature.customLayout.post.Enabled" => false], function () use (
+            $firstComment,
             $parentComment
         ) {
             // Get the view to set things up.
             $view = $this->bessy()
-                ->get("/discussion/comment/{$childComment["commentID"]}")
+                ->get("/discussion/comment/{$firstComment["commentID"]}")
                 ->fetchView();
 
-            $comment = $this->commentModel->getID($childComment["commentID"]);
+            $comment = $this->commentModel->getID($firstComment["commentID"]);
             $body = formatBody($comment);
             $this->assertStringContainsString(
                 $parentComment["body"],
@@ -464,7 +468,7 @@ class CommentThreadTest extends SiteTestCase
         ]);
         $this->api()->delete("/comments/{$parentComment["commentID"]}");
 
-        $this->runWithConfig(["Feature.customLayout.discussionThread.Enabled" => false], function () use (
+        $this->runWithConfig(["Feature.customLayout.post.Enabled" => false], function () use (
             $childComment,
             $parentComment
         ) {
@@ -497,7 +501,7 @@ class CommentThreadTest extends SiteTestCase
             "body" => "Child Comment",
         ]);
 
-        $this->runWithConfig(["Feature.customLayout.discussionThread.Enabled" => false], function () use (
+        $this->runWithConfig(["Feature.customLayout.post.Enabled" => false], function () use (
             $childComment,
             $parentComment
         ) {
@@ -522,11 +526,11 @@ class CommentThreadTest extends SiteTestCase
     {
         $layout = $this->api()
             ->post("/layouts", [
-                "layoutViewType" => "discussionThread",
+                "layoutViewType" => "discussion",
                 "name" => "My custom layout",
                 "layout" => [
                     [
-                        "\$hydrate" => "react." . DiscussionCommentsAsset::getWidgetID(),
+                        "\$hydrate" => "react." . PostCommentThreadAsset::getWidgetID(),
                         "apiParams" => [
                             "maxDepth" => 2,
                         ],

@@ -5,8 +5,8 @@
  */
 
 import { registerWidgetOverviews } from "@dashboard/layout/overview/LayoutOverview";
-import TabbedCommentListAssetPreview from "@QnA/asset/TabbedCommentListAsset.preview";
+import AnswerThreadAssetPreview from "@QnA/asset/AnswerThreadAsset.preview";
 
 registerWidgetOverviews({
-    TabbedCommentListAsset: TabbedCommentListAssetPreview,
+    AnswerThreadAsset: AnswerThreadAssetPreview,
 });

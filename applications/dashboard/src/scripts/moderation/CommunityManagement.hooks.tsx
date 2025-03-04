@@ -13,18 +13,19 @@ import {
     IReport,
     PutReportReasonParams,
 } from "@dashboard/moderation/CommunityManagementTypes";
-import { usePostRevision } from "@dashboard/moderation/PostRevisionContext";
-
 import { IApiError } from "@library/@types/api/core";
+import type { IUserFragment } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
 import DateTime, { DateFormats } from "@library/content/DateTime";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useToast } from "@library/features/toaster/ToastContext";
+import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
+import { hashString } from "@vanilla/utils";
 import { AxiosResponse } from "axios";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export function useReportReasons(params?: { includeSystem?: boolean }) {
     const reasons = useQuery<any, IError, IReason[]>({
@@ -60,7 +61,7 @@ export function useReasonMutation(omitErrorToast?: boolean) {
         },
         mutationKey: ["postPatchReportReason"],
         onSuccess: () => {
-            queryClient.invalidateQueries(["reasons"]);
+            void queryClient.invalidateQueries(["reasons"]);
             toast.addToast({ body: t("Report reason changes saved."), autoDismiss: true, dismissible: true });
         },
         onError: () => {
@@ -79,7 +80,7 @@ export function useReasonsDeleteMutation() {
         },
         mutationKey: ["deleteReportReason"],
         onSuccess: () => {
-            queryClient.invalidateQueries(["reasons"]);
+            void queryClient.invalidateQueries(["reasons"]);
             toast.addToast({ body: t("Report reason deleted."), autoDismiss: true, dismissible: true });
         },
         onError: () => {
@@ -100,7 +101,7 @@ export function useReasonsSortMutation() {
         },
         mutationKey: ["sortReportReason"],
         onSuccess: () => {
-            queryClient.invalidateQueries(["reasons"]);
+            void queryClient.invalidateQueries(["reasons"]);
             toast.addToast({ body: t("Report reason order updated."), autoDismiss: true, dismissible: true });
         },
         onError: () => {
@@ -109,46 +110,111 @@ export function useReasonsSortMutation() {
     });
 }
 
-/**
- * Get select box state for revisions of the current record
- */
-export function useRevisionOptions() {
-    const { reports, activeReport, mostRecentRevision } = usePostRevision();
-
-    const options = useMemo<ISelectBoxItem[]>(() => {
-        if (mostRecentRevision) {
-            // Always present the most recent revision an option
-            let options = [
-                {
-                    value: -1,
-                    dateInserted: mostRecentRevision.dateUpdated ?? mostRecentRevision.dateInserted,
+export function useReportsQuery(recordType: string | null, recordID: string | null) {
+    return useQuery<any, IError, IReport[]>({
+        queryFn: async () => {
+            const response = await apiv2.get(`/reports`, {
+                params: {
+                    recordID,
+                    recordType,
+                    expand: "users",
                 },
-            ];
-            // Format options for select component
-            return options.map((option) => {
-                return {
-                    value: `${option.value}`,
-                    name: <DateTime type={DateFormats.EXTENDED} mode={"fixed"} timestamp={option.dateInserted} />,
-                };
+            });
+            return response.data;
+        },
+        enabled: recordType !== null && recordID !== null,
+        queryKey: ["reports", recordType, recordID],
+    });
+}
+
+export interface IPostRevisionOption {
+    value: string;
+    recordRevisionDate: string;
+    reportIDs: number[];
+    recordHtml: string;
+    recordName: string;
+    recordUser: IUserFragment;
+    placeRecordName: string;
+    placeRecordUrl: string;
+    label: React.ReactNode;
+    livePost?: IDiscussion | IComment;
+}
+
+export function isPostDiscussion(post: IDiscussion | IComment | null | undefined): post is IDiscussion {
+    return !!post && "discussionID" in post && !("commentID" in post);
+}
+
+export function usePostRevisions(reports: IReport[], livePost: IDiscussion | IComment | null) {
+    const options: IPostRevisionOption[] = useMemo(() => {
+        const options: IPostRevisionOption[] = [];
+
+        if (livePost) {
+            options.push({
+                value: "live",
+                recordRevisionDate: livePost.dateInserted,
+                recordHtml: livePost.body!,
+                recordName: livePost.name,
+                recordUser: livePost.insertUser ?? deletedUserFragment(),
+                placeRecordName: livePost.category?.name ?? "",
+                placeRecordUrl: livePost.category?.url ?? "",
+                reportIDs: [],
+                label: t("Live"),
+                livePost,
             });
         }
-        return [];
-    }, [mostRecentRevision, reports]);
 
-    const selectedOption = useMemo<ISelectBoxItem | undefined>(() => {
-        if (activeReport && options) {
-            const option = options.find((option) => option.value === `${activeReport.reportID}`);
-            return option;
-        } else if (activeReport === null && options) {
-            const option = options.find((option) => option.value === "-1");
-            return option;
+        reports.forEach((report) => {
+            const reportDate = report.dateInserted;
+
+            // Try to find an existing option for this report.
+            const existingOption = options.find((option) => option.recordHtml === report.recordHtml);
+            if (existingOption) {
+                existingOption.reportIDs.push(report.reportID);
+                if (new Date(reportDate) < new Date(existingOption.recordRevisionDate)) {
+                    existingOption.recordRevisionDate = reportDate;
+                    existingOption.label = (
+                        <DateTime timestamp={reportDate} type={DateFormats.EXTENDED} mode={"fixed"} />
+                    );
+                }
+            } else {
+                options.push({
+                    value: `reported-${hashString(report.recordHtml)}`,
+                    recordRevisionDate: reportDate,
+                    recordHtml: report.recordHtml,
+                    recordName: report.recordName,
+                    recordUser: report.recordUser ?? deletedUserFragment(),
+                    placeRecordName: report.placeRecordName,
+                    placeRecordUrl: report.placeRecordUrl,
+                    reportIDs: [report.reportID],
+                    label: <DateTime timestamp={reportDate} type={DateFormats.EXTENDED} mode={"fixed"} />,
+                });
+            }
+        });
+
+        return options;
+    }, [reports, livePost]);
+
+    const [selectedRevisionValue, setSelectedRevisionValue] = useState<string | undefined>(options[0]?.value);
+
+    useEffect(() => {
+        // Our post has been updated, so we need to update the selected revision.
+        setSelectedRevisionValue(options[0]?.value);
+    }, [livePost]);
+
+    const selectedRevision = options.find((option) => option.value === selectedRevisionValue);
+
+    function setReportRevisionActive(reportID: number) {
+        const revision = options.find((option) => option.reportIDs.includes(reportID));
+        if (revision) {
+            setSelectedRevisionValue(revision.value);
         }
-        return undefined;
-    }, [activeReport]);
+    }
 
     return {
         options,
-        selectedOption,
+        selectedRevision,
+        setSelectedRevisionValue,
+        setReportRevisionActive,
     };
 }
 
@@ -175,9 +241,10 @@ export function useEscalationMutation(escalationID?: IEscalation["escalationID"]
             return response.data;
         },
         mutationKey: ["escalationPatch", escalationID],
-        onSuccess: () => {
-            queryClient.invalidateQueries(["escalations", escalationID]);
-            queryClient.invalidateQueries(["escalations"]);
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(["escalations", escalationID]);
+            await queryClient.invalidateQueries(["escalations"]);
+            await queryClient.invalidateQueries(["livePost"]);
             toast.addToast({ body: t("Escalation Updated"), autoDismiss: true, dismissible: true });
         },
         onError: () => {
@@ -220,7 +287,7 @@ export function useEscalationCommentMutation(escalationID: IEscalation["escalati
         },
         mutationKey: ["escalationComment", escalationID],
         onSuccess: () => {
-            queryClient.invalidateQueries(["escalationComments", escalationID]);
+            void queryClient.invalidateQueries(["escalationComments", escalationID]);
         },
         onError: () => {
             toast.addToast({ body: t("Error posting comment."), dismissible: true });

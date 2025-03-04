@@ -54,6 +54,9 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase
         $this->profileFieldModel = self::container()->get(ProfileFieldModel::class);
 
         $this->createUserFixtures();
+
+        // Profile extender doesn't work with custom profile fields which is now enabled by default.
+        $this->disableFeature(ProfileFieldModel::FEATURE_FLAG);
     }
 
     /**

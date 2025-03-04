@@ -48,7 +48,7 @@ class SpawnSiteCommand extends Console\Command\Command
                         "base-path",
                         null,
                         Console\Input\InputOption::VALUE_OPTIONAL,
-                        "The base path to spawn the site in. Eg. https://vanilla.localhost/BASE_PATH"
+                        "The base path to spawn the site in. Eg. https://vanilla.local/BASE_PATH"
                     ),
                 ])
             );
@@ -67,7 +67,7 @@ class SpawnSiteCommand extends Console\Command\Command
         if (!$basePath) {
             // Prompt for it.
             $question = new Console\Question\Question(
-                "What should the base path of the site be. A base path of <info>my-path</info> will result in a site at <comment>https://vanilla.localhost/</comment><info>my-path</info>: "
+                "What should the base path of the site be. A base path of <info>my-path</info> will result in a site at <comment>https://vanilla.local/</comment><info>my-path</info>: "
             );
             $basePath = $helper->ask($input, $output, $question);
             if (!$basePath) {
@@ -81,7 +81,7 @@ class SpawnSiteCommand extends Console\Command\Command
             $existingBaseUrls[] = $site->getBaseUrl();
         }
 
-        $expectedBaseUrl = "http://vanilla.localhost/$basePath";
+        $expectedBaseUrl = "http://vanilla.local/$basePath";
         $siteAlreadyExists = in_array($expectedBaseUrl, $existingBaseUrls);
         if ($siteAlreadyExists) {
             $this->logger()->error("A site already exists at <yellow>$expectedBaseUrl</yellow>.");
@@ -115,13 +115,13 @@ class SpawnSiteCommand extends Console\Command\Command
         $this->logger()->success("Database <yellow>$dbname</yellow> created.");
 
         $this->logger()->info("Creating configuration file.");
-        $configPath = PATH_ROOT . "/conf/vanilla.localhost/$basePath.php";
+        $configPath = PATH_ROOT . "/conf/vanilla.local/$basePath.php";
         touch($configPath);
         chmod($configPath, 0777);
         $this->logger()->success("Created configuration file at <yellow>{$configPath}</yellow>");
 
         $this->logger()->info("Spawning Site");
-        $baseUrl = "http://vanilla.localhost/$basePath";
+        $baseUrl = "http://vanilla.local/$basePath";
         $httpClient = new HttpClient($baseUrl);
         $httpClient->setThrowExceptions(true);
         $httpClient->post("/dashboard/setup.json", [
@@ -144,6 +144,6 @@ class SpawnSiteCommand extends Console\Command\Command
         $this->logger()->info("Admin Email: <yellow>test@example.com</yellow>");
         $this->logger()->info("Admin Username: <yellow>admin</yellow>");
         $this->logger()->info("Admin Password: <yellow>password1234</yellow>");
-        $this->logger()->info("All emails will be sent to <yellow>http://mail.vanilla.localhost</yellow>");
+        $this->logger()->info("All emails will be sent to <yellow>http://mail.vanilla.local</yellow>");
     }
 }

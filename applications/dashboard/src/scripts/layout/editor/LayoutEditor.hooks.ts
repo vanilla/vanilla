@@ -53,7 +53,7 @@ export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutView
                 }
             } else {
                 // fetch the layout first, if necessary
-                dispatch(layoutActions.fetchLayoutJson(layoutID))
+                void dispatch(layoutActions.fetchLayoutJson(layoutID))
                     .unwrap()
                     .then((editLayout) => {
                         dispatch(
@@ -80,7 +80,7 @@ export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutView
             }
             dispatch(layoutActions.updateLayoutDraft(extra));
             const result = dispatch(layoutActions.persistLayoutDraft({ ...layoutDraft, ...extra })).unwrap();
-            queryClient.invalidateQueries(["layouts"]);
+            void queryClient.invalidateQueries(["layouts"]);
             return result;
         },
         [dispatch, layoutDraft, queryClient],

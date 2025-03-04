@@ -21,6 +21,7 @@ class Anchor extends AbstractNode
         $attributes = HtmlUtils::attributes([
             "href" => $this->getUrl(),
             "target" => $this->data["target"] ?? null,
+            "rel" => "nofollow noopener ugc",
         ]);
         return "<a $attributes>";
     }

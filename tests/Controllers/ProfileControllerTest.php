@@ -13,6 +13,7 @@ use Garden\Web\Exception\ResponseException;
 use Gdn_UserException;
 use ProfileController;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\Fixtures\TestUploader;
 use VanillaTests\SiteTestCase;
@@ -309,17 +310,19 @@ class ProfileControllerTest extends SiteTestCase
      */
     public function testProfileEdit(): void
     {
-        $userID = $this->createUserFixture(self::ROLE_MEMBER);
-        $this->getSession()->start($userID);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $userID = $this->createUserFixture(self::ROLE_MEMBER);
+            $this->getSession()->start($userID);
 
-        $page = $this->bessy()->getHtml("/profile/edit");
-        $data = $page->getFormValues();
+            $page = $this->bessy()->getHtml("/profile/edit");
+            $data = $page->getFormValues();
 
-        // By default, there is not much we are allowed to edit.
-        $r = $this->bessy()->postBack(["ShowEmail" => true]);
+            // By default, there is not much we are allowed to edit.
+            $r = $this->bessy()->postBack(["ShowEmail" => true]);
 
-        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
-        $this->assertTrue((bool) $user["ShowEmail"], "The user was not updated.");
+            $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+            $this->assertTrue((bool) $user["ShowEmail"], "The user was not updated.");
+        });
     }
 
     /**
@@ -388,10 +391,12 @@ class ProfileControllerTest extends SiteTestCase
      */
     public function testProfileEditReauthenticate(): void
     {
-        $userID = $this->createUserFixture(self::ROLE_MEMBER);
-        $this->getSession()->start($userID);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $userID = $this->createUserFixture(self::ROLE_MEMBER);
+            $this->getSession()->start($userID);
 
-        $this->doProfileEditSteps(["ShowEmail" => true]);
+            $this->doProfileEditSteps(["ShowEmail" => true]);
+        });
     }
 
     /**
@@ -401,12 +406,14 @@ class ProfileControllerTest extends SiteTestCase
      */
     public function testProfileEditReauthenticateOnEmailChange(): void
     {
-        $userID = $this->createUserFixture(self::ROLE_MEMBER);
-        $this->getSession()->start($userID);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $userID = $this->createUserFixture(self::ROLE_MEMBER);
+            $this->getSession()->start($userID);
 
-        $this->doProfileEditSteps(["Email" => "changed@example.com"], [self::OPT_FORCE_REAUTHENTICATE => false]);
+            $this->doProfileEditSteps(["Email" => "changed@example.com"], [self::OPT_FORCE_REAUTHENTICATE => false]);
 
-        $page = $this->bessy()->getHtml("/profile/edit");
+            $page = $this->bessy()->getHtml("/profile/edit");
+        });
     }
 
     /**
@@ -416,16 +423,19 @@ class ProfileControllerTest extends SiteTestCase
      */
     public function testReauthenticatePasswordBug(): void
     {
-        $this->runWithConfig(["Garden.Registration.Method" => "Connect"], function () {
-            $userID = $this->createUserFixture(self::ROLE_MEMBER);
-            $pw = new VbulletinPassword();
-            $hash = $pw->hash("test");
-            $this->userModel->setField($userID, ["Password" => $hash, "HashMethod" => "vbulletin"]);
+        $this->runWithConfig(
+            [ProfileFieldModel::CONFIG_FEATURE_FLAG => false, "Garden.Registration.Method" => "Connect"],
+            function () {
+                $userID = $this->createUserFixture(self::ROLE_MEMBER);
+                $pw = new VbulletinPassword();
+                $hash = $pw->hash("test");
+                $this->userModel->setField($userID, ["Password" => $hash, "HashMethod" => "vbulletin"]);
 
-            $this->getSession()->start($userID);
+                $this->getSession()->start($userID);
 
-            $this->doProfileEditSteps(["ShowEmail" => true], [self::OPT_SHOULD_REAUTHENTICATE => false]);
-        });
+                $this->doProfileEditSteps(["ShowEmail" => true], [self::OPT_SHOULD_REAUTHENTICATE => false]);
+            }
+        );
     }
 
     /**
@@ -435,15 +445,17 @@ class ProfileControllerTest extends SiteTestCase
      */
     public function testReauthenticateDifferentPasswordHash(): void
     {
-        $userID = $this->createUserFixture(self::ROLE_MEMBER);
-        $pw = new VbulletinPassword();
-        // See password value as set in SiteTestTrait's createUserFixture() function.
-        $hash = $pw->hash("test15!AVeryS3cUR3pa55W0rd");
-        $this->userModel->setField($userID, ["Password" => $hash, "HashMethod" => "vbulletin"]);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $userID = $this->createUserFixture(self::ROLE_MEMBER);
+            $pw = new VbulletinPassword();
+            // See password value as set in SiteTestTrait's createUserFixture() function.
+            $hash = $pw->hash("test15!AVeryS3cUR3pa55W0rd");
+            $this->userModel->setField($userID, ["Password" => $hash, "HashMethod" => "vbulletin"]);
 
-        $this->getSession()->start($userID);
+            $this->getSession()->start($userID);
 
-        $this->doProfileEditSteps(["ShowEmail" => true]);
+            $this->doProfileEditSteps(["ShowEmail" => true]);
+        });
     }
 
     /**
@@ -458,14 +470,16 @@ class ProfileControllerTest extends SiteTestCase
      */
     public function testReauthenticateWithDifferentUser(): void
     {
-        $adminID = $this->createUserFixture(self::ROLE_ADMIN);
-        $memberID = $this->createUserFixture(self::ROLE_MEMBER);
-        // Change the member's password to make sure it's the admin's password we are checking.
-        $this->userModel->setField($memberID, ["Password" => "foo"]);
+        $this->runWithConfig([ProfileFieldModel::CONFIG_FEATURE_FLAG => false], function () {
+            $adminID = $this->createUserFixture(self::ROLE_ADMIN);
+            $memberID = $this->createUserFixture(self::ROLE_MEMBER);
+            // Change the member's password to make sure it's the admin's password we are checking.
+            $this->userModel->setField($memberID, ["Password" => "foo"]);
 
-        $this->getSession()->start($adminID);
+            $this->getSession()->start($adminID);
 
-        $this->doProfileEditSteps(["ShowEmail" => true], [self::OPT_USER_ID => $memberID]);
+            $this->doProfileEditSteps(["ShowEmail" => true], [self::OPT_USER_ID => $memberID]);
+        });
     }
 
     /**

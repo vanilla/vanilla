@@ -78,7 +78,7 @@ export function DiscussionListFilter(props: IProps) {
     };
 
     useEffect(() => {
-        setValues({
+        void setValues({
             type: apiParams.type ?? DEFAULT_FILTER_VALUES.type,
             tagID: apiParams.tagID ?? DEFAULT_FILTER_VALUES.tagID,
             internalStatusID: apiParams.internalStatusID ?? DEFAULT_FILTER_VALUES.internalStatusID,
@@ -96,7 +96,7 @@ export function DiscussionListFilter(props: IProps) {
                     className={classes.filterAndSortingButton}
                 >
                     {t("Filters")}
-                    <Icon icon={`search-filter-small${dirty ? "-applied" : ""}`} />
+                    <Icon icon={`filter-compact${dirty ? "-applied" : ""}`} />
                 </Button>
                 {dirty && (
                     <ToolTip label={t("Clear all filters")}>
@@ -118,7 +118,7 @@ export function DiscussionListFilter(props: IProps) {
                     onSubmit={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        submitForm();
+                        void submitForm();
                     }}
                 >
                     <Frame
@@ -128,7 +128,7 @@ export function DiscussionListFilter(props: IProps) {
                                 <SelectTypes
                                     value={values.type}
                                     onChange={(type) => {
-                                        setValues({ ...values, type });
+                                        void setValues({ ...values, type });
                                         setFilterStatus(type);
                                     }}
                                     label={t("Post Type")}

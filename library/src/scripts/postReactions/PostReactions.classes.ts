@@ -8,7 +8,6 @@ import { css } from "@emotion/css";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { media } from "@library/styles/styleShim";
 import { useThemeCache } from "@library/styles/themeCache";
 
 /**
@@ -90,6 +89,19 @@ export const postReactionsClasses = useThemeCache(() => {
         },
     });
 
+    const legacyFlagDropdownButton = css({
+        height: "auto",
+        width: "auto",
+        // replicate legacy styles
+        "&&&:hover, &&&:focus, &&&.focus-visible, &&&:active": {
+            background: "none",
+        },
+        "&&&.focus-visible": {
+            outlineStyle: "auto",
+            outlineColor: ColorsUtils.colorOut(globalVars.links.colors.default),
+        },
+    });
+
     return {
         root,
         button,
@@ -100,5 +112,6 @@ export const postReactionsClasses = useThemeCache(() => {
         tooltipTitle,
         tooltipIcon,
         tooltipUserList,
+        legacyFlagDropdownButton,
     };
 });

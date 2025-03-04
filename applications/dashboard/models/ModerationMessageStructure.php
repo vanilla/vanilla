@@ -96,7 +96,7 @@ final class ModerationMessageStructure
                     ],
                 ],
                 [
-                    "ViewType" => "discussionThread",
+                    "ViewType" => "discussion",
                     "where" => [
                         "Application" => "Vanilla",
                         "Controller" => "Discussion",

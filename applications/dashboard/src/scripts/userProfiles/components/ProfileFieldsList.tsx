@@ -255,7 +255,7 @@ function RowActions(props: RowActionProps) {
                         buttonType={ButtonTypes.ICON_COMPACT}
                         disabled={!canDelete}
                     >
-                        <Icon icon={"data-trash"} />
+                        <Icon icon={"delete"} />
                         <span className={visibility().visuallyHidden}>{t("Delete")}</span>
                     </Button>
                 </span>

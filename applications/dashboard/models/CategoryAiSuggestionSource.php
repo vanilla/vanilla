@@ -115,7 +115,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
             if ($result["recordID"] != $discussion["DiscussionID"]) {
                 $formattedResult[] = [
                     "format" => "Vanilla",
-                    "sourceIcon" => "search-discussion",
+                    "sourceIcon" => "meta-discussions",
                     "type" => $result["type"],
                     "documentID" => $result["recordID"],
                     "url" => $result["url"],

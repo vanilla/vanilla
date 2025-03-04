@@ -131,6 +131,8 @@ class ReactResolver extends AbstractDataResolver implements
                 $result['$reactTestID'] = $testID;
             }
             return $result;
+        } catch (\Throwable $t) {
+            throw $t;
         } finally {
             $span->finish();
         }

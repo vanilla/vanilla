@@ -8,6 +8,7 @@ import SectionThreeColumns from "@library/layout/ThreeColumnSection";
 import AdminTitleBar from "@dashboard/components/AdminTitleBar";
 import { userContentClasses } from "@library/content/UserContent.styles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
+import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
 
 type IProps = {
     /** The content which should be rendered in the hamburger menu on mobile */
@@ -24,6 +25,7 @@ type IProps = {
     contentClassNames?: string;
     /** Any other nodes that need to render within the container */
     children?: ReactNode;
+    secondaryBar?: ReactNode;
 } & (
     | {
           customTitleBar?: false;
@@ -74,6 +76,7 @@ export default function AdminLayout(props: IProps) {
         description,
         titleLabel,
         preTitle,
+        secondaryBar,
     } = props;
 
     const topTitleBar = useMemo(
@@ -92,6 +95,7 @@ export default function AdminLayout(props: IProps) {
                         actions={titleBarActions}
                         titleLabel={titleLabel}
                         actionsWrapperClassName={props.actionsWrapperClassName}
+                        secondaryBar={secondaryBar}
                     />
                 </>
             ),
@@ -105,7 +109,7 @@ export default function AdminLayout(props: IProps) {
     }, []);
 
     return (
-        <>
+        <ErrorBoundary>
             <AdminHeader hamburgerContent={props.adminBarHamburgerContent} activeSectionID={props.activeSectionID} />
             <div className={classes.container}>
                 <Container fullGutter className={rightPanel ? classes.adjustedContainerPadding : undefined}>
@@ -146,6 +150,6 @@ export default function AdminLayout(props: IProps) {
                     {props.children}
                 </Container>
             </div>
-        </>
+        </ErrorBoundary>
     );
 }

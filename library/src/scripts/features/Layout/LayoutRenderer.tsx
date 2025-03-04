@@ -4,11 +4,7 @@
  * @license Proprietary
  */
 
-import {
-    IHydratedLayoutSpec,
-    IHydratedLayoutWidget,
-    LayoutDevice,
-} from "@library/features/Layout/LayoutRenderer.types";
+import { IHydratedLayoutWidget, LayoutDevice } from "@library/features/Layout/LayoutRenderer.types";
 import LayoutErrorBoundary, { LayoutError } from "@library/features/Layout/LayoutErrorBoundary";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
@@ -26,6 +22,7 @@ export type IComponentWrapper<T> = React.ComponentType<IHydratedLayoutWidget<T>[
 interface IProps<T> {
     applyContexts?: boolean;
     layout: Array<IHydratedLayoutWidget<T>>;
+    contexts?: Array<IHydratedLayoutWidget<T>>;
     layoutRef?: React.Ref<HTMLDivElement>;
     allowInternalProps?: boolean;
     fallback?: React.ReactNode;
@@ -60,6 +57,23 @@ export function LayoutRenderer<T>(props: IProps<T>): React.ReactElement {
             </SectionBehaviourContext.Provider>
         );
     }
+
+    const contexts = props.contexts ?? [];
+    const componentFetcher = lookupContext.componentFetcher ?? getComponent;
+
+    for (const context of contexts) {
+        const ContextComponent = componentFetcher(context.$reactComponent);
+        if (!ContextComponent) {
+            continue;
+        }
+
+        content = (
+            <ContextComponent.Component key={context.$reactComponent} {...context.$reactProps}>
+                {content}
+            </ContextComponent.Component>
+        );
+    }
+
     return <LayoutErrorBoundary componentName="Layout">{content}</LayoutErrorBoundary>;
 }
 

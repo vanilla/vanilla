@@ -183,7 +183,7 @@ export function NumberedPager(props: INumberedPagerProps) {
                                     onClick={() => setShowJumper(true)}
                                     ariaLabel={t("Jump to a specific page")}
                                 >
-                                    <Icon icon={"navigation-skip" as IconType} />
+                                    <Icon icon={"pager-skip" as IconType} />
                                 </Button>
                             </span>
                         </ToolTip>

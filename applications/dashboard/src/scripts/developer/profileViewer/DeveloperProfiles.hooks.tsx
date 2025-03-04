@@ -72,7 +72,7 @@ export function usePatchDeveloperProfileMutation(options?: { onSuccess?: () => v
         mutationKey: ["developerProfiles", "download"],
         mutationFn: async (params: DeveloperProfilesApi.PatchParams) => {
             const details = await DeveloperProfilesApi.patch(params);
-            queryClient.invalidateQueries(["developerProfiles", "byID"]);
+            await queryClient.invalidateQueries(["developerProfiles", "byID"]);
             return details;
         },
         onSuccess(data) {

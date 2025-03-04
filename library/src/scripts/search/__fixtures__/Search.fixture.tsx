@@ -8,9 +8,9 @@ import React from "react";
 import { ISearchForm, ISearchResult, ISearchResponse, IArticlesSearchResult } from "@library/search/searchTypes";
 import { ISearchRequestQuery, ISearchSource } from "@library/search/searchTypes";
 import SearchDomain from "@library/search/SearchDomain";
-import { TypeAllIcon } from "@library/icons/searchIcons";
 import { SearchDomainLoadable } from "../SearchDomainLoadable";
 import { fn } from "@storybook/test";
+import { Icon } from "@vanilla/icons";
 
 interface IParams {
     pagination?: ISearchResponse["pagination"];
@@ -235,7 +235,7 @@ export const MOCK_SEARCH_DOMAIN = new (class MockSearchDomain extends SearchDoma
     public key = "mockSearchDomain";
     public sort = 0;
     public name = "Mock Search Domain";
-    public icon = (<TypeAllIcon />);
+    public icon = (<Icon icon="search-all" />);
     public recordTypes = [];
     public isIsolatedType = false;
     public transformFormToQuery = fn(function (form) {
@@ -249,7 +249,7 @@ export const MOCK_ASYNC_SEARCH_DOMAIN_LOADABLE = new (class MockAsyncSearchDomai
     public key = "mockAsyncSearchDomain";
     public sort = 0;
     public name = "Mock Async Search Domain";
-    public icon = (<TypeAllIcon />);
+    public icon = (<Icon icon="search-all" />);
     public recordTypes = [];
     public isIsolatedType = false;
     public transformFormToQuery = fn(function (form) {

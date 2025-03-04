@@ -82,6 +82,16 @@ class BreadcrumbWidget extends AbstractReactModule implements HydrateAwareInterf
             }
         }
 
+        // Group breadcrumbs
+        $groupID = $this->getHydrateParam("groupID");
+        if ($layoutViewType === "createPost" && $groupID) {
+            try {
+                $crumbs = $this->breadcrumbModel->getForRecord(new GenericRecord("group", $groupID));
+            } catch (\Vanilla\Navigation\BreadcrumbProviderNotFoundException $e) {
+                throw new ClientException("Unable to get breadcrumbs.");
+            }
+        }
+
         return ["children" => $crumbs];
     }
 

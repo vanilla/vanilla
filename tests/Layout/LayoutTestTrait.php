@@ -77,6 +77,10 @@ trait LayoutTestTrait
         $expected = ArrayUtils::jsonNormalizeArray($expected);
 
         $actual = $this->getLayoutService()->stripSeoHtmlFromHydratedLayout($actual);
+        // Now strip the top level contexts if we're not asserting about them.
+        if (!isset($expected["contexts"])) {
+            unset($actual["contexts"]);
+        }
         $actual = ApiUtils::jsonFilter($actual);
         $actual = ArrayUtils::jsonNormalizeArray($actual);
 

@@ -21,7 +21,7 @@ interface IProps extends React.SVGAttributes<HTMLOrSVGElement> {
 export function Icon(_props: IProps) {
     const { icon, size = "default", ...props } = _props;
     const FoundIcon = iconRegistry.getIcon(icon);
-    const coreIcon = coreIconsData[icon] ?? null;
+    const coreIcon = (window as any).__VANILLA_ICON_ATTRS__?.[icon] ?? coreIconsData[icon] ?? null;
     // Return null for FoundIcon when in test mode
     if (!FoundIcon) {
         if (coreIcon) {

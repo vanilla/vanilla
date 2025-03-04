@@ -5,6 +5,8 @@
  */
 
 use Garden\Web\Exception\ClientException;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 
 /**
  * Class QnaTypeHandler
@@ -38,7 +40,8 @@ class QnaTypeHandler extends \Vanilla\AbstractTypeHandler
         DiscussionModel $discussionModel,
         \Gdn_Session $session,
         QnAPlugin $qnAPlugin,
-        CategoryModel $categoryModel
+        CategoryModel $categoryModel,
+        private \Vanilla\Forum\Models\PostMetaModel $postMetaModel
     ) {
         $this->discussionModel = $discussionModel;
         $this->session = $session;
@@ -52,22 +55,20 @@ class QnaTypeHandler extends \Vanilla\AbstractTypeHandler
      *
      * @param array $from
      * @param string $to
+     * @param array|null $postMeta
      * @throws ClientException If category doesn't allow record type.
      */
-    public function handleTypeConversion(array $from, $to)
+    public function handleTypeConversion(array $from, $to, ?array $postMeta)
     {
         $categoryID = $from["CategoryID"] ?? null;
         $category = $this->categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
-        $allowedTypes = $category["AllowedDiscussionTypes"] ?? [];
 
-        if (in_array(self::HANDLER_TYPE, $allowedTypes) || empty($allowedTypes)) {
+        if ($this->categoryModel->isPostTypeAllowed($category, $to)) {
             $permissionCategoryID = $from["PermissionCategoryID"] ?? null;
             $this->session->checkPermission("Vanilla.Discussions.Edit", true, "Category", $permissionCategoryID);
-            $this->convertTo($from, $to);
+            $this->convertTo($from, $to, $postMeta);
         } else {
-            throw new ClientException(
-                "Category #{$categoryID} doesn't allow for " . self::HANDLER_TYPE . " type records"
-            );
+            throw new ClientException("Category #{$categoryID} doesn't allow for $to type records");
         }
     }
 
@@ -76,11 +77,12 @@ class QnaTypeHandler extends \Vanilla\AbstractTypeHandler
      *
      * @param array $record
      * @param string $to
+     * @param array|null $postMeta
      */
-    public function convertTo(array $record, string $to)
+    public function convertTo(array $record, string $to, ?array $postMeta)
     {
         $id = $record["DiscussionID"] ?? null;
-        $this->qnaPlugin->updateRecordType($id, $record, $to);
+        $this->qnaPlugin->updateRecordType($id, $record, $to, $postMeta);
     }
 
     /**
@@ -92,7 +94,6 @@ class QnaTypeHandler extends \Vanilla\AbstractTypeHandler
      */
     public function cleanUpRelatedData(array $record, string $to)
     {
-        // answer clean up not implemented.
         return true;
     }
 }

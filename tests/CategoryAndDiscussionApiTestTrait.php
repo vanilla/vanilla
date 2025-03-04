@@ -6,8 +6,17 @@
 
 namespace VanillaTests;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\ServerException;
 use Gdn;
 use TagModel;
+use Vanilla\Exception\PermissionException;
+use Vanilla\Navigation\BreadcrumbProviderNotFoundException;
 
 /**
  * Class CategoryAndDiscussionApiTestTrait
@@ -66,6 +75,16 @@ trait CategoryAndDiscussionApiTestTrait
      *
      * @param array $overrides
      * @return array
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws ClientException
+     * @throws ForbiddenException
+     * @throws HttpException
+     * @throws \Garden\Web\Exception\NotFoundException
+     * @throws ServerException
+     * @throws PermissionException
+     * @throws BreadcrumbProviderNotFoundException
      */
     public function createDiscussion(array $overrides = []): array
     {

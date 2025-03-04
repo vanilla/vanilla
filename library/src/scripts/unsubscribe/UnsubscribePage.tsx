@@ -1,6 +1,6 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -35,7 +35,7 @@ import {
 import { t } from "@library/utility/appUtils";
 import { useFormik } from "formik";
 import isEmpty from "lodash-es/isEmpty";
-import React, { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { IUnsubscribeData, IUnsubscribeToken } from "@library/unsubscribe/unsubscribePage.types";
 
@@ -77,17 +77,17 @@ export function UnsubscribePageImpl(props: IProps) {
                 ...pref,
                 enabled: newValues[pref.optionID],
             }));
-            const tmpFollowedCategory = unsubscribeData.followedCategory
+            const tmpFollowedContent = unsubscribeData.followedContent
                 ? {
-                      ...unsubscribeData.followedCategory,
-                      enabled: newValues[unsubscribeData.followedCategory.optionID],
+                      ...unsubscribeData.followedContent,
+                      enabled: newValues[unsubscribeData.followedContent.optionID],
                   }
                 : null;
 
             const newData = {
                 ...unsubscribeData,
                 preferences: tmpPreferences,
-                followedCategory: tmpFollowedCategory,
+                followedContent: tmpFollowedContent,
             } as IUnsubscribeData;
 
             await saveUnsubscribe(newData, {
@@ -104,7 +104,7 @@ export function UnsubscribePageImpl(props: IProps) {
                                     {t("You will no longer receive email notifications for")}:
                                 </p>
                                 {newData.preferences.filter(({ enabled }) => !enabled).map(({ label }) => label)}
-                                {!newData.followedCategory?.enabled && newData.followedCategory?.label}
+                                {!newData.followedContent?.enabled && newData.followedContent?.label}
                             </>
                         ),
                         error,
@@ -138,7 +138,7 @@ export function UnsubscribePageImpl(props: IProps) {
     };
 
     const fetchData = async () => {
-        getUnsubscribe(token, {
+        await getUnsubscribe(token, {
             onError: (error: IError) => {
                 setPageContent({ error });
             },
@@ -151,7 +151,7 @@ export function UnsubscribePageImpl(props: IProps) {
 
                 let title: string = "";
                 let body: ReactElement = <></>;
-                const prefLink = getPreferenceLink(data.user, data.isUnfollowCategory);
+                const prefLink = getPreferenceLink(data.user, data.isUnfollowContent);
 
                 const undoContent = (
                     <p className={classes.actions}>
@@ -193,25 +193,25 @@ export function UnsubscribePageImpl(props: IProps) {
                         </>
                     );
                 }
-                // Render Unfollow Category landing page
-                else if (data.followedCategory && data.followedCategory.preferenceName.toLowerCase() === "follow") {
+                // Render Unfollow Content landing page
+                else if (data.followedContent && data.followedContent.preferenceName.toLowerCase() === "follow") {
                     title = t("Unfollow Successful");
                     body = (
                         <>
-                            <p className={classes.infoLight}>{data.followedCategory.label}</p>
+                            <p className={classes.infoLight}>{data.followedContent.label}</p>
                             {undoContent}
                         </>
                     );
                 }
-                // Render Digest Hide Category ladning page
-                else if (data.followedCategory && data.followedCategory.preferenceName.toLowerCase() === "digest") {
+                // Render Digest Hide Content landing page
+                else if (data.followedContent && data.followedContent.preferenceName.toLowerCase() === "digest") {
                     title = t("Email Digest Preferences Updated");
                     body = (
                         <>
                             <p className={classes.infoLight}>
-                                {t("This category will no longer appear in your email digest.")}
+                                {t("This content will no longer appear in your email digest.")}
                             </p>
-                            {data.followedCategory.label}
+                            {data.followedContent.label}
                             {undoContent}
                         </>
                     );
@@ -219,19 +219,19 @@ export function UnsubscribePageImpl(props: IProps) {
                 // Render multiple reasons as checkboxes
                 else if (data.hasMultiple) {
                     const tmpSettingsList = [...data.preferences];
-                    if (data.followedCategory) {
-                        tmpSettingsList.push(data.followedCategory);
+                    if (data.followedContent) {
+                        tmpSettingsList.push(data.followedContent);
                     }
 
                     const tmpSettings = Object.fromEntries(
                         tmpSettingsList.map(({ optionID, enabled }) => [optionID, enabled]),
                     );
 
-                    setValues(tmpSettings);
+                    void setValues(tmpSettings);
 
                     const togglePreference = (event) => {
                         const { id, checked } = event.target;
-                        setFieldValue(id, checked);
+                        void setFieldValue(id, checked);
                     };
 
                     title = t("Unsubscribe");
@@ -246,7 +246,7 @@ export function UnsubscribePageImpl(props: IProps) {
                             <form
                                 onSubmit={(event) => {
                                     event.preventDefault();
-                                    submitForm();
+                                    void submitForm();
                                 }}
                                 className={classes.multipleOptions}
                             >
@@ -288,7 +288,7 @@ export function UnsubscribePageImpl(props: IProps) {
                     body = (
                         <>
                             <p className={classes.info}>{t("You will no longer receive email notifications for")}:</p>
-                            {data.followedCategory?.label ?? data.preferences[0].label}
+                            {data.followedContent?.label ?? data.preferences[0].label}
                             {undoContent}
                         </>
                     );
@@ -305,7 +305,7 @@ export function UnsubscribePageImpl(props: IProps) {
 
     useEffect(() => {
         if (token && isEmpty(unsubscribeData)) {
-            fetchData();
+            void fetchData();
         }
     }, [token]);
 
@@ -342,11 +342,11 @@ export function UnsubscribePageImpl(props: IProps) {
 
     const manageNotificationBtn = isEmpty(unsubscribeData) ? null : (
         <LinkAsButton
-            to={getPreferenceLink(unsubscribeData.user, unsubscribeData.isUnfollowCategory)}
+            to={getPreferenceLink(unsubscribeData.user, unsubscribeData.isUnfollowContent)}
             buttonType={ButtonTypes.STANDARD}
             className={classes.manageButton}
         >
-            {unsubscribeData.isUnfollowCategory ? t("Manage Followed Categories") : t("Manage All Notifications")}
+            {unsubscribeData.isUnfollowContent ? t("Manage Followed Content") : t("Manage All Notifications")}
         </LinkAsButton>
     );
 

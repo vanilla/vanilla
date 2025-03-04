@@ -7,6 +7,11 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use VanillaTests\ExpectExceptionTrait;
@@ -604,7 +609,11 @@ class EscalationsTest extends AbstractAPIv2Test
         $this->assertEquals(1, $escalation["countComments"]);
 
         // And finally we can delete the comment
-        $this->api()->delete("/comments/{$comment["commentID"]}");
+        $this->api()->deleteWithBody("/comments/list", [
+            "commentIDs" => [$comment["commentID"]],
+            "deleteMethod" => "full",
+        ]);
+
         $this->runWithExpectedExceptionCode(404, function () use ($comment) {
             $this->api()->get("/comments/{$comment["commentID"]}");
         });
@@ -646,5 +655,266 @@ class EscalationsTest extends AbstractAPIv2Test
             ],
             $comment
         );
+    }
+
+    /**
+     * Test getting escalation comments as a moderator.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testGetEscalationComment(): void
+    {
+        $this->resetTable("Comment");
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createComment();
+        $this->createEscalation($discussion, [
+            "name" => "My Escalation",
+        ]);
+        $comment = $this->createEscalationComment();
+        $moderator = $this->createUser(["roleID" => [\RoleModel::MOD_ID]]);
+
+        $this->runWithUser(function () use ($comment) {
+            $result = $this->api()
+                ->get("/comments")
+                ->getBody();
+            $this->assertEquals(
+                2,
+                count($result),
+                "The user should able to see the escalation comment when calling [GET] `/api/v2/comments`."
+            );
+
+            $result = $this->api()->get("/comments/{$comment["commentID"]}");
+            $this->assertEquals(
+                200,
+                $result->getStatusCode(),
+                "The user should able to see the escalation comment when calling [GET] `/api/v2/comments/{$comment["commentID"]}`."
+            );
+
+            $this->assertEquals($comment["commentID"], $result->getBody()["commentID"]);
+        }, $moderator);
+    }
+
+    /**
+     * Test that countComments, lastCommentUserID, and dateLastCommentUserID are accurate comment is added or removed.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testEscalationCommentData(): void
+    {
+        $this->resetTable("Comment");
+        $this->createCategory();
+        $user1 = $this->createUser(["name" => "user1", "roleID" => [\RoleModel::MOD_ID]]);
+        $user2 = $this->createUser(["name" => "user2", "roleID" => [\RoleModel::MOD_ID]]);
+
+        $discussion = $this->createDiscussion();
+        $this->createComment();
+        $escalation = $this->createEscalation($discussion, [
+            "name" => "My Escalation",
+        ]);
+        $comment1 = $this->createEscalationComment(["insertUserID" => $user1["userID"]]);
+        $comment2 = $this->createEscalationComment(["insertUserID" => $user2["userID"]]);
+
+        $escalation = $this->api()
+            ->get("/escalations/{$escalation["escalationID"]}")
+            ->getBody();
+        $this->assertEquals(2, $escalation["countComments"]);
+        $this->assertEquals($user2["userID"], $escalation["lastCommentUserID"]);
+        $this->assertEquals($comment2["commentID"], $escalation["lastCommentID"]);
+        $this->assertEquals($comment2["dateInserted"], $escalation["dateLastComment"]);
+
+        $this->api()->delete("/comments/{$comment2["commentID"]}");
+
+        $escalation = $this->api()
+            ->get("/escalations/{$escalation["escalationID"]}")
+            ->getBody();
+        $this->assertEquals(1, $escalation["countComments"]);
+        $this->assertEquals($comment1["insertUserID"], $escalation["lastCommentUserID"]);
+        $this->assertEquals($comment1["commentID"], $escalation["lastCommentID"]);
+        $this->assertEquals($comment1["dateInserted"], $escalation["dateLastComment"]);
+
+        $this->api()->delete("/comments/{$comment1["commentID"]}");
+
+        $escalation = $this->api()
+            ->get("/escalations/{$escalation["escalationID"]}")
+            ->getBody();
+        $this->assertEquals(0, $escalation["countComments"]);
+        $this->assertEquals(null, $escalation["lastCommentID"]);
+        $this->assertEquals(null, $escalation["lastCommentUserID"]);
+        $this->assertEquals(null, $escalation["dateLastComment"]);
+    }
+
+    /**
+     * Test that a user with insufficient permission is not allowed to see the escalation comments.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testGetEscalationCommentNoPermission(): void
+    {
+        $this->resetTable("Comment");
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createComment();
+        $this->createEscalation($discussion, [
+            "name" => "My Escalation",
+        ]);
+        $comment = $this->createEscalationComment();
+        $member = $this->createUser();
+
+        $this->runWithUser(function () use ($comment) {
+            // The user is not able to see when calling the index.
+            $result = $this->api()
+                ->get("/comments")
+                ->getBody();
+            $this->assertEquals(
+                1,
+                count($result),
+                "The user should not be able to see the escalation comment when calling [GET] `/api/v2/comments`."
+            );
+
+            $this->expectException(ClientException::class);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->api()->get("/comments/{$comment["commentID"]}");
+        }, $member);
+    }
+
+    /**
+     * Test creating an escalation comment as an unauthorized user.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testPostEscalationCommentNoPermission(): void
+    {
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createEscalation($discussion, [
+            "name" => "My Escalation",
+        ]);
+        $member = $this->createUser();
+
+        $this->runWithUser(function () {
+            $this->expectException(ClientException::class);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->createEscalationComment();
+        }, $member);
+    }
+
+    /**
+     * Test editing an escalation comment as an unauthorized user.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testPatchEscalationCommentNoPermission(): void
+    {
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createEscalation($discussion, [
+            "name" => "My Escalation",
+        ]);
+        $member = $this->createUser();
+        $comment = $this->createEscalationComment(["insertUserID" => $member["userID"]]);
+
+        $this->runWithUser(function () use ($comment) {
+            $this->expectException(ClientException::class);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->api()->patch("/comments/{$comment["commentID"]}", ["body" => "New Body"]);
+        }, $member);
+    }
+
+    /**
+     * Test deleting an escalation comment as an unauthorized user.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testDeleteEscalationCommentNoPermission(): void
+    {
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createEscalation($discussion, [
+            "name" => "My Escalation",
+        ]);
+        $member = $this->createUser();
+        $comment = $this->createEscalationComment(["insertUserID" => $member["userID"]]);
+
+        $this->runWithUser(function () use ($comment) {
+            $this->expectException(ClientException::class);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->api()->delete("/comments/{$comment["commentID"]}");
+        }, $member);
+    }
+
+    /**
+     * Test reacting on an escalation comment.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testReactOnEscalationComment(): void
+    {
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createEscalation($discussion, [
+            "name" => "My Escalation",
+        ]);
+        $comment = $this->createEscalationComment();
+        $this->api()->post("/comments/{$comment["commentID"]}/reactions", ["reactionType" => "like"]);
+        $result = $this->api()
+            ->get("/comments/{$comment["commentID"]}", ["expand" => "reactions"])
+            ->getBody();
+
+        $this->assertEquals(1, $result["score"]);
+        foreach ($result["reactions"] as $reaction) {
+            if ($reaction["name"] === "Like") {
+                $this->assertEquals(1, $reaction["count"]);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Test reacting on a comment without the proper permissions.
+     *
+     * @return void
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     */
+    public function testReactingNoPermission(): void
+    {
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createEscalation($discussion, [
+            "name" => "My Escalation",
+        ]);
+        $comment = $this->createEscalationComment();
+        $user = $this->createUser();
+
+        $this->runWithUser(function () use ($comment) {
+            $this->expectException(ForbiddenException::class);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->api()->post("/comments/{$comment["commentID"]}/reactions", [
+                "reactionType" => "like",
+            ]);
+        }, $user);
     }
 }

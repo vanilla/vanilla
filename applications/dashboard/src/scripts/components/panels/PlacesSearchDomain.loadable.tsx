@@ -3,9 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { t } from "@library/utility/appUtils";
-import { TypePlacesIcon } from "@library/icons/searchIcons";
 import { IPlacesSearchResult, ISearchForm } from "@library/search/searchTypes";
 import { IPlacesSearchTypes } from "@dashboard/components/panels/placesSearchTypes";
 import PlacesSearchFilterPanel from "@dashboard/components/panels/PlacesSearchFilterPanel";
@@ -13,6 +11,7 @@ import flatten from "lodash-es/flatten";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
 import { ResultMeta } from "@library/result/ResultMeta";
 import SearchDomain from "@library/search/SearchDomain";
+import { Icon } from "@vanilla/icons";
 
 export function PlacesResultMeta(props: { searchResult: Partial<IPlacesSearchResult> }) {
     const { searchResult } = props;
@@ -30,7 +29,7 @@ class PlacesSearchDomain extends SearchDomain<IPlacesSearchTypes> {
         return this.subTypes.length === 1 ? this.subTypes[0].label : t("Places");
     }
 
-    public icon = (<TypePlacesIcon />);
+    public icon = (<Icon icon={"search-places"} />);
 
     public getAllowedFields() {
         return ["name", "description", "types"];

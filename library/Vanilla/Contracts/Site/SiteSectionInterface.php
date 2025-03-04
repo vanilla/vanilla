@@ -133,7 +133,7 @@ interface SiteSectionInterface extends \JsonSerializable
     /**
      * @return string|int
      */
-    public function getLayoutRecordID();
+    public function getLayoutRecordID(): string|int;
 
     /**
      * Get a payload to apply to tracking events. This will be merged with an event payload.

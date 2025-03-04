@@ -167,7 +167,7 @@ function UserDropDownContentsImpl(props: IUserDropDownContentsProps) {
                     </Permission>
                     <DropDownItemLinkWithCount
                         to="/discussions/mine"
-                        name={t("My Discussions")}
+                        name={t("My Posts")}
                         count={getCountByName("Discussions")}
                     />
                 </DropDownSection>

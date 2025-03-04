@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ResponseException;
 
 /**
@@ -163,6 +164,12 @@ class ActivityController extends Gdn_Controller
         if ($offset < 0) {
             $offset = 0;
         }
+        $maxPage = 500;
+        $maxOffset = $maxPage * $limit - 1;
+        if ($offset >= $maxOffset) {
+            throw new ClientException("Activity can't be accessed beyond page {$maxPage}.");
+        }
+        $this->setHeader("X-Robots-Tag", "noindex");
         $totalRecords = $this->ActivityModel->getUserTotal($notifyUserID);
         PagerModule::current()->configure($offset, $limit, $totalRecords, $canonicalTemplate);
 

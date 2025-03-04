@@ -118,11 +118,7 @@ class DigestEmail extends \Gdn_Email implements LoggerAwareInterface
             $unsubscribeTextLink = $this->activityModel->getUnfollowCategoryLink($user, $categoryID);
             $mergeCode["*/unsubscribe_{$categoryID}/*"] = $unsubscribeTextLink;
         }
-
-        $html = str_replace(array_keys($mergeCode), $mergeCode, $this->getHtmlContent());
-        $this->setHtmlContent($html);
-        $text = str_replace(array_keys($mergeCode), $mergeCode, $this->getTextContent());
-        $this->setTextContent($text);
+        $this->setUnSubscribeMergeCodes(array_keys($mergeCode), $mergeCode);
     }
 
     /**
@@ -135,9 +131,21 @@ class DigestEmail extends \Gdn_Email implements LoggerAwareInterface
     {
         $mergeCode = "*/digest_unsubscribe/*";
         $unsubscribeTextLink = $this->activityModel->getUnsubscribeDigestLink($user);
-        $html = str_replace($mergeCode, $unsubscribeTextLink, $this->getHtmlContent());
+        $this->setUnSubscribeMergeCodes($mergeCode, $unsubscribeTextLink);
+    }
+
+    /**
+     * Replace merge code form digest contents with unsubscribe link
+     *
+     * @param array|string $mergeCode
+     * @param array|string $unsubscribeLink
+     * @return void
+     */
+    public function setUnSubscribeMergeCodes(array|string $mergeCode, array|string $unsubscribeLink): void
+    {
+        $html = str_replace($mergeCode, $unsubscribeLink, $this->getHtmlContent());
         $this->setHtmlContent($html);
-        $text = str_replace($mergeCode, $unsubscribeTextLink, $this->getTextContent());
+        $text = str_replace($mergeCode, $unsubscribeLink, $this->getTextContent());
         $this->setTextContent($text);
     }
 

@@ -1,0 +1,14 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="12.5" y="13.6786" width="3.75" height="8.25" rx="1.2" transform="rotate(90 12.5 13.6786)"
+        stroke="currentColor" stroke-width="0.9" />
+    <rect x="9.75" y="6.45" width="3.75" height="5.5" rx="1.2" transform="rotate(90 9.75 6.45)" stroke="currentColor"
+        stroke-width="0.9" />
+    <path d="M16.8107 8.36447H12.8821" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"
+        stroke-linejoin="round" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.1536 8.36447L13.0393 6.48947L13.0393 10.2395L11.1536 8.36447Z"
+        fill="currentColor" stroke="currentColor" stroke-width="0.675" stroke-linejoin="round" />
+    <path d="M14.2143 15.3987L18.1429 15.3987" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"
+        stroke-linejoin="round" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M19.8714 15.3987L17.9857 17.2737V13.5237L19.8714 15.3987Z"
+        fill="currentColor" stroke="currentColor" stroke-width="0.675" stroke-linejoin="round" />
+</svg>

@@ -7,10 +7,6 @@
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
-import { NewQuickLinksLabItem } from "@dashboard/labs/NewQuickLinksLabItem";
-import { NewSearchPageLabItem } from "@dashboard/labs/NewSearchPageLabItem";
-import { UserCardsLabItem } from "@dashboard/labs/UserCardsLabItem";
-import { NewPostMenuLabItem } from "@dashboard/labs/NewPostMenuLabItem";
 import AddonList from "@library/addons/AddonList";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
@@ -18,8 +14,9 @@ import React from "react";
 import { MemoryRouter } from "react-router";
 import Translate from "@library/content/Translate";
 import { NewEmbedSystemLabItem } from "@dashboard/labs/NewEmbedSystemLabItem";
-import { NewUserManagementLabItem } from "@dashboard/labs/NewUserManagementLabItem";
 import { NewAutomationRulesLabItem } from "@dashboard/labs/NewAutomationRulesLabItem";
+import { SentimentAnalysisLabItem } from "@dashboard/labs/SentimentAnalysisLabItem";
+import { AiSuggestedAnswersLabItem } from "@dashboard/labs/AiSuggestedAnswersLabItem";
 
 export function VanillaLabsPage() {
     return (
@@ -31,13 +28,10 @@ export function VanillaLabsPage() {
                     {VanillaLabsPage.extraLabComponents.map((ComponentName, index) => {
                         return <ComponentName key={index} />;
                     })}
+                    <SentimentAnalysisLabItem />
+                    <AiSuggestedAnswersLabItem />
                     <NewAutomationRulesLabItem />
-                    <UserCardsLabItem />
-                    <NewSearchPageLabItem />
-                    <NewQuickLinksLabItem />
-                    <NewPostMenuLabItem />
                     <NewEmbedSystemLabItem />
-                    <NewUserManagementLabItem />
                 </AddonList>
             </div>
             <DashboardHelpAsset>

@@ -58,7 +58,7 @@ class UsersExpander extends AbstractApiExpander
     /**
      * @inheritdoc
      */
-    public function resolveFragements(array $recordIDs): array
+    public function resolveFragments(array $recordIDs): array
     {
         return $this->userModel->getUserFragments($recordIDs);
     }

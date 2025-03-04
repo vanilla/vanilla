@@ -93,7 +93,13 @@ class SubscriptionChangeEvent extends ResourceEvent implements LoggableEventInte
      */
     public function getTrackablePayload(TrackableCommunityModel $trackableCommunity): array
     {
-        if (in_array($this->action, [self::ACTION_DIGEST_ENABLED, self::ACTION_DIGEST_DISABLED])) {
+        if (
+            in_array($this->action, [
+                self::ACTION_DIGEST_ENABLED,
+                self::ACTION_DIGEST_DISABLED,
+                self::ACTION_DIGEST_AUTO_SUBSCRIBE,
+            ])
+        ) {
             return $this->payload[self::COLLECTION_NAME];
         }
         return $trackableCommunity->getTrackableCategorySubscription($this->payload[self::COLLECTION_NAME]);

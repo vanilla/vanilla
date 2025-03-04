@@ -13,7 +13,7 @@ use Vanilla\Cli\Docker\ElasticSearchHttpClient;
 use Vanilla\Cli\Docker\KibanaHttpClient;
 
 /**
- * Service for kibana.vanilla.localhost
+ * Service for kibana.vanilla.local
  */
 class VanillaLogsService extends AbstractService
 {
@@ -61,7 +61,7 @@ class VanillaLogsService extends AbstractService
      */
     public function getHostname(): string
     {
-        return "kibana.vanilla.localhost";
+        return "kibana.vanilla.local";
     }
 
     /**

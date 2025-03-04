@@ -35,7 +35,6 @@ class CommunityStorybookTest extends StorybookGenerationTestCase
     {
         CurrentTimeStamp::mockTime("Dec 1 2019");
         \Gdn::config()->saveToConfig([
-            "Vanilla.Categories.Use" => true,
             "Vanilla.Categories.DoHeadings" => true,
             "Feature.NewQuickLinks.Enabled" => true,
         ]);

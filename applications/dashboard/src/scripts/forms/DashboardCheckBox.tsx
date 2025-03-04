@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,10 +8,13 @@ import CheckBox from "@library/forms/Checkbox";
 import { cx } from "@emotion/css";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import { useRadioGroupContext } from "@library/forms/RadioGroupContext";
+import { IFieldError } from "@library/json-schema-forms";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps extends Omit<React.ComponentProps<typeof CheckBox>, "onChange"> {
     onChange?: (newValue: boolean) => void;
     description?: string | React.ReactNode;
+    errors?: IFieldError[];
 }
 
 export function DashboardCheckBox(props: IProps) {
@@ -30,6 +33,7 @@ export function DashboardCheckBox(props: IProps) {
             {props.description && (
                 <p className={cx("info", checkRadioClasses().checkBoxDescription)}>{props.description}</p>
             )}
+            {props.errors && <ErrorMessages errors={props.errors} />}
         </>
     );
 }

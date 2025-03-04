@@ -31,6 +31,7 @@ paths:
                   in: query
                   schema:
                       type: boolean
+                - $ref: "#/components/parameters/PostTypeExpand"
                 - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
             responses:
                 "200":
@@ -90,6 +91,8 @@ paths:
                   in: query
                   schema:
                       type: boolean
+                - $ref: "#/components/parameters/PostTypeExpand"
+
             responses:
                 "200":
                     description: Success
@@ -154,6 +157,20 @@ paths:
             tags:
                 - Post Types
 components:
+    parameters:
+        PostTypeExpand:
+            name: expand
+            in: query
+            description: Expand associated records using one or more valid field names.
+            schema:
+                type: array
+                items:
+                    type: string
+                    enum:
+                        - all
+                        - insertUser
+                        - updateUser
+                        - postFields
     schemas:
         PostTypePost:
             properties:
@@ -165,7 +182,7 @@ components:
                     type: string
                 parentPostTypeID:
                     description: The ID of an associated post type.
-                    type: integer
+                    type: string
                 isActive:
                     description: Whether the post type is active.
                     type: boolean
@@ -185,6 +202,11 @@ components:
                     type: array
                     items:
                         type: integer
+                postFieldIDs:
+                    description: The post fields associated with this post type.
+                    type: array
+                    items:
+                        type: string
             required:
                 - postTypeID
                 - name
@@ -214,6 +236,11 @@ components:
                     type: array
                     items:
                         type: integer
+                postFieldIDs:
+                    description: The post fields associated with this post type.
+                    type: array
+                    items:
+                        type: string
             required:
                 - name
             type: object
@@ -221,13 +248,13 @@ components:
             properties:
                 postTypeID:
                     description: The ID of the post type.
-                    type: integer
+                    type: string
                 name:
                     description: The name of the post type.
                     type: string
                 parentPostTypeID:
                     description: The ID of an associated post type.
-                    type: integer
+                    type: string
                 postButtonLabel:
                     description: The label used for the post button.
                     type: string
@@ -255,10 +282,15 @@ components:
                     type: string
                 insertUserID:
                     description: The user that created the post type.
-                    type: string
+                    type: integer
                 updateUserID:
                     description: The user that last updated the post type.
-                    type: string
+                    type: integer
+                postFields:
+                    description: The post fields associated with this post type
+                    type: array
+                    items:
+                        $ref: "/post-fields.yml#/components/schemas/PostField"
             required:
                 - postTypeID
                 - name

@@ -3,13 +3,16 @@ use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Forum\Digest\DigestContentModel;
 use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\Forum\Digest\UserDigestModel;
-use Vanilla\Forum\Models\CommentThreadModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportModel;
+use Vanilla\Forum\Models\EventStructureModel;
+use Vanilla\Forum\Models\GroupStructureModel;
 use Vanilla\Forum\Models\PostFieldModel;
 use Vanilla\Forum\Models\PostMetaModel;
 use Vanilla\Forum\Models\PostTypeModel;
+use Vanilla\Models\KeywordSentimentModel;
+use Vanilla\Models\KeywordsModel;
 use Vanilla\Premoderation\ApprovalPremoderator;
 
 if (!defined("APPLICATION")) {
@@ -113,9 +116,9 @@ $Construct
     ->column("LastDateInserted", "datetime", null)
     ->column("AllowedDiscussionTypes", "varchar(255)", null)
     ->column("DefaultDiscussionType", "varchar(10)", null)
-    ->column("hasRestrictedPostTypes", "tinyint", 0)
     ->column("Featured", "tinyint", "0")
     ->column("SortFeatured", "int", "0", "index")
+    ->column("AllowGroups", "tinyint", "0")
     ->set($Explicit, $Drop);
 
 $RootCategoryInserted = false;
@@ -215,7 +218,10 @@ $Construct
     // Legacy resolved fields.
     ->column("CountResolved", "int", true)
     ->column("DateResolved", "datetime", true)
-    ->column("ResolvedUserID", "int", true);
+    ->column("ResolvedUserID", "int", true)
+    ->column("ResolvedUserID", "int", true)
+    ->column("GroupID", "int", true, "key")
+    ->column("Sentiment", "tinyint(4)", true, "sentiment");
 
 $Construct->set($Explicit, $Drop);
 
@@ -281,7 +287,9 @@ $Construct
         "DateLastComment",
         "DiscussionID",
         "CategoryID",
-    ]);
+    ])
+    ->createIndexIfNotExists("IX_Discussion_Group_Announce", ["GroupID", "Announce"])
+    ->createIndexIfNotExists("IX_Sentiment_DiscussionID", ["Sentiment", "DiscussionID"]);
 
 // Clear out legacy indexes
 $Construct
@@ -425,7 +433,10 @@ $Construct
     ->column("Format", "varchar(20)", true)
     ->column("DateInserted", "datetime")
     ->column("DateUpdated", "datetime", true)
+    ->column("GroupID", "int", true, "key")
     ->set($Explicit, $Drop);
+
+$Construct->table("Draft")->createIndexIfNotExists("IX_Draft_Group_Announce", ["GroupID", "Announce"]);
 
 // Insert some activity types
 ///  %1 = ActivityName
@@ -798,3 +809,7 @@ ReportReasonModel::structure($Construct);
 EscalationModel::structure($Construct);
 PostFieldModel::structure($Construct);
 PostMetaModel::structure($Construct);
+GroupStructureModel::structure($Construct);
+EventStructureModel::structure($Construct);
+KeywordsModel::structure(Gdn::database());
+KeywordSentimentModel::structure(Gdn::database());

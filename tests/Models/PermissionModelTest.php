@@ -211,6 +211,8 @@ class PermissionModelTest extends SiteTestCase
             "Garden.Users.Delete",
             "Garden.Users.Edit",
             "Reactions.Flag.Add",
+            "Reactions.Negative.Add",
+            "Reactions.Positive.Add",
             "Vanilla.Comments.Add",
             "Vanilla.Comments.Delete",
             "Vanilla.Comments.Edit",

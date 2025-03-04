@@ -84,7 +84,7 @@ function useApiLookup(
     useEffect(() => {
         if (initialValue && !(excludeLookups ?? []).includes(initialValue)) {
             const actualApiUrl = singleUrl.replace("/api/v2", "").replace("%s", initialValue);
-            apiv2.get(actualApiUrl).then((response) => {
+            void apiv2.get(actualApiUrl).then((response) => {
                 if (response.data) {
                     const option = transformApiToOption(response.data);
                     onInitialValueLoaded?.(option);
@@ -105,7 +105,7 @@ function useApiLookup(
             }
 
             // Fetch from API
-            apiv2.get(actualSearchUrl).then((response) => {
+            void apiv2.get(actualSearchUrl).then((response) => {
                 const { data } = response;
                 let options: IComboBoxOption[] = data.map(transformApiToOption);
                 if (processOptions) {

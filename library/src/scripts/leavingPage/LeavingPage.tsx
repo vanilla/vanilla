@@ -64,7 +64,7 @@ export function LeavingPageImpl(props: IProps) {
 
     const description = (
         <div className={classes.description}>
-            <span data-testid="external-link-as-text">{target}</span>
+            <span data-testid="meta-external-as-text">{target}</span>
             <Translate source={" is not an official <0/> site."} c0={siteName} />
         </div>
     );

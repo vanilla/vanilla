@@ -14,7 +14,6 @@ import {
 import { ELEMENT_HR } from "@udecode/plate-horizontal-rule";
 import { IndentPlugin } from "@udecode/plate-indent";
 import { ELEMENT_TODO_LI } from "@udecode/plate-list";
-import { ELEMENT_IMAGE } from "@udecode/plate-media";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { ResetNodePlugin } from "@udecode/plate-reset-node";
 import { SelectOnBackspacePlugin } from "@udecode/plate-select";
@@ -22,6 +21,7 @@ import { ELEMENT_TD } from "@udecode/plate-table";
 import { TrailingBlockPlugin } from "@udecode/plate-trailing-block";
 import { autoformatRules } from "./autoformat/autoformatRules";
 import { MyEditor, MyPlatePlugin, MyValue } from "./typescript";
+import { ELEMENT_IMAGE } from "@library/vanilla-editor/VanillaEditor.components";
 
 export const CONFIG = {
     indent: {

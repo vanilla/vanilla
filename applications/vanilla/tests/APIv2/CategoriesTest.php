@@ -1320,4 +1320,47 @@ class CategoriesTest extends AbstractResourceTest
 
         $this->disableFeature(InterestModel::SUGGESTED_CONTENT_FEATURE_FLAG);
     }
+
+    /**
+     * Test filtering by categories that can be posted into.
+     *
+     * @return void
+     */
+    public function testFilterDiscussionsAdd()
+    {
+        $category = $this->createCategory()["categoryID"];
+
+        $catSpecialPerms = $this->createCategory();
+        $user = $this->createUserWithCategoryPermissions($catSpecialPerms, [
+            "discussions.view" => true,
+            "discussions.add" => false,
+        ]);
+        $catSpecialPerms = $catSpecialPerms["categoryID"];
+
+        $testCategoryIDs = [];
+        $testCategoryIDs[] = $category;
+        $testCategoryIDs[] = $catSpecialPerms;
+
+        // Without the filter both categories are returned.
+        $this->api()
+            ->get($this->baseUrl, ["categoryID" => $testCategoryIDs])
+            ->assertCount(2);
+
+        // With the filter and with proper permissions, both categories are still returned.
+        $this->api()
+            ->get($this->baseUrl, ["categoryID" => $testCategoryIDs, "filterDiscussionsAdd" => true])
+            ->assertCount(2)
+            ->assertJsonArrayValues(["categoryID" => [$category, $catSpecialPerms]]);
+
+        // As a user without the discussions.add permission, only the category without custom permissions is returned.
+        $this->runWithUser(function () use ($testCategoryIDs, $category) {
+            $this->api()
+                ->get($this->baseUrl, [
+                    "filterDiscussionsAdd" => true,
+                    "categoryID" => $testCategoryIDs,
+                ])
+                ->assertCount(1)
+                ->assertJsonArrayValues(["categoryID" => [$category]]);
+        }, $user);
+    }
 }

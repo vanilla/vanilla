@@ -22,6 +22,13 @@ class CategoryAllowedDiscussionTest extends SiteTestCase
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        // Polls isn't currently supported in the custom post types.
+        self::disableFeature("customLayout.createPost");
+    }
+
     /**
      * Test patch AllowedDiscussionTypes.
      *

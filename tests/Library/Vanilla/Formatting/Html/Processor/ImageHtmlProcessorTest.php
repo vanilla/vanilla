@@ -61,19 +61,19 @@ class ImageHtmlProcessorTest extends VanillaTestCase
     }
 
     /**
-     * Test generating srcsets on content's images.
+     * Test generating `srcset`s on content's images.
      */
     public function testImagesSrcSet()
     {
         // Source content.
-        $body = "There is an image here! <img src='/image/baconSlice.png' />";
+        $body = "There is an image here! <img src='/image/baconSlice.png' alt='This is a bacon slice'/>";
         // The expected output.
         $expectedOutput =
             "There is an image here! " .
             "<img " .
-            'src="/image/baconSlice.png" ' .
-            'alt="image" ' .
+            'alt="This is a bacon slice" ' .
             'class="embedImage-img importedEmbed-img" ' .
+            "src=/image/baconSlice.png " .
             'srcset="' .
             "https://loremflickr.com/g/10/600/baconSlice 10w, " .
             "https://loremflickr.com/g/300/600/baconSlice 300w, " .
@@ -87,7 +87,7 @@ class ImageHtmlProcessorTest extends VanillaTestCase
         $document = new HtmlDocument(\Gdn::formatService()->renderHTML($body, WysiwygFormat::FORMAT_KEY));
         $actualOutput = $this->processor->processDocument($document)->getInnerHtml();
 
-        // Confirm that the expected & actual results are euivalent.
+        // Confirm that the expected & actual results are equivalent.
         $this->assertHtmlStringEqualsHtmlString($expectedOutput, $actualOutput);
     }
 

@@ -11,18 +11,17 @@ use CategoryModel;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
-use Gdn;
-use Gdn_SQLDriver;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Database\Operation\BooleanFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\FeatureFlagHelper;
-use Vanilla\Models\Model;
-use Vanilla\Models\PipelineModel;
+use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Web\ApiFilterMiddleware;
 
-class InterestModel extends PipelineModel
+class InterestModel extends FullRecordCacheModel
 {
     const SUGGESTED_CONTENT_FEATURE_FLAG = "SuggestedContent";
 
@@ -36,9 +35,11 @@ class InterestModel extends PipelineModel
     public function __construct(
         private ProfileFieldModel $profileFieldModel,
         private \TagModel $tagModel,
-        private \UserMetaModel $userMetaModel
+        \Gdn_Cache $cache
     ) {
-        parent::__construct("interest");
+        parent::__construct("interest", $cache, [
+            \Gdn_Cache::FEATURE_EXPIRY => 60 * 60, // 1 hour.
+        ]);
 
         $booleanFields = new BooleanFieldProcessor(["isDefault", "isDeleted"]);
         $this->addPipelineProcessor($booleanFields);
@@ -88,22 +89,14 @@ class InterestModel extends PipelineModel
      */
     public function getInterest(int $id): ?array
     {
-        $rows = $this->getWhere(["interestID" => $id], [Model::OPT_LIMIT => 1]);
-        return $rows[0] ?? null;
-    }
+        $row = $this->selectSingle(["interestID" => $id, "isDeleted" => 0]);
+        $rows = [&$row];
 
-    /**
-     * Returns base query for fetching records.
-     *
-     * @return \Gdn_SQLDriver
-     */
-    public function getWhereQuery(): \Gdn_SQLDriver
-    {
-        $sql = $this->createSql()->from($this->getTable());
+        $this->joinTags($rows);
+        $this->joinCategories($rows);
+        $this->joinProfileFields($rows);
 
-        $sql->where("isDeleted", 0);
-
-        return $sql;
+        return $row;
     }
 
     /**
@@ -111,19 +104,12 @@ class InterestModel extends PipelineModel
      *
      * @param array $where
      * @return array
-     * @throws \Exception
      */
-    public function getWhere(array $where, array $options = []): array
+    public function getWhere(array $where = []): array
     {
-        $sql = $this->getWhereQuery();
+        $rows = $this->select(["isDeleted" => 0]);
 
-        $this->applyFiltersToQuery($sql, $where);
-
-        $sql->applyModelOptions($options);
-
-        $rows = $sql->get()->resultArray();
-
-        $rows = $this->normalizeRows($rows);
+        $rows = $this->matchFilters($rows, $where);
 
         $this->joinTags($rows);
         $this->joinCategories($rows);
@@ -133,19 +119,21 @@ class InterestModel extends PipelineModel
     }
 
     /**
+     * Expand tag information for the tagIDs column.
+     *
      * @param array $rows
      * @return void
      */
     protected function joinTags(array &$rows): void
     {
-        $tags = array_column($rows, "tagIDs");
+        $tags = array_filter(array_column($rows, "tagIDs"));
         $allTagIDs = array_unique(array_merge(...$tags));
-        $tags = $this->tagModel->getTagsByIDs($allTagIDs);
+        $tags = $this->tagModel->getTagsByIDs($allTagIDs, false);
         $tags = array_column($tags, "FullName", "TagID");
 
         foreach ($rows as &$row) {
             $row["tags"] = [];
-            foreach ($row["tagIDs"] as $tagID) {
+            foreach ($row["tagIDs"] ?? [] as $tagID) {
                 if (isset($tags[$tagID])) {
                     $row["tags"][] = [
                         "tagID" => $tagID,
@@ -157,6 +145,8 @@ class InterestModel extends PipelineModel
     }
 
     /**
+     * Expand category information for categoryIDs column.
+     *
      * @param array $rows
      * @return void
      */
@@ -178,6 +168,8 @@ class InterestModel extends PipelineModel
     }
 
     /**
+     * Expand profile field information for the profileFieldMapping column.
+     *
      * @param array $rows
      * @return void
      */
@@ -203,21 +195,6 @@ class InterestModel extends PipelineModel
     }
 
     /**
-     * Query interests count with filters.
-     *
-     * @param array $where
-     * @return int
-     */
-    public function getWhereCount(array $where): int
-    {
-        $sql = $this->getWhereQuery();
-
-        $this->applyFiltersToQuery($sql, $where);
-
-        return $sql->getPagingCount("interestID");
-    }
-
-    /**
      * This returns either default interests or interests matching profile fields.
      *
      * @param array $profileFieldValues
@@ -225,20 +202,22 @@ class InterestModel extends PipelineModel
      */
     private function getByProfileFieldValues(array $profileFieldValues): array
     {
-        $sql = $this->getWhereQuery();
+        $rows = $this->select(["isDeleted" => 0]);
 
-        $sql->beginWhereGroup();
-        $sql->where("isDefault", 1);
+        return array_values(
+            array_filter($rows, function ($row) use ($profileFieldValues) {
+                if ($row["isDefault"]) {
+                    // Default interests are always returned.
+                    return true;
+                }
 
-        if (!empty($profileFieldValues)) {
-            $profileFieldValuesJson = $sql->quote(json_encode($profileFieldValues));
-            $sql->orWhere("JSON_OVERLAPS(profileFieldMapping, $profileFieldValuesJson)", null, false, false);
-        }
+                if ($this->hasProfileFieldValues($row, $profileFieldValues)) {
+                    return true;
+                }
 
-        $sql->endWhereGroup();
-
-        $rows = $sql->get()->resultArray();
-        return $this->normalizeRows($rows);
+                return false;
+            })
+        );
     }
 
     /**
@@ -256,12 +235,95 @@ class InterestModel extends PipelineModel
         $tagIDs = [];
         foreach ($rows as $row) {
             $categoryIDs = array_merge($categoryIDs, $row["categoryIDs"]);
-            $tagIDs = array_merge($tagIDs, $row["tagIDs"]);
+            $tagIDs = array_merge($tagIDs, $row["tagIDs"] ?? []);
         }
         $categoryIDs = array_unique($categoryIDs);
         $tagIDs = array_unique($tagIDs);
 
         return [$categoryIDs, $tagIDs];
+    }
+
+    /**
+     * Applies filters against a result set and returns the filtered array.
+     *
+     * @param $rows
+     * @param array $filters
+     * @return array
+     */
+    private function matchFilters($rows, array $filters = []): array
+    {
+        return array_values(
+            array_filter($rows, function ($row) use ($filters) {
+                foreach (["categoryIDs", "tagIDs"] as $field) {
+                    if (isset($filters[$field]) && empty(array_intersect($row[$field] ?? [], $filters[$field]))) {
+                        return false;
+                    }
+                }
+
+                if (isset($filters["profileFields"])) {
+                    $profileFieldMapping = $row["profileFieldMapping"] ?? [];
+                    if (empty(array_intersect_key($profileFieldMapping, array_flip($filters["profileFields"])))) {
+                        return false;
+                    }
+                }
+
+                if (isset($filters["isDefault"]) && $filters["isDefault"] !== $row["isDefault"]) {
+                    return false;
+                }
+
+                if (isset($filters["name"]) && !str_contains($row["name"], $filters["name"])) {
+                    return false;
+                }
+
+                return true;
+            })
+        );
+    }
+
+    /**
+     * Returns true if the interest row contains a profile field mapping matching the given user profile fields.
+     *
+     * @param array $row An interest record.
+     * @param array $profileFieldValues Profile fields for a specific user.
+     * @return bool
+     */
+    private function hasProfileFieldValues(array $row, array $profileFieldValues): bool
+    {
+        $activeProfileFields = $this->profileFieldModel->getEnabledProfileFieldsIndexed();
+        $profileFieldMapping = $row["profileFieldMapping"] ?? [];
+        foreach ($profileFieldMapping as $name => $mapping) {
+            if (!isset($activeProfileFields[$name])) {
+                // Only consider enabled profile fields.
+                continue;
+            }
+
+            $profileFieldValue = $profileFieldValues[$name] ?? null;
+            $dataType = $activeProfileFields[$name]["dataType"];
+
+            $mapping = is_array($mapping) ? $mapping : [$mapping];
+            foreach ($mapping as $value) {
+                switch ($dataType) {
+                    case "boolean":
+                        // Special handling for boolean (checkbox) fields.
+                        $value = in_array($value, ["true", true], true);
+                        if ($value === true && !$profileFieldValue) {
+                            // User profile field value is false or doesn't exist.
+                            return false;
+                        }
+                        if ($value === false && $profileFieldValue === true) {
+                            // User profile field value is true.
+                            return false;
+                        }
+                        break;
+                    default:
+                        $profileFieldValue = is_array($profileFieldValue) ? $profileFieldValue : [$profileFieldValue];
+                        if (empty(array_intersect($profileFieldValue, $mapping))) {
+                            return false;
+                        }
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -300,31 +362,6 @@ class InterestModel extends PipelineModel
 
         unset($where["page"], $where["limit"]);
         $sql->where($where);
-    }
-
-    /**
-     * Normalizes data for display.
-     *
-     * @param array $rows
-     * @return array
-     */
-    private function normalizeRows(array $rows): array
-    {
-        foreach ($rows as &$row) {
-            $row["profileFieldMapping"] = $row["profileFieldMapping"] ?? [];
-            if (is_string($row["profileFieldMapping"])) {
-                $row["profileFieldMapping"] = json_decode($row["profileFieldMapping"], true);
-            }
-            $row["categoryIDs"] = $row["categoryIDs"] ?? [];
-            if (is_string($row["categoryIDs"])) {
-                $row["categoryIDs"] = json_decode($row["categoryIDs"], true);
-            }
-            $row["tagIDs"] = $row["tagIDs"] ?? [];
-            if (is_string($row["tagIDs"])) {
-                $row["tagIDs"] = json_decode($row["tagIDs"], true);
-            }
-        }
-        return $rows;
     }
 
     /**

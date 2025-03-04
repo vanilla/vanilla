@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,6 +8,7 @@ namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
 use Garden\Events\TrackingEventInterface;
+use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LogLevel;
 use Vanilla\Analytics\TrackableCommunityModel;
 use Vanilla\Logging\LogEntry;
@@ -22,7 +23,7 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
     public function __construct(string $action, array $payload, $sender = null)
     {
         parent::__construct($action, $payload, $sender);
-        $this->addApiParams(["expand" => "crawl,roles"]);
+        $this->addApiParams(["expand" => "crawl,roles,vectorize"]);
     }
 
     /**
@@ -125,6 +126,23 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
     public function getInsertUserID(): int
     {
         return $this->payload["comment"]["insertUserID"];
+    }
+
+    /**
+     * Determine if the comment is searchable. Some parent types aren't implemented yet.
+     *
+     * @return bool
+     */
+    public function isSearchable(): bool
+    {
+        $parentRecordType = $this->payload["comment"]["parentRecordType"];
+        $commentModel = \Gdn::getContainer()->get(\CommentModel::class);
+        $handler = $commentModel->getParentHandler($parentRecordType);
+        if (!$handler) {
+            return false;
+        }
+
+        return $handler->isSearchable();
     }
 
     /**

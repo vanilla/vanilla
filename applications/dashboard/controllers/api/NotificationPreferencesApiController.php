@@ -251,7 +251,7 @@ class NotificationPreferencesApiController extends \AbstractApiController
     private function getAsIntegerValues(array $prefs): array
     {
         $prefsAsInts = array_map(function ($pref) {
-            return intval($pref);
+            return is_bool($pref) ? intval($pref) : $pref;
         }, $prefs);
         return $prefsAsInts;
     }
@@ -265,7 +265,7 @@ class NotificationPreferencesApiController extends \AbstractApiController
     private function getAsBooleanValues(array $prefs): array
     {
         $prefsAsBools = array_map(function ($pref) {
-            return (bool) $pref;
+            return is_numeric($pref) ? (bool) $pref : $pref;
         }, $prefs);
         return $prefsAsBools;
     }

@@ -30,6 +30,7 @@ interface IProps {
     textColor?: string;
     alignment?: BannerAlignment;
     isContentBanner?: boolean;
+    initialParams?: React.ComponentProps<typeof Banner>["initialParams"];
 }
 
 export default function BannerWidget(props: IProps) {
@@ -40,6 +41,7 @@ export default function BannerWidget(props: IProps) {
             description={props.description}
             backgroundImage={props.background?.image}
             backgroundUrlSrcSet={props.background?.imageUrlSrcSet}
+            initialParams={props.initialParams}
             options={{
                 enabled: true,
                 hideTitle: props.showTitle !== undefined ? !props.showTitle : undefined, //will take variables value if undefined

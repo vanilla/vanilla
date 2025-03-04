@@ -90,7 +90,7 @@ export default function AdvancedMembersFilters(props: IProps) {
     // reset values to what we have from props
     useEffect(() => {
         if (!modalOpen) {
-            setValues(props.values ?? {});
+            void setValues(props.values ?? {});
         }
     }, [modalOpen]);
 

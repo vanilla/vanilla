@@ -38,5 +38,6 @@ export interface IHydratedLayoutWidget<ExtraProps = {}> {
 export interface IHydratedLayoutSpec {
     /** An array describing components of a layout */
     layout: IHydratedLayoutWidget[];
+    contexts?: IHydratedLayoutWidget[];
     redirectTo?: string;
 }

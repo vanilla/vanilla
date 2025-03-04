@@ -208,7 +208,7 @@ export default function UserManagementColumnsConfig(props: IProps) {
                         }}
                         className={classes.columnsConfigurationButton}
                     >
-                        <Icon icon="data-settings" />
+                        <Icon icon="edit-filters" />
                     </Button>
                 </span>
             </ToolTip>
@@ -278,7 +278,7 @@ export default function UserManagementColumnsConfig(props: IProps) {
                                         return item.isHidden ?? false;
                                     }}
                                     isItemHideable={() => true}
-                                    getRowIcon={() => "data-drag-and-drop"}
+                                    getRowIcon={() => "move-drag"}
                                     RowContentsComponent={(props: UserManagementColumnTreeItem) => {
                                         const { label } = props;
                                         return <div className={classes.treeItemName}>{label}</div>;

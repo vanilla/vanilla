@@ -119,7 +119,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable, Inj
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->numRows();
     }
@@ -305,7 +305,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable, Inj
     /**
      * Interface method for IteratorAggregate.
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->result());
     }
@@ -792,7 +792,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable, Inj
      * @return mixed data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $result = $this->resultArray();
         jsonFilter($result);

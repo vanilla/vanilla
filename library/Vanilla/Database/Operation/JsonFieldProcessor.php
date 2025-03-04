@@ -112,7 +112,7 @@ class JsonFieldProcessor implements Processor
         foreach ($results as &$row) {
             foreach ($fields as $field) {
                 if (array_key_exists($field, $row)) {
-                    $row[$field] = json_decode($row[$field], true);
+                    $row[$field] = json_decode($row[$field] ?? "", true);
                     if (is_array($row[$field])) {
                         $row[$field] = ipDecodeRecursive($row[$field]);
                     }

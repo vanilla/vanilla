@@ -73,7 +73,7 @@ class ArrayContainer extends \ArrayObject implements ContainerInterface
      *
      * @return boolean
      */
-    public function has($id)
+    public function has($id): bool
     {
         $id = $this->normalizeID($id);
 

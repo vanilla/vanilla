@@ -82,7 +82,7 @@ export function PageHeadingBox(props: IProps) {
                 </PageHeading>
             </div>
             {subtitleType === SubtitleType.STANDARD && subtitleView}
-            {description && <div className={classes.descriptionWrap}>{description}</div>}
+            {description && <div className={cx(classes.descriptionWrap, "pageHeadingDescription")}>{description}</div>}
         </div>
     );
 }

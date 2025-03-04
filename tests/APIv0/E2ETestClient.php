@@ -48,7 +48,7 @@ class E2ETestClient extends HttpClient
     private bool $useSystemTokenOnNextRequest = false;
 
     /**
-     * Create site with selected slug, based on e2e-tests.vanilla.localhost
+     * Create site with selected slug, based on e2e-tests.vanilla.local
      *
      * @param string $siteSlug Site slug.
      * @param array $withAddons list of addon to enable.
@@ -56,12 +56,18 @@ class E2ETestClient extends HttpClient
      * @return E2ETestClient
      * @throws \Exception exceptions from site creation.
      */
-    public static function prepare(string $siteSlug, array $withAddons = []): E2ETestClient
+    public static function prepare(string $siteSlug, array $withAddons = [], array $withoutAddons = []): E2ETestClient
     {
         $client = new E2ETestClient($siteSlug);
+
+        foreach ($withoutAddons as $addon) {
+            $client->saveToConfig(["EnabledPlugins.$addon" => false]);
+        }
+
         // Cleanup from any previous tests.
         $client->uninstall();
         $client->install($siteSlug, false);
+        sleep(2);
 
         // Setup the addons.
         foreach ($withAddons as $addon) {
@@ -82,9 +88,9 @@ class E2ETestClient extends HttpClient
         $this->dbName = $e2eSlug;
 
         if ($e2eSlug) {
-            $baseUrl = "http://e2e-tests.vanilla.localhost/$e2eSlug";
+            $baseUrl = "http://e2e-tests.vanilla.local/$e2eSlug";
             $this->setBaseUrl($baseUrl);
-            $this->configPath = PATH_CONF . "/e2e-tests.vanilla.localhost/$e2eSlug.php";
+            $this->configPath = PATH_CONF . "/e2e-tests.vanilla.local/$e2eSlug.php";
         } else {
             $this->setBaseUrl(getenv("TEST_BASEURL"));
             $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
@@ -289,6 +295,8 @@ class E2ETestClient extends HttpClient
             "Garden.Errors.StackTrace" => true,
             "Garden.Embed.Allow" => true,
             "Test.APIKey" => $apiKey,
+            "EnabledPlugins.ideation" => false,
+            "EnabledPlugins.QnA" => false,
         ]);
         self::setAPIKey($apiKey);
 

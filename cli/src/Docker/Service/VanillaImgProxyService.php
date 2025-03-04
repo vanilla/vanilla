@@ -10,7 +10,7 @@ namespace Vanilla\Cli\Docker\Service;
 use Vanilla\Cli\Commands\DockerCommand;
 
 /**
- * Service for imgproxy.vanilla.localhost
+ * Service for imgproxy.vanilla.local
  */
 class VanillaImgProxyService extends AbstractService
 {
@@ -63,7 +63,7 @@ class VanillaImgProxyService extends AbstractService
      */
     public function getHostname(): string
     {
-        return "imgproxy.vanilla.localhost";
+        return "imgproxy.vanilla.local";
     }
 
     /**
@@ -74,7 +74,7 @@ class VanillaImgProxyService extends AbstractService
         return [
             "Plugins.ImageProxy.Key" => self::KEY,
             "Plugins.ImageProxy.Salt" => self::SALT,
-            "Plugins.ImageProxy.Url" => "https://imgproxy.vanilla.localhost",
+            "Plugins.ImageProxy.Url" => "https://imgproxy.vanilla.local",
         ];
     }
 }

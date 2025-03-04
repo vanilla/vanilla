@@ -8,11 +8,11 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { RecordID } from "@vanilla/utils";
 import { useSessionStorage } from "@vanilla/react-utils";
 import { useToast } from "@library/features/toaster/ToastContext";
-import { BulkActionsToast } from "@library/features/discussions/BulkActionsToast";
-import { BulkActionTypes } from "@library/features/discussions/BulkActionsModal";
-import { BulkActionsManager } from "@library/features/discussions/BulkActionsManager";
+import { BulkActionsManager } from "@library/bulkActions/BulkActionsManager";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
+import { DiscussionBulkActionsToast } from "@library/features/discussions/DiscussionBulkActionsToast";
+import { BulkAction } from "@library/bulkActions/BulkActions.types";
+import { bulkActionsClasses } from "@library/bulkActions/BulkActions.classes";
 
 /**
  * Context provider to manage the state of checkboxes when
@@ -54,7 +54,6 @@ interface IProps {
  */
 export function DiscussionCheckboxProvider(props: IProps) {
     const { children } = props;
-    const classes = discussionListClasses();
 
     const { addToast, updateToast, removeToast } = useToast();
 
@@ -71,7 +70,7 @@ export function DiscussionCheckboxProvider(props: IProps) {
      */
     const [toastIDsByKey, setToastIDsByKey] = useState<Record<string, any>>({});
 
-    const [bulkAction, setBulkAction] = useState<BulkActionTypes | null>(null);
+    const [bulkAction, setBulkAction] = useState<BulkAction | null>(null);
 
     /**
      * Utility function to normalize singular values to array
@@ -113,13 +112,13 @@ export function DiscussionCheckboxProvider(props: IProps) {
     const toastBody = useMemo(() => {
         if (checkedDiscussionIDs.length > 0) {
             return (
-                <BulkActionsToast
+                <DiscussionBulkActionsToast
                     selectedIDs={checkedDiscussionIDs}
                     handleSelectionClear={removeAllDiscussionIDs}
-                    handleBulkDelete={() => setBulkAction(BulkActionTypes.DELETE)}
-                    handleBulkMove={() => setBulkAction(BulkActionTypes.MOVE)}
-                    handleBulkMerge={() => setBulkAction(BulkActionTypes.MERGE)}
-                    handleBulkClose={() => setBulkAction(BulkActionTypes.CLOSE)}
+                    handleBulkDelete={() => setBulkAction(BulkAction.DELETE)}
+                    handleBulkMove={() => setBulkAction(BulkAction.MOVE)}
+                    handleBulkMerge={() => setBulkAction(BulkAction.MERGE)}
+                    handleBulkClose={() => setBulkAction(BulkAction.CLOSE)}
                 />
             );
         } else {
@@ -132,7 +131,11 @@ export function DiscussionCheckboxProvider(props: IProps) {
         const bulkActionsToastID = toastIDsByKey["action"];
         if (toastBody && !bulkActionsToastID) {
             setToastIDsByKey({
-                action: addToast({ persistent: true, body: toastBody, className: classes.bulkActionsToast }),
+                action: addToast({
+                    persistent: true,
+                    body: toastBody,
+                    className: bulkActionsClasses().bulkActionsToast,
+                }),
             });
         } else {
             updateToast(bulkActionsToastID, { body: toastBody });
@@ -155,7 +158,7 @@ export function DiscussionCheckboxProvider(props: IProps) {
                 removePendingDiscussionByIDs,
             }}
         >
-            <BulkActionsManager action={bulkAction} setAction={setBulkAction} />
+            <BulkActionsManager action={bulkAction} setAction={setBulkAction} recordType="discussion" />
             {children}
         </DiscussionCheckboxContext.Provider>
     );

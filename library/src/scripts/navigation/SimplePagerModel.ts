@@ -3,6 +3,8 @@
  * @license GPL-2.0-only
  */
 
+import { AxiosResponse, AxiosResponseHeaders, RawAxiosResponseHeaders } from "axios";
+
 /**
  * Maximum page count for most of our api endpoints.
  */
@@ -35,9 +37,8 @@ export interface IWithPagination<T> {
     pagination: ILinkPages;
     body: T;
 }
-
 export default class SimplePagerModel {
-    public static parseHeaders(headers?: Record<string, string>): ILinkPages {
+    public static parseHeaders(headers?: AxiosResponse["headers"] & { [key: string]: any }): ILinkPages {
         headers = headers ?? {};
         const result: ILinkPages = {};
 

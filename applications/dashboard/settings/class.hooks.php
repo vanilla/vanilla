@@ -14,6 +14,7 @@ use Garden\Container\NotFoundException;
 use Garden\Container\Reference;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ResponseException;
+use MachineTranslation\Services\GptTranslationService;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\AddonManager;
@@ -22,6 +23,7 @@ use Vanilla\Dashboard\Events\UserSpoofEvent;
 use Vanilla\Dashboard\Modules\CommunityLeadersModule;
 use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\CommunityMachineTranslationModel;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Logging\AuditLogger;
 use Vanilla\Utility\ContainerUtils;
@@ -617,12 +619,10 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 "",
                 $sort
             )
-            ->addGroup(t("Discussions"), "forum", "", ["after" => "email"])
+            ->addGroup(t("Posts"), "forum", "", ["after" => "email"])
             ->addLinkIf("Garden.Settings.Manage", t("Tagging"), "settings/tagging", "forum.tagging", $sort)
             ->addLinkIf(
-                Gdn::config("Feature.AISuggestions.Enabled") &&
-                    Gdn::config("Feature.aiFeatures.Enabled") &&
-                    $session->checkPermission("Garden.Settings.Manage"),
+                Gdn::config("Feature.AISuggestions.Enabled") && $session->checkPermission("Garden.Settings.Manage"),
                 t("AI Suggested Answers"),
                 "/settings/ai-suggestions",
                 "forum.ai-suggestions",
@@ -790,7 +790,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
 
         $queryType = $type;
 
-        if (strtolower($type) == "all" || $search || $type === null) {
+        if (($type && strtolower($type) == "all") || $search || $type === null) {
             $queryType = false;
             $type = "";
         }

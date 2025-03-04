@@ -43,6 +43,7 @@ export type UserSortParams =
 export enum UserManagementColumnNames {
     USER_NAME = "username",
     ROLES = "roles",
+    BANNED = "banned",
     FIRST_VISIT = "first visit",
     LAST_VISIT = "last visit",
     LAST_IP = "last ip",
@@ -69,6 +70,8 @@ export function mapColumnNameToSelectEntry(
             return [["dateInserted", t("First Visit")]];
         case UserManagementColumnNames.ROLES:
             return [["roles", t("Roles")]];
+        case UserManagementColumnNames.BANNED:
+            return [["banned", t("Banned")]];
         case UserManagementColumnNames.LAST_VISIT:
             return [["dateLastActive", t("Last Visit")]];
         case UserManagementColumnNames.LAST_IP:
@@ -138,6 +141,7 @@ export const DEFAULT_CONFIGURATION: StackableTableColumnsConfig = {
 };
 
 export const DEFAULT_ADDITIONAL_STATIC_COLUMNS = [
+    UserManagementColumnNames.BANNED,
     UserManagementColumnNames.REGISTER_IP,
     UserManagementColumnNames.USER_ID,
     UserManagementColumnNames.RANK,
@@ -188,6 +192,7 @@ interface IBaseSchema {
     dateInserted?: { start?: string; end?: string };
     dateLastActive?: { start?: string; end?: string };
     roleIDs?: number[];
+    banFilter: "none" | "banned" | "notBanned";
 }
 
 /**
@@ -209,6 +214,23 @@ export const getBaseFilterSchema = (): JsonSchema<IBaseSchema> => {
                     component: MultiRoleInput,
                 },
             },
+            banFilter: {
+                default: "none",
+                "x-control": {
+                    label: t("Ban Filter"),
+                    inputType: "radioPicker",
+                    options: [
+                        { value: "none", label: t("None") },
+                        { value: "banned", label: t("Banned"), description: t("Only show banned users.") },
+                        {
+                            value: "notBanned",
+                            label: t("Not Banned"),
+                            description: t("Only show users that are not banned."),
+                        },
+                    ],
+                },
+            },
+
             dateInserted: {
                 type: "object",
                 nullable: true,
@@ -250,6 +272,7 @@ export const getBaseFilterSchema = (): JsonSchema<IBaseSchema> => {
                 nullable: true,
                 "x-control": {
                     label: t("IP Address"),
+                    description: "Use * to indicate a wildcard.",
                     inputType: "textBox",
                 },
             },
@@ -264,6 +287,7 @@ export interface IUserManagementFilterValues {
     dateInserted?: { start?: string; end?: string };
     dateLastActive?: { start?: string; end?: string };
     ipAddresses?: string;
+    banFilter?: IBaseSchema["banFilter"];
     profileFields?: {
         [key: string]: any;
     };
@@ -298,8 +322,25 @@ export const mapFilterValuesToQueryParams = (values: IUserManagementFilterValues
             end: values.dateLastActive.end,
         });
 
+    let banFilters: Partial<IGetUsersQueryParams> = {};
+    switch (values.banFilter ?? "none") {
+        case "none":
+            break;
+        case "banned":
+            banFilters = {
+                isBanned: true,
+            };
+            break;
+        case "notBanned":
+            banFilters = {
+                isBanned: false,
+            };
+            break;
+    }
+
     return {
         ...values,
+        ...banFilters,
         ...(dateInsertedValue && {
             dateInserted: dateInsertedValue,
         }),
@@ -326,6 +367,7 @@ export const mapUrlQueryToQueryParams = (queryFromUrl: any): IGetUsersQueryParam
         query: queryFromUrl.Keywords ?? "",
         page: queryFromUrl.page ?? 1,
         sort: queryFromUrl.sort ?? "name",
+        isBanned: queryFromUrl.isBanned == undefined ? undefined : queryFromUrl.isBanned === "true",
         ...(queryFromUrl.roleIDs &&
             queryFromUrl.roleIDs.length && { roleIDs: queryFromUrl.roleIDs.map((roleID) => parseInt(roleID)) }),
         ...(queryFromUrl.rankIDs &&
@@ -344,7 +386,7 @@ export const mapUrlQueryToQueryParams = (queryFromUrl: any): IGetUsersQueryParam
  * @param profileFields - All profile fields.
  */
 export const mapQueryParamsToFilterValues = (currentQuery: IGetUsersQueryParams, profileFields?: ProfileField[]) => {
-    const { query, page, sort, ...filterValues } = currentQuery;
+    const { query, page, sort, isBanned, ...filterValues } = currentQuery;
 
     // format date ranges nested in profile fields
     const profileFieldFilters = { ...filterValues.profileFields };
@@ -360,6 +402,7 @@ export const mapQueryParamsToFilterValues = (currentQuery: IGetUsersQueryParams,
 
     return {
         ...filterValues,
+        banFilter: isBanned == undefined ? "none" : isBanned ? "banned" : "notBanned",
         ...(!!filterValues.dateInserted && { dateInserted: dateStringInUrlToDateRange(filterValues.dateInserted) }),
         ...(!!filterValues.dateLastActive && {
             dateLastActive: dateStringInUrlToDateRange(filterValues.dateLastActive),

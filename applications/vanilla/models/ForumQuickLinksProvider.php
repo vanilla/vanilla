@@ -36,7 +36,7 @@ class ForumQuickLinksProvider implements QuickLinkProviderInterface
         $result = [];
         $result[] = new QuickLink("All Categories", "/categories", null, -4, "discussions.view");
 
-        $result[] = new QuickLink("Recent Discussions", "/discussions", null, -3, "discussions.view");
+        $result[] = new QuickLink("Recent Posts", "/discussions", null, -3, "discussions.view");
 
         $result[] = new QuickLink("Activity", "/activity", null, -2, "discussions.view");
 
@@ -49,7 +49,7 @@ class ForumQuickLinksProvider implements QuickLinkProviderInterface
         );
 
         $result[] = new QuickLink(
-            "My Discussions",
+            "My Posts",
             "/discussions/mine",
             $this->session->User->CountDiscussions ?? 0,
             -1,

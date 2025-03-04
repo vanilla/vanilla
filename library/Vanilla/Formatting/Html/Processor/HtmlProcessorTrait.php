@@ -146,4 +146,23 @@ trait HtmlProcessorTrait
     {
         return self::queryCssSelectorForDocument($this->getDom(), $cssQuery);
     }
+
+    /**
+     * Query the text content of the first item matching a css selector.
+     *
+     * @param string $cssQuery
+     * @param string|null $fallback Fallback to use if it's not found.
+     *
+     * @return string|null
+     */
+    public function queryTextContent(string $cssQuery, ?string $fallback = null): ?string
+    {
+        $elements = $this->queryCssSelector($cssQuery);
+        $firstItem = $elements->item(0);
+        if ($firstItem instanceof \DOMElement) {
+            return $firstItem->textContent;
+        } else {
+            return $fallback;
+        }
+    }
 }

@@ -7,7 +7,9 @@
 use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\SimpleCache\CacheInterface;
 use Vanilla\Contracts\Web\FileUploadHandler;
+use Vanilla\FloodControlTrait;
 use Vanilla\Models\VanillaMediaSchema;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerFailedID;
@@ -26,9 +28,15 @@ use Vanilla\Web\SystemCallableInterface;
 class MediaModel extends Gdn_Model implements FileUploadHandler, SystemCallableInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
+    use FloodControlTrait;
 
     /** @var Gdn_Upload */
     private $upload;
+
+    /**
+     * @var CacheInterface Object used to store the FloodControl data.
+     */
+    protected $floodGate;
 
     /** @var int Bypass values set in ImageUpload.Limits config even if ImageUpload.Limits is enabled */
     const NO_IMAGE_DIMENSIONS_LIMIT = 0;
@@ -40,6 +48,11 @@ class MediaModel extends Gdn_Model implements FileUploadHandler, SystemCallableI
     {
         parent::__construct("Media");
         $this->upload = \Gdn::getContainer()->get(Gdn_Upload::class);
+        $this->floodGate = FloodControlHelper::configure($this, "Vanilla", "Media", false);
+        $this->setFloodControlEnabled(true);
+        $this->setPostCountThreshold(250);
+        $this->setTimeSpan(3600);
+        $this->setLockTime(3600);
     }
 
     /**
@@ -182,6 +195,13 @@ class MediaModel extends Gdn_Model implements FileUploadHandler, SystemCallableI
      */
     public function saveUploadedFile(UploadedFile $file, array $extraArgs = []): array
     {
+        // Spam check.
+        $spamming = $this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate);
+
+        if ($spamming) {
+            throw new Exception(t("You have exceeded the threshold for file uploads."), 429);
+        }
+
         $extraArgs += [
             "maxImageHeight" => self::NO_IMAGE_DIMENSIONS_LIMIT,
             "maxImageWidth" => self::NO_IMAGE_DIMENSIONS_LIMIT,

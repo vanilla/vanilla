@@ -7,6 +7,7 @@
 
 namespace VanillaTests\QnA;
 
+use Vanilla\FeatureFlagHelper;
 use VanillaTests\APIv2\QnaApiTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -41,5 +42,31 @@ class LegacyDiscussionTest extends SiteTestCase
         $this->assertEquals($accepted["discussionID"], $result["Discussions"][0]["DiscussionID"]);
 
         $test = true;
+    }
+
+    /**
+     * Test that the QnA tag only show for "question" type posts and not "discussion"
+     *
+     * @return void
+     */
+    public function testMetaTagFilteredOutForDiscussion()
+    {
+        $this->runWithConfig(
+            [
+                FeatureFlagHelper::featureConfigKey("customLayout.discussionThread") => false,
+                FeatureFlagHelper::featureConfigKey("DiscussionQnATag") => true,
+            ],
+            function () {
+                $discussion = $this->createDiscussion();
+                $this->bessy()
+                    ->getHtml($discussion["url"], [], ["deliveryType" => DELIVERY_TYPE_ALL])
+                    ->assertCssSelectorNotExists(".Tag.QnA-Tag-Question");
+
+                $question = $this->createQuestion();
+                $this->bessy()
+                    ->getHtml($question["url"], [], ["deliveryType" => DELIVERY_TYPE_ALL])
+                    ->assertCssSelectorExists(".Tag.QnA-Tag-Question");
+            }
+        );
     }
 }

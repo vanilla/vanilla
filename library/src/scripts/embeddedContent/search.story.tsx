@@ -4,7 +4,6 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import React from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import IndependentSearch from "@library/features/search/IndependentSearch";
 import SearchContext from "@library/contexts/SearchContext";
@@ -13,27 +12,12 @@ import { MemoryRouter } from "react-router";
 import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
-import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { bannerClasses } from "@library/banner/Banner.styles";
-import {
-    TypeAllIcon,
-    TypeArticlesIcon,
-    TypeCategoriesAndGroupsIcon,
-    TypeCategoriesIcon,
-    TypeDiscussionsIcon,
-    TypeIdeasIcon,
-    TypeMemberIcon,
-    TypePollsIcon,
-    TypeQuestionIcon,
-    TypeGroupsIcon,
-    TypeKnowledgeBaseIcon,
-} from "@library/icons/searchIcons";
 import { t } from "@vanilla/i18n/src";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { useSection } from "@library/layout/LayoutContext";
-import classNames from "classnames";
 import { PlacesResultMeta } from "@dashboard/components/panels/PlacesSearchDomain.loadable";
+import { Icon } from "@vanilla/icons";
 
 export default {
     title: "Embeds",
@@ -97,7 +81,7 @@ export const SearchResults = () => {
                             />
                         ),
                         // attachments: [{ name: "My File", type: AttachmentType.WORD }],
-                        icon: <TypeDiscussionsIcon />,
+                        icon: <Icon icon={"search-discussions"} />,
                     },
                     {
                         name: "Example search result",
@@ -115,7 +99,7 @@ export const SearchResults = () => {
                             />
                         ),
                         // attachments: [{ name: "My File", type: AttachmentType.WORD }],
-                        icon: <TypeDiscussionsIcon />,
+                        icon: <Icon icon={"search-discussions"} />,
                     },
                     {
                         name: "Example search result",
@@ -133,7 +117,7 @@ export const SearchResults = () => {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeQuestionIcon />,
+                        icon: <Icon icon={"search-questions"} />,
                     },
                     {
                         name: "Example search result",
@@ -142,7 +126,7 @@ export const SearchResults = () => {
                         excerpt:
                             "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
 
-                        icon: <TypePollsIcon />,
+                        icon: <Icon icon={"search-polls"} />,
                     },
                     {
                         name: "Example search result",
@@ -157,24 +141,7 @@ export const SearchResults = () => {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeIdeasIcon />,
-                    },
-                    {
-                        name: "Example search result",
-                        headingLevel: 3,
-                        url: "#",
-                        excerpt:
-                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
-                        meta: (
-                            <ResultMeta
-                                dateUpdated={"2016-07-25 17:51:15"}
-                                updateUser={dummyUserFragment}
-                                crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
-                                status={PublishStatus.PUBLISHED}
-                                type={"Article"}
-                            />
-                        ),
-                        icon: <TypeCategoriesIcon />,
+                        icon: <Icon icon={"search-ideas"} />,
                     },
                     {
                         name: "Example search result",
@@ -191,7 +158,7 @@ export const SearchResults = () => {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeMemberIcon />,
+                        icon: <Icon icon="search-categories" />,
                     },
                     {
                         name: "Example search result",
@@ -208,7 +175,7 @@ export const SearchResults = () => {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeCategoriesAndGroupsIcon />,
+                        icon: <Icon icon="search-members" />,
                     },
                     {
                         name: "Example search result",
@@ -225,7 +192,7 @@ export const SearchResults = () => {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeArticlesIcon />,
+                        icon: <Icon icon="search-categories" />,
                     },
                     {
                         name: "Example search result",
@@ -242,7 +209,24 @@ export const SearchResults = () => {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeAllIcon />,
+                        icon: <Icon icon={"search-articles"} />,
+                    },
+                    {
+                        name: "Example search result",
+                        headingLevel: 3,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <ResultMeta
+                                dateUpdated={"2016-07-25 17:51:15"}
+                                updateUser={dummyUserFragment}
+                                crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                                status={PublishStatus.PUBLISHED}
+                                type={"Article"}
+                            />
+                        ),
+                        icon: <Icon icon="search-all" />,
                     },
                     {
                         name: "Example search result - no icon",
@@ -300,7 +284,7 @@ export const SearchResultsForPlaces = () => {
                                 }}
                             />
                         ),
-                        icon: <TypeCategoriesIcon />,
+                        icon: <Icon icon="search-categories" />,
                     },
                     {
                         name: "Knowledge Bases Search Result",
@@ -316,7 +300,7 @@ export const SearchResultsForPlaces = () => {
                                 }}
                             />
                         ),
-                        icon: <TypeKnowledgeBaseIcon />,
+                        icon: <Icon icon={"search-knowledge-bases"} />,
                     },
                     {
                         name: "Groups Search Result",
@@ -335,7 +319,7 @@ export const SearchResultsForPlaces = () => {
                                 }}
                             />
                         ),
-                        icon: <TypeGroupsIcon />,
+                        icon: <Icon icon={"search-groups"} />,
                     },
                     {
                         name: "Categories Search Result",
@@ -354,7 +338,7 @@ export const SearchResultsForPlaces = () => {
                                 }}
                             />
                         ),
-                        icon: <TypeCategoriesIcon />,
+                        icon: <Icon icon="search-categories" />,
                     },
                     {
                         name: "Knowledge Bases Search Result",
@@ -370,7 +354,7 @@ export const SearchResultsForPlaces = () => {
                                 }}
                             />
                         ),
-                        icon: <TypeKnowledgeBaseIcon />,
+                        icon: <Icon icon={"search-knowledge-bases"} />,
                     },
                     {
                         name: "Groups Search Result",
@@ -389,7 +373,7 @@ export const SearchResultsForPlaces = () => {
                                 }}
                             />
                         ),
-                        icon: <TypeGroupsIcon />,
+                        icon: <Icon icon={"search-groups"} />,
                     },
                 ]}
             />

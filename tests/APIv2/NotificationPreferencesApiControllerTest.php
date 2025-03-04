@@ -13,6 +13,7 @@ use UserMetaModel;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Dashboard\Models\ActivityService;
 use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
+use Vanilla\Forum\Digest\DigestModel;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -195,6 +196,51 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
                             "ActivityComment"
                         ]
                     )
+                );
+            }
+        );
+    }
+
+    /**
+     * Test that the digest frequency option and conditions are included in the notification preferences schema.
+     *
+     * @return void
+     */
+    public function testGetSchemaWithDependentPreference(): void
+    {
+        $this->runWithConfig(
+            [
+                "Garden.Digest.Enabled" => true,
+                DigestModel::DEFAULT_DIGEST_FREQUENCY_KEY => DigestModel::DIGEST_TYPE_DAILY,
+            ],
+            function () {
+                $schema = $this->api()
+                    ->get("/notification-preferences/schema")
+                    ->getBody();
+                $this->assertNotEmpty($schema["properties"]["emailDigest"]);
+                $this->assertTrue(
+                    isset(
+                        $schema["properties"]["emailDigest"]["properties"]["DigestEnabled"]["properties"]["frequency"]
+                    )
+                );
+                $this->assertEqualsCanonicalizing(
+                    [DigestModel::DIGEST_TYPE_DAILY, DigestModel::DIGEST_TYPE_WEEKLY, DigestModel::DIGEST_TYPE_MONTHLY],
+                    $schema["properties"]["emailDigest"]["properties"]["DigestEnabled"]["properties"]["frequency"][
+                        "enum"
+                    ]
+                );
+                $this->assertTrue(
+                    isset(
+                        $schema["properties"]["emailDigest"]["properties"]["DigestEnabled"]["properties"]["frequency"][
+                            "x-control"
+                        ]["conditions"]
+                    )
+                );
+                $this->assertEqualsCanonicalizing(
+                    [["field" => "DigestEnabled.email", "type" => "boolean", "const" => true]],
+                    $schema["properties"]["emailDigest"]["properties"]["DigestEnabled"]["properties"]["frequency"][
+                        "x-control"
+                    ]["conditions"]
                 );
             }
         );
@@ -572,6 +618,19 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
     }
 
     /**
+     * Test that trying to set the default preferences for an activity that doesn't allow it will throw the appropriate error.
+     *
+     * @return void
+     */
+    public function testPatchForbiddenDefaultPreference(): void
+    {
+        $this->expectExceptionMessage("You cannot set a default preference for the EmailDigest activity.");
+        $this->runWithConfig(["Garden.Digest.Enabled" => true], function () {
+            $this->api()->patch("notification-preferences/defaults", ["DigestEnabled" => ["email" => true]]);
+        });
+    }
+
+    /**
      * Test that trying to patch default notification preference settings without the 'site.manage' permisison throws
      * an error.
      *
@@ -583,19 +642,6 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
         $this->api()->setUserID($modUser["userID"]);
         $this->expectExceptionCode(403);
         $this->api()->patch("notification-preferences/defaults", ["DiscussionComment" => ["email" => true]]);
-    }
-
-    /**
-     * Test that trying to set the default preferences for an activity that doesn't allow it will throw the appropriate error.
-     *
-     * @return void
-     */
-    public function testPatchForbiddenDefaultPreference(): void
-    {
-        $this->expectExceptionMessage("You cannot set a default preference for the EmailDigest activity.");
-        $this->runWithConfig(["Garden.Digest.Enabled" => true], function () {
-            $this->api()->patch("notification-preferences/defaults", ["DigestEnabled" => ["email" => true]]);
-        });
     }
 
     /**
@@ -640,6 +686,49 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
             $preferenceKey = sprintf(\CategoryModel::PREFERENCE_DIGEST_EMAIL, $followedCategoryID);
             $this->assertEquals(1, $userPreferences[$preferenceKey]);
         }
+    }
+
+    /**
+     * Test patching a user's digest frequency preference.
+     *
+     * @return void
+     */
+    public function testPatchDigestFrequency(): void
+    {
+        $user = $this->createUser();
+
+        $this->runWithConfig(
+            [
+                "Garden.Digest.Enabled" => true,
+                DigestModel::DEFAULT_DIGEST_FREQUENCY_KEY => DigestModel::DIGEST_TYPE_DAILY,
+            ],
+            function () use ($user) {
+                // The user hasn't set a preference, so the default should be used.
+                $userPrefs = $this->api()
+                    ->get("notification-preferences/{$user["userID"]}")
+                    ->getBody();
+                $this->assertSame(DigestModel::DIGEST_TYPE_DAILY, $userPrefs["DigestEnabled"]["frequency"]);
+
+                // Update the preference.
+                $patchedPrefs = $this->api()
+                    ->patch("notification-preferences/{$user["userID"]}", [
+                        "DigestEnabled" => ["frequency" => DigestModel::DIGEST_TYPE_WEEKLY],
+                    ])
+                    ->getBody();
+
+                // The user's preference should now be set to weekly.
+                $this->assertSame(DigestModel::DIGEST_TYPE_WEEKLY, $patchedPrefs["DigestEnabled"]["frequency"]);
+
+                // Trying to update it to an invalid value should not throw an error, but should not change the existing value.
+                $patchedPrefs = $this->api()
+                    ->patch("notification-preferences/{$user["userID"]}", [
+                        "DigestEnabled" => ["frequency" => "invalid"],
+                    ])
+                    ->getBody();
+
+                $this->assertSame(DigestModel::DIGEST_TYPE_WEEKLY, $patchedPrefs["DigestEnabled"]["frequency"]);
+            }
+        );
     }
 
     /**

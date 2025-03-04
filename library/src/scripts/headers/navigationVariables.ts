@@ -84,7 +84,7 @@ function getBuiltinNavItems() {
         builtins.push({
             id: "builtin-discussions",
             url: "/discussions",
-            name: t("Discussions"),
+            name: t("Posts"),
             children: [],
         });
         builtins.push({

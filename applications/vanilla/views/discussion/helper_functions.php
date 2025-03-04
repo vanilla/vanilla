@@ -43,6 +43,32 @@ if (!function_exists("getCustomFields")):
     }
 endif;
 
+if (!function_exists("getPostMeta")):
+    function getPostMeta($discussionID)
+    {
+        if (\Vanilla\FeatureFlagHelper::featureEnabled(\Vanilla\Forum\Models\PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+            $internalClient = \Gdn::getContainer()->get(\Vanilla\Http\InternalClient::class);
+            $discussion = $internalClient->get("/discussions/$discussionID?expand=postMeta")->getBody();
+            $discussionPostMeta = $discussion["postMeta"];
+            $postFieldConfigs = $internalClient->get("/post-fields", ["isActive" => true])->getBody();
+
+            $postFields = [];
+            foreach ($discussionPostMeta as $postFieldID => $value) {
+                $postFieldConfig = array_column($postFieldConfigs, null, "postFieldID")[$postFieldID];
+                $postFields[] = [
+                    "postFieldID" => $postFieldID,
+                    "label" => $postFieldConfig["label"],
+                    "description" => $postFieldConfig["description"],
+                    "dataType" => $postFieldConfig["dataType"],
+                    "value" => $value,
+                ];
+            }
+
+            return ["postFields" => $postFields];
+        }
+    }
+endif;
+
 if (!function_exists("formatBody")):
     /**
      * Format content of comment or discussion.
@@ -219,11 +245,11 @@ if (!function_exists("writeComment")):
                                     echo getCustomFields($author->UserID);
                                 } else {
                                     echo " " .
-                                        wrapIf(htmlspecialchars(val("Title", $author)), "span", [
+                                        wrapIf(htmlspecialchars(val("Title", $author) ?? ""), "span", [
                                             "class" => "MItem AuthorTitle",
                                         ]);
                                     echo " " .
-                                        wrapIf(htmlspecialchars(val("Location", $author)), "span", [
+                                        wrapIf(htmlspecialchars(val("Location", $author) ?? ""), "span", [
                                             "class" => "MItem AuthorLocation",
                                         ]);
                                 }
@@ -698,7 +724,7 @@ if (!function_exists("getCommentOptions")):
         $categoryID = val("CategoryID", $discussion);
 
         // Can the user edit the comment?
-        $canEdit = CommentModel::canEdit($comment, $timeLeft, $discussion);
+        $canEdit = CommentModel::canEdit($comment, $timeLeft);
         if ($canEdit) {
             if ($timeLeft) {
                 $timeLeft = " (" . Gdn_Format::seconds($timeLeft) . ")";

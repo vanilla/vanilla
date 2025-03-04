@@ -51,6 +51,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
      */
     private $connectSynchronizeErrors = false;
 
+    private bool $welcomeEmailDebug = false;
+
     /**
      * Setup error message & override MasterView for popups.
      *
@@ -78,6 +80,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
         $this->profileFieldModel = $profileFieldModel;
         $this->userNotificationPreferencesModel = $userNotificationPreferencesModel;
+        $this->welcomeEmailDebug = Gdn::config()->get("WelcomeEmail.Debug", false);
     }
 
     /**
@@ -574,8 +577,16 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             empty($this->Form->getFormValue("Name")) &&
             empty($this->Form->getFormValue("UserSelect"))
         ) {
-            $this->Form->validateRule("ConnectName", "ValidateRequired");
-            $this->Form->validateRule("ConnectName", "ValidateUsername");
+            $hasEmail = $this->Form->getFormValue("Email");
+            $user = $hasEmail
+                ? $userModel->getByEmail($this->Form->getFormValue("Email"), false, ["dataType" => DATASET_TYPE_ARRAY])
+                : false;
+            if ($user) {
+                $this->Form->setFormValue("Name", $user["Name"]);
+            } else {
+                $this->Form->validateRule("ConnectName", "ValidateRequired");
+                $this->Form->validateRule("ConnectName", "ValidateUsername");
+            }
         } elseif ($isPostBack && !$alreadyConnected && !empty($this->Form->getFormValue("ConnectName"))) {
             //if it's a post back call, and if we are getting a connectName we have to validate the ConnectName
             $this->Form->validateRule("ConnectName", "ValidateUsername");
@@ -642,6 +653,18 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
             // Sign the user in.
             Gdn::userModel()->fireEvent("BeforeSignIn", ["UserID" => $userID]);
+
+            if ($this->welcomeEmailDebug) {
+                $this->logger->info(
+                    "User already exists in the UserAuthentication table, Logging in user with out sending welcome email",
+                    [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                        Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                        "UserID" => $userID,
+                    ]
+                );
+            }
+
             Gdn::session()->start(
                 $userID,
                 true,
@@ -696,7 +719,11 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             $canMatchEmail = strlen($submittedEmail) > 0 && !UserModel::noEmail();
 
             // Check to automatically link the user.
-            if ((forceBool($emailVerified) || ($emailVerified === null && $autoConnect)) && count($existingUsers) > 0) {
+            if (
+                !$userProvidedEmail &&
+                (forceBool($emailVerified) || ($emailVerified === null && $autoConnect)) &&
+                count($existingUsers) > 0
+            ) {
                 if ($isPostBack && $this->Form->getFormValue("ConnectName")) {
                     $this->Form->setFormValue("Name", $this->Form->getFormValue("ConnectName"));
                 }
@@ -735,6 +762,18 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                             // Sign the user in.
                             Gdn::userModel()->fireEvent("BeforeSignIn", ["UserID" => $userID]);
+
+                            if ($this->welcomeEmailDebug) {
+                                $this->logger->info(
+                                    "Matched user with an existing email address, Logging user with out sending welcome email",
+                                    [
+                                        Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                                        Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                                        "UserID" => $userID,
+                                    ]
+                                );
+                            }
+
                             Gdn::session()->start(
                                 $userID,
                                 true,
@@ -885,6 +924,14 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                     // Sign in as the new user.
                     Gdn::userModel()->fireEvent("BeforeSignIn", ["UserID" => $userID]);
+
+                    if ($this->welcomeEmailDebug) {
+                        $this->logger->info("Registering a new user with out custom profile fields", [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                            "UserID" => $userID,
+                        ]);
+                    }
                     Gdn::session()->start(
                         $userID,
                         true,
@@ -895,6 +942,13 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                     // Send the welcome email.
                     if (c("Garden.Registration.SendConnectEmail", false)) {
+                        if ($this->welcomeEmailDebug) {
+                            $this->logger->info("Entered the block in entry controller to send welcome email", [
+                                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                                Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                                "UserID" => $userID,
+                            ]);
+                        }
                         try {
                             $providerName = $this->Form->getFormValue(
                                 "ProviderName",
@@ -1039,6 +1093,14 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 $userID = $userModel->register($user, $registerOptions);
                 $user["UserID"] = $userID;
 
+                if ($this->welcomeEmailDebug) {
+                    $this->logger->info("Registering a new user with custom profile fields", [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                        Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                        "UserID" => $userID,
+                    ]);
+                }
+
                 $this->EventArguments["UserID"] = $userID;
                 $this->fireEvent("AfterConnectSave");
 
@@ -1046,11 +1108,27 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                 // Send the welcome email.
                 if ($userID && c("Garden.Registration.SendConnectEmail", false)) {
+                    if ($this->welcomeEmailDebug) {
+                        $this->logger->info("Entered the block in entry controller to sent out welcome email", [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_TAGS => ["entry", "connect", "registration"],
+                            "UserID" => $userID,
+                        ]);
+                    }
                     $providerName = $this->Form->getFormValue(
                         "ProviderName",
                         $this->Form->getFormValue("Provider", "Unknown")
                     );
-                    $userModel->sendWelcomeEmail($userID, "", "Connect", ["ProviderName" => $providerName]);
+                    try {
+                        $userModel->sendWelcomeEmail($userID, "", "Connect", ["ProviderName" => $providerName]);
+                    } catch (Exception $ex) {
+                        $this->logger->error("Error Sending Welcome Email.", [
+                            "error" => $ex->getMessage(),
+                            "trace" => $ex->getTrace(),
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_EVENT => "syncConnect_welcome_email",
+                        ]);
+                    }
                 }
             }
 
@@ -1118,15 +1196,22 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 "enabled" => 1,
             ]) ?? [];
         $formData = $this->Form->formValues();
-
-        if (empty($formData)) {
-            // We have no data from SSO to process.
-            return;
+        $userID = $this->Form->getFormValue("UserID", null) ?? ($this->Form->getFormValue("UserSelect", null) ?? null);
+        $userEmail = $this->Form->getFormValue("Email", null);
+        if ($userID === null && $userEmail) {
+            $userID =
+                $this->UserModel->getByEmail($userEmail, false, ["dataType" => DATASET_TYPE_ARRAY])["UserID"] ?? null;
+        }
+        $metaModel = Gdn::getContainer()->get(UserMetaModel::class);
+        $userValues = [];
+        if (is_int($userID)) {
+            $userValues = $metaModel->getUserMeta($userID, "Profile.%", null, "Profile.");
+            $this->profileFieldModel->processUserProfileFields($userID, $userValues, ignoreVisibility: true);
         }
 
         $ssoProfileFields = $nonVisibleFields = [];
         foreach ($profileFields as $profileField) {
-            if (empty($formData[$profileField["apiName"]])) {
+            if (empty($formData[$profileField["apiName"]]) && $isPostBack) {
                 // The SSO data did not contain this profile field so there is no processing to do.
                 continue;
             }
@@ -1143,7 +1228,11 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 $tokenData = explode(",", $formData[$profileField["apiName"]]);
                 $formData[$profileField["apiName"]] = is_array($tokenData) ? $tokenData : [$tokenData];
             }
-            if ($notVisible && in_array($profileField["formType"], ["dropdown", "tokens"])) {
+            if (
+                $notVisible &&
+                in_array($profileField["formType"], ["dropdown", "tokens"]) &&
+                isset($formData[$profileField["apiName"]])
+            ) {
                 // In this case we need to validate that the values coming in is one of the values available in our options else discard them
                 $dropdownOptions = is_array($profileField["dropdownOptions"])
                     ? $profileField["dropdownOptions"]
@@ -1171,13 +1260,14 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             }
             if (!$isPostBack && $notVisible) {
                 // for syncConnectUser data, who already exists
-                $nonVisibleFields[$profileField["apiName"]] = $formData[$profileField["apiName"]];
+                $nonVisibleFields[$profileField["apiName"]] = $formData[$profileField["apiName"]] ?? null;
             }
 
             // If it's an internal field or hidden Field we don't show them on registration form but patch them through on post submission,
             // otherwise we populate the fields for the user to modify
             if (($isPostBack && $notVisible) || (!$isPostBack && !$notVisible)) {
-                $ssoProfileFields[$profileField["apiName"]] = $formData[$profileField["apiName"]];
+                $ssoProfileFields[$profileField["apiName"]] =
+                    $formData[$profileField["apiName"]] ?? ($userValues[$profileField["apiName"]] ?? null);
             }
 
             // Always remove profile fields from the data because we don't want them to conflict with normal user fields.
@@ -2505,6 +2595,19 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         $profileFields = $this->profileFieldModel->getProfileFields(["enabled" => 1]) ?? [];
         $userProfileFieldsSchema = $this->profileFieldModel->getUserProfileFieldSchema(false);
         $profileFormFields = $this->Form->formValues()["Profile"] ?? [];
+        // We need to get profile fields that are checkboxes which may not have been selected
+        $checkboxFields = $this->Form->formValues()["Checkboxes"] ?? [];
+        if (!empty($checkboxFields)) {
+            $searchString = "Profile[";
+            $checkboxProfileFields = array_filter(
+                array_map(function ($field) use ($searchString) {
+                    if (str_starts_with($field, $searchString)) {
+                        return substr($field, strlen($searchString), -1);
+                    }
+                }, $checkboxFields)
+            );
+        }
+
         try {
             $requiredFields = [];
             // If there is dataType/formType validation error from schema, this will fail, so we should not complete the registration
@@ -2534,6 +2637,19 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     $userProfileFieldsSchema->setField("properties.{$field["apiName"]}.minItems", 1);
                     $userProfileFieldsSchema->setField("properties.{$field["apiName"]}.minLength", 1);
                     $requiredFields[] = $field["apiName"];
+                }
+                // Check for required checkboxes that are not in the form
+                if (
+                    !empty($checkboxProfileFields) &&
+                    $field["formType"] === "checkbox" &&
+                    in_array($field["apiName"], $checkboxProfileFields) &&
+                    !array_key_exists($field["apiName"], $profileFormFields) &&
+                    $field["registrationOptions"] === "required"
+                ) {
+                    $this->UserModel->Validation->addValidationResult(
+                        $field["apiName"],
+                        t(sprintf("%s is required.", $field["label"]))
+                    );
                 }
             }
             $userProfileFieldsSchema->setField("required", $requiredFields);

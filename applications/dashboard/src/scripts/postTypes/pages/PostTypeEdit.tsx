@@ -7,7 +7,7 @@
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
-import { roleLookUp } from "@dashboard/moderation/communityManagmentUtils";
+import { categoryLookup, roleLookUp } from "@dashboard/moderation/communityManagmentUtils";
 import { PostFieldList } from "@dashboard/postTypes/components/PostFieldList";
 import { postTypeSettingsClasses } from "@dashboard/postTypes/pages/postTypeSettings.classes";
 import { PostType } from "@dashboard/postTypes/postType.types";
@@ -15,11 +15,8 @@ import { PostTypeEditProvider, usePostTypeEdit } from "@dashboard/postTypes/Post
 import { originalPostTypeAsOptions } from "@dashboard/postTypes/utils";
 import { css } from "@emotion/css";
 import { ErrorPageBoundary } from "@library/errorPages/ErrorPageBoundary";
-import { AutoWidthInput } from "@library/forms/AutoWidthInput";
-import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { EditIcon } from "@library/icons/common";
 import { SchemaFormBuilder } from "@library/json-schema-forms";
 import Heading from "@library/layout/Heading";
 import ButtonLoader from "@library/loaders/ButtonLoader";
@@ -30,7 +27,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { formatUrl, t } from "@library/utility/appUtils";
 import { slugify } from "@vanilla/utils";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 
 interface IProps
@@ -39,25 +36,39 @@ interface IProps
     }> {}
 
 function PostTypeEditImpl(props: IProps) {
-    const { mode, isDirty, isLoading, dirtyPostType, updatePostType, savePostType, isSaving, error } =
-        usePostTypeEdit();
+    const {
+        mode,
+        isDirty,
+        isLoading,
+        dirtyPostType,
+        initialOptionValues,
+        updatePostType,
+        savePostType,
+        isSaving,
+        error,
+    } = usePostTypeEdit();
     const history = useHistory();
 
     const classes = postTypeSettingsClasses();
 
-    const editableRef = useRef<HTMLInputElement | null>(null);
-    const focusAndSelectAll = (event?: any) => {
-        if (editableRef.current && editableRef.current !== document.activeElement) {
-            if (event) event.preventDefault();
-            editableRef.current.focus();
-            editableRef.current.select();
-        }
-    };
-
     const [shouldCreateApiLabel, setShouldCreateApiLabel] = useState(mode === "new");
     const [showConfirmExit, setShowConfirmExit] = useState(false);
 
+    const categoryLookupWithInitialOptions = {
+        ...categoryLookup,
+        initialOptions: initialOptionValues?.hasOwnProperty("categoryIDs")
+            ? initialOptionValues["categoryIDs"]
+            : undefined,
+    };
+
+    const roleLookUpWithInitialOptions = {
+        ...roleLookUp,
+        initialOptions: initialOptionValues?.hasOwnProperty("roleIDs") ? initialOptionValues["roleIDs"] : undefined,
+    };
+
     const schema = new SchemaFormBuilder()
+        .textBox("name", "Name", "The name of your custom post type. This will be displayed in the post type list.")
+        .required()
         .dropdown(
             "parentPostTypeID",
             "Post Base Type",
@@ -79,18 +90,26 @@ function PostTypeEditImpl(props: IProps) {
             "Post Button Label",
             "The name which will appear on the button to create a new post of this type.",
         )
-        .textBox("postHelperText", "Post Helper Text", "The name which will appear on the post itself.")
+        .required()
+        .selectLookup(
+            "categoryIDs",
+            "Categories",
+            "The categories that type can be posted in.",
+            categoryLookupWithInitialOptions,
+            true,
+        )
         .selectLookup(
             "roleIDs",
             "Creation Permission",
             "The roles that can create posts of this type.",
-            roleLookUp,
+            roleLookUpWithInitialOptions,
             true,
         )
         .getSchema();
 
     const handleSubmit = async () => {
         await savePostType();
+        history.push("/settings/post-types");
     };
 
     return (
@@ -109,35 +128,6 @@ function PostTypeEditImpl(props: IProps) {
                                     className={classes.backLink}
                                 />
                             </div>
-
-                            <div className={classes.postNameLayout}>
-                                <AutoWidthInput
-                                    disabled={isLoading}
-                                    onChange={(event) => {
-                                        updatePostType({
-                                            ...dirtyPostType,
-                                            name: event.target.value,
-                                            ...(shouldCreateApiLabel && { postTypeID: slugify(event.target.value) }),
-                                        });
-                                    }}
-                                    className={autoWidthInputClasses().themeInput}
-                                    ref={(ref) => (editableRef.current = ref)}
-                                    value={dirtyPostType?.name}
-                                    placeholder={t("Post Type must have a name")}
-                                    maxLength={300}
-                                    onKeyDown={(event) => {
-                                        if (event.key === "Enter") {
-                                            event.preventDefault();
-                                            (event.target as HTMLElement).blur();
-                                        }
-                                    }}
-                                    onMouseDown={focusAndSelectAll}
-                                />
-                                <Button buttonType={ButtonTypes.ICON} onClick={focusAndSelectAll}>
-                                    <EditIcon small />
-                                </Button>
-                            </div>
-
                             <div>
                                 <Button
                                     buttonType={ButtonTypes.OUTLINE}
@@ -152,7 +142,7 @@ function PostTypeEditImpl(props: IProps) {
                 }
             />
             <ErrorPageBoundary>
-                <section>
+                <section className={classes.sectionIndex}>
                     {isLoading ? (
                         <Loader />
                     ) : (
@@ -167,10 +157,14 @@ function PostTypeEditImpl(props: IProps) {
                                         : dirtyPostType
                                 }
                                 onChange={(values) => {
+                                    let vals = values();
+                                    if (values()["name"] && shouldCreateApiLabel) {
+                                        vals = { ...vals, postTypeID: slugify(values()["name"]) };
+                                    }
                                     if (values()["postTypeID"]) {
                                         setShouldCreateApiLabel(false);
                                     }
-                                    updatePostType({ ...values() });
+                                    updatePostType({ ...vals });
                                 }}
                             />
                             <PostFieldList />

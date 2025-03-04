@@ -44,7 +44,7 @@ class MultilingualPlugin extends Gdn_Plugin
     {
         $defaultLocale = Gdn_Locale::canonicalize(c("Garden.Locale"));
 
-        $localeModel = new LocaleModel();
+        $localeModel = Gdn::getContainer()->get(LocaleModel::class);
         if (class_exists("Locale")) {
             $localePacks = $localeModel->enabledLocalePacks(false);
             $locales = [];

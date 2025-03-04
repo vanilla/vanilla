@@ -55,7 +55,7 @@ export function PasswordInput(props: IProps) {
                     >
                         {/* This span is required for the conditional tooltip */}
                         <span style={{ display: "flex" }}>
-                            <Icon icon="notification-alert" className={classes.errorIcon} />
+                            <Icon icon="status-alert" className={classes.errorIcon} />
                         </span>
                     </ConditionalWrap>
                 )}
@@ -69,7 +69,7 @@ export function PasswordInput(props: IProps) {
                     title={t(buttonLabel)}
                     className={classes.hugRight}
                 >
-                    <Icon icon={showText ? "editor-eye-slash" : "editor-eye"} />
+                    <Icon icon={showText ? "hide-content" : "show-content"} />
                 </Button>
             )}
         </div>

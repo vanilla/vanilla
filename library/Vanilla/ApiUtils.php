@@ -53,7 +53,7 @@ class ApiUtils
      * @param array $output A single row as part of an API response.
      * @return array An array with camelCase keys.
      */
-    public static function convertOutputKeys(array $output)
+    public static function convertOutputKeys(array $output, array $excludedKeys = [])
     {
         static $scheme;
 
@@ -61,7 +61,7 @@ class ApiUtils
             $scheme = new CamelCaseScheme();
         }
 
-        $result = $scheme->convertArrayKeys($output);
+        $result = $scheme->convertArrayKeys($output, excludedKeys: $excludedKeys);
         return $result;
     }
 
@@ -350,7 +350,7 @@ class ApiUtils
     public static function jsonFilter($value)
     {
         $fn = function (&$value, $key = "") use (&$fn) {
-            if (is_array($value) || $value instanceof \ArrayAccess) {
+            if (is_array($value) || ($value instanceof \ArrayAccess && $value instanceof \Traversable)) {
                 array_walk($value, function (&$childValue, $childKey) use ($fn, $key) {
                     $fn($childValue, $childKey, $key);
                 });

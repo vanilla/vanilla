@@ -57,12 +57,15 @@ async function convertPanoptoEmbeds() {
 
     if (panoptoEmbeds.length > 0) {
         await ensureScript(PANOPTO_SCRIPT);
-        panoptoEmbeds.map((contentElement) => {
-            // Only render the embed if its not loaded yet.
-            if (!contentElement.classList.contains(EMBED_LOADED_CLASS)) {
-                renderPanoptoEmbed(contentElement as HTMLElement);
-            }
-        });
+        await Promise.all(
+            panoptoEmbeds.map((contentElement) => {
+                // Only render the embed if its not loaded yet.
+                if (!contentElement.classList.contains(EMBED_LOADED_CLASS)) {
+                    return renderPanoptoEmbed(contentElement as HTMLElement);
+                }
+                return Promise.resolve();
+            }),
+        );
     }
 }
 

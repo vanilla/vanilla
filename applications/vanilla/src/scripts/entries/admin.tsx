@@ -13,9 +13,13 @@ import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { CategoryPicker } from "@library/forms/select/CategoryPicker";
 import { addComponent } from "@library/utility/componentRegistry";
 import { CommunityMemberInput } from "@vanilla/addon-vanilla/forms/CommunityMemberInput";
+import { SelectPostTypes } from "@vanilla/addon-vanilla/forms/SelectPostTypes";
+
 cssOut(`.suggestedTextInput-option`, suggestedTextStyleHelper({ forDashboard: true }).option);
 addComponent("CategoryPicker", CategoryPicker, { overwrite: true });
 addComponent("CommunityMemberInput", CommunityMemberInput, { overwrite: true });
+addComponent("CategoryPostTypes", SelectPostTypes, { overwrite: true });
+
 onReady(handleImageUploadInputDisplay);
 onContent(handleImageUploadInputDisplay);
 
@@ -53,7 +57,7 @@ delegateEvent("click", ".dropdown-menu-link-delete-delete", (event, triggeringEl
     if (categoryID === null) {
         return;
     }
-    mountModal(
+    void mountModal(
         <DeleteCategoryModal
             categoryID={parseInt(categoryID)}
             discussionsCount={discussionsCount !== null ? parseInt(discussionsCount) : undefined}

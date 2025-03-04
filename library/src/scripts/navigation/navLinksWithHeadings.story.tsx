@@ -10,6 +10,7 @@ import { t } from "@library/utility/appUtils";
 import React from "react";
 import { NavLinksPlaceholder } from "@library/navigation/NavLinksPlaceholder";
 import { storyWithConfig } from "@library/storybook/StoryContext";
+import Container from "@library/layout/components/Container";
 
 export default {
     title: "Navigation/NavLinksWithHeadings",
@@ -18,12 +19,14 @@ export default {
 
 export function StoryNavLinks() {
     return (
-        <NavLinksWithHeadingsComponent
-            {...navLinksWithHeadingsData}
-            depth={2}
-            ungroupedTitle={t("Other Articles")}
-            ungroupedViewAllUrl={navLinksWithHeadingsData.ungroupedViewAllUrl}
-        />
+        <Container narrow>
+            <NavLinksWithHeadingsComponent
+                {...navLinksWithHeadingsData}
+                depth={2}
+                ungroupedTitle={t("Other Articles")}
+                ungroupedViewAllUrl={navLinksWithHeadingsData.ungroupedViewAllUrl}
+            />
+        </Container>
     );
 }
 

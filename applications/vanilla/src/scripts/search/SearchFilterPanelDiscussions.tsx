@@ -1,26 +1,25 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { SEARCH_SCOPE_LOCAL, useSearchScope } from "@library/features/search/SearchScopeContext";
+import { TagsInput } from "@library/features/tags/TagsInput";
+import MultiUserInput from "@library/features/users/MultiUserInput";
+import Checkbox from "@library/forms/Checkbox";
+import CheckboxGroup from "@library/forms/CheckboxGroup";
+import InputBlock from "@library/forms/InputBlock";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
+import LazyDateRange from "@library/forms/LazyDateRange";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { useSearchForm } from "@library/search/SearchFormContext";
 import { t } from "@library/utility/appUtils";
-import React, { useEffect, useMemo } from "react";
-import Checkbox from "@library/forms/Checkbox";
-import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
-import { IDiscussionSearchTypes } from "@vanilla/addon-vanilla/search/discussionSearchTypes";
-import MultiUserInput from "@library/features/users/MultiUserInput";
-import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
-import { TagsInput } from "@library/features/tags/TagsInput";
-import LazyDateRange from "@library/forms/LazyDateRange";
-import { SEARCH_SCOPE_LOCAL, useSearchScope } from "@library/features/search/SearchScopeContext";
-import InputBlock from "@library/forms/InputBlock";
-import { useSiteSectionContext } from "@library/utility/SiteSectionContext";
+import { IDiscussionSearchTypes } from "@vanilla/addon-vanilla/search/discussionSearchTypes";
+import React, { useEffect, useMemo } from "react";
+import { CategoryDropdown } from "@library/forms/nestedSelect/presets/CategoryDropdown";
 
 /**
  * Implement search filter panel for discussions
@@ -31,13 +30,11 @@ export function SearchFilterPanelDiscussions() {
 
     const classesInputBlock = inputBlockClasses();
 
-    const { siteSection } = useSiteSectionContext();
-
     /**
      * Category and Scope are exclusive
      */
     const isFilteringCategories = useMemo(() => {
-        return form?.categoryOptions && form.categoryOptions.length > 0;
+        return form?.categoryIDs && form.categoryIDs.length > 0;
     }, [form]);
 
     const isFilteringTags = useMemo(() => {
@@ -48,7 +45,7 @@ export function SearchFilterPanelDiscussions() {
     useEffect(() => {
         if (scope && scope.value !== SEARCH_SCOPE_LOCAL) {
             updateForm({
-                ...(isFilteringCategories ? { categoryOptions: [] } : {}),
+                ...(isFilteringCategories ? { categoryIDs: [] } : {}),
                 ...(isFilteringTags ? { tagsOptions: [] } : {}),
             });
         }
@@ -104,14 +101,15 @@ export function SearchFilterPanelDiscussions() {
                     end={form.endDateUpdated}
                 />
             </InputBlock>
-            <CommunityCategoryInput
-                label={t("Category")}
+
+            <CategoryDropdown
                 multiple
-                onChange={(options) => {
-                    updateForm({ categoryOptions: options });
+                isClearable
+                onChange={(categoryIDs: number[]) => {
+                    updateForm({ categoryIDs });
                 }}
-                parentCategoryID={siteSection?.attributes?.categoryID ?? null}
-                value={form.categoryOptions ?? []}
+                value={form.categoryIDs ?? []}
+                label={t("Category")}
                 labelNote={
                     scope && isFilteringCategories ? t("Searching categories on this community only") : undefined
                 }
@@ -119,7 +117,7 @@ export function SearchFilterPanelDiscussions() {
 
             <CheckboxGroup tight={true}>
                 <Checkbox
-                    disabled={(form.categoryOptions?.length || 0) > 1}
+                    disabled={(form.categoryIDs?.length || 0) > 1}
                     label={t("Search Subcategories")}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         updateForm({ includeChildCategories: event.target.checked || false });

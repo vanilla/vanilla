@@ -23,7 +23,7 @@ services:
     php-fpm:
         build:
             context: "./images/php"
-            dockerfile: "./8.0/Dockerfile"
+            dockerfile: "./8.1/Dockerfile"
             args:
                 WWWGROUP: "${WWWGROUP}"
                 WWWUSER: "${WWWUSER}"

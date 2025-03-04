@@ -8,6 +8,7 @@
  * @since 2.0
  */
 use Vanilla\Addon;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\AddonModel;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Utility\ArrayUtils;
@@ -53,6 +54,9 @@ class SettingsController extends DashboardController
     /** @var WidgetService */
     private $widgetService;
 
+    /** @var LocaleModel */
+    private LocaleModel $localeModel;
+
     /**
      * SettingsController constructor.
      */
@@ -61,6 +65,7 @@ class SettingsController extends DashboardController
         parent::__construct();
         $this->addonModel = \Gdn::getContainer()->get(AddonModel::class);
         $this->widgetService = \Gdn::getContainer()->get(WidgetService::class);
+        $this->localeModel = Gdn::getContainer()->get(LocaleModel::class);
     }
 
     /**
@@ -104,7 +109,7 @@ class SettingsController extends DashboardController
         $this->permission("Garden.Settings.Manage");
         $this->setHighlightRoute("/settings/post-types");
         $this->title(t("Post Types and Post Fields"));
-        if (Gdn::config("Feature.PostTypesAndPostFields.Enabled")) {
+        if (FeatureFlagHelper::featureEnabled("customLayout.createPost")) {
             $this->render("post-types");
         } else {
             $this->renderException(notFoundException());
@@ -289,16 +294,46 @@ class SettingsController extends DashboardController
      *    Valid keys are BanType and BanValue. BanValue is what is to be banned.
      *    Valid values for BanType are email, ipaddress or name.
      */
-    protected function _banFilter($ban)
+    private static function legacyUserPageBanFilter($ban)
     {
-        $banModel = $this->getBanModel();
+        $banModel = \Gdn::getContainer()->get(BanModel::class);
         $banWhere = $banModel->banWhere($ban, "u.");
         foreach ($banWhere as $name => $value) {
             if (!in_array($name, ["u.Admin", "u.Deleted"])) {
-                return "$name $value";
+                return ["Filter" => "$name $value"];
             }
         }
         return [];
+    }
+
+    /**
+     * @param array $banRow
+     * @return string
+     */
+    public static function banRuleUsersUrl(array $banRow): string
+    {
+        if (FeatureFlagHelper::featureEnabled("NewUserManagement")) {
+            $baseUrl = "/dashboard/user";
+
+            $query = [
+                "banned" => "true",
+            ];
+            $banType = strtolower($banRow["BanType"]);
+            switch ($banType) {
+                case "email":
+                case "name":
+                    $query["Keywords"] = $banRow["BanValue"];
+                    break;
+                case "ipaddress":
+                    $query["ipAddresses"][] = $banRow["BanValue"];
+                    break;
+            }
+        } else {
+            $baseUrl = "/dashboard/user/banned";
+            $query = self::legacyUserPageBanFilter($banRow);
+        }
+
+        return url($baseUrl . "?" . http_build_query($query), true);
     }
 
     /**
@@ -963,7 +998,7 @@ class SettingsController extends DashboardController
         $this->permission("Garden.Settings.Manage");
         $this->setHighlightRoute("settings/ai-suggestions");
         $this->title(t("AI Suggested Answers"));
-        if (Gdn::config("Feature.AISuggestions.Enabled") && Gdn::config("Feature.aiFeatures.Enabled")) {
+        if (Gdn::config("Feature.AISuggestions.Enabled")) {
             $this->render("ai-suggestions");
         } else {
             $this->renderException(notFoundException());
@@ -1213,13 +1248,11 @@ class SettingsController extends DashboardController
         $this->setHighlightRoute("/settings/locales");
         $this->addJsFile("addons.js");
 
-        $LocaleModel = new LocaleModel();
-
         // Get the available locale packs.
-        $AvailableLocales = $LocaleModel->availableLocalePacks();
+        $AvailableLocales = $this->localeModel->availableLocalePacks();
 
         // Get the enabled locale packs.
-        $EnabledLocales = $LocaleModel->enabledLocalePacks();
+        $EnabledLocales = $this->localeModel->enabledLocalePacks();
 
         // Check to enable/disable a locale.
         if ($this->Form->authenticatedPostBack() && !$Op) {
@@ -1271,7 +1304,7 @@ class SettingsController extends DashboardController
 
         $this->setData("AvailableLocales", $AvailableLocales);
         $this->setData("EnabledLocales", $EnabledLocales);
-        $this->setData("Locales", $LocaleModel->availableLocales());
+        $this->setData("Locales", $this->localeModel->availableLocales());
         $this->render();
     }
 
@@ -1290,7 +1323,8 @@ class SettingsController extends DashboardController
         } elseif (!isset($addonInfo["Locale"])) {
             $this->Form->addError("ValidateRequired", "Locale");
         } else {
-            saveToConfig("EnabledLocales.$addonName", $addonInfo["Locale"]);
+            Gdn::config()->saveToConfig("EnabledLocales.$addonName", $addonInfo["Locale"]);
+            $this->localeModel->enableLocale($addonInfo["Locale"]);
             $this->informMessage(sprintf(t("%s Enabled."), val("Name", $addonInfo, t("Locale"))));
         }
 
@@ -1649,7 +1683,7 @@ class SettingsController extends DashboardController
         $session = Gdn::session();
         $addonName = $session->validateTransientKey($transientKey) ? $addonName : "";
         if ($addonType == "Locale") {
-            $addonManager = new LocaleModel();
+            $addonManager = $this->localeModel;
             $testMethod = "TestLocale";
         } else {
             $addonManagerName = $addonType . "Manager";

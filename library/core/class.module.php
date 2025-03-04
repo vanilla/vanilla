@@ -198,7 +198,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule
             $view = substr($view, 4);
         }
 
-        if ($applicationFolder == "") {
+        if ($applicationFolder == "" && !is_null($this->_ApplicationFolder)) {
             $applicationFolder = strpos($this->_ApplicationFolder, "/")
                 ? $this->_ApplicationFolder
                 : strtolower($this->_ApplicationFolder);

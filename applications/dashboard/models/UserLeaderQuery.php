@@ -62,7 +62,8 @@ class UserLeaderQuery implements \JsonSerializable
         ?int $limit,
         ?array $includedRoleIDs = [],
         ?array $excludedRoleIDs = [],
-        ?string $leaderboardType = null
+        ?string $leaderboardType = null,
+        public array $excludedUserIDs = []
     ) {
         $this->slotType = $slotType;
         $this->categoryID = $categoryID;
@@ -71,5 +72,9 @@ class UserLeaderQuery implements \JsonSerializable
         $this->excludedRoleIDs = $excludedRoleIDs;
         $this->leaderboardType = $leaderboardType ?? UserLeaderService::LEADERBOARD_TYPE_REPUTATION;
         $this->siteSectionID = $siteSectionID;
+        $aiSuggestionsUserID = AiSuggestionSourceService::aiSuggestionConfigs()["userID"] ?? null;
+        if (!empty($aiSuggestionsUserID)) {
+            $this->excludedUserIDs[] = $aiSuggestionsUserID;
+        }
     }
 }

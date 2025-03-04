@@ -1100,7 +1100,7 @@ class Gdn_Request implements RequestInterface
          */
 
         // Attempt to get the web root from the server.
-        $webRoot = str_replace("\\", "/", val("SCRIPT_NAME", $_SERVER, ""));
+        $webRoot = str_replace("\\", "/", val("SCRIPT_NAME", $_SERVER, "") ?? "");
         if (($pos = strrpos($webRoot, "/index.php")) !== false) {
             $webRoot = substr($webRoot, 0, $pos);
         }

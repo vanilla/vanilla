@@ -1,13 +1,13 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import Translate from "@library/content/Translate";
-import { IBulkActionForm } from "@library/features/discussions/BulkActionsModal";
+import { IBulkActionForm } from "@library/bulkActions/BulkActions.types";
 import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
-import { useBulkDiscussionClose, useDiscussionByIDs } from "@library/features/discussions/discussionHooks";
+import { useBulkDiscussionClose } from "@library/features/discussions/discussionHooks";
 import { bulkDiscussionsClasses } from "@library/features/discussions/forms/BulkDiscussions.classes";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -21,7 +21,7 @@ import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import Message from "@library/messages/Message";
 import { t } from "@library/utility/appUtils";
 import { RecordID } from "@vanilla/utils";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 
 /**

@@ -9,6 +9,9 @@ namespace Vanilla\Layout;
 
 use CategoryModel;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Database\Select;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\Providers\LayoutViewRecordProviderInterface;
 use Vanilla\Site\SiteSectionModel;
@@ -94,6 +97,9 @@ class DiscussionLayoutRecordProvider implements LayoutViewRecordProviderInterfac
         return $query
             ->withRecordType(CategoryLayoutRecordProvider::RECORD_TYPE)
             ->withRecordID($categoryID)
+            ->withAdditionalParams([
+                "discussionID" => $query->getRecordID(),
+            ])
             ->withLayoutViewType($layoutViewType);
     }
 

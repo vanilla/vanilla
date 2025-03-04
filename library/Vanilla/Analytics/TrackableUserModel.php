@@ -110,8 +110,8 @@ class TrackableUserModel
                 ],
             ];
 
-            $timeFirstVisit = strtotime($user->DateFirstVisit) ?: 0;
-            $timeRegistered = strtotime($user->DateInserted) ?: 0;
+            $timeFirstVisit = $user->DateFirstVisit ? strtotime($user->DateFirstVisit) : 0;
+            $timeRegistered = $user->DateInserted ? strtotime($user->DateInserted) : 0;
 
             $userInfo["sinceFirstVisit"] = CurrentTimeStamp::get() - $timeFirstVisit;
             $userInfo["sinceRegistered"] = CurrentTimeStamp::get() - $timeRegistered;

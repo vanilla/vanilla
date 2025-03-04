@@ -39,7 +39,10 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     const IMAGE_SOURCE_STYLEGUIDE = "styleGuide";
     const IMAGE_SOURCE_SITE_SECTION = "siteSection";
     const IMAGE_SOURCE_CATEGORY = "category";
+    const IMAGE_SOURCE_PLACE = "place";
     const IMAGE_SOURCE_CUSTOM = "custom";
+    const IMAGE_SOURCE_KNOWLEDGE_BASE = "knowledgeBase/bannerImage";
+    const IMAGE_SOURCE_KNOWLEDGE_HOME = "knowledgeImage";
 
     /** @var SiteSectionModel */
     private $siteSectionModel;
@@ -281,6 +284,9 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                 self::IMAGE_SOURCE_CUSTOM,
                 self::IMAGE_SOURCE_SITE_SECTION,
                 self::IMAGE_SOURCE_CATEGORY,
+                self::IMAGE_SOURCE_PLACE,
+                self::IMAGE_SOURCE_KNOWLEDGE_BASE,
+                self::IMAGE_SOURCE_KNOWLEDGE_HOME,
             ],
             "x-control" => SchemaForm::radioPicker(
                 new FormOptions("Image Source"),
@@ -366,6 +372,19 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
             ? $this->props["descriptionType"] !== "none"
             : $this->props["showDescription"] ?? false;
 
+        $contextualSearchByCategory = Gdn::config("Search.ContextualSearchByCategory.Enabled", false);
+
+        $categoryID = $this->getHydrateParam("categoryID");
+
+        if ($contextualSearchByCategory && $categoryID > 0) {
+            $this->props["initialParams"] = [
+                "domain" => "discussions",
+                "categoryIDs" => [$categoryID],
+                "includeChildCategories" => true,
+                "recordTypes" => ["discussion", "comment"],
+            ];
+        }
+
         return $this->props;
     }
 
@@ -386,11 +405,28 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                 ? $siteSection->getBannerImageLink()
                 : null;
         }
+
+        if ($imageSource === self::IMAGE_SOURCE_PLACE) {
+            return $this->getHydrateParam("place.bannerImage") ?: null;
+        }
+
         if ($imageSource === self::IMAGE_SOURCE_CATEGORY) {
-            return BannerImageModel::getBannerImageSlug($this->getHydrateParam("categoryID"));
+            return BannerImageModel::getBannerImageUrl($this->getHydrateParam("categoryID"));
         }
         if ($imageSource === self::IMAGE_SOURCE_STYLEGUIDE) {
             return null;
+        }
+
+        if ($imageSource === self::IMAGE_SOURCE_KNOWLEDGE_BASE) {
+            return !empty($this->props["background"]["image"])
+                ? $this->props["background"]["image"]
+                : $this->getHydrateParam("knowledgeBase.bannerImage");
+        }
+
+        if ($imageSource === self::IMAGE_SOURCE_KNOWLEDGE_HOME) {
+            return !empty($this->props["background"]["image"])
+                ? $this->props["background"]["image"]
+                : $this->getHydrateParam("knowledgeImage");
         }
 
         return empty($this->props["background"]["image"])

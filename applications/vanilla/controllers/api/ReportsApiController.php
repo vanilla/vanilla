@@ -207,9 +207,6 @@ class ReportsApiController extends \AbstractApiController
             ]);
         }
 
-        if ($record["CategoryID"] === \CategoryModel::ROOT_ID) {
-            throw new ClientException("Cannot report a record in the root category.");
-        }
         if (isset($body["noteBody"]) && isset($body["noteFormat"])) {
             $this->formatService->filter($body["noteBody"], $body["noteFormat"]);
         }

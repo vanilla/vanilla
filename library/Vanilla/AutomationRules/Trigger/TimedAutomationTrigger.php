@@ -13,6 +13,7 @@ use DiscussionModel;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
@@ -42,7 +43,7 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
          * 6. If last run exists, use that to calculate the "since date" by subtracting the threshold time from the last run time.
          */
 
-        $currentDate = new DateTimeImmutable();
+        $currentDate = CurrentTimeStamp::getDateTime();
 
         $endDate = $currentDate->sub(
             DateInterval::createFromDateString(

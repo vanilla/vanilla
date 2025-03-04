@@ -8,7 +8,6 @@ import React from "react";
 import { render, screen, within } from "@testing-library/react";
 import SiteTotalsWidget from "@library/siteTotals/SiteTotalsWidget";
 import { SiteTotalsAlignment, SiteTotalsLabelType, ISiteTotalCount } from "@library/siteTotals/SiteTotals.variables";
-import { useValidCounts } from "@library/siteTotals/SiteTotals";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { formatNumberText } from "@library/content/NumberFormatted";
 import { JsonSchema } from "@vanilla/json-schema-forms";
@@ -176,65 +175,6 @@ describe("SiteTotals", () => {
         expect.objectContaining({
             labelType: SiteTotalsLabelType.ICON,
         });
-    });
-
-    it("Get valid count list based on enabled addons for the widget editor", () => {
-        const mockInstance = [
-            { recordType: "discussion", label: "Discussions", isHidden: false },
-            { recordType: "onlineUser", label: "Online", isHidden: false },
-            { recordType: "post", label: "Posts", isHidden: false },
-            { recordType: "answered", label: "Answered", isHidden: false },
-            { recordType: "comment", label: "Comments", isHidden: false },
-            { recordType: "question", label: "Questions", isHidden: true },
-        ];
-
-        const mockSchema: JsonSchema = {
-            description: "Site Totals",
-            type: "object",
-            required: ["apiParams"],
-            properties: {
-                apiParams: {
-                    type: "object",
-                    required: [],
-                    properties: {
-                        options: {
-                            type: "object",
-                            properties: {
-                                group: { type: "string" },
-                                event: { type: "string" },
-                                category: { type: "string" },
-                                discussion: { type: "string" },
-                                comment: { type: "string" },
-                                post: { type: "string" },
-                                user: { type: "string" },
-                            },
-
-                            default: {
-                                group: "Groups",
-                                event: "Events",
-                                category: "Categories",
-                                discussion: "Discussions",
-                                comment: "Comments",
-                                post: "Posts",
-                                user: "Members",
-                            },
-                            required: [],
-                        },
-                    },
-                },
-            },
-        };
-
-        const expectedInstance = [
-            { recordType: "discussion", label: "Discussions", isHidden: false },
-            { recordType: "post", label: "Posts", isHidden: false },
-            { recordType: "comment", label: "Comments", isHidden: false },
-            { recordType: "group", label: "Groups", isHidden: true },
-            { recordType: "event", label: "Events", isHidden: true },
-            { recordType: "category", label: "Categories", isHidden: true },
-        ];
-
-        expect(useValidCounts(mockInstance, mockSchema)).toStrictEqual(expectedInstance);
     });
 
     describe("useGetSiteTotalCount() hook", () => {

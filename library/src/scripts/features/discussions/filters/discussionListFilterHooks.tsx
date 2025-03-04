@@ -8,42 +8,12 @@ import { useMemo } from "react";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useQuery } from "@tanstack/react-query";
-import { ITag } from "@library/features/tags/TagsReducer";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import sortBy from "lodash-es/sortBy";
 import { IGroupOption } from "@library/forms/select/Tokens.loadable";
-import { getMeta, t } from "@library/utility/appUtils";
+import { t } from "@library/utility/appUtils";
 import { useConfigsByKeys } from "@library/config/configHooks";
 import { LoadStatus } from "@library/@types/api/core";
-
-/**
- * Get a list of User defined tags as combo box options sorted alphabetically
- */
-export function useTagOptions(): IComboBoxOption[] {
-    const { isSuccess, data } = useQuery<any, IError, ITag[]>({
-        queryKey: ["tags", { type: "User" }],
-        queryFn: async ({ queryKey }) => {
-            const [_, query] = queryKey;
-            const { data } = await apiv2.get("/tags", { params: query });
-            return sortBy(data, [(tag) => tag.name.toLowerCase()]);
-        },
-    });
-
-    const options = useMemo<IComboBoxOption[]>(() => {
-        if (isSuccess) {
-            return data.map(
-                ({ tagID, name }) =>
-                    ({
-                        value: tagID.toString(),
-                        label: name,
-                    } as IComboBoxOption),
-            );
-        }
-        return [];
-    }, [isSuccess, data]);
-
-    return options;
-}
 
 export function useTypeOptions(): IComboBoxOption[] {
     /**

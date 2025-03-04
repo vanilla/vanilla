@@ -29,6 +29,7 @@ interface IProps extends IFollowDropdownProps {
     categoryID: number;
     categoryName: string;
     notificationPreferences?: ICategoryPreferences;
+    categoryUrl?: string;
 }
 
 export function CategoryFollowDropDownImpl(props: IProps) {
@@ -61,7 +62,7 @@ export function CategoryFollowDropDownImpl(props: IProps) {
     });
 
     async function unfollowAndResetPreferences() {
-        setValues((values) => ({
+        await setValues((values) => ({
             // set everything to false
             ...Object.entries(values).reduce((acc, [key, type]) => {
                 acc[key] = false;
@@ -83,7 +84,7 @@ export function CategoryFollowDropDownImpl(props: IProps) {
                     canIncludeInDigest={canIncludeInDigest}
                     preferences={values}
                     onPreferenceChange={async function (delta) {
-                        setValues((values) => ({ ...values, ...delta }));
+                        await setValues((values) => ({ ...values, ...delta }));
                         await submitForm();
                     }}
                     preview={props.preview}
@@ -97,6 +98,7 @@ export function CategoryFollowDropDownImpl(props: IProps) {
             isFollowed={categoryNotificationPreferences?.["preferences.followed"] ?? false}
             defaultUserPreferences={defaultUserPreferences}
             onPreferencesChange={props.onPreferencesChange}
+            viewRecordUrl={props.categoryUrl}
         />
     );
 }

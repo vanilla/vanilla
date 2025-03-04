@@ -164,6 +164,8 @@ class ProfileFieldMigrationTest extends SiteTestCase
         $this->runWithConfig(
             [
                 ProfileFieldModel::CONFIG_FEATURE_FLAG => true,
+                // Next line simulates no migrations done since custom profile fields are enabled by default.
+                LegacyProfileFieldMigrator::CONF_ALREADY_RAN_MIGRATION => false,
                 "ProfileExtender.Fields" => [
                     "textField" => self::TEXTBOX_LEGACY,
                 ],

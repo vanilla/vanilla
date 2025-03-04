@@ -418,7 +418,7 @@ class UserMentionsRemovalTest extends SiteTestCase
                                     "body" => <<<EOT
 
 <blockquote class="Quote blockquote">test</blockquote>
-<a href="$profileUrlNoSpace" rel="nofollow">@UserToAnonymize</a>: test<br><a rel="nofollow" href="$profileUrlNoSpace">test</a><br><br>
+<a href="$profileUrlNoSpace" rel="nofollow">@UserToAnonymize</a>: test<br/><a rel="nofollow" href="$profileUrlNoSpace">test</a><br/><br/>
 EOT
                                     ,
                                     "bodyRaw" => <<<EOT
@@ -440,7 +440,7 @@ EOT
                                         "dateLastActive" => "2022-06-02T16:20:42+00:00",
                                         "label" => "yay",
                                     ],
-                                    "url" => "https://dev.vanilla.localhost/discussion/comment/1365#Comment_1365",
+                                    "url" => "https://dev.vanilla.local/discussion/comment/1365#Comment_1365",
                                     "embedType" => "quote",
                                 ],
                             ],
@@ -457,7 +457,7 @@ EOT
                                     "body" => <<<EOT
 
 <blockquote class="Quote blockquote">test</blockquote>
-<a href="$profileUrlAnonymize" rel="nofollow">@[Deleted User]</a>: test<br><a rel="nofollow" href="$profileUrlAnonymize">test</a><br><br>
+<a href="$profileUrlAnonymize" rel="nofollow">@[Deleted User]</a>: test<br/><a rel="nofollow" href="$profileUrlAnonymize">test</a><br/><br/>
 EOT
                                     ,
                                     "bodyRaw" => <<<EOT
@@ -490,7 +490,7 @@ EOT
                                         "renderFullContent" => false,
                                         "expandByDefault" => false,
                                     ],
-                                    "url" => "https://dev.vanilla.localhost/discussion/comment/1365#Comment_1365",
+                                    "url" => "https://dev.vanilla.local/discussion/comment/1365#Comment_1365",
                                     "embedType" => "quote",
                                 ],
                             ],
@@ -546,7 +546,7 @@ EOT
                                 "name" => self::USERNAME_NO_SPACE,
                                 "url" => $profileUrlNoSpace,
                                 "photoUrl" =>
-                                    "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+                                    "https://dev.vanilla.local/applications/dashboard/design/images/defaulticon.png",
                                 "dateLastActive" => "2022-12-20T17:41:59+00:00",
                                 "banned" => 0,
                                 "private" => false,
@@ -566,7 +566,7 @@ EOT
                                 "name" => self::USERNAME_ANONYMIZE,
                                 "url" => $profileUrlAnonymize,
                                 "photoUrl" =>
-                                    "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+                                    "https://dev.vanilla.local/applications/dashboard/design/images/defaulticon.png",
                                 "dateLastActive" => "2022-12-20T17:41:59+00:00",
                                 "banned" => 0,
                                 "private" => false,
@@ -623,13 +623,13 @@ EOT
                     [
                         "type" => "rich_embed_card",
                         "dataSourceType" => "url",
-                        "url" => "https://dev.vanilla.localhost/discussion/1362/test",
+                        "url" => "https://dev.vanilla.local/discussion/1362/test",
                         "embedData" => [
                             "recordID" => 1362,
                             "recordType" => "discussion",
                             "body" => <<<EOD
 <blockquote class="Quote blockquote">abc</blockquote>
-<a href="$profileUrlNoSpace" rel="nofollow">@$usernameNoSpace</a> test<br><br><a rel="nofollow" href="$profileUrlNoSpace">$profileUrlNoSpace</a>
+<a href="$profileUrlNoSpace" rel="nofollow">@$usernameNoSpace</a> test<br/><br/><a rel="nofollow" href="$profileUrlNoSpace">$profileUrlNoSpace</a>
 EOD
                             ,
                             "bodyRaw" => <<<EOD
@@ -645,14 +645,14 @@ EOD
                             "insertUser" => [
                                 "userID" => 16,
                                 "name" => self::USERNAME_NO_SPACE,
-                                "url" => "https://dev.vanilla.localhost/profile/UserToAnonymize",
+                                "url" => "https://dev.vanilla.local/profile/UserToAnonymize",
                                 "photoUrl" =>
-                                    "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+                                    "https://dev.vanilla.local/applications/dashboard/design/images/defaulticon.png",
                                 "dateLastActive" => date("c", $this->mockedTimeStamp),
                                 "banned" => 0,
                                 "private" => false,
                             ],
-                            "url" => "https://dev.vanilla.localhost/discussion/1362/test",
+                            "url" => "https://dev.vanilla.local/discussion/1362/test",
                             "embedType" => "quote",
                             "name" => "test",
                         ],
@@ -667,13 +667,13 @@ EOD
                     [
                         "type" => "rich_embed_card",
                         "dataSourceType" => "url",
-                        "url" => "https://dev.vanilla.localhost/discussion/1362/test",
+                        "url" => "https://dev.vanilla.local/discussion/1362/test",
                         "embedData" => [
                             "recordID" => 1362,
                             "recordType" => "discussion",
                             "body" => <<<EOT
 <blockquote class="Quote blockquote">abc</blockquote>
-<a href="$profileUrlAnonymize" rel="nofollow">@$usernameAnonymize</a> test<br><br><a rel="nofollow" href="$profileUrlAnonymize">$profileUrlAnonymize</a>
+<a href="$profileUrlAnonymize" rel="nofollow">@$usernameAnonymize</a> test<br/><br/><a rel="nofollow" href="$profileUrlAnonymize">$profileUrlAnonymize</a>
 EOT
                             ,
                             "bodyRaw" => <<<EOT
@@ -704,7 +704,7 @@ EOT
                                 "renderFullContent" => false,
                                 "expandByDefault" => false,
                             ],
-                            "url" => "https://dev.vanilla.localhost/discussion/1362/test",
+                            "url" => "https://dev.vanilla.local/discussion/1362/test",
                             "embedType" => "quote",
                             "name" => "test",
                         ],

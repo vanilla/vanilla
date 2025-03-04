@@ -154,7 +154,7 @@ paths:
                   schema:
                       format: date-filter
                       type: string
-                - name: expand[]
+                - name: expand
                   description: >
                       Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
                   in: query

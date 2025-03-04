@@ -41,11 +41,11 @@ class DateConfig
     public function __construct(LocaleInterface $locale, \Gdn_Session $session)
     {
         // Because these values are localizable, the are pulled from the locale instead of the config.
-        $this->defaultTimeFormat = $locale->translate("Date.DefaultTimeFormat", "%l:%M%p");
-        $this->defaultDayFormat = $locale->translate("Date.DefaultDayFormat", "%B %e");
-        $this->defaultYearFormat = $locale->translate("Date.DefaultYearFormat", "%B %Y");
-        $this->defaultFormat = $locale->translate("Date.DefaultFormat", "%B %e, %Y");
-        $this->defaultDateTimeFormat = $locale->translate("Date.DefaultDateTimeFormat", "%a %b %d %R:%S %Y");
+        $this->defaultTimeFormat = $locale->translate("Date.DefaultTimeFormat", "g:iA");
+        $this->defaultDayFormat = $locale->translate("Date.DefaultDayFormat", "F j");
+        $this->defaultYearFormat = $locale->translate("Date.DefaultYearFormat", "F Y");
+        $this->defaultFormat = $locale->translate("Date.DefaultFormat", "F j, Y");
+        $this->defaultDateTimeFormat = $locale->translate("Date.DefaultDateTimeFormat", "D M d H:i:s Y");
         $this->hourOffset = $session->hourOffset() ?? 0;
     }
 

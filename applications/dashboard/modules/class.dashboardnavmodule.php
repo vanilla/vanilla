@@ -51,6 +51,7 @@ class DashboardNavModule extends SiteNavModule
                 "Garden.Users.Delete",
                 "Garden.Settings.Manage",
                 "Garden.Users.Approve",
+                "staff.allow",
             ],
             "section" => "Moderation",
             "title" => "Moderation",

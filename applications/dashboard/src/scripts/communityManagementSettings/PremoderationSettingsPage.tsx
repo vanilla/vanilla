@@ -4,12 +4,12 @@
  * @license gpl-2.0-only
  */
 
-import AdminLayout from "@dashboard/components/AdminLayout";
-import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
+import { ModerationAdminLayout } from "@dashboard/components/navigation/ModerationAdminLayout";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardFormReadOnlySection } from "@dashboard/forms/DashboardFormReadonlySection";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
-import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { categoryLookup } from "@dashboard/moderation/communityManagmentUtils";
 import { IRole } from "@dashboard/roles/roleTypes";
 import { css } from "@emotion/css";
@@ -22,30 +22,23 @@ import { usePermissionsContext } from "@library/features/users/PermissionsContex
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { FormControlGroup, FormControlWithNewDropdown } from "@library/forms/FormControl";
-import { FormToggle } from "@library/forms/FormToggle";
 import InputTextBlock from "@library/forms/InputTextBlock";
-import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { TokenItem } from "@library/metas/TokenItem";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import ModalSizes from "@library/modal/ModalSizes";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import SmartLink from "@library/routing/links/SmartLink";
-import { ToolTip } from "@library/toolTip/ToolTip";
 import { getMeta } from "@library/utility/appUtils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
 import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { useCollisionDetector } from "@vanilla/react-utils";
-import { logError, uuidv4 } from "@vanilla/utils";
 import { NumberBox } from "@vanilla/ui";
+import { logError, uuidv4 } from "@vanilla/utils";
 import { useEffect, useState } from "react";
 import { sprintf } from "sprintf-js";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import { Icon } from "@vanilla/icons";
-import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
-import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 
 const BETA_ENABLED = getMeta("featureFlags.CommunityManagementBeta.Enabled", false);
 
@@ -111,7 +104,6 @@ export function PremoderationSettingsPage() {
         }
     }, [configs.data]);
 
-    const device = useTitleBarDevice();
     const rolesQuery = useQuery({
         queryKey: ["roles", "requiringApproval"],
         queryFn: async () => {
@@ -137,8 +129,6 @@ export function PremoderationSettingsPage() {
             return response.data;
         },
     });
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
 
     const categoryNames = categoryQuery?.data?.map((category) => category.name);
     const roleNames = rolesQuery.data?.map((role) => role.name);
@@ -159,9 +149,8 @@ export function PremoderationSettingsPage() {
     const cmdEnabled = getMeta("featureFlags.escalations.Enabled", false);
 
     return (
-        <AdminLayout
+        <ModerationAdminLayout
             title={t("Premoderation Settings")}
-            leftPanel={!isCompact && <ModerationNav />}
             rightPanel={
                 <>
                     <h3>{t("Heads Up!")}</h3>
@@ -224,7 +213,7 @@ export function PremoderationSettingsPage() {
                             indeterminate={isChallengeNewUsersLoading}
                             enabled={isChallengeNewUsersEnabled}
                             onChange={(enabled) => {
-                                challengeNewUsersPatcher.patchConfig({
+                                void challengeNewUsersPatcher.patchConfig({
                                     [CONF_PREMOD_CHALLENGE_NEW_USERS]: enabled,
                                 });
                             }}
@@ -246,12 +235,12 @@ export function PremoderationSettingsPage() {
                                 className={classes.comboInputButton}
                                 title={t("Save challenge cutoff age")}
                                 onClick={() => {
-                                    challengeAgePatcher.patchConfig({
+                                    void challengeAgePatcher.patchConfig({
                                         [CONF_PREMOD_CHALLENGE_AGE]: challengeCutoffAge,
                                     });
                                 }}
                             >
-                                <Icon icon="data-send" />
+                                <Icon icon="send" />
                             </Button>
                         </span>
                     </DashboardFormGroup>
@@ -462,7 +451,7 @@ function PremoderatedCategoriesModal(props: ModalProps) {
             onCancel={() => clearAndClose()}
             isConfirmDisabled={areConfigsLoading || configPatcher.isLoading}
             onConfirm={() => {
-                configPatcher.patchConfig(form ?? {}).then(() => {
+                void configPatcher.patchConfig(form ?? {}).then(() => {
                     clearAndClose();
                 });
             }}
@@ -508,7 +497,7 @@ function KeywordModal(props: ModalProps) {
             onCancel={() => clearAndClose()}
             isConfirmDisabled={areConfigsLoading || configPatcher.isLoading}
             onConfirm={() => {
-                configPatcher.patchConfig({ [CONF_PREMOD_KEYWORDS]: keywords }).then(() => {
+                void configPatcher.patchConfig({ [CONF_PREMOD_KEYWORDS]: keywords }).then(() => {
                     clearAndClose();
                 });
             }}

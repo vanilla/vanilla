@@ -11,11 +11,13 @@ import { ToastContext } from "@library/features/toaster/ToastContext";
 import { renderHook } from "@testing-library/react-hooks";
 import { vitest } from "vitest";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
+import { setMeta } from "@library/utility/appUtils";
 
 describe("EmailConfirmation", () => {
     it("Toast is created when a user is unconfirmed", async () => {
         const addToast = vitest.fn();
         const mockCurrentUser = UserFixture.createMockUser({ userID: 7, name: "new-test-user", emailConfirmed: false });
+        setMeta("isConfirmEmailRequired", true);
 
         const wrapper = ({ children }) => {
             return (

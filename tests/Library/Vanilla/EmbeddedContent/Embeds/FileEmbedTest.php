@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
+use Vanilla\EmbeddedContent\Embeds\FileEmbedFilter;
 use VanillaTests\MinimalContainerTestCase;
 
 /**
@@ -23,7 +24,7 @@ class FileEmbedTest extends MinimalContainerTestCase
     {
         $oldDataJSON = <<<JSON
  {
-    "url": "https://dev.vanilla.localhost/uploads/150/LKE0S2FWLFUP.zip",
+    "url": "https://dev.vanilla.local/uploads/150/LKE0S2FWLFUP.zip",
     "type": "file",
     "attributes": {
         "mediaID": 62,
@@ -42,7 +43,7 @@ class FileEmbedTest extends MinimalContainerTestCase
         "thumbHeight": null,
         "thumbPath": null,
         "foreignType": "embed",
-        "url": "https://dev.vanilla.localhost/uploads/150/LKE0S2FWLFUP.zip"
+        "url": "https://dev.vanilla.local/uploads/150/LKE0S2FWLFUP.zip"
     }
  }
 JSON;
@@ -82,5 +83,40 @@ JSON;
         $embed = new FileEmbed($data);
         $body = $embed->renderHtml();
         $this->assertEquals("<div></div>", $body);
+    }
+
+    /**
+     * Tests that the FileEmbedFilter replaces the URL with the media API endpoint if a mediaID exists.
+     *
+     * @return void
+     *
+     */
+    public function testFileEmbedFilter()
+    {
+        $mediaID = 22;
+        $fileData = [
+            "url" => "https://dev.vanilla.local/uploads/R5ANYXKSFK1I/dummy.pdf",
+            "name" => "dummy.pdf",
+            "type" => "file",
+            "size" => 13264,
+            "displaySize" => "large",
+            "float" => "none",
+            "mediaID" => $mediaID,
+            "dateInserted" => "2024-12-02T22:02:10+00:00",
+            "insertUserID" => 2,
+            "foreignType" => "embed",
+            "foreignID" => 2,
+        ];
+        $embed = new FileEmbed($fileData);
+        $filter = new FileEmbedFilter();
+
+        $embed = $filter->filterEmbed($embed);
+        $data = $embed->getData();
+        $this->assertArrayHasKey("url", $data);
+        $this->assertEquals(
+            "http://vanilla.test/minimal-container-test/api/v2/media/download-by-url?url=" .
+                urlencode($fileData["url"]),
+            $data["url"]
+        );
     }
 }

@@ -25,7 +25,7 @@ export default function MessagesCount(props: IProps) {
 
     return (
         <MeBoxIcon count={count} countLabel={t("Messages") + ": "} compact={compact}>
-            <Icon icon={open ? "me-messages-solid" : "me-messages"} />
+            <Icon icon={open ? "me-messages-filled" : "me-messages-empty"} />
         </MeBoxIcon>
     );
 }

@@ -26,7 +26,7 @@ export function ToggleSuggestions(props: IProps) {
     const handleButtonClick = async () => {
         try {
             await toggleVisibility(!visible);
-            onMutateSuccess?.();
+            await onMutateSuccess?.();
         } catch (err) {
             toastError(err);
         }

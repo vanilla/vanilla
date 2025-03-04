@@ -8,8 +8,6 @@
 namespace Vanilla\Forum\Models\CommunityManagement;
 
 use ActivityModel;
-use CommentModel;
-use DiscussionModel;
 use Exception;
 use Garden\Container\ContainerException;
 use Garden\EventManager;
@@ -18,9 +16,12 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn;
+use Gdn_SQLDriver;
 use PermissionNotificationGenerator;
 use Ramsey\Uuid\Uuid;
 use UserModel;
+use Vanilla\Analytics\TrackableCommunityModel;
+use Vanilla\Analytics\TrackableDateUtils;
 use Vanilla\Community\Events\cmdEscalationEvent;
 use Vanilla\Dashboard\Activity\EscalationActivity;
 use Vanilla\Dashboard\Activity\MyEscalationActivity;
@@ -37,7 +38,6 @@ use Vanilla\Models\Model;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Permissions;
 use Vanilla\Utility\ArrayUtils;
-use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
 
 /**
@@ -65,10 +65,9 @@ class EscalationModel extends PipelineModel
         private UserNotificationPreferencesModel $userNotificationPreferencesModel,
         private ResourceEventProcessor $resourceEventProcessor,
         private UserModel $userModel,
-        private DiscussionModel $discussionModel,
-        private CommentModel $commentModel,
         private EventManager $eventManager,
-        private \PermissionModel $permissionModel
+        private \PermissionModel $permissionModel,
+        private TrackableCommunityModel $trackableCommunityModel
     ) {
         parent::__construct("escalation");
 
@@ -88,27 +87,6 @@ class EscalationModel extends PipelineModel
     private function attachmentService(): AttachmentService
     {
         return \Gdn::getContainer()->get(AttachmentService::class);
-    }
-
-    /**
-     * Get a slot type based on the time since a discussion started.
-     *
-     * @param int $escalationID
-     * @return string
-     */
-    public function getAutoSlotType(int $escalationID): string
-    {
-        $dateInserted =
-            $this->createSql()
-                ->select("dateInserted")
-                ->from("escalation")
-                ->where("escalationID", $escalationID)
-                ->get()
-                ->firstRow()->dateInserted ?? null;
-        if ($dateInserted === null) {
-            throw new NotFoundException("Discussion", ["escalationID" => $escalationID]);
-        }
-        return ModelUtils::getDateBasedSlotType($dateInserted);
     }
 
     /**
@@ -170,11 +148,11 @@ class EscalationModel extends PipelineModel
             return true;
         }
 
-        if ($escalation["parentRecordType"] !== "category") {
+        if ($escalation["placeRecordType"] !== "category") {
             throw new ServerException("Only category escalations are supported.");
         }
 
-        $categoryID = $escalation["parentRecordID"];
+        $categoryID = $escalation["placeRecordID"];
 
         $isCategoryMod = $this->session
             ->getPermissions()
@@ -390,6 +368,9 @@ class EscalationModel extends PipelineModel
                 "dateLastReport:dt?",
                 "url:s",
                 "attachments:a?",
+                "lastCommentID:i|n?",
+                "lastCommentUserID:i|n?",
+                "dateLastComment:dt|n?",
             ]),
             CommunityManagementRecordModel::minimalRecordSchema()
         );
@@ -411,6 +392,9 @@ class EscalationModel extends PipelineModel
             ->column("status", "varchar(50)", false, "index")
             ->column("assignedUserID", "int", self::UNASSIGNED_USER_ID, "index")
             ->column("countComments", "int", 0)
+            ->column("dateLastComment", "datetime", true)
+            ->column("lastCommentID", "int", true)
+            ->column("lastCommentUserID", "int", true)
             ->column("insertUserID", "int")
             ->column("dateInserted", "datetime")
             ->column("dateUpdated", "datetime", true)
@@ -493,40 +477,12 @@ class EscalationModel extends PipelineModel
     }
 
     /**
-     * @param array $comment
-     * @return void
-     * @throws \Exception
-     */
-    public function handleCommentInsert(array $comment): void
-    {
-        if ($comment["parentRecordType"] !== "escalation") {
-            return;
-        }
-
-        $escalationID = $comment["parentRecordID"];
-        $this->incrementCommentCount($escalationID, value: 1);
-    }
-
-    /**
-     * @param array $comment
-     * @return void
-     */
-    public function handleCommentDelete(array $comment): void
-    {
-        if ($comment["parentRecordType"] !== "escalation") {
-            return;
-        }
-
-        $escalationID = $comment["parentRecordID"];
-        $this->incrementCommentCount($escalationID, value: -1);
-    }
-
-    /**
      * @param int $escalationID
      * @param int $value
      * @return void
+     * @throws Exception
      */
-    private function incrementCommentCount(int $escalationID, int $value = 1): void
+    public function incrementCommentCount(int $escalationID, int $value = 1): void
     {
         $this->createSql()
             ->update("escalation")
@@ -692,5 +648,33 @@ class EscalationModel extends PipelineModel
             preference: EscalationActivity::getPreference(),
             hasDefaultPreferences: true
         );
+    }
+
+    /**
+     * Get Trackable data for an event
+     *
+     * @param int $escalationID
+     * @return array
+     */
+    public function getTrackableData(int $escalationID): array
+    {
+        $escalation = $this->getEscalation($escalationID);
+
+        if (empty($escalation)) {
+            return [];
+        }
+
+        $escalation["dateInserted"] = TrackableDateUtils::getDateTime($escalation["dateInserted"]);
+
+        if ($escalation["placeRecordType"] == "category") {
+            $escalation["category"] = $this->trackableCommunityModel->getTrackableCategory(
+                $escalation["placeRecordID"]
+            );
+            $escalation["categoryAncestors"] = $this->trackableCommunityModel->getCategoryAncestors(
+                $escalation["placeRecordID"]
+            );
+        }
+
+        return $escalation;
     }
 }

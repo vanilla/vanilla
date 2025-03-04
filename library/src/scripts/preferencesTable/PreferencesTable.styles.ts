@@ -24,7 +24,7 @@ export const notificationPreferencesFormClasses = useThemeCache(() => {
 
     const subgroupWrapper = css({
         ...Mixins.margin({
-            vertical: globalVars.spacer.componentInner,
+            top: globalVars.spacer.componentInner,
         }),
     });
 
@@ -42,7 +42,7 @@ export const notificationPreferencesFormClasses = useThemeCache(() => {
 
     const tableWrapper = css({
         ...Mixins.margin({
-            top: globalVars.gutter.half,
+            vertical: globalVars.gutter.half,
         }),
     });
 
@@ -96,6 +96,12 @@ export const notificationPreferencesFormClasses = useThemeCache(() => {
         });
     };
 
+    const emailDigestSection = css({
+        ...mediaQueries.aboveOneColumn({
+            maxWidth: "50%",
+        }),
+    });
+
     return {
         selectContainer,
         description,
@@ -108,5 +114,6 @@ export const notificationPreferencesFormClasses = useThemeCache(() => {
         tableCell,
         icon,
         tableDescriptionWrapper,
+        emailDigestSection,
     };
 });

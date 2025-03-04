@@ -1,6 +1,6 @@
 import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
-import { IInterest, InterestFormValues, InterestQueryParams } from "@dashboard/interestsSettings/Interests.types";
-import { getInterestFormValues, useSaveInterest } from "@dashboard/interestsSettings/InterestsSettings.hooks";
+import { IInterest, InterestFormValues } from "@dashboard/interestsSettings/Interests.types";
+import { useSaveInterest } from "@dashboard/interestsSettings/InterestsSettings.hooks";
 import { useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hooks";
 import { CreatableFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import Translate from "@library/content/Translate";
@@ -22,54 +22,64 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import { IFieldError, SchemaFormBuilder } from "@vanilla/json-schema-forms";
 import { useEffect, useMemo, useState } from "react";
+import { Icon } from "@vanilla/icons";
+import { slugify } from "@vanilla/utils";
 
 interface IProps {
-    interest?: IInterest;
-    isVisible?: boolean;
+    title: string;
+    initialValues?: InterestFormValues;
+    onSubmit: (values: InterestFormValues) => Promise<void>;
     onClose: () => void;
-    queryParams?: InterestQueryParams;
+    onSuccess?: () => Promise<void>;
 }
 
-export function AddInterest(props: IProps) {
-    const { isVisible = false, onClose, interest, queryParams } = props;
-    const saveInterest = useSaveInterest(queryParams);
-    const [fieldErrors, setFieldErrors] = useState<Record<string, IFieldError[]>>();
-    const toast = useToast();
+const INITIAL_FORM_VALUES: InterestFormValues = {
+    apiName: "",
+    name: "",
+    profileFields: [],
+    categoryIDs: [],
+    tagIDs: [],
+    isDefault: false,
+};
 
-    const [values, setValues] = useState<InterestFormValues | null>(getInterestFormValues(interest));
+function getInterestFormValues(interest: IInterest): InterestFormValues {
+    const profileFieldMapping = Object.fromEntries(
+        (interest.profileFields ?? []).map((field) => [field.apiName, field.mappedValue]),
+    );
 
-    useEffect(() => {
-        setValues(getInterestFormValues(interest));
-    }, [interest]);
-
-    const handleSubmit = async () => {
-        function createPayload(values: InterestFormValues) {
-            const profileFieldApiNames = values?.profileFields ?? [];
-            const profileFieldMapping = profileFieldApiNames.reduce((acc, apiName) => {
-                return { ...acc, [apiName]: [values?.[apiName]] };
-            }, {});
-            return { ...values, profileFieldMapping };
-        }
-
-        try {
-            if (values) {
-                await saveInterest.mutateAsync(createPayload(values));
-                onClose();
-                toast.addToast({
-                    autoDismiss: true,
-                    body: <Translate source="You have successfully saved interest: <0/>" c0={values.name} />,
-                });
-            }
-        } catch (error) {
-            setFieldErrors(error.errors);
-        }
+    return {
+        interestID: interest.interestID,
+        apiName: interest.apiName,
+        name: interest.name,
+        isDefault: interest.isDefault ?? false,
+        profileFields: Object.keys(interest.profileFieldMapping ?? {}),
+        categoryIDs: interest.categoryIDs ?? [],
+        tagIDs: interest.tagIDs ?? [],
+        ...profileFieldMapping,
     };
+}
 
-    const handleCancel = () => {
-        setValues(null);
+function InterestForm(props: IProps) {
+    const { title, initialValues = INITIAL_FORM_VALUES, onClose } = props;
+    const isEditing = Boolean(initialValues?.interestID);
+
+    const [shouldAssignApiName, setShouldAssignApiName] = useState(!isEditing);
+    const [values, setValues] = useState<InterestFormValues>(initialValues);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, IFieldError[]> | undefined>(undefined);
+
+    async function submitForm() {
+        setIsSubmitting(true);
         setFieldErrors(undefined);
-        onClose();
-    };
+        try {
+            await props.onSubmit(values);
+        } catch (e) {
+            if (e.errors) {
+                setFieldErrors(e.errors);
+            }
+        }
+        setIsSubmitting(false);
+    }
 
     const [profileFieldDataByApiName, setProfileFieldDataByApiName] = useState<Record<string, any>>({});
 
@@ -93,17 +103,12 @@ export function AddInterest(props: IProps) {
         let schema = SchemaFormBuilder.create()
             .textBox("name", "Name of Interest", "A unique display name.")
             .required()
-            .textBox(
-                "apiName",
-                "API Name",
-                "A unique label name that cannot be changed once saved.",
-                Boolean(interest?.interestID),
-            )
+            .textBox("apiName", "API Name", "A unique label name that cannot be changed once saved.", isEditing)
             .required()
             .subHeading("Target Users")
             .checkBoxRight(
                 "isDefault",
-                "Target All Users",
+                "Default Interest - Target All Users",
                 "Set this interest as default to suggest following its mapped categories and tags to all users.",
             )
             .withDefault(false)
@@ -116,15 +121,6 @@ export function AddInterest(props: IProps) {
                     singleUrl: "/profile-fields/%s",
                     labelKey: "label",
                     valueKey: "apiName",
-                    processOptions: (options) => {
-                        setProfileFieldDataByApiName((prev) => {
-                            const opts = options.reduce((acc, option) => {
-                                return { ...acc, [option.data.apiName]: option.data };
-                            }, {});
-                            return { ...prev, ...opts };
-                        });
-                        return options;
-                    },
                 },
                 true,
             )
@@ -154,6 +150,7 @@ export function AddInterest(props: IProps) {
 
         let suggestSchema = schemaWithProfileFields
             .subHeading("Content to Suggest")
+            .staticText("Content that matches any selected category OR tag will be recommended.")
             .selectLookup(
                 "categoryIDs",
                 "Categories",
@@ -185,66 +182,146 @@ export function AddInterest(props: IProps) {
             .getSchema();
 
         return suggestSchema;
-    }, [values, profileFieldDataByApiName, interest]);
+    }, [isEditing, values, profileFieldDataByApiName]);
 
     return (
-        <Modal isVisible={isVisible} size={ModalSizes.LARGE}>
-            <form
-                onSubmit={async (event) => {
-                    event.preventDefault();
-                    await handleSubmit();
+        <form
+            role="form"
+            onSubmit={async (event) => {
+                event.preventDefault();
+                await submitForm();
+            }}
+        >
+            <Frame
+                scrollable
+                header={<FrameHeader closeFrame={onClose} title={title} />}
+                body={
+                    <FrameBody>
+                        <DashboardSchemaForm
+                            instance={values}
+                            schema={memoizedSchema}
+                            onChange={(values) => {
+                                let newValues: InterestFormValues = values();
+                                if (values()["name"] && shouldAssignApiName) {
+                                    newValues = { ...newValues, apiName: slugify(values()["name"]) };
+                                }
+                                if (values()["apiName"]) {
+                                    setShouldAssignApiName(false);
+                                }
+                                setValues((oldValues) => ({
+                                    ...oldValues,
+                                    ...newValues,
+                                }));
+                            }}
+                            fieldErrors={fieldErrors}
+                        />
+                    </FrameBody>
+                }
+                footer={
+                    <FrameFooter justifyRight>
+                        <Button
+                            className={frameFooterClasses().actionButton}
+                            buttonType={ButtonTypes.TEXT}
+                            onClick={onClose}
+                        >
+                            {t("Cancel")}
+                        </Button>
+                        <Button
+                            disabled={isSubmitting}
+                            submit
+                            className={frameFooterClasses().actionButton}
+                            buttonType={ButtonTypes.TEXT_PRIMARY}
+                        >
+                            {isSubmitting ? <ButtonLoader /> : t("Save")}
+                        </Button>
+                    </FrameFooter>
+                }
+            />
+        </form>
+    );
+}
+
+export function AddInterest(props: { onSuccess?: () => Promise<void>; forceVisible?: boolean }) {
+    const { onSuccess } = props;
+    const [isVisible, setIsVisible] = useState(props?.forceVisible ?? false);
+    const toast = useToast();
+
+    function closeModal() {
+        setIsVisible(false);
+    }
+
+    const { mutateAsync: saveInterest } = useSaveInterest();
+
+    async function handleSubmit(values: InterestFormValues) {
+        await saveInterest(createPayload(values));
+        await onSuccess?.();
+        closeModal();
+        toast.addToast({
+            autoDismiss: true,
+            body: <Translate source="You have successfully saved interest: <0/>" c0={values.name} />,
+        });
+    }
+
+    return (
+        <>
+            <Button buttonType={ButtonTypes.DASHBOARD_PRIMARY} onClick={() => setIsVisible(true)}>
+                {t("Add Interest")}
+            </Button>
+            <Modal isVisible={isVisible} size={ModalSizes.LARGE} exitHandler={closeModal}>
+                {<InterestForm title={t("Add Interest")} onSubmit={handleSubmit} onClose={closeModal} />}
+            </Modal>
+        </>
+    );
+}
+
+export function EditInterest(props: { interest: IInterest; onSuccess?: () => Promise<void> }) {
+    const { interest, onSuccess } = props;
+    const [isVisible, setIsVisible] = useState(false);
+
+    const toast = useToast();
+
+    function closeModal() {
+        setIsVisible(false);
+    }
+
+    const { mutateAsync: saveInterest } = useSaveInterest();
+
+    async function handleSubmit(values: InterestFormValues) {
+        await saveInterest(createPayload(values));
+        await onSuccess?.();
+        closeModal();
+        toast.addToast({
+            autoDismiss: true,
+            body: <Translate source="You have successfully saved interest: <0/>" c0={values.name} />,
+        });
+    }
+
+    return (
+        <>
+            <Button
+                buttonType={ButtonTypes.ICON_COMPACT}
+                onClick={() => {
+                    setIsVisible(true);
                 }}
             >
-                <Frame
-                    scrollable
-                    header={
-                        <FrameHeader
-                            closeFrame={handleCancel}
-                            title={interest ? t("Edit Interest") : t("Add Interest")}
-                        />
-                    }
-                    body={
-                        <FrameBody>
-                            <DashboardSchemaForm
-                                instance={values}
-                                schema={memoizedSchema}
-                                onChange={setValues}
-                                fieldErrors={fieldErrors}
-                                onBlur={(fieldName) => {
-                                    if (values?.name.length) {
-                                        const tmpApiName = values.name.toLowerCase().replace(/\s/g, "-");
-                                        if (
-                                            (fieldName === "name" && !values.apiName) ||
-                                            values.apiName !== tmpApiName
-                                        ) {
-                                            setValues({ ...values, apiName: tmpApiName });
-                                        }
-                                    }
-                                }}
-                            />
-                        </FrameBody>
-                    }
-                    footer={
-                        <FrameFooter justifyRight>
-                            <Button
-                                className={frameFooterClasses().actionButton}
-                                buttonType={ButtonTypes.TEXT}
-                                onClick={handleCancel}
-                            >
-                                {t("Cancel")}
-                            </Button>
-                            <Button
-                                disabled={saveInterest.isLoading}
-                                submit
-                                className={frameFooterClasses().actionButton}
-                                buttonType={ButtonTypes.TEXT_PRIMARY}
-                            >
-                                {saveInterest.isLoading ? <ButtonLoader /> : t("Save")}
-                            </Button>
-                        </FrameFooter>
-                    }
+                <Icon icon="edit" />
+            </Button>
+            <Modal isVisible={isVisible} size={ModalSizes.LARGE} exitHandler={closeModal}>
+                <InterestForm
+                    title={t("Edit Interest")}
+                    initialValues={getInterestFormValues(interest)}
+                    onSubmit={handleSubmit}
+                    onClose={closeModal}
                 />
-            </form>
-        </Modal>
+            </Modal>
+        </>
     );
+}
+
+function createPayload(values: InterestFormValues) {
+    const profileFieldApiNames = values?.profileFields ?? [];
+    const profileFieldMapping = profileFieldApiNames.reduce((acc, apiName) => {
+        return { ...acc, [apiName]: values?.[apiName] ?? [] };
+    }, {});
+    return { ...values, profileFieldMapping };
 }

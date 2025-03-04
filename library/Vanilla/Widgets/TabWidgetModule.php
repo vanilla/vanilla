@@ -80,7 +80,7 @@ class TabWidgetModule extends AbstractReactModule
 
                 $componentName = $tabWidget->getComponentName();
                 $props = $tabWidget->getProps();
-                $seoContent = $tabWidget->renderSeoHtml(array_merge($props, ["title" => $tabLabel]));
+                $seoContent = $tabWidget->renderSeoHtml(array_merge($props ?? [], ["title" => $tabLabel]));
                 if ($props === null) {
                     // User is unable to render this tab.
                     continue;

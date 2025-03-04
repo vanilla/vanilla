@@ -7,6 +7,7 @@
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { IUserFragment } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
+import { useToastErrorHandler } from "@library/features/toaster/ToastContext";
 import { useCurrentUser } from "@library/features/users/userHooks";
 import { IPostReaction, IPostRecord } from "@library/postReactions/PostReactions.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,6 +20,7 @@ export function useToggleReaction(props: IPostRecord) {
     const apiUrl = `/${recordType}s/${recordID}/reactions`;
 
     const queryClient = useQueryClient();
+    const toastErrorHandler = useToastErrorHandler();
 
     const { data, mutateAsync } = useMutation({
         mutationKey: ["toggle-reaction", recordType, recordID],
@@ -55,7 +57,10 @@ export function useToggleReaction(props: IPostRecord) {
             });
         },
         onSettled() {
-            queryClient.invalidateQueries(["reaction-log", recordType, recordID]);
+            void queryClient.invalidateQueries(["reaction-log", recordType, recordID]);
+        },
+        onError(err) {
+            toastErrorHandler(err);
         },
     });
 

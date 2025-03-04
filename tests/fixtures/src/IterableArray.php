@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Fixtures;
 
+use Traversable;
+
 /**
  * An array object that is also iterable.
  */
@@ -15,7 +17,7 @@ class IterableArray extends DumbArray implements \IteratorAggregate
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new \ArrayIterator($this->arr);
     }

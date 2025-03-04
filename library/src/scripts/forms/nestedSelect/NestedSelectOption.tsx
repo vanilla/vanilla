@@ -24,6 +24,7 @@ export function NestedSelectOption(props: INestedSelectOptionProps) {
         searchQuery,
         highlighted,
         onHover,
+        createableLabel,
         data,
     } = props;
     const classes = props.classes ?? nestedSelectClasses();
@@ -36,7 +37,8 @@ export function NestedSelectOption(props: INestedSelectOptionProps) {
     };
 
     const isCreatable = !!props.data?.createable;
-    let tooltip = props.tooltip ?? (isCreatable ? t("Add Exact Text") : undefined);
+    let createableText = createableLabel ?? t("Add Exact Text");
+    let tooltip = props.tooltip ?? (isCreatable ? createableText : undefined);
 
     return (
         <>

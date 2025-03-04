@@ -3,12 +3,12 @@
  * Defaults to CSV download
  */
 export const downloadAsFile = (
-    data: string,
+    data: string | Blob,
     filename: string,
-    opts: { fileExtension?: "csv" | "json" } = { fileExtension: "csv" },
+    opts: { fileExtension?: "csv" | "json" | "svg" | "zip" } = { fileExtension: "csv" },
 ) => {
-    const fileType = opts.fileExtension === "csv" ? "text/csv;charset=utf-8;" : "application/json;charset=utf-8;";
-    const blob = new Blob(Array.isArray(data) ? data : [data], { type: fileType });
+    const fileType = extensionToMime(opts.fileExtension);
+    const blob = data instanceof Blob ? data : new Blob(Array.isArray(data) ? data : [data], { type: fileType });
 
     // To add IE support, we would need to alternate between using
     // `URL.createObjectURL` and `window.navigator.msSaveOrOpenBlob` here
@@ -26,3 +26,18 @@ export const downloadAsFile = (
     URL.revokeObjectURL(url);
     document.body.removeChild(link);
 };
+
+function extensionToMime(extension: string | undefined): string | undefined {
+    switch (extension) {
+        case "csv":
+            return "text/csv;charset=utf-8;";
+        case "json":
+            return "application/json;charset=utf-8;";
+        case "svg":
+            return "image/svg+xml;charset=utf-8;";
+        case "zip":
+            return "application/zip;charset=utf-8;";
+        default:
+            undefined;
+    }
+}

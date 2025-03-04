@@ -2,8 +2,8 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
-import { TypeDiscussionsIcon } from "@library/icons/searchIcons";
 import React from "react";
+import { Icon } from "@vanilla/icons";
 
 const dummyUserFragment = {
     userID: 1,
@@ -52,7 +52,7 @@ export function StoryBookImageTypeSearchResult(props: {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeDiscussionsIcon />,
+                        icon: <Icon icon={"search-discussions"} />,
                     },
                     {
                         name: `Example search result - Flush Image {"${props.type}"} with ratio (${ratio})`,
@@ -69,7 +69,7 @@ export function StoryBookImageTypeSearchResult(props: {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeDiscussionsIcon />,
+                        icon: <Icon icon={"search-discussions"} />,
                     },
                     {
                         name: `Example search result - Small Image {"${props.type}"} with ratio (${ratio})`,
@@ -86,7 +86,7 @@ export function StoryBookImageTypeSearchResult(props: {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeDiscussionsIcon />,
+                        icon: <Icon icon={"search-discussions"} />,
                     },
                     {
                         name: `Example search result - icon, no image`,
@@ -102,7 +102,7 @@ export function StoryBookImageTypeSearchResult(props: {
                                 type={"Article"}
                             />
                         ),
-                        icon: <TypeDiscussionsIcon />,
+                        icon: <Icon icon={"search-discussions"} />,
                     },
                     {
                         name: `Example search result - Image, no icon`,

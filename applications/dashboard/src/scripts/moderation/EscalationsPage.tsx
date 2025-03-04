@@ -4,32 +4,28 @@
  * @license Proprietary
  */
 
-import AdminLayout from "@dashboard/components/AdminLayout";
-import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
+import { ModerationAdminLayout } from "@dashboard/components/navigation/ModerationAdminLayout";
+import { useEscalationMutation } from "@dashboard/moderation/CommunityManagement.hooks";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 import { EscalationStatus, IEscalation } from "@dashboard/moderation/CommunityManagementTypes";
+import { DisabledBanner } from "@dashboard/moderation/components/DisabledBanner";
+import { EmptyState } from "@dashboard/moderation/components/EmptyState";
+import { EscalationFilters, IEscalationFilters } from "@dashboard/moderation/components/EscalationFilters";
 import { EscalationListItem } from "@dashboard/moderation/components/EscalationListItem";
 import { IMessageInfo, MessageAuthorModal } from "@dashboard/moderation/components/MessageAuthorModal";
-import { Sort } from "@library/sort/Sort";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
-import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
+import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import Loader from "@library/loaders/Loader";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import { useQueryStringSync } from "@library/routing/QueryString";
 import { useQueryParam, useQueryParamPage } from "@library/routing/routingUtils";
+import { Sort } from "@library/sort/Sort";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
-import { useCollisionDetector } from "@vanilla/react-utils";
 import { useState } from "react";
-import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { EscalationFilters, IEscalationFilters } from "@dashboard/moderation/components/EscalationFilters";
-import { EmptyState } from "@dashboard/moderation/components/EmptyState";
-import DocumentTitle from "@library/routing/DocumentTitle";
-import { useEscalationMutation } from "@dashboard/moderation/CommunityManagement.hooks";
-import { DisabledBanner } from "@dashboard/moderation/components/DisabledBanner";
-import { notEmpty } from "@vanilla/utils";
 
 interface IProps {}
 
@@ -69,10 +65,6 @@ function EscalationsPage(props: IProps) {
     });
 
     const cmdClasses = communityManagementPageClasses();
-
-    const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
 
     const [authorMessage, setAuthorMessage] = useState<IMessageInfo | null>(null);
 
@@ -117,10 +109,9 @@ function EscalationsPage(props: IProps) {
         <>
             <DocumentTitle title={t("Escalations")} />
 
-            <AdminLayout
+            <ModerationAdminLayout
                 preTitle={<DisabledBanner />}
                 title={t("Escalations Dashboard")}
-                leftPanel={!isCompact && <ModerationNav />}
                 rightPanel={
                     <EscalationFilters
                         value={filters}
@@ -134,24 +125,22 @@ function EscalationsPage(props: IProps) {
                         }
                     />
                 }
+                secondaryBar={
+                    <>
+                        <span>
+                            <Sort sortOptions={sortOptions} selectedSort={selectedSort} onChange={setSelectedSort} />
+                        </span>
+                        <NumberedPager
+                            className={cmdClasses.pager}
+                            isMobile={false}
+                            {...paginationProps}
+                            showNextButton={false}
+                            onChange={setPage}
+                        />
+                    </>
+                }
                 content={
                     <>
-                        <section className={cmdClasses.secondaryTitleBar}>
-                            <span>
-                                <Sort
-                                    sortOptions={sortOptions}
-                                    selectedSort={selectedSort}
-                                    onChange={setSelectedSort}
-                                />
-                            </span>
-                            <NumberedPager
-                                className={cmdClasses.pager}
-                                isMobile={false}
-                                {...paginationProps}
-                                showNextButton={false}
-                                onChange={setPage}
-                            />
-                        </section>
                         <section className={cmdClasses.content}>
                             {escalationsQuery.isLoading && (
                                 <div>

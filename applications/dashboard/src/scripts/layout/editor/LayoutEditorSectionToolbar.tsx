@@ -40,7 +40,7 @@ export function LayoutEditorSectionToolbar(props: IProps) {
             }}
             disabled={props.hasAsset}
         >
-            <Icon icon={"data-trash"} />
+            <Icon icon={"delete"} />
         </EmbedButton>
     );
 
@@ -102,7 +102,7 @@ export function LayoutEditorSectionToolbar(props: IProps) {
                     editorSelection.moveSelectionTo(newPath, LayoutEditorSelectionMode.SECTION);
                 }}
             >
-                <Icon icon={"data-up"} />
+                <Icon icon={"move-up"} />
             </EmbedButton>
             <EmbedButton
                 disabled={isLastSection}
@@ -115,7 +115,7 @@ export function LayoutEditorSectionToolbar(props: IProps) {
                     editorSelection.moveSelectionTo(newPath, LayoutEditorSelectionMode.SECTION);
                 }}
             >
-                <Icon icon={"data-down"} />
+                <Icon icon={"move-down"} />
             </EmbedButton>
             {props.allowColumnInvert && (
                 <EmbedButton
@@ -129,7 +129,7 @@ export function LayoutEditorSectionToolbar(props: IProps) {
                     }}
                     ariaLabel={"Invert the secondary column alignment between left and right."}
                 >
-                    <Icon icon={"data-swap"} />
+                    <Icon icon={"swap"} />
                 </EmbedButton>
             )}
             {breadcrumbButton}

@@ -9,8 +9,8 @@ import { isDateRange } from "@dashboard/components/panels/FilteredProfileFields"
 import getMemberSearchFilterSchema from "@dashboard/components/panels/getMemberSearchFilterSchema";
 import { IMemberSearchTypes } from "@dashboard/components/panels/memberSearchTypes";
 import { MembersSearchFilterPanel } from "@dashboard/components/panels/MembersSearchFilterPanel";
+import { Icon } from "@vanilla/icons";
 import { PermissionChecker } from "@library/features/users/Permission";
-import { TypeMemberIcon } from "@library/icons/searchIcons";
 import SearchDomain from "@library/search/SearchDomain";
 import { SearchService } from "@library/search/SearchService";
 import { ISearchForm, ISearchResult } from "@library/search/searchTypes";
@@ -29,7 +29,7 @@ class MembersSearchDomain extends SearchDomain<IMemberSearchTypes, MemberSearchR
         return t("Members");
     }
 
-    public icon = (<TypeMemberIcon />);
+    public icon = (<Icon icon="search-members" />);
 
     public recordTypes = ["user"];
 

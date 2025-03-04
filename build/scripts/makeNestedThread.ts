@@ -24,7 +24,7 @@ async function createComment(body) {
         console.warn("NODE_TLS_REJECT_UNAUTHORIZED is not set to 0");
         console.warn("Run `export NODE_TLS_REJECT_UNAUTHORIZED=0` before running this script");
     }
-    return await fetch("https://dev.vanilla.localhost/api/v2/comments", {
+    return await fetch("https://dev.vanilla.local/api/v2/comments", {
         method: "POST",
         headers: {
             accept: "application/json",

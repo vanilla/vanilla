@@ -94,7 +94,7 @@ class ModerationMessagesApiController extends AbstractApiController
         $this->permission("session.valid");
         $message = $this->lookupMessage($id);
 
-        if (strtolower($message["recordType"]) === "category") {
+        if ($message["recordType"] && strtolower($message["recordType"]) === "category") {
             $this->permission("discussions.view", $message["recordID"]);
         }
 
@@ -188,7 +188,7 @@ class ModerationMessagesApiController extends AbstractApiController
             throw new ForbiddenException("Message is not dismissible.");
         }
 
-        if (strtolower($message["RecordType"]) === "category") {
+        if ($message["RecordType"] && strtolower($message["RecordType"]) === "category") {
             $this->permission("discussions.view", $message["RecordType"]);
         }
 

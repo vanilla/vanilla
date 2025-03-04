@@ -59,7 +59,6 @@ class ThemesApiController extends AbstractApiController
      */
     public function get(string $themeKey, array $query = []): Data
     {
-        $this->permission(Permissions::BAN_PRIVATE);
         if (isset($query["revisionID"]) && empty($query["revisionID"])) {
             unset($query["revisionID"]);
         }

@@ -10,6 +10,7 @@ namespace Vanilla\Layout\View;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Gdn;
+use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Site\SiteSectionSchema;
@@ -85,6 +86,7 @@ class CommonLayoutView extends AbstractCustomLayoutView
             "category?" => $this->categoryModel->fragmentSchema(),
             "locale:s",
             "siteSection" => SiteSectionSchema::getSchema(),
+            "layoutViewType:s?",
         ]);
     }
 

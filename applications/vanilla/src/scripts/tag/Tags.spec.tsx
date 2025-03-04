@@ -8,8 +8,9 @@ import { STORY_TAGS } from "@library/storybook/storyData";
 import { render, screen } from "@testing-library/react";
 import TagWidget from "@vanilla/addon-vanilla/tag/TagWidget";
 import { setMeta } from "@library/utility/appUtils";
-import DiscussionTagAsset from "@vanilla/addon-vanilla/thread/DiscussionTagAsset";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import PostTagsAsset from "@vanilla/addon-vanilla/posts/PostTagsAsset";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 describe("Tags", () => {
     const discussion = { ...DiscussionFixture.fakeDiscussions[2], url: "/mockPath", name: "Mock Discussion" };
@@ -29,7 +30,14 @@ describe("Tags", () => {
             expect(userTag?.getAttribute("href")?.includes(`/discussions?tagID=${tagID}`)).toBe(false);
         });
         it("Tags url in Tags Asset", () => {
-            render(<DiscussionTagAsset tags={STORY_TAGS} />);
+            const queryClient = new QueryClient();
+            render(
+                <QueryClientProvider client={queryClient}>
+                    <DiscussionFixture.PostPageProvider discussion={{ tags: STORY_TAGS }}>
+                        <PostTagsAsset />
+                    </DiscussionFixture.PostPageProvider>
+                </QueryClientProvider>,
+            );
             const userTag = screen.queryByRole("link", { name: "UserTag" });
             expect(userTag?.getAttribute("href")?.includes(`/discussions?tagID=${tagID}`)).toBe(false);
         });
@@ -49,7 +57,15 @@ describe("Tags", () => {
             expect(userTag?.getAttribute("href")?.includes(`/discussions?tagID=${tagID}`)).toBe(true);
         });
         it("Tags url in Tags Asset", () => {
-            render(<DiscussionTagAsset tags={STORY_TAGS} />);
+            const queryClient = new QueryClient();
+
+            render(
+                <QueryClientProvider client={queryClient}>
+                    <DiscussionFixture.PostPageProvider discussion={{ tags: STORY_TAGS }}>
+                        <PostTagsAsset />
+                    </DiscussionFixture.PostPageProvider>
+                </QueryClientProvider>,
+            );
             const userTag = screen.queryByRole("link", { name: "UserTag" });
             expect(userTag?.getAttribute("href")?.includes(`/discussions?tagID=${tagID}`)).toBe(true);
         });

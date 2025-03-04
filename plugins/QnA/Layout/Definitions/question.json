@@ -1,0 +1,62 @@
+{
+    "$schema": "http://dev.vanilla.local/api/v2/layouts/schema?layoutViewType=question&cacheBuster=5",
+    "dateInserted": "2022-01-01T00:00:00Z",
+    "layoutViewType": "question",
+    "layoutID": "question",
+    "name": "Question Template",
+    "layout": [
+        {
+            "$hydrate": "react.section.2-columns",
+            "mainBottom": [
+                {
+                    "$hydrate": "react.asset.originalPost"
+                },
+                {
+                    "$hydrate": "react.asset.postTags",
+                    "titleType": "static",
+                    "title": "Find more posts tagged with"
+                },
+                {
+                    "$hydrate": "react.asset.postMeta"
+                },
+                {
+                    "$hydrate": "react.asset.suggestedAnswers"
+                },
+                {
+                    "$hydrate": "react.asset.postAttachments"
+                },
+                {
+                    "$hydrate": "react.asset.answerThread",
+                    "apiParams": {
+                        "sort": "dateInserted"
+                    },
+                    "tabTitles": {
+                        "all": "All Replies",
+                        "accepted": "Accepted Answers",
+                        "rejected": "Rejected Answers"
+                    }
+                },
+                {
+                    "$hydrate": "react.asset.createComment"
+                }
+            ],
+            "secondaryBottom": [
+                {
+                    "$hydrate": "react.newpost",
+                    "asOwnButtons": [],
+                    "excludedButtons": [],
+                    "postableDiscussionTypes": ["discussion", "question", "poll"]
+                },
+                {
+                    "$hydrate": "react.quick-links",
+                    "title": "Quick Links"
+                }
+            ],
+            "breadcrumbs": [
+                {
+                    "$hydrate": "react.breadcrumbs"
+                }
+            ]
+        }
+    ]
+}

@@ -19,6 +19,9 @@ use Vanilla\Utility\DebugUtils;
 
 /**
  * Http client for making requests internally against the dispatcher.
+ *
+ * @template T of InternalResponse
+ *
  */
 class InternalClient extends SiteHttpClient
 {
@@ -296,9 +299,10 @@ class InternalClient extends SiteHttpClient
 
     /**
      * @param HttpResponse $response
-     * @return InternalResponse
+     *
+     * @return T
      */
-    private function ensureInternalResponse(HttpResponse $response): InternalResponse
+    protected function castResponse(HttpResponse $response)
     {
         if ($response instanceof InternalResponse) {
             return $response;
@@ -311,6 +315,8 @@ class InternalClient extends SiteHttpClient
     /**
      * Wrap in {@link InternalResponse}
      * @inheritDoc
+     *
+     * @return T
      */
     public function request(
         string $method,
@@ -319,42 +325,61 @@ class InternalClient extends SiteHttpClient
         array $headers = [],
         array $options = []
     ): InternalResponse {
-        return $this->ensureInternalResponse(parent::request($method, $uri, $body, $headers, $options));
+        return $this->castResponse(parent::request($method, $uri, $body, $headers, $options));
     }
 
     /**
      * Wrap in {@link InternalResponse}
      * @inheritDoc
+     *
+     * @return T
      */
     public function get(string $uri, array $query = [], array $headers = [], $options = []): InternalResponse
     {
-        return $this->ensureInternalResponse(parent::get($uri, $query, $headers, $options));
+        return $this->castResponse(parent::get($uri, $query, $headers, $options));
     }
 
     /**
      * Wrap in {@link InternalResponse}
      * @inheritDoc
+     *
+     * @return T
+     */
+    public function put(string $uri, $body = [], array $headers = [], $options = []): InternalResponse
+    {
+        return $this->castResponse(parent::put($uri, $body, $headers, $options));
+    }
+
+    /**
+     * Wrap in {@link InternalResponse}
+     * @inheritDoc
+     *
+     * @return T
      */
     public function post(string $uri, $body = [], array $headers = [], $options = []): InternalResponse
     {
-        return $this->ensureInternalResponse(parent::post($uri, $body, $headers, $options));
+        return $this->castResponse(parent::post($uri, $body, $headers, $options));
     }
 
     /**
      * Wrap in {@link InternalResponse}
      * @inheritDoc
+     *
+     * @return T
      */
     public function patch(string $uri, $body = [], array $headers = [], $options = []): InternalResponse
     {
-        return $this->ensureInternalResponse(parent::patch($uri, $body, $headers, $options));
+        return $this->castResponse(parent::patch($uri, $body, $headers, $options));
     }
 
     /**
      * Wrap in {@link InternalResponse}
      * @inheritDoc
+     *
+     * @return T
      */
     public function delete(string $uri, array $query = [], array $headers = [], array $options = []): InternalResponse
     {
-        return $this->ensureInternalResponse(parent::delete($uri, $query, $headers, $options));
+        return $this->castResponse(parent::delete($uri, $query, $headers, $options));
     }
 }

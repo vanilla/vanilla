@@ -84,14 +84,14 @@ export function CollectionsFormLoadable(props: CollectionsFormProps) {
             resourceCollections.data &&
             resourceCollections.data.length > 0
         ) {
-            setValues({
+            void setValues({
                 ...values,
                 collections: sortBy(resourceCollections.data.map(collectionToOption), ({ label }) =>
                     label.toLowerCase(),
                 ),
             });
         } else {
-            setValues({
+            void setValues({
                 ...values,
                 collections: [],
             });
@@ -170,7 +170,7 @@ export function CollectionsFormLoadable(props: CollectionsFormProps) {
 
     const handleAddCollection = () => {
         const { newCollections } = values;
-        setFieldValue("newCollections", [...newCollections, ""]);
+        void setFieldValue("newCollections", [...newCollections, ""]);
     };
 
     const lastCollectionRef = useRef<HTMLInputElement | null>(null);
@@ -185,7 +185,7 @@ export function CollectionsFormLoadable(props: CollectionsFormProps) {
 
     const handleDeleteCollection = (idx: number) => {
         const newCollections = values.newCollections.filter((_, index) => index !== idx);
-        setFieldValue("newCollections", newCollections);
+        void setFieldValue("newCollections", newCollections);
     };
 
     const changeNewCollection = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -196,7 +196,7 @@ export function CollectionsFormLoadable(props: CollectionsFormProps) {
         const [collectionIdx] = id.split("-");
         const tmpList = [...newCollections];
         tmpList[collectionIdx] = value;
-        setFieldValue("newCollections", tmpList);
+        void setFieldValue("newCollections", tmpList);
     };
 
     // Check to ensure that the new collection name isn't already in use
@@ -248,7 +248,7 @@ export function CollectionsFormLoadable(props: CollectionsFormProps) {
                                                     className={classes.deleteNewCollectionButton}
                                                     onClick={() => handleDeleteCollection(idx)}
                                                 >
-                                                    <Icon icon="analytics-remove" />
+                                                    <Icon icon="filter-remove" />
                                                 </Button>
                                             </div>
                                             {/* Displays the loading status of the new collection as it is saving */}
@@ -282,7 +282,7 @@ export function CollectionsFormLoadable(props: CollectionsFormProps) {
                                     buttonType={ButtonTypes.TEXT}
                                     onClick={handleAddCollection}
                                 >
-                                    <Icon icon="analytics-add" /> {t("Add New Collection")}
+                                    <Icon icon="filter-add" /> {t("Add New Collection")}
                                 </Button>
                             </div>
                         </div>

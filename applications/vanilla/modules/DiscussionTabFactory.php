@@ -102,7 +102,7 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory
     {
         return new Reference(static::class, [
             self::PRESET_RECENT_DISCUSSIONS,
-            "Recent Discussions",
+            "Recent Posts",
             [
                 "excludeHiddenCategories" => true,
                 "sort" => "-dateLastComment",
@@ -121,7 +121,7 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory
     {
         return new Reference(static::class, [
             self::PRESET_TRENDING_DISCUSSIONS,
-            "Trending Discussions",
+            "Trending Posts",
             [
                 "slotType" => "w",
                 "sort" => "-hot",
@@ -140,7 +140,7 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory
     {
         return new Reference(static::class, [
             self::PRESET_TOP_DISCUSSIONS,
-            "Top Discussions",
+            "Top Posts",
             [
                 "slotType" => "m",
                 "sort" => "-score",
@@ -158,7 +158,7 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory
     {
         return new Reference(static::class, [
             self::PRESET_ANNOUNCEMENTS,
-            "Announced Discussions",
+            "Announced Posts",
             [
                 "pinned" => true,
             ],

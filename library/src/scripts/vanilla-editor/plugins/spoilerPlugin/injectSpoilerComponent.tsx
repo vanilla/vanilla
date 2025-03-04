@@ -17,13 +17,11 @@ export const injectSpoilerComponent = <V extends Value = Value>(
     const spoilerType = getPluginType(editor, ELEMENT_SPOILER);
 
     if (element.type === spoilerType) {
-        // eslint-disable-next-line no-console
-
         const SpoilerComponent = ({ children }) => (
             <div className="spoiler isShowingSpoiler">
                 <div className="spoiler-buttonContainer">
                     <button className="button-spoiler" disabled>
-                        <Icon icon="editor-eye-slash" />
+                        <Icon icon="hide-content" />
                         {t("Spoiler Warning")}
                     </button>
                 </div>

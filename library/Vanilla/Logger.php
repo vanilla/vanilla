@@ -47,6 +47,9 @@ class Logger implements LoggerInterface
         self::FIELD_USERNAME,
         self::FIELD_TIMERS,
         self::FIELD_SERVICE,
+        "automationRuleID",
+        "dispatchUUID",
+        "automationRuleDispatchUUID",
     ];
 
     public const CHANNEL_AUDIT = "audit";

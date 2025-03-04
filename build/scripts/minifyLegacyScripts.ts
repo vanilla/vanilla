@@ -32,6 +32,7 @@ function getLegacyScripts() {
         "packages",
         "vendor",
         "storyshots",
+        "plugins/hootsuite-app",
         "__tests__",
         "legacy-dist",
     ];

@@ -64,48 +64,56 @@ export function SuggestedContentWidget(props: ISuggestedContentWidgetProps) {
         },
     );
 
+    const categorySuggestions = suggestions?.data?.categories ?? [];
+    const discussionSuggestions = suggestions?.data?.discussions ?? [];
+
+    if (
+        (!suggestedFollows.enabled && !suggestedContent.enabled) ||
+        (categorySuggestions.length == 0 && discussionSuggestions.length == 0)
+    ) {
+        return null;
+    }
+
     return (
-        <Widget>
-            <HomeWidgetContainer options={options}>
-                <PageHeadingBox
-                    pageHeadingClasses={classes.headerAlignment}
-                    title={title}
-                    subtitle={subtitle}
-                    description={description}
-                    options={{ alignment: containerOptions?.headerAlignment }}
-                    actions={
-                        <>
-                            <ToolTip label={t("Refresh Suggestions")}>
-                                <Button
-                                    className={classes.refetchButton}
-                                    buttonType={ButtonTypes.ICON}
-                                    onClick={() => !preview && suggestions.refetch()}
-                                >
-                                    {suggestions.isFetching ? <ButtonLoader /> : <Icon icon={"data-replace"} />}
-                                </Button>
-                            </ToolTip>
-                        </>
-                    }
+        <HomeWidgetContainer options={options}>
+            <PageHeadingBox
+                pageHeadingClasses={classes.headerAlignment}
+                title={title}
+                subtitle={subtitle}
+                description={description}
+                options={{ alignment: containerOptions?.headerAlignment }}
+                actions={
+                    <>
+                        <ToolTip label={t("Refresh Suggestions")}>
+                            <Button
+                                className={classes.refetchButton}
+                                buttonType={ButtonTypes.ICON}
+                                onClick={() => !preview && suggestions.refetch()}
+                            >
+                                {suggestions.isFetching ? <ButtonLoader /> : <Icon icon={"replace"} />}
+                            </Button>
+                        </ToolTip>
+                    </>
+                }
+            />
+            {suggestedFollows.enabled && categorySuggestions.length > 0 && (
+                <SuggestedFollows
+                    isLoading={suggestions.isFetching}
+                    suggestedFollows={suggestedFollows}
+                    categories={categorySuggestions}
+                    containerOptions={containerOptions}
                 />
-                {suggestedFollows.enabled && (
-                    <SuggestedFollows
-                        isLoading={suggestions.isFetching}
-                        suggestedFollows={suggestedFollows}
-                        categories={suggestions?.data?.categories}
-                        containerOptions={containerOptions}
-                    />
-                )}
-                {suggestedContent.enabled && (
-                    <SuggestedContent
-                        isLoading={suggestions.isFetching}
-                        suggestedContent={suggestedContent}
-                        discussions={suggestions?.data?.discussions}
-                        discussionOptions={discussionOptions}
-                        containerOptions={containerOptions}
-                    />
-                )}
-            </HomeWidgetContainer>
-        </Widget>
+            )}
+            {suggestedContent.enabled && discussionSuggestions.length > 0 && (
+                <SuggestedContent
+                    isLoading={suggestions.isFetching}
+                    suggestedContent={suggestedContent}
+                    discussions={discussionSuggestions}
+                    discussionOptions={discussionOptions}
+                    containerOptions={containerOptions}
+                />
+            )}
+        </HomeWidgetContainer>
     );
 }
 

@@ -6,7 +6,7 @@
 
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { postTypeSettingsClasses } from "@dashboard/postTypes/pages/postTypeSettings.classes";
-import { PostField } from "@dashboard/postTypes/postType.types";
+import { PostField, PostFieldDeleteMethod } from "@dashboard/postTypes/postType.types";
 import StackableTable, {
     CellRendererProps,
     StackableTableColumnsConfig,
@@ -21,9 +21,22 @@ import { TokenItem } from "@library/metas/TokenItem";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { PostFieldEditModal } from "@dashboard/postTypes/components/PostFieldEditModal";
 import { PostFieldSubmit, usePostTypeEdit } from "@dashboard/postTypes/PostTypeEditContext";
-import { css } from "@emotion/css";
-import ModalConfirm from "@library/modal/ModalConfirm";
 import PostFieldsReorderModal from "@dashboard/postTypes/components/PostFieldReorderModal";
+import { notEmpty } from "@vanilla/utils";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
+import Frame from "@library/layout/frame/Frame";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import FrameBody from "@library/layout/frame/FrameBody";
+import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
+import Translate from "@library/content/Translate";
+import InputBlock from "@library/forms/InputBlock";
+import { RadioPicker } from "@library/forms/RadioPicker";
+import FrameFooter from "@library/layout/frame/FrameFooter";
+import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
+import Message from "@library/messages/Message";
+import SmartLink from "@library/routing/links/SmartLink";
+import { usePostTypeQuery } from "@dashboard/postTypes/postType.hooks";
 
 interface IProps {}
 
@@ -36,6 +49,19 @@ export function PostFieldList(props: IProps) {
     const [isReorderVisible, setReorderVisible] = useState(false);
     const [postFieldToEdit, setPostFieldToEdit] = useState<PostField | null>(null);
     const [fieldToDelete, setFieldToDelete] = useState<PostField | null>(null);
+    const allPostTypesQuery = usePostTypeQuery();
+
+    const impactedPostTypes = useMemo(() => {
+        if (fieldToDelete && allPostTypesQuery.data) {
+            return fieldToDelete.postTypeIDs?.map((postTypeID) => {
+                return {
+                    label: allPostTypesQuery.data.find((postType) => postType.postTypeID === postTypeID)?.name,
+                    url: `/settings/post-types/edit/${postTypeID}`,
+                };
+            });
+        }
+        return [];
+    }, [fieldToDelete, allPostTypesQuery.data]);
 
     const postFields = useMemo(() => {
         return postTypeID && postFieldsByPostTypeID[postTypeID];
@@ -133,7 +159,9 @@ export function PostFieldList(props: IProps) {
     }
 
     const handleSubmit = (postField: PostFieldSubmit) => {
-        addPostField({ ...postField, postTypeID });
+        const existingIDs = postField.postTypeIDs ?? [];
+        const appendedIDs = [...new Set([...existingIDs, postTypeID].filter(notEmpty))];
+        addPostField({ ...postField, postTypeIDs: appendedIDs });
     };
 
     function ActionsCellRenderer(props) {
@@ -148,7 +176,7 @@ export function PostFieldList(props: IProps) {
                         buttonType={ButtonTypes.ICON}
                         ariaLabel={t("Edit Post Field")}
                     >
-                        <Icon icon={"data-pencil"} />
+                        <Icon icon={"edit"} />
                     </Button>
                 </ToolTip>
                 <ToolTip label={t("Delete Post Field")}>
@@ -157,12 +185,14 @@ export function PostFieldList(props: IProps) {
                         buttonType={ButtonTypes.ICON}
                         ariaLabel={t("Delete Post Field")}
                     >
-                        <Icon icon={"data-trash"} />
+                        <Icon icon={"delete"} />
                     </Button>
                 </ToolTip>
             </div>
         );
     }
+
+    const [deleteMethod, setDeleteMethod] = useState<PostFieldDeleteMethod>("unlink");
 
     return (
         <>
@@ -195,6 +225,7 @@ export function PostFieldList(props: IProps) {
                 />
             </div>
             <PostFieldEditModal
+                postTypeID={postTypeID}
                 postField={postFieldToEdit}
                 isVisible={isEditVisible}
                 onConfirm={handleSubmit}
@@ -214,32 +245,116 @@ export function PostFieldList(props: IProps) {
                     setReorderVisible(false);
                 }}
             />
-            <ModalConfirm
-                isVisible={!!fieldToDelete}
-                title={
-                    <>
-                        {t("Delete Post Field")}: {fieldToDelete && fieldToDelete.label}
-                    </>
-                }
-                onCancel={() => setFieldToDelete(null)}
-                onConfirm={async () => {
-                    if (fieldToDelete) {
-                        removePostField(fieldToDelete);
-                        setFieldToDelete(null);
+            <Modal isVisible={!!fieldToDelete} size={ModalSizes.MEDIUM} titleID={"delete-field-Modal"}>
+                <Frame
+                    header={
+                        <FrameHeader closeFrame={() => setFieldToDelete(null)} title={<>{t("Delete Post Field")}</>} />
                     }
-                }}
-                cancelTitle={t("Cancel")}
-                confirmTitle={t("Remove")}
-                confirmClasses={classes.emphasisColor}
-                bodyClassName={css({ justifyContent: "start" })}
-            >
-                <p>{t("Are you sure you want to delete?")}</p>
-                <p>
-                    {t(
-                        "New Posts will not show this post field. Posts which already contain this fields data will not be deleted.",
-                    )}
-                </p>
-            </ModalConfirm>
+                    body={
+                        <FrameBody>
+                            <div className={frameBodyClasses().contents}>
+                                <>
+                                    <div>
+                                        {fieldToDelete && (
+                                            <>
+                                                <p>
+                                                    <Translate
+                                                        source={'You are about to delete "<0/>" field.'}
+                                                        c0={fieldToDelete.label}
+                                                    />
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
+                                    <InputBlock required label={t("Delete Method")}>
+                                        <RadioPicker
+                                            pickerTitle={t("Delete Method")}
+                                            value={deleteMethod}
+                                            onChange={(val: PostFieldDeleteMethod) => setDeleteMethod(val)}
+                                            options={[
+                                                {
+                                                    value: "unlink",
+                                                    label: t("Unlink from Post Type"),
+                                                    description: t(
+                                                        "Remove this field from this post type only. This will not affect any other post types.",
+                                                    ),
+                                                },
+                                                {
+                                                    value: "delete",
+                                                    label: t("Delete"),
+                                                    description: t(
+                                                        "Completely remove this post field from your community. This will also remove this fields from all other post types.",
+                                                    ),
+                                                },
+                                            ]}
+                                            dropdownContentsFullWidth
+                                        />
+                                    </InputBlock>
+                                    <div>
+                                        {deleteMethod === "delete" ? (
+                                            <>
+                                                <Message
+                                                    type={"warning"}
+                                                    stringContents={t(
+                                                        "Completely remove this post field from your community.",
+                                                    )}
+                                                    contents={
+                                                        <Translate
+                                                            source={
+                                                                "This action will affect the following post types: <0></0>"
+                                                            }
+                                                            c0={(_) => (
+                                                                <>
+                                                                    {impactedPostTypes.map(({ label, url }) => (
+                                                                        <span key={label}>
+                                                                            <SmartLink to={url}>{label}</SmartLink>{" "}
+                                                                        </span>
+                                                                    ))}
+                                                                </>
+                                                            )}
+                                                        />
+                                                    }
+                                                />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p>
+                                                    {t(
+                                                        "Removing this field from this post type only. This will not affect any other post types.",
+                                                    )}
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
+                                </>
+                            </div>
+                        </FrameBody>
+                    }
+                    footer={
+                        <FrameFooter justifyRight>
+                            <Button
+                                buttonType={ButtonTypes.TEXT}
+                                onClick={() => setFieldToDelete(null)}
+                                className={frameFooterClasses().actionButton}
+                            >
+                                {t("Cancel")}
+                            </Button>
+                            <Button
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
+                                className={frameFooterClasses().actionButton}
+                                onClick={() => {
+                                    if (fieldToDelete) {
+                                        removePostField(fieldToDelete, deleteMethod);
+                                        setFieldToDelete(null);
+                                    }
+                                }}
+                            >
+                                {deleteMethod === "delete" ? t("Delete") : t("Unlink")}
+                            </Button>
+                        </FrameFooter>
+                    }
+                />
+            </Modal>
         </>
     );
 }

@@ -1375,7 +1375,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
 
         $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
 
-        $linkUri = url("/unsubscribe/$token", true);
+        $linkUri = url("/unsubscribe/$token", "https");
         if ($format == "text") {
             $link = "<br />" . $linkText . ": " . $linkUri;
         } else {
@@ -1421,7 +1421,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
     protected function generateUnsubscribeLink(array $tokenData): string
     {
         $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
-        return url("/unsubscribe/$token", true);
+        return url("/unsubscribe/$token", "https");
     }
 
     /**
@@ -1475,7 +1475,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
 
         $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
 
-        $linkUrl = url("/unsubscribe/$token", true);
+        $linkUrl = url("/unsubscribe/$token", "https");
         return $linkUrl;
     }
 

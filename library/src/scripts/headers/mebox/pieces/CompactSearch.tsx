@@ -153,7 +153,7 @@ export function CompactSearch(props: ICompactSearchProps) {
                         buttonRef={openSearchButtonRef}
                     >
                         <div className={classNames(props.buttonContentClassName)}>
-                            <Icon icon="search-search" />
+                            <Icon icon="search" />
                         </div>
                     </Button>
                     {label}
@@ -186,7 +186,7 @@ export function CompactSearch(props: ICompactSearchProps) {
                             resultsRef={resultsRef}
                             onOpenSuggestions={props.onOpenSuggestions}
                             onCloseSuggestions={props.onCloseSuggestions}
-                            className={"compactSearch-searchBar"}
+                            className={"compactsearchBar"}
                             clearButtonClass={props.clearButtonClass}
                             valueContainerClasses={classNames(classes.valueContainer, props.valueContainerClass)}
                             scope={props.scope}

@@ -11,6 +11,7 @@ import {
     CreatableFieldFormType,
     CreatableFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { RecordID } from "@vanilla/utils";
 
 export interface PostType {
@@ -28,6 +29,9 @@ export interface PostType {
     postButtonLabel: string;
     postHelperText: string;
     roleIDs: Array<IRole["roleID"]>;
+    categoryIDs: Array<ICategory["categoryID"]>;
+    postFields: PostField[];
+    postFieldIDs: Array<PostField["postFieldID"]>;
 }
 
 export interface PostTypeGetParams {
@@ -39,6 +43,7 @@ export interface PostTypeGetParams {
     page: number;
     limit: number;
     fields: string[];
+    expand?: string[];
 }
 
 export interface PostTypePostParams {
@@ -47,8 +52,11 @@ export interface PostTypePostParams {
     parentPostTypeID: string | null;
     isActive: boolean;
     roleIDs: Array<IRole["roleID"]>;
+    categoryIDs: Array<ICategory["categoryID"]>;
     postButtonLabel: string;
     postHelperText: string;
+    postFields: PostField[];
+    postFieldIDs: Array<PostField["postFieldID"]>;
     fields?: PostField[];
 }
 
@@ -58,7 +66,7 @@ export type OriginalPostTypes = (typeof originalPostTypes)[number];
 
 export interface PostField {
     postFieldID: string;
-    postTypeID: PostType["postTypeID"];
+    postTypeIDs: Array<PostType["postTypeID"]>;
     label: string;
     description: string;
     dataType: CreatableFieldDataType;
@@ -75,7 +83,7 @@ export interface PostField {
 }
 
 export interface PostFieldGetParams {
-    postTypeID: PostField["postTypeID"];
+    postTypeIDs: Array<PostType["postTypeID"]>;
     dataType: PostField["dataType"];
     formType: PostField["formType"];
     visibility: PostField["visibility"];
@@ -88,7 +96,6 @@ export interface PostFieldGetParams {
 
 export interface PostFieldPostParams {
     postFieldID: string;
-    postTypeID: PostType["postTypeID"];
     label: string;
     description: string;
     dataType: CreatableFieldDataType;
@@ -100,8 +107,11 @@ export interface PostFieldPostParams {
     sort: number;
 }
 
-export interface PostFieldPatchParams extends Partial<Omit<PostFieldPostParams, "postFieldID" | "postTypeID">> {}
+export interface PostFieldPatchParams extends Partial<Omit<PostFieldPostParams, "postFieldID">> {}
 
 export interface PostFieldPutParams {
     [postFieldID: PostField["postFieldID"]]: NonNullable<PostField["sort"]>;
 }
+
+export const PostFieldDeleteMethods = ["unlink", "delete"] as const;
+export type PostFieldDeleteMethod = (typeof PostFieldDeleteMethods)[number];

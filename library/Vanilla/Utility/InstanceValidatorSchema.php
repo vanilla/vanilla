@@ -27,7 +27,9 @@ class InstanceValidatorSchema extends Schema implements MetaInterface
      */
     public function __construct($className)
     {
-        parent::__construct();
+        parent::__construct([
+            "description" => "Validates instances of {$className}",
+        ]);
         $this->classNames = is_array($className) ? $className : [$className];
         $this->addValidator("", [$this, "validator"]);
     }

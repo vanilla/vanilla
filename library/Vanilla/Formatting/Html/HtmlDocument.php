@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Html;
 
+use Dom\HTMLElement;
 use Vanilla\Formatting\Formats\WysiwygFormat;
 use Vanilla\Formatting\FormatText;
 use Vanilla\Formatting\Html\Processor\HtmlProcessorTrait;
@@ -130,6 +131,19 @@ class HtmlDocument implements TextDOMInterface
     }
 
     /**
+     * @param \DOMElement $element
+     * @return string
+     */
+    public function elementInnerHtml(\DOMElement $element): string
+    {
+        $contents = "";
+        foreach ($element->childNodes as $child) {
+            $contents .= $this->dom->saveXML($child, LIBXML_NOEMPTYTAG | LIBXML_NOXMLDECL);
+        }
+        return $contents;
+    }
+
+    /**
      * Return the inner HTML content of the document.
      * We grab everything inside the document body.
      *
@@ -139,16 +153,21 @@ class HtmlDocument implements TextDOMInterface
     {
         if ($this->wrap) {
             $content = $this->dom->getElementsByTagName("body");
-            $result = @$this->dom->saveXML($content[0], LIBXML_NOEMPTYTAG);
+            $result = @$this->dom->saveXML($content[0], LIBXML_NOEMPTYTAG | LIBXML_NOXMLDECL);
 
             // The DOM Document added starting body and ending tags. We need to remove them.
             $result = preg_replace("/^<body>/", "", $result);
             $result = preg_replace('/<\/body>$/', "", $result);
         } else {
-            $result = @$this->dom->saveXML(null, LIBXML_NOEMPTYTAG);
+            $result = @$this->dom->saveXML(null, LIBXML_NOEMPTYTAG | LIBXML_NOXMLDECL);
         }
         // saveXML adds closing <br> tags, which breaks formatting.
+
         $result = preg_replace("/<\/br>/", "", $result);
+        //make sure the current <br> tags are self-closing
+        $result = preg_replace("/<br>/", "<br/>", $result);
+        //make sure the current <br anything> tags are self-closing
+        $result = preg_replace("/<br (.*?)>/i", '<br \1/>', $result);
         return $result;
     }
 

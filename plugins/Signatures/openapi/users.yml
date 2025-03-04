@@ -1,0 +1,12 @@
+openapi: 3.0.3
+info:
+components:
+    parameters:
+        UserExpand:
+            name: expand
+            in: query
+            schema:
+                items:
+                    enum:
+                        - signature
+                    type: string

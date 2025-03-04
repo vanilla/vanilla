@@ -525,6 +525,13 @@ export function userContentMixin(): CSSObject {
             display: "none !important",
         },
 
+        // Clearfix at the end in case there is an image hanging off of it.
+        "&:after": {
+            content: '""',
+            display: "table",
+            clear: "both",
+        },
+
         "& .moderationImageAndButtonContainer": {
             position: "relative",
 

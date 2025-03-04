@@ -8,6 +8,7 @@
 namespace VanillaTests\APIv2;
 
 use QnAPlugin;
+use Vanilla\Forum\Models\DiscussionPermissions;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -177,5 +178,46 @@ class DiscussionsApiExpandTest extends AbstractAPIv2Test
             ->getBody();
         $retrievedDiscussion = $result[0];
         $this->assertArrayNotHasKey("attachments", $retrievedDiscussion);
+    }
+
+    /**
+     * Test expansion of discussion permissions.
+     *
+     * @return void
+     */
+    public function testExpandPermissions()
+    {
+        $moderatorCategory = $this->createCategory();
+        $partialPermissions =
+            [
+                DiscussionPermissions::VIEW => true,
+                DiscussionPermissions::ADD => true,
+                DiscussionPermissions::EDIT => true,
+                DiscussionPermissions::DELETE => false,
+                DiscussionPermissions::COMMENTS_DELETE => true,
+            ] + array_fill_keys(DiscussionPermissions::getPermissionNames(), false);
+        $user = $this->createUserWithCategoryPermissions($moderatorCategory, $partialPermissions);
+        $discussion = $this->createDiscussion();
+
+        // First let's check it as our admin, we should have everything.
+        $allPermissions = array_fill_keys(DiscussionPermissions::getPermissionNames(), true);
+
+        $this->assertUserHasDiscussionPermissions(
+            $allPermissions,
+            discussion: $discussion,
+            user: $this->api()->getUserID()
+        );
+        $this->assertUserHasCategoryDiscussionPermissions(
+            $allPermissions,
+            category: $moderatorCategory,
+            user: $this->api()->getUserID()
+        );
+
+        $this->assertUserHasDiscussionPermissions($partialPermissions, discussion: $discussion, user: $user);
+        $this->assertUserHasCategoryDiscussionPermissions(
+            $partialPermissions,
+            category: $moderatorCategory,
+            user: $user
+        );
     }
 }

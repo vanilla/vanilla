@@ -63,7 +63,7 @@ class FileBasedLayoutProvider implements LayoutProviderInterface
     public function getByID($layoutID): array
     {
         if (!isset($this->layoutPaths[$layoutID])) {
-            throw new NotFoundException("Layout");
+            throw new NotFoundException("Layout '$layoutID' not found.");
         }
         $cachePath = "{$this->cacheBasePath}/{$layoutID}.php";
         $this->requestedLayoutPath = $this->layoutPaths[$layoutID];

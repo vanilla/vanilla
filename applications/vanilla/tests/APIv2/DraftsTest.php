@@ -7,6 +7,7 @@
 namespace VanillaTests\APIv2;
 
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Models\ContentDraftModel;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
@@ -18,24 +19,28 @@ class DraftsTest extends AbstractResourceTest
 
     use CommunityApiTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($name = null, array $data = [], $dataName = "")
+    protected bool $useFeatureFlag = false;
+
+    protected $baseUrl = "/drafts";
+    protected $record = [
+        "recordType" => "comment",
+        "parentRecordID" => 1,
+        "attributes" => [
+            "body" => "Hello world. I am a comment.",
+            "format" => "Markdown",
+        ],
+    ];
+    protected $patchFields = ["parentRecordID", "attributes"];
+
+    public function setUp(): void
     {
-        $this->baseUrl = "/drafts";
-        $this->record = [
-            "recordType" => "comment",
-            "parentRecordID" => 1,
-            "attributes" => [
-                "body" => "Hello world. I am a comment.",
-                "format" => "Markdown",
-            ],
-        ];
-
-        $this->patchFields = ["parentRecordID", "attributes"];
-
-        parent::__construct($name, $data, $dataName);
+        parent::setUp();
+        $this->disableFeature("customLayout.createPost");
+        if ($this->useFeatureFlag) {
+            $this->enableFeature(ContentDraftModel::FEATURE);
+        } else {
+            $this->disableFeature(ContentDraftModel::FEATURE);
+        }
     }
 
     /**
@@ -83,6 +88,8 @@ class DraftsTest extends AbstractResourceTest
                 "name" => "Discussion Draft",
                 "sink" => 0,
                 "tags" => "interesting,helpful",
+                "type" => "discussion",
+                "groupID" => null,
             ],
         ];
         parent::testPost($data);
@@ -114,6 +121,7 @@ class DraftsTest extends AbstractResourceTest
         $session->start($adminID);
         $viewedDraftData = $this->bessy()
             ->getHtml("post/editcomment?CommentID=&DraftID={$draftComment["draftID"]}")
+            ->removeSvgsAndStyles()
             ->getInnerHtml();
         $this->assertStringContainsString($record["attributes"]["body"], $viewedDraftData);
 
@@ -132,33 +140,29 @@ class DraftsTest extends AbstractResourceTest
         \Gdn::themeFeatures()->forceFeatures([
             "NewCategoryDropdown" => false,
         ]);
-        $this->runWithConfig(
-            [
-                "Vanilla.Categories.Use" => true,
-            ],
-            function () {
-                $newCat = $this->createCategory();
-                $data = [
-                    "recordType" => "discussion",
-                    "parentRecordID" => $newCat["categoryID"],
-                    "attributes" => [
-                        "announce" => 0,
-                        "body" => "Check the category picker",
-                        "closed" => 1,
-                        "format" => "Markdown",
-                        "name" => "Discussion Draft",
-                        "sink" => 0,
-                        "tags" => "interesting,helpful",
-                    ],
-                ];
-                $draft = $this->testPost($data);
-                $content = $this->bessy()->getHtml("post/editdiscussion/0/{$draft["draftID"]}", [
-                    "deliveryType" => DELIVERY_TYPE_ALL,
-                ]);
 
-                $content->assertCssSelectorText("option[selected]", $newCat["name"]);
-            }
-        );
+        $newCat = $this->createCategory();
+        $data = [
+            "recordType" => "discussion",
+            "parentRecordID" => $newCat["categoryID"],
+            "attributes" => [
+                "announce" => 0,
+                "body" => "Check the category picker",
+                "closed" => 1,
+                "format" => "Markdown",
+                "name" => "Discussion Draft",
+                "sink" => 0,
+                "tags" => "interesting,helpful",
+                "type" => "discussion",
+                "groupID" => null,
+            ],
+        ];
+        $draft = $this->testPost($data);
+        $content = $this->bessy()->getHtml("post/editdiscussion/0/{$draft["draftID"]}", [
+            "deliveryType" => DELIVERY_TYPE_ALL,
+        ]);
+
+        $content->assertCssSelectorText("option[selected]", $newCat["name"]);
     }
 
     /**
@@ -179,43 +183,6 @@ class DraftsTest extends AbstractResourceTest
             ->get("$this->baseUrl/{$draft["draftID"]}")
             ->getBody();
         $this->assertEquals($result["attributes"]["format"], "Text");
-    }
-
-    /**
-     * Test that when there are multiple drafts for the same comment,
-     * only the most recently updated draft is returned.
-     *
-     * @return void
-     */
-    public function testMultipleCommentDrafts(): void
-    {
-        $discussion = $this->createDiscussion();
-
-        CurrentTimeStamp::mockTime("now");
-
-        $firstDraft = $this->api()->post($this->baseUrl, [
-            "recordType" => "comment",
-            "parentRecordID" => $discussion["discussionID"],
-            "attributes" => [
-                "body" => "draft1",
-            ],
-        ]);
-
-        CurrentTimeStamp::mockTime("+1 second");
-
-        $secondDraft = $this->api()->post($this->baseUrl, [
-            "recordType" => "comment",
-            "parentRecordID" => $discussion["discussionID"],
-            "attributes" => [
-                "body" => "draft2",
-            ],
-        ]);
-
-        $rows = $this->api()
-            ->get($this->baseUrl, ["recordType" => "comment", "parentRecordID" => $discussion["discussionID"]])
-            ->getBody();
-        $this->assertCount(1, $rows);
-        $this->assertSame($secondDraft["attributes"]["body"], $rows[0]["attributes"]["body"]);
     }
 
     /**

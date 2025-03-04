@@ -165,6 +165,10 @@ class ReportModel extends PipelineModel
      */
     public function createCountedReportsQuery(array $where): Gdn_SQLDriver
     {
+        if (isset($where["reportReasonID"])) {
+            $where["rrj.reportReasonID"] = $where["reportReasonID"];
+            unset($where["reportReasonID"]);
+        }
         $wherePrefixes = [];
         foreach ($where as $key => $value) {
             $wherePrefixes[] = explode(".", $key)[0] ?? null;
@@ -677,5 +681,46 @@ class ReportModel extends PipelineModel
                 return $record ? $model->normalizeRow($record) : null;
         }
         return null;
+    }
+
+    /**
+     * Iterator to get records based on condition in batches
+     *
+     * @param array $where
+     * @param array $orderFields
+     * @param string $orderDirection
+     * @param int $batchSize
+     * @return \Generator
+     * @throws \Exception
+     */
+    public function getWhereIterator(
+        array $where = [],
+        array $orderFields = [],
+        string $orderDirection = "asc",
+        int $batchSize = 100
+    ): \Generator {
+        $offset = 0;
+
+        $sql = $this->createSql();
+        while (true) {
+            $records = $sql
+                ->select()
+                ->from("report r")
+                ->where($where)
+                ->orderBy($orderFields, $orderDirection)
+                ->limit($batchSize, $offset)
+                ->get()
+                ->resultArray();
+
+            foreach ($records as $record) {
+                $primaryKey = $record["reportID"];
+                yield $primaryKey => $record;
+            }
+
+            $offset += $batchSize;
+            if (count($records) < $batchSize) {
+                return;
+            }
+        }
     }
 }

@@ -103,7 +103,7 @@ public function base_render_beforebase_render_beforebase_render_beforebase_rende
  <a href="http://test.com/" rel="nofollow"><strong><em><s>bold italic strike link</s></em></strong></a>
 </p>
 <p>
- Some text with a mention in it&nbsp;<a class="atMention" data-username="Alex Other Name" data-userid="23" href="http://dev.vanilla.localhost/profile/Alex%20Other%20Name">@Alex Other Name</a>&nbsp;Another mention&nbsp;<a class="atMention" data-username="System" data-userid="1" href="http://dev.vanilla.localhost/profile/System">@System</a>.
+ Some text with a mention in it&nbsp;<a class="atMention" data-username="Alex Other Name" data-userid="23" href="http://dev.vanilla.local/profile/Alex%20Other%20Name">@Alex Other Name</a>&nbsp;Another mention&nbsp;<a class="atMention" data-username="System" data-userid="1" href="http://dev.vanilla.local/profile/System">@System</a>.
 </p>
 <p>
  Some text with emojis🤗🤔🤣.

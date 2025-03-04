@@ -11,9 +11,14 @@ use CategoryModel;
 use CommentModel;
 use DiscussionModel;
 use DiscussionStatusModel;
+use Exception;
+use Garden\Container\ContainerException;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Community\Events\SubscriptionChangeEvent;
 use Vanilla\Community\Events\TrackableDiscussionAnalyticsEvent;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -164,6 +169,7 @@ class TrackableCommunityModel
     {
         $discussionData["discussionID"] = 0;
         $discussionData = ArrayUtils::camelCase($discussionData);
+        $discussionData["announce"] = (bool) ($discussionData["announce"] ?? 0);
         $schema = $this->discussionModel->schema();
         $discussionData = $schema->validate($discussionData, true);
         $discussionData["discussionType"] = ucfirst($discussionData["type"] ?? "Discussion");
@@ -188,6 +194,11 @@ class TrackableCommunityModel
      * @param int|array $commentOrCommentID A comment's unique ID, used to query data.
      * @param string $type Event type (e.g. comment_add or comment_edit).
      * @return array Array representing comment row on success, false on failure.
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
+     * @throws \Garden\Container\NotFoundException
+     * @throws FormatterNotFoundException
      */
     public function getTrackableComment($commentOrCommentID, string $type = "comment_add"): array
     {
@@ -212,28 +223,33 @@ class TrackableCommunityModel
         $data = [
             "commentID" => (int) $comment["commentID"],
             "dateInserted" => TrackableDateUtils::getDateTime($comment["dateInserted"]),
-            "discussionID" => (int) $comment["discussionID"],
             "insertUser" => $this->userUtils->getTrackableUser($comment["insertUserID"]),
         ];
 
+        $parentHandler = $this->commentModel->getParentHandler($comment["parentRecordType"]);
+        $data["category"] = $parentHandler->getCategoryID($comment["parentRecordID"]);
+
         try {
-            $discussion = $this->getTrackableDiscussion($comment["discussionID"]);
-        } catch (\Exception $ex) {
-            $discussion = false;
+            $parentRecord = $parentHandler->getTrackableData($comment["parentRecordID"]);
+        } catch (Exception $ex) {
+            $parentRecord = false;
         }
 
-        if ($discussion) {
-            $commentNumber = val("countComments", $discussion, 0);
+        if ($parentRecord) {
+            $commentNumber = $parentRecord["countComments"] ?? 0;
+            $timeSinceDiscussion = $data["dateInserted"]["timestamp"] - $parentRecord["dateInserted"]["timestamp"];
 
-            $data["category"] = val("category", $discussion);
-            $data["categoryAncestors"] = val("categoryAncestors", $discussion);
-            $data["discussionUser"] = val("discussionUser", $discussion);
+            $data["category"] = val("category", $parentRecord);
+            $data["categoryAncestors"] = val("categoryAncestors", $parentRecord);
 
-            $timeSinceDiscussion = $data["dateInserted"]["timestamp"] - $discussion["dateInserted"]["timestamp"];
             $data["commentMetric"] = [
-                "firstComment" => $data["commentID"] === $discussion["firstCommentID"] ? true : false,
                 "time" => (int) $timeSinceDiscussion,
             ];
+
+            // We only track the first comment for Discussions.
+            if (isset($parentRecord["firstCommentID"])) {
+                $data["commentMetric"]["firstComment"] = $parentRecord["firstCommentID"] === $comment["commentID"];
+            }
 
             // The count of comments we get from the discussion doesn't include this one, so we compensate if it's an add.
             if ($type === "comment_add") {
@@ -250,16 +266,13 @@ class TrackableCommunityModel
                 $data["commentPosition"] = $commentNumber;
             }
 
-            // Removing those redundancies...
-            unset(
-                $discussion["category"],
-                $discussion["categoryAncestors"],
-                $discussion["commentMetric"],
-                $discussion["discussionUser"],
-                $discussion["record"]
-            );
+            // We use the `discussionID`, and `userDiscussion` keys for backward compatibility.
+            // The fields are in the catalog t`Parent Record ID`, and `Parent Record User` respectively.
+            $data["discussionID"] = (int) $comment["parentRecordID"];
+            $data["discussionUser"] = $this->userUtils->getTrackableUser($parentRecord["insertUserID"]);
 
-            $data["discussion"] = $discussion;
+            $data["parentRecordType"] = $comment["parentRecordType"];
+            $data[$parentHandler->getRecordType()] = $parentRecord;
         }
 
         return $data;
@@ -271,6 +284,9 @@ class TrackableCommunityModel
      *
      * @param array $commentData
      * @return array
+     * @throws ContainerException
+     * @throws ValidationException
+     * @throws NotFoundException
      */
     public function getTrackableLogComment(array $commentData): array
     {
@@ -279,32 +295,43 @@ class TrackableCommunityModel
         $schema = $this->commentModel->schema();
         $commentData = $schema->validate($commentData, true);
         $commentData["dateInserted"] = TrackableDateUtils::getDateTime($commentData["dateInserted"]);
-        $commentData["discussionID"] = (int) $commentData["discussionID"];
         $commentData["insertUser"] = $this->userUtils->getTrackableUser($commentData["insertUserID"]);
-        try {
-            $discussion = $this->getTrackableDiscussion($commentData["discussionID"]);
-        } catch (\Exception $ex) {
-            $discussion = false;
-        }
-        if ($discussion) {
-            $commentData["category"] = $discussion["category"];
-            $commentData["categoryAncestors"] = $discussion["categoryAncestors"];
-            $commentData["discussionUser"] = $discussion["discussionUser"];
 
-            // Removing those redundancies...
-            unset(
-                $discussion["category"],
-                $discussion["categoryAncestors"],
-                $discussion["commentMetric"],
-                $discussion["discussionUser"],
-                $discussion["record"]
-            );
+        if (isset($commentData["parentRecordType"], $commentData["parentRecordID"])) {
+            $parentRecord = $this->getParentRecord($commentData["parentRecordID"], $commentData["parentRecordType"]);
+        } else {
+            $parentRecord = false;
+        }
+
+        if ($parentRecord) {
+            $commentData["category"] = val("category", $parentRecord);
+            $commentData["categoryAncestors"] = val("categoryAncestors", $parentRecord);
+            $commentData["discussionUser"] = $this->userUtils->getTrackableUser($parentRecord["insertUserID"]);
         }
 
         // The body is large and unnecessary.
         $commentData["body"] = null;
 
         return $commentData;
+    }
+
+    /**
+     * Get the parent record for a comment if it exists. Returns false if it doesn't.
+     *
+     * @param int $parentRecordID
+     * @param string $parentRecordType
+     * @return array|false
+     * @throws NotFoundException
+     */
+    private function getParentRecord(int $parentRecordID, string $parentRecordType): array|false
+    {
+        $parentHandler = $this->commentModel->getParentHandler($parentRecordType);
+        try {
+            $parentRecord = $parentHandler->getTrackableData($parentRecordID);
+        } catch (Exception $ex) {
+            $parentRecord = false;
+        }
+        return $parentRecord;
     }
 
     /**
@@ -367,6 +394,10 @@ class TrackableCommunityModel
         return $data;
     }
 
+    /**
+     * @param array $preferences
+     * @return array
+     */
     protected function normalizePreferences(array $preferences): array
     {
         $trackablePreferences["followed"] = $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW];

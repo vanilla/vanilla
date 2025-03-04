@@ -751,7 +751,7 @@ if (!function_exists("commentUrl")) {
      */
     function commentUrl($comment, $withDomain = true)
     {
-        return CommentModel::createRawCommentUrl($comment, $withDomain);
+        return CommentModel::commentUrl($comment, $withDomain);
     }
 }
 
@@ -964,6 +964,10 @@ if (!function_exists("formatPossessive")) {
     {
         if (function_exists("formatPossessiveCustom")) {
             return formatPossesiveCustom($word);
+        }
+
+        if (is_null($word)) {
+            return null;
         }
 
         return substr($word, -1) == "s" ? $word . "'" : $word . "'s";

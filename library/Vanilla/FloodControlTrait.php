@@ -199,7 +199,7 @@ trait FloodControlTrait
 
         $isSpamming = false;
         $countSpamCheck = $storageObject->get($userPostCountKey, 0);
-        $dateSpamCheck = $storageObject->get($userLastDateCheckedKey, null);
+        $dateSpamCheck = $storageObject->get($userLastDateCheckedKey, "0");
         $secondsSinceSpamCheck = time() - (int) strtotime($dateSpamCheck);
 
         // Apply a spam lock if necessary

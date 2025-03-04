@@ -745,10 +745,12 @@ class UserModelTest extends SiteTestCase
         ]);
 
         // Create a discussion for old user.
+        $category = $this->createCategory();
         $discussionID = $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "valid discussion",
             "Format" => "markdown",
+            "CategoryID" => $category["categoryID"],
             "InsertUserID" => $oldUserID,
         ]);
 
@@ -906,11 +908,8 @@ class UserModelTest extends SiteTestCase
 
         $set = [
             "Photo" => "https://example.com/test.jpg",
-            "Title" => "Foo",
-            "Location" => "Bar",
             "About" => "A simple story.",
             "DiscoveryText" => "test",
-            "DateOfBirth" => $date,
             "DateFirstVisit" => $date,
             "DateLastActive" => $date,
             "InsertIPAddress" => $ip,
@@ -1227,13 +1226,13 @@ class UserModelTest extends SiteTestCase
     {
         $user1ID = $this->createUser(__FUNCTION__ . "1");
         $user2ID = $this->createUser(__FUNCTION__ . "2");
-        $this->userModel->saveIP($user1ID, "101.102.103.104");
-        $this->userModel->saveIP($user2ID, "2001:db8:3333:4444:5555:6666:7777:8888");
+        $this->trackUserVisit($user1ID, "101.102.103.104");
+        $this->trackUserVisit($user2ID, "2001:db8:3333:4444:5555:6666:7777:8888");
         $userIDs = $this->userModel->getUserIDsForIPAddresses([
             "101.102.103.104",
             "2001:db8:3333:4444:5555:6666:7777:8888",
         ]);
-        $this->assertSame(array_map("intval", [$user1ID, $user2ID]), $userIDs);
+        $this->assertEquals([(int) $user2ID, (int) $user1ID], $userIDs);
     }
 
     /**

@@ -38,7 +38,7 @@ export default function DashboardAddEditUserModal(props: React.PropsWithChildren
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    props.handleSubmit();
+                    void props.handleSubmit();
                 }}
                 noValidate
                 className={classes.form}

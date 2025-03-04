@@ -25,6 +25,7 @@ class FileUploadPostPermissionTest extends SiteTestCase
     public function setUp(): void
     {
         parent::setUp();
+        self::disableFeature("customLayout.createPost");
     }
 
     /**

@@ -108,4 +108,14 @@ abstract class AbstractCustomLayoutView implements LayoutViewInterface
     {
         return $this->assetClasses;
     }
+
+    /**
+     * Given the resolved parameters for the layout views, return contexts that should wrap the whole page.
+     *
+     * @return array<array{$reactComponent: string, $reactProps: array}>
+     */
+    public function getContexts(array $resolvedParams): array
+    {
+        return [];
+    }
 }

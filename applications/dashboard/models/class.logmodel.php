@@ -15,6 +15,7 @@ use Psr\Log\LoggerAwareTrait;
 use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Events\SpamEvent;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Events\LogPostEvent;
 use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\Forum\Models\SpamReport;
@@ -96,8 +97,7 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
     {
         if ($pruneAfter) {
             // Make sure the string can be converted into a date.
-            $now = time();
-            $testTime = strtotime($pruneAfter, $now);
+            $testTime = strtotime($pruneAfter, baseTimestamp: CurrentTimeStamp::get());
             if ($testTime === false) {
                 throw new \InvalidArgumentException('Invalid timespan value for "delete prune after".', 400);
             }
@@ -117,9 +117,11 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
         if (!$this->deletePruneAfter) {
             return null;
         } else {
-            $tz = new \DateTimeZone("UTC");
-            $now = new \DateTimeImmutable("now", $tz);
-            $test = new \DateTimeImmutable($this->deletePruneAfter, $tz);
+            $now = CurrentTimeStamp::getDateTime();
+            $test = DateTimeImmutable::createFromFormat(
+                "U",
+                (string) strtotime($this->deletePruneAfter, baseTimestamp: CurrentTimeStamp::get())
+            );
 
             $interval = $test->diff($now);
 
@@ -247,7 +249,7 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
         $logs = $this->getIDs($logIDs);
         $models = [];
         $models["Discussion"] = new DiscussionModel();
-        $models["Comment"] = new CommentModel();
+        $models["Comment"] = Gdn::getContainer()->get(CommentModel::class);
 
         foreach ($logs as $log) {
             $recordType = $log["RecordType"];
@@ -809,33 +811,21 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
      * @param string $operation The specific operation being logged.
      * @param string $recordType The type of record. This matches the name of the record's table.
      * @param array $newData The record after the edit.
-     * @param array|null $oldData The record before the edit.
      */
-    public static function logChange($operation, $recordType, $newData, $oldData = null)
+    public static function logChange(string $operation, string $recordType, array $newData): void
     {
-        $recordID = isset($newData["RecordID"]) ? $newData["RecordID"] : val($recordType . "ID", $newData);
+        $recordID = $newData["RecordID"] ?? ($newData[$recordType . "ID"] ?? null);
 
-        // Grab the record from the DB.
-        if ($oldData === null) {
-            $oldData = Gdn::sql()
-                ->getWhere($recordType, [$recordType . "ID" => $recordID])
-                ->resultArray();
-        } elseif (!is_array($oldData)) {
-            $oldData = [$oldData];
+        if (!$recordID) {
+            throw new Exception("RecordID not found in data to track changes.");
         }
 
-        foreach ($oldData as $row) {
-            // Don't log the change if it's right after an insert.
-            if (
-                val("DateInserted", $row) &&
-                time() - Gdn_Format::toTimestamp(val("DateInserted", $row)) < c("Garden.Log.FloodControl", 20) * 60
-            ) {
-                continue;
-            }
+        $oldData = Gdn::sql()
+            ->getWhere($recordType, [$recordType . "ID" => $recordID])
+            ->firstRow(DATASET_TYPE_ARRAY);
 
-            setValue("_New", $row, $newData);
-            self::insert($operation, $recordType, $row);
-        }
+        $oldData["_New"] = $newData;
+        self::insert($operation, $recordType, $oldData);
     }
 
     /**
@@ -1181,6 +1171,7 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
                         case "Comment":
                             $this->recalcIDs["Discussion"][$log["ParentRecordID"]] = true;
                             $this->recalcIDs["Comment"][$iD] = true;
+
                             break;
                     }
 
@@ -1219,7 +1210,7 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
 
             // Dispatch CommentEvent if it's a comment being approved
             if ("Comment" === $log["RecordType"]) {
-                $commentModel = new CommentModel();
+                $commentModel = Gdn::getContainer()->get(CommentModel::class);
                 $comment = $commentModel->getID($iD, DATASET_TYPE_ARRAY);
 
                 if ($comment) {
@@ -1365,7 +1356,7 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
         switch (strtolower($recordType)) {
             case "comment":
                 if ($hasRecordID) {
-                    $commentModel = CommentModel::instance();
+                    $commentModel = Gdn::getContainer()->get(CommentModel::class);
                     $payloadData = $commentModel->getID($data["CommentID"] ?? $data["RecordID"], DATASET_TYPE_ARRAY);
                     if ($payloadData !== false) {
                         $resourceEvent = $commentModel->eventFromRow($payloadData, "log{$operation}");

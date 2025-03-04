@@ -16,6 +16,7 @@ import { vanillaEditorClasses } from "@library/vanilla-editor/VanillaEditor.clas
 import { VanillaEditorPlugins } from "@library/vanilla-editor/VanillaEditor.plugins";
 import { VanillaEditorBoundsContext } from "@library/vanilla-editor/VanillaEditorBoundsContext";
 import { VanillaEditorFocusContext } from "@library/vanilla-editor/VanillaEditorFocusContext";
+import VanillaEditorPlaceholder from "@library/vanilla-editor/VanillaEditorPlaceholder";
 import MentionToolbar from "@library/vanilla-editor/plugins/mentionPlugin/MentionToolbar";
 import QuoteEmbedToolbar from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/QuoteEmbedToolbar";
 import { insertRichEmbed } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichEmbed";
@@ -248,7 +249,6 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
                                     editableProps={{
                                         onBlur: props.onBlur,
                                         autoFocus: props.autoFocus,
-                                        placeholder: t("Type..."),
                                         className: cx(
                                             userContentClasses().root,
                                             vanillaEditorClasses().root({ horizontalPadding: true }),
@@ -259,6 +259,7 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
                                         ),
                                     }}
                                 >
+                                    <VanillaEditorPlaceholder />
                                     <MarkToolbar />
                                     <MentionToolbar pluginKey="@" />
                                     <QuoteEmbedToolbar />

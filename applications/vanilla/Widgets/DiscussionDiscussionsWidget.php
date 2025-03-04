@@ -35,7 +35,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
      */
     public static function getWidgetName(): string
     {
-        return "Discussions";
+        return "Posts";
     }
 
     /**

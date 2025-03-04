@@ -29,6 +29,7 @@ use Vanilla\Utility\Timers;
 use Vanilla\Utility\TracedContainer;
 use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\Pagination\WebLinking;
+use VanillaTests\Http\TestHttpClient;
 
 /**
  * Allow a class to test against
@@ -41,7 +42,7 @@ trait SiteTestTrait
     }
 
     /**
-     * @var InternalClient
+     * @var TestHttpClient
      */
     protected $api;
 
@@ -167,7 +168,7 @@ trait SiteTestTrait
             $this->userModel = $userModel;
             $this->roleModel = $roleModel;
         });
-        $this->api = static::container()->getArgs(InternalClient::class, [
+        $this->api = static::container()->getArgs(TestHttpClient::class, [
             static::container()->get("@baseUrl") . "/api/v2",
         ]);
 
@@ -464,7 +465,7 @@ TEMPLATE;
     /**
      * Get the API client for internal requests.
      *
-     * @return InternalClient Returns the API client.
+     * @return TestHttpClient Returns the API client.
      */
     public function api()
     {

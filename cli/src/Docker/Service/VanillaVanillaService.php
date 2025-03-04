@@ -13,7 +13,7 @@ use Vanilla\Cli\Utils\DockerUtils;
 use Vanilla\Cli\Utils\ShellUtils;
 
 /**
- * Service for dev.vanilla.localhost
+ * Service for dev.vanilla.local
  */
 class VanillaVanillaService extends AbstractService
 {
@@ -54,14 +54,12 @@ class VanillaVanillaService extends AbstractService
             "Feature.customLayout.discussionList.Enabled" => true,
             "Feature.customLayout.home.Enabled" => true,
             "Feature.customLayout.categoryList.Enabled" => true,
-            "Feature.customLayout.discussionThread.Enabled" => true,
+            "Feature.customLayout.post.Enabled" => true,
             "Feature.layoutEditor.discussionThread.Enabled" => true,
             "Feature.escalations.Enabled" => true,
             "Feature.CustomProfileFields.Enabled" => true,
             "Feature.discussionSiteMaps.Enable" => true,
             "Feature.NewUserManagement.Enabled" => true,
-            "Feature.Digest.Enabled" => true,
-            "Feature.UnsubscribeLink.Enabled" => true,
         ];
     }
 
@@ -78,7 +76,7 @@ class VanillaVanillaService extends AbstractService
      */
     public function getHostname(): string
     {
-        return "dev.vanilla.localhost";
+        return "dev.vanilla.local";
     }
 
     public function start()

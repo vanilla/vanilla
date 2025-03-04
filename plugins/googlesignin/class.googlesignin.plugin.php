@@ -36,6 +36,10 @@ class GoogleSignInPlugin extends Gdn_OAuth2
         if (!$this->provider) {
             $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
 
+            if (!$this->provider) {
+                return $this->provider;
+            }
+
             // These URLs are added here instead of being stored in the DB in case they ever change, we will not have to update the DB.
             $this->provider["AuthorizeUrl"] = self::AUTHORIZE_URL;
             $this->provider["TokenUrl"] = self::TOKEN_URL;

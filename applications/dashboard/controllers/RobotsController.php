@@ -1,12 +1,13 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 use Garden\EventManager;
 use Gdn_Session as SessionInterface;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\Robots;
 
 /**
@@ -15,32 +16,21 @@ use Vanilla\Web\Robots;
 class RobotsController extends Gdn_Controller
 {
     /** Default robots.txt contents. */
-    private const ROBOTS_DEFAULT = <<<ROBOTS_DEFAULT
-User-agent: *
-Disallow: /entry/
-Disallow: /messages/
-Disallow: /profile/comments/
-Disallow: /profile/discussions/
-Disallow: /search/
-Disallow: /sso/
-Disallow: /sso
-ROBOTS_DEFAULT;
+    private const ROBOTS_DEFAULT = [
+        "/entry/",
+        "/messages/",
+        "/profile/comments/",
+        "/profile/discussions/",
+        "/search/",
+        "/sso/",
+        "/sso",
+    ];
 
     /** Content of robots.txt when the site is supposed to be "invisible" to crawlers and bots. */
     private const ROBOTS_INVISIBLE = <<<ROBOTS_INVISIBLE
 User-agent: *
 Disallow: /
 ROBOTS_INVISIBLE;
-
-    /** @var ConfigurationInterface */
-    private $configuration;
-
-    /** @var EventManager */
-    private $eventManager;
-
-    /** @var SessionInterface */
-    private $session;
-
     /**
      * Inject dependencies.
      *
@@ -49,14 +39,10 @@ ROBOTS_INVISIBLE;
      * @param SessionInterface $session
      */
     public function __construct(
-        ConfigurationInterface $configuration,
-        EventManager $eventManager,
-        SessionInterface $session
+        private ConfigurationInterface $configuration,
+        private EventManager $eventManager,
+        private SessionInterface $session
     ) {
-        $this->configuration = $configuration;
-        $this->eventManager = $eventManager;
-        $this->session = $session;
-
         parent::__construct();
     }
 
@@ -68,10 +54,34 @@ ROBOTS_INVISIBLE;
     private function robotRules(): string
     {
         // Config lookup is backwards-compatible with Sitemaps addon.
-        $rules = $this->configuration->get("Robots.Rules", $this->configuration->get("Sitemap.Robots.Rules", null));
-        if ($rules === null) {
-            $rules = self::ROBOTS_DEFAULT;
+        $rules = $this->configuration->get(
+            "Robots.Rules",
+            $this->configuration->get("Sitemap.Robots.Rules", $this->generateSiteRobotDefault())
+        );
+
+        return $rules;
+    }
+
+    private function generateSiteRobotDefault(): string
+    {
+        $rules = <<<UserAgent
+User-agent: *
+
+UserAgent;
+
+        $sectionModel = \Gdn::getContainer()->get(SiteSectionModel::class);
+
+        // Go through the sections to find the correct one.
+        $sections = $sectionModel->getAll();
+        foreach (self::ROBOTS_DEFAULT as $disallowLine) {
+            foreach ($sections as $section) {
+                $rules .= <<<DisallowText
+Disallow: {$section->getBasePath()}$disallowLine
+
+DisallowText;
+            }
         }
+
         return $rules;
     }
 

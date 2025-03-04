@@ -30,7 +30,7 @@ export function ProfileFieldVisibilityIcon(props: { visibility: CreatableFieldVi
         return (
             <ToolTip label={t("This information will only be shown to users with permission to view internal info.")}>
                 <span className={iconContainerClass}>
-                    <Icon className={iconClasses} icon="profile-crown" />
+                    <Icon className={iconClasses} icon="visibility-internal" />
                 </span>
             </ToolTip>
         );
@@ -39,7 +39,7 @@ export function ProfileFieldVisibilityIcon(props: { visibility: CreatableFieldVi
         return (
             <ToolTip label={t("This is private information and will not be shared with other members.")}>
                 <span className={iconContainerClass}>
-                    <Icon className={iconClasses} icon="profile-lock" />
+                    <Icon className={iconClasses} icon="visibility-private" />
                 </span>
             </ToolTip>
         );

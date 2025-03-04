@@ -7,14 +7,41 @@
 
 namespace VanillaTests\Library\Core;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for deprecated().
  */
-
 class DeprecatedTest extends TestCase
 {
+    /**
+     * Set a custom error handler to throw exceptions.
+     *
+     * This is necessary because PHPUnit 10+ no longer has a decated method to assert deprecation notices.
+     *
+     * See: https://github.com/sebastianbergmann/phpunit/issues/5062
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        set_error_handler(static function ($errno, $errstr) {
+            throw new \Exception($errstr, $errno);
+        }, E_ALL);
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        restore_error_handler();
+    }
+
     /**
      * Test {@link deprecated()} against two scenarios ($newName and !$newName).
      *
@@ -24,8 +51,8 @@ class DeprecatedTest extends TestCase
      */
     public function testDeprecated(string $testOldName, string $testNewName = "")
     {
-        $this->expectDeprecation();
-        $this->expectDeprecationMessage("$testOldName is deprecated.");
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("$testOldName is deprecated.");
         deprecated($testOldName, $testNewName);
     }
 

@@ -3,14 +3,14 @@
  * @license Proprietary
  */
 import InputBlock from "@library/forms/InputBlock";
-import { DurationPicker } from "@library/forms/durationPicker/DurationPicker";
+import { DurationPicker, DurationPickerValue } from "@library/forms/durationPicker/DurationPicker";
 import { IFieldError } from "@library/@types/api/core";
 import { DurationPickerUnit } from "@library/forms/durationPicker/DurationPicker.types";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 interface IProps {
-    value: string;
-    onChange(newValue: string): void;
+    value: DurationPickerValue;
+    onChange(newValue: DurationPickerValue): void;
     disabled?: boolean;
     placeholder?: string;
     inputAriaLabel?: string;

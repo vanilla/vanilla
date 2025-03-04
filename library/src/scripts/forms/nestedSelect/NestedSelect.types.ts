@@ -35,6 +35,13 @@ export interface INestedSelectProps extends Select.SelectConfig {
     onInputChange?: (inputValue?: string) => void;
     classes?: Record<string, string>;
     createable?: boolean;
+    createableLabel?: string;
+    /** List of values that should be looked up on mount */
+    initialValues?: RecordID | RecordID[];
+    /** Get the text input from this component */
+    onInputValueChange?: (inputValue?: string) => void;
+    /** Force options fetched options to always be available to select */
+    withOptionCache?: boolean;
 }
 
 export interface INestedSelectOptionProps extends Omit<Select.Option, "children" | "parent"> {
@@ -51,6 +58,7 @@ export interface INestedSelectOptionProps extends Omit<Select.Option, "children"
     searchQuery?: string;
     highlighted?: boolean;
     onHover?: () => void;
+    createableLabel?: string;
 }
 
 export interface INestedOptionsState {

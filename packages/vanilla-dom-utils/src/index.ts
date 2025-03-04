@@ -8,7 +8,6 @@ import "focus-visible";
 
 export * from "./downloadAsFile";
 export * from "./domData";
-export * from "./emoji";
 export * from "./EscapeListener";
 export * from "./events";
 export * from "./FocusWatcher";

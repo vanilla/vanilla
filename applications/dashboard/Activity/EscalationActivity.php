@@ -81,7 +81,7 @@ class EscalationActivity extends Activity
      */
     public static function getPluralHeadline(): ?string
     {
-        return null;
+        return self::getFullHeadline();
     }
 
     /**

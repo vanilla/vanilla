@@ -26,13 +26,13 @@ export function CategoryItemMeta(props: ICategoryItemMetaProps) {
     const countIcon = (recordName: string) => {
         switch (recordName) {
             case "discussion":
-                return "search-discussion";
+                return "meta-discussions";
             case "comment":
-                return "meta-comment";
+                return "meta-comments";
             case "post":
-                return "search-post-count";
+                return "meta-posts";
             case "follower":
-                return "me-notifications-small";
+                return "meta-follower";
         }
     };
 
@@ -114,7 +114,7 @@ export function CategoryItemMeta(props: ICategoryItemMetaProps) {
     const subcategoriesMeta =
         display?.subcategories && childrenToRender.length ? (
             asIcons ? (
-                <MetaIcon icon="search-subcategories" aria-label={t("Subcategories")}>
+                <MetaIcon icon="meta-child-categories" aria-label={t("Subcategories")}>
                     {subcategoriesMetaContent}
                 </MetaIcon>
             ) : (

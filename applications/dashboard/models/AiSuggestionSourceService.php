@@ -8,6 +8,8 @@
 namespace Vanilla\Dashboard\Models;
 
 use CommentModel;
+use DateInterval;
+use DateTimeImmutable;
 use DiscussionModel;
 use Exception;
 use Garden\EventManager;
@@ -20,6 +22,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use UserMetaModel;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Activity\AiSuggestionsActivity;
 use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\FeatureFlagHelper;
@@ -64,7 +67,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         private LongRunner $longRunner,
         private \ActivityModel $activityModel,
         private AiSuggestionModel $aiSuggestionModel,
-        private FormatService $formatService
+        private FormatService $formatService,
+        private DiscussionModel $discussionModel
     ) {
         $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
     }
@@ -92,7 +96,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
      */
     private function aiSuggestionFeatureEnabled(): bool
     {
-        return FeatureFlagHelper::featureEnabled("aiFeatures") && FeatureFlagHelper::featureEnabled("AISuggestions");
+        return FeatureFlagHelper::featureEnabled("AISuggestions");
     }
 
     /**
@@ -106,6 +110,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
             "enabled" => false,
             "userID" => 0,
             "sources" => ["category" => ["enabled" => false, "exclusionIDs" => [0]]],
+            "delay" => ["unit" => "hour", "length" => 0],
         ]);
     }
 
@@ -147,7 +152,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
         return $this->aiSuggestionFeatureEnabled() &&
             $this->checkIfUserHasEnabledAiSuggestions() === true &&
             $aiConfig["enabled"] &&
-            FeatureFlagHelper::featureEnabled("customLayout.discussionThread");
+            FeatureFlagHelper::featureEnabled("customLayout.post");
     }
 
     /**
@@ -188,6 +193,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
     {
         $discussion = $this->getDiscussionModel()->getID($recordID, DATASET_TYPE_ARRAY);
         $aiConfig = $this->aiSuggestionConfigs()["sources"];
+
         $suggestions = [];
 
         $keywords = $this->generateKeywords($discussion);
@@ -200,6 +206,7 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
                     continue;
                 }
                 $localSuggestions = $source->generateSuggestions($discussion, $keywords);
+                $this->deleteSuggestions($discussion["DiscussionID"]);
                 $suggestions = array_merge($localSuggestions, $suggestions);
                 yield new LongRunnerSuccessID($source->getName());
             } catch (Exception $e) {

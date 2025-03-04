@@ -1,0 +1,171 @@
+openapi: 3.0.3
+info:
+paths:
+    /icons/:iconUUID:
+        delete:
+            summary: Delete an icon variant
+            tags:
+                - Icons
+            parameters:
+                - name: iconUUID
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      format: uuid
+                      description: The unique identifier of the icon variant to delete.
+            responses:
+                "204":
+                    description: Success
+
+    /icons/active:
+        get:
+            summary: List the active version of each icon.
+            tags:
+                - Icons
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Icon"
+    /icons/system:
+        get:
+            summary: List all system icons.
+            tags:
+                - Icons
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Icon"
+    /icons/by-name:
+        get:
+            summary: List icon variants by name.
+            tags:
+                - Icons
+            parameters:
+                - in: query
+                  name: iconName
+                  required: true
+                  schema:
+                      type: string
+                      description: The name of the icon to list.
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      description: The maximum number of icons to return per page.
+
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Icon"
+    /icons/override:
+        post:
+            summary: Override icons
+            description: Create one or more new icon variants and mark them as active.
+            tags:
+                - Icons
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                overrides:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            iconName:
+                                                type: string
+                                                description: The name of the icon to override.
+                                            svgRaw:
+                                                type: string
+                                                description: The raw SVG of the icon.
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Icon"
+    /icons/restore:
+        post:
+            summary: Restore existing icon revisions
+            description: Restore one or more existing icon variants to active status.
+            tags:
+                - Icons
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                restorations:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            iconName:
+                                                type: string
+                                                description: The name of the icon to restore.
+                                            iconUUID:
+                                                type: string
+                                                format: uuid
+                                                description: The unique identifier of the icon variant to restore.
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Icon"
+components:
+    schemas:
+        Icon:
+            type: object
+            properties:
+                iconUUID:
+                    type: string
+                    format: uuid
+                    description: The unique identifier of the icon.
+                iconName:
+                    type: string
+                    description: The name of the icon. There can be multiple icons with 1 one name, but only 1 active at a time.
+                isActive:
+                    type: boolean
+                    description: Whether or not the icon is the active variant for that icon name.
+                isCustom:
+                    type: boolean
+                    description: Whether or not the icon is a custom icon or a default vanilla icon..
+                svgRaw:
+                    type: string
+                    description: The raw SVG of the icon.
+                svgContents:
+                    type: string
+                    description: The inner contents of the SVG tag with final processing applied.
+                iconSvgViewBox:
+                    type: string
+                    description: The exracted `viewbox` property of the SVG.
+                dateInserted:
+                    type: string
+                    format: date-time
+                    description: The date and time the icon was created.
+                insertUserID:
+                    type: integer
+                    description: The userID that uploaded the icon.

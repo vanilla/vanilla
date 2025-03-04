@@ -24,6 +24,7 @@ use Vanilla\Analytics\AnalyticsActionsProvider;
 use Vanilla\Analytics\TrackableDecoratorInterface;
 use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
+use Vanilla\Forum\Models\ResourceModel;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\Providers\DefaultImageResizeProvider;
 use Vanilla\Layout\GlobalLayoutRecordProvider;
@@ -40,6 +41,7 @@ use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
+use Vanilla\Web\Middleware\ChunkingMiddleware;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
 use Vanilla\Web\Page;
 
@@ -258,10 +260,12 @@ class Bootstrap
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(LogTransactionMiddleware::class)])
             ->addCall("addMiddleware", [new Reference("@smart-id-middleware")])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\LocaleMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(ChunkingMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ApiSelectMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(Vanilla\Web\ApiExtensionMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\ValidateUTF8Middleware::class)])
@@ -285,6 +289,9 @@ class Bootstrap
 
             ->rule(\Vanilla\Web\APIExpandMiddleware::class)
             ->setConstructorArgs(["/api/v2/"])
+            ->setShared(true)
+
+            ->rule(\Vanilla\Web\Middleware\LocaleMiddleware::class)
             ->setShared(true)
 
             ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
@@ -339,7 +346,18 @@ class Bootstrap
 
             ->rule(Vanilla\Widgets\DynamicContainerSchemaOptions::class)
             ->setShared(true)
-
+            //Locale Translation
+            ->rule(Vanilla\Forum\Models\CommunityMachineTranslationModel::class)
+            ->addCall("addTranslatableModel", [
+                new Reference(\MachineTranslation\Providers\CommentTranslatableModel::class),
+            ])
+            ->addCall("addTranslatableModel", [
+                new Reference(\MachineTranslation\Providers\PostTranslatableModel::class),
+            ])
+            ->addCall("addTranslatableModel", [
+                new Reference(\MachineTranslation\Providers\LayoutTranslatableModel::class),
+            ])
+            ->setShared(true)
             // Sites
             ->rule(OwnSite::class)
             ->setShared(true);

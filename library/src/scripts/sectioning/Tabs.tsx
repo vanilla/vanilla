@@ -136,7 +136,7 @@ export function Tabs(props: ITabsProps) {
             className={cx(classes?.root(props.extendContainer), tabsRootClass)}
             onChange={(index) => {
                 setActiveTab(index);
-                props.onChange?.(props.data[index]);
+                void props.onChange?.(props.data[index]);
             }}
         >
             {tabList}

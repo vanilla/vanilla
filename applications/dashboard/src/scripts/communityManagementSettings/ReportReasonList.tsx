@@ -246,7 +246,7 @@ function RowActions(props: IRowActionsProps) {
                     ariaLabel={t("Delete")}
                     buttonType={ButtonTypes.ICON_COMPACT}
                 >
-                    <Icon icon={"data-trash"} />
+                    <Icon icon={"delete"} />
                     <span className={visibility().visuallyHidden}>{t("Delete")}</span>
                 </Button>
             </ToolTip>

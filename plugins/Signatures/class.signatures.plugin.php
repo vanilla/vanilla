@@ -30,6 +30,11 @@ use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
+use Vanilla\Formatting\Html\HtmlDocument;
+use Vanilla\Formatting\Html\Processor\StripImagesProcessor;
+use Vanilla\Formatting\Exception\FormatterNotFoundException;
+use Garden\Schema\Schema;
+use Vanilla\Utility\ArrayUtils;
 
 class SignaturesPlugin extends Gdn_Plugin
 {
@@ -704,6 +709,11 @@ EOT;
             $sigFormat = c("Garden.InputFormatter");
         }
 
+        // There are more than one signature so we will use the first one.
+        if (is_array($signature)) {
+            $signature = $signature[0];
+        }
+
         if (!$sigFormat) {
             $sigFormat = c("Garden.InputFormatter");
         }
@@ -779,11 +789,11 @@ EOT;
     }
 
     /**
-     *
+     * Check to see if the signature should be hidden from viewing.
      *
      * @return bool
      */
-    protected function hide()
+    public function hide()
     {
         if ($this->Disabled) {
             return true;
@@ -1090,5 +1100,192 @@ EOT;
     private function getAllowEmbeds()
     {
         return c("Signatures.Allow.Embeds", true);
+    }
+
+    /**
+     * Update user index schema to add signature to expand.
+     *
+     * @param Schema $schema
+     * @return void
+     */
+    public function userIndexSchema_init(Schema $schema): void
+    {
+        $this->addSchemaExpand($schema);
+    }
+
+    /**
+     * update user get schema to add signature to expand.
+     *
+     * @param Schema $schema
+     * @return void
+     */
+    public function userGetSchema_init(Schema $schema): void
+    {
+        $this->addSchemaExpand($schema);
+    }
+
+    /**
+     * Add Signature expand to the schema.
+     * @param Schema $schema
+     * @return void
+     */
+    public function addSchemaExpand(Schema $schema): void
+    {
+        $expandEnum = $schema->getField("properties.expand.items.enum");
+        if (!in_array("signature", $expandEnum)) {
+            $expandEnum[] = "signature";
+            $schema->setField("properties.expand.items.enum", $expandEnum);
+        }
+    }
+
+    /**
+     * Add signature data to the user api out schema.
+     *
+     * @param Schema $schema
+     */
+    public function userSchema_init(Schema $schema)
+    {
+        $schema->merge(
+            Schema::parse([
+                "signature:o?" => ["body:s|n"],
+            ])
+        );
+    }
+
+    /**
+     * Expand users signature if available for users endpoint.
+     *
+     * @param array $result
+     * @param UsersApiController $sender
+     * @param Schema $inSchema
+     * @param array $query
+     * @param array $rows
+     * @return array
+     */
+    public function usersApiController_indexOutput(
+        array $result,
+        UsersApiController $sender,
+        Schema $inSchema,
+        array $query,
+        array $rows
+    ): array {
+        return $this->expandSignature($result, $query, $sender);
+    }
+
+    public function usersApiController_getOutput(
+        array $result,
+        UsersApiController $sender,
+        Schema $inSchema,
+        array $query,
+        array $rows
+    ): array {
+        return $this->expandSignature($result, $query, $sender);
+    }
+
+    /**
+     * Add the signature data to the user data.
+     *
+     * @param array $result
+     * @param array $query
+     * @param UsersApiController $sender
+     * @return array
+     */
+    private function expandSignature(array $result, array $query, UsersApiController $sender): array
+    {
+        // If the Signature is not visible for guest users, then hide it.
+        if (
+            !$sender->isExpandField("signature", $query["expand"]) ||
+            (self::getHideGuest() && !Gdn::session()->isValid())
+        ) {
+            return $result;
+        }
+        // Check if it's a single user record or an array of user records.
+        if (ArrayUtils::isAssociative($result)) {
+            $singleUser = true;
+            $userIDs = [$result["userID"]];
+        } else {
+            $singleUser = false;
+            $userIDs = array_column($result, "userID");
+        }
+
+        //Assign signature to the user data.
+        if (!empty($userIDs)) {
+            $signatures = $this->getUsersSignature($userIDs);
+            if ($singleUser) {
+                $signature = val($userIDs[0], $signatures, null);
+                if ($signature) {
+                    $result["signature"] = $signature;
+                }
+            } else {
+                foreach ($result as &$user) {
+                    $userID = $user["userID"];
+                    $signature = val($userID, $signatures, null);
+                    if ($signature) {
+                        $user["signature"] = $signature;
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get the signature for the given user IDs.
+     *
+     * @param array $userIDs
+     * @return array
+     * @throws FormatterNotFoundException
+     */
+    public function getUsersSignature(array $userIDs): array
+    {
+        if (empty($userIDs)) {
+            return [];
+        }
+
+        $currentUserID = Gdn::session()->UserID;
+        $hideSignature = $this->getUserMeta($currentUserID, "HideAll", false)[$this->makeMetaKey("HideAll")];
+
+        if ($hideSignature) {
+            // The current user has chosen to hide all signatures on their profile.
+            return [];
+        }
+        // Check if the user has chosen to hide images from the signatures.
+        $stripImages = $this->getUserMeta($currentUserID, "HideImages", false)[$this->makeMetaKey("HideImages")];
+
+        $signatures = [];
+        $dataSignatures = $this->getUserMeta($userIDs, "Sig");
+        $formats = $this->getUserMeta($userIDs, "Format");
+
+        if (count($dataSignatures)) {
+            foreach ($dataSignatures as $userID => $userSig) {
+                $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+                if (!empty($user["HideSignature"]) || !empty($user["Deleted"]) || !empty($user["Banned"])) {
+                    continue;
+                }
+                if (isset($formats[$userID])) {
+                    $format = val($this->makeMetaKey("Format"), $formats[$userID], c("Garden.InputFormatter"));
+                } else {
+                    $format = c("Garden.InputFormatter");
+                }
+                $signature = val($this->makeMetaKey("Sig"), $userSig, null);
+                if ($signature === null) {
+                    continue;
+                }
+                $signature = Gdn::formatService()->renderHTML($signature, $format);
+                if ($stripImages) {
+                    // The user has chosen to strip images form the signatures.
+                    $dom = new HtmlDocument($signature);
+                    $processor = new StripImagesProcessor();
+                    $document = $processor->processDocument($dom);
+                    $signature = $document->renderHTML();
+                }
+                $signatures[$userID] = [
+                    "body" => $signature,
+                ];
+            }
+        }
+
+        return $signatures;
     }
 }

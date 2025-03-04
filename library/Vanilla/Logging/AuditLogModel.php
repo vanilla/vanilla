@@ -9,7 +9,7 @@ namespace Vanilla\Logging;
 
 use Garden\Schema\Schema;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Database\Operation\InsertUuidProcessor;
+use Vanilla\Database\Operation\PrimaryKeyUuidProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
 use Vanilla\Database\Operation\PruneProcessor;
 use Vanilla\Database\SetLiterals\JsonArrayInsert;
@@ -35,7 +35,7 @@ class AuditLogModel extends PipelineModel
         $this->addPipelineProcessor(
             new PruneProcessor("dateInserted", $config->get(AuditLogger::CONF_RETENTION, "60 days"))
         );
-        $this->addPipelineProcessor(new InsertUuidProcessor(["auditLogID"]));
+        $this->addPipelineProcessor(new PrimaryKeyUuidProcessor("auditLogID"));
     }
 
     /**
@@ -123,7 +123,8 @@ class AuditLogModel extends PipelineModel
 
         $structure
             ->table("auditLog")
-            ->createIndexIfNotExists("auditLog_insertUserID", ["dateInserted", "insertUserID"]);
+            ->createIndexIfNotExists("auditLog_insertUserID", ["dateInserted", "insertUserID"])
+            ->createIndexIfNotExists("auditLog_insertUserID_dateInserted", ["insertUserID", "dateInserted"]);
 
         if (\Gdn::config("Garden.Installed")) {
             \Gdn::config()->touch(AuditLogger::CONF_ENABLED, true);

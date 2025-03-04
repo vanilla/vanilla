@@ -99,7 +99,7 @@ class DefaultSiteSection implements SiteSectionInterface
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return SiteSectionSchema::toArray($this);
     }
@@ -181,7 +181,7 @@ class DefaultSiteSection implements SiteSectionInterface
         return GlobalLayoutRecordProvider::RECORD_TYPE;
     }
 
-    public function getLayoutRecordID(): int
+    public function getLayoutRecordID(): int|string
     {
         return GlobalLayoutRecordProvider::RECORD_ID;
     }

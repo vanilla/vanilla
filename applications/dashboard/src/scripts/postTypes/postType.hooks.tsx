@@ -22,7 +22,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
 import { debug, logDebug } from "@vanilla/utils";
 
-export function usePostTypeQuery(params?: Partial<PostTypeGetParams>) {
+export function usePostTypeQuery(params?: Partial<PostTypeGetParams>, enabled = true) {
     return useQuery<PostTypeGetParams, IError, PostType[]>({
         queryKey: ["postTypes", params, params?.postTypeID],
         queryFn: async () => {
@@ -30,13 +30,14 @@ export function usePostTypeQuery(params?: Partial<PostTypeGetParams>) {
                 return [];
             }
 
-            const response = await apiv2("/post-types", {
+            const response = await apiv2.get("/post-types", {
                 params: {
                     ...params,
                 },
             });
             return response.data;
         },
+        enabled,
     });
 }
 
@@ -86,7 +87,7 @@ export function usePostTypeDelete() {
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(["postTypes"]);
+            void queryClient.invalidateQueries(["postTypes"]);
             addToast({
                 autoDismiss: true,
                 body: <>{t("Post type successfully deleted")}</>,
@@ -111,15 +112,11 @@ export function usePostFieldQuery(params?: Partial<PostFieldGetParams>) {
 }
 
 export function usePostFieldPatchMutation() {
-    return useMutation<
-        PostField,
-        IError,
-        { postTypeID: PostType["postTypeID"]; postFieldID: PostField["postFieldID"]; body: PostFieldPatchParams }
-    >({
+    return useMutation<PostField, IError, { postFieldID: PostField["postFieldID"]; body: PostFieldPatchParams }>({
         mutationKey: ["postFieldPatch"],
         mutationFn: async (mutationArgs) => {
-            const { postTypeID, postFieldID, body } = mutationArgs;
-            const response = await apiv2.patch(`/post-fields/${postTypeID}/${postFieldID}`, body);
+            const { postFieldID, body } = mutationArgs;
+            const response = await apiv2.patch(`/post-fields/${postFieldID}`, body);
             return response.data;
         },
     });
@@ -136,15 +133,12 @@ export function usePostFieldPostMutation() {
     });
 }
 
-export function usePostFieldDelete(postTypeID: PostType["postTypeID"]) {
+export function usePostFieldDelete() {
     const { addToast } = useToast();
     return useMutation<any, IError, PostField["postFieldID"]>({
         mutationKey: ["postTypeDelete"],
         mutationFn: async (postFieldID) => {
-            if (postTypeID == "-1") {
-                return null;
-            }
-            const response = await apiv2.delete(`/post-fields/${postTypeID}/${postFieldID}`);
+            const response = await apiv2.delete(`/post-fields/${postFieldID}`);
             return response.data;
         },
         onError: (error) => {

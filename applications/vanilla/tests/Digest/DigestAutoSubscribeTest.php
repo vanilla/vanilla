@@ -38,7 +38,7 @@ class DigestAutoSubscribeTest extends SiteTestCase
      */
     public function testAutoSubscribeRegistrant(): void
     {
-        $this->runWithConfig(["Garden.Digest.Enabled" => 1, "Preferences.Digest.Autosubscribe" => 1], function () {
+        $this->runWithConfig(["Garden.Digest.Enabled" => 1, "Garden.Digest.Autosubscribe.Enabled" => 1], function () {
             $this->getEventManager()->clearDispatchedEvents();
             $registrationRecord = $this->getRegistrationRecord();
             $registrationResults = $this->registerNewUser($registrationRecord);
@@ -126,27 +126,28 @@ class DigestAutoSubscribeTest extends SiteTestCase
     public function testAutoSubscribeSigninNoPreferences(): void
     {
         $user = $this->createUser();
-        $this->runWithConfig(["Garden.Digest.Enabled" => 1, "Preferences.Digest.Autosubscribe" => 1], function () use (
-            $user
-        ) {
-            // The user hasn't signed in, so the auto-subscribe setting should not have taken effect.
-            $preferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
-            $this->assertSame(0, $preferences["Email.DigestEnabled"]);
-            // The user should be autosubscribed after signing in.
-            $this->bessy()->post("/entry/signin", ["Email" => $user["email"], "Password" => "testpassword"]);
-            $updatedPreferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
-            $this->assertSame(3, $updatedPreferences["Email.DigestEnabled"]);
-            // An auto-subscribe subscription change event should have been dispatched.
-            $this->assertEventDispatched(
-                $this->expectedResourceEvent(
-                    SubscriptionChangeEvent::COLLECTION_NAME,
-                    SubscriptionChangeEvent::ACTION_DIGEST_AUTO_SUBSCRIBE,
+        $this->runWithConfig(
+            ["Garden.Digest.Enabled" => 1, "Garden.Digest.Autosubscribe.Enabled" => 1],
+            function () use ($user) {
+                // The user hasn't signed in, so the auto-subscribe setting should not have taken effect.
+                $preferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
+                $this->assertSame(0, $preferences["Email.DigestEnabled"]);
+                // The user should be autosubscribed after signing in.
+                $this->bessy()->post("/entry/signin", ["Email" => $user["email"], "Password" => "testpassword"]);
+                $updatedPreferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
+                $this->assertSame(3, $updatedPreferences["Email.DigestEnabled"]);
+                // An auto-subscribe subscription change event should have been dispatched.
+                $this->assertEventDispatched(
+                    $this->expectedResourceEvent(
+                        SubscriptionChangeEvent::COLLECTION_NAME,
+                        SubscriptionChangeEvent::ACTION_DIGEST_AUTO_SUBSCRIBE,
+                        []
+                    ),
                     []
-                ),
-                []
-            );
-            $this->clearDispatchedEvents();
-        });
+                );
+                $this->clearDispatchedEvents();
+            }
+        );
     }
 
     /**
@@ -168,26 +169,27 @@ class DigestAutoSubscribeTest extends SiteTestCase
             []
         );
         $this->clearDispatchedEvents();
-        $this->runWithConfig(["Garden.Digest.Enabled" => 1, "Preferences.Digest.Autosubscribe" => 1], function () use (
-            $user
-        ) {
-            // The user's preference should be set to true.
-            $preferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
-            $this->assertSame(1, $preferences["Email.DigestEnabled"]);
-            // The user's preference should not have changed.
-            $this->bessy()->post("/entry/signin", ["Email" => $user["email"], "Password" => "testpassword"]);
-            $updatedPreferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
-            $this->assertSame(1, $updatedPreferences["Email.DigestEnabled"]);
-            // No events should have been dispatched.
-            $this->assertEventNotDispatched([
-                "type" => SubscriptionChangeEvent::COLLECTION_NAME,
-                "action" => SubscriptionChangeEvent::ACTION_DIGEST_ENABLED,
-            ]);
-            $this->assertEventNotDispatched([
-                "type" => SubscriptionChangeEvent::COLLECTION_NAME,
-                "action" => SubscriptionChangeEvent::ACTION_DIGEST_AUTO_SUBSCRIBE,
-            ]);
-        });
+        $this->runWithConfig(
+            ["Garden.Digest.Enabled" => 1, "Garden.Digest.Autosubscribe.Enabled" => 1],
+            function () use ($user) {
+                // The user's preference should be set to true.
+                $preferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
+                $this->assertSame(1, $preferences["Email.DigestEnabled"]);
+                // The user's preference should not have changed.
+                $this->bessy()->post("/entry/signin", ["Email" => $user["email"], "Password" => "testpassword"]);
+                $updatedPreferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
+                $this->assertSame(1, $updatedPreferences["Email.DigestEnabled"]);
+                // No events should have been dispatched.
+                $this->assertEventNotDispatched([
+                    "type" => SubscriptionChangeEvent::COLLECTION_NAME,
+                    "action" => SubscriptionChangeEvent::ACTION_DIGEST_ENABLED,
+                ]);
+                $this->assertEventNotDispatched([
+                    "type" => SubscriptionChangeEvent::COLLECTION_NAME,
+                    "action" => SubscriptionChangeEvent::ACTION_DIGEST_AUTO_SUBSCRIBE,
+                ]);
+            }
+        );
     }
 
     /**
@@ -197,30 +199,31 @@ class DigestAutoSubscribeTest extends SiteTestCase
     {
         $user = $this->createUser();
         $this->api()->patch("/notification-preferences/{$user["userID"]}", ["DigestEnabled" => ["email" => false]]);
-        $this->runWithConfig(["Garden.Digest.Enabled" => 1, "Preferences.Digest.Autosubscribe" => 1], function () use (
-            $user
-        ) {
-            // The user's preference should be set to false.
-            $preferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
-            $this->assertSame(0, $preferences["Email.DigestEnabled"]);
-            // The user's preference should not have changed.
-            $this->bessy()->post("/entry/signin", ["Email" => $user["email"], "Password" => "testpassword"]);
-            $updatedPreferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
-            $this->assertSame(0, $updatedPreferences["Email.DigestEnabled"]);
+        $this->runWithConfig(
+            ["Garden.Digest.Enabled" => 1, "Garden.Digest.Autosubscribe.Enabled" => 1],
+            function () use ($user) {
+                // The user's preference should be set to false.
+                $preferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
+                $this->assertSame(0, $preferences["Email.DigestEnabled"]);
+                // The user's preference should not have changed.
+                $this->bessy()->post("/entry/signin", ["Email" => $user["email"], "Password" => "testpassword"]);
+                $updatedPreferences = $this->userPrefsModel->getUserPrefs($user["userID"]);
+                $this->assertSame(0, $updatedPreferences["Email.DigestEnabled"]);
 
-            // No events should have been dispatched.
-            $this->assertEventNotDispatched([
-                "type" => SubscriptionChangeEvent::COLLECTION_NAME,
-                "action" => SubscriptionChangeEvent::ACTION_DIGEST_ENABLED,
-            ]);
-            $this->assertEventNotDispatched([
-                "type" => SubscriptionChangeEvent::COLLECTION_NAME,
-                "action" => SubscriptionChangeEvent::ACTION_DIGEST_AUTO_SUBSCRIBE,
-            ]);
-            $this->assertEventNotDispatched([
-                "type" => SubscriptionChangeEvent::COLLECTION_NAME,
-                "action" => SubscriptionChangeEvent::ACTION_DIGEST_DISABLED,
-            ]);
-        });
+                // No events should have been dispatched.
+                $this->assertEventNotDispatched([
+                    "type" => SubscriptionChangeEvent::COLLECTION_NAME,
+                    "action" => SubscriptionChangeEvent::ACTION_DIGEST_ENABLED,
+                ]);
+                $this->assertEventNotDispatched([
+                    "type" => SubscriptionChangeEvent::COLLECTION_NAME,
+                    "action" => SubscriptionChangeEvent::ACTION_DIGEST_AUTO_SUBSCRIBE,
+                ]);
+                $this->assertEventNotDispatched([
+                    "type" => SubscriptionChangeEvent::COLLECTION_NAME,
+                    "action" => SubscriptionChangeEvent::ACTION_DIGEST_DISABLED,
+                ]);
+            }
+        );
     }
 }

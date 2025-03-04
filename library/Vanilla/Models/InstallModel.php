@@ -34,6 +34,8 @@ class InstallModel
     /** @var \Gdn_Session  */
     protected $session;
 
+    protected ?PDO $pdo = null;
+
     /**
      * InstallModel constructor.
      *
@@ -84,7 +86,6 @@ class InstallModel
             "Database.Name" => $data["database"]["name"],
             "Database.User" => $data["database"]["user"],
             "Database.Password" => $data["database"]["password"],
-
             "Garden.Title" => $data["site"]["title"],
             "Garden.Cookie.Salt" => $this->config->get("Garden.Cookie.Salt") ?: betterRandomString(32, "Aa0"),
             "Garden.Unsubscribe.Salt" => $this->config->get("Garden.Unsubscribe.Salt") ?: betterRandomString(32, "Aa0"),
@@ -366,13 +367,15 @@ class InstallModel
      *
      * @param array $info Database connection information.
      */
-    protected function createPDO(array $info)
+    protected function createPDO(array $info): PDO
     {
-        $pdo = new PDO($this->getDatabaseDsn($info), $info["user"], $info["password"], [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT => false,
-        ]);
+        if ($this->pdo === null) {
+            $this->pdo = new PDO($this->getDatabaseDsn($info), $info["user"], $info["password"], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_PERSISTENT => false,
+            ]);
+        }
 
-        return $pdo;
+        return $this->pdo;
     }
 }

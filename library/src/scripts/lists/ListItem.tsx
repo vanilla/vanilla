@@ -27,6 +27,7 @@ import { ListItemMedia } from "@library/lists/ListItemMedia";
 import { listItemMediaClasses } from "@library/lists/ListItemMedia.styles";
 import { createSourceSetValue, t } from "@library/utility/appUtils";
 import { HomeWidgetItemDefaultImage } from "@library/homeWidget/HomeWidgetItemDefaultImage";
+import type { IBoxOptions } from "@library/styles/cssUtilsTypes";
 
 export interface IListItemProps {
     className?: string;
@@ -53,12 +54,12 @@ export interface IListItemProps {
     checkbox?: React.ReactNode;
     asTile?: boolean;
     disableButtonsInItems?: boolean;
+    boxOptions?: Partial<IBoxOptions>;
 }
 
 export function ListItem(props: IListItemProps) {
     const { headingDepth = 3, descriptionClassName, truncateDescription = true, descriptionMaxCharCount = 200 } = props;
     const selfRef = useRef<HTMLDivElement>(null);
-    const measure = useMeasure(selfRef);
     const { layout } = useContext(ListItemContext);
     const listItemVars = listItemVariables(props.options);
     const mediaClasses = listItemMediaClasses();
@@ -66,12 +67,13 @@ export function ListItem(props: IListItemProps) {
         options: { iconPosition },
     } = listItemVars;
 
+    const measure = useMeasure(selfRef);
     const isMobileMedia = measure.width > 0 ? measure.width <= 600 : false;
     const hasImage = props.featuredImage?.display || Boolean(props.mediaItem);
     const asTile = props.asTile == null ? props.asTile || isMobileMedia : props.asTile;
     const iconInMeta = iconPosition === ListItemIconPosition.META && !hasImage;
     const hasCheckbox = Boolean(props.checkbox);
-    const classes = listItemClasses(asTile, hasImage, hasCheckbox, isMobileMedia && !props.asTile);
+    const classes = listItemClasses(asTile, hasImage, hasCheckbox, isMobileMedia && props.asTile);
 
     const checkboxWrapped = props.checkbox && <div className={cx(classes.checkboxContainer)}>{props.checkbox}</div>;
 
@@ -188,7 +190,7 @@ export function ListItem(props: IListItemProps) {
     }
 
     return (
-        <PageBox as={props.as ?? "li"} ref={selfRef} className={cx(props.className)}>
+        <PageBox options={props.boxOptions} as={props.as ?? "li"} ref={selfRef} className={cx(props.className)}>
             <div className={cx(classes.item, props.actionAlignment === "center" && classes.itemCentered)}>
                 {media}
                 {asTile && (icon || actionsContent || hasCheckbox) && (
@@ -202,7 +204,7 @@ export function ListItem(props: IListItemProps) {
                 )}
                 <div className={classes.contentContainer}>
                     <div className={classes.titleContainer}>
-                        <Heading custom className={classes.title} depth={headingDepth}>
+                        <Heading custom className={cx(classes.title, "heading")} depth={headingDepth}>
                             {props.url ? (
                                 <SmartLink to={props.url} className={cx(classes.titleLink, props.nameClassName)}>
                                     <TruncatedText lines={3}>{props.name}</TruncatedText>

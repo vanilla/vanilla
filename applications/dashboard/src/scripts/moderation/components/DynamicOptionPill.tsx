@@ -38,7 +38,7 @@ export function DynamicOptionPill(props: IProps) {
                 />
             </label>
             <Button className={classes.removeButton} buttonType={ButtonTypes.CUSTOM} onClick={props.removeOption}>
-                <Icon icon={"search-close"} size={"compact"} />
+                <Icon icon={"dismiss-compact"} size={"compact"} />
             </Button>
         </span>
     );

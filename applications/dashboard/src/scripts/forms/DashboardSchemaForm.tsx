@@ -22,6 +22,7 @@ export const DashboardSchemaForm = React.forwardRef(function DashboardSchemaForm
             value={{
                 compact: props.compact,
                 forceVerticalLabels: props.forceVerticalLabels,
+                groupTag: props.groupTag,
             }}
         >
             <JsonSchemaForm

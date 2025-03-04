@@ -6,6 +6,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Formatting\DateTimeFormatter;
 use Webmozart\Assert\Assert;
@@ -817,7 +818,7 @@ class Gdn_Model extends Gdn_Pluggable
                         break;
                     case "enum":
                         $enums = array_change_key_case(array_combine($column->Enum, $column->Enum));
-                        if (isset($enums[strtolower($value)])) {
+                        if ($value && isset($enums[strtolower($value)])) {
                             $value = $enums[strtolower($value)];
                         } elseif (!$value) {
                             $value = null;
@@ -1082,12 +1083,12 @@ class Gdn_Model extends Gdn_Pluggable
 
         if ($editContentTimeout == -1) {
             $canEdit = true;
-        } elseif ($timeInserted + $editContentTimeout > time()) {
+        } elseif ($timeInserted + $editContentTimeout > CurrentTimeStamp::get()) {
             $canEdit = true;
         }
 
         if ($canEdit && $editContentTimeout > 0) {
-            $timeLeft = $timeInserted + $editContentTimeout - time();
+            $timeLeft = $timeInserted + $editContentTimeout - CurrentTimeStamp::get();
         }
 
         return $canEdit;

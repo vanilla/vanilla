@@ -191,7 +191,9 @@ class TestDispatcher
             $obLevelStart = ob_get_level();
             // Capture output.
             ob_start();
+            $request->setMeta("throwRedirects", true);
             $dispatcher->dispatch($request, $options[self::OPT_PERMANENT]);
+
             $output = ob_get_contents();
             $this->lastOutput = $output;
             $this->lastHeaders = $dispatcher->getSentHeaders();
@@ -546,10 +548,13 @@ class TestDispatcher
      * Set whether or not to rethrow dispatcher exceptions.
      *
      * @param bool $rethrowExceptions
+     *
+     * @return $this
      */
-    public function setRethrowExceptions(bool $rethrowExceptions): void
+    public function setRethrowExceptions(bool $rethrowExceptions): TestDispatcher
     {
         $this->rethrowExceptions = $rethrowExceptions;
+        return $this;
     }
 
     /**

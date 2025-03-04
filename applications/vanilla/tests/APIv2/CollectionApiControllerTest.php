@@ -880,6 +880,10 @@ class CollectionApiControllerTest extends AbstractResourceTest
         foreach ($keys as $key) {
             $this->assertArrayHasKey($key, $record);
         }
+
+        $head = $response->getHeaders();
+        $this->assertStringContainsString("/api/v2/collections/contents/en?page=1", $head["X-App-Page-First-Url"][0]);
+        $this->assertStringContainsString("/api/v2/collections/contents/en?page=1", $head["X-App-Page-Last-Url"][0]);
         return $data = [
             "records" => [$recordSet1, $recordSet2],
             "collections" => [$updatedCollection1, $updatedCollection2],

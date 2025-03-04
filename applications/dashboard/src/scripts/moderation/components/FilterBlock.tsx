@@ -65,7 +65,7 @@ export function FilterBlock(props: FilterBlockProps) {
             return { ...prevFilters, ...initial };
         });
         if (props.initialFilters && props.dynamicOptionApi) {
-            setInitialDynamicState(props.initialFilters);
+            void setInitialDynamicState(props.initialFilters);
         }
     }, []);
 
@@ -249,7 +249,7 @@ export function FilterBlock(props: FilterBlockProps) {
                             buttonType={ButtonTypes.TEXT}
                             onClick={() => setShowDynamicInput(true)}
                         >
-                            <Icon icon="analytics-add" /> {t("Add Filter")}
+                            <Icon icon="filter-add" /> {t("Add Filter")}
                         </Button>
                     )}
                 </>

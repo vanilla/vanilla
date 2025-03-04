@@ -16,6 +16,7 @@
  * L610: Disable globalEval function
  * L8405: Resolve CVE-2015-9251
  * L9813: Resolve CVE-2020-11022
+ * L9813: Resolve CVE-2020-11023
  *
  */
 (function( window, undefined ) {
@@ -9813,8 +9814,18 @@
     }
 
     /**
-     * PATCH NOTES: Resolve CVE-2020-11022
+     * PATCH NOTES: Resolve CVE-2020-11022 & CVE-2020-11023
      * Advisory & Workaround: https://github.com/advisories/GHSA-gxr4-xjj5-5px2
+     *
+     * Query used a regex in its jQuery.htmlPrefilter method to ensure that all
+     * closing tags were XHTML-compliant when passed to methods. For example, this
+     * prefilter ensured that a call like jQuery("<div class='hot' />") is actually
+     * converted to jQuery("<div class='hot'></div>"). Recently, an issue was
+     * reported that demonstrated the regex could introduce a cross-site scripting
+     * (XSS) vulnerability.
+     * https://blog.jquery.com/2020/04/10/jquery-3-5-0-released/
+     *
+     * This patch removes the regex manipulation from the jQuery.htmlPrefilter method entirly.
      */
     jQuery.htmlPrefilter = function( html ) {
         return html;

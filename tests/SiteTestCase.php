@@ -11,8 +11,11 @@ use Garden\Container\Container;
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Schema\ValidationException;
+use Psr\Log\LoggerInterface;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\AddonModel;
+use VanillaTests\Fixtures\Scheduler\InstantScheduler;
+use VanillaTests\Fixtures\SpyingEventManager;
 
 /**
  * A base class for tests that require Vanilla to be installed.
@@ -56,6 +59,16 @@ class SiteTestCase extends VanillaTestCase
     {
         parent::tearDown();
         $this->tearDownTestTraits();
+
+        $scheduler = \Gdn::scheduler();
+        $scheduler->reset();
+        $eventManager = \Gdn::eventManager();
+        if ($eventManager instanceof SpyingEventManager) {
+            $eventManager->clearDispatchedEvents();
+            $eventManager->clearFiredEvents();
+        }
+        $this->getTestLogger()->clear();
+
         if (\Gdn::database()->isInTransaction()) {
             self::fail("Test run ended with an open database transaction.");
         }

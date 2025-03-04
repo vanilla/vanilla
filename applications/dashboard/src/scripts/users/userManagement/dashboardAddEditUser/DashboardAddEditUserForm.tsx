@@ -181,7 +181,7 @@ export default function DashboardAddEditUserForm(props: IProps) {
                     componentProps={{
                         onSubmit: (e) => {
                             e.preventDefault();
-                            submitForm();
+                            void submitForm();
                         },
                         className: classes.form,
                         noValidate: true,

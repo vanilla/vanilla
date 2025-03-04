@@ -51,5 +51,20 @@ export const vanillaEditorClasses = useThemeCache(() => {
         justifyContent: "space-between",
     });
 
-    return { root, elementToolbarPosition, elementToolbarContents, footer };
+    const placeholder = css({
+        position: "absolute",
+        top: "9px",
+        left: "15px",
+        fontSize: "16px",
+        color: "rgb(85, 90, 98)",
+        pointerEvents: "none",
+        userSelect: "none",
+        opacity: "0.333",
+
+        "&.hidden": {
+            display: "none",
+        },
+    });
+
+    return { root, elementToolbarPosition, elementToolbarContents, footer, placeholder };
 });

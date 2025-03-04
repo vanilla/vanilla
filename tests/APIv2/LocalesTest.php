@@ -1,11 +1,13 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\APIv2;
 
+use Gdn;
+use LocaleModel;
 use Vanilla\Contracts\ConfigurationInterface;
 
 /**
@@ -43,12 +45,56 @@ class LocalesTest extends AbstractAPIv2Test
      */
     public function testGet(string $config, string $value, array $expected): void
     {
+        $this->resetTable("locale");
         $this->configuration->saveToConfig($config, $value);
+        $this->configuration->saveToConfig("Locales.migrated", false);
+        LocaleModel::structure(Gdn::database());
         $results = $this->api()
             ->get("locales")
             ->getBody();
-        $this->assertEqualsCanonicalizing($expected, $results);
+        $this->assertArraySubsetRecursive($expected, $results);
         $this->configuration->remove($config);
+    }
+
+    /**
+     * Test Locales expandDisplayNames.
+     *
+     * @param string $config
+     * @param string $value
+     * @param array $expected
+     *
+     * @dataProvider provideData
+     * @return void
+     */
+    public function testGetLegacy(string $config, string $value, array $expected): void
+    {
+        $this->configuration->saveToConfig($config, $value);
+        $this->configuration->saveToConfig("Locales.migrated", false);
+        $results = $this->api()
+            ->get("locales")
+            ->getBody();
+        $this->assertArraySubsetRecursive($expected, $results);
+        $this->configuration->remove($config);
+    }
+
+    /**
+     * Test Locales post/get for machineTranslation.
+     *
+     * @return void
+     */
+    public function testPost(): void
+    {
+        LocaleModel::structure(Gdn::database());
+        $this->resetTable("locale");
+        $result = $this->api->post("locales", ["locale" => "ru", "translatable" => true])->getBody();
+
+        $getResults = $this->api()
+            ->get("locales?isMachineTranslations=true")
+            ->getBody();
+
+        $this->assertEquals("ru", $result["localeKey"]);
+        $this->assertCount(1, $getResults);
+        $this->assertEquals("ru", $getResults[0]["localeKey"]);
     }
 
     /**

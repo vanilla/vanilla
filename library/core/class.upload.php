@@ -189,6 +189,10 @@ class Gdn_Upload extends Gdn_Pluggable
     public static function parse($name)
     {
         $result = false;
+        if (is_null($name)) {
+            return $result;
+        }
+
         $name = str_replace("\\", "/", $name);
         $pathUploads = str_replace("\\", "/", PATH_UPLOADS);
 

@@ -739,7 +739,7 @@ class Gdn_Format
     public static function tagContent($html, $callback, $skipAnchors = true, $skipCode = true)
     {
         $regex = "`([<>])`i";
-        $parts = preg_split($regex, $html, null, PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split($regex, $html, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         $inTag = false;
         $inAnchor = false;
@@ -844,7 +844,8 @@ class Gdn_Format
                             http_build_query([
                                 "allowTrusted" => 1,
                                 "target" => $url,
-                            ])
+                            ]),
+                        true
                     );
                 }
             }
@@ -907,7 +908,7 @@ class Gdn_Format
                         "allowTrusted" => 1,
                         "target" => $plainUrl,
                     ]);
-                return anchor($text, $href) . $punc;
+                return anchor($text, $href, attributes: ["WithDomain" => true]) . $punc;
             }
 
             return '<a href="' . $url . '"' . $nofollow . ">" . $text . "</a>" . $punc;

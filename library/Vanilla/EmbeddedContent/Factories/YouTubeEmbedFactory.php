@@ -124,7 +124,7 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory
             return null;
         }
 
-        if (preg_match("/t=(?P<start>\d+)/", $fragment, $timeParts)) {
+        if ($fragment && preg_match("/t=(?P<start>\d+)/", $fragment, $timeParts)) {
             return (int) $timeParts["start"];
         }
 

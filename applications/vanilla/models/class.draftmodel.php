@@ -54,7 +54,7 @@ class DraftModel extends Gdn_Model
      * @param int $offset Number of results to skip.
      * @param int|false $limit Max number of drafts to return.
      * @param int $discussionID Limits drafts returned to a single discussion.
-     * @return object Gdn_DataSet SQL results.
+     * @return Gdn_DataSet SQL results.
      */
     public function getByUser($userID, $offset = 0, $limit = false, $discussionID = 0)
     {

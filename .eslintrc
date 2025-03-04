@@ -41,6 +41,9 @@
         "no-debugger": ["error"],
         "no-alert": ["error"],
 
+        // Super important
+        "@typescript-eslint/no-floating-promises": "error",
+
         // Typescript specific rules
         "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/ban-types": [
@@ -87,7 +90,7 @@
 
         // React hooks
         "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "warn",
+        "react-hooks/exhaustive-deps": "off",
 
         // Vanilla Custom
         "@vanilla/no-unconventional-imports": "error",

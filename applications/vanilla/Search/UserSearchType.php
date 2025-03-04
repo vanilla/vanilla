@@ -112,10 +112,10 @@ class UserSearchType extends AbstractSearchType
                 $outSchema = match ($showFullSchema) {
                     UsersApiController::FULL_USER_VIEW_PERMISSIONS => $this->usersApi->userSchema(),
                     UsersApiController::BASIC_USER_VIEW_PERMISSIONS => match ($result["private"]) {
-                        false => $this->usersApi->viewPrivateProfileSchema(),
-                        true => $this->usersApi->viewProfileSchema(),
+                        true => $this->usersApi->viewPrivateProfileSchema(),
+                        false => $this->usersApi->viewProfileSchema(),
                     },
-                    default => $this->usersApi->viewPrivateProfileSchema(),
+                    default => $this->usersApi->viewProfileSchema(),
                 };
 
                 $mapped = ArrayUtils::remapProperties($result, [
@@ -187,6 +187,13 @@ class UserSearchType extends AbstractSearchType
             // Users are indexed with 0 for non-banned, >0 for various ban statuses.
             if (!$query->getQueryParameter("includeBanned")) {
                 $query->setFilter("banned", [0]);
+            } elseif ($query->getQueryParameter("onlyBanned")) {
+                $query->setFilter("banned", [
+                    \BanModel::BAN_MANUAL,
+                    \BanModel::BAN_AUTOMATIC,
+                    \BanModel::BAN_TEMPORARY,
+                    \BanModel::BAN_WARNING,
+                ]);
             }
 
             foreach ($this->filters as $filterName => $filterField) {
@@ -269,6 +276,7 @@ class UserSearchType extends AbstractSearchType
                     ],
                 ],
                 "includeBanned:b?",
+                "onlyBanned:b?",
             ],
             $this->schemaFields
         );
@@ -317,16 +325,22 @@ class UserSearchType extends AbstractSearchType
         }
 
         $ipAddresses = $query->getQueryParameter("ipAddresses", []);
-        if (!empty($ipAddresses) && !$this->usersApi->checkUserPermissionMode()) {
+        if (!empty($ipAddresses) && !$this->usersApi->checkUserPermissionMode(throw: false)) {
             throw new PermissionException("You don't have permission to search by IP address.");
         }
 
-        if ($query->getQueryParameter("includeBanned") === true && !$this->usersApi->checkUserPermissionMode()) {
+        if (
+            ($query->getQueryParameter("includeBanned") || $query->getQueryParameter("onlyBanned")) &&
+            !$this->usersApi->checkUserPermissionMode(throw: false)
+        ) {
             throw new PermissionException("You don't have permission to search banned users.");
         }
 
         foreach ($ipAddresses as $ipAddress) {
-            if (!filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
+            if (
+                !str_contains(haystack: $ipAddress, needle: "*") &&
+                !filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)
+            ) {
                 throw new ClientException("$ipAddress is not a valid IP address");
             }
         }
@@ -339,7 +353,7 @@ class UserSearchType extends AbstractSearchType
      */
     private function canSearchEmails(): bool
     {
-        return $this->usersApi->checkUserPermissionMode() == UsersApiController::FULL_USER_VIEW_PERMISSIONS;
+        return $this->usersApi->checkUserPermissionMode(throw: false) == UsersApiController::FULL_USER_VIEW_PERMISSIONS;
     }
 
     /**

@@ -69,7 +69,7 @@ export function ElementToolbar(props: IElementToolbarProps) {
                 ownIsVisible && !props.renderAbove ? (
                     <>
                         {/* Shrinking this down to 12 to fit */}
-                        <Icon style={{ width: 12, height: 12 }} icon="search-close" />
+                        <Icon style={{ width: 12, height: 12 }} icon="dismiss-compact" />
                     </>
                 ) : isEdgeCase ? (
                     <PilcrowIcon />

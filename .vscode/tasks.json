@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+		{
+			"type": "npm",
+			"script": "check-types",
+			"problemMatcher": [
+				"$tsc",
+			],
+			"label": "npm: check-types",
+			"detail": "tsc -p tsconfig.json --noemit"
+		}
+	]
+}

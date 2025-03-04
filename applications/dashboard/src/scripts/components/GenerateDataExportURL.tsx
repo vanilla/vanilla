@@ -80,14 +80,14 @@ export default function GenerateDataExportURL() {
                                 aria-label={t("Copy URL")}
                                 buttonType={ButtonTypes.ICON_COMPACT}
                                 onClick={async () => {
-                                    await navigator.clipboard.writeText("https://google.com");
+                                    await navigator.clipboard.writeText(data?.exportUrl);
                                     toast.addToast({
                                         body: <>{t("URL copied to clipboard.")}</>,
                                         autoDismiss: true,
                                     });
                                 }}
                             >
-                                <Icon icon={"editor-link"} />
+                                <Icon icon={"copy-link"} />
                             </Button>
                         </ToolTip>
                     </div>

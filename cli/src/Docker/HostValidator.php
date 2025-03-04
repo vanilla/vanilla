@@ -22,26 +22,28 @@ class HostValidator
         // Internal services
         "database" => "127.0.0.1",
         "memcached" => "127.0.0.1",
-        "queue.vanilla.localhost" => "127.0.0.1",
-        "advanced-embed.vanilla.localhost" => "127.0.0.1",
-        "dev.vanilla.localhost" => "127.0.0.1",
-        "embed.vanilla.localhost" => "127.0.0.1",
-        "modern-embed.vanilla.localhost" => "127.0.0.1",
-        "modern-embed-hub.vanilla.localhost" => "127.0.0.1",
-        "vanilla.localhost" => "127.0.0.1",
-        "sso.vanilla.localhost" => "127.0.0.1",
-        "e2e-tests.vanilla.localhost" => "127.0.0.1",
-        "webpack.vanilla.localhost" => "127.0.0.1",
-        "logs.vanilla.localhost" => "127.0.0.1",
-        "imgproxy.vanilla.localhost" => "127.0.0.1",
-        "search.vanilla.localhost" => "127.0.0.1",
-        "elastic.vanilla.localhost" => "127.0.0.1",
-        "mail.vanilla.localhost" => "127.0.0.1",
+        "queue.vanilla.local" => "127.0.0.1",
+        "advanced-embed.vanilla.local" => "127.0.0.1",
+        "dev.vanilla.local" => "127.0.0.1",
+        "embed.vanilla.local" => "127.0.0.1",
+        "modern-embed.vanilla.local" => "127.0.0.1",
+        "modern-embed-hub.vanilla.local" => "127.0.0.1",
+        "vanilla.local" => "127.0.0.1",
+        "sso.vanilla.local" => "127.0.0.1",
+        "e2e-tests.vanilla.local" => "127.0.0.1",
+        "webpack.vanilla.local" => "127.0.0.1",
+        "logs.vanilla.local" => "127.0.0.1",
+        "kibana.vanilla.local" => "127.0.0.1",
+        "imgproxy.vanilla.local" => "127.0.0.1",
+        "search.vanilla.local" => "127.0.0.1",
+        "elastic.vanilla.local" => "127.0.0.1",
+        "mail.vanilla.local" => "127.0.0.1",
     ];
 
     const CERTS = [
-        "*.vanilla.localhost" => PATH_ROOT . "/docker/images/nginx/certs/wildcard.vanilla.localhost.crt",
-        "vanilla.localhost" => PATH_ROOT . "/docker/images/nginx/certs/vanilla.localhost.crt",
+        "Dev Certificate Authority" => PATH_ROOT . "/docker/images/nginx/certs/ca.crt",
+        "vanilla.local" => PATH_ROOT . "/docker/images/nginx/certs/vanilla.local.crt",
+        "*.vanilla.local" => PATH_ROOT . "/docker/images/nginx/certs/wildcard.vanilla.local.crt",
     ];
 
     /**
@@ -98,8 +100,8 @@ class HostValidator
     public function ensureCertsMacOS(): void
     {
         foreach (self::CERTS as $name => $certFile) {
-            $process = new Process(["security", "find-certificate", "-c", "*.vanilla.localhost"]);
-            $process->mustRun();
+            $process = new Process(["security", "find-certificate", "-c", "*.vanilla.local"]);
+            $process->run();
             if (str_contains($process->getOutput(), "attributes")) {
                 $this->logger()->info("<green>{$name}</green> ✅");
             } else {

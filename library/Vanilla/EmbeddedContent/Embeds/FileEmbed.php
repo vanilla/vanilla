@@ -20,6 +20,16 @@ class FileEmbed extends AbstractEmbed
 {
     const TYPE = "file";
 
+    private string $originalUrl;
+
+    public function __construct(array $data)
+    {
+        parent::__construct($data);
+
+        // The URL is updated by FileEmbedFilter. Stash the original in a local property to do the sanitization check later.
+        $this->originalUrl = $data["url"];
+    }
+
     /**
      * @inheritdoc
      */
@@ -55,7 +65,7 @@ class FileEmbed extends AbstractEmbed
     public function renderHtml(): string
     {
         $uploader = Gdn::getContainer()->get(Gdn_upload::class);
-        if (!$uploader->isOwnWebPath($this->getUrl())) {
+        if (!$uploader->isOwnWebPath($this->originalUrl)) {
             return "<div></div>";
         }
 

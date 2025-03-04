@@ -41,7 +41,7 @@ export default function QuoteEmbedToolbar() {
                         });
                     }}
                 >
-                    <Icon icon={"data-trash"} />
+                    <Icon icon={"delete"} />
                 </EmbedButton>
             </EmbedMenu>
         </Floating>

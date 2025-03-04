@@ -8,7 +8,9 @@
  * @since 2.0
  */
 
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Forum\Models\PostTypeModel;
 
 /**
  * Handles displaying discussions in most contexts via /discussions endpoint.
@@ -207,6 +209,7 @@ class DiscussionsController extends VanillaController
             ]);
             if ($visibleCategoriesResult !== true) {
                 $where["d.CategoryID"] = $visibleCategoriesResult;
+                $announcementsWhere["d.CategoryID"] = $visibleCategoriesResult;
             }
         }
 

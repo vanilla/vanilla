@@ -66,7 +66,7 @@ export default function CheckBox(props: IProps) {
         hideLabel,
 
         tooltip,
-        tooltipIcon = "data-information",
+        tooltipIcon = "info",
 
         name,
     } = props;

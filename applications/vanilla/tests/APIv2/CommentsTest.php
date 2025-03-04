@@ -9,8 +9,12 @@ namespace VanillaTests\APIv2;
 
 use CommentModel;
 use DiscussionModel;
+use Exception;
+use Garden\Container\ContainerException;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
 use Gdn;
 use Vanilla\Models\DirtyRecordModel;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -199,22 +203,24 @@ class CommentsTest extends AbstractResourceTest
         $this->assertSame("an admin can post a comment on a closed discussion.", $commentBody);
 
         // Create a member-level user and try the same thing.
-        $username = substr(__FUNCTION__, 0, 20);
-        $user = $this->api()
-            ->post("users", [
-                "name" => $username,
-                "email" => $username . "@example.com",
-                "password" => randomString(\Gdn::config("Garden.Password.MinLength")),
-            ])
-            ->getBody();
+        $user = $this->createUser();
 
-        $this->api()->setUserID($user["userID"]);
-        $this->expectExceptionMessage("This discussion has been closed.");
-        $this->api()->post("/comments", [
-            "body" => "a member cannot post on a closed discussion.",
-            "discussionID" => $discussionID,
-            "format" => "markdown",
-        ]);
+        $this->runWithUser(function () use ($discussionID) {
+            $this->api()
+                ->post(
+                    "/comments",
+                    [
+                        "body" => "a member cannot post on a closed discussion.",
+                        "discussionID" => $discussionID,
+                        "format" => "markdown",
+                    ],
+                    options: ["throw" => false]
+                )
+                ->assertStatus(400)
+                ->assertJsonObjectLike([
+                    "message" => "This discussion has been closed.",
+                ]);
+        }, $user);
     }
 
     /**
@@ -500,6 +506,7 @@ class CommentsTest extends AbstractResourceTest
      */
     protected function triggerDirtyRecords()
     {
+        $this->resetTable("dirtyRecord");
         $discussion = $this->createDiscussion();
         $comment1 = $this->createComment();
         $comment2 = $this->createComment();
@@ -535,6 +542,244 @@ class CommentsTest extends AbstractResourceTest
         return [
             DirtyRecordModel::DIRTY_RECORD_OPT => true,
             "insertUserID" => $this->api()->getUserID(),
+        ];
+    }
+
+    /**
+     * Test Delete comment
+     *
+     * @return void
+     */
+
+    /**
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function testPatchInsertUserIDPermission(): void
+    {
+        $this->expectExceptionMessage("Permission Problem");
+        $this->expectExceptionCode(403);
+        $this->createDiscussion();
+        $comment = $this->createComment();
+
+        // Try as an admin
+        $this->api()->patch("{$this->baseUrl}/{$comment["commentID"]}", [
+            "insertUserID" => 42,
+        ]);
+        $comment = $this->api()->get("{$this->baseUrl}/{$comment["commentID"]}");
+        $this->assertEquals(42, $comment["insertUserID"]);
+
+        // Try as a member
+        $member = $this->createUser();
+        $this->runWithUser(function () use ($comment) {
+            $this->api()->patch("{$this->baseUrl}/{$comment["commentID"]}", [
+                "insertUserID" => 1,
+            ]);
+        }, $member);
+    }
+
+    /**
+     * Test that users with `Garden.Comments.Edit` permission can patch a comment.
+     *
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function testPatchCommentPermissions(): void
+    {
+        $this->createDiscussion();
+        $comment = $this->createComment();
+        $this->runWithPermissions(
+            function () use ($comment) {
+                $this->api()->patch("{$this->baseUrl}/{$comment["commentID"]}", [
+                    "body" => "Edited body",
+                    "format" => "text",
+                ]);
+            },
+            [],
+            $this->categoryPermission(-1, ["comments.edit" => true])
+        );
+
+        $comment = $this->api()->get("{$this->baseUrl}/{$comment["commentID"]}");
+        $this->assertEquals("Edited body", $comment["body"]);
+    }
+
+    /**
+     * Test reacting on a comment without the proper permissions.
+     *
+     * @param string $reaction
+     * @param string $permission
+     * @return void
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws ValidationException
+     * @dataProvider provideReactionPermissionData
+     */
+    public function testReactNoPermission(string $reaction, string $permission, string $message): void
+    {
+        $this->expectException(ServerException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->createCategory();
+        $this->createDiscussion();
+
+        $author = $this->createUser();
+        $this->runWithUser(function () {
+            $this->createComment();
+        }, $author);
+
+        $this->runWithPermissions(
+            function () use ($reaction) {
+                $this->api()->post("/comments/{$this->lastInsertCommentID}/reactions", [
+                    "reactionType" => $reaction,
+                ]);
+            },
+            [$permission => false],
+            [
+                "type" => "category",
+                "id" => $this->lastInsertedCategoryID,
+                "permissions" => ["discussions.view" => true],
+            ]
+        );
+    }
+
+    /**
+     * Test deleting a reaction on a comment without the proper permissions.
+     *
+     * @param string $reaction
+     * @param string $permission
+     * @param string $message
+     * @return void
+     * @throws ContainerException
+     * @throws ValidationException
+     * @throws \Garden\Container\NotFoundException
+     * @dataProvider provideReactionPermissionData
+     */
+    public function testDeleteReactionNoPermission(string $reaction, string $permission, string $message): void
+    {
+        $this->expectException(ServerException::class);
+        $this->expectExceptionMessage($message);
+        $this->createCategory();
+        $this->createDiscussion();
+
+        $author = $this->createUser();
+        $this->runWithUser(function () {
+            $this->createComment();
+        }, $author);
+
+        // Add a reaction as the user.
+        $role = $this->createRole(
+            ["Name" => __FUNCTION__ . $reaction],
+            [$permission => true, "session.valid" => true],
+            [
+                "type" => "category",
+                "id" => $this->lastInsertedCategoryID,
+                "permissions" => ["discussions.view" => true],
+            ]
+        );
+        $user = $this->createUser(["roleID" => $role["roleID"]]);
+        $this->runWithUser(function () use ($reaction) {
+            $this->api()->post("/comments/{$this->lastInsertCommentID}/reactions", [
+                "reactionType" => $reaction,
+            ]);
+        }, $user);
+
+        // Remove the permission
+        $this->api()->patch("roles/{$role["roleID"]}", [
+            "permissions" => [
+                [
+                    "type" => "global",
+                    "permissions" => [
+                        $permission => false,
+                        "session.valid" => true,
+                    ],
+                ],
+                [
+                    "type" => "category",
+                    "id" => $this->lastInsertedCategoryID,
+                    "permissions" => ["discussions.view" => true],
+                ],
+            ],
+        ]);
+
+        $this->runWithUser(function () use ($reaction) {
+            $this->api()->delete("/comments/{$this->lastInsertCommentID}/reactions");
+        }, $user);
+    }
+
+    /**
+     * Test that orphaned discussion comments are not returned from index, even for system.
+     *
+     * @return void
+     */
+    public function testOrphanedDiscussionComment(): void
+    {
+        $discussion = $this->createDiscussion();
+        $comment = $this->createComment();
+        \Gdn::sql()->delete("Discussion", where: ["DiscussionID" => $discussion["discussionID"]]);
+        $this->api()
+            ->get("comments", ["commentID" => $comment["commentID"]])
+            ->assertSuccess()
+            ->assertCount(0);
+
+        $this->api()
+            ->get("comments", ["commentID" => $comment["commentID"], "expand" => "crawl"])
+            ->assertSuccess()
+            ->assertCount(0);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAddCommentNoAccess(): void
+    {
+        $discussion = $this->createDiscussion();
+
+        $user = $this->createUser([
+            "roleID" => \RoleModel::UNCONFIRMED_ID,
+        ]);
+
+        $this->runWithUser(function () use ($discussion) {
+            $this->api()
+                ->post(
+                    "/comments",
+                    [
+                        "parentRecordType" => "discussion",
+                        "parentRecordID" => $discussion["discussionID"],
+                        "body" => "hello body",
+                        "format" => "text",
+                    ],
+                    options: ["throw" => false]
+                )
+                ->assertStatus(403)
+                ->assertJsonObjectLike([
+                    "message" => "Permission Problem",
+                ]);
+        }, $user);
+    }
+
+    /**
+     * Provide reaction data to test permissions.
+     *
+     * @return array[]
+     */
+    public static function provideReactionPermissionData(): array
+    {
+        return [
+            "positive" => [
+                "like",
+                "reactions.positive.add",
+                "You need the Reactions.Positive.Add permission to do that.",
+            ],
+            "negative" => [
+                "disagree",
+                "reactions.negative.add",
+                "You need the Reactions.Negative.Add permission to do that.",
+            ],
+            "flags" => ["spam", "flag.add", "You need the Reactions.Flag.Add permission to do that"],
         ];
     }
 }

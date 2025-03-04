@@ -354,7 +354,7 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
     {
         $formatService = $this->formatService();
         $content =
-            '<img class="emoji" src="http://dev.vanilla.localhost/resources/emoji/smile.png" title=":)" alt=":)" height="20">';
+            '<img class="emoji" src="http://dev.vanilla.local/resources/emoji/smile.png" title=":)" alt=":)" height="20">';
         $result = $formatService->parseImageUrls($content, $this->formatKey());
         $this->assertEquals([], $result);
     }

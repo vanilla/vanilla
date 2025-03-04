@@ -66,6 +66,31 @@ export default function UserManagementTableCell(props: IProps) {
                 />
             );
 
+        case UserManagementColumnNames.BANNED:
+            let banMessage = t("Not Banned");
+            switch (userData.banned) {
+                case 1:
+                    banMessage = t("Banned");
+                    break;
+                case 2:
+                    banMessage = t("Auto Banned");
+                    break;
+                case 4:
+                    banMessage = t("Temp Banned");
+                    break;
+                case 8:
+                    banMessage = t("Warning Banned");
+                    break;
+            }
+
+            return (
+                <RegularCell
+                    label={"Banned"}
+                    permission={true}
+                    wrappedVersion={wrappedVersion}
+                    component={banMessage}
+                />
+            );
         case UserManagementColumnNames.LAST_VISIT:
             return (
                 <RegularCell

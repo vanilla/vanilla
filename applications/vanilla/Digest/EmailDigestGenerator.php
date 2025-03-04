@@ -11,6 +11,7 @@ use Garden\EventManager;
 use Garden\Web\Exception\ServerException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Community\Events\DigestUnsubscribeEvent;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Controller\Api\NotificationPreferencesApiController;
@@ -136,24 +137,79 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
      */
     public function prepareWeeklyDigest(\DateTimeInterface $scheduleDate): TrackingSlipInterface
     {
-        $action = $this->prepareWeeklyDigestAction($scheduleDate);
+        $action = $this->prepareDigestAction($scheduleDate, DigestModel::DIGEST_TYPE_WEEKLY);
         return $this->longRunner->runDeferred($action);
     }
 
     /**
-     * Get an action for usage with {@link self::prepareWeeklyDigest()}. Exposed publicly for testing only.
+     * Get daily digest data for users of the site
+     *
+     * @param \DateTimeInterface $scheduleDate The datetime the digest should be scheduled for generation.
+     *
+     * @return TrackingSlipInterface
+     */
+    public function prepareDailyDigest(\DateTimeInterface $scheduleDate): TrackingSlipInterface
+    {
+        $action = $this->prepareDigestAction($scheduleDate, DigestModel::DIGEST_TYPE_DAILY);
+        return $this->longRunner->runDeferred($action);
+    }
+
+    /**
+     * Get monthly digest data for users of the site
+     *
+     * @param \DateTimeInterface $scheduleDate The datetime the digest should be scheduled for generation.
+     *
+     * @return TrackingSlipInterface
+     */
+    public function prepareMonthlyDigest(\DateTimeInterface $scheduleDate): TrackingSlipInterface
+    {
+        $action = $this->prepareDigestAction($scheduleDate, DigestModel::DIGEST_TYPE_MONTHLY);
+        return $this->longRunner->runDeferred($action);
+    }
+
+    /**
+     * Get an action for usage with {@link self::prepareWeeklyDigest(),self::prepareMonthlyDigest(), self::prepareDailyDigest()}. Exposed publicly for testing only.
+     *
+     * @param \DateTimeInterface $scheduleDate The date the digest should be scheduled for.
+     * @param string $digestType
+     *
+     * @return LongRunnerAction
+     * @internal
+     */
+    public function prepareDigestAction(\DateTimeInterface $scheduleDate, string $digestType): LongRunnerAction
+    {
+        if (!in_array($digestType, DigestModel::DIGEST_FREQUENCY_OPTIONS)) {
+            throw new \InvalidArgumentException("Invalid digest type");
+        }
+        // Create a digest
+        $digestID = $this->digestModel->insert([
+            "dateScheduled" => $scheduleDate,
+            "digestType" => $digestType,
+            "totalSubscribers" => $this->getDigestEnabledUsersCount($digestType),
+        ]);
+
+        $action = new LongRunnerMultiAction([
+            new LongRunnerAction(self::class, "createDigestsIterator", [$digestID, $digestType]),
+            new LongRunnerAction(self::class, "sendDigestsIterator", [$digestID]),
+        ]);
+
+        return $action;
+    }
+
+    /**
+     * Get an action for usage with {@link self::prepareDailyDigest()}.
      *
      * @param \DateTimeInterface $scheduleDate The date the digest should be scheduled for.
      *
      * @return LongRunnerAction
      * @internal
      */
-    public function prepareWeeklyDigestAction(\DateTimeInterface $scheduleDate): LongRunnerAction
+    public function prepareDailyDigestAction(\DateTimeInterface $scheduleDate): LongRunnerAction
     {
         // Create a digest
         $digestID = $this->digestModel->insert([
             "dateScheduled" => $scheduleDate,
-            "digestType" => DigestModel::DIGEST_TYPE_WEEKLY,
+            "digestType" => DigestModel::DIGEST_TYPE_DAILY,
             "totalSubscribers" => $this->getDigestEnabledUsersCount(),
         ]);
 
@@ -195,7 +251,13 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
             "digestLanguage" => $this->getUserLanguagePreference($userID),
         ];
         $utmParameters = $this->generateUtmParameters($digestID);
-        $userDigestID = $this->createUserDigest($digestID, $digestUserCategory, $utmParameters);
+        $userDigestFrequencyPreference = $this->getUserDigestFrequencyPreference($userID);
+        $userDigestID = $this->createUserDigest(
+            $digestID,
+            $digestUserCategory,
+            $utmParameters,
+            $userDigestFrequencyPreference
+        );
         if ($userDigestID === null) {
             // In the future we may have a specific email template for this.
             throw new ServerException("There was no content found for this user's digest.");
@@ -224,12 +286,11 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
      */
     public function sendDigestsIterator(int $digestID): iterable
     {
+        $digest = $this->digestModel->selectSingle(["digestID" => $digestID]);
         $context = [
-            Logger::FIELD_TAGS => ["digest"],
+            Logger::FIELD_TAGS => ["digest", $digest["digestType"]],
             Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
         ];
-
-        $digest = $this->digestModel->selectSingle(["digestID" => $digestID]);
 
         yield new LongRunnerQuantityTotal([$this->userDigestModel, "getCountUsersInDigest"], [$digestID]);
 
@@ -298,6 +359,11 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
         }
 
         $digestEmail->mergeDigestUnsubscribe($digestUser);
+        // Fire the event to merge additional data
+        $this->eventManager->dispatch(
+            new DigestUnsubscribeEvent($digestEmail, $digestUser, $digestRecord["digestAttributes"])
+        );
+
         $addBannerTitle = $this->config->get("Garden.Digest.IncludeCommunityName", false);
         $digestTitle = "";
         if ($addBannerTitle) {
@@ -317,23 +383,34 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
      *
      * @return \Generator
      */
-    public function createDigestsIterator(int $digestID, ?int $lastProcessedUserID = null): \Generator
-    {
+    public function createDigestsIterator(
+        int $digestID,
+        ?string $digestFrequency = null,
+        ?int $lastProcessedUserID = null
+    ): \Generator {
         try {
             //Long runner jobs can time out and when it resumes we need to flush category permissions
             \DiscussionModel::clearCategoryPermissions();
-            yield new LongRunnerQuantityTotal(function () {
-                return $this->getDigestEnabledUsersCount();
+            yield new LongRunnerQuantityTotal(function () use ($digestFrequency) {
+                return $this->getDigestEnabledUsersCount($digestFrequency);
             });
             $utmParameters = $this->generateUtmParameters($digestID);
-            $usersWithDigest = $this->getDigestUserCategoriesIterator(
-                ["um.UserID >" => $lastProcessedUserID ?? 0],
-                self::DATA_PROCESSING_CHUNK_SIZE
-            );
+            $condition = [
+                "um.UserID >" => $lastProcessedUserID ?? 0,
+            ];
+            if (!empty($digestFrequency)) {
+                $condition["um.DigestFrequency"] = $digestFrequency;
+            }
+            $usersWithDigest = $this->getDigestUserCategoriesIterator($condition, self::DATA_PROCESSING_CHUNK_SIZE);
             foreach ($usersWithDigest as $userID => $row) {
                 try {
                     $lastProcessedUserID = $userID;
-                    $this->createUserDigest($digestID, $row, $utmParameters);
+                    $this->createUserDigest(
+                        $digestID,
+                        $row,
+                        $utmParameters,
+                        $digestFrequency ?? DigestModel::DIGEST_TYPE_WEEKLY
+                    );
                     yield new LongRunnerSuccessID($userID);
                 } catch (\Exception $e) {
                     if ($e instanceof LongRunnerTimeoutException) {
@@ -346,21 +423,22 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
                 }
             }
         } catch (LongRunnerTimeoutException $e) {
-            return new LongRunnerNextArgs([$digestID, $lastProcessedUserID]);
+            return new LongRunnerNextArgs([$digestID, $digestFrequency, $lastProcessedUserID]);
         }
 
         return LongRunner::FINISHED;
     }
 
     /**
-     * Determine which categories a user's digest should have.
+     * Determine the categories / groups from where the data should be fetched.
      *
      * @param array $digestUserCategory A row from {@link self::getDigestUserCategoriesIterator()}
      *
      * @return array{categoryIDs: int[], canUnsubscribe: boolean, logContext: array}|null Null if the user has no access to any potential category-based digest content.
      */
-    public function getDigestCategoryData(array $digestUserCategory): ?array
+    public function getDigestData(array $digestUserCategory): ?array
     {
+        // Get the user's visible category data for digest.
         $userID = $digestUserCategory["userID"];
         $userVisibleCategoryIDs = $this->categoryModel->getCategoryIDsWithPermissionForUser(
             $userID,
@@ -411,12 +489,13 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
             "digestEnabledCategoryIDs" => $selectedDigestCategoryIDs,
             "defaultDigestCategoryIDs" => $defaultDigestCategoryIDs,
         ];
-
-        return [
+        $digestData = [
             "categoryIDs" => array_values(array_unique($digestCategoryIDs)),
             "canUnsubscribe" => $canUnsubscribeFromCategories,
             "logContext" => $logContext,
         ];
+        // Fire the event to get any additional data
+        return $this->eventManager->fireFilter("additionalEmailDigestData", $digestData);
     }
 
     /**
@@ -428,32 +507,41 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
      *
      * @return int|null A userDigestID or null.
      */
-    public function createUserDigest(int $digestID, array $digestUserCategory, string $utmParameters = ""): ?int
-    {
+    public function createUserDigest(
+        int $digestID,
+        array $digestUserCategory,
+        string $utmParameters = "",
+        string $digestFrequency = DigestModel::DIGEST_TYPE_WEEKLY
+    ): ?int {
         $context = [
             Logger::FIELD_EVENT => "user_digest_skip",
-            Logger::FIELD_TAGS => ["digest"],
+            Logger::FIELD_TAGS => ["digest", $digestFrequency],
         ];
         $userID = $digestUserCategory["userID"];
         $digestLanguage = $digestUserCategory["digestLanguage"];
-        $digestCategoryData = $this->getDigestCategoryData($digestUserCategory);
-        $digestCategoryIDs = $digestCategoryData["categoryIDs"];
-        $canUnsubscribe = $digestCategoryData["canUnsubscribe"];
-        $logContext = $digestCategoryData["logContext"] + [
+        $digestData = $this->getDigestData($digestUserCategory);
+        $digestCategoryIDs = $digestData["categoryIDs"];
+        $canUnsubscribe = $digestData["canUnsubscribe"];
+        $logContext = $digestData["logContext"] + [
             Logger::FIELD_EVENT => ["user_digest_skip"],
-            Logger::FIELD_TAGS => ["digest"],
+            Logger::FIELD_TAGS => ["digest", $digestFrequency],
         ];
 
-        if ($digestCategoryData === null) {
+        if ($digestData === null) {
             $this->logger->info(
                 "Skipped generating digest for user because there was no content visible to them.",
-                $digestCategoryData["logContext"] + $context
+                $logContext + $context
             );
             // There we no categories available for the user.
             return null;
         }
+        $additionalAttributes = [];
+        if (!empty($digestData["additionalAttributes"])) {
+            $additionalAttributes = $digestData["additionalAttributes"];
+            unset($digestData["additionalAttributes"]);
+        }
 
-        $digestHashData = $digestCategoryData + [
+        $digestHashData = $digestData + [
             "language" => $digestLanguage,
         ];
         $digestHash = sha1(json_encode($digestHashData));
@@ -470,14 +558,29 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
         );
         $digestContentID = $existingContent[0]["digestContentID"] ?? null;
         if ($digestContentID === null) {
-            $title = $this->config->get("Garden.Digest.Title", "This week's trending content");
+            $defaultTitle = match ($digestFrequency) {
+                DigestModel::DIGEST_TYPE_DAILY => "Today's trending content",
+                DigestModel::DIGEST_TYPE_MONTHLY => "This month's trending content",
+                default => "This week's trending content",
+            };
+            $title = $this->config->get("Garden.Digest.Title", $defaultTitle);
             $templateData["email"] = $this->getTemplateSettings();
             if (!empty($utmParameters)) {
                 $templateData["email"]["utmParams"] = $utmParameters;
             }
             $templateData["email"]["title"] = $title;
             $templateData["email"]["locale"] = $digestLanguage;
-            $trendingDiscussions = $this->getTopWeeklyDiscussions($digestCategoryIDs, $canUnsubscribe);
+
+            $slotType = strtolower(substr($digestFrequency, 0, 1));
+            $trendingDiscussions = $this->getTopDiscussions($digestCategoryIDs, $canUnsubscribe, $slotType);
+
+            // Fire filter to get additional data
+            $trendingDiscussions = \Gdn::eventManager()->fireFilter(
+                "additionalWeeklyDiscussion",
+                $trendingDiscussions,
+                $digestData
+            );
+
             if (empty($trendingDiscussions)) {
                 $this->logger->info(
                     "Skipped generating digest for user because there was no discussions visible to them.",
@@ -495,10 +598,11 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
                 ]);
                 return null;
             }
-            $templateData["email"]["categories"] = $trendingDiscussions;
+            $templateData["email"]["contents"] = $trendingDiscussions;
             $this->email->setFormat("html");
             $templateData["email"]["introduction"] = $this->email->getIntroductionContentForDigest();
             $templateData["email"]["footer"] = $this->email::imageInlineStyles($this->email->getFooterContent());
+
             $this->setLocale($digestLanguage);
             $renderHtml = $this->renderTwig("@vanilla/email/email-digest.twig", $templateData);
             $this->email->setFormat("text");
@@ -506,12 +610,16 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
             $templateData["email"]["footer"] = $this->email->getFooterContent();
             $renderPlainText = $this->renderTwig("@vanilla/email/email-digest-plaintext.twig", $templateData);
 
-            $attributes = [
-                "digestLang" => $digestLanguage,
-                "digestCategoryIDs" => $digestCategoryIDs,
-                "canUnsubscribeCategories" => $canUnsubscribe,
-                "title" => $title,
-            ];
+            $attributes = array_merge(
+                [
+                    "digestLang" => $digestLanguage,
+                    "digestCategoryIDs" => $digestCategoryIDs,
+                    "canUnsubscribeCategories" => $canUnsubscribe,
+                    "title" => $title,
+                ],
+                $additionalAttributes
+            );
+
             $newDigestContent = [
                 "digestID" => $digestID,
                 "digestContentHash" => $digestHash,
@@ -540,10 +648,14 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
      *
      * @param array $categories
      * @param bool $needUnsubscribeLink
+     * @param string $slotType
      * @return array
      */
-    public function getTopWeeklyDiscussions(array $categories, bool $needUnsubscribeLink = true): array
-    {
+    public function getTopDiscussions(
+        array $categories,
+        bool $needUnsubscribeLink = true,
+        string $slotType = "w"
+    ): array {
         $metaSettings = $this->getDiscussionMetaSettings();
         $metaMappings = $this->getMetaMappings();
         $postLimit = $this->config->get("Garden.Digest.PostCount", 5);
@@ -552,14 +664,13 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
         }
 
         // now get the top 5 Discussion Posts for these categories
-
         $query = [
             "categoryID" => $categories,
             "limit" => $postLimit,
             "expand" => ["snippet", "-body"],
             "excludeHiddenCategories" => false,
             "sort" => "-" . \DiscussionModel::SORT_EXPIRIMENTAL_TRENDING,
-            "slotType" => "w",
+            "slotType" => $slotType,
         ];
         $result = $this->discussionApiController->index($query);
         $trendingDiscussions = $result->getData();
@@ -594,7 +705,7 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
             }
             $digestData[$categoryID]["discussions"][] = $trending;
         }
-        return $digestData;
+        return ["Category" => $digestData];
     }
 
     /**
@@ -642,6 +753,7 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
             $this->config->get(DigestModel::AUTOSUBSCRIBE_DEFAULT_PREFERENCE) == 1
                 ? 'u.UserID = um.UserID and um.QueryValue in ("Preferences.Email.DigestEnabled.1","Preferences.Email.DigestEnabled.3") AND u.Deleted = 0'
                 : 'u.UserID = um.UserID and um.QueryValue = "Preferences.Email.DigestEnabled.1" AND u.Deleted = 0';
+
         $query = $this->database
             ->createSql()
             ->from("UserMeta um")
@@ -651,23 +763,64 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
             ->join("UserRole ur", "ur.UserID = um.UserID")
             ->where([
                 "ur.RoleID" => $roleIDs,
+                "u.Confirmed" => 1,
             ]);
 
         return $query;
     }
 
-    public function getDigestEnabledUsersCount(): int
+    /**
+     * Get the count of users who have digest enabled.
+     * Optionally filter by digest frequency.
+     *
+     * @param string|null $digestFrequency
+     * @return int
+     * @throws \Exception
+     */
+    public function getDigestEnabledUsersCount(?string $digestFrequency = null): int
     {
         $roleIDs = $this->getRolesWithEmailViewPermission();
         if (empty($roleIDs)) {
             return 0;
         }
 
-        $result = $this->getDigestEnabledUsersQuery($roleIDs)
-            ->select("COUNT(DISTINCT(um.UserID)) as total")
-            ->get()
-            ->column("total")[0];
-        return $result;
+        $sql = $this->getDigestEnabledUsersQuery($roleIDs)->select("COUNT(DISTINCT(um.UserID)) as total");
+        if (!empty($digestFrequency) && in_array($digestFrequency, DigestModel::DIGEST_FREQUENCY_OPTIONS)) {
+            $this->addUserDigestFrequency($sql, $digestFrequency);
+        }
+        return $sql->get()->column("total")[0];
+    }
+
+    /**
+     * Add the user digest frequency to the query filter
+     *
+     * @param \Gdn_SQLDriver $query
+     * @param string $digestFrequency
+     * @return void
+     */
+    private function addUserDigestFrequency(\Gdn_SQLDriver &$query, string $digestFrequency): void
+    {
+        // This is the default digest frequency for users who have not set a explicit preference.
+        $defaultUserDigestFrequency = \Gdn::config()->get(
+            DigestModel::DEFAULT_DIGEST_FREQUENCY_KEY,
+            DigestModel::DIGEST_TYPE_WEEKLY
+        );
+
+        $key = UserNotificationPreferencesModel::USER_PREFERENCE_DIGEST_FREQUENCY_KEY;
+        if ($digestFrequency === $defaultUserDigestFrequency) {
+            $query
+                ->join("UserMeta um2", "um.UserID = um2.UserID AND um2.Name = '$key'", "left")
+                ->beginWhereGroup()
+                ->where("um2.QueryValue", null)
+                ->orWhere("um2.QueryValue", "$key.$digestFrequency", false, true)
+                ->endWhereGroup();
+        } else {
+            $query->join(
+                "UserMeta um2",
+                "um.UserID = um2.UserID AND um2.QueryValue = '$key.$digestFrequency'",
+                "inner"
+            );
+        }
     }
 
     /**
@@ -688,7 +841,13 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
 
         $lastUserID = 0;
         while (true) {
-            $innerQuery = $this->getDigestEnabledUsersQuery($roleIDs)
+            $digestEnabledUserQuery = $this->getDigestEnabledUsersQuery($roleIDs);
+            if (!empty($where["um.DigestFrequency"])) {
+                $this->addUserDigestFrequency($digestEnabledUserQuery, $where["um.DigestFrequency"]);
+                unset($where["um.DigestFrequency"]);
+            }
+
+            $innerQuery = $digestEnabledUserQuery
                 ->select("um.UserID")
                 ->where([
                     "um.UserID >" => $lastUserID,
@@ -793,7 +952,7 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
      *
      * @return string[]
      */
-    private function getMetaMappings(): array
+    public function getMetaMappings(): array
     {
         return $metaSettings = [
             "imageEnabled" => "image",
@@ -870,5 +1029,21 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
     private function getDefaultLocale(): string
     {
         return $this->config->get("Garden.Locale", "en");
+    }
+
+    /**
+     * Get a user's digest frequency preference. If the user has not set a preference, the default is used.
+     *
+     * @param $userID
+     * @return string
+     */
+    private function getUserDigestFrequencyPreference($userID): string
+    {
+        $preferenceKey = UserNotificationPreferencesModel::USER_PREFERENCE_DIGEST_FREQUENCY_KEY;
+        $defaultFrequency = $this->config->get(
+            DigestModel::DEFAULT_DIGEST_FREQUENCY_KEY,
+            DigestModel::DIGEST_TYPE_WEEKLY
+        );
+        return $this->userMetaModel->getUserMeta($userID, $preferenceKey, $defaultFrequency)[$preferenceKey];
     }
 }

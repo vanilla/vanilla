@@ -91,7 +91,7 @@ export function PhpGeneratedStory(props: { html: string; bodyClasses: string; cs
     useEffect(() => {
         setMeta("themeFeatures.NewQuickLinks", true);
 
-        resolveCssUrls(cssFiles)
+        void resolveCssUrls(cssFiles)
             .then((resolvedCssUrls) => {
                 for (const resolvedCssUrl of resolvedCssUrls.reverse()) {
                     const link = document.createElement("link");
@@ -100,18 +100,18 @@ export function PhpGeneratedStory(props: { html: string; bodyClasses: string; cs
                     document.head.insertBefore(link, document.head.firstElementChild!);
                 }
             })
-            .then(() => {
+            .then(async () => {
                 compatibilityStyles();
                 applyCompatibilityIcons();
                 applyCompatibilityUserCards();
-                initAllUserContent();
+                await initAllUserContent();
                 // Kludge to prevent some flashing during loading.
                 cssOut(".Flyout", { display: "none !important" });
 
                 // Copy body classes.
                 document.body.className = classNames(document.body.className, bodyClasses);
 
-                _executeReady();
+                await _executeReady();
             });
     }, []);
     return <div ref={ref} dangerouslySetInnerHTML={{ __html: html }} />;

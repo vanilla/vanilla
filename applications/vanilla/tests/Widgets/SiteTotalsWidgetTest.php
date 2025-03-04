@@ -90,7 +90,7 @@ class SiteTotalsWidgetTest extends SiteTestCase
                     [
                         "recordType" => "user",
                         "label" => "Members",
-                        "iconName" => "search-members",
+                        "iconName" => "meta-users",
                         "isCalculating" => false,
                         "isFiltered" => false,
                         "count" => $countsResponse["user"]["count"],
@@ -99,7 +99,7 @@ class SiteTotalsWidgetTest extends SiteTestCase
                     [
                         "recordType" => "post",
                         "label" => "Posts",
-                        "iconName" => "search-post-count",
+                        "iconName" => "meta-posts",
                         "isCalculating" => false,
                         "isFiltered" => false,
                         "count" => $countsResponse["post"]["count"],
@@ -108,7 +108,7 @@ class SiteTotalsWidgetTest extends SiteTestCase
                     [
                         "recordType" => "onlineUser",
                         "label" => "Online Users",
-                        "iconName" => "data-online",
+                        "iconName" => "whos-online",
                         "isCalculating" => false,
                         "isFiltered" => false,
                         "count" => $countsResponse["onlineUser"]["count"],
@@ -189,7 +189,7 @@ HTML
                     [
                         "recordType" => "user",
                         "label" => "Members",
-                        "iconName" => "search-members",
+                        "iconName" => "meta-users",
                         "isCalculating" => false,
                         "isFiltered" => false,
                         "count" => $countsResponse["user"]["count"],
@@ -198,7 +198,7 @@ HTML
                     [
                         "recordType" => "question",
                         "label" => "Questions",
-                        "iconName" => "search-questions",
+                        "iconName" => "meta-questions",
                         "isCalculating" => false,
                         "isFiltered" => false,
                         "count" => $countsResponse["question"]["count"],
@@ -207,7 +207,7 @@ HTML
                     [
                         "recordType" => "post",
                         "label" => "Posts",
-                        "iconName" => "search-post-count",
+                        "iconName" => "meta-posts",
                         "isCalculating" => false,
                         "isFiltered" => false,
                         "count" => $countsResponse["post"]["count"],
@@ -216,7 +216,7 @@ HTML
                     [
                         "recordType" => "onlineUser",
                         "label" => "Online",
-                        "iconName" => "data-online",
+                        "iconName" => "whos-online",
                         "isCalculating" => false,
                         "isFiltered" => false,
                         "count" => $countsResponse["onlineUser"]["count"],

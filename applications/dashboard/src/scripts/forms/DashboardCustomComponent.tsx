@@ -14,6 +14,7 @@ export function DashboardCustomComponent(props: IControlProps<ICustomControl>) {
     return (
         <DashboardInputWrap>
             <CustomComponent
+                {...props}
                 {...(control.componentProps ?? {})}
                 errors={errors}
                 value={instance ?? props.schema.default}

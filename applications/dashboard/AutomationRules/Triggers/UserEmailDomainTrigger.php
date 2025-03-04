@@ -99,14 +99,17 @@ class UserEmailDomainTrigger extends AutomationTrigger
                     $domainError = false;
                     foreach ($emailDomains as $emailDomain) {
                         $emailDomain = trim($emailDomain);
-                        if (is_numeric($emailDomain) || !filter_var(gethostbyname($emailDomain), FILTER_VALIDATE_IP)) {
+                        if (
+                            is_numeric($emailDomain) ||
+                            !preg_match(
+                                "/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]/",
+                                $emailDomain
+                            )
+                        ) {
                             $field->addError("Invalid domain", [
-                                "messageCode" => "Could not resolve domain $emailDomain.",
+                                "messageCode" => "Domain $emailDomain is not valid.",
                                 "code" => "403",
                             ]);
-                            $domainError = true;
-                        } elseif (filter_var($emailDomain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
-                            $field->addError("You should provide a domain name, not an IP address.");
                         }
                     }
                     if ($domainError) {

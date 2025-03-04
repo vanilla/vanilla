@@ -193,7 +193,7 @@ export function initializeAtComplete(editorElement, iframe?: any) {
             // Produce the suggestions based on data either
             // cached or retrieved.
             if (shouldContinueFiltering && !isQueryEmpty && !atCache[query]) {
-                $.getJSON(
+                void $.getJSON(
                     formatUrl("/user/tagsearch"),
                     {
                         q: query,

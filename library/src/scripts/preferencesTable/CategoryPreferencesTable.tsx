@@ -102,7 +102,7 @@ export function CategoryPreferencesTable(props: IProps) {
                     return (
                         <ToolTip label={t("Notification popup")}>
                             <span>
-                                <Icon size="default" icon={"me-notifications"} className={formClasses.icon} />
+                                <Icon size="default" icon={"me-notifications-filled"} className={formClasses.icon} />
                             </span>
                         </ToolTip>
                     );
@@ -131,7 +131,7 @@ export function CategoryPreferencesTable(props: IProps) {
                     return (
                         <ToolTip label={t("Notification Email")}>
                             <span>
-                                <Icon size="default" icon={"me-inbox"} className={formClasses.icon} />
+                                <Icon size="default" icon={"notify-email"} className={formClasses.icon} />
                             </span>
                         </ToolTip>
                     );
@@ -166,7 +166,7 @@ export function CategoryPreferencesTable(props: IProps) {
                         className={formClasses.tableDescriptionWrapper("normal")}
                     >
                         {cellProps.cell.value}
-                        {cellProps.row.original.error && <Icon icon={"notification-alert"} />}
+                        {cellProps.row.original.error && <Icon icon={"status-alert"} />}
                     </span>
                 );
             },

@@ -9,6 +9,7 @@ namespace Vanilla\Http;
 
 use Garden\Http\HttpResponse;
 use Garden\Web\Data;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Response type for internal requests.
@@ -27,10 +28,11 @@ class InternalResponse extends HttpResponse
     {
         $this->data = $data;
         $data->applyMetaHeaders();
-        parent::__construct(
-            $data->getStatus(),
-            array_merge($data->getHeaders(), ["X-Data-Meta" => json_encode($data->getMetaArray())])
-        );
+        parent::__construct($data->getStatus(), []);
+        $headers = array_merge($data->getHeaders(), ["X-Data-Meta" => json_encode($data->getMetaArray())]);
+        foreach ($headers as $key => $value) {
+            $this->addHeader($key, is_array($value) ? $value[0] : $value);
+        }
         if ($ex = $data->getMeta("exception")) {
             $this->setThrowable($ex);
         }
@@ -74,8 +76,16 @@ class InternalResponse extends HttpResponse
      */
     public function getThrowable(): ?\Throwable
     {
+        if (!ArrayUtils::isArray($this->data->getData())) {
+            return null;
+        }
         $progressExceptions = $this->data["progress"]["exceptionsByID"] ?? [];
-        $progressException = reset($progressExceptions) ?: null;
+        if (is_array($progressExceptions)) {
+            $progressException = reset($progressExceptions) ?: null;
+        } else {
+            $progressException = null;
+        }
+
         return $this->throwable ?? $progressException;
     }
 

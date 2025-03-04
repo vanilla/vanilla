@@ -11,7 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import DropDownSwitchButton from "@library/flyouts/DropDownSwitchButton";
-import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
+import { DiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
 
 const DiscussionOptionsDismiss: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
     discussion,

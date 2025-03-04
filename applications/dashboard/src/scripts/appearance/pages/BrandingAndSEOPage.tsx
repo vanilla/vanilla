@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
+import { AppearanceNav } from "@dashboard/components/navigation/AppearanceNav";
 import { BrandingAndSEOPageClasses } from "@dashboard/appearance/pages/BrandingAndSEOPage.classes";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
@@ -23,6 +23,7 @@ import { extractSchemaDefaults } from "@vanilla/json-schema-forms/src/utils";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { useFormik } from "formik";
 import React, { useEffect, useMemo } from "react";
+import { AppearanceAdminLayout } from "@dashboard/components/navigation/AppearanceAdminLayout";
 
 const BRANDING_SETTINGS: JSONSchemaType<{
     "garden.homepageTitle": string;
@@ -220,7 +221,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             "x-control": {
                 label: t("Disable Forum Pages"),
                 description: t(
-                    "Remove discussion and categories links from menus. Set discussion and category related pages to return not found page 404.",
+                    "Remove post and categories links from menus. Set post and category related pages to return not found page 404.",
                 ),
                 inputType: "toggle",
             },
@@ -260,14 +261,8 @@ export default function BrandingAndSEOPage() {
         },
     });
 
-    const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
-
     return (
-        <AdminLayout
-            adminBarHamburgerContent={<AppearanceNav asHamburger />}
-            activeSectionID={"appearance"}
+        <AppearanceAdminLayout
             title={t("Branding & SEO")}
             titleBarActions={
                 <Button
@@ -280,7 +275,6 @@ export default function BrandingAndSEOPage() {
                     {isPatchLoading ? <ButtonLoader buttonType={ButtonTypes.DASHBOARD_PRIMARY} /> : t("Save")}
                 </Button>
             }
-            leftPanel={!isCompact && <AppearanceNav />}
             contentClassNames={cx(BrandingAndSEOPageClasses.layout)}
             content={
                 <section>

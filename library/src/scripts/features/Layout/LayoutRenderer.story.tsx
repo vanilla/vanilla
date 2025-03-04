@@ -9,7 +9,7 @@ import {
     LayoutDevice,
 } from "@library/features/Layout/LayoutRenderer.types";
 import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
 export default {
     title: "Widgets/LayoutRenderer",

@@ -4,44 +4,39 @@
  * @license Proprietary
  */
 
+import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
+import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 import { IReport } from "@dashboard/moderation/CommunityManagementTypes";
 import { isHtmlEmpty } from "@dashboard/moderation/communityManagmentUtils";
+import BlurContainer from "@dashboard/moderation/components/BlurContainerUserContent";
+import { EscalateModal } from "@dashboard/moderation/components/EscalateModal";
+import { reportStatusLabel } from "@dashboard/moderation/components/ReportFilters.constants";
 import { reportListItemClasses } from "@dashboard/moderation/components/ReportListItem.classes";
 import { ReportRecordMeta } from "@dashboard/moderation/components/ReportRecordMeta";
+import { detailPageClasses } from "@dashboard/moderation/DetailPage.classes";
 import { cx } from "@emotion/css";
+import apiv2 from "@library/apiv2";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
 import UserContent from "@library/content/UserContent";
+import { useToast } from "@library/features/toaster/ToastContext";
 import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import Heading from "@library/layout/Heading";
 import { ListItem, ListItemContext } from "@library/lists/ListItem";
 import { ListItemLayout } from "@library/lists/ListItem.variables";
-import { MetaIcon, MetaItem, Metas, MetaProfile } from "@library/metas/Metas";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import { MetaIcon, MetaItem, MetaProfile, Metas } from "@library/metas/Metas";
 import Notice from "@library/metas/Notice";
 import { Tag } from "@library/metas/Tags";
 import { TagPreset } from "@library/metas/Tags.variables";
-import ProfileLink from "@library/navigation/ProfileLink";
 import SmartLink from "@library/routing/links/SmartLink";
 import { ToolTip } from "@library/toolTip/ToolTip";
-import { t } from "@vanilla/i18n";
-import { LocationDescriptor } from "history";
-import { useState } from "react";
-import BlurContainer from "@dashboard/moderation/components/BlurContainerUserContent";
-import LinkAsButton from "@library/routing/LinkAsButton";
-import { Icon } from "@vanilla/icons";
-import { detailPageClasses } from "@dashboard/moderation/DetailPage.classes";
-import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
-import { EscalateModal } from "@dashboard/moderation/components/EscalateModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import apiv2 from "@library/apiv2";
-import ButtonLoader from "@library/loaders/ButtonLoader";
-import { useToast } from "@library/features/toaster/ToastContext";
-import { ReportStatus, reportStatusLabel } from "@dashboard/moderation/components/ReportFilters.constants";
-import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
+import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
+import { useState } from "react";
 
 interface IProps {
     report: IReport;
@@ -152,13 +147,15 @@ export function ReportListItem(props: IProps) {
                         name={
                             <span className={detailPageClasses().headerIconLayout}>
                                 {report.recordName}
-                                <span>
-                                    <ToolTip label={t("View post in community")}>
-                                        <span>
-                                            <Icon icon="meta-external" size={"compact"} />
-                                        </span>
-                                    </ToolTip>
-                                </span>
+                                {report.recordUrl && (
+                                    <span>
+                                        <ToolTip label={t("View post in community")}>
+                                            <span>
+                                                <Icon icon="meta-external" size={"compact"} />
+                                            </span>
+                                        </ToolTip>
+                                    </span>
+                                )}
                             </span>
                         }
                         url={report.recordUrl}
@@ -229,6 +226,8 @@ export function ReportListItem(props: IProps) {
                 </div>
             </div>
             <EscalateModal
+                recordType={report.recordType}
+                recordID={report.recordID}
                 escalationType={"report"}
                 report={report}
                 isVisible={showEscalate}

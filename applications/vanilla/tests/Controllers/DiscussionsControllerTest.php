@@ -368,4 +368,55 @@ class DiscussionsControllerTest extends SiteTestCase
             }
         );
     }
+
+    /**
+     * Test that the legacy discussion controller only redirects if the discussion is a redirect. The bug was that an empty string type would trigger it.
+     *
+     * https://higherlogic.atlassian.net/browse/VANS-2460
+     *
+     * @return void
+     */
+    public function testRenderDiscussionNotARedirect()
+    {
+        $discussion = $this->createDiscussion([
+            "name" => "Hello Discussion",
+            "body" => "[Hello discussion body](https://google.com)",
+            "format" => MarkdownFormat::FORMAT_KEY,
+        ]);
+        \Gdn::database()
+            ->createSql()
+            ->update("Discussion")
+            ->where("DiscussionID", $discussion["discussionID"])
+            ->set("Type", "")
+            ->put();
+
+        $url = $discussion["url"];
+        self::disableFeature("customLayout.post");
+        $this->bessy()
+            ->getHtml($url, [
+                "deliveryType" => DELIVERY_TYPE_ALL,
+            ])
+            ->assertCssSelectorTextContains("h1", $discussion["name"]);
+
+        // Now if I make it a redirect it should redirect.
+        \Gdn::database()
+            ->createSql()
+            ->update("Discussion")
+            ->where("DiscussionID", $discussion["discussionID"])
+            ->set("Type", "Redirect")
+            ->put();
+
+        $this->assertRedirectsTo(
+            safeURL(
+                "https://vanilla.test/discussionscontrollertest/home/leaving?allowTrusted=1&target=https%3A%2F%2Fgoogle.com",
+                true
+            ),
+            301,
+            function () use ($url) {
+                $this->bessy()->getHtml($url, [
+                    "deliveryType" => DELIVERY_TYPE_ALL,
+                ]);
+            }
+        );
+    }
 }

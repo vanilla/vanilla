@@ -28,8 +28,6 @@ class FloodControlHelper
      */
     public static function configure($instance, $configScope, $type, $skipAdmins = true)
     {
-        $session = Gdn::session();
-
         // The CheckSpam and SpamCheck attributes are deprecated and should be removed in 2018.
         if (property_exists($instance, "CheckSpam")) {
             deprecated(__CLASS__ . "->CheckSpam", __CLASS__ . "->setFloodControlEnabled()");
@@ -40,42 +38,13 @@ class FloodControlHelper
             $instance->setFloodControlEnabled($instance->SpamCheck);
         }
 
-        if (!Gdn::session()->isValid()) {
-            $instance->setFloodControlEnabled(false);
+        $storageObject = new \Vanilla\Cache\CacheCacheAdapter(Gdn::cache());
 
-            // Let's deactivate flood control if the user is an admin :)
-        } elseif ($skipAdmins && ($session->User->Admin || $session->checkPermission("Garden.Moderation.Manage"))) {
-            $instance->setFloodControlEnabled(false);
-        } elseif (DebugUtils::isTestMode()) {
-            // Here too
-            $instance->setFloodControlEnabled(false);
-        }
-
-        // Return early since flood control is not enabled.
-        if (!$instance->isFloodControlEnabled()) {
-            return new UserAttributeCacheAdapter($session, Gdn::userModel());
-        }
-
-        if (c("Cache.Enabled")) {
-            $storageObject = new \Vanilla\Cache\CacheCacheAdapter(Gdn::cache());
-
-            $keyPostCount = $instance->getDefaultKeyCurrentPostCount();
-            $keyLastDateChecked = $instance->getDefaultKeyLastDateChecked();
-            // Add the type in the key in case that a model do multiple types (activityModel for example).
-            foreach ([&$keyPostCount, &$keyLastDateChecked] as &$key) {
-                $key = str_replace("%s.%s", "%s." . strtolower($type) . ".%s", $key);
-            }
-        } else {
-            // Convert old keys to new ones
-            $storageObject = new UserAttributeCacheAdapter($session, Gdn::userModel());
-
-            $keyPostCount = "Count" . $type . "SpamCheck";
-            $keyLastDateChecked = "Date" . $type . "SpamCheck";
-
-            if ($session->getAttribute("Time" . $type . "SpamCheck")) {
-                // Remove old attribute used in the conversationModel
-                Gdn::userModel()->saveAttribute($session->UserID, "Time" . $type . "SpamCheck", null);
-            }
+        $keyPostCount = $instance->getDefaultKeyCurrentPostCount();
+        $keyLastDateChecked = $instance->getDefaultKeyLastDateChecked();
+        // Add the type in the key in case that a model do multiple types (activityModel for example).
+        foreach ([&$keyPostCount, &$keyLastDateChecked] as &$key) {
+            $key = str_replace("%s.%s", "%s." . strtolower($type) . ".%s", $key);
         }
 
         $instance
@@ -83,7 +52,8 @@ class FloodControlHelper
             ->setTimeSpan(c($configScope . "." . $type . ".SpamTime", 60))
             ->setLockTime(c($configScope . "." . $type . ".SpamLock", 60))
             ->setKeyCurrentPostCount($keyPostCount)
-            ->setKeyLastDateChecked($keyLastDateChecked);
+            ->setKeyLastDateChecked($keyLastDateChecked)
+            ->setSkipAdmins($skipAdmins);
 
         return $storageObject;
     }

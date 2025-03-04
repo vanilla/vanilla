@@ -88,7 +88,7 @@ export default function DashboardTitleBar(props: IProps) {
                             </div>
                             <SmartLink to={"/"} className={classes.backBtn}>
                                 {t("Visit Site")}
-                                <Icon icon="external-link" size="compact" />
+                                <Icon icon="meta-external" size="compact" />
                             </SmartLink>
                         </div>
                         <nav className={classes.nav}>

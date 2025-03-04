@@ -5,7 +5,6 @@
  */
 
 import { fireEvent, render, waitFor, screen } from "@testing-library/react";
-import { SuggestedAnswers } from "./SuggestedAnswers";
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { setMeta } from "@library/utility/appUtils";
@@ -15,6 +14,7 @@ import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { format } from "path";
 import { SuggestedAnswersOptionsMenu } from "./SuggestedAnswersOptionsMenu";
+import { SuggestedAnswers } from "@library/suggestedAnswers/SuggestedAnswersAsset";
 
 const queryClient = new QueryClient();
 

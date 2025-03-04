@@ -13,10 +13,10 @@ COPY ./www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY ./start-container.sh /start-container.sh
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-COPY ./certs/vanilla.localhost.crt /usr/local/share/ca-certificates/vanilla.localhost.crt
-COPY ./certs/wildcard.vanilla.localhost.crt /usr/local/share/ca-certificates/wildcard.vanilla.localhost.crt
-RUN chmod 644 /usr/local/share/ca-certificates/vanilla.localhost.crt \
-    && chmod 644 /usr/local/share/ca-certificates/wildcard.vanilla.localhost.crt \
+COPY ./certs/vanilla.local.crt /usr/local/share/ca-certificates/vanilla.local.crt
+COPY ./certs/wildcard.vanilla.local.crt /usr/local/share/ca-certificates/wildcard.vanilla.local.crt
+RUN chmod 644 /usr/local/share/ca-certificates/vanilla.local.crt \
+    && chmod 644 /usr/local/share/ca-certificates/wildcard.vanilla.local.crt \
     && update-ca-certificates
 
 CMD ["/start-container.sh"]

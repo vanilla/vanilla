@@ -35,6 +35,7 @@ export interface IHomeWidgetContainerProps {
     contentIsListWithSeparators?: boolean;
     extraHeader?: React.ReactNode;
     actions?: React.ReactNode;
+    className?: string;
 }
 
 export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
@@ -95,7 +96,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                 </Container>
             )}
 
-            <div className={cx(!isNavLinks && widgetClass, classes.root)}>
+            <div className={cx(!isNavLinks && widgetClass, classes.root, props.className)}>
                 <Container
                     // Our own container will be setting the maximum width.
                     maxWidth={options.maxWidth}
@@ -141,19 +142,21 @@ export function HomeWidgetGridContainer(props: IHomeWidgetContainerProps) {
         <div className={classes.grid}>
             {React.Children.map(props.children, (child, i) => {
                 return (
-                    <div
-                        ref={i === 0 ? firstItemRef : undefined}
-                        className={classNames(
-                            classes.gridItem,
+                    child && (
+                        <div
+                            ref={i === 0 ? firstItemRef : undefined}
+                            className={classNames(
+                                classes.gridItem,
 
-                            // Constrain grid items to the same max width in each row.
-                            // Workaround for flex-box limitations.
-                            i !== 0 && classes.gridItemWidthConstraint(firstItemMeasure.width),
-                        )}
-                        key={i}
-                    >
-                        <div className={classes.gridItemContent}>{child}</div>
-                    </div>
+                                // Constrain grid items to the same max width in each row.
+                                // Workaround for flex-box limitations.
+                                i !== 0 && classes.gridItemWidthConstraint(firstItemMeasure.width),
+                            )}
+                            key={i}
+                        >
+                            <div className={classes.gridItemContent}>{child}</div>
+                        </div>
+                    )
                 );
             })}
         </div>

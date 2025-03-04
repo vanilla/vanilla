@@ -318,8 +318,9 @@
                             {% endif %}
                         </table>
 
-                        {% for category in email.categories %}
-
+                        {% for contentType, sections in email.contents %}
+                        <!-- {{ "Section " ~ contentType}} -->
+                        {% for sectionID, section in sections %}
                         <table {{ wInner | raw }} style="{{ contentStyle | raw }}">
                             <tr>
                                 <td align="left" valign="middle" style="padding: 10px 10px 10px 30px" width="61%">
@@ -337,9 +338,9 @@
                                     >
                                         <a
                                                 {% if email.utmParams|default(false) %}
-                                                    href="{{ category.url ~ '?' ~ email.utmParams}}"
+                                                    href="{{ section.url ~ '?' ~ email.utmParams}}"
                                                 {% else %}
-                                                    href="{{ category.url }}"
+                                                    href="{{ section.url }}"
                                                 {% endif %}
                                             style="
                                                 text-decoration: underline;
@@ -351,18 +352,18 @@
                                                 font-weight: 500;
                                             "
                                         >
-                                            {{ category.name }}
+                                            {{ section.name }}
                                         </a>
                                     </p>
                                 </td>
                                 <td align="right" valign="middle" style="padding: 10px 30px 10px 0" width="30%">
-                                    {% if category.unsubscribeLink|default(false) %}
-                                    <a
-                                            {% if email.utmParams|default(false) %}
-                                                href="{{ category.unsubscribeLink ~ '?' ~ email.utmParams }}"
-                                            {% else %}
-                                                href="{{ category.unsubscribeLink }}"
-                                            {% endif %}
+                                    {% if section.unsubscribeLink|default(false) %}
+                                        <a
+                                                {% if email.utmParams|default(false) %}
+                                                    href="{{ section.unsubscribeLink ~ '?' ~ email.utmParams }}"
+                                                {% else %}
+                                                    href="{{ section.unsubscribeLink }}"
+                                                {% endif %}
 
                                             target="_blank" style="text-decoration: none">
                                         <span
@@ -374,9 +375,9 @@
                                                 font-size: 14px;
                                             "
                                         >
-                                            {{t("Hide category")}}
+                                            {{t("Hide " ~contentType )}}
                                         </span>
-                                    </a>
+                                        </a>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -391,7 +392,7 @@
                             </tr>
                         </table>
 
-                        {% for discussion in category.discussions %}
+                        {% for discussion in section.discussions %}
                         <table {{ wInner | raw }} style="{{ contentStyle | raw }}">
                             <tr>
                                 <td
@@ -500,6 +501,7 @@
                         <table {{ wInner | raw }} style="{{ contentStyle | raw }}">
                             {{ spacerRow | raw }}
                         </table>
+                        {% endfor %}
                         {% endfor %}
 
                         <table {{ wInner | raw }} style="{{ contentStyle | raw }}">

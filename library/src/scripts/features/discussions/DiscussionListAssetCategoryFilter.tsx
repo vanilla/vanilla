@@ -16,6 +16,8 @@ export type DiscussionsCategoryFollowFilter = "all" | "followed" | "suggested";
 interface IProps {
     filter: DiscussionsCategoryFollowFilter;
     onFilterChange: (newFilter: string) => void;
+    hasFollowedCategoriesFilter: boolean;
+    hasSuggestedContentFilter: boolean;
     className?: string;
     isMobile?: boolean;
 }
@@ -24,16 +26,17 @@ interface IProps {
  * Component for displaying an discussion category follow filters
  */
 export default function DiscussionListAssetCategoryFilter(props: IProps) {
-    const { filter, onFilterChange, isMobile } = props;
+    const { filter, onFilterChange, hasFollowedCategoriesFilter, hasSuggestedContentFilter, isMobile } = props;
 
     const currentUser = useCurrentUser();
-    const suggestedContentEnabled = getMeta("suggestedContentEnabled", false);
 
     let options: ISelectBoxItem[] = [{ name: t("All"), value: "all" }];
 
     if (currentUser?.userID ?? 0 > 0) {
-        options.push({ name: t("Followed Categories"), value: "followed" });
-        if (suggestedContentEnabled) {
+        if (hasFollowedCategoriesFilter) {
+            options.push({ name: t("Followed Categories"), value: "followed" });
+        }
+        if (hasSuggestedContentFilter) {
             options.push({ name: t("Suggested Content"), value: "suggested" });
         }
     }

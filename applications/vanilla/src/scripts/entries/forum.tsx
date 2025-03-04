@@ -41,12 +41,13 @@ import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacy
 import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 import { CommunitySearchProvider } from "@vanilla/addon-vanilla/search/CommunitySearchProvider";
 import { delegateEvent } from "@vanilla/dom-utils";
+import { LegacyFlagDropdown } from "@library/postReactions/LegacyFlagDropdown";
 import {
     LegacyIntegrationsOptionsMenuItems,
     LegacyThreadAttachmentsAsset,
-} from "@vanilla/addon-vanilla/thread/LegacyAttachments";
-import { ReportRecordOption } from "@library/features/discussions/ReportRecordOption";
-import { TrollComment } from "@vanilla/addon-vanilla/thread/LegacyTrollComment";
+} from "@vanilla/addon-vanilla/legacy/LegacyAttachments";
+import { TrollComment } from "@vanilla/addon-vanilla/legacy/LegacyTrollComment";
+import { LegacyPostMetaAsset } from "@vanilla/addon-vanilla/legacy/LegacyPostMetaAsset";
 
 registerReducer("forum", forumReducer);
 
@@ -77,6 +78,8 @@ addComponent("NotificationPreferences", NotificationPreferences, { overwrite: tr
 addComponent("LegacyThreadAttachmentsAsset", LegacyThreadAttachmentsAsset);
 addComponent("LegacyIntegrationsOptionsMenuItems", LegacyIntegrationsOptionsMenuItems);
 addComponent("TrollComment", TrollComment);
+addComponent("LegacyFlagDropdown", LegacyFlagDropdown);
+addComponent("legacyPostMeta", LegacyPostMetaAsset);
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();
@@ -95,36 +98,12 @@ delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElemen
         return;
     }
     const id = parseInt(discussionID, 10);
-    mountModal(
+    void mountModal(
         <CollectionsOptionButton
             initialVisibility={true}
             recordID={id}
             recordType={recordType as CollectionRecordTypes}
             modalOnly
-        />,
-    );
-});
-
-delegateEvent("click", ".js-legacyDiscussionOrCommentReport", (event, triggeringElement) => {
-    event.preventDefault();
-    const recordID = triggeringElement.getAttribute("data-recordID");
-    const recordType = triggeringElement.getAttribute("data-recordType");
-    const categoryID = triggeringElement.getAttribute("data-categoryID");
-    const discussionName = triggeringElement.getAttribute("data-discussionName");
-    if (!recordID || !recordType || !discussionName || !categoryID) {
-        return;
-    }
-
-    mountModal(
-        <ReportRecordOption
-            discussionName={discussionName}
-            recordID={parseInt(recordID, 10)}
-            recordType={recordType as "discussion" | "comment"}
-            placeRecordType="category"
-            placeRecordID={categoryID}
-            initialVisibility={true}
-            customTrigger={() => null}
-            isLegacyPage
         />,
     );
 });

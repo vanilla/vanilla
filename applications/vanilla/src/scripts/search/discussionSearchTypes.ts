@@ -6,10 +6,7 @@
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 export interface IDiscussionSearchTypes {
-    categoryID?: number;
     categoryIDs?: number[];
-    categoryOption?: IComboBoxOption<number>;
-    categoryOptions?: IComboBoxOption[];
     followedCategories?: boolean;
     includeChildCategories?: boolean;
     includeArchivedCategories?: boolean;

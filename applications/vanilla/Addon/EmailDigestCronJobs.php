@@ -8,6 +8,8 @@
 namespace Vanilla\Forum\Addon;
 
 use Vanilla\AddonCronJobs;
+use Vanilla\Forum\Digest\ScheduleDailyDigestJob;
+use Vanilla\Forum\Digest\ScheduleMonthlyDigestJob;
 use Vanilla\Forum\Digest\ScheduleWeeklyDigestJob;
 use Vanilla\Scheduler\Descriptor\CronJobDescriptor;
 
@@ -21,6 +23,10 @@ class EmailDigestCronJobs extends AddonCronJobs
      */
     public function getCronJobDescriptors(): array
     {
-        return [new CronJobDescriptor(ScheduleWeeklyDigestJob::class, ScheduleWeeklyDigestJob::getCronExpression())];
+        return [
+            new CronJobDescriptor(ScheduleWeeklyDigestJob::class, ScheduleWeeklyDigestJob::getCronExpression()),
+            new CronJobDescriptor(ScheduleDailyDigestJob::class, ScheduleDailyDigestJob::getCronExpression()),
+            new CronJobDescriptor(ScheduleMonthlyDigestJob::class, ScheduleMonthlyDigestJob::getCronExpression()),
+        ];
     }
 }

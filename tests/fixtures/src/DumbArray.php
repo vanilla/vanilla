@@ -15,7 +15,7 @@ class DumbArray implements \ArrayAccess
     /**
      * @var array
      */
-    protected $arr;
+    protected array $arr;
 
     /**
      * DumbArray constructor.
@@ -30,7 +30,7 @@ class DumbArray implements \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->arr);
     }
@@ -38,7 +38,7 @@ class DumbArray implements \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->arr[$offset];
     }
@@ -46,7 +46,7 @@ class DumbArray implements \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if ($offset === null) {
             $this->arr[] = $value;
@@ -58,7 +58,7 @@ class DumbArray implements \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->arr[$offset]);
     }

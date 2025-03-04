@@ -172,9 +172,9 @@ class ProfileFieldUserFollowCategoryTriggerTest extends SiteTestCase
         $this->assertLog([
             "level" => "error",
             "message" => "Error occurred trying to follow category",
+            "automationRuleID" => $automationRule["automationRuleID"],
+            "automationRuleDispatchUUID" => $dispatchedRecord["automationRuleDispatchUUID"],
             "data" => [
-                "automationRuleID" => $automationRule["automationRuleID"],
-                "automationRuleDispatchUUID" => $dispatchedRecord["automationRuleDispatchUUID"],
                 "categoryID" => 999,
                 "error" => "Failed setting users notification preference., Category not found.",
             ],

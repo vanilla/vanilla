@@ -61,7 +61,7 @@ export default function AutomationRulesHistoryDateFilter(props: IProps) {
                 }}
                 className={classes.dateIcon}
             >
-                <Icon icon="search-events" />
+                <Icon icon="meta-events" />
             </Button>
             <Modal
                 isVisible={isVisible}
@@ -104,7 +104,7 @@ export default function AutomationRulesHistoryDateFilter(props: IProps) {
                                             start={dateRange.start}
                                             end={dateRange.end}
                                             datePickerDropdownClassName={css({
-                                                zIndex: zIndex,
+                                                zIndex: zIndex + 1,
                                             })}
                                         />
                                     </InputBlock>

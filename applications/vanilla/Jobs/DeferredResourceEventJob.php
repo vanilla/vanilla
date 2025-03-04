@@ -22,6 +22,7 @@ class DeferredResourceEventJob implements LocalJobInterface
     protected EventManager $eventManager;
     protected UserModel $userModel;
     protected string $action;
+    protected bool $textUpdated;
     private string $modelClass;
 
     public function __construct(EventManager $eventManager, UserModel $userModel)
@@ -32,12 +33,13 @@ class DeferredResourceEventJob implements LocalJobInterface
 
     public function setMessage(array $message)
     {
-        $in = new Schema(["id:i", "model:s", "action:s"]);
+        $in = new Schema(["id:i", "model:s", "action:s", "textUpdated:b?"]);
         $in->validate($message);
 
         $this->id = $message["id"];
         $this->modelClass = $message["model"];
         $this->action = $message["action"];
+        $this->textUpdated = $message["textUpdated"] ?? false;
     }
 
     public function run(): JobExecutionStatus
@@ -45,7 +47,7 @@ class DeferredResourceEventJob implements LocalJobInterface
         $model = \Gdn::getContainer()->get($this->modelClass);
         $record = $model->getID($this->id, DATASET_TYPE_ARRAY);
         $event = $model->eventFromRow((array) $record, $this->action, $this->userModel->currentFragment());
-
+        $event->setTextUpdated($this->textUpdated);
         $response = $this->eventManager->dispatch($event);
         return JobExecutionStatus::complete();
     }

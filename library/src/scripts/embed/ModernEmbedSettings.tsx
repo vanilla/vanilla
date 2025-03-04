@@ -102,7 +102,7 @@ export default function ModernEmbedSettings() {
 
     const handleSubmit = () => {
         if (!isEmpty(dirtySettings)) {
-            patchConfig(dirtySettings);
+            void patchConfig(dirtySettings);
         }
     };
 

@@ -35,6 +35,7 @@ import "@library/VanillaGlobals";
 import "@library/gdn";
 import { initModernEmbed } from "@library/embed/modernEmbed.local";
 import { iconRegistry } from "@vanilla/icons";
+import { AxiosRequestHeaders } from "axios";
 
 export async function bootstrapVanilla() {
     performance.mark("Bootstrap - Start");
@@ -91,7 +92,7 @@ export async function bootstrapVanilla() {
         let auditLog = getMeta("auditLog");
         if (auditLog) {
             if (!config.headers) {
-                config.headers = {};
+                config.headers = {} as AxiosRequestHeaders;
             }
             config.headers["X-Parent-Audit-Log-Id"] = auditLog.auditLogID;
             config.headers["X-Parent-Audit-Log-Request-Path"] = auditLog.requestPath;

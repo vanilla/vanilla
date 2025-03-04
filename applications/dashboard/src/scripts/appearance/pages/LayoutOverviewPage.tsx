@@ -6,7 +6,7 @@
 import { AppliedLayoutViewLocationDetails } from "@dashboard/appearance/components/AppliedLayoutViewLocationDetails";
 import { ApplyLayout } from "@dashboard/appearance/components/ApplyLayout";
 import { DeleteLayout } from "@dashboard/appearance/components/DeleteLayout";
-import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
+import { AppearanceNav } from "@dashboard/components/navigation/AppearanceNav";
 import { ErrorWrapper } from "@dashboard/appearance/pages/ErrorWrapper";
 import { LayoutEditorRoute } from "@dashboard/appearance/routes/appearanceRoutes";
 import AdminLayout from "@dashboard/components/AdminLayout";
@@ -31,6 +31,7 @@ import { notEmpty, stableObjectHash } from "@vanilla/utils";
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { layoutOverviewPageClasses } from "./LayoutOverviewPage.classes";
+import { AppearanceAdminLayout } from "@dashboard/components/navigation/AppearanceAdminLayout";
 
 function LayoutOverviewPageMetasImpl(props: { layout: ILayoutDetails }) {
     const { layout } = props;
@@ -118,9 +119,6 @@ export default function LayoutOverviewPage(
     const layoutID = props.match.params.layoutID;
 
     const classes = layoutOverviewPageClasses();
-    const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
 
     const layoutQuery = useLayoutQuery(layoutID);
 
@@ -135,14 +133,11 @@ export default function LayoutOverviewPage(
     );
 
     return (
-        <AdminLayout
+        <AppearanceAdminLayout
             contentClassNames={classes.overviewContent}
-            activeSectionID={"appearance"}
             title={layoutQuery.data?.name || ""}
             description={descriptionContent}
             titleBarActions={layoutQuery.data ? <TitleBarActionsContent layout={layoutQuery.data} /> : <></>}
-            adminBarHamburgerContent={<AppearanceNav asHamburger />}
-            leftPanel={!isCompact && <AppearanceNav />}
             content={<LayoutOverview layoutID={layoutID} />}
             titleLabel={
                 (layoutQuery.data?.layoutViews ?? []).length > 0 ? (

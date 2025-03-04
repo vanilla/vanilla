@@ -27,14 +27,16 @@ interface SiteSectionProviderInterface
     /**
      * Get the current site section for the request automatically if possible.
      *
-     * @return SiteSectionInterface
+     * @param string|null $locale
+     * @return SiteSectionInterface|null
      */
     public function getCurrentSiteSection(): ?SiteSectionInterface;
 
     /**
      * Get the default site section for the request automatically if possible.
      *
-     * @return SiteSectionInterface
+     * @param string|null $locale
+     * @return SiteSectionInterface|null
      */
     public function getDefaultSiteSection(): ?SiteSectionInterface;
 

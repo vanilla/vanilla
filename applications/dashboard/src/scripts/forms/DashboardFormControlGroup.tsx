@@ -22,7 +22,12 @@ export function DashboardFormControlGroup(
     const { children, controls, required, errors } = props;
     const control = controls[0];
     let { label, legend, description, fullSize, inputType, tooltip, labelType } = control;
-    const isFieldset = ["radio"].includes(inputType);
+
+    let isFieldset = ["radio"].includes(inputType);
+    if (control.inputType === "custom" && !!legend) {
+        isFieldset = true;
+    }
+
     if (fullSize || inputType === "upload") {
         return <>{children}</>;
     }

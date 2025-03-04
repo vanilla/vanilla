@@ -154,11 +154,13 @@ $Definition["ThemeHelp"] =
     "Themes allow you to change the look &amp; feel of your site.<br />Once a theme has been added to your %s folder, you can enable it here.";
 $Definition["AddonProblems"] =
     "<h2>Problems?</h2><p>If something goes wrong with an addon and you can't use your site, you can disable them manually by editing:</p>%s";
-$Definition["Date.DefaultFormat"] = "%B %e, %Y";
-$Definition["Date.DefaultDayFormat"] = "%B %e";
-$Definition["Date.DefaultYearFormat"] = "%B %Y";
-$Definition["Date.DefaultTimeFormat"] = "%l:%M%p";
-$Definition["Date.DefaultDateTimeFormat"] = "%B %e, %Y %l:%M%p";
+
+$Definition["Date.DefaultFormat"] = "F j, Y";
+$Definition["Date.DefaultDayFormat"] = "F j";
+$Definition["Date.DefaultYearFormat"] = "F Y";
+$Definition["Date.DefaultTimeFormat"] = "g:iA";
+$Definition["Date.DefaultDateTimeFormat"] = "F j, Y g:iA";
+
 $Definition["Saved"] = "Your changes have been saved.";
 $Definition["%s new plural"] = "%s new";
 $Definition["TermsOfService"] = "Terms of Service";

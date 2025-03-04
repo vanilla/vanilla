@@ -8,7 +8,7 @@ helpAsset(
     t("Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; to undo any change.")
 );
 $links = "<ul>";
-$links .= "<li>" . anchor(t("Discussions"), "dashboard/log/edits/discussion") . "</li>";
+$links .= "<li>" . anchor(t("Posts"), "dashboard/log/edits/discussion") . "</li>";
 $links .= "<li>" . anchor(t("Comments"), "dashboard/log/edits/comment") . "</li>";
 $links .= "<li>" . anchor(t("Users"), "dashboard/log/edits/user") . "</li>";
 if (gdn::session()->checkPermission("site.manage")) {

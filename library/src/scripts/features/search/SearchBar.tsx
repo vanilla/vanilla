@@ -449,7 +449,7 @@ function SearchBarControl(props: IControlProps) {
                         title={t("Search")}
                         tabIndex={1}
                     >
-                        <Icon size="compact" icon="search-search" />
+                        <Icon size="compact" icon="search" />
                     </Button>
                 )}
                 {hasScope && (
@@ -522,7 +522,7 @@ function SearchBarControl(props: IControlProps) {
                         title={t("Search")}
                         tabIndex={0}
                     >
-                        <Icon size="compact" icon="search-search" />
+                        <Icon size="compact" icon="search" />
                     </Button>
                 )}
             </ConditionalWrap>

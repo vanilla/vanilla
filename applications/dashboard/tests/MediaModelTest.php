@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Dashboard;
 
+use Exception;
 use Garden\Web\Exception\NotFoundException;
 use MediaModel;
 use Vanilla\UploadedFile;
@@ -23,13 +24,23 @@ class MediaModelTest extends AbstractAPIv2Test
     /** @var MediaModel */
     protected $mediaModel;
 
+    /** @var \Gdn_Cache */
+    protected $cache;
+
     /**
      * @inheritdoc
      */
     public function setUp(): void
     {
+        $this->cache = $this->enableCaching();
+        $this->cache->flush();
+
         parent::setUp();
         $this->mediaModel = self::container()->get(\MediaModel::class);
+        $this->mediaModel->setFloodControlEnabled(true);
+        $this->mediaModel->setPostCountThreshold(250);
+        $this->mediaModel->setTimeSpan(3600);
+        $this->mediaModel->setLockTime(3600);
     }
 
     /**
@@ -67,5 +78,28 @@ class MediaModelTest extends AbstractAPIv2Test
 
         $this->expectException(NotFoundException::class);
         $this->mediaModel->findUploadedMediaByID($insertedMedia["mediaID"]);
+    }
+
+    /**
+     * Test flooding produces the correct exception.
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function testFlooding(): void
+    {
+        $this->resetTable("Media");
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("You have exceeded the threshold for file uploads.");
+        $this->expectExceptionCode(429);
+
+        $file = UploadedFile::fromRemoteResourceUrl(UploadedFileTest::TEST_REMOTE_FILE_URL);
+        $this->mediaModel->setForceEnabled(true);
+        $this->mediaModel->setFloodControlEnabled(true);
+        $this->mediaModel->setPostCountThreshold(1);
+        $this->mediaModel->setTimeSpan(2);
+        $this->mediaModel->setLockTime(2);
+        $this->mediaModel->saveUploadedFile($file);
+        $this->mediaModel->saveUploadedFile($file);
     }
 }

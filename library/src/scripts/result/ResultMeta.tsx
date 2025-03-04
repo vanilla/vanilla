@@ -47,6 +47,8 @@ export function ResultMeta(props: IProps) {
             />
         ) : type ? (
             t(capitalizeFirstLetter(type))
+        ) : updateUser?.userID != null ? (
+            <ProfileLink className={metasClasses().metaLink} userFragment={updateUser} />
         ) : null;
 
     const countMeta =
@@ -75,6 +77,9 @@ export function ResultMeta(props: IProps) {
 
     const customLayoutsForDiscussionListIsEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
 
+    // Prevent duplicates of idea statuses
+    const tagsToShow = tags?.filter((tag) => !labels?.includes(tag.name));
+
     return (
         <>
             {labels &&
@@ -84,7 +89,7 @@ export function ResultMeta(props: IProps) {
                     </MetaTag>
                 ))}
 
-            {tags?.map((tag) => {
+            {tagsToShow?.map((tag) => {
                 const discussionsWithTagFilterUrl = customLayoutsForDiscussionListIsEnabled
                     ? `/discussions?tagID=${tag.tagID}`
                     : `/discussions/tagged/${tag.urlcode}`;

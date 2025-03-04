@@ -25,7 +25,7 @@ import { dateRangeToString } from "@library/search/SearchUtils";
 import { AutomationRulesRunOnce } from "@dashboard/automationRules/AutomationRulesRunOnce";
 import { AutomationRulesPreviewCollectionRecordsContent } from "@dashboard/automationRules/preview/AutomationRulesPreviewCollectionRecordsContent";
 import { CollectionRecordTypes, ICollectionResource } from "@library/featuredCollections/Collections.variables";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
 const queryClient = new QueryClient({
     defaultOptions: {

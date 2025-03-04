@@ -4,13 +4,10 @@
  * @license gpl-2.0-only
  */
 
-import AdminLayout from "@dashboard/components/AdminLayout";
-import { SettingsNav } from "@dashboard/components/navigation/SettingsNav";
+import { SettingsAdminLayout } from "@dashboard/components/navigation/SettingsAdminLayout";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
-import { css } from "@emotion/css";
 import apiv2 from "@library/apiv2";
 import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
-import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
 import Loader from "@library/loaders/Loader";
 import Message from "@library/messages/Message";
 import { MetaItem } from "@library/metas/Metas";
@@ -18,13 +15,8 @@ import { OpenApiViewer } from "@library/openapi/OpenApiViewer";
 import { siteUrl } from "@library/utility/appUtils";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
-import { useCollisionDetector } from "@vanilla/react-utils";
 
 export default function ApiOverviewPage() {
-    const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
-
     const specQuery = useQuery({
         queryKey: ["openapi-spec"],
         queryFn: async () => {
@@ -35,8 +27,7 @@ export default function ApiOverviewPage() {
     });
 
     return (
-        <AdminLayout
-            leftPanel={!isCompact && <SettingsNav />}
+        <SettingsAdminLayout
             title={
                 <span>
                     {t("Vanilla API v2")}

@@ -18,7 +18,14 @@ import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { type IFormControl, type JsonSchema, type JSONSchemaType } from "@library/json-schema-forms";
+import {
+    type IControlProps,
+    type ICustomControl,
+    type IFieldError,
+    type IFormControl,
+    type JsonSchema,
+    type JSONSchemaType,
+} from "@library/json-schema-forms";
 import { Row } from "@library/layout/Row";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { TokenItem } from "@library/metas/TokenItem";
@@ -49,6 +56,9 @@ import { type AxiosResponse, type AxiosResponseHeaders, type Method } from "axio
 import qs from "qs";
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import Message from "@library/messages/Message";
+import { UploadButton } from "@library/forms/UploadButton";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 export function OpenApiTryIt() {
     const context = useTryItContext();
@@ -58,6 +68,96 @@ export function OpenApiTryIt() {
 
     const formRef = useRef<HTMLFormElement | null>(null);
     const [forceResponseSchema, setForceResponseSchema] = useState(false);
+
+    const [rawJsonValue, _setRawJsonValue] = useState("");
+    const [isRawJsonDirty, setIsRawJsonDirty] = useState(false);
+    const [jsonError, setJsonError] = useState<string | null>(null);
+    const [useRawJson, _setUseRawJson] = useState(false);
+    const setRawJsonValue = useCallback(
+        (value: string) => {
+            _setRawJsonValue(value);
+            setJsonError(null);
+
+            try {
+                submitContext.setBodyValue(JSON.parse(value));
+                setIsRawJsonDirty(false);
+            } catch (err) {
+                setIsRawJsonDirty(true);
+                // Nothing to do.
+            }
+        },
+        [_setRawJsonValue, setJsonError],
+    );
+
+    const routeSpec = context.route ? spec.paths[context.route.path][context.route.method.toLowerCase()] : undefined;
+
+    const rawBodySchema = useMemo(() => {
+        if (!routeSpec) {
+            return undefined;
+        }
+        const resolved = resolveOpenApiRefRecursively(
+            spec,
+            resolveOpenApiRefRecursively(spec, routeSpec.requestBody)?.content?.["application/json"]?.["schema"],
+        );
+
+        return sortRequiredSchemaPropertiesFirst(resolved as any);
+    }, [routeSpec]);
+
+    function tryPersistRawJson(): boolean {
+        // We are switching away, let's decode the JSON.
+        try {
+            const newValue = JSON.parse(rawJsonValue);
+            submitContext.setBodyValue(newValue);
+            setIsRawJsonDirty(false);
+            return true;
+        } catch (err) {
+            setJsonError("Invalid JSON in the editor.");
+            return false;
+        }
+    }
+
+    function setUseRawJson(newUseJson: boolean, withBodyValue?: (existing: any) => any) {
+        if (newUseJson === useRawJson) {
+            // Nothing to do.
+            return;
+        }
+
+        if (newUseJson) {
+            // As we transition we need to set this to be either the form value or the default value.
+
+            let valueToSerialize = {};
+            let bodyValue = submitContext.bodyValue;
+            if (withBodyValue) {
+                bodyValue = withBodyValue(bodyValue);
+            }
+            if (Object.keys(bodyValue).length > 0) {
+                // The form was already started to be filled.
+                valueToSerialize = bodyValue;
+            } else {
+                valueToSerialize = schemaDefaultValue(spec, rawBodySchema as any);
+            }
+            setRawJsonValue(JSON.stringify(valueToSerialize, null, 2));
+            setIsRawJsonDirty(false);
+            _setUseRawJson(true);
+        } else {
+            if (!isRawJsonDirty) {
+                // No need to try and convert anything. It wasn't modified.
+                _setUseRawJson(false);
+                return;
+            }
+            if (tryPersistRawJson()) {
+                _setUseRawJson(false);
+            }
+        }
+    }
+
+    function toggleRawJson() {
+        if (!useRawJson) {
+            setUseRawJson(true);
+        } else {
+            setUseRawJson(false);
+        }
+    }
 
     if (!context.enabled) {
         return <></>;
@@ -71,7 +171,6 @@ export function OpenApiTryIt() {
         return <></>;
     }
 
-    const routeSpec = spec.paths[context.route.path][context.route.method.toLowerCase()];
     if (!routeSpec) {
         return <></>;
     }
@@ -101,6 +200,10 @@ export function OpenApiTryIt() {
                 ref={formRef}
                 onSubmit={(e) => {
                     e.preventDefault();
+                    if (useRawJson && !tryPersistRawJson()) {
+                        return;
+                    }
+
                     if (!formRef.current?.checkValidity()) {
                         formRef.current?.reportValidity();
                     }
@@ -118,7 +221,17 @@ export function OpenApiTryIt() {
                 <div className={classes.split}>
                     <div className={classes.splitRequest}>
                         <ErrorBoundary isFixed={false}>
-                            <Form endpoint={endpoint} submitContext={submitContext} />
+                            <Form
+                                endpoint={endpoint}
+                                submitContext={submitContext}
+                                setRawJsonValue={setRawJsonValue}
+                                rawJsonValue={rawJsonValue}
+                                toggleRawJson={toggleRawJson}
+                                setUseRawJson={setUseRawJson}
+                                useRawJson={useRawJson}
+                                jsonError={jsonError}
+                                rawBodySchema={rawBodySchema}
+                            />
                         </ErrorBoundary>
                     </div>
                     <div className={classes.splitResponse}>
@@ -164,7 +277,7 @@ function ActualResponse(props: { response: AxiosResponse }) {
     );
 }
 
-function ResponseHeaders(props: { headers: AxiosResponseHeaders }) {
+function ResponseHeaders(props: { headers: AxiosResponse["headers"] }) {
     return (
         <div>
             <Table
@@ -204,16 +317,26 @@ function useApiSubmit() {
     const [pathValue, setPathValue] = useState<any>({});
     const [queryValue, setQueryValue] = useState<any>({});
     const [bodyValue, setBodyValue] = useState<any>({});
+
     const submitMutation = useMutation({
         mutationFn: async (options: { method: string; path: string; body?: any; queryParams?: any }) => {
             try {
+                // If there is a file in the body, we need to convert to a formdata.
+                let finalBody = options.body;
+                if (options.body && Object.values(options.body).some((val) => val instanceof File)) {
+                    finalBody = new FormData();
+                    for (const [key, val] of Object.entries(options.body)) {
+                        finalBody.append(key, val);
+                    }
+                }
+
                 const response = await apiv2.request({
                     method: options.method as Method,
                     url: options.path,
                     headers: {
                         "X-Requested-With": "vanilla",
                     },
-                    data: options.body,
+                    data: finalBody,
                     params: options.queryParams,
                     paramsSerializer: (params) => qs.stringify(params),
                 });
@@ -265,7 +388,7 @@ function useCopier() {
     };
 
     function copyValue(value: string) {
-        navigator.clipboard.writeText(value).then(() => {
+        void navigator.clipboard.writeText(value).then(() => {
             if (isMounted()) {
                 setWasCopied();
             }
@@ -287,6 +410,7 @@ function CopyAsDropdown(props: { route: IOpenApiRoute; submitContext: ReturnType
 
     const curlCopier = useCopier();
     const fetchCopier = useCopier();
+    const urlCopier = useCopier();
 
     return (
         <DropDown
@@ -359,6 +483,15 @@ fetch("${fullUrl}", {
             >
                 {fetchCopier.wasCopied ? t("Copied to Clipboard") : t("Copy as Fetch (Javascript)")}
             </DropDownItemButton>
+            {route.method.toLowerCase() === "get" && (
+                <DropDownItemButton
+                    onClick={() => {
+                        urlCopier.copyValue(fullUrl);
+                    }}
+                >
+                    {urlCopier.wasCopied ? t("Copied to Clipboard") : t("Copy as URL")}
+                </DropDownItemButton>
+            )}
         </DropDown>
     );
 }
@@ -384,7 +517,7 @@ function EndpointHeader(props: { route: IOpenApiRoute; submitContext: ReturnType
                     buttonType={ButtonTypes.PRIMARY}
                     className={classes.headerButton}
                 >
-                    <Icon size={"compact"} icon={"data-send"} />
+                    <Icon size={"compact"} icon={"send"} />
                     {submitMutation.isLoading ? <ButtonLoader /> : t("Send")}
                 </Button>
             </div>
@@ -392,10 +525,28 @@ function EndpointHeader(props: { route: IOpenApiRoute; submitContext: ReturnType
     );
 }
 
-function Form(props: { endpoint: IOpenApiProcessedEndpoint; submitContext: ReturnType<typeof useApiSubmit> }) {
-    const { endpoint, submitContext } = props;
-
-    const [useRawJson, setUseRawJson] = useState(false);
+function Form(props: {
+    endpoint: IOpenApiProcessedEndpoint;
+    submitContext: ReturnType<typeof useApiSubmit>;
+    rawJsonValue: string;
+    setRawJsonValue: (val: string) => void;
+    toggleRawJson: () => void;
+    setUseRawJson: (useRawJson: boolean, withBodyValue?: (existing: any) => any) => void;
+    useRawJson: boolean;
+    jsonError: string | null;
+    rawBodySchema: any;
+}) {
+    const {
+        endpoint,
+        submitContext,
+        useRawJson,
+        setUseRawJson,
+        toggleRawJson,
+        setRawJsonValue,
+        rawJsonValue,
+        rawBodySchema,
+        jsonError,
+    } = props;
 
     const pathSchema = useParameterBasedSchema(endpoint, "path");
     const querySchema = useParameterBasedSchema(endpoint, "query");
@@ -403,60 +554,6 @@ function Form(props: { endpoint: IOpenApiProcessedEndpoint; submitContext: Retur
     const hasBodySchema = Object.keys(bodySchema.properties ?? {}).length > 0;
     const hasQuerySchema = Object.keys(querySchema.properties ?? {}).length > 0;
     const hasPathSchema = Object.keys(pathSchema.properties ?? {}).length > 0;
-
-    const { spec } = useOpenApiContext();
-    const rawBodySchema = useMemo(() => {
-        const resolved = resolveOpenApiRefRecursively(
-            spec,
-            resolveOpenApiRefRecursively(spec, endpoint.requestBody)?.content?.["application/json"]?.["schema"],
-        );
-
-        return sortRequiredSchemaPropertiesFirst(resolved as any);
-    }, [endpoint]);
-    const [rawJsonValue, _setRawJsonValue] = useState("");
-    const [isRawJsonDirty, setIsRawJsonDirty] = useState(false);
-    const [jsonError, setJsonError] = useState<string | null>(null);
-    const setRawJsonValue = useCallback(
-        (value: string) => {
-            _setRawJsonValue(value);
-            setIsRawJsonDirty(true);
-            setJsonError(null);
-        },
-        [_setRawJsonValue, setJsonError],
-    );
-
-    function toggleRawJson() {
-        if (!useRawJson) {
-            // As we transition we need to set this to be either the form value or the default value.
-
-            let valueToSerialize = {};
-            if (Object.keys(submitContext.bodyValue).length > 0) {
-                // The form was already started to be filled.
-                valueToSerialize = submitContext.bodyValue;
-            } else {
-                valueToSerialize = schemaDefaultValue(rawBodySchema as any);
-            }
-            setRawJsonValue(JSON.stringify(valueToSerialize, null, 2));
-            setIsRawJsonDirty(false);
-            setUseRawJson(true);
-        } else {
-            if (!isRawJsonDirty) {
-                // No need to try and convert anything. It wasn't modified.
-                setUseRawJson(false);
-                return;
-            }
-
-            // We are switching away, let's decode the JSON.
-            try {
-                const newValue = JSON.parse(rawJsonValue);
-                submitContext.setBodyValue(newValue);
-                setUseRawJson(false);
-                setIsRawJsonDirty(false);
-            } catch (err) {
-                setJsonError("Invalid JSON in the editor.");
-            }
-        }
-    }
 
     return (
         <ul>
@@ -530,23 +627,25 @@ function Form(props: { endpoint: IOpenApiProcessedEndpoint; submitContext: Retur
                 <p className={classes.emptyFormSection}>{t("Request body is not supported for this endpoint.")}</p>
             )}
             {useRawJson ? (
-                <div>
-                    <TextEditor
-                        jsonSchema={rawBodySchema as any}
-                        noPadding={true}
-                        language={"json"}
-                        value={rawJsonValue}
-                        onChange={(value) => {
-                            setRawJsonValue(value ?? "");
-                        }}
-                    />
-                </div>
+                <>
+                    {jsonError && <Message className={classes.jsonError} stringContents={jsonError} type={"error"} />}
+
+                    <div>
+                        <TextEditor
+                            jsonSchema={rawBodySchema as any}
+                            noPadding={true}
+                            language={"json"}
+                            value={rawJsonValue}
+                            onChange={(value) => {
+                                setRawJsonValue(value ?? "");
+                            }}
+                        />
+                    </div>
+                </>
             ) : (
                 <TryItFormContext.Provider
                     value={{
-                        setUseRawJson: () => {
-                            setUseRawJson(true);
-                        },
+                        setUseRawJson,
                     }}
                 >
                     <DashboardSchemaForm
@@ -561,14 +660,30 @@ function Form(props: { endpoint: IOpenApiProcessedEndpoint; submitContext: Retur
     );
 }
 
-function CustomElementRequiresRawJson() {
+function CustomElementRequiresRawJson(props: IControlProps<ICustomControl> & { value: any }) {
     const context = useContext(TryItFormContext);
 
     return (
         <Button
             buttonType={ButtonTypes.STANDARD}
             onClick={() => {
-                context.setUseRawJson();
+                context.setUseRawJson(true, (existingBodyValue) => {
+                    if (Object.keys(existingBodyValue).length > 0 && !props.value) {
+                        if (props.schema.type === "object") {
+                            return {
+                                ...existingBodyValue,
+                                [props.path[props.path.length - 1]]: {},
+                            };
+                        } else if (props.schema.type === "array") {
+                            return {
+                                ...existingBodyValue,
+                                [props.path[props.path.length - 1]]: [],
+                            };
+                        }
+                    }
+
+                    return existingBodyValue;
+                });
             }}
         >
             {t("Edit in JSON editor.")}
@@ -577,7 +692,7 @@ function CustomElementRequiresRawJson() {
 }
 
 interface ITryItFormContext {
-    setUseRawJson(): void;
+    setUseRawJson(newValue: boolean, withBodyValue?: (existing: any) => any): void;
 }
 const TryItFormContext = createContext<ITryItFormContext>({
     setUseRawJson() {},
@@ -605,7 +720,12 @@ function useRequestBodySchema(endpoint: IOpenApiProcessedEndpoint): JsonSchema {
 
     return useMemo(() => {
         const resolvedRequestBody = resolveOpenApiRef(spec, endpoint.requestBody);
-        const resolvedJsonBodySchema = resolveOpenApiRef(spec, resolvedRequestBody?.content["application/json"].schema);
+
+        const resolvedJsonBodySchema = resolveOpenApiRef(
+            spec,
+            resolvedRequestBody?.content?.["application/json"]?.schema ??
+                resolvedRequestBody?.content?.["multipart/form-data"]?.schema,
+        );
         const schema = objectSchemaToSchemaForm(spec, resolvedJsonBodySchema as any) ?? {
             type: "object",
             properties: {},
@@ -702,6 +822,50 @@ function schemaToFormControl(property: string, schema: JsonSchema): IFormControl
             };
         }
 
+        if (schema.format === "binary") {
+            // File upload
+            return {
+                inputType: "custom",
+                ...labelDescription,
+                labelType: "vertical",
+
+                component: (props: {
+                    value?: File | null;
+                    onChange: (file: File | null) => void;
+                    errors: IFieldError[];
+                }) => {
+                    return (
+                        <div className={classes.uploadWrap}>
+                            {props.value ? (
+                                <>
+                                    <strong className={classes.uploadedFileName}>{props.value.name}</strong>
+                                    <Button
+                                        className={classes.uploadButton}
+                                        onClick={() => {
+                                            props.onChange(null);
+                                        }}
+                                    >
+                                        Clear file
+                                    </Button>
+                                </>
+                            ) : (
+                                <UploadButton
+                                    className={classes.uploadButton}
+                                    acceptedMimeTypes={"file"}
+                                    accessibleTitle="Upload file"
+                                    onUpload={(file) => {
+                                        props.onChange(file);
+                                    }}
+                                >
+                                    Upload file
+                                </UploadButton>
+                            )}
+                        </div>
+                    );
+                },
+            };
+        }
+
         const result: IFormControl = {
             inputType: "textBox",
             ...labelDescription,
@@ -757,7 +921,7 @@ function schemaToFormControl(property: string, schema: JsonSchema): IFormControl
     };
 }
 
-function schemaDefaultValue(schema: JsonSchema): any {
+function schemaDefaultValue(spec: IOpenApiSpec, schema: JsonSchema): any {
     if (schema.example) {
         return schema.example;
     }
@@ -766,12 +930,16 @@ function schemaDefaultValue(schema: JsonSchema): any {
         return schema.default;
     }
 
+    if (schema.allOf) {
+        return schemaDefaultValue(spec, resolveAllOf(spec, schema) as any);
+    }
+
     switch (schema.type) {
         case "object": {
             const results: any[] = [];
             if (schema.properties) {
                 for (const [propertyName, subSchema] of Object.entries(schema.properties)) {
-                    results.push([propertyName, schemaDefaultValue(subSchema as any)]);
+                    results.push([propertyName, schemaDefaultValue(spec, subSchema as any)]);
                 }
             }
             return Object.fromEntries(results);
@@ -780,7 +948,7 @@ function schemaDefaultValue(schema: JsonSchema): any {
             const result: any[] = [];
             if (schema.items) {
                 for (let i = 0; i < 3; i++) {
-                    result.push(schemaDefaultValue(schema.items));
+                    result.push(schemaDefaultValue(spec, schema.items));
                 }
             }
             return result;

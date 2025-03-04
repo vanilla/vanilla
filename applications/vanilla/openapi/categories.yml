@@ -81,7 +81,7 @@ paths:
                           - -name
                           - dateFollowed
                           - -dateFollowed
-                - name: expand[]
+                - name: expand
                   description: >
                       Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
                   in: query
@@ -93,6 +93,7 @@ paths:
                               - all
                               - lastPost
                               - preferences
+                              - permissions
                 - description: |-
                       Filter categories by site section ID (ex. subcommunity).
                       The subcommunity ID or folder can be used if you use [smart IDs](https://success.vanillaforums.com/kb/articles/46-smart-ids).
@@ -128,6 +129,22 @@ paths:
                   required: false
                   schema:
                       type: string
+                - description: Allowed status for the post type ID filter.
+                  in: query
+                  name: postTypeStatus
+                  required: false
+                  schema:
+                      type: string
+                      enum:
+                          - active
+                          - inactive
+                          - both
+                - description: Filter out categories that cannot be posted into
+                  in: query
+                  name: filterDiscussionsAdd
+                  required: false
+                  schema:
+                      type: boolean
             responses:
                 "200":
                     content:
@@ -309,6 +326,9 @@ paths:
                                             $ref: "discussions.yml#/components/schemas/PostFragment"
                                         preferences:
                                             $ref: "#/components/schemas/CategoryPreferences"
+                                        permissions:
+                                            $ref: "discussions.yml#/components/schemas/DiscussionPermissions"
+
                                     required:
                                         - categoryID
                                         - name
@@ -441,7 +461,7 @@ paths:
                   schema:
                       minLength: 1
                       type: string
-                - name: displayAs[]
+                - name: displayAs
                   description: The display style of the category.
                   in: query
                   required: false
@@ -493,6 +513,12 @@ paths:
                   schema:
                       minLength: 1
                       type: string
+                - description: Filter out categories that cannot be posted into
+                  in: query
+                  name: filterDiscussionsAdd
+                  required: false
+                  schema:
+                      type: boolean
             responses:
                 "200":
                     content:
@@ -624,6 +650,18 @@ paths:
                   required: true
                   schema:
                       type: integer
+                - name: expand
+                  description: |
+                      Expand associated records using one or more valid field names (all, parent, breadcrumbs).
+                      A value of "all" will expand all expandable fields.
+                  in: query
+                  schema:
+                      items:
+                          enum:
+                              - lastPost
+                              - permissions
+                              - all
+                          type: string
             responses:
                 "200":
                     content:
@@ -893,7 +931,7 @@ paths:
             x-hidden: true
             summary: List categories based on interests.
             parameters:
-                - name: excludedCategoryIDs[]
+                - name: excludedCategoryIDs
                   description: Category IDs to exclude.
                   in: query
                   schema:
@@ -991,6 +1029,15 @@ components:
                     type: boolean
                 preferences.email.comments:
                     type: boolean
+                preferences.email.digest:
+                    type: boolean
+                    x-feature: "Digest"
+                preferences.popup.categoryevent:
+                    x-addon: groups
+                    type: boolean
+                preferences.email.categoryevent:
+                    type: boolean
+                    x-addon: groups
         CategoryPreferencesMulti:
             type: array
             items:
@@ -1070,6 +1117,8 @@ components:
                         - up-down
                         - false
                     x-addon: ideation
+                permissions:
+                    $ref: "discussions.yml#/components/schemas/DiscussionPermissions"
             required:
                 - categoryID
                 - name

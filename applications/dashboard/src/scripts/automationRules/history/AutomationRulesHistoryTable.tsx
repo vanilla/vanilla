@@ -32,6 +32,7 @@ import { iconClasses } from "@library/icons/iconStyles";
 import { ErrorIcon } from "@library/icons/common";
 import { TableAccordion } from "@dashboard/components/TableAccordion";
 import SmartLink from "@library/routing/links/SmartLink";
+import { unknownUserFragment } from "@library/features/users/constants/userFragment";
 
 interface IProps {
     dispatches?: IAutomationRuleDispatch[];
@@ -150,12 +151,7 @@ function AutomationRulesHistoryAccordion(props: {
                     <animated.div style={{ height: animatedDateLastRunHeight }}>
                         <div>
                             <span>{`${t("by")} `}</span>
-                            <ProfileLink
-                                userFragment={{
-                                    userID: dispatch.updateUser.userID,
-                                    name: dispatch.updateUser.name,
-                                }}
-                            />
+                            <ProfileLink userFragment={dispatch.automationRule.updateUser ?? unknownUserFragment()} />
                         </div>
                     </animated.div>
                 </span>
@@ -210,7 +206,7 @@ function AutomationRulesHistoryAccordion(props: {
                                     });
                                 }}
                             >
-                                <Icon icon={"editor-link"} />
+                                <Icon icon={"copy-link"} />
                             </Button>
                         </ToolTip>
                         <ToolTip label={t("View Run History for This Rule")}>
@@ -240,7 +236,7 @@ function AutomationRulesHistoryStatus(props: {
             return (
                 <ToolTip label={t("Rule was run successfully.")}>
                     <ToolTipIcon>
-                        <Icon icon={"event-registered"} className={iconClasses().successFgColor} />
+                        <Icon icon={"status-success"} size="compact" className={iconClasses().successFgColor} />
                     </ToolTipIcon>
                 </ToolTip>
             );
@@ -249,7 +245,7 @@ function AutomationRulesHistoryStatus(props: {
             return (
                 <ToolTip label={t("Rule is running.")}>
                     <ToolTipIcon>
-                        <Icon icon={"notification-running"} className={iconClasses().successFgColor} />
+                        <Icon icon={"status-running"} className={iconClasses().successFgColor} />
                     </ToolTipIcon>
                 </ToolTip>
             );

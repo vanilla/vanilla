@@ -100,6 +100,14 @@ export function PartialSchemaForm(props: IProps) {
         let sectionTitle: React.ReactNode | undefined;
         let description: React.ReactNode | undefined;
 
+        if (control && !Array.isArray(control)) {
+            const conditionsValidation = validateConditions(control.conditions ?? [], rootInstance);
+            const disabled = conditionsValidation.conditions.some((c) => c.disable);
+            if (disabled || !conditionsValidation.valid) {
+                return null;
+            }
+        }
+
         if (!Array.isArray(control) && (control?.label || control?.description)) {
             sectionTitle = control?.label;
             description = control?.description ?? undefined;

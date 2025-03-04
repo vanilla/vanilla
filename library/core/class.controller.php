@@ -1066,11 +1066,11 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             $controllerName = $this->ControllerName;
         }
 
-        if (stringEndsWith($controllerName, "controller", true)) {
+        if (stringEndsWith($controllerName ?? "", "controller", true)) {
             $controllerName = substr($controllerName, 0, -10);
         }
 
-        if (strtolower(substr($controllerName, 0, 4)) == "gdn_") {
+        if (strtolower(substr($controllerName ?? "", 0, 4)) == "gdn_") {
             $controllerName = substr($controllerName, 4);
         }
 
@@ -1079,7 +1079,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         }
 
         //$ApplicationFolder = strtolower($ApplicationFolder);
-        $controllerName = strtolower($controllerName);
+        $controllerName = $controllerName ? strtolower($controllerName) : $controllerName;
         if (strpos($view, DS) === false) {
             // keep explicit paths as they are.
             $view = strtolower($view);
@@ -1116,7 +1116,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             // Define the subpath for the view.
             // The $ControllerName used to default to '' instead of FALSE.
             // This extra search is added for backwards-compatibility.
-            if (strlen($controllerName) > 0 && $useController) {
+            if ($controllerName && strlen($controllerName) > 0 && $useController) {
                 $subPaths[] = "views/$controllerName/$view";
             } else {
                 $subPaths[] = "views/$view";

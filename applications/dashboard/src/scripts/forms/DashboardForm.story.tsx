@@ -373,12 +373,23 @@ export function CurrencyInput() {
         <>
             <StoryHeading depth={1}>Currency Input</StoryHeading>
             <form>
-                <DashboardFormGroup labelType={DashboardLabelType.VERTICAL} label={t("Currency")}>
+                <DashboardFormGroup labelType={DashboardLabelType.VERTICAL} label={t("With 2 decimal places")}>
                     <DashboardCurrencyInput
                         value={value}
                         onChange={(newValue) => {
                             setValue(newValue);
                         }}
+                    />
+                </DashboardFormGroup>
+
+                <DashboardFormGroup labelType={DashboardLabelType.VERTICAL} label={t("With 0 decimal places")}>
+                    <DashboardCurrencyInput
+                        value={value}
+                        onChange={(newValue) => {
+                            setValue(newValue);
+                        }}
+                        minimumFractionDigits={0}
+                        maximumFractionDigits={0}
                     />
                 </DashboardFormGroup>
             </form>

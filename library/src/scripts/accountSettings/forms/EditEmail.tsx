@@ -96,7 +96,7 @@ export const EditEmail = forwardRef(function EditEmailImpl(
         ref,
         () => ({
             onSave: () => {
-                patchUser({
+                void patchUser({
                     userID: viewingUserID,
                     email,
                     ...(password && { passwordConfirmation: password }),

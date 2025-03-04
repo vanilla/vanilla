@@ -31,18 +31,19 @@ export function AppliedLayoutViewLocationDetails(props: IProps) {
 
     // Get together a list of records the layout is applied to.
     const namedLayoutViews = layout.layoutViews.filter(
-        (layoutView) => ![LayoutRecordType.GLOBAL, LayoutRecordType.ROOT].includes(layoutView.recordType),
+        (layoutView) =>
+            ![LayoutRecordType.GLOBAL, LayoutRecordType.ROOT].includes(layoutView.recordType) &&
+            layoutView.record !== undefined,
     );
+
     const names = namedLayoutViews.length > 0 && (
         <Metas>
             {namedLayoutViews.map((layoutView, index) => {
                 return (
-                    <>
-                        <MetaLink key={index} to={layoutView.record.url}>
-                            {layoutView.record.name}
-                        </MetaLink>
+                    <React.Fragment key={index}>
+                        <MetaLink to={layoutView.record.url}>{layoutView.record.name}</MetaLink>
                         {index < namedLayoutViews.length - 1 && <span>•</span>}
-                    </>
+                    </React.Fragment>
                 );
             })}
         </Metas>
@@ -60,6 +61,8 @@ export function AppliedLayoutViewLocationDetails(props: IProps) {
                     return count > 1 ? t("%d Categories") : t("%d Category");
                 case LayoutRecordType.SUBCOMMUNITY:
                     return count > 1 ? t("%d Subcommunities") : t("%d Subcommunity");
+                case LayoutRecordType.KNOWLEDGE_BASE:
+                    return count > 1 ? t("%d Knowledge Bases") : t("%d Knowledge Base");
                 default:
                     return t("Unknown");
             }

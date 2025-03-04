@@ -19,6 +19,7 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
 import { IPickerOption } from "@vanilla/json-schema-forms";
 import { DropDownArrow } from "@vanilla/ui/src/forms/shared/DropDownArrow";
+import { stableObjectHash } from "@vanilla/utils";
 import { useEffect, useState } from "react";
 
 interface IProps {
@@ -29,6 +30,8 @@ interface IProps {
     onOpenChange?: (isOpen: boolean) => void;
     pickerTitle?: string;
     compact?: boolean;
+    dropdownContentsFullWidth?: boolean; // will take the full width of the input element
+    className?: string;
 }
 
 export function RadioPicker(props: IProps) {
@@ -39,7 +42,7 @@ export function RadioPicker(props: IProps) {
 
     const currentOption = options.find((option) => option.value == value?.toString());
     const currentValue = currentOption?.value;
-    const firstValue = options[0]?.value;
+    const firstValue = options[0]?.value?.toString();
     useEffect(() => {
         if (currentValue === undefined && firstValue !== undefined) {
             // Set the first value.
@@ -52,7 +55,8 @@ export function RadioPicker(props: IProps) {
         <DropDown
             isVisible={isOpen}
             onVisibilityChange={onOpenChange}
-            className={classes.root}
+            className={cx(classes.root, props.className)}
+            contentsClassName={props.dropdownContentsFullWidth ? classes.root : undefined}
             buttonType={ButtonTypes.STANDARD}
             buttonClassName={cx(classes.button, props.compact ? classes.compactButton : undefined)}
             buttonContents={
@@ -90,9 +94,9 @@ export function RadioPicker(props: IProps) {
                             >
                                 {options.map((option) => {
                                     return (
-                                        <div key={option.label}>
+                                        <div key={option.value}>
                                             <DashboardRadioButton
-                                                value={option.value}
+                                                value={option.value?.toString()}
                                                 label={option.label}
                                                 note={option.description}
                                                 onChecked={() => {

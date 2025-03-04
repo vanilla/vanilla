@@ -15,6 +15,8 @@ use Garden\Web\ControllerDispatchedEvent;
 use Garden\Web\Data;
 use Garden\Web\Dispatcher;
 use Garden\Web\DispatcherExceptionEvent;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
@@ -363,7 +365,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable
             } else {
                 redirectTo("/entry/signin?Target=" . urlencode($request->pathAndQuery()));
             }
-            exit();
+            if (DebugUtils::isTestMode()) {
+                return;
+            } else {
+                exit();
+            }
         }
 
         // If we're rendering the homepage, and we don't have custom layout home, and the legacy homepage doesn't need
@@ -382,6 +388,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable
             // Try and dispatch with the new dispatcher.
             // This is temporary. We will eventually just have the new dispatcher.
             $response = $this->dispatcher->dispatch($request);
+
+            if ($request->getMeta("throwRedirects") && $response instanceof Redirect) {
+                throw new ResponseException($response);
+            }
 
             // If we received a matched response with the new dispatcher
             // Use that.
@@ -857,15 +867,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable
                     // Do nothing. The request has been rewritten.
                     break;
                 case "Temporary":
-                    safeHeader("HTTP/1.1 302 Moved Temporarily");
-                    safeHeader("Location: " . url($matchRoute["FinalDestination"]));
-                    exit();
+                    redirectTo($matchRoute["FinalDestination"], 302, false);
                     break;
 
                 case "Permanent":
-                    safeHeader("HTTP/1.1 301 Moved Permanently");
-                    safeHeader("Location: " . url($matchRoute["FinalDestination"]));
-                    exit();
+                    redirectTo($matchRoute["FinalDestination"], 301, false);
                     break;
 
                 case "NotAuthorized":

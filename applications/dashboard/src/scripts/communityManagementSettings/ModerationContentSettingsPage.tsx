@@ -5,36 +5,31 @@
  */
 
 import { ReportReasonList } from "@dashboard/communityManagementSettings/ReportReasonList";
-import AdminLayout from "@dashboard/components/AdminLayout";
-import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
+import { ModerationAdminLayout } from "@dashboard/components/navigation/ModerationAdminLayout";
+import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
+import { css, cx } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
+import apiv2 from "@library/apiv2";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
 import Translate from "@library/content/Translate";
-import { FormToggle } from "@library/forms/FormToggle";
-import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
-import SmartLink from "@library/routing/links/SmartLink";
-import { ToolTip } from "@library/toolTip/ToolTip";
-import { t } from "@vanilla/i18n";
-import { useCollisionDetector } from "@vanilla/react-utils";
-import { css, cx } from "@emotion/css";
-import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
-import { getMeta } from "@library/utility/appUtils";
-import { useEffect, useState } from "react";
+import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
 import ModalConfirm from "@library/modal/ModalConfirm";
+import SmartLink from "@library/routing/links/SmartLink";
+import { getMeta } from "@library/utility/appUtils";
 import { useMutation } from "@tanstack/react-query";
-import apiv2 from "@library/apiv2";
-import { useToast } from "@library/features/toaster/ToastContext";
-import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
-import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { t } from "@vanilla/i18n";
+import { useEffect, useState } from "react";
 
 const BETA_ENABLED = getMeta("featureFlags.CommunityManagementBeta.Enabled", false);
 export const CONF_ESCALATIONS_ENABLED = "escalations.enabled";
 const CONF_TRIAGE_ENABLED = "triage.enabled";
-const CONF_DISCUSSION_THREAD = "customLayout.discussionThread";
+const CONF_DISCUSSION_THREAD = "customLayout.post";
 
 const classes = {
     main: css({
@@ -58,14 +53,10 @@ export default function ModerationContentSettingsPage() {
     const isTriageEnabled: boolean = configs.data?.[CONF_TRIAGE_ENABLED] ?? false;
     const [showResolveAll, setShowResolveAll] = useState(false);
 
-    const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
-
     // Force escalations off if beta is disabled.
     useEffect(() => {
         if (!BETA_ENABLED && isEscalationsEnabled) {
-            escalationsPatcher
+            void escalationsPatcher
                 .patchConfig({
                     [CONF_ESCALATIONS_ENABLED]: false,
                 })
@@ -76,9 +67,8 @@ export default function ModerationContentSettingsPage() {
     }, [isEscalationsEnabled]);
 
     return (
-        <AdminLayout
+        <ModerationAdminLayout
             title={t("Content Settings")}
-            leftPanel={!isCompact && <ModerationNav />}
             rightPanel={
                 <>
                     <h3>{t("Heads Up!")}</h3>
@@ -110,7 +100,7 @@ export default function ModerationContentSettingsPage() {
                                     isEscalationsLoading || (isCustomDiscussionThreadsEnabled && isEscalationsEnabled)
                                 }
                                 onChange={(enabled) => {
-                                    escalationsPatcher
+                                    void escalationsPatcher
                                         .patchConfig({
                                             [CONF_ESCALATIONS_ENABLED]: enabled,
                                         })
@@ -138,7 +128,7 @@ export default function ModerationContentSettingsPage() {
                             indeterminate={isTriageLoading}
                             enabled={isTriageEnabled}
                             onChange={(enabled) => {
-                                triagePatcher
+                                void triagePatcher
                                     .patchConfig({
                                         [CONF_TRIAGE_ENABLED]: enabled,
                                     })
@@ -193,7 +183,7 @@ function ResolveAllModal(props: { isVisible: boolean; setIsVisible: (isVisible: 
             isConfirmLoading={resolveAllMutation.isLoading}
             isConfirmDisabled={resolveAllMutation.isLoading}
             onConfirm={() => {
-                resolveAllMutation.mutateAsync().then(() => {
+                void resolveAllMutation.mutateAsync().then(() => {
                     props.setIsVisible(false);
                 });
             }}

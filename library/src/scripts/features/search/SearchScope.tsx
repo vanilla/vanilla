@@ -43,7 +43,7 @@ export function SearchScope(props: {
                 horizontalOffset={false}
                 afterButton={separator}
                 // The intention here is by default, we'll get the compact value from the layout context if undefined, or a value from props.
-                overwriteButtonContents={compact ? <Icon size="compact" icon="search-search" /> : undefined}
+                overwriteButtonContents={compact ? <Icon size="compact" icon="search" /> : undefined}
             />
         </div>
     );

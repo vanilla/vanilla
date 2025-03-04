@@ -15,6 +15,11 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Forms\ApiFormChoices;
+use Vanilla\Forms\FieldMatchConditional;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
+use Vanilla\Forms\StaticFormChoices;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Site\SiteSectionModel;
@@ -179,6 +184,39 @@ class CategoryListAsset extends AbstractLayoutAsset implements HydrateAwareInter
      */
     public static function getApiSchema(): Schema
     {
-        return CategoriesWidgetTrait::getApiSchema(false, false, false, false);
+        $apiSchema = new Schema([
+            "type" => "object",
+            "default" => new \stdClass(),
+            "description" => "Api parameters for categories endpoint.",
+        ]);
+
+        $filterEnum = ["none", "currentCategory", "parentCategory", "category"];
+        $staticFormChoices = [
+            "none" => "None",
+            "currentCategory" => "Current Category",
+            "parentCategory" => "Parent Category",
+            "category" => "Specific Categories",
+        ];
+
+        $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
+        $siteSectionSchema = $siteSectionModel->getSiteSectionFormOption(
+            new FieldMatchConditional(
+                "apiParams.filter",
+                Schema::parse([
+                    "type" => "string",
+                    "const" => "siteSection",
+                ])
+            )
+        );
+
+        // include subcommunities filter
+        if ($siteSectionSchema !== null) {
+            $filterEnum[] = "currentSiteSection";
+            $filterEnum[] = "siteSection";
+            $staticFormChoices["currentSiteSection"] = "Current Subcommunity";
+            $staticFormChoices["siteSection"] = "Subcommunity";
+        }
+
+        return $apiSchema;
     }
 }

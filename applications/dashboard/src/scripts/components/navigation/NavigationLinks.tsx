@@ -282,7 +282,7 @@ export default function NavigationLinks(props: IProps) {
                             onClick={expandAll}
                             ariaLabel={t("Expand All")}
                         >
-                            <Icon icon="navigation-expandAll" />
+                            <Icon icon="expand-all" />
                             {!layout.isCompact && <span>{t("Expand All")}</span>}
                         </Button>
                         <Button
@@ -291,7 +291,7 @@ export default function NavigationLinks(props: IProps) {
                             onClick={collapseAll}
                             ariaLabel={t("Collapse All")}
                         >
-                            <Icon icon="navigation-collapseAll" />
+                            <Icon icon="collapse-all" />
                             {!layout.isCompact && <span>{t("Collapse All")}</span>}
                         </Button>
                     </>

@@ -29,6 +29,11 @@ paths:
                       type: array
                       items:
                           type: integer
+                - name: banned
+                  description: Filter by the banned status of a user. Pass true to filter only banned users, and false to exclude banned users.
+                  in: query
+                  schema:
+                      type: boolean
                 - name: rankIDs
                   description: Filter by one of multiple rank IDs.
                   in: query

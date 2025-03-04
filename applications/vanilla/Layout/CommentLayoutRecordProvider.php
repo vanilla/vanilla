@@ -7,16 +7,13 @@
 
 namespace Vanilla\Layout;
 
-use CategoryModel;
 use CommentModel;
 use DiscussionModel;
 use Garden\Web\Exception\NotFoundException;
-use Gdn;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Forum\Models\CommentThreadModel;
 use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\Providers\LayoutViewRecordProviderInterface;
-use Vanilla\Site\SiteSectionModel;
 
 /**
  * Handle resolving of discussion layout for a specific comment.
@@ -73,6 +70,14 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
     }
 
     /**
+     * @return LayoutHydrator
+     */
+    private function layoutHydrator(): LayoutHydrator
+    {
+        return \Gdn::getContainer()->get(LayoutHydrator::class);
+    }
+
+    /**
      * @inheritDoc
      */
     public function resolveParentLayoutQuery(LayoutQuery $query): LayoutQuery
@@ -81,23 +86,23 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
         if (!$comment) {
             throw new NotFoundException("Comment");
         }
-        $discussion = $this->discussionModel->getID($comment["DiscussionID"], DATASET_TYPE_ARRAY);
-        if (!$discussion) {
-            throw new NotFoundException("Discussion");
-        }
-        $discussionID = $discussion["DiscussionID"];
-
         $this->commentModel->orderBy("c.DateInserted asc");
+        // Skip loading Comment Pages number to avoid infinite loop.
+        $skipPageCalculation = $query->getParams()["skipPageCalculation"] ?? false;
+        $newQuery = $query
+            ->withRecordType($comment["parentRecordType"])
+            ->withRecordID($comment["parentRecordID"])
+            ->withAdditionalParams([
+                "page" => $skipPageCalculation ? 1 : $this->commentModel->getCommentThreadPage($comment),
+                "parentRecordType" => $comment["parentRecordType"],
+                "parentRecordID" => $comment["parentRecordID"],
+                "commentID" => $query->recordID,
+            ]);
 
-        $page = $this->commentModel->getDiscussionPage($comment);
-
-        $newQuery = $query->withRecordType("discussion")->withRecordID($discussionID);
-        $newQuery->setParams([
-            "page" => $page,
-            "discussionID" => $discussionID,
-            "commentID" => $query->recordID,
-        ]);
-
+        if ($query->layoutViewType === "comment") {
+            // Our querying didn't know if this comment was an event comment or a post comment, so we'll work it out.
+            $newQuery = $newQuery->withLayoutViewType($comment["parentRecordType"]);
+        }
         return $newQuery;
     }
 }

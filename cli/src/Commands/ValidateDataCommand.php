@@ -403,6 +403,8 @@ and UserID not in (select UserID from GDN_UserMeta where Name = 'Plugin.Signatur
         // Not NULL
         $this->assertNotNULLOrEmpty("GDN_Comment", "Body", level: "warning");
         $this->assertNotNULLOrEmpty("GDN_Comment", "Format");
+        $this->assertNotNULLOrEmpty("GDN_Comment", "parentRecordType");
+        $this->assertNotNULLOrEmpty("GDN_Comment", "parentRecordID");
 
         // Discussion
         $this->assertParentExists("GDN_Comment", "DiscussionID", "GDN_Discussion", "DiscussionID");

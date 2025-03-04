@@ -18,31 +18,11 @@ import { twoColumnVariables } from "@library/layout/types/layout.twoColumns";
 import { formatNumberText } from "@library/content/NumberFormatted";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import { JsonSchema } from "@vanilla/json-schema-forms";
 
 export interface ISiteTotalsProps {
     options: DeepPartial<ISiteTotalsOptions>;
     totals: ISiteTotalCount[];
     labelType: SiteTotalsLabelType;
-}
-
-export function useValidCounts(instance: any, rootSchema: JsonSchema) {
-    const options = rootSchema.properties.apiParams.properties.options.default;
-    const maxOptions = instance.length;
-    let validValues = instance.filter(({ recordType }) => options[recordType]);
-    const stillNeeded = maxOptions - validValues.length;
-
-    if (stillNeeded > 0) {
-        const availableOptions = Object.entries(options)
-            .filter(([type]) => {
-                const validRecord = validValues.find(({ recordType }) => recordType === type);
-                return !validRecord;
-            })
-            .map(([recordType, label]) => ({ recordType, label, isHidden: true }));
-        validValues = validValues.concat(availableOptions.slice(0, stillNeeded));
-    }
-
-    return validValues;
 }
 
 export function SiteTotals(props: ISiteTotalsProps) {

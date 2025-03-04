@@ -62,7 +62,7 @@ export const LayoutEditorAddSection = React.forwardRef(function LayoutEditorAddS
                 >
                     <div className={cx(classes.buttonLine)}>
                         <div className={cx(classes.buttonCircle, "buttonCircle")}>
-                            <Icon icon={"data-add"} />
+                            <Icon icon={"add"} />
                         </div>
                     </div>
                 </Button>

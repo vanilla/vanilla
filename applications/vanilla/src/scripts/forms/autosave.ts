@@ -24,7 +24,7 @@ window.onVanillaReady(function () {
         const userInputs = formContainer?.querySelectorAll("input, textarea");
         [].slice.call(userInputs).forEach((input: HTMLInputElement) => {
             input.addEventListener("input", function () {
-                saveDraft(formContainer);
+                void saveDraft(formContainer);
             });
         });
     }

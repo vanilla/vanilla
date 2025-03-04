@@ -67,6 +67,20 @@ class TestHtmlDocument extends HtmlDocument
     }
 
     /**
+     * @return $this
+     */
+    public function removeSvgsAndStyles(): TestHtmlDocument
+    {
+        foreach ($this->queryCssSelector("svg") as $svg) {
+            $svg->parentNode->removeChild($svg);
+        }
+        foreach ($this->queryCssSelector("style") as $style) {
+            $style->parentNode->removeChild($style);
+        }
+        return $this;
+    }
+
+    /**
      * Assert that the text content at a resulting xpath is equivalent.
      *
      * @param string $cssSelector The CSS selector query.

@@ -3,13 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { PlacesSearchListingContainer, IPlacesSearchListingItem } from "@library/search/PlacesSearchListingContainer";
 import { PlacesListingPlaceHolder } from "@library/search/PlacesListingPlaceHolder";
 import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
-import { TypeCategoriesIcon, TypeGroupsIcon, TypeKnowledgeBaseIcon } from "@library/icons/searchIcons";
 import { PLACES_CATEGORY_TYPE, PLACES_GROUP_TYPE, PLACES_KNOWLEDGE_BASE_TYPE } from "./searchConstants";
 import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
 
 export default {
     title: "Search/PlacesListing",
@@ -17,19 +16,19 @@ export default {
 
 PLACES_SEARCH_DOMAIN.addSubType({
     label: t("Categories"),
-    icon: <TypeCategoriesIcon />,
+    icon: <Icon icon="search-categories" />,
     type: PLACES_CATEGORY_TYPE,
 });
 
 PLACES_SEARCH_DOMAIN.addSubType({
     label: t("Groups"),
-    icon: <TypeGroupsIcon />,
+    icon: <Icon icon={"search-groups"} />,
     type: PLACES_GROUP_TYPE,
 });
 
 PLACES_SEARCH_DOMAIN.addSubType({
     label: t("Knowledge Bases"),
-    icon: <TypeKnowledgeBaseIcon />,
+    icon: <Icon icon={"search-knowledge-bases"} />,
     type: PLACES_KNOWLEDGE_BASE_TYPE,
 });
 

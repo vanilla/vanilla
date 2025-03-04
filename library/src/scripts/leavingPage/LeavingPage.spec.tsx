@@ -19,7 +19,7 @@ describe("Leaving Page", () => {
 
         expect(screen.getByText(`Back to ${SITE_NAME}`)).toBeInTheDocument();
 
-        const linkAsTextInSpan = screen.getByTestId("external-link-as-text");
+        const linkAsTextInSpan = screen.getByTestId("meta-external-as-text");
         expect(linkAsTextInSpan).toBeInTheDocument();
         expect(linkAsTextInSpan.innerHTML).toBe(`${EXTERNAL_URL}/`);
 

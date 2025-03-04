@@ -146,7 +146,7 @@ paths:
                   in: query
                   schema:
                       type: string
-                - $ref: "#/components/parameters/expand[]"
+                - $ref: "#/components/parameters/expand"
                 - name: groupID
                   description: Filter by a range or CSV of group IDs.
                   in: query
@@ -177,21 +177,21 @@ paths:
                   in: query
                   schema:
                       type: string
-                - name: statusID[]
+                - name: statusID
                   description: List of statusIDs to filter discussion by.
                   in: query
                   schema:
                       type: array
                       items:
                           type: integer
-                - name: internalStatusID[]
+                - name: internalStatusID
                   description: List of internalStatusIDs to filter discussion by.
                   in: query
                   schema:
                       type: array
                       items:
                           type: integer
-                - name: suggestions
+                - name: suggested
                   description: Filter discussion list based on user interests.
                   in: query
                   schema:
@@ -202,7 +202,7 @@ paths:
                   in: query
                   schema:
                       type: integer
-                - name: excludedCategoryIDs[]
+                - name: excludedCategoryIDs
                   description: Category IDs to exclude.
                   in: query
                   schema:
@@ -263,7 +263,7 @@ paths:
                       default: 30
                       maximum: 100
                       minimum: 1
-                - $ref: "#/components/parameters/expand[]"
+                - $ref: "#/components/parameters/expand"
             responses:
                 "200":
                     content:
@@ -348,7 +348,7 @@ paths:
                       default: 30
                       maximum: 100
                       minimum: 1
-                - $ref: "#/components/parameters/expand[]"
+                - $ref: "#/components/parameters/expand"
             responses:
                 "200":
                     content:
@@ -371,7 +371,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/expand[]"
+                - $ref: "#/components/parameters/expand"
             responses:
                 "202":
                     $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
@@ -393,7 +393,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/expand[]"
+                - $ref: "#/components/parameters/expand"
             responses:
                 "200":
                     content:
@@ -473,6 +473,9 @@ paths:
                                 addRedirects:
                                     description: If a redirect discussion needs to be created.
                                     type: boolean
+                                postTypeID:
+                                    description: The post type ID to associate with the moved discussion.
+                                    type: string
             responses:
                 "200":
                     description: Success
@@ -547,6 +550,65 @@ paths:
             tags:
                 - Discussions
             summary: Merge discussions.
+    "/discussions/split":
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                newPost:
+                                    type: object
+                                    description: Date about new discussion to create.
+                                    properties:
+                                        name:
+                                            description: Name of the new discussion.
+                                            type: string
+                                        body:
+                                            description: The body of the discussion.
+                                            type: string
+                                        format:
+                                            $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/Format"
+                                        categoryID:
+                                            description: Category ID for the new discussion.
+                                            type: integer
+                                        postType:
+                                            description: Post type of the discussion.
+                                            type: string
+                                        #postTypeID: Placeholder for custom post types.
+                                        #   description: Post type ID of the discussion.
+                                        #   type: integer
+                                        authorType:
+                                            description: Author of the new discussion.
+                                            type: string
+                                            enum: ["me", "System"]
+                                    required:
+                                        - name
+                                        - categoryID
+                                        - postType
+                                        - authorType
+                                commentIDs:
+                                    description: Comment IDs to split out into its own discussion.
+                                    type: array
+                                    items:
+                                        type: integer
+                            required:
+                                - commentIDs
+                                - newPost
+            responses:
+                "200":
+                    description: Success
+                "202":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+                "403":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+                "408":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+            tags:
+                - Discussions
+            summary: Split comments out into a discussion.
+
     "/discussions/resolve-bulk":
         post:
             summary: Mark all discussions you can triage as resolved.
@@ -602,7 +664,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/expand[]"
+                - $ref: "#/components/parameters/expand"
             responses:
                 "200":
                     content:
@@ -637,10 +699,13 @@ paths:
                         schema:
                             properties:
                                 type:
-                                    description: record type to convert to.
+                                    description: Record type to convert to.
+                                    type: string
+                                postTypeID:
+                                    description: Custom post type ID.
                                     type: string
                             required:
-                                - recordType
+                                - type
                             type: object
                 required: true
             summary: Change a discussion type.
@@ -780,7 +845,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/expand[]"
+                - $ref: "#/components/parameters/expand"
             responses:
                 "200":
                     content:
@@ -1000,7 +1065,7 @@ paths:
                   required: true
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/expand[]"
+                - $ref: "#/components/parameters/expand"
             responses:
                 "204":
                     description: Success
@@ -1195,8 +1260,8 @@ components:
             schema:
                 format: date-filter
                 type: string
-        expand[]:
-            name: expand[]
+        expand:
+            name: expand
             description: >
                 Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
             in: query
@@ -1219,10 +1284,29 @@ components:
                         - status.log
                         - reportMeta
                         - attachments
-                        - postFields
+                        - postMeta
+                        - permissions
             style: form
 
     schemas:
+        PostMeta:
+            type: object
+            description: Custom post fields. This is an object keyed by postFieldID.
+            example:
+                my-field: value1
+                my-arrayField: ["arrVal1", "arrVal2"]
+        DiscussionPermissions:
+            type: object
+            description: Permissions for the current user related to discussions. Applied when expanded..
+            example:
+                discussions.view: true
+                discussions.add: true
+                discussions.edit: false
+                discussions.delete: false
+                discussions.sink: false
+                comments.add: true
+                comments.edit: false
+                comments.delete: false
         CategoryFragment:
             properties:
                 categoryID:
@@ -1402,11 +1486,6 @@ components:
                 sink:
                     description: Whether or not the discussion has been sunk.
                     type: boolean
-                type:
-                    description: The type of this discussion if any.
-                    minLength: 1
-                    nullable: true
-                    type: string
                 unread:
                     description: Whether or not the discussion should have an unread indicator.
                     type: boolean
@@ -1428,6 +1507,19 @@ components:
                     x-feature: "Feature.AISuggestions.Enabled"
                 reportMeta:
                     $ref: "../../vanilla/openapi/reports.yml#/components/schemas/ReportMeta"
+                type:
+                    description: The base post type of the discussion.
+                    minLength: 1
+                    type: string
+                    enum:
+                        - discussion
+                        - idea
+                        - question
+                postTypeID:
+                    description: The discussions postType.
+                    type: string
+                postMeta:
+                    $ref: "#/components/schemas/PostMeta"
                 suggestions:
                     type: array
                     items:
@@ -1461,6 +1553,9 @@ components:
                                 description: Comment ID of the suggestion
                         type: object
                     x-feature: "Feature.AISuggestions.Enabled"
+                permissions:
+                    $ref: "#/components/schemas/DiscussionPermissions"
+
             required:
                 - discussionID
                 - type
@@ -1522,6 +1617,11 @@ components:
                 sink:
                     description: Whether or not the discussion has been sunk.
                     type: boolean
+                postTypeID:
+                    description: The discussions postTypeID.
+                    type: string
+                postMeta:
+                    $ref: "#/components/schemas/PostMeta"
             required:
                 - discussionID
                 - name
@@ -1578,11 +1678,10 @@ components:
                     description: Whether or not the discussion should has been resolved.
                     type: boolean
                 postTypeID:
-                    description: A post type to assign to the discussion
+                    description: The discussions postTypeID.
                     type: string
-                postFields:
-                    description: Post field values to save to the discussion as mapping of post field IDs to post field values.
-                    type: object
+                postMeta:
+                    $ref: "#/components/schemas/PostMeta"
             required:
                 - name
                 - body
@@ -1632,9 +1731,8 @@ components:
                     x-addon: resolved2
                     description: Whether or not the discussion should has been resolved.
                     type: boolean
-                postFields:
-                    description: Post field values to save to the discussion as mapping of post field IDs to post field values.
-                    type: object
+                postMeta:
+                    $ref: "#/components/schemas/PostMeta"
             type: object
         PostFragment:
             properties:

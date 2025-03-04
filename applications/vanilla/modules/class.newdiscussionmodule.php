@@ -11,6 +11,7 @@
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\TwigStaticRenderer;
 
@@ -100,7 +101,7 @@ class NewDiscussionModule extends Gdn_Module
     public function toString()
     {
         // Set CategoryID if we have one.
-        if (c("Vanilla.Categories.Use", true) && $this->CategoryID === null) {
+        if ($this->CategoryID === null) {
             $this->CategoryID = Gdn::controller()->data(
                 "Category.CategoryID",
                 Gdn::controller()->data("ContextualCategoryID", false)
@@ -128,12 +129,18 @@ class NewDiscussionModule extends Gdn_Module
             return "";
         }
 
-        // Grab the allowed discussion types.
-        $discussionTypes = CategoryModel::getAllowedDiscussionData(
-            $permissionCategory,
-            isset($category) ? $category : [],
-            $this->_Sender
-        );
+        $sender = $this->_Sender ?? null;
+        if (\Vanilla\Forum\Models\PostTypeModel::isPostTypesFeatureEnabled()) {
+            $groupID = $sender?->data("Group.GroupID", null);
+            $discussionTypes = CategoryModel::getAllowedPostTypeData($category ?? null, $groupID);
+        } else {
+            // Grab the allowed discussion types.
+            $discussionTypes = CategoryModel::getAllowedDiscussionData(
+                $permissionCategory,
+                isset($category) ? $category : [],
+                $sender
+            );
+        }
         $buttonsConfig = c("NewDiscussionModule.Types", []);
 
         foreach ($discussionTypes as $key => $type) {
@@ -195,7 +202,9 @@ class NewDiscussionModule extends Gdn_Module
                 ]);
             }
 
-            $postableDiscussionTypes = CategoryModel::instance()->getPostableDiscussionTypes();
+            $postableDiscussionTypes = PostTypeModel::isPostTypesFeatureEnabled()
+                ? null
+                : CategoryModel::instance()->getPostableDiscussionTypes();
 
             $props = [
                 "items" => $items,

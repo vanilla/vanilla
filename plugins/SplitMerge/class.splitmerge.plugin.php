@@ -9,6 +9,7 @@
 
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Forum\Models\DiscussionMergeModel;
+use Vanilla\Forum\Models\DiscussionSplitModel;
 use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\Scheduler\LongRunnerFailedID;
 use Vanilla\Scheduler\LongRunnerSuccessID;
@@ -68,16 +69,16 @@ class SplitMergePlugin extends Gdn_Plugin
     /**
      * Add a method to the ModerationController to handle splitting comments out to a new discussion.
      *
-     * @param moderationController $sender
+     * @param moderationController $controller
      */
-    public function moderationController_splitComments_create($sender)
+    public function moderationController_splitComments_create(ModerationController $controller)
     {
         $session = Gdn::session();
-        $sender->Form = new Gdn_Form();
-        $sender->title(t("Split Comments"));
-        $sender->Category = false;
+        $controller->Form = new Gdn_Form();
+        $controller->title(t("Split Comments"));
+        $controller->Category = false;
 
-        $discussionID = val("0", $sender->RequestArgs, "");
+        $discussionID = val("0", $controller->RequestArgs, "");
         if (!is_numeric($discussionID)) {
             return;
         }
@@ -89,7 +90,7 @@ class SplitMergePlugin extends Gdn_Plugin
         }
 
         // Verify that the user has permission to perform the split
-        $sender->permission("Vanilla.Discussions.Edit", true, "Category", $discussion->PermissionCategoryID);
+        $controller->permission("Vanilla.Discussions.Edit", true, "Category", $discussion->PermissionCategoryID);
 
         $checkedComments = Gdn::userModel()->getAttribute($session->User->UserID, "CheckedComments", []);
         if (!is_array($checkedComments)) {
@@ -106,13 +107,13 @@ class SplitMergePlugin extends Gdn_Plugin
         }
 
         // Load category data.
-        $sender->ShowCategorySelector = (bool) c("Vanilla.Categories.Use");
         $countCheckedComments = count($commentIDs);
-        $sender->setData("CountCheckedComments", $countCheckedComments);
+        $controller->setData("CountCheckedComments", $countCheckedComments);
         // Perform the split
-        if ($sender->Form->authenticatedPostBack()) {
+        if ($controller->Form->authenticatedPostBack()) {
+            $discussionSplitModel = \Gdn::getContainer()->get(DiscussionSplitModel::class);
             // Create a new discussion record
-            $data = $sender->Form->formValues();
+            $data = $controller->Form->formValues();
             $data["Body"] = sprintf(
                 t("This discussion was created from comments split from: %s."),
                 anchor(
@@ -125,8 +126,6 @@ class SplitMergePlugin extends Gdn_Plugin
 
             // Use the System user as the author.
             $data["InsertUserID"] = Gdn::userModel()->getSystemUserID();
-
-            $destinationCategoryID = $data["CategoryID"];
 
             // Pass a forced input formatter around this exception.
             if (c("Garden.ForceInputFormatter")) {
@@ -141,51 +140,50 @@ class SplitMergePlugin extends Gdn_Plugin
                 saveToConfig("Garden.InputFormatter", $inputFormat, false);
             }
 
-            $sender->Form->setValidationResults($discussionModel->validationResults());
+            $controller->Form->setValidationResults($discussionModel->validationResults());
 
-            if ($sender->Form->errorCount() == 0 && $newDiscussionID > 0) {
+            if ($controller->Form->errorCount() == 0 && $newDiscussionID > 0) {
                 // Re-assign the comments to the new discussion record
-                $discussionModel->SQL
-                    ->update("Comment")
-                    ->set("DiscussionID", $newDiscussionID)
-                    ->whereIn("CommentID", $commentIDs)
-                    ->put();
-
-                // Update counts on both discussions
-                $newDiscussion = $discussionModel->getID($newDiscussionID, DATASET_TYPE_ARRAY);
-                if ($newDiscussion) {
-                    $this->aggregateModel()->recalculateDiscussionAggregates($newDiscussion);
-                }
-                $oldDiscussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
-                if ($oldDiscussion) {
-                    $this->aggregateModel()->recalculateDiscussionAggregates($oldDiscussion);
-                }
-
-                // Dispatch a Discussion event (split)
-                $senderUserID = Gdn::session()->UserID;
-                $senderFragment = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
-                $discussion = $discussionModel->getID($newDiscussionID, DATASET_TYPE_ARRAY);
-                $discussionEvent = $discussionModel->eventFromRow(
-                    $discussion,
-                    DiscussionEvent::ACTION_SPLIT,
-                    $senderFragment
+                $iterator = $discussionSplitModel->splitDiscussionsIterator(
+                    $commentIDs,
+                    $newDiscussionID,
+                    $discussionID
                 );
-                $discussionEvent->setSourceDiscussionID($discussionID);
-                $discussionEvent->setDestinationDiscussionID($newDiscussionID);
-                $discussionEvent->setCommentIDs($commentIDs);
-                $discussionModel->getEventManager()->dispatch($discussionEvent);
+                $errorMessages = "";
 
+                foreach ($iterator as $result) {
+                    if ($result instanceof LongRunnerSuccessID) {
+                        $successCommentID = (int) $result->getRecordID();
+                        $checkedComments[$discussionID] = $newCheckedIDs = array_filter(
+                            $checkedComments[$discussionID],
+                            fn($id) => $id != $successCommentID
+                        );
+                        Gdn::userModel()->saveAttribute($session->UserID, "CheckedComments", [
+                            $discussionID => $newCheckedIDs,
+                        ]);
+                    } elseif ($result instanceof LongRunnerFailedID) {
+                        $errorMessages .= $result->getException()->getMessage() . "\n";
+                    }
+                }
+
+                ModerationController::informCheckedComments($controller);
                 // Clear selections
-                unset($checkedComments[$discussionID]);
-                Gdn::userModel()->saveAttribute($session->UserID, "CheckedComments", $checkedComments);
-                ModerationController::informCheckedComments($sender);
-                $sender->setRedirectTo("discussion/" . $newDiscussionID . "/" . Gdn_Format::url($data["Name"]));
+
+                if (empty($errorMessages)) {
+                    unset($checkedComments[$discussionID]);
+                    Gdn::userModel()->saveAttribute($session->UserID, "CheckedComments", $checkedComments);
+                    $controller->jsonTarget("", "", "Refresh");
+                } else {
+                    $controller->informMessage($errorMessages);
+                }
+
+                $controller->setRedirectTo("discussion/" . $newDiscussionID . "/" . Gdn_Format::url($data["Name"]));
             }
         } else {
-            $sender->Form->setValue("CategoryID", val("CategoryID", $discussion));
+            $controller->Form->setValue("CategoryID", val("CategoryID", $discussion));
         }
 
-        $sender->render($sender->fetchViewLocation("splitcomments", "", "plugins/SplitMerge"));
+        $controller->render($controller->fetchViewLocation("splitcomments", "", "plugins/SplitMerge"));
     }
 
     /**

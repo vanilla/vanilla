@@ -11,7 +11,7 @@ import DiscussionOptionsMenu, { addDiscussionOption } from "@library/features/di
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
 const renderInProvider = async (permissions?: string[]) => {
     const queryClient = new QueryClient({
@@ -80,10 +80,11 @@ describe("Discussion List Options Menu", () => {
 
         const editOption = await screen.findByText("Edit");
         const moveOption = await screen.findByText("Move");
+        const changePostTypeOption = await screen.findByText("Change Post Type");
         const announceOption = await screen.findByText("Announce");
         const deleteOption = await screen.findByText("Delete");
         const sinkOption = await screen.findByText("Sink");
-        [editOption, moveOption, announceOption, deleteOption, sinkOption].forEach((option) => {
+        [editOption, moveOption, changePostTypeOption, announceOption, deleteOption, sinkOption].forEach((option) => {
             expect(option).toBeInTheDocument();
         });
     });
@@ -123,6 +124,7 @@ describe("Discussion List Options Menu", () => {
             "Move",
             "Fifth Option In First Group",
             "Delete",
+            "Change Post Type",
             "Tag",
             "Announce",
             "Change Author",

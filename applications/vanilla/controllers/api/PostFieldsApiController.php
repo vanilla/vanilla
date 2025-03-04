@@ -10,11 +10,9 @@ namespace Vanilla\Forum\Controllers\Api;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Data;
-use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
-use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Models\PostFieldModel;
 use Vanilla\Forum\Models\PostTypeModel;
@@ -34,8 +32,7 @@ class PostFieldsApiController extends \AbstractApiController
      */
     public function index(array $query)
     {
-        PostTypeModel::ensurePostTypesFeatureEnabled();
-        $this->permission("settings.manage");
+        $this->permission();
         $in = $this->schema([
             "postTypeID:s?" => ["x-filter" => true],
             "dataType:s?" => ["enum" => PostFieldModel::DATA_TYPES, "x-filter" => true],
@@ -66,7 +63,6 @@ class PostFieldsApiController extends \AbstractApiController
         $rows = $this->postFieldModel->getWhere($filters, [
             Model::OPT_LIMIT => $limit,
             Model::OPT_OFFSET => $offset,
-            Model::OPT_ORDER => "sort",
         ]);
 
         $rows = array_map(function ($row) {
@@ -87,17 +83,15 @@ class PostFieldsApiController extends \AbstractApiController
     /**
      * Get a post field.
      *
-     * @param string $path
+     * @param string $postFieldID
      * @return array
      */
-    public function get(string $path): array
+    public function get(string $postFieldID): array
     {
-        PostTypeModel::ensurePostTypesFeatureEnabled();
-        $this->permission("settings.manage");
+        $this->permission();
 
-        [$postTypeID, $postFieldID] = $this->parseIDsFromPath($path);
         $out = $this->schema($this->postFieldModel->outputSchema(), "out");
-        $row = $this->getPostFieldByID($postTypeID, $postFieldID);
+        $row = $this->getPostFieldByID($postFieldID);
         $row = $out->validate($row);
 
         return $row;
@@ -111,52 +105,47 @@ class PostFieldsApiController extends \AbstractApiController
      */
     public function post(array $body): array
     {
-        PostTypeModel::ensurePostTypesFeatureEnabled();
         $this->permission("settings.manage");
 
         $in = $this->schema($this->postFieldModel->postSchema());
         $body = $in->validate($body);
         $this->postFieldModel->insert($body);
 
-        return $this->getPostFieldByID($body["postTypeID"], $body["postFieldID"]);
+        return $this->getPostFieldByID($body["postFieldID"]);
     }
 
     /**
      * Update a post field.
      *
-     * @param string $path
+     * @param string $postFieldID
      * @param array $body
      * @return array
      */
-    public function patch(string $path, array $body): array
+    public function patch(string $postFieldID, array $body): array
     {
-        PostTypeModel::ensurePostTypesFeatureEnabled();
         $this->permission("settings.manage");
 
-        [$postTypeID, $postFieldID] = $this->parseIDsFromPath($path);
-        $existingPostField = $this->getPostFieldByID($postTypeID, $postFieldID);
+        $existingPostField = $this->getPostFieldByID($postFieldID);
 
         $in = $this->schema($this->postFieldModel->patchSchema($existingPostField));
         $body = $in->validate($body, true);
-        $this->postFieldModel->update($body, ["postTypeID" => $postTypeID, "postFieldID" => $postFieldID]);
+        $this->postFieldModel->update($body, ["postFieldID" => $postFieldID]);
 
-        return $this->getPostFieldByID($postTypeID, $postFieldID);
+        return $this->getPostFieldByID($postFieldID);
     }
 
     /**
      * Delete a post field.
      *
-     * @param string $path
+     * @param string $postFieldID
      * @return void
      */
-    public function delete(string $path): void
+    public function delete(string $postFieldID): void
     {
-        PostTypeModel::ensurePostTypesFeatureEnabled();
         $this->permission("settings.manage");
 
-        [$postTypeID, $postFieldID] = $this->parseIDsFromPath($path);
-        $this->getPostFieldByID($postTypeID, $postFieldID);
-        $this->postFieldModel->delete(["postTypeID" => $postTypeID, "postFieldID" => $postFieldID]);
+        $this->getPostFieldByID($postFieldID);
+        $this->postFieldModel->delete(["postFieldID" => $postFieldID]);
     }
 
     /**
@@ -166,9 +155,8 @@ class PostFieldsApiController extends \AbstractApiController
      * @return void
      * @throws HttpException|PermissionException|ValidationException|\Exception
      */
-    public function put_sorts(string $postTypeID, array $body)
+    public function put_sorts(string $postTypeID, array $body): void
     {
-        PostTypeModel::ensurePostTypesFeatureEnabled();
         $this->permission("settings.manage");
 
         $in = $this->schema(Schema::parse([":o" => "Key-value mapping of postFieldID => sort"]));
@@ -179,35 +167,18 @@ class PostFieldsApiController extends \AbstractApiController
     /**
      * Get post field by ID.
      *
-     * @param string $postTypeID
      * @param string $postFieldID
      * @return array
      * @throws NotFoundException
      */
-    private function getPostFieldByID(string $postTypeID, string $postFieldID): array
+    private function getPostFieldByID(string $postFieldID): array
     {
-        try {
-            $row = $this->postFieldModel->selectSingle(["postTypeID" => $postTypeID, "postFieldID" => $postFieldID]);
-        } catch (NoResultsException $e) {
-            throw new NotFoundException("postField", ["postTypeID" => $postTypeID, "postFieldID" => $postFieldID], $e);
+        $row = $this->postFieldModel->getWhere(["pf.postFieldID" => $postFieldID], [Model::OPT_LIMIT => 1])[0] ?? null;
+
+        if (empty($row)) {
+            throw new NotFoundException("postField", ["postField" => $postFieldID]);
         }
 
         return $row;
-    }
-
-    /**
-     * Parse postTypeID and postFieldID from path.
-     *
-     * @param string $path
-     * @return string[]
-     * @throws NotFoundException
-     */
-    private function parseIDsFromPath(string $path)
-    {
-        $parts = explode("/", trim($path, "/"));
-        if (count($parts) !== 2) {
-            throw new NotFoundException("postField", ["path" => $path]);
-        }
-        return $parts;
     }
 }

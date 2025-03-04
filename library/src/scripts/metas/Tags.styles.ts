@@ -25,10 +25,10 @@ export const tagMixin = (
         textOverflow: "ellipsis",
         ...userSelect(),
         ...Mixins.padding(padding),
-        ...Mixins.font(Variables.font({ ...font, color: tagPresetOptions?.fontColor ?? font.color })),
         ...Mixins.background(
             Variables.background({ ...background, color: tagPresetOptions?.bgColor ?? background.color }),
         ),
+        ...Mixins.font(Variables.font({ ...font, color: tagPresetOptions?.fontColor ?? font.color })),
         ...Mixins.border(
             Variables.border({
                 ...border,

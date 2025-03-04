@@ -144,7 +144,7 @@ export default function DropDown(props: IDropDownProps) {
     const handleID = props.handleID ?? ID + "-handle";
     const contentID = props.contentID ?? ID + "-contents";
 
-    const buttonContents = props.buttonContents || <Icon icon="navigation-ellipsis" />;
+    const buttonContents = props.buttonContents || <Icon icon="options-menu" />;
     const { zIndex } = useStackingContext();
 
     return (

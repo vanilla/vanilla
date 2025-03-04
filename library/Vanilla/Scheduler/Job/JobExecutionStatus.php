@@ -40,6 +40,7 @@ class JobExecutionStatus implements JsonSerializable, \Stringable
     /**
      * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->myStatus;

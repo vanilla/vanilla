@@ -69,11 +69,6 @@ export type ISearchRequestQuery<ExtraFormValues extends object = {}> = Omit<ISea
     locale?: string;
     expand?: string[];
     siteSectionID?: string;
-
-    // fixme: this stuff needs to go
-    categoryIDs?: RecordID[];
-    categoryID?: RecordID;
-    includeChildCategories?: boolean;
 };
 
 export interface ICountResult {

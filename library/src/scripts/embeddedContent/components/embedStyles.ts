@@ -197,3 +197,35 @@ export const embedContentClasses = useThemeCache(() => {
 
     return { small, root, menuBar };
 });
+
+export const embedElementClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+
+    // some hover/focus outline styles for the embeds, if rich text editor does not have parent witn richEditor class
+    const root = css({
+        "& .embedExternal": {
+            userSelect: "none",
+        },
+        "& .embedExternal-content, & .embedLinkLoader-link": {
+            cursor: "pointer",
+        },
+        "& .embedExternal-content:after, & .embedLinkLoader-link:after": {
+            ...Mixins.absolute.fullSizeOfParent(),
+            content: `""`,
+            transition: "0.2s ease box-shadow",
+            pointerEvents: "none",
+        },
+        "& .embedExternal-content:hover:after, & .embedLinkLoader-link:hover:after": {
+            boxShadow: `0 0 0 ${globalVars.embed.select.borderWidth}px ${globalVars.embed.focus.color.fade(0.5)} inset`,
+        },
+        "& .embed-isSelected": {
+            "& .embedExternal-content:after, & .embedLinkLoader-link:after": {
+                boxShadow: `0 0 0 ${
+                    globalVars.embed.select.borderWidth
+                }px ${globalVars.embed.focus.color.toString()} inset`,
+            },
+        },
+    });
+
+    return { root };
+});

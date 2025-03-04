@@ -8,119 +8,38 @@
 
 namespace Vanilla\Forum\Digest;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\FeatureFlagHelper;
 use Vanilla\Logger;
-use Vanilla\Logging\ErrorLogger;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
-use Vanilla\Scheduler\Job\LocalApiJob;
 
-class ScheduleWeeklyDigestJob extends LocalApiJob implements LoggerAwareInterface
+class ScheduleWeeklyDigestJob extends DigestJob
 {
-    /** @var string Config key representing how long before the digest is sent that it should be generated. */
-    public const CONF_DIGEST_GENERATION_OFFSET = "Garden.Digest.GenerationOffset";
-    /** @var string Config holding an ISO day of the week. */
-    public const CONF_SCHEDULE_DAY_OF_WEEK = "Garden.Digest.DayOfWeek";
+    protected const DIGEST_TYPE = "weekly";
 
-    /** @var string Config for a 24 hour time of day to schedule the digest. */
-    public const CONF_SCHEDULE_TIME = "Garden.Digest.ScheduleTime";
-    public const CONF_SCHEDULE_TIME_ZONE = "Garden.Digest.ScheduleTimeZone";
-
-    private const LOG_CONTEXT = [
+    protected const LOG_CONTEXT = [
         Logger::FIELD_TAGS => ["digest", "weeklyDigest"],
         Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
     ];
 
-    use LoggerAwareTrait;
-
-    private EmailDigestGenerator $digestGenerator;
-    private ConfigurationInterface $config;
-    private DigestModel $digestModel;
-
     /**
-     * @param EmailDigestGenerator $digestGenerator
-     * @param ConfigurationInterface $config
-     * @param DigestModel $digestModel
-     */
-    public function __construct(
-        EmailDigestGenerator $digestGenerator,
-        ConfigurationInterface $config,
-        DigestModel $digestModel
-    ) {
-        $this->digestGenerator = $digestGenerator;
-        $this->config = $config;
-        $this->digestModel = $digestModel;
-    }
-
-    /**
-     * No message needed.
-     *
-     * @param array $message
-     */
-    public function setMessage(array $message)
-    {
-        // No message needed.
-    }
-
-    /**
-     * Rotate the System token from the config file.
+     * Run the weekly digest job.
      *
      * @return JobExecutionStatus
      */
     public function run(): JobExecutionStatus
     {
-        $isDigestEnabled = $this->config->get("Garden.Digest.Enabled", false);
-        if (!$isDigestEnabled) {
-            $this->logger->debug(
-                "Weekly digest was not generated because digest is disabled.",
-                self::LOG_CONTEXT + [
-                    Logger::FIELD_EVENT => "weekly_digest_skip",
-                ]
-            );
+        if (!$this->validateBeforeRun()) {
             return JobExecutionStatus::abandoned();
         }
-
-        if ($this->config->get(\Gdn_Email::CONF_DISABLED, false)) {
-            $this->logger->debug(
-                "Weekly digest was not generated because email is disabled.",
-                self::LOG_CONTEXT + [
-                    Logger::FIELD_EVENT => "weekly_digest_skip",
-                ]
-            );
+        $scheduleDate = $this->getScheduledDateTime();
+        if ($scheduleDate === null) {
             return JobExecutionStatus::abandoned();
         }
-
-        $scheduleDate = $this->getNextScheduledDate();
-
-        $offset = $this->config->get(self::CONF_DIGEST_GENERATION_OFFSET, "-3 hours");
-        $nextGenerationDate = $scheduleDate->modify($offset);
-        $currentTime = CurrentTimeStamp::getDateTime();
-
-        if ($currentTime->getTimestamp() < $nextGenerationDate->getTimestamp()) {
-            $this->logger->info(
-                "Weekly digest was not generated because it is too early. The next weekly digest will be generated at {$nextGenerationDate->format(
-                    DATE_ATOM
-                )} for delivery at {$scheduleDate->format(DATE_ATOM)}",
-                self::LOG_CONTEXT + [
-                    "nextGenerationDate" => $nextGenerationDate,
-                    "nextScheduleDate" => $scheduleDate,
-                    Logger::FIELD_EVENT => "weekly_digest_skip",
-                ]
-            );
-            // It's not time to generate the digest yet.
-            return JobExecutionStatus::abandoned();
-        }
+        $nextGenerationDate = $scheduleDate->modify($this->digestOffset);
 
         // Now we know it's time to start generating the digest.
         // First we check if was already generated (or another process is already generating it).
-        $existingDigests = $this->digestModel->select([
-            "digestType" => DigestModel::DIGEST_TYPE_WEEKLY,
-            "dateScheduled >" => $currentTime,
-        ]);
-
+        $existingDigests = $this->getExistingDigest(DigestModel::DIGEST_TYPE_WEEKLY);
         if (count($existingDigests) > 0) {
             $this->logger->info(
                 "Weekly digest was not generated for upcoming scheduled date {$scheduleDate->format(
@@ -137,7 +56,7 @@ class ScheduleWeeklyDigestJob extends LocalApiJob implements LoggerAwareInterfac
         }
         //Clear the existing permissions. Let it recreate based on current Session
         \DiscussionModel::clearCategoryPermissions();
-        // Alrighty time to actually generate the digest now.
+        // Time to actually generate the digest now.
         $this->digestGenerator->prepareWeeklyDigest($scheduleDate);
         $this->logger->info(
             "Weekly digest has been scheduled for generation and will be delivered at {$scheduleDate->format(
@@ -152,20 +71,6 @@ class ScheduleWeeklyDigestJob extends LocalApiJob implements LoggerAwareInterfac
     }
 
     /**
-     * Get a cron expression to run this job.
-     *
-     * @return string
-     */
-    public static function getCronExpression(): string
-    {
-        // Hourly.
-        // We don't actually send digests every hour.
-        // We just check if we should start generation every hour.
-        // The check is cheap and this allows us to work around the random cron offset.
-        return "0 * * * *";
-    }
-
-    /**
      * Get the next digest schedule datetime
      *
      * @param int|null $dayOfWeek
@@ -173,39 +78,30 @@ class ScheduleWeeklyDigestJob extends LocalApiJob implements LoggerAwareInterfac
      */
     public function getNextScheduledDate(?int $dayOfWeek = null): \DateTimeImmutable
     {
-        $scheduleDayOfWeek = $dayOfWeek ?? $this->config->get(self::CONF_SCHEDULE_DAY_OF_WEEK, 1); // Monday
-        $scheduleTime = $this->config->get(self::CONF_SCHEDULE_TIME, "09:00");
-        $scheduleTimeZone = $this->config->get(self::CONF_SCHEDULE_TIME_ZONE, "America/New_York");
-        $timePieces = explode(":", $scheduleTime);
-        if (count($timePieces) === 2) {
-            $scheduleHour = (int) $timePieces[0];
-            $scheduleMinutes = (int) $timePieces[1];
-        } else {
-            $scheduleHour = 9;
-            $scheduleMinutes = 0;
-            ErrorLogger::warning(
-                "Digest scheduled time is invalid",
-                ["digest"],
-                [
-                    "schedule" => [
-                        "time" => $scheduleTime,
-                        "dayOfWeek" => $scheduleDayOfWeek,
-                        "timeZone" => $scheduleTimeZone,
-                    ],
-                ]
-            );
+        if ($dayOfWeek) {
+            $this->scheduleDayOfWeek = $dayOfWeek;
         }
-
-        $timezone = new \DateTimeZone($scheduleTimeZone);
+        [$scheduleHour, $scheduleMinutes] = $this->getScheduledTimePieces();
+        $timezone = new \DateTimeZone($this->scheduleTimeZone);
         $utcTimeZone = new \DateTimeZone("UTC");
         $now = CurrentTimeStamp::getDateTime();
+        $year = (int) $now->format("Y");
+        $week = (int) $now->format("W");
+        //Special case for the first week towards the start of a year we need to consider the next year
+        if ($week == 1 && $now->format("n") == 12) {
+            $year = (int) $year + 1;
+            $currentDayOfWeek = $now->format("N");
+            if ($currentDayOfWeek > $this->scheduleDayOfWeek) {
+                $week = 2;
+            }
+        }
         $scheduleDateTime = $now
             // Put ourselves in that timezone for construction.
             ->setTimezone($timezone)
             ->setISODate(
-                $now->format("Y"), // Year
-                $now->format("W"), // ISO week of the year.
-                $scheduleDayOfWeek
+                $year, // Year
+                $week, // ISO week of the year.
+                $this->scheduleDayOfWeek
             )
             ->setTime($scheduleHour, $scheduleMinutes)
             // Make sure we are back in UTC before passing the date anywhere else.

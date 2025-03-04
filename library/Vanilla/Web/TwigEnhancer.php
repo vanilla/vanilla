@@ -399,7 +399,9 @@ class TwigEnhancer
             "getTranslation" => [$this, "getTranslation"],
             "t" => [$this, "getTranslation"],
             "sprintf",
-            "empty",
+            "empty" => function (mixed $val): bool {
+                return empty($val);
+            },
 
             // Utility`
             "sanitizeUrl" => [\Gdn_Format::class, "sanitizeUrl"],

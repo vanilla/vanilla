@@ -70,7 +70,7 @@ export function ExternalSearchSettingsPage() {
                 onSubmit={(e) => {
                     e.preventDefault();
                     try {
-                        configPatcher.patchConfig({
+                        void configPatcher.patchConfig({
                             "externalSearch.query": value.externalSearchQuery,
                             "externalSearch.resultsInNewTab": value.externalSearchResultsInNewTab,
                         });

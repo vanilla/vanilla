@@ -33,10 +33,10 @@ echo $form->errors();
 <div class="form-group">
     <?php
     $checkboxDesc =
-        "Checkboxes allow admins to perform batch actions on a number of discussions or comments at the same time.";
+        "Checkboxes allow admins to perform batch actions on a number of posts or comments at the same time.";
     echo $form->toggle(
         "Vanilla.AdminCheckboxes.Use",
-        "Enable checkboxes on discussions and comments",
+        "Enable checkboxes on posts and comments",
         [],
         $checkboxDesc
     );
@@ -106,7 +106,7 @@ echo $form->errors();
 
 <div class="form-group">
     <?php
-    $embedsLabel = "Enable link embeds in discussions and comments";
+    $embedsLabel = "Enable link embeds in posts and comments";
     $embedsDesc = "@" . t("Allow links to be transformed");
     echo $form->toggle("Garden.Format.DisableUrlEmbeds", $embedsLabel, [], $embedsDesc, true);
     ?>
@@ -163,7 +163,7 @@ echo $form->errors();
         echo wrap(
             wrap(
                 t(
-                    "Add your custom Kaltura domain(s) to transform links into embedded videos in discussions, comments or articles."
+                    "Add your custom Kaltura domain(s) to transform links into embedded videos in posts, comments or articles."
                 ),
                 "p"
             ) . wrap(t("Specify one domain per line. Use * for wildcard matches."), "p"),
@@ -214,8 +214,8 @@ echo $form->errors();
     ?>
     <div class="label-wrap">
         <?php
-        echo $form->label("Discussions per Page", "Vanilla.Discussions.PerPage");
-        echo wrap(sprintft("Number of %s listed per page.", t("Discussions")), "div", ["class" => "info"]);
+        echo $form->label("Posts per Page", "Vanilla.Discussions.PerPage");
+        echo wrap(sprintft("Number of %s listed per page.", t("Posts")), "div", ["class" => "info"]);
         ?>
     </div>
     <div class="input-wrap">
@@ -252,7 +252,7 @@ echo $form->errors();
     ?>
     <div class="label-wrap">
         <?php
-        echo $form->label("Discussion & Comment Editing", "Garden.EditContentTimeout");
+        echo $form->label("Post & Comment Editing", "Garden.EditContentTimeout");
         echo wrap(
             t(
                 "EditContentTimeout.Notes",
@@ -270,7 +270,7 @@ echo $form->errors();
 <div class="form-group">
     <?php
     $autosaveDescription =
-        t("Automatically save drafts of unpublished discussions, questions, ideas and comments.") .
+        t("Automatically save drafts of unpublished posts, questions, ideas and comments.") .
         " " .
         anchor("Learn more", "https://success.vanillaforums.com/kb/articles/199-saving-drafts") .
         ".";

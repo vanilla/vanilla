@@ -18,9 +18,10 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
-import { IFieldError, JsonSchemaForm } from "@vanilla/json-schema-forms";
+import { IFieldError } from "@vanilla/json-schema-forms";
 import { useFormik } from "formik";
 import { Fragment, useState } from "react";
+import { DurationPickerUnit } from "@library/forms/durationPicker/DurationPicker.types";
 
 interface IProps {
     title: string;
@@ -38,6 +39,7 @@ export function SettingsForm(props: IProps) {
         initialValues: {
             ...getInitialSettings(sections),
             enabled: settings?.enabled ?? false,
+            delay: settings?.delay ?? { unit: DurationPickerUnit.DAYS, length: 0 },
         },
         onSubmit: async (formValues) => {
             setFieldErrors(undefined);

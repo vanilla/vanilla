@@ -11,7 +11,7 @@ use VanillaTests\SharedBootstrapTestCase;
 use Gdn_PasswordHash;
 
 /**
- * Test the the {@link Gdn_PasswordHash} class.
+ * Test the {@link Gdn_PasswordHash} class.
  */
 class PasswordTest extends SharedBootstrapTestCase
 {

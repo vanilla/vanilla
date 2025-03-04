@@ -496,13 +496,13 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $category = val("Category", $args);
         if (empty($category) || !c("Plugins.QnA.UseBigButtons")) {
             $args["Types"]["Question"] = [
-                "layoutViewType" => "questionThread",
+                "layoutViewType" => "question",
                 "apiType" => "question",
                 "Singular" => "Question",
                 "Plural" => "Questions",
                 "AddUrl" => "/post/question",
                 "AddText" => "Ask a Question",
-                "AddIcon" => "new-question",
+                "AddIcon" => "create-question",
             ];
         }
     }
@@ -668,7 +668,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         if ($comment["InsertUserID"] == $discussion["InsertUserID"]) {
             return;
         }
-        if (strtolower($discussion["Type"]) != "question") {
+        $type = $discussion["Type"] ?? "discussion";
+        if (strtolower($type) != "question") {
             return;
         }
         if (!c("Plugins.QnA.Notifications", true)) {
@@ -716,7 +717,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $discussion = $args["discussion"];
 
         // Bail out if this isn't a comment on a question.
-        if (strtolower($discussion["Type"]) !== "question") {
+        if (strtolower($discussion["Type"] ?? "discussion") !== "question") {
             return;
         }
 
@@ -1224,7 +1225,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
                                 "allowedPostTypeIDs",
                                 Schema::parse([
                                     "type" => "array",
-                                    "items" => [
+                                    "contains" => [
                                         "type" => "string",
                                         "enum" => ["question"],
                                     ],
@@ -1264,7 +1265,14 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $categoryID = val("CategoryID", $sender->Data);
         $category = CategoryModel::categories($categoryID);
 
-        $sender->setData("postTypeProps.QnaFollowUpNotification", $category["QnaFollowUpNotification"] ?? false);
+        $qnaFollowUpNotification = $category["QnaFollowUpNotification"] ?? false;
+
+        $sender->setData(
+            "instance",
+            array_merge(val("instance", $sender->Data, []), [
+                "QnaFollowUpNotification" => !!$qnaFollowUpNotification,
+            ])
+        );
     }
 
     /**
@@ -1274,7 +1282,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function base_afterCategorySettings_handler($sender)
     {
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
             return;
         }
         if ($this->questionFollowUpFeatureEnabled()) {
@@ -1487,7 +1495,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     private function getDiscussionQnATagString(object $discussion = null): string
     {
         $tag = "";
-        if (strtolower(val("Type", $discussion)) != "question") {
+        $type = val("Type", $discussion, "discussion") ?? "discussion";
+        if (strtolower($type) != "question") {
             return $tag;
         }
 
@@ -1605,7 +1614,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             if (isset($sender->Data["Comments"])) {
                 $comments = $sender->Data["Comments"]->result();
                 $comments = array_filter($comments, function ($row) {
-                    return strcasecmp(val("QnA", $row), "accepted");
+                    return strcasecmp(val("QnA", $row) ?? "", "accepted");
                 });
                 $sender->Data["Comments"] = new Gdn_DataSet(array_values($comments));
             }
@@ -2058,22 +2067,16 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             }
             return $comment;
         }
-        $discussionID = $comment["discussionID"] ?? null;
-        if ($discussionID === null) {
+
+        if ($comment["discussionType"] !== "Question") {
             return $comment;
         }
 
-        if (!isset($this->discussionsCache[$discussionID])) {
-            // This has the potential to be pretty bad, performance wise, so we at least cached the results.
-            $this->discussionsCache[$discussionID] = $commentsApiController->discussionByID($discussionID);
-        }
-        $discussion = $this->discussionsCache[$discussionID];
-
-        if ($discussion["Type"] !== "Question") {
-            return $comment;
-        }
-
-        if (!$this->session->checkPermission("Garden.Curation.Manage") && strtolower($comment["qnA"]) === "rejected") {
+        if (
+            !$this->session->checkPermission("Garden.Curation.Manage") &&
+            $comment["qnA"] &&
+            strtolower($comment["qnA"]) === "rejected"
+        ) {
             $comment["qna"] = "pending";
         }
 
@@ -2496,10 +2499,11 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      * @param int $discussionID
      * @param array $discussion
      * @param string $type
+     * @param array|null $postMeta
      */
-    public function updateRecordType(int $discussionID, array $discussion, string $type): void
+    public function updateRecordType(int $discussionID, array $discussion, string $type, ?array $postMeta = null): void
     {
-        $this->discussionModel->setField($discussionID, "Type", $type);
+        $this->discussionModel->setType($discussionID, $type, postMeta: $postMeta);
 
         // Update the QnA field.  Default to "Unanswered" for questions. Null the field for other types.
         switch ($type) {

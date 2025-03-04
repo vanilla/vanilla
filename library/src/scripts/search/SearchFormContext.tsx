@@ -1,16 +1,16 @@
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, ISearchState } from "@library/search/searchReducer";
 import { ISearchForm, ISearchSource } from "@library/search/searchTypes";
 import React, { useContext } from "react";
-import { TypeAllIcon } from "@library/icons/searchIcons";
 import SearchDomain from "@library/search/SearchDomain";
 import { EMPTY_SEARCH_DOMAIN_KEY } from "./searchConstants";
 import { SearchService } from "./SearchService";
+import { Icon } from "@vanilla/icons";
 
 export const EMPTY_SEARCH_DOMAIN = new (class EmptySearchDomain extends SearchDomain {
     public key = EMPTY_SEARCH_DOMAIN_KEY;
     public sort = 0;
     public name = "All";
-    public icon = (<TypeAllIcon />);
+    public icon = (<Icon icon="search-all" />);
     public recordTypes = [];
 })();
 

@@ -10,6 +10,7 @@ import { ComboboxOption, ComboboxOptionText } from "@reach/combobox";
 import { autoCompleteClasses } from "./AutoComplete.styles";
 import { useAutoCompleteContext } from "./AutoCompleteContext";
 import { Checkmark } from "../shared/Checkmark";
+import { IUserFragment } from "@library/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 
@@ -42,6 +43,13 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
     const extraLabelContent = props.data?.parentLabel ?? extraLabel;
 
     const icon = props.data?.icon;
+    const isUserFragment = (data: unknown): data is Partial<IUserFragment> => {
+        if (!data || typeof data !== "object") {
+            return false;
+        }
+        const keys = Object.keys(data);
+        return keys.includes("userID") && keys.includes("photoUrl");
+    };
 
     return (
         <ComboboxOption
@@ -51,8 +59,10 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
             data-autocomplete-selected={selected || undefined}
             value={label}
         >
-            <div className={cx(classes.optionText, icon && classes.iconLayout)}>
-                {icon && <UserPhoto size={UserPhotoSize.XSMALL} userInfo={icon ?? deletedUserFragment()} />}
+            <div className={cx(classes.optionText, isUserFragment(icon) && classes.iconLayout)}>
+                {isUserFragment(icon) && (
+                    <UserPhoto size={UserPhotoSize.XSMALL} userInfo={icon ?? deletedUserFragment()} />
+                )}
                 <span>
                     <ComboboxOptionText />
                     {extraLabelContent && <span className={classes.parentLabel}>{` - ${extraLabelContent}`}</span>}

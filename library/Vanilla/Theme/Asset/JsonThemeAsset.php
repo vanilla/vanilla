@@ -188,7 +188,7 @@ class JsonThemeAsset extends ThemeAsset
      *
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $result = [
             "url" => $this->getUrl(),

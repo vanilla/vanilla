@@ -71,7 +71,7 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
     }
 
     public render() {
-        const { label, legend, required, tooltip, tooltipIcon = "data-information" } = this.props;
+        const { label, legend, required, tooltip, tooltipIcon = "info" } = this.props;
         const OuterTag = legend ? "div" : label ? "label" : "div";
         const role = legend ? "group" : undefined;
 

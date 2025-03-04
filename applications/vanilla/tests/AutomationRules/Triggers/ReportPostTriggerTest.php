@@ -12,6 +12,7 @@ use LogModel;
 use Vanilla\AutomationRules\Actions\CreateEscalationAction;
 use Vanilla\AutomationRules\Triggers\ReportPostTrigger;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use VanillaTests\AutomationRules\AutomationRulesTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestCommentModelTrait;
@@ -117,6 +118,66 @@ class ReportPostTriggerTest extends SiteTestCase
             [
                 "recordType" => ["comment", "discussion"],
                 "recordID" => [$discussion["discussionID"], $comment["commentID"]],
+            ],
+            $escalations
+        );
+    }
+
+    /**
+     * Tests that the automation trigger works when processed manually (i.e. when enabling for the first time).
+     *
+     * @return void
+     */
+    public function testAutomationRuleIsProcessedByManualExecution()
+    {
+        $reportReason = $this->createReportReason();
+
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+
+        $this->createReport($discussion, [
+            "reportReasonIDs" => [$reportReason["reportReasonID"]],
+            "noteBody" => "test",
+        ]);
+
+        $automationRecord = $this->getAutomationRecord(
+            CreateEscalationAction::getType(),
+            1,
+            $reportReason["reportReasonID"],
+            [
+                "recordIsLive" => true,
+            ]
+        );
+
+        $automationRule = $this->createAutomationRule($automationRecord["trigger"], $automationRecord["action"]);
+
+        $this->api()->post("automation-rules/{$automationRule["automationRuleID"]}/trigger");
+
+        //Should create exactly two dispatch and a log
+        $dispatches = $this->getDispatchedRules(
+            $automationRule["automationRuleID"],
+            ["success"],
+            AutomationRuleDispatchesModel::TYPE_MANUAL
+        );
+        $this->assertCount(1, $dispatches);
+
+        $this->assertRowsLike(
+            [
+                "affectedRecordType" => ["discussion"],
+                "estimatedRecordCount" => [1],
+                "affectedRecordCount" => [1],
+            ],
+            array_column($dispatches, "attributes")
+        );
+
+        $escalations = $this->api()
+            ->get("/escalations", ["placeRecordType" => "category", "placeRecordID" => $this->lastInsertedCategoryID])
+            ->getBody();
+        $this->assertCount(1, $escalations);
+        $this->assertRowsLike(
+            [
+                "recordType" => ["discussion"],
+                "recordID" => [$discussion["discussionID"]],
             ],
             $escalations
         );

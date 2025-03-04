@@ -517,7 +517,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable
                 $group = $this->Group;
                 $data = &$this->Settings;
                 if ($this->Configuration) {
-                    ksort($data, $this->Configuration->getSortFlag());
+                    ksort($data, $this->Configuration->getSortFlag() ?? SORT_REGULAR);
                 }
 
                 // Check for the case when the configuration is the group.

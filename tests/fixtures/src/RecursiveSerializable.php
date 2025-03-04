@@ -15,7 +15,7 @@ final class RecursiveSerializable implements \JsonSerializable
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             "self" => $this,

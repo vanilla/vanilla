@@ -18,37 +18,56 @@ class LocalesApiController extends Controller
 {
     const GET_ALL_REDUX_KEY = "@@locales/GET_ALL_DONE";
 
-    /** @var \Gdn_Locale */
-    private $locale;
-
-    /** @var LocaleModel */
-    private $localeModel;
-
     /**
      * LocalesApiController constructor.
      *
      * @param \Gdn_Locale $locale
      * @param LocaleModel $localeModel
      */
-    public function __construct(\Gdn_Locale $locale, LocaleModel $localeModel)
-    {
-        $this->locale = $locale;
-        $this->localeModel = $localeModel;
+    public function __construct(
+        private \Gdn_Locale $locale,
+        private LocaleModel $localeModel,
+        private Gdn_Configuration $config
+    ) {
     }
 
     /**
      * Get all enabled locales for the site.
      *
+     * @param array $body
+     *
      * @return array
      */
-    public function index(): array
+    public function index(array $query = []): array
     {
         $this->permission(Permissions::BAN_PRIVATE);
+
+        $in = $this->schema(["isMachineTranslations:b?"]);
+        $body = $in->validate($query);
+
         $schema = $this->schema($this->localeSchema(), ["LocaleConfig", "out"]);
         $out = $this->schema([":a" => $schema], "out");
-        $enabled = $this->getEnabledLocales();
-        $this->expandDisplayNames($enabled, array_column($enabled, "localeKey"));
-        $locales = $this->getEventManager()->fireFilter("localesApiController_getOutput", $enabled, false);
+
+        $locales = [];
+        if ($body["isMachineTranslations"] ?? false) {
+            if ($this->config->get("Locales.migrated", false)) {
+                $locales = $this->localeModel->getMachineLocales();
+            }
+        } else {
+            $enabled = $this->localeModel->getEnabledLocales();
+            $this->localeModel->expandDisplayNames($enabled, array_column($enabled, "localeKey"));
+            $locales = $this->getEventManager()->fireFilter("localesApiController_getOutput", $enabled, false);
+            $dbLocales = $this->localeModel->getLanguageSetting();
+            $localeIDs = array_column($dbLocales, "localeID");
+            $locales = array_merge(
+                $dbLocales,
+                array_filter($locales, function ($locale) use ($localeIDs) {
+                    return !in_array($locale["localeID"], $localeIDs);
+                })
+            );
+            $locales = array_values($locales);
+        }
+
         $locales = $out->validate($locales);
 
         return $locales;
@@ -59,143 +78,14 @@ class LocalesApiController extends Controller
      */
     private function localeSchema()
     {
-        return Schema::parse(["localeID:s", "localeKey:s", "regionalKey:s", "displayNames:o"]);
-    }
-
-    /**
-     * Get all enabled locales of the site.
-     *
-     * @return array[]
-     */
-    private function getEnabledLocales(): array
-    {
-        $locales = $this->localeModel->enabledLocalePacks(true);
-        $hasEnLocale = false;
-        $result = [];
-        foreach ($locales as $localeID => $locale) {
-            $localeItem = [
-                "localeID" => $localeID,
-                "localeKey" => $locale["Locale"],
-                "regionalKey" => $locale["Locale"],
-            ];
-
-            if ($localeItem["localeKey"] === "en") {
-                $hasEnLocale = true;
-            }
-            $result[] = $localeItem;
-        }
-
-        if (!$hasEnLocale) {
-            $result = array_merge(
-                [
-                    [
-                        "localeID" => "en",
-                        "localeKey" => "en",
-                        "regionalKey" => "en",
-                    ],
-                ],
-                $result
-            );
-        }
-
-        return $result;
-    }
-
-    /**
-     * Expand display names for the locales.
-     *
-     * @param array $rows
-     * @param array $locales
-     */
-    public function expandDisplayNames(array &$rows, array $locales)
-    {
-        if (count($rows) === 0) {
-            return;
-        }
-        reset($rows);
-        $single = is_string(key($rows));
-
-        $populate = function (array &$row, array $locales) {
-            $displayNames = [];
-            foreach ($locales as $locale) {
-                $displayName = \Locale::getDisplayLanguage($row["localeKey"], $locale);
-                $displayNameRegion = \Locale::getDisplayRegion($row["localeKey"], $locale);
-                $displayName = empty($displayNameRegion) ? $displayName : $displayName . " ($displayNameRegion)";
-                // Standardize capitalization
-                $displayName = mb_convert_case($displayName, MB_CASE_TITLE);
-
-                // If I set the translation key
-                // localeOverrides.zh.* = Override in all other langauges
-                // localeOverrides.zh.zh_TW = Override in one specific language.
-                $wildCardOverrideKey = "localeOverrides.{$row["localeKey"]}.*";
-                $specificOverrideKey = "localeOverrides.{$row["localeKey"]}.$locale";
-                $displayName = c($specificOverrideKey, c($wildCardOverrideKey, $displayName));
-
-                $displayNames[$locale] = $displayName;
-            }
-            $row["displayNames"] = $displayNames;
-        };
-
-        if ($single) {
-            $populate($rows, $locales);
-        } else {
-            foreach ($rows as &$row) {
-                $populate($row, $locales);
-            }
-        }
-    }
-
-    /**
-     * Get a single locale.
-     *
-     * @param string $id The locale to get.
-     * @return Data
-     * @throws \Garden\Web\Exception\HttpException Exception.
-     * @throws \Vanilla\Exception\PermissionException Exception.
-     */
-    public function get(string $id): Data
-    {
-        $this->permission("Garden.Settings.Manage");
-
-        $out = $this->schema($this->localeSchema(), ["LocaleConfig", "out"]);
-
-        $allLocales = $this->getEnabledLocales();
-        $this->checkLocaleExists($id, $allLocales);
-        $locale = array_column($allLocales, null, "localeID")[$id];
-        $this->expandDisplayNames($locale, array_column($allLocales, "localeKey"));
-
-        $locale = $this->getEventManager()->fireFilter("localesApiController_getOutput", $locale, true);
-        $locale = \Vanilla\ApiUtils::convertOutputKeys($locale);
-        $out->validate($locale);
-        return new Data($locale);
-    }
-
-    /**
-     * Patch a single locale.
-     *
-     * @param string $id The locale to patch.
-     * @param array $body The fields and values to patch.
-     * @return Data
-     * @throws \Garden\Schema\ValidationException Exception.
-     * @throws \Garden\Web\Exception\HttpException Exception.
-     * @throws \Vanilla\Exception\PermissionException Exception.
-     */
-    public function patch(string $id, array $body): Data
-    {
-        $this->permission("Garden.Settings.Manage");
-        $in = $this->schema(["type" => "object"], ["LocaleConfigPatch", "in"]);
-        $out = $this->schema($this->localeSchema(), ["LocaleConfig", "out"]);
-        $body = $in->validate($body);
-
-        // Validate the locale exists.
-        $this->checkLocaleExists($id);
-
-        $this->getEventManager()->fire("localesApiController_patchData", $id, $body, $in);
-
-        $result = $this->get($id);
-        $validatedResult = $out->validate($result);
-
-        return new Data($validatedResult);
+        return Schema::parse([
+            "localeID:s",
+            "localeKey:s",
+            "regionalKey:s",
+            "displayNames:o",
+            "machineTranslationService:b?",
+            "translatable:b?",
+        ]);
     }
 
     /**
@@ -224,6 +114,90 @@ class LocalesApiController extends Controller
         // Translations may include these keywords.
         $r->setMeta(ApiFilterMiddleware::FIELD_ALLOW, ["password", "email", "insertipaddress", "updateipaddress"]);
         return $r;
+    }
+
+    /**
+     * Get a single locale.
+     *
+     * @param string $id The locale to get.
+     * @return Data
+     * @throws \Garden\Web\Exception\HttpException Exception.
+     * @throws \Vanilla\Exception\PermissionException Exception.
+     */
+    public function get(string $id): Data
+    {
+        $this->permission("Garden.Settings.Manage");
+
+        $out = $this->schema($this->localeSchema(), ["LocaleConfig", "out"]);
+        $locale = $this->localeModel->getLocale($id);
+
+        if (count($locale) === 0) {
+            $allLocales = $this->localeModel->getEnabledLocales();
+            $this->checkLocaleExists($id, $allLocales);
+            $locale = array_column($allLocales, null, "localeID")[$id];
+            $this->localeModel->expandDisplayNames($locale, array_column($allLocales, "localeKey"));
+
+            $locale = $this->getEventManager()->fireFilter("localesApiController_getOutput", $locale, true);
+            $locale = \Vanilla\ApiUtils::convertOutputKeys($locale);
+        }
+        if (count($locale) === 0) {
+            throw new \Garden\Web\Exception\NotFoundException("Locale");
+        }
+        $out->validate($locale);
+        return new Data($locale);
+    }
+
+    /**
+     * Patch a single locale.
+     *
+     * @param string $id The locale to patch.
+     * @param array $body The fields and values to patch.
+     * @return Data
+     * @throws \Garden\Schema\ValidationException Exception.
+     * @throws \Garden\Web\Exception\HttpException Exception.
+     * @throws \Vanilla\Exception\PermissionException Exception.
+     */
+    public function patch(string $id, array $body): Data
+    {
+        $this->permission("Garden.Settings.Manage");
+        $in = $this->schema(["type" => "object"], ["LocaleConfigPatch", "in"]);
+        $out = $this->schema($this->localeSchema(), ["LocaleConfig", "out"]);
+        $body = $in->validate($body);
+
+        // Validate the locale exists.
+        $this->checkLocaleExists($id);
+
+        $this->getEventManager()->fire("localesApiController_patchData", $id, $body, $in);
+
+        $result = $this->get($id);
+
+        $validatedResult = $out->validate($result);
+
+        return new Data($validatedResult);
+    }
+
+    /**
+     * Post a single locale.
+     *
+     * @param array $body The fields and values to patch.
+     * @return Data
+     * @throws \Garden\Schema\ValidationException Exception.
+     * @throws \Garden\Web\Exception\HttpException Exception.
+     * @throws \Vanilla\Exception\PermissionException Exception.
+     */
+    public function post(array $body): Data
+    {
+        $this->permission("Garden.Settings.Manage");
+        $in = $this->schema(["locale:s", "translatable:b"]);
+        $out = $this->schema($this->localeSchema(), ["LocaleConfig", "out"]);
+        $body = $in->validate($body);
+        $translatable = $body["translatable"] ?? false;
+
+        // Validate the locale exists.
+        $result = $this->localeModel->updateAddTranslatableLocale($body["locale"], $translatable);
+        $validatedResult = $out->validate($result);
+
+        return new Data($validatedResult);
     }
 
     /**
@@ -256,7 +230,7 @@ class LocalesApiController extends Controller
      */
     public function validateLocale(string $locale, \Garden\Schema\ValidationField $validationField): bool
     {
-        $locales = $this->getEnabledLocales();
+        $locales = $this->localeModel->getEnabledLocales();
         foreach ($locales as $localePack) {
             if (
                 $localePack["localeID"] === $locale ||
@@ -279,7 +253,7 @@ class LocalesApiController extends Controller
     private function checkLocaleExists(string $id, ?array $enabledLocales = null): void
     {
         if (is_null($enabledLocales)) {
-            $enabledLocales = $this->getEnabledLocales();
+            $enabledLocales = $this->localeModel->getEnabledLocales();
         }
 
         if (!in_array($id, array_keys(array_column($enabledLocales, null, "localeID")))) {

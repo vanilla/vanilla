@@ -33,7 +33,7 @@ use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\Resolvers\ReactResolver;
 use Vanilla\Layout\Section\AbstractLayoutSection;
 use Vanilla\Logging\AuditLogger;
-use Vanilla\QnA\Layout\Assets\TabbedCommentListAsset;
+use Vanilla\QnA\Layout\Assets\AnswerThreadAsset;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\React\ReactWidgetInterface;
@@ -204,6 +204,7 @@ class LayoutsApiController extends \AbstractApiController
                     "schema" => $schema,
                     "iconUrl" => $iconUrl,
                     "name" => $assetClass::getWidgetName(),
+                    "isRequired" => $assetClass::isRequired(),
                 ];
             }
         }
@@ -491,7 +492,7 @@ class LayoutsApiController extends \AbstractApiController
         try {
             $row = $provider->getByID($layoutID);
         } catch (NoResultsException $e) {
-            throw new NotFoundException("Layout");
+            throw new NotFoundException("Layout", previous: $e);
         }
 
         $layoutViewType = $row["layoutViewType"];

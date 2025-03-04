@@ -157,7 +157,7 @@ export default function TextEditor(props: ITextEditorProps) {
 }
 
 function applyJsonSchema(schema: any, uri?: string): void {
-    monaco.init().then((monaco) => {
+    void monaco.init().then((monaco) => {
         monaco.languages.json.jsonDefaults.setModeConfiguration({
             colors: true,
             completionItems: true,
@@ -193,7 +193,7 @@ function useJsonSchema(schemaUri: string | null) {
         const url = new URL(schemaUri);
         url.searchParams.append("h", getMeta("context.cacheBuster"));
         const busterUrl = url.toString();
-        monaco.init().then((monaco) => {
+        void monaco.init().then((monaco) => {
             monaco.languages.json.jsonDefaults.setModeConfiguration({
                 colors: true,
                 completionItems: true,
@@ -206,7 +206,7 @@ function useJsonSchema(schemaUri: string | null) {
                 selectionRanges: true,
                 tokens: true,
             });
-            fetch(busterUrl)
+            void fetch(busterUrl)
                 .then((res) => res.json())
                 .then((json) => {
                     return applyJsonSchema(json, busterUrl);
@@ -221,7 +221,7 @@ function useTypeDefinitions(fileContents?: string) {
             return;
         }
 
-        monaco.init().then((monaco) => {
+        void monaco.init().then((monaco) => {
             monaco.languages.typescript.javascriptDefaults.addExtraLib(fileContents);
         });
     }, [fileContents]);

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 
 interface AutoWidthProps extends React.InputHTMLAttributes<HTMLInputElement> {
     maximumWidth?: number;
+    fontSize?: number;
 }
 
 export const AutoWidthInput = React.forwardRef(function AutoWidthInput(
@@ -11,8 +12,8 @@ export const AutoWidthInput = React.forwardRef(function AutoWidthInput(
     ref: React.RefObject<HTMLInputElement>,
 ) {
     const maxWidth = props.maximumWidth ?? 300;
-    const width = measureText(String(props.value), 18);
-    const minWidth = measureText(String(props.placeholder), 18);
+    const width = measureText(String(props.value), props.fontSize ?? 18, "Open Sans");
+    const placeholderWidth = measureText(String(props.placeholder), props.fontSize ?? 18, "Open Sans");
 
     const [focused, setFocused] = useState(false);
 
@@ -20,7 +21,7 @@ export const AutoWidthInput = React.forwardRef(function AutoWidthInput(
         label: "autoWidthSizer",
         width: width,
         color: "#555a62",
-        ...(props.placeholder && !props.value ? { minWidth: minWidth } : {}),
+        ...(props.placeholder && !props.value ? { minWidth: placeholderWidth } : {}),
         ...(!focused ? { maxWidth: width > maxWidth ? maxWidth : width } : { maxWidth: maxWidth * 1.25 }),
     });
 

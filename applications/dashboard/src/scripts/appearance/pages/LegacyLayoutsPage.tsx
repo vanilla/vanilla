@@ -19,7 +19,6 @@ import { LayoutOption } from "@dashboard/appearance/types";
 import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import NotFoundPage from "@library/routing/NotFoundPage";
 import { t } from "@vanilla/i18n";
-import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 
 export default function LegacyLayoutsPage(
@@ -97,34 +96,61 @@ export default function LegacyLayoutsPage(
                     layoutTypeLabel={getLayoutTypeGroupLabel("discussionList")}
                     legacyLayoutConfigKey="discussions.layout"
                     customLayoutConfigKey={getLayoutFeatureFlagKey("discussionList")}
-                    legacyTitle={t("Legacy Discussion Layout")}
-                    legacyDescription={t("Choose the preferred Legacy Discussion Layout.")}
+                    legacyTitle={t("Legacy Recent Posts Layout")}
+                    legacyDescription={t("Choose the preferred Legacy Recent Posts Layout.")}
                     radios={{
-                        legendLabel: t("Discussion Layout Version"),
-                        legacyLabel: t("Legacy Discussion Layouts"),
-                        customLabel: t("Custom Discussion Layouts"),
+                        legendLabel: t("Recent Posts Layout Version"),
+                        legacyLabel: t("Legacy Recent Posts Layouts"),
+                        customLabel: t("Custom Recent Posts Layouts"),
                     }}
                 />
             );
-        case "discussionThread":
+        case "event":
             return (
                 <LegacyLayoutFormPage
-                    layoutTypeLabel={getLayoutTypeGroupLabel("discussionThread")}
-                    title={getLayoutTypeSettingsLabel("discussionThread")}
-                    customLayoutConfigKey={getLayoutFeatureFlagKey("discussionThread")}
-                    legacyTitle={t("Legacy Discussion Thread Layout")}
-                    legacyDescription={t("Choose the preferred Legacy Discussion Thread Layout.")}
+                    layoutTypeLabel={getLayoutTypeGroupLabel("event")}
+                    title={getLayoutTypeSettingsLabel("event")}
+                    customLayoutConfigKey={getLayoutFeatureFlagKey("event")}
+                    legacyTitle={t("Legacy Event Layout")}
+                    legacyDescription={t("Choose the preferred Legacy Event Layout.")}
                     radios={{
-                        legendLabel: t("Discussion Thread Layout Version"),
-                        legacyLabel: t("Legacy Discussion Thread Layouts"),
-                        customLabel: t("Custom Discussion Thread Layouts"),
+                        legendLabel: t("Event Layout Version"),
+                        legacyLabel: t("Legacy Event Layouts"),
+                        customLabel: t("Custom Event Layouts"),
+                    }}
+                />
+            );
+        case "post":
+            return (
+                <LegacyLayoutFormPage
+                    layoutTypeLabel={getLayoutTypeGroupLabel("post")}
+                    title={getLayoutTypeSettingsLabel("post")}
+                    customLayoutConfigKey={getLayoutFeatureFlagKey("post")}
+                    legacyTitle={t("Legacy Post Layout")}
+                    legacyDescription={t("Choose the preferred Legacy Post Layout.")}
+                    radios={{
+                        legendLabel: t("Post Layout Version"),
+                        legacyLabel: t("Legacy Post Layouts"),
+                        customLabel: t("Custom Post Layouts"),
+                    }}
+                />
+            );
+        case "createPost":
+            return (
+                <LegacyLayoutFormPage
+                    layoutTypeLabel={getLayoutTypeGroupLabel("createPost")}
+                    title={getLayoutTypeSettingsLabel("createPost")}
+                    customLayoutConfigKey={getLayoutFeatureFlagKey("createPost")}
+                    legacyTitle={t("Legacy Create Post Layout")}
+                    legacyDescription={t("Choose the preferred Legacy Create Post Layout.")}
+                    radios={{
+                        legendLabel: t("Create Post Layout Version"),
+                        legacyLabel: t("Legacy Create Post Layouts"),
+                        customLabel: t("Custom Create Post Layouts"),
                     }}
                 />
             );
         case "knowledgeBase":
-        case "article":
-            // FIXME: Remove this. When KB layouts are ready, we will not offer the legacy layout option.
-            // This is just to aid toggling the feature during development.
             return (
                 <LegacyLayoutFormPage
                     layoutTypeLabel={getLayoutTypeGroupLabel("knowledgeBase")}

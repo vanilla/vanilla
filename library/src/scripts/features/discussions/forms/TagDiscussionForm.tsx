@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-import React from "react";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import Loader from "@library/loaders/Loader";
 import { createLoadableComponent } from "@vanilla/react-utils";

@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IApiError, LoadStatus } from "@library/@types/api/core";
+import { IApiError, IServerError, LoadStatus } from "@library/@types/api/core";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
 import { userContentVariables } from "@library/content/UserContent.variables";
@@ -19,7 +19,7 @@ import Paragraph from "@library/layout/Paragraph";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { t } from "@library/utility/appUtils";
 import { escapeHTML } from "@vanilla/dom-utils";
-import { debug } from "@vanilla/utils";
+import { debug, logError } from "@vanilla/utils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
 
@@ -141,6 +141,23 @@ export function getErrorCode(errorMessageProps: IErrorMessageProps) {
     }
 }
 
+export function extractErrorMessage(throwable: unknown): string {
+    if (throwable instanceof Error) {
+        return throwable.message;
+    }
+
+    if (typeof throwable === "string") {
+        return throwable;
+    }
+
+    if (throwable && typeof throwable === "object" && "message" in throwable && typeof throwable.message === "string") {
+        return throwable.message;
+    }
+
+    logError(throwable);
+    return "Something went wrong.";
+}
+
 export interface IAPIErrorFragment {
     response: {
         status: number;
@@ -153,16 +170,13 @@ export interface IErrorMessageProps {
     apiError?: IAPIErrorFragment;
 }
 
-export interface IError {
-    status?: number;
+export interface IError extends Partial<Omit<IServerError, "description">> {
     message: string;
-    messageAsParagraph?: boolean;
-    description?: ReactNode;
-    actionItem?: ReactNode;
-    icon?: ReactNode;
+    description?: string | ReactNode;
     response?: any;
-    trace?: string;
-    actionButton?: IApiError["actionButton"];
+    messageAsParagraph?: boolean;
+    icon?: ReactNode;
+    actionItem?: ReactNode;
 }
 
 export enum DefaultError {

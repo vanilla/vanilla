@@ -9,6 +9,7 @@ use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
+use Vanilla\Forum\Models\DiscussionPermissions;
 use Vanilla\Forum\Models\PostMetaModel;
 use Vanilla\Utility\ModelUtils;
 
@@ -29,7 +30,8 @@ class DiscussionExpandSchema
         private ReactionModel $reactionModel,
         private \Vanilla\Forum\Models\CommunityManagement\ReportModel $reportModel,
         private Gdn_Session $session,
-        private PostMetaModel $postMetaModel
+        private PostMetaModel $postMetaModel,
+        private DiscussionPermissions $discussionPermissions
     ) {
     }
 
@@ -73,8 +75,10 @@ class DiscussionExpandSchema
             "attachments",
             "reportMeta",
             "countReports",
-            "postFields",
+            "postMeta",
             "warnings",
+            "permissions",
+            "vectorize",
         ]);
     }
 
@@ -119,8 +123,12 @@ class DiscussionExpandSchema
             $this->reactionModel->expandDiscussionReactions($rows);
         }
 
-        if (ModelUtils::isExpandOption("postFields", $expandOption)) {
-            $this->postMetaModel->joinPostFields($rows);
+        if (ModelUtils::isExpandOption("postMeta", $expandOption)) {
+            $this->postMetaModel->joinPostMeta($rows);
+        }
+
+        if (ModelUtils::isExpandOption("permissions", $expandOption)) {
+            $this->discussionPermissions->expandPermissions($rows);
         }
     }
 }

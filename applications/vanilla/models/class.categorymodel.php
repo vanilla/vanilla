@@ -255,8 +255,6 @@ class CategoryModel extends Gdn_Model implements
 
     private ?array $preferenceMap = null;
 
-    private ?PostTypeModel $postTypeModel = null;
-
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -401,6 +399,7 @@ class CategoryModel extends Gdn_Model implements
      * @param array $permissionCategory The permission category of the category.
      * @param array $category The category we're checking the permission on.
      * @param null $sender
+     * @param bool $checkCategory
      * @return array The allowed discussion types on the category.
      * @throws ContainerException
      * @throws \Garden\Container\NotFoundException
@@ -409,12 +408,14 @@ class CategoryModel extends Gdn_Model implements
     {
         $permissionCategory = self::permissionCategory($permissionCategory);
         $allowed = val("AllowedDiscussionTypes", $permissionCategory);
+
         $allTypes = DiscussionModel::discussionTypes();
         if (empty($allowed) || !is_array($allowed)) {
             $allowedTypes = $allTypes;
         } else {
             $allowedTypes = array_intersect_key($allTypes, array_flip($allowed));
         }
+
         Gdn::pluginManager()->EventArguments["AllowedDiscussionTypes"] = &$allowedTypes;
         Gdn::pluginManager()->EventArguments["Category"] = $category;
         Gdn::pluginManager()->EventArguments["PermissionCategory"] = $permissionCategory;
@@ -429,23 +430,31 @@ class CategoryModel extends Gdn_Model implements
     /**
      * Return post type data array formatted for rendering the new post widget.
      *
-     * @param array $category
+     * @param mixed $category
      * @return array
      * @throws Exception
      */
-    public function getAllowedPostTypeData(array $category): array
+    public static function getAllowedPostTypeData(mixed $category = null, ?int $groupID = null): array
     {
-        $postTypes = self::getPostTypeModel()->getAllowedPostTypes($category);
+        $postTypeModel = self::getPostTypeModel();
+        $postTypes = empty($category)
+            ? $postTypeModel->getAvailablePostTypes()
+            : $postTypeModel->getAllowedPostTypesByCategory((array) $category);
 
         // Convert post types to expected format for new post widget.
         $result = [];
         foreach ($postTypes as $postType) {
             $result[$postType["name"]] = $postType + [
+                "apiType" => $postType["postTypeID"],
+                "Singular" => $postType["name"],
+                "Plural" => $postType["name"],
                 "AddUrl" => "/post/{$postType["postTypeID"]}",
                 "AddText" => $postType["postButtonLabel"],
                 "AddIcon" => $postType["postButtonIcon"] ?? ($postType["parentPostType"]["postButtonIcon"] ?? null),
             ];
         }
+
+        $result = Gdn::eventManager()->fireFilter("getAllowedPostTypeData", $result, $category, $groupID);
         return $result;
     }
 
@@ -679,10 +688,12 @@ class CategoryModel extends Gdn_Model implements
         ?bool $includeChildCategories = null,
         ?bool $includeArchivedCategories = null,
         ?array $categoryIDs = null,
-        ?string $categorySearch = null
+        ?string $categorySearch = null,
+        bool $filterDiscussionsAdd = false
     ): array {
         $categoryFilter = [
             "forceArrayReturn" => true,
+            "filterDiscussionsAdd" => $filterDiscussionsAdd,
         ];
         if (!$includeArchivedCategories) {
             $categoryFilter["filterArchivedCategories"] = true;
@@ -1192,6 +1203,7 @@ class CategoryModel extends Gdn_Model implements
      *   - forceArrayReturn (bool): Force an array return value.
      *   - filterNonDiscussionCategories (bool) : Filter out categories with no discussion in them
      *   - filterSiteSections (bool) : Filter out categories that are not in the current site section
+     *   - filterDiscussionsAdd (bool): Filter out categories that don't have Discussions.Add or are invalid for posts.
      * @return array|bool An array of filtered categories or true if no categories were filtered.
      */
     public function getVisibleCategories(array $options = [])
@@ -1252,6 +1264,12 @@ class CategoryModel extends Gdn_Model implements
                 $permissionCategory = CategoryModel::permissionCategory($category);
                 $allowedDiscussionTypes = CategoryModel::getAllowedDiscussionData($permissionCategory, $category);
                 $category["AllowedDiscussionTypes"] = $allowedDiscussionTypes;
+            }
+
+            // Filter out categories that cannot be posted into.
+            if (($options["filterDiscussionsAdd"] ?? false) && !$category["PermsDiscussionsAdd"]) {
+                $unfiltered = false;
+                continue;
             }
 
             $lazyPermSet = self::$toLazySet[$categoryID]["PermsDiscussionsView"] ?? false;
@@ -1344,14 +1362,6 @@ class CategoryModel extends Gdn_Model implements
     {
         if ((is_int($ID) || is_string($ID)) && empty(self::$Categories)) {
             $category = self::instance()->getOne($ID);
-            if (!empty($category)) {
-                $category["Name"] = $category["Name"]
-                    ? Gdn::formatService()->renderPlainText($category["Name"], TextFormat::FORMAT_KEY)
-                    : $category["Name"];
-                $category["Description"] = $category["Description"]
-                    ? Gdn::formatService()->renderPlainText($category["Description"], TextFormat::FORMAT_KEY)
-                    : $category["Description"];
-            }
             return $category;
         }
 
@@ -1376,35 +1386,12 @@ class CategoryModel extends Gdn_Model implements
 
             if (isset(self::$Categories[$ID])) {
                 $Result = self::$Categories[$ID];
-                if (!empty($Result["Name"])) {
-                    $Result["Name"] = Gdn::formatService()->renderPlainText($Result["Name"], TextFormat::FORMAT_KEY);
-                }
-                if (!empty($Result["Description"])) {
-                    $Result["Description"] = Gdn::formatService()->renderPlainText(
-                        $Result["Description"],
-                        TextFormat::FORMAT_KEY
-                    );
-                }
                 return $Result;
             } else {
                 return null;
             }
         } else {
             $Result = self::$Categories;
-            foreach ($Result as &$category) {
-                if (!empty($category["Name"])) {
-                    $category["Name"] = Gdn::formatService()->renderPlainText(
-                        $category["Name"],
-                        TextFormat::FORMAT_KEY
-                    );
-                }
-                if (!empty($category["Description"])) {
-                    $category["Description"] = Gdn::formatService()->renderPlainText(
-                        $category["Description"],
-                        TextFormat::FORMAT_KEY
-                    );
-                }
-            }
             return $Result;
         }
     }
@@ -1730,12 +1717,6 @@ class CategoryModel extends Gdn_Model implements
 
             if ($categoryID) {
                 $category = self::categories($categoryID);
-                $category["Name"] = $category["Name"]
-                    ? Gdn::formatService()->renderPlainText($category["Name"], TextFormat::FORMAT_KEY)
-                    : $category["Name"];
-                $category["Description"] = $category["Description"]
-                    ? Gdn::formatService()->renderPlainText($category["Description"], TextFormat::FORMAT_KEY)
-                    : $category["Description"];
                 if ($categoryID === -1) {
                     setValue($field, $row, $this->getRootCategoryForDisplay());
                 } elseif ($category) {
@@ -2259,7 +2240,7 @@ class CategoryModel extends Gdn_Model implements
         // Figure out whether or not the category tracks points by CateoryID or by PointsCategoryID.
         $category = self::categories($categoryID);
 
-        if ($category["PointsCategoryID"]) {
+        if (isset($category["PointsCategoryID"]) && $category["PointsCategoryID"]) {
             $categoryID = val("PointsCategoryID", $category);
         }
 
@@ -2586,26 +2567,29 @@ class CategoryModel extends Gdn_Model implements
      * @param array $categories
      * @return void
      */
-    public static function joinPostTypes(array &$categories)
+    public static function joinPostTypes(array &$categories): void
     {
-        $categoryIDs = array_column($categories, "CategoryID");
-        $postTypesByCategory = self::getPostTypeModel()->getPostTypesByCategory(["categoryID" => $categoryIDs]);
+        $postTypeModel = self::getPostTypeModel();
+        $allowedPostTypes = $postTypeModel->getAllowedPostTypes();
+        $postTypesByCategory = PostTypeModel::indexPostTypesByCategory($allowedPostTypes);
+        $categoryAssociations = $postTypeModel->getCategoryAssociations();
+        $categoryAssociations = ArrayUtils::arrayColumnArrays($categoryAssociations, "postTypeID", "categoryID");
 
         foreach ($categories as &$category) {
-            if (isset($postTypesByCategory[$category["CategoryID"]])) {
-                $category["allowedPostTypeIDs"] = $postTypesByCategory[$category["CategoryID"]];
-            }
-
-            if (isset($category["AllowedDiscussionTypes"]) && !isset($category["allowedPostTypeIDs"])) {
-                // If the category has legacy allowed discussion types and no explicitly set post type IDs,
-                // convert from the legacy types to post type IDs.
-                $category["allowedPostTypeIDs"] = [];
-                if (!empty($category["AllowedDiscussionTypes"])) {
-                    $category["allowedPostTypeIDs"] = PostTypeModel::convertFromLegacyTypes(
-                        $category["AllowedDiscussionTypes"]
-                    );
-                }
-            }
+            $category["hasRestrictedPostTypes"] = !empty($categoryAssociations[$category["CategoryID"]]);
+            $category["allowedPostTypeIDs"] = array_column(
+                $postTypesByCategory[$category["CategoryID"]] ?? [],
+                "postTypeID"
+            );
+            $category["allowedPostTypeOptions"] = array_values(
+                array_intersect_key(
+                    array_column($allowedPostTypes, null, "postTypeID"),
+                    array_flip($category["allowedPostTypeIDs"])
+                )
+            );
+            $category["AllowedDiscussionTypes"] = array_unique(
+                array_column($category["allowedPostTypeOptions"], "baseType")
+            );
         }
     }
 
@@ -2648,12 +2632,6 @@ class CategoryModel extends Gdn_Model implements
      */
     public function fixRow(array &$row): void
     {
-        if (!empty($row["Name"])) {
-            $row["Name"] = Gdn::formatService()->renderPlainText($row["Name"], TextFormat::FORMAT_KEY);
-        }
-        if (!empty($row["Description"])) {
-            $row["Description"] = Gdn::formatService()->renderPlainText($row["Description"], TextFormat::FORMAT_KEY);
-        }
         if (!empty($row["LastTitle"])) {
             $row["LastTitle"] = Gdn::formatService()->renderPlainText($row["LastTitle"], TextFormat::FORMAT_KEY);
         }
@@ -2758,7 +2736,7 @@ class CategoryModel extends Gdn_Model implements
             ? (Gdn_UploadImage::url($dbRecord["Photo"]) ?:
             null) // In case false is returned.
             : null;
-        $schemaRecord["bannerUrl"] = BannerImageModel::getBannerImageSlug($dbRecord["CategoryID"]) ?: null;
+        $schemaRecord["bannerUrl"] = BannerImageModel::getBannerImageUrl($dbRecord["CategoryID"]) ?: null;
 
         // We add Images srcsets.
         $schemaRecord["iconUrlSrcSet"] = $this->imageSrcSetService->getResizedSrcSet($schemaRecord["iconUrl"]);
@@ -3913,9 +3891,19 @@ class CategoryModel extends Gdn_Model implements
         $CustomPermissions =
             (bool) val("CustomPermissions", $formPostValues) || is_array(val("Permissions", $formPostValues));
         $CustomPoints = val("CustomPoints", $formPostValues, null);
+        $allowedDiscussionTypes =
+            isset($formPostValues["AllowedDiscussionTypes"]) && is_array($formPostValues["AllowedDiscussionTypes"])
+                ? $formPostValues["AllowedDiscussionTypes"]
+                : null;
 
-        if (isset($formPostValues["AllowedDiscussionTypes"]) && is_array($formPostValues["AllowedDiscussionTypes"])) {
+        $allowedPostTypeIDs = $formPostValues["allowedPostTypeIDs"] ?? null;
+
+        if (isset($allowedDiscussionTypes)) {
             $formPostValues["AllowedDiscussionTypes"] = dbencode($formPostValues["AllowedDiscussionTypes"]);
+        } elseif (isset($allowedPostTypeIDs)) {
+            $legacyTypesFromPostTypes = array_intersect($allowedPostTypeIDs, PostTypeModel::LEGACY_TYPE_MAP);
+            $legacyTypesFromPostTypes = array_values(array_map("ucfirst", $legacyTypesFromPostTypes));
+            $formPostValues["AllowedDiscussionTypes"] = dbencode($legacyTypesFromPostTypes);
         } else {
             $formPostValues["AllowedDiscussionTypes"] = null;
         }
@@ -4125,10 +4113,15 @@ class CategoryModel extends Gdn_Model implements
                         "JunctionID" => $CategoryID,
                     ]);
                 }
+                $postTypeModel = self::getPostTypeModel();
 
-                if (isset($formPostValues["allowedPostTypeIDs"])) {
-                    $postTypeModel = self::getPostTypeModel();
-                    $postTypeModel->putPostTypesForCategory($CategoryID, $formPostValues["allowedPostTypeIDs"]);
+                if (isset($allowedPostTypeIDs)) {
+                    $allowedPostTypeIDs = $formPostValues["allowedPostTypeIDs"];
+                    $postTypeModel->putPostTypesForCategory($CategoryID, $allowedPostTypeIDs);
+                }
+
+                if (isset($allowedDiscussionTypes)) {
+                    $this->handleLegacyTypes($CategoryID, $allowedDiscussionTypes);
                 }
             }
 
@@ -4247,6 +4240,7 @@ class CategoryModel extends Gdn_Model implements
         }
 
         if (isset($property["AllowedDiscussionTypes"]) && is_array($property["AllowedDiscussionTypes"])) {
+            $this->handleLegacyTypes($rowID, $property["AllowedDiscussionTypes"]);
             $property["AllowedDiscussionTypes"] = dbencode($property["AllowedDiscussionTypes"]);
         }
         $newFeaturedSort = $this->calcFeaturedSort($rowID, $property);
@@ -4368,7 +4362,10 @@ class CategoryModel extends Gdn_Model implements
 
             foreach ($ancestors as $row) {
                 // If this ancestor already has a newer discussion, stop.
-                if (!$lastInserted || $lastInserted < strtotime($row["LastDateInserted"])) {
+                if (
+                    !$lastInserted ||
+                    (isset($row["LastDateInserted"]) && $lastInserted < strtotime($row["LastDateInserted"]))
+                ) {
                     // Make sure this latest discussion is even valid.
                     $discussionExists =
                         DiscussionModel::instance()->getCount([
@@ -5304,7 +5301,8 @@ SQL;
         array $where = [],
         bool $expandParent = false,
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
+        bool $filterDiscussionsAdd = false
     ) {
         if ($limit !== null && filter_var($limit, FILTER_VALIDATE_INT) === false) {
             $limit = null;
@@ -5313,7 +5311,13 @@ SQL;
             $offset = null;
         }
 
-        $searchableIDs = $this->getSearchCategoryIDs($parentCategoryID, null, true, true);
+        $searchableIDs = $this->getSearchCategoryIDs(
+            $parentCategoryID,
+            null,
+            true,
+            true,
+            filterDiscussionsAdd: $filterDiscussionsAdd
+        );
         $where["CategoryID"] = $searchableIDs;
 
         $query = $this->SQL
@@ -5483,10 +5487,13 @@ SQL;
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 "featured:b?" => "Featured category.",
                 "allowedDiscussionTypes:a",
+                "permissions:o?",
             ]);
 
-            if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
-                $this->schemaInstance->merge(Schema::parse(["allowedPostTypeIDs:a?"]));
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
+                $this->schemaInstance->merge(
+                    Schema::parse(["allowedPostTypeIDs:a?", "allowedPostTypeOptions:a?", "hasRestrictedPostTypes:b?"])
+                );
             }
         }
         return $this->schemaInstance;
@@ -5828,5 +5835,56 @@ SQL;
             }
             return true;
         };
+    }
+
+    /**
+     * Check if post type is allowed for a category.
+     *
+     * @param array $category
+     * @param string $type
+     * @return bool
+     * @throws Exception
+     */
+    public function isPostTypeAllowed(array $category, string $type, bool $exclusive = false): bool
+    {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            if (isset(PostTypeModel::LEGACY_TYPE_MAP[$type])) {
+                // If this is a legacy type name, convert to post type ID first.
+                $type = PostTypeModel::LEGACY_TYPE_MAP[$type];
+            }
+            $allowedPostTypes = self::getPostTypeModel()->getAllowedPostTypesByCategory($category);
+            return in_array($type, array_column($allowedPostTypes, "postTypeID"));
+        }
+
+        $allowedTypes = $category["AllowedDiscussionTypes"] ?? [];
+
+        if (empty($allowedTypes) && !$exclusive) {
+            return true;
+        }
+        return in_array($type, $allowedTypes);
+    }
+
+    /**
+     * Handles converting legacy discussion types to post type IDs.
+     *
+     * @param int $categoryID
+     * @param array $allowedDiscussionTypes Legacy types.
+     * @return void
+     * @throws Throwable
+     */
+    private function handleLegacyTypes(int $categoryID, array $allowedDiscussionTypes)
+    {
+        // Convert from legacy discussion types to post type IDs.
+        $convertedPostTypeIDs = PostTypeModel::convertFromLegacyTypes($allowedDiscussionTypes);
+
+        // For legacy types we need to remove the **base** post types that were not selected.
+        $unselectedPostTypeIDs = array_diff(array_values(PostTypeModel::LEGACY_TYPE_MAP), $convertedPostTypeIDs);
+
+        self::getPostTypeModel()->putPostTypesForCategory(
+            $categoryID,
+            $convertedPostTypeIDs,
+            addOnly: true,
+            removePostTypeIDs: $unselectedPostTypeIDs
+        );
     }
 }

@@ -71,7 +71,7 @@ export const listItemClasses = useThemeCache(
             }),
             ...(isTile &&
                 !hasImage && {
-                    ...Mixins.padding({ vertical: 0 }),
+                    ...Mixins.padding({ all: 16 }),
                 }),
             ...(asTile &&
                 !isMobileTile &&

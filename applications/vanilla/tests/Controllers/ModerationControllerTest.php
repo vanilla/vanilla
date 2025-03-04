@@ -44,7 +44,6 @@ class ModerationControllerTest extends SiteTestCase
         $this->useLegacyLayouts();
         /** @var \Gdn_Configuration $config */
         $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig("Vanilla.Categories.Use", true);
         $this->discussions = $this->insertDiscussions(6);
         $this->category = $this->insertCategories(1)[0];
     }

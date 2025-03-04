@@ -34,7 +34,7 @@ trait MockResponseTrait
             ksort($body);
             $body = json_encode($body);
         }
-        $bodyHash = md5($body);
+        $bodyHash = md5($body ?? "");
         return $method . "-" . $uri . $bodyHash;
     }
 

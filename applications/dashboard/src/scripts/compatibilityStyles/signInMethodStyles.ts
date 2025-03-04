@@ -103,10 +103,19 @@ export const signInMethodsCSS = useThemeCache(() => {
         paddingLeft: styleUnit(formElements.sizing.height + textOffset),
     });
 
+    cssOut(`body.Section-Entry .Methods .SignInLink.Button.Primary,`, {
+        color: ColorsUtils.colorOut(buttonGlobals.font.color),
+        whiteSpace: "normal",
+        textAlign: "start",
+        lineHeight: vars.lineHeights.condensed,
+        display: "flex",
+        alignItems: "center",
+        overflow: "hidden",
+    });
+
     // Workaround for important style in core
     cssOut(
         `
-        body.Section-Entry .Methods .SignInLink.Button.Primary,
         body.Section-Entry .Methods .SocialIcon.SocialIcon-Facebook,
         body.Section-Entry .Methods .SocialIcon.SocialIcon-Twitter,
         body.Section-Entry .Methods .SocialIcon.SocialIcon-Google,

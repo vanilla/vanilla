@@ -9,14 +9,14 @@ import { QnAStatus } from "@dashboard/@types/api/comment";
 import { MetaTag } from "@library/metas/Metas";
 import { TagPreset } from "@library/metas/Tags.variables";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
-import { addCommentOption } from "@vanilla/addon-vanilla/thread/CommentOptionsMenu";
-import { useThreadItemContext } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
-import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
+import { addCommentOption } from "@vanilla/addon-vanilla/comments/CommentOptionsMenu";
+import { CommentsBulkActionsProvider } from "@vanilla/addon-vanilla/comments/bulkActions/CommentsBulkActionsContext";
+import { useContentItemContext } from "@vanilla/addon-vanilla/contentItem/ContentItemContext";
+import { ContentItemHeader } from "@vanilla/addon-vanilla/contentItem/ContentItemHeader";
 import { t } from "@vanilla/i18n";
 
 registerLoadableWidgets({
-    TabbedCommentListAsset: () =>
-        import(/* webpackChunkName: "widgets/TabbedCommentListAsset" */ "@QnA/asset/TabbedCommentListAsset"),
+    AnswerThreadAsset: () => import("@QnA/asset/AnswerThreadAsset"),
 });
 
 addCommentOption({
@@ -30,7 +30,7 @@ addCommentOption({
 });
 
 function QnaStatusTag() {
-    const { attributes } = useThreadItemContext();
+    const { attributes } = useContentItemContext();
 
     const qnaStatus: QnAStatus = attributes?.answer?.status;
     switch (qnaStatus) {
@@ -43,7 +43,7 @@ function QnaStatusTag() {
     }
 }
 
-ThreadItemHeader.registerMetaItem(
+ContentItemHeader.registerMetaItem(
     QnaStatusTag,
     function (context) {
         return context.recordType === "comment" && !!context.attributes?.answer?.status;
@@ -52,3 +52,5 @@ ThreadItemHeader.registerMetaItem(
         placement: "metadata",
     },
 );
+
+CommentsBulkActionsProvider.registerPostType({ value: "question", label: "Question" });

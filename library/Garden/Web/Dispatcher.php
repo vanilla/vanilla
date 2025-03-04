@@ -22,9 +22,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Dashboard\Events\AccessDeniedEvent;
-use Vanilla\Exception\PermissionException;
+use Vanilla\Http\InternalRequest;
 use Vanilla\Logger;
-use Vanilla\Logging\AuditLogger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
@@ -163,7 +162,10 @@ class Dispatcher implements LoggerAwareInterface
     protected function dispatchInternal(RequestInterface $request)
     {
         $ex = null;
-
+        // If this is an internal api request we might have added meta contents in the middlewares that needs to passed along
+        if ($request instanceof InternalRequest && !empty($request->getMetaArray())) {
+            Gdn::request()->setMetaArray($request->getMetaArray());
+        }
         foreach ($this->routes as $route) {
             try {
                 $action = $route->match($request);

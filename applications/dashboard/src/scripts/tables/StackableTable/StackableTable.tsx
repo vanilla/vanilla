@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -15,8 +15,6 @@ import { Icon } from "@vanilla/icons";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { stackableTableClasses } from "@dashboard/tables/StackableTable/StackableTable.classes";
 import { spaceshipCompare } from "@vanilla/utils";
-import pickBy from "lodash-es/pickBy";
-import isEmpty from "lodash-es/isEmpty";
 
 export interface ColumnConfig {
     order: number;
@@ -42,7 +40,7 @@ export enum StackableTableSortOption {
     NO_SORT = "noSort",
 }
 
-interface IStackableTableProps {
+export interface IStackableTableProps {
     data: Array<Record<string, any>>;
     updateQuery?: (newQueryParams: any) => void;
     onHeaderClick?: (columnName: string, sortOption: string) => void;
@@ -94,7 +92,6 @@ const StackableTableHeader = (props: IStackableTableHeaderProps) => {
     } = props;
 
     const classes = stackableTableClasses(actionsColumnWidth);
-    const firstColumnWrapped = !isEmpty(pickBy(columnsConfiguration, ({ wrapped }) => wrapped));
 
     return (
         <thead className={headerClassNames}>
@@ -118,7 +115,7 @@ const StackableTableHeader = (props: IStackableTableHeaderProps) => {
                                 condition={hasWrapper}
                                 component={headerWrappers && headerWrappers[header]}
                                 componentProps={{
-                                    ...(headerWrappers && headerWrappers[header] && { firstColumnWrapped }),
+                                    ...(headerWrappers && headerWrappers[header]),
                                 }}
                             >
                                 <ConditionalWrap
@@ -148,9 +145,9 @@ const StackableTableHeader = (props: IStackableTableHeaderProps) => {
                                     {isSortable && sortDirection !== StackableTableSortOption.NO_SORT ? (
                                         <span>
                                             {sortDirection === StackableTableSortOption.DESC ? (
-                                                <Icon icon={"data-down"} />
+                                                <Icon icon={"move-down"} />
                                             ) : (
-                                                <Icon icon={"data-up"} />
+                                                <Icon icon={"move-up"} />
                                             )}
                                         </span>
                                     ) : (
@@ -181,7 +178,6 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
         actionsColumnWidth,
     } = props;
     const classes = stackableTableClasses(actionsColumnWidth);
-    const firstColumnWrapped = !isEmpty(pickBy(columnsConfiguration, ({ wrapped }) => wrapped));
 
     interface IEntry extends IUser {
         rowClassName?: string;
@@ -243,14 +239,9 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
                                         : undefined
                                 }
                             >
-                                <ConditionalWrap condition={isFirstColumn} className={cx("first-column")} key={key}>
+                                <ConditionalWrap condition={isFirstColumn} className="first-column" key={key}>
                                     {CellRenderer && (
-                                        <CellRenderer
-                                            data={row}
-                                            columnName={columnName}
-                                            updateQuery={updateQuery}
-                                            wrappedVersion={isFirstColumn && firstColumnWrapped}
-                                        />
+                                        <CellRenderer data={row} columnName={columnName} updateQuery={updateQuery} />
                                     )}
                                     {isFirstColumn && (
                                         <div className={cx(classes.wrappedContent, "wrapped-content")}>
@@ -373,7 +364,7 @@ export default function StackableTable(props: IStackableTableProps) {
                     headerWrappers={headerWrappers}
                 />
                 <StackableTableRows
-                    columnsConfiguration={columnsConfiguration}
+                    columnsConfiguration={configuration}
                     orderedColumns={orderedColumns}
                     rowClassNames={cx(props.rowClassNames)}
                     {...rest}
@@ -405,14 +396,17 @@ export function adjustColumnsVisibility(
         const spaceForVisibleColumns = actualWidth - DEFAULT_FIRST_COLUMN_WIDTH - lastColumnWidth;
 
         //some logic to adjust the wrapped value in configuration
-        const columnsWithCustomWidth = orderedColumns.filter(
-            (column) => configuration[column].width && !configuration[column].wrapped,
-        );
-        const customWidth = columnsWithCustomWidth[0] && configuration[columnsWithCustomWidth[0]].width;
-        const averageColumnWidth = customWidth
+        const columnsWithCustomWidth = orderedColumns.filter((column) => configuration[column].width);
+        const columnsWithCustomWidthTotal =
+            columnsWithCustomWidth.length > 0
+                ? columnsWithCustomWidth.reduce((acc, columnWithCustomWidth) => {
+                      return acc + (configuration?.[columnWithCustomWidth]?.width ?? DEFAULT_COLUMN_WIDTH);
+                  }, 0)
+                : 0;
+        const averageColumnWidth = columnsWithCustomWidthTotal
             ? (((DEFAULT_COLUMN_MAX_WIDTH + DEFAULT_COLUMN_WIDTH) / 2) *
                   (orderedColumns.length - columnsWithCustomWidth.length) +
-                  columnsWithCustomWidth.length * customWidth) /
+                  columnsWithCustomWidthTotal) /
               orderedColumns.length
             : (DEFAULT_COLUMN_MAX_WIDTH + DEFAULT_COLUMN_WIDTH) / 2;
         const notWrappedColumnsNumber =

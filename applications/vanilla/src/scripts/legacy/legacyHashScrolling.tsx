@@ -9,7 +9,7 @@ import { mountPortal } from "@vanilla/react-utils";
 import { MODAL_CONTAINER_ID } from "@library/modal/mountModal";
 
 export function triggerLegacyHashScrolling() {
-    mountPortal(<LegacyHashScroller />, MODAL_CONTAINER_ID);
+    void mountPortal(<LegacyHashScroller />, MODAL_CONTAINER_ID);
 }
 
 function LegacyHashScroller() {

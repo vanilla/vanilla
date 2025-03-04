@@ -14,6 +14,9 @@ $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledApplications']['Dashboard'] = 'dashboard';
 $Configuration['EnabledPlugins']['rich-editor'] = true;
 $Configuration['EnabledPlugins']['FederatedSearch'] = true;
+$Configuration['EnabledPlugins']['QnA'] = true;
+$Configuration['EnabledPlugins']['ideation'] = true;
+$Configuration['EnabledPlugins']['sitemaps'] = true;
 
 // ImageUpload
 $Configuration['ImageUpload']['Limits']['Enabled'] = false;
@@ -32,8 +35,8 @@ $Configuration['Database']['ExtendedProperties']['Collate'] = 'utf8mb4_unicode_c
 $Configuration['Database']['ConnectionOptions'] = [
     12 => false, // PDO::ATTR_PERSISTENT
     1000 => true, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY (missing in some PHP installations)
+    PDO::ATTR_TIMEOUT => 25
 ];
-
 
 //Configuration for Dba Counts
 $Configuration['Dba']['Limit'] = 1000;
@@ -67,7 +70,11 @@ $Configuration['Garden']['Forms']['HoneypotName'] = 'hpt';
 
 // Feature flags
 $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
-$Configuration["Feature"]["GroupsFollowing"]["Enabled"] = false;
+$Configuration["Feature"]["GroupsFollowing"]["Enabled"] = true;
+$Configuration['Feature']['NewAnalytics']['Enabled'] = true;
+$Configuration['Feature']['CustomProfileFields']['Enabled'] = true;
+$Configuration['Feature']['NewUserManagement']['Enabled'] = true;
+$Configuration['Feature']['SuggestedContent']['Enabled'] = true;
 
 // Developer stuff.
 $Configuration['Garden']['Debug'] = false;
@@ -194,6 +201,7 @@ $Configuration['Modules']['Vanilla']['Content'] = ['MessageModule', 'MeModule', 
 $Configuration['Modules']['Conversations']['Panel'] = ['MeModule', 'UserBoxModule', 'NewConversationModule', 'SignedInModule', 'GuestModule', 'Ads'];
 $Configuration['Modules']['Conversations']['Content'] = ['MessageModule', 'MeModule', 'UserBoxModule', 'NewConversationModule', 'Notices', 'Content', 'Ads'];
 
+
 // Routes.
 $Configuration['Routes']['DefaultController'] = array (
     0 => 'discussions',
@@ -207,3 +215,5 @@ $Configuration['Routes']['UpdateMode'] = 'home/updatemode';
 // Themes
 $Configuration['Theme']['Banner']['VisibleSections'] = ["DiscussionList", "CategoryDiscussionList", "CategoryList", "NewEventList"];
 $Configuration['Theme']['ContentBanner']['VisibleSections'] = ["Discussion", 'Drafts', 'Profile', 'PostDiscussion'];
+
+$Configuration['Search']['ContextualSearchByCategory']['Enabled'] = true;

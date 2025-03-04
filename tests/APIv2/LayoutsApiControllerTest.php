@@ -581,7 +581,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
             $catalog = str_contains($allowedID, "asset") ? $catalogData["assets"] : $catalogData["widgets"];
             //this conditioning is a temporary kludge until we figure out if sections should have different
             //allowedWidgetIDs depending on layoutViewType, as discussionList catalog don't have asset breadcrumbs in it
-            if (!in_array($allowedID, ["react.asset.discussionTagsAsset", "react.asset.breadcrumbs"])) {
+            if (!in_array($allowedID, ["react.asset.postTags", "react.asset.breadcrumbs"])) {
                 $this->assertArrayHasKey(
                     $allowedID,
                     $catalog,

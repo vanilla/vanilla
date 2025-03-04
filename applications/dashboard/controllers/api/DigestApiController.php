@@ -8,14 +8,15 @@
 
 namespace Vanilla\Dashboard\Controllers\Api;
 
+use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Forum\Digest\DigestEmail;
 use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\Forum\Digest\ScheduleWeeklyDigestJob;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Web\Controller;
 
 /**
@@ -23,27 +24,20 @@ use Vanilla\Web\Controller;
  */
 class DigestApiController extends Controller
 {
-    private DigestModel $digestModel;
-
-    private ScheduleWeeklyDigestJob $scheduleWeeklyDigestJob;
-
-    private ConfigurationInterface $config;
-
     /**
      * Constructor
      *
      * @param DigestModel $digestModel
      * @param ScheduleWeeklyDigestJob $scheduleWeeklyDigestJob
      * @param ConfigurationInterface $config
+     * @param LongRunner $longRunner
      */
     public function __construct(
-        DigestModel $digestModel,
-        ScheduleWeeklyDigestJob $scheduleWeeklyDigestJob,
-        ConfigurationInterface $config
+        private DigestModel $digestModel,
+        private ScheduleWeeklyDigestJob $scheduleWeeklyDigestJob,
+        private ConfigurationInterface $config,
+        private LongRunner $longRunner
     ) {
-        $this->digestModel = $digestModel;
-        $this->scheduleWeeklyDigestJob = $scheduleWeeklyDigestJob;
-        $this->config = $config;
     }
 
     /**
@@ -98,6 +92,8 @@ class DigestApiController extends Controller
         $upcomingSchedules = [];
         $nextScheduledDay = "";
         $maxIterations = 5;
+        // Re fetch the config as it might have changed  since the last time we fetched it.
+        $this->scheduleWeeklyDigestJob->initializeConfig();
         for ($i = 0; $i < $maxIterations; $i++) {
             $nextScheduledDay =
                 $i == 0
@@ -106,6 +102,42 @@ class DigestApiController extends Controller
             $upcomingSchedules[] = $nextScheduledDay->format("Y-m-d H:i:s");
         }
         return $upcomingSchedules;
+    }
+
+    /**
+     * Autosubscribe users to the digest who have logged in after a certain date.
+     *
+     * @param array $body
+     * @return Data
+     */
+    public function post_backfillOptin(array $body): Data
+    {
+        $this->permission("site.manage");
+
+        $in = $this->schema(["dateLastActive:dt"]);
+
+        $in->addValidator("dateLastActive", function ($dateLastActive, $field) {
+            $now = \Vanilla\CurrentTimeStamp::getDateTime();
+            $fiveYearsAgo = $now->modify("-5 years");
+            if ($dateLastActive < $fiveYearsAgo) {
+                $field->addError("The dateLastActive must be within the last 5 years.");
+                return Invalid::value();
+            }
+            return $dateLastActive;
+        });
+
+        $body = $in->validate($body, $in);
+
+        $dateLastActive =
+            $body["dateLastActive"] instanceof \DateTimeImmutable
+                ? $body["dateLastActive"]->format("Y-m-d")
+                : $body["dateLastActive"];
+
+        $result = $this->longRunner->runApi(
+            new LongRunnerAction(DigestModel::class, "backfillOptInIterator", [$dateLastActive])
+        );
+
+        return new Data($result);
     }
 
     /**

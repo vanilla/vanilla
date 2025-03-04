@@ -6,6 +6,7 @@
 
 namespace VanillaTests\Forum\Widgets;
 
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Models\PostTypeModel;
 use VanillaTests\SiteTestCase;
 use VanillaTests\Layout\LayoutTestTrait;
@@ -28,66 +29,69 @@ class NewPostWidgetTest extends SiteTestCase
      */
     public function testHydrateNewPostWidget()
     {
-        $permissionCategory = \CategoryModel::permissionCategory(null);
-        $allowedDiscussions = \CategoryModel::getAllowedDiscussionData($permissionCategory, []);
+        $this->runWithConfig(
+            [FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES) => false],
+            function () {
+                $permissionCategory = \CategoryModel::permissionCategory(null);
+                $allowedDiscussions = \CategoryModel::getAllowedDiscussionData($permissionCategory, []);
 
-        $spec = [
-            '$hydrate' => "react.newpost",
-            "title" => "My New Post Button",
-            "titleType" => "static",
-            '$reactTestID' => "newpost",
-        ];
+                $spec = [
+                    '$hydrate' => "react.newpost",
+                    "title" => "My New Post Button",
+                    "titleType" => "static",
+                    '$reactTestID' => "newpost",
+                ];
 
-        $expected = [
-            '$reactComponent' => "NewPostMenu",
-            '$reactProps' => [
-                "title" => "My New Post Button",
-                "titleType" => "static",
-                "asOwnButtons" => [],
-                "excludedButtons" => [],
-                "items" => [
-                    [
-                        "label" => $allowedDiscussions["Discussion"]["AddText"],
-                        "action" => $allowedDiscussions["Discussion"]["AddUrl"],
-                        "type" => "link",
-                        "id" => str_replace(" ", "-", strtolower($allowedDiscussions["Discussion"]["AddText"])),
-                        "icon" => $allowedDiscussions["Discussion"]["AddIcon"],
-                        "asOwnButton" => false,
+                $expected = [
+                    '$reactComponent' => "NewPostMenu",
+                    '$reactProps' => [
+                        "title" => "My New Post Button",
+                        "titleType" => "static",
+                        "asOwnButtons" => [],
+                        "excludedButtons" => [],
+                        "items" => [
+                            [
+                                "label" => $allowedDiscussions["Discussion"]["AddText"],
+                                "action" => $allowedDiscussions["Discussion"]["AddUrl"],
+                                "type" => "link",
+                                "id" => str_replace(" ", "-", strtolower($allowedDiscussions["Discussion"]["AddText"])),
+                                "icon" => $allowedDiscussions["Discussion"]["AddIcon"],
+                                "asOwnButton" => false,
+                            ],
+                            [
+                                "label" => $allowedDiscussions["Question"]["AddText"],
+                                "action" => $allowedDiscussions["Question"]["AddUrl"],
+                                "type" => "link",
+                                "id" => str_replace(" ", "-", strtolower($allowedDiscussions["Question"]["AddText"])),
+                                "icon" => $allowedDiscussions["Question"]["AddIcon"],
+                                "asOwnButton" => false,
+                            ],
+                            [
+                                "label" => $allowedDiscussions["Poll"]["AddText"],
+                                "action" => $allowedDiscussions["Poll"]["AddUrl"],
+                                "type" => "link",
+                                "id" => str_replace(" ", "-", strtolower($allowedDiscussions["Poll"]["AddText"])),
+                                "icon" => $allowedDiscussions["Poll"]["AddIcon"],
+                                "asOwnButton" => false,
+                            ],
+                            [
+                                "label" => $allowedDiscussions["Event"]["AddText"],
+                                "action" => $allowedDiscussions["Event"]["AddUrl"],
+                                "type" => "link",
+                                "id" => str_replace(" ", "-", strtolower($allowedDiscussions["Event"]["AddText"])),
+                                "icon" => $allowedDiscussions["Event"]["AddIcon"],
+                                "asOwnButton" => false,
+                            ],
+                        ],
+                        "postableDiscussionTypes" => [
+                            0 => "discussion",
+                            1 => "question",
+                            2 => "poll",
+                            3 => "event",
+                        ],
                     ],
-                    [
-                        "label" => $allowedDiscussions["Question"]["AddText"],
-                        "action" => $allowedDiscussions["Question"]["AddUrl"],
-                        "type" => "link",
-                        "id" => str_replace(" ", "-", strtolower($allowedDiscussions["Question"]["AddText"])),
-                        "icon" => $allowedDiscussions["Question"]["AddIcon"],
-                        "asOwnButton" => false,
-                    ],
-                    [
-                        "label" => $allowedDiscussions["Poll"]["AddText"],
-                        "action" => $allowedDiscussions["Poll"]["AddUrl"],
-                        "type" => "link",
-                        "id" => str_replace(" ", "-", strtolower($allowedDiscussions["Poll"]["AddText"])),
-                        "icon" => $allowedDiscussions["Poll"]["AddIcon"],
-                        "asOwnButton" => false,
-                    ],
-                    [
-                        "label" => $allowedDiscussions["Event"]["AddText"],
-                        "action" => $allowedDiscussions["Event"]["AddUrl"],
-                        "type" => "link",
-                        "id" => str_replace(" ", "-", strtolower($allowedDiscussions["Event"]["AddText"])),
-                        "icon" => $allowedDiscussions["Event"]["AddIcon"],
-                        "asOwnButton" => false,
-                    ],
-                ],
-                "postableDiscussionTypes" => [
-                    0 => "discussion",
-                    1 => "question",
-                    2 => "poll",
-                    3 => "event",
-                ],
-            ],
-            '$reactTestID' => "newpost",
-            '$seoContent' => <<<HTML
+                    '$reactTestID' => "newpost",
+                    '$seoContent' => <<<HTML
 <div class=pageBox>
     <div class=pageHeadingBox>
         <h2>My New Post Button</h2>
@@ -100,18 +104,18 @@ class NewPostWidgetTest extends SiteTestCase
     </ul>
 </div>
 HTML
-        ,
-        ];
+                ,
+                ];
 
-        $this->assertHydratesTo($spec, [], $expected);
+                $this->assertHydratesTo($spec, [], $expected);
 
-        //spec with asOwnButtons and excludedButtons params
-        $spec = array_merge($spec, ["asOwnButtons" => ["question"], "excludedButtons" => ["poll"]]);
-        //adjust expected
-        $expected['$reactProps']["asOwnButtons"] = ["question"];
-        $expected['$reactProps']["excludedButtons"] = ["poll"];
-        $expected['$reactProps']["items"][1]["asOwnButton"] = true;
-        $expected['$seoContent'] = <<<HTML
+                //spec with asOwnButtons and excludedButtons params
+                $spec = array_merge($spec, ["asOwnButtons" => ["question"], "excludedButtons" => ["poll"]]);
+                //adjust expected
+                $expected['$reactProps']["asOwnButtons"] = ["question"];
+                $expected['$reactProps']["excludedButtons"] = ["poll"];
+                $expected['$reactProps']["items"][1]["asOwnButton"] = true;
+                $expected['$seoContent'] = <<<HTML
 <div class=pageBox>
     <div class=pageHeadingBox>
         <h2>My New Post Button</h2>
@@ -124,10 +128,12 @@ HTML
 </div>
 HTML;
 
-        unset($expected['$reactProps']["items"][2]);
-        $expected['$reactProps']["items"] = array_values($expected['$reactProps']["items"]);
+                unset($expected['$reactProps']["items"][2]);
+                $expected['$reactProps']["items"] = array_values($expected['$reactProps']["items"]);
 
-        $this->assertHydratesTo($spec, [], $expected);
+                $this->assertHydratesTo($spec, [], $expected);
+            }
+        );
     }
 
     /**
@@ -138,31 +144,34 @@ HTML;
      */
     public function testButtonLinksContainCategoryUrlCode()
     {
-        $spec = [
-            '$hydrate' => "react.newpost",
-            '$reactTestID' => "newpost",
-        ];
+        $this->runWithConfig(
+            [FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES) => false],
+            function () {
+                $spec = [
+                    '$hydrate' => "react.newpost",
+                    '$reactTestID' => "newpost",
+                ];
 
-        $expected = self::markForSparseComparision([
-            '$reactComponent' => "NewPostMenu",
-            '$reactProps' => self::markForSparseComparision([
-                "items" => self::markForSparseComparision([
-                    self::markForSparseComparision([
-                        "action" => "/post/discussion/general",
+                $expected = self::markForSparseComparision([
+                    '$reactComponent' => "NewPostMenu",
+                    '$reactProps' => self::markForSparseComparision([
+                        "items" => self::markForSparseComparision([
+                            self::markForSparseComparision([
+                                "action" => "/post/discussion/general",
+                            ]),
+                            self::markForSparseComparision([
+                                "action" => "/post/question/general",
+                            ]),
+                            self::markForSparseComparision([
+                                "action" => "/post/poll/general",
+                            ]),
+                            self::markForSparseComparision([
+                                "action" => "/events/new?parentRecordID=1&parentRecordType=category",
+                            ]),
+                        ]),
                     ]),
-                    self::markForSparseComparision([
-                        "action" => "/post/question/general",
-                    ]),
-                    self::markForSparseComparision([
-                        "action" => "/post/poll/general",
-                    ]),
-                    self::markForSparseComparision([
-                        "action" => "/events/new?parentRecordID=1&parentRecordType=category",
-                    ]),
-                ]),
-            ]),
-            '$reactTestID' => "newpost",
-            '$seoContent' => <<<HTML
+                    '$reactTestID' => "newpost",
+                    '$seoContent' => <<<HTML
 <div class=pageBox>
     <ul class=linkList>
         <li><a href=/post/discussion/general>New Discussion</a></li>
@@ -172,10 +181,12 @@ HTML;
     </ul>
 </div>
 HTML
-        ,
-        ]);
+                ,
+                ]);
 
-        $this->assertHydratesTo($spec, ["categoryID" => 1], $expected, "discussionCategoryPage");
+                $this->assertHydratesTo($spec, ["categoryID" => 1], $expected, "discussionCategoryPage");
+            }
+        );
     }
 
     /**
@@ -207,7 +218,7 @@ HTML
                         "action" => "/post/{$postType1["postTypeID"]}/{$category["urlcode"]}",
                         "type" => "link",
                         "id" => str_replace(" ", "-", strtolower($postType1["postButtonLabel"])),
-                        "icon" => "new-discussion",
+                        "icon" => "create-discussion",
                         "asOwnButton" => false,
                     ],
                     [
@@ -215,7 +226,7 @@ HTML
                         "action" => "/post/{$postType2["postTypeID"]}/{$category["urlcode"]}",
                         "type" => "link",
                         "id" => str_replace(" ", "-", strtolower($postType2["postButtonLabel"])),
-                        "icon" => "new-discussion",
+                        "icon" => "create-discussion",
                         "asOwnButton" => false,
                     ],
                 ]),
@@ -224,13 +235,16 @@ HTML
             '$seoContent' => <<<HTML
 <div class=pageBox>
     <ul class=linkList>
-        <li><a href=/post/{$postType1["postTypeID"]}/{$category["urlcode"]}>{$postType1["postButtonLabel"]}</a></li>
-        <li><a href=/post/{$postType2["postTypeID"]}/{$category["urlcode"]}>{$postType2["postButtonLabel"]}</a></li>
+        <li><a href="/post/{$postType1["postTypeID"]}/{$category["urlcode"]}">{$postType1["postButtonLabel"]}</a></li>
+        <li><a href="/post/{$postType2["postTypeID"]}/{$category["urlcode"]}">{$postType2["postButtonLabel"]}</a></li>
+        <li><a href="/events/new?parentRecordID=3&amp;parentRecordType=category">New Event</a></li>
     </ul>
 </div>
 HTML
         ,
         ]);
+
+        \DiscussionModel::cleanForTests();
 
         $this->assertHydratesTo($spec, ["categoryID" => $category["categoryID"]], $expected, "discussionCategoryPage");
         $this->disableFeature(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS);

@@ -32,7 +32,7 @@ class Counter implements \JsonSerializable
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->asArray();
     }

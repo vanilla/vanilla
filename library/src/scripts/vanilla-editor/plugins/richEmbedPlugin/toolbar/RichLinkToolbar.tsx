@@ -197,7 +197,7 @@ export default function RichLinkToolbar() {
             <MenuBarItem
                 disabled={!url} // Some rich links may be files or images uploading and don't have a url yet.
                 accessibleLabel={t("Edit Link")}
-                icon={<Icon icon="data-pencil" />}
+                icon={<Icon icon="edit" />}
                 onActivate={() => triggerFloatingLinkEdit(editor)}
             />
 

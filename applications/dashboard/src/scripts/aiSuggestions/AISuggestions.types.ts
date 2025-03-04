@@ -5,6 +5,8 @@
  */
 
 import { RecordID } from "@vanilla/utils";
+import { DurationPickerUnit } from "@library/forms/durationPicker/DurationPicker.types";
+import { DurationPickerValue } from "@library/forms/durationPicker/DurationPicker";
 
 export interface AISuggestionsSettings {
     enabled: boolean;
@@ -14,6 +16,7 @@ export interface AISuggestionsSettings {
     levelOfTech: "layman" | "intermediate" | "balanced" | "advanced" | "technical";
     useBrEnglish?: boolean;
     sources?: Record<string, AISuggestionSource>;
+    delay: DurationPickerValue;
 }
 
 export const INITIAL_AISUGGESTION_SETTINGS: AISuggestionsSettings = {
@@ -22,6 +25,7 @@ export const INITIAL_AISUGGESTION_SETTINGS: AISuggestionsSettings = {
     toneOfVoice: "friendly",
     levelOfTech: "layman",
     useBrEnglish: false,
+    delay: { length: 0, unit: DurationPickerUnit.DAYS },
 };
 
 export type AISuggestionsSettingsForm = Omit<AISuggestionsSettings, "sources"> & {

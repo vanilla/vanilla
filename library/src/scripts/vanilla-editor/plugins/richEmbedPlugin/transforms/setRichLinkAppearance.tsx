@@ -101,19 +101,31 @@ export function setRichLinkAppearance(editor: MyEditor, newAppearance: RichLinkA
     }
 
     if (newAppearance === RichLinkAppearance.INLINE) {
-        // Make sure we give it text content.
-        removeNodes(editor, {
-            at: currentEmbed.path,
+        // Normalizing causes text nodes to be collapsed (see #2 here: https://docs.slatejs.org/concepts/11-normalizing)
+        // So if there's text before and after a link, when the link node is removed, the before & after text are collapsed,
+        // and the new rich link node is added after (same path, but now the wrong spot due to the collapse)
+        editor.withoutNormalizing(() => {
+            removeNodes(editor, {
+                at: currentEmbed.path,
+            });
+
+            insertNodes(
+                editor,
+                [
+                    {
+                        type: ELEMENT_RICH_EMBED_INLINE,
+                        dataSourceType: "url",
+                        url: currentEmbed.url,
+                        embedData: currentEmbed.embedData,
+                        children: [{ text: currentEmbed.text }],
+                    },
+                ],
+                // Necessary to prevent certain links in pasted content from being added to the end of the document
+                {
+                    at: currentEmbed.path,
+                },
+            );
         });
-        insertNodes(editor, [
-            {
-                type: ELEMENT_RICH_EMBED_INLINE,
-                dataSourceType: "url",
-                url: currentEmbed.url,
-                embedData: currentEmbed.embedData,
-                children: [{ text: currentEmbed.text }],
-            },
-        ]);
 
         return;
     }

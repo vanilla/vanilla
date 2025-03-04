@@ -96,19 +96,13 @@ paths:
                 "500":
                     description: Server Error
 
-    /post-fields/{postTypeID}/{postFieldID}:
+    /post-fields/{postFieldID}:
         x-hidden: true
         get:
             summary: Get a post field.
             tags:
                 - Post Fields
             parameters:
-                - description: The ID of the post type.
-                  in: path
-                  name: postTypeID
-                  required: true
-                  schema:
-                      type: string
                 - description: The ID of the post field.
                   in: path
                   name: postFieldID
@@ -129,12 +123,6 @@ paths:
             tags:
                 - Post Fields
             parameters:
-                - description: The ID of the post type.
-                  in: path
-                  name: postTypeID
-                  required: true
-                  schema:
-                      type: string
                 - description: The ID of the post field.
                   in: path
                   name: postFieldID
@@ -165,12 +153,6 @@ paths:
         delete:
             summary: Delete a post field.
             parameters:
-                - description: The ID of the post type.
-                  in: path
-                  name: postTypeID
-                  required: true
-                  schema:
-                      type: string
                 - description: The ID of the post field.
                   in: path
                   name: postFieldID
@@ -228,7 +210,7 @@ components:
                     description: The ID of the post field.
                     type: string
                 postTypeID:
-                    description: The ID of an associated post type.
+                    description: An optional post type to assign this post field to.
                     type: string
                 label:
                     description: The label of the post field.
@@ -281,7 +263,6 @@ components:
                     default: true
             required:
                 - postFieldID
-                - postTypeID
                 - label
                 - dataType
                 - formType
@@ -322,8 +303,8 @@ components:
                 postFieldID:
                     description: The ID of the post field.
                     type: string
-                postTypeID:
-                    description: The ID of an associated post type.
+                postTypeIDs:
+                    description: Array of post type IDs that this field is associated with.
                     type: string
                 label:
                     description: The label of the post field.
@@ -362,8 +343,10 @@ components:
                     description: Whether the post field is active.
                     type: boolean
                 sort:
-                    description: The sort value of the post field.
-                    type: string
+                    description: >
+                        The sort value used for sorting fields within a post type.
+                        Only returned when filtering a list of results by postTypeID.
+                    type: integer
                 dateInserted:
                     description: When the post field was created.
                     format: date-time
@@ -374,13 +357,13 @@ components:
                     type: string
                 insertUserID:
                     description: The user that created the post field.
-                    type: string
+                    type: integer
                 updateUserID:
                     description: The user that last updated the post field.
-                    type: string
+                    type: integer
             required:
                 - postFieldID
-                - postTypeID
+                - postTypeIDs
                 - label
                 - description
                 - dataType

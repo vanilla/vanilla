@@ -176,7 +176,7 @@ export class LayoutEditorAssetUtils {
                         },
                     },
                 },
-                title: "Recent Discussions",
+                title: "Recent Posts",
                 titleType: "static",
                 descriptionType: "none",
                 isAsset: true,

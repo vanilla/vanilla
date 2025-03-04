@@ -44,7 +44,7 @@ export async function hijackFollowUpClick(e) {
             />
         );
 
-        mountModal(modal);
+        void mountModal(modal);
     }
 }
 

@@ -44,7 +44,7 @@ final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory
     protected function getSupportedPathRegex(string $domain = ""): string
     {
         $regexRoot = $this->getRegexRoot();
-        return "/^$regexRoot\/discussion\/comment\/(?<commentID>\d+)/i";
+        return "/^$regexRoot\/(discussion|events)\/comment\/(?<commentID>\d+)/i";
     }
 
     /**

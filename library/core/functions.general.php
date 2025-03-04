@@ -656,7 +656,7 @@ if (!function_exists("dateCompare")) {
         }
         if ($date2 instanceof DateTimeInterface) {
             $date2 = $date2->getTimestamp();
-        } elseif (!is_numeric($date2)) {
+        } elseif ($date2 && !is_numeric($date2)) {
             $date2 = strtotime($date2);
         }
 
@@ -721,7 +721,7 @@ if (!function_exists("domGetContent")) {
     /**
      * Search a DOM for a selector and return the contents.
      *
-     * @param pQuery $dom The DOM to search.
+     * @param $dom The DOM to search.
      * @param string $selector The CSS style selector for the content to find.
      * @param string $default The default content to return if the node isn't found.
      * @return string Returns the content of the found node or {@link $default} otherwise.
@@ -738,7 +738,7 @@ if (!function_exists("domGetImages")) {
     /**
      * Get the images from a DOM.
      *
-     * @param pQuery $dom The DOM to search.
+     * @param $dom
      * @param string $url The URL of the document to add to relative URLs.
      * @param int $maxImages The maximum number of images to return.
      * @return array Returns an array in the form: `[['http://imageUrl.com'], ...]`.
@@ -1090,6 +1090,10 @@ if (!function_exists("inArrayI")) {
      */
     function inArrayI($needle, $haystack)
     {
+        if (!$needle) {
+            return false;
+        }
+
         $needle = strtolower($needle);
         foreach ($haystack as $item) {
             if (strtolower($item) == $needle) {
@@ -1316,6 +1320,7 @@ if (!function_exists("offsetLimit")) {
     function offsetLimit($offsetOrPage = "", $limitOrPageSize = "", $throw = false)
     {
         $limitOrPageSize = is_numeric($limitOrPageSize) ? (int) $limitOrPageSize : 50;
+        $offsetOrPage = $offsetOrPage ?? "";
 
         if (is_numeric($offsetOrPage)) {
             $offset = (int) $offsetOrPage;
@@ -1791,7 +1796,7 @@ if (!function_exists("sliceParagraph")) {
 
         if ($pos === false || $pos < $minLength) {
             // There was no paragraph so try and split on sentences.
-            $sentences = preg_split("`([.!?:]\s+)`", $string, null, PREG_SPLIT_DELIM_CAPTURE);
+            $sentences = preg_split("`([.!?:]\s+)`", $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 
             $result = "";
             if (count($sentences) > 1) {
@@ -1890,7 +1895,7 @@ if (!function_exists("stringEndsWith")) {
      * @param bool $trim Whether or not to trim $B off of $A if it is found.
      * @return bool|string Returns true/false unless $trim is true.
      */
-    function stringEndsWith($haystack, $needle, $caseInsensitive = false, $trim = false)
+    function stringEndsWith(string $haystack, string $needle, bool $caseInsensitive = false, bool $trim = false)
     {
         if (strlen($haystack) < strlen($needle)) {
             return $trim ? $haystack : false;
@@ -2130,8 +2135,8 @@ if (!function_exists("ipEncodeRecursive")) {
         walkAllRecursive($input, function (&$val, $key = null, $parent = null) {
             if (is_string($val)) {
                 if (
-                    stringEndsWith($key, "IPAddress", true) ||
-                    stringEndsWith($parent, "IPAddresses", true) ||
+                    ($key && stringEndsWith($key, "IPAddress", true)) ||
+                    ($parent && stringEndsWith($parent, "IPAddresses", true)) ||
                     $key === "IP"
                 ) {
                     $val = ipEncode($val);
@@ -2154,8 +2159,8 @@ if (!function_exists("ipDecodeRecursive")) {
         walkAllRecursive($input, function (&$val, $key = null, $parent = null) {
             if (is_string($val)) {
                 if (
-                    stringEndsWith($key, "IPAddress", true) ||
-                    stringEndsWith($parent, "IPAddresses", true) ||
+                    stringEndsWith($key ?? "", "IPAddress", true) ||
+                    stringEndsWith($parent ?? "", "IPAddresses", true) ||
                     $key === "IP"
                 ) {
                     $val = ipDecode($val);

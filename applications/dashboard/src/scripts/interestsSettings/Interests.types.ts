@@ -52,9 +52,7 @@ export interface InterestFilters {
     isDefault?: boolean;
 }
 
-export interface InterestQueryParams extends InterestFilters {
-    page: number;
-}
+export interface InterestQueryParams extends InterestFilters {}
 
 export interface IInterestResponse {
     interestsList?: IInterest[];

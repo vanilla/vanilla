@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
-import { PostTypeSettingsImpl, PostTypeSettings } from "@dashboard/postTypes/pages/PostTypeSettings";
-import { PostTypesSettingsContext, IPostTypesSettingsContext } from "@dashboard/postTypes/PostTypeSettingsContext";
+import { render, screen, waitFor } from "@testing-library/react";
+import { PostTypeSettings } from "@dashboard/postTypes/pages/PostTypeSettings";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ComponentProps } from "react";
+import MockAdapter from "axios-mock-adapter";
+import { mockAPI } from "@library/__tests__/utility";
 
 function createMockPostType() {
     return {
@@ -20,35 +21,33 @@ function createMockPostType() {
         dateUpdated: "2024-11-01 18:16:48",
         insertUserID: 2,
         updateUserID: 2,
+        categoryIDs: [],
     };
 }
-const queryClient = new QueryClient();
-function renderWrappedComponent(
-    values?: Partial<IPostTypesSettingsContext>,
-    props?: Partial<ComponentProps<typeof PostTypeSettings>>,
-) {
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: false,
+        },
+    },
+});
+
+function renderWrappedComponent(props?: Partial<ComponentProps<typeof PostTypeSettings>>) {
     render(
         <QueryClientProvider client={queryClient}>
-            <PostTypesSettingsContext.Provider
-                value={{
-                    status: {
-                        postTypes: "success",
-                    },
-                    postTypes: [createMockPostType()],
-                    postTypesByPostTypeID: {},
-                    toggleActive: () => {},
-                    ...values,
-                }}
-            >
-                <PostTypeSettingsImpl {...props} />
-            </PostTypesSettingsContext.Provider>
+            <PostTypeSettings {...props} />
         </QueryClientProvider>,
     );
 }
 
 describe("PostTypeSettings", () => {
-    it("Renders", () => {
+    let api: MockAdapter;
+    beforeEach(() => {
+        api = mockAPI();
+        api.onGet(/post-types/).reply(200, [createMockPostType()]);
+    });
+    it("Renders", async () => {
         renderWrappedComponent();
-        expect(screen.getByText("Mock Post Type")).toBeInTheDocument();
+        expect(await screen.findByText("Mock Post Type")).toBeInTheDocument();
     });
 });

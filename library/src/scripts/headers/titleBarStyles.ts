@@ -534,6 +534,9 @@ export const titleBarClasses = useThemeCache(() => {
                 minWidth: styleUnit(vars.dropDownContents.minWidth),
                 maxHeight: styleUnit(vars.dropDownContents.maxHeight),
             },
+            "& .frame": {
+                maxHeight: "80vh",
+            },
         },
     });
 

@@ -340,19 +340,22 @@ trait HomeWidgetContainerSchemaTrait
                     )
                 ),
             ],
-            "displayType:s?" => [
-                "enum" => array_keys($displayTypes),
-                "description" => "Describe the widget display format.",
-                "x-control" => SchemaForm::dropDown(
-                    new FormOptions(
-                        "Display Type",
-                        "Choose the widget display type.",
-                        "Style Guide Default",
-                        "Selection will affect the item options available."
+            "displayType:s?" => array_merge(
+                [
+                    "enum" => array_keys($displayTypes),
+                    "description" => "Describe the widget display format.",
+                    "x-control" => SchemaForm::dropDown(
+                        new FormOptions(
+                            "Display Type",
+                            "Choose the widget display type.",
+                            "Style Guide Default",
+                            "Selection will affect the item options available."
+                        ),
+                        new StaticFormChoices($displayTypes)
                     ),
-                    new StaticFormChoices($displayTypes)
-                ),
-            ],
+                ],
+                count(array_keys($displayTypes)) == 1 ? ["default" => array_key_first($displayTypes)] : []
+            ),
         ] +
             $viewAllSchema + [
                 "isGrid:b?" => [

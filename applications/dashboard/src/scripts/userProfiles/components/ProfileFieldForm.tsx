@@ -333,9 +333,9 @@ export default function ProfileFieldForm(props: IProps) {
     useEffect(() => {
         // These dropdown values are being filtered based off the value of visibilty set to internal. Need to update the dropdown to what is available
         if (values.visibility.visibility === CreatableFieldVisibility.INTERNAL) {
-            setFieldValue("registrationOptions", ProfileFieldRegistrationOptions.HIDDEN);
+            void setFieldValue("registrationOptions", ProfileFieldRegistrationOptions.HIDDEN);
             if (values.mutability === CreatableFieldMutability.ALL) {
-                setFieldValue("mutability", CreatableFieldMutability.RESTRICTED);
+                void setFieldValue("mutability", CreatableFieldMutability.RESTRICTED);
             }
         }
     }, [values.visibility, values.mutability, setFieldValue]);
@@ -343,14 +343,14 @@ export default function ProfileFieldForm(props: IProps) {
     useEffect(() => {
         // Can only be visible on posts if it is a textInput
         if (![CreatableFieldType.TEXT_INPUT, CreatableFieldType.SINGLE_SELECT_DROPDOWN].includes(values.type)) {
-            setFieldValue("visibility.posts", false);
+            void setFieldValue("visibility.posts", false);
         }
     }, [values.type, setFieldValue]);
 
     useEffect(() => {
         // To mark a field as required, mutability must be all
         if (values.registrationOptions === ProfileFieldRegistrationOptions.REQUIRED) {
-            setFieldValue("mutability", CreatableFieldMutability.ALL);
+            void setFieldValue("mutability", CreatableFieldMutability.ALL);
         }
     }, [values.registrationOptions, setFieldValue]);
 
@@ -370,7 +370,7 @@ export default function ProfileFieldForm(props: IProps) {
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    submitForm();
+                    void submitForm();
                 }}
             >
                 <Frame

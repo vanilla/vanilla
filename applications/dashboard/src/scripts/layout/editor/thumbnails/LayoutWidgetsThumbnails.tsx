@@ -86,7 +86,7 @@ export default function LayoutWidgetsThumbnails(props: IProps) {
             </div>
             <div className={cx(searchClasses.content, classes.searchContent)}>
                 <span className={searchClasses.iconContainer(false)}>
-                    <Icon size="compact" icon="search-search" />
+                    <Icon size="compact" icon="search" />
                 </span>
                 <label htmlFor={"searchInput"} className={classes.searchLabel}>
                     <input

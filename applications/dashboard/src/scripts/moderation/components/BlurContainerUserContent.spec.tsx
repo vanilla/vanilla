@@ -12,7 +12,7 @@ import { act } from "react-dom/test-utils";
 const BUTTON_LABEL_SHOW = /show/i;
 const BUTTON_LABEL_HIDE = /hide/i;
 
-const MOCK_IMAGE = `<img class="embedImage-img" src="https://dev.vanilla.localhost/uploads/K5XXWLAZDS0X/vanilla-sundae.jpeg" alt="vanilla sundae.jpeg" height="1125" width="1500" loading="lazy" data-display-size="small" data-float="none" data-type="image/jpeg" data-embed-type="image">`;
+const MOCK_IMAGE = `<img class="embedImage-img" src="https://dev.vanilla.local/uploads/K5XXWLAZDS0X/vanilla-sundae.jpeg" alt="vanilla sundae.jpeg" height="1125" width="1500" loading="lazy" data-display-size="small" data-float="none" data-type="image/jpeg" data-embed-type="image">`;
 const MOCK_PARAGRAPH = `<p>hello world</p>`;
 
 const MOCK_CONTENT = `<div>${MOCK_PARAGRAPH}

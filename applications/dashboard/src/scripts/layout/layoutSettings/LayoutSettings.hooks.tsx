@@ -104,7 +104,7 @@ export function useLayoutViewMutation(layout: ILayoutDetails) {
         },
         mutationKey: ["layoutView", layoutID],
         onSuccess: () => {
-            queryClient.invalidateQueries(["layouts"]);
+            void queryClient.invalidateQueries(["layouts"]);
         },
     });
     return mutation;
@@ -122,7 +122,7 @@ export function useDeleteLayoutMutation(layout: ILayoutDetails) {
         },
         mutationKey: ["layouts", "delete", layoutID],
         onSuccess: () => {
-            queryClient.invalidateQueries(["layouts"]);
+            void queryClient.invalidateQueries(["layouts"]);
 
             // If we're on the page of this layout, redirect to the settings page
             if (LayoutOverviewRoute.url(layout).includes(history.location.pathname)) {
@@ -191,12 +191,22 @@ export function getAllowedRecordTypesForLayout(layout: ILayoutDetails): LayoutRe
         case "subcommunityHome":
         case "categoryList":
         case "discussionList":
+        case "helpCenterCategory":
+        case "guideArticle":
+        case "helpCenterArticle":
+        case "helpCenterKnowledgeBase":
+            return [LayoutRecordType.GLOBAL, LayoutRecordType.SUBCOMMUNITY, LayoutRecordType.KNOWLEDGE_BASE];
+        case "knowledgeHome":
             return [LayoutRecordType.GLOBAL, LayoutRecordType.SUBCOMMUNITY];
         case "nestedCategoryList":
         case "discussionCategoryPage":
-        case "discussionThread":
-        case "ideaThread":
-        case "questionThread":
+        case "post":
+        case "idea":
+        case "discussion":
+        case "question":
+        case "event":
+            return [LayoutRecordType.GLOBAL, LayoutRecordType.CATEGORY, LayoutRecordType.SUBCOMMUNITY];
+        case "createPost":
             return [LayoutRecordType.GLOBAL, LayoutRecordType.CATEGORY, LayoutRecordType.SUBCOMMUNITY];
         default:
             return [];

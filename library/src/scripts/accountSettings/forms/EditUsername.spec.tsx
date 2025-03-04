@@ -11,7 +11,6 @@ import { LoadStatus } from "@library/@types/api/core";
 import { renderHook } from "@testing-library/react-hooks";
 import { useUsernameAvailability } from "@library/accountSettings/forms/EditUsername.hooks";
 import { mockAPI } from "@library/__tests__/utility";
-import TestRenderer from "react-test-renderer";
 import * as AccountSettingsFixtures from "@library/accountSettings/AccountSettings.fixtures";
 import { vitest } from "vitest";
 
@@ -117,9 +116,8 @@ describe("useUsernameAvailability", () => {
         const mockAdapter = mockAPI();
         mockAdapter.onGet("/users/by-names").replyOnce(200, []);
         const { result, rerender } = renderHook(() => useUsernameAvailability("admin"));
-        await TestRenderer.act(async () => {
+        await act(async () => {
             rerender();
-            // result.current;
         });
         expect(mockAdapter.history.get.length).toBeGreaterThan(0);
     });

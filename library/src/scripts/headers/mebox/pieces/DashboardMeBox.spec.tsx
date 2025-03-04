@@ -11,12 +11,13 @@ import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 
 describe("DashboardMeBox", () => {
-    it("Renders user name", () => {
-        const { findByText } = render(
+    it("Renders user name", async () => {
+        const screen = render(
             <TestReduxProvider>
                 <DashboardMeBox currentUser={UserFixture.adminAsCurrent.data} forceOpen />
             </TestReduxProvider>,
         );
-        expect(findByText(/admin/)).toBeTruthy();
+        await vi.dynamicImportSettled();
+        expect((await screen.findAllByText(/admin/)).length).toBeGreaterThanOrEqual(1);
     });
 });

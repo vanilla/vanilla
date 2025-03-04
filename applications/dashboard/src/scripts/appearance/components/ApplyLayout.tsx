@@ -4,7 +4,6 @@
  * @license gpl-2.0-only
  */
 
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import WidgetSettingsFormGroupWrapper from "@dashboard/layout/editor/widgetSettings/WidgetSettingsFormGroupWrapper";
 import { GLOBAL_LAYOUT_VIEW } from "@dashboard/layout/layoutSettings/LayoutSettings.constants";
@@ -16,6 +15,7 @@ import {
     ILayoutDetails,
     LayoutRecordType,
     LayoutViewFragment,
+    LayoutViewType,
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { css } from "@emotion/css";
 import { useConfigsByKeys } from "@library/config/configHooks";
@@ -38,24 +38,26 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { hasMultipleSiteSections, t } from "@library/utility/appUtils";
 import { useMutation } from "@tanstack/react-query";
 import { Icon } from "@vanilla/icons";
-import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import React, { useCallback, useState } from "react";
+import { JsonSchema, PartialSchemaDefinition } from "@vanilla/json-schema-forms";
+import { useCallback, useEffect, useState } from "react";
 import {
     getLayoutFeatureFlagKey,
     getLayoutTypeGroupLabel,
     getLayoutTypeLabel,
     getLayoutTypeSettingsLabel,
     getLayoutTypeSettingsUrl,
-} from "./layoutViewUtils";
+} from "@dashboard/appearance/components/layoutViewUtils";
 
 /**
  * Type for the form state.
  */
-interface IFormValues {
+interface IDefaultFormValues {
     applyOption: LayoutRecordType | "unassigned";
     subcommunityIDs?: Array<LayoutViewFragment["recordID"]>;
     categoryIDs?: Array<LayoutViewFragment["recordID"]>;
 }
+
+type FormValues = IDefaultFormValues & (IExternalApplyOptionFormValue | {});
 
 interface IProps {
     /**
@@ -88,6 +90,31 @@ export function ApplyLayout(props: IProps) {
 
     const layoutTypeLabel = getLayoutTypeLabel(layout.layoutViewType);
 
+    // This bit of code is to include apply options registered from external sources (e.g plugins) in our form
+    const [externalApplyOptions, setExternalApplyOptions] = useState<IExternalApplyOption[]>([]);
+    useEffect(() => {
+        if (ApplyLayout.externalApplyOptionGenerators.length) {
+            const generatedExternalApplyOptions = ApplyLayout.externalApplyOptionGenerators.map(
+                (generator: IExternalApplyOptionGenerator) => {
+                    return generator(layout.layoutViewType);
+                },
+            );
+
+            // External options that should not be used for the current layoutViewType will return null
+            const filteredGeneratedExternalApplyOptions = generatedExternalApplyOptions.filter(
+                (option) => option !== null,
+            );
+
+            if (filteredGeneratedExternalApplyOptions.length) {
+                setExternalApplyOptions(filteredGeneratedExternalApplyOptions);
+                setFormValues({
+                    ...getInitialValues(),
+                    ...getExternalApplyOptionInitialValues(layout, filteredGeneratedExternalApplyOptions),
+                });
+            }
+        }
+    }, [ApplyLayout.externalApplyOptionGenerators]);
+
     // These layout types don't have "default" layouts per subcommunity
     // Because there is only one of them per subcommunity.
     const noSubDefaults = ["discussionList", "categoryList", "subcommunityHome"].includes(layout.layoutViewType);
@@ -104,6 +131,12 @@ export function ApplyLayout(props: IProps) {
             ? t("Apply to specific subcommunities.")
             : t("Set as default layout for specific subcommunities."),
         [LayoutRecordType.CATEGORY]: t("Apply to specific categories."),
+
+        // Add external apply option labels
+        ...(externalApplyOptions.length &&
+            externalApplyOptions.reduce((acc, option) => {
+                return { ...acc, ...{ [option.recordType]: option.applyOptionLabel } };
+            }, {})),
     };
 
     const allowedRecordTypes = getAllowedRecordTypesForLayout(layout);
@@ -179,13 +212,19 @@ export function ApplyLayout(props: IProps) {
                     },
                 },
             }),
+            // Add external apply option schemas
+            ...(externalApplyOptions.length &&
+                externalApplyOptions.reduce((acc, option) => {
+                    return { ...acc, ...option.schema };
+                }, {})),
         },
     };
 
-    const getInitialValues = useCallback((): IFormValues => {
+    const getInitialValues = useCallback((): FormValues => {
         let applyOption = layout.layoutViews?.[0]?.recordType ?? "unassigned";
         // Map the legacy option over.
         applyOption = applyOption === LayoutRecordType.ROOT ? LayoutRecordType.GLOBAL : applyOption;
+
         return {
             categoryIDs: layout.layoutViews
                 .filter((layoutView) => layoutView.recordType === "category")
@@ -197,15 +236,32 @@ export function ApplyLayout(props: IProps) {
         };
     }, [layout]);
 
-    const [formValues, setFormValues] = useState<IFormValues>(getInitialValues());
+    const [formValues, setFormValues] = useState<FormValues>(getInitialValues());
 
     function resetForm() {
-        setFormValues(getInitialValues());
+        setFormValues({ ...getInitialValues(), ...getExternalApplyOptionInitialValues(layout, externalApplyOptions) });
     }
 
     const submitFormMutation = useMutation({
-        mutationFn: async (formValues: IFormValues) => {
+        mutationFn: async (formValues: FormValues) => {
             const layoutViewFragments: LayoutViewFragment[] = ((): LayoutViewFragment[] => {
+                if (externalApplyOptions.length) {
+                    const matchingApplyOption = externalApplyOptions.find(
+                        (applyOption) => applyOption.recordType === formValues.applyOption,
+                    );
+
+                    if (matchingApplyOption) {
+                        return (
+                            formValues?.[matchingApplyOption.key]?.map((recordID) => {
+                                return {
+                                    recordID,
+                                    recordType: matchingApplyOption.recordType,
+                                };
+                            }) ?? []
+                        );
+                    }
+                }
+
                 switch (formValues.applyOption) {
                     case LayoutRecordType.ROOT:
                     case LayoutRecordType.GLOBAL:
@@ -277,7 +333,7 @@ export function ApplyLayout(props: IProps) {
                                     <Message
                                         className={css({ marginTop: 18 })}
                                         type="warning"
-                                        icon={<Icon icon="notification-alert" />}
+                                        icon={<Icon icon="status-alert" />}
                                         title={t("Legacy Layouts enabled")}
                                         stringContents={t(
                                             "Note this layout change will not be visible until you switch to custom layouts.",
@@ -309,7 +365,7 @@ export function ApplyLayout(props: IProps) {
                                 )}
                                 {isDefaultAppliedTemplate && (
                                     <Message
-                                        icon={<Icon icon="notification-alert" />}
+                                        icon={<Icon icon="status-alert" />}
                                         className={css({ marginTop: 18 })}
                                         type="warning"
                                         title={t("Unable to re-assign default template")}
@@ -364,3 +420,47 @@ function getCategorySearchUrl(layout: ILayoutDetails) {
             return `/categories/search?query=%s`;
     }
 }
+
+interface IExternalApplyOptionFormValue {
+    [key: string]: Array<LayoutViewFragment["recordID"]>;
+}
+
+interface IExternalApplyOption {
+    key: string;
+    recordType: LayoutRecordType;
+    applyOptionLabel: string;
+    schema: Record<string, PartialSchemaDefinition<any>>;
+}
+
+type IExternalApplyOptionGenerator = (viewType: LayoutViewType) => IExternalApplyOption | null;
+
+/**
+ * Get initial values for external apply option
+ */
+function getExternalApplyOptionInitialValues(
+    layout: ILayoutDetails,
+    externaldApplyOptions: IExternalApplyOption[],
+): IExternalApplyOptionFormValue {
+    return Object.fromEntries(
+        externaldApplyOptions.map((option) => {
+            return [
+                option.key,
+                layout.layoutViews
+                    .filter((layoutView) => {
+                        return layoutView.recordType === option.recordType;
+                    })
+                    .map((layoutView) => {
+                        return layoutView.recordID;
+                    }),
+            ];
+        }),
+    );
+}
+
+/** Hold external (e.g from plugins) apply options generator functions. */
+ApplyLayout.externalApplyOptionGenerators = [] as IExternalApplyOptionGenerator[];
+
+/** Register external (e.g from plugins) apply options generator functions */
+ApplyLayout.registerExternalApplyOptionGenerator = (generator: IExternalApplyOptionGenerator) => {
+    ApplyLayout.externalApplyOptionGenerators.push(generator);
+};

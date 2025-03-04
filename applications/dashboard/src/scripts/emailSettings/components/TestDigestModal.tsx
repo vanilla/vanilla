@@ -1,10 +1,10 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { JsonSchema, JsonSchemaForm, IJsonSchemaFormHandle, IFieldError } from "@vanilla/json-schema-forms";
 import { t } from "@vanilla/i18n";
 import Button from "@library/forms/Button";
@@ -28,9 +28,10 @@ import { IApiError } from "@library/@types/api/core";
 import { useFormik } from "formik";
 import { mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
 import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
+import { getEmailSettingsSchemas } from "@dashboard/emailSettings/EmailSettings.utils";
+import { useConfigMutation, useConfigQuery } from "@library/config/configHooks";
 
 interface IProps {
-    settings: IEmailSettings | {};
     onCancel(): void;
 }
 
@@ -42,8 +43,45 @@ interface IFormValues {
 type ITestDigestPayload = ITestEmailPayload | IFormValues;
 
 export default function TestDigestModal(props: IProps) {
-    const { settings, onCancel } = props;
+    const { onCancel } = props;
     const toast = useToast();
+
+    const emailSettingsSchema = getEmailSettingsSchemas().emailSettingsSchema;
+
+    const { data } = useConfigQuery(
+        Object.keys({
+            ...emailSettingsSchema["properties"],
+        }),
+    );
+
+    const configs = data ?? {};
+
+    const emailSettings = useMemo(() => {
+        const refinedEmailSettings = {
+            // initial values
+            ...Object.keys(emailSettingsSchema.properties).reduce((acc, currentKey) => {
+                const value = emailSettingsSchema.properties[currentKey];
+                return {
+                    ...acc,
+                    [currentKey]: value.type === "boolean" ? false : value.type === "number" ? 1 : "",
+                };
+            }, {}),
+            // final values with actual data
+            ...(configs &&
+                Object.fromEntries(
+                    Object.keys(emailSettingsSchema.properties).map((key) => {
+                        if (key === "emailNotifications.disabled") {
+                            return [key, !configs[key]];
+                        } else if (key === "emailStyles.format") {
+                            return [key, configs[key] === "html" ? true : false];
+                        }
+                        return [key, configs[key] ?? ""];
+                    }),
+                )),
+        };
+
+        return refinedEmailSettings;
+    }, [emailSettingsSchema.properties, configs]);
 
     const testEmailMutation = useMutation<any, IApiError, IFormValues>({
         mutationKey: ["sendTestEmail"],
@@ -52,21 +90,21 @@ export default function TestDigestModal(props: IProps) {
                 ...formValues,
                 deliveryDate: new Date(),
                 from: {
-                    supportName: settings["outgoingEmails.supportName"],
-                    supportAddress: settings["outgoingEmails.supportAddress"],
+                    supportName: emailSettings["outgoingEmails.supportName"],
+                    supportAddress: emailSettings["outgoingEmails.supportAddress"],
                 },
-                emailFormat: settings["emailStyles.format"] == true ? "html" : "text",
+                emailFormat: emailSettings["emailStyles.format"] == true ? "html" : "text",
                 templateStyles: {
-                    logoUrl: settings["emailStyles.image"],
-                    textColor: settings["emailStyles.textColor"],
-                    backgroundColor: settings["emailStyles.backgroundColor"],
-                    containerBackgroundColor: settings["emailStyles.containerBackgroundColor"],
-                    buttonTextColor: settings["emailStyles.buttonTextColor"],
-                    buttonBackgroundColor: settings["emailStyles.buttonBackgroundColor"],
+                    logoUrl: emailSettings["emailStyles.image"],
+                    textColor: emailSettings["emailStyles.textColor"],
+                    backgroundColor: emailSettings["emailStyles.backgroundColor"],
+                    containerBackgroundColor: emailSettings["emailStyles.containerBackgroundColor"],
+                    buttonTextColor: emailSettings["emailStyles.buttonTextColor"],
+                    buttonBackgroundColor: emailSettings["emailStyles.buttonBackgroundColor"],
                 },
-                footer: isJsonString(settings["outgoingEmails.footer"])
-                    ? settings["outgoingEmails.footer"]
-                    : JSON.stringify(settings["outgoingEmails.footer"]),
+                footer: isJsonString(emailSettings["outgoingEmails.footer"])
+                    ? emailSettings["outgoingEmails.footer"]
+                    : JSON.stringify(emailSettings["outgoingEmails.footer"]),
             });
         },
         onSuccess: () => {

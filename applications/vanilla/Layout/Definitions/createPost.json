@@ -1,0 +1,25 @@
+{
+    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=createPost&cacheBuster=5",
+    "dateInserted": "2022-01-01T00:00:00Z",
+    "layoutViewType": "createPost",
+    "layoutID": "createPost",
+    "name": "Create Post Template",
+    "layout": [
+        {
+            "$hydrate": "react.section.3-columns",
+            "middleBottom": [
+                {
+                    "$hydrate": "react.asset.createPostForm",
+                    "title": "Create Post"
+                }
+            ],
+            "breadcrumbs": [
+                {
+                    "$hydrate": "react.breadcrumbs"
+                }
+            ],
+            "leftBottom": [],
+            "rightBottom": []
+        }
+    ]
+}

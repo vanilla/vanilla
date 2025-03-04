@@ -35,7 +35,7 @@ class CategoryAsLinkPlugin extends Gdn_Plugin
         $sender->Data["_ExtendedFields"]["RedirectUrl"] = [
             "Control" => "TextBox",
             "Description" =>
-                "Instead of acting as a category this will link to a discussion, another category or any URL when you add a full valid URL.",
+                "Instead of acting as a category this will link to a post, another category or any URL when you add a full valid URL.",
             "Options" => ["IncludeNull" => "None"],
         ];
 

@@ -115,7 +115,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
             {displayResolved && (
                 <MetaIcon
                     className={classes.resolved}
-                    icon={resolved ? "cmd-approve" : "cmd-alert"}
+                    icon={resolved ? "resolved" : "unresolved"}
                     aria-label={resolved ? t("Resolved") : t("Unresolved")}
                 />
             )}
@@ -209,7 +209,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                 </MetaItem>
             )}
             {renderViewCountAsIcon && (
-                <MetaIcon icon="meta-view" aria-label={t("Views")}>
+                <MetaIcon icon="meta-views" aria-label={t("Views")}>
                     {countViews}
                 </MetaIcon>
             )}
@@ -219,12 +219,12 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                 </MetaIcon>
             )}
             {renderScoreAsIcon && (
-                <MetaIcon icon="meta-like" aria-label={t("Score")}>
+                <MetaIcon icon="meta-points" aria-label={t("Score")}>
                     {score ?? 0}
                 </MetaIcon>
             )}
             {renderCommentCountAsIcon && (
-                <MetaIcon icon="meta-comment" aria-label={t("Comments")}>
+                <MetaIcon icon="meta-comments" aria-label={t("Comments")}>
                     {countComments}
                 </MetaIcon>
             )}

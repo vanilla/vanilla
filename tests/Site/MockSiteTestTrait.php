@@ -113,7 +113,7 @@ trait MockSiteTestTrait
                 $siteOrOverrides["accountID"] ?? $ownSite->getAccountID(),
                 null,
                 "cl00000",
-                $siteOrOverrides["webUrl"] ?? "http://vanilla.localhost/node" . $this->mockSiteCount
+                $siteOrOverrides["webUrl"] ?? "http://vanilla.local/node" . $this->mockSiteCount
             );
         }
 

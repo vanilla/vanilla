@@ -7,6 +7,8 @@
 
 namespace Vanilla\Dashboard\Activity;
 
+use Vanilla\Forum\Digest\DigestModel;
+
 /**
  * Represents the Email Digest activity.
  */
@@ -99,8 +101,12 @@ class EmailDigestActivity extends Activity
      */
     public static function getPreferenceSchemaProperties(): array
     {
+        $frequencyOptions = DigestModel::DIGEST_FREQUENCY_OPTIONS;
         $properties = [
-            "email" => ["type" => "boolean", "x-control" => ["inputType" => "checkBox", "label" => t("Email")]],
+            "email" => [
+                "type" => "boolean",
+                "x-control" => ["inputType" => "checkBox", "label" => t(self::getPreferenceDescription())],
+            ],
             "disabled" => [
                 "type" => "boolean",
                 "default" => false,
@@ -108,7 +114,61 @@ class EmailDigestActivity extends Activity
             ],
         ];
 
+        $choices = [];
+
+        foreach ($frequencyOptions as $frequency) {
+            $choices[$frequency] = t(ucfirst($frequency));
+        }
+
+        $properties["frequency"] = [
+            "default" => self::getDefaultFrequency(),
+            "type" => "string",
+            "enum" => $frequencyOptions,
+            "x-control" => [
+                "inputType" => "dropDown",
+                "label" => t("Digest Frequency"),
+                "choices" => [
+                    "staticOptions" => $choices,
+                ],
+                "conditions" => [
+                    [
+                        "field" => self::getPreference() . "." . "email",
+                        "type" => "boolean",
+                        "const" => true,
+                    ],
+                ],
+            ],
+        ];
+
         return $properties;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getPreferenceSchemaRequiredProperties(): array
+    {
+        return ["frequency"];
+    }
+
+    /**
+     * Get the default digest frequency.
+     * If the configured value is not among the valid frequency options, then the default value -- `weekly -- is returned
+     * @return string
+     */
+    public static function getDefaultFrequency(): string
+    {
+        $defaultFrequency = DigestModel::DIGEST_TYPE_WEEKLY;
+
+        $configuredDefaultFrequency = \Gdn::config(DigestModel::DEFAULT_DIGEST_FREQUENCY_KEY);
+        if (
+            $configuredDefaultFrequency &&
+            in_array($configuredDefaultFrequency, DigestModel::DIGEST_FREQUENCY_OPTIONS)
+        ) {
+            $defaultFrequency = $configuredDefaultFrequency;
+        }
+
+        return $defaultFrequency;
     }
 
     /**

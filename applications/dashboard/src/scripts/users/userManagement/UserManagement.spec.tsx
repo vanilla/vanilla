@@ -212,7 +212,7 @@ describe("UserManagement", () => {
 
             expect(result.current.data?.users).toBeDefined();
             expect(result.current.data?.users.length).toBe(1);
-            expect(result.current.data?.countUsers).toBe(1);
+            expect(result.current.data?.countUsers).toBe("1");
         });
 
         it("useAddUser() successfully adds a user.", async () => {
@@ -221,7 +221,7 @@ describe("UserManagement", () => {
             });
 
             act(() => {
-                result.current.mutateAsync({
+                result.current.mutate({
                     email: "test@example.com",
                     name: "new-test-user",
                     password: "a_b_c_12345",
@@ -240,7 +240,7 @@ describe("UserManagement", () => {
                 wrapper: queryClientWrapper(),
             });
             act(() => {
-                result.current.mutateAsync({
+                result.current.mutate({
                     userID: 5,
                     email: "test-updated@example.com",
                 });

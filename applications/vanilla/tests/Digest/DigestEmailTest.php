@@ -44,6 +44,10 @@ class DigestEmailTest extends SiteTestCase
 
         $this->digestEmail->mergeCategoryUnSubscribe($user, [$category["categoryID"]]);
         $mergedHtmlContent = $this->digestEmail->getHtmlContent();
+
+        // Testing that we're using "https" in our unsubscribe links. The getBaseUrl() method returns a string starting with "https".
+        $this->assertStringContainsString("{$this->getBaseUrl()}/unsubscribe", $mergedHtmlContent);
+
         $this->assertStringNotContainsString("*/unsubscribe_{$category["categoryID"]}/*", $mergedHtmlContent);
         $this->assertNotEquals($htmlContent, $mergedHtmlContent);
 

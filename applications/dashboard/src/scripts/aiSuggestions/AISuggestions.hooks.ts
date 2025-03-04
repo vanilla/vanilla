@@ -7,26 +7,10 @@
 import { AISuggestionsSettings, AISuggestionsSettingsForm } from "@dashboard/aiSuggestions/AISuggestions.types";
 import { IApiError } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { getMeta } from "@library/utility/appUtils";
 import { UseMutationResult, UseQueryResult, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import set from "lodash-es/set";
-import { useMemo } from "react";
 
 const SETTINGS_ENDPOINT = "/ai-suggestions/settings";
-
-/**
- * Check that required dependencies have been enabled
- */
-export function useDependenciesEnabled(): boolean {
-    const allEnabled = useMemo<boolean>(() => {
-        // Check that `question` is a valid post type
-        const qnaEnabled = getMeta("postTypes", []).includes("question");
-
-        return qnaEnabled;
-    }, []);
-
-    return allEnabled;
-}
 
 /**
  * Get suggestions settings from configuration

@@ -1,0 +1,110 @@
+{
+    "0": {
+        "$hydrate": "react.section.full-width",
+        "children": {
+            "0": {
+                "$hydrate": "react.app-banner",
+                "showTitle": true,
+                "showDescription": true,
+                "showSearch": true,
+                "titleType": "siteSection/name",
+                "title": {
+                    "$hydrate": "param",
+                    "ref": "siteSection/name"
+                },
+                "descriptionType": "none"
+            }
+        }
+    },
+    "1": {
+        "$hydrate": "react.section.1-column",
+        "children": {
+            "0": {
+                "$hydrate": "react.categories",
+                "apiParams": {
+                    "limit": 9,
+                    "featured": true,
+                    "filter": "none"
+                },
+                "itemOptions": {
+                    "display": {
+                        "name": true,
+                        "description": true,
+                        "counts": true
+                    }
+                },
+                "title": "Featured Categories",
+                "titleType": "static",
+                "descriptionType": "none",
+                "containerOptions": {
+                    "displayType": "carousel"
+                }
+            }
+        }
+    },
+    "2": {
+        "$hydrate": "react.section.2-columns",
+        "mainBottom": {
+            "0": {
+                "$hydrate": "react.discussion.discussions",
+                "apiParams": {
+                    "includeChildCategories": true,
+                    "sort": "-dateLastComment",
+                    "slotType": "a",
+                    "limit": 10
+                },
+                "containerOptions": {
+                    "viewAll": {
+                        "to": "/discussions"
+                    }
+                },
+                "title": "Recent Discussions",
+                "titleType": "static",
+                "descriptionType": "none"
+            }
+        },
+        "secondaryBottom": {
+            "0": {
+                "$hydrate": "react.guest-cta",
+                "title": "Welcome!",
+                "description": "It looks like you're new here. Sign in or register to get started.",
+                "titleType": "static",
+                "descriptionType": "static",
+                "secondButton": {
+                    "title": "Register",
+                    "type": "standard"
+                },
+                "button": {
+                    "title": "Sign In",
+                    "type": "primary"
+                },
+                "background": {
+                    "useOverlay": true
+                },
+                "alignment": "left"
+            },
+            "1": {
+                "$hydrate": "react.newpost",
+                "asOwnButtons": {},
+                "excludedButtons": {}
+            },
+            "2": {
+                "$hydrate": "react.quick-links",
+                "title": "Quick Links",
+                "titleType": "static"
+            },
+            "3": {
+                "$hydrate": "react.userspotlight",
+                "userTextAlignment": "left",
+                "apiParams": {
+                    "userID": -1
+                },
+                "title": "Customer Spotlight",
+                "subtitle": "",
+                "description": "Use this space to add a Customer Spotlight by telling the customer's story using their unique language, share what problems they experienced, and how they conquered it by using your product(s).",
+                "titleType": "static",
+                "descriptionType": "static"
+            }
+        }
+    }
+}

@@ -66,7 +66,7 @@ export default function ConnectionsIndexPage() {
                     </>
                 }
             />
-            <Modal isVisible={isFormVisible} size={ModalSizes.LARGE} exitHandler={closeFormModal}>
+            <Modal isVisible={isFormVisible} size={ModalSizes.XL} exitHandler={closeFormModal}>
                 <OAuth2AddEdit
                     authenticatorID={editingID}
                     onClose={() => {

@@ -1,0 +1,110 @@
+{
+    "0": {
+        "$hydrate": "react.section.full-width",
+        "children": [
+            {
+                "$hydrate": "react.app-banner",
+                "showTitle": true,
+                "showDescription": true,
+                "showSearch": true,
+                "titleType": "siteSection/name",
+                "title": {
+                    "$hydrate": "param",
+                    "ref": "siteSection/name"
+                },
+                "descriptionType": "none"
+            }
+        ]
+    },
+    "1": {
+        "$hydrate": "react.section.1-column",
+        "children": [
+            {
+                "$hydrate": "react.categories",
+                "apiParams": {
+                    "limit": 9,
+                    "featured": true,
+                    "filter": "none"
+                },
+                "itemOptions": {
+                    "display": {
+                        "name": true,
+                        "description": true,
+                        "counts": true
+                    }
+                },
+                "title": "lorem ipsum",
+                "titleType": "static",
+                "descriptionType": "none",
+                "containerOptions": {
+                    "displayType": "carousel"
+                }
+            }
+        ]
+    },
+    "2": {
+        "$hydrate": "react.section.2-columns",
+        "mainBottom": [
+            {
+                "$hydrate": "react.discussion.discussions",
+                "apiParams": {
+                    "includeChildCategories": true,
+                    "sort": "-dateLastComment",
+                    "slotType": "a",
+                    "limit": 10
+                },
+                "containerOptions": {
+                    "viewAll": {
+                        "to": "/discussions"
+                    }
+                },
+                "title": "lorem ipsum",
+                "titleType": "static",
+                "descriptionType": "none"
+            }
+        ],
+        "secondaryBottom": [
+            {
+                "$hydrate": "react.guest-cta",
+                "title": "lorem ipsum",
+                "description": "lorem ipsum",
+                "titleType": "static",
+                "descriptionType": "static",
+                "secondButton": {
+                    "title": "Register",
+                    "type": "standard"
+                },
+                "button": {
+                    "title": "Sign In",
+                    "type": "primary"
+                },
+                "background": {
+                    "useOverlay": true
+                },
+                "alignment": "left"
+            },
+            {
+                "$hydrate": "react.newpost",
+                "asOwnButtons": [],
+                "excludedButtons": []
+            },
+            {
+                "$hydrate": "react.quick-links",
+                "title": "lorem ipsum",
+                "titleType": "static"
+            },
+            {
+                "$hydrate": "react.userspotlight",
+                "userTextAlignment": "left",
+                "apiParams": {
+                    "userID": -1
+                },
+                "title": "lorem ipsum",
+                "subtitle": "",
+                "description": "",
+                "titleType": "static",
+                "descriptionType": "static"
+            }
+        ]
+    }
+}

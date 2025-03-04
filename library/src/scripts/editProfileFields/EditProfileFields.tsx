@@ -86,7 +86,7 @@ function EditFieldsForm(props: { userID: number; formSchema: JsonSchema; profile
             onSubmit={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                submitForm();
+                void submitForm();
             }}
         >
             <JsonSchemaForm

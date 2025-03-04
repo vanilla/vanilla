@@ -71,7 +71,7 @@ export default function OAuth2AddEdit(props: IProps) {
     });
 
     function update(updatedValues: Partial<IAuthenticator>) {
-        setValues({ ...values, ...updatedValues });
+        void setValues({ ...values, ...updatedValues });
     }
 
     return (

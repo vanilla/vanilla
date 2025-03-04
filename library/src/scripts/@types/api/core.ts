@@ -60,9 +60,10 @@ export interface IServerError {
         url: string;
         target?: string;
     };
+    trace?: string | null;
 }
 
-export interface IApiError extends AxiosError, IServerError {
+export interface IApiError extends Omit<AxiosError, "status">, IServerError {
     response: AxiosResponse<IServerError | null>;
 }
 

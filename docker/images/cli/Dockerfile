@@ -1,4 +1,4 @@
-FROM vanillaforums/php:8.0
+FROM vanillaforums/php:8.1
 
 ARG WWWGROUP=1000
 ARG WWWUSER=1000

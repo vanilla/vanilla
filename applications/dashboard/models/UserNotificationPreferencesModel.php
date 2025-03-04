@@ -28,6 +28,8 @@ class UserNotificationPreferencesModel
     const PREFERENCE_USER_LANGUAGE = "NotificationLanguage";
     const NOTIFICATION_TYPES = ["email", "popup", "disabled"];
 
+    public const USER_PREFERENCE_DIGEST_FREQUENCY_KEY = "Preferences.Frequency.Digest";
+
     /** @var UserMetaModel */
     private UserMetaModel $userMetaModel;
 
@@ -115,6 +117,18 @@ class UserNotificationPreferencesModel
         if (!empty($explicitPreferences[self::PREFERENCE_USER_LANGUAGE]) && $this->localeModel->hasMultiLocales()) {
             $result[self::PREFERENCE_USER_LANGUAGE] = $explicitPreferences[self::PREFERENCE_USER_LANGUAGE];
         }
+
+        // Get the digest frequency preference
+        if (Gdn::config("Garden.Digest.Enabled")) {
+            $frequencyKey = str_replace("Preferences.", "", self::USER_PREFERENCE_DIGEST_FREQUENCY_KEY);
+            $explicitFrequencyPreference = $explicitPreferences[$frequencyKey] ?? null;
+            if ($explicitFrequencyPreference) {
+                $frequency = $explicitFrequencyPreference;
+            } else {
+                $frequency = EmailDigestActivity::getDefaultFrequency();
+            }
+            $result["Frequency." . EmailDigestActivity::getPreference()] = $frequency;
+        }
         return $result;
     }
 
@@ -145,6 +159,7 @@ class UserNotificationPreferencesModel
     {
         $existingPrefs = $this->getUserPrefs($userID);
         $allPreferences = $this->activityService->getAllPreferences();
+        $userDigestFrequencyKey = str_replace("Preferences.", "", self::USER_PREFERENCE_DIGEST_FREQUENCY_KEY);
 
         $prefsToSave = [];
 
@@ -162,6 +177,11 @@ class UserNotificationPreferencesModel
                 }
                 $prefsToSave[$key] = $val;
                 $this->userMetaModel->setUserMeta($userID, "Preferences." . $key, intval($val));
+            } elseif ($key === "Frequency." . EmailDigestActivity::getPreference()) {
+                if (in_array($val, DigestModel::DIGEST_FREQUENCY_OPTIONS)) {
+                    $prefsToSave[$userDigestFrequencyKey] = $val;
+                    $this->userMetaModel->setUserMeta($userID, "Preferences." . $userDigestFrequencyKey, $val);
+                }
             } else {
                 $parts = explode(".", $key);
                 $notificationMethod = $parts[0];
@@ -298,7 +318,6 @@ class UserNotificationPreferencesModel
             }
 
             $activitiesPerPreference = $this->activityService->getActivitiesByPreference($keyParts[1]);
-
             /** @var Activity $activity */
             foreach ($activitiesPerPreference as $activity) {
                 if (!$activity::ALLOW_DEFAULT_PREFERENCE) {

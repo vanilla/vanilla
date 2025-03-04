@@ -701,6 +701,7 @@ class UsersApiController extends AbstractApiController
                     "default" => 1,
                     "minimum" => 1,
                 ],
+                "isBanned:b?",
                 "dirtyRecords:b?",
                 "sort:s?" => [
                     "enum" => ApiUtils::sortEnum(
@@ -749,6 +750,15 @@ class UsersApiController extends AbstractApiController
         $out = $this->schema([":a" => $outSchema], "out");
 
         $where = ApiUtils::queryToFilters($in, $query);
+
+        if (isset($query["isBanned"])) {
+            if ($query["isBanned"]) {
+                $where["Banned >"] = 0;
+            } else {
+                $where["Banned"] = 0;
+            }
+        }
+
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
         $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
@@ -819,11 +829,14 @@ class UsersApiController extends AbstractApiController
     public function createIpAddressesValidator(): Closure
     {
         return function (array $ipAddresses, \Garden\Schema\ValidationField $field) {
-            if ($this->checkUserPermissionMode() !== self::FULL_USER_VIEW_PERMISSIONS) {
+            if ($this->checkUserPermissionMode(throw: false) !== self::FULL_USER_VIEW_PERMISSIONS) {
                 $field->addError("You don't have permission to filter by IP address", ["status" => 403]);
             }
             foreach ($ipAddresses as $ipAddress) {
-                if (!filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
+                if (
+                    !str_contains(haystack: $ipAddress, needle: "*") &&
+                    !filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)
+                ) {
                     $field->addError("$ipAddress is not a valid IP address");
                 }
             }
@@ -887,7 +900,12 @@ class UsersApiController extends AbstractApiController
 
         // Add some specific filters
         // Make sure we don't exclude banned users (default behaviour of member search).
-        $query["includeBanned"] = true;
+        if (isset($originalQuery["isBanned"])) {
+            $query["includeBanned"] = $originalQuery["isBanned"];
+            $query["onlyBanned"] = $originalQuery["isBanned"];
+        } else {
+            $query["includeBanned"] = true;
+        }
 
         $query = $in->validate(["recordTypes" => [UserSearchType::TYPE]] + $query);
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
@@ -990,7 +1008,7 @@ class UsersApiController extends AbstractApiController
 
         $this->permission(Permissions::BAN_ROLE_TOKEN);
         $this->idParamSchema("in");
-        if ($this->checkUserPermissionMode() === self::FULL_USER_VIEW_PERMISSIONS) {
+        if ($this->checkUserPermissionMode(throw: false) === self::FULL_USER_VIEW_PERMISSIONS) {
             $in = $this->schema($this->userPatchSchema(), ["UserPatchCommon", "in"])->setDescription("Update a user.");
         } else {
             $in = $this->schema($this->userPatchSelfEditSchema(), ["UserPatchCommon", "in"])->setDescription(
@@ -1679,6 +1697,7 @@ class UsersApiController extends AbstractApiController
                 "photoUrl:s?",
                 "profilePhotoUrl:s?",
                 "url:s?",
+                "points:i?",
                 "dateInserted?",
                 "dateLastActive:dt?",
                 "countDiscussions?",

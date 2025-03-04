@@ -18,6 +18,7 @@ use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Webhooks\SiteSync\WebhooksProducer;
 use VanillaTests\ExpectExceptionTrait;
+use VanillaTests\SchedulerTestTrait;
 use VanillaTests\SiteTestCase;
 
 /**
@@ -28,11 +29,10 @@ use VanillaTests\SiteTestCase;
 class RemoteResourceModelTest extends SiteTestCase
 {
     use ExpectExceptionTrait;
+    use SchedulerTestTrait;
+
     /** @var RemoteResourceModel */
     private $remoteResourceModel;
-
-    /** @var MockObject */
-    private $mockScheduler;
 
     /**
      * @inheritDoc
@@ -104,7 +104,7 @@ class RemoteResourceModelTest extends SiteTestCase
     public function testRemoteResourceJobExecutedFirstTime()
     {
         $this->resetTable("remoteResource", false);
-        $this->assertIfJobIsRun($this->once(), "addJobDescriptor", "http://test.com");
+        $this->assertResourceJobScheduled("http://test.com");
     }
 
     /**
@@ -119,11 +119,11 @@ class RemoteResourceModelTest extends SiteTestCase
             "url" => RemoteResourceModel::PREFIX . $url,
             "content" => "amazing content",
         ]);
-        $this->assertIfJobIsRun($this->never(), "addJobDescriptor", $url);
+        $this->assertResourceJobScheduled($url, false);
 
         // Check cache
         $this->resetTable("remoteResource", false);
-        $this->assertIfJobIsRun($this->never(), "addJobDescriptor", $url);
+        $this->assertResourceJobScheduled($url, false);
     }
 
     /**
@@ -139,34 +139,41 @@ class RemoteResourceModelTest extends SiteTestCase
             "content" => "amazing content",
         ]);
         CurrentTimeStamp::mockTime("Jan 01 2020 02:02:01");
-        $this->assertIfJobIsRun($this->once(), "addJobDescriptor", $url);
+        $this->assertResourceJobScheduled($url);
     }
 
     /**
      * Executes GetByUrl and determines if remoteJobResource is run.
      *
-     * @param InvocationOrder $expects
-     * @param string $method
-     * @param string $url
+     * @param string $forUrl
+     * @param bool $isScheduled
+     *
      * @return mixed
      */
-    private function assertIfJobIsRun($expects, $method, $url)
+    private function assertResourceJobScheduled(string $forUrl, bool $isScheduled = true)
     {
-        /** @var SchedulerInterface */
-        $this->mockScheduler = $this->getMockBuilder(SchedulerInterface::class)->getMock();
-
-        $jobDescriptor = new NormalJobDescriptor(LocalRemoteResourceJob::class);
-        $jobDescriptor->setMessage(["url" => $url, "headers" => [], "callable" => null]);
-        $this->container()->setInstance(SchedulerInterface::class, $this->mockScheduler);
-
-        $this->mockScheduler
-            ->expects($expects)
-            ->method($method)
-            ->with($jobDescriptor);
+        $this->getScheduler()->pause();
 
         /** @var RemoteResourceModel $remoteResourceModel */
         $remoteResourceModel = Gdn::getContainer()->get(RemoteResourceModel::class);
-        return $remoteResourceModel->getByUrl($url);
+        $result = $remoteResourceModel->getByUrl($forUrl);
+
+        if ($isScheduled) {
+            $this->getScheduler()->assertJobScheduled(
+                LocalRemoteResourceJob::class,
+                expectedMessage: [
+                    "url" => $forUrl,
+                    "headers" => [],
+                    "callable" => null,
+                ]
+            );
+        } else {
+            $this->getScheduler()->assertJobNotScheduled(LocalRemoteResourceJob::class);
+        }
+
+        $this->getScheduler()->reset();
+
+        return $result;
     }
 
     /**
@@ -178,7 +185,7 @@ class RemoteResourceModelTest extends SiteTestCase
         $url = "https:://invaliddomain.com";
 
         //Verify the jobber is called for the first time the test is run
-        $this->assertIfJobIsRun($this->once(), "addJobDescriptor", $url);
+        $this->assertResourceJobScheduled($url);
 
         CurrentTimeStamp::mockTime("Sep 08 2022 01:01:01");
         $this->remoteResourceModel->insert([
@@ -188,12 +195,12 @@ class RemoteResourceModelTest extends SiteTestCase
 
         //Verify that data is cached with corresponding error message and an exception is thrown
         $this->runWithExpectedExceptionCode(400, function () use ($url) {
-            $this->assertIfJobIsRun($this->never(), "addJobDescriptor", $url);
+            $this->assertResourceJobScheduled($url, false);
         });
 
         //Verify the jobber is invoked when data become stale
         CurrentTimeStamp::mockTime("Sep 08 2022 03:01:01");
         $this->expectExceptionCode(400);
-        $this->assertIfJobIsRun($this->once(), "addJobDescriptor", $url);
+        $this->assertResourceJobScheduled($url);
     }
 }

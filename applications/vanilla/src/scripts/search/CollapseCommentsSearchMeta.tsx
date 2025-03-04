@@ -5,7 +5,6 @@
 
 import React, { useMemo, useState } from "react";
 import { searchResultClasses } from "@library/features/search/searchResultsStyles";
-import { TypeDiscussionsIcon } from "@library/icons/searchIcons";
 import { ResultMeta } from "@library/result/ResultMeta";
 import CollapseCommentsSearchMetaLoader from "@vanilla/addon-vanilla/search/CollapseCommentsSearchMetaLoader";
 import { ICountResult } from "@library/search/searchTypes";
@@ -18,6 +17,7 @@ import qs from "qs";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
 import { ListItem } from "@library/lists/ListItem";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { Icon } from "@vanilla/icons";
 
 interface IProps {
     discussionID: IDiscussion["discussionID"];
@@ -25,7 +25,7 @@ interface IProps {
 }
 
 export default function CollapseCommentSearchMeta(props: IProps) {
-    const { icon = <TypeDiscussionsIcon />, discussionID } = props;
+    const { icon = <Icon icon={"search-discussions"} />, discussionID } = props;
     const [forceLoader] = useState(false);
 
     const discussion = useDiscussion(discussionID);

@@ -61,7 +61,7 @@ class SchemaFiltersTest extends TestCase
         $testField = new ValidationField($testValidation, $testSchema, $testSchema);
         $testValue = "null";
         $decoded = SchemaFilters::decodeValue($testValue, $testField);
-        $this->assertSame($decoded, false);
+        $this->assertNull($decoded);
     }
 
     /**
@@ -74,6 +74,6 @@ class SchemaFiltersTest extends TestCase
         $testField = new ValidationField($testValidation, $testSchema, $testSchema);
         $testValue = "apos'trophe";
         $decoded = SchemaFilters::decodeValue($testValue, $testField);
-        $this->assertSame($decoded, false);
+        $this->assertNull($decoded);
     }
 }

@@ -7,9 +7,11 @@
 
 namespace Vanilla\Layout;
 
+use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Gdn;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Events\LayoutEvent;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
@@ -17,6 +19,7 @@ use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
 use Vanilla\Database\Operation\ResourceEventProcessor;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Forum\Models\CommunityMachineTranslationModel;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Models\FullRecordCacheModel;
@@ -40,7 +43,8 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
         protected LayoutViewModel $layoutViewModel,
         protected LayoutService $layoutProviderService,
         protected \GDN_Cache $cache,
-        protected ResourceEventProcessor $resourceEventProcessor
+        protected ResourceEventProcessor $resourceEventProcessor,
+        protected EventManager $eventManager
     ) {
         parent::__construct(self::TABLE_NAME, $cache);
 
@@ -87,20 +91,6 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
         if ($removeLayoutTypeColumn) {
             $construct->table(self::TABLE_NAME)->dropColumn("layoutType");
         }
-    }
-
-    /**
-     * Migrate configs for the 2022.011 release.
-     *
-     * @param \Gdn_Configuration $config
-     */
-    public static function migrateLegacyConfigs_2022_011(\Gdn_Configuration $config): void
-    {
-        $config->renameConfigKeys([
-            "Feature.UseCustomLayout.Enabled" => "Feature.customLayout.home.Enabled",
-            "Feature.LayoutEditor.Enabled" => "Feature.layoutEditor.Enabled",
-            "Feature.CustomLayoutDiscussionListPage.Enabled" => "Feature.customLayout.discussionList.Enabled",
-        ]);
     }
 
     /**
@@ -267,7 +257,15 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      */
     public function getHydratedSchema(): Schema
     {
-        return Schema::parse(["layoutID:i|s", "name:s", "layoutViewType:s", "isDefault:b", "layout:a", "seo:o"]);
+        return Schema::parse([
+            "layoutID:i|s",
+            "name:s",
+            "layoutViewType:s",
+            "isDefault:b",
+            "layout:a",
+            "seo:o",
+            "contexts:a?",
+        ]);
     }
 
     /**
@@ -338,11 +336,29 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
     }
 
     /**
+     * Get Original Layout by ID, without applying Machine Translation
+     *
+     * @param int $layoutID The layout ID
+     */
+    public function getOriginalByID($layoutID): array
+    {
+        $layout = $this->selectSingle(["layoutID" => $layoutID]);
+        return $layout;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getByID($layoutID): array
     {
-        return $this->selectSingle(["layoutID" => $layoutID]);
+        $layout = $this->selectSingle(["layoutID" => $layoutID]);
+        $communityMachineTranslationModel = Gdn::getContainer()->get(CommunityMachineTranslationModel::class);
+        $layout = $communityMachineTranslationModel->replaceTranslatableRecord(
+            "layout",
+            $layout,
+            \Gdn::locale()->current()
+        );
+        return $layout;
     }
 
     /**

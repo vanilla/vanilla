@@ -13,7 +13,7 @@ import { EmbedContainer } from "@library/embeddedContent/components/EmbedContain
 import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedContainerSize";
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { EmbedErrorBoundary } from "@library/embeddedContent/components/EmbedErrorBoundary";
-import { embedContainerClasses } from "@library/embeddedContent/components/embedStyles";
+import { embedContainerClasses, embedElementClasses } from "@library/embeddedContent/components/embedStyles";
 import { getEmbedForType } from "@library/embeddedContent/embedService.loadable";
 import { IBaseEmbedData } from "@library/embeddedContent/embedService.register";
 import { EmbedContext, useEmbedContext } from "@library/embeddedContent/IEmbedContext";
@@ -43,7 +43,7 @@ import {
 } from "@udecode/plate-common";
 import { useComponentDebug, useIsMounted } from "@vanilla/react-utils";
 import { matchWithWildcard } from "@vanilla/utils";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LiveMessage } from "react-aria-live";
 import { Transforms } from "slate";
 import { useSelected } from "slate-react";
@@ -120,7 +120,9 @@ export function RichEmbedElement(props: IProps) {
                         sprintf(t("Your %s %s is uploading."), t(element.dataSourceType), element.uploadFile.name),
                     );
                     const uploadedFile = await uploadFile(element.uploadFile, {
-                        onUploadProgress: progressEmitterRef.current.emit,
+                        onUploadProgress: (progressEvent) => {
+                            progressEmitterRef.current.emit(progressEvent.event);
+                        },
                     });
                     // Don't save the history for this so that we don't get caught in an undo loop
                     // Where we undo, and the effect triggers again to load the data.
@@ -220,7 +222,7 @@ export function RichEmbedElement(props: IProps) {
         // scrape again if the URL has changed
         if (element.dataSourceType === "url" && elementUrl !== element.url) {
             setElementUrl(element.url);
-            loadEmbedData();
+            void loadEmbedData();
         }
     }, [elementUrl, element.url]);
 
@@ -229,11 +231,11 @@ export function RichEmbedElement(props: IProps) {
             return;
         }
 
-        loadEmbedData();
+        void loadEmbedData();
     });
 
     return (
-        <span {...attributes} {...nodeProps}>
+        <span {...attributes} {...nodeProps} className={embedElementClasses().root}>
             <span
                 contentEditable={false}
                 suppressContentEditableWarning={true}

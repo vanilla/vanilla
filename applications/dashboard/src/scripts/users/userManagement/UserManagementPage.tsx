@@ -151,6 +151,7 @@ export function UserManagementImpl() {
             ...newParams,
             ...{
                 roleIDs: newParams.roleIDs,
+                isBanned: newParams.isBanned,
                 rankIDs: newParams.rankIDs,
                 dateInserted: newParams.dateInserted,
                 dateLastActive: newParams.dateLastActive,
@@ -192,6 +193,7 @@ export function UserManagementImpl() {
                     page: query.page,
                     roleIDs: query.roleIDs,
                     sort: query.sort,
+                    banned: query.isBanned != undefined ? (query.isBanned ? "true" : "false") : undefined,
                     rankIDs: query.rankIDs,
                     dateInserted: query.dateInserted,
                     dateLastActive: query.dateLastActive,
@@ -214,7 +216,7 @@ export function UserManagementImpl() {
                                         <DropDownItemButton
                                             disabled={userExport.isFetching}
                                             onClick={() => {
-                                                userExport.exportUsers(query);
+                                                void userExport.exportUsers(query);
                                             }}
                                         >
                                             <span className={dropdownSwitchButtonClasses().itemLabel}>

@@ -33,7 +33,9 @@ abstract class ExternalAction extends AutomationAction
                 isset($postFields["triggerValue"]["applyToNewContentOnly"]) &&
                 !$postFields["triggerValue"]["applyToNewContentOnly"]
             ) {
-                $field->addError("This action can only be applied to new content.");
+                $field
+                    ->setName("triggerValue.applyToNewContentOnly")
+                    ->addError("This action can only be applied to new content.");
                 return Invalid::value();
             }
 

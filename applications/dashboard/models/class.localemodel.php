@@ -2,21 +2,254 @@
 /**
  * Locale model.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
  */
 
+use Vanilla\Database\Operation\CurrentDateFieldProcessor;
+use Vanilla\Database\Operation\CurrentUserFieldProcessor;
+use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Utility\ArrayUtils;
 
 /**
  * Used to manage adding/removing different locale files.
  */
-class LocaleModel
+class LocaleModel extends FullRecordCacheModel
 {
+    //region Properties
+    private const TABLE_NAME = "locale";
+
+    const LOCALE_PREFERENCE_KEY = "NotificationLanguage";
+
     /** @var array|null Locales in the system.  */
     protected $_AvailableLocalePacks = null;
+
+    /** @var Gdn_Cache */
+    private \Gdn_Cache $cache;
+
+    /** @var string */
+    public string $defaultLocale = "";
+
+    const FIELD_MAPPINGS = ["translationService" => "kbTranslationService", "displayNames" => "displayName"];
+
+    /**
+     * @param Gdn_Configuration $config
+     * @param Gdn_Cache $cache
+     */
+    public function __construct(private Gdn_Configuration $config, \Gdn_Cache $cache)
+    {
+        $this->cache = $cache;
+        parent::__construct(self::TABLE_NAME, $cache);
+        $this->addPipelineProcessor(new CurrentDateFieldProcessor(["dateInserted", "dateUpdated"], ["dateUpdated"]));
+        $userProcessor = new CurrentUserFieldProcessor(\Gdn::session());
+        $userProcessor->setInsertFields(["insertUserID", "updateUserID"])->setUpdateFields(["updateUserID"]);
+        $this->addPipelineProcessor($userProcessor);
+        $this->defaultLocale = Gdn::config("Garden.Locale", "en");
+    }
+
+    /**
+     * @return void
+     */
+    public function invalidateCache()
+    {
+        $this->modelCache->invalidateAll();
+    }
+
+    /**
+     * Create the locals table.
+     *
+     * @param Gdn_Database $database
+     * @return void
+     */
+    public static function structure(Gdn_Database $database, bool $explicit = false, bool $drop = false): void
+    {
+        $database
+            ->structure()
+            ->table("locale")
+            ->column("localeID", "varchar(10)")
+            ->column("localeKey", "varchar(10)")
+            ->column("regionalKey", "varchar(10)")
+            ->column("displayName", "Text")
+            ->column("kbTranslationService", "varchar(255)")
+            ->column("translatable", "tinyint(4)")
+            ->column("machineTranslationService", "tinyint", 0)
+            ->column("dateInserted", "datetime")
+            ->column("insertUserID", "int")
+            ->column("dateUpdated", "datetime", true)
+            ->column("updateUserID", "int", true)
+            ->set($explicit, $drop);
+        if (!Gdn::config("Locales.migrated", false) && $database->structure()->tableExists("locale")) {
+            $locales = LocaleModel::getEnabledLocales();
+            $defaultLocale = Gdn::config("Garden.Locale", "en");
+            foreach ($locales as $locale) {
+                $hasLocale = $database->sql()->getWhere("locale", ["localeID" => $locale["localeID"]]);
+                if ($hasLocale->numRows() == 0) {
+                    $displayName = \Locale::getDisplayLanguage($locale["localeKey"], $defaultLocale);
+                    $displayNameRegion = \Locale::getDisplayRegion($locale["localeKey"], $defaultLocale);
+                    $displayName = empty($displayNameRegion) ? $displayName : $displayName . " ($displayNameRegion)";
+                    // Standardize capitalization
+                    $displayName = mb_convert_case($displayName, MB_CASE_TITLE);
+                    $translationService = Gdn::config("Locales.{$locale["localeID"]}.TranslationService", "none");
+
+                    $database->sql()->insert("locale", [
+                        "localeID" => $locale["localeID"],
+                        "localeKey" => $locale["localeKey"],
+                        "regionalKey" => $locale["regionalKey"],
+                        "displayName" => $displayName,
+                        "kbTranslationService" => $translationService,
+                        "translatable" => 0,
+                        "machineTranslationService" => 0,
+                        "dateInserted" => Gdn_Format::toDateTime(),
+                        "insertUserID" => Gdn::session()->UserID,
+                    ]);
+                }
+            }
+
+            Gdn::config()->saveToConfig("Locales.migrated", true);
+        }
+    }
+
+    /**
+     * Get All machine Locales from the DB.
+     *
+     * @return array
+     */
+    public function getMachineLocales(): array
+    {
+        $result = $this->normalizeOutput($this->select(["translatable" => 1]));
+
+        return $result;
+    }
+
+    /**
+     * Get Language Settings Locales from the DB.
+     *
+     * @return array
+     */
+    public function getLanguageSetting(): array
+    {
+        $result = (array) $this->config->get("EnabledLocales", []);
+        if ($result) {
+            $localIDs = array_keys($result);
+            $result = $this->normalizeOutput($this->select(["localeID" => $localIDs]));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Normalize locale output.
+     *
+     * @param array $locales An array of locales to normalize.
+     * @return array
+     */
+    public function normalizeOutput(array $locales): array
+    {
+        $normalizedLocales = [];
+
+        foreach ($locales as $locale) {
+            $normalized = \Vanilla\Models\LegacyModelUtils::normalizeApiOutput($locale, self::FIELD_MAPPINGS);
+            $normalized["displayNames"] = json_decode($locale["displayName"], true);
+
+            $normalizedLocales[] = $normalized;
+        }
+        LocaleModel::expandDisplayNames($normalizedLocales, array_column($normalizedLocales, "localeKey"));
+
+        return $normalizedLocales;
+    }
+
+    /**
+     * get Locale from DB.
+     *
+     * @param string $localeID
+     *
+     * @return array
+     */
+    public function getLocale(string $localeID): array
+    {
+        $localeData = $this->normalizeOutput($this->select(["localeID" => $localeID]));
+
+        return count($localeData) > 0 ? $localeData[0] : [];
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function select(array $where = [], array $options = []): array
+    {
+        if (\Gdn::structure()->tableExists("locale")) {
+            return parent::select($where, $options);
+        }
+        return [];
+    }
+
+    /**
+     * Update or Add Locale in the DB for machine translation.
+     *
+     * @param string $localeID
+     * @param bool $translatable True if the locale is translatable by machine translation.
+     *
+     * @return array
+     */
+    public function updateAddTranslatableLocale(string $localeID, bool $translatable): array
+    {
+        $locale = $this->getLocale($localeID);
+        if ($locale === [] && $translatable) {
+            $displayName = \Locale::getDisplayLanguage($localeID, $this->defaultLocale);
+            $displayNameRegion = \Locale::getDisplayRegion($localeID, $this->defaultLocale);
+            $displayName = empty($displayNameRegion) ? $displayName : $displayName . " ($displayNameRegion)";
+            // Standardize capitalization
+            $displayName = mb_convert_case($displayName, MB_CASE_TITLE);
+            $this->insert([
+                "localeID" => "vf-" . $localeID,
+                "localeKey" => $localeID,
+                "regionalKey" => $localeID,
+                "displayName" => $displayName,
+                "kbTranslationService" => "none",
+                "translatable" => $translatable,
+                "machineTranslationService" => 1,
+                "dateInserted" => Gdn_Format::toDateTime(),
+                "insertUserID" => Gdn::session()->UserID,
+            ]);
+        } elseif ($locale !== []) {
+            $this->update(["translatable" => $translatable], ["localeID" => "vf-" . $localeID]);
+        }
+        $localeData = $this->normalizeOutput($this->select(["localeID" => "vf-" . $localeID]))[0];
+
+        return $localeData;
+    }
+
+    /**
+     * Inserting Locate entry.
+     *
+     * @param string $locale
+     * @return array
+     */
+    public function enableLocale(string $locale): array
+    {
+        $addonManager = \Gdn::addonManager();
+        $key = "vf_" . $locale;
+        $addon = $addonManager->lookupLocale($key);
+        if ($addon !== null) {
+            $localeInfo = $addon->getInfo();
+            $localeInfo = ArrayUtils::pascalCase($localeInfo);
+            LocaleModel::calculateLocaleInfo($localeInfo);
+            $this->insert([
+                "localeID" => $key,
+                "localeKey" => $localeInfo["Locale"],
+                "regionalKey" => $localeInfo["Locale"],
+                "displayName" => $localeInfo["EnName"],
+                "kbTranslationService" => "",
+                "translatable" => 0,
+                "dateInserted" => Gdn_Format::toDateTime(),
+                "insertUserID" => Gdn::session()->UserID,
+            ]);
+            $return = $this->getLocale($key);
+        }
+        return [];
+    }
 
     /**
      *
@@ -69,7 +302,7 @@ class LocaleModel
      *
      * @param $info
      */
-    protected function calculateLocaleInfo(&$info)
+    protected static function calculateLocaleInfo(&$info)
     {
         $canonicalLocale = Gdn_Locale::canonicalize($info["Locale"]);
         if ($canonicalLocale !== $info["Locale"]) {
@@ -117,10 +350,10 @@ class LocaleModel
      * @param bool $getInfo
      * @return array
      */
-    public function enabledLocalePacks($getInfo = false)
+    public static function enabledLocalePacks($getInfo = false)
     {
-        $result = (array) c("EnabledLocales", []);
-        $translationDebug = c("TranslationDebug");
+        $result = (array) Gdn::config("EnabledLocales", []);
+        $translationDebug = Gdn::config("TranslationDebug");
         if ($getInfo) {
             $addonManager = \Gdn::addonManager();
             foreach ($result as $key => $locale) {
@@ -128,7 +361,7 @@ class LocaleModel
                 if ($addon !== null) {
                     $localeInfo = $addon->getInfo();
                     $localeInfo = ArrayUtils::pascalCase($localeInfo);
-                    $this->calculateLocaleInfo($localeInfo);
+                    LocaleModel::calculateLocaleInfo($localeInfo);
                     $result[$key] = $localeInfo;
                 } else {
                     unset($result[$key]);
@@ -218,6 +451,9 @@ class LocaleModel
         return $destPath;
     }
 
+    /**
+     * @return string
+     */
     protected function getFileHeader()
     {
         $now = Gdn_Format::toDateTime();
@@ -306,5 +542,129 @@ class LocaleModel
             $enabledLocales["en"] = "en";
         }
         return in_array($selectedLocale, $enabledLocales);
+    }
+
+    /**
+     * Get the locale prefered by the user.
+     *
+     * @return string|null
+     */
+    public static function getUserPreferedLocale(): ?string
+    {
+        $locale = Gdn::session()->getPreference(self::LOCALE_PREFERENCE_KEY, null);
+        return $locale;
+    }
+
+    /**
+     * Get translatable locales.
+     *
+     * We currently only support GPT for Community Machine Translation.
+     *
+     * @param bool $includeSiteLocale
+     * @return array
+     */
+    public static function getTranslatableLocales(bool $includeSiteLocale = true): array
+    {
+        $locales = Gdn::config()->get("MachineTranslation.translationServices.Gpt.locales", []);
+
+        if ($includeSiteLocale) {
+            $locales[] = Gdn::locale()->getSiteLocale();
+        }
+        return $locales;
+    }
+
+    /**
+     * Check if a language is translatable.
+     *
+     * @param string $locale
+     * @return bool
+     */
+    public function isTranslatableLocale(string $locale): bool
+    {
+        $locales = $this->getTranslatableLocales();
+        return in_array($locale, $locales);
+    }
+
+    /**
+     * Expand display names for the locales.
+     *
+     * @param array $rows
+     * @param array $locales
+     */
+    public static function expandDisplayNames(array &$rows, array $locales)
+    {
+        if (count($rows) === 0) {
+            return;
+        }
+        reset($rows);
+        $single = is_string(key($rows));
+
+        $populate = function (array &$row, array $locales) {
+            $displayNames = [];
+            foreach ($locales as $locale) {
+                $displayName = \Locale::getDisplayLanguage($row["localeKey"], $locale);
+                $displayNameRegion = \Locale::getDisplayRegion($row["localeKey"], $locale);
+                $displayName = empty($displayNameRegion) ? $displayName : $displayName . " ($displayNameRegion)";
+                // Standardize capitalization
+                $displayName = mb_convert_case($displayName, MB_CASE_TITLE);
+
+                // If I set the translation key
+                // localeOverrides.zh.* = Override in all other languages
+                // localeOverrides.zh.zh_TW = Override in one specific language.
+                $wildCardOverrideKey = "localeOverrides.{$row["localeKey"]}.*";
+                $specificOverrideKey = "localeOverrides.{$row["localeKey"]}.$locale";
+                $displayName = Gdn::config($specificOverrideKey, c($wildCardOverrideKey, $displayName));
+
+                $displayNames[$locale] = $displayName;
+            }
+            $row["displayNames"] = $displayNames;
+        };
+
+        if ($single) {
+            $populate($rows, $locales);
+        } else {
+            foreach ($rows as &$row) {
+                $populate($row, $locales);
+            }
+        }
+    }
+
+    /**
+     * Get all enabled locales of the site.
+     *
+     * @return array[]
+     */
+    public static function getEnabledLocales(): array
+    {
+        $locales = LocaleModel::enabledLocalePacks(true);
+        $hasEnLocale = false;
+        $result = [];
+        foreach ($locales as $localeID => $locale) {
+            $localeItem = [
+                "localeID" => $localeID,
+                "localeKey" => $locale["Locale"],
+                "regionalKey" => $locale["Locale"],
+            ];
+
+            if ($localeItem["localeKey"] === "en") {
+                $hasEnLocale = true;
+            }
+            $result[] = $localeItem;
+        }
+
+        if (!$hasEnLocale) {
+            $result = array_merge(
+                [
+                    [
+                        "localeID" => "en",
+                        "localeKey" => "en",
+                        "regionalKey" => "en",
+                    ],
+                ],
+                $result
+            );
+        }
+
+        return $result;
     }
 }

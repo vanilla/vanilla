@@ -42,8 +42,7 @@ function MockInterestsSettings() {
     );
 }
 
-function MockAddInterest(props: { isEdit?: boolean; onClose?: () => void }) {
-    const { isEdit = false, onClose = () => null } = props;
+function MockAddInterest() {
     const QueryClientWrapper = queryClientWrapper();
 
     const interest = {
@@ -91,7 +90,7 @@ function MockAddInterest(props: { isEdit?: boolean; onClose?: () => void }) {
     return (
         <QueryClientWrapper>
             <MockProfileFieldsProvider>
-                <AddInterest onClose={onClose} isVisible interest={isEdit ? interest : undefined} />
+                <AddInterest />
             </MockProfileFieldsProvider>
         </QueryClientWrapper>
     );
@@ -277,8 +276,6 @@ describe("InterestsSettings", () => {
             expect(addButton).toBeNull();
             const table = await screen.queryByRole("table");
             expect(table).toBeNull();
-            const nextPageButton = await screen.queryByRole("button", { name: "Next Page" });
-            expect(nextPageButton).toBeNull();
         });
 
         it("The interest table and add button are available if suggested content is enabled in site meta", async () => {
@@ -293,8 +290,6 @@ describe("InterestsSettings", () => {
             expect(addButton).toBeInTheDocument();
             const table = screen.getByRole("table");
             expect(table).toBeInTheDocument();
-            const nextPageButton = screen.getByRole("button", { name: "Next Page" });
-            expect(nextPageButton).toBeInTheDocument();
         });
 
         it("The interest table becomes visible when the suggested content is toggled on", async () => {
@@ -319,8 +314,6 @@ describe("InterestsSettings", () => {
         it("Renders the fetched interests in the table", async () => {
             setMeta("suggestedContentEnabled", true);
             render(<MockInterestsSettings />);
-            const pager = await screen.findByText(/1 - 3 of 3/);
-            expect(pager).toBeInTheDocument();
         });
 
         it("Opens the Add Interest form when the button is clicked", async () => {

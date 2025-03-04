@@ -289,7 +289,6 @@ class StubContentPlugin extends Gdn_Plugin
 
                 if ($authorRecord["row"] && !empty($category)) {
                     $authorID = $authorRecord["receipt"]["rowID"];
-                    $category = (array) $category;
 
                     // Build translation tags
                     $translateName = "{$content["tag"]}.title";
@@ -689,6 +688,10 @@ class StubContentPlugin extends Gdn_Plugin
 
         // Retrieve and decode receipt
         $encoded = Gdn::get($receiptKey);
+        if (!isset($encoded)) {
+            return false;
+        }
+
         return json_decode($encoded, true);
     }
 

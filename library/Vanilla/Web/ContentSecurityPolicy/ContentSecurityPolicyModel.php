@@ -78,7 +78,7 @@ class ContentSecurityPolicyModel implements LoggerAwareInterface
             $policies = array_merge($policies, $provider->getPolicies());
         }
         if ($this->config->get("HotReload.Enabled", false)) {
-            $policies[] = new Policy(Policy::SCRIPT_SRC, "'unsafe-eval' https://frontend.vanilla.localhost");
+            $policies[] = new Policy(Policy::SCRIPT_SRC, "'unsafe-eval' http://127.0.0.1");
         }
         return $policies;
     }

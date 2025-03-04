@@ -7,7 +7,7 @@
     "hasLocale": false,
     "settingsUrl": false,
     "settingsPermission": "Garden.Settings.Manage",
-    "icon": "ignore.png",
+    "icon": "ignore.svg",
     "key": "ignore",
     "type": "addon",
     "priority": 100,

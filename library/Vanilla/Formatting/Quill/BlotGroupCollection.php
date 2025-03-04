@@ -7,6 +7,8 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use ReturnTypeWillChange;
+use Traversable;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatText;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
@@ -56,7 +58,7 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface
     /**
      * @inheritdoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new \ArrayIterator($this->groups);
     }
@@ -79,7 +81,7 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface
     /**
      * Push the current line into the group and reset the line.
      */
-    private function clearLine()
+    private function clearLine(): void
     {
         $this->inProgressGroup->pushBlots($this->inProgressLine);
         $this->inProgressLine = [];
@@ -99,7 +101,7 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface
      * Push the group into our groups array and start a new one.
      * Do not push an empty group.
      */
-    private function clearBlotGroup()
+    private function clearBlotGroup(): void
     {
         if ($this->inProgressGroup->isEmpty()) {
             return;
@@ -123,7 +125,7 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface
     /**
      * Create Blots and their groups.
      */
-    private function createBlotGroups()
+    private function createBlotGroups(): void
     {
         $this->inProgressGroup = new BlotGroup();
         $this->inProgressLine = [];
@@ -214,7 +216,7 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface
      * @param BlotGroup $group
      * @param array $result Working result array.
      */
-    private function getFragmentsBlotGroup(BlotGroup $group, array &$result = [])
+    private function getFragmentsBlotGroup(BlotGroup $group, array &$result = []): void
     {
         if ($group->getBlotsAndGroups() instanceof AbstractBlot) {
             $result[] = new BlotGroupTextFragment($group, $this);

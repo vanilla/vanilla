@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -23,7 +23,7 @@ export interface IResultAnalyticsData {
     author: { authorID: RecordID[]; authorName: string[] };
     recordType: string[];
     tag: { tagID: RecordID[]; tagName: string[] };
-    category: { categoryID: RecordID[]; categoryName: string[] };
+    category: { categoryID: RecordID[] };
     kb: { kbID: RecordID | null; kbName: string };
     siteSection: object;
     siteSectionID: string;
@@ -134,7 +134,6 @@ export const getSearchAnalyticsData = (
         },
         category: {
             categoryID: [],
-            categoryName: [],
         },
         //we don't allow multiple kb filter in search so no mapping here
         kb: { kbID: null, kbName: "" },
@@ -150,10 +149,9 @@ export const getSearchAnalyticsData = (
         resultsWithAnalyticsData.tag.tagID = form.tagsOptions.map((tag) => tag.value);
         resultsWithAnalyticsData.tag.tagName = form.tagsOptions.map((tag) => tag.label);
     }
-    if (form.categoryOptions && form.categoryOptions.length) {
-        resultsWithAnalyticsData.category.categoryID = form.categoryOptions.map((category) => category.value);
-        resultsWithAnalyticsData.category.categoryName = form.categoryOptions.map((category) => category.label);
-    }
+
+    resultsWithAnalyticsData.category.categoryID = form.categoryIDs ?? [];
+
     if (form.knowledgeBaseOption) {
         resultsWithAnalyticsData.kb.kbID = form.knowledgeBaseOption.value;
         resultsWithAnalyticsData.kb.kbName = form.knowledgeBaseOption.label;

@@ -67,7 +67,7 @@ export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion
                                 value={{
                                     value: formik.values.pinLocation,
                                     onChange: (value) => {
-                                        formik.setFieldValue("pinLocation", value);
+                                        void formik.setFieldValue("pinLocation", value);
                                     },
                                 }}
                             >

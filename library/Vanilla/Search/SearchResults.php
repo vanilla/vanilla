@@ -7,6 +7,7 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\ValidationException;
+use Traversable;
 use Vanilla\Utility\UrlUtils;
 
 /**
@@ -58,7 +59,7 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      *
      * @param int $key
      */
-    public function removeResultItem(int $key)
+    public function removeResultItem(int $key): void
     {
         unset($this->resultItems[$key]);
         $this->resultItems = array_values($this->resultItems);
@@ -122,7 +123,7 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->resultItems;
     }
@@ -130,7 +131,7 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     /**
      * @inheritdoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new \ArrayIterator($this->resultItems);
     }
@@ -138,7 +139,7 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     /**
      * @inheritdoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->resultItems);
     }

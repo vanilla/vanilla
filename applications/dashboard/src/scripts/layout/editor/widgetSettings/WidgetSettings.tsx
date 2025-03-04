@@ -39,6 +39,10 @@ export function WidgetSettings(props: IProps) {
         expandableFormGroups.push("categoryOptions");
     }
 
+    if (props.schema.properties.articleOptions) {
+        expandableFormGroups.push("articleOptions");
+    }
+
     const formGroupWrapper: React.ComponentProps<typeof JsonSchemaForm>["FormGroupWrapper"] = function (props) {
         return (
             <WidgetSettingsFormGroupWrapper

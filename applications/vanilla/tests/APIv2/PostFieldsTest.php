@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Models\PostTypeModel;
 use VanillaTests\ExpectExceptionTrait;
@@ -79,34 +80,6 @@ class PostFieldsTest extends AbstractAPIv2Test
     }
 
     /**
-     * Test creating a post field with a duplicate apiName for a different post type. No exception thrown.
-     *
-     * @return void
-     */
-    public function testPostWithDuplicatePostFieldDifferentPostType()
-    {
-        $this->testPost(["postFieldID" => "duplicate-name"]);
-        $this->testPost(["postFieldID" => "duplicate-name", "postTypeID" => $this->postTypeTwo]);
-    }
-
-    /**
-     * Test that we get an exception when trying to create a post type when the feature is disabled.
-     *
-     * @return void
-     */
-    public function testPostWithFeatureNotEnabled()
-    {
-        $this->runWithConfig(
-            [FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS) => false],
-            function () {
-                $this->expectExceptionCode(400);
-                $this->expectExceptionMessage("Post Types & Post Fields is not enabled.");
-                $this->testPost();
-            }
-        );
-    }
-
-    /**
      * Tests the index endpoint with various filters applied.
      *
      * @return void
@@ -142,7 +115,7 @@ class PostFieldsTest extends AbstractAPIv2Test
         $postField = $this->testPost();
 
         $result = $this->api()
-            ->get($this->baseUrl . "/" . $postField["postTypeID"] . "/" . $postField["postFieldID"])
+            ->get($this->baseUrl . "/" . $postField["postFieldID"])
             ->getBody();
 
         $this->assertDataLike(
@@ -192,7 +165,7 @@ class PostFieldsTest extends AbstractAPIv2Test
             "isActive" => true,
         ];
         $postFieldUpdated = $this->api()
-            ->patch($this->baseUrl . "/" . $postField["postTypeID"] . "/" . $postField["postFieldID"], $payload)
+            ->patch($this->baseUrl . "/" . $postField["postFieldID"], $payload)
             ->getBody();
         $this->assertDataLike($payload, $postFieldUpdated);
     }
@@ -206,11 +179,11 @@ class PostFieldsTest extends AbstractAPIv2Test
     {
         $row = $this->testPost();
 
-        $response = $this->api()->delete($this->baseUrl . "/" . $row["postTypeID"] . "/" . $row["postFieldID"]);
+        $response = $this->api()->delete($this->baseUrl . "/" . $row["postFieldID"]);
         $this->assertSame(204, $response->getStatusCode());
 
         $this->runWithExpectedException(NotFoundException::class, function () use ($row) {
-            $this->api()->get($this->baseUrl . "/" . $row["postTypeID"] . "/" . $row["postFieldID"]);
+            $this->api()->get($this->baseUrl . "/" . $row["postFieldID"]);
         });
     }
 
@@ -250,6 +223,7 @@ class PostFieldsTest extends AbstractAPIv2Test
         $this->assertEquals(201, $result->getStatusCode());
 
         $body = $result->getBody();
+        unset($record["postTypeID"], $body["postTypeID"]);
         $this->assertRowsEqual($record, $body);
 
         return $body;
@@ -301,7 +275,92 @@ class PostFieldsTest extends AbstractAPIv2Test
     public function testValidatePostFieldIDUsedInAPIFilterMiddleware()
     {
         $this->expectException(ClientException::class);
-        $this->expectExceptionMessageMatches("/^The following values are not allowed:/");
+        $this->expectExceptionMessage("The following values are not allowed:");
         $this->testPost(["postFieldID" => "password"]);
+    }
+
+    /**
+     * Test migration of post fields from old table structure.
+     *
+     * @return void
+     */
+    public function testMigrateFromOldPostFieldsStructure()
+    {
+        // Recreate table with old table structure.
+        \Gdn::sql()->query("drop table GDN_postField;");
+        \Gdn::sql()->query("drop table GDN_postTypePostFieldJunction;");
+        \Gdn::sql()->query(
+            <<<SQL
+            create table `GDN_postField` (
+            `postFieldID` varchar(100) not null,
+            `postTypeID` varchar(100) not null,
+            `label` varchar(100) not null,
+            `description` varchar(500) null,
+            `dataType` enum('text','boolean','date','number','string[]','number[]') not null,
+            `formType` enum('text','text-multiline','dropdown','tokens','checkbox','date','number') not null,
+            `visibility` enum('public','private','internal') not null,
+            `displayOptions` json null,
+            `dropdownOptions` json null,
+            `isRequired` tinyint not null default 0,
+            `isActive` tinyint not null default 0,
+            `sort` tinyint not null default 0,
+            `dateInserted` datetime not null,
+            `dateUpdated` datetime null,
+            `insertUserID` int not null,
+            `updateUserID` int null,
+            primary key (`postFieldID`, `postTypeID`)
+            ) engine=innodb default character set utf8mb4 collate utf8mb4_unicode_ci;
+SQL
+        );
+
+        // Create three records for testing. Two with the same post field ID.
+        \Gdn::sql()->insert("postField", [
+            "postFieldID" => "my-post-field",
+            "postTypeID" => "discussion",
+            "label" => "my post field",
+            "dataType" => "text",
+            "formType" => "text",
+            "visibility" => "public",
+            "dateInserted" => CurrentTimeStamp::getMySQL(),
+            "insertUserID" => \Gdn::session()->UserID,
+        ]);
+        \Gdn::sql()->insert("postField", [
+            "postFieldID" => "my-post-field",
+            "postTypeID" => "question",
+            "label" => "my post field",
+            "dataType" => "text",
+            "formType" => "text",
+            "visibility" => "public",
+            "dateInserted" => CurrentTimeStamp::getMySQL(),
+            "insertUserID" => \Gdn::session()->UserID,
+        ]);
+        \Gdn::sql()->insert("postField", [
+            "postFieldID" => "my-post-field2",
+            "postTypeID" => "question",
+            "label" => "my post field",
+            "dataType" => "text",
+            "formType" => "text",
+            "visibility" => "public",
+            "dateInserted" => CurrentTimeStamp::getMySQL(),
+            "insertUserID" => \Gdn::session()->UserID,
+        ]);
+
+        // Run utility update to update table schemas and run the migration.
+        \Gdn::getContainer()
+            ->get(\UpdateModel::class)
+            ->runStructure();
+
+        // Test that three rows were inserted in the junction table.
+        $results = \Gdn::sql()
+            ->get("postTypePostFieldJunction")
+            ->resultArray();
+        $this->assertRowsLike(
+            [
+                "postTypeID" => ["discussion", "question", "question"],
+            ],
+            $results,
+            false,
+            3
+        );
     }
 }

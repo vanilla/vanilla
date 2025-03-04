@@ -8,6 +8,7 @@ import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings
 import { slugify } from "@vanilla/utils";
 import ModalLoader from "@library/modal/ModalLoader";
 import AppearanceRoutePageLoader from "../components/AppearanceRoutePageLoader";
+import { getLayoutTypeSettingsUrl } from "../components/layoutViewUtils";
 
 type LayoutFragment = {
     layoutID: ILayoutDetails["layoutID"];
@@ -25,7 +26,7 @@ export const AppearanceRoute = new RouteHandler(
 export const LegacyLayoutsRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/LegacyLayoutsPage"),
     "/appearance/layouts/:layoutViewType/legacy",
-    (layoutViewType: LayoutViewType) => `/appearance/layouts/${layoutViewType}/legacy`,
+    (layoutViewType: LayoutViewType) => getLayoutTypeSettingsUrl(layoutViewType),
     AppearanceRoutePageLoader,
 );
 
@@ -33,6 +34,13 @@ export const BrandingPageRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/BrandingAndSEOPage"),
     "/appearance/branding",
     () => "/appearance/branding",
+    AppearanceRoutePageLoader,
+);
+
+export const ManageIconsRoute = new RouteHandler(
+    () => import("@dashboard/appearance/pages/ManageIconsPage"),
+    "/appearance/icons",
+    () => "/appearance/icons",
     AppearanceRoutePageLoader,
 );
 
@@ -79,6 +87,7 @@ export const AppearanceLayoutsRoute = new RouteHandler(
 export function getAppearanceRoutes() {
     return [
         AppearanceRoute.route,
+        ManageIconsRoute.route,
         LegacyLayoutsRoute.route,
         BrandingPageRoute.route,
         LayoutEditorRoute.route,

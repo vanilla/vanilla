@@ -13,7 +13,7 @@ import { IPostRecord, PostReactionIconType } from "@library/postReactions/PostRe
 import { PostReactionsContext } from "@library/postReactions/PostReactionsContext";
 import { STORY_REACTIONS, getMockReactionLog } from "@library/storybook/storyData";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { renderHook } from "@testing-library/react-hooks";
 import { ReactNode } from "react";
 import { PostReactionTooltip } from "./PostReactionTooltip";
@@ -203,7 +203,9 @@ describe("Post Reactions Hooks", () => {
         mockAdapter = mockAPI();
         mockAdapter.onGet(REACTIONS_URL).replyOnce(200, reactionLog);
         const { result, waitFor } = renderHook(() => useReactionLog(MOCK_RECORD), { wrapper: queryClientWrapper() });
-        result.current.refetch();
+        act(() => {
+            void result.current.refetch();
+        });
         await waitFor(() => result.current.isSuccess);
         expect(result.current.data).toStrictEqual(reactionLog);
     });

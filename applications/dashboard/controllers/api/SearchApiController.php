@@ -12,12 +12,12 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
 use UserModel;
 use Vanilla\ApiUtils;
+use Vanilla\Dashboard\Models\RagSummaryService;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Search\SearchResults;
 use Vanilla\Search\SearchTypeaheadResult;
-use Vanilla\Utility\UrlUtils;
 
 /**
  * Class SearchApiController
@@ -30,21 +30,16 @@ class SearchApiController extends AbstractApiController
     /** Maximum number of items that can be returned in a page. */
     const LIMIT_MAXIMUM = 100;
 
-    /** @var UserModel */
-    private $userModel;
-
-    /** @var SearchService */
-    private $searchService;
-
     /**
      * SearchApiController constructor.
      *
      * @inheritdoc
      */
-    public function __construct(UserModel $userModel, SearchService $searchService)
-    {
-        $this->userModel = $userModel;
-        $this->searchService = $searchService;
+    public function __construct(
+        private UserModel $userModel,
+        private SearchService $searchService,
+        private RagSummaryService $ragSummaryService
+    ) {
     }
 
     /**
@@ -104,6 +99,44 @@ class SearchApiController extends AbstractApiController
                 "x-search-powered-by" => $driver->getName(),
             ]
         );
+    }
+
+    /**
+     * Uses the search service to get rag of search results.
+     *
+     * @param array $query
+     *
+     * @return Data
+     * @throws ValidationException
+     * @throws ServerException
+     */
+    public function get_rag(array $query): Data
+    {
+        $in = $this->searchService->buildQuerySchema();
+        $query = $in->validate($query);
+        $driver = $this->searchService->getActiveDriver($query["driver"] ?? null);
+        // Paging
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
+
+        $searchResults = $driver->search(
+            $query,
+            new SearchOptions(
+                $offset,
+                $limit,
+                includeTypeaheads: $query["includeTypeaheads"] ?? false,
+                includeResults: $query["includeResults"] ?? true
+            )
+        );
+
+        $expands = $query["expand"] ?? [];
+
+        $ragResult = $this->ragSummaryService->ragSummary(
+            $searchResults->getResultItems(),
+            $query["query"],
+            in_array("summary", $expands)
+        );
+
+        return new Data($ragResult);
     }
 
     /**

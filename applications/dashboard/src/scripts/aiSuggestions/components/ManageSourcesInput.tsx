@@ -43,14 +43,7 @@ export function ManageSourcesInput(props: IProps) {
             <DashboardFormLabel
                 label={t("Manage Sources")}
                 description={
-                    <Translate
-                        source="Sources that are selected here will be available to AI Suggested Answers. Add additional sources through Federated Search. <0/>"
-                        c0={
-                            <SmartLink to="https://success.vanillaforums.com/kb/articles/1606-ai-suggested-answers#adding-additional-sources">
-                                {t("Learn more.")}
-                            </SmartLink>
-                        }
-                    />
+                    <Translate source="Sources that are selected here will be available to AI Suggested Answers." />
                 }
             />
             <CheckboxGroup>

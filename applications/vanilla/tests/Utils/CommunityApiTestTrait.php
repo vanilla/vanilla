@@ -13,18 +13,22 @@ use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\Http\HttpResponse;
 use Garden\Schema\ValidationException;
+use Garden\Sites\Clients\SiteHttpClient;
 use Gdn_Format;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Dashboard\Models\RecordStatusModel;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Http\InternalClient;
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Utility\ModelUtils;
 use VanillaTests\Fixtures\TestUploader;
+use VanillaTests\Http\TestHttpClient;
 use VanillaTests\VanillaTestCase;
 
 /**
- * @method InternalClient api()
+ * @method TestHttpClient api()
  */
 trait CommunityApiTestTrait
 {
@@ -677,9 +681,13 @@ trait CommunityApiTestTrait
             throw new Exception("Could not insert a test media because mediaID is null");
         }
 
-        // Update media with $attachmentData
-        $response = $this->api()->patch("/media/{$mediaID}/attachment", $attachmentData);
-        return $response->getBody();
+        if (!empty($attachmentData)) {
+            // Update media with $attachmentData
+            $response = $this->api()->patch("/media/{$mediaID}/attachment", $attachmentData);
+            $result = $response->getBody();
+        }
+
+        return $result;
     }
 
     /**
@@ -744,15 +752,6 @@ trait CommunityApiTestTrait
      */
     public function createPostField(array $overrides = []): array
     {
-        if (!isset($overrides["postTypeID"])) {
-            // See if we have an postTypeID
-            if ($this->lastPostTypeID === null) {
-                throw new Exception("Could not insert a test post field because no post type was specified.");
-            }
-
-            $overrides["postTypeID"] = $this->lastPostTypeID;
-        }
-
         $params = $overrides + [
             "postFieldID" => "postfieldid-" . VanillaTestCase::id("postField"),
             "dataType" => "text",
@@ -914,6 +913,97 @@ trait CommunityApiTestTrait
                 $discussion["internalStatusID"],
                 "Expected internalStatusID to not be resolved."
             );
+        }
+    }
+
+    /**
+     * Assert that a certain user has particular permissions on a discussion.
+     *
+     * @param array $expectedPermissions
+     * @param array $discussion
+     * @param array|int $user
+     * @param string $message
+     * @return void
+     */
+    private function assertUserHasDiscussionPermissions(
+        array $expectedPermissions,
+        array $discussion,
+
+        array|int $user,
+        string $message = ""
+    ): void {
+        $fetchedDiscussion = $this->runWithUser(function () use ($discussion) {
+            return $this->api()
+                ->get("/discussions/{$discussion["discussionID"]}", ["expand" => "permissions"])
+                ->assertSuccess()
+                ->getBody();
+        }, $user);
+
+        $permissions = $fetchedDiscussion["permissions"] ?? null;
+        $this->assertNotEmpty($permissions, "Permissions not found in discussion response.");
+        $this->assertPermissionSubset($expectedPermissions, $permissions, $message);
+    }
+
+    /**
+     * Assert that a certain user has particular permissions on a category.
+     *
+     * @param array $expectedPermissions
+     * @param array $category
+     * @param array|int $user
+     * @param string $message
+     * @return void
+     */
+    private function assertUserHasCategoryDiscussionPermissions(
+        array $expectedPermissions,
+        array $category,
+        array|int $user,
+        string $message = ""
+    ): void {
+        $fetchedDiscussion = $this->runWithUser(function () use ($category) {
+            return $this->api()
+                ->get("/categories/{$category["categoryID"]}", ["expand" => "permissions"])
+                ->assertSuccess()
+                ->getBody();
+        }, $user);
+
+        $permissions = $fetchedDiscussion["permissions"] ?? null;
+        $this->assertNotEmpty($permissions, "Permissions not found in category response.");
+        $this->assertPermissionSubset($expectedPermissions, $permissions, $message);
+    }
+
+    /**
+     * @param array $expectedPermissions
+     * @param array $permissions
+     * @param string $message
+     * @return void
+     */
+    private function assertPermissionSubset(array $expectedPermissions, array $permissions, string $message): void
+    {
+        $filteredActualPermissions = [];
+        foreach ($expectedPermissions as $permissionName => $value) {
+            $filteredActualPermissions[$permissionName] = $permissions[$permissionName] ?? null;
+        }
+
+        $this->assertEquals(
+            $expectedPermissions,
+            $filteredActualPermissions,
+            $message ?: "Incorrect permissions found for user."
+        );
+    }
+
+    /**
+     * @param int $draftID
+     * @return array|false
+     */
+    private function getLegacyDraft(int $draftID): array|false
+    {
+        $contentDraftModel = self::container()->get(ContentDraftModel::class);
+        try {
+            $draft = $contentDraftModel->selectSingle(where: ["draftID" => $draftID]);
+            $draft = $contentDraftModel->convertToLegacyDraft($draft);
+            return $draft;
+        } catch (NoResultsException $ex) {
+            return false;
         }
     }
 }

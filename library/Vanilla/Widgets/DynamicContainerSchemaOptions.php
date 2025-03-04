@@ -27,6 +27,34 @@ class DynamicContainerSchemaOptions
         $this->reset();
     }
 
+    /** @var string|null */
+    private string|null $layoutViewType;
+
+    /**
+     * @return DynamicContainerSchemaOptions
+     */
+    public static function instance(): DynamicContainerSchemaOptions
+    {
+        return \Gdn::getContainer()->get(self::class);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLayoutViewType(): ?string
+    {
+        return $this->layoutViewType;
+    }
+
+    /**
+     * @param string|null $layoutViewType
+     * @return void
+     */
+    public function setLayoutViewType(?string $layoutViewType): void
+    {
+        $this->layoutViewType = $layoutViewType;
+    }
+
     /**
      * Add a dynamic choice to use in {@link HomeWidgetContainerSchemaTrait::widgetTitleSchema()}.
      *

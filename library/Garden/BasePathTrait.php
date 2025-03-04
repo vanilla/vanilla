@@ -32,7 +32,13 @@ trait BasePathTrait
      */
     protected function inBasePath(string $path): bool
     {
-        $result = strcasecmp(substr($path, 0, strlen($this->basePath)), $this->basePath) === 0;
+        if (is_null($this->basePath)) {
+            $basePathLength = 0;
+        } else {
+            $basePathLength = strlen($this->basePath);
+        }
+
+        $result = strcasecmp(substr($path, 0, $basePathLength), $this->basePath ?? "") === 0;
         return $result;
     }
 

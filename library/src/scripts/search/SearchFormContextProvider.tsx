@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { TypeAllIcon } from "@library/icons/searchIcons";
 import { FilterPanelAll } from "@library/search/panels/FilterPanelAll";
 import { SearchActions } from "@library/search/SearchActions";
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, searchReducer } from "@library/search/searchReducer";
@@ -32,6 +31,7 @@ import { useSiteSectionContext } from "@library/utility/SiteSectionContext";
 import QueryString from "@library/routing/QueryString";
 import PageLoader from "@library/routing/PageLoader";
 import { LoadStatus } from "@library/@types/api/core";
+import { Icon } from "@vanilla/icons";
 
 interface IProps<ExtraFormValues extends object = {}> {
     children?: React.ReactNode;
@@ -105,7 +105,7 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
 
     useEffect(() => {
         if (!ready) {
-            loadDomainsAndSetReady();
+            void loadDomainsAndSetReady();
         }
     }, [ready]);
 
@@ -129,7 +129,7 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
                     return t("All");
                 }
 
-                public icon = (<TypeAllIcon />);
+                public icon = (<Icon icon="search-all" />);
 
                 public subTypes = currentSourceDomains.map(({ subTypes }) => subTypes).flat();
 
@@ -313,7 +313,7 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
                 currentDomain.key === ALL_CONTENT_DOMAIN.key &&
                 currentSourceDomains.some((domain) => domain.key == PLACES_SEARCH_DOMAIN.key)
             ) {
-                searchInDomain(PLACES_SEARCH_DOMAIN.key);
+                void searchInDomain(PLACES_SEARCH_DOMAIN.key);
             }
 
             try {

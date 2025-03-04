@@ -75,7 +75,9 @@ export function PostReactions(props: { reactions?: IReaction[] }) {
     }
 
     const fetchUserReactionLog = () => {
-        reactionLog.isStale && reactionLog.refetch();
+        if (reactionLog.isStale) {
+            void reactionLog.refetch();
+        }
     };
 
     return (

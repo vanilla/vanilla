@@ -103,7 +103,7 @@ export function AutomationRulesFilter(props: {
                         className={userManagementClasses().actionButton}
                         aria-label="Filter"
                     >
-                        <Icon icon={`search-filter${isFilterApplied ? "-applied" : ""}`} />
+                        <Icon icon={`filter${isFilterApplied ? "-applied" : ""}`} />
                     </Button>
                 </span>
             </ToolTip>

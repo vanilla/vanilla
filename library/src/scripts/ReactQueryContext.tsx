@@ -13,9 +13,11 @@ const queryClient = new QueryClient({
         queries: {
             staleTime: 1000 * 60 * 5, // 5 minute stale time.
             networkMode: "always",
+            retry: false,
         },
         mutations: {
             networkMode: "always",
+            retry: false,
         },
     },
 });
@@ -45,6 +47,18 @@ export function ReactQueryContext(props: { children: React.ReactNode }) {
         // @ts-ignore
         window.toggleDevtools = () => setShowDevtools((old) => !old);
     }, []);
+
+    useEffect(() => {
+        function handlePageShow(event: PageTransitionEvent) {
+            if (event.persisted) {
+                // Page was restored from back/forward cache.
+                // https://web.dev/articles/bfcache#observe
+                void queryClient.invalidateQueries();
+            }
+        }
+        window.addEventListener("pageshow", handlePageShow);
+        return () => window.removeEventListener("pageshow", handlePageShow);
+    });
 
     return (
         <QueryClientProvider client={queryClient}>

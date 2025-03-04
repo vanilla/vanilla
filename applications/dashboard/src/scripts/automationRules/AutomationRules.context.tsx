@@ -134,18 +134,18 @@ export function AutomationRulesProvider(props: { children: ReactNode; isEscalati
     return (
         <AutomationRulesContext.Provider
             value={{
-                profileFields: profileFields,
-                automationRulesCatalog: automationRulesCatalog,
-                rolesByID: rolesByID,
-                tags: tags,
-                collections: collections,
-                categories: categories,
-                ideaStatusesByID: ideaStatusesByID,
-                users: users,
-                initialOrderedRulesIDs: initialOrderedRulesIDs,
-                setInitialOrderedRulesIDs: setInitialOrderedRulesIDs,
-                setAdditionalDataQuery: setAdditionalDataQuery,
-                optionalDataSources: optionalDataSources,
+                profileFields,
+                automationRulesCatalog,
+                rolesByID,
+                tags,
+                collections,
+                categories,
+                ideaStatusesByID,
+                users,
+                initialOrderedRulesIDs,
+                setInitialOrderedRulesIDs,
+                setAdditionalDataQuery,
+                optionalDataSources,
                 updateOptionalDataSources: (dataSourceType: string, newData: DataFromOptionalSource["data"]) => {
                     setOptionalDataSources({
                         ...optionalDataSources,

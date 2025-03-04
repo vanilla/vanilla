@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -27,6 +27,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     const ACTION_CLOSE = "close";
     const ACTION_MERGE = "merge";
     const ACTION_SPLIT = "split";
+    const ACTION_STATUS = "status";
 
     /** @var int|null */
     private $sourceDiscussionID = null;
@@ -51,7 +52,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     public function __construct(string $action, array $payload, $sender = null)
     {
         parent::__construct($action, $payload, $sender);
-        $this->addApiParams(["expand" => "tagIDs,crawl,roles"]);
+        $this->addApiParams(["expand" => "tagIDs,crawl,vectorize,roles"]);
     }
 
     /**
@@ -126,6 +127,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
             case self::ACTION_MOVE:
             case self::ACTION_MERGE:
             case self::ACTION_SPLIT:
+            case self::ACTION_STATUS:
                 return "post-modify";
             default:
                 return null;
@@ -200,6 +202,8 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
                 return "discussion_merge";
             case self::ACTION_SPLIT:
                 return "comment_split";
+            case self::ACTION_STATUS:
+                return "discussion_status";
             default:
                 return $this->getAction();
         }

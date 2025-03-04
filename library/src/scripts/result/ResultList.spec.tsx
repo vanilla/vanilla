@@ -17,7 +17,6 @@ import EVENT_SEARCH_DOMAIN from "@groups/search/EventSearchDomain";
 import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
 import { SearchService } from "@library/search/SearchService";
 import { MemoryRouter } from "react-router";
-import { expect } from "@storybook/test";
 
 beforeAll(() => {
     COMMUNITY_SEARCH_SOURCE.addDomain(DISCUSSIONS_SEARCH_DOMAIN);

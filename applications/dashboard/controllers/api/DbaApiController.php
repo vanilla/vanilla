@@ -51,6 +51,11 @@ class DbaApiController extends AbstractApiController
                 "LastCommentUserID",
                 "Hot",
             ]),
+            "comment" => new AggregateCountOption("Comment", CommentModel::class, "CommentID", [
+                "depth",
+                "countChildComments",
+                "scoreChildComments",
+            ]),
             "conversation" => new AggregateCountOption("Conversation", ConversationModel::class, "ConversationID", [
                 "CountMessages",
                 "CountParticipants",
@@ -113,6 +118,22 @@ class DbaApiController extends AbstractApiController
                     } elseif ($aggregate === "LastPost") {
                         $option = clone $option;
                         $option->setAggregates(["LastPost"]);
+                        $actions[] = new LongRunnerAction(AggregateCountModel::class, "processAggregateOption", [
+                            $option,
+                            $body["batchSize"] ?? null,
+                        ]);
+                    } elseif ($aggregate === "countChildComments" || $aggregate === "scoreChildComments") {
+                        // We need to calculate the depth of all comments first.
+                        $option = clone $option;
+                        $option->setAggregates(["depth"]);
+                        $actions[] = new LongRunnerAction(AggregateCountModel::class, "processAggregateOption", [
+                            $option,
+                            $body["batchSize"] ?? null,
+                        ]);
+
+                        // Then we can calculate the other fields.
+                        $option = clone $option;
+                        $option->setAggregates([$aggregate]);
                         $actions[] = new LongRunnerAction(AggregateCountModel::class, "processAggregateOption", [
                             $option,
                             $body["batchSize"] ?? null,

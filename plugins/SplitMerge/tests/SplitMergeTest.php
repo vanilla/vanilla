@@ -49,6 +49,55 @@ class SplitMergeTest extends AbstractAPIv2Test
             ->getBody();
         $this->assertSame($toIdeaCategoryID, $discussion["categoryID"]);
     }
+    /**
+     * Test the legacy split functionality.
+     *
+     * @return void
+     */
+    public function testLegacySplit()
+    {
+        $discussion1 = $this->createDiscussion(["body" => "Disc Split 1"]);
+        $commentIDs = [];
+        for ($index = 0; $index < 10; $index++) {
+            $comment = $this->createComment(["body" => "Comment {$index}"]);
+            if ($index % 2 === 0) {
+                $this->checkCommentLegacy($discussion1["discussionID"], $comment["commentID"]);
+                $commentIDs[] = $comment["commentID"];
+            }
+        }
+        $category = $this->createCategory();
+
+        // Assert that our checks are set
+        $this->assertEquals(
+            [$discussion1["discussionID"] => $commentIDs],
+            \Gdn::userModel()->getAttribute(\Gdn::session()->User->UserID, "CheckedComments", [])
+        );
+
+        $response = $this->bessy()->postJsonData("/moderation/split-comments/{$discussion1["discussionID"]}", [
+            "DeliveryMethod" => "JSON",
+            "TransientKey" => $this->api()->getTransientKey(),
+            "Name" => "Test Split",
+            "CategoryID" => $category["categoryID"],
+        ]);
+
+        $this->assertEquals(200, $response->getStatus());
+
+        $this->assertEquals(
+            5,
+            $this->api()
+                ->get("/discussions/{$discussion1["discussionID"]}")
+                ->getBody()["countComments"]
+        );
+        $this->assertNotEquals(
+            $discussion1["discussionID"],
+            $this->api()
+                ->get("/comments/{$commentIDs[0]}")
+                ->getBody()["discussionID"]
+        );
+
+        // Assert that our checks are cleared
+        $this->assertEquals([], \Gdn::userModel()->getAttribute(\Gdn::session()->User->UserID, "CheckedComments", []));
+    }
 
     /**
      * Test the legacy merge functionality.
@@ -102,7 +151,7 @@ class SplitMergeTest extends AbstractAPIv2Test
         $this->assertEquals(
             $discussion1["discussionID"],
             $this->api()
-                ->get("/comments/{$comment["discussionID"]}")
+                ->get("/comments/{$comment["commentID"]}")
                 ->getBody()["discussionID"]
         );
 
@@ -120,6 +169,19 @@ class SplitMergeTest extends AbstractAPIv2Test
     {
         $this->bessy()->postJsonData("/moderation/checked-discussions", [
             "CheckIDs" => [["checkId" => $discussionID, "checked" => true]],
+            "DeliveryMethod" => "JSON",
+            "TransientKey" => $this->api()->getTransientKey(),
+        ]);
+    }
+
+    /**
+     * @param int $commentID
+     */
+    private function checkCommentLegacy(int $discussionID, int $commentID)
+    {
+        $this->bessy()->postJsonData("/moderation/checked-comments", [
+            "DiscussionID" => $discussionID,
+            "CheckIDs" => [["checkId" => $commentID, "checked" => true]],
             "DeliveryMethod" => "JSON",
             "TransientKey" => $this->api()->getTransientKey(),
         ]);

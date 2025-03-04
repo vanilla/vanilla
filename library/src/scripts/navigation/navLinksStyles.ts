@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,7 +11,6 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 import { media } from "@library/styles/styleShim";
-import { CSSObject } from "@emotion/css/types/create-instance";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
@@ -239,19 +238,14 @@ export const navLinksClasses = useThemeCache(() => {
     const linksWithHeadings = style(
         "linksWithHeadings",
         {
-            ...Mixins.padding(vars.linksWithHeadings.paddings),
-            ...extendItemContainer(
-                (vars.item.padding.horizontal as number) + vars.linksWithHeadings.paddings.horizontal,
-            ),
+            ...extendItemContainer((vars.item.padding.horizontal as number) / 2),
             display: "flex",
             flexWrap: "wrap",
             alignItems: "stretch",
             justifyContent: "space-between",
         },
         mediaQueries.oneColumn({
-            ...extendItemContainer(
-                (vars.item.paddingMobile.horizontal as number) + vars.linksWithHeadings.paddings.horizontal,
-            ),
+            ...extendItemContainer((vars.item.paddingMobile.horizontal as number) / 2),
         }),
     );
 

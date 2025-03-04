@@ -60,6 +60,26 @@ class BannerImageModel
             "iconUrlSrcSet" => $this->imageSrcSetService->getResizedSrcSet($iconImage),
             "backgroundUrlSrcSet" => $this->imageSrcSetService->getResizedSrcSet($backgroundImage),
         ];
+
+        $contextualSearchByCategory = Gdn::config("Search.ContextualSearchByCategory.Enabled", false);
+
+        $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
+        $currentSection = $siteSectionModel->getCurrentSiteSection();
+        $siteSectionCategory = $currentSection->getCategoryID();
+
+        $categoryID = $controller
+            ? $controller->data("Category.CategoryID", $controller->data("ContextualCategoryID", $siteSectionCategory))
+            : $siteSectionCategory;
+
+        if ($contextualSearchByCategory && $categoryID > 0) {
+            $defaultProps["initialParams"] = [
+                "domain" => "discussions",
+                "categoryIDs" => [$categoryID],
+                "includeChildCategories" => true,
+                "recordTypes" => ["discussion", "comment"],
+            ];
+        }
+
         $title = $controller->contextualTitle();
 
         if ($title) {
@@ -105,9 +125,21 @@ class BannerImageModel
      *
      * @return string The category's slug on success, the default otherwise.
      */
-    public static function getBannerImageSlug($categoryID)
+    public static function getBannerImageSlug(mixed $categoryID)
     {
         return self::getCategoryField($categoryID, "BannerImage", c(self::DEFAULT_CONFIG_KEY));
+    }
+
+    /**
+     * Like {@link self::getBannerImageSlug()} but returns the fully qualified URL.
+     *
+     * @param mixed $categoryID
+     * @return mixed|string|null
+     */
+    public static function getBannerImageUrl(mixed $categoryID)
+    {
+        $slug = self::getBannerImageSlug($categoryID);
+        return $slug ? \Gdn_Upload::url($slug) : $slug;
     }
 
     /**

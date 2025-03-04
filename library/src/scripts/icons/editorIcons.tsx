@@ -87,10 +87,10 @@ export function CodeIcon(props: { className?: string; "aria-hidden"?: areaHidden
 
 /**
  * @deprecated
- * Use `<Icon icon="editor-link" />` instead.
+ * Use `<Icon icon="copy-link" />` instead.
  */
 export function LinkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    return <Icon icon={"editor-link"} {...props} />;
+    return <Icon icon={"copy-link"} {...props} />;
 }
 
 export function EmojiIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
@@ -218,10 +218,10 @@ export function Heading5Icon(props: { className?: string; "aria-hidden"?: areaHi
 
 /**
  * @deprecated
- * Use `<Icon icon="editor-quote" />` instead.
+ * Use `<Icon icon="quote-content" />` instead.
  */
 export function BlockquoteIcon(props: { className?: string }) {
-    return <Icon icon="editor-quote" />;
+    return <Icon icon="quote-content" />;
 }
 
 export function CodeBlockIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {

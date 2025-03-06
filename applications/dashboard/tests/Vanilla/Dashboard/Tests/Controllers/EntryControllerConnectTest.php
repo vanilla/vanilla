@@ -12,12 +12,11 @@ namespace Vanilla\Dashboard\Tests\Controllers;
 use EntryController;
 use Garden\Schema\ValidationException;
 use PermissionModel;
-use Vanilla\CurrentTimeStamp;
+use UserMetaModel;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\AuditLogTestTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\Dashboard\EntryControllerConnectTestTrait;
-use VanillaTests\ExpectedAuditLog;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -977,9 +976,14 @@ class EntryControllerConnectTest extends SiteTestCase
         $userData = $this->userModel->getByEmail($ssoUser["Email"], false, ["dataType" => "array"]);
         $this->assertNotEmpty($userData, "SSO user not created");
         //We need to make sure our hidden data got saved
-        $userMetaModel = \Gdn::userMetaModel();
+        $userMetaModel = $this->container()->get(UserMetaModel::class);
         $metaData = $userMetaModel->getUserMeta($userData["UserID"]);
+        $this->assertEquals($ssoData[$hiddenProfileField["apiName"]], $metaData["Profile." . $field["apiName"]]);
 
+        // Make sure the hidden field is removed if the SSO is no longer sending it.
+        unset($ssoUser["hidden-text"]);
+        $r = $this->entryConnect($ssoUser);
+        $metaData = $userMetaModel->getUserMeta($userData["UserID"]);
         $this->assertEquals($ssoData[$hiddenProfileField["apiName"]], $metaData["Profile." . $field["apiName"]]);
     }
 
@@ -1407,6 +1411,36 @@ class EntryControllerConnectTest extends SiteTestCase
             "Usernames must be 3-20 characters and consist of letters, numbers, and underscores."
         );
         $r = $this->entryConnect($newSSOInfo, $body);
+    }
+
+    /**
+     * Validate that the email field can't be set when AutoConnect is enabled.
+     *
+     * This can lead to account takeovers. See: https://higherlogic.atlassian.net/browse/VNLA-7854
+     */
+    public function testNoAutoConnectAccountTakeover(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", true);
+        $ssoUser = $this->insertDummyUser(["Name" => "Victim", "UniqueID" => "Victim"]);
+
+        $user = [
+            "ConnectName" => $ssoUser["Name"],
+            "Email" => $ssoUser["Email"],
+            "EmailVisible" => 1,
+            "UniqueID" => __FUNCTION__,
+        ];
+
+        $body = [
+            "ConnectName" => $ssoUser["Name"],
+            "Email" => $ssoUser["Email"],
+            "EmailVisible" => 1,
+        ];
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage(
+            "Password is required. You are trying to connect with a username that is already assigned to a user on this forum. If this is your account, please enter the account password."
+        );
+        $r = $this->entryConnect($user, $body, skipLastHtml: true);
     }
 
     /**

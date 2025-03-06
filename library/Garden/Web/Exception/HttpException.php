@@ -150,7 +150,7 @@ abstract class HttpException extends \Exception implements \JsonSerializable
             case 403:
                 return new ForbiddenException($message, $context, $previous);
             case 404:
-                return new NotFoundException($message);
+                return new NotFoundException($message, previous: $previous);
             case 405:
                 $method = empty($context["method"]) ? "" : $context["method"];
                 $allow = empty($context["allow"]) ? [] : $context["allow"];
@@ -211,7 +211,7 @@ abstract class HttpException extends \Exception implements \JsonSerializable
      * @return mixed data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $context = [];
         foreach ($this->context as $key => $value) {

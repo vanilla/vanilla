@@ -57,6 +57,7 @@ export function mapNotificationPreferencesToSchemaLikeStructure(
                             ? {
                                   ...("email" in property.properties && { email: value?.email }),
                                   ...("popup" in property.properties && { popup: value?.popup }),
+                                  ...("frequency" in property.properties && { frequency: value?.frequency }),
                               }
                             : traverseSchema({}, property, preferences),
                     };

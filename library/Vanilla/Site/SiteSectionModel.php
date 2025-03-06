@@ -8,6 +8,7 @@
 namespace Vanilla\Site;
 
 use Garden\Schema\Schema;
+use Gdn;
 use Gdn_Router;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionChildIDProviderInterface;
@@ -175,10 +176,15 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
      * Get a site section by from its ID.
      *
      * @param string $siteSectionID
+     * @param string|null $locale
      * @return SiteSectionInterface|null
      */
-    public function getByID(string $siteSectionID): ?SiteSectionInterface
+    public function getByID(string $siteSectionID, ?string $locale = null): ?SiteSectionInterface
     {
+        if ($locale) {
+            $siteSectionID .= "-$locale";
+        }
+
         foreach ($this->getAll() as $siteSection) {
             if ($siteSection->getSectionID() === $siteSectionID) {
                 return $siteSection;
@@ -262,6 +268,20 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
             }
         }
         return $this->currentSiteSection ?? $this->defaultSiteSection;
+    }
+
+    /**
+     * Get information about the current site section that applies to all layout queries.
+     *
+     * @return array
+     */
+    public function getCurrentLayoutParams(): array
+    {
+        $siteSection = SiteSectionSchema::toArray($this->getCurrentSiteSection());
+        return [
+            "locale" => $siteSection["contentLocale"],
+            "siteSectionID" => $siteSection["sectionID"],
+        ];
     }
 
     /**

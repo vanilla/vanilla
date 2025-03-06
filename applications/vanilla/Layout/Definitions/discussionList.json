@@ -1,9 +1,9 @@
 {
-    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=discussionList&cacheBuster=5",
+    "$schema": "http://dev.vanilla.local/api/v2/layouts/schema?layoutViewType=discussionList&cacheBuster=5",
     "dateInserted": "2022-01-01T00:00:00Z",
     "layoutViewType": "discussionList",
     "layoutID": "discussionList",
-    "name": "Discussions Template",
+    "name": "Recent Posts Template",
     "layout": [
         {
             "$hydrate": "react.section.full-width",
@@ -16,7 +16,7 @@
                         "useOverlay": true,
                         "image": ""
                     },
-                    "title": "Community Discussions",
+                    "title": "Community Posts",
                     "titleType": "static",
                     "alignment": "left",
                     "description": "The most recent content from our members.",
@@ -60,7 +60,7 @@
                             }
                         }
                     },
-                    "title": "Recent Discussions",
+                    "title": "Recent Posts",
                     "titleType": "static",
                     "descriptionType": "none",
                     "isAsset": true

@@ -74,7 +74,7 @@ class GdnFormatLinksTest extends TestCase
     public function testRightLeftOverrideLink()
     {
         $input = "https://‮test.com";
-        $href = url("/home/leaving?allowTrusted=1&target=" . urlencode("https://test.com"));
+        $href = url("/home/leaving?allowTrusted=1&target=" . urlencode("https://test.com"), true);
         $expected = '<a href="' . htmlspecialchars($href) . '">https://test.com</a>';
         $output = Gdn_Format::links($input);
         $this->assertHtmlStringEqualsHtmlString($expected, $output);
@@ -89,7 +89,7 @@ class GdnFormatLinksTest extends TestCase
     public function testPunctuation(string $punc)
     {
         $input = "https://test.com{$punc} Other text";
-        $href = htmlspecialchars(url("/home/leaving?allowTrusted=1&target=" . urlencode("https://test.com")));
+        $href = htmlspecialchars(url("/home/leaving?allowTrusted=1&target=" . urlencode("https://test.com"), true));
         $expected = <<<HTML
 <a href="$href">https://test.com</a>{$punc} Other text
 HTML;
@@ -128,7 +128,7 @@ HTML;
             "parensBetweenSlashes" => ["http:/(/www.foo.bar", "http:/(/www.foo.bar"],
             "parensAfterSlashes" => [
                 "http://www.(foo).bar",
-                '<a href="/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=http%3A%2F%2Fwww.%28foo%29.bar">http://www.(foo).bar</a>',
+                '<a href="https://vanilla.test/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=http%3A%2F%2Fwww.%28foo%29.bar">http://www.(foo).bar</a>',
             ],
         ];
 
@@ -158,7 +158,7 @@ HTML;
             "bracesBetweenSlashes" => ["http:/{/www.foo.bar", "http:/{/www.foo.bar"],
             "bracesAfterSlashes" => [
                 "http://www.foo.com/{bar}",
-                '<a href="/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=http%3A%2F%2Fwww.foo.com%2F%7Bbar%7D">http://www.foo.com/{bar}</a>',
+                '<a href="https://vanilla.test/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=http%3A%2F%2Fwww.foo.com%2F%7Bbar%7D">http://www.foo.com/{bar}</a>',
             ],
             "realWorldAgain" => [
                 "https://example.com/en_gb/#mode=routes+viewport=60.60109,26.71257,2,0,-0+routes={%22departu" .
@@ -167,7 +167,7 @@ HTML;
                 "27.79943~A~Virolahti%20(Vaalimaa)%20Kymenlaakso,%20FIN%22,%22hw~60.59615,27.91827~A~Seleznevskoye%20(To" .
                 "rfyanovka)%20Northwestern%20Federal%20District,%20RUS%22,%22hw~59.93848,30.31248~A~Saint%20Petersburg%20" .
                 "Northwestern%20Federal%20District,%20RUS%22%5D,%22avoidCriteria%22:%5B%5D%7D+ver=3",
-                '<a href="/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=https%3A%2F%2Fexample.com%2Fen_' .
+                '<a href="https://vanilla.test/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=https%3A%2F%2Fexample.com%2Fen_' .
                 "gb%2F%23mode%3Droutes%2Bviewport%3D60.60109%2C26.71257%2C2%2C0%2C-0%2Broutes%3D%7B%2522departure%2522" .
                 "%3Atrue%2C%2522traffic%2522%3Atrue%2C%2522routeType%2522%3A%2522FASTEST%2522%2C%2522travelMode%2522%3" .
                 "A%2522CAR%2522%2C%2522date%2522%3A%25221593608700000%2522%2C%2522points%2522%3A%255B%2522hw%7E60.1698" .
@@ -259,11 +259,14 @@ HTML;
     public function warnLeavingProvider(): array
     {
         return [
-            ["https://test.com", "/gdnformatlinkstest/home/leaving?allowTrusted=1&target=https%3A%2F%2Ftest.com"],
+            [
+                "https://test.com",
+                "https://vanilla.test/gdnformatlinkstest/home/leaving?allowTrusted=1&target=https%3A%2F%2Ftest.com",
+            ],
             // Try some encoded values.
             [
                 "https://test.com/path?query=%5B%27one%27%2C%20%27two%27%2C%20%27three%27%5D",
-                "/gdnformatlinkstest/home/leaving?" .
+                "https://vanilla.test/gdnformatlinkstest/home/leaving?" .
                 "allowTrusted=1&target=https%3A%2F%2Ftest.com%2Fpath%3Fquery%3D%255B%2527one%2527%252C%2520%2527two%2527%252C%2520%2527three%2527%255D",
             ],
         ];
@@ -298,7 +301,7 @@ HTML;
      */
     private function leavingUrl(string $url): string
     {
-        return url("/home/leaving?allowTrusted=1&target=" . urlencode($url));
+        return url("/home/leaving?allowTrusted=1&target=" . urlencode($url), true);
     }
 
     /**

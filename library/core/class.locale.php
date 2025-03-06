@@ -9,7 +9,6 @@
  * @since 2.0
  */
 
-use Garden\EventManager;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
@@ -136,7 +135,7 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface
      */
     public static function canonicalize($locale)
     {
-        $locale = str_replace(["-", "@"], ["_", "__"], $locale);
+        $locale = str_replace(["-", "@"], ["_", "__"], $locale ?? "");
         $parts = explode("_", $locale, 2);
         if (isset($parts[1])) {
             $parts[1] = strtoupper($parts[1]);
@@ -443,5 +442,15 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface
         }
 
         return $this->DeveloperContainer->get(".");
+    }
+
+    /**
+     * Get the current site locale.
+     *
+     * @return string
+     */
+    public function getSiteLocale(): string
+    {
+        return $this->config->get("Garden.Locale", "en");
     }
 }

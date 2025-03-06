@@ -51,7 +51,7 @@ export default function DashboardMeBox(props: DashboardMeBoxProps) {
         <div className={classes.supportSection}>
             <a href="https://success.vanillaforums.com/categories/support" className={classes.supportLink}>
                 {t("Customer Support")}
-                <Icon icon="external-link" size="compact" />
+                <Icon icon="meta-external" size="compact" />
             </a>
         </div>
     );
@@ -102,7 +102,7 @@ export default function DashboardMeBox(props: DashboardMeBoxProps) {
                                     className={classes.dropdownProfileLink}
                                 >
                                     {t("My Profile")}
-                                    <Icon icon="external-link" size="compact" />
+                                    <Icon icon="meta-external" size="compact" />
                                 </LinkAsButton>
                             </div>
                         </FrameBody>

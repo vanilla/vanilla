@@ -60,7 +60,7 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
     useEffect(() => {
         // request the schema when the modal is opened
         if (isVisible && schemaStatus === LoadStatus.PENDING) {
-            getSchema();
+            void getSchema();
         }
     }, [isVisible]);
 

@@ -235,13 +235,13 @@ class RenderFunctionsTest extends SiteTestCase
             "simple" => [
                 ["testName", "testClass"],
                 '<svg alt="testName" class="icon icon-svg testClass" viewbox="0 0 17 17">
-                    <use xlink:href="#testName"></use>
+                    <use xlink:href="#dash-testName"></use>
                 </svg>',
             ],
             "compat attributes" => [
                 ["testName", "", ["class" => "testClass", "alt" => "testAlt"]],
                 '<svg alt="testAlt" class="icon icon-svg testClass" viewbox="0 0 17 17">
-                    <use xlink:href="#testName"></use>
+                    <use xlink:href="#dash-testName"></use>
                 </svg>',
             ],
             "arbitrary attributes" => [
@@ -253,7 +253,7 @@ class RenderFunctionsTest extends SiteTestCase
                     data-test="test"
                     data-xss="&quot;&gt;&lt;script&gt;alert(\'hi\')&lt;/script&gt;"
                 >
-                    <use xlink:href="#testName"></use>
+                    <use xlink:href="#dash-testName"></use>
                 </svg>',
             ],
         ];

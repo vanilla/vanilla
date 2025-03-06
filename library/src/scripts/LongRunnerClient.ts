@@ -131,13 +131,8 @@ export class LongRunnerClient {
      * @param err
      * @returns
      */
-    private async extractErrResponse(err: AxiosError | Error) {
-        if (
-            "response" in err &&
-            err.response &&
-            err.response.config[FROM_LONG_RUNNER] &&
-            err.response.data.callbackPayload !== undefined
-        ) {
+    private async extractErrResponse(err: LongRunnerAxiosResponse | Error) {
+        if (isLongRunnerError(err) && err.response?.data.callbackPayload !== undefined) {
             return err.response;
         } else {
             return Promise.reject(err);
@@ -180,6 +175,10 @@ export class LongRunnerClient {
     }
 }
 
+const isLongRunnerError = (err: LongRunnerAxiosResponse | Error): err is LongRunnerAxiosResponse => {
+    return "response" in err && (err.response as AxiosResponse)?.config?.[FROM_LONG_RUNNER];
+};
+
 ///
 /// Supporting Types
 ///
@@ -211,3 +210,5 @@ export type LongRunnerSuccessHandler = (successIDs: number[]) => void;
 export type LongRunnerFailedHandler = (errorsIDs: number[], exceptionsByID: LongRunnerExceptions) => void;
 
 const FROM_LONG_RUNNER = "FROM_LONG_RUNNER";
+
+export type LongRunnerAxiosResponse = AxiosError<ILongRunnerResponse, { [FROM_LONG_RUNNER]: true }>;

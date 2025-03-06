@@ -76,7 +76,7 @@ class YouTubeEmbed extends AbstractEmbed
     /**
      * @return array|mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();
         if (array_key_exists("videoID", $data) || array_key_exists("listID", $data)) {

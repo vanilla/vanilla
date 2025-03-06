@@ -161,7 +161,12 @@ class SpamModel extends Gdn_Pluggable
                 if (!empty($recordID) && $options["Operation"] === LogModel::TYPE_SPAM) {
                     // Pass the source as a $data field, so we can propagate it to the LogPostEvent created in flagForReview()..
                     $data["Source"] = $sp->EventArguments["Source"] ?? "unknown";
-                    self::flagForReview($recordType, $recordID, $data);
+                    self::flagForReview(
+                        $recordType,
+                        $recordID,
+                        $data,
+                        ($options["action"] ?? "") === "update" ? false : true
+                    );
                 } else {
                     LogModel::insert($options["Operation"], $recordType, $data, $logOptions);
 
@@ -191,21 +196,19 @@ class SpamModel extends Gdn_Pluggable
      * @param string $recordType The type of record we're flagging: Discussion or Comment.
      * @param int $id ID of the record we're flagging.
      * @param object|array $data Properties used for updating/overriding the record's current values.
+     * @param bool $deleteRow We're planning to purge the spammy record.
      *
      * @throws Exception If an invalid record type is specified, throw an exception.
      */
-    protected static function flagForReview($recordType, $id, $data)
+    protected static function flagForReview(string $recordType, int $id, object|array $data, bool $deleteRow = true)
     {
-        // We're planning to purge the spammy record.
-        $deleteRow = true;
-
         /**
          * We're only handling two types of content: discussions and comments.  Both need some special setup.
          * Error out if we're not dealing with a discussion or comment.
          */
         switch ($recordType) {
             case "Comment":
-                $model = new CommentModel();
+                $model = Gdn::getContainer()->get(CommentModel::class);
                 $row = $model->getID($id, DATASET_TYPE_ARRAY);
                 break;
             case "Discussion":

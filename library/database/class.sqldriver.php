@@ -22,6 +22,7 @@ use Vanilla\Database\Select;
 use Vanilla\Database\SetLiterals\RawExpression;
 use Vanilla\Models\Model;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\StringUtils;
 
 /**
  * Class Gdn_SQLDriver
@@ -1286,6 +1287,31 @@ SQL;
         $result = $this->query($sql);
 
         return $result;
+    }
+
+    /**
+     * Filter a query by an IP address.
+     *
+     * @param string $field The field to filter on.
+     * @param string $ipAddressOrExpression Either a valid IP address or a partial IP address with wildcards.
+     *
+     * @return $this
+     */
+    public function whereIpAddress(string $field, string $ipAddressOrExpression): static
+    {
+        $field = $this->escapeFieldReference($field);
+        if (str_contains(haystack: $ipAddressOrExpression, needle: "*")) {
+            // We have a wildcard.
+            $this->where(
+                "inet6_ntoa($field) LIKE",
+                str_replace(search: "*", replace: "%", subject: StringUtils::condenseIP($ipAddressOrExpression)),
+                escapeFieldSql: false
+            );
+        } else {
+            $this->where($field, inet_pton($ipAddressOrExpression));
+        }
+
+        return $this;
     }
 
     /**
@@ -2661,6 +2687,30 @@ SQL;
     }
 
     /**
+     * Add a where condition that is always true.
+     * Particularly useful if you have a where that is a part of an or expression that you want to optimize/short-circuit.
+     *
+     * @return $this
+     */
+    public function whereAlwaysTrue(): Gdn_SQLDriver
+    {
+        $this->where("1", "1", escapeFieldSql: false, escapeValueSql: false);
+        return $this;
+    }
+
+    /**
+     * Add a where condition that is always false.
+     * Particularly useful if you have a where that is a part of an or expression that you want to optimize/short-circuit.
+     *
+     * @return $this
+     */
+    public function whereAlwaysFalse(): Gdn_SQLDriver
+    {
+        $this->where("1", "0", escapeFieldSql: false, escapeValueSql: false);
+        return $this;
+    }
+
+    /**
      * Adds to the $this->_Wheres collection. Called by $this->where() and $this->orWhere();
      *
      * @param mixed $field The string on the left side of the comparison, or an associative array of
@@ -2762,7 +2812,7 @@ SQL;
         // Build up the in clause.
         $in = [];
         foreach ($values as $value) {
-            if ($escape) {
+            if ($escape && isset($value)) {
                 $valueExpr = $this->Database->connection()->quote($value);
             } else {
                 $valueExpr = (string) $value;
@@ -2883,5 +2933,23 @@ SQL;
                 $this->where("$field $op", $value);
             }
         }
+    }
+
+    /**
+     * Apply multiple where's to the query.
+     *
+     * @param array $whereGroups
+     * @return void
+     */
+    public function applyWheresToQuery(array $whereGroups): void
+    {
+        $this->beginWhereGroup();
+        foreach ($whereGroups as $where) {
+            $this->orOp()
+                ->beginWhereGroup()
+                ->where($where)
+                ->endWhereGroup();
+        }
+        $this->endWhereGroup();
     }
 }

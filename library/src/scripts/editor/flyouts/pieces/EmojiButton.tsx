@@ -6,7 +6,6 @@
 
 import React from "react";
 import classNames from "classnames";
-import { convertToSafeEmojiCharacters } from "@vanilla/dom-utils";
 import { insertEmojiClasses } from "@library/editor/flyouts/pieces/insertEmojiClasses";
 
 interface IProps {
@@ -41,10 +40,7 @@ export class EmojiButton extends React.Component<IProps> {
                 type="button"
                 onClick={this.props.onClick}
             >
-                <span
-                    className="safeEmoji"
-                    dangerouslySetInnerHTML={{ __html: convertToSafeEmojiCharacters(this.props.emojiChar) }}
-                />
+                <span className="safeEmoji">{this.props.emojiChar}</span>
             </button>
         );
     }

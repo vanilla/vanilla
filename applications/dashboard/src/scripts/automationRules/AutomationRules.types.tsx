@@ -11,7 +11,7 @@ import { IGetCollectionResourcesParams } from "@library/featuredCollections/coll
 import { IGetTagsParams } from "@library/features/tags/TagsHooks";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 import { IGetReportsForAutomationRulesParams } from "@dashboard/automationRules/preview/AutomationRulesPreviewReportedPostsContent";
-import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
+import { CommentsApi } from "@vanilla/addon-vanilla/comments/CommentsApi";
 
 export type AutomationRuleTriggerType =
     | "discussionReachesScoreTrigger"
@@ -62,6 +62,8 @@ export interface IAutomationRuleAction {
     actionTriggers: AutomationRuleTriggerType[];
     contentType: "users" | "posts";
     schema?: JsonSchema<any>;
+    dynamicSchema?: JsonSchema<any>;
+    dynamicSchemaParams?: string[];
 }
 
 export interface IAutomationRulesCatalog {
@@ -76,6 +78,8 @@ export interface IAutomationRule {
     dateInserted: string;
     insertUserID: number;
     updateUserID: number;
+    insertUser?: IUserFragment;
+    updateUser?: IUserFragment;
     dateUpdated: string;
     dateLastRun: string;
     status: AutomationRuleStatusType;
@@ -94,8 +98,6 @@ export interface IAutomationRule {
 
 export interface IAutomationRuleDispatch {
     automationRuleDispatchUUID: string;
-    insertUser: IUserFragment;
-    updateUser: IUserFragment;
     dispatchUser: IUserFragment;
     dateDispatched: string;
     dateFinished: string;

@@ -139,7 +139,6 @@ class Rich2FormatTest extends AbstractFormatTestCase
             ["text" => "something"],
             ["text" => "else"],
             ["text" => "Header"],
-            ["text" => ""],
         ];
 
         /** @var NodeList $output */
@@ -182,7 +181,7 @@ class Rich2FormatTest extends AbstractFormatTestCase
             '"embedType":"link","name":"Lorem Ipsum","faviconUrl":"/favicon.ico"},' .
             '"children":[{"text":"https://www.lipsum.com/"}]},{"text":""}]}]';
         $expectedOutput = <<<HTML
-<p>Something here?</p><p>An inline link! <a  href="https://www.lipsum.com/">Hey</a>!</p><p><a href="https://www.lipsum.com/" rel="nofollow noopener ugc">
+<p>Something here?</p><p>An inline link! <a  href="https://www.lipsum.com/" rel="nofollow noopener ugc">Hey</a>!</p><p><a href="https://www.lipsum.com/" rel="nofollow noopener ugc">
     https://www.lipsum.com/
 </a>
 </p>

@@ -13,7 +13,7 @@ services:
         environment:
             MAIL_URL: http://localhost:8025
             MAIL_HOSTS: http://localhost:8025
-            SERVER_PUBLICBASEURL: https://mail.vanilla.localhost
+            SERVER_PUBLICBASEURL: https://mail.vanilla.local
 networks:
     vanilla-network:
         external: true

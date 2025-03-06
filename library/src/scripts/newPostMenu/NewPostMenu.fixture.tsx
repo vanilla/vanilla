@@ -13,7 +13,7 @@ export const newPostItems: IAddPost[] = [
         action: () => {
             logDebug("Some Action");
         },
-        icon: "new-poll",
+        icon: "create-poll",
         label: "New Poll",
     },
     {
@@ -22,7 +22,7 @@ export const newPostItems: IAddPost[] = [
         action: () => {
             logDebug("Some Action");
         },
-        icon: "new-idea",
+        icon: "create-idea",
         label: "New Idea",
     },
     {
@@ -31,7 +31,7 @@ export const newPostItems: IAddPost[] = [
         action: () => {
             logDebug("Some Action");
         },
-        icon: "new-discussion",
+        icon: "create-discussion",
         label: "New Discussion",
     },
     {
@@ -40,7 +40,7 @@ export const newPostItems: IAddPost[] = [
         action: () => {
             logDebug("Some Action");
         },
-        icon: "new-question",
+        icon: "create-question",
         label: "New Question",
     },
     {
@@ -49,7 +49,7 @@ export const newPostItems: IAddPost[] = [
         action: () => {
             logDebug("Some Action");
         },
-        icon: "new-event",
+        icon: "create-event",
         label: "New Event",
     },
 ];

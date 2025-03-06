@@ -37,12 +37,11 @@ class DiscussionsWidgetTest extends SiteTestCase
     public function testDiscussionsWidgetHydrate()
     {
         CurrentTimeStamp::mockTime("Dec 1 2020");
-        $discussion1 = $this->createDiscussion(["name" => "Disc1"]);
-        unset($discussion1["body"]);
+        $discussion1 = $this->createDiscussion(["name" => "Disc1"], ["expand" => ["all", "-body"]]);
+        unset($discussion1["updateUser"]);
         CurrentTimeStamp::mockTime("Dec 2 2020");
-        $discussion2 = $this->createDiscussion(["name" => "Disc2"]);
-        unset($discussion2["body"]);
-
+        $discussion2 = $this->createDiscussion(["name" => "Disc2"], ["expand" => ["all", "-body"]]);
+        unset($discussion2["updateUser"]);
         $spec = [
             '$hydrate' => "react.discussion.discussions",
             '$reactTestID' => "discussions",
@@ -89,11 +88,12 @@ HTML
     public function testHydrateDiscussionListAsset()
     {
         CurrentTimeStamp::mockTime("Dec 1 2020");
-        $discussion1 = $this->createDiscussion(["name" => "Disc1"]);
-        unset($discussion1["body"]);
+        $discussion1 = $this->createDiscussion(["name" => "Disc1"], ["expand" => ["all", "-body"]]);
+
         CurrentTimeStamp::mockTime("Dec 2 2020");
-        $discussion2 = $this->createDiscussion(["name" => "Disc2"]);
-        unset($discussion2["body"]);
+        $discussion2 = $this->createDiscussion(["name" => "Disc2"], ["expand" => ["all", "-body"]]);
+
+        $discussion1["updateUser"]["dateLastActive"] = $discussion2["updateUser"]["dateLastActive"];
 
         $spec = [
             '$hydrate' => "react.asset.discussionList",

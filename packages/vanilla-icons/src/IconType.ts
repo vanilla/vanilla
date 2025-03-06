@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -11,148 +11,83 @@ export type IconData = {
 };
 
 export const coreIconsData = {
-    "ai-sparkle-monocolor": {
+    add: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "ai-indicator": {
         width: "16",
         height: "16",
         fill: "currentColor",
+        viewBox: "0 0 16 16",
     },
-    "ai-sparkle": {
+    "ai-sparkle-monocolor": {
         width: "16",
         height: "16",
-        fill: "none",
+        viewBox: "0 0 16 16",
+        fill: "currentColor",
     },
-    "analytics-add": {
-        width: "18",
-        height: "18",
-        viewBox: "0 0 18 18",
-        fill: "none",
+    "bookmark-empty": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        stroke: "currentColor",
+        strokeWidth: "1.4",
     },
-    "analytics-remove": {
-        width: "18",
-        height: "18",
-        viewBox: "0 0 18 18",
-        fill: "none",
+    "bookmark-filled": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "currentColor",
+        stroke: "currentColor",
+        strokeWidth: "1.4",
     },
-    "cmd-alert": {
+    "collapse-all": {
+        viewBox: "0 0 24 24",
+        role: "img",
+    },
+    "copy-link": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "cmd-approve": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
+    "create-discussion": {
+        width: "24px",
+        height: "21px",
+        viewBox: "0 0 24 21",
     },
-    "cmd-dismiss": {
+    "create-event": {
+        width: "24px",
+        height: "24px",
+        viewBox: "0 0 24 24",
+    },
+    "create-idea": {
+        viewBox: "0 0 24 24",
+        width: "24",
+        height: "24",
+    },
+    "create-poll": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        fill: "none",
+    },
+    "create-question": {
+        width: "24px",
+        height: "24px",
+        viewBox: "0 0 24 24",
     },
     "dashboard-edit": {
         width: "22",
         height: "22",
         viewBox: "0 0 22 22",
     },
-    "data-add": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-article": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
     "data-checked": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-down": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-drag-and-drop": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-folder-tabs": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
-    "data-information": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-left": {
-        style: {
-            transform: " rotate(-90deg)",
-        },
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-online": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-pencil": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-refresh": {
-        viewBox: "0 0 24 24",
-        fill: "#555A62",
-    },
-    "data-replace": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-right": {
-        style: {
-            transform: " rotate(90deg)",
-        },
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-send": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "data-settings": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        ariahidden: "true",
-    },
-    "data-share": {
-        width: "16",
-        height: "16",
-        viewBox: "0 0 16 16",
         fill: "none",
     },
     "data-site-metric": {
@@ -161,57 +96,28 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "data-sort-dropdown": {
+    delete: {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "data-swap": {
+    "dismiss-compact": {
+        viewBox: "0 0 9.5 9.5",
+    },
+    dismiss: {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "data-trash": {
+    "edit-filters": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        fill: "none",
+        ariahidden: "true",
     },
-    "data-undo": {
-        width: "16",
-        height: "17",
-        viewBox: "0 0 16 17",
-        fill: "none",
-    },
-    "data-up": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "discussion-bookmark-solid": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "currentColor",
-        stroke: "currentColor",
-        strokeWidth: "1.4",
-    },
-    "discussion-bookmark": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        stroke: "currentColor",
-        strokeWidth: "1.4",
-    },
-    "editor-eye-slash": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
-    "editor-eye": {
+    edit: {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -235,17 +141,6 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "editor-link": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "editor-quote": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
     "editor-unlink": {
         width: "24",
         height: "24",
@@ -264,14 +159,71 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "event-registered": {
+    "expand-all": {
+        viewBox: "0 0 24 24",
+        role: "img",
+    },
+    "filter-add": {
+        width: "18",
+        height: "18",
+        viewBox: "0 0 18 18",
+        fill: "none",
+    },
+    "filter-applied": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "external-link": {
-        viewBox: "0 0 17 17",
+    "filter-compact-applied": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "filter-compact": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "filter-remove": {
+        width: "18",
+        height: "18",
+        viewBox: "0 0 18 18",
+        fill: "none",
+    },
+    filter: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    folder: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
+    "follow-empty": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
+    "follow-filled": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
+    "hide-content": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
+    info: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
     },
     "logo-github": {
         width: "60",
@@ -295,34 +247,22 @@ export const coreIconsData = {
         height: "60",
         viewBox: "0 0 60 60",
     },
-    "me-inbox": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "me-messages-solid": {
+    "me-messages-empty": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
     },
-    "me-messages": {
+    "me-messages-filled": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
     },
-    "me-notifications-small": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "me-notifications-solid": {
+    "me-notifications-empty": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
     },
-    "me-notifications": {
+    "me-notifications-filled": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -332,7 +272,47 @@ export const coreIconsData = {
         height: "24",
         viewBox: "0 0 24 24",
     },
-    "meta-comment": {
+    "me-subcommunities": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
+    "meta-answered": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-article": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-categories": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-child-categories": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-comments": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
+    "meta-discussions": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-events": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -348,25 +328,98 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "meta-like": {
+    "meta-follower": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-groups": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-ideas": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-knowledge-bases": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-points": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
     },
-    "meta-smile": {
+    "meta-posts": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-questions": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
     },
     "meta-time": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
     },
-    "meta-view": {
+    "meta-users": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-views": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
+    "move-down": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "move-drag": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "move-left": {
+        style: {
+            transform: " rotate(-90deg)",
+        },
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "move-right": {
+        style: {
+            transform: " rotate(90deg)",
+        },
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "move-up": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
     },
     "navigation-breadcrumb-active": {
         width: "24",
@@ -380,89 +433,27 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "navigation-circle-ellipsis": {
+    "notify-email": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "navigation-collapseAll": {
-        viewBox: "0 0 24 24",
-        role: "img",
-    },
-    "navigation-ellipsis": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
-    "navigation-expandAll": {
-        viewBox: "0 0 24 24",
-        role: "img",
-    },
-    "navigation-languages": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
-    "navigation-skip": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
-    "new-discussion": {
-        width: "24px",
-        height: "21px",
-        viewBox: "0 0 24 21",
-    },
-    "new-event": {
-        width: "24px",
-        height: "24px",
-        viewBox: "0 0 24 24",
-    },
-    "new-idea": {
-        viewBox: "0 0 24 24",
-        width: "24",
-        height: "24",
-    },
-    "new-poll": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
-    "new-question": {
-        width: "24px",
-        height: "24px",
-        viewBox: "0 0 24 24",
-    },
-    "notification-alert": {
+    "options-menu": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "notification-running": {
+    "pager-skip": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        fill: "none",
     },
-    "post-flag": {
+    "quote-content": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "profile-crown": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "profile-lock": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
     },
     "reaction-arrow-down": {
         width: "25",
@@ -578,11 +569,35 @@ export const coreIconsData = {
         viewBox: "0 0 25 24",
         fill: "none",
     },
-    "search-answered": {
+    refresh: {
+        viewBox: "0 0 24 24",
+        fill: "#555A62",
+    },
+    replace: {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
+    },
+    "report-content": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    resolved: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "search-all": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
+    "search-articles": {
+        viewBox: "0 0 14.666 14.666",
     },
     "search-categories": {
         width: "24",
@@ -590,95 +605,72 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "search-close": {
-        viewBox: "0 0 9.5 9.5",
-    },
-    "search-discussion": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "search-events": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-    },
-    "search-filter-applied": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "search-filter-small-applied": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "search-filter-small": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
-    },
-    "search-filter": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
+    "search-discussions": {
+        viewBox: "0 0 18.869 15.804",
     },
     "search-groups": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
+        viewBox: "0 0 17 16",
     },
     "search-ideas": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
+        viewBox: "0 0 18.444 16.791",
     },
-    "search-kb": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
+    "search-knowledge-bases": {
+        viewBox: "0 0 16 16",
     },
     "search-members": {
-        width: "24",
-        height: "24",
-        viewBox: "0 0 24 24",
-        fill: "none",
+        viewBox: "0 0 20 20",
     },
-    "search-post-count": {
+    "search-places": {
+        viewBox: "0 0 15.122 16.416",
+    },
+    "search-polls": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
     },
     "search-questions": {
+        viewBox: "0 0 26 26",
+    },
+    search: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
+    send: {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
     },
-    "search-search": {
+    share: {
+        width: "16",
+        height: "16",
+        viewBox: "0 0 16 16",
+        fill: "none",
+    },
+    "show-content": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
+        fill: "none",
     },
-    "search-subcategories": {
+    "sort-by": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "status-alert": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         fill: "none",
     },
     "status-running": {
-        width: "16",
-        height: "16",
-        viewBox: "0 0 16 16",
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
         fill: "none",
     },
     "status-success": {
@@ -693,6 +685,24 @@ export const coreIconsData = {
         viewBox: "0 0 16 16",
         fill: "none",
     },
+    swap: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    undo: {
+        width: "16",
+        height: "17",
+        viewBox: "0 0 16 17",
+        fill: "none",
+    },
+    unresolved: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
     "user-spoof": {
         width: "24",
         height: "24",
@@ -701,6 +711,24 @@ export const coreIconsData = {
     },
     "vanilla-logo": {
         viewBox: "0 0 347.01 143.98",
+    },
+    "visibility-internal": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "visibility-private": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "whos-online": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
     },
 };
 

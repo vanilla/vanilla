@@ -101,6 +101,14 @@ paths:
                                     schema:
                                         type: object
                                         description: The schema for the action
+                                    dynamicSchemaParams:
+                                        type: array
+                                        description: An array of any required dynamic properties.
+                                        items:
+                                            type: string
+                                    dynamicSchema:
+                                        type: object
+                                        description: The dynamic schema that depends on the dynamic schema params.
                     description: Success
                 "403":
                     $ref: "responses.yml#/components/responses/PermissionError"
@@ -246,7 +254,7 @@ paths:
                   in: query
                   schema:
                       type: string
-                - name: dispatchStatus[]
+                - name: dispatchStatus
                   description: Filter by automation rule dispatch status.
                   in: query
                   schema:
@@ -287,7 +295,7 @@ paths:
                       default: 30
                       maximum: 100
                       minimum: 1
-                - name: expand[]
+                - name: expand
                   description: Expand fields on the result.
                   in: query
                   schema:
@@ -299,7 +307,7 @@ paths:
                           type: string
                       type: array
                   style: form
-                - name: sort[]
+                - name: sort
                   description: The results' sort order.
                   in: query
                   schema:
@@ -341,7 +349,7 @@ paths:
                   in: query
                   schema:
                       type: string
-                - name: dispatchStatus[]
+                - name: dispatchStatus
                   description: Filter by automation rule dispatch status.
                   in: query
                   schema:
@@ -376,7 +384,7 @@ paths:
                       default: 30
                       maximum: 100
                       minimum: 1
-                - name: expand[]
+                - name: expand
                   description: Expand fields on the result.
                   in: query
                   schema:
@@ -388,7 +396,7 @@ paths:
                           type: string
                       type: array
                   style: form
-                - name: sort[]
+                - name: sort
                   description: The results' sort order.
                   in: query
                   schema:
@@ -627,7 +635,7 @@ components:
 
     parameters:
         AutomationRecipeExpand:
-            name: expand[]
+            name: expand
             in: query
             description: >
                 <p>Expand associated records using one or more valid field names. A

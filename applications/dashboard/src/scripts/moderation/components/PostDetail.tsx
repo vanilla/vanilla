@@ -5,66 +5,66 @@
  */
 
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
+import { isPostDiscussion, type IPostRevisionOption } from "@dashboard/moderation/CommunityManagement.hooks";
+import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
+import BlurContainer from "@dashboard/moderation/components/BlurContainerUserContent";
+import { detailPageClasses } from "@dashboard/moderation/DetailPage.classes";
 import { CollapsableContent } from "@library/content/CollapsableContent";
+import DateTime from "@library/content/DateTime";
+import Translate from "@library/content/Translate";
 import UserContent from "@library/content/UserContent";
-import { deletedUserFragment } from "@library/features/users/constants/userFragment";
+import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { PageBoxContextProvider } from "@library/layout/PageBox.context";
 import { ListItem } from "@library/lists/ListItem";
-import ProfileLink from "@library/navigation/ProfileLink";
-import { BorderType } from "@library/styles/styleHelpersBorders";
-import { t } from "@vanilla/i18n";
-import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
-import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
-import DateTime from "@library/content/DateTime";
+import { listItemClasses } from "@library/lists/ListItem.styles";
+import { MetaIcon, MetaItem, Metas } from "@library/metas/Metas";
+import { metasClasses } from "@library/metas/Metas.styles";
 import { Tag } from "@library/metas/Tags";
 import { TagPreset } from "@library/metas/Tags.variables";
-import { Icon } from "@vanilla/icons";
-import { detailPageClasses } from "@dashboard/moderation/DetailPage.classes";
-import Translate from "@library/content/Translate";
-import { Metas, MetaIcon, MetaItem } from "@library/metas/Metas";
-import { metasClasses } from "@library/metas/Metas.styles";
+import ProfileLink from "@library/navigation/ProfileLink";
 import SmartLink from "@library/routing/links/SmartLink";
-import { listItemClasses } from "@library/lists/ListItem.styles";
+import { BorderType } from "@library/styles/styleHelpersBorders";
 import { ToolTip } from "@library/toolTip/ToolTip";
-import { usePostRevision } from "@dashboard/moderation/PostRevisionContext";
-import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
-import BlurContainer from "@dashboard/moderation/components/BlurContainerUserContent";
+import { ContentItemAttachment } from "@vanilla/addon-vanilla/contentItem/ContentItemAttachment";
+import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
 
 interface IProps {
-    truncatePost?: boolean;
+    activeRevisionOption: IPostRevisionOption;
 }
 
 export function PostDetail(props: IProps) {
-    const { activeRevision, activeReport } = usePostRevision();
+    const { activeRevisionOption } = props;
+    const { livePost } = activeRevisionOption;
     const classes = detailPageClasses();
     const listClasses = listItemClasses();
 
-    const filteredAttachments = (activeRevision?.attachments ?? []).filter(
+    const filteredAttachments = (livePost?.attachments ?? []).filter(
         ({ attachmentType }) => attachmentType !== "vanilla-escalation",
     );
 
     return (
         <>
             <DashboardFormSubheading>
-                {!activeReport ? t("Latest Post Revision") : t("Post Revision")}
-                {activeReport && (
+                {livePost ? t("Live Post") : t("Post Revision")}
+                {!livePost && (
                     <Tag className={classes.tag} preset={TagPreset.GREYSCALE}>
                         <Icon icon="meta-time" />
-                        <DateTime mode={"fixed"} timestamp={activeReport.dateInserted} />
+                        <DateTime mode={"fixed"} timestamp={activeRevisionOption.recordRevisionDate} />
                     </Tag>
                 )}
             </DashboardFormSubheading>
 
             <PageBoxContextProvider options={{ borderType: BorderType.SHADOW }}>
-                {activeRevision && (
-                    <ListItem
-                        as={"div"}
-                        nameClassName={communityManagementPageClasses().listItemLink}
-                        name={
-                            <div className={classes.headerIconLayout}>
-                                {activeRevision.name}
+                <ListItem
+                    as={"div"}
+                    nameClassName={communityManagementPageClasses().listItemLink}
+                    name={
+                        <div className={classes.headerIconLayout}>
+                            {activeRevisionOption.recordName}
+                            {livePost && (
                                 <span>
                                     <ToolTip label={t("View post in community")}>
                                         <span>
@@ -72,69 +72,61 @@ export function PostDetail(props: IProps) {
                                         </span>
                                     </ToolTip>
                                 </span>
-                            </div>
-                        }
-                        url={activeRevision.url}
-                        description={
-                            <>
-                                <ConditionalWrap
-                                    condition={!!props.truncatePost}
-                                    component={CollapsableContent}
-                                    componentProps={{ maxHeight: 80 }}
-                                >
-                                    <BlurContainer>
-                                        <UserContent
-                                            className={listClasses.description}
-                                            content={activeRevision.body ?? ""}
-                                            moderateEmbeds
-                                        />
-                                    </BlurContainer>
-                                </ConditionalWrap>
-                            </>
-                        }
-                        truncateDescription={false}
-                        icon={
-                            <ProfileLink userFragment={activeRevision.insertUser ?? deletedUserFragment()}>
-                                <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={activeRevision.insertUser} />
-                            </ProfileLink>
-                        }
-                        metas={
-                            <>
-                                <Metas>
+                            )}
+                        </div>
+                    }
+                    url={livePost?.url}
+                    description={
+                        <BlurContainer>
+                            <UserContent
+                                className={listClasses.description}
+                                content={activeRevisionOption.recordHtml}
+                                moderateEmbeds
+                            />
+                        </BlurContainer>
+                    }
+                    truncateDescription={false}
+                    icon={
+                        <ProfileLink userFragment={activeRevisionOption.recordUser}>
+                            <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={activeRevisionOption.recordUser} />
+                        </ProfileLink>
+                    }
+                    metas={
+                        <>
+                            <Metas>
+                                {isPostDiscussion(livePost) && (
                                     <MetaIcon
-                                        icon={activeRevision.resolved ? "cmd-approve" : "cmd-alert"}
-                                        aria-label={activeRevision.resolved ? t("Resolved") : t("Unresolved")}
+                                        icon={livePost.resolved ? "resolved" : "unresolved"}
+                                        aria-label={livePost.resolved ? t("Resolved") : t("Unresolved")}
                                     />
-                                    <MetaItem>
-                                        <Translate
-                                            source="Posted by <0/> in <1/>"
-                                            c0={
-                                                <SmartLink
-                                                    to={activeRevision.insertUser?.url ?? ""}
-                                                    className={metasClasses().metaLink}
-                                                >
-                                                    {activeRevision.insertUser?.name}
-                                                </SmartLink>
-                                            }
-                                            c1={
-                                                <SmartLink
-                                                    to={activeRevision.category?.url ?? ""}
-                                                    className={metasClasses().metaLink}
-                                                >
-                                                    {activeRevision.category?.name}
-                                                </SmartLink>
-                                            }
-                                        />
-                                    </MetaItem>
-                                    <MetaItem>
-                                        <MetaIcon icon="meta-time" style={{ marginLeft: -4 }} />
-                                        <DateTime timestamp={activeRevision.dateInserted}></DateTime>
-                                    </MetaItem>
-                                </Metas>
-                            </>
-                        }
-                    />
-                )}
+                                )}
+                                <MetaItem>
+                                    <Translate
+                                        source="Posted by <0/> in <1/>"
+                                        c0={
+                                            <ProfileLink
+                                                className={metasClasses().metaLink}
+                                                userFragment={activeRevisionOption.recordUser}
+                                            />
+                                        }
+                                        c1={
+                                            <SmartLink
+                                                to={activeRevisionOption.placeRecordUrl}
+                                                className={metasClasses().metaLink}
+                                            >
+                                                {activeRevisionOption.placeRecordName}
+                                            </SmartLink>
+                                        }
+                                    />
+                                </MetaItem>
+                                <MetaItem>
+                                    <MetaIcon icon="meta-time" style={{ marginLeft: -4 }} />
+                                    <DateTime timestamp={activeRevisionOption.recordRevisionDate}></DateTime>
+                                </MetaItem>
+                            </Metas>
+                        </>
+                    }
+                />
                 {filteredAttachments.length > 0 && (
                     <div className={classes.postAttachment}>
                         <CollapsableContent>
@@ -145,7 +137,7 @@ export function PostDetail(props: IProps) {
                                         key={attachment.attachmentID}
                                         attachmentType={attachment.attachmentType}
                                     >
-                                        <DiscussionAttachment key={attachment.attachmentID} attachment={attachment} />
+                                        <ContentItemAttachment key={attachment.attachmentID} attachment={attachment} />
                                     </ReadableIntegrationContextProvider>
                                 ))}
                             </>

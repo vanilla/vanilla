@@ -8,6 +8,8 @@
 namespace VanillaTests\Forum;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Forum\Models\PostTypeModel;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
@@ -16,7 +18,16 @@ use VanillaTests\SiteTestTrait;
  */
 class VanillaStructureTest extends SiteTestCase
 {
-    protected static $addons = ["vanilla", "conversations"];
+    use CommunityApiTestTrait;
+
+    public static function getAddons(): array
+    {
+        $addons = parent::getAddons();
+        $addons[] = "QnA";
+        $addons[] = "ideation";
+        $addons[] = "polls";
+        return $addons;
+    }
 
     /**
      * Test that the old
@@ -82,5 +93,72 @@ class VanillaStructureTest extends SiteTestCase
 
         $this->assertSame("Rich", $config->get("Garden.InputFormatter"));
         $this->assertSame("Rich", $config->get("Garden.MobileInputFormatter"));
+    }
+
+    /**
+     * Test migration of category allowed discussion types to the post type category junction table.
+     *
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws \Throwable
+     */
+    public function testMigrateCategoryDiscussionTypesToPostTypes()
+    {
+        \Gdn::sql()->truncate("Category");
+        \Gdn::config()->removeFromConfig(["postTypes.2025_003.wasMigrated", "postTypes.2025_003.wasMigratedV2"]);
+
+        // Category with custom permissions and a child
+        $category1 = $this->createCategory(["allowedDiscussionTypes" => ["Idea"], "customPermissions" => true]);
+
+        // Category that inherits from category1 above.
+        $category2 = $this->createCategory();
+
+        // Category with custom permissions but didn't have the permissionCategoryID set.
+        $category3 = $this->createCategory([
+            "parentCategoryID" => -1,
+            "name" => __FUNCTION__,
+            "allowedDiscussionTypes" => ["Discussion", "Question", "Poll"],
+        ]);
+
+        \Gdn::database()
+            ->createSql()
+            ->truncate("postTypeCategoryJunction");
+
+        include PATH_APPLICATIONS . "/vanilla/settings/structure.php";
+
+        $rows = \Gdn::database()
+            ->createSql()
+            ->getWhere("postTypeCategoryJunction")
+            ->resultArray();
+
+        $this->assertRowsLike(
+            [
+                "categoryID" => [
+                    $category1["categoryID"],
+                    $category2["categoryID"],
+                    $category3["categoryID"],
+                    $category3["categoryID"],
+                    $category3["categoryID"],
+                ],
+                "postTypeID" => ["idea", "idea", "discussion", "question", "poll"],
+            ],
+            $rows,
+            strictOrder: false
+        );
+
+        // Run full structure to re-create addon-specific post types.
+        \Gdn::getContainer()
+            ->get(\UpdateModel::class)
+            ->runStructure();
+
+        // Test with category api endpoints with postTypeID filter.
+        $this->api()
+            ->get("/categories", ["postTypeID" => "idea", "outputFormat" => "flat"])
+            ->assertJsonArrayValues(["categoryID" => [$category1["categoryID"], $category2["categoryID"]]]);
+
+        $this->api()
+            ->get("/categories", ["postTypeID" => "question", "outputFormat" => "flat"])
+            ->assertJsonArrayValues(["categoryID" => [$category3["categoryID"]]]);
     }
 }

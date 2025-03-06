@@ -71,6 +71,9 @@ export const frameHeaderClasses = useThemeCache(() => {
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
         }),
+        "&:focus-visible": {
+            outline: "none",
+        },
     });
 
     const headingMinimal = style("headingMinimal", {

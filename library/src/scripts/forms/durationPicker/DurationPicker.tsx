@@ -17,6 +17,11 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 
+export type DurationPickerValue = {
+    length: number;
+    unit: DurationPickerUnit.DAYS;
+};
+
 export function DurationPicker(props: IDurationPickerProps) {
     const {
         className,

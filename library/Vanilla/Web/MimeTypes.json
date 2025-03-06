@@ -1004,7 +1004,8 @@
         "avi": ["video/x-msvideo"],
         "movie": ["video/x-sgi-movie"],
         "smv": ["video/x-smv"],
-        "ice": ["x-conference/x-cooltalk"]
+        "ice": ["x-conference/x-cooltalk"],
+        "dva": ["application/x-dvi", "application/x-dvi"]
     },
     "extensions": {
         "application/font-woff": ["wof"],
@@ -1622,7 +1623,7 @@
         "application/xv+xml": ["mxml", "xhvml", "xvml", "xvm"],
         "application/yang": ["yang"],
         "application/yin+xml": ["yin"],
-        "application/zip": ["zip"],
+        "application/zip": ["zip", "dva"],
         "audio/adpcm": ["adp"],
         "audio/basic": ["au", "snd"],
         "audio/midi": ["mid", "midi", "kar", "rmi"],

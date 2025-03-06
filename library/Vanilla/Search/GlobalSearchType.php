@@ -8,9 +8,10 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
-use Vanilla\ApiUtils;
-use Vanilla\Contracts\Site\VanillaSiteProvider;
+use UserModel;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\DateFilterSchema;
+use Vanilla\Logger;
 use Vanilla\Models\CrawlableRecordSchema;
 
 /**
@@ -18,17 +19,14 @@ use Vanilla\Models\CrawlableRecordSchema;
  */
 class GlobalSearchType extends AbstractSearchType
 {
-    /** @var \UserModel */
-    private $userModel;
-
     /**
      * DI.
      *
-     * @param \UserModel $userModel
+     * @param UserModel $userModel
+     * @param ConfigurationInterface $config
      */
-    public function __construct(\UserModel $userModel)
+    public function __construct(private UserModel $userModel, private ConfigurationInterface $config)
     {
-        $this->userModel = $userModel;
     }
 
     /**
@@ -111,18 +109,20 @@ class GlobalSearchType extends AbstractSearchType
         // Fulltext matching. These apply to everything except users which does queries name in a different way.
         if (!in_array("user", $query->getQueryParameter("types"))) {
             $name = $query->getQueryParameter("name");
+            $matchMode = $this->getSearchMatchMode($query);
+
             if ($name) {
-                $query->whereText($name, ["name"], $query::MATCH_FULLTEXT_EXTENDED);
+                $query->whereText($name, ["name"], $matchMode);
             }
 
             $allTextQuery = $query->getQueryParameter("query");
             if ($allTextQuery) {
                 $fields = ["name", "bodyPlainText", "description"];
-                $query->whereText($allTextQuery, $fields, $query::MATCH_FULLTEXT_EXTENDED);
+                $query->whereText($allTextQuery, $fields, $matchMode);
             }
 
             if ($description = $query->getQueryParameter("description", false)) {
-                $query->whereText($description, ["description"], SearchQuery::MATCH_FULLTEXT_EXTENDED);
+                $query->whereText($description, ["description"], $matchMode);
             }
         }
 
@@ -142,6 +142,27 @@ class GlobalSearchType extends AbstractSearchType
         } else {
             $query->setSort(SearchQuery::SORT_DESC, $sortField);
         }
+    }
+
+    /**
+     * Get the match mode for the query.
+     *
+     * Priority is given to the query parameter, then the config, then fallback to `fulltext_extended`.
+     *
+     * @param SearchQuery $query
+     * @return string
+     */
+    private function getSearchMatchMode(SearchQuery $query): string
+    {
+        $matchMode =
+            $query->getQueryParameter("matchMode") ??
+            $this->config->get("Elastic.MatchMode", SearchQuery::MATCH_FULLTEXT_EXTENDED);
+
+        if (!in_array($matchMode, SearchQuery::TEXT_MATCH_MODES)) {
+            $matchMode = SearchQuery::MATCH_FULLTEXT_EXTENDED;
+        }
+
+        return $matchMode;
     }
 
     /**

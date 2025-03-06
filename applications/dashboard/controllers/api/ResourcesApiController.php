@@ -12,6 +12,7 @@ use Garden\Web\Data;
 use Garden\Web\Exception\HttpException;
 use Vanilla\ApiUtils;
 use Vanilla\Contracts\Models\CrawlableInterface;
+use Vanilla\Contracts\Models\VectorizeInterface;
 use Vanilla\DateFilterSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\ModelFactory;
@@ -58,6 +59,7 @@ class ResourcesApiController extends Controller
 
         $in = Schema::parse([
             "crawlable:b?",
+            "vectorize:b?",
             "recordTypes:a?" => [
                 "items" => ["type" => "string"],
             ],
@@ -86,14 +88,21 @@ class ResourcesApiController extends Controller
 
         $r = [];
         $allowedRecordTypes = $query["recordTypes"] ?? null;
+
         foreach ($models as $recordType => $model) {
             if ($allowedRecordTypes !== null && !in_array($recordType, $allowedRecordTypes)) {
                 continue;
             }
+            $tempPassThroughQuery = $passthroughQuery;
 
             $url = "/api/v2/resources/$recordType";
-            if ($passthroughQuery) {
-                $url .= "?" . $passthroughQuery;
+            if ($model instanceof VectorizeInterface && isset($query["vectorize"])) {
+                $tempPassThroughQueryParams = $passThroughQueryParams;
+                $tempPassThroughQueryParams["expand"] .= ",vectorize";
+                $tempPassThroughQuery = http_build_query($tempPassThroughQueryParams);
+            }
+            if ($tempPassThroughQuery) {
+                $url .= "?" . $tempPassThroughQuery;
             }
             $r[] = [
                 "recordType" => $recordType,
@@ -116,7 +125,7 @@ class ResourcesApiController extends Controller
         $this->permission("Garden.Settings.Manage");
 
         $in = Schema::parse([
-            "expand?" => ApiUtils::getExpandDefinition(["crawl"]),
+            "expand?" => ApiUtils::getExpandDefinition(["crawl", "vectorize"]),
             "dirtyRecords:b?",
             "dateInserted?" => new DateFilterSchema(),
         ]);
@@ -133,6 +142,9 @@ class ResourcesApiController extends Controller
         if (ModelUtils::isExpandOption("crawl", $query["expand"]) && $model instanceof CrawlableInterface) {
             $data["crawl"] = $model->getCrawlInfo();
             $data["crawl"]["url"] = \Gdn::request()->getSimpleUrl($data["crawl"]["url"]);
+            if (ModelUtils::isExpandOption("crawl", $query["expand"]) && $model instanceof VectorizeInterface) {
+                $data["crawl"]["url"] .= ",vectorize";
+            }
             if (isset($query["dirtyRecords"])) {
                 $data["crawl"]["url"] .= "&dirtyRecords=true";
             }

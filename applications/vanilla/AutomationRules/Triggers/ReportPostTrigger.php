@@ -221,7 +221,7 @@ class ReportPostTrigger extends AutomationTrigger
     /**
      * @inheridoc
      */
-    private function getObjectModel(): Model
+    private function getObjectModel(): ReportModel
     {
         return Gdn::getContainer()->get(ReportModel::class);
     }
@@ -251,7 +251,6 @@ class ReportPostTrigger extends AutomationTrigger
 
         return $this->getObjectModel()->getWhereIterator(
             $where,
-            [],
             ["recordType", "reportID"],
             "asc",
             AutomationRuleLongRunnerGenerator::BUCKET_SIZE

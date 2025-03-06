@@ -17,8 +17,6 @@ use Vanilla\Models\Model;
 
 class PostTypesApiController extends \AbstractApiController
 {
-    const GET_POST_TYPE_RESPONSE = "@@postTypes/GET_POST_TYPE_DONE";
-
     public function __construct(private PostTypeModel $postTypeModel)
     {
     }
@@ -33,48 +31,26 @@ class PostTypesApiController extends \AbstractApiController
     {
         PostTypeModel::ensurePostTypesFeatureEnabled();
         $in = $this->schema([
-            "postTypeID:s?" => ["x-filter" => true],
-            "parentPostTypeID:s?" => ["x-filter" => true],
-            "isOriginal:b?" => ["x-filter" => true],
-            "isActive:b?" => ["x-filter" => true],
+            "postTypeID:s?",
+            "parentPostTypeID:s?",
+            "isOriginal:b?",
+            "isActive:b?",
             "includeDeleted:b?",
-            "page:i?" => [
-                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
-                "default" => 1,
-                "minimum" => 1,
-            ],
-            "limit:i?" => [
-                "description" => "Desired number of items per page.",
-                "default" => 30,
-                "minimum" => 1,
-                "maximum" => ApiUtils::getMaxLimit(),
-            ],
         ]);
         $out = $this->schema([":a" => $this->postTypeModel->outputSchema()], "out");
 
         $query = $in->validate($query);
 
-        $filters = ApiUtils::queryToFilters($in, $query);
-        $filters["isDeleted"] = 0;
+        $query["isDeleted"] = 0;
 
         if ($query["includeDeleted"] ?? false) {
-            unset($filters["isDeleted"]);
+            unset($query["isDeleted"]);
         }
+        unset($query["includeDeleted"]);
 
-        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
-
-        $rows = $this->postTypeModel->getWhere($filters, [
-            Model::OPT_LIMIT => $limit,
-            Model::OPT_OFFSET => $offset,
-        ]);
-
+        $rows = $this->postTypeModel->getWhere($query);
         $rows = $out->validate($rows);
-
-        $totalCount = $this->postTypeModel->getWhereCount($filters);
-
-        $paging = ApiUtils::numberedPagerInfo($totalCount, "/api/v2/post-types", $query, $in);
-
-        return new Data($rows, ["paging" => $paging]);
+        return $rows;
     }
 
     /**
@@ -113,9 +89,6 @@ class PostTypesApiController extends \AbstractApiController
 
         $body = $in->validate($body);
         $this->postTypeModel->insert($body);
-        if (isset($body["categoryIDs"])) {
-            $this->postTypeModel->putCategoriesForPostType($body["postTypeID"], $body["categoryIDs"]);
-        }
 
         return $this->getPostTypeByID($body["postTypeID"], true);
     }
@@ -135,10 +108,8 @@ class PostTypesApiController extends \AbstractApiController
 
         $in = $this->schema($this->postTypeModel->patchSchema());
         $body = $in->validate($body, true);
-        $this->postTypeModel->update($body, ["postTypeID" => $id]);
-        if (isset($body["categoryIDs"])) {
-            $this->postTypeModel->putCategoriesForPostType($id, $body["categoryIDs"]);
-        }
+
+        $this->postTypeModel->updateByID($id, $body);
 
         return $this->getPostTypeByID($id, true);
     }

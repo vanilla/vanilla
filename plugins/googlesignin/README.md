@@ -52,5 +52,5 @@ For more information about the Google Sign In OpenID Connect workflow go to [dev
 
 -   **Pitfalls and Gotchas:**
     -   There are many possible pitfalls when setting up SSO. Most of the difficulty will be in setting up the Google Sign In app in [**Google's developer console**](https://console.developer.google.com). Among the things to watch for:
-        -   Google will only allow to be configured to a legitimate TLD (no `.localhost`)
+        -   Google will only allow to be configured to a legitimate TLD (no `.local`)
         -   You have to include the exact `redirect_uri`. If your local set up is not HTTPS, it will send a `redirect_uri` that does not include the https schema and will be rejected by the Google app.

@@ -16,14 +16,27 @@ export function addLayoutPaths(paths: string[]) {
     layoutPaths = [...layoutPaths, ...paths];
 }
 
+let excludePaths: string[] = [];
+
+export function excludeLayoutPaths(paths: string[]) {
+    excludePaths = [...excludePaths, ...paths];
+}
+
 export function isLayoutRoute(url: string): boolean {
     if (!url.startsWith(siteUrl(""))) {
         return false;
     }
+
     const relative = getRelativeUrl(url);
     const result = !!matchPath(relative, {
         path: layoutPaths,
         exact: true,
     });
-    return result;
+
+    const excludeResult = !!matchPath(relative, {
+        path: excludePaths,
+        exact: true,
+    });
+
+    return result && !excludeResult;
 }

@@ -59,7 +59,7 @@ class QuickLinksWidgetTest extends SiteTestCase
                             "url" => "/categories",
                         ]),
                         self::markForSparseComparision([
-                            "name" => "Recent Discussions",
+                            "name" => "Recent Posts",
                             "url" => "/discussions",
                         ]),
                         self::markForSparseComparision([
@@ -71,7 +71,7 @@ class QuickLinksWidgetTest extends SiteTestCase
                             "url" => "/discussions/bookmarked",
                         ]),
                         self::markForSparseComparision([
-                            "name" => "My Discussions",
+                            "name" => "My Posts",
                             "url" => "/discussions/mine",
                         ]),
                         self::markForSparseComparision([
@@ -95,7 +95,7 @@ class QuickLinksWidgetTest extends SiteTestCase
             <a href=/categories>All Categories</a>
         </li>
         <li>
-            <a href=/discussions>Recent Discussions</a>
+            <a href=/discussions>Recent Posts</a>
         </li>
         <li>
             <a href=/activity>Activity</a>
@@ -104,7 +104,7 @@ class QuickLinksWidgetTest extends SiteTestCase
             <a href=/discussions/bookmarked>My Bookmarks</a>
         </li>
         <li>
-            <a href=/discussions/mine>My Discussions</a>
+            <a href=/discussions/mine>My Posts</a>
         </li>
         <li>
             <a href=/drafts>My Drafts</a>

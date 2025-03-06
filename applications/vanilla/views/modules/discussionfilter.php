@@ -57,22 +57,19 @@ $titleID = "BoxFilterTitle";
     <ul class="FilterMenu">
         <?php
         $Controller->fireEvent("BeforeDiscussionFilters");
-        //      if (c('Vanilla.Categories.ShowTabs')) {
-        if (c("Vanilla.Categories.Use")) {
-            $CssClass = "AllCategories";
-            if (
-                strtolower($Controller->ControllerName) == "categoriescontroller" &&
-                in_array(strtolower($Controller->RequestMethod), ["index", "all"])
-            ) {
-                $CssClass .= " Active";
-            }
-
-            echo '<li class="' .
-                $CssClass .
-                '">' .
-                anchor(sprite("SpAllCategories") . " " . t("All Categories", "Categories"), "/categories") .
-                "</li> ";
+        $CssClass = "AllCategories";
+        if (
+            strtolower($Controller->ControllerName) == "categoriescontroller" &&
+            in_array(strtolower($Controller->RequestMethod), ["index", "all"])
+        ) {
+            $CssClass .= " Active";
         }
+
+        echo '<li class="' .
+            $CssClass .
+            '">' .
+            anchor(sprite("SpAllCategories") . " " . t("All Categories", "Categories"), "/categories") .
+            "</li> ";
         ?>
         <li class="Discussions<?php echo strtolower($Controller->ControllerName) == "discussionscontroller" &&
         strtolower($Controller->RequestMethod) == "index"

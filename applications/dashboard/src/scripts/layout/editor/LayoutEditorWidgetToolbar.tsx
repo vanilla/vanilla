@@ -37,13 +37,13 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
     const widgetSpec = editorContents.getWidget(props.path);
     const { $hydrate, ...rest } = widgetSpec ?? {};
     const [isWidgetSettingsModalOpen, setWidgetSettingsModalOpen] = useState(false);
-    const isAsset = $hydrate?.includes("asset");
     const widget = $hydrate ? catalog?.assets[$hydrate] ?? catalog?.widgets[$hydrate] : undefined;
+    const isRequired = widget?.isRequired ?? false;
     const widgetProps = isEmpty(rest) ? undefined : rest;
 
     const trashButton = (
         <EmbedButton
-            disabled={isAsset}
+            disabled={isRequired}
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -51,7 +51,7 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                 editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
             }}
         >
-            <Icon icon={"data-trash"} />
+            <Icon icon={"delete"} />
         </EmbedButton>
     );
 
@@ -75,7 +75,7 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                         editorSelection.moveSelectionTo(pathLeft, LayoutEditorSelectionMode.WIDGET);
                     }}
                 >
-                    <Icon icon={"data-left"} />
+                    <Icon icon={"move-left"} />
                 </EmbedButton>
                 <EmbedButton
                     disabled={!pathUp}
@@ -87,7 +87,7 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                         editorSelection.moveSelectionTo(pathUp, LayoutEditorSelectionMode.WIDGET);
                     }}
                 >
-                    <Icon icon={"data-up"} />
+                    <Icon icon={"move-up"} />
                 </EmbedButton>
                 <EmbedButton
                     disabled={!pathDown}
@@ -99,7 +99,7 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                         editorSelection.moveSelectionTo(pathDown, LayoutEditorSelectionMode.WIDGET);
                     }}
                 >
-                    <Icon icon={"data-down"} />
+                    <Icon icon={"move-down"} />
                 </EmbedButton>
                 <EmbedButton
                     disabled={!pathRight}
@@ -111,7 +111,7 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                         editorSelection.moveSelectionTo(pathRight, LayoutEditorSelectionMode.WIDGET);
                     }}
                 >
-                    <Icon icon={"data-right"} />
+                    <Icon icon={"move-right"} />
                 </EmbedButton>
                 <EmbedButton
                     onClick={(e) => {
@@ -120,14 +120,14 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                         setWidgetSettingsModalOpen(true);
                     }}
                 >
-                    <Icon icon={"data-pencil"} />
+                    <Icon icon={"edit"} />
                 </EmbedButton>
                 <ConditionalWrap
                     component={ToolTip}
-                    condition={!!isAsset}
+                    condition={!!isRequired}
                     componentProps={{ label: t("You cannot delete this required widget") }}
                 >
-                    {isAsset ? <span>{trashButton}</span> : trashButton}
+                    {isRequired ? <span>{trashButton}</span> : trashButton}
                 </ConditionalWrap>
             </EmbedMenu>
             {!!catalog && !!$hydrate && !!widget && (

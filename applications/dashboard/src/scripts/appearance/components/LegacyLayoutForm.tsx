@@ -4,7 +4,7 @@
  */
 
 import LayoutPreviewList from "@dashboard/appearance/components/LayoutPreviewList";
-import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
+import { AppearanceNav } from "@dashboard/components/navigation/AppearanceNav";
 import { layoutOptionsClasses } from "@dashboard/appearance/pages/LayoutOptions.classes";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import AdminTitleBar from "@dashboard/components/AdminTitleBar";
@@ -31,6 +31,7 @@ import { Icon } from "@vanilla/icons";
 import { notEmpty } from "@vanilla/utils";
 import React, { useEffect, useState } from "react";
 import { sprintf } from "sprintf-js";
+import { AppearanceAdminLayout } from "@dashboard/components/navigation/AppearanceAdminLayout";
 
 interface IFormProps {
     legacyLayoutTypes?: Array<{
@@ -103,7 +104,7 @@ function LegacyLayoutForm(props: IFormProps) {
                                         }
                                     >
                                         <ToolTipIcon className={classes.legacyOptionsTooltip}>
-                                            <Icon icon="data-information" />
+                                            <Icon icon="info" />
                                         </ToolTipIcon>
                                     </ToolTip>
                                 )}
@@ -183,7 +184,7 @@ export function LegacyLayoutFormPage(props: IProps) {
                     title={sprintf(t("Change %s"), props.radios.legendLabel)}
                     onCancel={() => setShowWarning(false)}
                     onConfirm={() => {
-                        configPatcher.patchConfig(configs);
+                        void configPatcher.patchConfig(configs);
                         setShowWarning(false);
                     }}
                 >
@@ -199,8 +200,7 @@ export function LegacyLayoutFormPage(props: IProps) {
         );
     })();
     return (
-        <AdminLayout
-            activeSectionID={"appearance"}
+        <AppearanceAdminLayout
             customTitleBar={
                 <AdminTitleBar
                     useTwoColumnContainer
@@ -232,7 +232,7 @@ export function LegacyLayoutFormPage(props: IProps) {
                                     setShowWarning(true);
                                     return;
                                 }
-                                configPatcher.patchConfig(configs);
+                                void configPatcher.patchConfig(configs);
                             }}
                             disabled={configPatcher.isLoading}
                         >
@@ -241,8 +241,6 @@ export function LegacyLayoutFormPage(props: IProps) {
                     }
                 />
             }
-            adminBarHamburgerContent={<AppearanceNav asHamburger />}
-            leftPanel={!isCompact && <AppearanceNav />}
             content={content}
         />
     );

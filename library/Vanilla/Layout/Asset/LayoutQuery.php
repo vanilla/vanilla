@@ -158,6 +158,17 @@ class LayoutQuery implements \JsonSerializable
     }
 
     /**
+     * @param array $params
+     * @return $this
+     */
+    public function withAdditionalParams(array $params): LayoutQuery
+    {
+        $query = clone $this;
+        $query->params = array_merge($this->params, $params);
+        return $query;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize(): array

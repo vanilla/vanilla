@@ -15,6 +15,19 @@ paths:
                                 type: array
                                 items:
                                     $ref: "#/components/schemas/Locale"
+        post:
+            tags:
+                - Locales
+            parameters:
+                - $ref: "#/components/parameters/LocaleCodeParameter"
+                - $ref: "#/components/parameters/TranslatableParameter"
+            responses:
+                "200":
+                    description: The specified locale information
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/LocaleConfig"
     /locales/{locale}:
         get:
             summary: Get single locale
@@ -87,6 +100,21 @@ components:
             schema:
                 type: string
                 pattern: "[a-zA-Z0-9-]+"
+        MachineTranslationsParameter:
+            name: isMachineTranslations
+            in: query
+            description: Whether or not to return machine translations locales.
+            required: false
+            schema:
+                type: boolean
+            x-hidden: true
+        TranslatableParameter:
+            name: translatable
+            in: query
+            description: Whether or not to mark this locale as translatable by machine translations.
+            required: false
+            schema:
+                type: boolean
         CacheBusterParameter:
             name: etag
             in: query

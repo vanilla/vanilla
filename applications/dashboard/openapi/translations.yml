@@ -1,0 +1,204 @@
+openapi: 3.0.2
+info:
+paths:
+    /translations/{resourceUrlCode}:
+        get:
+            parameters:
+                - description: Resource to filter.
+                  in: path
+                  name: resourceUrlCode
+                  required: true
+                  schema:
+                      type: string
+                - description: recordType of the translation.
+                  in: query
+                  name: recordType
+                  schema:
+                      type: string
+                - description: array of recordIDs of the translation.
+                  in: query
+                  name: recordIDs
+                  schema:
+                      items:
+                          type: integer
+                      type: array
+                - description: array of recordKeys of the translation.
+                  in: query
+                  name: recordKeys
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - description: locale of the translation.
+                  in: query
+                  name: locale
+                  required: true
+                  schema:
+                      type: string
+                - description: desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 100
+                      maximum: 100
+                      minimum: 1
+                - description: >
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      default: 1
+                      maximum: 100
+                      minimum: 1
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Translation"
+                                type: array
+                    description: Success
+            tags:
+                - Translations
+            summary: Get translations from a specified resource.
+        patch:
+            parameters:
+                - description: resource to add\update in.
+                  in: path
+                  name: resourceUrlCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: Success
+                "400":
+                    description: Bad Request
+            tags:
+                - Translations
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PatchTranslations"
+                required: true
+            summary: Add or update translations.
+    /translations/{resourceUrlCode}/remove:
+        patch:
+            parameters:
+                - description: Delete a translation.
+                  in: path
+                  name: resourceUrlCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: Success
+            tags:
+                - Translations
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                properties:
+                                    recordType:
+                                        description: Name of the resource associated to the translation.
+                                        type: string
+                                    recordID:
+                                        description: The recordID associated to the translation.
+                                        type: integer
+                                    recordKey:
+                                        description: The recordKey associated to the translation.
+                                        type: string
+                                    locale:
+                                        description: The locale associated to the translation.
+                                        type: string
+                                    propertyName:
+                                        description: The property name associated to the translation.
+                                        type: string
+                                required:
+                                    - recordType
+                                    - locale
+                                    - propertyName
+                                type: object
+            summary: Delete specified translations.
+    /translations:
+        x-hidden: true
+        post:
+            responses:
+                "201":
+                    description: Success
+            tags:
+                - Translations
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                name:
+                                    description: Descriptive name of the resource.
+                                    type: string
+                                sourceLocale:
+                                    description: The source locale of the resource.
+                                    type: string
+                                urlCode:
+                                    description: The resource.
+                                    type: string
+                required: true
+            summary: Add a Resource.
+components:
+    schemas:
+        Translation:
+            properties:
+                resource:
+                    description: Name of the resource.
+                    type: string
+                key:
+                    description: a unique translation identifier.
+                    type: string
+                locale:
+                    description: The locale of the translation.
+                    type: string
+                translation:
+                    description: The translation sentence.
+                    type: string
+            required:
+                - resource
+                - key
+                - locale
+                - translation
+            type: object
+        PatchTranslations:
+            type: array
+            items:
+                properties:
+                    recordType:
+                        description: They recordType associated to the translation.
+                        type: string
+                    recordID:
+                        description: The recordID associated to the translation.
+                        type: integer
+                    recordKey:
+                        description: The recordKey associated to the translation.
+                        type: string
+                    locale:
+                        description: The locale associated to the translation.
+                        type: string
+                    propertyName:
+                        description: The property name associated to the translation.
+                        type: string
+                    translation:
+                        description: The translation sentence.
+                        type: string
+                required:
+                    - recordType
+                    - locale
+                    - propertyName
+                    - translation
+                type: object

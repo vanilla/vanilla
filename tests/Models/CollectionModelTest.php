@@ -8,6 +8,7 @@
 
 namespace VanillaTests\Models;
 
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Models\CollectionModel;
 use VanillaTests\SiteTestCase;
 use VanillaTests\ExpectExceptionTrait;
@@ -56,6 +57,7 @@ class CollectionModelTest extends SiteTestCase
             ],
         ];
 
+        CurrentTimeStamp::mockTime(time());
         $collectionID = $this->collectionModel->saveCollection($collectionRecord);
         $this->assertisInt($collectionID);
 
@@ -63,7 +65,12 @@ class CollectionModelTest extends SiteTestCase
         $savedRecord = $savedCollection["records"][0];
         $this->assertEquals($collectionRecord["name"], $savedCollection["name"]);
         $this->assertEquals($collectionRecord["records"][0]["recordID"], $savedRecord["recordID"]);
-        $this->assertEquals(date("Y-m-d H:i"), date("Y-m-d H:i", strtotime($savedRecord["dateInserted"])));
+
+        $this->assertEquals(
+            CurrentTimeStamp::getDateTime()->format("Y-m-d H:i"),
+            date("Y-m-d H:i", strtotime($savedRecord["dateInserted"]))
+        );
+        CurrentTimeStamp::clearMockTime();
         return $collectionID;
     }
 

@@ -19,6 +19,7 @@ use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggerUtils;
 use Vanilla\Logging\ResourceEventLogger;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\StringUtils;
 
@@ -52,6 +53,9 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
 
     /** @var string */
     protected $type;
+
+    /** @var bool */
+    protected bool $textUpdated;
 
     /** @var array $apiParams */
     protected $apiParams;
@@ -118,6 +122,26 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
     public function setPayload(array $payload): void
     {
         $this->payload = $payload;
+    }
+
+    /**
+     * Get the event textUpdated.
+     *
+     * @return bool
+     */
+    public function getTextUpdated(): ?bool
+    {
+        return $this->textUpdated ?? false;
+    }
+
+    /**
+     * Set the event textUpdated.
+     *
+     * @param bool $textUpdated
+     */
+    public function setTextUpdated(bool $textUpdated): void
+    {
+        $this->textUpdated = $textUpdated;
     }
 
     /**
@@ -229,7 +253,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             "type" => $this->type,

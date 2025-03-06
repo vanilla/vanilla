@@ -985,6 +985,8 @@ class CategoryModelTest extends SiteTestCase
      */
     public function testSetLocalNotFetched(): void
     {
+        CategoryModel::clearCache();
+
         $this->assertNull(CategoryModel::$Categories);
         CategoryModel::setLocalField($this->categoryID, "Name", __FUNCTION__);
 
@@ -1003,6 +1005,8 @@ class CategoryModelTest extends SiteTestCase
      */
     public function testSetLocalNotFetched2(): void
     {
+        CategoryModel::clearCache();
+
         $this->assertNull(CategoryModel::$Categories);
         CategoryModel::setLocalField($this->categoryID, "Name", __FUNCTION__);
 
@@ -1435,7 +1439,7 @@ class CategoryModelTest extends SiteTestCase
     public function testGetPostableDiscussionTypes()
     {
         $translations = [
-            "New Poll" => "Funny Poll",
+            "New Question" => "Funny Question",
         ];
         $locale = self::container()->get(\Gdn_Locale::class);
         $locale->LocaleContainer->loadArray($translations, "ClientLocale", "Definition", true);
@@ -1443,6 +1447,7 @@ class CategoryModelTest extends SiteTestCase
 
         $this->assertCount(3, $postableDiscussionTypes);
         $this->assertContains("poll", $postableDiscussionTypes);
+        $this->assertContains("question", $postableDiscussionTypes);
         $this->assertContains("discussion", $postableDiscussionTypes);
     }
 

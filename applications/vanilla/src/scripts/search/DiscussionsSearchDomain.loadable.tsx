@@ -6,7 +6,6 @@
 import React from "react";
 import { getGlobalSearchSorts } from "@library/search/SearchFormContextProvider";
 import { SearchService } from "@library/search/SearchService";
-import { TypeDiscussionsIcon } from "@library/icons/searchIcons";
 import { ISearchForm, ISearchRequestQuery } from "@library/search/searchTypes";
 import { IDiscussionSearchTypes } from "@vanilla/addon-vanilla/search/discussionSearchTypes";
 import { t } from "@vanilla/i18n";
@@ -19,16 +18,17 @@ import { notEmpty } from "@vanilla/utils";
 import SearchDomain from "@library/search/SearchDomain";
 import { getSiteSection } from "@library/utility/appUtils";
 import { dateRangeToString } from "@library/search/SearchUtils";
+import { Icon } from "@vanilla/icons";
 
 class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { discussionID: string }> {
     public key = "discussions";
     public sort = 1;
 
     public get name() {
-        return t("Discussions");
+        return t("Posts");
     }
 
-    public icon = (<TypeDiscussionsIcon />);
+    public icon = (<Icon icon={"search-discussions"} />);
 
     public recordTypes = ["discussion", "comment"];
 
@@ -42,8 +42,7 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
             "authors",
             "tagsOptions",
             "tagOperator",
-            "categoryOption",
-            "categoryOptions",
+            "categoryIDs",
             "followedCategories",
             "includeChildCategories",
             "includeArchivedCategories",
@@ -83,15 +82,6 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
             query.tags = query.tagsOptions.map((tag: any) => tag?.tagCode ?? tag?.tagName).filter(notEmpty);
         }
 
-        if (query.categoryOptions) {
-            query.categoryIDs = query.categoryOptions.map((option) => option.value as number);
-            // These are not allowed parameters
-            delete query.categoryOptions;
-            delete query.categoryOption;
-        } else if (query.categoryOption) {
-            query.categoryID = query.categoryOption.value as number;
-        }
-
         const siteSection = getSiteSection();
         const siteSectionCategoryID = siteSection.attributes.categoryID;
         /**
@@ -99,7 +89,7 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
          */
         const hasCategoryIDs = !!(query["categoryIDs"] && query["categoryIDs"].length);
         if (!("categoryID" in query) && !hasCategoryIDs && siteSectionCategoryID > 0) {
-            query.categoryID = siteSectionCategoryID;
+            query.categoryIDs = [siteSectionCategoryID];
             query.includeChildCategories = true;
         }
 

@@ -118,7 +118,7 @@ export default function ReorderProfileFields(props: IProps) {
             return [treeValue.items[draggableID]!.data!.apiName!, index + 1];
         });
         const formVals = Object.fromEntries(order);
-        setValues(formVals);
+        void setValues(formVals);
     }, [treeValue, setValues]);
 
     return (

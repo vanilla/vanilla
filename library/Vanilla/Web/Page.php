@@ -160,7 +160,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
             $this->siteMeta->getDebugModeEnabled() &&
             $this->requiresSeo &&
             ($this->getSeoTitle() === null ||
-                $this->getSeoBreadcrumbs() === null ||
                 $this->seoContent === null ||
                 $this->getSeoDescription() === null ||
                 $this->getCanonicalUrl() === null);

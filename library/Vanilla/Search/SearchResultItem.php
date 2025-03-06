@@ -17,6 +17,7 @@ use Vanilla\ImageSrcSet\ImageSrcSet;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
 
@@ -279,6 +280,24 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
     }
 
     /**
+     * @return string|null
+     */
+    public function getChunks(): ?string
+    {
+        if (array_key_exists("vectorizedData", $this->data)) {
+            $result = "";
+            foreach ($this->data["vectorizedData"] as $vectorizedData) {
+                if (array_key_exists("text", $vectorizedData)) {
+                    $result .= $vectorizedData["text"] . " ";
+                }
+            }
+            return trim($result);
+        }
+
+        return $this->getExcerpt();
+    }
+
+    /**
      * @return array|null
      */
     public function getImage(): ?array
@@ -441,7 +460,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $output = $this->getFilteredOutput();
 
@@ -451,7 +470,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
     /**
      * @inheritdoc
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->data[$offset]);
     }
@@ -459,7 +478,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
     /**
      * @inheritdoc
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->data[$offset] ?? null;
     }
@@ -467,7 +486,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
     /**
      * @inheritdoc
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (is_null($offset)) {
             $this->data[] = $value;
@@ -481,7 +500,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
     /**
      * @inheritdoc
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->data[$offset]);
         $this->itemInputSchema()->validate($this->data);
@@ -572,5 +591,28 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
             "Name:s",
             "Photo:s",
         ]);
+    }
+
+    /**
+     * Add the vectorized data to the payload.
+     *
+     * @param array $textChunk
+     * @return void
+     */
+    public function setVectorizedData(array $textChunk, array $expand): void
+    {
+        $vectorizedData = $textChunk["inference"]["chunks"];
+
+        if (DebugUtils::isDebug()) {
+            $expand[] = "vector_debug";
+        }
+
+        if (!in_array("vector_debug", $expand)) {
+            array_walk($vectorizedData, function (&$item) {
+                unset($item["embeddings"]);
+            });
+        }
+
+        $this->data["vectorizedData"] = $vectorizedData;
     }
 }

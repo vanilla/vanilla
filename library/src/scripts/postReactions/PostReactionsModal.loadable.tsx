@@ -7,6 +7,7 @@
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameHeader from "@library/layout/frame/FrameHeader";
+import Message from "@library/messages/Message";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { useReactionLog } from "@library/postReactions/PostReactions.hooks";
@@ -28,8 +29,10 @@ export default function PostReactionsModalImpl(props: PostReactionsModalProps) {
 
     // Fetch log on mount
     useEffect(() => {
-        reactionLog.isStale && reactionLog.refetch();
-    }, []);
+        if (reactionLog.isStale && visibility) {
+            void reactionLog.refetch();
+        }
+    }, [visibility, reactionLog]);
 
     return (
         <Modal
@@ -48,7 +51,7 @@ export default function PostReactionsModalImpl(props: PostReactionsModalProps) {
                 }
                 body={
                     <FrameBody>
-                        <PostReactionsLog />
+                        {reactionLog.error ? <Message error={reactionLog.error as any} /> : <PostReactionsLog />}
                     </FrameBody>
                 }
             />

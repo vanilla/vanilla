@@ -12,6 +12,8 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Events\DiscussionTagEvent;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Models\ModelCache;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
@@ -1119,7 +1121,7 @@ class TagModel extends Gdn_Model
             $this->joinTags($rows);
             foreach ($rows as &$row) {
                 $row["Tags"] = $this->normalizeOutput($row["Tags"]);
-                $row = ApiUtils::convertOutputKeys($row);
+                $row = ApiUtils::convertOutputKeys($row, ["postMeta"]);
                 unset($row["Tags"]);
                 $this->validateTagFragmentsOutput($row["tags"], $tagSchema);
             }
@@ -1546,14 +1548,8 @@ class TagModel extends Gdn_Model
         $offset = 0;
         while (true) {
             $sql = $this->createSql();
-            if (
-                is_array($where["d.Type"]) &&
-                (in_array("discussion", $where["d.Type"]) || in_array("Discussion", $where["d.Type"]))
-            ) {
-                $sql->beginWhereGroup()
-                    ->where("d.Type", $where["d.Type"])
-                    ->orWhere("d.Type is null")
-                    ->endWhereGroup();
+            if (isset($where["d.Type"])) {
+                PostTypeModel::whereParentPostType($sql, $where["d.Type"], "d.");
                 unset($where["d.Type"]);
             }
             $results = $sql

@@ -135,12 +135,12 @@ export function mapProfileFieldsToSchema(
                                 tooltip: t(
                                     "This information will only be shown to users with permission to view internal info.",
                                 ),
-                                tooltipIcon: "profile-crown",
+                                tooltipIcon: "visibility-internal",
                             }),
 
                             ...(config["visibility"] === CreatableFieldVisibility.PRIVATE && {
                                 tooltip: t("This is private information and will not be shared with other members."),
-                                tooltipIcon: "profile-lock",
+                                tooltipIcon: "visibility-private",
                             }),
                         } as IFormControl,
                     },

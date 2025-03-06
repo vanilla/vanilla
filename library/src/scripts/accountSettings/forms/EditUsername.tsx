@@ -164,7 +164,7 @@ export const EditUsername = forwardRef(function UsernameEditImpl(
         ref,
         () => ({
             onSave: () => {
-                patchUser({
+                void patchUser({
                     userID: viewingUserID,
                     name: username,
                     ...(password && { passwordConfirmation: password }),

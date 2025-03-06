@@ -68,7 +68,6 @@ class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidge
             self::suggestedContentSchema(),
 
             self::optionsSchema(allowedProperties: ["metas?"]),
-            self::displayOptionsSchema(),
             self::containerOptionsSchema("containerOptions", viewAll: false)
         );
     }

@@ -6,13 +6,12 @@
 
 import React from "react";
 import { render, act, fireEvent, screen, RenderResult, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import DefaultCategoriesModal, {
     ILegacyCategoryPreferences,
     IFollowedCategory,
 } from "@dashboard/userPreferences/DefaultCategoriesModal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { stableObjectHash } from "@vanilla/utils";
-import { LoadStatus } from "@library/@types/api/core";
 import { CategoryPreferencesFixture } from "@dashboard/userPreferences/__fixtures__/CategoryNotificationPreferences.Fixture";
 import { mockAPI } from "@library/__tests__/utility";
 import MockAdapter from "axios-mock-adapter/types";
@@ -30,8 +29,8 @@ beforeEach(() => {
     vitest.resetAllMocks();
 });
 
-const renderInProvider = (preferences: ILegacyCategoryPreferences[] | IFollowedCategory[]) => {
-    return render(
+const renderInProvider = async (preferences: ILegacyCategoryPreferences[] | IFollowedCategory[]) => {
+    const result = render(
         <QueryClientProvider client={queryClient}>
             <DefaultCategoriesModal
                 initialValues={convertOldConfig(preferences)}
@@ -41,6 +40,10 @@ const renderInProvider = (preferences: ILegacyCategoryPreferences[] | IFollowedC
             />
         </QueryClientProvider>,
     );
+
+    await vitest.dynamicImportSettled();
+
+    return result;
 };
 
 describe("DefaultCategoriesModal", () => {
@@ -51,24 +54,18 @@ describe("DefaultCategoriesModal", () => {
     });
     it("renders empty table state", async () => {
         mockAdapter.onGet(/categories.outputFormat.+/).reply(200, []);
-        await act(async () => {
-            result = renderInProvider([]);
-        });
-        expect(await result.findByText("No categories selected.")).toBeInTheDocument();
+        result = await renderInProvider([]);
+        expect(result.getByText("No categories selected.")).toBeInTheDocument();
     });
     it("saved categories render in the table", async () => {
-        await act(async () => {
-            result = renderInProvider(CategoryPreferencesFixture.mockPreferenceConfig);
-        });
-        expect(await result.findByText("Mock Category 1")).toBeInTheDocument();
+        result = await renderInProvider(CategoryPreferencesFixture.mockPreferenceConfig);
+        expect(result.getByText("Mock Category 1")).toBeInTheDocument();
     });
     it("legacy saved categories render in the table", async () => {
-        await act(async () => {
-            result = renderInProvider(CategoryPreferencesFixture.mockLegacyConfigs);
-        });
-        expect(await result.findByText("Mock Category 1")).toBeInTheDocument();
-        expect(await result.findByText("Mock Category 2")).toBeInTheDocument();
-        expect(await result.findByText("Mock Category 3")).toBeInTheDocument();
+        result = await renderInProvider(CategoryPreferencesFixture.mockLegacyConfigs);
+        expect(result.getByText("Mock Category 1")).toBeInTheDocument();
+        expect(result.getByText("Mock Category 2")).toBeInTheDocument();
+        expect(result.getByText("Mock Category 3")).toBeInTheDocument();
     });
     it("category configurations are saved", async () => {
         const singleFollowedCategory = {
@@ -84,12 +81,10 @@ describe("DefaultCategoriesModal", () => {
          * Our current combobox is _very_ difficult to interact with within tests
          * Preloading a category and updating it instead
          */
-        await act(async () => {
-            result = renderInProvider([singleFollowedCategory]);
-        });
+        result = await renderInProvider([singleFollowedCategory]);
 
         // Ensure everything is loaded
-        vitest.waitFor(async () => expect(await result.findByText("Mock Category 2")).toBeInTheDocument());
+        await result.findByText("Mock Category 2");
 
         const form = await result.findByRole("form");
 
@@ -100,7 +95,7 @@ describe("DefaultCategoriesModal", () => {
         });
 
         // Click it, will mutate state
-        fireEvent.click(checkbox);
+        await userEvent.click(checkbox);
 
         // Save the changed configuration
         await act(async () => {
@@ -129,11 +124,9 @@ describe("DefaultCategoriesModal", () => {
                 "preferences.email.posts": true,
             },
         };
-        await act(async () => {
-            result = renderInProvider([singleFollowedCategory]);
-        });
+        result = await renderInProvider([singleFollowedCategory]);
         // Ensure everything is loaded
-        vitest.waitFor(async () => expect(await result.findByText("Mock Category 2")).toBeInTheDocument());
+        await result.findByText("Mock Category 2");
 
         const form = await result.findByRole("form");
         // Find the posts popup checkbox
@@ -161,11 +154,9 @@ describe("DefaultCategoriesModal", () => {
             },
         };
 
-        await act(async () => {
-            result = renderInProvider([singleFollowedCategory]);
-        });
+        result = await renderInProvider([singleFollowedCategory]);
         // Ensure everything is loaded
-        vitest.waitFor(async () => expect(await result.findByText("Mock Category 2")).toBeInTheDocument());
+        await result.findByText("Mock Category 2");
         // Find the posts popup checkbox
         const checkbox = await screen.findByRole("checkbox", {
             name: "Notification popup",

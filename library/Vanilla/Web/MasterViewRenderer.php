@@ -11,6 +11,7 @@ use Garden\EventManager;
 use Garden\Web\Data;
 use Twig\TwigFunction;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Models\IconModel;
 use Vanilla\FileUtils;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Theme\ThemePreloadProvider;
@@ -32,18 +33,6 @@ class MasterViewRenderer
 
     use TwigRenderTrait;
 
-    /** @var ThemePreloadProvider */
-    private $themePreloader;
-
-    /** @var SiteMeta */
-    private $siteMeta;
-
-    /** @var ConfigurationInterface */
-    private $config;
-
-    /** @var EventManager */
-    private $eventManager;
-
     /**
      * DI.
      *
@@ -53,15 +42,12 @@ class MasterViewRenderer
      * @param EventManager $eventManager
      */
     public function __construct(
-        ThemePreloadProvider $themePreloader,
-        SiteMeta $siteMeta,
-        ConfigurationInterface $config,
-        EventManager $eventManager
+        private ThemePreloadProvider $themePreloader,
+        private SiteMeta $siteMeta,
+        private ConfigurationInterface $config,
+        private EventManager $eventManager,
+        private IconModel $iconModel
     ) {
-        $this->themePreloader = $themePreloader;
-        $this->siteMeta = $siteMeta;
-        $this->config = $config;
-        $this->eventManager = $eventManager;
     }
 
     /**
@@ -75,6 +61,8 @@ class MasterViewRenderer
     public function renderPage(Page $page, array $viewData, $masterViewPath = self::MASTER_VIEW_PATH): string
     {
         $head = $page->getHead();
+
+        $head->addInlineScript($this->iconModel->getActiveIconScriptData());
 
         foreach ($this->getFontCssUrls() as $fontCssUrl) {
             $inlineContent = $head->getInlineStyleFromUrl($fontCssUrl);
@@ -119,6 +107,10 @@ class MasterViewRenderer
         $data["title"] = $data["Title"] ?? $this->siteMeta->getSiteTitle();
 
         $bodyHtmlKey = $controller->getIsReactView() ? "seoContent" : "bodyContent";
+
+        $controller->Head->addScript("", "", false, [
+            "content" => (string) $this->iconModel->getActiveIconScriptData(),
+        ]);
 
         foreach ($this->getFontCssUrls() as $fontCssUrl) {
             $modernPageHead = \Gdn::getContainer()->get(PageHead::class);
@@ -206,6 +198,7 @@ class MasterViewRenderer
             "themeFooter" => new \Twig\Markup($this->themePreloader->getThemeFooterHtml(), "utf-8"),
             "homePageTitle" => $this->config->get("Garden.HomepageTitle", ""),
             "isDirectionRTL" => $this->siteMeta->getDirectionRTL(),
+            "iconDefinitions" => new \Twig\Markup($this->iconModel->getActiveIconDefinitions(), "utf-8"),
         ];
     }
 

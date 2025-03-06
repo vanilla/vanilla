@@ -645,6 +645,7 @@ class Gdn_Form extends Gdn_Pluggable
 
         // This one is for react props
         $items = [];
+        $initialValue = "";
 
         if (is_array($safeCategoryData)) {
             foreach ($safeCategoryData as $categoryID => $category) {
@@ -667,7 +668,6 @@ class Gdn_Form extends Gdn_Pluggable
                 }
 
                 $return .= '<option value="' . $categoryID . '"';
-                $initialValue = "";
                 if ($disabled) {
                     $return .= ' disabled="disabled"';
                 } elseif ($selected) {
@@ -2619,7 +2619,7 @@ PASSWORDMETER;
             $value = implode($implodeGlue, $value);
         }
 
-        $return .= $multiLine === true ? ">" . htmlentities($value, ENT_COMPAT, "UTF-8") . "</textarea>" : " />";
+        $return .= $multiLine === true ? ">" . htmlentities($value ?? "", ENT_COMPAT, "UTF-8") . "</textarea>" : " />";
 
         // Append validation error message
         if ($showErrors) {
@@ -2662,7 +2662,7 @@ PASSWORDMETER;
     public function addError($error, $fieldName = "")
     {
         if (is_string($error)) {
-            $errorCode = htmlspecialchars($error);
+            $errorCode = htmlspecialchars($error, ENT_NOQUOTES);
         } elseif (is_a($error, "Exception")) {
             if (debug()) {
                 // Strip the extra information out of the exception.
@@ -3661,7 +3661,7 @@ PASSWORDMETER;
                     $return .=
                         " " .
                         $attribute .
-                        ($value === true ? "" : '="' . htmlspecialchars($value, ENT_COMPAT, "UTF-8") . '"');
+                        ($value === true ? "" : '="' . htmlspecialchars($value ?? "", ENT_COMPAT, "UTF-8") . '"');
                 }
             }
         }

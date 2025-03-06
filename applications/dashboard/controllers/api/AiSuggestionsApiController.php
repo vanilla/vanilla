@@ -68,7 +68,7 @@ class AiSuggestionsApiController extends \AbstractApiController
 
     protected \DiscussionModel $discussionModel;
 
-    /** @var CommentModel  */
+    /** @var CommentModel */
     private CommentModel $commentModel;
     protected AiSuggestionSourceService $suggestionSourceService;
 
@@ -121,10 +121,14 @@ class AiSuggestionsApiController extends \AbstractApiController
                 "enabled:b" => ["default" => false],
                 "name:s" => ["default" => ""],
                 "icon:s?",
-                "toneOfVoice:s" => ["enum" => self::TONES, "default" => self::TONE_FRIENDLY],
-                "levelOfTech:s" => ["enum" => self::LEVELS, "default" => self::LEVEL_LAYMAN],
+                "toneOfVoice:s?" => ["enum" => self::TONES, "default" => self::TONE_FRIENDLY],
+                "levelOfTech:s?" => ["enum" => self::LEVELS, "default" => self::LEVEL_LAYMAN],
                 "useBrEnglish:b?" => ["default" => false],
                 "sources?" => $this->suggestionSourceService->getSettingsSchema(),
+                "delay?" => [
+                    "unit:s" => ["default" => "hour", "enum" => ["hour", "day"]],
+                    "length:i" => ["default" => 0, "min" => 0, "max" => 99],
+                ],
             ],
             "out"
         );
@@ -159,10 +163,14 @@ class AiSuggestionsApiController extends \AbstractApiController
                 Schema::parse([
                     "name:s",
                     "icon:s?",
-                    "toneOfVoice:s" => ["enum" => self::TONES],
-                    "levelOfTech:s" => ["enum" => self::LEVELS],
+                    "toneOfVoice:s?" => ["enum" => self::TONES],
+                    "levelOfTech:s?" => ["enum" => self::LEVELS],
                     "useBrEnglish:b?" => ["default" => false],
                     "sources?" => $this->suggestionSourceService->getSettingsSchema(),
+                    "delay?" => [
+                        "unit:s" => ["default" => "hour", "enum" => ["hour", "day"]],
+                        "length:i" => ["default" => 0, "min" => 0, "max" => 99],
+                    ],
                 ])
             );
         }
@@ -176,7 +184,7 @@ class AiSuggestionsApiController extends \AbstractApiController
             $this->createOrUpdateAssistant($body);
         }
 
-        $settings = ArrayUtils::pluck($body, ["enabled", "sources"]);
+        $settings = ArrayUtils::pluck($body, ["enabled", "sources", "delay"]);
         foreach ($settings as $name => $setting) {
             if (isset($setting)) {
                 $this->config->saveToConfig("aiSuggestions.$name", $setting);
@@ -385,30 +393,6 @@ class AiSuggestionsApiController extends \AbstractApiController
             $body["suggestionIDs"]
         );
         return new Data(["removed" => $status]);
-    }
-
-    /**
-     * Handles the /ai-suggestions/generate endpoint.
-     *
-     * @param array $body
-     * @return mixed
-     */
-    public function put_generate(array $body)
-    {
-        $this->ensureSuggestionsEnabled();
-
-        $in = $this->schema(["discussionID:i"]);
-        $body = $in->validate($body);
-        $discussionID = $body["discussionID"];
-
-        $discussion = $this->discussionsApi->discussionByID($discussionID);
-        $this->checkPermission($discussion);
-        if (strtolower($discussion["Type"]) !== "question") {
-            throw new ClientException("Suggestions may only be generated on questions");
-        }
-        $this->suggestionSourceService->deleteSuggestions($discussionID);
-        $action = new LongRunnerAction(AiSuggestionSourceService::class, "generateSuggestions", [$discussionID, true]);
-        return $this->longRunner->runApi($action);
     }
 
     /**

@@ -139,6 +139,7 @@ class EscalationsApiController extends \AbstractApiController
     {
         $this->permission(["posts.moderate", "community.moderate"]);
         $escalation = $this->getEscalation($escalationID);
+
         return $escalation;
     }
 

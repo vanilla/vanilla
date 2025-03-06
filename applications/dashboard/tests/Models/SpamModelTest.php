@@ -8,6 +8,7 @@
 namespace Models;
 
 use Garden\EventManager;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 
 /**
@@ -15,6 +16,8 @@ use VanillaTests\SiteTestCase;
  */
 class SpamModelTest extends SiteTestCase
 {
+    use CommunityApiTestTrait;
+
     const EVENT_NAME = "base_checkSpam";
     /**
      * @var \LogModel
@@ -75,10 +78,140 @@ class SpamModelTest extends SiteTestCase
     }
 
     /**
+     * By default, a spam record should go to the spam queue.
+     */
+    public function testDefaultDiscussionSpam(): void
+    {
+        $discussion = $this->createDiscussion();
+        $id = $discussion["discussionID"];
+
+        $fn = function (\SpamModel $sender, $args) {
+            $sender->EventArguments["IsSpam"] = true;
+        };
+
+        $this->eventManager->bind(self::EVENT_NAME, $fn);
+
+        $isSpam = \SpamModel::isSpam("Discussion", [
+            "Name" => __FUNCTION__,
+            "Body" => __FUNCTION__,
+            "DiscussionID" => $id,
+        ]);
+        $this->assertTrue($isSpam);
+
+        $r = $this->logModel->getWhere(["Operation" => "Spam", "RecordType" => "Discussion", "RecordID" => $id]);
+        $this->assertCount(1, $r);
+
+        $row = $r[0];
+        $this->assertSame(\LogModel::TYPE_SPAM, $row["Operation"]);
+        $discussionModel = $this->container()->get(\DiscussionModel::class);
+        $dbRecord = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
+        $this->assertSame(false, $dbRecord);
+    }
+
+    /**
+     * By default, a spam record should go to the spam queue.
+     */
+    public function testDefaultSpamNotDeletedOnUpdate(): void
+    {
+        $discussion = $this->createDiscussion();
+        $id = $discussion["discussionID"];
+
+        $fn = function (\SpamModel $sender, $args) {
+            $sender->EventArguments["IsSpam"] = true;
+        };
+
+        $this->eventManager->bind(self::EVENT_NAME, $fn);
+
+        $isSpam = \SpamModel::isSpam(
+            "Discussion",
+            ["Name" => __FUNCTION__, "Body" => __FUNCTION__, "RecordID" => $id, "DiscussionID" => $id],
+            ["action" => "update"]
+        );
+        $this->assertTrue($isSpam);
+
+        $r = $this->logModel->getWhere(["Operation" => "Spam", "RecordType" => "Discussion", "RecordID" => $id]);
+        $this->assertCount(1, $r);
+
+        $row = $r[0];
+        $this->assertSame(\LogModel::TYPE_SPAM, $row["Operation"]);
+        $discussionModel = $this->container()->get(\DiscussionModel::class);
+        $dbRecord = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
+        // Discussion is not deleted on update.
+        $this->assertSame($id, $dbRecord["DiscussionID"]);
+    }
+
+    /**
+     * By default, a spam record should go to the spam queue.
+     */
+    public function testDefaultCommentSpam(): void
+    {
+        $this->createDiscussion();
+
+        $comment = $this->createComment();
+        $id = $comment["commentID"];
+
+        $fn = function (\SpamModel $sender, $args) {
+            $sender->EventArguments["IsSpam"] = true;
+        };
+
+        $this->eventManager->bind(self::EVENT_NAME, $fn);
+
+        $isSpam = \SpamModel::isSpam("Comment", [
+            "Name" => __FUNCTION__,
+            "Body" => __FUNCTION__,
+            "CommentID" => $id,
+        ]);
+        $this->assertTrue($isSpam);
+
+        $r = $this->logModel->getWhere(["Operation" => "Spam", "RecordType" => "Comment", "RecordID" => $id]);
+        $this->assertCount(1, $r);
+
+        $row = $r[0];
+        $this->assertSame(\LogModel::TYPE_SPAM, $row["Operation"]);
+        $commentModel = $this->container()->get(\CommentModel::class);
+        $dbRecord = $commentModel->getID($id, DATASET_TYPE_ARRAY);
+        $this->assertSame(false, $dbRecord);
+    }
+
+    /**
+     * By default, a spam record should go to the spam queue.
+     */
+    public function testDefaultSpamCommentNotDeletedOnUpdate(): void
+    {
+        $this->createDiscussion();
+        $comment = $this->createComment();
+        $id = $comment["commentID"];
+
+        $fn = function (\SpamModel $sender, $args) {
+            $sender->EventArguments["IsSpam"] = true;
+        };
+
+        $this->eventManager->bind(self::EVENT_NAME, $fn);
+
+        $isSpam = \SpamModel::isSpam(
+            "Comment",
+            ["Name" => __FUNCTION__, "Body" => __FUNCTION__, "RecordID" => $id, "CommentID" => $id],
+            ["action" => "update"]
+        );
+        $this->assertTrue($isSpam);
+
+        $r = $this->logModel->getWhere(["Operation" => "Spam", "RecordType" => "Comment", "RecordID" => $id]);
+        $this->assertCount(1, $r);
+
+        $row = $r[0];
+        $this->assertSame(\LogModel::TYPE_SPAM, $row["Operation"]);
+        $commentModel = $this->container()->get(\CommentModel::class);
+        $dbRecord = $commentModel->getID($id, DATASET_TYPE_ARRAY);
+        // Comment is not deleted on update.
+        $this->assertSame($id, $dbRecord["CommentID"]);
+    }
+
+    /**
      * Addons should be able to change the type of log to moderation.
      */
     public function testChangeLogOperation(): void
     {
+        $this->resetTable("Log");
         $fn = function (\SpamModel $sender, $args) {
             $sender->EventArguments["IsSpam"] = true;
             $sender->EventArguments["Options"]["Operation"] = \LogModel::TYPE_MODERATE;

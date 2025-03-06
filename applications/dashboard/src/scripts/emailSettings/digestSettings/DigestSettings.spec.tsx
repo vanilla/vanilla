@@ -1,22 +1,21 @@
 /**
  * @author Sooraj Francis <sfrancis@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React from "react";
 import { render, screen, act, fireEvent, within, RenderResult } from "@testing-library/react";
 import { DigestSettings } from "@dashboard/emailSettings/digestSettings/DigestSettings";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { TestDigestModalImpl } from "@dashboard/emailSettings/components/TestDigestModal";
 import { DigestScheduleImpl } from "@dashboard/emailSettings/components/DigestSchedule";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { setMeta } from "@library/utility/appUtils";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
 import { mockAPI } from "@library/__tests__/utility";
 import { LiveAnnouncer } from "react-aria-live";
 import MockAdapter from "axios-mock-adapter";
+import { IEmailDigestAdditionalSettingPosition } from "@dashboard/emailSettings/EmailSettings.types";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -31,83 +30,76 @@ beforeEach(() => {
     mockApi = mockAPI();
 });
 
+afterEach(() => {
+    mockApi.reset();
+    vitest.clearAllMocks();
+});
+
 const dummyData = {
     "emailDigest.enabled": true,
+    "emailDigest.autosubscribe.enabled": true,
     "emailDigest.imageEnabled": true,
     "emailDigest.postCount": 3,
     "emailDigest.dayOfWeek": 1,
-    "emailStyles.format": "html",
-    "emailStyles.image": "",
-    "emailStyles.textColor": "#663399",
-    "emailStyles.backgroundColor": "#8A2BE2",
-    "emailStyles.containerBackgroundColor": "#9400D3",
-    "emailStyles.buttonTextColor": "#9932CC",
-    "emailStyles.buttonBackgroundColor": "#8B008B",
-    "outgoingEmails.supportName": "Joe Support",
-    "outgoingEmails.supportAddress": "support@email.com",
-    "emailNotifications.disabled": false,
-    "emailNotifications.fullPost": true,
-    "outgoingEmails.footer": '[{"type":"p","children":[{"text":"footer content here"}]}]',
 };
+
+const defaultConfigKeysForLookup = [
+    "emailDigest.enabled",
+    "emailDigest.autosubscribe.enabled",
+    "emailDigest.optInTimeFrame",
+    "emailDigest.logo",
+    "emailDigest.dayOfWeek",
+    "emailDigest.postCount",
+    "emailDigest.metaOptions",
+    "emailDigest.imageEnabled",
+    "emailDigest.authorEnabled",
+    "emailDigest.viewCountEnabled",
+    "emailDigest.commentCountEnabled",
+    "emailDigest.scoreCountEnabled",
+    "emailDigest.title",
+    "emailDigest.includeCommunityName",
+    "emailDigest.introduction",
+    "emailDigest.footer",
+];
+
+async function renderInProvider(configKeysToLookup?: string[], configResponse?: any) {
+    mockApi.onGet(/users\/by-name/).reply(200, []);
+    mockApi.onGet(/digest\/delivery-dates.*/).reply(200, {});
+    mockApi.onGet("/config").reply(200, configResponse ?? dummyData);
+
+    return render(
+        <QueryClientProvider client={queryClient}>
+            <LiveAnnouncer>
+                <TestReduxProvider
+                    state={{
+                        config: {
+                            configsByLookupKey: {
+                                [stableObjectHash(configKeysToLookup ?? defaultConfigKeysForLookup)]: {
+                                    status: LoadStatus.SUCCESS,
+                                    data: configResponse ?? dummyData,
+                                },
+                            },
+                        },
+                    }}
+                >
+                    <DigestSettings />
+                </TestReduxProvider>
+            </LiveAnnouncer>
+        </QueryClientProvider>,
+    );
+}
 
 describe("DigestSettings", () => {
     let result: RenderResult;
 
     beforeEach(async () => {
-        mockApi.onGet(/users\/by-name/).reply(200, []);
-        mockApi.onGet(/digest\/delivery-dates.*/).reply(200, {});
-        result = render(
-            <QueryClientProvider client={queryClient}>
-                <LiveAnnouncer>
-                    <TestReduxProvider
-                        state={{
-                            config: {
-                                configsByLookupKey: {
-                                    [stableObjectHash([
-                                        "emailDigest.enabled",
-                                        "emailDigest.logo",
-                                        "emailDigest.dayOfWeek",
-                                        "emailDigest.postCount",
-                                        "emailDigest.metaOptions",
-                                        "emailDigest.imageEnabled",
-                                        "emailDigest.authorEnabled",
-                                        "emailDigest.viewCountEnabled",
-                                        "emailDigest.commentCountEnabled",
-                                        "emailDigest.scoreCountEnabled",
-                                        "emailDigest.title",
-                                        "emailDigest.includeCommunityName",
-                                        "emailDigest.introduction",
-                                        "emailDigest.footer",
-                                        "emailStyles.format",
-                                        "emailStyles.image",
-                                        "emailStyles.textColor",
-                                        "emailStyles.backgroundColor",
-                                        "emailStyles.containerBackgroundColor",
-                                        "emailStyles.buttonTextColor",
-                                        "emailStyles.buttonBackgroundColor",
-                                        "outgoingEmails.supportName",
-                                        "outgoingEmails.supportAddress",
-                                        "emailNotifications.disabled",
-                                        "emailNotifications.fullPost",
-                                        "outgoingEmails.footer",
-                                    ])]: {
-                                        status: LoadStatus.SUCCESS,
-                                        data: dummyData,
-                                    },
-                                },
-                            },
-                        }}
-                    >
-                        <DigestSettings />
-                    </TestReduxProvider>
-                </LiveAnnouncer>
-            </QueryClientProvider>,
-        );
+        result = await renderInProvider();
     });
 
     describe("Email digest section", () => {
         it("We have all expected fields in the form", async () => {
-            const deliveryDate = await result.findByText("Delivery Date");
+            await vi.dynamicImportSettled();
+            const deliveryDate = await result.findByText("Weekly Delivery Day");
             const numberOfPosts = await result.findByText("Number of posts");
             const subjectLineAndTitle = await result.findByText("Subject Line and Title");
             const introduction = await result.findByText("Introduction");
@@ -116,12 +108,10 @@ describe("DigestSettings", () => {
             [deliveryDate, numberOfPosts, subjectLineAndTitle, introduction, footer].forEach((field) => {
                 expect(field).toBeInTheDocument();
             });
-
-            const checkBoxes = await result.findAllByRole("checkbox");
-            expect(checkBoxes.length).toBe(7);
         });
 
         it("There is a dropdown button that opens Test Digest modal", async () => {
+            await vi.dynamicImportSettled();
             const digestOptionsDropdownButton = await result.findByRole("button", { name: "Email Digest Options" });
             expect(digestOptionsDropdownButton).toBeInTheDocument();
 
@@ -223,5 +213,36 @@ describe("TestDigestModal", () => {
         });
 
         expect(within(form).queryByText(/Not a valid email/)).not.toBeInTheDocument();
+    });
+});
+
+describe("DigestSettings with extra setting field", () => {
+    it("We have all expected fields in the form", async () => {
+        DigestSettings.addAdditionalSetting({
+            [IEmailDigestAdditionalSettingPosition.AFTER_POST_COUNT]: {
+                "emailDigest.myTestField": {
+                    type: "text",
+                    "x-control": {
+                        label: "Test Field Label",
+                        inputType: "textBox",
+                    },
+                },
+            },
+        });
+        const configKeysToLookup = [...defaultConfigKeysForLookup];
+        configKeysToLookup.splice(
+            configKeysToLookup.indexOf("emailDigest.postCount") + 1,
+            0,
+            "emailDigest.myTestField",
+        );
+
+        const result = await renderInProvider(configKeysToLookup, {
+            ...dummyData,
+            "emailDigest.myTestField": 5,
+        });
+
+        await vi.dynamicImportSettled();
+        const newSettingField = await result.findByText("Test Field Label");
+        expect(newSettingField).toBeInTheDocument();
     });
 });

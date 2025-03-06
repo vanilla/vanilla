@@ -62,7 +62,7 @@ export function AutomationRulesDeleteRule(props: IProps) {
                     buttonType={ButtonTypes.ICON_COMPACT}
                     disabled={isRuleRunning}
                 >
-                    <Icon icon={"data-trash"} />
+                    <Icon icon={"delete"} />
                 </Button>
             )}
             {!props.asActionButtonInTable && (

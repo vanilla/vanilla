@@ -685,8 +685,8 @@ class ProfileController extends Gdn_Controller
             // We build the redirect URL by substituting {TAGS} from the URL model.
             $urlReplacements = [
                 "userID" => $this->User->UserID, // just an int, no need to encode
-                "name" => rawurlencode($this->User->Name),
-                "ssoID" => rawurlencode($userSsoID),
+                "name" => rawurlencode($this->User->Name ?? ""),
+                "ssoID" => rawurlencode($userSsoID ?? ""),
             ];
             $newUrl = formatString($redirectUrl, $urlReplacements);
 

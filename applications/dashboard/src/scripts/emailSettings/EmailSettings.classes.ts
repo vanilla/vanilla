@@ -18,24 +18,15 @@ export const emailSettingsClasses = useThemeCache(() => {
         scrollMarginTop: 96,
     });
 
-    const metaGroupHeader = css({
-        fontWeight: 600,
-        paddingLeft: 18,
-    });
-
     const quickLinks = css({
         display: "flex",
         flexDirection: "column",
         color: ColorsUtils.colorOut(globalVariables().links.colors.default),
     });
 
-    const hidden = css({
-        display: "none",
-    });
-
     const uppercase = css({
         textTransform: "uppercase",
     });
 
-    return { root, section, metaGroupHeader, quickLinks, hidden, uppercase };
+    return { root, section, quickLinks, uppercase };
 });

@@ -9,6 +9,7 @@ namespace Vanilla\Dashboard\Models;
 
 use ArrayIterator;
 use Countable;
+use Traversable;
 use Vanilla\ArrayAccessTrait;
 use Vanilla\Models\UserFragmentSchema;
 
@@ -62,7 +63,7 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
     /**
      * @return array|mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->data;
     }
@@ -70,7 +71,7 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
     /**
      * @return ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->data);
     }
@@ -135,7 +136,7 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
     /**
      * Implement the \Countable interface.
      */
-    public function count()
+    public function count(): int
     {
         return count($this->data);
     }

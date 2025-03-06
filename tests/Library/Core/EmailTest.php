@@ -357,6 +357,39 @@ class EmailTest extends SiteTestCase
     }
 
     /**
+     * Test Gdn_Email::formatMessage() changes embedImage class names into inline styles.
+     *
+     * @return void
+     */
+    public function testApplyInlineStylesForEmbedImages()
+    {
+        $email = new Gdn_Email();
+        $email->setFormat("html");
+
+        $expectedEmbedImagesInlineStyle =
+            'style="height: auto; display: inline-flex; position: relative; margin-left: auto; margin-right: auto; max-width: 100%; max-height: 100%;"';
+        $expectedEmbedImageLinksInlineStyle = 'style="display: inline-flex; flex-direction: column;"';
+
+        $email->formatMessage('<div><span>Test discussion content</span><img class="embedImage-img" src="#"/></div>');
+        $formattedMessage = $email->getMailer()->getBodyContent();
+        $this->assertStringContainsString($expectedEmbedImagesInlineStyle, $formattedMessage);
+        $this->assertStringNotContainsString('class="embedImage-img"', $formattedMessage);
+
+        $email->formatMessage(
+            '<div><span>Test event content</span><img class="embedImage-img importedEmbed-img" src="#"/></div>'
+        );
+        $formattedMessage = $email->getMailer()->getBodyContent();
+        $this->assertStringContainsString($expectedEmbedImagesInlineStyle, $formattedMessage);
+        $this->assertStringNotContainsString('class="embedImage-img importedEmbed-img"', $formattedMessage);
+
+        $email->formatMessage('<div><span>Test image link content</span><img class="embedImage-link" src="#"/></div>');
+        $formattedMessage = $email->getMailer()->getBodyContent();
+        $this->assertStringContainsString($expectedEmbedImageLinksInlineStyle, $formattedMessage);
+        $this->assertStringNotContainsString($expectedEmbedImagesInlineStyle, $formattedMessage);
+        $this->assertStringNotContainsString('class="embedImage-link"', $formattedMessage);
+    }
+
+    /**
      * Test getting and setting the format.
      *
      * @return void

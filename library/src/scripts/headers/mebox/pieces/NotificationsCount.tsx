@@ -22,7 +22,7 @@ export default function NotificationsCount(props: IProps) {
 
     return (
         <MeBoxIcon count={count} countLabel={t("Notifications") + ": "} compact={compact}>
-            {open ? <Icon icon="me-notifications-solid" /> : <Icon icon={"me-notifications"} />}
+            {open ? <Icon icon="me-notifications-filled" /> : <Icon icon={"me-notifications-empty"} />}
         </MeBoxIcon>
     );
 }

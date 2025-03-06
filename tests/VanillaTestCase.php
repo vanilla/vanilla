@@ -197,12 +197,13 @@ class VanillaTestCase extends TestCase
         if ($rows instanceof \Gdn_DataSet) {
             $rows = $rows->resultArray();
         }
-        $rows = array_filter($rows, ArrayUtils::filterCallback($filter, false));
-        if (count($rows) === 1) {
-            return array_pop($rows);
+        $filteredRows = array_filter($rows, ArrayUtils::filterCallback($filter, false));
+        if (count($filteredRows) === 1) {
+            return array_pop($filteredRows);
         } else {
             $message = $message ?: "The array did not contain exactly one row matching the filter.";
-            $message .= " " . count($rows) . " found.";
+            $message .= " " . count($filteredRows) . " found.";
+            $message .= "Actual Rows: " . json_encode($rows, JSON_PRETTY_PRINT);
 
             TestCase::fail($message);
         }
@@ -337,7 +338,7 @@ class VanillaTestCase extends TestCase
      * @param bool $strictOrder Should the items be strictly ordered.
      * @param int|null $count The expected count of rows.
      */
-    protected static function assertRowsLike(
+    public static function assertRowsLike(
         array $expectedFields,
         array $actualRows,
         bool $strictOrder = true,
@@ -418,6 +419,11 @@ class VanillaTestCase extends TestCase
     public static function markForSparseComparision(array $arr): array
     {
         $arr[self::KEY_SPARSE_COMPARISON] = true;
+        foreach ($arr as $key => &$value) {
+            if (is_array($value) && ArrayUtils::isAssociative($value)) {
+                $value = self::markForSparseComparision($value);
+            }
+        }
         return $arr;
     }
 

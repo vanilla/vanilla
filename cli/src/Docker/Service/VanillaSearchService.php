@@ -10,7 +10,7 @@ namespace Vanilla\Cli\Docker\Service;
 use Webmozart\PathUtil\Path;
 
 /**
- * Service for search.vanilla.localhost
+ * Service for search.vanilla.local
  */
 class VanillaSearchService extends AbstractLaravelService
 {
@@ -38,7 +38,7 @@ class VanillaSearchService extends AbstractLaravelService
 
     function getHostname(): string
     {
-        return "search.vanilla.localhost";
+        return "search.vanilla.local";
     }
 
     function getContainerName(): string
@@ -50,7 +50,7 @@ class VanillaSearchService extends AbstractLaravelService
     {
         return [
             "ElasticDev.Secret" => "localhostsecret",
-            "Inf.SearchApi.URL" => "http://search.vanilla.localhost",
+            "Inf.SearchApi.URL" => "http://search.vanilla.local",
             "EnabledPlugins.ElasticSearch" => true,
         ];
     }

@@ -219,7 +219,9 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const vars = homeWidgetContainerVariables(optionOverrides);
     const navLinkVars = navLinksVariables();
 
-    const fgColor = ColorsUtils.colorOut(globalVars.getFgForBg(vars.options.outerBackground!.color));
+    const fgColor = vars.options.outerBackground?.color
+        ? ColorsUtils.colorOut(globalVars.getFgForBg(vars.options.outerBackground.color))
+        : "inherit";
     const hasSeparatorAndOuterBackground =
         vars.options.borderType === BorderType.SEPARATOR &&
         Variables.boxHasBackground(Variables.box({ background: vars.options.outerBackground }));

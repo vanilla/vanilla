@@ -41,15 +41,15 @@ class SchemaFilters
         if ($value === null || $value === "") {
             $value = null;
         } elseif (is_string($value)) {
-            $value = json_decode($value, true);
-            if ($value === null) {
+            $decodedValue = json_decode($value, true);
+            if (is_null($decodedValue)) {
                 try {
                     $value = unserialize($value);
-                    // @codeCoverageIgnoreStart
                 } catch (\Exception $e) {
                     $value = null;
-                    // @codeCoverageIgnoreEnd
                 }
+            } else {
+                $value = $decodedValue;
             }
         }
 

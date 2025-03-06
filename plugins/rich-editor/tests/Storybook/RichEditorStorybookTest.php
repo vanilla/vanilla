@@ -29,6 +29,7 @@ class RichEditorStorybookTest extends StorybookGenerationTestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
+        self::disableFeature("customLayout.createPost");
         self::container()
             ->rule(EmbedService::class)
             ->addCall("addCoreEmbeds");

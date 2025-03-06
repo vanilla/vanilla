@@ -168,19 +168,19 @@ const MOCK_CATEGORY_SEARCH = [
         breadcrumbs: [
             {
                 name: "Home",
-                url: "https://dev.vanilla.localhost/",
+                url: "https://dev.vanilla.local/",
             },
             {
                 name: "Crochet",
-                url: "https://dev.vanilla.localhost/categories/crochet",
+                url: "https://dev.vanilla.local/categories/crochet",
             },
             {
                 name: "Tunisian",
-                url: "https://dev.vanilla.localhost/categories/tunisian",
+                url: "https://dev.vanilla.local/categories/tunisian",
             },
             {
                 name: "Beginner",
-                url: "https://dev.vanilla.localhost/categories/tunisian-beginner",
+                url: "https://dev.vanilla.local/categories/tunisian-beginner",
             },
         ],
     },
@@ -192,19 +192,19 @@ const MOCK_CATEGORY_SEARCH = [
         breadcrumbs: [
             {
                 name: "Home",
-                url: "https://dev.vanilla.localhost/",
+                url: "https://dev.vanilla.local/",
             },
             {
                 name: "Crochet",
-                url: "https://dev.vanilla.localhost/categories/crochet",
+                url: "https://dev.vanilla.local/categories/crochet",
             },
             {
                 name: "Traditional",
-                url: "https://dev.vanilla.localhost/categories/traditional",
+                url: "https://dev.vanilla.local/categories/traditional",
             },
             {
                 name: "Beginner",
-                url: "https://dev.vanilla.localhost/categories/traditional-beginner",
+                url: "https://dev.vanilla.local/categories/traditional-beginner",
             },
         ],
     },

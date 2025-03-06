@@ -40,7 +40,6 @@ import {
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_H4, ELEMENT_H5, ELEMENT_H6 } from "@udecode/plate-heading";
 import { ELEMENT_LINK } from "@udecode/plate-link";
 import { ELEMENT_LI, ELEMENT_LIC, ELEMENT_OL, ELEMENT_UL } from "@udecode/plate-list";
-import { ELEMENT_IMAGE } from "@udecode/plate-media";
 import { ELEMENT_MENTION_INPUT } from "@udecode/plate-mention";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { ELEMENT_TABLE, ELEMENT_TD, ELEMENT_TH, ELEMENT_TR } from "@udecode/plate-table";
@@ -50,6 +49,8 @@ import debounce from "lodash-es/debounce";
 import "prismjs/components/prism-php";
 import React, { ElementType, useCallback, useEffect } from "react";
 import { Node } from "slate";
+
+export const ELEMENT_IMAGE = "img";
 
 type HLJS = typeof import("@library/content/highlightJs").default;
 
@@ -165,7 +166,7 @@ const SpoilerElement = (props: PlateRenderElementProps<any, TCodeBlockElement>) 
                 <button className="iconButton button-spoiler" disabled>
                     <span className="spoiler-warning">
                         <span className="spoiler-warningMain">
-                            <Icon icon="editor-eye-slash" className="spoiler-icon" />
+                            <Icon icon="hide-content" className="spoiler-icon" />
                             <span className="spoiler-warningLabel">{t("Spoiler Warning")}</span>
                         </span>
                     </span>

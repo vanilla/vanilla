@@ -11,6 +11,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n";
 import React, { useEffect, useRef } from "react";
+import { getMeta } from "@library/utility/appUtils";
 
 function ToastContent() {
     const root = css({
@@ -42,8 +43,11 @@ export function useEmailConfirmationToast() {
     const currentUser = useCurrentUser();
     const isGuest = currentUser?.userID === 0;
 
+    // Do we require email confirmation?
+    const requireConfirmEmail = getMeta("isConfirmEmailRequired");
+
     useEffect(() => {
-        if (currentUser && !isGuest) {
+        if (currentUser && requireConfirmEmail && !isGuest) {
             if (!currentUser.emailConfirmed) {
                 addToast({
                     body: <ToastContent />,

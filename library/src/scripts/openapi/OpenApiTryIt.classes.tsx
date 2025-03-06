@@ -21,6 +21,18 @@ export const openApiTryItClasses = {
         flex: "1",
         minHeight: 0,
     }),
+    uploadedFileName: css({
+        display: "block",
+    }),
+    uploadWrap: css({
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+    }),
+    uploadButton: css({
+        width: "100%",
+        maxWidth: 300,
+    }),
     emptyFormSection: css({
         paddingTop: 12,
         paddingBottom: 12,
@@ -52,6 +64,9 @@ export const openApiTryItClasses = {
         "& th": {
             paddingLeft: 8,
         },
+    }),
+    jsonError: css({
+        marginBottom: 12,
     }),
     header: css({
         position: "sticky",

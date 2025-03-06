@@ -34,7 +34,7 @@ export function EscalationMetas(props: IProps) {
             <MetaIcon icon="meta-time" aria-label="Date Updated">
                 <DateTime timestamp={escalation.dateInserted} />
             </MetaIcon>
-            <MetaIcon icon="meta-comment" aria-label="Count Comments">
+            <MetaIcon icon="meta-comments" aria-label="Count Comments">
                 {escalation.countComments}
             </MetaIcon>
             <MetaLink to={escalation.placeRecordUrl}>{escalation.placeRecordName}</MetaLink>

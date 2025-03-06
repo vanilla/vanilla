@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Models;
 
+use AiSuggestionJob;
 use DiscussionModel;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
@@ -20,6 +21,7 @@ use VanillaTests\ExpectedNotification;
 use VanillaTests\Fixtures\OpenAI\MockOpenAIClient;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\NotificationsApiTestTrait;
+use VanillaTests\SchedulerTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -32,6 +34,7 @@ class AISuggestionModelTest extends SiteTestCase
     use UsersAndRolesApiTestTrait;
     use NotificationsApiTestTrait;
     use AiSuggestionsTestTrait;
+    use SchedulerTestTrait;
 
     public static $addons = ["qna"];
 
@@ -88,6 +91,8 @@ class AISuggestionModelTest extends SiteTestCase
     {
         $discussion = $this->createDiscussion(["type" => "question"]);
 
+        $this->getScheduler()->addJob(AiSuggestionJob::class);
+
         $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
         $this->assertCount(3, $suggestions);
         $this->assertArraySubsetRecursive(
@@ -129,6 +134,8 @@ class AISuggestionModelTest extends SiteTestCase
     public function testRemoveAcceptedSuggestions()
     {
         $discussion = $this->createDiscussion(["type" => "question"]);
+
+        $this->getScheduler()->addJob(AiSuggestionJob::class);
 
         $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
         $this->assertCount(3, $suggestions);
@@ -184,6 +191,8 @@ class AISuggestionModelTest extends SiteTestCase
     public function testRemoveAllAcceptedSuggestions()
     {
         $discussion = $this->createDiscussion(["type" => "question"]);
+
+        $this->getScheduler()->addJob(AiSuggestionJob::class);
 
         $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
         $this->assertCount(3, $suggestions);
@@ -273,6 +282,9 @@ class AISuggestionModelTest extends SiteTestCase
         $discussion = $this->createDiscussion(["type" => "question"]);
 
         $newDiscussion = $this->discussionModel->getID($discussion["discussionID"], DATASET_TYPE_ARRAY);
+
+        $this->getScheduler()->addJob(AiSuggestionJob::class);
+
         $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"], null);
 
         // Test that suggestions are not hidden by default
@@ -320,6 +332,9 @@ class AISuggestionModelTest extends SiteTestCase
         $user = $this->createUser();
         $this->runWithUser(function () {
             $discussion = $this->createDiscussion(["type" => "question"]);
+
+            $this->getScheduler()->addJob(AiSuggestionJob::class);
+
             $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"], null);
             $this->assertCount(3, $suggestions);
         }, $user);

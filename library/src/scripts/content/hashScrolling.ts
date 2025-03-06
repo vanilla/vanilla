@@ -25,6 +25,7 @@ export function useHashScrolling(content: string, disabled?: boolean) {
         }
         void initAllUserContent().then(() => {
             initHashScrolling(calcedOffset, () => temporarilyDisabledWatching(500));
+            scrollToCurrentHash(calcedOffset);
         });
     }, [calcedOffset, temporarilyDisabledWatching, disabled, content]);
 }

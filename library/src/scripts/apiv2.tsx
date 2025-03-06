@@ -12,7 +12,7 @@ import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from "axios";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
 import { humanFileSize } from "@library/utility/fileUtils";
-import { IApiError, IFieldError } from "@library/@types/api/core";
+import { IApiError, IFieldError, IServerError } from "@library/@types/api/core";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ApiContext } from "@vanilla/ui";
 import { LongRunnerClient } from "@library/LongRunnerClient";
@@ -81,7 +81,7 @@ export function extractJsonErrorFromCFHtmlString(body: string): IError | null {
  * - Hoists up response body errors.
  * - Parsed cloudflare html type errors.
  */
-function customErrorHandler(error: AxiosError) {
+function customErrorHandler(error: IApiError) {
     const data = error.response?.data || "";
 
     if (typeof data === "object" && data.message) {
@@ -104,7 +104,9 @@ function customErrorHandler(error: AxiosError) {
         // we have an HTML error.
 
         const htmlResponse = error.response.data || "";
-        const newError = extractJsonErrorFromCFHtmlString(htmlResponse);
+        const newError = extractJsonErrorFromCFHtmlString(
+            typeof htmlResponse === "string" ? htmlResponse : `${htmlResponse}`,
+        );
         if (newError) {
             return Promise.reject(newError);
         }

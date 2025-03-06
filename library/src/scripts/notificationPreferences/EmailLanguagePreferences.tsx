@@ -96,7 +96,7 @@ export function EmailLanguagePreferencesImpl(props: {
                     FormControl={FormControl}
                     FormControlGroup={FormControlGroup}
                     onChange={async (values) => {
-                        setValues(values);
+                        await setValues(values);
                         await submitForm();
                     }}
                 />

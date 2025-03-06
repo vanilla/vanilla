@@ -19,6 +19,7 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Dashboard\AiSuggestionsTestTrait;
 use VanillaTests\Fixtures\OpenAI\MockOpenAIClient;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\SchedulerTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
 class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
@@ -26,6 +27,7 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
     use AiSuggestionsTestTrait;
+    use SchedulerTestTrait;
 
     const VALID_SETTINGS = [
         "enabled" => true,
@@ -39,6 +41,10 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
                 "enabled" => true,
                 "exclusionIDs" => [1, 2, 3],
             ],
+        ],
+        "delay" => [
+            "unit" => "hour",
+            "length" => 0,
         ],
     ];
 
@@ -54,9 +60,8 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
     {
         parent::setUp();
         self::enableFeature("AISuggestions");
-        self::enableFeature("aiFeatures");
         \Gdn::config()->saveToConfig("VanillaAnalytics.AnonymizeData", false);
-        self::enableFeature("customLayout.discussionThread");
+        self::enableFeature("customLayout.post");
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->aiSuggestionModel = $this->container()->get(AiSuggestionModel::class);
         $this->clearSettings();
@@ -283,6 +288,8 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $this->setupConfigs();
         $discussion = $this->createDiscussion(["type" => "question"]);
 
+        $this->getScheduler()->addJob(\AiSuggestionJob::class);
+
         $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
         $this->assertCount(3, $suggestions);
         $this->assertArraySubsetRecursive(
@@ -331,6 +338,8 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
             \Gdn::userMetaModel()->setUserMeta($user["userID"], UserMetaModel::ANONYMIZE_DATA_USER_META, -1);
             $this->runWithUser(function () {
                 $discussion = $this->createDiscussion(["type" => "question"]);
+
+                $this->getScheduler()->addJob(\AiSuggestionJob::class);
 
                 $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
                 $this->assertCount(3, $suggestions);
@@ -409,6 +418,8 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $this->setupConfigs();
 
         $discussion = $this->createDiscussion(["type" => "question"]);
+
+        $this->getScheduler()->addJob(\AiSuggestionJob::class);
 
         $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussion["discussionID"]);
         $this->assertCount(3, $suggestions);
@@ -655,6 +666,9 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
     {
         // Quick test that suggestions are generated when the question is first posted.
         $discussionID = $this->createDiscussion(["type" => "question"])["discussionID"];
+
+        $this->getScheduler()->addJob(\AiSuggestionJob::class);
+
         $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussionID);
         $this->assertNotEmpty($suggestions);
         $this->assertSame("mockSuggestion", $suggestions[0]["type"]);
@@ -666,10 +680,8 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
         $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
         $this->assertNull($discussion["Attributes"]);
 
-        // Now call generate endpoint and check that suggestions are regenerated.
-        $response = $this->api()->put("/ai-suggestions/generate", ["discussionID" => $discussionID]);
-        $this->assertTrue($response->isSuccessful());
-        $this->assertContains("mockSuggestion", $response->getBody()["progress"]["successIDs"]);
+        // Now call the job and check that suggestions are regenerated.
+        $this->getScheduler()->addJob(\AiSuggestionJob::class);
         $suggestions = $this->aiSuggestionModel->getByDiscussionID($discussionID);
         $this->assertNotEmpty($suggestions);
         $this->assertSame("mockSuggestion", $suggestions[0]["type"]);

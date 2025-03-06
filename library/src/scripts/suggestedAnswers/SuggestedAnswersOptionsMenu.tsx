@@ -47,7 +47,7 @@ export function SuggestedAnswersOptionsMenu(props: IProps) {
         setMenuVisible(false);
         try {
             await restoreSuggestions();
-            onMutateSuccess?.();
+            await onMutateSuccess?.();
         } catch (err) {
             toastError(err);
         }
@@ -57,7 +57,7 @@ export function SuggestedAnswersOptionsMenu(props: IProps) {
         setMenuVisible(false);
         try {
             await acceptSuggestions({ suggestion: "all", accept: true });
-            onMutateSuccess?.();
+            await onMutateSuccess?.();
         } catch (err) {
             toastError(err);
         }
@@ -92,7 +92,7 @@ export function SuggestedAnswersOptionsMenu(props: IProps) {
         <>
             <DropDown
                 name={t("Suggested Answers Options")}
-                buttonContents={<Icon icon="navigation-circle-ellipsis" />}
+                buttonContents={<Icon icon="options-menu" />}
                 openDirection={DropDownOpenDirection.BELOW_LEFT}
                 flyoutType={FlyoutType.LIST}
                 isVisible={menuVisible}

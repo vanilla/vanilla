@@ -3,13 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { placesSearchListingClasses } from "@library/search/placesSearchListing.styles";
-import { TypeQuestionIcon } from "@library/icons/searchIcons";
 import { buttonUtilityClasses } from "@library/forms/Button.styles";
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
 import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
+import { Icon } from "@vanilla/icons";
 
 export interface IPlacesSearchListingItem {
     name: string;
@@ -29,7 +28,7 @@ export function PlacesSearchListingItem(props: IPlacesSearchListingItem) {
     const icon = type ? (
         PLACES_SEARCH_DOMAIN.subTypes.find((subType) => subType.type === type)?.icon
     ) : (
-        <TypeQuestionIcon />
+        <Icon icon={"search-questions"} />
     );
 
     const classes = placesSearchListingClasses();

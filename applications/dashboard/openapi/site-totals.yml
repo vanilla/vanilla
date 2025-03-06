@@ -24,7 +24,7 @@ paths:
 components:
     parameters:
         SiteTotalsCounts:
-            name: counts[]
+            name: counts
             description: Choose the site counts you want by choosing one or more valid field names. Choosing "all" will return all available counts.
             in: query
             schema:

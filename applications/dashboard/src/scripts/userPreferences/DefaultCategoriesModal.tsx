@@ -211,7 +211,7 @@ export default function DefaultCategoriesModal(props: IProps) {
                                 className={overrides}
                                 preferences={category.preferences}
                                 onPreferenceChange={async (change) => {
-                                    setFieldValue(`followedCategories.${index}.preferences`, {
+                                    void setFieldValue(`followedCategories.${index}.preferences`, {
                                         ...category.preferences,
                                         ...change,
                                     });
@@ -227,7 +227,7 @@ export default function DefaultCategoriesModal(props: IProps) {
                             <Button
                                 buttonType={ButtonTypes.ICON}
                                 onClick={() => {
-                                    setValues(({ followedCategories }) => ({
+                                    void setValues(({ followedCategories }) => ({
                                         followedCategories: followedCategories.filter((_, i) => i !== index),
                                     }));
                                 }}
@@ -235,7 +235,7 @@ export default function DefaultCategoriesModal(props: IProps) {
                                 role="button"
                                 title={t("Remove Category")}
                             >
-                                <Icon icon="data-trash" />
+                                <Icon icon="delete" />
                             </Button>
                         </ToolTip>
                     ),
@@ -336,7 +336,7 @@ export default function DefaultCategoriesModal(props: IProps) {
                                         }
                                         disabled={missingCategoriesLoading && missingCategoriesFetchStatus !== "idle"}
                                         onChange={(categoryID) => {
-                                            setValues(({ followedCategories }) => {
+                                            void setValues(({ followedCategories }) => {
                                                 return {
                                                     followedCategories: followedCategories.concat([
                                                         {

@@ -44,10 +44,7 @@ class HomePageController extends PageDispatchController
             $siteSection->getSectionID() !== DefaultSiteSection::DEFAULT_ID ? "subcommunityHome" : "home",
             "siteSection",
             (string) $siteSection->getSectionID(),
-            [
-                "siteSectionID" => (string) $siteSection->getSectionID(),
-                "locale" => $siteSection->getContentLocale(),
-            ]
+            []
         );
 
         return $this->usePage(LayoutPage::class)

@@ -4,31 +4,28 @@
  * @license Proprietary
  */
 
-import AdminLayout from "@dashboard/components/AdminLayout";
-import { ModerationNav } from "@dashboard/components/navigation/ModerationNav";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { ModerationAdminLayout } from "@dashboard/components/navigation/ModerationAdminLayout";
+import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
+import { EmptyState } from "@dashboard/moderation/components/EmptyState";
+import { EscalateModal } from "@dashboard/moderation/components/EscalateModal";
+import { IMessageInfo, MessageAuthorModal } from "@dashboard/moderation/components/MessageAuthorModal";
+import { ITriageFilters, TriageFilters } from "@dashboard/moderation/components/TriageFilters";
+import { TriageInternalStatus } from "@dashboard/moderation/components/TriageFilters.constants";
 import { TriageListItem } from "@dashboard/moderation/components/TriageListItem";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
+import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import Loader from "@library/loaders/Loader";
+import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import { useQueryStringSync } from "@library/routing/QueryString";
+import { useQueryParam, useQueryParamPage } from "@library/routing/routingUtils";
+import { ISort, Sort } from "@library/sort/Sort";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
-import { ITriageFilters, TriageFilters } from "@dashboard/moderation/components/TriageFilters";
 import { useState } from "react";
-import { TriageInternalStatus } from "@dashboard/moderation/components/TriageFilters.constants";
-import { ISort, Sort } from "@library/sort/Sort";
-import { useQueryParam, useQueryParamPage } from "@library/routing/routingUtils";
-import { useQueryStringSync } from "@library/routing/QueryString";
-import Loader from "@library/loaders/Loader";
-import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
-import { EscalateModal } from "@dashboard/moderation/components/EscalateModal";
-import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
-import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
-import { useCollisionDetector } from "@vanilla/react-utils";
-import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { EmptyState } from "@dashboard/moderation/components/EmptyState";
-import { IMessageInfo, MessageAuthorModal } from "@dashboard/moderation/components/MessageAuthorModal";
-import { IDiscussion } from "@dashboard/@types/api/discussion";
-import DocumentTitle from "@library/routing/DocumentTitle";
 
 interface IProps {}
 
@@ -55,9 +52,6 @@ function TriagePage(props: IProps) {
     const cmdClasses = communityManagementPageClasses();
     const [recordToEscalate, setRecordToEscalate] = useState<IDiscussion | null>(null);
 
-    const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
     const [selectedSort, setSelectedSort] = useState<ISelectBoxItem>();
     const [authorMessage, setAuthorMessage] = useState<IMessageInfo | null>(null);
 
@@ -114,31 +108,30 @@ function TriagePage(props: IProps) {
     return (
         <>
             <DocumentTitle title={t("Triage")} />
-            <AdminLayout
+            <ModerationAdminLayout
                 title={t("Triage Dashboard")}
-                leftPanel={!isCompact && <ModerationNav />}
+                secondaryBar={
+                    <>
+                        <Sort
+                            sortOptions={sortOptions}
+                            selectedSort={selectedSort}
+                            onChange={(sort) => {
+                                setSelectedSort(sort);
+                                if (page !== 1) setPage(1);
+                            }}
+                        />
+                        <NumberedPager
+                            className={cmdClasses.pager}
+                            isMobile={false}
+                            showNextButton={false}
+                            onChange={setPage}
+                            {...paginationProps}
+                        />
+                    </>
+                }
                 rightPanel={<TriageFilters value={filters} onFilter={(newFilters) => handleFilterSet(newFilters)} />}
                 content={
                     <>
-                        <section className={cmdClasses.secondaryTitleBar}>
-                            <span>
-                                <Sort
-                                    sortOptions={sortOptions}
-                                    selectedSort={selectedSort}
-                                    onChange={(sort) => {
-                                        setSelectedSort(sort);
-                                        if (page !== 1) setPage(1);
-                                    }}
-                                />
-                            </span>
-                            <NumberedPager
-                                className={cmdClasses.pager}
-                                isMobile={false}
-                                showNextButton={false}
-                                onChange={setPage}
-                                {...paginationProps}
-                            />
-                        </section>
                         <section className={cmdClasses.content}>
                             {triageQuery.isLoading && (
                                 <div>
@@ -163,16 +156,19 @@ function TriagePage(props: IProps) {
                                 </div>
                             )}
                         </section>
-                        <EscalateModal
-                            escalationType={"record"}
-                            report={null}
-                            recordType={recordToEscalate?.type}
-                            record={recordToEscalate ?? null}
-                            isVisible={!!recordToEscalate}
-                            onClose={() => {
-                                setRecordToEscalate(null);
-                            }}
-                        />
+                        {recordToEscalate && (
+                            <EscalateModal
+                                escalationType={"record"}
+                                report={null}
+                                recordType={"discussion"}
+                                recordID={recordToEscalate.discussionID}
+                                record={recordToEscalate ?? null}
+                                isVisible={!!recordToEscalate}
+                                onClose={() => {
+                                    setRecordToEscalate(null);
+                                }}
+                            />
+                        )}
                         <MessageAuthorModal
                             messageInfo={authorMessage}
                             isVisible={!!authorMessage}

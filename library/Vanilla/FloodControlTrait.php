@@ -7,7 +7,9 @@
 
 namespace Vanilla;
 
+use Gdn;
 use Psr\SimpleCache\CacheInterface;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Utility methods for models that want to implement flood control.
@@ -44,6 +46,47 @@ trait FloodControlTrait
      * @var string Key name, in the {@link CacheInterface}, of the last flood check. Args:[__CLASS__, '$userID'].
      */
     private $keyLastDateChecked;
+
+    /**
+     * Whether admins should be skipped in the flood control checks.
+     *
+     * @var bool
+     */
+    private $skipAdmins = true;
+
+    /**
+     * Force the flood control to be true for testing.
+     *
+     * @var bool
+     */
+    private $forceEnabled = false;
+
+    public function setForceEnabled(bool $forceEnabled): void
+    {
+        $this->forceEnabled = $forceEnabled;
+    }
+
+    /**
+     * Get the skipAdmins value.
+     *
+     * @return bool
+     */
+    public function getSkipAdmins(): bool
+    {
+        return $this->skipAdmins;
+    }
+
+    /**
+     * Set the skipAdmins value.
+     *
+     * @param bool $skipAdmins
+     * @return $this
+     */
+    public function setSkipAdmins(bool $skipAdmins): self
+    {
+        $this->skipAdmins = $skipAdmins;
+        return $this;
+    }
 
     /**
      * @return int
@@ -166,6 +209,19 @@ trait FloodControlTrait
      */
     public function isFloodControlEnabled()
     {
+        $session = Gdn::session();
+        if (!$session->isValid()) {
+            $this->setFloodControlEnabled(false);
+        } elseif (
+            $this->skipAdmins &&
+            ($session->User->Admin || $session->checkPermission("Garden.Moderation.Manage"))
+        ) {
+            $this->setFloodControlEnabled(false);
+        } elseif (DebugUtils::isTestMode() && !$this->forceEnabled) {
+            // Here too
+            $this->setFloodControlEnabled(false);
+        }
+
         return $this->floodControlEnabled;
     }
 
@@ -199,7 +255,7 @@ trait FloodControlTrait
 
         $isSpamming = false;
         $countSpamCheck = $storageObject->get($userPostCountKey, 0);
-        $dateSpamCheck = $storageObject->get($userLastDateCheckedKey, null);
+        $dateSpamCheck = $storageObject->get($userLastDateCheckedKey, "0");
         $secondsSinceSpamCheck = time() - (int) strtotime($dateSpamCheck);
 
         // Apply a spam lock if necessary

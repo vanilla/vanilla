@@ -37,7 +37,7 @@ export function SuggestedAnswerItem(props: ISuggestedAnswer) {
                 suggestion: props.aiSuggestionID,
                 accept: true,
             });
-            onMutateSuccess?.();
+            await onMutateSuccess?.();
         } catch (err) {
             toastError(err);
             setDisableButtons(false);
@@ -49,7 +49,7 @@ export function SuggestedAnswerItem(props: ISuggestedAnswer) {
 
         try {
             await dismissAnswer(props.aiSuggestionID);
-            onMutateSuccess?.();
+            await onMutateSuccess?.();
         } catch (err) {
             toastError(err);
             setDisableButtons(false);
@@ -79,7 +79,7 @@ export function SuggestedAnswerItem(props: ISuggestedAnswer) {
                     onClick={handleDismissAnswer}
                     disabled={disableButtons}
                 >
-                    <Icon icon="search-close" size="compact" />
+                    <Icon icon="dismiss-compact" size="compact" />
                     <ScreenReaderContent>{t("Dismiss Answer")}</ScreenReaderContent>
                 </Button>
             </ToolTip>
@@ -88,7 +88,7 @@ export function SuggestedAnswerItem(props: ISuggestedAnswer) {
 }
 
 export function SuggestedAnswerContent(props: ISuggestedAnswer & { className?: string }) {
-    const { sourceIcon = "search-discussion", title, summary, url, type, className } = props;
+    const { sourceIcon = "meta-discussions", title, summary, url, type, className } = props;
     const classes = suggestedAnswersClasses();
 
     return (

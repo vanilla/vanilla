@@ -127,8 +127,7 @@ export function EscalationActions(props: IProps) {
                                 >
                                     <IntegrationButtonAndModal
                                         onSuccess={() => {
-                                            queryClient.invalidateQueries(["escalations"]);
-                                            return Promise.resolve();
+                                            return queryClient.invalidateQueries(["escalations"]);
                                         }}
                                     />
                                 </WriteableIntegrationContextProvider>

@@ -23,6 +23,7 @@ use Vanilla\Dashboard\AutomationRules\EscalationRuleService;
 use Vanilla\Dashboard\AutomationRules\Triggers\ProfileFieldSelectionTrigger;
 use Vanilla\Dashboard\AutomationRules\Triggers\TimeSinceUserRegistrationTrigger;
 use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
+use Vanilla\Dashboard\Controllers\Api\GpcApiController;
 use Vanilla\Dashboard\Models\AttachmentService;
 use Vanilla\Forum\Controllers\Pages\AdminContentPageController;
 use Vanilla\AutomationRules\Actions\AddDiscussionToCollectionAction;
@@ -39,18 +40,19 @@ use Vanilla\Dashboard\AutomationRules\AutomationRuleService;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Forum\Controllers\Pages\CategoryListPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
-use Vanilla\Forum\Controllers\Pages\DiscussionThreadPageController;
-use Vanilla\Forum\Controllers\Pages\PostController;
+use Vanilla\Forum\Controllers\Pages\DiscussionPageController;
+use Vanilla\Forum\Controllers\Pages\CreatePostPageController;
 use Vanilla\Forum\Controllers\Pages\UnsubscribePageController;
 use Vanilla\Forum\Controllers\Pages\ConvertHTMLPageController;
 use Vanilla\Forum\Layout\View\CategoryListLayoutView;
 use Vanilla\Forum\Layout\View\DiscussionCategoryPageLayoutView;
 use Vanilla\Forum\Layout\View\LegacyCategoryListLayoutView;
 use Vanilla\Forum\Layout\View\DiscussionListLayoutView;
-use Vanilla\Forum\Layout\View\DiscussionThreadLayoutView;
+use Vanilla\Forum\Layout\View\DiscussionLayoutView;
 use Vanilla\Forum\Layout\View\LegacyNewDiscussionLayoutView;
 use Vanilla\Forum\Layout\Middleware\CategoryFilterMiddleware;
 use Vanilla\Forum\Layout\View\NestedCategoryListPageLayoutView;
+use Vanilla\Forum\Layout\View\CreatePostLayoutView;
 use Vanilla\Forum\Models\AiSuggestionSiteMetaExtra;
 use Vanilla\Forum\Models\CategoryCollectionProvider;
 use Vanilla\Forum\Models\CategorySiteMetaExtra;
@@ -68,7 +70,8 @@ use Vanilla\Forum\Models\Totals\PostSiteTotalProvider;
 use Vanilla\Forum\Models\VanillaEscalationAttachmentProvider;
 use Vanilla\Forum\Widgets\DiscussionAnnouncementsWidget;
 use Vanilla\Forum\Widgets\DiscussionDiscussionsWidget;
-use Vanilla\Forum\Widgets\DiscussionTagsAsset;
+use Vanilla\Forum\Widgets\PostTagsAsset;
+use Vanilla\Forum\Widgets\CreatePostFormAsset;
 use Vanilla\Forum\Widgets\SuggestedContentWidget;
 use Vanilla\Forum\Widgets\TagWidget;
 use Vanilla\Forum\Widgets\CategoriesWidget;
@@ -109,7 +112,6 @@ class ForumContainerRules extends AddonContainerRules
         $container
             ->rule(ForumAggregateModel::class)
             ->setShared(true)
-
             ->rule(LayoutHydrator::class)
             ->addCall("addReactResolver", [DiscussionAnnouncementsWidget::class])
             ->addCall("addReactResolver", [DiscussionDiscussionsWidget::class])
@@ -125,7 +127,7 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addReactResolver", [DiscussionListAsset::class])
             ->addCall("addReactResolver", [FeaturedCollectionsWidget::class])
             ->addCall("addReactResolver", [BreadcrumbWidget::class])
-            ->addCall("addReactResolver", [DiscussionTagsAsset::class])
+            ->addCall("addReactResolver", [PostTagsAsset::class])
             ->addCall("addReactResolver", [SuggestedContentWidget::class])
             ->addCall("addMiddleware", [new Reference(CategoryFilterMiddleware::class)])
 
@@ -134,7 +136,8 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addLayoutView", [new Reference(CategoryListLayoutView::class)])
             ->addCall("addLayoutView", [new Reference(NestedCategoryListPageLayoutView::class)])
             ->addCall("addLayoutView", [new Reference(DiscussionCategoryPageLayoutView::class)])
-            ->addCall("addLayoutView", [new Reference(DiscussionThreadLayoutView::class)]);
+            ->addCall("addLayoutView", [new Reference(DiscussionLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(CreatePostLayoutView::class)]);
 
         $container
             ->rule(LayoutViewModel::class)
@@ -149,8 +152,12 @@ class ForumContainerRules extends AddonContainerRules
                 PATH_ROOT . "/applications/vanilla/Layout/Definitions/discussionList.json",
             ])
             ->addCall("registerStaticLayout", [
-                "discussionThread",
-                PATH_ROOT . "/applications/vanilla/Layout/Definitions/discussionThread.json",
+                "discussion",
+                PATH_ROOT . "/applications/vanilla/Layout/Definitions/discussion.json",
+            ])
+            ->addCall("registerStaticLayout", [
+                "createPost",
+                PATH_ROOT . "/applications/vanilla/Layout/Definitions/createPost.json",
             ]);
 
         $container
@@ -195,7 +202,7 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addLayoutView", [new Reference(CategoryListLayoutView::class)])
             ->addCall("addLayoutView", [new Reference(NestedCategoryListPageLayoutView::class)])
             ->addCall("addLayoutView", [new Reference(DiscussionCategoryPageLayoutView::class)])
-            ->addCall("addLayoutView", [new Reference(DiscussionThreadLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(DiscussionLayoutView::class)])
             ->addCall("addLayoutView", [new Reference(LegacyNewDiscussionLayoutView::class)])
             ->addCall("addLayoutView", [new Reference(HomeLayoutView::class)]);
 
@@ -210,9 +217,9 @@ class ForumContainerRules extends AddonContainerRules
         PageControllerRoute::configurePageRoutes(
             $container,
             [
-                "/discussion/" => DiscussionThreadPageController::class,
+                "/discussion/" => DiscussionPageController::class,
             ],
-            "customLayout.discussionThread"
+            "customLayout.post"
         );
 
         PageControllerRoute::configurePageRoutes(
@@ -235,8 +242,8 @@ class ForumContainerRules extends AddonContainerRules
 
         PageControllerRoute::configurePageRoutes(
             $container,
-            ["/post/" => PostController::class],
-            PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS
+            ["/post/" => CreatePostPageController::class],
+            "customLayout.createPost"
         );
 
         PageControllerRoute::configurePageRoutes($container, [
@@ -275,7 +282,6 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addAutomationTrigger", [StaleDiscussionTrigger::class])
             ->addCall("addAutomationTrigger", [TimeSinceUserRegistrationTrigger::class])
             ->addCall("addAutomationTrigger", [UserEmailDomainTrigger::class])
-
             ->addCall("addAutomationAction", [AddDiscussionToCollectionAction::class])
             ->addCall("addAutomationAction", [AddRemoveUserRoleAction::class])
             ->addCall("addAutomationAction", [AddTagToDiscussionAction::class])
@@ -306,8 +312,16 @@ class ForumContainerRules extends AddonContainerRules
             ->rule(AutomationRuleModel::class)
             ->setShared(true);
 
+        $container
+            ->rule(APIExpandMiddleware::class)
+            ->addCall("addExpander", [new Reference(PostFieldsExpander::class)]);
+
         if (!DebugUtils::isTestMode() && !function_exists("writeReactions")) {
             include PATH_APPLICATIONS . "/dashboard/views/reactions/reaction_functions.php";
         }
+
+        PageControllerRoute::configurePageRoutes($container, [
+            "/.well-known/gpc.json" => GpcApiController::class,
+        ]);
     }
 }

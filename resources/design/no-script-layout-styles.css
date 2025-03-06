@@ -21,6 +21,7 @@ body {
 #app, .Frame {
     margin: 40px auto;
     max-width: 1400px;
+    width: 100%;
     line-height: 1.6;
     font-size: 18px;
     color: #444;
@@ -29,6 +30,20 @@ body {
 
 h1, h2, h3, h4 {
     line-height: 1.25;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.userContent p {
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.userContent *:last-child {
+    margin-bottom: 0;
 }
 
 .pageHeadingBox > * {
@@ -72,8 +87,8 @@ section, .Frame-row {
 }
 
 .separated {
-    padding-top: 24px;
-    padding-bottom: 24px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .separated + .separated {
@@ -92,6 +107,7 @@ section, .Frame-row {
     display: flex;
     gap: 20px;
     list-style: crumb;
+    padding-left: 0;
 }
 
 .seoBreadcrumbs .linkList li:first-of-type {

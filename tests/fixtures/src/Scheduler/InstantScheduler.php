@@ -80,6 +80,21 @@ class InstantScheduler extends DeferredScheduler
     }
 
     /**
+     * Assert that no jobs of a type were scheduled.
+     *
+     * @param string $jobType
+     * @param string $message
+     * @return void
+     */
+    public function assertJobNotScheduled(string $jobType, string $message = ""): void
+    {
+        $jobs = $this->scheduledJobs[$jobType] ?? [];
+        $count = count($jobs);
+        $message = $message ?: "Expected no jobs of type '{$jobType}' to be scheduled but found $count";
+        TestCase::assertCount(0, $jobs, $message);
+    }
+
+    /**
      * Add a new job descriptor and immediate dispatch the queue.
      *
      * @param JobDescriptorInterface $jobDescriptor

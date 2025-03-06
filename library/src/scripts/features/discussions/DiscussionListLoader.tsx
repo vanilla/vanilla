@@ -106,8 +106,8 @@ function DiscussionLoaderItemActions(props) {
                 <Icon icon={props.icon} />
             ) : (
                 <>
-                    <Icon icon="discussion-bookmark" style={{ fill: "transparent", marginRight: 6 }} />
-                    <Icon icon="navigation-ellipsis" />
+                    <Icon icon="bookmark-empty" style={{ fill: "transparent", marginRight: 6 }} />
+                    <Icon icon="options-menu" />
                 </>
             )}
         </div>

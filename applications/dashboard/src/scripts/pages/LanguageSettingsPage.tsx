@@ -70,7 +70,7 @@ export function LanguageSettingsPage() {
     };
     const machineTranslationContent = useMemo(() => {
         const setTranslationEnabled = (isEnabled: boolean) => {
-            patchConfig({ "machineTranslation.enabled": isEnabled });
+            void patchConfig({ "machineTranslation.enabled": isEnabled });
         };
         if (hasMachineTranslation) {
             return {

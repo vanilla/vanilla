@@ -11,7 +11,9 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\DiscussionTypeHandler;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Menu\CommunityManagementCounterProvider;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Theme\ThemeSectionModel;
 
@@ -114,6 +116,7 @@ class VanillaHooks extends Gdn_Plugin
                 "CountAllComments",
                 "LastPost",
             ],
+            "Comment" => ["depth", "countChildComments", "scoreChildComments"],
             "Tag" => ["CountDiscussions"],
             "User" => ["CountDiscussions", "CountComments"],
         ];
@@ -865,7 +868,7 @@ class VanillaHooks extends Gdn_Plugin
         if (is_object($sender->User) && $sender->User->UserID > 0) {
             $userID = $sender->User->UserID;
             // Add the discussion tab
-            $discussionsLabel = sprite("SpDiscussions") . " " . t("Discussions");
+            $discussionsLabel = sprite("SpDiscussions") . " " . t("Posts");
             $commentsLabel = sprite("SpComments") . " " . t("Comments");
             if (c("Vanilla.Profile.ShowCounts", true)) {
                 $discussionsCount = getValueR("User.CountDiscussions", $sender, null);
@@ -887,12 +890,7 @@ class VanillaHooks extends Gdn_Plugin
                         "</span>";
                 }
             }
-            $sender->addProfileTab(
-                t("Discussions"),
-                userUrl($sender->User, "", "discussions"),
-                "Discussions",
-                $discussionsLabel
-            );
+            $sender->addProfileTab(t("Posts"), userUrl($sender->User, "", "discussions"), "Posts", $discussionsLabel);
             $sender->addProfileTab(t("Comments"), userUrl($sender->User, "", "comments"), "Comments", $commentsLabel);
             // Add the discussion tab's CSS and Javascript.
             $sender->addJsFile("jquery.gardenmorepager.js");
@@ -1211,11 +1209,11 @@ class VanillaHooks extends Gdn_Plugin
                 $sort
             )
             ->addLinkIf(
-                ["Garden.Settings.Manage", "Feature.PostTypesAndPostFields.Enabled"],
+                Gdn::session()->checkPermission("Garden.Settings.Manage") && PostTypeModel::isPostTypesFeatureEnabled(),
                 t("Post Types"),
                 "/settings/post-types",
-                "forum.posting",
-                "nav-forum-posting",
+                "forum.post-types",
+                "",
                 $sort
             )
             ->addLinkIf(

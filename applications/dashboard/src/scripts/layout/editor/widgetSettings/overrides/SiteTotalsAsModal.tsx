@@ -18,7 +18,6 @@ import { FormTreeControl, IFormTreeControl } from "@library/tree/FormTreeControl
 import { t } from "@vanilla/i18n";
 import { IControlProps, IModalControl } from "@vanilla/json-schema-forms";
 import { IconType } from "@vanilla/icons";
-import { useValidCounts } from "@library/siteTotals/SiteTotals";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 export const SITE_TOTALS_AS_MODAL = {
@@ -26,13 +25,8 @@ export const SITE_TOTALS_AS_MODAL = {
         return props.control.inputType === "modal" && props.rootSchema.description === "Site Totals";
     },
     callback: function SiteTotalsModalControl(props: IControlProps<IModalControl<IFormTreeControl>>) {
-        const validInstance = useValidCounts(props.instance, props.rootSchema);
         const [isOpen, setOpen] = useState(false);
         const classes = modalClasses();
-
-        useEffect(() => {
-            props.onChange(validInstance);
-        }, []);
 
         function openModal() {
             setOpen(true);

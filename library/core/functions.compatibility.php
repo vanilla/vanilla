@@ -431,7 +431,7 @@ if (!function_exists("safeHeader")) {
         }
 
         if ($context == "http") {
-            header($header, $replace, $http_response_code);
+            header($header, $replace, $http_response_code ?? 0);
         }
     }
 }

@@ -156,6 +156,7 @@ class PostTypesTest extends AbstractAPIv2Test
         $this->assertEquals(201, $result->getStatusCode());
 
         $body = $result->getBody();
+        unset($record["postFieldIDs"]);
         $this->assertRowsEqual($record, $body);
 
         return $body;
@@ -249,5 +250,60 @@ class PostTypesTest extends AbstractAPIv2Test
         $this->expectException(ClientException::class);
         $this->expectExceptionMessage("The category 9999 is not a valid category.");
         $this->testPost(["categoryIDs" => [9999]]);
+    }
+
+    /**
+     * Test post field ID validation.
+     *
+     * @return void
+     */
+    public function testPostWithInvalidPostFields()
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage("The following post fields are invalid: not-a-valid-post-field");
+        $this->testPost(["postFieldIDs" => ["not-a-valid-post-field"]]);
+    }
+
+    /**
+     * Test associating post fields with a post type.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testPostWithValidPostFields()
+    {
+        $postField1 = $this->createPostField();
+        $postField2 = $this->createPostField();
+        $postType = $this->testPost(["postFieldIDs" => [$postField1["postFieldID"], $postField2["postFieldID"]]]);
+
+        $this->assertApiResults(
+            "/post-fields",
+            ["postTypeID" => $postType["postTypeID"]],
+            ["postFieldID" => [$postField1["postFieldID"], $postField2["postFieldID"]]]
+        );
+    }
+
+    /**
+     * Test expand post fields on the post types api endpoint.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testExpandPostFields()
+    {
+        $postField1 = $this->createPostField();
+        $postField2 = $this->createPostField();
+        $postType = $this->createPostType(["postFieldIDs" => [$postField1["postFieldID"], $postField2["postFieldID"]]]);
+
+        $result = $this->api()
+            ->get("/post-types/{$postType["postTypeID"]}", ["expand" => "postFields"])
+            ->getBody();
+        $this->assertArrayHasKey("postFields", $result);
+        $this->assertRowsLike(
+            ["postFieldID" => [$postField1["postFieldID"], $postField2["postFieldID"]]],
+            $result["postFields"],
+            true,
+            2
+        );
     }
 }

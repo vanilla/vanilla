@@ -87,9 +87,19 @@ class DebugUtils
     {
         $trace = array_slice($trace, $offset, $limit);
         $r = [];
+
+        $commonPatterns = ["MiddlewareAwareTrait.php"];
+
         foreach ($trace as $item) {
             $file = StringUtils::substringLeftTrim($item["file"] ?? "/unknown", PATH_ROOT);
             $line = $item["line"] ?? 0;
+
+            foreach ($commonPatterns as $pattern) {
+                // These are common enough that they get annoying.
+                if (str_contains($file, $pattern)) {
+                    continue 2;
+                }
+            }
 
             $r[] = "$file ($line)";
         }

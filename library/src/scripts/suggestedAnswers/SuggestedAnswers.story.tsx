@@ -14,9 +14,9 @@ import {
     STORY_IPSUM_MEDIUM,
     STORY_IPSUM_SHORT,
 } from "@library/storybook/storyData";
-import { SuggestedAnswers } from "@library/suggestedAnswers/SuggestedAnswers";
 import { SuggestedAnswersProvider } from "@library/suggestedAnswers/SuggestedAnswers.context";
 import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
+import { SuggestedAnswers } from "@library/suggestedAnswers/SuggestedAnswersAsset";
 import { setMeta } from "@library/utility/appUtils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -98,7 +98,7 @@ const suggestions: ISuggestedAnswer[] = [
         title: "Suggested Answer from a Vanilla Discussion",
         summary: STORY_IPSUM_LONG,
         hidden: false,
-        sourceIcon: "new-discussion",
+        sourceIcon: "create-discussion",
     },
     {
         aiSuggestionID: 4,
@@ -109,7 +109,7 @@ const suggestions: ISuggestedAnswer[] = [
         title: "Suggested Answer from a Vanilla Discussion",
         summary: [STORY_IPSUM_LONG, STORY_IPSUM_LONG2, STORY_IPSUM_LONG3].join(" "),
         hidden: false,
-        sourceIcon: "new-discussion",
+        sourceIcon: "create-discussion",
     },
     {
         aiSuggestionID: 2,
@@ -120,7 +120,7 @@ const suggestions: ISuggestedAnswer[] = [
         title: "Suggested Answer from a Vanilla KB Article",
         summary: STORY_IPSUM_SHORT,
         hidden: false,
-        sourceIcon: "data-article",
+        sourceIcon: "meta-article",
     },
     {
         aiSuggestionID: 3,

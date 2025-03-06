@@ -351,7 +351,7 @@ export const TitleBarGuestUser = storyWithConfig(
             return (
                 <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
                     <>
-                        <Icon icon="navigation-languages" />
+                        <Icon icon="me-subcommunities" />
                         <DownTriangleIcon />
                     </>
                 </Button>
@@ -414,7 +414,7 @@ export const TitleBarWithMeboxWithLabelsAndSeparators = storyWithConfig({}, () =
         return (
             <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
                 <>
-                    <Icon icon="navigation-languages" />
+                    <Icon icon="me-subcommunities" />
                     <DownTriangleIcon />
                 </>
             </Button>

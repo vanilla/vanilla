@@ -30,8 +30,9 @@ class ImageSrcSet implements \JsonSerializable
     /**
      * @inheritdoc
      */
-    public function jsonSerialize()
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize(): ?array
     {
-        return $this->data;
+        return $this->data ?? null;
     }
 }

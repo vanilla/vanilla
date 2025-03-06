@@ -124,7 +124,7 @@ class UnsubscribeModel
         $status = $enabled == null || !$enabled;
         $result = Gdn::eventManager()->fireFilter("unsubscribeModel_processPayload", $result, $payload, $status);
         // If the notification is related to any plugin, process and return the result
-        if (!empty($result)) {
+        if (!empty($result["processed"]) && $result["processed"] == 1) {
             return $result;
         }
         $activityInfo = $this->activityModel->getNotificationData($payload);

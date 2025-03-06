@@ -316,7 +316,7 @@ if (!function_exists("validateAgainstUsernameBlacklist")) {
      */
     function validateAgainstUsernameBlacklist($value)
     {
-        if (in_array(strtolower($value), UserModel::getUsernameBlacklist())) {
+        if ($value && in_array(strtolower($value), UserModel::getUsernameBlacklist())) {
             return t("Username is reserved. Please choose a different username.");
         }
         return true;
@@ -506,6 +506,10 @@ if (!function_exists("validateTime")) {
      */
     function validateTime($value)
     {
+        if (is_null($value)) {
+            return \Vanilla\Invalid::emptyMessage();
+        }
+
         if (preg_match('`^(\d\d?):(\d\d)(?::(\d\d))?$`', $value, $match)) {
             $h = (int) $match[1];
             $m = (int) $match[2];
@@ -541,8 +545,12 @@ if (!function_exists("validateLength")) {
      * @param object $field The field information that contains the maximum length for the {@link $value}.
      * @return bool|string
      */
-    function validateLength($value, $field)
+    function validateLength(?string $value, $field)
     {
+        if ($value === null) {
+            return true;
+        }
+
         $lengthDiff = mb_strlen($value, "UTF-8") - $field->Length;
         if (isset($field->ByteLength)) {
             $byteLengthDiff = mb_strlen($value, "8bit") - $field->ByteLength;

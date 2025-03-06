@@ -167,7 +167,7 @@ export class LayoutEditorFixture {
                                     description: "",
                                     categoryID: null,
                                     locale: "en",
-                                    url: "https://dev.vanilla.localhost/en",
+                                    url: "https://dev.vanilla.local/en",
                                     siteSectionGroup: "subcommunities-group-10",
                                     siteSectionID: "subcommunities-section-10",
                                     isDefault: false,

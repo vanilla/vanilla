@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import apiv2 from "@library/apiv2";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { RecordID } from "@vanilla/utils";
 
 export interface IGetCategoryListParams {
     expand?: string;
@@ -15,7 +16,7 @@ export interface IGetCategoryListParams {
     maxDepth?: number;
     limit?: number;
     followed?: boolean;
-    categoryID?: number[];
+    categoryID?: RecordID | RecordID[];
     parentCategoryID?: number;
     siteSectionID?: number | string;
     page?: number;
@@ -27,8 +28,12 @@ export interface IGetCategoryListResponse {
     pagination: ILinkPages;
 }
 
-export function useCategoryList(queryParams?: IGetCategoryListParams, shouldFetch: boolean = true) {
-    const { refetch, isLoading, error, isSuccess, isFetching, data } = useQuery<
+export function useCategoryList(
+    queryParams?: IGetCategoryListParams,
+    shouldFetch: boolean = true,
+    initialData?: IGetCategoryListResponse,
+) {
+    const { refetch, isLoading, error, isSuccess, isFetching, data, status } = useQuery<
         any,
         IApiError,
         IGetCategoryListResponse
@@ -45,7 +50,8 @@ export function useCategoryList(queryParams?: IGetCategoryListParams, shouldFetc
         keepPreviousData: true,
         queryKey: ["categoryList", { ...queryParams }],
         enabled: shouldFetch,
+        initialData,
     });
 
-    return { refetch, error, isLoading, isSuccess, isFetching, data };
+    return { refetch, error, isLoading, isSuccess, isFetching, data, status };
 }

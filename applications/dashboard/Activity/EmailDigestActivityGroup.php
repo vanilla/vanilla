@@ -25,7 +25,7 @@ class EmailDigestActivityGroup extends ActivityGroup
      */
     public static function getPreferenceLabel(): string
     {
-        return "Weekly Email Digest";
+        return "Email Digest";
     }
 
     /**
@@ -34,8 +34,14 @@ class EmailDigestActivityGroup extends ActivityGroup
     public static function getPreferenceDescription(): ?string
     {
         $url = url("/profile/followed-content", true);
-        $descriptionString =
-            'The email digest delivers the week\'s top content from the categories you follow into your email inbox once per week. <a href="{url,html}">Manage Followed Categories</a>.';
+        $isGroupsEnabled = \Gdn::config("EnabledApplications.Groups") === "groups";
+
+        $descriptionString = $isGroupsEnabled
+            ? t("The email digest delivers top content from categories and groups you follow, straight to your inbox.")
+            : t("The email digest delivers top content from categories you follow, straight to your inbox.");
+
+        $descriptionString .= " <a href='{url,html}'>" . t("Manage Followed Content") . "</a>";
+
         $formattedString = formatString($descriptionString, ["url" => $url]);
         return $formattedString;
     }

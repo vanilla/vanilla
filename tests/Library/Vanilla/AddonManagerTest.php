@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Vanilla;
 
+use Garden\Container\Container;
 use Test\OldApplication\Controllers\Api\NewApiController;
 use Test\OldApplication\Controllers\ArchiveController;
 use Test\OldApplication\Controllers\HiddenController;
@@ -16,12 +17,12 @@ use Test\OldApplication\arbitraryLowercase;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
 use VanillaTests\Fixtures\TestAddonManager;
-use VanillaTests\SharedBootstrapTestCase;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Tests for the AddonManager
  */
-class AddonManagerTest extends SharedBootstrapTestCase
+class AddonManagerTest extends VanillaTestCase
 {
     const FIXTURE_ROOT = "/tests/fixtures";
 
@@ -98,6 +99,7 @@ class AddonManagerTest extends SharedBootstrapTestCase
         if ($singleton && $instance !== null) {
             return $instance;
         }
+        \Gdn::setContainer(new Container());
         $manager = new AddonManager(
             [
                 Addon::TYPE_ADDON => ["/addons/addons", "/applications", "/plugins"],
@@ -414,13 +416,13 @@ class AddonManagerTest extends SharedBootstrapTestCase
      *
      * @return array Returns a data provider array.
      */
-    public function provideVanillaThemeInfo()
+    public static function provideVanillaThemeInfo(): array
     {
         $tm = new \Gdn_ThemeManager(static::createVanillaManager(), false);
         $infoArrays = [];
         $tm->indexSearchPath(PATH_THEMES, $infoArrays);
 
-        return $this->makeProvider($infoArrays);
+        return self::makeProvider($infoArrays);
     }
 
     /**
@@ -429,7 +431,7 @@ class AddonManagerTest extends SharedBootstrapTestCase
      * @param array $array The array to massage.
      * @return array
      */
-    protected function makeProvider($array)
+    public static function makeProvider($array): array
     {
         $result = array_map(function ($arr) {
             return [$arr];

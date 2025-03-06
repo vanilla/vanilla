@@ -7,15 +7,22 @@
 
 namespace Vanilla\Dashboard\Controllers\Api;
 
+use Garden\Container\ContainerException;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\InterestModel;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
-use Vanilla\Models\Model;
-use Vanilla\Utility\SchemaUtils;
+use Vanilla\Navigation\BreadcrumbProviderNotFoundException;
 
+/**
+ * Interests API controller.
+ */
 class InterestsApiController extends \AbstractApiController
 {
     /**
@@ -35,46 +42,30 @@ class InterestsApiController extends \AbstractApiController
      *
      * @param array $query
      * @return Data
+     * @throws ClientException
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function index(array $query)
     {
         $this->interestModel->ensureSuggestedContentEnabled();
         $this->permission("settings.manage");
         $in = $this->schema([
-            "apiName:s?",
             "name:s?",
             "categoryIDs:a?" => "i",
             "tagIDs:a?" => "i",
             "profileFields:a?" => "s",
             "isDefault:b?",
-            "page:i?" => [
-                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
-                "default" => 1,
-                "minimum" => 1,
-            ],
-            "limit:i?" => [
-                "description" => "Desired number of items per page.",
-                "default" => 30,
-                "minimum" => 1,
-                "maximum" => ApiUtils::getMaxLimit(),
-            ],
         ]);
         $out = $this->schema([":a" => $this->outputSchema()]);
 
         $query = $in->validate($query);
-        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
-        $rows = $this->interestModel->getWhere($query, [
-            Model::OPT_LIMIT => $limit,
-            Model::OPT_OFFSET => $offset,
-        ]);
+        $rows = $this->interestModel->getWhere($query);
         $rows = $out->validate($rows);
 
-        $totalCount = $this->interestModel->getWhereCount($query);
-
-        $paging = ApiUtils::numberedPagerInfo($totalCount, "/api/v2/interests", $query, $in);
-
-        return new Data($rows, ["paging" => $paging]);
+        return new Data($rows);
     }
 
     /**
@@ -82,6 +73,11 @@ class InterestsApiController extends \AbstractApiController
      *
      * @param int $id
      * @return Data
+     * @throws ClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function get(int $id): Data
     {
@@ -99,6 +95,10 @@ class InterestsApiController extends \AbstractApiController
      *
      * @param array $body
      * @return Data
+     * @throws ClientException
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function post(array $body): Data
     {
@@ -119,6 +119,11 @@ class InterestsApiController extends \AbstractApiController
      * @param int $id
      * @param array $body
      * @return Data
+     * @throws ClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function patch(int $id, array $body): Data
     {
@@ -177,11 +182,18 @@ class InterestsApiController extends \AbstractApiController
      *
      * @param array $query
      * @return Data
+     * @throws NotFoundException
+     * @throws ContainerException
+     * @throws ValidationException
+     * @throws ClientException
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws BreadcrumbProviderNotFoundException
      */
     public function get_suggestedContent(array $query = []): Data
     {
         $this->interestModel->ensureSuggestedContentEnabled();
-        $this->permission("Garden.SignIn.Allow");
+        $isUserAuthenticated = $this->getSession()->UserID > 0;
 
         $in = $this->schema([
             "suggestedContentLimit:i?" => ["minimum" => 1, "maximum" => 20],
@@ -191,28 +203,38 @@ class InterestsApiController extends \AbstractApiController
         ]);
         $query = $in->validate($query);
 
+        $discussionSuggestions = $this->discussionsApi
+            ->index([
+                "limit" => $query["suggestedContentLimit"],
+                "expand" => ["all", "-body"],
+                "sort" => "-" . \DiscussionModel::SORT_EXPIRIMENTAL_TRENDING,
+                "slotType" => "w",
+                "suggested" => true,
+                "excerptLength" => $query["suggestedContentExcerptLength"],
+                "excludedCategoryIDs" => $query["excludedCategoryIDs"],
+            ])
+            ->getData();
+
+        $categorySuggestions = [];
+
+        // Only signed-in users can follow categories
+        if ($isUserAuthenticated) {
+            $this->permission("Garden.SignIn.Allow");
+
+            $suggestedQuery = [
+                "excludedCategoryIDs" => $query["excludedCategoryIDs"],
+            ];
+
+            if (isset($query["suggestedFollowsLimit"])) {
+                $suggestedQuery["limit"] = $query["suggestedFollowsLimit"];
+            }
+
+            $categorySuggestions = $this->categoriesApi->get_suggested($suggestedQuery)->getData();
+        }
+
         $output = [
-            "discussions" => isset($query["suggestedContentLimit"])
-                ? $this->discussionsApi
-                    ->index([
-                        "limit" => $query["suggestedContentLimit"],
-                        "expand" => ["all", "-body"],
-                        "sort" => "-" . \DiscussionModel::SORT_EXPIRIMENTAL_TRENDING,
-                        "slotType" => "w",
-                        "suggestions" => true,
-                        "excerptLength" => $query["suggestedContentExcerptLength"],
-                        "excludedCategoryIDs" => $query["excludedCategoryIDs"],
-                    ])
-                    ->getData()
-                : [],
-            "categories" => isset($query["suggestedFollowsLimit"])
-                ? $this->categoriesApi
-                    ->get_suggested([
-                        "limit" => $query["suggestedFollowsLimit"],
-                        "excludedCategoryIDs" => $query["excludedCategoryIDs"],
-                    ])
-                    ->getData()
-                : [],
+            "discussions" => isset($query["suggestedContentLimit"]) ? $discussionSuggestions : [],
+            "categories" => isset($query["suggestedFollowsLimit"]) ? $categorySuggestions : [],
         ];
 
         return new Data($output);
@@ -227,9 +249,9 @@ class InterestsApiController extends \AbstractApiController
      */
     private function getInterestByID(int $id): array
     {
-        $row = $this->interestModel->getInterest($id);
-
-        if (empty($row)) {
+        try {
+            $row = $this->interestModel->getInterest($id);
+        } catch (NoResultsException $e) {
             throw new NotFoundException("Interest");
         }
         return $row;

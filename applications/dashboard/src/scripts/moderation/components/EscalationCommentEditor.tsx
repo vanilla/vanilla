@@ -7,8 +7,8 @@
 import { useEscalationCommentMutation } from "@dashboard/moderation/CommunityManagement.hooks";
 import { IEscalation } from "@dashboard/moderation/CommunityManagementTypes";
 import { MyValue } from "@library/vanilla-editor/typescript";
-import { EMPTY_DRAFT } from "@vanilla/addon-vanilla/thread/DiscussionCommentEditorAsset";
-import { NewCommentEditor } from "@vanilla/addon-vanilla/thread/components/NewCommentEditor";
+import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
+import { CommentEditor } from "@vanilla/addon-vanilla/comments/CommentEditor";
 import { useState } from "react";
 
 interface IProps {
@@ -22,21 +22,23 @@ export function EscalationCommentEditor(props: IProps) {
     const post = useEscalationCommentMutation(props.escalationID);
 
     const resetState = () => {
-        setValue(EMPTY_DRAFT);
+        setValue(EMPTY_RICH2_BODY);
         setEditorKey((existing) => existing + 1);
     };
 
     return (
-        <NewCommentEditor
+        <CommentEditor
             title={<></>}
             editorKey={editorKey}
             value={value}
             onValueChange={setValue}
+            format={"rich2"}
             onPublish={async (value) => {
                 await post.mutateAsync(JSON.stringify(value));
                 await resetState();
             }}
             publishLoading={post.isLoading}
+            autoFocus
         />
     );
 }

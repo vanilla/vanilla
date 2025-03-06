@@ -4,16 +4,15 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Container\ContainerException;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
 use Vanilla\Dashboard\Models\InterestModel;
-use Vanilla\Dashboard\Models\ProfileFieldModel;
-use Vanilla\Database\CallbackWhereExpression;
 use Vanilla\Exception\PermissionException;
-use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\DiscussionPermissions;
 use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Scheduler\LongRunner;
@@ -86,7 +85,8 @@ class CategoriesApiController extends AbstractApiController
         private LongRunner $runner,
         private SiteSectionModel $siteSectionModel,
         private InterestModel $interestModel,
-        private PostTypeModel $postTypeModel
+        private PostTypeModel $postTypeModel,
+        private DiscussionPermissions $discussionPermissions
     ) {
     }
 
@@ -129,7 +129,7 @@ class CategoriesApiController extends AbstractApiController
                     ]);
                 }
             });
-            if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+            if (PostTypeModel::isPostTypesFeatureEnabled()) {
                 $validPostTypes = $this->postTypeModel->getAvailablePostTypes();
                 $this->categoryPostSchema
                     ->merge(
@@ -143,16 +143,16 @@ class CategoriesApiController extends AbstractApiController
                             ],
                         ])
                     )
-                    ->addFilter("", SchemaUtils::fieldRequirement("allowedPostTypeIDs", "hasRestrictedPostTypes"))
                     ->addFilter("", function ($data, ValidationField $field) {
                         if (!ArrayUtils::isArray($data)) {
                             return $data;
                         }
 
-                        if (!($data["hasRestrictedPostTypes"] ?? false)) {
+                        if (isset($data["hasRestrictedPostTypes"]) && !$data["hasRestrictedPostTypes"]) {
                             // Make sure we clear associated post types.
                             $data["allowedPostTypeIDs"] = [];
                         }
+                        unset($data["hasRestrictedPostTypes"]);
                         return $data;
                     })
                     ->addFilter("allowedPostTypeIDs", fn($allowedPostTypeIDs) => array_unique($allowedPostTypeIDs))
@@ -189,7 +189,7 @@ class CategoriesApiController extends AbstractApiController
         if (empty($category)) {
             throw new NotFoundException("Category");
         }
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
             $categories = [&$category];
             CategoryModel::joinPostTypes($categories);
         }
@@ -407,6 +407,7 @@ class CategoriesApiController extends AbstractApiController
                 "description" => "Layout View Type.",
                 "minLength" => 0,
             ],
+            "filterDiscussionsAdd:b?" => "Filter out categories that cannot be posted into.",
             "expand?" => ApiUtils::getExpandDefinition(["parent", "breadcrumbs"]),
         ])->setDescription("Search categories.");
         $expand = $query["expand"] ?? [];
@@ -435,7 +436,8 @@ class CategoriesApiController extends AbstractApiController
             $where,
             $this->isExpandField("parent", $expand),
             $limit,
-            $offset
+            $offset,
+            filterDiscussionsAdd: $query["filterDiscussionsAdd"] ?? false
         );
 
         foreach ($results as $key => $row) {
@@ -461,7 +463,7 @@ class CategoriesApiController extends AbstractApiController
             $this->idParamSchema = $this->schema(
                 Schema::parse([
                     "id:i" => "The category ID.",
-                    "expand?" => ApiUtils::getExpandDefinition(["lastPost"]),
+                    "expand?" => ApiUtils::getExpandDefinition(["lastPost", "permissions"]),
                 ]),
                 $type
             );
@@ -499,7 +501,7 @@ class CategoriesApiController extends AbstractApiController
                     "minimum" => 1,
                     "maximum" => ApiUtils::getMaxLimit(),
                 ],
-                "expand?" => ApiUtils::getExpandDefinition(["lastPost", "preferences"]),
+                "expand?" => ApiUtils::getExpandDefinition(["lastPost", "preferences", "permissions"]),
                 "featured:b?",
                 "dirtyRecords:b?",
                 "outputFormat:s?" => [
@@ -514,6 +516,11 @@ class CategoriesApiController extends AbstractApiController
                 ],
                 "layoutViewType:s?",
                 "postTypeID:s?",
+                "postTypeStatus:s?" => [
+                    "enum" => ["active", "inactive", "both"],
+                    "default" => "active",
+                ],
+                "filterDiscussionsAdd:b?" => "Filter out categories that cannot be posted into.",
             ],
             "in"
         )
@@ -654,7 +661,10 @@ class CategoriesApiController extends AbstractApiController
         $categoryIDs = $query["categoryID"] ?? new RangeExpression(">", 0);
 
         // Apply permission filtering.
-        $visibleIDs = $this->categoryModel->getVisibleCategoryIDs();
+        $visibleIDs = $this->categoryModel->getVisibleCategoryIDs([
+            "filterDiscussionsAdd" => $query["filterDiscussionsAdd"] ?? false,
+        ]);
+
         if ($visibleIDs === true) {
             $categoryIDs = $categoryIDs->withFilteredValue(">", 0);
         } else {
@@ -691,10 +701,11 @@ class CategoriesApiController extends AbstractApiController
 
         // Additional filtering by post type
         if (!empty($query["postTypeID"])) {
-            $postTypesByCategory = $this->postTypeModel->getPostTypesByCategory([
-                "ptcj.postTypeID" => $query["postTypeID"],
-            ]);
-            $categoryIDs = $categoryIDs->withFilteredValue("=", array_keys($postTypesByCategory));
+            $allowedCategoriesIDsByPostType = $this->postTypeModel->getAllowedCategoryIDsByPostTypeID(
+                $query["postTypeID"],
+                $query["postTypeStatus"] ?? "active"
+            );
+            $categoryIDs = $categoryIDs->withFilteredValue("=", $allowedCategoriesIDsByPostType);
         }
 
         $where["CategoryID"] = $categoryIDs;
@@ -747,7 +758,10 @@ class CategoriesApiController extends AbstractApiController
      *
      * @param array $rows
      * @param array|bool|string $expand
+     * @param int|null $userID
      * @return void
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     private function joinCategoryExpandFields(array &$rows, $expand, ?int $userID = null): void
     {
@@ -769,6 +783,13 @@ class CategoriesApiController extends AbstractApiController
                         $userPreferences[$row["CategoryID"]]["preferences"]
                     );
                 }
+            }
+        }
+
+        if (ModelUtils::isExpandOption("permissions", $expand)) {
+            foreach ($rows as &$row) {
+                $categoryID = $row["CategoryID"];
+                $row["permissions"] = $this->discussionPermissions->getForCategory($categoryID);
             }
         }
     }
@@ -1102,7 +1123,7 @@ class CategoriesApiController extends AbstractApiController
             unset($request["iconUrl"]);
         }
 
-        $request = ApiUtils::convertInputKeys($request, ["allowedPostTypeIDs", "hasRestrictedPostTypes"]);
+        $request = ApiUtils::convertInputKeys($request, ["allowedPostTypeIDs"]);
 
         if (array_key_exists("Urlcode", $request)) {
             $request["UrlCode"] = $request["Urlcode"];
@@ -1313,7 +1334,7 @@ class CategoriesApiController extends AbstractApiController
             CategoryModel::calculate($category);
         }
 
-        if (FeatureFlagHelper::featureEnabled(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS)) {
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
             CategoryModel::joinPostTypes($categories);
         }
 

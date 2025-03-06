@@ -699,10 +699,10 @@ class RequestTest extends SharedBootstrapTestCase
             "HTTP_UPGRADE_INSECURE_REQUESTS" => "1",
             "HTTP_CACHE_CONTROL" => "max-age=0",
             "HTTP_CONNECTION" => "keep-alive",
-            "HTTP_HOST" => "dev.vanilla.localhost",
+            "HTTP_HOST" => "dev.vanilla.local",
             "SCRIPT_FILENAME" => "/srv/vanilla-repositories/vanilla/index.php",
             "REDIRECT_STATUS" => "200",
-            "SERVER_NAME" => "dev.vanilla.localhost",
+            "SERVER_NAME" => "dev.vanilla.local",
             "SERVER_PORT" => "80",
             "SERVER_ADDR" => "172.18.0.7",
             "REMOTE_PORT" => "38172",
@@ -730,7 +730,7 @@ class RequestTest extends SharedBootstrapTestCase
     public function testEncodedPath(): void
     {
         $request = self::createRequest("/profile/Fran#k.html");
-        $this->assertSame("http://dev.vanilla.localhost/profile/Fran%23k.html", $request->getUrl());
+        $this->assertSame("http://dev.vanilla.local/profile/Fran%23k.html", $request->getUrl());
         $this->assertSame($request->getUrl(), $request->url("", true));
         $this->assertSame($request->getUrl(), (string) $request->getUri());
     }

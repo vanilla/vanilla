@@ -7,6 +7,8 @@
 namespace Vanilla\Web;
 
 use Garden\BasePathTrait;
+use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Gdn_Session;
@@ -28,6 +30,8 @@ class APIExpandMiddleware
 {
     use BasePathTrait;
 
+    public const META_EXPAND_PREFIXES = "expand_prefixes";
+    public const META_EXTRA_ITERABLES = "expand_extra_iterables";
     private const EXPAND_FIELD = "expand";
 
     /** @var array<string, AbstractApiExpander> */
@@ -68,6 +72,7 @@ class APIExpandMiddleware
     public function __invoke(RequestInterface $request, callable $next)
     {
         $rawExpands = $request->getQuery()["expand"] ?? "";
+        $request->setMeta("expand", $rawExpands);
         $expands = $this->inBasePath($request->getPath()) ? $this->extractExpands($request) : [];
         $keysToExpand = [];
         foreach ($expands as $nestedExpands) {
@@ -198,14 +203,29 @@ class APIExpandMiddleware
     private function readExpand(RequestInterface $request): ?array
     {
         $query = $request->getQuery();
-        $expand = $query[self::EXPAND_FIELD] ?? null;
+        $schema = Schema::parse([
+            "expand:a?" => [
+                "items" => [
+                    "type" => "string",
+                ],
+                "style" => "form",
+            ],
+        ]);
 
-        if ($expand === null) {
+        try {
+            $query = $schema->validate($query);
+        } catch (ValidationException $ex) {
+            // If it doesn't validate, let it pass. The endpoint itself will handle validation.
             return null;
         }
 
-        $fields = is_string($expand) ? explode(",", $expand) : [];
-        array_walk($fields, "trim");
+        $expand = $query[self::EXPAND_FIELD] ?? null;
+
+        if (empty($expand)) {
+            return null;
+        }
+
+        $fields = array_map("trim", $expand);
         return $fields;
     }
 
@@ -297,12 +317,36 @@ class APIExpandMiddleware
         }
         foreach ($fields as $key => $currentFields) {
             $expander = $this->enabledExpanders()[$key];
+
+            $prefixes = $response->getMeta(self::META_EXPAND_PREFIXES) ?? [];
+            $fieldMapping = $currentFields;
+            foreach ($prefixes as $prefix) {
+                foreach ($currentFields as $key => $val) {
+                    $fieldMapping["{$prefix}.{$key}"] = "{$prefix}.{$val}";
+                }
+            }
+
             ModelUtils::leftJoin(
                 $dataset,
-                $currentFields,
-                [$expander, "resolveFragements"],
+                $fieldMapping,
+                [$expander, "resolveFragments"],
                 $expander->getDefaultRecord()
             );
+
+            $extraIterables = $response->getMeta(self::META_EXTRA_ITERABLES) ?? [];
+            if (!empty($extraIterables)) {
+                foreach ($extraIterables as $iterable) {
+                    if (empty($data[$iterable])) {
+                        continue;
+                    }
+                    ModelUtils::leftJoin(
+                        $data[$iterable],
+                        $fieldMapping,
+                        [$expander, "resolveFragments"],
+                        $expander->getDefaultRecord()
+                    );
+                }
+            }
         }
 
         $response->setData($data);

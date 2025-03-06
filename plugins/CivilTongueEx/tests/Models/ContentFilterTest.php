@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Isis Graziatto <isis.g@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,10 +9,8 @@ namespace VanillaTests\CivilTongueEx\Library;
 
 use CivilTongueEx\Library\ContentFilter;
 use Garden\Container\Container;
-use PHPUnit\Framework\TestCase;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestCase;
-use VanillaTests\SiteTestTrait;
 
 /**
  * Class ContentFilterTest
@@ -42,15 +40,16 @@ class ContentFilterTest extends SiteTestCase
     public static function configureContainerBeforeStartup(Container $container)
     {
         self::$contentFilter = new ContentFilter();
+        self::$contentFilter->setStaticPatterns(null);
         $container->setInstance(ContentFilter::class, self::$contentFilter);
     }
 
     /**
      * Test replace() method in ContentFilter
      *
-     * @param string string $patternList
-     * @param string string $text
-     * @param string string $expected
+     * @param string $patternList
+     * @param string $text
+     * @param string $expected
      * @dataProvider providePatternList
      */
     public function testReplace(string $patternList, string $text, string $expected)

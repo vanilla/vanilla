@@ -55,7 +55,7 @@ export function ColorPicker(_props: IProps) {
     const defaultBackgroundColor =
         defaultBackground === "global-mainColors-fg"
             ? globalVariables().mainColors.fg.toHexString()
-            : PICKER_DEFAULT_BACKGROUND;
+            : defaultBackground ?? PICKER_DEFAULT_BACKGROUND;
 
     // Track whether we have a valid color.
     // If the color is not set, we don't really care.

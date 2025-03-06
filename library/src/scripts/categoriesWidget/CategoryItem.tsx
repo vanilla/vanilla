@@ -183,6 +183,7 @@ export default function CategoryItem(props: IProps) {
                         preview={props.isPreview}
                         className={classes.listItemActionButton}
                         onPreferencesChange={onCategoryFollowChange}
+                        categoryUrl={category.to as string}
                     />
                 )
             }

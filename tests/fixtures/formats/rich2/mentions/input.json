@@ -2,7 +2,7 @@
   {
     "type": "rich_embed_card",
     "dataSourceType": "url",
-    "url": "https://dev.vanilla.localhost/discussion/comment/668#Comment_668",
+    "url": "https://dev.vanilla.local/discussion/comment/668#Comment_668",
     "embedData": {
       "recordID": 668,
       "recordType": "comment",
@@ -13,8 +13,8 @@
       "insertUser": {
         "userID": 16,
         "name": "QuoteBlockAuthor",
-        "url": "https://dev.vanilla.localhost/profile/QuoteBlockAuthor",
-        "photoUrl": "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+        "url": "https://dev.vanilla.local/profile/QuoteBlockAuthor",
+        "photoUrl": "https://dev.vanilla.local/applications/dashboard/design/images/defaulticon.png",
         "dateLastActive": "2023-01-31T08:51:29+00:00",
         "banned": 0,
         "punished": 0,
@@ -30,7 +30,7 @@
         "renderFullContent": false,
         "expandByDefault": false
       },
-      "url": "https://dev.vanilla.localhost/discussion/comment/668#Comment_668",
+      "url": "https://dev.vanilla.local/discussion/comment/668#Comment_668",
       "embedType": "quote"
     },
     "children": [
@@ -48,8 +48,8 @@
         "children": [{ "text": "" }],
         "userID": 7,
         "name": "AtMentionedUserOutsideOfQuoteBlock",
-        "url": "https://dev.vanilla.localhost/profile/AtMentionedUserOutsideOfQuoteBlock",
-        "photoUrl": "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+        "url": "https://dev.vanilla.local/profile/AtMentionedUserOutsideOfQuoteBlock",
+        "photoUrl": "https://dev.vanilla.local/applications/dashboard/design/images/defaulticon.png",
         "dateLastActive": "2022-12-20T17:41:59+00:00",
         "banned": 0,
         "private": false,

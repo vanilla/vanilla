@@ -46,7 +46,7 @@ export function ProfileFieldDelete(props: IProps) {
     // process the deletion of the profile field
     const handleDeleteConfirm = () => {
         if (field) {
-            deleteProfileField(field.apiName);
+            void deleteProfileField(field.apiName);
         }
     };
 

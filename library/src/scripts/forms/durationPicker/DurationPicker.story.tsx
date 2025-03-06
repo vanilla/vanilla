@@ -65,7 +65,7 @@ export function DurationPicker() {
                 value={valueThree}
                 className={durationClass}
                 submitButton={{
-                    children: <Icon icon="data-send" />,
+                    children: <Icon icon="send" />,
                     onClick: () => setMessageThree(`Duration: ${valueThree.length} ${valueThree.unit}`),
                     tooltip: "Save Duration",
                 }}

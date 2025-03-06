@@ -49,14 +49,14 @@ vnla docker --service vanilla,mailhog
 
 **The following web services will then be accessible**
 
--   https://dev.vanilla.localhost, https://vanilla.localhost/OTHER_SITE_SLUGS - Vanilla Sites
--   https://vanilla.localhost/dev - Same site as the previous
--   https://kibana.vanilla.localhost - Logs/Kibana instance
--   https://queue.vanilla.localhost - Dashboard for the queue if you are running with it.
--   https://mail.vanilla.localhost - All outgoing mail goes here.
--   https://search.vanilla.localhost - Vanilla search microservice.
--   https://imgproxy.vanilla.localhost - Image resizing service
--   https://elasticsearch.vanilla.localhost - ElasticSearch instance for kibana/logs and search service.
+-   https://dev.vanilla.local, https://vanilla.local/OTHER_SITE_SLUGS - Vanilla Sites
+-   https://vanilla.local/dev - Same site as the previous
+-   https://kibana.vanilla.local - Logs/Kibana instance
+-   https://queue.vanilla.local - Dashboard for the queue if you are running with it.
+-   https://mail.vanilla.local - All outgoing mail goes here.
+-   https://search.vanilla.local - Vanilla search microservice.
+-   https://imgproxy.vanilla.local - Image resizing service
+-   https://elasticsearch.vanilla.local - ElasticSearch instance for kibana/logs and search service.
 
 ## `vnla spawn-site`
 

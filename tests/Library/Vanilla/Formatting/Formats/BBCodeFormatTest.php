@@ -47,7 +47,8 @@ class BBCodeFormatTest extends AbstractFormatTestCase
                 http_build_query([
                     "allowTrusted" => 1,
                     "target" => "https://de.wikipedia.org/wiki/Prüfsumme",
-                ])
+                ]),
+            true
         );
         $expected = '<a href="' . htmlspecialchars($expectedHref) . '" rel="nofollow">a</a>';
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);

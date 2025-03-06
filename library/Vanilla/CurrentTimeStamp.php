@@ -25,6 +25,8 @@ final class CurrentTimeStamp
      */
     const MYSQL_DATE_FORMAT = "Y-m-d H:i:s";
     const MYSQL_DATE_FORMAT_PRECISE = "Y-m-d H:i:s.u";
+
+    const SAML_SSO_DATE_FORMAT = "Y-m-d\TH:i:s.v\Z";
     const PRECISE_DATE_FORMAT = "U.u";
 
     /** @var string */
@@ -45,7 +47,8 @@ final class CurrentTimeStamp
      */
     public static function get(): int
     {
-        return self::$timeMock ?? time();
+        $time = self::$timeMock ?? time();
+        return (int) $time;
     }
 
     /**

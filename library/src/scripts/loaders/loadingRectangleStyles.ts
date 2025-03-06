@@ -17,9 +17,9 @@ export const loadingRectangleVariables = useThemeCache(() => {
     const colors = makeVars("colors", {
         bg: linearGradient(
             "to right",
-            `${ColorsUtils.colorOut(globalVariables().mixBgAndFg(0.08))} 6%`,
-            `${ColorsUtils.colorOut(globalVariables().mixBgAndFg(0.1))} 25%`,
-            `${ColorsUtils.colorOut(globalVariables().mixBgAndFg(0.08))} 34%`,
+            `${ColorsUtils.colorOut(globalVariables().mixBgAndFg(0.12))} 6%`,
+            `${ColorsUtils.colorOut(globalVariables().mixBgAndFg(0.2))} 25%`,
+            `${ColorsUtils.colorOut(globalVariables().mixBgAndFg(0.12))} 34%`,
         ),
     });
 

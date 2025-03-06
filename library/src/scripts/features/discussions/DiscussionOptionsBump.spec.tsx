@@ -6,13 +6,14 @@
 
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionOptionsBump from "@library/features/discussions/DiscussionOptionsBump";
 import { mockAPI } from "@library/__tests__/utility";
 import { ToastProvider } from "@library/features/toaster/ToastContext";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 import { vitest } from "vitest";
 import MockAdapter from "axios-mock-adapter/types";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
 const discussion = DiscussionFixture.mockDiscussion;
 let mockApi: MockAdapter;
@@ -47,14 +48,11 @@ describe("DiscussionOptionsBump", () => {
         beforeEach(async () => {
             mockApi.onPatch(`/discussions/${discussion.discussionID}/bump`).replyOnce(200, discussion);
 
-            await act(async () => {
-                renderInProvider();
-            });
+            await renderInProvider();
 
             const button = await screen.findByText("Bump");
-            await act(async () => {
-                fireEvent.click(button);
-            });
+
+            await userEvent.click(button);
         });
 
         it("makes an API call to the bump endpoint", async () => {
@@ -79,14 +77,10 @@ describe("DiscussionOptionsBump", () => {
                 .onPatch(`/discussions/${discussion.discussionID}/bump`)
                 .replyOnce(500, { message: fakeErrorMessage });
 
-            await act(async () => {
-                renderInProvider();
-            });
+            await renderInProvider();
 
             const button = await screen.findByText("Bump");
-            await act(async () => {
-                fireEvent.click(button);
-            });
+            await userEvent.click(button);
         });
 
         it("does not call the onMutateSuccess callback", async () => {

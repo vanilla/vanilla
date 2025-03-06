@@ -6,16 +6,23 @@
 
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { emailSettingsClasses } from "@dashboard/emailSettings/EmailSettings.classes";
-import { IEmailDigestSettings } from "@dashboard/emailSettings/EmailSettings.types";
-import { getDigestSettingsSchemas, getEmailSettingsSchemas } from "@dashboard/emailSettings/EmailSettings.utils";
+import {
+    IEmailDigestAdditionalSetting,
+    IEmailDigestSettingsConfigValues,
+    IEmailDigestSettingsFormValues,
+} from "@dashboard/emailSettings/EmailSettings.types";
+import {
+    getDigestSettingsSchemas,
+    getInitialFormValues,
+    mapFormValuesToConfigValues,
+} from "@dashboard/emailSettings/digestSettings/DigestSettings.utils";
 import DigestSchedule from "@dashboard/emailSettings/components/DigestSchedule";
-import TestDigestModal from "@dashboard/emailSettings/components/TestDigestModal";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import { cx } from "@emotion/css";
-import { LoadStatus } from "@library/@types/api/core";
-import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
+import { useConfigMutation, useConfigQuery } from "@library/config/configHooks";
 import Translate from "@library/content/Translate";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
@@ -23,135 +30,65 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
-import { IFieldError, IJsonSchemaFormHandle, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { validationErrorsToFieldErrors } from "@vanilla/json-schema-forms/src/utils";
+import { IFieldError, IJsonSchemaFormHandle } from "@vanilla/json-schema-forms";
+import { extractSchemaDefaults, mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
 import { useRouteChangePrompt } from "@vanilla/react-utils";
-import isEqual from "lodash/isEqual";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useFormik } from "formik";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MemoryRouter } from "react-router";
-import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
-import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
+import TestDigestModal from "../components/TestDigestModal";
 
-export function DigestSettings() {
-    // Schemas
-    const DIGEST_SETTINGS_SCHEMA = getDigestSettingsSchemas().emailDigestSchema;
-    const EMAIL_SETTINGS_SCHEMA = getEmailSettingsSchemas().emailSettingsSchema;
+/**
+ * This is responsible for registering additional setting (schema properties) as form field (e.g. from groups)
+ */
 
-    const classes = emailSettingsClasses();
+let additionalSettings: IEmailDigestAdditionalSetting = {};
+DigestSettings.addAdditionalSetting = (newSetting: IEmailDigestAdditionalSetting) => {
+    additionalSettings = { ...additionalSettings, ...newSetting };
+};
 
-    const { isLoading: isPatchLoading, patchConfig, error } = useConfigPatcher();
-
-    const sections = ["General", "Content"];
-
-    // Grab saved values from the config
-    const settings = useConfigsByKeys(
-        Object.keys({
-            ...DIGEST_SETTINGS_SCHEMA["properties"],
-            ...EMAIL_SETTINGS_SCHEMA["properties"],
-        }),
-    );
-
-    const [showTestDigestModal, setShowTestDigestModal] = useState<boolean>(false);
-    const [values, setValues] = useState<any>(null);
-
-    useEffect(() => {
-        if (settings?.data) {
-            setValues(settings.data);
-        }
-    }, [settings]);
-
-    const isDirty = useMemo(() => {
-        if (settings?.data && values) {
-            /**
-             * Normalize values to match the stored config data types
-             */
-            const normalized = {
-                ...values,
-                "emailDigest.postCount": parseInt(values["emailDigest.postCount"]),
-                "emailDigest.dayOfWeek": parseInt(values["emailDigest.dayOfWeek"]),
-                "emailDigest.footer":
-                    typeof values["emailDigest.footer"] !== "string"
-                        ? JSON.stringify(values["emailDigest.footer"])
-                        : values["emailDigest.footer"],
-                "emailDigest.introduction":
-                    typeof values["emailDigest.introduction"] !== "string"
-                        ? JSON.stringify(values["emailDigest.introduction"])
-                        : values["emailDigest.introduction"],
-            };
-
-            return !isEqual(normalized, settings.data);
-        }
-        return false;
-    }, [values, settings]);
-
-    useRouteChangePrompt(
-        t(
-            "You are leaving the Email Settings page without saving your changes. Make sure your updates are saved before exiting.",
-        ),
-        !isDirty,
-    );
-
-    const emailSettings = useMemo(() => {
-        const refinedEmailSettings = {
-            // initial values
-            ...Object.keys(EMAIL_SETTINGS_SCHEMA.properties).reduce((acc, currentKey) => {
-                const value = EMAIL_SETTINGS_SCHEMA.properties[currentKey];
-                return {
-                    ...acc,
-                    [currentKey]: value.type === "boolean" ? false : value.type === "number" ? 1 : "",
-                };
-            }, {}),
-            // final values with actual data
-            ...(settings.data &&
-                Object.fromEntries(
-                    Object.keys(EMAIL_SETTINGS_SCHEMA.properties).map((key) => {
-                        if (key === "emailNotifications.disabled") {
-                            return [key, !settings.data[key]];
-                        } else if (key === "emailStyles.format") {
-                            return [key, settings.data[key] === "html" ? true : false];
-                        }
-                        return [key, settings.data[key] ?? ""];
-                    }),
-                )),
-        };
-
-        return refinedEmailSettings;
-    }, [EMAIL_SETTINGS_SCHEMA.properties, settings.data]);
-
-    // Validation & save
+function DigestSettingsForm(props: {
+    initialValues: IEmailDigestSettingsFormValues;
+    onSubmit: (values: IEmailDigestSettingsFormValues) => Promise<void>;
+}) {
     const schemaFormRef = useRef<IJsonSchemaFormHandle | null>(null);
-    const [fieldErrors, setFieldErrors] = useState<IFieldError[]>([]);
-    const validateForm = () => {
-        const result = schemaFormRef?.current?.validate();
-        setFieldErrors(validationErrorsToFieldErrors(result?.errors));
-        return result?.valid;
-    };
+    const [fieldErrors, setFieldErrors] = useState<Record<string, IFieldError[]>>({});
 
-    const handleFormSubmit = async () => {
-        if (validateForm()) {
+    const {
+        values: nonNormalizedValues,
+        setValues,
+        submitForm,
+        isSubmitting,
+        dirty,
+    } = useFormik<IEmailDigestSettingsFormValues>({
+        initialValues: props.initialValues,
+        onSubmit: async (values) => {
             try {
-                await patchConfig(
-                    Object.fromEntries(
-                        Object.keys(values)
-                            .map((key) => {
-                                if (key === "emailDigest.footer" || key === "emailDigest.introduction") {
-                                    return [
-                                        key,
-                                        typeof values[key] === "string" ? values[key] : JSON.stringify(values[key]),
-                                    ];
-                                }
-                                return [key, values[key]];
-                            })
-                            .filter((entry) => entry[0] !== "emailDigest.metaOptions"),
-                    ) as IEmailDigestSettings,
-                );
+                await props.onSubmit(values);
             } catch (e) {
                 if (e.errors) {
                     setFieldErrors(e.errors);
                 }
             }
-        }
-    };
+        },
+        validate: () => {
+            const result = schemaFormRef?.current?.validate();
+            const mappedErrors = mapValidationErrorsToFormikErrors(result?.errors ?? []);
+            return mappedErrors ?? {};
+        },
+        enableReinitialize: true,
+    });
+
+    const classes = emailSettingsClasses();
+
+    useRouteChangePrompt(
+        t(
+            "You are leaving the Email Settings page without saving your changes. Make sure your updates are saved before exiting.",
+        ),
+        !dirty,
+    );
+
+    const [showTestDigestModal, setShowTestDigestModal] = useState<boolean>(false);
 
     // if errors are present, scroll to the first error
     useEffect(() => {
@@ -161,17 +98,21 @@ export function DigestSettings() {
         }
     }, [fieldErrors]);
 
-    const normalizedValues = {
-        ...values,
+    const values = {
+        ...nonNormalizedValues,
         // Disallow line breaks in subject & title field
-        "emailDigest.title": (values?.["emailDigest.title"] ?? "").replace(/(\r\n|\n|\r)/gm, ""),
+        "emailDigest.title": (nonNormalizedValues?.["emailDigest.title"] ?? "").replace(/(\r\n|\n|\r)/gm, ""),
     };
+
+    let sections = ["General"].concat(values["emailDigest.enabled"] ? ["Delivery", "Content", "Subscription"] : []);
 
     const scrollRefs = useRef<HTMLDivElement[]>([]);
 
     const addToRefs = useCallback((el: HTMLDivElement | null, index: number) => {
-        if (!el || scrollRefs.current.includes(el)) return;
-        scrollRefs.current.splice(index, 0, el);
+        if (!el || scrollRefs.current.includes(el)) {
+            return;
+        }
+        scrollRefs.current.splice(index, 1, el);
     }, []);
 
     const scrollToRef = (index: any) => {
@@ -179,65 +120,65 @@ export function DigestSettings() {
     };
 
     return (
-        <MemoryRouter>
+        <>
             <form
                 role="form"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                     e.preventDefault();
-                    handleFormSubmit();
+                    await submitForm();
                 }}
                 className={classes.root}
-                noValidate
             >
                 <DashboardHeaderBlock
                     title={t("Digest Settings")}
                     actionButtons={
-                        <Button
-                            buttonType={ButtonTypes.DASHBOARD_PRIMARY}
-                            disabled={isPatchLoading || settings.status !== LoadStatus.SUCCESS}
-                            submit
-                        >
+                        <Button buttonType={ButtonTypes.DASHBOARD_PRIMARY} disabled={isSubmitting} submit>
                             {t("Save")}
                         </Button>
                     }
                 />
                 <DashboardFormList>
-                    {values &&
-                        sections.map((section, index) => (
-                            <div key={index} ref={(ele) => addToRefs(ele, index)} className={cx(classes.section)}>
-                                <DashboardFormSubheading hasBackground>
-                                    {t(section)}
-                                    {section === "General" && (
-                                        <>
-                                            <DropDown name={t("Email Digest Options")} flyoutType={FlyoutType.LIST}>
-                                                <DropDownItemButton
-                                                    name={t("Send Test Digest")}
-                                                    onClick={() => {
-                                                        setShowTestDigestModal(true);
-                                                    }}
-                                                />
-                                            </DropDown>
-                                        </>
-                                    )}
-                                </DashboardFormSubheading>
-                                <DashboardSchemaForm
-                                    disabled={settings.status !== LoadStatus.SUCCESS}
-                                    fieldErrors={error?.errors ?? fieldErrors ?? {}}
-                                    schema={
-                                        section === "General"
-                                            ? getDigestSettingsSchemas().emailDigestGeneralSchema
-                                            : getDigestSettingsSchemas().emailDigestContentSchema
-                                    }
-                                    instance={normalizedValues}
-                                    ref={schemaFormRef}
-                                    onChange={setValues}
-                                />
+                    {sections.map((section, index) => (
+                        <div key={index} ref={(ele) => addToRefs(ele, index)} className={cx(classes.section)}>
+                            <DashboardFormSubheading hasBackground>
+                                {t(section)}
 
-                                {section === "General" && values["emailDigest.enabled"] && (
+                                {section === "General" && (
+                                    <>
+                                        <DropDown name={t("Email Digest Options")} flyoutType={FlyoutType.LIST}>
+                                            <DropDownItemButton
+                                                name={t("Send Test Digest")}
+                                                onClick={() => {
+                                                    setShowTestDigestModal(true);
+                                                }}
+                                            />
+                                        </DropDown>
+                                    </>
+                                )}
+                            </DashboardFormSubheading>
+                            <DashboardSchemaForm
+                                disabled={isSubmitting}
+                                fieldErrors={fieldErrors}
+                                schema={
+                                    {
+                                        General: getDigestSettingsSchemas().emailDigestGeneralSchema,
+                                        Delivery: getDigestSettingsSchemas().emailDigestDeliverySchema,
+                                        Content: getDigestSettingsSchemas(additionalSettings).emailDigestContentSchema,
+                                        Subscription: getDigestSettingsSchemas().emailDigestSubscriptionSchema,
+                                    }[section]!
+                                }
+                                instance={values}
+                                ref={schemaFormRef}
+                                onChange={setValues}
+                            />
+
+                            {section === "Delivery" &&
+                                values["emailDigest.enabled"] &&
+                                !!values["emailDigest.dayOfWeek"] && (
                                     <DigestSchedule dayOfWeek={values["emailDigest.dayOfWeek"]} />
                                 )}
-                            </div>
-                        ))}
+                        </div>
+                    ))}
                 </DashboardFormList>
             </form>
             <DashboardHelpAsset>
@@ -272,9 +213,39 @@ export function DigestSettings() {
                     />
                 </p>
             </DashboardHelpAsset>
-            {showTestDigestModal && (
-                <TestDigestModal settings={emailSettings} onCancel={() => setShowTestDigestModal(false)} />
-            )}
+
+            {showTestDigestModal && <TestDigestModal onCancel={() => setShowTestDigestModal(false)} />}
+        </>
+    );
+}
+
+export function DigestSettings() {
+    const digestSettingsSchema = getDigestSettingsSchemas(additionalSettings).emailDigestSchema;
+
+    let defaultValues = extractSchemaDefaults(digestSettingsSchema) as IEmailDigestSettingsFormValues;
+
+    const settings = useConfigQuery(["emailDigest.*"]);
+
+    const { mutateAsync: patchConfig } = useConfigMutation();
+
+    let initialValues = defaultValues;
+    if (settings.data) {
+        let configs = settings.data as IEmailDigestSettingsConfigValues;
+
+        initialValues = {
+            ...defaultValues,
+            ...getInitialFormValues(configs, defaultValues),
+        };
+    }
+
+    async function handleFormSubmit(values: IEmailDigestSettingsFormValues) {
+        const mappedValues = mapFormValuesToConfigValues(values);
+        return await patchConfig(mappedValues);
+    }
+
+    return (
+        <MemoryRouter>
+            <DigestSettingsForm initialValues={initialValues} onSubmit={handleFormSubmit} />
         </MemoryRouter>
     );
 }

@@ -350,6 +350,11 @@ export const dashboardClasses = useThemeCache(() => {
         padding: "0 18px",
     });
 
+    const staticText = css({
+        padding: "0 18px",
+        fontSize: globalVariables().fonts.size.small,
+    });
+
     return {
         subHeading,
         subHeadingBackground,
@@ -388,5 +393,6 @@ export const dashboardClasses = useThemeCache(() => {
         imagePreview,
         content,
         reachAutocompleteInput,
+        staticText,
     };
 });

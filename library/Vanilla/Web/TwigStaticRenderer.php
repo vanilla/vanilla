@@ -76,7 +76,7 @@ TWIG
             [
                 "props" => json_encode(ApiUtils::jsonFilter($props), JSON_UNESCAPED_UNICODE),
                 "component" => $componentName,
-                "class" => trim($cssClass),
+                "class" => trim($cssClass ?? ""),
                 "htmlContents" => $htmlContents,
             ]
         );

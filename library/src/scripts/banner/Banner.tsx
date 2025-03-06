@@ -48,6 +48,7 @@ export interface IBannerProps {
     isContentBanner?: boolean;
     scope?: ISearchScopeNoCompact;
     initialQuery?: string; // prepopulate text input
+    initialParams?: React.ComponentProps<typeof IndependentSearch>["initialParams"];
     hideSearch?: boolean;
     hideIcon?: boolean;
     options?: Partial<IBannerOptions>;
@@ -188,6 +189,7 @@ export default function Banner(props: IBannerProps) {
                 resultsAsModalClasses={classes.resultsAsModal}
                 scope={props.scope}
                 initialQuery={props.initialQuery}
+                initialParams={props.initialParams}
                 overwriteSearchBar={{
                     borderRadius: styleUnit(vars.searchBar.border.radius),
                     preset: vars.presets.input.preset,

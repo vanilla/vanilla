@@ -9,7 +9,7 @@ paths:
                   in: query
                   schema:
                       type: string
-                - name: tagID[]
+                - name: tagID
                   description: The ID of the tag to find.
                   in: query
                   schema:

@@ -41,6 +41,17 @@ abstract class SearchQuery
     // Exact text matching with wildcard support. Only used on small text fields.
     const MATCH_WILDCARD = "wildcard";
 
+    // Match terms from the query in any order using a fulltext-language specific analyzer.
+    const MATCH_VECTORIZED = "vectorized";
+
+    // Match terms from the query by combining the result of a fulltext match and a vectorized match.
+    const MATCH_VECTORIZED_EXTENDED = "vectorized_extended";
+    const TEXT_MATCH_MODES = [
+        self::MATCH_FULLTEXT,
+        self::MATCH_FULLTEXT_EXTENDED,
+        self::MATCH_VECTORIZED,
+        self::MATCH_VECTORIZED_EXTENDED,
+    ];
     const SORT_RELEVANCE = "relevance";
     const SORT_ASC = "asc";
     const SORT_DESC = "desc";
@@ -259,6 +270,9 @@ abstract class SearchQuery
                 "excerpt",
                 "-body",
                 "tagIDs",
+                "vectors",
+                "vectors_debug",
+                "summary",
             ]),
             "recordTypes:a?" => [
                 "items" => [
@@ -293,6 +307,15 @@ abstract class SearchQuery
             ],
             "includeResults:b" => [
                 "default" => true,
+            ],
+            "matchMode:s?" => [
+                "enum" => [
+                    self::MATCH_FULLTEXT,
+                    self::MATCH_FULLTEXT_EXTENDED,
+                    self::MATCH_WILDCARD,
+                    self::MATCH_VECTORIZED,
+                    self::MATCH_VECTORIZED_EXTENDED,
+                ],
             ],
         ]);
 

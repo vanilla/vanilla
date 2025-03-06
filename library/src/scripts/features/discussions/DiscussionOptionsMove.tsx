@@ -1,17 +1,18 @@
 /**
  * @author Raphaël Bergina <raphael.bergina@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React, { FunctionComponent, useState } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
-import { t } from "@library/utility/appUtils";
+import { getMeta, t } from "@library/utility/appUtils";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import LazyMoveDiscussionForm from "@library/features/discussions/forms/LazyMoveDiscussionForm";
+import MoveDiscussionForm from "@library/features/discussions/forms/MoveDiscussionForm.loadable";
 import { StackingContextProvider } from "@vanilla/react-utils";
+import MovePostForm from "@library/features/discussions/forms/MovePostForm";
 
 const DiscussionOptionsMove: FunctionComponent<{
     discussion: IDiscussion;
@@ -26,12 +27,18 @@ const DiscussionOptionsMove: FunctionComponent<{
         close();
     }
 
+    const POST_TYPES_ENABLED = getMeta("featureFlags.customLayout.createPost.Enabled", false);
+
     return (
         <>
             <DropDownItemButton onClick={open}>{t("Move")}</DropDownItemButton>
             <StackingContextProvider>
                 <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={close}>
-                    <LazyMoveDiscussionForm discussion={discussion} onSuccess={handleSuccess} onCancel={close} />
+                    {POST_TYPES_ENABLED ? (
+                        <MovePostForm discussion={discussion} onSuccess={handleSuccess} onCancel={close} />
+                    ) : (
+                        <MoveDiscussionForm discussion={discussion} onSuccess={handleSuccess} onCancel={close} />
+                    )}
                 </Modal>
             </StackingContextProvider>
         </>

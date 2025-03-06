@@ -6,10 +6,11 @@
 
 import React from "react";
 import { render, screen, fireEvent, act, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { mockAPI } from "@library/__tests__/utility";
 import { ToastProvider } from "@library/features/toaster/ToastContext";
-import { CommentFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Comment.Fixture";
+import { CommentFixture } from "@vanilla/addon-vanilla/comments/__fixtures__/Comment.Fixture";
 import CommentOptionsChangeStatus from "./CommentOptionsChangeStatus";
 import { QnAStatus } from "@dashboard/@types/api/comment";
 import { vitest } from "vitest";
@@ -46,9 +47,7 @@ async function renderInProvider() {
 
 async function clickOptionButtonToOpenForm() {
     const button = await screen.findByText("Change Status");
-    await act(async () => {
-        fireEvent.click(button);
-    });
+    await userEvent.click(button);
 }
 
 async function fillAndSubmitForm() {
@@ -58,14 +57,10 @@ async function fillAndSubmitForm() {
         exact: false,
         selector: `input[value='${QnAStatus.ACCEPTED}']`,
     });
-    await act(async () => {
-        fireEvent.click(acceptRadioButton);
-    });
+    await userEvent.click(acceptRadioButton);
 
     const submitButton = await within(form).findByText("Save");
-    await act(async () => {
-        fireEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
 }
 
 describe("CommentOptionsChangeStatus", () => {
@@ -81,9 +76,7 @@ describe("CommentOptionsChangeStatus", () => {
     });
 
     it("renders a form with the correct radio button initially selected", async () => {
-        await act(async () => {
-            renderInProvider();
-        });
+        await renderInProvider();
         await clickOptionButtonToOpenForm();
         const form = await screen.findByRole("form");
         expect(form).toBeInTheDocument();
@@ -118,9 +111,7 @@ describe("CommentOptionsChangeStatus", () => {
                     ];
                 },
             );
-            await act(async () => {
-                renderInProvider();
-            });
+            await renderInProvider();
             await clickOptionButtonToOpenForm();
             await fillAndSubmitForm();
         });
@@ -142,9 +133,7 @@ describe("CommentOptionsChangeStatus", () => {
                 .onPatch(`/comments/${rejectedComment.commentID}/answer`)
                 .replyOnce(500, { message: fakeErrorMessage });
 
-            await act(async () => {
-                renderInProvider();
-            });
+            await renderInProvider();
             await clickOptionButtonToOpenForm();
             await fillAndSubmitForm();
         });

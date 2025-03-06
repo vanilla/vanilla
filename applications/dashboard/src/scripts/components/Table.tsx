@@ -22,7 +22,7 @@ import { DashboardPager } from "@dashboard/components/DashboardPager";
 import { cx } from "@emotion/css";
 import { Scrollbars } from "react-custom-scrollbars";
 import TruncatedText from "@library/content/TruncatedText";
-import { getJSLocaleKey } from "@vanilla/i18n";
+import { getJSLocaleKey, t } from "@vanilla/i18n";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { Icon } from "@vanilla/icons";
@@ -92,7 +92,7 @@ const TableHeader = (props: ITableHeaderProps) => {
                                     >
                                         {column.render("Header")}
                                     </ConditionalWrap>
-                                    <Icon icon={column.isSortedDesc ? "data-down" : "data-up"} />
+                                    <Icon icon={column.isSortedDesc ? "move-down" : "move-up"} />
                                 </ConditionalWrap>
                             </th>
                         );
@@ -256,7 +256,7 @@ export const Table = (props: ITableProps) => {
                             if (typeof row.original[key] === "number") {
                                 return new Intl.NumberFormat(getJSLocaleKey()).format(row.original[key]);
                             }
-                            return row.original[key];
+                            return row.original?.[key] ?? t("Other");
                         },
                         ...(Object.keys(customSortByFnPerColumn ?? {}).includes(key) && {
                             sortType: customSortByFnPerColumn?.[key],

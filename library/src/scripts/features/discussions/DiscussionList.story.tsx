@@ -25,7 +25,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import keyBy from "lodash/keyBy";
 import { GlobalPreset } from "@library/styles/globalStyleVars";
-import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
 export default {
     title: "Components/DiscussionLists",

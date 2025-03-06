@@ -12,7 +12,9 @@ use Garden\Web\Exception\ResponseException;
 use Gdn;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Dashboard\Events\NotificationEvent;
+use Vanilla\Formatting\Formats\WysiwygFormat;
 use VanillaTests\ExpectedNotification;
+use VanillaTests\Fixtures\Html\TestHtmlDocument;
 use VanillaTests\NotificationsApiTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -599,5 +601,51 @@ class ActivityModelTest extends SiteTestCase
     {
         $payload = $this->activityModel->decodeNotificationToken($token);
         return $this->activityModel->getNotificationData($payload);
+    }
+
+    /**
+     * Tests that absolute URLs are used in notification emails.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testAbsoluteUrlsUsedInEmails()
+    {
+        $user = $this->createUser();
+        $activity = [
+            "ActivityType" => "Comment",
+            "ActivityUserID" => 2,
+            "NotifyUserID" => $user["userID"],
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_PENDING,
+            "Emailed" => ActivityModel::SENT_PENDING,
+            "Ext" => [
+                "Email" => [
+                    "Format" => WysiwygFormat::FORMAT_KEY,
+                    "Story" => "<div><a href='https://www.google.com/'>Test</a></div>",
+                ],
+            ],
+        ];
+
+        $emailContent = null;
+
+        // This is to get the final rendered html content of the email.
+        Gdn::eventManager()->bind("ActivityModel_BeforeSendNotification", function ($sender, $args) use (
+            &$emailContent
+        ) {
+            /** @var \Gdn_Email $email */
+            $email = $args["Email"];
+            $emailContent = $email->getEmailTemplate()->getMessage();
+        });
+
+        $this->activityModel->save($activity);
+
+        // Check that the email content uses absolute URLs.
+        $emailContent = new TestHtmlDocument($emailContent);
+        $emailContent->assertContainsLink(
+            "https://vanilla.test/activitymodeltest/home/leaving?" .
+                http_build_query(["allowTrusted" => 1, "target" => "https://www.google.com/"]),
+            "Test"
+        );
     }
 }

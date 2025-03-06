@@ -22,9 +22,12 @@ class OpenAIClient
 {
     const MODELS = [self::MODEL_GPT35, self::MODEL_GPT4];
     const MODEL_GPT4 = "gpt4";
+    const MODEL_GPT4OMINI = "gpt4omini";
     const MODEL_GPT35 = "gpt35";
 
+    const CONF_GPT4OMINI_ENDPOINT = "azure.gpt4omini.deploymentUrl";
     const CONF_GPT4_ENDPOINT = "azure.gpt4.deploymentUrl";
+
     const CONF_GPT4_SECRET = "azure.gpt4.secret";
 
     const CONF_GPT35_ENDPOINT = "azure.gpt35.deploymentUrl";
@@ -116,6 +119,8 @@ class OpenAIClient
 
         if ($model === self::MODEL_GPT35) {
             $client = $this->gpt35Client();
+        } elseif ($model === self::MODEL_GPT4OMINI) {
+            $client = $this->gpt4OMiniClient();
         } else {
             // Need the newer GPT models for this.
             $body["response_format"] = ["type" => "json_object"];
@@ -153,7 +158,7 @@ class OpenAIClient
             "top_p" => 0.3,
             "frequency_penalty" => 0.2,
             "presence_penalty" => 0.35,
-            "max_tokens" => 400,
+            "max_tokens" => 4000,
         ];
 
         if ($model === self::MODEL_GPT4) {
@@ -198,6 +203,18 @@ class OpenAIClient
     private function gpt4Client(): HttpClient
     {
         $baseUrl = $this->configuration->get(self::CONF_GPT4_ENDPOINT);
+        $secret = $this->configuration->get(self::CONF_GPT4_SECRET);
+        return $this->gptClient($baseUrl, $secret);
+    }
+
+    /**
+     * Get an authenticated GPT-4oMini client.
+     *
+     * @return HttpClient
+     */
+    private function gpt4OMiniClient(): HttpClient
+    {
+        $baseUrl = $this->configuration->get(self::CONF_GPT4OMINI_ENDPOINT);
         $secret = $this->configuration->get(self::CONF_GPT4_SECRET);
         return $this->gptClient($baseUrl, $secret);
     }

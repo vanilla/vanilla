@@ -47,6 +47,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
         $this->conversationModel = \Gdn::getContainer()->get(\ConversationModel::class);
         $this->sql = $this->discussionModel->SQL;
         $this->conversations = $this->users = [];
+        $this->enableFeature("customLayout.post");
         CurrentTimeStamp::mockTime("2022-01-01");
         \Gdn::config()->set("Dba.Limit", 2);
     }
@@ -384,5 +385,83 @@ class DbaRecalculateCountsTest extends SiteTestCase
         foreach ($allCategoryIDs as $categoryID) {
             $this->assertCategoryCounts($categoryID);
         }
+    }
+
+    /**
+     * Test recalculating the nested comment fields -- i.e., depth, scoreChildComments, and countChildComments. This
+     * test is run in batches of 2.
+     *
+     * @return void
+     */
+    public function testNestedCommentsRecalculation(): void
+    {
+        $this->insertCategories(1);
+        $this->insertDiscussions(1);
+        $topLevelComment = $this->insertComments(1, [
+            "parentRecordType" => "discussion",
+            "parentRecordID" => $this->lastInsertedDiscussionID,
+        ]);
+        $oneDeep = $this->insertComments(1, [
+            "parentRecordType" => "discussion",
+            "parentRecordID" => $this->lastInsertedDiscussionID,
+            "parentCommentID" => $topLevelComment[0]["CommentID"],
+            "Score" => 5,
+        ]);
+        $twoDeep = $this->insertComments(1, [
+            "parentRecordType" => "discussion",
+            "parentRecordID" => $this->lastInsertedDiscussionID,
+            "parentCommentID" => $oneDeep[0]["CommentID"],
+            "Score" => 5,
+        ]);
+        $threeDeep = $this->insertComments(2, [
+            "parentRecordType" => "discussion",
+            "parentRecordID" => $this->lastInsertedDiscussionID,
+            "parentCommentID" => $twoDeep[0]["CommentID"],
+            "Score" => 5,
+        ]);
+
+        $body = [
+            "aggregates" => ["comment.*"],
+        ];
+
+        $response = $this->api()->put("/dba/recalculate-aggregates", $body);
+        // Request should be successful.
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // Verify that the correct values have been calculated for each recalculated field.
+        $topLevelComment = $this->api()
+            ->get("/comments/{$topLevelComment[0]["CommentID"]}")
+            ->getBody();
+        $this->assertSame(1, $topLevelComment["depth"]);
+        $this->assertSame(20, $topLevelComment["scoreChildComments"]);
+        $this->assertSame(4, $topLevelComment["countChildComments"]);
+
+        $oneDeep = $this->api()
+            ->get("/comments/{$oneDeep[0]["CommentID"]}")
+            ->getBody();
+        $this->assertSame(2, $oneDeep["depth"]);
+        $this->assertSame(15, $oneDeep["scoreChildComments"]);
+        $this->assertSame(3, $oneDeep["countChildComments"]);
+
+        $twoDeep = $this->api()
+            ->get("/comments/{$twoDeep[0]["CommentID"]}")
+            ->getBody();
+        $this->assertSame(3, $twoDeep["depth"]);
+        $this->assertSame(10, $twoDeep["scoreChildComments"]);
+        $this->assertSame(2, $twoDeep["countChildComments"]);
+
+        $threeDeep_1 = $this->api()
+            ->get("/comments/{$threeDeep[0]["CommentID"]}")
+            ->getBody();
+        $this->assertSame(4, $threeDeep_1["depth"]);
+        $this->assertSame(0, $threeDeep_1["scoreChildComments"]);
+        $this->assertSame(0, $threeDeep_1["countChildComments"]);
+
+        $threeDeep_2 = $this->api()
+            ->get("/comments/{$threeDeep[1]["CommentID"]}")
+            ->getBody();
+        $this->assertSame(4, $threeDeep_2["depth"]);
+        $this->assertSame(0, $threeDeep_2["scoreChildComments"]);
+        $this->assertSame(0, $threeDeep_2["countChildComments"]);
     }
 }

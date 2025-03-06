@@ -861,7 +861,7 @@ class Gdn_Session implements LoggerAwareInterface
         $sessionModel = new SessionModel();
 
         // Grab the user's session.
-        $session = $this->getStashSession($sessionModel, $value, $expireInternal);
+        $session = $this->getStashSession($sessionModel, $value, $expireInternal, $unsetOnRetrieve);
         if (!$session) {
             return;
         }
@@ -896,11 +896,16 @@ class Gdn_Session implements LoggerAwareInterface
      * @param SessionModel $sessionModel
      * @param mixed $valueToStash The value of the stash to set.
      * @param string $expireInternal Date, this session expires, if left blank, defaults to 'getPersistExpiry()'.
+     * @param bool $expireCookieNow Whether or not to expire the cookie now.
      *
      * @return bool|array Current session.
      */
-    private function getStashSession(SessionModel $sessionModel, $valueToStash, string $expireInternal = "")
-    {
+    private function getStashSession(
+        SessionModel $sessionModel,
+        $valueToStash,
+        string $expireInternal = "",
+        bool $expireCookieNow = false
+    ) {
         $cookieName = c("Garden.Cookie.Name", "Vanilla");
         $name = $cookieName . "-sid";
         $sessionID = Gdn::session()->SessionID;
@@ -908,6 +913,7 @@ class Gdn_Session implements LoggerAwareInterface
             // Get session ID from cookie
             $sessionID = val($name, $_COOKIE, "");
         }
+
         // If there is no session, and no value for saving, return.
         if ($sessionID == "" && $valueToStash == "") {
             return false;
@@ -917,14 +923,13 @@ class Gdn_Session implements LoggerAwareInterface
         $this->Session = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
 
         if (!$this->Session) {
+            $expireInternal =
+                $expireInternal !== "" ? $expireInternal : $sessionModel->getPersistExpiry()->format(MYSQL_DATE_FORMAT);
             $this->Session = [
                 "UserID" => Gdn::session()->UserID,
                 "DateInserted" => CurrentTimeStamp::getMySQL(),
                 "Attributes" => [],
-                "DateExpires" =>
-                    $expireInternal !== ""
-                        ? $expireInternal
-                        : $sessionModel->getPersistExpiry()->format(MYSQL_DATE_FORMAT),
+                "DateExpires" => $expireInternal,
             ];
 
             // Save the session information to the database.
@@ -932,27 +937,16 @@ class Gdn_Session implements LoggerAwareInterface
             $this->Session["SessionID"] = $sessionID;
             trace("Inserting session stash $sessionID");
 
-            // Save a session cookie.
-            $path = c("Garden.Cookie.Path", "/");
-            $domain = c("Garden.Cookie.Domain", "");
-            $expire = 0;
+            $expiry = new DateTime($expireInternal);
 
-            // If the domain being set is completely incompatible with the
-            // current domain then make the domain work.
-            $currentHost = Gdn::request()->host();
-            if (!stringEndsWith($currentHost, trim($domain, "."))) {
-                $domain = "";
-            }
-
-            safeCookie($name, $sessionID, $expire, $path, $domain);
-            $_COOKIE[$name] = $sessionID;
+            $this->setCookie("-sid", $sessionID, $expiry->getTimestamp());
         }
 
         return $this->Session;
     }
 
     /**
-     * Locad cookie and save to user meta after login.
+     * Local cookie and save to user meta after login.
      *
      * @return void
      */

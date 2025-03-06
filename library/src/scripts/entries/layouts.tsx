@@ -14,7 +14,6 @@ import { Router } from "@library/Router";
 import { addPageComponent, registerLoadableWidgets, registerWidgets } from "@library/utility/componentRegistry";
 import { applySharedPortalContext } from "@vanilla/react-utils";
 import { registerReducer } from "@library/redux/reducerRegistry";
-import { layoutSlice } from "@library/features/Layout/LayoutPage.slice";
 import { Backgrounds } from "@library/layout/Backgrounds";
 
 // Theming Reset
@@ -33,11 +32,11 @@ import SectionFullWidth from "@library/layout/SectionFullWidth";
 import SectionOneColumn from "@library/layout/SectionOneColumn";
 import ThreeColumnSection from "@library/layout/ThreeColumnSection";
 import TwoColumnSection from "@library/layout/TwoColumnSection";
-import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
+import { ContentItemHeader } from "@vanilla/addon-vanilla/contentItem/ContentItemHeader";
 import { MetaIcon } from "@library/metas/Metas";
 import AiEscalationMetaIcon from "@library/features/discussions/integrations/components/AiEscalationMetaIcon";
-import { DiscussionAttachment } from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
+import { ContentItemAttachmentService } from "@vanilla/addon-vanilla/contentItem/ContentItemAttachments.service";
 
 if (getMeta("inputFormat.desktop")?.match(/rich2/i)) {
     supportsFrames(true);
@@ -83,72 +82,44 @@ registerWidgets({
 
 registerLoadableWidgets({
     // Sections
-    SectionTwoColumnsEven: () =>
-        import(/* webpackChunkName: "sections/SectionEvenColumns" */ "@library/layout/SectionEvenColumns"),
-    SectionThreeColumnsEven: () =>
-        import(/* webpackChunkName: "sections/SectionEvenColumns" */ "@library/layout/SectionEvenColumns"),
+    SectionTwoColumnsEven: () => import("@library/layout/SectionEvenColumns"),
+    SectionThreeColumnsEven: () => import("@library/layout/SectionEvenColumns"),
     // Widgets
-    BannerWidget: () => import(/* webpackChunkName: "widgets/BannerWidget" */ "@library/banner/BannerWidget"),
-    BannerContentWidget: () =>
-        import(/* webpackChunkName: "widgets/BannerContentWidget" */ "@library/banner/BannerContentWidget"),
+    BannerWidget: () => import("@library/banner/BannerWidget"),
+    BannerContentWidget: () => import("@library/banner/BannerContentWidget"),
 
-    Banner: () => import(/* webpackChunkName: "widgets/Banner" */ "@library/banner/Banner"),
-    Breadcrumbs: () => import(/* webpackChunkName: "widgets/Breadcrumbs" */ "@library/navigation/Breadcrumbs"),
-    DiscussionListModule: () =>
-        import(
-            /* webpackChunkName: "widgets/DiscussionListModule" */ "@library/features/discussions/DiscussionListModule"
-        ),
-    HtmlWidget: () => import(/* webpackChunkName: "widgets/HtmlWidget" */ "@library/htmlWidget/HtmlWidget"),
-    QuickLinks: () => import(/* webpackChunkName: "widgets/QuickLinks" */ "@library/navigation/QuickLinks"),
-    CategoriesWidget: () =>
-        import(/* webpackChunkName: "widgets/CategoriesWidget" */ "@library/categoriesWidget/CategoriesWidget"),
-    TagWidget: () => import(/* webpackChunkName: "widgets/TagWidget" */ "@vanilla/addon-vanilla/tag/TagWidget"),
-    RSSWidget: () => import(/* webpackChunkName: "widgets/RSSWidget" */ "@library/rssWidget/RSSWidget"),
-    UserSpotlightWidget: () =>
-        import(/* webpackChunkName: "widgets/UserSpotlightWidget" */ "@library/userSpotlight/UserSpotlightWidget"),
-    SiteTotalsWidget: () =>
-        import(/* webpackChunkName: "widgets/SiteTotalsWidget" */ "@library/siteTotals/SiteTotalsWidget"),
-    NewPostMenu: () => import(/* webpackChunkName: "widgets/NewPostMenu" */ "@library/newPostMenu/NewPostMenu"),
-    LeaderboardWidget: () =>
-        import(/* webpackChunkName: "widgets/LeaderboardWidget" */ "@library/leaderboardWidget/LeaderboardWidget"),
-    DiscussionsWidget: () =>
-        import(/* webpackChunkName: "widgets/DiscussionsWidget" */ "@library/features/discussions/DiscussionsWidget"),
-    TabWidget: () => import(/* webpackChunkName: "widgets/TabWidget" */ "@library/tabWidget/TabWidget"),
-    CallToActionWidget: () =>
-        import(/* webpackChunkName: "widgets/CallToActionWidget" */ "@library/callToAction/CallToActionWidget"),
-    GuestCallToActionWidget: () =>
-        import(
-            /* webpackChunkName: "widgets/GuestCallToActionWidget" */ "@library/callToAction/GuestCallToActionWidget"
-        ),
-    FeaturedCollectionsWidget: () =>
-        import(
-            /* webpackChunkName: "widgets/FeaturedCollectionsWidget" */ "@library/featuredCollections/FeaturedCollectionsWidget"
-        ),
-    CategoryFollowWidget: () =>
-        import(
-            /* webpackChunkName: "widgets/CategoryFollowWidget" */ "@vanilla/addon-vanilla/categories/CategoryFollowDropdown"
-        ),
-    SuggestedContentWidget: () =>
-        import(
-            /* webpackChunkName: "widgets/SuggestedContentWidget" */ "@library/suggestedContent/SuggestedContentWidget"
-        ),
+    Banner: () => import("@library/banner/Banner"),
+    Breadcrumbs: () => import("@library/navigation/Breadcrumbs"),
+    DiscussionListModule: () => import("@library/features/discussions/DiscussionListModule"),
+    HtmlWidget: () => import("@library/htmlWidget/HtmlWidget"),
+    QuickLinks: () => import("@library/navigation/QuickLinks"),
+    CategoriesWidget: () => import("@library/categoriesWidget/CategoriesWidget"),
+    TagWidget: () => import("@vanilla/addon-vanilla/tag/TagWidget"),
+    RSSWidget: () => import("@library/rssWidget/RSSWidget"),
+    UserSpotlightWidget: () => import("@library/userSpotlight/UserSpotlightWidget"),
+    SiteTotalsWidget: () => import("@library/siteTotals/SiteTotalsWidget"),
+    NewPostMenu: () => import("@library/newPostMenu/NewPostMenu"),
+    LeaderboardWidget: () => import("@library/leaderboardWidget/LeaderboardWidget"),
+    DiscussionsWidget: () => import("@library/features/discussions/DiscussionsWidget"),
+    TabWidget: () => import("@library/tabWidget/TabWidget"),
+    CallToActionWidget: () => import("@library/callToAction/CallToActionWidget"),
+    GuestCallToActionWidget: () => import("@library/callToAction/GuestCallToActionWidget"),
+    FeaturedCollectionsWidget: () => import("@library/featuredCollections/FeaturedCollectionsWidget"),
+    CategoryFollowWidget: () => import("@vanilla/addon-vanilla/categories/CategoryFollowDropdown"),
+    SuggestedContentWidget: () => import("@library/suggestedContent/SuggestedContentWidget"),
 });
 
 // Reducers
 logDebug("Register core reducers");
 registerReducer("notifications", new NotificationsModel().reducer);
 registerReducer("forum", forumReducer);
-registerReducer(layoutSlice.name, layoutSlice.reducer);
 logDebug("Register homepage handler");
 registerLayoutPage("/", () => {
     return {
         layoutViewType: getSiteSection().sectionID.toString() !== "0" ? "subcommunityHome" : "home",
         recordType: "siteSection",
         recordID: getSiteSection().sectionID,
-        params: {
-            siteSectionID: getSiteSection().sectionID.toString(),
-            locale: getSiteSection().contentLocale,
-        },
+        params: {},
     };
 });
 
@@ -161,15 +132,15 @@ onPageViewWithContext((event: CustomEvent) => {
 
 trackLink();
 
-function ThreadItemHeaderAiAssistantIcon() {
-    return <MetaIcon icon="ai-sparkle-monocolor" size="compact" />;
+function AiAssistantIcon() {
+    return <MetaIcon icon="ai-indicator" size="compact" />;
 }
 
 if (getMeta("answerSuggestionsEnabled", false)) {
     const aiAssistant = getMeta("aiAssistant");
     const aiAssistantUserID = aiAssistant?.userID;
-    ThreadItemHeader.registerMetaItem(
-        ThreadItemHeaderAiAssistantIcon,
+    ContentItemHeader.registerMetaItem(
+        AiAssistantIcon,
         (context) => {
             const { authorID } = context;
             const isAiAssistant = !!authorID && !!aiAssistantUserID && aiAssistantUserID === authorID;
@@ -180,7 +151,7 @@ if (getMeta("answerSuggestionsEnabled", false)) {
 }
 
 if (getMeta("featureFlags.escalations.Enabled", false)) {
-    DiscussionAttachment.registerMetaItem(AiEscalationMetaIcon, (attachment) => {
+    ContentItemAttachmentService.registerMetaItem(AiEscalationMetaIcon, (attachment) => {
         return attachment?.escalatedByAi ?? false;
     });
 }

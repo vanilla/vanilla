@@ -44,15 +44,17 @@ export interface IIndependentSearchProps extends IWithSearchProps, RouteComponen
     forceMenuOpen?: boolean;
     scope?: ISearchScopeNoCompact;
     initialQuery?: string;
+    initialParams?: Record<string, any>;
     overwriteSearchBar?: ISearchBarOverwrites;
 }
 
 /**
  * Implements independent search component. All wired up, just drop it where you need it.
  */
-export function IndependentSearch(props: IIndependentSearchProps) {
+function IndependentSearch(props: IIndependentSearchProps) {
     const id = useUniqueID("search");
     const resultsRef = useRef<HTMLDivElement>(null);
+    const { initialParams } = props;
     const [query, setQuery] = useState(props.initialQuery || "");
     const [forcedOptions, setForcedOptions] = useState<any[]>([]);
     const contextScope = useSearchScope();
@@ -67,7 +69,9 @@ export function IndependentSearch(props: IIndependentSearchProps) {
 
     const scopeValue = scope.value?.value || "";
     const handleSubmit = useCallback(() => {
-        const queryParams: Record<string, any> = {};
+        const queryParams: Record<string, any> = {
+            ...initialParams,
+        };
 
         if ([SEARCH_SCOPE_LOCAL, SEARCH_SCOPE_EVERYWHERE].includes(scopeValue)) {
             queryParams.scope = scopeValue;
@@ -93,7 +97,7 @@ export function IndependentSearch(props: IIndependentSearchProps) {
     const { forceMenuOpen, searchOptionProvider } = props;
     useEffect(() => {
         if (forceMenuOpen) {
-            searchOptionProvider.autocomplete("").then((results) => {
+            void searchOptionProvider.autocomplete("").then((results) => {
                 setQuery("a");
                 setForcedOptions(results);
             });
@@ -120,7 +124,11 @@ export function IndependentSearch(props: IIndependentSearchProps) {
                 loadOptions={(query, options) =>
                     externalSearch?.query
                         ? Promise.resolve([])
-                        : props.searchOptionProvider.autocomplete(query, { ...options, scope: scope.value?.value })
+                        : props.searchOptionProvider.autocomplete(query, {
+                              ...initialParams,
+                              ...options,
+                              scope: scope.value?.value,
+                          })
                 }
                 triggerSearchOnClear={false}
                 resultsRef={resultsRef}

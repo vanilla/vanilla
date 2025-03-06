@@ -119,7 +119,7 @@ export const EditPassword = forwardRef(function PasswordEditImpl(
         () => ({
             onSave: () => {
                 if (confirmPassword === newPassword) {
-                    patchUser({
+                    void patchUser({
                         userID: viewingUserID,
                         password: newPassword,
                         ...(currentPassword && { passwordConfirmation: currentPassword }),

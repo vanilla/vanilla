@@ -33,6 +33,7 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface
     }
 
     /**
+     * @param string|null $locale
      * @inheritDoc
      */
     public function getDefaultSiteSection(): ?SiteSectionInterface
@@ -49,6 +50,7 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface
     }
 
     /**
+     * @param string|null $locale
      * @inheritDoc
      */
     public function getCurrentSiteSection(): ?SiteSectionInterface

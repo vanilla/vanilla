@@ -1,22 +1,32 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import { PostField, PostType } from "@dashboard/postTypes/postType.types";
+import { PostType } from "@dashboard/postTypes/postType.types";
 import {
     CreatableFieldDataType,
     CreatableFieldFormType,
     CreatableFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { IPickerOption } from "@library/json-schema-forms";
+import { getMeta } from "@library/utility/appUtils";
 import { Icon } from "@vanilla/icons";
 import { labelize } from "@vanilla/utils";
 
-export const originalPostTypes = ["discussion", "question", "idea", "poll", "event"] as const;
+export const originalPostTypes = ["discussion", "question", "idea", "event"] as const;
+const enabledPostTypes = getMeta("postTypes", originalPostTypes);
 export const formType: CreatableFieldFormType[] = [...Object.values(CreatableFieldFormType)] as const;
 export const fieldVisibility: CreatableFieldVisibility[] = [...Object.values(CreatableFieldVisibility)] as const;
+
+const TEXT_FORM_TYPES = [CreatableFieldFormType.TEXT, CreatableFieldFormType.TEXT_MULTILINE];
+const SELECT_FORM_TYPES = [CreatableFieldFormType.DROPDOWN, CreatableFieldFormType.TOKENS];
+const INCOMPATIBLE_FORM_TYPES = [
+    CreatableFieldFormType.DATE,
+    CreatableFieldFormType.NUMBER,
+    CreatableFieldFormType.CHECKBOX,
+];
 
 function arrayToOptions(array: Readonly<string[]>): IPickerOption[] {
     return array.map((item) => ({
@@ -26,11 +36,23 @@ function arrayToOptions(array: Readonly<string[]>): IPickerOption[] {
 }
 
 export function originalPostTypeAsOptions(): IPickerOption[] {
-    return arrayToOptions(originalPostTypes);
+    return arrayToOptions(originalPostTypes.filter((postType) => enabledPostTypes.includes(postType)));
 }
 
-export function formTypeAsOptions(): IPickerOption[] {
-    return arrayToOptions(formType).map((option) => {
+export function formTypeAsOptions(initialType?: CreatableFieldFormType): IPickerOption[] {
+    let formArray = formType;
+    if (initialType) {
+        if (TEXT_FORM_TYPES.includes(initialType)) {
+            formArray = TEXT_FORM_TYPES;
+        }
+        if (SELECT_FORM_TYPES.includes(initialType)) {
+            formArray = SELECT_FORM_TYPES;
+        }
+        if (INCOMPATIBLE_FORM_TYPES.includes(initialType)) {
+            formArray = [];
+        }
+    }
+    return arrayToOptions(formArray).map((option) => {
         if (option.value === CreatableFieldFormType.TOKENS) {
             return {
                 ...option,
@@ -74,15 +96,15 @@ export function mapFormTypeToDataType(formType: CreatableFieldFormType): Creatab
 export function getIconForPostType(postType: PostType["postTypeID"]) {
     switch (postType) {
         case "discussion":
-            return <Icon icon={"new-discussion"} />;
+            return <Icon icon={"create-discussion"} />;
         case "question":
-            return <Icon icon={"new-question"} />;
+            return <Icon icon={"create-question"} />;
         case "idea":
-            return <Icon icon={"new-idea"} />;
+            return <Icon icon={"create-idea"} />;
         case "event":
-            return <Icon icon={"new-event"} />;
+            return <Icon icon={"create-event"} />;
         case "poll":
-            return <Icon icon={"new-poll"} />;
+            return <Icon icon={"create-poll"} />;
         default:
             return null;
     }

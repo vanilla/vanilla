@@ -145,7 +145,7 @@ export function DefaultNotificationPreferencesModal(
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
-                        submitForm();
+                        void submitForm();
                     }}
                     aria-label={t("Default Notification Preferences")}
                 >

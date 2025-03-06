@@ -114,7 +114,7 @@ function HighlightedCode(props: { code: string }) {
     const isMounted = useIsMounted();
 
     useEffect(() => {
-        highlightText(props.code).then((highlighted) => {
+        void highlightText(props.code).then((highlighted) => {
             if (isMounted()) {
                 setHtml(highlighted);
             }

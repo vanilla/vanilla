@@ -48,7 +48,7 @@ class VanillaNginxService extends AbstractService
      */
     public function getHostname(): string
     {
-        return "*.vanilla.localhost";
+        return "*.vanilla.local";
     }
 
     /**

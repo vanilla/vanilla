@@ -19,11 +19,13 @@ use Vanilla\AutomationRules\Models\AutomationRuleLongRunnerGenerator;
 use Vanilla\AutomationRules\Trigger\AutomationTrigger;
 use Vanilla\Dashboard\AutomationRules\Models\DiscussionRuleDataType;
 use Vanilla\Dashboard\AutomationRules\Models\EscalationRuleDataType;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Forum\Models\PostTypeModel;
 
 /**
  * Class DiscussionReachesScoreTrigger
@@ -351,12 +353,8 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     {
         $sql = $this->getObjectModel()->SQL;
 
-        // We need to ensure that NULL are treated as discussions.
-        if (!empty($where["Type"]) && in_array("discussion", $where["Type"])) {
-            $sql->beginWhereGroup()
-                ->where("Type", $where["Type"])
-                ->orWhere("Type is null")
-                ->endWhereGroup();
+        if (!empty($where["Type"])) {
+            PostTypeModel::whereParentPostType($sql, $where["Type"]);
             unset($where["Type"]);
         }
         if (!empty($where["TagID"])) {

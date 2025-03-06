@@ -46,9 +46,26 @@ class ActivityControllerTest extends AbstractAPIv2Test
     }
 
     /**
+     * Tests that activity feed can only be accessed up to page 500.
+     *
+     * @return void
+     */
+    public function testNoAccessPage501(): void
+    {
+        $data = $this->bessy()->getJsonData("/activity/feed");
+        $this->assertEquals(200, $data->getStatus());
+
+        $data = $this->bessy()->getJsonData("/activity/feed/p500");
+        $this->assertEquals(200, $data->getStatus());
+
+        $this->expectExceptionMessage("Activity can't be accessed beyond page 500.");
+        $data = $this->bessy()->getJsonData("/activity/feed/p501");
+    }
+
+    /**
      * Add a notification for the current user.
      *
-     * @param null|array $overrides Fields to override or add on the insert.
+     * @param array $overrides Fields to override or add on the insert.
      * @return int Activity ID of the new notification.
      */
     private function addNotification(array $overrides = []): int
@@ -56,8 +73,8 @@ class ActivityControllerTest extends AbstractAPIv2Test
         $result = $this->activityModel->insert(
             $overrides + [
                 "ActivityTypeID" => self::ACTIVITY_TYPE_ID,
-                "DateInserted" => date("Y-m-d H:i:s", now()),
-                "DateUpdated" => date("Y-m-d H:i:s", now()),
+                "DateInserted" => date("Y-m-d H:i:s"),
+                "DateUpdated" => date("Y-m-d H:i:s"),
                 "Emailed" => ActivityModel::SENT_PENDING,
                 "NotifyUserID" => $this->api()->getUserID(),
                 "Notified" => ActivityModel::SENT_PENDING,

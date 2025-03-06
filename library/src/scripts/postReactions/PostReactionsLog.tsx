@@ -49,7 +49,7 @@ export function PostReactionsLog() {
                                     }
                                 }}
                             >
-                                <Icon icon="data-trash" />
+                                <Icon icon="delete" />
                             </Button>
                         </span>
                     </ToolTip>

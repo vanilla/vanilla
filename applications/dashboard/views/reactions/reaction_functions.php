@@ -11,6 +11,8 @@
 if (!defined("APPLICATION")) {
     exit();
 }
+
+use Vanilla\ApiUtils;
 use Vanilla\Utility\HtmlUtils;
 use Vanilla\Web\TwigStaticRenderer;
 
@@ -89,32 +91,20 @@ if (!function_exists("writeReactions")) {
                 $discussionOrCommentID !== null
             ) {
                 $discussionName = $row->DiscussionName ?? $row->Name;
+                $extraFlagOptions = array_values(
+                    array_diff(array_map("strtolower", array_keys($flags)), ["report", "spam", "abuse"])
+                );
 
-                $twig = <<<TWIG
-<a
-    class="ReactButton js-legacyDiscussionOrCommentReport"
-    href="#"
-    tabindex="0"
-    title="Flag"
-    rel="nofollow"
-    role="button"
-    data-recordType="{{ recordType }}"
-    data-recordID="{{ discussionOrCommentID }}"
-    data-discussionName="{{ discussionName }}"
-    data-categoryID="{{ categoryID }}"
->
-    <span class="ReactSprite ReactFlag" />
-    <span class="ReactLabel">{{ t("Flag") }}</span>
-</a>
-TWIG;
-
-                $flagHtml = TwigStaticRenderer::renderString($twig, [
+                echo TwigStaticRenderer::renderReactModule("LegacyFlagDropdown", [
                     "recordType" => $recordType,
+                    "recordID" => $discussionOrCommentID,
                     "discussionOrCommentID" => $discussionOrCommentID,
                     "discussionName" => $discussionName,
                     "categoryID" => $categoryID,
+                    "userID" => $row->InsertUserID,
+                    "userName" => $row->InsertName,
+                    "extraFlagOptions" => $extraFlagOptions,
                 ]);
-                echo $flagHtml;
             } else {
                 echo Gdn_Theme::bulletItem("Flags");
 

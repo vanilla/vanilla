@@ -125,7 +125,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
     const discussionPointsTriggerValue =
         (formValues.trigger?.triggerType === "discussionReachesScoreTrigger" ||
             formValues.trigger?.triggerType === "ideationVoteTrigger") &&
-        formValues.trigger?.triggerValue.score;
+        formValues.trigger?.triggerValue?.score;
 
     const countReportsTriggerValue =
         formValues.trigger?.triggerType === "reportPostTrigger" && formValues.trigger?.triggerValue?.countReports;
@@ -453,7 +453,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
             {isEditing && isRuleRunning && (
                 <Message
                     type="warning"
-                    icon={<Icon icon="notification-alert" />}
+                    icon={<Icon icon="status-alert" />}
                     stringContents={t("Rule may not be edited while it is running")}
                     className={classes.bottomGap()}
                 />

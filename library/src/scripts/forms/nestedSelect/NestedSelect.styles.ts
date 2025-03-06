@@ -8,15 +8,11 @@ import { css } from "@emotion/css";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { placeholderStyles, singleBorder } from "@library/styles/styleHelpers";
+import { placeholderStyles } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "../formElementStyles";
 import { inputVariables } from "../inputStyles";
 
-const DEFAULT_PARAMS = {
-    compact: false,
-    maxHeight: 250,
-};
 export const nestedSelectClasses = useThemeCache((params: { compact?: boolean; maxHeight?: number } = {}) => {
     const { compact = false, maxHeight = 250 } = params;
     const globalVars = globalVariables();
@@ -31,6 +27,7 @@ export const nestedSelectClasses = useThemeCache((params: { compact?: boolean; m
     const label = css({});
 
     const clearButton = css({
+        ...Mixins.margin({ top: 4, left: 2 }),
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("small", "bold"),
         }),

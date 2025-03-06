@@ -4,7 +4,6 @@
  */
 
 import { css } from "@emotion/css";
-import { navLinksVariables } from "@library/navigation/navLinksStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { useThemeCache } from "@library/styles/themeCache";

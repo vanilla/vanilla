@@ -262,7 +262,7 @@ class Gdn_CookieIdentity
         $result = null;
 
         if (array_key_exists($name, $_COOKIE)) {
-            $cookie = $_COOKIE[$name];
+            $cookie = $_COOKIE[$name] ?? "";
 
             $v1Parts = explode("|", $cookie);
             if (count($v1Parts) === 5) {

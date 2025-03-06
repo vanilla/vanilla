@@ -159,7 +159,9 @@ trait TokenSigningTrait
      */
     private function toTimestamp($dt)
     {
-        if (is_numeric($dt)) {
+        if (is_null($dt)) {
+            return null;
+        } elseif (is_numeric($dt)) {
             return (int) $dt;
         } elseif ($ts = strtotime($dt)) {
             return $ts;

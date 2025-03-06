@@ -8,10 +8,10 @@ import { INestedOptionsState, INestedSelectOptionProps } from "@library/forms/ne
 import { t } from "@library/utility/appUtils";
 import { useQuery } from "@tanstack/react-query";
 import get from "lodash-es/get";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Select } from "@vanilla/json-schema-forms";
-import { useApiContext } from "@vanilla/ui";
-import { RecordID } from "@vanilla/utils";
+import { RecordID, stableObjectHash } from "@vanilla/utils";
+import apiv2 from "@library/apiv2";
 
 // Get the options to display in the dropdown
 export function useNestedOptions(params: {
@@ -21,8 +21,35 @@ export function useNestedOptions(params: {
     createable?: boolean;
     createdOptions?: Select.Option[];
     initialValues?: RecordID | RecordID[];
+    withOptionCache?: boolean;
 }): INestedOptionsState & { isSuccess?: boolean } {
-    const { searchQuery = "", options, optionsLookup, createable = false, createdOptions } = params;
+    const {
+        searchQuery = "",
+        options,
+        optionsLookup,
+        createable = false,
+        createdOptions,
+        withOptionCache,
+        initialValues,
+    } = params;
+
+    const [optionCache, setOptionCache] = useState<Select.Option[]>([]);
+    const [lookupDataCache, setLookupDataCache] = useState<Select.Option[]>([]);
+
+    useEffect(() => {
+        if (withOptionCache) {
+            setOptionCache((prev) => {
+                return [...prev, ...(options ?? [])];
+            });
+        }
+    }, [options, withOptionCache]);
+
+    const lookupInitialOptions = useInitialOptionLookup();
+    const { data: initialOptionsData } = useQuery({
+        queryKey: ["initial-nested-options-lookup", optionsLookup, initialValues],
+        queryFn: lookupInitialOptions,
+        enabled: !!optionsLookup?.singleUrl,
+    });
 
     const fetchOptions = useFetchOptions();
     const { data, isSuccess } = useQuery({
@@ -31,13 +58,55 @@ export function useNestedOptions(params: {
         enabled: Boolean(optionsLookup),
     });
 
+    useEffect(() => {
+        setLookupDataCache((prev) => {
+            return [...prev, ...(data ?? [])];
+        });
+    }, [data]);
+
     const optionsState = useMemo<INestedOptionsState>(() => {
+        const processedInitialOptions =
+            initialOptionsData && optionsLookup?.processOptions
+                ? optionsLookup.processOptions(initialOptionsData)
+                : initialOptionsData ?? [];
         const processedOptions =
             options && optionsLookup?.processOptions ? optionsLookup.processOptions(options) : options ?? [];
         const processedData = data ?? [];
-        const initialOptions = [...processedOptions, ...processedData, ...(createdOptions ?? [])];
-        return getOptionsState(initialOptions, searchQuery, createable);
-    }, [options, data, searchQuery, createable, createdOptions]);
+
+        const baseOptions = withOptionCache ? optionCache : [];
+        const lookupOptions = lookupDataCache ?? [];
+
+        const mergedOptions = [
+            ...baseOptions,
+            ...lookupOptions,
+            ...processedInitialOptions,
+            ...processedOptions,
+            ...processedData,
+            ...(createdOptions ?? []),
+        ];
+        if (withOptionCache) {
+            const optionsState = getOptionsState(mergedOptions, searchQuery, createable);
+            const dedupeOptions = optionsState.options.filter(
+                (option1, index, array) =>
+                    array.findIndex((option2) => stableObjectHash(option2) === stableObjectHash(option1)) === index,
+            );
+            return {
+                ...optionsState,
+                options: dedupeOptions,
+            };
+        }
+        const optionsState = getOptionsState(mergedOptions, searchQuery, createable);
+        return {
+            ...optionsState,
+            options: optionsState.options.filter((option1, index, array) => {
+                if (option1.isHeader) {
+                    return true;
+                } else {
+                    return array.findIndex((option2) => option2.value === option1.value) === index;
+                }
+            }),
+        };
+    }, [initialOptionsData, options, data, searchQuery, createable, createdOptions]);
 
     return {
         ...optionsState,
@@ -45,9 +114,46 @@ export function useNestedOptions(params: {
     };
 }
 
+// Keeping this hook separate since initial options should only be fetched once but persist
+function useInitialOptionLookup() {
+    const api = apiv2;
+    const lookupInitialOptions = useCallback(
+        async function lookupInitialOptions({ queryKey }): Promise<Select.Option[]> {
+            const [_, lookup, values]: [never, Select.LookupApi, string] = queryKey;
+            const singleUrl = lookup?.singleUrl;
+            if (singleUrl && values) {
+                const valuesToGet = Array.isArray(values) ? values : [values];
+                const rawData = await Promise.all(
+                    valuesToGet.map(async (val) => {
+                        const response = await api.get(singleUrl.replace("%s", val));
+                        return response.data;
+                    }),
+                );
+
+                let options: Select.Option[] = rawData.map((data) => {
+                    const label = get(data, lookup.labelKey, t("Untitled"));
+                    const value = lookup.valueKey ? get(data, lookup.valueKey, label) : label;
+                    const extraLabel = lookup.extraLabelKey ? get(data, lookup.extraLabelKey) : undefined;
+                    return {
+                        value,
+                        label,
+                        extraLabel,
+                        data,
+                    };
+                });
+
+                return options;
+            }
+            return [];
+        },
+        [api],
+    );
+    return lookupInitialOptions;
+}
+
 // Fetch the nested options from an API lookup and transform into a nested options tree
 export function useFetchOptions() {
-    const api = useApiContext();
+    const api = apiv2;
 
     const fetchOptions = useCallback(
         async function fetchOptions({ queryKey }): Promise<Select.Option[]> {

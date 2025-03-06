@@ -6,10 +6,14 @@
 
 use Garden\SafeCurl\Exception\InvalidURLException;
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Redirect;
+use Vanilla\Community\Events\DownloadEvent;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\ImageResizer;
 use Vanilla\Scheduler\LongRunner;
@@ -239,7 +243,7 @@ class MediaApiController extends AbstractApiController
      * @return array
      * @throws NotFoundException If the media item could not be found.
      */
-    public function get(int $id)
+    public function get(string $id)
     {
         $this->permission("Garden.SignIn.Allow");
 
@@ -437,5 +441,63 @@ class MediaApiController extends AbstractApiController
 
         $result = $out->validate($pageInfo);
         return $result;
+    }
+
+    /**
+     * Redirects a download request to the target file after tracking information about the download.
+     *
+     * @param int $id The media item's numeric ID.
+     *
+     * @return Data
+     * @throws NotFoundException If the media item could not be found or not URL is associated with it.
+     * @throws \Garden\Web\Exception\HttpException|PermissionException
+     */
+    public function get_download(int $id): Data
+    {
+        $this->permission("Garden.SignIn.Allow");
+
+        $row = $this->mediaModel->findUploadedMediaByID($id);
+        if ($row["insertUserID"] !== $this->getSession()->UserID) {
+            $this->permission("Garden.Community.Manage");
+        }
+        if (!$row["url"]) {
+            throw new NotFoundException("There is no URL associated with that file.");
+        }
+
+        $this->getEventManager()->dispatch(new DownloadEvent(DownloadEvent::ACTION_DOWNLOAD, $row));
+
+        return new Redirect($row["url"], 302);
+    }
+
+    /**
+     * Redirects a download request to the target file after tracking information about the download.
+     *
+     * @param array $query The request body.
+     *
+     * @return Data
+     * @throws NotFoundException If the media item could not be found or not URL is associated with it.
+     * @throws \Garden\Web\Exception\HttpException|PermissionException
+     */
+    public function get_downloadByUrl(array $query): Data
+    {
+        $this->permission();
+        $in = $this->schema(
+            [
+                "url:s" => "The URL to download.",
+            ],
+            "in"
+        );
+
+        $body = $in->validate($query);
+
+        $row = $this->mediaModel->findUploadedMediaByUrl($body["url"]);
+
+        if (!$row["url"]) {
+            throw new NotFoundException("There is no URL associated with that file.");
+        }
+
+        $this->getEventManager()->dispatch(new DownloadEvent(DownloadEvent::ACTION_DOWNLOAD, $row));
+
+        return new Redirect($row["url"], 302);
     }
 }

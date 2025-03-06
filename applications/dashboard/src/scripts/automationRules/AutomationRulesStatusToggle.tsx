@@ -69,7 +69,7 @@ export function AutomationRulesStatusToggle(props: IProps) {
         <>
             <DashboardToggle
                 onChange={() => {
-                    !enabled ? setIsPreviewVisible(true) : handleStatusChange();
+                    !enabled ? setIsPreviewVisible(true) : void handleStatusChange();
                 }}
                 enabled={enabled}
                 labelID={props.labelID}

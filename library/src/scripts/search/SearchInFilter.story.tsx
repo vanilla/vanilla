@@ -6,19 +6,13 @@
 import * as React from "react";
 import { useState } from "react";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import {
-    TypeAllIcon,
-    TypeArticlesIcon,
-    TypeCategoriesAndGroupsIcon,
-    TypeDiscussionsIcon,
-    TypeMemberIcon,
-} from "@library/icons/searchIcons";
 import { t } from "@vanilla/i18n/src";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
 import SearchContext from "@library/contexts/SearchContext";
 import { MemoryRouter } from "react-router";
 import { MockSearchData } from "@library/contexts/DummySearchContext";
+import { Icon } from "@vanilla/icons";
 
 interface IProps {
     activeItem?: string;
@@ -30,22 +24,22 @@ interface IProps {
 const dummmyFilters: ISearchInButton[] = [
     {
         label: t("All"),
-        icon: <TypeAllIcon />,
+        icon: <Icon icon="search-all" />,
         data: "all",
     },
     {
         label: t("Discussions"),
-        icon: <TypeDiscussionsIcon />,
+        icon: <Icon icon={"search-discussions"} />,
         data: "discussions",
     },
     {
         label: t("Articles"),
-        icon: <TypeArticlesIcon />,
+        icon: <Icon icon={"search-articles"} />,
         data: "articles",
     },
     {
         label: t("Categories & Groups"),
-        icon: <TypeCategoriesAndGroupsIcon />,
+        icon: <Icon icon="search-categories" />,
         data: "categoriesAndGroups",
     },
 ];
@@ -53,7 +47,7 @@ const dummmyFilters: ISearchInButton[] = [
 const dummmyEndFilters: ISearchInButton[] = [
     {
         label: t("Members"),
-        icon: <TypeMemberIcon />,
+        icon: <Icon icon="search-members" />,
         data: "members",
     },
 ];

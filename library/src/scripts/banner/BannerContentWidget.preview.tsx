@@ -5,17 +5,11 @@
  */
 
 import BannerContentWidget from "@library/banner/BannerContentWidget";
+import { BannerWidgetPreview } from "@library/banner/BannerWidget.preview";
 import React from "react";
 
 interface IProps extends React.ComponentProps<typeof BannerContentWidget> {}
 
 export function BannerContentWidgetPreview(_props: IProps) {
-    const props: IProps = {
-        ..._props,
-        title: _props.title,
-        description: _props.description,
-        showTitle: _props.showTitle,
-        showDescription: _props.showDescription,
-    };
-    return <BannerContentWidget {...props} />;
+    return <BannerWidgetPreview {...(_props as any)} isContentBanner={true} />;
 }

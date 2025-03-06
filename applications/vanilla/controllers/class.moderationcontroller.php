@@ -72,11 +72,11 @@ class ModerationController extends VanillaController
     {
         $session = Gdn::session();
         $hadCheckedComments = false;
-        $transientKey = val("TransientKey", $_POST);
-        if ($session->isValid() && $session->validateTransientKey($transientKey)) {
+        $checkedComments = [];
+        if ($session->isValid() && Gdn::request()->isAuthenticatedPostBack()) {
             // Form was posted, so accept changes to checked items.
-            $discussionID = val("DiscussionID", $_POST, 0);
-            $checkIDs = val("CheckIDs", $_POST);
+            $discussionID = \Gdn::request()->post("DiscussionID");
+            $checkIDs = \Gdn::request()->post("CheckIDs");
             if (empty($checkIDs)) {
                 $checkIDs = [];
             }
@@ -317,7 +317,7 @@ class ModerationController extends VanillaController
 
         if ($this->Form->authenticatedPostBack()) {
             // Delete the selected comments
-            $commentModel = new CommentModel();
+            $commentModel = Gdn::getContainer()->get(CommentModel::class);
             foreach ($commentIDs as $commentID) {
                 Assert::integerish($commentID);
                 $comment = $commentModel->getID($commentID, DATASET_TYPE_ARRAY);

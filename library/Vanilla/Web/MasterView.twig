@@ -120,7 +120,7 @@
     </head>
 
     <body class="{{ cssClasses }}" style="margin: 0;">
-        {% include "@resources/svg-symbols.html" %}
+        {{- iconDefinitions -}}
         <div id="page" class="page">
             <div class="page-minHeight">
                 {%- if themeHeader -%}

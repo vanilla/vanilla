@@ -55,7 +55,7 @@ class SsoUsersExpander extends AbstractApiExpander
     /**
      * @inheritdoc
      */
-    public function resolveFragements(array $recordIDs): array
+    public function resolveFragments(array $recordIDs): array
     {
         return $this->userModel->getDefaultSSOIDs($recordIDs);
     }

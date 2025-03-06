@@ -35,7 +35,7 @@ export function useUsernameAvailability(username: string): boolean {
         // Checking the key here instead of value because
         // we storing booleans and JS handles falsy values in the same way
         if (username && !Object.keys(availabilityCache).includes(username)) {
-            checkUsername(username);
+            void checkUsername(username);
         }
     }, [username, checkUsername]);
 

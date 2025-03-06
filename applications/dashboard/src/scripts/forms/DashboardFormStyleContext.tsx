@@ -9,11 +9,13 @@ import React from "react";
 export type IDashboardFormStyle = {
     compact?: boolean;
     forceVerticalLabels?: boolean;
+    groupTag?: "li" | "div";
 };
 
 export const DashboardFormStyleContext = React.createContext<IDashboardFormStyle>({
     compact: false,
     forceVerticalLabels: false,
+    groupTag: "li",
 });
 
 export function useDashboardFormStyle() {

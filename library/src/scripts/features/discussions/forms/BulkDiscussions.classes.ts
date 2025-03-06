@@ -49,6 +49,10 @@ export const bulkDiscussionsClasses = useThemeCache(() => {
         width: "100%",
     });
 
+    const bottomSpace = css({
+        marginBottom: 8,
+    });
+
     return {
         autocomplete,
         separatedSection,
@@ -56,5 +60,6 @@ export const bulkDiscussionsClasses = useThemeCache(() => {
         errorMessageOffset,
         errorLine,
         errorLabel,
+        bottomSpace,
     };
 });

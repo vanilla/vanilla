@@ -9,7 +9,9 @@ namespace Vanilla\Search;
 use Garden\Schema\Schema;
 use Garden\Sites\Exceptions\SiteNotFoundException;
 use Vanilla\Contracts\Site\VanillaSiteProvider;
+use Vanilla\Dashboard\DocumentModel;
 use Vanilla\InjectableInterface;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Base search driver class.
@@ -154,6 +156,12 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
                 if ($highlight !== null) {
                     $resultItemForKey->setHighlight($highlight);
                 }
+
+                $expand = $query->getQueryParameter("expand") ?? [];
+                if (DocumentModel::isEnabled() && in_array("vectors", $expand) && isset($record["chunkText"])) {
+                    $resultItemForKey->setVectorizedData($record["chunkText"], $expand);
+                }
+
                 $resultItemForKey->setSearchScore($record[SearchResultItem::FIELD_SCORE] ?? null);
                 $resultItemForKey->setSubqueryMatchCount($record[SearchResultItem::FIELD_SUBQUERY_COUNT] ?? null);
                 $orderedResultItems[] = $resultItemForKey;

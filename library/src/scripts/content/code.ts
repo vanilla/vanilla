@@ -96,7 +96,7 @@ function importHLJS(): Promise<HLJS> {
 export function useHLJS(): HLJS | null {
     const ref = useRef<HLJS>(null);
     useEffect(() => {
-        importHLJS().then((hljs) => (ref.current = hljs));
+        void importHLJS().then((hljs) => (ref.current = hljs));
     }, []);
     return ref.current;
 }

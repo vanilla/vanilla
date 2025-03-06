@@ -11,7 +11,10 @@ use Gdn_Form;
 use PermissionModel;
 use RoleModel;
 use TagModel;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostTypeModel;
 use VanillaTests\Fixtures\TestUploader;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 
 /**
@@ -19,6 +22,8 @@ use VanillaTests\SiteTestCase;
  */
 class VanillaSettingsControllerTest extends SiteTestCase
 {
+    use CommunityApiTestTrait;
+
     /** @inheritDoc */
     protected static $addons = ["vanilla"];
 
@@ -321,5 +326,56 @@ class VanillaSettingsControllerTest extends SiteTestCase
         $this->assertNotEmpty($defaultAvatar);
         $this->assertNotEquals($defaultAvatar, $newDefaultAvatar);
         $this->assertFileExists(PATH_UPLOADS . "/" . $newDefaultAvatar);
+    }
+
+    /**
+     * Smoke test of the add category page when custom post types is enabled.
+     *
+     * @return void
+     */
+    public function testAddCategoryWithCustomPostTypes()
+    {
+        $this->runWithConfig(
+            [FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES) => true],
+            function () {
+                $response = $this->bessy()->getJsonData(
+                    "vanilla/settings/addcategory.json",
+                    options: ["deliveryType" => DELIVERY_TYPE_ALL]
+                );
+                $data = $response->getData();
+                $this->assertArrayHasKey("postTypeProps", $data);
+            }
+        );
+    }
+
+    /**
+     * Smoke test of the edit category page when custom post types is enabled.
+     *
+     * @return void
+     */
+    public function testEditCategoryWithCustomPostTypes()
+    {
+        $this->runWithConfig(
+            [FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES) => true],
+            function () {
+                $postType = $this->createPostType();
+                $category = $this->createCategory(["allowedPostTypeIDs" => [$postType["postTypeID"]]]);
+
+                $response = $this->bessy()->getJsonData(
+                    "vanilla/settings/editcategory.json",
+                    ["categoryid" => $category["categoryID"]],
+                    options: ["deliveryType" => DELIVERY_TYPE_ALL]
+                );
+                $data = $response->getData();
+                $this->assertArrayHasKey("postTypeProps", $data);
+                $this->assertDataLike(
+                    [
+                        "postTypeProps.instance.hasRestrictedPostTypes" => true,
+                        "postTypeProps.instance.allowedPostTypeIDs" => [$postType["postTypeID"]],
+                    ],
+                    $data
+                );
+            }
+        );
     }
 }

@@ -91,19 +91,46 @@ export function WidgetSettingsModal(props: IProps) {
             }
         });
 
-        const limitSchema = tmpSchema.properties.limit ?? tmpSchema.properties.apiParams?.properties?.limit;
-        const limitToCheck = tmpValue.limit ?? tmpValue.apiParams?.limit;
-        const currentLimitExceedsMaximum =
-            limitSchema && limitSchema.maximum && limitToCheck && parseInt(limitToCheck) > limitSchema.maximum;
-        if (currentLimitExceedsMaximum) {
-            errors[tmpSchema.properties.limit ? "limit" : "apiParams/limit"] = [
-                {
-                    field: "limit",
-                    message: t("Number input must be between 1 and 100."),
-                    path: tmpSchema.properties.limit ? undefined : "apiParams",
-                },
-            ];
-        }
+        const limitSchemas = [
+            tmpSchema.properties.limit,
+            tmpSchema.properties.apiParams?.properties?.limit,
+            tmpSchema.properties.authorBadges?.properties?.limit,
+            tmpSchema.properties?.suggestedFollows?.properties?.limit,
+            tmpSchema.properties?.suggestedContent?.properties?.limit,
+        ];
+
+        // authorBadges is not in API params, we control the number in FE only
+        const limitsToCheck = [
+            tmpValue.limit,
+            tmpValue.apiParams?.limit,
+            tmpValue.authorBadges?.limit,
+            tmpValue?.suggestedFollows?.limit,
+            tmpValue?.suggestedContent?.limit,
+        ];
+
+        const limitPaths = ["limit", "apiParams", "authorBadges", "suggestedFollows", "suggestedContent"];
+
+        limitsToCheck.forEach((limitToCheck, i) => {
+            const limitSchema = limitSchemas[i];
+
+            const currentLimitExceedsMaximum =
+                limitSchema && limitSchema.maximum && limitToCheck && parseInt(limitToCheck) > limitSchema.maximum;
+
+            if (currentLimitExceedsMaximum) {
+                const errorMessage = `${t("Number input must be between")} ${limitSchemas[i].minimum} ${t("and")} ${
+                    limitSchemas[i].maximum
+                }.`;
+
+                errors[`${limitPaths[i]}/limit`] = [
+                    {
+                        field: "limit",
+                        message: errorMessage,
+                        path: limitPaths[i],
+                    },
+                ];
+            }
+        });
+
         return errors;
     };
 
@@ -154,7 +181,7 @@ export function WidgetSettingsModal(props: IProps) {
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    submitForm();
+                    void submitForm();
                 }}
                 className={classes.modalForm}
             >

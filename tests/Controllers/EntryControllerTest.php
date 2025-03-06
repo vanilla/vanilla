@@ -368,6 +368,84 @@ class EntryControllerTest extends SiteTestCase
             }
         );
     }
+
+    /**
+     * Test basic registration with custom required checkbox field validation
+     *
+     * @return void
+     */
+    public function testBasicRegistrationWithCustomRequiredCheckBoxField(): void
+    {
+        $this->resetTable("profileField");
+        $this->runWithConfig(
+            ["Garden.Registration.Method" => "Basic", ProfileFieldModel::CONFIG_FEATURE_FLAG => true],
+            function () {
+                //first create some profile fields
+                $this->createProfileField([
+                    "apiName" => "fieldTextBox",
+                    "label" => "field test textBox",
+                ])->assertSuccess();
+                //create some check box field
+                $this->createProfileField([
+                    "apiName" => "test-checkbox-1",
+                    "label" => "Check this box",
+                    "description" => "Some description",
+                    "dataType" => "boolean",
+                    "formType" => "checkbox",
+                    "registrationOptions" => "required",
+                    "enabled" => true,
+                ])->assertSuccess();
+                $this->createProfileField([
+                    "apiName" => "test-checkbox-2",
+                    "label" => "Count me in",
+                    "description" => "Some description",
+                    "dataType" => "boolean",
+                    "formType" => "checkbox",
+                    "registrationOptions" => "required",
+                    "enabled" => true,
+                ])->assertSuccess();
+                $this->createProfileField([
+                    "apiName" => "test-checkbox-3",
+                    "label" => "Non required check box",
+                    "description" => "Some description",
+                    "dataType" => "boolean",
+                    "formType" => "checkbox",
+                    "enabled" => true,
+                ])->assertSuccess();
+
+                $formFields = [
+                    "Email" => "newCheckBoxTest@user.com",
+                    "Name" => "NewUserName_2",
+                    "Profile" => [
+                        "fieldTextBox" => "testValue",
+                    ],
+                    "Checkboxes" => [
+                        "Profile[test-checkbox-1]",
+                        "Profile[test-checkbox-2]",
+                        "Profile[test-checkbox-3]",
+                    ],
+                    "Password" => "jXM>e!gL4#38cP3Z",
+                    "PasswordMatch" => "jXM>e!gL4#38cP3Z",
+                    "TermsOfService" => "1",
+                    "Save" => "Save",
+                ];
+
+                //Submit the form with out required check box fields
+                $this->runWithExpectedExceptionMessage(
+                    "Check this box is required. Count me in is required.",
+                    function () use ($formFields) {
+                        $this->bessy()->post("/entry/register", $formFields);
+                    }
+                );
+
+                // Add one of the `required` check box field
+                $formFields["Profile"]["test-checkbox-1"] = "1";
+                $this->expectExceptionMessage("Count me in is required.");
+                $this->bessy()->post("/entry/register", $formFields);
+            }
+        );
+    }
+
     /**
      * Create profile fields.
      *

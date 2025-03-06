@@ -829,6 +829,9 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface
                 }
             } catch (\Throwable $e) {
                 $handleThrowable($e);
+                if (DebugUtils::isTestMode()) {
+                    throw $e;
+                }
             }
         }
 

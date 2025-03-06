@@ -6,17 +6,16 @@
 
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { getCategoryReason, getUnsubscribeReason } from "@library/unsubscribe/getUnsubscribeReason";
+import { getFollowedContentReason, getUnsubscribeReason } from "@library/unsubscribe/getUnsubscribeReason";
 import { t } from "@library/utility/appUtils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React from "react";
 import {
     IDecodedToken,
     IUnsubscribeData,
     IUnsubscribePreference,
     IUnsubscribeResult,
     IUnsubscribeToken,
-} from "./unsubscribePage.types";
+} from "@library/unsubscribe/unsubscribePage.types";
 import { useCurrentUser } from "@library/features/users/userHooks";
 
 /**
@@ -40,14 +39,17 @@ export function useGetUnsubscribe(token: IUnsubscribeToken) {
                 ...reduceUnsubscribe(response.data),
             } as IUnsubscribeData;
 
-            if (response.data.preferences.length === 0 && response.data.followCategory.length === 0) {
+            if (
+                response.data.preferences?.length === 0 &&
+                (response.data.followCategory?.length === 0 || response.data.followContent?.length === 0)
+            ) {
                 data.isAllProcessed = true;
             }
 
             return data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries();
+            void queryClient.invalidateQueries();
         },
         onError: (error: IError) => {
             throw error;
@@ -77,7 +79,7 @@ export function useUndoUnsubscribe(token: IUnsubscribeToken) {
             } as IUnsubscribeData;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries();
+            void queryClient.invalidateQueries();
         },
         onError: (error: IError) => {
             throw error;
@@ -99,7 +101,7 @@ export function useSaveUnsubscribe(token: IUnsubscribeToken) {
                 throw { message: t("Unsubscribe token is invalid.") };
             }
 
-            const { preferences = [], followedCategory } = unsubscribeData;
+            const { preferences = [], followedContent } = unsubscribeData;
 
             const params: IUnsubscribeResult = {
                 preferences: preferences.map(({ preferenceRaw, enabled }) => ({
@@ -107,13 +109,26 @@ export function useSaveUnsubscribe(token: IUnsubscribeToken) {
                     enabled: enabled ? "1" : "0",
                 })),
             };
-            if (followedCategory) {
-                params.followCategory = {
-                    preference: followedCategory.preferenceRaw,
-                    enabled: followedCategory.enabled ? "1" : "0",
-                    name: followedCategory.categoryName,
-                    categoryID: followedCategory.categoryID,
+            if (followedContent) {
+                const isContentCategory = followedContent.contentType === "category";
+                const commonParams = {
+                    preference: followedContent.preferenceRaw,
+                    enabled: followedContent.enabled ? "1" : "0",
+                    name: followedContent.contentName,
                 };
+                if (isContentCategory) {
+                    params.followCategory = {
+                        categoryID: followedContent.contentID,
+                        ...commonParams,
+                    };
+                } else {
+                    params.followContent = {
+                        contentType: followedContent.contentType as string,
+                        contentID: followedContent.contentID,
+                        userID: decodedToken.user.userID,
+                        ...commonParams,
+                    };
+                }
             }
 
             const response = await apiv2.patch(`/unsubscribe/${token}`, params);
@@ -124,7 +139,7 @@ export function useSaveUnsubscribe(token: IUnsubscribeToken) {
             } as IUnsubscribeData;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries();
+            void queryClient.invalidateQueries();
         },
         onError: (error: IError) => {
             throw error;
@@ -180,7 +195,7 @@ function reduceUnsubscribe(data: IUnsubscribeResult): Partial<IUnsubscribeData> 
         return {};
     }
 
-    const preferences: IUnsubscribePreference[] = data.preferences.map(({ preference, enabled }) => {
+    const preferences: IUnsubscribePreference[] = (data.preferences ?? []).map(({ preference, enabled }) => {
         const preferenceName = preference.replace("Email.", "");
 
         const tmpPreference: IUnsubscribePreference = {
@@ -198,38 +213,49 @@ function reduceUnsubscribe(data: IUnsubscribeResult): Partial<IUnsubscribeData> 
         return tmpPreference;
     });
 
-    let followedCategory: IUnsubscribeData["followedCategory"];
-    let isUnfollowCategory: boolean = false;
-    let isDigestHideCategory: boolean = false;
-    if (!Array.isArray(data.followCategory) && data.followCategory) {
-        const preferenceData = data.followCategory.preference
-            .replace(`.${data.followCategory.categoryID}`, "")
+    let followedContent: IUnsubscribeData["followedContent"];
+    let isUnfollowContent: boolean = false;
+    let isDigestHideContent: boolean = false;
+
+    const followContentFromAPI = data.followCategory || data.followContent;
+    if (!Array.isArray(followContentFromAPI) && followContentFromAPI) {
+        const isContentCategory = Boolean(data.followCategory);
+        const preference = isContentCategory ? data.followCategory?.["preference"] : data.followContent?.["preference"];
+        const preferenceData = (preference ?? "")
+            .replace(`.${isContentCategory ? data.followCategory?.categoryID : data.followContent?.contentID}`, "")
             .split(".");
         const preferenceName = preferenceData[preferenceData.length - 1];
-        followedCategory = {
+        followedContent = {
             preferenceName,
-            preferenceRaw: data.followCategory.preference,
-            enabled: data.followCategory.enabled === "1" || data.followCategory.enabled === true,
+            preferenceRaw: followContentFromAPI.preference,
+            enabled: followContentFromAPI.enabled === "1" || followContentFromAPI.enabled === true,
             label: <></>,
-            categoryID: data.followCategory.categoryID,
-            categoryName: data.followCategory.name,
-            optionID: data.followCategory.preference.replace(/\./g, "||"),
+            contentID: isContentCategory ? followContentFromAPI["categoryID"] : followContentFromAPI["contentID"],
+            contentName: followContentFromAPI["name"],
+            contentType: isContentCategory ? "category" : followContentFromAPI["contentType"],
+            contentUrl: followContentFromAPI["contentUrl"],
+            optionID: followContentFromAPI.preference.replace(/\./g, "||"),
         };
-        isUnfollowCategory = preferenceName.toLowerCase() === "follow";
-        isDigestHideCategory = preferenceName.toLowerCase() === "digest";
-        followedCategory.label = getCategoryReason(followedCategory, isUnfollowCategory, isDigestHideCategory);
+        isUnfollowContent = preferenceName.toLowerCase() === "follow";
+        isDigestHideContent = preferenceName.toLowerCase() === "digest";
+        followedContent.label = getFollowedContentReason(
+            followedContent,
+            isUnfollowContent,
+            isDigestHideContent,
+            isContentCategory,
+        );
     }
 
-    const hasMultiple = preferences.length > 1 || (preferences.length > 0 && Boolean(followedCategory));
+    const hasMultiple = preferences.length > 1 || (preferences.length > 0 && Boolean(followedContent));
     const disabledPreferences = preferences.filter(({ enabled }) => enabled).length > 0;
-    const categoryDisabled = !followedCategory || (followedCategory && followedCategory.enabled);
+    const contentDisabled = !followedContent || (followedContent && followedContent.enabled);
 
     return {
         preferences,
-        followedCategory,
+        followedContent,
         hasMultiple,
-        isAllProcessed: !hasMultiple && disabledPreferences && categoryDisabled,
+        isAllProcessed: !hasMultiple && disabledPreferences && contentDisabled,
         isEmailDigest: preferences.length === 1 && preferences[0].preferenceName === "DigestEnabled",
-        isUnfollowCategory,
+        isUnfollowContent,
     };
 }

@@ -138,7 +138,7 @@ final class ViteAssetProvider
     function getHotBuildInlineScript(): string
     {
         return <<<JS
-            import RefreshRuntime from "http://frontend.vanilla.localhost:3030/@react-refresh"
+            import RefreshRuntime from "http://127.0.0.1:3030/@react-refresh"
             RefreshRuntime.injectIntoGlobalHook(window)
             window.\$RefreshReg\$ = () => {}
             window.\$RefreshSig\$ = () => (type) => type
@@ -155,8 +155,8 @@ JS;
     function getHotBuildScriptAssets(string $section): array
     {
         return [
-            new WebAsset("http://frontend.vanilla.localhost:3030/@vite/client", true),
-            new WebAsset("http://frontend.vanilla.localhost:3030/build/.vite/{$section}.js", true),
+            new WebAsset("http://127.0.0.1:3030/@vite/client", true),
+            new WebAsset("http://127.0.0.1:3030/build/.vite/{$section}.js", true),
             $this->getLocaleAsset(),
         ];
     }

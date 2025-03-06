@@ -20,16 +20,18 @@ abstract class AbstractTypeHandler
      *
      * @param array $from
      * @param string $to
+     * @param array|null $postMeta Optional array of custom post fields.
      */
-    abstract public function handleTypeConversion(array $from, string $to);
+    abstract public function handleTypeConversion(array $from, string $to, ?array $postMeta);
 
     /**
      * Convert the handlers type.
      *
      * @param array $record
      * @param string $to
+     * @param array|null $postMeta
      */
-    abstract public function convertTo(array $record, string $to);
+    abstract public function convertTo(array $record, string $to, ?array $postMeta);
 
     /**
      * Convert any related records|data (ie. comments)

@@ -5,7 +5,7 @@
  */
 
 import { PostType } from "@dashboard/postTypes/postType.types";
-import { usePostTypesSettings } from "@dashboard/postTypes/PostTypeSettingsContext";
+import { css } from "@emotion/css";
 import { IApiError } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Translate from "@library/content/Translate";
@@ -31,6 +31,7 @@ interface IProps {
     isVisible: boolean;
     onVisibilityChange: (isVisible: boolean) => void;
     postTypeID?: PostType["postTypeID"] | null;
+    postTypeName?: PostType["name"] | null;
 }
 
 interface CategoryLinkResponse {
@@ -39,31 +40,40 @@ interface CategoryLinkResponse {
 }
 
 export function CategoryListModal(props: IProps) {
-    const { postTypesByPostTypeID } = usePostTypesSettings();
-    const name = props.postTypeID ? postTypesByPostTypeID[props.postTypeID]?.name : "";
+    const name = props.postTypeName ?? props.postTypeID;
 
     const categoryQuery = useQuery<any, IApiError, CategoryLinkResponse>({
         queryFn: async () => {
-            const response = await apiv2.get("/categories", {
+            const response = await apiv2.get<ICategory[]>("/categories", {
                 params: {
+                    postTypeStatus: "both",
                     postTypeID: props.postTypeID,
                     limit: 500,
                 },
             });
 
-            const links: INavigationVariableItem[] = response.data.map((category: ICategory) => {
-                return {
-                    id: category.categoryID,
-                    name: category.name,
-                    url: category.url,
-                };
-            });
+            const links: INavigationVariableItem[] = response.data
+                .filter(({ displayAs }) => displayAs === "discussions")
+                .map((category: ICategory) => {
+                    return {
+                        id: `${category.categoryID}`,
+                        name: category.name,
+                        url: category.url,
+                    };
+                });
 
             const pagination = SimplePagerModel.parseHeaders(response.headers);
             return { results: links, pagination: pagination };
         },
-        queryKey: ["categoryList", props.postTypeID],
+        queryKey: ["categoryList", props.postTypeID, props.isVisible],
         enabled: props.isVisible && !!props.postTypeID,
+    });
+
+    const hasResults = categoryQuery.data?.results && categoryQuery.data?.results.length > 0;
+
+    const container = css({
+        paddingTop: 16,
+        paddingBottom: 16,
     });
 
     return (
@@ -78,7 +88,14 @@ export function CategoryListModal(props: IProps) {
                     <FrameHeader
                         titleID={"categoriesByPostType"}
                         closeFrame={() => props.onVisibilityChange(false)}
-                        title={<Translate source={"Categories Containing <0/> Posts"} c0={name} />}
+                        title={
+                            <Translate
+                                source={"Categories containing <0/> posts"}
+                                c0={() => {
+                                    return <strong>&nbsp;&quot;{name}&quot;&nbsp;</strong>;
+                                }}
+                            />
+                        }
                     />
                 }
                 body={
@@ -88,9 +105,13 @@ export function CategoryListModal(props: IProps) {
                                 <Loader small />
                             </div>
                         ) : (
-                            <>
-                                <QuickLinksView links={categoryQuery.data?.results ?? []} />
-                            </>
+                            <div className={container}>
+                                {hasResults ? (
+                                    <QuickLinksView links={categoryQuery.data?.results ?? []} />
+                                ) : (
+                                    <p>There are no categories assigned to this post type</p>
+                                )}
+                            </div>
                         )}
                     </FrameBody>
                 }

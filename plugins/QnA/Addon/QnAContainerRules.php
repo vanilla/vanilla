@@ -18,6 +18,7 @@ use Vanilla\QnA\Activity\AnswerAcceptedActivity;
 use Vanilla\QnA\Activity\QuestionAnswerActivity;
 use Vanilla\QnA\Activity\QuestionFollowUpActivity;
 use Vanilla\QnA\AutomationRules\Triggers\UnAnsweredQuestionTrigger;
+use Vanilla\QnA\Layout\View\NewQuestionLayoutView;
 use Vanilla\QnA\Models\QnaQuickLinksProvider;
 use Vanilla\QnA\Models\Totals\AcceptedSiteTotalProvider;
 use Vanilla\QnA\Models\Totals\QuestionSiteTotalProvider;
@@ -26,7 +27,7 @@ use Vanilla\QnA\Layout\View\LegacyNewQuestionLayoutView;
 use Vanilla\QnA\Widgets\DiscussionQuestionsWidget;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
-use Vanilla\QnA\Layout\View\QuestionThreadLayoutView;
+use Vanilla\QnA\Layout\View\QuestionLayoutView;
 
 /**
  * Class ForumContainerRules
@@ -55,18 +56,15 @@ class QnAContainerRules extends AddonContainerRules
             ->rule(ActivityService::class)
             ->addCall("registerActivity", [AnswerAcceptedActivity::class])
             ->addCall("registerActivity", [QuestionAnswerActivity::class])
-            ->addCall("registerActivity", [QuestionFollowUpActivity::class, false]);
+            ->addCall("registerActivity", [QuestionFollowUpActivity::class]);
 
         $container
             ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
-            ->addCall("registerStaticLayout", [
-                "questionThread",
-                PATH_ROOT . "/plugins/QnA/Layout/Definitions/questionThread.json",
-            ])
+            ->addCall("registerStaticLayout", ["question", PATH_ROOT . "/plugins/QnA/Layout/Definitions/question.json"])
             ->rule(LayoutHydrator::class)
-            ->addCall("addLayoutView", [new Reference(QuestionThreadLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(QuestionLayoutView::class)])
             ->rule(LayoutService::class)
-            ->addCall("addLayoutView", [new Reference(QuestionThreadLayoutView::class)]);
+            ->addCall("addLayoutView", [new Reference(QuestionLayoutView::class)]);
 
         $container
             ->rule(AutomationRuleService::class)

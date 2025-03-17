@@ -1258,7 +1258,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     $formData[$profileField["apiName"]] = $properValues;
                 }
             }
-            if (!$isPostBack && $notVisible) {
+            if (!$isPostBack && $notVisible && isset($formData[$profileField["apiName"]])) {
                 // for syncConnectUser data, who already exists
                 $nonVisibleFields[$profileField["apiName"]] = $formData[$profileField["apiName"]] ?? null;
             }

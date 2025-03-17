@@ -7,6 +7,7 @@
 namespace Vanilla;
 
 use Garden\SafeCurl\SafeCurl;
+use Garden\Web\Exception\ServerException;
 use InvalidArgumentException;
 use RuntimeException;
 use Gdn_Upload;
@@ -135,7 +136,10 @@ class UploadedFile
         }
 
         if (!$contentType === null || $downloadSize === null) {
-            throw new \Exception("File missing content type or download size");
+            throw new ServerException(
+                "File missing content type or download size",
+                context: ["url" => $remoteUrl, "header" => $requestHeaders]
+            );
         }
 
         $name = self::extractNameFromUrl($remoteUrl);
@@ -159,7 +163,7 @@ class UploadedFile
         $successful = file_put_contents($tmpFilePath, fopen($resolvedUrl, "r", false, $streamContext));
 
         if (!$successful) {
-            throw new \Exception("Failed to copy file locally");
+            throw new ServerException("Failed to copy file locally", context: ["url" => $resolvedUrl]);
         }
 
         $file = new UploadedFile(new \Gdn_Upload(), $tmpFilePath, $downloadSize, UPLOAD_ERR_OK, $name, $contentType);

@@ -80,7 +80,7 @@ class LocaleModel extends FullRecordCacheModel
             ->column("dateUpdated", "datetime", true)
             ->column("updateUserID", "int", true)
             ->set($explicit, $drop);
-        if (!Gdn::config("Locales.migrated", false) && $database->structure()->tableExists("locale")) {
+        if ($database->structure()->tableExists("locale")) {
             $locales = LocaleModel::getEnabledLocales();
             $defaultLocale = Gdn::config("Garden.Locale", "en");
             foreach ($locales as $locale) {
@@ -106,7 +106,6 @@ class LocaleModel extends FullRecordCacheModel
                     ]);
                 }
             }
-
             Gdn::config()->saveToConfig("Locales.migrated", true);
         }
     }
@@ -598,7 +597,7 @@ class LocaleModel extends FullRecordCacheModel
         }
         reset($rows);
         $single = is_string(key($rows));
-
+        $locales[] = Gdn::config("Garden.Locale", "en");
         $populate = function (array &$row, array $locales) {
             $displayNames = [];
             foreach ($locales as $locale) {

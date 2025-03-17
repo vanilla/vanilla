@@ -378,7 +378,10 @@ class DiscussionsSplitTest extends SiteTestCase
         $comments[] = $this->createComment();
         $comments[] = $this->createComment();
 
-        $category = $this->createCategory(["allowedDiscussionTypes" => ["Discussion", "Question"]]);
+        $category = $this->createCategory([
+            "allowedDiscussionTypes" => ["Discussion", "Question"],
+            "customPermissions" => true,
+        ]);
         $this->runWithExpectedExceptionCode(400, function () use ($category, $comments) {
             $this->api()->post("/discussions/split", [
                 "commentIDs" => array_column($comments, "commentID"),
@@ -393,7 +396,11 @@ class DiscussionsSplitTest extends SiteTestCase
             ]);
         });
 
-        $ideaCategory = $this->createCategory(["ideationType" => "up", "allowedDiscussionTypes" => ["Idea"]]);
+        $ideaCategory = $this->createCategory([
+            "ideationType" => "up",
+            "allowedDiscussionTypes" => ["Idea"],
+            "customPermissions" => true,
+        ]);
         $this->runWithExpectedExceptionCode(400, function () use ($ideaCategory, $comments) {
             $this->api()->post("/discussions/split", [
                 "commentIDs" => array_column($comments, "commentID"),

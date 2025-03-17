@@ -125,7 +125,7 @@ export function CreatePostFormAsset(props: IProps) {
 
     const isEdit = !!parentRecordContext?.record;
 
-    const { draftID, draft, draftLoaded, updateDraft, updateImmediate, enable, disable, draftLastSaved } =
+    const { draftID, draft, draftLoaded, updateDraft, updateImmediate, enable, disable, draftLastSaved, removeDraft } =
         useDraftContext();
 
     // Handle group information
@@ -163,7 +163,6 @@ export function CreatePostFormAsset(props: IProps) {
     const postMutation = usePostMutation(tagsToAssign, tagsToCreate);
 
     const allPostTypes = usePostTypeQuery({
-        postTypeID: formBody.postTypeID,
         isActive: true,
         expand: ["postFields"],
     });
@@ -290,11 +289,17 @@ export function CreatePostFormAsset(props: IProps) {
         // We now have a server draftID and we need to update the URL
         // We compare vs the pathname, because local drafts use the pathname as the ID.
         if (draftID && draftID !== window.location.pathname) {
-            window.history.replaceState(null, "", `/post/editdiscussion/${initialPostID}/${draftID}`);
+            window.history.replaceState(
+                null,
+                "",
+                `${getMeta("context.basePath", "")}/post/editdiscussion/${initialPostID}/${draftID}`,
+            );
         }
     }, [draftID]);
 
     const handleSubmit = async () => {
+        // Disable draft autosave
+        disable();
         const endpoint = getPostEndpointForPostType(selectedPostType ?? null);
         const body = {
             ...formBody,
@@ -309,7 +314,10 @@ export function CreatePostFormAsset(props: IProps) {
                 endpoint,
                 body,
             });
+            removeDraft(draftID ?? window.location.pathname, true);
         }
+        // Re-enable autosave
+        enable();
     };
 
     useEffect(() => {
@@ -438,6 +446,7 @@ export function CreatePostFormAsset(props: IProps) {
                                             ) : (
                                                 <FilteredCategorySelector
                                                     postTypeID={formBody.postTypeID}
+                                                    filterByCurrentSiteSection
                                                     initialValues={
                                                         category?.categoryID !== -1 ? category?.categoryID : undefined
                                                     }

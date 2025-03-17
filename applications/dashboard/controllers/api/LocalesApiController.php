@@ -56,13 +56,15 @@ class LocalesApiController extends Controller
         } else {
             $enabled = $this->localeModel->getEnabledLocales();
             $this->localeModel->expandDisplayNames($enabled, array_column($enabled, "localeKey"));
-            $locales = $this->getEventManager()->fireFilter("localesApiController_getOutput", $enabled, false);
-            $dbLocales = $this->localeModel->getLanguageSetting();
-            $localeIDs = array_column($dbLocales, "localeID");
+            $dbLocales = $this->getEventManager()->fireFilter("localesApiController_getOutput", $enabled, false);
+            // Get Entries saved in config.
+            $Locales = $this->localeModel->getLanguageSetting();
+            $localeIDs = array_column($Locales, "localeID");
+            // Combine the locales from the database with the locales from the config.
             $locales = array_merge(
                 $dbLocales,
-                array_filter($locales, function ($locale) use ($localeIDs) {
-                    return !in_array($locale["localeID"], $localeIDs);
+                array_filter($Locales, function ($Locales) use ($localeIDs) {
+                    return !in_array($Locales["localeID"], $localeIDs);
                 })
             );
             $locales = array_values($locales);

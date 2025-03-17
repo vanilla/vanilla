@@ -2587,8 +2587,9 @@ class CategoryModel extends Gdn_Model implements
                     array_flip($category["allowedPostTypeIDs"])
                 )
             );
+
             $category["AllowedDiscussionTypes"] = array_unique(
-                array_column($category["allowedPostTypeOptions"], "baseType")
+                array_intersect($category["allowedPostTypeIDs"], array_values(PostTypeModel::LEGACY_TYPE_MAP))
             );
         }
     }
@@ -3900,10 +3901,11 @@ class CategoryModel extends Gdn_Model implements
 
         if (isset($allowedDiscussionTypes)) {
             $formPostValues["AllowedDiscussionTypes"] = dbencode($formPostValues["AllowedDiscussionTypes"]);
-        } elseif (isset($allowedPostTypeIDs)) {
+        } elseif (!empty($allowedPostTypeIDs)) {
             $legacyTypesFromPostTypes = array_intersect($allowedPostTypeIDs, PostTypeModel::LEGACY_TYPE_MAP);
             $legacyTypesFromPostTypes = array_values(array_map("ucfirst", $legacyTypesFromPostTypes));
             $formPostValues["AllowedDiscussionTypes"] = dbencode($legacyTypesFromPostTypes);
+            $CustomPermissions = true;
         } else {
             $formPostValues["AllowedDiscussionTypes"] = null;
         }
@@ -4115,9 +4117,8 @@ class CategoryModel extends Gdn_Model implements
                 }
                 $postTypeModel = self::getPostTypeModel();
 
-                if (isset($allowedPostTypeIDs)) {
-                    $allowedPostTypeIDs = $formPostValues["allowedPostTypeIDs"];
-                    $postTypeModel->putPostTypesForCategory($CategoryID, $allowedPostTypeIDs);
+                if (isset($formPostValues["allowedPostTypeIDs"])) {
+                    $postTypeModel->putPostTypesForCategory($CategoryID, $formPostValues["allowedPostTypeIDs"]);
                 }
 
                 if (isset($allowedDiscussionTypes)) {

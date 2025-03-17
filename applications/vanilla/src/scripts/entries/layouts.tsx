@@ -134,7 +134,7 @@ const customCreatePostEnabled = getMeta("featureFlags.customLayout.createPost.En
 
 if (customCreatePostEnabled) {
     // We will handle all the new post route here on the FE
-    registerLayoutPage(["/post/*"], (routeParams) => {
+    registerLayoutPage(["*/post/*"], (routeParams) => {
         const { location } = routeParams;
         const { pathname, search } = location;
         const parameters = getParamsFromPath(pathname, search);

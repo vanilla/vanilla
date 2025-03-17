@@ -12,12 +12,11 @@ namespace Vanilla\Dashboard\Tests\Controllers;
 use EntryController;
 use Garden\Schema\ValidationException;
 use PermissionModel;
-use Vanilla\CurrentTimeStamp;
+use UserMetaModel;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\AuditLogTestTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\Dashboard\EntryControllerConnectTestTrait;
-use VanillaTests\ExpectedAuditLog;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -977,9 +976,14 @@ class EntryControllerConnectTest extends SiteTestCase
         $userData = $this->userModel->getByEmail($ssoUser["Email"], false, ["dataType" => "array"]);
         $this->assertNotEmpty($userData, "SSO user not created");
         //We need to make sure our hidden data got saved
-        $userMetaModel = \Gdn::userMetaModel();
+        $userMetaModel = $this->container()->get(UserMetaModel::class);
         $metaData = $userMetaModel->getUserMeta($userData["UserID"]);
+        $this->assertEquals($ssoData[$hiddenProfileField["apiName"]], $metaData["Profile." . $field["apiName"]]);
 
+        // Make sure the hidden field is removed if the SSO is no longer sending it.
+        unset($ssoUser["hidden-text"]);
+        $r = $this->entryConnect($ssoUser);
+        $metaData = $userMetaModel->getUserMeta($userData["UserID"]);
         $this->assertEquals($ssoData[$hiddenProfileField["apiName"]], $metaData["Profile." . $field["apiName"]]);
     }
 

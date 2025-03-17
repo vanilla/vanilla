@@ -13,12 +13,15 @@ use MediaModel;
 use Vanilla\UploadedFile;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Library\Vanilla\UploadedFileTest;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests for the media model.
  */
 class MediaModelTest extends AbstractAPIv2Test
 {
+    use UsersAndRolesApiTestTrait;
+
     protected static $addons = ["vanilla", "dashboard"];
 
     /** @var MediaModel */
@@ -36,6 +39,7 @@ class MediaModelTest extends AbstractAPIv2Test
         $this->cache->flush();
 
         parent::setUp();
+        self::container()->setInstance(MediaModel::class, null);
         $this->mediaModel = self::container()->get(\MediaModel::class);
         $this->mediaModel->setFloodControlEnabled(true);
         $this->mediaModel->setPostCountThreshold(250);
@@ -89,16 +93,26 @@ class MediaModelTest extends AbstractAPIv2Test
     public function testFlooding(): void
     {
         $this->resetTable("Media");
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("You have exceeded the threshold for file uploads.");
-        $this->expectExceptionCode(429);
 
-        $file = UploadedFile::fromRemoteResourceUrl(UploadedFileTest::TEST_REMOTE_FILE_URL);
-        $this->mediaModel->setFloodControlEnabled(true);
-        $this->mediaModel->setPostCountThreshold(1);
-        $this->mediaModel->setTimeSpan(2);
-        $this->mediaModel->setLockTime(2);
-        $this->mediaModel->saveUploadedFile($file);
-        $this->mediaModel->saveUploadedFile($file);
+        $this->runWithPermissions(
+            function () {
+                $file = UploadedFile::fromRemoteResourceUrl(UploadedFileTest::TEST_REMOTE_FILE_URL);
+                $file2 = UploadedFile::fromRemoteResourceUrl(UploadedFileTest::TEST_REMOTE_FILE_URL . "?1");
+
+                $this->mediaModel->setForceEnabled(true);
+                $this->mediaModel->setFloodControlEnabled(true);
+                $this->mediaModel->setPostCountThreshold(1);
+                $this->mediaModel->setTimeSpan(2);
+                $this->mediaModel->setLockTime(2);
+                $this->mediaModel->saveUploadedFile($file);
+                $this->expectException(Exception::class);
+                $this->expectExceptionMessage("You have exceeded the threshold for file uploads.");
+                $this->expectExceptionCode(429);
+                $this->mediaModel->saveUploadedFile($file2);
+            },
+            [
+                "uploads.add" => true,
+            ]
+        );
     }
 }

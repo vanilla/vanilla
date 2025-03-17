@@ -102,17 +102,6 @@ $dic->setInstance(Container::class, $dic)
     ->addCall("addProvider", [new Reference(SingleSiteSectionProvider::class)])
     ->setShared(true)
 
-    // Site applications
-    ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
-    ->setClass(\Vanilla\Site\ApplicationProvider::class)
-    ->addCall("add", [
-        new Reference(\Vanilla\Site\Application::class, [
-            "garden",
-            ["api", "entry", "sso", "utility", "robots.txt", "robots"],
-        ]),
-    ])
-    ->setShared(true)
-
     // ApplicationManager
     ->rule("Gdn_ApplicationManager")
     ->setShared(true)

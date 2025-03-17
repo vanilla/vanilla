@@ -73,7 +73,7 @@ export function ListItem(props: IListItemProps) {
     const asTile = props.asTile == null ? props.asTile || isMobileMedia : props.asTile;
     const iconInMeta = iconPosition === ListItemIconPosition.META && !hasImage;
     const hasCheckbox = Boolean(props.checkbox);
-    const classes = listItemClasses(asTile, hasImage, hasCheckbox, isMobileMedia && props.asTile);
+    const classes = listItemClasses(asTile, hasImage, hasCheckbox, isMobileMedia && !props.asTile);
 
     const checkboxWrapped = props.checkbox && <div className={cx(classes.checkboxContainer)}>{props.checkbox}</div>;
 

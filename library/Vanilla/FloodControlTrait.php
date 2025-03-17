@@ -7,7 +7,9 @@
 
 namespace Vanilla;
 
+use Gdn;
 use Psr\SimpleCache\CacheInterface;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Utility methods for models that want to implement flood control.
@@ -44,6 +46,18 @@ trait FloodControlTrait
      * @var string Key name, in the {@link CacheInterface}, of the last flood check. Args:[__CLASS__, '$userID'].
      */
     private $keyLastDateChecked;
+
+    /**
+     * Force the flood control to be true for testing.
+     *
+     * @var bool
+     */
+    private $forceEnabled = false;
+
+    public function setForceEnabled(bool $forceEnabled): void
+    {
+        $this->forceEnabled = $forceEnabled;
+    }
 
     /**
      * @return int
@@ -166,6 +180,16 @@ trait FloodControlTrait
      */
     public function isFloodControlEnabled()
     {
+        $session = Gdn::session();
+        if (!$session->isValid()) {
+            $this->setFloodControlEnabled(false);
+        } elseif ($session->User->Admin || $session->checkPermission("Garden.Moderation.Manage")) {
+            $this->setFloodControlEnabled(false);
+        } elseif (DebugUtils::isTestMode() && !$this->forceEnabled) {
+            // Here too
+            $this->setFloodControlEnabled(false);
+        }
+
         return $this->floodControlEnabled;
     }
 

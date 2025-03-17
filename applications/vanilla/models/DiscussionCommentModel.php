@@ -358,6 +358,10 @@ class DiscussionCommentModel extends AbstractCommentParentHandler
             return [];
         }
 
+        if ($discussion["discussionID"] == 0) {
+            return [];
+        }
+
         unset($discussion["discussionUser"], $discussion["record"], $discussion["commentMetric"]);
 
         return $discussion;

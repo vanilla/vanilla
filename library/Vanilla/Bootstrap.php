@@ -117,6 +117,17 @@ class Bootstrap
         $container->rule(Vanilla\Web\BotDetector::class)->setShared(true);
         $container->rule(TraceCollector::class)->setShared(true);
 
+        $container
+            ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
+            ->setClass(\Vanilla\Site\ApplicationProvider::class)
+            ->addCall("add", [
+                new Reference(\Vanilla\Site\Application::class, [
+                    "garden",
+                    ["api", "entry", "sso", "utility", "robots.txt", "robots"],
+                ]),
+            ])
+            ->setShared(true);
+
         // Image Srcset
         $container
             ->rule(ImageSrcSetService::class)

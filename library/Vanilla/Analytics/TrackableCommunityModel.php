@@ -15,17 +15,22 @@ use Exception;
 use Garden\Container\ContainerException;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Community\Events\SubscriptionChangeEvent;
 use Vanilla\Community\Events\TrackableDiscussionAnalyticsEvent;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
+use Vanilla\Logger;
 use Vanilla\Utility\ArrayUtils;
 
 /**
  * Utility functions for Trackable Events.
  */
-class TrackableCommunityModel
+class TrackableCommunityModel implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** @var DiscussionModel */
     private $discussionModel;
 
@@ -290,27 +295,35 @@ class TrackableCommunityModel
      */
     public function getTrackableLogComment(array $commentData): array
     {
-        $commentData["commentID"] = 0;
-        $commentData = ArrayUtils::camelCase($commentData);
-        $schema = $this->commentModel->schema();
-        $commentData = $schema->validate($commentData, true);
-        $commentData["dateInserted"] = TrackableDateUtils::getDateTime($commentData["dateInserted"]);
-        $commentData["insertUser"] = $this->userUtils->getTrackableUser($commentData["insertUserID"]);
+        try {
+            $commentData["commentID"] = 0;
+            $commentData = ArrayUtils::camelCase($commentData);
+            $schema = $this->commentModel->schema();
+            $commentData = $schema->validate($commentData, true);
+            $commentData["dateInserted"] = TrackableDateUtils::getDateTime($commentData["dateInserted"]);
+            $commentData["insertUser"] = $this->userUtils->getTrackableUser($commentData["insertUserID"]);
 
-        if (isset($commentData["parentRecordType"], $commentData["parentRecordID"])) {
-            $parentRecord = $this->getParentRecord($commentData["parentRecordID"], $commentData["parentRecordType"]);
-        } else {
-            $parentRecord = false;
+            if (isset($commentData["parentRecordType"], $commentData["parentRecordID"])) {
+                $parentRecord = $this->getParentRecord(
+                    $commentData["parentRecordID"],
+                    $commentData["parentRecordType"]
+                );
+            } else {
+                $parentRecord = false;
+            }
+
+            if ($parentRecord) {
+                $commentData["category"] = val("category", $parentRecord);
+                $commentData["categoryAncestors"] = val("categoryAncestors", $parentRecord);
+                $commentData["discussionUser"] = $this->userUtils->getTrackableUser($parentRecord["insertUserID"]);
+            }
+
+            // The body is large and unnecessary.
+            $commentData["body"] = null;
+        } catch (Exception $ex) {
+            $this->logger->error("Error getting trackable log comment: " . $ex->getMessage());
+            $commentData = [];
         }
-
-        if ($parentRecord) {
-            $commentData["category"] = val("category", $parentRecord);
-            $commentData["categoryAncestors"] = val("categoryAncestors", $parentRecord);
-            $commentData["discussionUser"] = $this->userUtils->getTrackableUser($parentRecord["insertUserID"]);
-        }
-
-        // The body is large and unnecessary.
-        $commentData["body"] = null;
 
         return $commentData;
     }
@@ -331,6 +344,12 @@ class TrackableCommunityModel
         } catch (Exception $ex) {
             $parentRecord = false;
         }
+
+        // There are no parent records for comments.
+        if (empty($parentRecord)) {
+            return false;
+        }
+
         return $parentRecord;
     }
 

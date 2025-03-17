@@ -90,13 +90,15 @@ class ForumAggregateModel
         $countComments = $this->db->createSql()->getCount("Comment", ["DiscussionID" => $discussionID]);
         $newFirstComment = $this->selectCommentFragment(
             [
-                "DiscussionID" => $discussionID,
+                "parentRecordType" => "discussion",
+                "parentRecordID" => $discussionID,
             ],
             "DateInserted"
         );
         $newLastComment = $this->selectCommentFragment(
             [
-                "DiscussionID" => $discussionID,
+                "parentRecordType" => "discussion",
+                "parentRecordID" => $discussionID,
             ],
             "-DateInserted"
         );
@@ -304,7 +306,8 @@ class ForumAggregateModel
     {
         $newLastComment = $this->selectCommentFragment(
             [
-                "DiscussionID" => $comment["DiscussionID"],
+                "parentRecordType" => "discussion",
+                "parentRecordID" => $comment["DiscussionID"],
             ],
             "-DateInserted"
         );
@@ -369,13 +372,19 @@ class ForumAggregateModel
      */
     private function selectCommentFragment(array $where, string $orderBy): ?array
     {
-        // Not necessarilly the newest comment.
-        // Fetch the newest one.
+        // Weed out the comments first.
+        $innerComments = $this->db
+            ->createSql()
+            ->select("CommentID")
+            ->from("Comment")
+            ->where($where);
+
         $newLastestComment = $this->db
             ->createSql()
-            ->select("CommentID, DateInserted, DiscussionID, InsertUserID")
-            ->from("Comment")
-            ->where($where)
+            ->with("innerComments", $innerComments)
+            ->select("c.CommentID, c.DateInserted, c.DiscussionID, c.InsertUserID")
+            ->from("Comment c")
+            ->join("@innerComments ic", "ic.CommentID = c.CommentID")
             ->orderBy($orderBy)
             ->limit(1)
             ->get()

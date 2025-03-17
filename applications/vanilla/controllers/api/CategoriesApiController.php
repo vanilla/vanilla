@@ -399,6 +399,7 @@ class CategoriesApiController extends AbstractApiController
                 "minimum" => 1,
             ],
             "parentCategoryID:i?",
+            "siteSectionID:s?" => "Filter categories by site-section-id (subcommunity)",
             "limit:i?" => [
                 "description" => "Desired number of items per page.",
                 "default" => $this->categoryModel->getDefaultLimit(),
@@ -432,9 +433,11 @@ class CategoriesApiController extends AbstractApiController
             $where["DisplayAs"] = $query["displayAs"];
         }
 
+        $parentCategory = $this->getIndexParentCategoryID($query);
+
         $results = $this->categoryModel->searchByName(
             $query["query"],
-            $query["parentCategoryID"] ?? null,
+            $parentCategory["CategoryID"] ?? null,
             $where,
             $this->isExpandField("parent", $expand),
             $limit,
@@ -515,6 +518,11 @@ class CategoriesApiController extends AbstractApiController
                      The query looks like:
                      siteSectionID=$SubcommunityID:{id} ie. 1
                      siteSectionID=$SubcommunityID:{folder} ie. ',
+                ],
+                "includeParentCategory:b?" => [
+                    "description" =>
+                        "Whether to include the parent category when used with parentCategoryID, parentCategoryCode, or siteSectionID.",
+                    "default" => false,
                 ],
                 "layoutViewType:s?",
                 "postTypeID:s?",
@@ -695,9 +703,12 @@ class CategoriesApiController extends AbstractApiController
         // Parent category filtering.
         if (!empty($parentCategory)) {
             $descendantIDs = $this->categoryModel->getCategoriesDescendantIDs([$parentCategory["CategoryID"]]);
-            $descendantIDs = array_filter($descendantIDs, function (int $id) use ($parentCategory) {
-                return $id !== $parentCategory["CategoryID"];
-            });
+            if (!$query["includeParentCategory"]) {
+                $descendantIDs = array_filter($descendantIDs, function (int $id) use ($parentCategory) {
+                    return $id !== $parentCategory["CategoryID"];
+                });
+            }
+
             $categoryIDs = $categoryIDs->withFilteredValue("=", $descendantIDs);
         }
 

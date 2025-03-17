@@ -5,7 +5,7 @@
  */
 
 import { ITag } from "@library/features/tags/TagsReducer";
-import { safelyParseJSON, safelySerializeJSON } from "@library/utility/appUtils";
+import { safelyParseJSON, safelySerializeJSON, getSiteSection } from "@library/utility/appUtils";
 import { MyValue } from "@library/vanilla-editor/typescript";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
 import { CommentEditor } from "@vanilla/addon-vanilla/comments/CommentEditor";
@@ -34,9 +34,13 @@ export const EMPTY_DRAFT: MyValue = [{ type: "p", children: [{ text: "" }] }];
  * - /post/editdiscussion/:discussionID?/:draftID?
  */
 export const getParamsFromPath = (path: string, search: string): CreatePostParams | EditExistingPostParams | null => {
-    const urlParts = path.split("/").filter((part) => part.length > 0);
-    const isPost = urlParts?.[0].includes("post");
-    const isEdit = urlParts?.[1].includes("editdiscussion");
+    const siteSection = getSiteSection();
+
+    const pathWithoutSiteSection = siteSection?.basePath ? path.replace(siteSection.basePath, "") : path;
+    const urlParts = pathWithoutSiteSection.split("/").filter((part) => part.length > 0);
+
+    const isPost = urlParts?.[0]?.includes("post");
+    const isEdit = urlParts?.[1]?.includes("editdiscussion");
 
     let params: any = {};
     if (isPost) {

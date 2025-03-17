@@ -48,7 +48,7 @@ class MediaModel extends Gdn_Model implements FileUploadHandler, SystemCallableI
     {
         parent::__construct("Media");
         $this->upload = \Gdn::getContainer()->get(Gdn_Upload::class);
-        $this->floodGate = FloodControlHelper::configure($this, "Vanilla", "Media", false);
+        $this->floodGate = FloodControlHelper::configure($this, "Vanilla", "Media");
         $this->setFloodControlEnabled(true);
         $this->setPostCountThreshold(250);
         $this->setTimeSpan(3600);

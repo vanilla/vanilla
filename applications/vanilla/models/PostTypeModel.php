@@ -144,14 +144,17 @@ class PostTypeModel extends FullRecordCacheModel
         $associations = $this->getCategoryAssociations();
         $associationsByPostTypeID = ArrayUtils::arrayColumnArrays($associations, "categoryID", "postTypeID");
         $explicitCategoryIDs = array_column($associations, "categoryID");
-        $allCategories = array_filter(
+        $allCategories = $this->categoryModel->getVisibleCategories(["forceArrayReturn" => true]);
+        $implicitCategoryIDs = array_diff(array_column($allCategories, "CategoryID"), $explicitCategoryIDs);
+
+        $postableCategories = array_filter(
             $this->categoryModel->getVisibleCategories([
                 "filterDiscussionsAdd" => true,
                 "forceArrayReturn" => true,
             ]),
             fn($category) => $category["CategoryID"] === -1 || strtolower($category["DisplayAs"]) === "discussions"
         );
-        $implicitCategoryIDs = array_diff(array_column($allCategories, "CategoryID"), $explicitCategoryIDs);
+        $postableCategoryIDs = array_column($postableCategories, "CategoryID");
 
         foreach ($rows as &$row) {
             if (!empty($row["categoryIDs"])) {
@@ -165,8 +168,10 @@ class PostTypeModel extends FullRecordCacheModel
                     $implicitCategoryIDs
                 );
             }
-
-            $row["countCategories"] = count(array_filter($row["availableCategoryIDs"], fn($cat) => $cat > -1));
+            $row["postableCategoryIDs"] = array_values(
+                array_intersect($row["availableCategoryIDs"], $postableCategoryIDs)
+            );
+            $row["countCategories"] = count(array_filter($row["postableCategoryIDs"], fn($cat) => $cat > -1));
         }
     }
 
@@ -575,7 +580,7 @@ class PostTypeModel extends FullRecordCacheModel
             },
         ]);
         $postType = array_find($allowedPostTypes, fn($item) => $item["postTypeID"] === $postTypeID);
-        return $postType["availableCategoryIDs"] ?? [];
+        return $postType["postableCategoryIDs"] ?? [];
     }
 
     /**
@@ -704,16 +709,13 @@ class PostTypeModel extends FullRecordCacheModel
             $sort = 0;
         }
 
-        $rows = [];
         foreach ($postFieldIDs as $postFieldID) {
-            $rows[] = [
+            $sql->insert("postTypePostFieldJunction", [
                 "postFieldID" => $postFieldID,
                 "postTypeID" => $postTypeID,
                 "sort" => $sort++,
-            ];
+            ]);
         }
-
-        $sql->insert("postTypePostFieldJunction", $rows);
     }
 
     /**

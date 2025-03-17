@@ -107,6 +107,12 @@ paths:
                   name: siteSectionID
                   schema:
                       type: string
+                - description: Whether to include the parent category when used with parentCategoryID, parentCategoryCode, or siteSectionID.
+                  in: query
+                  name: includeParentCategory
+                  required: false
+                  schema:
+                      type: boolean
                 - description: Format of the output as flat or tree.
                   in: query
                   name: outputFormat
@@ -519,6 +525,11 @@ paths:
                   required: false
                   schema:
                       type: boolean
+                - description: Filter categories by site section ID (ex. subcommunity).
+                  in: query
+                  name: siteSectionID
+                  schema:
+                      type: string
             responses:
                 "200":
                     content:

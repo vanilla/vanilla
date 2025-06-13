@@ -111,7 +111,7 @@
     "lodash.debounce": "^4.0.8",
     "moment": "^2.29.4",
     "monaco-editor": "^0.52.0",
-    "node-gyp": "^9.1.0",
+    "node-gyp": "^11.2.0",
     "normalize.css": "8.0.1",
     "p-debounce": "1.0.0",
     "postcss": "^8.4.33",

@@ -25,6 +25,7 @@ interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "
     swatchClassName?: string;
     disabled?: boolean;
     value?: string;
+    noInput?: boolean;
     onChange?: (color: string) => void;
     inputID?: string;
     labelID?: string;
@@ -48,6 +49,7 @@ export function ColorPicker(_props: IProps) {
         isInvalid,
         placeholder,
         defaultBackground,
+        noInput,
     } = _props;
 
     const classes = colorPickerClasses();
@@ -78,9 +80,9 @@ export function ColorPicker(_props: IProps) {
         setTextFieldValue(colorString);
         if (colorString === "") {
             // we are clearing our color to the default.
+            setLastValidColor(colorString);
             setCurrentlySelectedColor(colorString);
             onChange && onChange(colorString);
-            setLastValidColor("");
         } else if (stringIsValidColor(colorString)) {
             setCurrentlySelectedColor(colorString); // Only set valid color if passes validation
             setLastValidColor(colorString);
@@ -119,7 +121,11 @@ export function ColorPicker(_props: IProps) {
     const onPickerChange = (newColor: string) => {
         // Will always be valid color, since it's a real picker
         //in case its our default picker color, we need to make sure we actually want that color and its not just empty input
-        if (newColor && (newColor !== defaultBackgroundColor || currentlySelectedColor === defaultBackgroundColor)) {
+        if (
+            newColor &&
+            newColor !== "" &&
+            (newColor !== defaultBackgroundColor || currentlySelectedColor === defaultBackgroundColor)
+        ) {
             handleColorChangeRef.current = handleColorChange;
             _debouncedPickerUpdate(newColor);
         }
@@ -135,21 +141,23 @@ export function ColorPicker(_props: IProps) {
     return (
         <>
             <span className={cx(classes.root, rootClassName)}>
-                <input
-                    id={inputID}
-                    ref={textInput}
-                    type="text"
-                    aria-describedby={labelID}
-                    aria-hidden={true}
-                    className={cx(inputClassName)}
-                    placeholder={placeholder ?? defaultColorString}
-                    value={textInputValue ?? ""} // Null is not an allowed value for an input.
-                    onChange={onTextChange}
-                    autoCorrect="false"
-                    disabled={disabled}
-                    aria-disabled={disabled}
-                />
-                {textInputValue && (
+                {!noInput && (
+                    <input
+                        id={inputID}
+                        ref={textInput}
+                        type="text"
+                        aria-describedby={labelID}
+                        aria-hidden={true}
+                        className={cx(inputClassName)}
+                        placeholder={placeholder ?? defaultColorString}
+                        value={textInputValue ?? ""} // Null is not an allowed value for an input.
+                        onChange={onTextChange}
+                        autoCorrect="false"
+                        disabled={disabled}
+                        aria-disabled={disabled}
+                    />
+                )}
+                {!noInput && textInputValue && (
                     <ClearButton className={classes.clearButton} onClick={(e) => handleColorChange("")} />
                 )}
                 <Picker
@@ -167,6 +175,7 @@ function Picker(props: { onChange: (newColor: string) => void; validColorString:
     const pickrRef = useRef<Pickr | null>(null);
     const { onChange, validColorString, swatchClassName } = props;
     const classes = colorPickerClasses();
+    const ignorePickrChangeRef = useRef(false);
     const currentColorRef = useRef(validColorString);
     useEffect(() => {
         currentColorRef.current = validColorString;
@@ -174,6 +183,10 @@ function Picker(props: { onChange: (newColor: string) => void; validColorString:
 
     const handleChange = useCallback(
         (color: Pickr.HSVaColor) => {
+            if (ignorePickrChangeRef.current) {
+                // We just set this ourself.
+                return;
+            }
             const finalColor = color.toHEXA().toString();
             onChange(finalColor);
         },
@@ -234,7 +247,9 @@ function Picker(props: { onChange: (newColor: string) => void; validColorString:
     }, []);
 
     useEffect(() => {
+        ignorePickrChangeRef.current = true;
         pickrRef.current?.setColor(validColorString, true);
+        ignorePickrChangeRef.current = false;
     }, [validColorString]);
 
     useEffect(() => {

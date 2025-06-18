@@ -40,9 +40,9 @@ export default class Paragraph extends React.Component<IParagraphProps> {
             }
 
             return (
-                <p id={this.id} className={componentClasses} {...accessibilityProps}>
+                <div id={this.id} className={componentClasses} {...accessibilityProps}>
                     {this.props.children}
-                </p>
+                </div>
             );
         } else {
             return null;

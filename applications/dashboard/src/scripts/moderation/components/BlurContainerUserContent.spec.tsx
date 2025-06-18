@@ -8,6 +8,7 @@ import { RenderResult, fireEvent, render, screen } from "@testing-library/react"
 import BlurContainer from "@dashboard/moderation/components/BlurContainerUserContent";
 import UserContent from "@library/content/UserContent";
 import { act } from "react-dom/test-utils";
+import { type VanillaSanitizedHtml } from "@vanilla/dom-utils";
 
 const BUTTON_LABEL_SHOW = /show/i;
 const BUTTON_LABEL_HIDE = /hide/i;
@@ -19,7 +20,7 @@ const MOCK_CONTENT = `<div>${MOCK_PARAGRAPH}
 <div class="moderationImageAndButtonContainer">
     <div class="moderationContainer blur">
        ${MOCK_IMAGE}
-    </div></div></div>`;
+    </div></div></div>` as VanillaSanitizedHtml;
 
 describe("Blur container", () => {
     let renderResult: RenderResult;
@@ -27,7 +28,7 @@ describe("Blur container", () => {
     beforeEach(async () => {
         renderResult = render(
             <BlurContainer>
-                <UserContent content={MOCK_CONTENT} moderateEmbeds={true} />
+                <UserContent vanillaSanitizedHtml={MOCK_CONTENT} moderateEmbeds={true} />
             </BlurContainer>,
         );
 

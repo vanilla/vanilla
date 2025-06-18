@@ -6,7 +6,7 @@ use Vanilla\CurrentTimeStamp;
 class TestAction extends BumpDiscussionAction
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -14,7 +14,7 @@ class TestAction extends BumpDiscussionAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -22,7 +22,7 @@ class TestAction extends BumpDiscussionAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {

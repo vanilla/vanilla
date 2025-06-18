@@ -3,76 +3,109 @@
  * @license gpl-2.0-only
  */
 
-import React, { memo, useEffect, useRef, useState } from "react";
-import SmartLink from "@library/routing/links/SmartLink";
-import { widgetSettingsClasses } from "@dashboard/layout/editor/widgetSettings/WidgetSettings.classes";
-import Translate from "@library/content/Translate";
-import { IWidgetConfigurationComponentProps } from "@dashboard/layout/editor/widgetSettings/WidgetSettingsModal";
-import { HtmlWidgetCodeEditor } from "@library/htmlWidget/HtmlWidgetEditor";
-import { LayoutLookupContext, LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
-import { FauxWidget, fetchOverviewComponent } from "@dashboard/layout/overview/LayoutOverview";
-import { WidgetContextProvider } from "@library/layout/Widget";
-import { LinkContext } from "@library/routing/links/LinkContextProvider";
-import { IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { MemoryRouter } from "react-router-dom";
+import { ColorPicker } from "@dashboard/components/ColorPicker";
+import { LayoutEditorContents } from "@dashboard/layout/editor/LayoutEditorContents";
 import { resolveFieldParams } from "@dashboard/layout/editor/widgetSettings/resolveFieldParams";
-import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
+import { widgetSettingsClasses } from "@dashboard/layout/editor/widgetSettings/WidgetSettings.classes";
+import { IWidgetConfigurationComponentProps } from "@dashboard/layout/editor/widgetSettings/WidgetSettingsModal";
+import { type ILayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { FauxWidget, fetchOverviewComponent } from "@dashboard/layout/overview/LayoutOverview";
 import { cx } from "@emotion/css";
+import Translate from "@library/content/Translate";
+import { LayoutLookupContext, LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
+import { NestedSelect } from "@library/forms/nestedSelect";
+import { HtmlWidgetCodeEditor } from "@library/htmlWidget/HtmlWidgetEditor";
+import { WidgetContextProvider } from "@library/layout/LayoutWidget";
+import { Row } from "@library/layout/Row";
 import WidgetPreviewNoPointerEventsWrapper from "@library/layout/WidgetPreviewNoPointerEventsWrapper";
-import debounce from "lodash/debounce";
+import { LinkContext } from "@library/routing/links/LinkContextProvider";
+import SmartLink from "@library/routing/links/SmartLink";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { EditorThemePreviewOverrides, useEditorThemePreview } from "@library/theming/EditorThemePreviewContext";
+import { t } from "@vanilla/i18n";
+import debounce from "lodash-es/debounce";
+import React, { memo, useEffect, useRef, useState } from "react";
+import { MemoryRouter } from "react-router-dom";
 
 interface IWidgetSettingsPreviewProps {
-    widgetCatalog: IWidgetCatalog;
+    layoutCatalog: ILayoutCatalog;
     widgetID: string;
     config?: object;
-    assetCatalog?: IWidgetCatalog;
+    schema: IWidgetConfigurationComponentProps["schema"];
+    value: IWidgetConfigurationComponentProps["value"];
+    onChange: IWidgetConfigurationComponentProps["onChange"];
 }
 
 type IRendererConfig = React.ComponentProps<typeof LayoutRenderer>;
 
-export function WidgetSettingsPreview(props: IWidgetConfigurationComponentProps & IWidgetSettingsPreviewProps) {
+export function WidgetSettingsPreview(props: IWidgetSettingsPreviewProps) {
     const schemaIncludesHtml = props.schema.properties && "html" in props.schema.properties;
 
-    const { widgetCatalog, assetCatalog, widgetID, config } = props;
-    const widgetClassName = `${widgetID.split(".")[1]}`;
+    const { layoutCatalog, widgetID, config } = props;
 
-    LayoutEditorPreviewData.addExternalData(widgetCatalog);
-
-    const reactComponent = widgetCatalog[widgetID]
-        ? widgetCatalog[widgetID].$reactComponent
-        : assetCatalog && assetCatalog[widgetID]
-        ? assetCatalog[widgetID].$reactComponent
-        : "";
-
-    const [rendererConfig, setRendererConfig] = useState<IRendererConfig>({
-        layout: [
+    const [rendererConfig, setRendererConfig] = useState<IRendererConfig>(
+        new LayoutEditorContents(
             {
-                $reactComponent: reactComponent,
-                $reactProps: {
-                    $hydrate: widgetID,
-                    ...resolveFieldParams(config),
-                },
+                titleBar: {} as any,
+                layoutViewType: "home",
+                layout: [
+                    {
+                        $hydrate: widgetID,
+                        ...resolveFieldParams(config),
+                    },
+                ],
             },
-        ],
-    });
+            layoutCatalog,
+        ).hydrate(),
+    );
 
     const throttledSetRendererConfig = useRef(debounce(setRendererConfig, 250, { leading: true }));
 
     useEffect(() => {
-        throttledSetRendererConfig.current({
-            layout: [
+        throttledSetRendererConfig.current(
+            new LayoutEditorContents(
                 {
-                    $reactComponent: reactComponent,
-                    $reactProps: {
-                        $hydrate: widgetID,
-                        ...resolveFieldParams(config),
-                    },
+                    titleBar: {} as any,
+                    layoutViewType: "home",
+                    layout: [
+                        {
+                            $hydrate: widgetID,
+                            ...config,
+                        },
+                    ],
                 },
-            ],
-        });
-    }, [reactComponent, config, widgetID]);
+                layoutCatalog,
+            ).hydrate(),
+        );
+    }, [config, widgetID]);
 
     const classes = widgetSettingsClasses();
+
+    const previewTheme = useEditorThemePreview();
+    const [scalePercent, setScalePercent] = useState("100%");
+    const [previewBgColor, setPreviewBgColor] = useState(
+        ColorsUtils.ensureColorHelper(
+            previewTheme.previewedThemeQuery?.data?.assets?.variables?.data?.global?.mainColors.bg ?? "#fff",
+        ).toHexString(),
+    );
+    const transform = (() => {
+        switch (scalePercent) {
+            case "150%":
+                return "scale(0.6666666667)";
+            case "200%":
+                return "scale(0.5)";
+            default:
+                return undefined;
+        }
+    })();
+    const previewStyle: React.CSSProperties = {
+        width: scalePercent,
+        transform,
+        transformOrigin: "top left",
+        backgroundColor: previewBgColor,
+    };
+
+    const widgetClassName = cx(`${widgetID.split(".")[1]}`);
 
     return (
         <div className={classes.preview}>
@@ -92,22 +125,61 @@ export function WidgetSettingsPreview(props: IWidgetConfigurationComponentProps 
                     onChange={(newValue) => props.onChange({ ...props.value, ...newValue })}
                 />
             ) : (
-                <WidgetSettingsPreviewImpl widgetClassName={widgetClassName} {...rendererConfig} />
+                <>
+                    <Row gap={16} align={"center"} className={classes.previewContainer}>
+                        <NestedSelect
+                            inline={true}
+                            compact={true}
+                            label={t("Scale") + ":"}
+                            value={scalePercent}
+                            onChange={(value: string) => setScalePercent(value)}
+                            options={[
+                                { label: "200%", value: "200%" },
+                                { label: "150%", value: "150%" },
+                                { label: "100%", value: "100%" },
+                                { label: "75%", value: "75%" },
+                                { label: "50%", value: "50%" },
+                                { label: "25%", value: "25%" },
+                            ]}
+                        />
+                        <label className={classes.previewColorLabel}>
+                            <strong>{t("Preview Background")}:</strong>
+                            <ColorPicker
+                                swatchClassName={classes.previewColorSwatch}
+                                noInput={true}
+                                value={previewBgColor}
+                                onChange={setPreviewBgColor}
+                            ></ColorPicker>
+                        </label>
+                    </Row>
+                    <div className={classes.previewContainer}>
+                        <EditorThemePreviewOverrides>
+                            <WidgetSettingsPreviewImpl
+                                key={scalePercent} // Need to re-render on scale change so overflow detection and measures are reset.
+                                style={previewStyle}
+                                widgetClassName={widgetClassName}
+                                {...rendererConfig}
+                            />
+                        </EditorThemePreviewOverrides>
+                    </div>
+                </>
             )}
         </div>
     );
 }
 
 const WidgetSettingsPreviewImpl = memo(function WidgetSettingsPreview(
-    props: React.ComponentProps<typeof LayoutRenderer> & { widgetClassName: string },
+    props: React.ComponentProps<typeof LayoutRenderer> & { style?: React.CSSProperties; widgetClassName: string },
 ) {
-    const { widgetClassName, ...rendererConfig } = props;
-    const classes = widgetSettingsClasses();
+    const { widgetClassName, style, ...rendererConfig } = props;
+    const classes = widgetSettingsClasses.useAsHook();
 
     return (
-        <div className={cx(classes.previewBody, "widgetSettingsPreview", widgetClassName)}>
+        <div style={style} className={cx(classes.previewBody, "widgetSettingsPreview", widgetClassName)}>
             <WidgetContextProvider
                 // To override outer context
+                widgetRef={{ current: null }}
+                inert={true}
                 extraClasses={classes.previewContent}
             >
                 <WidgetPreviewNoPointerEventsWrapper>

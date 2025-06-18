@@ -17,7 +17,7 @@ import TruncatedText from "@library/content/TruncatedText";
 import { ICountResult } from "@library/search/searchTypes";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { getClassForButtonType } from "@library/forms/Button.getClassForButtonType";
-import { createSourceSetValue, ImageSourceSet, t } from "@library/utility/appUtils";
+import { createSourceSetValue, ImageSourceSet, siteUrl, t } from "@library/utility/appUtils";
 import { ArrowIcon } from "@library/icons/common";
 import { DeepPartial } from "redux";
 import { MetaItem, Metas } from "@library/metas/Metas";
@@ -65,9 +65,9 @@ export type IHomeWidgetItemProps = CommonHomeWidgetItemProps &
 
 export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     const { to, callback } = props;
-    const vars = homeWidgetItemVariables(props.options);
+    const vars = homeWidgetItemVariables.useAsHook(props.options);
     const options = vars.options;
-    const classes = homeWidgetItemClasses(props.options);
+    const classes = homeWidgetItemClasses.useAsHook(props.options);
     const isMobile = [Devices.MOBILE, Devices.XS].includes(useDevice());
 
     const imageUrlSrcSet = useMemo(() => {
@@ -144,7 +144,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                           height={isMobile ? vars.icon.sizeMobile : vars.icon.size}
                           width={"auto"}
                           role="presentation"
-                          src={iconUrl}
+                          src={siteUrl(iconUrl)}
                           alt={props.name}
                           loading="lazy"
                           {...iconUrlSrcSet}
@@ -167,7 +167,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                                 <img
                                     height={vars.icon.size}
                                     className={classes.image}
-                                    src={imageUrl}
+                                    src={siteUrl(imageUrl)}
                                     alt={props.name}
                                     loading="lazy"
                                     {...imageUrlSrcSet}
@@ -230,8 +230,8 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
 }
 
 function HomeWidgetStaticContent(props: IHomeWidgetItemProps & { extraChildren?: React.ReactNode }) {
-    const options = homeWidgetItemVariables(props.options).options;
-    const classes = homeWidgetItemClasses(props.options);
+    const options = homeWidgetItemVariables.useAsHook(props.options).options;
+    const classes = homeWidgetItemClasses.useAsHook(props.options);
 
     return (
         <div className={classes.content}>
@@ -262,8 +262,8 @@ function HomeWidgetStaticContent(props: IHomeWidgetItemProps & { extraChildren?:
 }
 
 function HomeWidgetAbsoluteContent(props: IHomeWidgetItemProps) {
-    const options = homeWidgetItemVariables(props.options).options;
-    const classes = homeWidgetItemClasses(props.options);
+    const options = homeWidgetItemVariables.useAsHook(props.options).options;
+    const classes = homeWidgetItemClasses.useAsHook(props.options);
     const viewMoreCode = options.viewMore?.labelCode;
 
     return (

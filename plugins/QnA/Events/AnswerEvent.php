@@ -39,7 +39,7 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTrackableAction(): string
     {
@@ -47,7 +47,7 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTrackableCollection(): ?string
     {
@@ -55,7 +55,7 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {

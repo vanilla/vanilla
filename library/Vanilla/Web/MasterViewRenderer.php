@@ -16,6 +16,7 @@ use Vanilla\FileUtils;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Web\Asset\ViteAssetProvider;
 use Vanilla\Web\Events\PageRenderBeforeEvent;
 
 /**
@@ -43,6 +44,7 @@ class MasterViewRenderer
      */
     public function __construct(
         private ThemePreloadProvider $themePreloader,
+        private ViteAssetProvider $assetProvider,
         private SiteMeta $siteMeta,
         private ConfigurationInterface $config,
         private EventManager $eventManager,
@@ -79,7 +81,10 @@ class MasterViewRenderer
 
         $this->eventManager->fire("pageRenderBefore", new PageRenderBeforeEvent($head, $page));
 
+        $isDistMissing = !file_exists(PATH_DIST . "/" . $page->getAssetSection());
+
         $extraData = [
+            "isDistMissing" => $isDistMissing,
             "seoContent" => new \Twig\Markup($page->getSeoContent(), "utf-8"),
             "cssClasses" => ["isLoading"],
             "pageHead" => $page->getHead()->renderHtml(),
@@ -129,6 +134,8 @@ class MasterViewRenderer
             }
         }
 
+        $isDistMissing = !file_exists(PATH_DIST . "/forum") || !file_exists(PATH_DIST . "/admin");
+
         $extraData = [
             $bodyHtmlKey => $this->renderThemeContentView($data) ?? $controller->renderAssetForTwig("Content"),
             "cssClasses" =>
@@ -136,6 +143,7 @@ class MasterViewRenderer
                 " isLoading" .
                 (\Gdn::themeFeatures()->useDataDrivenTheme() ? " dataDriven" : ""),
             "pageHead" => $controller->renderAssetForTwig("Head"),
+            "isDistMissing" => $isDistMissing,
         ];
 
         $data = array_merge($data, $extraData);

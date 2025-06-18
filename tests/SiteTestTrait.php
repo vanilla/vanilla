@@ -161,6 +161,7 @@ trait SiteTestTrait
         Timers::instance()->reset();
 
         \Gdn::getScheduler()->clear();
+        \ActivityModel::$Queue = [];
 
         // Clear out all notifications before each test.
         static::container()->call(function (\Gdn_SQLDriver $sql, \UserModel $userModel, \RoleModel $roleModel) {
@@ -642,7 +643,7 @@ TEMPLATE;
             }
 
             /**
-             * @inheritDoc
+             * @inheritdoc
              */
             public function getVariables(): array
             {

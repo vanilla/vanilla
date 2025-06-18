@@ -14,13 +14,28 @@ use Vanilla\Cli\Commands\DockerCommand;
  */
 class VanillaImgProxyService extends AbstractService
 {
-    const SERVICE_NAME = "imgproxy";
+    const SERVICE_ID = "imgproxy";
 
     const KEY = "dummykey";
     const SALT = "dummysalt";
 
     /**
-     * @inheritDoc
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(
+            new ServiceDescriptor(
+                serviceID: self::SERVICE_ID,
+                label: "Image Proxy",
+                containerName: "imgproxy",
+                url: "https://imgproxy.vanilla.local"
+            )
+        );
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getEnv(): array
     {
@@ -43,31 +58,7 @@ class VanillaImgProxyService extends AbstractService
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getName(): string
-    {
-        return "ImgProxy";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTargetDirectory(): string
-    {
-        return DockerCommand::VNLA_DOCKER_CWD;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getHostname(): string
-    {
-        return "imgproxy.vanilla.local";
-    }
-
-    /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getVanillaConfigDefaults(): array
     {

@@ -27,7 +27,6 @@ $WallBody =
 $SystemUserID = Gdn::userModel()->getSystemUserID();
 $TargetUserID = Gdn::session()->UserID;
 $Now = Gdn_Format::toDateTime();
-$CategoryID = val("CategoryID", CategoryModel::defaultCategory());
 
 // Get wall post type ID
 $WallCommentTypeID = $SQL->getWhere("ActivityType", ["Name" => "WallPost"])->value("ActivityTypeID");

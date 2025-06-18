@@ -28,7 +28,7 @@ export function ReportRecordMeta(props: IProps) {
                     source="Posted by <0/> in <1/>"
                     c0={<MetaProfile user={record.recordUser ?? deletedUserFragment()} />}
                     c1={
-                        <SmartLink to={`${record.placeRecordUrl}`} className={metasClasses().metaLink}>
+                        <SmartLink to={`${record.placeRecordUrl}`} asMeta>
                             {record.placeRecordName}
                         </SmartLink>
                     }

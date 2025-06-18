@@ -30,6 +30,7 @@ import UserManagementColumnsConfig from "@dashboard/users/userManagement/UserMan
 import { LiveAnnouncer } from "react-aria-live";
 import { vitest } from "vitest";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
+import { setMeta } from "@library/utility/appUtils";
 
 describe("UserManagement", () => {
     const mockUser = {
@@ -96,7 +97,6 @@ describe("UserManagement", () => {
             start: "22.08.2023",
             end: "22.08.2024",
         },
-        ipAddresses: "12.22.33.56",
         profileFields: {
             date: {
                 start: "22.08.2023",
@@ -104,6 +104,8 @@ describe("UserManagement", () => {
             },
         },
     };
+
+    setMeta("featureFlags.CustomProfileFields.Enabled", true);
 
     beforeEach(() => {
         const mockAdapter = mockAPI();
@@ -296,8 +298,6 @@ describe("UserManagement", () => {
             expect(result).toBeDefined();
             expect(result.roleIDs).toBe(mockFilterValues.roleIDs);
             expect(typeof result.dateInserted).toBe("string");
-            expect(Array.isArray(result.ipAddresses)).toBeTruthy();
-            expect(result.ipAddresses?.[0]).toBe(mockFilterValues.ipAddresses);
             expect(typeof result.profileFields?.date).toBe("string");
 
             const convertBackResult = mapQueryParamsToFilterValues(result, mockProfileFields);
@@ -307,8 +307,6 @@ describe("UserManagement", () => {
             expect(typeof convertBackResult.dateInserted).toBe("object");
             expect(convertBackResult.dateInserted?.["start"]).toBe(mockFilterValues.dateInserted.start);
             expect(convertBackResult.dateInserted?.["end"]).toBe(mockFilterValues.dateInserted.end);
-            expect(Array.isArray(convertBackResult.ipAddresses)).toBeTruthy();
-            expect(convertBackResult.ipAddresses?.[0]).toBe(mockFilterValues.ipAddresses);
             expect(typeof convertBackResult.profileFields?.date).toBe("object");
             expect(convertBackResult.profileFields?.date["start"]).toBe(mockFilterValues.profileFields.date.start);
             expect(convertBackResult.profileFields?.date["end"]).toBe(mockFilterValues.profileFields.date.end);

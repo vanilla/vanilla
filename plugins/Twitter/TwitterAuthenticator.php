@@ -30,7 +30,7 @@ class TwitterAuthenticator extends ShimAuthenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getAuthenticatorTypeInfoImpl(): array
     {
@@ -52,7 +52,7 @@ class TwitterAuthenticator extends ShimAuthenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isUnique(): bool
     {

@@ -62,7 +62,7 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveLayoutQuery(LayoutQuery $query): LayoutQuery
     {
@@ -78,7 +78,7 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParentLayoutQuery(LayoutQuery $query): LayoutQuery
     {

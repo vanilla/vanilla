@@ -10,41 +10,43 @@ import Translate from "@library/content/Translate";
 import { TagPostUI } from "@library/features/discussions/forms/TagPostUI";
 import { IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
-import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
 import { FormControl, FormControlGroup } from "@library/forms/FormControl";
 import InputBlock from "@library/forms/InputBlock";
 import { NestedSelect } from "@library/forms/nestedSelect";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { ErrorIcon } from "@library/icons/common";
-import { IPickerOption, JsonSchemaForm, Select } from "@library/json-schema-forms";
-import ButtonLoader from "@library/loaders/ButtonLoader";
+import { IFieldError, IPickerOption, JsonSchemaForm } from "@library/json-schema-forms";
 import Message from "@library/messages/Message";
 import { getMeta, safelyParseJSON, safelySerializeJSON } from "@library/utility/appUtils";
 import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
 import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { useDraftContext } from "@vanilla/addon-vanilla/drafts/DraftContext";
-import { makePostDraft, makePostFormValues } from "@vanilla/addon-vanilla/drafts/utils";
+import { makePostDraft, mapDraftToPostFormValues } from "@vanilla/addon-vanilla/drafts/utils";
 import { FilteredCategorySelector } from "@vanilla/addon-vanilla/createPost/FilteredCategorySelector";
 import { createPostFormAssetClasses } from "@vanilla/addon-vanilla/createPost/CreatePostFormAsset.classes";
 import { ICreatePostForm, usePostMutation } from "@vanilla/addon-vanilla/createPost/CreatePostFormAsset.hooks";
 import { buildSchemaFromPostFields, getPostEndpointForPostType } from "@vanilla/addon-vanilla/createPost/utils";
 import { t } from "@vanilla/i18n";
-import { TextBox } from "@vanilla/ui";
-import { notEmpty, RecordID } from "@vanilla/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { notEmpty, RecordID } from "@vanilla/utils";
 import isEqual from "lodash-es/isEqual";
 import { CreatePostFormAssetSkeleton } from "@vanilla/addon-vanilla/createPost/CreatePostFormAsset.skeleton";
-import DateTime from "@library/content/DateTime";
 import { useParentRecordContext } from "@vanilla/addon-vanilla/posts/ParentRecordContext";
 import { RadioGroupContext } from "@library/forms/RadioGroupContext";
 import RadioButton from "@library/forms/RadioButton";
 import { UseQueryResult } from "@tanstack/react-query";
 import { useLayoutQueryContext } from "@library/features/Layout/LayoutQueryProvider";
 import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
-import { CreatePostParams, EditExistingPostParams } from "@vanilla/addon-vanilla/drafts/types";
+import { CreatePostParams, DraftStatus, EditExistingPostParams } from "@vanilla/addon-vanilla/drafts/types";
+import { IDraft } from "@vanilla/addon-vanilla/drafts/types";
+import { DraftsApi } from "@vanilla/addon-vanilla/drafts/DraftsApi";
+import DraftFormFooterContent from "@vanilla/addon-vanilla/drafts/components/DraftFormFooterContent";
+import { getSiteSection } from "@library/utility/appUtils";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import { useLinkContext } from "@library/routing/links/LinkContextProvider";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps {
     category: ICategory | null;
@@ -54,8 +56,7 @@ interface IProps {
     description?: string;
     subtitle?: string;
     containerOptions?: IHomeWidgetContainerOptions;
-    /** Skip waiting around in tests */
-    forceFormLoaded?: boolean;
+    taggingEnabled?: boolean;
 }
 
 interface IGroup {
@@ -82,21 +83,31 @@ const INITIAL_EMPTY_FORM_BODY: Partial<ICreatePostForm> = {
     postTypeID: undefined,
     categoryID: undefined,
     pinLocation: "none",
+    pinned: false,
 };
 
 /**
  * A form for creating a new post
  */
 export function CreatePostFormAsset(props: IProps) {
+    const { pushSmartLocation } = useLinkContext();
+    const { hasPermission } = usePermissionsContext();
+    // remove feature flag dependency when this feature is fully released
+    const canScheduleDraft = getMeta("featureFlags.DraftScheduling.Enabled", false) && hasPermission("schedule.allow");
+
     // Do some look up from the URL
     const { layoutQuery } = useLayoutQueryContext();
     const { params } = layoutQuery as ILayoutQuery<CreatePostParams | EditExistingPostParams>;
     const parentRecordContext = useParentRecordContext<UseQueryResult<IGroup, any>>();
+    const isEdit = !!parentRecordContext?.record;
 
     const initialPostID = `${parentRecordContext.recordID}`.length > 0 ? parentRecordContext.recordID ?? "0" : "0";
 
-    const classes = createPostFormAssetClasses();
-    const { category, postType } = props;
+    const classes = createPostFormAssetClasses.useAsHook();
+    const { category, postType, taggingEnabled = false } = props;
+    const userCanCreateNewTags = taggingEnabled && (hasPermission("tags.add") || isEdit);
+
+    const formRef = useRef<HTMLFormElement | null>(null);
 
     const initialFormBody: Partial<ICreatePostForm> = {
         // Empty form body
@@ -114,6 +125,13 @@ export function CreatePostFormAsset(props: IProps) {
             body: parentRecordContext.record.body,
             format: parentRecordContext.record.format,
             pinLocation: parentRecordContext.record.pinLocation ?? "none",
+            pinned: parentRecordContext.record.pinned ?? false,
+            ...(taggingEnabled && {
+                tagIDs: parentRecordContext.record.tagIDs ?? [],
+                ...(userCanCreateNewTags && {
+                    newTagNames: parentRecordContext.record.newTagNames ?? [],
+                }),
+            }),
         }),
         ...(parentRecordContext.record &&
             parentRecordContext.record.format.toLowerCase() === "rich2" && {
@@ -123,9 +141,7 @@ export function CreatePostFormAsset(props: IProps) {
             }),
     };
 
-    const isEdit = !!parentRecordContext?.record;
-
-    const { draftID, draft, draftLoaded, updateDraft, updateImmediate, enable, disable, draftLastSaved, removeDraft } =
+    const { draftID, draft, draftLoaded, updateDraft, updateImmediate, enableAutosave, disableAutosave, removeDraft } =
         useDraftContext();
 
     // Handle group information
@@ -148,10 +164,6 @@ export function CreatePostFormAsset(props: IProps) {
 
     const groupLookup = parentRecordContext.getExternalData("fetchGroupByID", [{ groupID }, !!groupID]);
 
-    const { hasPermission } = usePermissionsContext();
-
-    const [tagsToAssign, setTagsToAssign] = useState<number[]>();
-    const [tagsToCreate, setTagsToCreate] = useState<string[]>();
     const [formBody, setFormBody] = useState<Partial<ICreatePostForm>>(initialFormBody);
 
     useEffect(() => {
@@ -160,7 +172,23 @@ export function CreatePostFormAsset(props: IProps) {
         }
     }, [groupLookup]);
 
-    const postMutation = usePostMutation(tagsToAssign, tagsToCreate);
+    const postMutation = usePostMutation();
+
+    const [error, setError] = useState<string>();
+    const [fieldErrors, setFieldErrors] = useState<IFieldError[] | null>(null);
+
+    useEffect(() => {
+        if (postMutation.error) {
+            setError(postMutation.error.message);
+            setFieldErrors(postMutation.error?.errors?.body ?? null);
+        }
+    }, [postMutation.error]);
+
+    useEffect(() => {
+        if (error) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    }, [error]);
 
     const allPostTypes = usePostTypeQuery({
         isActive: true,
@@ -186,21 +214,11 @@ export function CreatePostFormAsset(props: IProps) {
         return formBody.categoryID ?? category?.categoryID ?? null;
     }, [category, formBody.categoryID, formBody.groupID]);
 
-    /**
-     * These specific permission sets are used when showing the announce context menu
-     * option(canModerate & canAddToCollection).
-     * and these when allowing announcing in recent discussion (canAnnounce & canModerate).
-     */
     const canAnnounce = permissionCategoryID
         ? hasPermission("discussions.announce", { ...BASE_PERMISSIONS_OPTIONS, resourceID: +permissionCategoryID })
         : null;
-    const canModerate = permissionCategoryID
-        ? hasPermission("discussions.moderate", { ...BASE_PERMISSIONS_OPTIONS, resourceID: +permissionCategoryID })
-        : null;
-    const canAddToCollection = hasPermission("community.manage", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
-
     const announcementOptions: IPickerOption[] | null =
-        canModerate || canAddToCollection
+        selectedCategory && canAnnounce
             ? [
                   {
                       label: "Don't announce",
@@ -210,7 +228,7 @@ export function CreatePostFormAsset(props: IProps) {
                       label: <Translate source={"Announce in <0/>"} c0={selectedCategory.name} />,
                       value: "category",
                   },
-                  ...(canAnnounce || canModerate
+                  ...(canAnnounce
                       ? [
                             {
                                 label: (
@@ -226,22 +244,48 @@ export function CreatePostFormAsset(props: IProps) {
               ]
             : null;
 
+    const isScheduledDraft = !!draft && !!draft.dateScheduled;
     useEffect(() => {
-        if (canAnnounce) {
-            updateFormBody({ pinLocation: "none" });
+        if (isScheduledDraft) {
+            disableAutosave();
         }
-    }, [canAnnounce, category]);
+    }, [isScheduledDraft]);
+
+    const siteSectionID = getSiteSection()?.sectionID;
+
+    // We don't need to filter if we're not in a subcommunity (indicated by siteSectionID of "0")
+    const filterCategoriesBySiteSection = siteSectionID !== "0";
+
+    const categoriesForCurrentSiteSection = useCategoryList(
+        { siteSectionID: siteSectionID, includeParentCategory: 1 },
+        filterCategoriesBySiteSection,
+    );
+
+    let allowedPostTypesForCurrentSiteSection: string[] = [];
+    categoriesForCurrentSiteSection?.data?.result &&
+        categoriesForCurrentSiteSection.data.result.forEach(
+            (category) =>
+                (allowedPostTypesForCurrentSiteSection = allowedPostTypesForCurrentSiteSection.concat(
+                    category.allowedPostTypeIDs ?? [],
+                )),
+        );
 
     const postTypeOptions = useMemo(() => {
         if (!formBody?.categoryID) {
-            return allPostTypes.data?.map((postType) => {
+            const allowedPostTypesData = filterCategoriesBySiteSection
+                ? allPostTypes.data?.filter((postType) =>
+                      allowedPostTypesForCurrentSiteSection.includes(postType.postTypeID),
+                  )
+                : allPostTypes.data;
+
+            return allowedPostTypesData?.map((postType) => {
                 return {
                     label: postType.name,
                     value: postType.postTypeID,
                 };
             });
         }
-        return selectedCategory.allowedPostTypeOptions?.map((postType) => {
+        return selectedCategory?.allowedPostTypeOptions?.map((postType) => {
             return {
                 label: postType.name,
                 value: postType.postTypeID,
@@ -251,19 +295,22 @@ export function CreatePostFormAsset(props: IProps) {
 
     const updateDraftField = (updatedField: Record<string, any>) => {
         // Turn the current draft into form values
-        const draftAsFormValues = (draft && makePostFormValues(draft)) ?? initialFormBody;
+        const draftAsFormValues = (draft && mapDraftToPostFormValues(draft)) ?? initialFormBody;
         // We compare the updated field with the current draft, if they do not match, we update the draft
         const shouldUpdate = Object.keys(updatedField).some((key) => {
             return !isEqual(updatedField[key], draftAsFormValues?.[key]);
         });
-        if (shouldUpdate) {
-            disable();
+
+        // No autosave if scheduled draft
+        if (shouldUpdate && !isScheduledDraft) {
+            disableAutosave();
             const draftPayload = makePostDraft({
                 ...formBody,
                 ...updatedField,
+                ...(isEdit && initialPostID !== "0" && { recordID: initialPostID }),
             });
             updateDraft(draftPayload);
-            enable();
+            enableAutosave();
         }
     };
 
@@ -277,57 +324,62 @@ export function CreatePostFormAsset(props: IProps) {
     };
 
     useEffect(() => {
-        if (tagsToAssign) {
-            updateFormBody({ tags: tagsToAssign });
-        }
-    }, [tagsToAssign]);
-
-    useEffect(() => {
         // We now have a server draftID and we need to update the URL
         // We compare vs the pathname, because local drafts use the pathname as the ID.
         if (draftID && draftID !== window.location.pathname) {
-            window.history.replaceState(null, "", `/post/editdiscussion/${initialPostID}/${draftID}`);
+            window.history.replaceState(
+                null,
+                "",
+                `${getMeta("context.basePath", "")}/post/editdiscussion/${initialPostID}/${draftID}`,
+            );
         }
     }, [draftID]);
 
     const handleSubmit = async () => {
         // Disable draft autosave
-        disable();
+        disableAutosave();
         const endpoint = getPostEndpointForPostType(selectedPostType ?? null);
+        const { pinLocation, pinned, ...rest } = formBody;
         const body = {
-            ...formBody,
+            ...rest,
             body: safelySerializeJSON(formBody.body) ?? "",
             ...(formBody.format !== "rich2" && { format: "rich2" }),
-            ...(formBody.pinLocation === "none" && { pinLocation: undefined }),
+            ...(canAnnounce && {
+                ...(pinLocation === "none" && { pinned: false, pinLocation: undefined }),
+                ...(pinLocation !== "none" && { pinned: true, pinLocation }),
+            }),
             ...(draftID && { draftID: draftID }),
             ...(initialPostID && initialPostID !== "0" && { discussionID: initialPostID }),
         } as ICreatePostForm;
+
         if (endpoint) {
-            postMutation.mutate({
+            const response = await postMutation.mutateAsync({
                 endpoint,
                 body,
             });
             removeDraft(draftID ?? window.location.pathname, true);
+            pushSmartLocation(response.canonicalUrl);
         }
         // Re-enable autosave
-        enable();
+        enableAutosave();
     };
-
-    useEffect(() => {
-        if (postMutation.error) {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-    }, [postMutation.error]);
 
     // We want to wait for the draft to populate the form
     // But only do it once so we don't overwrite any user changes
     const initialDraftLoaded = useRef<boolean>();
     useEffect(() => {
         if (draft && !initialDraftLoaded.current) {
-            const formValuesFromDraft = makePostFormValues(draft);
+            const formValuesFromDraft = mapDraftToPostFormValues(draft);
+            const { tagIDs, newTagNames, ...rest } = formValuesFromDraft ?? {};
             setFormBody((prev) => ({
                 ...prev,
-                ...formValuesFromDraft,
+                ...rest,
+                ...(taggingEnabled && {
+                    tagIDs: tagIDs ?? [],
+                    ...(userCanCreateNewTags && {
+                        newTagNames: newTagNames ?? [],
+                    }),
+                }),
             }));
             initialDraftLoaded.current = true;
         }
@@ -338,21 +390,46 @@ export function CreatePostFormAsset(props: IProps) {
         (formBody?.categoryID ? categoryQuery.isSuccess : true) &&
         (groupID ? groupLookup?.isSuccess : true);
 
-    const [formHasLoaded, setFromHasLoaded] = useState(props.forceFormLoaded ?? false);
+    // if errored schedule, trigger form validation
+    const isErroredSchedule = !!draft && (draft as IDraft).draftStatus === DraftStatus.ERROR;
     useEffect(() => {
-        if (formLoaded) {
-            setFromHasLoaded(true);
+        if (isErroredSchedule && formLoaded) {
+            // wait a bit so dropdowns can be populated
+            setTimeout(() => {
+                if (!formRef.current?.checkValidity()) {
+                    formRef.current?.reportValidity();
+                }
+            }, 500);
         }
-    }, [formLoaded]);
+    }, [isErroredSchedule, formLoaded]);
 
-    const manualDraftSave = async () => {
-        disable();
-        const draftPayload = makePostDraft(formBody);
-        await updateImmediate(draftPayload);
-        enable();
+    const manualDraftSave = async (newScheduleParams?: Partial<DraftsApi.PatchParams>) => {
+        disableAutosave();
+        const scheduleParams = newScheduleParams
+            ? newScheduleParams
+            : isScheduledDraft && draft.dateScheduled
+            ? { dateScheduled: draft?.dateScheduled, draftStatus: draft?.draftStatus }
+            : {};
+        const draftPayload = makePostDraft({
+            ...formBody,
+            ...scheduleParams,
+            ...(isEdit && initialPostID !== "0" && { recordID: initialPostID }),
+        });
+
+        // we need to check form validity in case this is scheduled draft
+        const isValidForm = isScheduledDraft ? formRef.current?.checkValidity() : true;
+
+        if (isValidForm) {
+            await updateImmediate(draftPayload);
+        } else {
+            formRef.current?.reportValidity();
+        }
+        !isScheduledDraft && enableAutosave();
     };
 
     const isBodyRequired = getMeta("posting.minLength", 0) > 0;
+
+    const postTitleMaxLength = getMeta("posting.titleMaxLength", 250);
 
     /**
      * Need to massage the field level errors here because the form
@@ -380,24 +457,33 @@ export function CreatePostFormAsset(props: IProps) {
         return postMutation.error?.errors;
     }, [postMutation.error?.errors]);
 
+    const isSubmitting = postMutation.isLoading;
+
     return (
         <>
-            {formHasLoaded ? (
+            {formLoaded ? (
                 <HomeWidgetContainer
                     title={props.title}
                     description={props.description}
                     subtitle={props.subtitle}
                     options={props.containerOptions}
                 >
-                    {postMutation.error && (
-                        <Message type="error" stringContents={postMutation.error.message} icon={<ErrorIcon />} />
+                    {error && (
+                        <Message
+                            type="error"
+                            stringContents={error}
+                            icon={<ErrorIcon />}
+                            contents={fieldErrors ? <ErrorMessages errors={fieldErrors} /> : null}
+                        />
                     )}
 
                     <form
-                        onSubmit={(event) => {
+                        role="form"
+                        ref={formRef}
+                        onSubmit={async (event) => {
                             event.preventDefault();
                             event.stopPropagation();
-                            void handleSubmit();
+                            await handleSubmit();
                         }}
                         style={{ ...(props.isPreview && { pointerEvents: "none" }) }}
                     >
@@ -442,6 +528,7 @@ export function CreatePostFormAsset(props: IProps) {
                                             ) : (
                                                 <FilteredCategorySelector
                                                     postTypeID={formBody.postTypeID}
+                                                    filterByCurrentSiteSection
                                                     initialValues={
                                                         category?.categoryID !== -1 ? category?.categoryID : undefined
                                                     }
@@ -488,7 +575,7 @@ export function CreatePostFormAsset(props: IProps) {
                                 </div>
                             </div>
                             <div>
-                                <InputBlock
+                                <InputTextBlock
                                     label={
                                         <>
                                             {selectedPostType ? (
@@ -499,14 +586,15 @@ export function CreatePostFormAsset(props: IProps) {
                                         </>
                                     }
                                     required
-                                >
-                                    <TextBox
-                                        value={formBody.name}
-                                        onChange={(event) => {
+                                    inputProps={{
+                                        value: formBody.name,
+                                        onChange: (event) => {
                                             updateFormBody({ name: event.currentTarget.value });
-                                        }}
-                                    />
-                                </InputBlock>
+                                        },
+                                        required: true,
+                                        maxLength: postTitleMaxLength,
+                                    }}
+                                />
                             </div>
                             <div className={classes.main}>
                                 <div className={classes.postFieldsContainer}>
@@ -537,23 +625,32 @@ export function CreatePostFormAsset(props: IProps) {
                                         />
                                     </InputBlock>
                                 </div>
-                                <div className={classes.tagsContainer}>
-                                    <InputBlock
-                                        legend={<label className={classes.labelStyle}>{t("Tags")}</label>}
-                                        label={t("Tag")}
-                                    >
-                                        <TagPostUI
-                                            initialTagIDs={formBody.tags}
-                                            onSelectedExistingTag={setTagsToAssign}
-                                            onSelectedNewTag={setTagsToCreate}
-                                            popularTagsLayoutClasses={classes.popularTagsLayout}
-                                            popularTagsTitle={
-                                                <span className={classes.labelStyle}>{t("Popular Tags")}</span>
-                                            }
-                                            showPopularTags
-                                        />
-                                    </InputBlock>
-                                </div>
+                                {taggingEnabled && (
+                                    <div className={classes.tagsContainer}>
+                                        <InputBlock
+                                            legend={<label className={classes.labelStyle}>{t("Tags")}</label>}
+                                            label={t("Tag")}
+                                        >
+                                            <TagPostUI
+                                                initialTags={[
+                                                    ...(formBody.tagIDs ?? []),
+                                                    ...(formBody.newTagNames ?? []),
+                                                ]}
+                                                onSelectedExistingTag={(tagIDs) => {
+                                                    updateFormBody({ tagIDs });
+                                                }}
+                                                onSelectedNewTag={(newTagNames) => {
+                                                    updateFormBody({ newTagNames });
+                                                }}
+                                                popularTagsLayoutClasses={classes.popularTagsLayout}
+                                                popularTagsTitle={
+                                                    <span className={classes.labelStyle}>{t("Popular Tags")}</span>
+                                                }
+                                                showPopularTags
+                                            />
+                                        </InputBlock>
+                                    </div>
+                                )}
                                 {announcementOptions && formBody?.categoryID !== -1 && (
                                     <div className={classes.announcementContainer}>
                                         <InputBlock
@@ -563,8 +660,9 @@ export function CreatePostFormAsset(props: IProps) {
                                             <RadioGroupContext.Provider
                                                 value={{
                                                     value: formBody.pinLocation,
-                                                    onChange: (pinLocation: ICreatePostForm["pinLocation"]) =>
-                                                        updateFormBody({ pinLocation }),
+                                                    onChange: (
+                                                        pinLocation: NonNullable<ICreatePostForm["pinLocation"]>,
+                                                    ) => updateFormBody({ pinLocation }),
                                                 }}
                                             >
                                                 {announcementOptions.map((option) => (
@@ -579,20 +677,19 @@ export function CreatePostFormAsset(props: IProps) {
                                     </div>
                                 )}
                             </div>
-                            <div className={classes.footer}>
-                                <Button onClick={() => manualDraftSave()} buttonType={ButtonTypes.OUTLINE}>
-                                    {t("Save Draft")}
-                                </Button>
-                                <Button submit buttonType={ButtonTypes.PRIMARY}>
-                                    {postMutation.isLoading ? <ButtonLoader /> : t("Post")}
-                                </Button>
-                            </div>
-                            {draftLastSaved && (
-                                <span className={classes.draftLastSaved}>
-                                    {t("Draft last saved: ")}
-                                    <DateTime mode={"relative"} timestamp={draftLastSaved} />
-                                </span>
-                            )}
+                            <DraftFormFooterContent
+                                onOpenScheduleModal={() => {
+                                    disableAutosave();
+                                    setError(undefined);
+                                }}
+                                handleSaveDraft={manualDraftSave}
+                                formRef={formRef}
+                                draftSchedulingEnabled={canScheduleDraft}
+                                isDraftForExistingRecord={isEdit}
+                                isScheduledDraft={isScheduledDraft}
+                                recordType="post"
+                                submitDisabled={isSubmitting}
+                            />
                         </section>
                     </form>
                 </HomeWidgetContainer>

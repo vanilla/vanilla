@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/themeCache";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { defaultTransition } from "@library/styles/styleHelpers";
 

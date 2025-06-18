@@ -18,7 +18,7 @@ class ResourcesTest extends AbstractAPIv2Test
     use TestCrawlTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getAddons(): array
     {

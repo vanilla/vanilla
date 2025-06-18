@@ -2,10 +2,10 @@ import path from "path";
 import { mergeConfig, UserConfig } from "vite";
 import { VANILLA_ROOT } from "./scripts/env";
 import reactPlugin from "@vitejs/plugin-react-swc";
-import { getAddonKeyFromChunkID, isEntryChunk, isLibraryChunk, makeViteCommonConfig } from "./vite.commonConfig";
-import fse from "fs-extra";
+import { getAddonKeyFromChunkID, isAddonEntry, makeViteCommonConfig } from "./vite.commonConfig";
+import { VanillaManifestPlugin } from "./VanillaManifestPlugin";
 
-export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
+export function makeViteBuildConfig(buildSection: string, entryHtmlFile: string): UserConfig {
     const buildConfig: UserConfig = {
         clearScreen: false,
         experimental: {
@@ -13,15 +13,27 @@ export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
                 return { relative: true };
             },
         },
-        cacheDir: path.join(VANILLA_ROOT, "build/.cache"),
+        cacheDir: path.join(VANILLA_ROOT, "node_modules/.vite"),
         esbuild: {
             legalComments: "external",
+        },
+        resolve: {
+            alias: [
+                {
+                    find: "@storybook/test",
+                    replacement: path.resolve(VANILLA_ROOT, "dont-import-storybook-outside-of-storybook"),
+                },
+                {
+                    find: "@testing-library.*",
+                    replacement: path.resolve(VANILLA_ROOT, "dont-import-testinglibrary-outside-of-tests"),
+                },
+            ],
         },
         plugins: [
             reactPlugin({
                 plugins: [
                     [
-                        "@vanilla/plugin-emotion",
+                        "@swc/plugin-emotion",
                         {
                             // default is true. It will be disabled when build type is production.
                             sourceMap: false,
@@ -38,12 +50,15 @@ export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
                     ],
                 ],
             }),
+            VanillaManifestPlugin(buildSection),
         ],
         build: {
             watch: null,
             chunkSizeWarningLimit: 1000,
-            manifest: true,
+            // We have our own manifest plugin.
+            manifest: false,
             sourcemap: false,
+            modulePreload: false,
             rollupOptions: {
                 input: entryHtmlFile,
                 onwarn: (warning, warn) => {
@@ -53,17 +68,44 @@ export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
                     warn(warning);
                 },
                 output: {
-                    compact: false,
+                    inlineDynamicImports: false,
+                    compact: true,
                     minifyInternalExports: true,
                     generatedCode: "es2015",
-                    chunkFileNames(chunkInfo) {
-                        const addonName = getAddonKeyFromChunkID(chunkInfo.facadeModuleId);
-                        if (addonName) {
-                            if (isEntryChunk(chunkInfo.facadeModuleId)) {
-                                return `entries/addons/${addonName}/[name].[hash].min.js`;
-                            }
+                    entryFileNames(chunkInfo) {
+                        return "entries/[name].[hash].min.js";
+                    },
+                    assetFileNames(chunkInfo) {
+                        if (chunkInfo.names.some((name) => name.endsWith(".css"))) {
+                            const addonName =
+                                chunkInfo.originalFileNames
+                                    ?.map((name) => getAddonKeyFromChunkID(name))
+                                    ?.filter((val) => val)?.[0] ?? null;
 
+                            if (addonName) {
+                                return `chunks/addons/${addonName}/[name].[hash].css`;
+                            }
+                        }
+                        return `assets/[name].[hash][extname]`;
+                    },
+                    chunkFileNames(chunkInfo) {
+                        const { moduleIds } = chunkInfo;
+                        let addonName;
+                        for (const moduleId of moduleIds) {
+                            const potentialAddonName = getAddonKeyFromChunkID(moduleId);
+                            if (potentialAddonName && isAddonEntry(moduleId)) {
+                                return `entries/addons/${potentialAddonName}/[name].[hash].min.js`;
+                            } else if (potentialAddonName) {
+                                addonName = potentialAddonName;
+                            }
+                        }
+
+                        if (addonName) {
                             return `chunks/addons/${addonName}/[name].[hash].min.js`;
+                        }
+
+                        if (chunkInfo.moduleIds.includes(entryHtmlFile)) {
+                            return `entries/${buildSection}.[hash].min.js`;
                         }
 
                         if (
@@ -73,9 +115,6 @@ export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
                             return `vendor/[name].[hash].min.js`;
                         }
 
-                        if (isLibraryChunk(chunkInfo.facadeModuleId)) {
-                            return `chunks/library/[name].[hash].min.js`;
-                        }
                         return `chunks/[name].[hash].min.js`;
                     },
                     manualChunks(id, { getModuleInfo }) {
@@ -84,27 +123,64 @@ export function makeViteBuildConfig(entryHtmlFile: string): UserConfig {
                             "react-dom",
                             "react-router-dom",
                             "react-router",
-                            "react-redux",
-                            "redux",
-                            "redux-thunk",
                             "react-loadable",
                             "@emotion",
                             "@tanstack/react-query",
                             "@tanstack/query-core",
+                            "axios",
                         ];
                         const isVendor = vendorPaths.some((vendorPath) => id.includes(`node_modules/${vendorPath}/`));
                         if (isVendor) {
                             return "vendor/react-core";
                         }
+
+                        const reduxPaths = ["react-redux", "redux", "redux-thunk", "@reduxjs/toolkit", "immer"];
+                        const isRedux = reduxPaths.some((reduxPath) => id.includes(`node_modules/${reduxPath}/`));
+                        if (isRedux) {
+                            return "vendor/redux";
+                        }
+
+                        const isLodash = id.includes("node_modules/lodash");
+                        if (isLodash) {
+                            return "vendor/lodash";
+                        }
+
+                        const platePaths = ["@udecode/plate-core", "slate"];
+                        const isPlate = platePaths.some((platePath) => id.includes(`node_modules/${platePath}`));
+
+                        if (isPlate) {
+                            return "vendor/react-plate";
+                        }
+
+                        if (id.includes("node_modules/moment/")) {
+                            return "vendor/moment";
+                        }
+
+                        if (id.includes("node_modules/react-select/")) {
+                            return "vendor/react-select";
+                        }
+
+                        if (id.includes("node_modules/react-spring/")) {
+                            return "vendor/react-spring";
+                        }
+
+                        const markdownPaths = ["micromark", "unified", "remark-parse", "micromark", "vfile"];
+                        const isMarkdown = markdownPaths.some((markdownPath) =>
+                            id.includes(`node_modules/${markdownPath}`),
+                        );
+                        if (isMarkdown) {
+                            return "vendor/markdown";
+                        }
                     },
+                    dynamicImportInCjs: true,
+                    esModule: true,
+                    hoistTransitiveImports: false,
                 },
             },
         },
         server: {
             host: "0.0.0.0",
-            origin: "https://dev.vanilla.local",
             port: 3030,
-            open: "https://dev.vanilla.local",
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",

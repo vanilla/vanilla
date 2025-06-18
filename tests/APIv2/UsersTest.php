@@ -10,6 +10,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Container\NotFoundException;
 use Gdn;
+use RoleModel;
 use UserModel;
 use CategoryModel;
 use UsersApiController;
@@ -93,7 +94,7 @@ class UsersTest extends AbstractResourceTest
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {
@@ -209,7 +210,7 @@ class UsersTest extends AbstractResourceTest
     /**
      * Overridden to execute before other custom tests that generate users that don't play well with this test.
      *
-     * @inheritDoc
+     * @inheritdoc
      * @dataProvider provideSortFields
      */
     public function testIndexSort(string $field): void
@@ -312,6 +313,7 @@ class UsersTest extends AbstractResourceTest
             "userID" => 0,
             "name" => "Guest",
             "photoUrl" => UserModel::getDefaultAvatarUrl(),
+            "profilePhotoUrl" => UserModel::getDefaultAvatarUrl(),
             "dateLastActive" => null,
             "isAdmin" => false,
             "isSysAdmin" => false,
@@ -324,6 +326,25 @@ class UsersTest extends AbstractResourceTest
             "emailConfirmed" => false,
             "profileFields" => [],
             "extended" => [],
+            "banned" => 0,
+            "bypassSpam" => false,
+            "dateInserted" => "2000-01-01T00:00:00+00:00",
+            "dateUpdated" => "2000-01-01T00:00:00+00:00",
+            "url" => "https://vanilla.test/userstest/profile/Guest",
+            "points" => 0,
+            "roles" => [
+                [
+                    "roleID" => RoleModel::GUEST_ID,
+                    "name" => "Guest",
+                ],
+            ],
+            "showEmail" => false,
+            "countDiscussions" => 0,
+            "countComments" => 0,
+            "countPosts" => 0,
+            "private" => false,
+            "countVisits" => 0,
+            "roleIDs" => [RoleModel::GUEST_ID],
         ];
         $actual = $response->getBody();
 
@@ -400,6 +421,9 @@ class UsersTest extends AbstractResourceTest
                 "session.valid",
                 "settings.view",
                 "site.manage",
+                "staff.allow",
+                "tags.add",
+                "tokens.add",
                 "uploads.add",
                 "users.add",
                 "users.delete",
@@ -2396,6 +2420,45 @@ class UsersTest extends AbstractResourceTest
             ->assertSuccess()
             ->assertCount(1, "Expected 1 user to be found")
             ->assertJsonArrayValues(["userID" => [$user2["userID"]]]);
+
+        // Now let's make sure we surface a user if their LastIPAddress is different from
+        // a previous ipAddress.
+        $this->trackUserVisit($user1, "5.6.7.9");
+
+        // This address is no longer the user's last ip address, but
+        // the user should still surface because the association is stored in the
+        // GDN_UserIP table.
+        $this->api()
+            ->get("/users", [
+                "ipAddresses" => ["5.6.7.8"],
+            ])
+            ->assertSuccess()
+            ->assertCount(1, "Expected 1 user to be found")
+            ->assertJsonArrayValues(["userID" => [$user1["userID"]]]);
+    }
+
+    /**
+     * Test searching by IP address as a query value.
+     *
+     * @return void
+     */
+    public function testIpAddressQuery(): void
+    {
+        $user1 = $this->createUser();
+
+        // The user should show up when searching either of these addresses.
+        $this->trackUserVisit($user1, "5.6.8.8");
+        $this->trackUserVisit($user1, "5.6.8.9");
+
+        $this->api()
+            ->get("/users", ["query" => "5.6.8.8"])
+            ->assertCount(1, "Expected 1 user to be found")
+            ->assertJsonArrayValues(["userID" => [$user1["userID"]]]);
+
+        $this->api()
+            ->get("/users", ["query" => "5.6.8.9"])
+            ->assertCount(1, "Expected 1 user to be found")
+            ->assertJsonArrayValues(["userID" => [$user1["userID"]]]);
     }
 
     /**

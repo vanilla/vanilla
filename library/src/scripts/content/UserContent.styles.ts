@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,16 +10,17 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { TLength } from "@library/styles/styleShim";
 import { useThemeCache } from "@library/styles/themeCache";
-import { em, important, percent } from "csx";
+import { percent } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { Property } from "csstype";
 import { blockQuoteVariables } from "@rich-editor/editor/components/blockQuoteStyles";
 import { media } from "@library/styles/styleShim";
 import { userContentVariables } from "@library/content/UserContent.variables";
 import { LinkDecorationType } from "@library/styles/cssUtilsTypes";
+import { ColorVar } from "@library/styles/CssVar";
 
 export function codeMixin(): CSSObject {
     const vars = userContentVariables();
@@ -88,9 +89,9 @@ export function userContentMixin(): CSSObject {
             fontSize,
             ...Mixins.font({
                 size: fontSize,
-                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
                 weight: globalVars.fonts.weights.bold,
             }),
+            color: ColorsUtils.varOverride(ColorVar.Foreground, globalVars.mainColors.fg),
             ...lineHeightAdjustment(),
             lineHeight: globalVars.lineHeights.condensed,
         };
@@ -110,6 +111,10 @@ export function userContentMixin(): CSSObject {
             listStylePosition: "inside",
             margin: `1em 0 1em 2em`,
             padding: 0,
+
+            "&:last-child": {
+                marginBottom: 0,
+            },
         },
         ["& ul"]: {
             listStyle: "disc",
@@ -334,6 +339,38 @@ export function userContentMixin(): CSSObject {
         },
     };
 
+    const customizedTableOuterBorders = () => {
+        const horizontalBordersWidthVar = vars.tables.horizontalBorders.borders.width;
+        const verticalBordersWidthVar = vars.tables.verticalBorders.borders.width;
+        const horizontalBordersWidth =
+            typeof horizontalBordersWidthVar === "string"
+                ? parseInt(horizontalBordersWidthVar, 10)
+                : horizontalBordersWidthVar;
+        const verticalBordersWidth =
+            typeof verticalBordersWidthVar === "string"
+                ? parseInt(verticalBordersWidthVar, 10)
+                : verticalBordersWidthVar;
+
+        return {
+            tableBorderRadius:
+                vars.tables.horizontalBorders.enabled && vars.tables.verticalBorders.enabled
+                    ? vars.tables.outerBorderRadius
+                    : 0,
+            cellHorizontalBorders: vars.tables.horizontalBorders.enabled
+                ? singleBorder({
+                      ...vars.tables.horizontalBorders.borders,
+                      ...(horizontalBordersWidth && { width: horizontalBordersWidth * 2 }),
+                  })
+                : undefined,
+            cellVerticalBorders: vars.tables.verticalBorders.enabled
+                ? singleBorder({
+                      ...vars.tables.verticalBorders.borders,
+                      ...(verticalBordersWidth && { width: verticalBordersWidth * 2 }),
+                  })
+                : undefined,
+        };
+    };
+
     const tables: CSSObject = {
         ".tableWrapper": {
             overflowX: "auto",
@@ -352,6 +389,7 @@ export function userContentMixin(): CSSObject {
             textOverflow: "ellipsis",
             wordBreak: "keep-all",
             minWidth: 80,
+
             ...Mixins.padding({
                 vertical: 6,
                 horizontal: 12,
@@ -385,11 +423,84 @@ export function userContentMixin(): CSSObject {
             : {},
         "& .tableWrapper th, & .tableWrapper thead td": {
             fontWeight: globalVars.fonts.weights.bold,
+            backgroundColor: ColorsUtils.colorOut(vars.tables.header.bgColor),
+            color: ColorsUtils.colorOut(vars.tables.header.fgColor),
         },
 
         // Mobile table styles.
         ".mobileTableHead": {
             display: "none",
+        },
+
+        // this means we edited the table in rich editor, we need to preserve the sizing etc
+        ".tableWrapper.customized": {
+            border: "none",
+            borderRadius: 0,
+            position: "relative",
+            whiteSpace: "nowrap",
+
+            maskImage:
+                "linear-gradient(to right, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%)",
+            maskRepeat: "no-repeat",
+            maskSize: "100% 100%",
+
+            "&.hasRightScroll": {
+                maskImage: "linear-gradient(to left, transparent 0%, black 40px, black 100%)",
+            },
+
+            "&.hasLeftScroll": {
+                maskImage: "linear-gradient(to right, transparent 0%, black 40px, black 100%)",
+            },
+
+            "&.hasRightScroll.hasLeftScroll": {
+                maskImage:
+                    "linear-gradient(to left, transparent 0%, black 40px, black 100%),linear-gradient(to right, transparent 0%, black 40px, black 100%)",
+                maskComposite: "intersect",
+            },
+
+            "&.noScroll": {
+                WebkitMaskImage: "none",
+                maskImage: "none",
+            },
+
+            "& .tableWrapper": {
+                border: "none",
+                borderRadius: 0,
+            },
+
+            "& table": {
+                tableLayout: "fixed",
+                borderCollapse: "separate",
+                borderSpacing: 0,
+
+                "& td, & th": {
+                    whiteSpace: "normal",
+                },
+                "& tr:first-child > *": {
+                    borderTop: customizedTableOuterBorders().cellHorizontalBorders,
+                },
+                "& tr > *:first-child": {
+                    borderLeft: customizedTableOuterBorders().cellVerticalBorders,
+                },
+                "& tr > *:last-child": {
+                    borderRight: customizedTableOuterBorders().cellVerticalBorders,
+                },
+                "& :not(thead) tr:last-child > *": {
+                    borderBottom: customizedTableOuterBorders().cellHorizontalBorders,
+                },
+                "& tr:first-child th:first-child, & tr:first-child td:first-child": {
+                    borderTopLeftRadius: customizedTableOuterBorders().tableBorderRadius,
+                },
+                "& tr:first-child th:last-child, & tr:first-child td:last-child": {
+                    borderTopRightRadius: customizedTableOuterBorders().tableBorderRadius,
+                },
+                "& tr:last-child th:first-child, & tr:last-child td:first-child": {
+                    borderBottomLeftRadius: customizedTableOuterBorders().tableBorderRadius,
+                },
+                "& tr:last-child td:last-child": {
+                    borderBottomRightRadius: customizedTableOuterBorders().tableBorderRadius,
+                },
+            },
         },
     };
 
@@ -442,10 +553,10 @@ export function userContentMixin(): CSSObject {
         { maxWidth: vars.tables.mobileBreakpoint },
         {
             ...{
-                ".tableWrapper .tableHead": {
+                ".tableWrapper:not(.customized) .tableHead": {
                     ...Mixins.absolute.srOnly(),
                 },
-                ".tableWrapper tr": {
+                ".tableWrapper:not(.customized) tr": {
                     display: "block",
                     flexWrap: "wrap",
                     width: percent(100),
@@ -453,7 +564,7 @@ export function userContentMixin(): CSSObject {
                     marginBottom: vars.blocks.margin,
                     ...outerBorderMixin(),
                 },
-                ".tableWrapper tr .mobileStripe": vars.tables.striped
+                ".tableWrapper:not(.customized) tr .mobileStripe": vars.tables.striped
                     ? {
                           borderTop: "none",
                           borderBottom: "none",
@@ -464,28 +575,28 @@ export function userContentMixin(): CSSObject {
                           borderBottom: "none",
                       },
                 // First row.
-                ".tableWrapper tr > *:first-child": {
+                ".tableWrapper:not(.customized) tr > *:first-child": {
                     borderTop: "none",
                 },
                 // Last row.
-                ".tableWrapper tr > *:last-child": {
+                ".tableWrapper:not(.customized) tr > *:last-child": {
                     borderBottom: "none",
                 },
-                ".tableWrapper .mobileTableHead": {
+                ".tableWrapper:not(.customized) .mobileTableHead": {
                     borderBottom: "none",
                 },
-                ".tableWrapper .mobileTableHead + *": {
+                ".tableWrapper:not(.customized) .mobileTableHead + *": {
                     marginTop: -6,
                     borderTop: "none",
                 },
-                ".tableWrapper tr > *": {
+                ".tableWrapper:not(.customized) tr > *": {
                     width: percent(100),
                     wordWrap: "break-word",
                     display: "block",
                     borderLeft: "none",
                     borderRight: "none",
                 },
-                ".tableWrapper tr > :not(.mobileTableHead)": {
+                ".tableWrapper:not(.customized) tr > :not(.mobileTableHead)": {
                     borderRight: "none",
                 },
             },
@@ -499,8 +610,8 @@ export function userContentMixin(): CSSObject {
         ...Mixins.font({
             size: vars.fonts.size,
             lineHeight: globalVars.lineHeights.base,
-            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         }),
+        color: ColorsUtils.varOverride(ColorVar.Foreground, globalVars.mainColors.fg),
         marginTop: lineHeightAdjustment()["::before"]?.marginTop,
         // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
         "& iframe": {
@@ -717,7 +828,11 @@ export const userContentClasses = useThemeCache(() => {
                 : {},
             "& th, & thead td": {
                 fontWeight: globalVars.fonts.weights.bold,
+                backgroundColor: ColorsUtils.colorOut(vars.tables.header.bgColor),
+                color: ColorsUtils.colorOut(vars.tables.header.fgColor),
             },
+        },
+        "&:not(.customized) > table": {
             ...tableOuterRadiusQuery,
             ...tableMobileQuery,
         },

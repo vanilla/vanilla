@@ -1,14 +1,37 @@
 {
     "version": "2.0.0",
     "tasks": [
-		{
-			"type": "npm",
-			"script": "check-types",
-			"problemMatcher": [
-				"$tsc",
-			],
-			"label": "npm: check-types",
-			"detail": "tsc -p tsconfig.json --noemit"
-		}
-	]
+        {
+            "type": "npm",
+            "script": "check-types",
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "label": "npm: check-types",
+            "detail": "tsc -p tsconfig.json --noemit"
+        },
+        {
+            "label": "New Fragment",
+            "detail": "Create a new fragment",
+            "type": "shell",
+            "command": "touch './library/src/scripts/widget-fragments/${input:fragmentName}.template.tsx' './library/src/scripts/widget-fragments/${input:fragmentName}.template.css' './library/src/scripts/widget-fragments/${input:fragmentName}.previewData.tsx' && echo 'export default function ${input:fragmentName}(props) {\n\treturn (\n\t\t<div>\n\t\t\t<h1>${input:fragmentName}</h1>\n\t\t</div>\n\t);\n};' > './library/src/scripts/widget-fragments/${input:fragmentName}.template.tsx' && echo '.${input:fragmentName} {\n\tcolor: black;\n}' > './library/src/scripts/widget-fragments/${input:fragmentName}.template.css' && echo 'const previewData = [];\nexport default previewData;' > './library/src/scripts/widget-fragments/${input:fragmentName}.previewData.tsx'",
+            "presentation": {
+                "echo": false,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "type": "promptString",
+            "id": "fragmentName",
+            "description": "FragmentName Name",
+            "default": "NewFragment"
+        }
+    ]
 }

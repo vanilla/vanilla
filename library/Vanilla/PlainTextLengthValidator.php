@@ -42,7 +42,7 @@ class PlainTextLengthValidator
      * @param array $post POST array.
      * @return mixed Either an Invalid Object or the value.
      */
-    private function validate($value, $field, $post)
+    protected function validate($value, $field, $post)
     {
         $format = $post["Format"] ?? "";
         if (!$format) {

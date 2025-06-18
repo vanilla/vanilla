@@ -58,6 +58,13 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
         marginTop: 12,
     });
 
+    const userTitleContainer = css({
+        // Allow slightly larger images from custom ranks in the full user card
+        "& img": {
+            maxHeight: "50px",
+        },
+    });
+
     const button = css({
         maxWidth: percent(100),
         ...{
@@ -202,6 +209,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
         userPhoto,
         row,
         rankRow,
+        userTitleContainer,
         metas,
         metaItem,
         message,

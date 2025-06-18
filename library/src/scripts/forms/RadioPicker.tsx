@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { css, cx } from "@emotion/css";
@@ -14,12 +14,12 @@ import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { ColorVar } from "@library/styles/CssVar";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
 import { IPickerOption } from "@vanilla/json-schema-forms";
 import { DropDownArrow } from "@vanilla/ui/src/forms/shared/DropDownArrow";
-import { stableObjectHash } from "@vanilla/utils";
 import { useEffect, useState } from "react";
 
 interface IProps {
@@ -136,7 +136,8 @@ const classes = {
         width: "100%",
         paddingLeft: 8,
         paddingRight: 8,
-        color: ColorsUtils.colorOut(globalVariables().mainColors.fg),
+        background: ColorsUtils.var(ColorVar.InputBackground),
+        color: ColorsUtils.var(ColorVar.InputForeground),
     }),
     compactButton: css({
         maxHeight: 32,

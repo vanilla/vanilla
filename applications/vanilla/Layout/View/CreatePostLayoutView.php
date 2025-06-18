@@ -76,14 +76,14 @@ class CreatePostLayoutView extends AbstractCustomLayoutView
             "postType" => $paramInput["postType"] ?? "discussion",
             "recordID" => $paramInput["recordID"],
             "record" => $record,
-            "parentRecordType" => "category",
+            "parentRecordType" => $paramInput["parentRecordType"] ?? "category",
         ];
 
         return array_merge($paramInput, $resolved);
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getContexts(array $resolvedParams): array
     {
@@ -124,7 +124,7 @@ class CreatePostLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -132,7 +132,7 @@ class CreatePostLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -140,7 +140,7 @@ class CreatePostLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLegacyType(): string
     {

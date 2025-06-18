@@ -18,6 +18,7 @@ import {
     VANILLA_THEMES,
     VANILLA_THEMES_LEGACY,
 } from "../env";
+import { getVanillaInjectables } from "./vanillaSrcDirs";
 
 interface IEntry {
     entryPath: string;
@@ -32,6 +33,13 @@ interface IAddon {
     entriesDir: string;
     srcDir: string;
     addonDir: string;
+}
+
+const vanillaInjectables = getVanillaInjectables();
+const injectablesByName: Record<string, string> = {};
+for (const injectable of vanillaInjectables) {
+    const name = path.basename(injectable).replace(/\.injectable\.tsx?$/, "");
+    injectablesByName[`@vanilla/injectables/${name}`] = injectable;
 }
 
 /**
@@ -162,6 +170,7 @@ export default class EntryModel {
 
         let synthesizedFile = `
 import { bootstrapVanilla } from "@library/bootstrap";
+${process.env.NODE_ENV === "development" ? `import "@library/enableReactScan";` : ""}
 ${constantImportStrings.join("\n")}
 
 
@@ -230,6 +239,18 @@ Promise.all(addonPromises).then(async (resolved) => {
         result.push({
             find: "@library",
             replacement: LIBRARY_SRC_DIRECTORY,
+        });
+
+        result.push({
+            find: /^@vanilla\/injectables/,
+            replacement: "@vanilla/injectables",
+            async customResolver(source, importer) {
+                // This is a bit of a hack to get the path to the injectables.
+                // Vite doesn't have an out of the box way to resolve one path to one of many paths.
+                const resolved = injectablesByName[source] ?? null;
+                // use Vite's (in fact, rollup's) resolution function
+                return (await this.resolve(resolved ?? source))?.id;
+            },
         });
         return result;
     }

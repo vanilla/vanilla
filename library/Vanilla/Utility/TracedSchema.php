@@ -32,7 +32,7 @@ class TracedSchema extends Schema
 
     /**
      * @override To add tracing to the validation.
-     * @inheritDoc
+     * @inheritdoc
      */
     public function validate($data, $sparse = false)
     {

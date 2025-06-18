@@ -38,7 +38,15 @@ class TabsWidget extends TabWidgetModule implements HydrateAwareInterface
      */
     public static function getWidgetName(): string
     {
-        return "Tabs";
+        return "Tabbed Posts";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
     }
 
     /**

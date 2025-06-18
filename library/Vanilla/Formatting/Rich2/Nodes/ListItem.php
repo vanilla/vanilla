@@ -11,7 +11,7 @@ class ListItem extends AbstractNode
 {
     const TYPE_KEY = "li";
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -19,7 +19,7 @@ class ListItem extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -27,7 +27,7 @@ class ListItem extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {
@@ -35,7 +35,7 @@ class ListItem extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getExclusiveChildTypes(): array
     {

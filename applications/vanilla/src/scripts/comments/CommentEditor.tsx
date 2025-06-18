@@ -9,12 +9,11 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { ToolTip } from "@library/toolTip/ToolTip";
-import { MyEditor, MyValue } from "@library/vanilla-editor/typescript";
+import { MyValue, type IVanillaEditorRef } from "@library/vanilla-editor/typescript";
 import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
 import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { FormatConversionNotice } from "@rich-editor/editor/FormatConversionNotice";
-import { focusEditor } from "@udecode/plate-common";
 import { commentEditorClasses } from "@vanilla/addon-vanilla/comments/CommentEditor.classes";
 import { IDraftProps } from "@vanilla/addon-vanilla/drafts/types";
 import { t } from "@vanilla/i18n";
@@ -42,7 +41,6 @@ interface CommonProps {
     postLabel?: string;
     autoFocus?: boolean;
     containerClasses?: string;
-    focusEditor?: () => void;
 }
 
 type IProps = CommonProps &
@@ -91,15 +89,15 @@ export const CommentEditor = forwardRef(function CommentEditor(
         format = "rich2",
     } = props;
 
-    const classes = commentEditorClasses();
+    const classes = commentEditorClasses.useAsHook();
 
-    const editorRef = useRef<MyEditor | null>(null);
+    const editorRef = useRef<IVanillaEditorRef | null>(null);
     const formRef = useRef<HTMLFormElement>(null);
 
     useImperativeHandle(ref, () => ({
         focusCommentEditor: () => {
             if (editorRef.current) {
-                focusEditor(editorRef.current);
+                editorRef.current.focusEditor();
             } else {
                 logDebug("Editor ref not available");
             }
@@ -129,7 +127,7 @@ export const CommentEditor = forwardRef(function CommentEditor(
                 />
             )}
             <VanillaEditor
-                editorRef={editorRef}
+                ref={editorRef}
                 containerClasses={props.containerClasses}
                 autoFocus={props.autoFocus}
                 key={editorKey}

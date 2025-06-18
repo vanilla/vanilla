@@ -33,7 +33,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Discus
     private array $collectionIDs;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -41,7 +41,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Discus
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -49,7 +49,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Discus
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -57,7 +57,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Discus
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -81,7 +81,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Discus
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -153,7 +153,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Discus
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -197,7 +197,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Discus
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {
@@ -218,7 +218,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Discus
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setDiscussionID(int $discussionID): void
     {
@@ -226,7 +226,7 @@ class AddDiscussionToCollectionAction extends AutomationAction implements Discus
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getDiscussionID(): int
     {

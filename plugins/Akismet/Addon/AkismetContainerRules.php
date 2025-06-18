@@ -19,7 +19,7 @@ use Vanilla\Premoderation\PremoderationService;
 class AkismetContainerRules extends AddonContainerRules
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function configureContainer(ContainerConfigurationInterface $container): void
     {

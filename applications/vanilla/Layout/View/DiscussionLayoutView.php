@@ -86,7 +86,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
             ->get("/discussions/{$discussionID}?expand={$commaSeparatedExpands}")
             ->asData();
 
-        $this->discussionModel->tryRedirectFromDiscussion($discussion->getData());
+        $this->discussionModel->tryRedirectFromDiscussion($discussion->getData(), throw: true);
 
         $discussionTags = $discussion["tags"] ?? [];
 
@@ -170,7 +170,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getContexts(array $resolvedParams): array
     {
@@ -258,7 +258,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -266,7 +266,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -274,7 +274,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLegacyType(): string
     {

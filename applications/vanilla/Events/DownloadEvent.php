@@ -46,7 +46,7 @@ class DownloadEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -54,7 +54,7 @@ class DownloadEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAction(): string
     {
@@ -62,7 +62,7 @@ class DownloadEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getPayload(): ?array
     {
@@ -110,7 +110,7 @@ class DownloadEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {

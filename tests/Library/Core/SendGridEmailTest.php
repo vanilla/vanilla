@@ -10,7 +10,7 @@ use Vanilla\Email\SendGridMailer;
 class SendGridEmailTest extends EmailTest
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getAddons(): array
     {
@@ -20,7 +20,7 @@ class SendGridEmailTest extends EmailTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -30,7 +30,7 @@ class SendGridEmailTest extends EmailTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testMailerType()
     {

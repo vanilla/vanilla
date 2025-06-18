@@ -5,10 +5,14 @@
  */
 
 export function mergeRefs<T = any>(
-    ...refs: Array<React.MutableRefObject<T> | React.LegacyRef<T>>
+    ...refs: Array<React.MutableRefObject<T> | React.LegacyRef<T> | undefined>
 ): React.RefCallback<T> {
     return (value) => {
         refs.forEach((ref) => {
+            if (ref == undefined) {
+                return;
+            }
+
             if (typeof ref === "function") {
                 ref(value);
             } else if (ref != null) {

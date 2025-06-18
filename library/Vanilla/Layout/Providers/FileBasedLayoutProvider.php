@@ -79,7 +79,7 @@ class FileBasedLayoutProvider implements LayoutProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAll(): array
     {

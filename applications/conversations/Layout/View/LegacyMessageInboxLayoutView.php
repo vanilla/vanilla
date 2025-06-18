@@ -13,7 +13,7 @@ namespace Vanilla\Conversations\Layout;
 class LegacyMessageInboxLayoutView implements \Vanilla\Layout\View\LegacyLayoutViewInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -21,7 +21,7 @@ class LegacyMessageInboxLayoutView implements \Vanilla\Layout\View\LegacyLayoutV
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -29,7 +29,7 @@ class LegacyMessageInboxLayoutView implements \Vanilla\Layout\View\LegacyLayoutV
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLegacyType(): string
     {

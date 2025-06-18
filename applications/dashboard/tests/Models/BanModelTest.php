@@ -30,7 +30,7 @@ class BanModelTest extends SiteTestCase
     private $commentModel;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

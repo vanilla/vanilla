@@ -6,7 +6,7 @@
 
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { percent } from "csx";
+import { important, percent } from "csx";
 import { flexHelper } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
@@ -14,6 +14,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IGlobalBorderStyles } from "@library/styles/cssUtilsTypes";
+import { css } from "@emotion/css";
 
 export const themeDropDownClasses = useThemeCache(() => {
     const style = styleFactory("themeDropDown");
@@ -23,66 +24,23 @@ export const themeDropDownClasses = useThemeCache(() => {
     const root = style({
         width: percent(100),
         background: ColorsUtils.colorOut(globalVars.mainColors.bg),
-        ...{
-            ".SelectOne__menu": {
-                ...Mixins.border(
-                    {
-                        ...(builderVariables.border as IGlobalBorderStyles),
-                        radius: builderVariables.wrap.borderRadius,
-                    },
-                    {},
-                ),
-            },
-            "&&& .hasFocus .inputBlock-inputText": {
-                borderRadius: builderVariables.wrap.borderRadius,
-                borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
-                cursor: "pointer",
-            },
-            ".suggestedTextInput-option": {
-                width: percent(100),
-                textAlign: "start",
-                minHeight: styleUnit(builderVariables.input.height),
-                paddingTop: 0,
-                paddingBottom: 0,
-            },
-            ".suggestedTextInput-head": {
-                ...flexHelper().middleLeft(),
-                justifyContent: "space-between",
-            },
-            ".suggestedTextInput-valueContainer.suggestedTextInput-valueContainer": {
-                minHeight: styleUnit(builderVariables.input.height),
-                paddingTop: 0,
-                paddingBottom: 0,
-                paddingLeft: 8,
-                height: "initial",
-                backgroundColor: ColorsUtils.colorOut(globalVars.elementaryColors.white),
-                fontSize: "inherit",
-                ...Mixins.border(
-                    {
-                        ...(builderVariables.border as IGlobalBorderStyles),
-                        radius: builderVariables.wrap.borderRadius,
-                    },
-                    {},
-                ),
-                ...{
-                    "&:hover, &:focus, &:active, &.focus-visible": {
-                        borderRadius: builderVariables.wrap.borderRadius,
-                        borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
-                        cursor: "pointer",
-                    },
-                },
-            },
-            ".SelectOne__indicators": {
-                height: styleUnit(builderVariables.input.height),
-                width: styleUnit(builderVariables.input.height),
-            },
-            ".SelectOne__single-value.SelectOne__single-value": {
-                ...Mixins.font(builderVariables.input.fonts),
-            },
+    });
+
+    const select = css({
+        width: "100%",
+
+        borderTopLeftRadius: `${builderVariables.wrap.borderRadius}px !important`,
+        borderBottomRightRadius: `${builderVariables.wrap.borderRadius}px !important`,
+        borderBottomLeftRadius: `${builderVariables.wrap.borderRadius}px !important`,
+        borderTopRightRadius: `${builderVariables.wrap.borderRadius}px !important`,
+
+        "& input": {
+            paddingLeft: 8,
         },
     });
 
     return {
         root,
+        select,
     };
 });

@@ -28,7 +28,7 @@ class HtmlFragmentTest extends BootstrapTestCase
     private $formatter;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

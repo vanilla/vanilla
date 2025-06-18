@@ -36,7 +36,7 @@ class MentionBlot extends AbstractInlineEmbedBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getInsertKey(): string
     {
@@ -44,7 +44,7 @@ class MentionBlot extends AbstractInlineEmbedBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getContainerHTMLTag(): string
     {
@@ -52,7 +52,7 @@ class MentionBlot extends AbstractInlineEmbedBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getContainerHMTLAttributes(): array
     {

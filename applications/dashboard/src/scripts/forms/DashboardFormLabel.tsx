@@ -15,8 +15,9 @@ import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.c
 import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
 import ReactMarkdown from "react-markdown";
 import { userContentClasses } from "@library/content/UserContent.styles";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 
-interface IProps {
+interface IDashboardFormLabelProps {
     label: React.ReactNode;
     metas?: React.ReactNode;
     description?: string | React.ReactNode;
@@ -29,15 +30,7 @@ interface IProps {
     checkPosition?: "left" | "right";
 }
 
-export enum DashboardLabelType {
-    STANDARD = "standard",
-    WIDE = "wide",
-    VERTICAL = "vertical",
-    JUSTIFIED = "justified",
-    NONE = "none", //for cases when component for inputType already has label code to render
-}
-
-export const DashboardFormLabel: React.FC<IProps> = (props: IProps) => {
+export const DashboardFormLabel: React.FC<IDashboardFormLabelProps> = (props: IDashboardFormLabelProps) => {
     const { inputID, labelID } = useFormGroup();
 
     const { labelType = DashboardLabelType.STANDARD, fieldset = false } = props;

@@ -66,13 +66,7 @@ class LayoutPage extends ThemedPage
      * @param LayoutQuery $layoutQuery Contains all the parameters for hydration.
      *
      * @return $this
-     * @throws ClientException Client Exception.
      * @throws HttpException Http Exception.
-     * @throws NotFoundException Not Found Exception.
-     * @throws ValidationException Validation Exception.
-     * @throws ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws PermissionException
      */
     public function preloadLayout(LayoutQuery $layoutQuery): self
     {
@@ -95,7 +89,11 @@ class LayoutPage extends ThemedPage
 
         // Our layout needs all of these assets
         foreach ($layoutWidgetAssets["js"] as $scriptPath) {
-            $this->addScript(new WebAsset($scriptPath, true));
+            // Add preloads for our assets
+            $this->addLinkTag([
+                "rel" => "modulepreload",
+                "href" => $scriptPath,
+            ]);
         }
 
         foreach ($layoutWidgetAssets["css"] as $cssPath) {

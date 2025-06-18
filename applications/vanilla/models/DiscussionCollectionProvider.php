@@ -33,7 +33,7 @@ class DiscussionCollectionProvider implements CollectionRecordProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRecordType(): string
     {
@@ -41,7 +41,7 @@ class DiscussionCollectionProvider implements CollectionRecordProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function filterValidRecordIDs(array $recordIDs): array
     {
@@ -49,7 +49,7 @@ class DiscussionCollectionProvider implements CollectionRecordProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRecords(array $recordIDs, string $locale): array
     {

@@ -80,7 +80,7 @@ class LocaleModel extends FullRecordCacheModel
             ->column("dateUpdated", "datetime", true)
             ->column("updateUserID", "int", true)
             ->set($explicit, $drop);
-        if (!Gdn::config("Locales.migrated", false) && $database->structure()->tableExists("locale")) {
+        if ($database->structure()->tableExists("locale")) {
             $locales = LocaleModel::getEnabledLocales();
             $defaultLocale = Gdn::config("Garden.Locale", "en");
             foreach ($locales as $locale) {
@@ -106,7 +106,6 @@ class LocaleModel extends FullRecordCacheModel
                     ]);
                 }
             }
-
             Gdn::config()->saveToConfig("Locales.migrated", true);
         }
     }
@@ -175,7 +174,7 @@ class LocaleModel extends FullRecordCacheModel
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function select(array $where = [], array $options = []): array
     {
@@ -598,7 +597,7 @@ class LocaleModel extends FullRecordCacheModel
         }
         reset($rows);
         $single = is_string(key($rows));
-
+        $locales[] = Gdn::config("Garden.Locale", "en");
         $populate = function (array &$row, array $locales) {
             $displayNames = [];
             foreach ($locales as $locale) {
@@ -666,5 +665,24 @@ class LocaleModel extends FullRecordCacheModel
         }
 
         return $result;
+    }
+
+    /**
+     * Run a callback with a designated locale selected. Resets the previous locale after the callback is executed.
+     *
+     * @param string $localeKey
+     * @param callable $callback
+     * @return mixed
+     */
+    public static function runWithLocale(string $localeKey, callable $callback): mixed
+    {
+        $existingLocale = \Gdn::locale()->Locale;
+
+        try {
+            \Gdn::locale()->set($localeKey);
+            return call_user_func($callback);
+        } finally {
+            \Gdn::locale()->set($existingLocale);
+        }
     }
 }

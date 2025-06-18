@@ -1,0 +1,280 @@
+openapi: 3.0.2
+info:
+    title: Custom Pages
+    description: Custom Pages
+    version: "2.0"
+paths:
+    /custom-pages:
+        x-hidden: true
+        get:
+            summary: List custom pages.
+            parameters:
+                - name: status
+                  description: Filter by status
+                  in: query
+                  schema:
+                      items:
+                          enum:
+                              - published
+                              - unpublished
+                          type: string
+                      type: array
+                  style: form
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/CustomPage"
+                                type: array
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+            tags:
+                - Custom Pages
+        post:
+            summary: Create a custom page.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/CustomPagePost"
+                required: true
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/CustomPage"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+            tags:
+                - Custom Pages
+
+    /custom-pages/{customPageID}:
+        x-hidden: true
+        get:
+            summary: Get a custom page.
+            parameters:
+                - name: customPageID
+                  description: The ID of the custom page.
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/CustomPage"
+                "404":
+                    description: Not Found
+            tags:
+                - Custom Pages
+        patch:
+            summary: Update a custom page.
+            parameters:
+                - name: customPageID
+                  in: path
+                  description: The ID of the custom page.
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/CustomPagePatch"
+                required: true
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/CustomPage"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+            tags:
+                - Custom Pages
+
+        delete:
+            summary: Delete a custom page.
+            parameters:
+                - name: customPageID
+                  in: path
+                  description: The ID of the custom page.
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "204":
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+            tags:
+                - Custom Pages
+components:
+    schemas:
+        CustomPagePost:
+            properties:
+                seoTitle:
+                    description: The SEO title of the custom page.
+                    type: string
+                seoDescription:
+                    description: The SEO description of the custom page.
+                    type: string
+                urlcode:
+                    description: The path of the custom page.
+                    type: string
+                status:
+                    description: The status of the custom page.
+                    type: string
+                    enum:
+                        - published
+                        - unpublished
+                siteSectionID:
+                    description: The siteSectionID associated with the custom page.
+                    type: string
+                roleIDs:
+                    description: The roles that have permission to view this custom page.
+                    type: array
+                    items:
+                        type: integer
+                rankIDs:
+                    description: The ranks that have permission to view this custom page.
+                    type: array
+                    items:
+                        type: integer
+                layoutData:
+                    type: object
+                    properties:
+                        name:
+                            description: Name of the layout to associate with the custom page.
+                            type: string
+                        layout:
+                            $ref: "/layouts.yml#/components/schemas/LayoutDefinition"
+                        titleBar:
+                            type: object
+                            description: Title bar properties
+            required:
+                - seoTitle
+                - seoDescription
+                - urlcode
+            type: object
+        CustomPagePatch:
+            properties:
+                seoTitle:
+                    description: The SEO title of the custom page.
+                    type: string
+                seoDescription:
+                    description: The SEO description of the custom page.
+                    type: string
+                urlcode:
+                    description: The path of the custom page.
+                    type: string
+                status:
+                    description: The status of the custom page.
+                    type: string
+                    enum:
+                        - published
+                        - unpublished
+                siteSectionID:
+                    description: The siteSectionID associated with the custom page.
+                    type: string
+                roleIDs:
+                    description: The roles that have permission to view this custom page.
+                    type: array
+                    items:
+                        type: integer
+                rankIDs:
+                    description: The ranks that have permission to view this custom page.
+                    type: array
+                    items:
+                        type: integer
+                layoutData:
+                    type: object
+                    properties:
+                        name:
+                            description: Name of the layout to associate with the custom page.
+                            type: string
+                        layout:
+                            $ref: "/layouts.yml#/components/schemas/LayoutDefinition"
+                        titleBar:
+                            type: object
+                            description: Title bar properties
+            type: object
+        CustomPage:
+            properties:
+                customPageID:
+                    description: The ID of the custom page.
+                    type: integer
+                seoTitle:
+                    description: The SEO title of the custom page.
+                    type: string
+                seoDescription:
+                    description: The SEO description of the custom page.
+                    type: string
+                urlcode:
+                    description: The path of the custom page.
+                    type: string
+                url:
+                    description: The fully qualified URL of the custom page.
+                    type: string
+                status:
+                    description: The status of the custom page.
+                    type: string
+                    enum:
+                        - published
+                        - unpublished
+                siteSectionID:
+                    description: The siteSectionID associated with the custom page.
+                    type: string
+                roleIDs:
+                    description: The roles that have permission to view this custom page.
+                    type: array
+                    items:
+                        type: integer
+                rankIDs:
+                    description: The ranks that have permission to view this custom page.
+                    type: array
+                    items:
+                        type: integer
+                layoutID:
+                    description: The layoutID associated with this custom page.
+                    type: boolean
+            required:
+                - customPageID
+                - seoTitle
+                - seoDescription
+                - urlcode
+                - url
+                - status
+                - roleIDs
+                - rankIDs
+                - layoutID
+            type: object

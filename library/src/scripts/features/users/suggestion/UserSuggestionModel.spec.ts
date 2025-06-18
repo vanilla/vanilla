@@ -8,7 +8,6 @@ import { IMentionSuggestionData } from "@library/editor/pieces/MentionSuggestion
 import { LoadStatus } from "@library/@types/api/core";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
-import sinon from "sinon";
 import { getDateBysubStractDays } from "@library/content/DateTimeHelpers";
 
 type SortProviderTuple = [string[], string, string[]];
@@ -98,7 +97,7 @@ describe("UserSuggestionModel", () => {
         it("can handle LOAD_USERS_FAILURE", () => {
             let state = model.reducer(undefined, UserSuggestionActions.loadUsersACs.request({ username: "test" }));
 
-            const consoleStub = sinon.stub(console, "error");
+            const consoleStub = vitest.spyOn(console, "error").mockImplementation(() => {});
 
             const error = new Error("Failure!");
             state = model.reducer(state, UserSuggestionActions.loadUsersACs.error(error as any, { username: "test" }));
@@ -108,7 +107,7 @@ describe("UserSuggestionModel", () => {
                 data: undefined,
                 error,
             });
-            consoleStub.restore();
+            consoleStub.mockRestore();
         });
 
         describe("LOAD_USERS_SUCCESS", () => {

@@ -23,7 +23,7 @@ class SsoUtilsTest extends TestCase
     private $ssoUtils;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

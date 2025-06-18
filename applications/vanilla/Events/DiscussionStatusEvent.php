@@ -44,7 +44,7 @@ class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterf
     //region Methods
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {

@@ -360,7 +360,8 @@ class Gdn_Model extends Gdn_Pluggable
 
         // See if a primary key value was posted and decide how to save
         $primaryKeyVal = val($this->PrimaryKey, $formPostValues, false);
-        $insert = $primaryKeyVal == false ? true : false;
+        $forceInsert = $settings["forceInsert"] ?? false;
+        $insert = $primaryKeyVal == false || $forceInsert ? true : false;
         if ($insert) {
             $this->addInsertFields($formPostValues);
         } else {
@@ -371,7 +372,9 @@ class Gdn_Model extends Gdn_Pluggable
         if ($this->validate($formPostValues, $insert) === true) {
             $fields = $this->Validation->validationFields();
             $fields = $this->coerceData($fields, false);
-            unset($fields[$this->PrimaryKey]); // Don't try to insert or update the primary key
+            if (!$forceInsert) {
+                unset($fields[$this->PrimaryKey]); // Don't try to insert or update the primary key
+            }
             if ($insert === false) {
                 $this->update($fields, [$this->PrimaryKey => $primaryKeyVal]);
             } else {

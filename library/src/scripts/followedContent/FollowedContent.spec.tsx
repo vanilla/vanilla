@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -28,7 +28,7 @@ const renderFollowedContent = (withAdditionalFollowedContent?: boolean) => {
                         additionalFollowedContent: additionalFollowedContent,
                     }}
                 >
-                    <FollowedContentImpl userID={1} renderAdditionalFollowedContent={withAdditionalFollowedContent} />
+                    <FollowedContentImpl userID={1} />
                 </FollowedContentContext.Provider>
             </CurrentUserContextProvider>
         </QueryClientProvider>,

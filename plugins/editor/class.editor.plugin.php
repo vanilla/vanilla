@@ -8,6 +8,10 @@
  * @package editor
  */
 
+use Garden\Schema\ValidationException;
+use Vanilla\EmbeddedContent\Embeds\FileEmbed;
+use Vanilla\Models\VanillaMediaSchema;
+
 /**
  * Class EditorPlugin
  */
@@ -1918,5 +1922,178 @@ class EditorPlugin extends Gdn_Plugin
             }
         }
         return $this->canUpload;
+    }
+
+    /**
+     * Add the file to a non-rich discussion. This should only affect migrated content.
+     *
+     * @param array $results
+     * @return array
+     * @throws ValidationException
+     */
+    public function discussionsApiController_getSingleOutput_handler(array $results): array
+    {
+        // Check whether attachments should be rendered (for example, private discussions).
+        $shouldAttach = Gdn::eventManager()->fireFilter("shouldAttachUploads", true);
+        if (!$shouldAttach) {
+            return $results;
+        }
+
+        $mediaModel = new MediaModel();
+        $attachments = $mediaModel
+            ->getWhere(["ForeignID" => $results["discussionID"], "ForeignTable" => "discussion"])
+            ->resultArray();
+
+        $results["body"] = $this->addFileToPost($results["body"], $attachments);
+        return $results;
+    }
+
+    /**
+     * Add the file to a non-rich comment. This should only affect migrated content.
+     *
+     * @param array $results
+     * @return array
+     * @throws ValidationException
+     */
+    public function commentsApiController_getOutput_handler(array $results): array
+    {
+        // Check whether attachments should be rendered (for example, private discussions).
+        $shouldAttach = Gdn::eventManager()->fireFilter("shouldAttachUploads", true);
+        if (!$shouldAttach) {
+            return $results;
+        }
+
+        $mediaModel = new MediaModel();
+        $attachments = $mediaModel
+            ->getWhere(["ForeignID" => $results["commentID"], "ForeignTable" => "comment"])
+            ->resultArray();
+
+        $results["body"] = $this->addFileToPost($results["body"], $attachments);
+        return $results;
+    }
+
+    /**
+     * Add the file to a rich comment. This should only affect migrated content.
+     *
+     * @param array $results
+     * @return array
+     * @throws ValidationException
+     */
+    public function commentsApiController_indexOutput(array $results): array
+    {
+        // Check whether attachments should be rendered (for example, private discussions).
+        $shouldAttach = Gdn::eventManager()->fireFilter("shouldAttachUploads", true);
+        if (!$shouldAttach) {
+            return $results;
+        }
+
+        $commentIDs = array_column($results, "commentID");
+
+        // Bail early if there are no valid comments.
+        if (empty($commentIDs)) {
+            return $results;
+        }
+
+        $mediaModel = new MediaModel();
+        $attachments = $mediaModel->getWhere(["ForeignID" => $commentIDs, "ForeignTable" => "comment"])->resultArray();
+
+        if (empty($attachments)) {
+            return $results;
+        }
+
+        foreach ($results as $key => $comment) {
+            // Only get attachments for this comment.
+            $commentAttachments = [];
+            foreach ($attachments as $attachment) {
+                if ($attachment["ForeignID"] == $comment["commentID"]) {
+                    $commentAttachments[] = $attachment;
+                }
+            }
+
+            $results[$key]["body"] = $this->addFileToPost($comment["body"], $commentAttachments);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Add the attachment files at the end of a post if it's not already in the body.
+     *
+     * @param string $body Fully rendered HTML.
+     * @param array $attachments
+     * @return string
+     * @throws ValidationException
+     */
+    private function addFileToPost(string $body, array $attachments): string
+    {
+        $result = $body;
+        $format = $this->Format ? strtolower($this->Format) : "";
+        $attachedFileNames = [];
+
+        foreach ($attachments as $attachment) {
+            // Only process active attachments
+            if (empty($attachment["Active"]) || $attachment["Active"] != 1) {
+                continue;
+            }
+
+            $fileUrl = Gdn_Upload::url($attachment["Path"]);
+            $inbody = str_contains($body, $fileUrl);
+
+            // Check for protocol-relative versions of the URL
+            if (!$inbody) {
+                $urlParts = parse_url($fileUrl);
+                $protocolRelativeUrl =
+                    ($urlParts["host"] ?? "") .
+                    ($urlParts["path"] ?? "") .
+                    (isset($urlParts["query"]) ? "?" . $urlParts["query"] : "") .
+                    (isset($urlParts["fragment"]) ? "#" . $urlParts["fragment"] : "");
+                $inbody |= str_contains($body, $protocolRelativeUrl);
+            }
+
+            // Check for URL-encoded versions
+            if (!$inbody) {
+                $encodedUrl = urlencode($fileUrl);
+                $inbody |= str_contains($body, $encodedUrl);
+                $partiallyEncodedUrl = str_replace(["&", " "], ["%26", "%20"], $fileUrl);
+                $inbody |= str_contains($body, $partiallyEncodedUrl);
+            }
+
+            // Check for JSON-escaped versions of the URL
+            if (!$inbody) {
+                $jsonEscapedUrl = str_replace("/", "\/", $fileUrl);
+                $inbody |= str_contains($body, $jsonEscapedUrl);
+
+                $protocolRelativeJsonEscaped = str_replace("/", "\/", $protocolRelativeUrl);
+                $inbody |= str_contains($body, $protocolRelativeJsonEscaped);
+            }
+
+            // Check for HTML-encoded versions
+            if (!$inbody) {
+                $htmlEncodedUrl = htmlspecialchars($fileUrl, ENT_QUOTES);
+                $inbody |= str_contains($body, $htmlEncodedUrl);
+            }
+
+            if ($inbody) {
+                continue;
+            }
+
+            // Check if we already have a file with the same name attached
+            $fileName = $attachment["Name"];
+            if (in_array($fileName, $attachedFileNames)) {
+                continue;
+            }
+
+            // Add this filename to our tracking array
+            $attachedFileNames[] = $fileName;
+
+            $attachment = VanillaMediaSchema::normalizeFromDbRecord($attachment);
+            $attachment["embedType"] = "file";
+
+            // Use existing HTML rendering for non-rich formats
+            $file = new FileEmbed($attachment);
+            $result .= $file->renderHtml();
+        }
+
+        return $result;
     }
 }

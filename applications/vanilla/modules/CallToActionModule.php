@@ -12,7 +12,7 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\AbstractHomeWidgetModule;
 
 /**
@@ -20,7 +20,7 @@ use Vanilla\Widgets\AbstractHomeWidgetModule;
  *
  * @package Vanilla\Community
  */
-class CallToActionModule extends AbstractReactModule
+class CallToActionModule extends LegacyReactModule
 {
     /** @var string */
     private $textCTA;
@@ -271,7 +271,7 @@ class CallToActionModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -322,7 +322,7 @@ class CallToActionModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -336,7 +336,7 @@ class CallToActionModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -371,7 +371,7 @@ class CallToActionModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getProps(): ?array
     {

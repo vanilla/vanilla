@@ -19,11 +19,19 @@ import {
     ILayoutEditorPath,
     IWidgetCatalog,
     ILayoutEditorSectionPath,
+    type ILayoutEditorSpecialWidgetPath,
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { isHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.utils";
-import { ArrayUtils } from "@vanilla/utils";
+import { siteUrl } from "@library/utility/appUtils";
+import { ArrayUtils, uuidv4 } from "@vanilla/utils";
 import produce from "immer";
 import omit from "lodash-es/omit";
+
+export namespace LayoutEditorContents {
+    export type HydrateOptions = {
+        roleIDs?: number[];
+    };
+}
 
 /**
  * Class representing the primary data structure of the layout editor
@@ -98,7 +106,10 @@ export class LayoutEditorContents {
      *
      * @returns A new editor contents instance.
      */
-    public moveSection = (sourcePath: ILayoutEditorPath, destPath: ILayoutEditorPath): LayoutEditorContents => {
+    public moveSection = (
+        sourcePath: ILayoutEditorSectionPath,
+        destPath: ILayoutEditorSectionPath,
+    ): LayoutEditorContents => {
         const sourceIndex = sourcePath.sectionIndex;
         const destIndex = destPath.sectionIndex;
         const modified = this.modifyLayout((draft) => {
@@ -186,9 +197,17 @@ export class LayoutEditorContents {
      * @returns A new editor contents instance.
      */
     public modifyWidget = (destination: ILayoutEditorPath, widgetSpec: IEditableLayoutWidget): LayoutEditorContents => {
-        return this.modifyLayout((draft) => {
+        return this.modifySpec((draft) => {
+            if (LayoutEditorPath.isSpecialWidgetPath(destination)) {
+                // Special handling for these.
+                if (destination === "TitleBar") {
+                    draft.titleBar = widgetSpec as any;
+                }
+                return draft;
+            }
+
             LayoutEditorPath.assertDestinationPath(destination);
-            const section = draft[destination.sectionIndex];
+            const section = draft.layout[destination.sectionIndex];
             let region = section[destination.sectionRegion] ?? [];
             region[destination.sectionRegionIndex ?? region.length] = widgetSpec;
             section[destination.sectionRegion] = region;
@@ -261,6 +280,15 @@ export class LayoutEditorContents {
         });
     };
 
+    private modifySpec = (callback: (draft: IEditableLayoutSpec) => IEditableLayoutSpec): LayoutEditorContents => {
+        const originalSpec = this.editSpec;
+        const newEditSpec = produce(this.editSpec, callback);
+        const newContents = new LayoutEditorContents(newEditSpec, this.catalog, this.onModify);
+
+        this.onModify?.(newContents);
+        return newContents;
+    };
+
     /**
      * Internal utility for immutably modifying the edit spec and creating a new instance.
      *
@@ -271,19 +299,12 @@ export class LayoutEditorContents {
     private modifyLayout = (
         callback: (draft: IEditableLayoutWidget[]) => IEditableLayoutWidget[],
     ): LayoutEditorContents => {
-        const newLayout = produce(this.editSpec.layout, callback);
-        const newContents = new LayoutEditorContents(
-            {
-                ...this.editSpec,
-                layout: newLayout,
-            },
-            this.catalog,
-            this.onModify,
-        );
-
-        this.onModify?.(newContents);
-
-        return newContents;
+        return this.modifySpec((draft) => {
+            // Use the callback to modify the layout array
+            // This allows for immer to track the changes and return a new object
+            draft.layout = callback(draft.layout);
+            return draft; // return the modified draft
+        });
     };
 
     /**
@@ -311,6 +332,7 @@ export class LayoutEditorContents {
         return LayoutEditorAssetUtils.validateAssets({
             layout: this.editSpec.layout,
             layoutViewType: this.editSpec.layoutViewType,
+            titleBar: this.editSpec.titleBar,
         });
     };
 
@@ -339,6 +361,9 @@ export class LayoutEditorContents {
      * Get a section in a layout by it's path.
      */
     public getSection = (path: ILayoutEditorPath): IEditableLayoutWidget | null => {
+        if (LayoutEditorPath.isSpecialWidgetPath(path)) {
+            return null;
+        }
         return this.getLayout()[path.sectionIndex] ?? null;
     };
 
@@ -362,7 +387,7 @@ export class LayoutEditorContents {
      * Get a section in a layout by it's path.
      */
     public getRegion = (path: ILayoutEditorPath): IEditableLayoutWidget[] | null => {
-        if (!path.sectionRegion) {
+        if (LayoutEditorPath.isSpecialWidgetPath(path) || !path.sectionRegion) {
             return null;
         }
         return this.getLayout()[path.sectionIndex][path.sectionRegion] ?? null;
@@ -376,6 +401,13 @@ export class LayoutEditorContents {
      * @returns The widget definition or null.
      */
     public getWidget = (path: ILayoutEditorPath): IEditableLayoutWidget | null => {
+        if (LayoutEditorPath.isSpecialWidgetPath(path)) {
+            // Handle special widget paths (like title bar)
+            if (path === "TitleBar") {
+                return this.editSpec.titleBar;
+            }
+        }
+
         if (!LayoutEditorPath.isWidgetPath(path)) {
             return null;
         }
@@ -477,24 +509,36 @@ export class LayoutEditorContents {
     /**
      * Get hydrated editor contents.
      */
-    public hydrate = (): IHydratedEditableLayoutSpec => {
-        return this.hydrateInternal(this.editSpec);
+    public hydrate = (options: LayoutEditorContents.HydrateOptions = {}): IHydratedEditableLayoutSpec => {
+        return this.hydrateInternal(this.editSpec, options);
     };
 
     /**
      * Resolve a raw layout schema with the specifications in the catalog
      */
-    private hydrateInternal(editSpec: IEditableLayoutSpec): IHydratedEditableLayoutSpec {
+    private hydrateInternal(
+        editSpec: IEditableLayoutSpec,
+        options: LayoutEditorContents.HydrateOptions,
+    ): IHydratedEditableLayoutSpec {
         const layout = editSpec.layout.map((node, i) => {
-            return this.hydrateNode(node, {
-                sectionIndex: i,
-            });
+            return this.hydrateNode(
+                node,
+                {
+                    sectionIndex: i,
+                },
+                options,
+            );
         });
 
-        return {
+        const result = {
             ...editSpec,
             layout,
         };
+
+        if ("titleBar" in editSpec) {
+            result.titleBar = this.hydrateFragmentImpls(editSpec.titleBar as any);
+        }
+        return result;
     }
 
     /**
@@ -521,18 +565,28 @@ export class LayoutEditorContents {
      * @param nodePath The path to the node.
      * @returns The hydrated node.
      */
-    private hydrateNode = (node: unknown | IHydratedEditableLayoutWidget, nodePath: Partial<ILayoutEditorPath>) => {
+    private hydrateNode = (
+        node: unknown | IHydratedEditableLayoutWidget,
+        nodePath: Partial<ILayoutEditorWidgetPath>,
+        options: LayoutEditorContents.HydrateOptions,
+    ) => {
         if (node == null || typeof node !== "object") {
             return node;
         }
         // If its an array, we want to resolve all the entries
         if (Array.isArray(node)) {
-            return node.map((subNode, i) =>
-                this.hydrateNode(subNode, {
-                    ...nodePath,
-                    sectionRegionIndex: i,
-                }),
-            );
+            return node
+                .map((subNode, i) =>
+                    this.hydrateNode(
+                        subNode,
+                        {
+                            ...nodePath,
+                            sectionRegionIndex: i,
+                        },
+                        options,
+                    ),
+                )
+                .filter((n) => n !== null);
         }
 
         if (!isHydrateable(node)) {
@@ -545,8 +599,20 @@ export class LayoutEditorContents {
             componentName = node.$hydrate;
         }
 
+        const roleMiddleware: { roleIDs?: number[] } = node.$middleware?.["role-filter"] ?? {};
+        if (roleMiddleware.roleIDs && roleMiddleware.roleIDs.length > 0) {
+            if (
+                options.roleIDs !== undefined &&
+                !roleMiddleware.roleIDs.some((roleID) => options.roleIDs?.includes(roleID))
+            ) {
+                // We don't have this role.
+
+                return null;
+            }
+        }
+
         const props = Object.fromEntries(
-            Object.keys(omit(node, "$hydrate", "$middleware")).map((key) => {
+            Object.keys(omit(node, "$hydrate", "$middleware", "$fragmentImpls")).map((key) => {
                 if (["title", "description"].includes(key)) {
                     const hydrated = this.resolveFieldParam(key, node);
                     if (hydrated) {
@@ -556,29 +622,68 @@ export class LayoutEditorContents {
 
                 return [
                     key,
-                    this.hydrateNode(node[key], {
-                        ...nodePath,
-                        sectionRegion: key,
-                    }),
+                    this.hydrateNode(
+                        node[key],
+                        {
+                            ...nodePath,
+                            sectionRegion: key,
+                        },
+                        options,
+                    ),
                 ];
             }),
         );
 
         const extraProps: IHydratedEditableWidgetProps = {
-            // TODO: Figure out where we could have a bad section here.
             $componentName: componentName,
             $editorPath: nodePath as ILayoutEditorPath,
             $hydrate: node.$hydrate,
         };
-
-        return {
+        const resultNode = {
+            $fragmentImpls: node.$fragmentImpls,
             $reactComponent: componentName,
             $reactProps: {
                 ...props,
                 ...extraProps,
             },
-        };
+            $middleware: node.$middleware,
+        } as IHydratedEditableLayoutWidget;
+
+        const withFragmentImpls = this.hydrateFragmentImpls(resultNode);
+        return withFragmentImpls;
     };
+
+    private hydrateFragmentImpls<
+        T extends {
+            $fragmentImpls?: IHydratedEditableLayoutWidget["$fragmentImpls"];
+        },
+    >(node: T): T {
+        const $fragmentImpls: IHydratedEditableLayoutWidget["$fragmentImpls"] = {};
+        if (node.$fragmentImpls) {
+            for (const [fragmentType, fragmentImpl] of Object.entries(node.$fragmentImpls)) {
+                const fragmentUUID = fragmentImpl?.fragmentUUID;
+                if (!fragmentUUID) {
+                    continue;
+                }
+                if (fragmentUUID === "system" || fragmentUUID === "styleguide") {
+                    $fragmentImpls[fragmentType] = {
+                        fragmentUUID,
+                    };
+                    continue;
+                }
+                $fragmentImpls[fragmentType] = {
+                    fragmentUUID,
+                    // This is a bit less efficient since they will have to redirect to the permalink url, but they are enough for the layout editor since we don't actually know the revisionUUID here.
+                    jsUrl: siteUrl(`/api/v2/fragments/${fragmentUUID}/js`),
+                    cssUrl: siteUrl(`/api/v2/fragments/${fragmentUUID}/css`),
+                };
+            }
+        }
+        return {
+            ...node,
+            $fragmentImpls,
+        };
+    }
 }
 /**
  * Check if some node is a hydrateable node.
@@ -651,8 +756,12 @@ export class LayoutEditorPath {
         };
     }
 
+    public static isSpecialWidgetPath(path: ILayoutEditorPath | null): path is ILayoutEditorSpecialWidgetPath {
+        return typeof path === "string";
+    }
+
     public static isWidgetPath(path: ILayoutEditorPath): path is ILayoutEditorWidgetPath {
-        return path.sectionRegion != null && path.sectionIndex != null;
+        return typeof path === "object" && path.sectionRegion != null && path.sectionIndex != null;
     }
 
     public static assertWidgetPath(path: ILayoutEditorPath): asserts path is ILayoutEditorWidgetPath {
@@ -662,7 +771,7 @@ export class LayoutEditorPath {
     }
 
     public static isDestinationPath(path: ILayoutEditorPath): path is ILayoutEditorDestinationPath {
-        return path.sectionRegion != null;
+        return typeof path === "object" && path.sectionRegion != null;
     }
 
     public static assertDestinationPath(path: ILayoutEditorPath): asserts path is ILayoutEditorDestinationPath {
@@ -672,18 +781,33 @@ export class LayoutEditorPath {
     }
 
     public static areSectionPathsEqual(pathA: ILayoutEditorPath | null, pathB: ILayoutEditorPath | null): boolean {
-        return !!pathA && !!pathB && pathA.sectionIndex === pathB.sectionIndex;
+        return (
+            !!pathA &&
+            !!pathB &&
+            typeof pathA === "object" &&
+            typeof pathB === "object" &&
+            pathA.sectionIndex === pathB.sectionIndex
+        );
+    }
+
+    public static droppableID(path: ILayoutEditorWidgetPath): string {
+        return `widget-droppable-${path.sectionIndex}-${path.sectionRegion}-${path.sectionRegionIndex}`;
+    }
+
+    public static draggableID(path: ILayoutEditorWidgetPath): string {
+        return `widget-draggable-${path.sectionIndex}-${path.sectionRegion}-${path.sectionRegionIndex}`;
     }
 
     public static areWidgetPathsEqual(pathA: ILayoutEditorPath | null, pathB: ILayoutEditorPath | null): boolean {
         return (
-            !!pathA &&
-            !!pathB &&
-            this.isWidgetPath(pathA) &&
-            this.isWidgetPath(pathB) &&
-            pathA.sectionIndex === pathB.sectionIndex &&
-            pathA.sectionRegion === pathB.sectionRegion &&
-            pathA.sectionRegionIndex === pathB.sectionRegionIndex
+            (!!pathA &&
+                !!pathB &&
+                this.isWidgetPath(pathA) &&
+                this.isWidgetPath(pathB) &&
+                pathA.sectionIndex === pathB.sectionIndex &&
+                pathA.sectionRegion === pathB.sectionRegion &&
+                pathA.sectionRegionIndex === pathB.sectionRegionIndex) ||
+            (this.isSpecialWidgetPath(pathA) && this.isSpecialWidgetPath(pathB) && pathA === pathB)
         );
     }
 }

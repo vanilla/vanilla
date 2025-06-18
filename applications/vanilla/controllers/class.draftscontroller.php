@@ -10,6 +10,8 @@
 
 use Vanilla\Models\ContentDraftModel;
 use Vanilla\Models\Model;
+use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\FeatureFlagHelper;
 
 /**
  * Handles displaying saved drafts of unposted comments via /drafts endpoint.
@@ -139,8 +141,10 @@ class DraftsController extends VanillaController
         $this->addModule("CategoriesModule");
         $this->addModule("BookmarkedModule");
 
-        // Render default view (drafts/index.php)
-        $this->render();
+        if (!FeatureFlagHelper::featureEnabled("DraftScheduling")) {
+            // Render default view (drafts/index.php)
+            $this->render();
+        }
     }
 
     /**

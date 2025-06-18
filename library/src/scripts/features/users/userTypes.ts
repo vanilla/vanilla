@@ -4,10 +4,6 @@ import { IUserSuggestionState } from "@library/features/users/suggestion/UserSug
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { RecordID } from "@vanilla/utils";
 
-export interface IInjectableUserState {
-    currentUser: ILoadable<IMe>;
-}
-
 export interface IPermission {
     type: string;
     id: number | null;

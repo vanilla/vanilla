@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import PostAttachmentsAsset from "@vanilla/addon-vanilla/posts/PostAttachmentsAsset";
 import React from "react";
@@ -25,10 +25,10 @@ export function PostAttachmentsAssetPreview(
     props: Omit<React.ComponentProps<typeof PostAttachmentsAsset>, "discussion">,
 ) {
     return (
-        <Widget>
+        <LayoutWidget>
             <QueryClientProvider client={queryClient}>
                 <PostAttachmentsAsset {...props} discussion={discussion} />
             </QueryClientProvider>
-        </Widget>
+        </LayoutWidget>
     );
 }

@@ -97,7 +97,7 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function clear(): void
     {

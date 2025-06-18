@@ -15,6 +15,7 @@ import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { Icon } from "@vanilla/icons";
 import { extractErrorMessage } from "@library/errorPages/CoreErrorMessages";
+import { cx } from "@emotion/css";
 
 interface IProps {
     name?: string;
@@ -31,6 +32,7 @@ interface IProps {
     isLoading?: boolean;
     mutation?: UseMutationResult;
     query?: UseQueryResult;
+    shortcut?: string;
 }
 
 /**
@@ -39,19 +41,19 @@ interface IProps {
 export default function DropDownItemButton(props: IProps) {
     const { children, name, query, mutation, disabled } = props;
     const buttonContent = children ? children : name;
-    const classes = dropDownClasses();
-    const defaultButtonClass = dropDownClasses().action;
-    const buttonClassName = classNames("dropDownItem-button", props.buttonClassName ?? defaultButtonClass);
+    const classes = dropDownClasses.useAsHook();
+    const defaultButtonClass = dropDownClasses.useAsHook().action;
+    const buttonClassName = cx("dropDownItem-button", props.buttonClassName ?? defaultButtonClass);
 
     const isLoading = props.isLoading || query?.isLoading || mutation?.isLoading;
 
     return (
-        <DropDownItem className={classNames(props.className)}>
+        <DropDownItem className={props.className}>
             <Button
                 buttonRef={props.buttonRef}
                 title={props.name}
                 onClick={props.onClick}
-                className={classNames(buttonClassName, classes.action, props.isActive && classes.actionActive)}
+                className={cx(buttonClassName, classes.action, props.isActive && classes.actionActive)}
                 buttonType={ButtonTypes.CUSTOM}
                 disabled={disabled ?? (query?.isLoading || query?.isError || mutation?.isLoading)}
                 aria-current={props.current ? "true" : "false"}
@@ -60,6 +62,7 @@ export default function DropDownItemButton(props: IProps) {
             >
                 <span className={classes.text}>{buttonContent}</span>
 
+                {props.shortcut && <span>{props.shortcut}</span>}
                 {query?.error || mutation?.error ? (
                     <ToolTip label={extractErrorMessage(query?.error ?? mutation?.error)}>
                         <ToolTipIcon>

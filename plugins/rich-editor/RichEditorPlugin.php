@@ -40,7 +40,7 @@ class RichEditorPlugin extends Gdn_Plugin
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setup()
     {

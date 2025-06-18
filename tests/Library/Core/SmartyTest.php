@@ -25,7 +25,7 @@ class SmartyTest extends SiteTestCase
     private $smarty;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

@@ -7,14 +7,12 @@
 import { reorderReportReasonModalClasses } from "@dashboard/communityManagementSettings/ReorderReportReasonModal.classes";
 import { useReasonsSortMutation } from "@dashboard/moderation/CommunityManagement.hooks";
 import { IReason } from "@dashboard/moderation/CommunityManagementTypes";
-import { cx } from "@emotion/css";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
-import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import Modal from "@library/modal/Modal";
@@ -64,7 +62,6 @@ const REASON_ITEM_SCHEMA: JsonSchema = {
 
 export default function ReorderReportReasonModalImpl(props: ReorderReportReasonModelProps) {
     const { isVisible, onVisibilityChange, reportReasons } = props;
-    const classesFrameBody = frameBodyClasses();
     const classFrameFooter = frameFooterClasses();
     const classes = reorderReportReasonModalClasses();
     const reasonSort = useReasonsSortMutation();
@@ -147,7 +144,7 @@ export default function ReorderReportReasonModalImpl(props: ReorderReportReasonM
                             />
                         }
                         body={
-                            <FrameBody className={cx(classesFrameBody.root, classes.frameBody)}>
+                            <FrameBody className={classes.frameBody}>
                                 {treeValue && (
                                     <FormTree<ReasonTreeValue>
                                         itemSchema={REASON_ITEM_SCHEMA}

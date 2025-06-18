@@ -4,7 +4,7 @@
  */
 
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { HomeWidgetItemContentType, homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { pageHeadingBoxVariables, SubtitleType } from "@library/layout/PageHeadingBox.variables";
@@ -146,9 +146,9 @@ export const homeWidgetContainerVariables = useThemeCache(
                     ...options.innerBackground,
                     color:
                         options.visualBackgroundType === "inner" &&
-                        ![BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN, BorderType.NONE].includes(
-                            options.borderType!,
-                        )
+                        !(
+                            [BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN, BorderType.NONE] as BorderType[]
+                        ).includes(options.borderType!)
                             ? globalVars.body.backgroundImage.color
                             : undefined,
                 },

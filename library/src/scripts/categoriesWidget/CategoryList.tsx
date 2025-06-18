@@ -19,7 +19,7 @@ import cloneDeep from "lodash-es/cloneDeep";
 import isEqual from "lodash-es/isEqual";
 
 export function CategoryList(props: ICategoriesWidgetProps) {
-    const classes = categoryListClasses();
+    const classes = categoryListClasses.useAsHook();
     const categoryOptions: ICategoryItemOptions = {
         ...props.categoryOptions,
         imagePlacement: "left",
@@ -109,7 +109,7 @@ export function CategoryList(props: ICategoriesWidgetProps) {
     );
 }
 
-interface ICategoryHeadingGroup {
+interface ICategoryHeadingGroupProps {
     options?: ICategoryItemOptions;
     headingCategory: ICategoryItem;
     isFirstItem?: boolean;
@@ -120,9 +120,9 @@ interface ICategoryHeadingGroup {
     topLevelHeadingDepth?: number;
 }
 
-function CategoryHeadingGroup(props: ICategoryHeadingGroup) {
+function CategoryHeadingGroup(props: ICategoryHeadingGroupProps) {
     const { headingCategory, isFirstItem, options, onCategoryFollowChange } = props;
-    const classes = categoryListClasses();
+    const classes = categoryListClasses.useAsHook();
     const childCategories = headingCategory.children;
 
     // determine what is the top level heading depth, its 1 if we are on categories root page, but we can be nested somewhere in the categories tree

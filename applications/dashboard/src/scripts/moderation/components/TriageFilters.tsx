@@ -11,7 +11,6 @@ import {
     TriageInternalStatusLabels,
 } from "@dashboard/moderation/components/TriageFilters.constants";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { t } from "@vanilla/i18n";
 
 export type ITriageFilters = {

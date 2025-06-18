@@ -17,7 +17,7 @@ use Vanilla\Community\Events\SearchDiscussionEvent;
 class SearchDiscussionEventProvider implements \Vanilla\Analytics\EventProviderInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEvent(array $body): object
     {
@@ -48,7 +48,7 @@ class SearchDiscussionEventProvider implements \Vanilla\Analytics\EventProviderI
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canHandleRequest(array $body): bool
     {

@@ -10,7 +10,7 @@ import {
     AISuggestionsSettingsForm,
 } from "@dashboard/aiSuggestions/AISuggestions.types";
 import { ManageSourcesInput } from "@dashboard/aiSuggestions/components/ManageSourcesInput";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { getMeta, t } from "@library/utility/appUtils";
 import set from "lodash-es/set";
 import { JsonSchema } from "@library/json-schema-forms";

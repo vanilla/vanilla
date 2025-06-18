@@ -9,7 +9,7 @@ import { loaderClasses } from "@library/loaders/loaderStyles";
 import { createLoadableComponent } from "@vanilla/react-utils";
 
 const ChangeQnaStatusForm = createLoadableComponent({
-    loadFunction: () => import("./ChangeQnaStatusForm"),
+    loadFunction: () => import("./ChangeQnaStatusForm.loadable"),
     fallback: () => {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },

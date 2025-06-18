@@ -11,6 +11,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Forum\Models\PostFieldModel;
 use Vanilla\Forum\Models\PostTypeModel;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -29,13 +30,14 @@ class PostFieldsTest extends AbstractAPIv2Test
     protected $postTypeTwo;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
         parent::setUp();
         $this->enableFeature(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS);
         \Gdn::sql()->truncate("postField");
+        \Gdn::sql()->truncate("postTypePostFieldJunction");
 
         if (!isset($this->postTypeOne, $this->postTypeTwo)) {
             // Create post type fixtures.
@@ -198,7 +200,12 @@ class PostFieldsTest extends AbstractAPIv2Test
         $two = $this->testPost(["postFieldID" => "two"] + $this->record());
         $three = $this->testPost(["postFieldID" => "three"] + $this->record());
 
-        $this->assertApiResults($this->baseUrl, [], ["postFieldID" => ["one", "two", "three"]]);
+        $body = $this->api()
+            ->get("/post-types", ["postTypeID" => $this->postTypeOne, "expand" => "postFields"])
+            ->assertCount(1)
+            ->getBody();
+
+        $this->assertRowsLike(["postFieldID" => ["one", "two", "three"]], $body[0]["postFields"]);
 
         $this->api()->put("$this->baseUrl/sorts/{$this->postTypeOne}", [
             $one["postFieldID"] => 3,
@@ -206,7 +213,12 @@ class PostFieldsTest extends AbstractAPIv2Test
             $three["postFieldID"] => 1,
         ]);
 
-        $this->assertApiResults($this->baseUrl, [], ["postFieldID" => ["three", "two", "one"]]);
+        $body = $this->api()
+            ->get("/post-types", ["postTypeID" => $this->postTypeOne, "expand" => "postFields"])
+            ->assertCount(1)
+            ->getBody();
+
+        $this->assertRowsLike(["postFieldID" => ["three", "two", "one"]], $body[0]["postFields"]);
     }
 
     /**
@@ -361,6 +373,107 @@ SQL
             $results,
             false,
             3
+        );
+    }
+
+    /**
+     * Test that the users are able to view post fields based on their permissions.
+     *
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function testAvailableViewFieldsForCurrentSessionUser()
+    {
+        $this->createUserFixtures();
+        $record = $this->record();
+        $postFields = [];
+        $postFields["privatePostField"] =
+            [
+                "postFieldID" => "text-field-private",
+                "label" => "Discussion text field",
+                "description" => "test txt field",
+                "visibility" => "private",
+            ] + $record;
+
+        $postFields["publicPostField"] =
+            [
+                "postFieldID" => "text-meta-public",
+                "label" => "Discussion text field 2",
+                "description" => "test txt field",
+                "visibility" => "public",
+            ] + $record;
+        $postFields["internalPostField"] =
+            [
+                "postFieldID" => "text-meta-internal",
+                "label" => "Discussion text field 3",
+                "description" => "test txt field",
+                "visibility" => "internal",
+            ] + $record;
+
+        foreach ($postFields as $postField) {
+            $this->createPostField($postField);
+        }
+
+        $postFieldIDs = array_column($postFields, "postFieldID");
+        $this->runWithAdminUser(function () use ($postFieldIDs) {
+            $availableFields = PostFieldModel::getAvailableViewFieldsForCurrentSessionUser();
+            $availablePostFieldID = array_column($availableFields, "postFieldID");
+            $this->assertEqualsCanonicalizing($postFieldIDs, $availablePostFieldID);
+        });
+        $this->runWithUser(function () {
+            $availableFields = PostFieldModel::getAvailableViewFieldsForCurrentSessionUser();
+            $availablePostFieldID = array_column($availableFields, "postFieldID");
+            // Moderators have personal info view permission
+            $this->assertContains("Garden.PersonalInfo.View", $this->getSession()->getPermissionsArray());
+            $this->assertEqualsCanonicalizing(["text-meta-public", "text-field-private"], $availablePostFieldID);
+        }, $this->moderatorID);
+
+        $this->runWithUser(function () use ($postFieldIDs) {
+            $availableFields = PostFieldModel::getAvailableViewFieldsForCurrentSessionUser();
+            $availablePostFieldID = array_column($availableFields, "postFieldID");
+            // Members get only public fields
+            $this->assertEqualsCanonicalizing(["text-meta-public"], $availablePostFieldID);
+
+            // Give member the permissions to view all fields
+            $this->getSession()->setPermission([
+                "Garden.PersonalInfo.View" => true,
+                "Garden.InternalInfo.View" => true,
+            ]);
+            $availableFields = PostFieldModel::getAvailableViewFieldsForCurrentSessionUser();
+            $availablePostFieldID = array_column($availableFields, "postFieldID");
+            $this->assertEqualsCanonicalizing($postFieldIDs, $availablePostFieldID);
+        }, $this->memberID);
+    }
+
+    /**
+     * Test that we can filter post fields by one or more post types.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testFilterByPostTypes()
+    {
+        // Orphan post field.
+        $this->createPostField();
+
+        $postTypeOnePostField = $this->createPostField();
+        $postTypeOneAndTwoPostField = $this->createPostField();
+
+        $this->api()->patch("/post-types/{$this->postTypeOne}", [
+            "postFieldIDs" => [$postTypeOnePostField["postFieldID"], $postTypeOneAndTwoPostField["postFieldID"]],
+        ]);
+
+        $this->api()->patch("/post-types/{$this->postTypeTwo}", [
+            "postFieldIDs" => [$postTypeOneAndTwoPostField["postFieldID"]],
+        ]);
+
+        // Should only get the two post fields assigned to the post types.
+        $this->assertApiResults(
+            "/post-fields",
+            ["postTypeID" => "{$this->postTypeOne},{$this->postTypeTwo}"],
+            ["postFieldID" => [$postTypeOnePostField["postFieldID"], $postTypeOneAndTwoPostField["postFieldID"]]],
+            count: 2
         );
     }
 }

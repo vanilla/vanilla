@@ -354,5 +354,6 @@ class UserNotificationPreferencesModel
                 $this->save($userID, ["Email.DigestEnabled" => 3]);
             }
         }
+        $this->eventManager->fire("afterSetInitialDefaults", $userID, $isNewUser);
     }
 }

@@ -8,6 +8,31 @@
     max-width: 100%;
     display: block;
 
+    & .embedExternal-content {
+        display: block;
+    }
+
+    // For the rendered page
+    &.display-inline {
+        display: inline-block;
+        vertical-align: middle;
+        width: fit-content;
+
+        & .embedExternal-content {
+            display: inline;
+        }
+
+        // Extra specificity to override UserContent styles
+        &.embedExternal.embedImage.display-inline {
+            margin: 0 !important;
+            font-size: inherit;
+        }
+    }
+
+    .embedExternal-content {
+        display: block;
+    }
+
     @include mediaQuery-embedDesktop {
         &:after {
             // Prevents paragraphs from collapsing borders with images.
@@ -19,6 +44,11 @@
 
         &.display-small .embedExternal-content {
             max-width: calc(33.333% - 1px);
+        }
+
+        &.display-inline .embedExternal-content {
+            width: fit-content;
+            height: 1em;
         }
 
         &.display-medium .embedExternal-content {
@@ -68,8 +98,16 @@
         display: inline-block;
     }
 }
-
 .embedImage-link {
     display: flex; // https://github.com/vanilla/support/issues/3336
     flex-direction: column;
+}
+
+.display-inline .embedImage-link {
+    height: auto;
+}
+
+.display-inline .embedImage-img {
+    height: 1em;
+    width: auto;
 }

@@ -89,7 +89,7 @@ class OAuth2PluginTest extends SiteTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

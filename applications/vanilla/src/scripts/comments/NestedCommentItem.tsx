@@ -28,6 +28,8 @@ import { isCommentDraftMeta } from "@vanilla/addon-vanilla/drafts/utils";
 import { useLocation } from "react-router";
 import { DiscardDraftModal } from "@vanilla/addon-vanilla/comments/DiscardDraftModal";
 import { useCreateCommentContext } from "@vanilla/addon-vanilla/posts/CreateCommentContext";
+import { IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
+import { useCommentThreadParentContext } from "@vanilla/addon-vanilla/comments/CommentThreadParentContext";
 
 interface IProps {
     threadItem: IThreadItem & { type: "comment" };
@@ -60,8 +62,19 @@ export const NestedCommentItem = memo(function NestedCommentItem(props: IProps) 
         removeReplyFromThread,
     } = useNestedCommentContext();
     const { hasPermission } = usePermissionsContext();
-    const canReply = hasPermission("comments.add");
     const comment = getComment(props.threadItem.commentID);
+
+    const commentParent = useCommentThreadParentContext();
+    const permissionOptions: IPermissionOptions = {
+        mode: PermissionMode.RESOURCE_IF_JUNCTION,
+        resourceType: comment?.parentRecordType,
+        resourceID: comment?.parentRecordID ?? null,
+    };
+
+    const replyPermission = hasPermission("comments.add", permissionOptions);
+    const closePermission = hasPermission("discussions.close", permissionOptions);
+    const canReply = commentParent.closed ? closePermission : replyPermission;
+
     const { draftToRemove, setDraftToRemove } = useCreateCommentContext();
     const classes = nestCommentListClasses();
     const childrenRef = useRef<HTMLDivElement>(null);

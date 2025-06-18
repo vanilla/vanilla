@@ -8,15 +8,19 @@ import { menuBarClasses } from "@library/MenuBar/MenuBar.classes";
 import EditorUploadButton from "@library/editor/flyouts/EditorUploadButton";
 import EmbedFlyout from "@library/editor/flyouts/EmbedFlyout";
 import EmojiFlyout from "@library/editor/flyouts/EmojiFlyout";
+import InsertTableFlyout from "@library/editor/flyouts/InsertTableFlyout";
 import Permission from "@library/features/users/Permission";
 import { insertRichEmbed } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichEmbed";
 import { insertRichFile } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichFile";
 import { insertRichImage } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichImage";
 import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 import { ElementToolbar } from "@library/vanilla-editor/toolbars/ElementToolbar";
-import { useMyPlateEditorState } from "@library/vanilla-editor/typescript";
-import { focusEditor, selectEditor, useEventPlateId } from "@udecode/plate-common";
+import { useMyPlateEditorState } from "@library/vanilla-editor/getMyEditor";
+import { focusEditor, selectEditor, setNodes, useEventPlateId, withoutNormalizing } from "@udecode/plate-common";
+import { insertTable, getTableAbove } from "@udecode/plate-table";
 import React, { RefObject, useCallback } from "react";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { getMeta } from "@library/utility/appUtils";
 
 interface IProps {
     className?: string;
@@ -32,6 +36,8 @@ interface IProps {
 export function PersistentToolbar(props: IProps) {
     const { uploadEnabled, className, contentRef, flyoutsDirection = "above" } = props;
     const editor = useMyPlateEditorState(useEventPlateId());
+
+    const isRichTableEnabled = getMeta("featureFlags.RichTable.Enabled", false);
 
     // focus the editor and place cursor at the end if a selection does not already exist
     const ensureEditorFocused = () => {
@@ -105,6 +111,37 @@ export function PersistentToolbar(props: IProps) {
                         />
                     </li>
                 </Permission>
+            )}
+            {isRichTableEnabled && (
+                <li>
+                    <InsertTableFlyout
+                        renderAbove={flyoutsDirection === "above"}
+                        onSelectionComplete={(layout) => {
+                            const selectionInTable = getTableAbove(editor);
+
+                            // if the selection is in a table, get out of it
+                            if (selectionInTable) {
+                                const currentTablePath = selectionInTable[1];
+                                selectEditor(editor, { at: [currentTablePath[0] + 1], focus: true });
+                            } else {
+                                ensureEditorFocused();
+                            }
+
+                            insertTable(editor, layout);
+                            const tableEntry = getTableAbove(editor);
+                            if (tableEntry) {
+                                const [, tablePath] = tableEntry;
+                                withoutNormalizing(editor, () => {
+                                    setNodes(
+                                        editor,
+                                        { id: `${uniqueIDFromPrefix("rich-table")}-${tablePath}` },
+                                        { at: tablePath },
+                                    );
+                                });
+                            }
+                        }}
+                    />
+                </li>
             )}
             {getExtraComponents().map((item, i) => {
                 return <React.Fragment key={i}>{item}</React.Fragment>;

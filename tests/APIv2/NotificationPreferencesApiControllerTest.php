@@ -46,7 +46,7 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
     protected static $enabledLocales = ["vf_fr" => "fr", "vf_ru" => "ru"];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

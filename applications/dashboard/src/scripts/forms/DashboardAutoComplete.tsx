@@ -5,7 +5,7 @@
 
 import React from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { AutoComplete } from "@vanilla/ui/src/forms/autoComplete";

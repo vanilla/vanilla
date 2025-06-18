@@ -10,106 +10,112 @@ import { VANILLA_ROOT } from "./scripts/env";
 import EntryModel from "./scripts/utility/EntryModel";
 import fs from "fs";
 import { createRequire } from "node:module";
+import { getVanillaSrcDirs } from "./scripts/utility/vanillaSrcDirs";
 
 const require = createRequire(import.meta.url);
 
-const warmupGlobs = [
-    "lodash-es",
+const lodashEsPackageNames = () => {
+    const lodashEsPath = path.resolve(VANILLA_ROOT, "node_modules/lodash-es");
+    const jsFiles = fs.readdirSync(lodashEsPath);
+    const results: string[] = [];
+    for (const file of jsFiles) {
+        if (file.endsWith(".js") && !file.startsWith("_")) {
+            results.push(`lodash-es/${file.slice(0, -3)}`);
+        }
+    }
+    return results;
+};
+
+const optimizedPackages = [
     "react",
-    "react-dom",
+    "lodash-es",
+    ...lodashEsPackageNames(),
     "sprintf-js",
-    "immer",
-    "typescript-fsa-reducers",
-    "react-redux",
-    "redux",
-    "react-router",
-    "axios",
-    "prismjs",
-    "react-virtualized",
-    "slate-react",
-    "slate",
-    "formik",
-    "moment",
-    "react-autosize-textarea",
-    "react-day-picker",
-    "is-hotkey",
-    "qs",
-    "react-aria-live",
-    "classnames",
-    "csx",
-    "@emotion/css",
-    "react-spring",
-    "@reach/skip-nav",
+    "react-dom",
     "react-router-dom",
-    "history",
-    "@reduxjs/toolkit",
-    "p-debounce",
-    "lodash-es/omit",
-    "lodash-es/debounce",
-    "lodash-es/random",
-    "lodash-es/throttle",
-    "redux-thunk",
-    "@tanstack/react-query",
-    "@tanstack/react-query-devtools",
-    "@tanstack/react-query-devtools/build/lib/index.prod.js",
-    "react-scrolllock",
-    "lodash-es/clone",
-    "lodash-es/difference",
+    "classnames",
+    "warning",
+    "prop-types",
+    "@reach/popover > tabbable",
+    "hoist-non-react-statics",
+    "react-is",
     "typescript-fsa",
-    "lodash-es/memoize",
-    "lodash-es/isEmpty",
-    "lodash-es/merge",
-    "react-select",
-    "lodash-es/set",
-    "lodash-es/unset",
-    "lodash-es/get",
-    "lodash-es/intersection",
-    "@reach/tooltip",
-    "@reach/portal",
-    "lodash-es/cloneDeep",
-    "@reach/popover",
-    "lodash-es/keyBy",
-    "lodash-es/isEqual",
-    "lodash/isEqual",
-    "@monaco-editor/react",
-    "@reach/tabs",
-    "lodash-es/sortBy",
-    "lodash-es/pick",
-    "react-table",
-    "react-custom-scrollbars",
+    "typescript-fsa-reducers",
+    "react-router",
+    "react-scrolllock",
+    "stylis-rule-sheet",
+    "react-input-autosize",
+    "react-autosize-textarea/lib/TextareaAutosize",
+    "react-transition-group",
+    "raf",
     "react-day-picker/DayPicker",
     "react-relative-portal",
-    "react-autosize-textarea/lib/TextareaAutosize",
+    "react-markdown",
+    "slate",
+    "use-sync-external-store/shim/index",
+    "react-aria-live",
+    "react/jsx-runtime",
+    "scheduler",
+    "p-debounce",
+    "react-fast-compare",
     "@simonwep/pickr",
+    "react-table",
+    "keen-analysis",
+    "emotion",
+    "esbuild-wasm",
+    "prettier/parser-typescript",
+    "prettier/parser-postcss",
+    "prettier/standalone",
+    "react-swipeable",
+    "@udecode/plate-autoformat",
+    "@udecode/plate-basic-marks",
+    "@udecode/plate-break",
+    "@udecode/plate-combobox",
+    "@udecode/plate-reset-node",
+    "@udecode/plate-select",
+    "@udecode/plate-serializer-csv",
+    "@udecode/plate-serializer-docx",
+    "@udecode/plate-serializer-md",
+    "@udecode/plate-trailing-block",
+    "@udecode/plate-floating",
+    "@udecode/plate-mention",
+    "@udecode/plate-horizontal-rule",
+    "@udecode/plate-table",
+    "prismjs/components/prism-php",
+    "is-hotkey",
+    "slate-react",
+    "buffer",
+    "@udecode/plate-highlight",
     "react-beautiful-dnd",
     "css-box-model",
-    "lodash-es/clamp",
+    "@radix-ui/react-tabs",
+    "diff",
+    "dompurify",
+    "jszip",
+    "react-spring/renderprops.cjs",
+    "@dnd-kit/core",
+    "@dnd-kit/modifiers",
+    "@dnd-kit/sortable",
+    "@dnd-kit/utilities",
+    "@tanstack/react-query-devtools",
+    "@tanstack/react-query-devtools/build/lib/index.prod.js",
+    "@reach/tabs",
+    "@cfworker/json-schema",
+    "moment",
+    "@reach/tooltip",
+    "@reach/portal",
+    "react-select",
     "@reach/menu-button",
-    "lodash-es/range",
-    "react-swipeable",
-    "lodash-es/startCase",
-    "lodash-es/flatten",
-    "react-grid-layout",
-    "@nivo/line",
-    "@nivo/pie",
-    "@nivo/bar",
-    "lodash-es/uniq",
-    "lodash-es/uniqBy",
-    "lodash-es/capitalize",
-    "lodash-es/lowerCase",
-    "lodash-es/chunk",
-    "lodash-es/isUndefined",
-    "keen-analysis",
-    "@reach/menu-button",
-    "lodash-es/range",
-    "lodash-es/clamp",
-    "@udecode/plate-common",
-    "react-swipeable",
-    "lodash-es/startCase",
-    "lodash/snakeCase",
-    "lodash/startCase",
-    "immutable",
+    "react-custom-scrollbars",
+    "@udecode/plate-list",
+    "@udecode/plate-block-quote",
+    "@udecode/plate-code-block",
+    "@udecode/plate-heading",
+    "@udecode/plate-paragraph",
+    "react-virtualized",
 ];
+
+const warmupGlobs = [...getVanillaSrcDirs().map((dir) => dir + "/entries/*")];
 
 export function makeViteCommonConfig(): UserConfig {
     const entryModel = new EntryModel();
@@ -125,14 +131,13 @@ export function makeViteCommonConfig(): UserConfig {
                 "@vanilla/dom-utils",
                 "@vanilla/icons",
                 "@vanilla/i18n",
-                `fake-dep-${Math.random()}`,
             ],
             include: [
                 "@vanilla/utils > tabbable",
                 "@vanilla/ui > @reach/accordion",
                 "@vanilla/ui > @reach/combobox",
                 "@vanilla/ui > @reach/rect",
-                ...warmupGlobs,
+                ...optimizedPackages,
             ],
             holdUntilCrawlEnd: true,
         },
@@ -206,20 +211,53 @@ export function makeViteCommonConfig(): UserConfig {
                     replacement: path.resolve(VANILLA_ROOT, "library/src/scripts"),
                 },
                 {
+                    find: /^@vanilla\/ui-library$/,
+                    replacement: path.resolve(VANILLA_ROOT, "DONT_USE_VANILLA_UI_LIBRARY"),
+                },
+                {
                     find: /^@vanilla\/json-schema-forms$/,
                     replacement: path.resolve(VANILLA_ROOT, "library/src/scripts/json-schema-forms"),
+                },
+                {
+                    find: /^@vanilla\/react-utils$/,
+                    // Point directly to the typescript src.
+                    replacement: path.resolve(VANILLA_ROOT, "packages/vanilla-react-utils/src/index.ts"),
+                },
+                {
+                    find: /^@vanilla\/dom-utils$/,
+                    // Point directly to the typescript src.
+                    replacement: path.resolve(VANILLA_ROOT, "packages/vanilla-dom-utils/src/index.ts"),
+                },
+                {
+                    find: /^@vanilla\/utils$/,
+                    // Point directly to the typescript src.
+                    replacement: path.resolve(VANILLA_ROOT, "packages/vanilla-utils/index.ts"),
+                },
+                {
+                    find: /^@vanilla\/icons$/,
+                    // Point directly to the typescript src.
+                    replacement: path.resolve(VANILLA_ROOT, "packages/vanilla-icons/index.ts"),
+                },
+                {
+                    find: /^@vanilla\/i18n$/,
+                    // Point directly to the typescript src.
+                    replacement: path.resolve(VANILLA_ROOT, "packages/vanilla-i18n/src/index.ts"),
                 },
                 {
                     find: "@vanilla/json-schema-forms/src",
                     replacement: path.resolve(VANILLA_ROOT, "library/src/scripts/json-schema-forms"),
                 },
                 {
-                    find: /$lodash^/,
-                    replacement: "lodash-es",
+                    find: /^lodash\//,
+                    replacement: path.join(VANILLA_ROOT, "node_modules/lodash-es/"),
                 },
                 {
                     find: /@vanilla\//,
                     replacement: path.resolve(VANILLA_ROOT, "packages/vanilla-"),
+                },
+                {
+                    find: /^qs$/,
+                    replacement: path.resolve(VANILLA_ROOT, "node_modules/qs-esm"),
                 },
             ],
         },
@@ -231,24 +269,16 @@ export function getAddonKeyFromChunkID(chunkID: string | undefined | null): stri
         return null;
     }
 
-    const addonName = /(applications|plugins|themes)\/([^\/]*)\/src\/scripts/.exec(chunkID)?.[2];
+    const addonName = /(addons\/themes|applications|plugins|themes)\/([^/]*)\/src\/scripts/.exec(chunkID)?.[2];
     return addonName ?? null;
 }
 
-export function isEntryChunk(chunkID: string | undefined | null): boolean {
+export function isAddonEntry(chunkID: string | undefined | null): boolean {
     if (!chunkID) {
         return false;
     }
 
     return chunkID.includes("src/scripts/entries");
-}
-
-export function isLibraryChunk(chunkID: string | undefined | null): boolean {
-    if (!chunkID) {
-        return false;
-    }
-
-    return chunkID.includes("/packages/vanilla") || chunkID.includes("/library/src");
 }
 
 function fixReactVirtualizedPlugin() {

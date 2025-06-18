@@ -7,12 +7,9 @@
 
 namespace VanillaTests;
 
-use Garden\Http\HttpRequest;
-use Garden\Http\HttpResponse;
-use PHPUnit\Framework\Assert;
+use Gdn;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Http\InternalClient;
-use Vanilla\Utility\ArrayUtils;
 use VanillaTests\Http\TestHttpClient;
 
 /**
@@ -98,11 +95,13 @@ trait UsersAndRolesApiTestTrait
         $this->api()->setUserID($userID);
         \CategoryModel::clearUserCache($userID);
         try {
+            Gdn::session()->ensureSession();
             $result = call_user_func($callback);
         } finally {
             $this->api()->setUserID($apiUserBefore);
             \CategoryModel::clearUserCache($apiUserBefore);
         }
+
         return $result;
     }
 
@@ -409,7 +408,7 @@ trait UsersAndRolesApiTestTrait
      */
     private function generateSalt(): string
     {
-        return "-" . round(microtime(true) * 1000) . rand(1, 1000);
+        return VanillaTestCase::makeRandomKey("-");
     }
 
     /**

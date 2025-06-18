@@ -8,11 +8,11 @@ import { discussionListVariables } from "@library/features/discussions/Discussio
 import { ITag } from "@library/features/tags/TagsReducer";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { MetaTag, Metas } from "@library/metas/Metas";
 import { getMeta } from "@library/utility/appUtils";
 import { usePostPageContext } from "@vanilla/addon-vanilla/posts/PostPageContext";
-import qs from "qs";
+import * as qs from "qs-esm";
 
 interface IProps {
     title?: string;
@@ -38,7 +38,7 @@ export default function PostTagsAsset(props: IProps) {
     }
 
     return (
-        <Widget>
+        <LayoutWidget>
             <HomeWidgetContainer
                 subtitle={subtitle}
                 description={description}
@@ -75,6 +75,6 @@ export default function PostTagsAsset(props: IProps) {
                     })}
                 </Metas>
             </HomeWidgetContainer>
-        </Widget>
+        </LayoutWidget>
     );
 }

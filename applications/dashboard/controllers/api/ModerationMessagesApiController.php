@@ -31,7 +31,7 @@ class ModerationMessagesApiController extends AbstractApiController
     private $categoryModel;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @param MessageModel $messageModel
      * @param CategoryModel $categoryModel

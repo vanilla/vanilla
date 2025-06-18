@@ -13,7 +13,7 @@ use Vanilla\Community\Events\PageViewEvent;
 class PageViewEventProvider implements EventProviderInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEvent(array $body): object
     {
@@ -24,7 +24,7 @@ class PageViewEventProvider implements EventProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canHandleRequest(array $body): bool
     {

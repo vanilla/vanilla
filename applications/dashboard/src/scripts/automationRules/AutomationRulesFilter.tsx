@@ -20,7 +20,7 @@ import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { cx } from "@emotion/css";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
 import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
 import { IAutomationRulesFilterValues } from "@dashboard/automationRules/AutomationRules.types";

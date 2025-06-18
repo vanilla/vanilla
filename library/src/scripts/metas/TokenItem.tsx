@@ -12,19 +12,30 @@ import { TokenItemClasses } from "@library/metas/TokenItem.styles";
 import { Icon } from "@vanilla/icons";
 import React, { ReactNode } from "react";
 
-interface IProps extends React.HTMLAttributes<HTMLSpanElement> {
+interface ITokenItemProps extends React.HTMLAttributes<HTMLSpanElement> {
     classNames?: string;
+    tokenTextClassName?: string;
     children: ReactNode;
     onRemove?: () => void;
     compact?: boolean;
 }
 
-export const TokenItem = React.forwardRef(function TokenItemImpl(props: IProps, ref: React.RefObject<HTMLDivElement>) {
+export const TokenItem = React.forwardRef(function TokenItemImpl(
+    props: ITokenItemProps,
+    ref: React.RefObject<HTMLDivElement>,
+) {
     const { onRemove, ...rest } = props;
-    const classes = TokenItemClasses();
+    const classes = TokenItemClasses.useAsHook();
     return (
         <span {...rest} ref={ref} className={cx(classes.root, props.className, "token")}>
-            <span className={cx(classes.textContent, "tokenText", props.compact && classes.textContentCompact)}>
+            <span
+                className={cx(
+                    classes.textContent,
+                    "tokenText",
+                    props.compact && classes.textContentCompact,
+                    props.tokenTextClassName,
+                )}
+            >
                 {props.children}
             </span>
             {onRemove && (

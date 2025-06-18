@@ -66,6 +66,11 @@ interface IState {
     isWatchingEnabled: boolean;
 }
 
+declare global {
+    interface Window {
+        __VANILLA_GLOBAL_SCROLL_OFFSET__: number;
+    }
+}
 window.__VANILLA_GLOBAL_SCROLL_OFFSET__ = 0;
 
 /**

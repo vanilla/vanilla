@@ -29,12 +29,32 @@ class StaticFormChoices implements FormChoicesInterface
     }
 
     /**
-     * Get all choices.
-     *
      * @return array
      */
     public function getChoices(): array
     {
         return ["staticOptions" => $this->choices];
+    }
+
+    /**
+     * Get all choices.
+     *
+     * @return array
+     */
+    public function getOptionsData(): array
+    {
+        $options = [];
+        foreach ($this->choices as $key => $value) {
+            $options[] = [
+                "value" => $key,
+                "label" => $value,
+            ];
+        }
+
+        if (empty($options)) {
+            return [];
+        }
+
+        return ["options" => $options];
     }
 }

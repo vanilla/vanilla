@@ -26,7 +26,7 @@ class ScheduleMonthlyDigestJob extends DigestJob
     ];
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function run(): JobExecutionStatus
     {

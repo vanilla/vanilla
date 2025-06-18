@@ -4,13 +4,13 @@
  */
 
 import React from "react";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import CreateCommentAsset from "@vanilla/addon-vanilla/comments/CreateCommentAsset";
 
 export function CreateCommentAssetPreview(props: React.ComponentProps<typeof CreateCommentAsset>) {
     return (
-        <Widget>
+        <LayoutWidget>
             <CreateCommentAsset {...props} isPreview={true} />
-        </Widget>
+        </LayoutWidget>
     );
 }

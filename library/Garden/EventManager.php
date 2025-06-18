@@ -517,7 +517,7 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function dispatch(object $event)
     {
@@ -533,7 +533,7 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getListenersForEvent(object $event): iterable
     {
@@ -552,7 +552,7 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function addListenerMethod(string $class, string $method): EventListenerConfigInterface
     {

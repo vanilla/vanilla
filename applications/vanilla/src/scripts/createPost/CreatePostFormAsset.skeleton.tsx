@@ -9,6 +9,7 @@ import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { createPostFormAssetClasses } from "@vanilla/addon-vanilla/createPost/CreatePostFormAsset.classes";
+import { draftFormFooterContentClasses } from "@vanilla/addon-vanilla/drafts/components/DraftFormFooterContent.classes";
 
 interface IProps {
     title?: string;
@@ -76,7 +77,7 @@ export function CreatePostFormAssetSkeleton(props: IProps) {
                             </span>
                         </div>
                     </div>
-                    <div className={classes.footer}>
+                    <div className={draftFormFooterContentClasses().footer}>
                         <LoadingRectangle width="150px" height="32px" />
                         <LoadingRectangle width="120px" height="32px" />
                     </div>

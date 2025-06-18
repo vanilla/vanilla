@@ -348,7 +348,7 @@ export const mapFilterValuesToQueryParams = (values: IUserManagementFilterValues
             dateLastActive: dateLastActiveValue,
         }),
         ...(values.ipAddresses && {
-            ipAddresses: [values.ipAddresses],
+            ipAddresses: values.ipAddresses,
         }),
         ...(profileFieldFilters &&
             Object.keys(profileFieldFilters).length && {
@@ -407,7 +407,6 @@ export const mapQueryParamsToFilterValues = (currentQuery: IGetUsersQueryParams,
         ...(!!filterValues.dateLastActive && {
             dateLastActive: dateStringInUrlToDateRange(filterValues.dateLastActive),
         }),
-        ...(!!filterValues.ipAddresses && { lastIPAddress: filterValues.ipAddresses }),
         ...(profileFieldFilters && Object.keys(profileFieldFilters).length && { profileFields: profileFieldFilters }),
     };
 };

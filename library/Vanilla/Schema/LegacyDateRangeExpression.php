@@ -46,7 +46,7 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetExists($offset): bool
     {
@@ -135,7 +135,7 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetGet($offset): mixed
     {
@@ -144,7 +144,7 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @codeCoverageIgnore
      */
     public function offsetSet($offset, $value): void
@@ -155,7 +155,7 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @codeCoverageIgnore
      */
     public function offsetUnset($offset): void

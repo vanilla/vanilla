@@ -526,6 +526,10 @@ class CommentsAnswerTest extends AbstractAPIv2Test
     public function testAnswerNotifications()
     {
         $notifyUser = $this->createUser();
+        $this->api()->patch("/notification-preferences/{$notifyUser["userID"]}", [
+            "QuestionAnswer" => ["email" => true, "popup" => true],
+            "DiscussionComment" => ["email" => false, "popup" => false],
+        ]);
         $question = $this->runWithUser(function () {
             return $this->createQuestion();
         }, $notifyUser);
@@ -563,6 +567,51 @@ class CommentsAnswerTest extends AbstractAPIv2Test
             ],
             true
         );
+    }
+
+    /**
+     * Test that user preferences for receiving notifications when a question is answered are respected.
+     *
+     * @return void
+     */
+    public function testEmailPreferenceRespected(): void
+    {
+        $this->api()->patch("/notification-preferences/defaults", [
+            "QuestionAnswer" => ["email" => true, "popup" => true],
+        ]);
+
+        $defaultPreferences = $this->api()
+            ->get("/notification-preferences/defaults")
+            ->getBody();
+        $this->assertTrue($defaultPreferences["QuestionAnswer"]["email"]);
+        $this->assertTrue($defaultPreferences["QuestionAnswer"]["popup"]);
+
+        $notifyUser = $this->createUser();
+        $this->api()->patch("/notification-preferences/{$notifyUser["userID"]}", [
+            "QuestionAnswer" => ["email" => false, "popup" => false],
+            "DiscussionComment" => ["email" => false, "popup" => false],
+        ]);
+        $notifyUserPreferences = $this->api()
+            ->get("/notification-preferences/{$notifyUser["userID"]}")
+            ->getBody();
+        $this->assertFalse($notifyUserPreferences["QuestionAnswer"]["email"]);
+        $this->assertFalse($notifyUserPreferences["QuestionAnswer"]["popup"]);
+
+        $question = $this->runWithUser(function () {
+            return $this->createQuestion();
+        }, $notifyUser);
+
+        $this->clearUserNotifications($notifyUser);
+
+        $user = $this->createUser();
+        $this->runWithUser(function () {
+            $this->createAnswer([
+                "body" => "check your notifications",
+            ]);
+        }, $user);
+
+        $this->assertUserHasNoNotifications($notifyUser);
+        $this->assertUserHasNoEmails($notifyUser);
     }
 
     /**

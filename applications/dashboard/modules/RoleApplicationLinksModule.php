@@ -15,7 +15,7 @@ use Vanilla\Dashboard\Models\RoleRequestModel;
 class RoleApplicationLinksModule extends Gdn_Module
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function __construct()
     {
@@ -24,7 +24,7 @@ class RoleApplicationLinksModule extends Gdn_Module
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function assetTarget()
     {

@@ -5,14 +5,15 @@
 
 import React, { ElementType } from "react";
 import { useUniqueID } from "@library/utility/idUtils";
-import { DashboardFormLabel, DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardFormLabel } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { FormGroupContext } from "./DashboardFormGroupContext";
 import { cx } from "@emotion/css";
 import { IFieldError } from "@vanilla/json-schema-forms";
 import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
 import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
 
-interface IProps extends React.ComponentProps<typeof DashboardFormLabel> {
+interface IDashboardFormGroupProps extends React.ComponentProps<typeof DashboardFormLabel> {
     tag?: ElementType;
     children?: React.ReactNode;
     inputID?: string;
@@ -26,7 +27,7 @@ interface IProps extends React.ComponentProps<typeof DashboardFormLabel> {
     justified?: boolean;
 }
 
-export function DashboardFormGroup(props: IProps) {
+export function DashboardFormGroup(props: IDashboardFormGroupProps) {
     const { fieldset = false } = props;
 
     const formStyle = useDashboardFormStyle();
@@ -41,7 +42,9 @@ export function DashboardFormGroup(props: IProps) {
     let labelType = props.labelType ?? DashboardLabelType.STANDARD;
     if (
         formStyle.forceVerticalLabels &&
-        [DashboardLabelType.STANDARD, DashboardLabelType.WIDE, DashboardLabelType.JUSTIFIED].includes(labelType)
+        (
+            [DashboardLabelType.STANDARD, DashboardLabelType.WIDE, DashboardLabelType.JUSTIFIED] as DashboardLabelType[]
+        ).includes(labelType)
     ) {
         labelType = DashboardLabelType.VERTICAL;
     }
@@ -74,9 +77,10 @@ export function DashboardFormGroup(props: IProps) {
                 value={{ inputID, labelID, labelType: props.labelType || DashboardLabelType.STANDARD }}
             >
                 {!!props.label && <DashboardFormLabel {...props} />}
-                {!props.label && ![DashboardLabelType.NONE, DashboardLabelType.VERTICAL].includes(labelType) && (
-                    <DashboardFormLabel {...props} />
-                )}
+                {!props.label &&
+                    !([DashboardLabelType.NONE, DashboardLabelType.VERTICAL] as DashboardLabelType[]).includes(
+                        labelType,
+                    ) && <DashboardFormLabel {...props} />}
                 {props.children}
             </FormGroupContext.Provider>
             {props.after}

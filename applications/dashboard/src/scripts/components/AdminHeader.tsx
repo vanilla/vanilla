@@ -9,11 +9,10 @@ import DashboardTitleBar from "@dashboard/components/DashboardTitleBar";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { t } from "@vanilla/i18n";
 import Heading from "@library/layout/Heading";
-import { useDashboardSection } from "@dashboard/DashboardSectionHooks";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
-import { IDashboardGroupLink, IDashboardSection } from "@dashboard/DashboardSectionType";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { getRelativeUrl } from "@library/utility/appUtils";
+import { DashboardMenusApi } from "@dashboard/DashboardMenusApi";
 
 interface IProps {
     hamburgerContent?: React.ReactNode;
@@ -23,11 +22,11 @@ interface IProps {
 export default function AdminHeader(props: IProps) {
     const { activeSectionID } = props;
     const dropdownClasses = dropDownClasses();
-    const sections = useDashboardSection();
+    const sections = DashboardMenusApi.useMenus();
     const [navItems, setNavItems] = useState<INavigationTreeItem[] | undefined>();
-    const [activeSection, setActiveSection] = useState<IDashboardSection | undefined>();
-    const [activeItem, setActiveItem] = useState<IDashboardSection | IDashboardGroupLink | undefined>();
-    const [childlessSections, setChildlessSections] = useState<IDashboardSection[] | undefined>();
+    const [activeSection, setActiveSection] = useState<DashboardMenusApi.Section | undefined>();
+    const [activeItem, setActiveItem] = useState<DashboardMenusApi.Section | DashboardMenusApi.GroupLink | undefined>();
+    const [childlessSections, setChildlessSections] = useState<DashboardMenusApi.Section[] | undefined>();
 
     useEffect(() => {
         if (sections.data) {
@@ -86,7 +85,7 @@ export default function AdminHeader(props: IProps) {
     );
 }
 
-function getActiveItem(treeItems): IDashboardSection | IDashboardGroupLink {
+function getActiveItem(treeItems): DashboardMenusApi.Section | DashboardMenusApi.GroupLink {
     let activeItem;
 
     for (let item of treeItems) {
@@ -106,7 +105,7 @@ function getActiveItem(treeItems): IDashboardSection | IDashboardGroupLink {
     return activeItem;
 }
 
-function getActiveSection(treeItems, activeItemID, sections): IDashboardSection {
+function getActiveSection(treeItems, activeItemID, sections): DashboardMenusApi.Section {
     let activeSection;
     for (let item of treeItems) {
         if (item.id === activeItemID) {
@@ -158,6 +157,6 @@ function getNavItemsTree(items): INavigationTreeItem[] {
     return navItemsTree;
 }
 
-function getChildlessSections(sections: IDashboardSection[]): IDashboardSection[] {
-    return sections.map((section) => ({ ...section, children: [] })) as unknown as IDashboardSection[];
+function getChildlessSections(sections: DashboardMenusApi.Section[]): DashboardMenusApi.Section[] {
+    return sections.map((section) => ({ ...section, children: [] })) as unknown as DashboardMenusApi.Section[];
 }

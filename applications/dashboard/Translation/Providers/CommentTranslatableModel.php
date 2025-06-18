@@ -33,7 +33,7 @@ class CommentTranslatableModel extends BaseTranslatableModel
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getContentToTranslate(int $primaryID = null, array $data = null): array
     {
@@ -48,7 +48,7 @@ class CommentTranslatableModel extends BaseTranslatableModel
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getObjectKey(array $data): string
     {

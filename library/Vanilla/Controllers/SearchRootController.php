@@ -33,7 +33,7 @@ class SearchRootController extends PageDispatchController
     public function index()
     {
         $page = $this->useSimplePage(t("Search"));
-        $page->registerReduxActionProvider($this->profileFieldsPreloadProvider);
+        $page->registerPreloader($this->profileFieldsPreloadProvider);
 
         return $page->blockRobots("noindex nofollow")->render();
     }

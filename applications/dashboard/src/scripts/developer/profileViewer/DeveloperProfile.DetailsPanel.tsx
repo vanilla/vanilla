@@ -29,7 +29,7 @@ export function DeveloperProfileDetailsPanel(props: { profile: IDeveloperProfile
     const { selectedSpan, setSelectedSpan } = useDeveloperProfile();
     const { profile } = props.profile;
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const containerMeasure = useMeasure(containerRef, false, false);
+    const containerMeasure = useMeasure(containerRef);
     return (
         <>
             <div ref={containerRef} className={classes.forceSized}>

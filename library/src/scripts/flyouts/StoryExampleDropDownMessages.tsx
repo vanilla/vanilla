@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { titleBarClasses } from "@library/headers/TitleBar.classes";
 import { t } from "@library/utility/appUtils";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";

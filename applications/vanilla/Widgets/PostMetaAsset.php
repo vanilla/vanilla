@@ -41,7 +41,8 @@ class PostMetaAsset extends AbstractLayoutAsset implements HydrateAwareInterface
         }
         $discussion = $this->getHydrateParam("discussion");
         $discussionPostFields = $discussion["postMeta"] ?? [];
-        $postFieldConfigs = $this->internalClient->get("/post-fields", ["isActive" => true])->getBody();
+        // TODO: After release 009 the limit fields should be removed
+        $postFieldConfigs = $this->internalClient->get("/post-fields?limit=500", ["isActive" => true])->getBody();
 
         $postFields = [];
         foreach ($discussionPostFields as $postFieldID => $value) {

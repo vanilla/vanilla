@@ -17,8 +17,11 @@ use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Forum\Models\DiscussionNotificationExpander;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
+use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Manage notifications for the current user.
@@ -31,43 +34,45 @@ class NotificationsApiController extends AbstractApiController
     /** Maximum allowable number of items in a page of a paginated response. */
     const PAGE_SIZE_MAXIMUM = 100;
 
-    /** @var ActivityModel */
-    private $activityModel;
-
-    /** @var LongRunner */
-    private $longRunner;
-
     /**
-     * NotificationsApiController constructor.
-     *
-     * @param ActivityModel $activityModel
+     * DI.
      */
-    public function __construct(ActivityModel $activityModel, LongRunner $longRunner)
-    {
-        $this->activityModel = $activityModel;
-        $this->longRunner = $longRunner;
+    public function __construct(
+        private ActivityModel $activityModel,
+        private LongRunner $longRunner,
+        private DiscussionNotificationExpander $notificationExpander
+    ) {
     }
 
     /**
      * Get a single notification.
      *
      * @param int $id
+     * @param array $query
+     *
      * @return array
      * @throws ValidationException If the request fails validation.
      * @throws ValidationException If the response fails validation.
      * @throws HttpException If the user has a permission-based ban in their session.
      * @throws PermissionException If the user does not have permission to access the notification.
      */
-    public function get(int $id): array
+    public function get(int $id, array $query): array
     {
         $this->permission("Garden.SignIn.Allow");
+        $in = Schema::parse([
+            "expand?" => ApiUtils::getExpandDefinition(["discussion"]),
+        ]);
 
-        $this->idParamSchema()->setDescription("Get a single notification.");
         $out = $this->schema($this->notificationSchema(), "out");
+        $query = $in->validate($query);
 
         $row = $this->notificationByID($id);
         $this->notificationPermission($row);
         $row = $this->normalizeOutput($row);
+
+        if (ModelUtils::isExpandOption("discussion", $query["expand"] ?? false)) {
+            $this->notificationExpander->expandDiscussions($row);
+        }
 
         $result = $out->validate($row);
         return $result;
@@ -126,6 +131,7 @@ class NotificationsApiController extends AbstractApiController
                     "Notifications pertaining to a single record will be grouped and delivered as a single notification.",
                 "default" => true,
             ],
+            "expand?" => ApiUtils::getExpandDefinition(["discussion"]),
         ])->setDescription("List notifications for the current user.");
         $out = $this->schema(
             [
@@ -163,6 +169,10 @@ class NotificationsApiController extends AbstractApiController
 
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
+        }
+
+        if (ModelUtils::isExpandOption("discussion", $query["expand"] ?? false)) {
+            $this->notificationExpander->expandDiscussions($rows);
         }
 
         $result = $out->validate($rows);

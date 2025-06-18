@@ -1,139 +1,87 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
+import { IServerError } from "@library/@types/api/core";
 import { IUser } from "@library/@types/api/users";
-import React, { useCallback } from "react";
-import { isINotificationPreference } from "@library/notificationPreferences/utils";
+import FollowContentDropdown from "@library/followedContent/FollowContentDropdown";
+import { FollowedContentNotificationPreferencesContext } from "@library/followedContent/FollowedContentNotificationPreferences.context";
+import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
+import Message from "@library/messages/Message";
 import {
     INotificationPreferencesApi,
     NotificationPreferencesContextProvider,
     useNotificationPreferencesContext,
 } from "@library/notificationPreferences";
 import NotificationPreferencesApi from "@library/notificationPreferences/NotificationPreferences.api";
-import debounce from "lodash-es/debounce";
-import { useFormik } from "formik";
 import {
-    useCategoryNotificationPreferencesContext,
-    getDefaultCategoryNotificationPreferences,
-    ICategoryPreferences,
+    useGetCategoryNotificationPreferences,
+    usePatchCategoryNotificationPreferences,
+} from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.context";
+import {
     CATEGORY_NOTIFICATION_TYPES,
+    getDefaultCategoryNotificationPreferences,
+    IFollowedCategoryNotificationPreferences,
 } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
-import { CategoryNotificationPreferencesContextProvider } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.context";
-import { FollowDropdown, IFollowDropdownProps } from "@vanilla/addon-vanilla/forms/FollowDropdown";
-import { CategoryPreferencesTable } from "@library/preferencesTable/CategoryPreferencesTable";
+import { t } from "@vanilla/i18n";
+import React, { useState } from "react";
 
-interface IProps extends IFollowDropdownProps {
-    categoryID: number;
-    categoryName: string;
-    notificationPreferences?: ICategoryPreferences;
-    categoryUrl?: string;
-}
-
-export function CategoryFollowDropDownImpl(props: IProps) {
-    const { categoryID, emailDigestEnabled } = props;
-
-    const { preferences: categoryNotificationPreferences, setPreferences } =
-        useCategoryNotificationPreferencesContext();
-
-    const debouncedSetPreferences = useCallback(
-        debounce(setPreferences, 1250, {
-            leading: true,
-        }),
-        [setPreferences],
-    );
-
-    const { preferences: globalNotificationPreferences } = useNotificationPreferencesContext();
-    const defaultUserPreferences = globalNotificationPreferences?.data ?? undefined;
-
-    const canIncludeInDigest =
-        emailDigestEnabled &&
-        isINotificationPreference(defaultUserPreferences?.DigestEnabled) &&
-        defaultUserPreferences?.DigestEnabled?.email;
-
-    const { values, setValues, submitForm } = useFormik<ICategoryPreferences>({
-        enableReinitialize: true,
-        initialValues: categoryNotificationPreferences,
-        onSubmit: async (values) => {
-            await debouncedSetPreferences(values);
-        },
-    });
-
-    async function unfollowAndResetPreferences() {
-        await setValues((values) => ({
-            // set everything to false
-            ...Object.entries(values).reduce((acc, [key, type]) => {
-                acc[key] = false;
-                return acc;
-            }, {} as ICategoryPreferences),
-            ...(props.emailDigestEnabled && { "preferences.email.digest": false }),
-        }));
-        await submitForm();
-    }
-
-    return (
-        <FollowDropdown
-            {...props}
-            recordID={categoryID}
-            name={props.categoryName}
-            emailDigestEnabled={emailDigestEnabled}
-            preferencesTable={
-                <CategoryPreferencesTable
-                    canIncludeInDigest={canIncludeInDigest}
-                    preferences={values}
-                    onPreferenceChange={async function (delta) {
-                        await setValues((values) => ({ ...values, ...delta }));
-                        await submitForm();
-                    }}
-                    preview={props.preview}
-                    notificationTypes={CATEGORY_NOTIFICATION_TYPES}
-                />
-            }
-            notificationTypes={CATEGORY_NOTIFICATION_TYPES}
-            updatePreferences={setPreferences}
-            submitForm={submitForm}
-            unfollowAndResetPreferences={unfollowAndResetPreferences}
-            isFollowed={categoryNotificationPreferences?.["preferences.followed"] ?? false}
-            defaultUserPreferences={defaultUserPreferences}
-            onPreferencesChange={props.onPreferencesChange}
-            viewRecordUrl={props.categoryUrl}
-        />
-    );
-}
-
-export function CategoryFollowDropDownWithCategoryNotificationsContext(
-    props: React.ComponentProps<typeof CategoryFollowDropDownImpl> & {
+export function CategoryFollowDropdownImpl(
+    props: Omit<React.ComponentProps<typeof FollowContentDropdown>, "notificationTypes" | "recordDetails"> & {
         userID: IUser["userID"];
+        notificationPreferences?: IFollowedCategoryNotificationPreferences;
     },
 ) {
-    const { userID, ...rest } = props;
+    const { userID, notificationPreferences: initialPreferences, ...rest } = props;
+    const { recordID } = rest;
     const { preferences } = useNotificationPreferencesContext();
 
+    const [serverError, setServerError] = useState<IServerError | null>(null);
+    const classesFrameBody = frameBodyClasses();
+    const preferencesQuery = useGetCategoryNotificationPreferences({
+        categoryID: recordID,
+        userID,
+        initialData: initialPreferences ?? getDefaultCategoryNotificationPreferences(preferences?.data),
+    });
+
+    const { mutateAsync } = usePatchCategoryNotificationPreferences({
+        categoryID: recordID,
+        userID,
+        setServerError,
+    });
+
     return (
-        <CategoryNotificationPreferencesContextProvider
-            userID={props.userID}
-            categoryID={props.categoryID}
-            initialPreferences={
-                props.notificationPreferences ?? getDefaultCategoryNotificationPreferences(preferences?.data)
-            }
+        <FollowedContentNotificationPreferencesContext.Provider
+            value={{ preferences: preferencesQuery.data, setPreferences: mutateAsync }}
         >
-            <CategoryFollowDropDownImpl {...rest} />
-        </CategoryNotificationPreferencesContextProvider>
+            {serverError && (
+                <Message error={serverError} stringContents={serverError.message} className={classesFrameBody.error} />
+            )}
+            <FollowContentDropdown
+                {...rest}
+                recordDetails={{
+                    recordKey: "categoryID",
+                    recordFollowedContentText: t("View all followed categories"),
+                    recordUnfollowText: t("Unfollow Category"),
+                }}
+                viewRecordText={t("View Category")}
+                notificationTypes={CATEGORY_NOTIFICATION_TYPES}
+            />
+        </FollowedContentNotificationPreferencesContext.Provider>
     );
 }
 
-export default function CategoryFollowDropdownWithNotificationPreferencesContext(
-    props: React.ComponentProps<typeof CategoryFollowDropDownImpl> & {
-        userID: IUser["userID"];
+export default function CategoryFollowDropDown(
+    props: React.ComponentProps<typeof CategoryFollowDropdownImpl> & {
         api?: INotificationPreferencesApi;
     },
 ) {
     const { api = NotificationPreferencesApi, ...rest } = props;
     return (
         <NotificationPreferencesContextProvider userID={rest.userID} api={NotificationPreferencesApi}>
-            <CategoryFollowDropDownWithCategoryNotificationsContext {...rest} />
+            <CategoryFollowDropdownImpl {...rest} />
         </NotificationPreferencesContextProvider>
     );
 }

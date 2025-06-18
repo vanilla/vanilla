@@ -11,7 +11,7 @@ import Portal from "@reach/portal";
 import { toolTipClasses, tooltipVariables } from "@library/toolTip/toolTipStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import throttle from "lodash-es/throttle";
-import { StackingContextProvider, useStackingContext } from "@vanilla/react-utils";
+import { StackingContextProvider, useIsMounted, useStackingContext } from "@vanilla/react-utils";
 import { cx } from "@emotion/css";
 
 const nubPosition = (triggerRect, hasOverflow) => {
@@ -34,6 +34,7 @@ function TriangleTooltip(props: {
     ariaLabel?: React.ReactNode;
     customZIndex?: number;
     customWidth?: number;
+    noPadding?: boolean;
 }) {
     const globalVars = globalVariables();
     const { children, label, ariaLabel, customZIndex, customWidth } = props;
@@ -50,6 +51,7 @@ function TriangleTooltip(props: {
     const classes = toolTipClasses(customWidth);
     const toolTipVars = tooltipVariables();
     const borderOffset = globalVars.border.width * 2;
+    const isMounted = useIsMounted();
 
     const toolBoxPosition = (triggerRect, tooltipRect) => {
         const triangleHeight = toolTipVars.nub.width / 2;
@@ -58,7 +60,9 @@ function TriangleTooltip(props: {
         const maxLeft = window.innerWidth - tooltipRect.width - 2;
         const hasOverflow = triggerRect.bottom + tooltipRect.height + triangleHeight > window.innerHeight;
 
-        setHasOverflow(hasOverflow);
+        if (isMounted()) {
+            setHasOverflow(hasOverflow);
+        }
 
         const overTriggerPosition =
             triggerRect.top - tooltipRect.height + borderOffset - toolTipVars.nub.width + window.scrollY;
@@ -95,7 +99,11 @@ function TriangleTooltip(props: {
                             label={label}
                             aria-label={ariaLabel ? ariaLabel : label}
                             position={toolBoxPosition}
-                            className={cx(classes.box, classes.boxStackingLevel(customZIndex ?? zIndex))}
+                            className={cx(
+                                classes.box,
+                                classes.boxStackingLevel(customZIndex ?? zIndex),
+                                props.noPadding && "noPadding",
+                            )}
                         />
                     </>
                 )}
@@ -140,18 +148,19 @@ export function ToolTip(props: {
     ariaLabel?: React.ReactNode;
     customZIndex?: number;
     customWidth?: number;
+    noPadding?: boolean;
 }) {
     const { children, ...rest } = props;
     return <TriangleTooltip {...rest}>{children}</TriangleTooltip>;
 }
 
-interface IIconProps extends React.HTMLAttributes<HTMLSpanElement> {}
+export interface ITooltipIconProps extends React.HTMLAttributes<HTMLSpanElement> {}
 
 /**
  * Class for reprenting to wrap an icon inside of a tooltip.
  */
 export const ToolTipIcon = React.forwardRef(function ToolTipIcon(
-    props: IIconProps,
+    props: ITooltipIconProps,
     ref: React.RefObject<HTMLSpanElement>,
 ) {
     const classes = toolTipClasses();

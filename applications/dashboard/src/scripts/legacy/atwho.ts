@@ -295,7 +295,7 @@ export function initializeAtComplete(editorElement, iframe?: any) {
         });
     }
 
-    $(editorElement)
+    ($(editorElement) as any)
         .atwho({
             at: "@",
             tpl: '<li data-value="@${name}" data-id="${id}">${name}</li>',
@@ -403,5 +403,12 @@ export function initializeAtComplete(editorElement, iframe?: any) {
     // Based on work here: https://github.com/ichord/At.js/issues/124
     if (iframeWindow) {
         $(iframeWindow).on("reposition.atwho", iframeAtWhoRepositionHandler);
+    }
+}
+
+declare global {
+    interface Window {
+        /** @deprecated */
+        $: JQueryStatic;
     }
 }

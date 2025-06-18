@@ -72,7 +72,7 @@ class DigestModel extends PipelineModel implements SystemCallableInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {

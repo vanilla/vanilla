@@ -6,6 +6,8 @@
 
 namespace VanillaTests;
 
+use Exception;
+use PHPUnit\Framework\ExceptionWrapper;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestFailure;
@@ -13,6 +15,7 @@ use PHPUnit\Runner\BaseTestRunner;
 use PHPUnit\Util\Filter;
 
 use PHPUnit\TextUI\DefaultResultPrinter;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * PHPUnit printer that outputs individual classnames, the time they took and the
@@ -23,7 +26,7 @@ class PhpUnitProgressPrinter extends DefaultResultPrinter
     protected string|null $previousClassName = null;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function startTest(Test $test): void
     {
@@ -31,7 +34,7 @@ class PhpUnitProgressPrinter extends DefaultResultPrinter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function endTest(Test $test, float $time): void
     {
@@ -105,7 +108,7 @@ class PhpUnitProgressPrinter extends DefaultResultPrinter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function writeProgress(string $progress): void
     {
@@ -161,18 +164,23 @@ class PhpUnitProgressPrinter extends DefaultResultPrinter
      */
     protected function printDefectTrace(TestFailure $defect): void
     {
+        $exception = $defect->thrownException();
+        if ($exception instanceof ExceptionWrapper) {
+            $exception = $exception->getOriginalException() ?? $exception;
+        }
         $this->write($this->formatExceptionMsg($defect->getExceptionAsString()));
-        $trace = Filter::getFilteredStacktrace($defect->thrownException());
+        $trace = DebugUtils::stackTraceString($exception->getTrace());
         if (!empty($trace)) {
             $this->write("\n" . $trace);
         }
-        $exception = $defect->thrownException()->getPrevious();
-        while ($exception) {
+
+        $exception = $exception->getPrevious();
+        while ($exception instanceof Exception) {
             $this->write(
-                "\nCaused by\n" .
+                "\n\nCaused by\n" .
                     TestFailure::exceptionToString($exception) .
                     "\n" .
-                    Filter::getFilteredStacktrace($exception)
+                    DebugUtils::stackTraceString($exception->getTrace())
             );
             $exception = $exception->getPrevious();
         }

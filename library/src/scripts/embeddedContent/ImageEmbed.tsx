@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -25,7 +25,10 @@ import { MenuBarSubMenuItemGroup } from "@library/MenuBar/MenuBarSubMenuItemGrou
 import { accessibleLabel } from "@library/utility/appUtils";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { Icon } from "@vanilla/icons";
+import { iconClasses } from "@library/icons/iconStyles";
+
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
     size: number;
@@ -33,7 +36,7 @@ interface IProps extends IBaseEmbedProps {
     name: string;
     width?: number;
     height?: number;
-    displaySize?: "small" | "medium" | "large";
+    displaySize?: "small" | "medium" | "large" | "inline";
     float?: "left" | "right" | "none";
 }
 
@@ -56,7 +59,13 @@ export function ImageEmbed(props: IProps) {
         right: { icon: <FloatRightIcon />, label: t("Float Right") },
     };
 
+    const classesRichEditor = iconClasses();
+
     const displayOptions = {
+        inline: {
+            icon: <Icon icon="editor-resize-inline" className={classesRichEditor.standard} />,
+            label: t("Inline"),
+        },
         small: { icon: <ResizeSmallIcon />, label: t("Small") },
         medium: { icon: <ResizeMediumIcon />, label: t("Medium") },
         large: { icon: <ResizeLargeIcon />, label: t("Large") },
@@ -69,29 +78,39 @@ export function ImageEmbed(props: IProps) {
             className={classNames("embedImage", `display-${displaySize}`, `float-${float}`)}
         >
             <EmbedContent
+                ref={contentRef}
+                positionBelow={displaySize === "inline"}
                 type={embedType}
                 embedActions={
                     <>
                         <MenuBarItem accessibleLabel={floatOptions[float].label} icon={floatOptions[float].icon}>
                             <MenuBarSubMenuItemGroup>
-                                {Object.entries(floatOptions).map(([value, option]) => (
-                                    <MenuBarSubMenuItem
-                                        key={value}
-                                        icon={option.icon}
-                                        active={float === value}
-                                        onActivate={() =>
-                                            setValue({
-                                                float: value,
-                                                displaySize:
-                                                    displaySize === "large" && value !== "none"
-                                                        ? "medium"
-                                                        : displaySize,
-                                            })
-                                        }
-                                    >
-                                        {option.label}
-                                    </MenuBarSubMenuItem>
-                                ))}
+                                {displaySize === "inline" ? (
+                                    <span>
+                                        {t(
+                                            "Inline images can't be positioned. Change the size to see position options here.",
+                                        )}
+                                    </span>
+                                ) : (
+                                    Object.entries(floatOptions).map(([value, option]) => (
+                                        <MenuBarSubMenuItem
+                                            key={value}
+                                            icon={option.icon}
+                                            active={float === value}
+                                            onActivate={() =>
+                                                setValue({
+                                                    float: value,
+                                                    displaySize:
+                                                        displaySize === "large" && value !== "none"
+                                                            ? "medium"
+                                                            : displaySize,
+                                                })
+                                            }
+                                        >
+                                            {option.label}
+                                        </MenuBarSubMenuItem>
+                                    ))
+                                )}
                             </MenuBarSubMenuItemGroup>
                         </MenuBarItem>
 

@@ -13,24 +13,31 @@ use Vanilla\Cli\Docker\ElasticSearchHttpClient;
 use Vanilla\Cli\Docker\KibanaHttpClient;
 
 /**
- * Service for kibana.vanilla.local
+ * Service for logs.vanilla.local
  */
 class VanillaLogsService extends AbstractService
 {
-    const SERVICE_NAME = "logs";
-
-    private KibanaHttpClient $kibanaClient;
+    const SERVICE_ID = "logs";
 
     /**
+     * Constructor.
+     *
      * @param KibanaHttpClient $kibanaClient
      */
-    public function __construct(KibanaHttpClient $kibanaClient)
+    public function __construct(private KibanaHttpClient $kibanaClient)
     {
-        $this->kibanaClient = $kibanaClient;
+        parent::__construct(
+            new ServiceDescriptor(
+                serviceID: self::SERVICE_ID,
+                label: "Vanilla Logs",
+                containerName: "kibana",
+                url: "https://logs.vanilla.local"
+            )
+        );
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEnv(): array
     {
@@ -41,48 +48,11 @@ class VanillaLogsService extends AbstractService
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function getName(): string
-    {
-        return "Vanilla Logs";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTargetDirectory(): string
-    {
-        return DockerCommand::VNLA_DOCKER_CWD;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getHostname(): string
-    {
-        return "kibana.vanilla.local";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function start()
+    public function start(): void
     {
         parent::start();
-        $this->setup();
-    }
-
-    public function getVanillaConfigDefaults(): array
-    {
-        return [];
-    }
-
-    /**
-     * Perform additional setup of indexes.
-     */
-    private function setup()
-    {
         $this->checkElasticRunning();
         $this->kibanaClient->setupIndexes();
     }
@@ -90,7 +60,7 @@ class VanillaLogsService extends AbstractService
     /**
      * Validate that the elastic search logs are running.
      */
-    private function checkElasticRunning()
+    private function checkElasticRunning(): void
     {
         $this->logger()->title("Checking Kibana Health");
         try {

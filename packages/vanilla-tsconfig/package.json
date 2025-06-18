@@ -1,8 +1,0 @@
-{
-    "name": "@vanilla/tsconfig",
-    "version": "3.0.1",
-    "license": "MIT",
-    "publishConfig": {
-        "access": "public"
-    }
-}

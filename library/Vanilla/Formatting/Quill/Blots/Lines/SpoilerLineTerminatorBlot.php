@@ -18,7 +18,7 @@ class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot
     use TwigRenderTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $operation): bool
     {
@@ -26,7 +26,7 @@ class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupOpeningTag(): string
     {
@@ -38,7 +38,7 @@ class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupClosingTag(): string
     {
@@ -46,7 +46,7 @@ class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderLineStart(): string
     {
@@ -54,7 +54,7 @@ class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderLineEnd(): string
     {

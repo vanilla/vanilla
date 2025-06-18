@@ -21,7 +21,7 @@ class BlotPointerTextFragmentTest extends VanillaTestCase
     use BootstrapTrait, SetupTraitsTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

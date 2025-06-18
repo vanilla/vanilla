@@ -40,6 +40,14 @@ class PostAttachmentsAsset extends AbstractLayoutAsset implements HydrateAwareIn
         return $props;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
+    }
+
     public function renderSeoHtml(array $props): ?string
     {
         return "";

@@ -170,6 +170,7 @@ const widgetCatalogMock = {
             },
             required: [],
         } as JsonSchema,
+        widgetGroup: "Widgets",
     },
 };
 
@@ -184,12 +185,19 @@ export function LayoutEditorWidgetSettingsModal() {
                 initialValues={extractSchemaDefaults(widgetCatalogMock.widgetID.schema)}
                 schema={widgetCatalogMock.widgetID.schema}
                 name={widgetCatalogMock.widgetID.name}
-                widgetCatalog={widgetCatalogMock}
                 widgetID="widgetID"
                 exitHandler={() => {}}
                 onSave={onSave}
                 isVisible={true}
-                middlewaresCatalog={{}}
+                layoutCatalog={{
+                    widgets: widgetCatalogMock,
+                    assets: {},
+                    layoutViewType: "home",
+                    layoutParams: {},
+                    sections: {},
+                    middlewares: {},
+                    fragments: {},
+                }}
             />
         </StoryContent>
     );

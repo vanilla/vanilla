@@ -72,7 +72,7 @@ class RequestsController extends \Gdn_Controller
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function renderData($data = null)
     {

@@ -37,7 +37,7 @@ class StatusFieldProcessorTest extends BootstrapTestCase
     private $model;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -57,7 +57,7 @@ class StatusFieldProcessorTest extends BootstrapTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {

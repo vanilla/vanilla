@@ -14,6 +14,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { translateX, percent, px, important } from "csx";
 import { css } from "@emotion/css";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const tooltipVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("toolTips");
@@ -70,11 +71,15 @@ export const toolTipClasses = useThemeCache((customWidth?: number) => {
         }),
         minWidth: customWidth ?? styleUnit(vars.sizes.min),
         maxWidth: styleUnit(vars.sizes.max),
-        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        backgroundColor: ColorsUtils.var(ColorVar.Background),
+        color: ColorsUtils.var(ColorVar.Foreground),
         ...Mixins.border(),
         ...Mixins.padding({
             all: globalVars.fonts.size.medium,
         }),
+        "&.noPadding": {
+            padding: 0,
+        },
         ...shadow.toolbar(),
     });
 
@@ -113,8 +118,8 @@ export const toolTipClasses = useThemeCache((customWidth?: number) => {
         borderRight: singleBorder({
             width: globalVars.border.width,
         }),
-        boxShadow: globalVars.overlay.dropShadow,
-        background: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        boxShadow: `4px -4px 4px rgba(0, 0, 0, 0.05)`,
+        background: ColorsUtils.var(ColorVar.Background),
         zIndex: 1,
         ...{
             [`&.isUp`]: {

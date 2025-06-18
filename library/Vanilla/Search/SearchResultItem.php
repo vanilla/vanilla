@@ -282,7 +282,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
     /**
      * @return string|null
      */
-    public function getChunks(): ?string
+    public function getTextFragments(): ?string
     {
         if (array_key_exists("vectorizedData", $this->data)) {
             $result = "";

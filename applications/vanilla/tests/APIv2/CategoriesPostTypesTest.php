@@ -18,7 +18,7 @@ class CategoriesPostTypesTest extends AbstractAPIv2Test
     use UsersAndRolesApiTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getAddons(): array
     {
@@ -28,7 +28,7 @@ class CategoriesPostTypesTest extends AbstractAPIv2Test
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -40,7 +40,7 @@ class CategoriesPostTypesTest extends AbstractAPIv2Test
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {
@@ -242,9 +242,15 @@ class CategoriesPostTypesTest extends AbstractAPIv2Test
                 ->get("/post-types/{$postType["postTypeID"]}")
                 ->getBody();
 
-            $this->assertArrayHasKey("availableCategoryIDs", $responseBody);
-            $this->assertContains($category["categoryID"], $responseBody["availableCategoryIDs"]);
-            $this->assertNotContains($catSpecialPerms["categoryID"], $responseBody["availableCategoryIDs"]);
+            $responseBody = $this->api()
+                ->get("/categories", [
+                    "postTypeID" => $postType["postTypeID"],
+                ])
+                ->getBody();
+            $categoryIDs = array_column($responseBody, "categoryID");
+
+            $this->assertContains($category["categoryID"], $categoryIDs);
+            $this->assertNotContains($catSpecialPerms["categoryID"], $categoryIDs);
         }, $user);
     }
 }

@@ -215,7 +215,7 @@ abstract class TimedAutomationTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getDiscussionSchema(): Schema
     {

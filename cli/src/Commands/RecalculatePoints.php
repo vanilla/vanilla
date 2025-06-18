@@ -76,7 +76,7 @@ class RecalculatePoints extends DatabaseCommand
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {

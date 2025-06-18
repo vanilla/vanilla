@@ -122,10 +122,8 @@ class LayoutViewModel extends FullRecordCacheModel
      */
     public function saveLayoutViews(array $body, string $layoutViewType, string $layoutID): array
     {
-        $layoutViewIDs = [];
-        try {
-            $this->database->beginTransaction();
-
+        return $this->database->runWithTransaction(function () use ($body, $layoutViewType, $layoutID) {
+            $layoutViewIDs = [];
             $this->delete([
                 "layoutID" => $layoutID,
             ]);
@@ -157,12 +155,8 @@ class LayoutViewModel extends FullRecordCacheModel
                 ]);
                 $layoutViewIDs[] = $this->insert($record);
             }
-            $this->database->commitTransaction();
-        } catch (Exception $e) {
-            $this->database->rollbackTransaction();
-            throw $e;
-        }
-        return $layoutViewIDs;
+            return $layoutViewIDs;
+        });
     }
 
     /**

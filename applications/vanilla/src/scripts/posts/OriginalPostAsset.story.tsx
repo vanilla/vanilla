@@ -6,7 +6,7 @@
 
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
-import { STORY_DISCUSSION } from "@library/storybook/storyData";
+import { STORY_DISCUSSION, STORY_ME_ADMIN } from "@library/storybook/storyData";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import OriginalPostAsset from "@vanilla/addon-vanilla/posts/OriginalPostAsset";
 import React from "react";
@@ -31,7 +31,7 @@ const StoryOriginalPostAsset = (props?: IProps) => {
     return (
         <QueryClientProvider client={queryClient}>
             <OriginalPostAsset
-                category={STORY_DISCUSSION.category}
+                category={STORY_DISCUSSION.category!}
                 discussion={STORY_DISCUSSION}
                 titleType={"discussion/name"}
                 {...props}
@@ -46,7 +46,7 @@ export const Default = () => {
 
 export const CurrentUser = () => {
     return (
-        <CurrentUserContextProvider currentUser={STORY_DISCUSSION.insertUser}>
+        <CurrentUserContextProvider currentUser={{ ...STORY_ME_ADMIN, ...STORY_DISCUSSION.insertUser }}>
             <PermissionsFixtures.AllPermissions>
                 <StoryOriginalPostAsset />
             </PermissionsFixtures.AllPermissions>

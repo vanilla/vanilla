@@ -545,35 +545,40 @@ class UsersApiController extends AbstractApiController
 
         $in = $this->schema([], "in")->setDescription("Get information about the current user.");
         $out = $this->schema(
-            Schema::parse([
-                "userID",
-                "name",
-                "photoUrl",
-                "email:s|n" => ["default" => null],
-                "emailConfirmed:b" => [
-                    "default" => false,
-                ],
-                "dateLastActive",
-                "isAdmin:b",
-                "isSysAdmin:b",
-                "isSuperAdmin:b",
-                "countUnreadNotifications" => [
-                    "description" => "Total number of unread notifications for the current user.",
-                    "type" => "integer",
-                ],
-                "countUnreadConversations" => [
-                    "description" => "Total number of unread conversations for the current user.",
-                    "type" => "integer",
-                ],
-                "permissions" => [
-                    "description" => "Global permissions available to the current user.",
-                    "items" => [
-                        "type" => "string",
+            SchemaUtils::composeSchemas(
+                $this->userSchema(),
+                Schema::parse([
+                    "email:s|n" => ["default" => null],
+                    "emailConfirmed:b" => [
+                        "default" => false,
                     ],
-                    "type" => "array",
-                ],
-                "suggestAnswers:b?",
-            ])->add($this->getUserFragmentSchema()),
+                    "isAdmin:b" => ["default" => false],
+                    "isSysAdmin:b" => ["default" => false],
+                    "isSuperAdmin:b" => ["default" => false],
+                    "countUnreadNotifications" => [
+                        "description" => "Total number of unread notifications for the current user.",
+                        "type" => "integer",
+                    ],
+                    "countUnreadConversations" => [
+                        "description" => "Total number of unread conversations for the current user.",
+                        "type" => "integer",
+                    ],
+                    "permissions" => [
+                        "description" => "Global permissions available to the current user.",
+                        "items" => [
+                            "type" => "string",
+                        ],
+                        "type" => "array",
+                    ],
+                    "roles:a",
+                    "roleIDs:a" => [
+                        "items" => [
+                            "type" => "integer",
+                        ],
+                    ],
+                    "suggestAnswers:b?",
+                ])
+            ),
             "out"
         );
 
@@ -583,7 +588,22 @@ class UsersApiController extends AbstractApiController
             $user = (array) $this->getSession()->User;
             $user = $this->normalizeOutput($user);
         } else {
-            $user = $this->getGuestFragment();
+            $user = [
+                "UserID" => UserModel::GUEST_USER_ID,
+                "Name" => t("Guest"),
+                "Photo" => UserModel::getDefaultAvatarUrl(),
+                "DateLastActive" => null,
+                "Confirmed" => false,
+                "Verified" => false,
+                "Admin" => 0,
+                "Roles" => $this->roleModel->getByType(RoleModel::TYPE_GUEST)->resultArray(),
+                "Banned" => 0,
+                "DateInserted" => "2000-01-01 00:00:00",
+                "DateUpdated" => "2000-01-01 00:00:00",
+                "ShowEmail" => false,
+                "Points" => 0,
+            ];
+            $user = $this->normalizeOutput($user);
         }
 
         // Expand permissions for the current user.
@@ -649,6 +669,9 @@ class UsersApiController extends AbstractApiController
         $result = $this->tryWithUserSearch($query);
         if ($result instanceof Data) {
             return $result;
+        } elseif (isset($query["query"]) && self::isIpAddress($query["query"])) {
+            $query["ipAddresses"] = [$query["query"]];
+            unset($query["query"]);
         }
         $this->permission(Permissions::BAN_ROLE_TOKEN);
         $showFullSchema = $this->checkUserPermissionMode(null, false);
@@ -692,6 +715,7 @@ class UsersApiController extends AbstractApiController
                         "type" => "string",
                     ],
                     "x-filter" => ["field" => "ipAddresses"],
+                    "style" => "form",
                 ],
                 "emailConfirmed:b?" => [
                     "x-filter" => ["field" => "u.Confirmed"],
@@ -868,8 +892,10 @@ class UsersApiController extends AbstractApiController
         ]);
         $searchFilters = ArrayUtils::arrayToDotNotation($searchFilters);
 
-        // If we don't have any search-only filters, break out of here.
+        // If we don't have any search-only filters or we're searching an ipaddress, break out of here.
         if (empty($searchFilters)) {
+            return null;
+        } elseif (isset($searchFilters["query"]) && self::isIpAddress($searchFilters["query"])) {
             return null;
         }
 
@@ -1703,6 +1729,7 @@ class UsersApiController extends AbstractApiController
                 "countDiscussions?",
                 "countComments?",
                 "label:s?",
+                "labelHtml:s?",
                 "banned:i?",
                 "private:b?" => ["default" => false],
                 "countVisits:i?",
@@ -1944,5 +1971,16 @@ class UsersApiController extends AbstractApiController
             new LongRunnerAction(UserModel::class, "usersRolesIterator", [$validatedRoleAssignments])
         );
         return $result;
+    }
+
+    /**
+     * Determine if a value is an IP address.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function isIpAddress(string $value): bool
+    {
+        return filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6) !== false;
     }
 }

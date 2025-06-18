@@ -1035,7 +1035,7 @@ class Gdn_Format
             // Text before the mention.
             if ($i == 0) {
                 if (!empty($str)) {
-                    $str[0] = htmlspecialchars(mb_substr($str, 0, 1));
+                    $str = htmlspecialchars(mb_substr($str, 0, 1)) . mb_substr($str, 1);
                 }
                 continue;
             }

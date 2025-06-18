@@ -32,13 +32,11 @@ describe("EditProfileForm", () => {
     });
 
     beforeEach(async () => {
-        await act(async () => {
-            result = render(
-                <MockProfileFieldsProvider>
-                    <EditProfileFields userID={2} isOwnProfile={true} />
-                </MockProfileFieldsProvider>,
-            );
-        });
+        result = render(
+            <MockProfileFieldsProvider>
+                <EditProfileFields userID={2} isOwnProfile={true} />
+            </MockProfileFieldsProvider>,
+        );
     });
 
     it("It renders inputs for all enabled profile fields.", async () => {
@@ -130,6 +128,7 @@ describe("Datepicker", () => {
                 </MockProfileFieldsProvider>,
             );
         });
+        await vi.dynamicImportSettled();
     });
 
     it("Populates and successfully edits Datepicker", async () => {

@@ -12,7 +12,7 @@ use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
 class TestTrigger extends TimedAutomationTrigger
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -20,7 +20,7 @@ class TestTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -28,7 +28,7 @@ class TestTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -36,7 +36,7 @@ class TestTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggerValueSchema(): Schema
     {
@@ -44,7 +44,7 @@ class TestTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -70,7 +70,7 @@ class TestTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {
@@ -78,7 +78,7 @@ class TestTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {

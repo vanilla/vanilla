@@ -305,4 +305,30 @@ class ReportsTest extends SiteTestCase
             $newReport
         );
     }
+
+    /**
+     * Make sure that deleted reasons are not coming back.
+     *
+     * @return void
+     */
+    public function testDeletingDefaultReasons(): void
+    {
+        $this->api()
+            ->delete("/report-reasons/abuse")
+            ->assertSuccess();
+
+        $response = $this->api()
+            ->get("/report-reasons/abuse", options: ["throw" => false])
+            ->assertFailure()
+            ->assertResponseCode(404);
+
+        //Run the structure part to create default reasons.
+        ReportReasonModel::structure(\Gdn::structure());
+
+        // Make sure the reason is still gone.
+        $response = $this->api()
+            ->get("/report-reasons/abuse", options: ["throw" => false])
+            ->assertFailure()
+            ->assertResponseCode(404);
+    }
 }

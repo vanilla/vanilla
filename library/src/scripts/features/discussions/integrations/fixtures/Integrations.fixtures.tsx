@@ -10,14 +10,7 @@ import {
     IAttachmentIntegrationCatalog,
     IIntegrationsApi,
 } from "@library/features/discussions/integrations/Integrations.types";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { JsonSchema } from "@vanilla/json-schema-forms";
-import { PropsWithChildren } from "react";
-import { fn } from "@storybook/test";
-import {
-    AttachmentIntegrationsApiContextProvider,
-    AttachmentIntegrationsContextProvider,
-} from "../Integrations.context";
 
 export const FAKE_WRITEABLE_INTEGRATION: IAttachmentIntegration = {
     name: "fakeIntegration",
@@ -147,29 +140,3 @@ export const FAKE_API: IIntegrationsApi = {
     postAttachment: async (params) => ({} as any),
     refreshAttachments: async (params) => [],
 };
-
-export const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            enabled: false,
-            retry: false,
-        },
-    },
-});
-
-export const mockApi = {
-    getIntegrationsCatalog: fn(FAKE_API.getIntegrationsCatalog),
-    getAttachmentSchema: fn(FAKE_API.getAttachmentSchema),
-    postAttachment: fn(FAKE_API.postAttachment),
-    refreshAttachments: fn(FAKE_API.refreshAttachments),
-};
-
-export function IntegrationsTestWrapper({ children }: PropsWithChildren<{}>) {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <AttachmentIntegrationsApiContextProvider api={mockApi}>
-                <AttachmentIntegrationsContextProvider>{children}</AttachmentIntegrationsContextProvider>
-            </AttachmentIntegrationsApiContextProvider>
-        </QueryClientProvider>
-    );
-}

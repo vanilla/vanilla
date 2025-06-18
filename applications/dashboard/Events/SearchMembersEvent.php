@@ -31,7 +31,7 @@ class SearchMembersEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -39,7 +39,7 @@ class SearchMembersEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAction(): string
     {
@@ -47,7 +47,7 @@ class SearchMembersEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getPayload(): ?array
     {
@@ -55,7 +55,7 @@ class SearchMembersEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {

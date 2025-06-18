@@ -9,6 +9,7 @@ namespace Vanilla\Web;
 
 use Garden\EventManager;
 use Garden\Web\RequestInterface;
+use Gdn_Locale;
 use Twig\Markup;
 use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\Models\SiteMeta;
@@ -29,55 +30,20 @@ final class PageHead implements PageHeadInterface
 {
     use TwigRenderTrait;
 
-    /** @var ContentSecurityPolicyModel */
-    private $cspModel;
-
-    /** @var AssetPreloadModel */
-    private $preloadModel;
-
-    /** @var EventManager */
-    private $eventManager;
-
-    /** @var SiteMeta */
-    private $siteMeta;
-
-    /** @var ViteAssetProvider */
-    protected $assetProvider;
-
-    /** @var RequestInterface */
-    protected $request;
-
-    protected SeoMetaModel $seoMetaModel;
-
     /**
      * Dependency Injection.
-     *
-     * @param ContentSecurityPolicyModel $cspModel
-     * @param AssetPreloadModel $preloadModel
-     * @param EventManager $eventManager
-     * @param SiteMeta $siteMeta
-     * @param ViteAssetProvider $assetProvider
-     * @param RequestInterface $request
-     * @param SeoMetaModel $seoMetaModel
-     * @param NoScriptStylesAsset $noScriptLayoutStylesAsset
      */
     public function __construct(
-        ContentSecurityPolicyModel $cspModel,
-        AssetPreloadModel $preloadModel,
-        EventManager $eventManager,
-        SiteMeta $siteMeta,
-        ViteAssetProvider $assetProvider,
-        RequestInterface $request,
-        SeoMetaModel $seoMetaModel,
+        private ContentSecurityPolicyModel $cspModel,
+        private AssetPreloadModel $preloadModel,
+        private EventManager $eventManager,
+        private SiteMeta $siteMeta,
+        private ViteAssetProvider $assetProvider,
+        private RequestInterface $request,
+        private SeoMetaModel $seoMetaModel,
+        private Gdn_Locale $locale,
         NoScriptStylesAsset $noScriptLayoutStylesAsset
     ) {
-        $this->cspModel = $cspModel;
-        $this->preloadModel = $preloadModel;
-        $this->eventManager = $eventManager;
-        $this->siteMeta = $siteMeta;
-        $this->assetProvider = $assetProvider;
-        $this->request = $request;
-        $this->seoMetaModel = $seoMetaModel;
         $this->styles[] = $noScriptLayoutStylesAsset;
     }
 
@@ -133,7 +99,7 @@ final class PageHead implements PageHeadInterface
     {
         $this->applyMetaTags();
 
-        $this->inlineScripts[] = $this->assetProvider->getBootstrapInlineScript();
+        $this->inlineScripts[] = $this->assetProvider->getBootstrapInlineScript($this->assetSection);
         if ($this->assetProvider->isHotBuild()) {
             $this->inlineScripts[] = $this->assetProvider->getHotBuildInlineScript();
             $this->scripts = array_merge(
@@ -155,6 +121,8 @@ final class PageHead implements PageHeadInterface
                 "meta" => $this->siteMeta->value($this->siteMetaExtras),
             ],
         ]);
+        $this->inlineScripts[] = $this->locale->getMissingTranslationsScriptContents();
+
         $viewData = [
             "nonce" => $this->cspModel->getNonce(),
             "title" => $this->seoTitle,

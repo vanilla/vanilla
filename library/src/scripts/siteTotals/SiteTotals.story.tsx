@@ -9,7 +9,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { BorderType } from "@library/styles/styleHelpers";
-import { SiteTotalsWidget } from "@library/siteTotals/SiteTotalsWidget";
+import { SiteTotalsWidget } from "@library/widgets/SiteTotalsWidget";
 import { DeepPartial } from "redux";
 import {
     ISiteTotalsOptions,
@@ -18,7 +18,7 @@ import {
     SiteTotalsAlignment,
     SiteTotalsLabelType,
 } from "@library/siteTotals/SiteTotals.variables";
-import { SiteTotalsWidgetPreview } from "@library/siteTotals/SiteTotalsWidget.preview";
+import { SiteTotalsWidgetPreview } from "@library/widgets/SiteTotalsWidget.preview";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { formatNumberText } from "@library/content/NumberFormatted";
 

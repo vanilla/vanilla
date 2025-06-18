@@ -36,6 +36,7 @@ import "@library/gdn";
 import { initModernEmbed } from "@library/embed/modernEmbed.local";
 import { iconRegistry } from "@vanilla/icons";
 import { AxiosRequestHeaders } from "axios";
+import { conditionallyMountChunkDebugger } from "@library/ChunkDebugger.mount";
 
 export async function bootstrapVanilla() {
     performance.mark("Bootstrap - Start");
@@ -79,7 +80,7 @@ export async function bootstrapVanilla() {
     try {
         const embedEnabled = getMeta("embed.enabled", false);
         const advancedEmbed = getMeta("embed.isAdvancedEmbed", false);
-        if (embedEnabled && advancedEmbed && window.parent.show) {
+        if (embedEnabled && advancedEmbed && "show" in window.parent && typeof window.parent.show === "function") {
             window.parent.show();
         }
     } catch (error) {
@@ -118,6 +119,8 @@ export async function bootstrapVanilla() {
             window.__VANILLA_INTERNAL_IS_READY__ = true;
             const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });
             document.dispatchEvent(contentEvent);
+
+            conditionallyMountChunkDebugger();
         })
         .catch((error) => {
             logError(error);
@@ -125,4 +128,11 @@ export async function bootstrapVanilla() {
         .finally(() => {
             performance.mark("Bootstrap - End");
         });
+}
+
+declare global {
+    interface Window {
+        __VANILLA_INTERNAL_IS_READY__: boolean;
+        onPageView: typeof onPageView;
+    }
 }

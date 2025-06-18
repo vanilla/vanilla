@@ -35,7 +35,7 @@ const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Hea
     const isComponentSubTitle = finalRenderDepth >= 3;
 
     const Tag = `h${finalDepth}` as "h1";
-    const classes = typographyClasses();
+    const classes = typographyClasses.useAsHook();
 
     return (
         <Tag

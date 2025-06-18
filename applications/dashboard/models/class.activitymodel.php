@@ -1343,6 +1343,8 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             "CategoryID" => 0,
         ];
 
+        $tokenData = Gdn::eventManager()->fireFilter("activityModel_addTokenData", $tokenData, $activity);
+
         $activityData = [];
 
         if (isset($data["Reason"])) {
@@ -1384,9 +1386,10 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
 
         // Form a message as to why the user is receiving this email and give them the opportunity to unsubscribe
         if ($activityType == "DigestEnabled") {
-            $notifyReason = t(
-                "You are receiving this email because you are currently subscribed to receive email digests."
-            );
+            $notifyReason =
+                $this->userMetaModel->getUserMeta($user["UserID"])["Preferences.Email.DigestEnabled"] === 3
+                    ? t("You are receiving this email digest because you were opted in to receive email digests.")
+                    : t("You are receiving this email digest because you opted in to receive email digests.");
         } elseif (
             in_array("FollowedCategory", $tokenData["ActivityTypes"]) &&
             count($activityData["reasons"]) === 1 &&
@@ -1462,7 +1465,6 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
      */
     public function getUnsubscribeDigestLink(array $user): string
     {
-        $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
         $tokenData = [
             "UserID" => val("UserID", $user, false),
             "Name" => val("Name", $user, false),
@@ -2736,6 +2738,9 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
 
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
+
+        $result["recordType"] = !empty($result["recordType"]) ? strtolower($result["recordType"]) : null;
+        $result["recordUrl"] = !empty($result["route"]) ? \Gdn::request()->getSimpleUrl($result["route"]) : null;
         return $result;
     }
 
@@ -2779,13 +2784,21 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             "readUrl?" => ["type" => "string"],
             "count:i?",
             "reason:s?",
+            "recordType:s?",
+            "recordID:i?",
+            "recordUrl:s?",
+            "discussionID:i|n?",
+            "discussion?" => Schema::parse(["discussionID:i", "name:s", "url:s", "categoryID:i"])->setField("type", [
+                "object",
+                "null",
+            ]),
         ]);
 
         return $result;
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {

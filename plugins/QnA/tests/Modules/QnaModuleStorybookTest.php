@@ -21,7 +21,7 @@ class QnaModuleStorybookTest extends StorybookGenerationTestCase
     use QnaApiTestTrait;
     use EventSpyTestTrait;
 
-    public static $addons = ["vanilla", "QnA"];
+    public static $addons = ["vanilla", "qna"];
 
     /**
      * Test rendering of the QnA module.

@@ -79,7 +79,7 @@ class HtmlDomRangeFragment implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getInnerContent(): string
     {
@@ -87,7 +87,7 @@ class HtmlDomRangeFragment implements TextFragmentInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setInnerContent(string $text)
     {
@@ -100,7 +100,7 @@ class HtmlDomRangeFragment implements TextFragmentInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getFragmentType(): string
     {

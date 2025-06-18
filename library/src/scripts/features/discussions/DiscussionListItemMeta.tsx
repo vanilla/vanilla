@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -17,7 +17,7 @@ import Notice from "@library/metas/Notice";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { t } from "@vanilla/i18n";
 import React from "react";
-import qs from "qs";
+import * as qs from "qs-esm";
 import { PermissionMode } from "@library/features/users/Permission";
 import DateTime from "@library/content/DateTime";
 import { metasClasses } from "@library/metas/Metas.styles";
@@ -39,10 +39,11 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
         item: {
             metas: { display, asIcons: renderAsIcons },
         },
-    } = discussionListVariables(props.discussionOptions);
+    } = discussionListVariables.useAsHook(props.discussionOptions);
 
-    const classes = discussionListClasses(props.discussionOptions, props.inTile);
-    const variables = discussionListVariables(props.discussionOptions);
+    const classes = discussionListClasses.useAsHook(props.discussionOptions, props.inTile);
+    const variables = discussionListVariables.useAsHook(props.discussionOptions);
+    const classesMeta = metasClasses.useAsHook();
 
     const {
         pinned,
@@ -56,7 +57,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
         unread,
         countUnread,
         attributes,
-        tags,
+        tags: allTags,
         score,
         resolved,
         inTile,
@@ -101,8 +102,18 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
     const displayLastCommentDate = !!dateLastComment && display.lastCommentDate;
     const renderLastCommentDateAsIcon = displayLastCommentDate && renderAsIcons;
 
+    const taggingEnabled = getMeta("tagging.enabled", false);
+    let tagsToRender = allTags;
+
+    if (allTags && !taggingEnabled) {
+        // Filter out all the "User"-type tags (this leaves the Status tags, for Ideation, etc.)
+        tagsToRender = allTags.filter((tag) => {
+            return tag.type !== "User";
+        });
+    }
+
     const shouldShowUserTags: boolean =
-        !!tags && tags.length > 0 && display.userTags && variables.userTags.maxNumber > 0;
+        !!tagsToRender && tagsToRender.length > 0 && display.userTags && variables.userTags.maxNumber > 0;
 
     const canResolve = hasPermission("staff.allow", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
     const displayResolved =
@@ -134,7 +145,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
             )}
 
             {shouldShowUserTags &&
-                tags?.slice(0, variables.userTags.maxNumber).map((tag, i) => {
+                tagsToRender?.slice(0, variables.userTags.maxNumber).map((tag, i) => {
                     const query = qs.stringify({
                         domain: "discussions",
                         tagsOptions: [
@@ -179,7 +190,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                 <MetaItem>
                     <Translate
                         source="Started by <0/>"
-                        c0={<ProfileLink userFragment={insertUser!} className={metasClasses().metaLink} />}
+                        c0={<ProfileLink userFragment={insertUser!} className={classesMeta.metaLink} />}
                     />
                 </MetaItem>
             )}
@@ -187,7 +198,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                 <MetaItem className={cx({ [classes.fullWidth]: inTile })}>
                     <Translate
                         source="Most recent by <0/>"
-                        c0={<ProfileLink userFragment={lastUser!} className={metasClasses().metaLink} />}
+                        c0={<ProfileLink userFragment={lastUser!} className={classesMeta.metaLink} />}
                     />
                 </MetaItem>
             )}

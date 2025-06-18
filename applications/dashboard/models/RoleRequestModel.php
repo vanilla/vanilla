@@ -315,7 +315,7 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function fetchFragments(array $ids, array $options = []): array
     {
@@ -362,7 +362,7 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function update(array $set, array $where, array $options = []): bool
     {

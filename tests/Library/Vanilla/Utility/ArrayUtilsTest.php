@@ -165,6 +165,7 @@ class ArrayUtilsTest extends TestCase
                 ]),
                 "Hello world.",
             ],
+            "access numeric" => ["fooArr.0.name", ["fooArr" => [["name" => "Hello world."]]], "Hello world."],
         ];
         return $result;
     }

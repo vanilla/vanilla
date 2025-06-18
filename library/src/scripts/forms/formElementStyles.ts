@@ -63,7 +63,7 @@ export const formElementsVariables = useThemeCache((forcedVars?: IThemeVariables
     });
 
     const placeholder = makeThemeVars("placeholder", {
-        color: mixBgAndFg(0.83),
+        color: mixBgAndFg(0.5),
     });
 
     const disabled = makeThemeVars("disabled", {

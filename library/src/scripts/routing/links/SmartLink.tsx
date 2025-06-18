@@ -10,13 +10,19 @@ import { makeLocationDescriptorObject, useLinkContext } from "@library/routing/l
 import { sanitizeUrl } from "@vanilla/utils";
 import { LocationDescriptor } from "history";
 import { siteUrl } from "@library/utility/appUtils";
+import { metasClasses } from "@library/metas/Metas.styles";
+import { cx } from "@emotion/css";
 
-export interface ISmartLinkProps extends NavLinkProps {
+// export interface ISmartLinkProps extends NavLinkProps {
+export interface ISmartLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
     tabIndex?: number;
     to: LocationDescriptor;
     disabled?: boolean;
     className?: string;
     active?: boolean;
+    asMeta?: boolean;
+    /** Pulling these in from react router so that we can compile fragment type definitions */
+    replace?: boolean | undefined;
 }
 
 /**
@@ -36,7 +42,7 @@ export interface ISmartLinkProps extends NavLinkProps {
  * Result = https://test.com/root/someUrl/deeper/nested (full refresh)
  */
 export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: React.Ref<HTMLAnchorElement>) {
-    const { replace, active = false, to, ...passthru } = props;
+    const { replace, asMeta, active = false, to, ...passthru } = props;
     const context = useLinkContext();
 
     // Filter out undefined props
@@ -45,6 +51,9 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
             delete passthru[prop];
         }
     }
+
+    const classesMeta = metasClasses.useAsHook();
+    const className = cx(asMeta && classesMeta.metaLink, props.className);
 
     let href = context.makeHref(to);
 
@@ -59,6 +68,7 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
                 tabIndex={tabIndex}
                 replace={replace}
                 data-link-type="modern"
+                className={className}
             />
         );
     } else {
@@ -73,6 +83,7 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
                 {...(passthru as any)}
                 tabIndex={tabIndex}
                 data-link-type="legacy"
+                className={className}
             />
         );
     }

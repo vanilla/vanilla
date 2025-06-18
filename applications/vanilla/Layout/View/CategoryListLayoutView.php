@@ -39,7 +39,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -47,7 +47,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -55,7 +55,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTemplateID(): string
     {
@@ -63,7 +63,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamInputSchema(): Schema
     {
@@ -71,7 +71,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamResolvedSchema(): Schema
     {
@@ -79,7 +79,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {

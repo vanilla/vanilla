@@ -4,15 +4,17 @@ import DateTime from "@library/content/DateTime";
 import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { Metas, MetaItem } from "@library/metas/Metas";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { BorderType } from "@library/styles/styleHelpersBorders";
-import { ToolTip } from "@library/toolTip/ToolTip";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { PostMetaAssetClasses } from "@vanilla/addon-vanilla/posts/PostMetaAsset.classes";
-import { getCurrentLocale, t } from "@vanilla/i18n";
+import { formatList, getCurrentLocale, getJSLocaleKey, t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
 import { RecordID } from "@vanilla/utils";
+import type React from "react";
 
 export interface ProfileFieldProp
     extends Pick<PostField, "postFieldID" | "label" | "description" | "dataType" | "visibility"> {
@@ -33,7 +35,7 @@ interface IProps {
 export function PostMetaAsset(props: IProps) {
     const { postFields, subtitle, description, title, containerOptions, displayOptions } = props;
     const { asMetas } = displayOptions ?? {};
-    const globalVars = globalVariables();
+    const globalVars = globalVariables.useAsHook();
 
     const _containerOptions: IHomeWidgetContainerOptions = {
         ...containerOptions,
@@ -48,7 +50,7 @@ export function PostMetaAsset(props: IProps) {
         borderType: BorderType.NONE,
     };
 
-    const classes = PostMetaAssetClasses({
+    const classes = PostMetaAssetClasses.useAsHook({
         numberOfFields: postFields?.length,
     });
 
@@ -59,15 +61,14 @@ export function PostMetaAsset(props: IProps) {
             case "boolean":
                 return field.value ? t("Yes") : t("No");
             case "date":
-                return <DateTime timestamp={`${field.value}`} />;
+                return new Date(`${field.value}`).toLocaleString(getJSLocaleKey(), {
+                    timeZone: "UTC",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                });
             case "string[]": {
-                if (Intl?.["ListFormat"]) {
-                    // We just checked if the browser supports it
-                    // @ts-ignore: Property 'ListFormat' does not exist on type 'typeof Intl'.
-                    const formatter = new Intl.ListFormat(getCurrentLocale());
-                    return formatter.format(field.value);
-                }
-                return Array.isArray(field.value) && field.value.join(", ");
+                return formatList(field.value as string[]);
             }
             default:
                 return field.value;
@@ -79,7 +80,7 @@ export function PostMetaAsset(props: IProps) {
     }
 
     return (
-        <Widget>
+        <LayoutWidget>
             <ErrorBoundary>
                 <HomeWidgetContainer
                     subtitle={subtitle}
@@ -115,12 +116,21 @@ export function PostMetaAsset(props: IProps) {
                                 <ol className={classes.layout}>
                                     {postFields.map((field) => {
                                         const { postFieldID, label, description } = field;
+                                        let infoTooltip: React.ReactNode = null;
+                                        if (description) {
+                                            infoTooltip = (
+                                                <ToolTip label={description}>
+                                                    <ToolTipIcon>
+                                                        <Icon icon={"info"} />
+                                                    </ToolTipIcon>
+                                                </ToolTip>
+                                            );
+                                        }
                                         return (
                                             <li className={classes.field} key={postFieldID}>
                                                 <span className={classes.fieldName}>
-                                                    <ToolTip label={description} key={postFieldID}>
-                                                        <span>{label}</span>
-                                                    </ToolTip>
+                                                    {label}
+                                                    {infoTooltip}
                                                 </span>
                                                 <span className={classes.fieldValue}>{getFormattedValue(field)}</span>
                                             </li>
@@ -132,7 +142,7 @@ export function PostMetaAsset(props: IProps) {
                     )}
                 </HomeWidgetContainer>
             </ErrorBoundary>
-        </Widget>
+        </LayoutWidget>
     );
 }
 

@@ -30,7 +30,7 @@ class ResourceEventLoggerTest extends SiteTestCase
     private $logger;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

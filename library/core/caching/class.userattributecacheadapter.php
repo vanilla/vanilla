@@ -33,7 +33,7 @@ class UserAttributeCacheAdapter implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function get($key, $default = null)
     {
@@ -41,7 +41,7 @@ class UserAttributeCacheAdapter implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function set($key, $value, $ttl = null)
     {
@@ -49,7 +49,7 @@ class UserAttributeCacheAdapter implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function delete($key)
     {
@@ -57,7 +57,7 @@ class UserAttributeCacheAdapter implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMultiple($keys, $default = null)
     {
@@ -69,7 +69,7 @@ class UserAttributeCacheAdapter implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setMultiple($values, $ttl = null)
     {
@@ -86,7 +86,7 @@ class UserAttributeCacheAdapter implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function deleteMultiple($keys)
     {
@@ -94,7 +94,7 @@ class UserAttributeCacheAdapter implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function has($key)
     {
@@ -102,7 +102,7 @@ class UserAttributeCacheAdapter implements \Psr\SimpleCache\CacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function clear()
     {

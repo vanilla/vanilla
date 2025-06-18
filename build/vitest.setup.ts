@@ -15,11 +15,15 @@ beforeAll(() => {
     // Always override the global axios in case something uses it.
     new MockAdapter(Axios);
     mockApi = mockAPI();
+    // https://github.com/wobsoriano/vitest-canvas-mock/issues/10#issuecomment-1893782655
+    vi.stubGlobal("jest", vi);
 });
 
 afterAll(() => {
     mockApi.reset();
     resetGlobalValues();
+    // https://github.com/wobsoriano/vitest-canvas-mock/issues/10#issuecomment-1893782655
+    vi.stubGlobal("jest", vi);
 });
 
 beforeEach(() => {
@@ -76,7 +80,16 @@ global.ResizeObserver = class ResizeObserver {
 global.Range.prototype.getBoundingClientRect = () => {
     // Make these a bit different from the empty rect so that things checking that something actually rendered
     // see an actual rect. Some of our code has bailouts on an empty rect.
-    return { ...EMPTY_RECT, top: 1, left: 1, width: 20, height: 20 };
+    return {
+        ...EMPTY_RECT,
+        toJSON() {
+            return { ...this };
+        },
+        top: 1,
+        left: 1,
+        width: 20,
+        height: 20,
+    };
 };
 const originalWarn = console.warn;
 global.console.warn = (...args) => {

@@ -18,7 +18,7 @@ interface IProps {
 }
 
 export function FrameHeaderMinimal(props: IProps) {
-    const classes = frameHeaderClasses();
+    const classes = frameHeaderClasses.useAsHook();
     return (
         <header className={classNames(classes.root, classes.rootMinimal)}>
             <h2 id={props.id} className={classNames(classes.centred, classes.headingMinimal)}>

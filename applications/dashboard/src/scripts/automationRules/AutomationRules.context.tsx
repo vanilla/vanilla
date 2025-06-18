@@ -22,7 +22,7 @@ import { useTagList } from "@library/features/tags/TagsHooks";
 import { ICollection } from "@library/featuredCollections/Collections.variables";
 import { useCollectionList } from "@library/featuredCollections/collectionsHooks";
 import { useStatusOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
-import { IGroupOption } from "@library/forms/select/Tokens.loadable";
+import { IGroupOption } from "@library/forms/select/Tokens.types";
 import { t } from "@vanilla/i18n";
 import { useGetUsers } from "@dashboard/users/userManagement/UserManagement.hooks";
 import { IUser } from "@library/@types/api/users";

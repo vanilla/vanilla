@@ -8,12 +8,12 @@
 namespace Vanilla\Theme\VariableProviders;
 
 use Garden\Schema\Schema;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 
 /**
  * Module for the react based quicklinks.
  */
-class QuickLinksModule extends AbstractReactModule
+class QuickLinksModule extends LegacyReactModule
 {
     /**
      * @inheritdoc

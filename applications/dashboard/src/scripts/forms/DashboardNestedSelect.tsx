@@ -5,7 +5,7 @@
  */
 
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { cx } from "@emotion/css";
 import { INestedSelectProps, NestedSelect } from "@library/forms/nestedSelect";

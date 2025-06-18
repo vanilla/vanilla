@@ -27,10 +27,6 @@ call_user_func(function () {
     } else {
         // This domain treats the root directory as its own virtual root.
         [$root, $_] = explode("/", ltrim($_SERVER["SCRIPT_NAME"], "/"), 2) + ["", ""];
-        // Exclusion for vanilla.local/dev
-        if ($root === "dev") {
-            return;
-        }
 
         // Use a config specific to the site.
         $configPath = PATH_ROOT . "/conf/$host/$root.php";

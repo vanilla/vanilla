@@ -110,12 +110,15 @@ class DockerUtils
      */
     public static function restartContainer(string $cwd, string $containerName)
     {
+        $logger = new SimpleScriptLogger();
+        $logger->info("Restarting container <yellow>$containerName</yellow>");
         $process = new Process(["docker", "container", "restart", $containerName], $cwd);
         $process->setTimeout(null);
         $process->setIdleTimeout(null);
 
         // We don't care if it fails. Some use cases don't have nginx running at all.
         $process->run();
+        $logger->success("Restarted container <yellow>$containerName</yellow>");
     }
 
     /**

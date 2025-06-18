@@ -16,7 +16,7 @@ use Vanilla\Events\SearchPlacesEvent;
 class SearchPlacesEventProvider implements EventProviderInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEvent(array $body): object
     {
@@ -35,7 +35,7 @@ class SearchPlacesEventProvider implements EventProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canHandleRequest(array $body): bool
     {

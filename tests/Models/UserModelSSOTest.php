@@ -29,7 +29,7 @@ class UserModelSSOTest extends SiteTestCase
     private $authModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setup(): void
     {

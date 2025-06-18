@@ -12,7 +12,7 @@ class SpoilerLine extends AbstractNode
     const TYPE_KEY = "spoiler-item";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -20,7 +20,7 @@ class SpoilerLine extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -28,7 +28,7 @@ class SpoilerLine extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getTextEnd(): string
     {
@@ -36,7 +36,7 @@ class SpoilerLine extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

@@ -16,7 +16,7 @@ import { fetchOverviewComponent } from "@dashboard/layout/overview/LayoutOvervie
 import { IComponentFetcher } from "@library/features/Layout/LayoutRenderer";
 import { extractSchemaDefaults } from "@library/json-schema-forms/utils";
 import { IRegisteredComponent } from "@library/utility/componentRegistry";
-import React from "react";
+import React, { useMemo } from "react";
 
 const _editorOverviewComponents: Record<string, IRegisteredComponent> = {};
 
@@ -42,17 +42,19 @@ export const fetchEditorOverviewComponent: IComponentFetcher = (componentName) =
 };
 
 export function useEditorSchemaDefaultsEnhancer(catalog: ILayoutCatalog | null) {
-    if (catalog === null) {
-        return () => ({});
-    }
-    return (hydrateKey: string) => {
-        // Ensure the rendered widgets in the layout / preview get the default values.
-        const catalogItem = catalog.widgets[hydrateKey] ?? catalog.assets[hydrateKey] ?? null;
-        if (catalogItem === null) {
-            return {};
+    return useMemo(() => {
+        if (catalog === null) {
+            return () => ({});
         }
+        return (hydrateKey: string) => {
+            // Ensure the rendered widgets in the layout / preview get the default values.
+            const catalogItem = catalog.widgets[hydrateKey] ?? catalog.assets[hydrateKey] ?? null;
+            if (catalogItem === null) {
+                return {};
+            }
 
-        const defaults = extractSchemaDefaults(catalogItem.schema);
-        return defaults;
-    };
+            const defaults = extractSchemaDefaults(catalogItem.schema);
+            return defaults;
+        };
+    }, [catalog]);
 }

@@ -58,7 +58,6 @@ export function AutomationRulesPreviewUsersContent(props: IProps) {
                             showNextButton: false,
                         }}
                         onChange={(page: number) => setQuery({ ...query, page: page })}
-                        isMobile={false}
                     />
                 )}
                 {hasData && (

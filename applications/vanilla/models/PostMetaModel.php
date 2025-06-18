@@ -7,7 +7,9 @@
 
 namespace Vanilla\Forum\Models;
 
+use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Models\PipelineModel;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\StringUtils;
 
@@ -72,8 +74,8 @@ class PostMetaModel extends PipelineModel
         if (empty($postMeta)) {
             return;
         }
-        try {
-            $this->database->beginTransaction();
+
+        $this->database->runWithTransaction(function () use ($recordType, $recordID, $postMeta) {
             foreach ($postMeta as $postFieldID => $postFieldValue) {
                 $values = is_array($postFieldValue) ? $postFieldValue : [$postFieldValue];
                 $this->delete([
@@ -90,11 +92,7 @@ class PostMetaModel extends PipelineModel
                     ]);
                 }
             }
-            $this->database->commitTransaction();
-        } catch (\Throwable $e) {
-            $this->database->rollbackTransaction();
-            throw $e;
-        }
+        });
     }
 
     public function insert(array $set, array $options = [])
@@ -211,7 +209,10 @@ class PostMetaModel extends PipelineModel
         $postMetaRecords = array_map(fn($record) => $this->condensePostMeta($record), $postMetaRecords);
 
         // Get post field definitions indexed by postTypeID and postFieldID
-        $postFields = $this->postFieldModel->getWhere(["postTypeID" => $postTypeIDs, "isActive" => true]);
+        $postFields = $this->postFieldModel->getPostFieldsByPostTypes([
+            "ptpf.postTypeID" => $postTypeIDs,
+            "isActive" => true,
+        ]);
         $postFields = ArrayUtils::arrayColumnArrays($postFields, null, "postTypeID");
         $postFields = array_map(fn($field) => array_column($field, null, "postFieldID"), $postFields);
 
@@ -235,6 +236,42 @@ class PostMetaModel extends PipelineModel
                 $recordPostMeta[$postFieldID] = $value;
             }
             $row["postMeta"] = $recordPostMeta;
+        }
+    }
+
+    /**
+     * Adds post field values to discussion rows' `bodyPlainText` so that they are searchable.
+     *
+     * @param array $rowOrRows
+     * @return void
+     * @throws \Exception
+     */
+    public function updateBodyPlainText(array &$rowOrRows): void
+    {
+        if (ArrayUtils::isAssociative($rowOrRows)) {
+            $rows = [&$rowOrRows];
+        } else {
+            $rows = &$rowOrRows;
+        }
+
+        $postFields = array_column($this->postFieldModel->getWhere(["isActive" => true]), null, "postFieldID");
+        foreach ($rows as &$row) {
+            if (array_key_exists("bodyPlainText", $row) && array_key_exists("postMeta", $row)) {
+                $postFieldsToAppend = [];
+                foreach ($row["postMeta"] as $postFieldID => $value) {
+                    $postField = $postFields[$postFieldID] ?? null;
+
+                    if (($postField["dataType"] ?? null) === "boolean") {
+                        // It doesn't make sense to search for a boolean value. This will be handled as a filter.
+                        continue;
+                    }
+
+                    $label = $postField["label"] ?? $postFieldID;
+                    $value = self::normalizeValueForDisplay($value);
+                    $postFieldsToAppend[] = "$label: $value";
+                }
+                $row["bodyPlainText"] .= !empty($postFieldsToAppend) ? "\n" . implode("\n", $postFieldsToAppend) : "";
+            }
         }
     }
 
@@ -305,11 +342,8 @@ class PostMetaModel extends PipelineModel
      * @return void
      * @throws \Exception
      */
-    public function movePostMeta(int $recordID, string $fromPostTypeID, string $toPostTypeID): void
+    public function movePostMeta(int $recordID, string $fromPostTypeID, string $toPostTypeID, array $postMeta): void
     {
-        // Get the existing post meta for the record.
-        $postMeta = $this->getPostMeta($recordID, $fromPostTypeID);
-
         // Get the post fields for the destination post type.
         $postFields = $this->postFieldModel->getWhere(["postTypeID" => $toPostTypeID]);
         $postFieldsIndexed = array_column($postFields, null, "postFieldID");
@@ -365,7 +399,7 @@ class PostMetaModel extends PipelineModel
     }
 
     /**
-     * Convert value for displaying in a text post field.
+     * Format post field value for displaying in plain text.
      *
      * @param mixed $value
      * @return mixed|string
@@ -377,6 +411,9 @@ class PostMetaModel extends PipelineModel
         }
         if (is_bool($value)) {
             return $value ? "Yes" : "No";
+        }
+        if ($value instanceof \DateTimeImmutable) {
+            return $value->format("Y-m-d");
         }
         return $value;
     }
@@ -394,5 +431,109 @@ class PostMetaModel extends PipelineModel
             "private" => PostFieldModel::PRIVATE_DATA_FIELD_ID,
             default => PostFieldModel::INTERNAL_DATA_FIELD_ID,
         };
+    }
+
+    /**
+     * Filter discussion records based on post field values.
+     *
+     * @param array $filterFields
+     * @return array
+     */
+    public function discussionMetaPostFieldsFilter(array $filterFields): array
+    {
+        if (!PostTypeModel::isPostTypesFeatureEnabled()) {
+            return [];
+        }
+        $availableViewFields = PostFieldModel::getAvailableViewFieldsForCurrentSessionUser();
+        if (empty($filterFields) || empty($availableViewFields)) {
+            return [];
+        }
+        $availableViewFields = array_column($availableViewFields, null, "postFieldID");
+
+        $sql = $this->createSql();
+        $sql->select("recordID")
+            ->from("postMeta")
+            ->where("recordType", "discussion");
+
+        foreach ($filterFields as $filterField => $filterValue) {
+            if (!isset($availableViewFields[$filterField])) {
+                throw new ForbiddenException("You do not have permission to view $filterField.");
+            }
+            $datatype = $availableViewFields[$filterField]["dataType"];
+            $formType = $availableViewFields[$filterField]["formType"];
+            $this->generateQueryFilter($sql, $filterField, $filterValue, $datatype, $formType);
+        }
+        $result = $sql->get()->resultArray();
+        if (!empty($result)) {
+            $result = array_column($result, "recordID");
+        }
+        return $result;
+    }
+
+    /**
+     * Query search filter for discussion filter .
+     *
+     * @param \Gdn_SQLDriver $sql
+     * @param string $filterField
+     * @param mixed $filterValue
+     * @param string $datatype
+     * @param string $formType
+     * @return void
+     */
+    private function generateQueryFilter(
+        \Gdn_SQLDriver &$sql,
+        string $filterField,
+        mixed $filterValue,
+        string $datatype,
+        string $formType
+    ): void {
+        switch ([$datatype, $formType]) {
+            case [PostFieldModel::DATA_TYPES["BOOLEAN"], PostFieldModel::FORM_TYPES["CHECKBOX"]]:
+            case [PostFieldModel::DATA_TYPES["NUMBER"], PostFieldModel::FORM_TYPES["NUMBER"]]:
+                $value = (int) $filterValue;
+                $sql->beginWhereGroup()
+                    ->where("postFieldID", $filterField)
+                    ->where("queryValue", $filterField . "." . $value)
+                    ->endWhereGroup();
+                break;
+            case [PostFieldModel::DATA_TYPES["DATE"], PostFieldModel::FORM_TYPES["DATE"]]:
+                $sql->beginWhereGroup()->where("postFieldID", $filterField);
+                if ($filterValue instanceof RangeExpression) {
+                    $dateRange = $filterValue->getValues();
+                    foreach ($dateRange as $op => $range) {
+                        if ($op === "=") {
+                            $sql->where("queryValue", $filterField . "." . $range);
+                        } else {
+                            $sql->where("timestamp(value) $op", $range, false);
+                        }
+                    }
+                    $sql->endWhereGroup();
+                }
+                break;
+            case [PostFieldModel::DATA_TYPES["TEXT"], PostFieldModel::FORM_TYPES["TEXT"]]:
+            case [PostFieldModel::DATA_TYPES["TEXT"], PostFieldModel::FORM_TYPES["TEXT_MULTILINE"]]:
+                $sql->beginWhereGroup()
+                    ->where("postFieldID", $filterField)
+                    ->like("queryValue", $filterField . ".%" . $filterValue, $sql::LIKE_RIGHT)
+                    ->endWhereGroup();
+                break;
+            case [PostFieldModel::DATA_TYPES["STRING_MUL"], PostFieldModel::FORM_TYPES["TOKENS"]]:
+            case [PostFieldModel::DATA_TYPES["TEXT"], PostFieldModel::FORM_TYPES["DROPDOWN"]]:
+                if (!is_array($filterValue)) {
+                    $filterValue = [$filterValue];
+                }
+
+                foreach ($filterValue as &$value) {
+                    $value = $filterField . "." . $value;
+                }
+
+                $sql->beginWhereGroup()
+                    ->where("postFieldID", $filterField)
+                    ->_whereIn("queryValue", $filterValue)
+                    ->endWhereGroup();
+                break;
+            default:
+                break;
+        }
     }
 }

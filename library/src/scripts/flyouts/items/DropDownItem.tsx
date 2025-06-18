@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
-export interface IProps {
+interface IDropDownItemProps {
     children: React.ReactNode;
     className?: string;
 }
@@ -16,13 +16,11 @@ export interface IProps {
 /**
  * Generic wrap for items in DropDownMenu
  */
-export default class DropDownItem extends React.Component<IProps> {
-    public render() {
-        const classes = dropDownClasses();
-        return (
-            <li className={classNames(this.props.className, classes.item)} role="menuitem">
-                {this.props.children}
-            </li>
-        );
-    }
+export default function DropDownItem(props: IDropDownItemProps) {
+    const classes = dropDownClasses.useAsHook();
+    return (
+        <li className={classNames(props.className, classes.item)} role="menuitem">
+            {props.children}
+        </li>
+    );
 }

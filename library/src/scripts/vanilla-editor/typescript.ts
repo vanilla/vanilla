@@ -4,14 +4,13 @@
  * @license gpl-2.0-only
  */
 
-import { IMentionSuggestionData } from "@library/editor/pieces/MentionSuggestion";
-import { IBaseEmbedData } from "@library/embeddedContent/embedService.register";
-import { IRichEmbedElement } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
-import { AutoformatRule } from "@udecode/plate-autoformat";
-import { ELEMENT_BLOCKQUOTE } from "@udecode/plate-block-quote";
-import { ELEMENT_CODE_BLOCK, ELEMENT_CODE_LINE } from "@udecode/plate-code-block";
-import {
-    CreatePlateEditorOptions,
+import type { IMentionSuggestionData } from "@library/editor/pieces/MentionSuggestion";
+import type { IBaseEmbedData } from "@library/embeddedContent/embedService.register";
+import type { IRichEmbedElement } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
+import type { AutoformatRule } from "@udecode/plate-autoformat";
+import type { ELEMENT_BLOCKQUOTE } from "@udecode/plate-block-quote";
+import type { ELEMENT_CODE_BLOCK, ELEMENT_CODE_LINE } from "@udecode/plate-code-block";
+import type {
     DOMHandler,
     Decorate,
     DecorateEntry,
@@ -32,7 +31,6 @@ import {
     OverrideByKey,
     PlateEditor,
     PlatePlugin,
-    PlatePluginComponent,
     PlatePluginInsertData,
     PlatePluginProps,
     PlateProps,
@@ -43,17 +41,6 @@ import {
     TReactEditor,
     TText,
     WithOverride,
-    createPlateEditor,
-    createPluginFactory,
-    createPlugins,
-    createTEditor,
-    getTEditor,
-    useEditorRef,
-    useEditorState,
-    usePlateEditorRef,
-    usePlateEditorState,
-    usePlateSelectors,
-    PlateId,
 } from "@udecode/plate-common";
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from "@udecode/plate-heading";
 import { ELEMENT_HR } from "@udecode/plate-horizontal-rule";
@@ -61,7 +48,7 @@ import { ELEMENT_LINK, TLinkElement } from "@udecode/plate-link";
 import { ELEMENT_LI, ELEMENT_OL, ELEMENT_TODO_LI, ELEMENT_UL, TTodoListItemElement } from "@udecode/plate-list";
 import { ELEMENT_MENTION, ELEMENT_MENTION_INPUT, TMentionElement, TMentionInputElement } from "@udecode/plate-mention";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
-import { ELEMENT_TABLE, ELEMENT_TD, ELEMENT_TR, TTableElement } from "@udecode/plate-table";
+import { ELEMENT_TABLE, ELEMENT_TD, ELEMENT_TH, ELEMENT_TR, TTableElement } from "@udecode/plate-table";
 
 /**
  * Text
@@ -169,6 +156,7 @@ export interface MyCodeLineElement extends TElement {
 export interface MyTableElement extends TTableElement, MyBlockElement {
     type: typeof ELEMENT_TABLE;
     children: MyTableRowElement[];
+    id: string;
 }
 
 export interface MyTableRowElement extends TElement {
@@ -177,8 +165,12 @@ export interface MyTableRowElement extends TElement {
 }
 
 export interface MyTableCellElement extends TElement {
-    type: typeof ELEMENT_TD;
+    type: typeof ELEMENT_TD | typeof ELEMENT_TH;
     children: MyNestableBlock[];
+    attributes?: {
+        colspan?: string;
+        rowspan?: string;
+    };
 }
 
 export interface MyBulletedListElement extends TElement, MyBlockElement {
@@ -263,31 +255,29 @@ export type MyPlateProps = PlateProps<MyValue, MyEditor>;
 export type MySerializeHtml = SerializeHtml<MyValue>;
 export type MyWithOverride<P = PluginOptions> = WithOverride<P, MyValue, MyEditor>;
 
-/**
- * Plate store, Slate context
- */
-
-export const getMyEditor = (editor: MyEditor) => getTEditor<MyValue, MyEditor>(editor);
-export const useMyEditorRef = () => useEditorRef<MyValue, MyEditor>();
-export const useMyEditorState = () => useEditorState<MyValue, MyEditor>();
-export const useMyPlateEditorRef = (id?: PlateId) => usePlateEditorRef<MyValue, MyEditor>(id);
-export const useMyPlateEditorState = (id?: PlateId) => usePlateEditorState<MyValue, MyEditor>(id);
-export const useMyPlateSelectors = (id?: PlateId) => usePlateSelectors<MyValue, MyEditor>(id);
-
-/**
- * Utils
- */
-export const createMyEditor = () => createTEditor() as MyEditor;
-export const createMyPlateEditor = (options: CreatePlateEditorOptions<MyValue, MyEditor> = {}) =>
-    createPlateEditor<MyValue, MyEditor>(options);
-export const createMyPluginFactory = <P = PluginOptions>(defaultPlugin: PlatePlugin<NoInfer<P>, MyValue, MyEditor>) =>
-    createPluginFactory(defaultPlugin);
-export const createMyPlugins = (
-    plugins: MyPlatePlugin[],
-    options?: {
-        components?: Record<string, PlatePluginComponent>;
-        overrideByKey?: MyOverrideByKey;
-    },
-) => createPlugins<MyValue, MyEditor>(plugins, options);
-
 export type MyAutoformatRule = AutoformatRule<MyValue, MyEditor>;
+
+export interface IVanillaEditorRef {
+    focusEditor(): void;
+}
+
+export type MyTableMeasures = {
+    actualWidth: number;
+    marginLeft?: number;
+};
+export type MyTableHighlightArea = "table" | "column" | "row";
+export type MyTableHeaderType = "top" | "left" | "both";
+
+export type MyTableContentAlignment = {
+    rows?: Record<number, { alignment: "start" | "center" | "end"; appliedTimestamp: number }>;
+    columns?: Record<number, { alignment: "start" | "center" | "end"; appliedTimestamp: number }>;
+};
+
+export type MyTableState = {
+    tableMeasures: MyTableMeasures | undefined;
+    headerType: MyTableHeaderType;
+    tableHighlightedArea?: MyTableHighlightArea;
+    rowSizesByIndex?: Record<number, number>;
+    multipleCellsSelected?: boolean;
+    contentAlignment?: MyTableContentAlignment;
+};

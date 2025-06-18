@@ -67,16 +67,17 @@ class PostAndDraftsControllerTest extends TestCase
 
     private \Gdn_Configuration $config;
 
-    protected bool $useFeatureFlag = false;
+    protected bool $useFeatureFlag = true;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function setupBeforeClass(): void
     {
         self::$addons = ["vanilla", "editor"];
         self::setupBeforeClassSiteTestTrait();
         self::disableFeature("customLayout.createPost");
+        self::disableFeature("DraftScheduling");
     }
 
     /**
@@ -86,11 +87,6 @@ class PostAndDraftsControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTestTraits();
-        if ($this->useFeatureFlag) {
-            $this->enableFeature(ContentDraftModel::FEATURE);
-        } else {
-            $this->disableFeature(ContentDraftModel::FEATURE);
-        }
         $this->createUserFixtures();
         $this->useLegacyLayouts();
         $this->container()->call(function (
@@ -210,7 +206,7 @@ class PostAndDraftsControllerTest extends TestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {

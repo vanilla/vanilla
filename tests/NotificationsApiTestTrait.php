@@ -73,15 +73,39 @@ trait NotificationsApiTestTrait
     public function assertUserHasNoEmails($userOrUserID)
     {
         $userID = is_array($userOrUserID) ? $userOrUserID["userID"] : $userOrUserID;
+
+        $emailActivities = $this->getUserEmails($userID);
+
+        $this->assertCount(0, $emailActivities);
+    }
+
+    /**
+     * Get all email notifications for a user.
+     *
+     * @param int $userID
+     * @return array
+     */
+    public function getUserEmails(int $userID, ?string $status = null): array
+    {
+        if ($status === null) {
+            $status = [\ActivityModel::SENT_OK, \ActivityModel::SENT_PENDING, \ActivityModel::SENT_FAIL];
+        }
+
         $activityModel = \Gdn::getContainer()->get(\ActivityModel::class);
+        // Get all email activities for the user
         $emailActivities = $activityModel
             ->getWhere([
                 "Notified >" => 0, // Apply this to not filter to only items with in app notifications.
                 "NotifyUserID" => $userID,
-                "Emailed" => [\ActivityModel::SENT_OK, \ActivityModel::SENT_PENDING, \ActivityModel::SENT_FAIL],
+                "Emailed" => $status,
             ])
             ->resultArray();
-        $this->assertCount(0, $emailActivities);
+        if (!empty($emailActivities)) {
+            foreach ($emailActivities as &$emailActivity) {
+                $emailActivity = $activityModel->normalizeNotificationRow($emailActivity);
+            }
+        }
+        return $emailActivities;
     }
 
     /**
@@ -96,17 +120,9 @@ trait NotificationsApiTestTrait
     public function assertUserHasEmailsLike($userOrUserID, string $status, array $expectedNotifications)
     {
         $userID = is_array($userOrUserID) ? $userOrUserID["userID"] : $userOrUserID;
-        $activityModel = \Gdn::getContainer()->get(\ActivityModel::class);
-        $emailActivities = $activityModel
-            ->getWhere([
-                "Notified >" => 0, // Apply this to not filter to only items with in app notifications.
-                "NotifyUserID" => $userID,
-                "Emailed" => $status,
-            ])
-            ->resultArray();
-        foreach ($emailActivities as &$emailActivity) {
-            $emailActivity = $activityModel->normalizeNotificationRow($emailActivity);
-        }
+
+        $emailActivities = $this->getUserEmails($userID, $status);
+
         $this->assertNotificationsLike($expectedNotifications, $emailActivities);
     }
 

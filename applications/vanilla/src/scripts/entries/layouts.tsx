@@ -4,18 +4,15 @@
  */
 
 import { registerLayoutPage } from "@library/features/Layout/LayoutPage.registry";
-import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
 import { getMeta, getSiteSection } from "@library/utility/appUtils";
-import { DraftContextProvider } from "@vanilla/addon-vanilla/drafts/DraftContext";
-import { CreatePostParams, EditExistingPostParams, PostPageParams } from "@vanilla/addon-vanilla/drafts/types";
-import { getParamsFromPath, isCreatePostParams } from "@vanilla/addon-vanilla/drafts/utils";
-import QueryStringParams from "qs";
 import { addComponent, registerLoadableWidgets } from "@library/utility/componentRegistry";
 import { CommentThreadParentContext } from "@vanilla/addon-vanilla/comments/CommentThreadParentContext";
-import qs from "qs";
-import { PostPageContextProvider } from "@vanilla/addon-vanilla/posts/PostPageContext";
+import { DraftContextProvider } from "@vanilla/addon-vanilla/drafts/DraftContext";
+import { getParamsFromPath } from "@vanilla/addon-vanilla/drafts/utils";
 import { CreateCommentProvider } from "@vanilla/addon-vanilla/posts/CreateCommentContext";
 import { ParentRecordContextProvider } from "@vanilla/addon-vanilla/posts/ParentRecordContext";
+import { PostPageContextProvider } from "@vanilla/addon-vanilla/posts/PostPageContext";
+import * as qs from "qs-esm";
 
 const postPageEnabled = getMeta("featureFlags.customLayout.post.Enabled", false);
 const postListEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
@@ -24,7 +21,7 @@ const categoryListEnabled = getMeta("featureFlags.customLayout.categoryList.Enab
 postListEnabled &&
     registerLayoutPage("/discussions", (routeParams) => {
         const { location } = routeParams;
-        const urlQuery = QueryStringParams.parse(location.search.substring(1));
+        const urlQuery = qs.parse(location.search.substring(1));
 
         return {
             layoutViewType: "discussionList",
@@ -42,7 +39,7 @@ postListEnabled &&
 categoryListEnabled &&
     registerLayoutPage("/categories", (routeParams) => {
         const { location } = routeParams;
-        const urlQuery = QueryStringParams.parse(location.search.substring(1));
+        const urlQuery = qs.parse(location.search.substring(1));
         return {
             layoutViewType: "categoryList",
             recordType: "siteSection",
@@ -66,7 +63,7 @@ categoryListEnabled &&
         ["/categories/:id([^/]+)?/p:page(\\d+)", "/categories/:id([^/]+)?"],
         (params) => {
             const { location } = params;
-            const urlQuery = QueryStringParams.parse(location.search.substring(1));
+            const urlQuery = qs.parse(location.search.substring(1));
             return {
                 layoutViewType: "categoryList",
                 recordType: "category",
@@ -134,11 +131,11 @@ const customCreatePostEnabled = getMeta("featureFlags.customLayout.createPost.En
 
 if (customCreatePostEnabled) {
     // We will handle all the new post route here on the FE
-    registerLayoutPage(["/post/*"], (routeParams) => {
+    registerLayoutPage(["*/post/*"], (routeParams) => {
         const { location } = routeParams;
         const { pathname, search } = location;
         const parameters = getParamsFromPath(pathname, search);
-        const urlQuery = QueryStringParams.parse(location.search.substring(1));
+        const urlQuery = qs.parse(location.search.substring(1));
         let layoutViewType = `createPost`;
 
         return {

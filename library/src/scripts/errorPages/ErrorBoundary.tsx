@@ -11,7 +11,7 @@ import { t } from "@vanilla/i18n";
 
 interface IProps {
     children?: React.ReactNode;
-    errorComponent?: React.ComponentType<any>;
+    errorComponent?: React.ComponentType<{ error: Error }>;
     isFixed?: boolean;
 }
 
@@ -37,6 +37,11 @@ export class ErrorBoundary extends React.Component<IProps, IState> {
     render() {
         const { error } = this.state;
         if (error) {
+            if (this.props.errorComponent) {
+                const ErrorComponent = this.props.errorComponent;
+                return <ErrorComponent error={error} />;
+            }
+
             // You can render any custom fallback UI
             return (
                 <Message

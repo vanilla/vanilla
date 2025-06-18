@@ -31,7 +31,7 @@ interface IPageHeading {
 export function PageHeading(props: IPageHeading) {
     const { includeBackLink = true, actions, children, headingClassName, title, className, titleCount } = props;
 
-    const classes = pageHeadingClasses();
+    const classes = pageHeadingClasses.useAsHook();
     const device = useDevice();
     const isMobile = [Devices.MOBILE, Devices.XS].includes(device);
 

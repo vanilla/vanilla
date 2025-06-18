@@ -20,11 +20,12 @@ import ProfileLink from "@library/navigation/ProfileLink";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@library/utility/appUtils";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import type { VanillaSanitizedHtml } from "@vanilla/dom-utils";
 import classNames from "classnames";
 import React from "react";
 
 interface IProps extends IBaseEmbedProps {
-    body: string;
+    body: VanillaSanitizedHtml;
     dateInserted: string;
     insertUser: IUserFragment;
     discussionLink?: string;
@@ -124,7 +125,7 @@ export function QuoteEmbed(props: IProps) {
                         isExpandedDefault={!!expandByDefault}
                     >
                         <blockquote className={classes.blockquote} cite={url}>
-                            <UserContent content={body} />
+                            <UserContent vanillaSanitizedHtml={body} />
                         </blockquote>
                     </CollapsableContent>
                     {(linkToDiscussion || linkToPost) && (

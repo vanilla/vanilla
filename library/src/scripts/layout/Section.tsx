@@ -125,7 +125,7 @@ export default function Section(props: ISectionProps) {
     };
 
     const panelRef = useRef<HTMLDivElement | null>(null);
-    const panelMeasure = useMeasure(panelRef, true);
+    const panelMeasure = useMeasure(panelRef, { watchRef: true, offsetScroll: true });
     const panelTop = panelMeasure.top;
 
     const globalVars = globalVariables();

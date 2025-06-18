@@ -5,7 +5,6 @@ import { ReasonFilter } from "@dashboard/moderation/components/ReasonFilter";
 import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { t } from "@vanilla/i18n";
 
 export type IEscalationFilters = {

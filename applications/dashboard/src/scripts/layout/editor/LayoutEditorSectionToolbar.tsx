@@ -7,9 +7,16 @@
 import { useLayoutEditor } from "@dashboard/layout/editor/LayoutEditor";
 import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.classes";
 import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
-import { IEditableLayoutWidget, ILayoutEditorPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { EmbedMenu } from "@library/editor/pieces/EmbedMenu";
-import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
+import { LayoutEditorToolbar } from "@dashboard/layout/editor/LayoutEditorToolbar";
+import { LayoutEditorWidgetMeta } from "@dashboard/layout/editor/LayoutEditorWidgetMeta";
+import { LayoutSectionInfos } from "@dashboard/layout/editor/LayoutSectionInfos";
+import {
+    IEditableLayoutWidget,
+    ILayoutEditorPath,
+    type ILayoutEditorSectionPath,
+} from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ToolTip } from "@library/toolTip/ToolTip";
@@ -18,31 +25,49 @@ import { Icon } from "@vanilla/icons";
 import React from "react";
 
 interface IProps {
-    path: ILayoutEditorPath;
-    offset?: number;
+    path: ILayoutEditorSectionPath;
+    positionRelativeTo?: HTMLElement | null;
     allowColumnInvert?: boolean;
-    hasAsset?: boolean;
 }
 
 export function LayoutEditorSectionToolbar(props: IProps) {
     const { editorContents, editorSelection } = useLayoutEditor();
-    const classes = layoutEditorClasses();
     const isFirstSection = props.path.sectionIndex === 0;
     const isLastSection = props.path.sectionIndex === editorContents.getSectionCount() - 1;
     const globalVars = globalVariables();
     let offsetLeft = (document.body.clientWidth - globalVars.contentWidth - globalVars.gutter.size * 2) / 2;
     offsetLeft = Math.max(globalVars.gutter.size, offsetLeft);
 
-    const trashButton = (
-        <EmbedButton
+    const section = editorContents.getSection(props.path);
+    const hasAnyChildren = section
+        ? LayoutSectionInfos[section.$hydrate].regionNames.some((region) => {
+              return section[region] && Array.isArray(section[region]) && section[region].length > 0;
+          })
+        : false;
+
+    let trashButton = (
+        <Button
+            buttonType={ButtonTypes.ICON}
             onClick={() => {
                 editorContents.deleteSection(props.path.sectionIndex);
             }}
-            disabled={props.hasAsset}
+            disabled={hasAnyChildren}
         >
             <Icon icon={"delete"} />
-        </EmbedButton>
+        </Button>
     );
+
+    if (hasAnyChildren) {
+        trashButton = (
+            <ToolTip
+                label={t(
+                    "This section contains a widget and cannot be deleted. The widget may be hidden by your role preview settings.",
+                )}
+            >
+                <span>{trashButton}</span>
+            </ToolTip>
+        );
+    }
 
     const hasBreadcrumb = editorContents.hasBreadcrumb(props.path);
 
@@ -64,7 +89,8 @@ export function LayoutEditorSectionToolbar(props: IProps) {
     const breadcrumbButton = !editorContents.isSectionFullWidth(props.path) && (
         <ToolTip label={hasBreadcrumb ? t("Hide breadcrumbs on this section") : t("Show breadcrumbs on this section")}>
             <span>
-                <EmbedButton
+                <Button
+                    buttonType={ButtonTypes.ICON}
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -77,21 +103,16 @@ export function LayoutEditorSectionToolbar(props: IProps) {
                     ) : (
                         <Icon icon={"navigation-breadcrumb-inactive"} />
                     )}
-                </EmbedButton>
+                </Button>
             </span>
         </ToolTip>
     );
 
     return (
-        <EmbedMenu
-            className={classes.toolbarOffset(offsetLeft)}
-            onClick={(e) => {
-                // Prevent this click from bubbling up.
-                e.preventDefault();
-                e.stopPropagation();
-            }}
-        >
-            <EmbedButton
+        <LayoutEditorToolbar positionRelativeTo={props.positionRelativeTo}>
+            <LayoutEditorWidgetMeta widgetPath={props.path} />
+            <Button
+                buttonType={ButtonTypes.ICON}
                 disabled={isFirstSection}
                 onClick={() => {
                     const newPath: ILayoutEditorPath = {
@@ -103,8 +124,9 @@ export function LayoutEditorSectionToolbar(props: IProps) {
                 }}
             >
                 <Icon icon={"move-up"} />
-            </EmbedButton>
-            <EmbedButton
+            </Button>
+            <Button
+                buttonType={ButtonTypes.ICON}
                 disabled={isLastSection}
                 onClick={() => {
                     const newPath: ILayoutEditorPath = {
@@ -116,9 +138,10 @@ export function LayoutEditorSectionToolbar(props: IProps) {
                 }}
             >
                 <Icon icon={"move-down"} />
-            </EmbedButton>
+            </Button>
             {props.allowColumnInvert && (
-                <EmbedButton
+                <Button
+                    buttonType={ButtonTypes.ICON}
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -130,16 +153,10 @@ export function LayoutEditorSectionToolbar(props: IProps) {
                     ariaLabel={"Invert the secondary column alignment between left and right."}
                 >
                     <Icon icon={"swap"} />
-                </EmbedButton>
+                </Button>
             )}
             {breadcrumbButton}
-            <ConditionalWrap
-                component={ToolTip}
-                condition={!!props.hasAsset}
-                componentProps={{ label: t("This section contains a required widget and cannot be deleted") }}
-            >
-                {props.hasAsset ? <span>{trashButton}</span> : trashButton}
-            </ConditionalWrap>
-        </EmbedMenu>
+            {trashButton}
+        </LayoutEditorToolbar>
     );
 }

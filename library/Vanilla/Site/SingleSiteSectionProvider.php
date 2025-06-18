@@ -34,7 +34,7 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface
 
     /**
      * @param string|null $locale
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getDefaultSiteSection(): ?SiteSectionInterface
     {
@@ -42,7 +42,7 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAll(): array
     {
@@ -51,7 +51,7 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface
 
     /**
      * @param string|null $locale
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCurrentSiteSection(): ?SiteSectionInterface
     {
@@ -59,7 +59,7 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionIDSchema(?FieldMatchConditional $conditional): ?Schema
     {

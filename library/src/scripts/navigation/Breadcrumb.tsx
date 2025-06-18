@@ -19,28 +19,26 @@ interface IProps {
 /**
  * A component representing a single crumb in a breadcrumb component.
  */
-export default class Breadcrumb extends React.Component<IProps> {
-    public render() {
-        const classes = breadcrumbsClasses();
-        let ariaCurrent;
-        if (this.props.lastElement) {
-            ariaCurrent = `page`;
-        }
-
-        return (
-            <li className={classes.breadcrumb}>
-                <SmartLink
-                    to={this.props.url}
-                    title={this.props.name}
-                    aria-current={ariaCurrent}
-                    className={classNames(classes.link, this.props.className, { isCurrent: ariaCurrent })}
-                    itemScope
-                    itemType="http://schema.org/Thing"
-                    itemProp="item"
-                >
-                    <span itemProp="name">{this.props.name}</span>
-                </SmartLink>
-            </li>
-        );
+export default function Breadcrumb(props: IProps) {
+    const classes = breadcrumbsClasses.useAsHook();
+    let ariaCurrent;
+    if (props.lastElement) {
+        ariaCurrent = `page`;
     }
+
+    return (
+        <li className={classes.breadcrumb}>
+            <SmartLink
+                to={props.url}
+                title={props.name}
+                aria-current={ariaCurrent}
+                className={classNames(classes.link, props.className, { isCurrent: ariaCurrent })}
+                itemScope
+                itemType="http://schema.org/Thing"
+                itemProp="item"
+            >
+                <span itemProp="name">{props.name}</span>
+            </SmartLink>
+        </li>
+    );
 }

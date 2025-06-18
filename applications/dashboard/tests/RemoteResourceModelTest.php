@@ -35,7 +35,7 @@ class RemoteResourceModelTest extends SiteTestCase
     private $remoteResourceModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

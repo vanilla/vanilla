@@ -62,6 +62,7 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                         inputProps={{
                             multiline: true,
                             disabled: disabled,
+                            required: required,
                             value: value ?? "",
                             onChange: (event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value),
                             onBlur,
@@ -155,6 +156,7 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                     onBlur={onBlur}
                     disabled={disabled}
                     checked={value}
+                    required={required}
                     labelBold={control.labelBold}
                 />
             );
@@ -196,7 +198,7 @@ export function FormControl(props: IControlProps & { useNewDropdown?: boolean })
                     isClearable={control.isClearable ?? !required}
                     placeholder={control.placeholder}
                     onChange={onChange}
-                    options={control.choices}
+                    options={control.options ?? control.choices}
                     optionsLookup={control.optionsLookup}
                     createable={control.createable}
                     createableLabel={control.createableLabel}

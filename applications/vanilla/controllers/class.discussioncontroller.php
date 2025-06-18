@@ -257,20 +257,6 @@ class DiscussionController extends VanillaController
             $this->image($ogImage);
         }
 
-        // Save the insert date of the last comment viewed to set in the user's discussion watch table.
-
-        // Make sure to set the user's discussion watch records if this is not an API request.
-        if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
-            $maxDateInserted = $this->maxDateInserted($this->data("Comments"));
-            $this->DiscussionModel->setWatch(
-                $this->Discussion,
-                $Limit,
-                $this->Offset,
-                $this->Discussion->CountComments,
-                $maxDateInserted
-            );
-        }
-
         // Build a pager
         $PagerFactory = new Gdn_PagerFactory();
         $this->EventArguments["PagerType"] = "Pager";
@@ -411,7 +397,7 @@ class DiscussionController extends VanillaController
         $this->addDefinition("ConfirmDeleteCommentHeading", t("ConfirmDeleteCommentHeading", "Delete Comment"));
         $this->addDefinition(
             "ConfirmDeleteCommentText",
-            t("ConfirmDeleteCommentText", "Are you sure you want to delete this comment 1 1 1 ?")
+            t("ConfirmDeleteCommentText", "Are you sure you want to delete this comment?")
         );
         $this->Menu->highlightRoute("/discussions");
     }

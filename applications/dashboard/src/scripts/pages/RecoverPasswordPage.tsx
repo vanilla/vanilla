@@ -21,7 +21,7 @@ interface IProps {}
 export default function RecoverPasswordPage(props: IProps) {
     const pageTitleID = useUniqueID("recoverPassword-title");
     const [email, setEmail] = useState("");
-    const emailRef = useRef<InputTextBlock | null>(null);
+    const emailRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
     const pageTitle = (
         <DocumentTitle title={t("Recover Password")}>
             <h1 id={pageTitleID} className="isCentered">
@@ -76,9 +76,9 @@ export default function RecoverPasswordPage(props: IProps) {
                         value: email,
                         onChange: (event) => setEmail(event.target.value),
                         disabled: !allowEdit,
+                        inputRef: emailRef,
                     }}
                     errors={getFieldErrors(error, "email")}
-                    ref={emailRef}
                 />
                 <ButtonSubmit disabled={!allowEdit || email.length === 0} legacyMode={true}>
                     {t("Request a new password")}

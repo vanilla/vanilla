@@ -39,8 +39,6 @@ interface ReactWidgetInterface extends WidgetInterface
 
     /**
      * Get widget icon url.
-     *
-     * @return string
      */
     public static function getWidgetIconPath(): ?string;
 
@@ -49,4 +47,18 @@ interface ReactWidgetInterface extends WidgetInterface
      *
      */
     public static function getAllowedSectionIDs(): array;
+
+    /**
+     * Get the fragment types this widget uses.
+     *
+     * @return array<class-string<FragmentMeta>>
+     */
+    public static function getFragmentClasses(): array;
+
+    /**
+     * Get a group to place the widget in.
+     *
+     * @return string
+     */
+    public static function getWidgetGroup(): string;
 }

@@ -7,7 +7,7 @@
 import { ensureHtmlElement } from "@vanilla/dom-utils";
 import React from "react";
 import { mountReact } from "@vanilla/react-utils";
-import { LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 
 /**
  * Mount the editor into a DOM Node.
@@ -136,7 +136,7 @@ export function handleLegacyAttachments(container: HTMLElement, documentFromCall
                                 }
                                 previewInput.setAttribute("name", "MediaIDs[]");
                                 previewInput.removeAttribute("id");
-                                previewInput.setAttribute("disabled", true);
+                                previewInput.setAttribute("disabled", "true");
                                 clonedNode.classList.remove("editor-file-removed");
                             });
                     }

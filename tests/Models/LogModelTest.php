@@ -8,7 +8,10 @@
 namespace VanillaTests\Models;
 
 use DiscussionModel;
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\EventManager;
+use Garden\Schema\ValidationException;
 use Gdn;
 use LogModel;
 use Vanilla\CurrentTimeStamp;
@@ -53,6 +56,8 @@ class LogModelTest extends SiteTestCase
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
         $this->logModel = Gdn::getContainer()->get(LogModel::class);
         $this->reactionModel = Gdn::getContainer()->get(\ReactionModel::class);
+        $this->resetTable("automationRule");
+        $this->resetTable("automationRuleRevision");
     }
 
     /**
@@ -296,9 +301,9 @@ class LogModelTest extends SiteTestCase
      * Test log model getAutomationLogsByDispatchID for User type.
      *
      * @return void
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws \Garden\Web\Exception\NotFoundException
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws \Garden\Web\Exception\NotFoundException|ValidationException
      */
     public function testGetAutomationLogsByDispatchIDForUserType(): void
     {
@@ -336,9 +341,9 @@ class LogModelTest extends SiteTestCase
      * Test log model getAutomationLogsByDispatchID for Discussion type.
      *
      * @return void
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws \Garden\Schema\ValidationException
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
      * @throws \Garden\Web\Exception\NotFoundException
      */
     public function testGetAutomationLogsByDispatchIDForDiscussionType()

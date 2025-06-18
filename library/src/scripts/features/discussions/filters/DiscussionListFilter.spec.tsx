@@ -266,12 +266,11 @@ describe("DiscussionListFilter", () => {
     it("Displays all fields including resolution status and post engagement due to proper permissions", async () => {
         render(<MockFilter isCommunityManager />);
         await vi.dynamicImportSettled();
-
-        expect(screen.getByText(/Post Type/)).toBeInTheDocument();
+        expect(await screen.findByText(/Post Type/)).toBeInTheDocument();
         expect(await screen.findByText(/Post Status/)).toBeInTheDocument();
-        expect(screen.getByText(/Tags/)).toBeInTheDocument();
-        expect(screen.getByText(/Resolution Status/)).toBeInTheDocument();
-        expect(screen.getByText(/Post Engagement/)).toBeInTheDocument();
+        expect(await screen.findByText(/Tags/)).toBeInTheDocument();
+        expect(await screen.findByText(/Resolution Status/)).toBeInTheDocument();
+        expect(await screen.findByText(/Post Engagement/)).toBeInTheDocument();
     });
 
     it("Displays all fields except resolution status and post engagement due to lack of permissions", async () => {

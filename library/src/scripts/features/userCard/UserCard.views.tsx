@@ -82,7 +82,7 @@ UserCardView.registerLinks = function (registeredLinks: IExtraUserCardContent) {
 export function UserCardView(props: IProps) {
     const { zIndex } = useStackingContext();
     const { hasPermission } = usePermissionsContext();
-    const classes = userCardClasses({ zIndex: zIndex });
+    const classes = userCardClasses.useAsHook({ zIndex: zIndex });
     const { user } = props;
     const device = useDevice();
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
@@ -130,7 +130,9 @@ export function UserCardView(props: IProps) {
 
                 {
                     /* We don't want this section to show at all if there's no label */
-                    userTitle && <div className={cx(classes.row, classes.rankRow)}>{userTitle}</div>
+                    userTitle && (
+                        <div className={cx(classes.row, classes.rankRow, classes.userTitleContainer)}>{userTitle}</div>
+                    )
                 }
 
                 {user.email && (
@@ -214,7 +216,7 @@ export function UserCardSkeleton(props: ISkeletonProps) {
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
     const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
     const isConversationsEnabled = getMeta("context.conversationsEnabled", false);
-    const classes = userCardClasses();
+    const classes = userCardClasses.useAsHook();
     return (
         <>
             <div className={classes.header}>
@@ -325,7 +327,7 @@ interface IMinimalProps {
 
 export function UserCardMinimal(props: IMinimalProps) {
     const { user, userFragment } = props;
-    const classes = userCardClasses();
+    const classes = userCardClasses.useAsHook();
     const device = useDevice();
 
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
@@ -366,7 +368,7 @@ interface IUserCardErrorProps {
 }
 
 export function UserCardError(props: IUserCardErrorProps) {
-    const classes = userCardClasses();
+    const classes = userCardClasses.useAsHook();
     const device = useDevice();
 
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
@@ -398,7 +400,7 @@ export function UserCardError(props: IUserCardErrorProps) {
 
 export function CardButton(props: { disabled?: boolean; to?: string; target?: string; children?: React.ReactNode }) {
     const { zIndex } = useStackingContext();
-    const classes = userCardClasses({ zIndex: zIndex });
+    const classes = userCardClasses.useAsHook({ zIndex: zIndex });
 
     return (
         <div className={classes.buttonContainer}>
@@ -417,8 +419,8 @@ export function CardButton(props: { disabled?: boolean; to?: string; target?: st
 
 function StatSkeleton(props: { text: string; position: "left" | "right" }) {
     const { zIndex } = useStackingContext();
-    const classes = statClasses();
-    const cardClasses = userCardClasses({ zIndex: zIndex });
+    const classes = statClasses.useAsHook();
+    const cardClasses = userCardClasses.useAsHook({ zIndex: zIndex });
 
     const { text, position } = props;
     return (
@@ -440,6 +442,6 @@ function StatSkeleton(props: { text: string; position: "left" | "right" }) {
 function Container(props: { children: React.ReactNode; borderTop?: boolean }) {
     const { borderTop } = props;
     const { zIndex } = useStackingContext();
-    const classes = userCardClasses({ zIndex: zIndex });
+    const classes = userCardClasses.useAsHook({ zIndex: zIndex });
     return <div className={borderTop ? classes.containerWithBorder : classes.container}>{props.children}</div>;
 }

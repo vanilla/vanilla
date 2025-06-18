@@ -45,7 +45,7 @@ class BanUserCountGenerator implements SystemCallableInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {

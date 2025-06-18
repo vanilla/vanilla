@@ -1,6 +1,6 @@
 import { siteUrl, t, getMeta } from "@library/utility/appUtils";
 import axios from "axios";
-import qs from "qs";
+import * as qs from "qs-esm";
 import debounce from "lodash-es/debounce";
 import { logDebug } from "@vanilla/utils";
 import { isEmptyRich2 } from "@library/vanilla-editor/utils/emptyRich2";
@@ -104,6 +104,13 @@ const generateFormRequestBody = (form: HTMLFormElement): object | null => {
 };
 
 // Global used to store initial draft button text value
+
+declare global {
+    interface Window {
+        __DRAFT_KLUDGE__: string;
+    }
+}
+
 window.__DRAFT_KLUDGE__ = "";
 
 /**
@@ -117,16 +124,16 @@ const setDraftButtonState = (form: HTMLFormElement, state: "save" | "initial") =
         const draftInput = form.querySelector('input[class*="DraftButton"]') as HTMLInputElement;
         const postButton = form.querySelector('input[type="submit"][name*="Post"]') as HTMLInputElement;
         if (state === "save") {
-            postButton.setAttribute("disabled", true);
+            postButton.setAttribute("disabled", "true");
             if (draftInput) {
                 window.__DRAFT_KLUDGE__ = draftInput.value;
                 draftInput.value = t("Saving draft...");
-                draftInput.setAttribute("disabled", true);
+                draftInput.setAttribute("disabled", "true");
             }
             if (draftAnchor) {
                 window.__DRAFT_KLUDGE__ = draftAnchor.innerText;
                 draftAnchor.innerText = t("Saving draft...");
-                draftAnchor.setAttribute("disabled", true);
+                draftAnchor.setAttribute("disabled", "true");
             }
         }
         if (state === "initial") {

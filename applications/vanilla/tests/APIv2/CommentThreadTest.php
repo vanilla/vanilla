@@ -29,7 +29,7 @@ class CommentThreadTest extends SiteTestCase
     private CommentModel $commentModel;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

@@ -18,7 +18,7 @@ use VanillaTests\Fixtures\Addons\TestMockIssue\MockAttachmentProvider;
 class MockExternalIssueContainerRules extends AddonContainerRules
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function configureContainer(ContainerConfigurationInterface $container): void
     {

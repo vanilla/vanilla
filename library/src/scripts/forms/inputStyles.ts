@@ -17,8 +17,9 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { important, percent } from "csx";
 import merge from "lodash-es/merge";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { IBorderStyles, ISimpleBorderStyle, IMixedBorderStyles } from "@library/styles/cssUtilsTypes";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -26,7 +27,7 @@ export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("input", forcedVars);
 
     const colors = makeThemeVars("colors", {
-        placeholder: globalVars.mixBgAndFg(0.5),
+        placeholder: formElementVars.placeholder.color,
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         state: {
@@ -81,25 +82,31 @@ export const inputMixin = (vars?: {
     const globalVars = globalVariables();
     const { sizing, font, colors, border } = variables;
 
+    const placeHolderColor = ColorsUtils.varOverride(
+        ColorVar.InputPlaceholder,
+        formElementsVariables().placeholder.color,
+    );
+
     return {
         ...textInputSizingFromFixedHeight(sizing.height, font.size as number, border.width * 2),
-        backgroundColor: ColorsUtils.colorOut(colors.bg),
-        color: ColorsUtils.colorOut(colors.fg),
+        backgroundColor: ColorsUtils.varOverride(ColorVar.InputBackground, colors.bg),
         ...Mixins.border(border),
+        borderColor: ColorsUtils.varOverride(ColorVar.InputBorder, border.color),
         ...Mixins.font(font),
+        color: ColorsUtils.varOverride(ColorVar.InputForeground, colors.fg),
         outline: 0,
         height: "auto",
         ...placeholderStyles({
-            color: ColorsUtils.colorOut(colors.placeholder),
+            color: placeHolderColor,
         }),
         ".SelectOne__input": {
             width: percent(100),
         },
         ".SelectOne__placeholder": {
-            color: ColorsUtils.colorOut(formElementsVariables().placeholder.color),
+            color: placeHolderColor,
         },
         ".tokens__placeholder": {
-            color: ColorsUtils.colorOut(formElementsVariables().placeholder.color),
+            color: placeHolderColor,
         },
         ".SelectOne__input input": {
             display: "inline-block",
@@ -112,7 +119,7 @@ export const inputMixin = (vars?: {
             "&:active, &:hover, &:focus, &.focus-visible, &:focus-within": {
                 ...Mixins.border({
                     ...border,
-                    color: colors.state.fg,
+                    color: ColorsUtils.varOverride(ColorVar.InputBorderActive, colors.state.fg),
                 }),
             },
         },

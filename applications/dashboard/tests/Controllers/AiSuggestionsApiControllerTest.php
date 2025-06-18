@@ -54,7 +54,7 @@ class AiSuggestionsApiControllerTest extends AbstractAPIv2Test
     private AiSuggestionModel $aiSuggestionModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

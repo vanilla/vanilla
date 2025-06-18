@@ -14,6 +14,7 @@ import {
     ISchemaRenderProps,
     ISectionProps,
     JSONSchemaType,
+    type CustomConditionEvaluator,
 } from "./types";
 import { notEmpty } from "@vanilla/utils";
 import { TabbedSchemaForm } from "./TabbedSchemaForm";
@@ -33,15 +34,16 @@ export interface IPartialSchemaFormProps {
     size?: "small" | "default";
     autocompleteClassName?: string;
     hideDescriptionInLabels?: boolean;
+    customConditionValidator?: CustomConditionEvaluator;
 }
 
-interface IProps extends IBaseSchemaFormProps, ISchemaRenderProps, IPartialSchemaFormProps {
+interface IPartialSchemaProps extends IBaseSchemaFormProps, ISchemaRenderProps, IPartialSchemaFormProps {
     isRequired?: boolean;
     inheritSchema?: JSONSchemaType;
     groupName?: string;
 }
 
-export function PartialSchemaForm(props: IProps) {
+export function PartialSchemaForm(props: IPartialSchemaProps) {
     let {
         path,
         rootSchema,
@@ -60,6 +62,7 @@ export function PartialSchemaForm(props: IProps) {
         hideDescriptionInLabels = false,
         size = "default",
         autocompleteClassName,
+        customConditionValidator,
     } = props;
 
     const schema: JSONSchemaType = props.inheritSchema
@@ -101,7 +104,11 @@ export function PartialSchemaForm(props: IProps) {
         let description: React.ReactNode | undefined;
 
         if (control && !Array.isArray(control)) {
-            const conditionsValidation = validateConditions(control.conditions ?? [], rootInstance);
+            const conditionsValidation = validateConditions(
+                control.conditions ?? [],
+                rootInstance,
+                customConditionValidator,
+            );
             const disabled = conditionsValidation.conditions.some((c) => c.disable);
             if (disabled || !conditionsValidation.valid) {
                 return null;
@@ -170,6 +177,7 @@ export function PartialSchemaForm(props: IProps) {
                                 hideDescriptionInLabels={hideDescriptionInLabels}
                                 size={size}
                                 autocompleteClassName={autocompleteClassName}
+                                customConditionValidator={customConditionValidator}
                             />
                         );
                     })}
@@ -211,7 +219,11 @@ export function PartialSchemaForm(props: IProps) {
 
     // Check conditions for controls
     const visibleControls = validControls.filter((control) => {
-        const conditionsValidation = validateConditions(control.conditions ?? [], rootInstance);
+        const conditionsValidation = validateConditions(
+            control.conditions ?? [],
+            rootInstance,
+            customConditionValidator,
+        );
         const disabled = conditionsValidation.conditions.some((c) => c.disable);
         return disabled || conditionsValidation.valid;
     });

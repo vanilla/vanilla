@@ -57,10 +57,23 @@ export const menuBarClasses = useThemeCache(() => {
         },
     });
 
+    const menuItemSeparator = (
+        spacing: { leftSpace?: number; rightSpace?: number } = { leftSpace: 4, rightSpace: 4 },
+    ) => {
+        return css({
+            display: "block",
+            height: 16,
+            width: 1,
+            background: ColorsUtils.colorOut(globalVariables().border.color),
+            marginLeft: spacing.leftSpace,
+            marginRight: spacing.rightSpace,
+        });
+    };
+
     const menuItemIconContent = buttonUtils.buttonIconMenuBar;
 
     const floatingElementMenuButton = css({
-        ...shadowHelper().embed(),
+        ...shadowOrBorderBasedOnLightness(globalVars.mainColors.bg, undefined, shadowHelper().embed()),
         background: `${ColorsUtils.colorOut(globalVars.mainColors.bg)} !important`,
         borderRadius: "100%",
         "&:hover, &:focus": {
@@ -102,6 +115,10 @@ export const menuBarClasses = useThemeCache(() => {
         },
     });
 
+    const subMenuGroupTitle = css({
+        paddingLeft: 34,
+    });
+
     const subMenuItem = css({
         ...Mixins.padding({
             vertical: listSpacer,
@@ -128,29 +145,57 @@ export const menuBarClasses = useThemeCache(() => {
             outline: "none",
             boxShadow: `inset 0 0 0 1px ${globalVars.mainColors.primary}`,
         },
+        "&.isInline": {
+            padding: 0,
+            "&:not(:disabled):not([aria-disabled='true'])": {
+                "&:hover, &:focus": {
+                    background: "none",
+                },
+            },
+            "&&.focus-visible, &:focus-visible": {
+                background: ColorsUtils.colorOut(globalVars.mainColors.primary.fade(0.1)),
+            },
+        },
     });
 
     const subMenuItemIcon = css({
         marginLeft: -listSpacer,
         marginRight: listSpacer,
     });
+
+    const inlineSubMenuItemsWrapper = css({
+        paddingLeft: 6,
+        paddingTop: listSpacer,
+    });
+
     const subMenuItemText = css({
         paddingTop: listSpacer,
         paddingBottom: listSpacer,
+    });
+
+    const menuBarAsPopover = css({
+        "&&": {
+            top: 0,
+            left: 0,
+        },
     });
 
     return {
         root,
         menuItemsList,
         menuItem,
+        menuItemSeparator,
         menuItemIconContent,
         floatingElementMenuButton,
         menuItemTextContent,
         subMenuContainer,
         subMenuItemsList,
         subMenuGroup,
+        subMenuGroupTitle,
         subMenuItem,
         subMenuItemIcon,
         subMenuItemText,
+        inlineSubMenuItemsWrapper,
+        menuBarAsPopover,
     };
 });

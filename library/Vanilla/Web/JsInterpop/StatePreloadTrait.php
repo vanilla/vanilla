@@ -13,20 +13,20 @@ namespace Vanilla\Web\JsInterpop;
 trait StatePreloadTrait
 {
     /** @var ReduxAction[] */
-    private $reduxActions = [];
+    private array $reduxActions = [];
 
     /** @var ReduxActionProviderInterface[] */
-    private $actionProviders = [];
+    private array $actionProviders = [];
 
     /** @var array<array{array, mixed}>  */
-    private $reactQuerys = [];
+    private array $reactQuerys = [];
 
     /**
-     * Register an redux action preloader.
+     * Register redux action preloader or react query preloader.
      *
-     * @param ReduxActionProviderInterface $provider The provider to register.
+     * @param ReduxActionProviderInterface|ReactQueryPreloadProvider $provider The provider to register.
      */
-    public function registerReduxActionProvider(ReduxActionProviderInterface $provider)
+    public function registerPreloader(ReduxActionProviderInterface|ReactQueryPreloadProvider $provider): void
     {
         $this->actionProviders[] = $provider;
     }
@@ -44,9 +44,17 @@ trait StatePreloadTrait
         return $this;
     }
 
-    public function preloadReactQuery(array $key, $result)
+    /**
+     * Preload a react query.
+     *
+     * @param PreloadedQuery $query
+     *
+     * @return $this Own instance for chaining.
+     */
+    public function preloadReactQuery(PreloadedQuery $query): self
     {
-        $this->reactQuerys[] = [$key, $result];
+        $this->reactQuerys[] = $query;
+        return $this;
     }
 
     /**
@@ -59,7 +67,11 @@ trait StatePreloadTrait
         // Apply all extra providers.
         foreach ($this->actionProviders as $provider) {
             try {
-                $this->reduxActions = array_merge($this->reduxActions, $provider->createActions());
+                if ($provider instanceof ReactQueryPreloadProvider) {
+                    $this->reactQuerys = array_merge($this->reactQuerys, $provider->createQueries());
+                } else {
+                    $this->reduxActions = array_merge($this->reduxActions, $provider->createActions());
+                }
             } catch (\Exception $e) {
                 $this->reduxActions[] = new ReduxErrorAction($e);
             }

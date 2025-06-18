@@ -3,7 +3,9 @@
  * @license GPL-2.0-only
  */
 
-export const STORY_CONTENT_RICH = `
+import { blessStringAsSanitizedHtml } from "@vanilla/dom-utils";
+
+export const STORY_CONTENT_RICH = blessStringAsSanitizedHtml(`
 <h1>h1</h1>
 <h2>h2</h2>
 <h3>h3</h3>
@@ -171,9 +173,9 @@ public function base_render_beforebase_render_beforebase_render_beforebase_rende
    <a href="https://vanillaforums.com/" rel="nofollow"><strong>link</strong></a><strong>.</strong>
  </li>
 </ol>
-`;
+`);
 
-export const STORY_CONTENT_TABLES = `
+export const STORY_CONTENT_TABLES = blessStringAsSanitizedHtml(`
 <p>This is a table with main headings</p>
 <table>
     <thead>
@@ -308,9 +310,9 @@ export const STORY_CONTENT_TABLES = `
         </tr>
     </tbody>
 </table>
-`;
+`);
 
-export const STORY_CONTENT_LEGACY = `
+export const STORY_CONTENT_LEGACY = blessStringAsSanitizedHtml(`
 <h2>Legacy Code - BB Code</h2>
 
 <div class="bbcode_left">
@@ -431,4 +433,4 @@ export const STORY_CONTENT_LEGACY = `
     </blockquote>
     <br>
     This is by no means the worst.<br><br><b>Please do something about it.<br></b></div>
-</blockquote>`;
+</blockquote>`);

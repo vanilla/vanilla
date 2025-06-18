@@ -145,7 +145,7 @@ class CacheCacheAdapter implements CacheInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function clear()
     {

@@ -493,7 +493,7 @@ class CommentThreadModel
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function counts(string $column, $from = false, $to = false, $max = false, array $where = []): array
     {

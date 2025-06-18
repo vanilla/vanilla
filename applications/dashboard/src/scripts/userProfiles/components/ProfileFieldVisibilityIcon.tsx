@@ -46,3 +46,7 @@ export function ProfileFieldVisibilityIcon(props: { visibility: CreatableFieldVi
     }
     return <></>;
 }
+
+export function PrivateFieldIndicator() {
+    return <ProfileFieldVisibilityIcon visibility={CreatableFieldVisibility.PRIVATE} />;
+}

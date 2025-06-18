@@ -26,7 +26,7 @@ class SignaturesTest extends SiteTestCase
     public static $addons = ["Signatures", "ranks"];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

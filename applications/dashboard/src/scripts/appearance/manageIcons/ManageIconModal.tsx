@@ -194,7 +194,7 @@ function IconRow(props: { icon: ManageIconsApi.IManagedIcon }) {
                         <Translate
                             source={"Uploaded <0/> by <1/>"}
                             c0={<DateTime timestamp={icon.dateInserted} />}
-                            c1={<ProfileLink className={metasClasses().metaLink} userFragment={icon.insertUser} />}
+                            c1={<ProfileLink asMeta userFragment={icon.insertUser} />}
                         />
                     </MetaItem>
                 </>

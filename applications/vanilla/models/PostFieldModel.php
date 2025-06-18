@@ -11,15 +11,17 @@ use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
+use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Database\Operation\BooleanFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
-use Vanilla\Models\PipelineModel;
+use Vanilla\DateFilterSchema;
+use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\ApiFilterMiddleware;
 
-class PostFieldModel extends PipelineModel
+class PostFieldModel extends FullRecordCacheModel
 {
     const PUBLIC_DATA_FIELD_ID = "public-data";
 
@@ -33,18 +35,35 @@ class PostFieldModel extends PipelineModel
         self::INTERNAL_DATA_FIELD_ID,
     ];
 
-    const DATA_TYPES = ["text", "boolean", "date", "number", "string[]", "number[]"];
+    const DATA_TYPES = [
+        "TEXT" => "text",
+        "BOOLEAN" => "boolean",
+        "DATE" => "date",
+        "NUMBER" => "number",
+        "STRING_MUL" => "string[]",
+        "NUMBER_MUL" => "number[]",
+    ];
 
-    const FORM_TYPES = ["text", "text-multiline", "dropdown", "tokens", "checkbox", "date", "number"];
+    const FORM_TYPES = [
+        "TEXT" => "text",
+        "TEXT_MULTILINE" => "text-multiline",
+        "DROPDOWN" => "dropdown",
+        "TOKENS" => "tokens",
+        "CHECKBOX" => "checkbox",
+        "DATE" => "date",
+        "NUMBER" => "number",
+    ];
 
     const VISIBILITIES = ["public", "private", "internal"];
 
     /**
      * D.I.
      */
-    public function __construct()
+    public function __construct(\Gdn_Cache $cache)
     {
-        parent::__construct("postField");
+        parent::__construct("postField", $cache, [
+            \Gdn_Cache::FEATURE_EXPIRY => 60 * 60, // 1 hour.
+        ]);
 
         $this->addPipelineProcessor(new CurrentDateFieldProcessor(["dateInserted", "dateUpdated"], ["dateUpdated"]));
         $this->addPipelineProcessor(new BooleanFieldProcessor(["isRequired", "isActive"]));
@@ -75,7 +94,7 @@ class PostFieldModel extends PipelineModel
     /**
      * Add a row with a default sort value if not provided.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function insert(array $set, array $options = [])
     {
@@ -87,6 +106,7 @@ class PostFieldModel extends PipelineModel
                 "postFieldID" => $set["postFieldID"],
                 "sort" => $this->getMaxSort($set["postTypeID"]) + 1,
             ]);
+            $this->clearCache();
         }
         return $result;
     }
@@ -100,20 +120,16 @@ class PostFieldModel extends PipelineModel
      */
     public function updateSorts(string $postTypeID, array $sorts): void
     {
-        try {
-            $this->database->beginTransaction();
+        $this->database->runWithTransaction(function () use ($sorts, $postTypeID) {
             foreach ($sorts as $postFieldID => $sort) {
-                $this->createSql()->update(
+                $this->createSql()->put(
                     "postTypePostFieldJunction",
                     ["sort" => $sort],
                     ["postTypeID" => $postTypeID, "postFieldID" => $postFieldID]
                 );
             }
-            $this->database->commitTransaction();
-        } catch (\Exception $e) {
-            $this->database->rollbackTransaction();
-            throw $e;
-        }
+        });
+        $this->clearCache();
     }
 
     /**
@@ -122,31 +138,15 @@ class PostFieldModel extends PipelineModel
      * @param array $where
      * @return \Gdn_SQLDriver
      */
-    private function getWhereQuery(array $where = []): \Gdn_SQLDriver
+    private function getBaseQuery(array $where = []): \Gdn_SQLDriver
     {
-        $where = array_combine(
-            array_map(fn($k) => str_contains($k, ".") || $k === "postTypeID" ? $k : "pf.$k", array_keys($where)),
-            $where
-        );
-        $sql = $this->createSql()
+        $where = array_combine(array_map(fn($k) => str_contains($k, ".") ? $k : "pf.$k", array_keys($where)), $where);
+
+        return $this->createSql()
             ->select("pf.*")
-            ->select("ptpf.postTypeID", "JSON_ARRAYAGG", "postTypeIDs")
             ->from("postField pf")
             ->leftJoin("postTypePostFieldJunction ptpf", "ptpf.postFieldID = pf.postFieldID")
-            ->groupBy("pf.postFieldID");
-
-        if (isset($where["postTypeID"])) {
-            $sql->join("postTypePostFieldJunction ptpf2", "ptpf2.postFieldID = pf.postFieldID")
-                ->where("ptpf2.postTypeID", $where["postTypeID"])
-                ->groupBy("ptpf2.postTypePostFieldJunctionID")
-                ->orderBy("ptpf2.sort")
-                ->select(["ptpf2.postTypeID", "ptpf2.sort"]);
-            unset($where["postTypeID"]);
-        }
-
-        $sql->where($where);
-
-        return $sql;
+            ->where($where);
     }
 
     /**
@@ -157,26 +157,41 @@ class PostFieldModel extends PipelineModel
      * @return array|null
      * @throws \Exception
      */
-    public function getWhere(array $where, array $options = [])
+    public function getWhere(array $where = [], array $options = [])
     {
-        $sql = $this->getWhereQuery($where);
+        $postTypeID = $where["postTypeID"] ?? null;
+        unset($where["postTypeID"]);
 
-        $sql->applyModelOptions($options);
+        $rows = $this->modelCache->getCachedOrHydrate([$where, $options, __FUNCTION__], function ($where, $options) {
+            return $this->getBaseQuery($where)
+                ->select("ptpf.postTypeID", "JSON_ARRAYAGG", "postTypeIDs")
+                ->groupBy("pf.postFieldID")
+                ->applyModelOptions($options)
+                ->get()
+                ->resultArray();
+        });
 
-        $rows = $sql->get()->resultArray();
         $this->normalizeRows($rows);
-        return $rows;
+        return $this->filterRows($rows, $postTypeID);
     }
 
     /**
-     * Query post field count with filters.
+     * Returns cartesian product of post fields and post types.
      *
      * @param array $where
-     * @return int
+     * @return array
+     * @throws \Exception
      */
-    public function getWhereCount(array $where): int
+    public function getPostFieldsByPostTypes(array $where = []): array
     {
-        return $this->getWhereQuery($where)->getPagingCount("pf.postFieldID");
+        $rows = $this->modelCache->getCachedOrHydrate([$where, __FUNCTION__], function ($where) {
+            return $this->getBaseQuery($where)
+                ->select(["ptpf.sort", "ptpf.postTypeID"])
+                ->get()
+                ->resultArray();
+        });
+        $this->normalizeRows($rows);
+        return $rows;
     }
 
     /**
@@ -192,7 +207,27 @@ class PostFieldModel extends PipelineModel
             if (is_string($row["dropdownOptions"])) {
                 $row["dropdownOptions"] = json_decode($row["dropdownOptions"]);
             }
+            $row["isRequired"] = (bool) $row["isRequired"];
+            $row["isActive"] = (bool) $row["isActive"];
         }
+    }
+
+    /**
+     * Filters normalized rows by some criteria.
+     *
+     * @param array $rows
+     * @param array|null $postTypeID
+     * @return array
+     */
+    private function filterRows(array $rows, array|string|null $postTypeID): array
+    {
+        if (empty($postTypeID)) {
+            return $rows;
+        }
+        if (is_string($postTypeID)) {
+            $postTypeID = [$postTypeID];
+        }
+        return array_values(array_filter($rows, fn($row) => !empty(array_intersect($row["postTypeIDs"], $postTypeID))));
     }
 
     /**
@@ -219,7 +254,30 @@ class PostFieldModel extends PipelineModel
             "dateUpdated",
             "insertUserID",
             "updateUserID",
-            "sort?",
+        ]);
+    }
+
+    /**
+     * Returns the schema for validating query string parameters on the index endpoint.
+     *
+     * @return Schema
+     */
+    public function indexSchema(): Schema
+    {
+        return Schema::parse([
+            "postTypeID:a?" => [
+                "description" => "Filter post fields that belong to one or more post types.",
+                "x-filter" => true,
+                "items" => [
+                    "type" => "string",
+                ],
+                "style" => "form",
+            ],
+            "dataType:s?" => ["enum" => PostFieldModel::DATA_TYPES, "x-filter" => true],
+            "formType:s?" => ["enum" => PostFieldModel::FORM_TYPES, "x-filter" => true],
+            "visibility:s?" => ["x-filter" => true],
+            "isRequired:b?" => ["x-filter" => true],
+            "isActive:b?" => ["x-filter" => true],
         ]);
     }
 
@@ -307,6 +365,86 @@ class PostFieldModel extends PipelineModel
                 return ArrayUtils::mergeRecursive($existingPostField, $data);
             })
             ->addFilter("", $this->createDropdownOptionsFilter());
+    }
+
+    /**
+     * Return a schema for validating post meta filters.
+     *
+     * @return Schema
+     */
+    public static function getPostMetaFilterSchema(): Schema
+    {
+        $availableFields = self::getAvailableViewFieldsForCurrentSessionUser();
+        $schemaArray = [];
+        foreach ($availableFields as $field) {
+            $formType = $field["formType"];
+            $dataType = $field["dataType"];
+            $postField = $field["postFieldID"];
+
+            switch ([$dataType, $formType]) {
+                case [self::DATA_TYPES["BOOLEAN"], self::FORM_TYPES["CHECKBOX"]]:
+                    $schemaArray["$postField?"] = ["type" => "boolean", "example" => "true|false"];
+                    break;
+                case [self::DATA_TYPES["TEXT"], self::FORM_TYPES["DROPDOWN"]]:
+                case [self::DATA_TYPES["STRING_MUL"], self::FORM_TYPES["TOKENS"]]:
+                    $schemaArray["$postField:a?"] = [
+                        "items" => ["type" => "string", "enum" => $field["dropdownOptions"] ?? [], "minItems" => 1],
+                        "style" => "form",
+                        "example" => "option1,option2,option3",
+                    ];
+                    break;
+                case [self::DATA_TYPES["NUMBER"], self::FORM_TYPES["NUMBER"]]:
+                    $schemaArray["$postField:i?"] = [];
+                    break;
+                case [self::DATA_TYPES["DATE"], self::FORM_TYPES["DATE"]]:
+                    $schemaArray["$postField?"] = new DateFilterSchema();
+                    break;
+                case [self::DATA_TYPES["TEXT"], self::FORM_TYPES["TEXT"]]:
+                case [self::DATA_TYPES["TEXT"], self::FORM_TYPES["TEXT_MULTILINE"]]:
+                    $schemaArray["$postField:s?"] = ["minLength" => 1];
+            }
+        }
+
+        return Schema::parse($schemaArray)->addFilter("", function ($metaData, ValidationField $field) use (
+            $availableFields
+        ) {
+            $postFieldIDs = array_column($availableFields, "postFieldID");
+            $invalidFields = array_diff(array_keys($metaData), $postFieldIDs);
+            if (!empty($invalidFields)) {
+                throw new ForbiddenException(
+                    "You don't have permission to access the following fields: " . implode(", ", $invalidFields)
+                );
+            }
+            return $metaData;
+        });
+    }
+
+    /**
+     * Get the available view fields for the current session user.
+     *
+     * @return array
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public static function getAvailableViewFieldsForCurrentSessionUser(): array
+    {
+        $schemaArray = [];
+        $where = ["isActive" => 1];
+        // check user permission for visibility of the field
+        $visibility = ["public"];
+        if (\Gdn::session()->checkPermission("personalInfo.view")) {
+            $visibility[] = "private";
+        }
+        if (\Gdn::session()->checkPermission("internalInfo.view")) {
+            $visibility[] = "internal";
+        }
+        if (count($visibility) !== 3) {
+            $where["visibility"] = $visibility;
+        }
+        $postTypeModel = \Gdn::getContainer()->get(PostFieldModel::class);
+        return $postTypeModel->select($where, [
+            self::OPT_SELECT => ["postFieldID", "formType", "dataType", "displayOptions", "dropdownOptions"],
+        ]);
     }
 
     /**
@@ -440,6 +578,7 @@ class PostFieldModel extends PipelineModel
     public function valueSchema(string $postTypeID): Schema
     {
         $rows = $this->getWhere(["postTypeID" => $postTypeID, "isActive" => true]);
+        $tokenFields = [];
 
         $schemaArray = [];
         foreach ($rows as $row) {
@@ -451,13 +590,34 @@ class PostFieldModel extends PipelineModel
             $properties["allowNull"] = !$row["isRequired"];
             if ($type === "array") {
                 $properties["items"]["type"] = $row["dataType"] == "number[]" ? "integer" : "string";
-                $properties["minItems"] = $row["isRequired"] ? 1 : 0;
+                $properties["minItems"] = 1;
+            }
+            if ($row["formType"] == self::FORM_TYPES["DROPDOWN"]) {
+                $properties["enum"] = $row["dropdownOptions"] ?? [];
+            }
+            if ($row["formType"] == self::FORM_TYPES["TOKENS"]) {
+                $tokenFields[$row["postFieldID"]] = $row["dropdownOptions"] ?? [];
             }
 
             $schemaArray[$name] = $properties;
         }
 
-        return Schema::parse($schemaArray);
+        return Schema::parse($schemaArray)->addValidator("", function ($data, ValidationField $field) use (
+            $tokenFields
+        ) {
+            foreach ($tokenFields as $postFieldID => $options) {
+                if (isset($data[$postFieldID])) {
+                    $tokens = $data[$postFieldID];
+                    foreach ($tokens as $token) {
+                        if (!in_array($token, $options)) {
+                            $field->addError("postMeta.$postFieldID must be one of: " . implode(", ", $options));
+                            return Invalid::value();
+                        }
+                    }
+                }
+            }
+            return true;
+        });
     }
 
     /**

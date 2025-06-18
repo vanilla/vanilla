@@ -37,7 +37,6 @@ export const contentBannerVariables = useThemeCache(
             enabled: false,
             alignment: BannerAlignment.CENTER,
             mobileAlignment: BannerAlignment.LEFT,
-            overlayTitleBar: false,
             hideDescription: true,
             hideTitle: true,
             hideSearch: true,
@@ -102,17 +101,19 @@ export const contentBannerVariables = useThemeCache(
     },
 );
 
-export const contentBannerClasses = useThemeCache((optionOverrides?: Partial<IBannerOptions>) => {
-    const vars = contentBannerVariables(optionOverrides);
-    const classes = bannerClasses(vars, optionOverrides);
-    return {
-        ...classes,
-        textAndSearchContainer: cx(
-            classes.textAndSearchContainer,
-            css({
-                flexBasis: styleUnit(vars.searchBar.sizing.maxWidth),
-                flexGrow: 1,
-            }),
-        ),
-    };
-});
+export const contentBannerClasses = useThemeCache(
+    (optionOverrides?: Partial<IBannerOptions>, forcedVars?: IThemeVariables) => {
+        const vars = contentBannerVariables(optionOverrides, forcedVars);
+        const classes = bannerClasses(vars, optionOverrides);
+        return {
+            ...classes,
+            textAndSearchContainer: cx(
+                classes.textAndSearchContainer,
+                css({
+                    flexBasis: styleUnit(vars.searchBar.sizing.maxWidth),
+                    flexGrow: 1,
+                }),
+            ),
+        };
+    },
+);

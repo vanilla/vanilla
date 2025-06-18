@@ -13,6 +13,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LeftChevronSmallIcon } from "@library/icons/common";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
+import { useDeferredFocuser } from "@vanilla/react-utils";
 
 interface IProps {
     currentPage: number;
@@ -20,11 +21,12 @@ interface IProps {
     selectPage: (page: number) => void;
     close: () => void;
     hasMorePages?: boolean;
+    inputID?: string;
 }
 
 export function NumberedPagerJumper(props: IProps) {
-    const vars = numberedPagerVariables();
-    const classes = numberedPagerClasses();
+    const vars = numberedPagerVariables.useAsHook();
+    const classes = numberedPagerClasses.useAsHook();
     const [pageNumber, setPageNumber] = useState<string>(props.currentPage.toString());
 
     const handlePageChange = ({ target: { value } }) => {
@@ -43,7 +45,13 @@ export function NumberedPagerJumper(props: IProps) {
     };
 
     return (
-        <>
+        <form
+            className={classes.jumperForm}
+            onSubmit={(e) => {
+                e.preventDefault();
+                handleSelectPage();
+            }}
+        >
             <ToolTip label={t("Back to post count")}>
                 <span>
                     <Button
@@ -58,6 +66,7 @@ export function NumberedPagerJumper(props: IProps) {
             </ToolTip>
             {t("Jump to page")}
             <InputTextBlock
+                id={props.inputID}
                 inputProps={{
                     value: pageNumber,
                     onChange: handlePageChange,
@@ -67,10 +76,10 @@ export function NumberedPagerJumper(props: IProps) {
                 baseClass={InputTextBlockBaseClass.CUSTOM}
             />
             {t("of")} {props.totalPages}
-            <Button onClick={handleSelectPage} className={classes.jumperButton} buttonType={ButtonTypes.PRIMARY}>
+            <Button type="submit" className={classes.jumperButton} buttonType={ButtonTypes.PRIMARY}>
                 {t("Go")}
             </Button>
-        </>
+        </form>
     );
 }
 

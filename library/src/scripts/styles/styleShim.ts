@@ -1,5 +1,5 @@
 import { keyframes, cx, injectGlobal, css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 
 export { keyframes, cx };
 

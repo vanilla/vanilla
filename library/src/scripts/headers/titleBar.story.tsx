@@ -3,9 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { LoadStatus } from "@library/@types/api/core";
-import { IMe } from "@library/@types/api/users";
-import { BannerContextProvider } from "@library/banner/BannerContext";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
@@ -21,10 +18,9 @@ import { StoryFullPage } from "@library/storybook/StoryFullPage";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { testStoreState } from "@library/__tests__/testStoreState";
 import { loadTranslations } from "@vanilla/i18n";
 import { color, linearGradient } from "csx";
-import React from "react";
+import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
@@ -32,8 +28,15 @@ import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
 import { Icon } from "@vanilla/icons";
 
 import localLogoUrl from "./titleBarStoryLogo.png";
-import { CurrentUserContextProvider, ReduxCurrentUserContextProvider } from "@library/features/users/userHooks";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { ReduxThemeContextProvider } from "@library/theming/Theme.context";
+import {
+    initialState,
+    initialStateWithMeboxVars,
+    mockGuestUser,
+    mockRegisterUser,
+} from "@library/headers/titleBarStoryUtils";
+import { TitleBarPositioning } from "@library/headers/TitleBar.ParamContext";
 
 loadTranslations({});
 
@@ -67,71 +70,35 @@ export default {
     },
 };
 
-const mockRegisterUser: IMe = {
-    name: "Neena",
-    userID: 1,
-    isAdmin: true,
-    photoUrl: "",
-    dateLastActive: "",
-    countUnreadNotifications: 1,
-    countUnreadConversations: 1,
-    emailConfirmed: true,
-};
-
-const initialState = testStoreState({
-    theme: {
-        assets: {
-            data: {
-                logo: {
-                    type: "image",
-                    url: localLogoUrl as string,
-                },
-            },
-        },
-    },
-});
-
-const initialStateWithMeboxVars = testStoreState({
-    theme: {
-        assets: {
-            data: {
-                logo: {
-                    type: "image",
-                    url: localLogoUrl as string,
-                },
-                variables: {
-                    type: "json",
-                    data: {
-                        titleBar: {
-                            meBox: {
-                                withLabel: true,
-                                withSeparator: true,
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    },
-});
-
 function StoryTitleBar(props: { title: string; openSearch?: boolean; scope?: boolean; forceMenuOpen?: boolean }) {
     let dummyData: React.ReactNode[] = [];
     for (let i = 0; i < 350; i++) {
-        dummyData.push(<p>Scrollable content</p>);
+        dummyData.push(<p key={i}>Scrollable content</p>);
     }
+
+    useEffect(() => {
+        TitleBarStatic.extraMeBoxComponents = [
+            () => {
+                return (
+                    <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
+                        <>
+                            <Icon icon="me-subcommunities" />
+                            <DownTriangleIcon />
+                        </>
+                    </Button>
+                );
+            },
+        ];
+    }, []);
 
     return (
         <>
             <MemoryRouter>
-                {/* <CurrentUserContextProvider currentUser={mockRegisterUser}> */}
-                <BannerContextProvider>
+                <CurrentUserContextProvider currentUser={mockRegisterUser}>
                     <TitleBarDeviceProvider>
                         <ScrollOffsetProvider scrollWatchingEnabled={false}>
                             <StoryHeading depth={2}>{props.title}</StoryHeading>
                             <TitleBar
-                                useMobileBackButton={false}
-                                isFixed={true}
                                 forceVisibility={props.openSearch}
                                 scope={props.scope ? scope : undefined}
                                 forceMenuOpen={props.forceMenuOpen}
@@ -143,8 +110,7 @@ function StoryTitleBar(props: { title: string; openSearch?: boolean; scope?: boo
                             </Container>
                         </ScrollOffsetProvider>
                     </TitleBarDeviceProvider>
-                </BannerContextProvider>
-                {/* </CurrentUserContextProvider> */}
+                </CurrentUserContextProvider>
             </MemoryRouter>
         </>
     );
@@ -186,8 +152,8 @@ export const WithGradientAndSwoop = storyWithConfig(
                 mobile: {
                     height: 50,
                 },
-                fullBleed: {
-                    enabled: true,
+                positioning: {
+                    mode: TitleBarPositioning.StickySolid,
                 },
                 colors: {
                     fg: color("#000"),
@@ -247,8 +213,8 @@ export const WithGradientAndSwoopOpenSearch = storyWithConfig(
                 mobile: {
                     height: 50,
                 },
-                fullBleed: {
-                    enabled: true,
+                positioning: {
+                    mode: TitleBarPositioning.StickySolid,
                 },
                 colors: {
                     fg: color("#000"),
@@ -296,8 +262,8 @@ export const WithGradientAndImageOnSticky = storyWithConfig(
         useWrappers: false,
         themeVars: {
             titleBar: {
-                fullBleed: {
-                    enabled: true,
+                positioning: {
+                    mode: TitleBarPositioning.StickySolid,
                 },
                 colors: {
                     fg: color("#fff"),
@@ -320,17 +286,6 @@ export const WithGradientAndImageOnSticky = storyWithConfig(
 
 loadTranslations({});
 
-const mockGuestUser: IMe = {
-    name: "test",
-    userID: 0,
-    isAdmin: true,
-    photoUrl: "",
-    dateLastActive: "",
-    countUnreadNotifications: 1,
-    countUnreadConversations: 1,
-    emailConfirmed: false,
-};
-
 export const TitleBarGuestUser = storyWithConfig(
     {
         storeState: {
@@ -347,16 +302,6 @@ export const TitleBarGuestUser = storyWithConfig(
         },
     },
     () => {
-        TitleBarStatic.registerBeforeMeBox(() => {
-            return (
-                <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
-                    <>
-                        <Icon icon="me-subcommunities" />
-                        <DownTriangleIcon />
-                    </>
-                </Button>
-            );
-        });
         return (
             <MemoryRouter>
                 <Provider store={getStore(initialState, true)}>
@@ -365,40 +310,25 @@ export const TitleBarGuestUser = storyWithConfig(
                             <TitleBarDeviceProvider>
                                 <StoryFullPage>
                                     <StoryHeading>Hamburger menu</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} />
+                                    <TitleBar isFixed={false} />
                                     <StoryHeading>Hamburger menu - open </StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                                    <TitleBar isFixed={false} forceVisibility={true} />
                                     <StoryHeading>Hamburger menu - open with scope</StoryHeading>
-                                    <TitleBar
-                                        useMobileBackButton={false}
-                                        isFixed={false}
-                                        forceVisibility={true}
-                                        scope={scope}
-                                    />
+                                    <TitleBar isFixed={false} forceVisibility={true} scope={scope} />
 
                                     <StoryHeading>Big Logo</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} />
+                                    <TitleBar isFixed={false} />
 
                                     <StoryHeading>Big Logo - open</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                                    <TitleBar isFixed={false} forceVisibility={true} />
                                     <StoryHeading>Big Logo - open with scope</StoryHeading>
-                                    <TitleBar
-                                        useMobileBackButton={false}
-                                        isFixed={false}
-                                        forceVisibility={true}
-                                        scope={scope}
-                                    />
+                                    <TitleBar isFixed={false} forceVisibility={true} scope={scope} />
                                     <StoryHeading>Extra Navigation links</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} />
+                                    <TitleBar isFixed={false} />
                                     <StoryHeading>Extra Navigation links - open</StoryHeading>
-                                    <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                                    <TitleBar isFixed={false} forceVisibility={true} />
                                     <StoryHeading>Extra Navigation links - open with scope</StoryHeading>
-                                    <TitleBar
-                                        useMobileBackButton={false}
-                                        isFixed={false}
-                                        forceVisibility={true}
-                                        scope={scope}
-                                    />
+                                    <TitleBar isFixed={false} forceVisibility={true} scope={scope} />
                                 </StoryFullPage>
                             </TitleBarDeviceProvider>
                         </CurrentUserContextProvider>
@@ -410,16 +340,6 @@ export const TitleBarGuestUser = storyWithConfig(
 );
 
 export const TitleBarWithMeboxWithLabelsAndSeparators = storyWithConfig({}, () => {
-    TitleBarStatic.registerBeforeMeBox(() => {
-        return (
-            <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
-                <>
-                    <Icon icon="me-subcommunities" />
-                    <DownTriangleIcon />
-                </>
-            </Button>
-        );
-    });
     return (
         <MemoryRouter>
             <Provider store={getStore(initialStateWithMeboxVars, true)}>
@@ -600,7 +520,7 @@ const navigationItems: INavigationVariableItem[] = [
 
 export const TitleBarWithMegaMenu = storyWithConfig(
     { useWrappers: false, themeVars: { navigation: { navigationItems } } },
-    () => <StoryTitleBar forceMenuOpen title="With Mega Menu" />,
+    () => <StoryTitleBar title="With Mega Menu" />,
 );
 
 export const TitleBarWithMegaMenuLogoAlignment = storyWithConfig(

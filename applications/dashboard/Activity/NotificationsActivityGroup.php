@@ -13,7 +13,7 @@ namespace Vanilla\Dashboard\Activity;
 class NotificationsActivityGroup extends ActivityGroup
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityGroupID(): string
     {
@@ -31,7 +31,7 @@ class NotificationsActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getParentGroupClass(): ?string
     {

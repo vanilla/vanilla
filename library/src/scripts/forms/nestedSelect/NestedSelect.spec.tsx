@@ -52,7 +52,7 @@ describe("Hooks", async () => {
     });
 
     it("Converts a simple list with no groups", () => {
-        const { result } = renderHook(() => useNestedOptions({ options: MOCK_SIMPLE_LIST }), {
+        const { result } = renderHook(() => useNestedOptions({ value: "apple", options: MOCK_SIMPLE_LIST }), {
             wrapper: queryClientWrapper(),
         });
         const options = MOCK_SIMPLE_LIST.map((option) => ({
@@ -65,6 +65,7 @@ describe("Hooks", async () => {
             options,
             optionsByValue: Object.fromEntries(options.map((option) => [option.value, option])),
             optionsByGroup: {},
+            selectedOptions: [MOCK_SIMPLE_LIST.find((opt) => opt.value === "apple")],
         };
         expect(result.current).toStrictEqual(expected);
     });
@@ -89,6 +90,7 @@ describe("Hooks", async () => {
                 options.filter(({ value }) => value !== undefined).map((itm) => [itm.value, itm]),
             ),
             optionsByGroup,
+            selectedOptions: [],
         };
         expect(result.current).toStrictEqual(expected);
     });
@@ -113,6 +115,7 @@ describe("Hooks", async () => {
             optionsByValue: Object.fromEntries(options.map((itm) => [itm.value, itm])),
             optionsByGroup: {},
             isSuccess: true,
+            selectedOptions: [],
         };
 
         expect(result.current).toStrictEqual(expected);
@@ -148,6 +151,7 @@ describe("Hooks", async () => {
             optionsByValue: Object.fromEntries(options.filter(({ value }) => value).map((itm) => [itm.value, itm])),
             optionsByGroup,
             isSuccess: true,
+            selectedOptions: [],
         };
 
         expect(result.current).toStrictEqual(expected);
@@ -174,6 +178,7 @@ describe("Hooks", async () => {
             optionsByValue: Object.fromEntries(options.map((itm) => [itm.value, itm])),
             optionsByGroup: {},
             isSuccess: true,
+            selectedOptions: [],
         };
 
         expect(result.current).toStrictEqual(expected);
@@ -201,6 +206,7 @@ describe("Hooks", async () => {
             optionsByValue: Object.fromEntries(options.filter(({ value }) => value).map((itm) => [itm.value, itm])),
             optionsByGroup: {},
             isSuccess: true,
+            selectedOptions: [],
         };
 
         expect(result.current).toStrictEqual(expected);
@@ -233,6 +239,7 @@ describe("Hooks", async () => {
             optionsByValue: Object.fromEntries(options.map((option) => [option.value, option])),
             optionsByGroup: {},
             isSuccess: true,
+            selectedOptions: [],
         };
 
         expect(result.current).toStrictEqual(expected);
@@ -259,6 +266,7 @@ describe("Hooks", async () => {
             optionsByValue: Object.fromEntries(options.map((itm) => [itm.value, itm])),
             optionsByGroup: {},
             isSuccess: true,
+            selectedOptions: [],
         };
 
         expect(result.current).toStrictEqual(expected);

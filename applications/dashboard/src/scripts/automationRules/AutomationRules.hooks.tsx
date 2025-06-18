@@ -33,8 +33,8 @@ export function useRecipes(continiousFetch: boolean = true, escalationActionsFil
         isRefetching,
     } = useQuery<any, IApiError, IAutomationRule[]>({
         queryFn: async () => {
-            const response = await apiv2.get("/automation-rules/recipes?expand=all", {
-                params: queryParams,
+            const response = await apiv2.get("/automation-rules/recipes", {
+                params: { ...queryParams, expand: "all" },
             });
             return response.data;
         },

@@ -1,20 +1,16 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { css } from "@emotion/css";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
-import { viewHeight } from "csx";
 
 export default function UserPreferencesClasses() {
     return {
         frameBody: css({
-            maxHeight: viewHeight(80),
-        }),
-        noBorder: css({
-            border: "none",
+            height: "100%",
         }),
         tableWrap: css({
             overflow: "auto",
@@ -37,6 +33,15 @@ export default function UserPreferencesClasses() {
                 },
             },
         }),
+        preferencesTableOverrides: css({
+            '& td[role="cell"], & th[role="columnheader"]': {
+                padding: "0!important",
+                "& > label": {
+                    paddingTop: 4,
+                    paddingBottom: 4,
+                },
+            },
+        }),
         cell: css({
             "& > span": {
                 maxHeight: "none",
@@ -50,10 +55,6 @@ export default function UserPreferencesClasses() {
                 width: 30,
                 height: 30,
             },
-        }),
-        errors: css({
-            paddingTop: 10,
-            textAlign: "center",
         }),
     };
 }

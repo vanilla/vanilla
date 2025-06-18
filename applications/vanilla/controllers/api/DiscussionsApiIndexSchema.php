@@ -18,6 +18,8 @@ use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Forum\Models\PostFieldModel;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
 
@@ -96,6 +98,14 @@ class DiscussionsApiIndexSchema extends Schema
                         new FormOptions("Discussion Type", "Choose a specific type of discussions to display."),
                         new StaticFormChoices($this->discussionTypesEnumValues())
                     ),
+                ],
+                "postTypeID:a?" => [
+                    "description" => "Filter by one or more postTypeIDs.",
+                    "x-filter" => true,
+                    "items" => [
+                        "type" => "string",
+                    ],
+                    "style" => "form",
                 ],
                 "excludeHiddenCategories:b" => [
                     "default" => false,
@@ -204,6 +214,10 @@ class DiscussionsApiIndexSchema extends Schema
                 ],
             ])
         );
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $schema = Schema::parse(["postMeta:o?" => PostFieldModel::getPostMetaFilterSchema()]);
+            $this->merge($schema);
+        }
         $this->addValidator("insertUserRoleID", function ($data, $field) {
             RoleModel::roleViewValidator($data, $field);
         });

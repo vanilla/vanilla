@@ -1,15 +1,5 @@
 {
     "name": "@vanilla/addon-rich-editor",
     "version": "3.0.1",
-    "private": true,
-    "dependencies": {
-        "@vanilla/dom-utils": "^3.0.1",
-        "@vanilla/react-utils": "^3.0.1",
-        "@vanilla/utils": "^3.0.1"
-    },
-    "peerDependencies": {
-        "lodash-es": "*",
-        "react": "^17.0.0",
-        "react-dom": "^17.0.0"
-    }
+    "private": true
 }

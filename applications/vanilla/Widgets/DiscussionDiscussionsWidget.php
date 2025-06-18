@@ -17,13 +17,13 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 /**
  * Class DiscussionDiscussionsWidget
  */
-class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements ReactWidgetInterface
+class DiscussionDiscussionsWidget extends DiscussionWidgetModule
 {
     use DiscussionsWidgetSchemaTrait;
     use FilterableWidgetTrait;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -31,7 +31,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -39,7 +39,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -55,7 +55,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -69,7 +69,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getApiSchema(): Schema
     {

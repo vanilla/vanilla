@@ -74,7 +74,7 @@ abstract class AbstractFormat
     abstract protected function getTagName(): string;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $operations): bool
     {
@@ -112,7 +112,7 @@ abstract class AbstractFormat
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     private function shouldRenderOpeningTag(): bool
     {
@@ -152,7 +152,7 @@ abstract class AbstractFormat
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     private function shouldRenderClosingTag(): bool
     {

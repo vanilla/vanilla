@@ -53,15 +53,22 @@ class ApiUtils
      * @param array $output A single row as part of an API response.
      * @return array An array with camelCase keys.
      */
-    public static function convertOutputKeys(array $output, array $excludedKeys = [])
-    {
+    public static function convertOutputKeys(
+        array $output,
+        array $excludedKeys = [],
+        array $excludeKeysWithCharacters = []
+    ) {
         static $scheme;
 
         if ($scheme === null) {
             $scheme = new CamelCaseScheme();
         }
 
-        $result = $scheme->convertArrayKeys($output, excludedKeys: $excludedKeys);
+        $result = $scheme->convertArrayKeys(
+            $output,
+            excludedKeys: $excludedKeys,
+            excludeKeysWithCharacters: $excludeKeysWithCharacters
+        );
         return $result;
     }
 

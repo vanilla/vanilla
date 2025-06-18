@@ -5,7 +5,7 @@
  */
 
 import { IBorderStyles, IFont } from "@library/styles/cssUtilsTypes";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { TLength } from "@library/styles/styleShim";
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ButtonTypes } from "@library/forms/buttonTypes";

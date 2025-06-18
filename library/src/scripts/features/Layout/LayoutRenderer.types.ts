@@ -16,6 +16,22 @@ export interface ILayoutQuery<T extends object = object> {
     params: T | Record<string, any>;
 }
 
+export type IHydratedLayoutFragmentImpl =
+    | {
+          fragmentUUID: string;
+          jsUrl: string;
+          cssUrl: string;
+          css?: string;
+      }
+    | {
+          fragmentUUID: "system" | "styleguide";
+          jsUrl?: undefined;
+          cssUrl?: undefined;
+          css?: undefined;
+      };
+
+export type IHydratedLayoutFragmentImpls = Record<string, IHydratedLayoutFragmentImpl>;
+
 /**
  * Interface representing a layout widget definition that can be rendered with the layout renderer.
  * This is what comes back from /api/v2/layouts/:id/hydrate
@@ -30,6 +46,7 @@ export interface IHydratedLayoutWidget<ExtraProps = {}> {
     $reactComponent: string;
     /** Props to be passed to the component */
     $reactProps: Record<string, IHydratedLayoutWidget | IHydratedLayoutWidget[] | any> & ExtraProps;
+    $fragmentImpls?: IHydratedLayoutFragmentImpls;
 }
 
 /**
@@ -38,6 +55,7 @@ export interface IHydratedLayoutWidget<ExtraProps = {}> {
 export interface IHydratedLayoutSpec {
     /** An array describing components of a layout */
     layout: IHydratedLayoutWidget[];
+    titleBar: IHydratedLayoutWidget;
     contexts?: IHydratedLayoutWidget[];
     redirectTo?: string;
 }

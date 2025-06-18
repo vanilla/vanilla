@@ -1,0 +1,21 @@
+.siteTotalsFragment__root {
+}
+
+.siteTotalsFragment__countContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.siteTotalsFragment__content {
+    display: flex;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    gap: 24px;
+}
+
+.siteTotalsFragment_count {
+}
+
+.siteTotalsFragment_label {
+}

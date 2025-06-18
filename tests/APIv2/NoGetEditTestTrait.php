@@ -35,7 +35,7 @@ trait NoGetEditTestTrait
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function testGetEditFields()
     {

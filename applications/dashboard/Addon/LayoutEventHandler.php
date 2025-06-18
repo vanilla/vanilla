@@ -66,7 +66,7 @@ class LayoutEventHandler implements
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {

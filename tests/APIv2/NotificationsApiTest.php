@@ -10,6 +10,7 @@ use ActivityModel;
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Vanilla\Scheduler\LongRunner;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\NotificationsApiTestTrait;
 use VanillaTests\SchedulerTestTrait;
 
@@ -20,6 +21,7 @@ class NotificationsApiTest extends AbstractAPIv2Test
 {
     use NotificationsApiTestTrait;
     use SchedulerTestTrait;
+    use CommunityApiTestTrait;
 
     /** @var int Debug activity type. */
     const ACTIVITY_TYPE_ID = 10;
@@ -38,6 +40,7 @@ class NotificationsApiTest extends AbstractAPIv2Test
      */
     private function addNotification(?array $extras = []): int
     {
+        $recordID = $extras["RecordID"] ?? self::id("notificationRecordID");
         $result = $this->activityModel->insert(
             array_merge(
                 [
@@ -47,6 +50,12 @@ class NotificationsApiTest extends AbstractAPIv2Test
                     "Emailed" => ActivityModel::SENT_PENDING,
                     "NotifyUserID" => $this->api()->getUserID(),
                     "Notified" => ActivityModel::SENT_PENDING,
+                    "RecordType" => "test",
+                    "RecordID" => $recordID,
+                    "HeadlineFormat" => "Hello Headline",
+                    "Story" => "Hello Story",
+                    "Format" => "Text",
+                    "Route" => "/test/$recordID#hash",
                 ],
                 $extras
             )
@@ -72,13 +81,17 @@ class NotificationsApiTest extends AbstractAPIv2Test
      */
     public function testGet()
     {
-        $id = $this->addNotification();
+        $id = $this->addNotification(["RecordID" => 1]);
 
         $response = $this->api()->get("/notifications/{$id}");
         $this->assertEquals($response->getStatusCode(), 200);
 
-        $notification = $response->getBody();
-        $this->assertEquals($id, $notification["notificationID"]);
+        $response->assertSuccess()->assertJsonObjectLike([
+            "notificationID" => $id,
+            "recordType" => "test",
+            "recordID" => 1,
+            "recordUrl" => \Gdn::request()->getSimpleUrl("/test/1#hash"),
+        ]);
     }
 
     /**
@@ -104,6 +117,28 @@ class NotificationsApiTest extends AbstractAPIv2Test
         }
 
         $this->pagingTest("/notifications");
+    }
+
+    /**
+     * Test that notifications for the same record are aggregated.
+     */
+    public function testIndexAggregation()
+    {
+        $this->resetTable("Activity");
+        $this->addNotification(["RecordID" => 5]);
+        $this->addNotification(["RecordID" => 5]);
+
+        $this->api
+            ->get("/notifications")
+            ->assertSuccess()
+            ->assertJsonArrayValues(
+                // We have one item, that is made up of 2 notifications.
+                [
+                    "recordID" => [5],
+                    "count" => [2],
+                ],
+                count: 1
+            );
     }
 
     /**
@@ -325,5 +360,67 @@ class NotificationsApiTest extends AbstractAPIv2Test
         $this->assertEquals(200, $response->getStatusCode());
         $result = $this->activityModel->getID($activityID2);
         $this->assertEquals(ActivityModel::SENT_OK, $result["Notified"]);
+    }
+
+    /**
+     * Test the expand=discussion parameter.
+     *
+     * @return void
+     */
+    public function testExpandDiscussion(): void
+    {
+        $this->resetTable("Activity");
+
+        $discussion = $this->createDiscussion();
+        $comment = $this->createComment();
+
+        $discussionNotificationID = $this->addNotification([
+            "RecordType" => "discussion",
+            "RecordID" => $discussion["discussionID"],
+        ]);
+
+        $commentNotificationID = $this->addNotification([
+            "RecordType" => "comment",
+            "RecordID" => $comment["commentID"],
+        ]);
+
+        $otherNotificationID = $this->addNotification();
+        $expectedDiscussionFragment = [
+            "discussionID" => $discussion["discussionID"],
+            "name" => $discussion["name"],
+            "url" => $discussion["url"],
+            "categoryID" => $discussion["categoryID"],
+        ];
+
+        $expectedCommentNotification = [
+            "notificationID" => $commentNotificationID,
+            "recordType" => "comment",
+            "recordID" => $comment["commentID"],
+            "discussionID" => $comment["discussionID"],
+            "discussion" => $expectedDiscussionFragment,
+        ];
+
+        // First check the index
+        $this->api()
+            ->get("/notifications", ["expand" => "discussion"])
+            ->assertJsonArray()
+            ->assertJsonArrayContains([
+                "notificationID" => $discussionNotificationID,
+                "recordType" => "discussion",
+                "recordID" => $discussion["discussionID"],
+                "discussionID" => $discussion["discussionID"],
+                "discussion" => $expectedDiscussionFragment,
+            ])
+            ->assertJsonArrayContains($expectedCommentNotification)
+            ->assertJsonArrayContains([
+                "notificationID" => $otherNotificationID,
+                "discussionID" => null,
+                "discussion" => null,
+            ]);
+
+        // Check the single notification endpoint as well.
+        $this->api()
+            ->get("/notifications/{$commentNotificationID}", ["expand" => "discussion"])
+            ->assertJsonObjectLike($expectedCommentNotification);
     }
 }

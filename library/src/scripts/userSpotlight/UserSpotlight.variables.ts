@@ -8,7 +8,7 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { DeepPartial } from "redux";
 import { Variables } from "@library/styles/Variables";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { BorderType } from "@library/styles/styleHelpers";
 import { UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";

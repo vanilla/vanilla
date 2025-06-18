@@ -19,6 +19,8 @@ import {
     showDisplayOptions,
 } from "@dashboard/layout/editor/widgetSettings/WidgetSchemaTransformer";
 import { DashboardFormStyleContext } from "@dashboard/forms/DashboardFormStyleContext";
+import { useEditorThemePreview } from "@library/theming/EditorThemePreviewContext";
+import get from "lodash-es/get";
 
 interface IProps extends IWidgetConfigurationComponentProps {
     fieldErrors?: Record<string, IFieldError[]>;
@@ -27,7 +29,7 @@ interface IProps extends IWidgetConfigurationComponentProps {
 export function WidgetSettings(props: IProps) {
     const classes = widgetSettingsClasses();
     const { transformedSchema, value } = widgetsSchemaTransformer(props.schema, props.middlewares, props.value);
-    const expandableFormGroups = ["containerOptions", "itemOptions", "$middleware", "displayOptions"];
+    const expandableFormGroups = ["containerOptions", "itemOptions", "$middleware", "displayOptions", "$fragmentImpls"];
     if (showDisplayOptions(props.schema.description)) {
         expandableFormGroups.push("apiParams");
     }
@@ -41,6 +43,11 @@ export function WidgetSettings(props: IProps) {
 
     if (props.schema.properties.articleOptions) {
         expandableFormGroups.push("articleOptions");
+    }
+
+    // Knowledge Bases List widget / asset
+    if (props.schema?.description?.includes("Knowledge Bases")) {
+        expandableFormGroups.push("display");
     }
 
     const formGroupWrapper: React.ComponentProps<typeof JsonSchemaForm>["FormGroupWrapper"] = function (props) {
@@ -64,6 +71,8 @@ export function WidgetSettings(props: IProps) {
         props.onChange(() => value);
     }, [value]);
 
+    const themePreviewContext = useEditorThemePreview();
+
     return (
         <div className={classes.settings}>
             <h3 className={classes.settingsHeader}>{t("Widget Options")}</h3>
@@ -81,6 +90,26 @@ export function WidgetSettings(props: IProps) {
                     size="small"
                     autocompleteClassName={classes.autocompleteContainer}
                     fieldErrors={props.fieldErrors}
+                    customConditionValidator={(condition, rootInstance) => {
+                        const fieldName = condition.field;
+                        let fieldValue = fieldName ? get(rootInstance, fieldName) : null;
+                        if (condition.type === "noCustomFragment") {
+                            const fragmentType = condition.fragmentType;
+                            fieldValue = fieldValue ?? "styleguide";
+
+                            if (fieldValue === "styleguide") {
+                                // Go get it from the previewed theme.
+                                fieldValue =
+                                    themePreviewContext.previewedThemeQuery.data?.assets?.variables?.data
+                                        ?.globalFragmentImpls?.[fragmentType]?.fragmentUUID ?? "system";
+                            }
+
+                            return fieldValue === "system";
+                        }
+
+                        // Use the default validator.
+                        return null;
+                    }}
                 />
             </DashboardFormStyleContext.Provider>
         </div>

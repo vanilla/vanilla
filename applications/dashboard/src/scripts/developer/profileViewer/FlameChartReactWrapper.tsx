@@ -4,12 +4,11 @@
  * @license gpl-2.0-only
  */
 
+import { useMeasure } from "@vanilla/react-utils";
 import { FlameChart } from "flame-chart-js";
-import type { FlameChartSettings } from "flame-chart-js/dist/flame-chart";
-import type { FlameChartNodes } from "flame-chart-js/dist/types";
+import type { FlameChartSettings, FlameChartNodes } from "flame-chart-js";
 import type { NodeTypes } from "flame-chart-js/react";
 import { useCallback, useEffect, useRef } from "react";
-import useResizeObserver from "use-resize-observer";
 
 interface IProps {
     data?: FlameChartNodes;
@@ -31,15 +30,15 @@ export function FlameChartReactWrapper(props: IProps) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const flameChart = useRef<FlameChart | null>(null);
 
-    useResizeObserver({
-        ref: boxRef,
-        onResize: ({ width = 0, height = 0 }) => {
-            if (width === 0 || height === 0) {
-                return;
-            }
-            flameChart.current?.resize(width, height);
-        },
-    });
+    const measure = useMeasure(boxRef);
+
+    useEffect(() => {
+        if (measure.width === 0 || measure.height === 0) {
+            return;
+        }
+
+        flameChart.current?.resize(measure.width, measure.height);
+    }, [measure]);
 
     const initialize = useCallback(() => {
         const { data, settings, colors } = props;

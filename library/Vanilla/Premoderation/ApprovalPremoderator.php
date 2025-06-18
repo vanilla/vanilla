@@ -64,7 +64,7 @@ class ApprovalPremoderator implements PremoderationHandlerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function premoderateItem(PremoderationItem $item): PremoderationResponse
     {

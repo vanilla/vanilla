@@ -6,7 +6,7 @@
 
 import { mockAPI } from "@library/__tests__/utility";
 import {
-    LegacyFormVanillaEditor,
+    LegacyFormVanillaEditorLoadable,
     deserializeHtml,
     emailLinkCheck,
 } from "@library/vanilla-editor/VanillaEditor.loadable";
@@ -179,7 +179,10 @@ describe("VanillaEditor", () => {
 
     it("Editor content should be empty when comment is posted/event is fired", async () => {
         const { queryByText } = render(
-            <LegacyFormVanillaEditor legacyTextArea={form?.firstChild as HTMLInputElement} initialFormat={"rich2"} />,
+            <LegacyFormVanillaEditorLoadable
+                legacyTextArea={form?.firstChild as HTMLInputElement}
+                initialFormat={"rich2"}
+            />,
         );
 
         // Assert that it exists

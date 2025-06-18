@@ -51,7 +51,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function createAttachment(string $recordType, int $recordID, array $issueData): array
     {
@@ -82,7 +82,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getHydratedFormSchema(string $recordType, int $recordID, array $args): Schema
     {
@@ -92,7 +92,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getProviderName(): string
     {
@@ -100,7 +100,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTypeName(): string
     {
@@ -108,7 +108,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getIsEscalation(): bool
     {
@@ -126,7 +126,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRecordTypes(): array
     {
@@ -134,7 +134,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCreateLabelCode(): string
     {
@@ -142,7 +142,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSubmitLabelCode(): string
     {
@@ -150,7 +150,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTitleLabelCode(): string
     {
@@ -158,7 +158,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getExternalIDLabelCode(): string
     {
@@ -166,7 +166,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogoIconName(): string
     {
@@ -174,7 +174,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function refreshAttachments(array $attachmentRows): array
     {
@@ -210,7 +210,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRefreshTimeSeconds(): int
     {
@@ -218,7 +218,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getWriteableContentScope(): string
     {
@@ -229,7 +229,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canViewBasicAttachment(array $attachment): bool
     {
@@ -237,7 +237,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canViewFullAttachment(array $attachment): bool
     {
@@ -245,7 +245,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canCreateAttachmentForRecord(string $recordType, int $recordID): bool
     {
@@ -253,7 +253,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEscalationDelayUnit(): ?string
     {
@@ -261,7 +261,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEscalationDelayLength(): int
     {
@@ -269,7 +269,7 @@ class MockAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAdditionalCatalogInfo(): array
     {

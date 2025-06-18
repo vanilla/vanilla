@@ -12,13 +12,14 @@ import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { getPixelNumber, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, rgba } from "csx";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { metasVariables } from "@library/metas/Metas.variables";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const notUserContent = "u-notUserContent";
 
@@ -152,14 +153,15 @@ export const dropDownClasses = useThemeCache(() => {
 
     const contentMixin: CSSObject = {
         minWidth: styleUnit(vars.sizing.widths.default),
-        backgroundColor: ColorsUtils.colorOut(vars.contents.bg),
-        color: ColorsUtils.colorOut(vars.contents.fg),
+        backgroundColor: ColorsUtils.varOverride(ColorVar.DropdownBackground, vars.contents.bg),
+        color: ColorsUtils.varOverride(ColorVar.DropdownForeground, vars.contents.fg),
         overflow: "auto",
         ...Mixins.border(vars.contents.border),
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, Mixins.border(vars.contents.border), shadows.dropDown()),
         "&&": {
             zIndex: 3,
             ...Mixins.border(vars.contents.border),
+            borderColor: ColorsUtils.varOverride(ColorVar.Border, vars.contents.border.color),
         },
         "&.isMedium": {
             width: styleUnit(vars.sizing.widths.medium),
@@ -338,13 +340,14 @@ export const dropDownClasses = useThemeCache(() => {
 
     const text = css({
         display: "flex",
+        alignItems: "center",
         flex: 1,
     });
 
     const separator = css({
         listStyle: "none",
         height: styleUnit(globalVars.separator.size),
-        backgroundColor: ColorsUtils.colorOut(globalVars.separator.color),
+        backgroundColor: ColorsUtils.varOverride(ColorVar.Border, globalVars.separator.color),
         ...Mixins.margin(vars.spacer.margin),
         border: "none",
         "&:first-child": {
@@ -673,7 +676,7 @@ export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
         }),
         // Override legacy style.scss with global variables by making it important.
         // ".MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active "
-        color: ColorsUtils.colorOut(vars.contents.fg, { makeImportant: true }),
+        color: important(ColorsUtils.varOverride(ColorVar.DropdownForeground, vars.contents.fg)),
         ...userSelect("none"),
         ...buttonStates(
             {
@@ -682,28 +685,29 @@ export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
                     outline: 0,
                 },
                 hover: {
-                    backgroundColor: important(ColorsUtils.colorOut(globalVars.states.hover.highlight) as string),
-                    color: globalVars.states.hover.contrast
-                        ? ColorsUtils.colorOut(globalVars.states.hover.contrast)
-                        : undefined,
-                },
-                focus: {
-                    backgroundColor: important(ColorsUtils.colorOut(globalVars.states.focus.highlight) as string),
-                    color: globalVars.states.hover.contrast
-                        ? ColorsUtils.colorOut(globalVars.states.focus.contrast)
-                        : undefined,
+                    backgroundColor: important(
+                        ColorsUtils.varOverride(
+                            ColorVar.HighlightBackground,
+                            globalVars.states.hover.highlight,
+                        ) as string,
+                    ),
+                    color: ColorsUtils.varOverride(ColorVar.HighlightForeground, globalVars.states.hover.contrast),
                 },
                 active: {
-                    backgroundColor: important(ColorsUtils.colorOut(globalVars.states.active.highlight) as string),
-                    color: globalVars.states.hover.contrast
-                        ? ColorsUtils.colorOut(globalVars.states.active.contrast)
-                        : undefined,
+                    backgroundColor: important(
+                        ColorsUtils.varOverride(
+                            ColorVar.HighlightBackground,
+                            globalVars.states.active.highlight,
+                        ) as string,
+                    ),
+                    color: ColorsUtils.varOverride(ColorVar.HighlightForeground, globalVars.states.active.contrast),
                 },
                 keyboardFocus: {
-                    borderColor: ColorsUtils.colorOut(globalVars.states.focus.highlight),
-                    color: globalVars.states.hover.contrast
-                        ? ColorsUtils.colorOut(globalVars.states.focus.contrast)
-                        : undefined,
+                    borderColor: ColorsUtils.varOverride(
+                        ColorVar.HighlightFocusBackground,
+                        globalVars.states.focus.highlight,
+                    ),
+                    color: ColorsUtils.varOverride(ColorVar.HighlightFocusForeground, globalVars.states.focus.contrast),
                 },
             },
             undefined,

@@ -26,7 +26,7 @@ use Vanilla\QnA\AutomationRule\Models\QuestionRuleDataType;
 class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -34,7 +34,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -42,7 +42,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -50,7 +50,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -58,7 +58,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -127,7 +127,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getTriggerValueSchema(): Schema
     {
@@ -180,7 +180,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -191,7 +191,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getPrimaryKey(string $alias = ""): string
     {
@@ -200,7 +200,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getWhereArray(array $triggerValue, ?DateTimeImmutable $lastRunDate = null): array
     {
@@ -247,7 +247,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess(mixed $lastRecordId, array $where): iterable
     {
@@ -277,7 +277,7 @@ class UnAnsweredQuestionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {

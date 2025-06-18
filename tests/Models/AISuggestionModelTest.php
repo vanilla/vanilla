@@ -62,7 +62,7 @@ class AISuggestionModelTest extends SiteTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function setUpBeforeClass(): void
     {

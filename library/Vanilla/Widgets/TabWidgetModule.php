@@ -12,14 +12,14 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Site\SiteSectionModel;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 
 /**
  * Module for rendering multiple modules for tabs.
  *
  * Other modules must have a factory extending TabWidgetTabFactory and be registered with the TabWidgetTabService.
  */
-class TabWidgetModule extends AbstractReactModule
+class TabWidgetModule extends LegacyReactModule
 {
     use HomeWidgetContainerSchemaTrait;
 
@@ -52,7 +52,7 @@ class TabWidgetModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getProps(): ?array
     {
@@ -109,7 +109,7 @@ class TabWidgetModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -164,7 +164,7 @@ class TabWidgetModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {

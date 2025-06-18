@@ -76,6 +76,7 @@ export default function AutomationRulesSummary(props: IAutomationRulesSummaryPro
             staleDiscussionTrigger: t("A post"),
             staleCollectionTrigger: t("A post has been added to a collection"),
             timeSinceUserRegistrationTrigger: t("A user has been registered"),
+            timeSinceLastActiveTrigger: t("A user has not been active"),
             unAnsweredQuestionTrigger: t("A question"),
         },
         // Add new actions, alphabetically.

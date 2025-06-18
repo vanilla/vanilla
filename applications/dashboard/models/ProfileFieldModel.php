@@ -869,6 +869,7 @@ class ProfileFieldModel extends FullRecordCacheModel
         $session = Gdn::session();
         // Load profiles fields if the loading current user's data, or have full permissions
         if (
+            $ignoreVisibility ||
             $session->UserID === $userID ||
             $session->checkPermission(
                 [
@@ -889,7 +890,7 @@ class ProfileFieldModel extends FullRecordCacheModel
             // Loading public account with profile view permissions
             if (!($user["Private"] ?? 0) && $session->checkPermission(["Garden.Profiles.View"], false)) {
                 $values = $this->userMetaModel->getUserMeta($userID, "Profile.%", null, "Profile.");
-                $this->processUserProfileFields($userID, $values, $ignoreVisibility);
+                $this->processUserProfileFields($userID, $values);
             }
         }
 
@@ -948,6 +949,10 @@ class ProfileFieldModel extends FullRecordCacheModel
 
             $dataType = $fields[$name]["dataType"] ?? null;
             $value = self::normnalizeDuplicatedFields($value, $dataType);
+            if ($value === null) {
+                // If the value is null, we can skip further processing.
+                continue;
+            }
             switch ($dataType) {
                 case ProfileFieldModel::DATA_TYPE_BOOL:
                     $value = (bool) $value;
@@ -958,7 +963,7 @@ class ProfileFieldModel extends FullRecordCacheModel
                 case ProfileFieldModel::DATA_TYPE_DATE:
                     try {
                         $value = new \DateTimeImmutable($value, $utc);
-                    } catch (\Exception $ex) {
+                    } catch (\Throwable $ex) {
                         $value = null;
                     }
                     break;

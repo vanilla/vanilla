@@ -5,6 +5,7 @@
 import { logDebugConditionnal, logError } from "@vanilla/utils";
 import { color, ColorHelper, important } from "csx";
 import { stringIsLinearGradient } from "@library/styles/styleUtils";
+import { ColorVar } from "@library/styles/CssVar";
 export class ColorsUtils {
     constructor() {
         throw new Error("Not to be instantiated");
@@ -32,6 +33,52 @@ export class ColorsUtils {
     static ensureColorHelper = (colorValue: string | ColorHelper): ColorHelper => {
         return typeof colorValue === "string" ? color(colorValue) : colorValue;
     };
+
+    static var(first: string | ColorHelper, ...rest: Array<string | ColorHelper | undefined | null>): string;
+    static var(
+        first: string | ColorHelper | undefined,
+        ...rest: Array<string | ColorHelper | undefined | null>
+    ): string | undefined;
+    static var(...args: Array<string | ColorHelper>): string | undefined {
+        let [first, ...rest] = args;
+
+        if (!first) {
+            return;
+        }
+
+        if (first instanceof ColorHelper) {
+            first = first.toString();
+        }
+
+        if (!first.startsWith("--")) {
+            // not a css variable
+            return first;
+        }
+
+        const restResult = this.var(...(rest as [string | ColorHelper]));
+        if (restResult === null) {
+            return `var(${first})`;
+        } else {
+            return `var(${first}, ${restResult})`;
+        }
+    }
+
+    static varOverride(first: ColorVar | ColorHelper, ...rest: Array<string | ColorHelper | undefined | null>): string;
+    static varOverride(
+        first: string | ColorHelper | undefined,
+        ...rest: Array<string | ColorHelper | undefined | null>
+    ): string | undefined;
+    static varOverride(...args: Array<ColorVar | string | ColorHelper>): string | undefined {
+        args = args.map((arg) => {
+            if (Object.values(ColorVar).includes(arg as ColorVar)) {
+                return `${arg}-override`;
+            } else {
+                return arg;
+            }
+        });
+
+        return this.var(...(args as [string | ColorHelper]));
+    }
 
     static colorOut(
         colorValue?: ColorHelper | string,

@@ -8,11 +8,13 @@
 namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
+use Vanilla\Forms\NoCustomFragmentCondition;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\TwigRenderTrait;
+use Vanilla\Widgets\Fragments\OriginalPostFragmentMeta;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 class OriginalPostAsset extends AbstractLayoutAsset implements HydrateAwareInterface
@@ -55,12 +57,9 @@ TWIG
         return "OriginalPostAsset";
     }
 
-    /**
-     * TODO: Get new icon from design and replace
-     */
     public static function getWidgetIconPath(): ?string
     {
-        return "/applications/dashboard/design/images/widgetIcons/guest-cta.svg";
+        return "/applications/dashboard/design/images/widgetIcons/OriginalPost.svg";
     }
 
     public static function getWidgetSchema(): Schema
@@ -85,5 +84,13 @@ TWIG
     public static function getWidgetID(): string
     {
         return "asset.originalPost";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [OriginalPostFragmentMeta::class];
     }
 }

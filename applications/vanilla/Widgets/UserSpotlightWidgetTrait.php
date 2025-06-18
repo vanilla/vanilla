@@ -71,7 +71,7 @@ trait UserSpotlightWidgetTrait
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

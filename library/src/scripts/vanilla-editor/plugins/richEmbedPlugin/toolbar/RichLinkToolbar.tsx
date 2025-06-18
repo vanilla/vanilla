@@ -23,7 +23,7 @@ import { setRichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbed
 import { unlinkRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/unlinkRichLink";
 import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 import Floating, { defaultFloatingOptions } from "@library/vanilla-editor/toolbars/Floating";
-import { useMyEditorState } from "@library/vanilla-editor/typescript";
+import { useMyEditorState } from "@library/vanilla-editor/getMyEditor";
 import { focusEditor } from "@udecode/plate-common";
 import { arrow, shift } from "@udecode/plate-floating";
 import { useFloatingLinkSelectors } from "@udecode/plate-link";

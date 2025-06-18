@@ -4,48 +4,89 @@
  * @license Proprietary
  */
 
-import { PostField, PostType } from "@dashboard/postTypes/postType.types";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { PostField } from "@dashboard/postTypes/postType.types";
 import { ITag } from "@library/features/tags/TagsReducer";
-import { MyValue } from "@library/vanilla-editor/typescript";
-import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { RecordID } from "@vanilla/utils";
+import { ICreatePostForm } from "@vanilla/addon-vanilla/createPost/CreatePostFormAsset.hooks";
 
 // Find DraftsApi namespace in DraftsApi.tsx
 
+export enum DraftRecordType {
+    DISCUSSION = "discussion",
+    COMMENT = "comment",
+    ARTICLE = "article",
+    EVENT = "event",
+}
 /**
  * The shape of the draft object returned from the drafts API.
  */
 export interface IDraft {
     draftID: RecordID;
-    recordType: "discussion" | "comment";
+    draftStatus: DraftStatus;
+    breadCrumbs: ICrumb[];
+    recordType: DraftRecordType;
     insertUserID: RecordID;
     dateInserted: string;
     updateUserID: RecordID;
     dateUpdated: string;
     attributes: DraftAttributes;
+    editUrl: string;
+    dateScheduled?: string;
+    permaLink?: string;
+    parentRecordType?: string;
+    parentRecordID?: number;
+    failedReason?: string;
+    excerpt?: string;
+    name?: string;
+    recordID?: RecordID;
 }
 
 export interface DraftAttributes {
-    /** Text content of the draft */
+    /** Text content of the draft in whatever format it was saved*/
     body: string | undefined;
     /** Content format */
     format: string;
-    draftType: "discussion" | "comment";
-    /** The parent of this draft once posted */
-    parentRecordType?: null | "discussion" | "comment" | "category" | "group";
-    parentRecordID?: null | RecordID;
+    draftType: "discussion" | "comment" | "event";
+
     draftMeta?: Partial<PostDraftMeta> | Partial<CommentDraftMeta>;
     lastSaved: string;
     groupID?: RecordID;
 }
 
-export interface PostDraftMeta {
-    name: string;
+export interface ILegacyDraft {
+    draftID: RecordID;
+    recordType: DraftRecordType;
+    insertUserID: RecordID;
+    dateInserted: string;
+    updateUserID: RecordID;
+    dateUpdated: string;
+    attributes: LegacyDraftAttributes;
+    parentRecordID?: number;
+}
+
+/**
+ * Shape of the legacy draft attributes
+ */
+export type LegacyDraftAttributes = {
+    announce?: string;
+    body?: string;
+    format?: string;
+    name?: string;
+    tags?: string;
+    type?: "Discussion";
+};
+
+export interface PostDraftMeta
+    extends Partial<
+        Pick<
+            ICreatePostForm,
+            "name" | "tagIDs" | "newTagNames" | "pinLocation" | "pinned" | "categoryID" | "postTypeID"
+        >
+    > {
+    /** @deprecated Use `tagIDs` and `newTagNames` instead **/
+    tags?: Array<ITag["tagID"]>; // @deprecated
     postMeta: Record<PostField["postFieldID"], any>;
-    tags: Array<ITag["tagID"]>;
-    pinLocation: "none" | "category" | "recent";
-    categoryID?: ICategory["categoryID"];
-    postTypeID?: PostType["postTypeID"];
 }
 
 export interface CommentDraftMeta {
@@ -76,6 +117,13 @@ export interface EditExistingPostParams {
     parentRecordID: RecordID | null;
 }
 
+export enum DraftStatus {
+    DRAFT = "draft",
+    SCHEDULED = "scheduled",
+    ERROR = "error",
+}
+
+export type DraftsSortValue = "dateScheduled" | "-dateScheduled" | "";
 export interface PostPageParams {
     discussionID?: RecordID;
     commentID?: RecordID;

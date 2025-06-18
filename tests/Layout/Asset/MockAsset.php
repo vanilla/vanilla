@@ -12,7 +12,7 @@ use Garden\Schema\Schema;
 class MockAsset extends \Vanilla\Layout\Asset\AbstractLayoutAsset
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -20,7 +20,7 @@ class MockAsset extends \Vanilla\Layout\Asset\AbstractLayoutAsset
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): ?string
     {
@@ -28,7 +28,7 @@ class MockAsset extends \Vanilla\Layout\Asset\AbstractLayoutAsset
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -39,7 +39,7 @@ class MockAsset extends \Vanilla\Layout\Asset\AbstractLayoutAsset
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -47,7 +47,7 @@ class MockAsset extends \Vanilla\Layout\Asset\AbstractLayoutAsset
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -73,7 +73,7 @@ class MockAsset extends \Vanilla\Layout\Asset\AbstractLayoutAsset
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

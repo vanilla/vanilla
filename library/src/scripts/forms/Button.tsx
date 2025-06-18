@@ -6,30 +6,38 @@
 
 import React from "react";
 import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonType, ButtonTypes } from "@library/forms/buttonTypes";
 import { cx } from "@emotion/css";
 import { getClassForButtonType } from "./Button.getClassForButtonType";
+import { useWithThemeContext } from "@library/theming/ThemeOverrideContext";
+import type { UseMutationResult } from "@tanstack/react-query";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 
 export interface IButtonProps extends IOptionalComponentID, React.ButtonHTMLAttributes<HTMLButtonElement> {
     prefix?: string;
     legacyMode?: boolean;
     ariaLabel?: string;
-    buttonType?: ButtonTypes;
+    buttonType?: ButtonType;
     ariaHidden?: boolean;
     tabIndex?: number;
     buttonRef?: React.Ref<HTMLButtonElement>;
     controls?: string;
     submit?: boolean;
+    mutation?: UseMutationResult<any>;
 }
 
 interface IState {
     id?: string;
 }
 
+declare namespace Button {
+    export type Type = ButtonType;
+}
+
 /**
  * A stylable, configurable button component.
  */
-const Button = React.forwardRef(function Button(_props: IButtonProps, ref: React.Ref<HTMLButtonElement>) {
+const ButtonInit = React.forwardRef(function Button(_props: IButtonProps, ref: React.Ref<HTMLButtonElement>) {
     const props = {
         id: undefined,
         disabled: false,
@@ -48,12 +56,15 @@ const Button = React.forwardRef(function Button(_props: IButtonProps, ref: React
         controls,
         buttonRef,
         id: _id,
+        mutation,
         ...restProps
     } = props;
 
     const ownID = useUniqueID(props.prefix);
     const id = _id ?? ownID;
-    const componentClasses = cx(getClassForButtonType(buttonType), { Button: legacyMode }, className);
+    const componentClasses = useWithThemeContext(() =>
+        cx(getClassForButtonType(buttonType), { Button: legacyMode }, className),
+    );
 
     return (
         <button
@@ -65,9 +76,17 @@ const Button = React.forwardRef(function Button(_props: IButtonProps, ref: React
             ref={ref ?? buttonRef}
             aria-controls={controls}
             {...restProps}
+            disabled={props.disabled ?? mutation?.isLoading ?? false}
         >
-            {props.children}
+            {mutation?.isLoading ? <ButtonLoader /> : props.children}
         </button>
     );
 });
+
+const Button = Object.assign(ButtonInit, {
+    Type: ButtonType,
+    getClassForType: getClassForButtonType,
+    Loader: ButtonLoader,
+});
+
 export default Button;

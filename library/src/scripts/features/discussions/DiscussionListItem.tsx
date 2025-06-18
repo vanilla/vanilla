@@ -50,8 +50,8 @@ export default function DiscussionListItem(props: IProps) {
     const { getDiscussionByIDs } = useDiscussionActions();
     const dispatch = useDiscussionsDispatch();
 
-    const classes = discussionListClasses(props.discussionOptions, props.asTile);
-    const variables = discussionListVariables(props.discussionOptions);
+    const classes = discussionListClasses.useAsHook(props.discussionOptions, props.asTile);
+    const variables = discussionListVariables.useAsHook(props.discussionOptions);
     const currentUserSignedIn = useCurrentUserSignedIn();
     const checkBoxContext = useDiscussionCheckBoxContext();
     const hasUnread = discussion.unread || (discussion.countUnread !== undefined && discussion.countUnread > 0);

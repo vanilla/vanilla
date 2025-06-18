@@ -23,7 +23,7 @@ class TagModuleTest extends SiteTestCase
     public static $addons = ["pockets"];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

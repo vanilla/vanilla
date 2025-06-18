@@ -12,6 +12,7 @@ import { BorderType } from "@library/styles/styleHelpers";
 import { ListSeparation } from "@library/styles/cssUtilsTypes";
 import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import PanelWidget from "@library/layout/components/PanelWidget";
+import { color } from "csx";
 
 export default {
     title: "Components/QuickLinks",
@@ -115,7 +116,7 @@ export const ListItemColors = storyWithConfig(
                         color: "#03526C",
                     },
                     fontState: {
-                        color: "#013D51",
+                        color: color("#013D51"),
                     },
                     listSeparation: ListSeparation.SEPARATOR,
                 },
@@ -168,7 +169,7 @@ export const Borders = storyWithConfig(
                         color: "#fff",
                     },
                     fontState: {
-                        color: "#fff",
+                        color: color("#fff"),
                     },
                     listSeparation: ListSeparation.SEPARATOR,
                     spacing: {

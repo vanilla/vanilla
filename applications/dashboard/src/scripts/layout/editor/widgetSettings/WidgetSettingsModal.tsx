@@ -20,7 +20,7 @@ import { WidgetSettingsPreview } from "@dashboard/layout/editor/widgetSettings/W
 import { widgetSettingsClasses } from "@dashboard/layout/editor/widgetSettings/WidgetSettings.classes";
 import { WidgetSettings } from "@dashboard/layout/editor/widgetSettings/WidgetSettings";
 import { IFieldError, JsonSchema, PartialSchemaDefinition } from "@vanilla/json-schema-forms";
-import { ILayoutCatalog, IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ILayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { useFormik } from "formik";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { useIsMounted } from "@vanilla/react-utils";
@@ -38,26 +38,13 @@ interface IProps {
     exitHandler: ComponentProps<typeof Modal>["exitHandler"];
     widgetID: string;
     initialValues: any;
-    widgetCatalog: IWidgetCatalog;
-    middlewaresCatalog: ILayoutCatalog["middlewares"];
-    assetCatalog?: IWidgetCatalog;
+    layoutCatalog: ILayoutCatalog | null;
     schema: JsonSchema;
     name: string;
 }
 
 export function WidgetSettingsModal(props: IProps) {
-    const {
-        schema,
-        name,
-        widgetID,
-        onSave,
-        isVisible,
-        exitHandler,
-        initialValues,
-        widgetCatalog,
-        middlewaresCatalog,
-        assetCatalog,
-    } = props;
+    const { schema, name, widgetID, onSave, isVisible, exitHandler, initialValues, layoutCatalog } = props;
 
     const classes = widgetSettingsClasses();
     const classFrameFooter = frameFooterClasses();
@@ -170,6 +157,10 @@ export function WidgetSettingsModal(props: IProps) {
         }
     }
 
+    if (!layoutCatalog) {
+        return <></>;
+    }
+
     return (
         <Modal
             isVisible={isVisible}
@@ -186,6 +177,7 @@ export function WidgetSettingsModal(props: IProps) {
                 className={classes.modalForm}
             >
                 <Frame
+                    canGrow={true}
                     header={
                         <FrameHeader
                             titleID={titleID}
@@ -199,17 +191,15 @@ export function WidgetSettingsModal(props: IProps) {
                                 widgetID={widgetID}
                                 config={values}
                                 value={values}
-                                widgetCatalog={widgetCatalog}
                                 onChange={setValues}
                                 schema={schema}
-                                middlewares={middlewaresCatalog}
-                                assetCatalog={assetCatalog}
+                                layoutCatalog={layoutCatalog}
                             />
                             <WidgetSettings
                                 value={values}
                                 onChange={setValues}
                                 schema={schema}
-                                middlewares={middlewaresCatalog}
+                                middlewares={layoutCatalog.middlewares}
                                 fieldErrors={fieldErrors}
                             />
                         </section>

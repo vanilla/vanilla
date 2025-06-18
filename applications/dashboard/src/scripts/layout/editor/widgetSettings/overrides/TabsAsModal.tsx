@@ -14,16 +14,16 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import { FormTreeControl, IFormTreeControl } from "@library/tree/FormTreeControl";
+import { FormTreeControl } from "@library/tree/FormTreeControl";
 import { t } from "@vanilla/i18n";
-import { IControlProps, IModalControl } from "@vanilla/json-schema-forms";
+import { IControlProps, IModalControl, type IDragAndDropControl } from "@vanilla/json-schema-forms";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 
 export const TABS_AS_MODAL = {
     condition: (props: IControlProps): boolean => {
         return props.control.inputType === "modal" && props.rootSchema.description === "Tabs";
     },
-    callback: function TabsListModalControl(props: IControlProps<IModalControl<IFormTreeControl>>) {
+    callback: function TabsListModalControl(props: IControlProps<IModalControl<IDragAndDropControl>>) {
         const classes = modalClasses();
 
         const [isOpen, setOpen] = useState(false);

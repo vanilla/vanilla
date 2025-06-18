@@ -30,7 +30,7 @@ class RichTextFragmentTest extends BootstrapTestCase
     private $formatter;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

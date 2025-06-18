@@ -65,7 +65,7 @@ class SiteSectionLayoutRecordProvider implements LayoutViewRecordProviderInterfa
     /**
      * Resolve a layout query using a site section.
      *
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveLayoutQuery(LayoutQuery $query): LayoutQuery
     {

@@ -10,7 +10,7 @@ use Garden\Schema\Schema;
 use Vanilla\Contracts\Addons\WidgetInterface;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\Widgets\AbstractWidgetModule;
+use Vanilla\Widgets\LegacyWidgetModule;
 
 /**
  * Class MockWidget3

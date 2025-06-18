@@ -24,7 +24,7 @@ class UserSignInEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function eventType(): string
     {
@@ -32,7 +32,7 @@ class UserSignInEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function formatAuditMessage(string $eventType, array $context, array $meta): string
     {

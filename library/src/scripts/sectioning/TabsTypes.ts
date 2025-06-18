@@ -7,4 +7,5 @@ export enum TabsTypes {
     STANDARD = "tab-standard",
     BROWSE = "tab-browse",
     GROUP = "tab-group",
+    RESET = "reset",
 }

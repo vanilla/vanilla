@@ -35,7 +35,7 @@ use Vanilla\QnA\Models\QnAJsonLD;
 use Vanilla\QnA\Models\QuestionSearchType;
 use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetService;
 
 /**
  * Adds Question & Answer format to Vanilla.
@@ -285,7 +285,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function getPsrEventHandlerMethods(): array
     {
@@ -305,7 +305,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             ->addCall("registerSearchType", [new Reference(QuestionSearchType::class)])
             ->addCall("registerSearchType", [new Reference(AnswerSearchType::class)]);
 
-        $dic->rule(WidgetService::class)->addCall("registerWidget", [QnAWidgetModule::class]);
+        $dic->rule(LegacyWidgetService::class)->addCall("registerWidget", [QnAWidgetModule::class]);
 
         $dic->rule(\Vanilla\DiscussionTypeConverter::class)->addCall("addTypeHandler", [
             new Reference(QnaTypeHandler::class),
@@ -589,23 +589,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             return;
         }
 
-        if (isset($args["DiscussionOptions"])) {
-            $args["DiscussionOptions"]["QnA"] = [
-                "Label" => t("Q&A") . "...",
-                "Url" => "/discussion/qnaoptions?discussionid=" . $discussion->DiscussionID,
-                "Class" => "Popup",
-            ];
-        } elseif (isset($sender->Options)) {
-            $sender->Options .=
-                "<li>" .
-                anchor(
-                    t("Q&A") . "...",
-                    "/discussion/qnaoptions?discussionid=" . $discussion->DiscussionID,
-                    "Popup QnAOptions"
-                ) .
-                "</li>";
-        }
-
         // add option for follow up notification endpoint manual trigger
         if (
             strtolower($sender->ControllerName) === "discussioncontroller" &&
@@ -704,7 +687,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             ],
         ];
 
-        $activityModel->save($activity, "QuestionAnswered");
+        $activityModel->save($activity, "QuestionAnswer");
     }
 
     /**
@@ -913,9 +896,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function discussionController_qnAOptions_create($sender, $discussionID = "", $commentID = "")
     {
-        if ($discussionID) {
-            $this->_discussionOptions($sender, $discussionID);
-        } elseif ($commentID) {
+        if ($commentID) {
             $this->_commentOptions($sender, $commentID);
         }
     }
@@ -1080,50 +1061,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     protected function updateCommentQnA($discussion, $comment, $newQnA, Gdn_Form $form = null)
     {
         $this->answerModel->updateCommentQnA($discussion, $comment, $newQnA, $form);
-    }
-
-    /**
-     *
-     *
-     * @param $sender controller instance.
-     * @param int|string $discussionID Identifier of the discussion.
-     *
-     * @throws notFoundException
-     * @throws Gdn_UserException
-     */
-    protected function _discussionOptions($sender, $discussionID)
-    {
-        $sender->Form = new Gdn_Form();
-
-        $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
-
-        if (!$discussion) {
-            throw notFoundException("Discussion");
-        }
-
-        $sender->permission("Vanilla.Discussions.Edit", true, "Category", val("PermissionCategoryID", $discussion));
-
-        // Both '' and 'Discussion' denote a discussion type of discussion.
-        if (!val("Type", $discussion)) {
-            setValue("Type", $discussion, "Discussion");
-        }
-
-        if ($sender->Form->authenticatedPostBack()) {
-            $type = $sender->Form->getFormValue("Type");
-            $this->updateRecordType($discussionID, $discussion, $type);
-            $sender->Form->setValidationResults($this->discussionModel->validationResults());
-            Gdn::controller()->jsonTarget("", "", "Refresh");
-        } else {
-            $sender->Form->setData($discussion);
-        }
-
-        $sender->setData("Discussion", $discussion);
-        $sender->setData("_Types", [
-            "Question" => "@" . t("Question Type", "Question"),
-            "Discussion" => "@" . t("Discussion Type", "Discussion"),
-        ]);
-        $sender->setData("Title", t("Q&A Options"));
-        $sender->render("DiscussionOptions", "", "plugins/QnA");
     }
 
     /**
@@ -1980,7 +1917,16 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function discussionsApiController_post_question(DiscussionsApiController $sender, array $body)
     {
-        $this->apiQuestionInsert = true;
+        if (
+            isset($body["type"]) &&
+            $body["type"] == DiscussionModel::SCHEDULE_TYPE &&
+            $body["postTypeID"] == "question"
+        ) {
+            $this->apiQuestionInsert = false;
+        } else {
+            $this->apiQuestionInsert = true;
+        }
+
         try {
             // Type is added in discussionModel_beforeSaveDiscussion_handler
             return $sender->post($body);

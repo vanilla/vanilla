@@ -45,7 +45,7 @@ class BlotPointerTextFragment implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getInnerContent(): string
     {
@@ -63,7 +63,7 @@ class BlotPointerTextFragment implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFragmentType(): string
     {

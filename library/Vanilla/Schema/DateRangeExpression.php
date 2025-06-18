@@ -36,7 +36,7 @@ class DateRangeExpression extends RangeExpression
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function parse($expr, Schema $valueSchema = null, bool $keepExpr = false)
     {
@@ -54,7 +54,7 @@ class DateRangeExpression extends RangeExpression
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function createSchema($valueSchema = null, bool $allowRevalidate = false): Schema
     {
@@ -63,7 +63,7 @@ class DateRangeExpression extends RangeExpression
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected static function validateValue($value, ?Schema $schema, Validation $validation, string $name, string $op)
     {

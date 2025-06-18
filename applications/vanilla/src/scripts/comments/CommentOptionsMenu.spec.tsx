@@ -4,20 +4,20 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { screen, waitFor, within } from "@testing-library/react";
 import { CommentOptionsMenu } from "@vanilla/addon-vanilla/comments/CommentOptionsMenu";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import { CommentFixture } from "@vanilla/addon-vanilla/comments/__fixtures__/Comment.Fixture";
 import { setMeta } from "@library/utility/appUtils";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
+import { CommentSpecFixture } from "@vanilla/addon-vanilla/comments/__fixtures__/CommentSpecFixture";
 
 describe("CommentOptionsMenu", () => {
     describe("Someones else's comment", () => {
         const notMyComment = { ...CommentFixture.mockComment, insertUserID: 12 };
         describe("With no permissions", () => {
             it("No menu is rendered", async () => {
-                await CommentFixture.wrapInProvider(
+                await CommentSpecFixture.wrapInProvider(
                     <PermissionsFixtures.NoPermissions>
                         <CommentOptionsMenu
                             comment={notMyComment}
@@ -34,7 +34,7 @@ describe("CommentOptionsMenu", () => {
 
         describe("With all permissions", () => {
             it("All options are rendered", async () => {
-                await CommentFixture.wrapInProvider(
+                await CommentSpecFixture.wrapInProvider(
                     <PermissionsFixtures.AllPermissions>
                         <CommentOptionsMenu
                             comment={notMyComment}
@@ -69,7 +69,7 @@ describe("CommentOptionsMenu", () => {
                 // allow deleting one's own comment
                 setMeta("ui.allowSelfDelete", true);
 
-                await CommentFixture.wrapInProvider(
+                await CommentSpecFixture.wrapInProvider(
                     <CommentOptionsMenu
                         comment={commentCreatedTwentyMinutesAgo}
                         commentParent={DiscussionFixture.mockCommentParent}
@@ -97,7 +97,7 @@ describe("CommentOptionsMenu", () => {
                 // set the edit content timeout to 15 minutes
                 setMeta("ui.editContentTimeout", 15 * 60);
 
-                await CommentFixture.wrapInProvider(
+                await CommentSpecFixture.wrapInProvider(
                     <CommentOptionsMenu
                         comment={commentCreatedTwentyMinutesAgo}
                         commentParent={DiscussionFixture.mockCommentParent}

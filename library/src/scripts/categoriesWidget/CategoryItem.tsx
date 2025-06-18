@@ -1,12 +1,12 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { cx } from "@emotion/css";
 import { ListItem } from "@library/lists/ListItem";
 import React from "react";
-import { createSourceSetValue, getMeta } from "@library/utility/appUtils";
+import { createSourceSetValue, getMeta, siteUrl } from "@library/utility/appUtils";
 import {
     HomeWidgetItemContentType,
     IHomeWidgetItemOptions,
@@ -20,7 +20,7 @@ import { CategoryItemMeta } from "@library/categoriesWidget/CategoryItemMeta";
 import CategoryFollowDropDown from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import { useCurrentUser, useCurrentUserSignedIn } from "@library/features/users/userHooks";
 import { LocationDescriptor } from "history";
-import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
+import { IFollowedCategoryNotificationPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
 
 export interface ICategoryItemOptions {
     imagePlacement?: IHomeWidgetItemOptions["imagePlacement"];
@@ -62,7 +62,7 @@ export interface ICategoryItem extends CommonHomeWidgetItemProps {
     noChildCategoriesMessage?: string;
     counts: ICategoryItemCount[];
     lastPost?: Partial<IDiscussion>;
-    preferences?: ICategoryPreferences;
+    preferences?: IFollowedCategoryNotificationPreferences;
 }
 interface IProps {
     category: ICategoryItem;
@@ -95,10 +95,10 @@ export default function CategoryItem(props: IProps) {
     const currentUser = useCurrentUser();
     const currentUserSignedIn = useCurrentUserSignedIn();
 
-    const classes = categoryListClasses(categoryOptions, asTile);
+    const classes = categoryListClasses.useAsHook(categoryOptions, asTile);
 
     const iconUrlSrcSet = category.iconUrlSrcSet ? { srcSet: createSourceSetValue(category.iconUrlSrcSet) } : {};
-    const defaultIconUrl = homeWidgetItemVariables().options.defaultIconUrl;
+    const defaultIconUrl = homeWidgetItemVariables.useAsHook().options.defaultIconUrl;
 
     const showIcon = options?.contentType === HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON;
     const showFeaturedImage = options?.contentType === HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE;
@@ -107,7 +107,7 @@ export default function CategoryItem(props: IProps) {
         <div className={classes.iconContainer}>
             <img
                 className={classes.icon}
-                src={category.iconUrl ?? defaultIconUrl}
+                src={siteUrl(category.iconUrl ?? defaultIconUrl!)}
                 alt={category.name}
                 loading="lazy"
                 {...iconUrlSrcSet}
@@ -174,16 +174,16 @@ export default function CategoryItem(props: IProps) {
                 currentUser?.userID &&
                 !asTile && (
                     <CategoryFollowDropDown
+                        recordID={category.categoryID}
                         userID={currentUser?.userID}
-                        categoryID={category.categoryID}
-                        categoryName={category.name}
+                        name={category.name}
                         notificationPreferences={category.preferences}
                         emailDigestEnabled={getMeta("emails.digest", false)}
                         iconOnly
                         preview={props.isPreview}
                         className={classes.listItemActionButton}
                         onPreferencesChange={onCategoryFollowChange}
-                        categoryUrl={category.to as string}
+                        viewRecordUrl={category.to as string}
                     />
                 )
             }

@@ -17,7 +17,7 @@ import { logError } from "@vanilla/utils";
 import { Mixins } from "@library/styles/Mixins";
 import { oneColumnVariables } from "./Section.variables";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 
 export type ISectionClasses = ReturnType<typeof generateSectionClasses>;
 
@@ -58,6 +58,11 @@ export const generateSectionClasses = (props: {
         [`&.noBreadcrumbs > .${main}`]: {
             // Offset for our widget spacers.
             marginTop: negativeUnit(globalVars.widget.padding),
+        },
+
+        "& .widget-droppable": {
+            marginLeft: 10,
+            marginRight: 10,
         },
     });
 
@@ -250,11 +255,14 @@ export const generateSectionClasses = (props: {
         ...Mixins.margin({
             vertical: globalVars.spacer.pageComponentCompact,
         }),
-        "&:first-child": {
+        "&:first-child, .widget-droppable.collapsed:first-child + &": {
             marginTop: 0,
         },
         "&:last-child": {
             marginBottom: 0,
+        },
+        "& + .widget-droppable.collapsed:last-child": {
+            "--droppable-inverse-margin": -globalVars.spacer.pageComponentCompact,
         },
     };
     const mainPanelWidget = css(mainPanelWidgetMixin);
@@ -263,11 +271,15 @@ export const generateSectionClasses = (props: {
         ...Mixins.margin({
             vertical: globalVars.spacer.panelComponent,
         }),
-        "&:first-child": {
+        "&:first-child, .widget-droppable.collapsed:first-child + &": {
             marginTop: 0,
         },
         "&:last-child": {
             marginBottom: 0,
+        },
+
+        "& + .widget-droppable.collapsed:last-child": {
+            "--droppable-inverse-margin": -globalVars.spacer.panelComponent,
         },
     };
     const secondaryPanelWidget = css(secondaryPanelWidgetMixin);

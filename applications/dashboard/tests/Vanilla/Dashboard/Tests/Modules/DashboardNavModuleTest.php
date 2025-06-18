@@ -18,7 +18,7 @@ class DashboardNavModuleTest extends AbstractAPIv2Test
     private $nav;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

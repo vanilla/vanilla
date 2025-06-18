@@ -562,7 +562,7 @@ class ProfileController extends Gdn_Controller
         $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
         $hasFields = $profileFieldModel->hasVisibleFields($userID);
 
-        $this->registerReduxActionProvider(\Gdn::getContainer()->get(ProfileFieldsPreloadProvider::class));
+        $this->registerPreloader(\Gdn::getContainer()->get(ProfileFieldsPreloadProvider::class));
 
         if ($hasFields) {
             $this->getUserInfo($userReference, $username, $userID, true);
@@ -604,7 +604,7 @@ class ProfileController extends Gdn_Controller
         }
         $this->permission(["Garden.SignIn.Allow", "Garden.Profiles.Edit"], true);
 
-        $this->registerReduxActionProvider(\Gdn::getContainer()->get(ProfileFieldsPreloadProvider::class));
+        $this->registerPreloader(\Gdn::getContainer()->get(ProfileFieldsPreloadProvider::class));
 
         // Get the currently viewed user's information
         $this->getUserInfo($userReference, $username, $userID, true);

@@ -7,9 +7,11 @@
 
 namespace Vanilla\Site;
 
+use Exception;
 use Garden\Schema\Schema;
-use Gdn;
 use Gdn_Router;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionChildIDProviderInterface;
 use Vanilla\Contracts\Site\SiteSectionCounterInterface;
@@ -23,8 +25,10 @@ use VanillaTests\Fixtures\MockSiteSectionProvider;
  * Class SiteSectionModel
  * @package Vanilla\Site
  */
-class SiteSectionModel implements SiteSectionChildIDProviderInterface
+class SiteSectionModel implements SiteSectionChildIDProviderInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** @var SiteSectionProviderInterface[] $providers */
     private $providers = [];
 
@@ -387,8 +391,15 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
     {
         $default = null;
         foreach ($this->providers as $provider) {
-            if (!empty(($current = $provider->getDefaultSiteSection()))) {
-                $default = $current;
+            try {
+                if (!empty(($current = $provider->getDefaultSiteSection()))) {
+                    $default = $current;
+                }
+            } catch (Exception $ex) {
+                // We don't want an exception to break the whole routing so we will log it and carry on.
+                $this->logger->error("Error getting default site section from " . $provider::class, [
+                    "message" => $ex->getMessage(),
+                ]);
             }
         }
         return $default ?? $this->defaultSiteSection;

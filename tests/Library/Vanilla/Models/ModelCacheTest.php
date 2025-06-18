@@ -34,7 +34,7 @@ class ModelCacheTest extends SiteTestCase
     private $modelCache;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

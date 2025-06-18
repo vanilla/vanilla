@@ -12,7 +12,7 @@ import { t } from "@library/utility/appUtils";
 import { useVanillaEditorBounds } from "@library/vanilla-editor/VanillaEditorBoundsContext";
 import Floating, { defaultFloatingOptions } from "@library/vanilla-editor/toolbars/Floating";
 import { useFloatingMarkToolbar } from "@library/vanilla-editor/toolbars/useFloatingMarkToolbar";
-import { useMyEditorState } from "@library/vanilla-editor/typescript";
+import { useMyEditorState } from "../getMyEditor";
 import { MARK_BOLD, MARK_CODE, MARK_ITALIC, MARK_STRIKETHROUGH } from "@udecode/plate-basic-marks";
 import { focusEditor, getPluginType, isMarkActive, someNode, toggleMark } from "@udecode/plate-common";
 import { arrow, shift } from "@udecode/plate-floating";

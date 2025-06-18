@@ -21,7 +21,7 @@ use Vanilla\Salesforce\Action\EscalateSalesforceLeadAction;
 class EscalationRuleDataType extends RuleDataType
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      * @psalm-suppress UndefinedClass
      */
     protected function getAllTriggerClasses(): array
@@ -30,7 +30,7 @@ class EscalationRuleDataType extends RuleDataType
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      * @psalm-suppress UndefinedClass
      */
     protected function getAllActionsClasses(): array

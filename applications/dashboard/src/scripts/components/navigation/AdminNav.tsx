@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { useDashboardSection } from "@dashboard/DashboardSectionHooks";
+import { DashboardMenusApi } from "@dashboard/DashboardMenusApi";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
@@ -24,7 +24,7 @@ interface IProps {
 }
 
 function useDashboardNav(sectionID: string): INavigationTreeItem[] | null {
-    const sections = useDashboardSection();
+    const sections = DashboardMenusApi.useMenus();
 
     const sectionNav = sections.data?.find((section) => section.id === sectionID);
     if (!sectionNav) {

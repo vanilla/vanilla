@@ -1,6 +1,6 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -12,9 +12,12 @@ import {
 } from "@library/forms/nestedSelect/presets/CategoryDropdown";
 import { Select } from "@library/json-schema-forms";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
+import { getSiteSection } from "@library/utility/appUtils";
 
 interface IProps extends ComponentProps<typeof NestedSelect> {
     postTypeID?: PostType["postTypeID"];
+    limit?: number;
+    filterByCurrentSiteSection?: boolean;
 }
 
 /**
@@ -23,13 +26,19 @@ interface IProps extends ComponentProps<typeof NestedSelect> {
  */
 export function FilteredCategorySelector(props: IProps) {
     const [ownInputValue, setOwnInputValue] = useState<string | undefined>(props.inputValue);
+    const siteSection = getSiteSection();
+    const siteSectionID = siteSection?.sectionID ?? "0";
+
+    const optionalSiteSectionParams = props.filterByCurrentSiteSection
+        ? `siteSectionID=${siteSectionID}&includeParentCategory=1`
+        : "";
+
+    const optionalPostTypeIDParams = props.postTypeID ? `postTypeID=${props.postTypeID}&` : "";
 
     const optionsLookup: Select.LookupApi = {
-        searchUrl: "/categories/search?query=%s&filterDiscussionsAdd=true",
+        searchUrl: `/categories/search?query=%s&filterDiscussionsAdd=true&${optionalSiteSectionParams}`,
         singleUrl: "/categories/%s",
-        defaultListUrl: `/categories?filterDiscussionsAdd=true&${
-            props.postTypeID ? `postTypeID=${props.postTypeID}&` : ""
-        }outputFormat=flat&limit=100`,
+        defaultListUrl: `/categories?filterDiscussionsAdd=true&outputFormat=flat&limit=100&${optionalPostTypeIDParams}&${optionalSiteSectionParams}`,
         labelKey: "name",
         valueKey: "categoryID",
         processOptions: ownInputValue ? getFilteredNestedOptions : getDefaultNestedOptions,

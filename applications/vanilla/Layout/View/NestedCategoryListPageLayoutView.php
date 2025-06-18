@@ -36,7 +36,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -44,7 +44,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -52,7 +52,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTemplateID(): string
     {
@@ -60,7 +60,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamInputSchema(): Schema
     {
@@ -68,7 +68,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamResolvedSchema(): Schema
     {
@@ -76,7 +76,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {

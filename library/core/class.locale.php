@@ -12,6 +12,7 @@
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 
 /**
  * The Locale class is used to load, define, change, and render translations
@@ -92,6 +93,8 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface
 
     /** @var int  */
     public $SavedDeveloperCalls = 0;
+
+    public array $missedTranslations = [];
 
     /**
      * Setup the default locale.
@@ -354,7 +357,7 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface
      *
      * @param string $code The code related to the language-specific definition.
      * Codes that begin with an '@' symbol are treated as literals and not translated.
-     * @param string|false $default The default value to be displayed if the translation code is not found.
+     * @param string|false|array $default The default value to be displayed if the translation code is not found.
      * @return string
      */
     public function translate($code, $default = false)
@@ -365,30 +368,40 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface
         if ($default === false) {
             $default = $code;
         }
+        $isOptional = false;
+        if (is_array($default)) {
+            $isOptional = $default["optional"] ?? false;
+            $default = array_key_exists("default", $default) ? $default["default"] : $code;
+        }
 
         // Codes that begin with @ are considered literals.
         if (substr_compare("@", $code, 0, 1) == 0) {
             return substr($code, 1);
         }
 
-        $translation = $this->LocaleContainer->get($code, $default);
+        $translation = $this->LocaleContainer->get($code, null);
 
-        // If developer mode is on, and this translation returned the default value,
-        // remember it and save it to the developer locale.
-        if ($this->DeveloperMode && $translation == $default) {
-            $devKnows = $this->DeveloperContainer->get($code, false);
-            if ($devKnows === false) {
-                $this->DeveloperContainer->saveToConfig($code, $default);
-            }
+        if (
+            $translation === null &&
+            self::c("TranslationDebug", false) &&
+            !$isOptional &&
+            !str_contains($default ?? "", "☢")
+        ) {
+            $this->missedTranslations[] = $code;
+            $default = "☢️☢{$default}☢️☢";
         }
 
-        if (self::c("Debug", false)) {
-            $this->EventArguments["Code"] = $code;
-            $this->EventArguments["Default"] = $default;
-            $this->fireEvent("BeforeTranslate");
-        }
+        return $translation ?? $default;
+    }
 
-        return $translation;
+    /**
+     * @return PhpAsJsVariable
+     */
+    public function getMissingTranslationsScriptContents(): PhpAsJsVariable
+    {
+        return new PhpAsJsVariable([
+            "VANILLA_MISSED_TRANSLATIONS_INITIAL" => $this->missedTranslations,
+        ]);
     }
 
     /**
@@ -404,10 +417,6 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface
         $this->LocaleContainer = new Gdn_Configuration();
         $this->LocaleContainer->splitting(false);
         $this->LocaleContainer->caching(false);
-
-        if ($this->config->get("TranslationDebug")) {
-            $this->LocaleContainer->setFallbackDecorator("☢️☢️");
-        }
     }
 
     /**

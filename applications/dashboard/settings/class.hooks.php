@@ -28,7 +28,7 @@ use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Logging\AuditLogger;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Web\SystemTokenUtils;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetService;
 
 /**
  * Event handlers for the Dashboard application.
@@ -98,7 +98,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             ->rule(\Vanilla\Menu\CounterModel::class)
             ->addCall("addProvider", [new Reference(ActivityCounterProvider::class)])
             ->addCall("addProvider", [new Reference(RoleCounterProvider::class)])
-            ->rule(WidgetService::class)
+            ->rule(LegacyWidgetService::class)
             ->addCall("registerWidget", [CommunityLeadersModule::class]);
 
         $mf = \Vanilla\Models\ModelFactory::fromContainer($dic);
@@ -384,6 +384,23 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         }
 
         $escalationsEnabled = FeatureFlagHelper::featureEnabled("escalations");
+
+        $nav->addGroupToSection("VanillaStaff", "Product", "product")
+            ->addLinkToSection(
+                "VanillaStaff",
+                "Manage Messages",
+                "/settings/vanilla-staff/product-messages",
+                "product.messages"
+            )
+            ->addGroupToSection("VanillaStaff", "Developer", "developer")
+            ->addLinkToSection("VanillaStaff", "Database Migrations", "/utility/structure", "developer.dbaStructure")
+            ->addLinkToSection("VanillaStaff", "Aggregate Counts", "/dba/counts", "developer.dbaCounts")
+            ->addLinkToSection(
+                "VanillaStaff",
+                "Performance Profiles",
+                "/settings/vanilla-staff/profiles",
+                "developer.profiles"
+            );
 
         $nav->addGroupToSection("Moderation", t("Posts"), "content")
             ->addLinkToSectionIf(
@@ -1011,7 +1028,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         if (!$hasPermission && $discussion["InsertUserID"] !== GDN::session()->UserID) {
             throw permissionException("Vanilla.Tagging.Add");
         }
-        $sender->title("Add Tags");
+        $sender->title(t("Add Tags"));
 
         if ($sender->Form->authenticatedPostBack()) {
             $rawFormTags = $sender->Form->getFormValue("Tags");

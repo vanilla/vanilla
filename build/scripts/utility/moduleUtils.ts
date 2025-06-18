@@ -10,12 +10,14 @@ import path from "path";
 import { DIST_DIRECTORY, VANILLA_ROOT } from "../env";
 import { print } from "./utils";
 
+const MONACO_PATH = path.join(VANILLA_ROOT, "node_modules", "monaco-editor");
+const ESBUILD_PATH = path.join(VANILLA_ROOT, "/node_modules/esbuild-wasm/esbuild.wasm");
+
 /**
  * Copy files from the monaco editor the dist directory.
  */
 export function copyMonacoEditorModule() {
-    fse.ensureDir(DIST_DIRECTORY);
-    const MONACO_PATH = path.join(VANILLA_ROOT, "node_modules", "monaco-editor");
+    fse.ensureDirSync(DIST_DIRECTORY);
 
     print("Copying monaco editor to /dist");
     if (fse.existsSync(MONACO_PATH)) {
@@ -29,6 +31,32 @@ export function copyMonacoEditorModule() {
             },
         });
     }
+
+    kludgeMonacoTypescriptCompletion();
+
+    print("Copying esbuild wasm to /dist");
+    if (fse.existsSync(ESBUILD_PATH)) {
+        fse.copySync(ESBUILD_PATH, path.resolve(DIST_DIRECTORY, "esbuild.wasm"));
+    }
+}
+
+/**
+ * Monaco by default is very anemic with its completion trigger characters for typescript.
+ * This kludge is to add the trigger characters for typescript completion that VSCode uses.
+ *0
+ * I couldn't find a way for us to kludge this in ourselves.
+ *
+ * @see https://github.com/microsoft/monaco-editor/discussions/3711
+ */
+function kludgeMonacoTypescriptCompletion() {
+    const tsPath = path.join(MONACO_PATH, "min/vs/language/typescript/tsMode.js");
+    const tsFile = fse.readFileSync(tsPath, "utf8");
+
+    const source = `get triggerCharacters(){return["."]}`;
+    const replacement = `get triggerCharacters(){return['.','"','\\'','\`','/','@','<','#',' ']}`;
+
+    const newTsFile = tsFile.replace(source, replacement);
+    fse.writeFileSync(tsPath, newTsFile);
 }
 
 /**

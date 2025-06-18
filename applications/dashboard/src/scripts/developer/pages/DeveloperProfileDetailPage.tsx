@@ -4,8 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import AdminLayout from "@dashboard/components/AdminLayout";
-import { DeveloperNav } from "@dashboard/developer/DeveloperNav";
+import { StaffAdminLayout } from "@dashboard/components/navigation/StaffAdminLayout";
 import { developerProfileClasses } from "@dashboard/developer/pages/DeveloperProfilePage.classes";
 import { DeveloperProfileProvider } from "@dashboard/developer/profileViewer/DeveloperProfile.context";
 import { DeveloperProfileDetailsPanel } from "@dashboard/developer/profileViewer/DeveloperProfile.DetailsPanel";
@@ -33,12 +32,12 @@ export function DeveloperProfilesDetailPage() {
     const query = useDeveloperProfileDetailsQuery(profileID);
 
     const classes = developerProfileClasses();
-    useFallbackBackUrl("/settings/developer/profiles");
+    useFallbackBackUrl("/settings/vanilla-staff/profiles");
     const tabRef = useRef<HTMLDivElement | null>(null);
 
     return (
         <DeveloperProfileProvider>
-            <AdminLayout
+            <StaffAdminLayout
                 title={
                     <>
                         <BackLink className={classes.backlink} />
@@ -55,7 +54,6 @@ export function DeveloperProfilesDetailPage() {
                     )
                 }
                 titleBarActions={query.data && <DeveloperProfileOptionsMenu profile={query.data} />}
-                leftPanel={<DeveloperNav />}
                 rightPanel={query.data && <DeveloperProfileFilterPanel profile={query.data} />}
                 content={
                     <>

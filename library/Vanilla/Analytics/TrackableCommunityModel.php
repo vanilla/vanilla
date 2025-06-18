@@ -17,11 +17,11 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use UserDiscussionModel;
 use Vanilla\Community\Events\SubscriptionChangeEvent;
 use Vanilla\Community\Events\TrackableDiscussionAnalyticsEvent;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
-use Vanilla\Logger;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -31,17 +31,6 @@ class TrackableCommunityModel implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var DiscussionModel */
-    private $discussionModel;
-
-    /** @var TrackableUserModel */
-    private $userUtils;
-
-    /** @var CommentModel */
-    private $commentModel;
-
-    private DiscussionStatusModel $discussionStatusModel;
-
     /**
      * DI.
      *
@@ -49,17 +38,15 @@ class TrackableCommunityModel implements LoggerAwareInterface
      * @param DiscussionStatusModel $discussionStatusModel
      * @param TrackableUserModel $userUtils
      * @param CommentModel $commentModel
+     * @param UserDiscussionModel $userDiscussionModel
      */
     public function __construct(
-        DiscussionModel $discussionModel,
-        DiscussionStatusModel $discussionStatusModel,
-        TrackableUserModel $userUtils,
-        CommentModel $commentModel
+        private DiscussionModel $discussionModel,
+        private DiscussionStatusModel $discussionStatusModel,
+        private TrackableUserModel $userUtils,
+        private CommentModel $commentModel,
+        private UserDiscussionModel $userDiscussionModel
     ) {
-        $this->discussionModel = $discussionModel;
-        $this->discussionStatusModel = $discussionStatusModel;
-        $this->userUtils = $userUtils;
-        $this->commentModel = $commentModel;
     }
 
     /**
@@ -125,7 +112,7 @@ class TrackableCommunityModel implements LoggerAwareInterface
      */
     public function getTrackableDiscussion($discussionOrDiscussionID): array
     {
-        if (is_int($discussionOrDiscussionID)) {
+        if (is_numeric($discussionOrDiscussionID)) {
             $discussion = $this->discussionModel->getID($discussionOrDiscussionID, DATASET_TYPE_ARRAY);
             if (empty($discussion)) {
                 return [
@@ -136,6 +123,7 @@ class TrackableCommunityModel implements LoggerAwareInterface
         } else {
             $discussion = $discussionOrDiscussionID;
         }
+
         $schema = $this->discussionModel->schema();
         $firstCommentID = $discussion["firstCommentID"] ?? ($discussion["FirstCommentID"] ?? null);
         $discussion = $schema->validate($discussion);
@@ -157,6 +145,7 @@ class TrackableCommunityModel implements LoggerAwareInterface
         $discussion["countComments"] = (int) $discussion["countComments"];
         $discussion["dateInserted"] = TrackableDateUtils::getDateTime($discussion["dateInserted"]);
         $discussion["discussionUser"] = $this->userUtils->getTrackableUser($discussion["insertUserID"]);
+
         $eventManager = \Gdn::eventManager();
         $eventManager->dispatch(new TrackableDiscussionAnalyticsEvent($discussion));
 

@@ -1,6 +1,6 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -16,7 +16,6 @@ import { FollowedCategoriesContent } from "@library/followedContent/FollowedCate
 
 interface IProps {
     userID: number;
-    renderAdditionalFollowedContent?: boolean;
 }
 
 export function FollowedContentImpl(props: IProps) {
@@ -28,12 +27,11 @@ export function FollowedContentImpl(props: IProps) {
             <Heading depth={1} renderAsDepth={1}>
                 {t("Followed Content")}
             </Heading>
-            {props.renderAdditionalFollowedContent ? (
+            {additionalFollowedContent.length > 0 ? (
                 <Tabs
                     tabsRootClass={classes.tabsContent}
-                    tabPanelClasses={classes.tabsPanel}
-                    tabListClasses={classes.tabList}
                     tabType={TabsTypes.BROWSE}
+                    extendContainer
                     largeTabs
                     includeBorder={false}
                     data={[
@@ -56,7 +54,7 @@ export function FollowedContentImpl(props: IProps) {
     );
 }
 
-export function FollowedContent(props: IProps) {
+export default function FollowedContent(props: IProps) {
     return (
         <div>
             <FollowedContentProvider userID={props.userID}>
@@ -68,5 +66,3 @@ export function FollowedContent(props: IProps) {
         </div>
     );
 }
-
-export default FollowedContent;

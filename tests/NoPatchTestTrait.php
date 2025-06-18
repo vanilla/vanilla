@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 trait NoPatchTestTrait
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function testPatchFull()
     {
@@ -23,7 +23,7 @@ trait NoPatchTestTrait
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function providePatchFields()
     {

@@ -93,6 +93,8 @@ class IconModel extends PipelineModel
                     "data-uuid" => $icon["iconUUID"],
                     "data-is-custom" => $icon["isCustom"] ? "true" : "false",
                     "id" => $icon["iconName"],
+                    // Needed for items with negative viewboxes.
+                    "overflow" => "visible",
                 ];
 
                 $attributesStr = HtmlUtils::attributes($attributes);

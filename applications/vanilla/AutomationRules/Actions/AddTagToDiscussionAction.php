@@ -32,7 +32,7 @@ class AddTagToDiscussionAction extends AutomationAction implements DiscussionInt
 
     public string $affectedRecordType = "Discussion";
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -40,7 +40,7 @@ class AddTagToDiscussionAction extends AutomationAction implements DiscussionInt
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -48,7 +48,7 @@ class AddTagToDiscussionAction extends AutomationAction implements DiscussionInt
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -56,7 +56,7 @@ class AddTagToDiscussionAction extends AutomationAction implements DiscussionInt
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -80,7 +80,7 @@ class AddTagToDiscussionAction extends AutomationAction implements DiscussionInt
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -146,7 +146,7 @@ class AddTagToDiscussionAction extends AutomationAction implements DiscussionInt
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -184,7 +184,7 @@ class AddTagToDiscussionAction extends AutomationAction implements DiscussionInt
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {
@@ -206,7 +206,7 @@ class AddTagToDiscussionAction extends AutomationAction implements DiscussionInt
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setDiscussionID(int $discussionID): void
     {
@@ -214,7 +214,7 @@ class AddTagToDiscussionAction extends AutomationAction implements DiscussionInt
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getDiscussionID(): int
     {

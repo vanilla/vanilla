@@ -3,20 +3,18 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useEffect, useRef } from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import classNames from "classnames";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import { t } from "@vanilla/i18n";
-import { uploadFile } from "@library/apiv2";
-import { IFieldError } from "@library/@types/api/core";
-import ErrorMessages from "@library/forms/ErrorMessages";
-import ButtonLoader from "@library/loaders/ButtonLoader";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
+import { dashboardImageUploadClasses } from "@dashboard/forms/DashboardImageUpload.classes";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import { cx } from "@emotion/css";
-import { dashboardImageUploadClasses } from "@dashboard/forms/DashboardImageUpload.classes";
-import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
+import { IFieldError } from "@library/@types/api/core";
+import { uploadFile } from "@library/apiv2";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import { t } from "@vanilla/i18n";
+import React, { useEffect, useRef, useState } from "react";
 
 interface IProps {
     value: string | null; // The image url
@@ -47,17 +45,22 @@ export function DashboardImageUpload(props: IProps) {
     }, [props.value]);
 
     const fallbackName = props.value?.substring(props.value?.lastIndexOf("/") + 1);
-    const classes = dashboardImageUploadClasses();
+    const classes = dashboardImageUploadClasses.useAsHook();
     const formStyle = useDashboardFormStyle();
 
     return (
         <DashboardInputWrap>
-            <label className={cx("file-upload", classes.fileUpload, { isCompact: formStyle.compact })}>
+            <label
+                className={cx(
+                    classes.fileUpload, //
+                    { isCompact: formStyle.compact },
+                )}
+            >
                 <input
                     key={`${isLoading}`}
                     type="file"
                     id={inputID}
-                    className={cx("form-control", props.className)}
+                    className={classes.input}
                     disabled={props.disabled}
                     onChange={async (event) => {
                         const file = event.target.files && event.target.files[0];
@@ -83,8 +86,8 @@ export function DashboardImageUpload(props: IProps) {
                         }
                     }}
                 />
-                <span className="file-upload-choose">{name || fallbackName || props.placeholder || t("Choose")}</span>
-                <span className="file-upload-browse">
+                <span className={classes.choose}>{name || fallbackName || props.placeholder || t("Choose")}</span>
+                <span className={cx(classes.browse)}>
                     {isLoading ? <ButtonLoader buttonType={ButtonTypes.DASHBOARD_PRIMARY} /> : t("Browse")}
                 </span>
             </label>

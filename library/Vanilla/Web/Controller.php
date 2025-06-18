@@ -72,7 +72,7 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     protected function getPermissions(): ?Permissions
     {

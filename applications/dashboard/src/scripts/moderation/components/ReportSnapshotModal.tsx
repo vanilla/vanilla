@@ -47,7 +47,7 @@ export function ReportSnapshotModal(props: IProps) {
                                     </ProfileLink>
                                 }
                                 url={report.recordUrl}
-                                description={<UserContent content={report.recordHtml} />}
+                                description={<UserContent vanillaSanitizedHtml={report.recordHtml} />}
                                 truncateDescription={false}
                                 metas={<ReportRecordMeta record={report} />}
                             />

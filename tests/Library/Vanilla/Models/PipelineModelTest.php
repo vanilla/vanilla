@@ -23,7 +23,7 @@ class PipelineModelTest extends ModelTest
     protected $model;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

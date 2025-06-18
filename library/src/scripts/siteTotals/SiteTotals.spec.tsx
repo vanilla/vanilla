@@ -6,7 +6,7 @@
 
 import React from "react";
 import { render, screen, within } from "@testing-library/react";
-import SiteTotalsWidget from "@library/siteTotals/SiteTotalsWidget";
+import SiteTotalsWidget from "@library/widgets/SiteTotalsWidget";
 import { SiteTotalsAlignment, SiteTotalsLabelType, ISiteTotalCount } from "@library/siteTotals/SiteTotals.variables";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { formatNumberText } from "@library/content/NumberFormatted";

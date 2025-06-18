@@ -32,7 +32,7 @@ class DiscussionListLayoutView extends AbstractCustomLayoutView implements Legac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -40,7 +40,7 @@ class DiscussionListLayoutView extends AbstractCustomLayoutView implements Legac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -48,7 +48,7 @@ class DiscussionListLayoutView extends AbstractCustomLayoutView implements Legac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLegacyType(): string
     {
@@ -56,7 +56,7 @@ class DiscussionListLayoutView extends AbstractCustomLayoutView implements Legac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTemplateID(): string
     {
@@ -64,7 +64,7 @@ class DiscussionListLayoutView extends AbstractCustomLayoutView implements Legac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamInputSchema(): Schema
     {
@@ -72,7 +72,7 @@ class DiscussionListLayoutView extends AbstractCustomLayoutView implements Legac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamResolvedSchema(): Schema
     {
@@ -80,7 +80,7 @@ class DiscussionListLayoutView extends AbstractCustomLayoutView implements Legac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {
@@ -93,7 +93,7 @@ class DiscussionListLayoutView extends AbstractCustomLayoutView implements Legac
 
         $pageHead->setSeoBreadcrumbs($crumbs);
 
-        $url = isset($paramInput["page"]) ? "discussions/p{$paramInput["page"]}" : "/discussions";
+        $url = isset($paramInput["page"]) ? "discussions?page={$paramInput["page"]}" : "/discussions";
         $pageHead->setCanonicalUrl($url);
 
         return $resolvedParams + ["layoutViewType" => $this->getType()];

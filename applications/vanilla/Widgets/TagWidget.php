@@ -8,41 +8,29 @@
 namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
-use Vanilla\ApiUtils;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
-use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
-use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
-use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
  * Class TagWidget
  */
-class TagWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface
+class TagWidget extends LegacyReactModule
 {
-    use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
-
-    /** @var \TagsApiController */
-    private $apiClient;
 
     /**
      * DI.
-     *
-     * @param \TagsApiController $apiClient
      */
-    public function __construct(\TagsApiController $apiClient)
+    public function __construct(private \TagsApiController $apiClient)
     {
-        $this->apiClient = $apiClient;
         parent::__construct();
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -50,7 +38,15 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -58,7 +54,7 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -123,7 +119,7 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -146,7 +142,7 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -155,7 +151,7 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getProps(): ?array
     {

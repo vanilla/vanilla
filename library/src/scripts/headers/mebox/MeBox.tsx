@@ -11,7 +11,7 @@ import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDr
 import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React from "react";
+
 export interface IMeBoxProps {
     currentUser?: IMe;
     countClass?: string;
@@ -26,33 +26,31 @@ export interface IMeBoxProps {
 /**
  * Implements MeBox component. Note that on mobile we use the CompactMeBox component but they share children components
  */
-export default class MeBox extends React.Component<IMeBoxProps> {
-    public render() {
-        const userInfo = this.props.currentUser;
-        if (!userInfo) {
-            return null;
-        }
-        const classes = meBoxClasses();
-        const separator = this.props.withSeparator && <span>|</span>;
-        const withLabel = this.props.withLabel;
-        return (
-            <div className={classNames("meBox", this.props.className, classes.root)}>
-                {separator}
-                <div className={classes.meboxItem}>
-                    <NotificationsDropDown userSlug={userInfo.name} countUnread={userInfo.countUnreadNotifications} />
-                    {withLabel && <div className={classes.label}>{t("Notifications")}</div>}
-                </div>
-                {separator}
-                <div className={classes.meboxItem}>
-                    <MessagesDropDown count={userInfo.countUnreadConversations} />
-                    {withLabel && <div className={classes.label}>{t("Messages")}</div>}
-                </div>
-                {separator}
-                <div className={classes.meboxItem}>
-                    <UserDropdown />
-                    {withLabel && <div className={classes.label}>{t("Profile")}</div>}
-                </div>
-            </div>
-        );
+export default function MeBox(props: IMeBoxProps) {
+    const userInfo = props.currentUser;
+    const classes = meBoxClasses.useAsHook();
+    if (!userInfo) {
+        return <></>;
     }
+    const separator = props.withSeparator && <span>|</span>;
+    const withLabel = props.withLabel;
+    return (
+        <div className={classNames("meBox", props.className, classes.root)}>
+            {separator}
+            <div className={classes.meboxItem}>
+                <NotificationsDropDown userSlug={userInfo.name} countUnread={userInfo.countUnreadNotifications} />
+                {withLabel && <div className={classes.label}>{t("Notifications")}</div>}
+            </div>
+            {separator}
+            <div className={classes.meboxItem}>
+                <MessagesDropDown count={userInfo.countUnreadConversations} />
+                {withLabel && <div className={classes.label}>{t("Messages")}</div>}
+            </div>
+            {separator}
+            <div className={classes.meboxItem}>
+                <UserDropdown />
+                {withLabel && <div className={classes.label}>{t("Profile")}</div>}
+            </div>
+        </div>
+    );
 }

@@ -14,7 +14,7 @@ use Vanilla\Cache\ValidatingCacheCacheAdapter;
  */
 class DirtyCacheTest extends SimpleCacheTest {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         parent::__construct($name, $data, $dataName);
@@ -23,7 +23,7 @@ class DirtyCacheTest extends SimpleCacheTest {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function createSimpleCache() {
         $cache = new ValidatingCacheCacheAdapter($this->createLegacyCache());
@@ -31,7 +31,7 @@ class DirtyCacheTest extends SimpleCacheTest {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function createLegacyCache(): \Gdn_Cache {
         return new \Gdn_Dirtycache();

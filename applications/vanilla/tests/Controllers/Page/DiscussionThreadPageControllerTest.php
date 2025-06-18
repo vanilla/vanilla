@@ -28,7 +28,7 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
     private ConfigurationInterface $config;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

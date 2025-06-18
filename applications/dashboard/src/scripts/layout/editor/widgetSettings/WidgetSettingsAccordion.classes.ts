@@ -5,16 +5,18 @@
 
 import { css } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
+import { singleBorder } from "@library/styles/styleHelpersBorders";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { calc } from "csx";
 
 export const widgetSettingsAccordionClasses = useThemeCache(() => {
     const root = css({
-        "&:first-of-type": {
-            marginTop: 24,
+        "& > .item": {
+            borderBottom: singleBorder(),
         },
-        "&:last-child > .item": {
-            borderBottom: "solid 1px #c1cbd7",
+
+        "& + .modernFormGroup": {
+            marginTop: 12,
         },
 
         ".modernFormGroup + &": {
@@ -39,7 +41,7 @@ export const widgetSettingsAccordionClasses = useThemeCache(() => {
             size: 12,
             weight: 600,
         }),
-        borderTop: "solid 1px #c1cbd7",
+        borderTop: singleBorder(),
     });
     const item = css({
         ...Mixins.margin({

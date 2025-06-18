@@ -10,7 +10,7 @@ namespace Vanilla\Formatting\Quill\Formats;
 class Code extends AbstractFormat
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getAttributeLookupKey(): array
     {
@@ -18,7 +18,7 @@ class Code extends AbstractFormat
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getBlackListedNestedFormats(): array
     {
@@ -26,7 +26,7 @@ class Code extends AbstractFormat
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getTagName(): string
     {

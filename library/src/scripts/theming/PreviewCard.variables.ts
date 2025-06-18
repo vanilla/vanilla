@@ -21,7 +21,7 @@ const previewCardVariables = useThemeCache(() => {
 
     const container = makeThemeVars("container", {
         maxWidth: 600,
-        minWidth: 220,
+        minWidth: 120,
         ratioHeight: 225,
         ratioWidth: 310,
     });

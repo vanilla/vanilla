@@ -32,7 +32,7 @@ class TwigEnhancerTest extends SiteTestCase
     private $session;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

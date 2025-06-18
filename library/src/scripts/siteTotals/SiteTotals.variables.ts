@@ -9,25 +9,27 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { DeepPartial } from "redux";
 import { Variables } from "@library/styles/Variables";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { media } from "@library/styles/styleShim";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IconType } from "@vanilla/icons";
 import { IBackground } from "@library/styles/cssUtilsTypes";
 
-export enum SiteTotalsAlignment {
-    LEFT = "flex-start",
-    RIGHT = "flex-end",
-    CENTER = "center",
-    JUSTIFY = "space-around",
-}
+export const SiteTotalsAlignment = {
+    LEFT: "flex-start",
+    RIGHT: "flex-end",
+    CENTER: "center",
+    JUSTIFY: "space-around",
+} as const;
+export type SiteTotalsAlignment = (typeof SiteTotalsAlignment)[keyof typeof SiteTotalsAlignment];
 
-export enum SiteTotalsLabelType {
-    BOTH = "both",
-    ICON = "icon",
-    TEXT = "text",
-}
+export const SiteTotalsLabelType = {
+    BOTH: "both",
+    ICON: "icon",
+    TEXT: "text",
+} as const;
+export type SiteTotalsLabelType = (typeof SiteTotalsLabelType)[keyof typeof SiteTotalsLabelType];
 
 export interface ISiteTotalsOptions {
     background?: IBackground;

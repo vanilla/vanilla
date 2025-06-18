@@ -34,7 +34,7 @@ class CommunityManagementCounterProvider implements CounterProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getMenuCounters(): array
     {

@@ -14,7 +14,7 @@ interface INoticeProps {
 }
 
 const Notice: FunctionComponent<React.PropsWithChildren<INoticeProps>> = ({ children, className }) => {
-    const classes = noticeClasses();
+    const classes = noticeClasses.useAsHook();
     return <span className={cx(classes.root, className)}>{children}</span>;
 };
 

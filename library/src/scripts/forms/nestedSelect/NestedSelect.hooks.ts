@@ -15,20 +15,22 @@ import apiv2 from "@library/apiv2";
 
 // Get the options to display in the dropdown
 export function useNestedOptions(params: {
+    value?: RecordID | RecordID[] | undefined;
     searchQuery?: string;
     options?: Select.Option[];
     optionsLookup?: Select.LookupApi;
     createable?: boolean;
-    createdOptions?: Select.Option[];
+    createdValues?: RecordID[];
     initialValues?: RecordID | RecordID[];
     withOptionCache?: boolean;
 }): INestedOptionsState & { isSuccess?: boolean } {
     const {
+        value,
         searchQuery = "",
         options,
         optionsLookup,
         createable = false,
-        createdOptions,
+        createdValues,
         withOptionCache,
         initialValues,
     } = params;
@@ -45,10 +47,18 @@ export function useNestedOptions(params: {
     }, [options, withOptionCache]);
 
     const lookupInitialOptions = useInitialOptionLookup();
+
+    const arrValue = Array.isArray(value) ? value : [value];
+    const optionsThatNeedLookup = arrValue.filter((value) => {
+        const hasStaticOption = options && options.some((option) => option.value === value);
+        const hasCachedOption = optionCache.some((option) => option.value === value);
+        return !hasStaticOption && !hasCachedOption;
+    });
+
     const { data: initialOptionsData } = useQuery({
         queryKey: ["initial-nested-options-lookup", optionsLookup, initialValues],
         queryFn: lookupInitialOptions,
-        enabled: !!optionsLookup?.singleUrl,
+        enabled: !!optionsLookup?.singleUrl && optionsThatNeedLookup.length > 0,
     });
 
     const fetchOptions = useFetchOptions();
@@ -82,8 +92,31 @@ export function useNestedOptions(params: {
             ...processedInitialOptions,
             ...processedOptions,
             ...processedData,
-            ...(createdOptions ?? []),
+            ...(createable
+                ? (createdValues ?? []).map<Select.Option>((val) => ({
+                      label: `${val}`,
+                      value: val,
+                      data: { createable: true },
+                  }))
+                : []),
         ];
+        const selectedOptions: Select.Option[] = [];
+        if (value) {
+            if (Array.isArray(value)) {
+                for (const val of value) {
+                    const option = mergedOptions.find((opt) => opt.value === val);
+                    if (option) {
+                        selectedOptions.push(option);
+                    }
+                }
+            } else {
+                const option = mergedOptions.find((opt) => opt.value === value);
+                if (option) {
+                    selectedOptions.push(option);
+                }
+            }
+        }
+
         if (withOptionCache) {
             const optionsState = getOptionsState(mergedOptions, searchQuery, createable);
             const dedupeOptions = optionsState.options.filter(
@@ -92,12 +125,14 @@ export function useNestedOptions(params: {
             );
             return {
                 ...optionsState,
+                selectedOptions,
                 options: dedupeOptions,
             };
         }
         const optionsState = getOptionsState(mergedOptions, searchQuery, createable);
         return {
             ...optionsState,
+            selectedOptions,
             options: optionsState.options.filter((option1, index, array) => {
                 if (option1.isHeader) {
                     return true;
@@ -106,7 +141,7 @@ export function useNestedOptions(params: {
                 }
             }),
         };
-    }, [initialOptionsData, options, data, searchQuery, createable, createdOptions]);
+    }, [value, initialOptionsData, options, data, searchQuery, createable, createdValues]);
 
     return {
         ...optionsState,
@@ -244,6 +279,7 @@ function getOptionsState(
         options,
         optionsByValue,
         optionsByGroup,
+        selectedOptions: [], // Handled above
     };
 }
 

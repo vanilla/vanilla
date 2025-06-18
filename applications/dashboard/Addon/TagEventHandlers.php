@@ -36,7 +36,7 @@ class TagEventHandlers implements PsrEventHandlersInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPsrEventHandlerMethods(): array
     {

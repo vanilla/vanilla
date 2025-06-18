@@ -14,10 +14,12 @@ import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/ani
 import { useLastValue } from "@vanilla/react-utils";
 import { useDropdownContext } from "../flyouts/DropDown";
 import { StackingContextProvider, useStackingContext } from "@vanilla/react-utils";
+import { StickyContextProvider } from "@library/modal/StickyContext";
+import { TabHandler } from "@vanilla/dom-utils";
 
 interface IProps {
     id?: string;
-    onOverlayClick: React.MouseEventHandler;
+    onExit: React.EventHandler<any>;
     onModalClick: React.MouseEventHandler;
     onKeyDown: React.KeyboardEventHandler;
     description?: string;
@@ -35,6 +37,8 @@ interface IProps {
     realRootID: string;
     // If enabled, regardless of content, modal's height will be fixed to max
     isFixHeight?: boolean;
+    elementToFocusOnExit?: HTMLElement | null;
+    noFocusOnExit?: boolean;
 }
 
 /**
@@ -46,18 +50,54 @@ export function ModalView(props: IProps) {
     const dropdownContext = useDropdownContext();
     const [removeTransform, setRemoveTransform] = useState(false);
 
-    const lastVisible = useLastValue(isVisible);
+    const [isFirstRender, setIsFirstRender] = useState(true);
+    const focusOnExistRef = useRef<HTMLElement | null>(null);
+
+    useEffect(() => {
+        if (props.elementToFocusOnExit) {
+            focusOnExistRef.current = props.elementToFocusOnExit;
+        }
+
+        if (props.noFocusOnExit) {
+            focusOnExistRef.current = null;
+        }
+    }, [props.elementToFocusOnExit, props.noFocusOnExit]);
+
+    useEffect(() => {
+        setIsFirstRender(false);
+
+        return () => {
+            focusOnExistRef.current?.focus();
+            dropdownContext.setIsForcedOpen(false);
+        };
+    }, []);
+    const _lastVisible = useLastValue(isVisible);
+    const lastVisible = isFirstRender ? false : _lastVisible;
     useLayoutEffect(() => {
         if (lastVisible && !isVisible) {
             // Lose visibility
             setIsAnimatingOut(true);
             setRemoveTransform(false);
             dropdownContext.setIsForcedOpen(false);
+            focusOnExistRef.current?.focus();
         } else if (!lastVisible && isVisible) {
             // Gain visibility
             dropdownContext.setIsForcedOpen(true);
+
+            if (props.noFocusOnExit) {
+                focusOnExistRef.current = null;
+            } else if (props.elementToFocusOnExit) {
+                focusOnExistRef.current = props.elementToFocusOnExit;
+            } else if (document.activeElement instanceof HTMLElement) {
+                focusOnExistRef.current = document.activeElement;
+            }
+
+            // Focus first element
+            if (props.modalRef?.current) {
+                new TabHandler(props.modalRef.current).getInitial()?.focus();
+            }
         }
-    }, [isVisible, lastVisible]);
+    }, [props.noFocusOnExit, props.elementToFocusOnExit, lastVisible, isVisible]);
 
     const handleDestroy = useCallback(() => {
         setIsAnimatingOut(false);
@@ -70,7 +110,7 @@ export function ModalView(props: IProps) {
     const ownRef = useRef<HTMLDivElement>(null);
     const modalRef = props.modalRef || ownRef;
     const { zIndex } = useStackingContext();
-    const classes = modalClasses();
+    const classes = modalClasses.useAsHook();
 
     let contents = (
         <>
@@ -83,11 +123,18 @@ export function ModalView(props: IProps) {
         </>
     );
 
+    const stickyPortalRef = useRef<HTMLDivElement>(null);
+
     if (props.scrollable) {
         contents = (
-            <TouchScrollable>
-                <div className={classes.scroll}>{contents}</div>
-            </TouchScrollable>
+            <StickyContextProvider portalLocation={stickyPortalRef.current}>
+                <TouchScrollable>
+                    <div className={classes.scroll}>
+                        {contents}
+                        <div ref={stickyPortalRef} className="modal-sticky-portal-location"></div>
+                    </div>
+                </TouchScrollable>
+            </StickyContextProvider>
         );
     }
 
@@ -149,6 +196,13 @@ export function ModalView(props: IProps) {
         <StackingContextProvider>
             <div
                 onKeyPress={props.onKeyPress}
+                onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        props.onExit(e);
+                    }
+                }}
                 data-modal-real-root-id={props.realRootID}
                 className={classes.stackingZindex(zIndex)}
             >
@@ -163,7 +217,7 @@ export function ModalView(props: IProps) {
                 <ScrollLock isActive={props.isVisible || lastVisible || isAnimatingOut}>
                     <div
                         className={classes.overlayContent}
-                        onClick={props.onOverlayClick}
+                        onClick={props.onExit}
                         style={{ pointerEvents: props.isVisible ? "initial" : "none" }}
                     >
                         <EntranceAnimation

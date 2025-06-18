@@ -15,6 +15,7 @@ use Vanilla\Forms\FormPickerOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Http\InternalClient;
+use Vanilla\InjectableInterface;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
@@ -22,9 +23,11 @@ use Vanilla\Permissions;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\TwigRenderTrait;
+use Vanilla\Widgets\Fragments\CommentItemMeta;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
+use Vanilla\Widgets\React\ReactWidget;
 
-class PostCommentThreadAsset extends AbstractLayoutAsset implements HydrateAwareInterface
+class PostCommentThreadAsset extends ReactWidget
 {
     use HydrateAwareTrait;
     use TwigRenderTrait;
@@ -36,6 +39,14 @@ class PostCommentThreadAsset extends AbstractLayoutAsset implements HydrateAware
         protected ConfigurationInterface $configuration,
         protected \Gdn_Session $session
     ) {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
     }
 
     /**
@@ -181,7 +192,7 @@ TWIG
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): ?string
     {
@@ -313,5 +324,13 @@ TWIG
             self::widgetSubtitleSchema(),
             self::widgetDescriptionSchema(allowDynamic: false)
         );
+    }
+
+    /**
+     * @inheridoc
+     */
+    static function getFragmentClasses(): array
+    {
+        return [CommentItemMeta::class];
     }
 }

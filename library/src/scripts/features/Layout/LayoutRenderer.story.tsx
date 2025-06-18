@@ -137,7 +137,7 @@ const sampleHomeLayout: IHydratedLayoutWidget[] = [
     },
 ];
 
-function LayoutStory(props: IHydratedLayoutSpec) {
+function LayoutStory(props: Omit<IHydratedLayoutSpec, "titleBar">) {
     const source = JSON.stringify(props.layout, null, 2);
 
     return (

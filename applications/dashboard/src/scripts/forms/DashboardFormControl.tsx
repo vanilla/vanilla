@@ -12,7 +12,7 @@ import { DashboardCustomComponent } from "@dashboard/forms/DashboardCustomCompon
 import { DashboardDatePicker } from "@dashboard/forms/DashboardDatePicker";
 import { DashboardDurationPicker } from "@dashboard/forms/DashboardDurationPicker";
 import { DashboardColorPicker } from "@dashboard/forms/DashboardFormColorPicker";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardFormStaticText } from "@dashboard/forms/DashboardFormStaticText";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
@@ -37,6 +37,7 @@ import { ICommonControl, IControlProps, ICustomControl } from "@vanilla/json-sch
 import { useStackingContext } from "@vanilla/react-utils";
 import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/AutoCompleteLookupOptions";
 import isEmpty from "lodash-es/isEmpty";
+import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
 
 interface IControlOverride<T = ICommonControl> {
     /** This boolean controls if the associated component (in callback) should be rendered */
@@ -68,6 +69,7 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
     } = props;
 
     const dateRangeDirection = props.control?.["dateRangeDirection"] ?? propsDateRangeDirection;
+    const formStyle = useDashboardFormStyle();
 
     const { zIndex } = useStackingContext();
 
@@ -217,10 +219,12 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                         isClearable={control.isClearable ?? !required}
                         placeholder={control.placeholder}
                         onChange={onChange}
+                        compact={formStyle.compact}
                         options={control.options}
                         optionsLookup={control.optionsLookup}
                         createable={control.createable}
                         createableLabel={control.createableLabel}
+                        checkIsOptionUserCreated={control.checkIsOptionUserCreated}
                         // See note in FormControl, label can technically be a ReactNode
                         ariaLabel={
                             typeof control.inputAriaLabel === "string"
@@ -277,6 +281,7 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                         disabled={props.disabled}
                         checked={value ?? false}
                         onChange={onChange}
+                        required={required}
                         className={
                             control.labelType === DashboardLabelType.NONE ? dashboardClasses().noLeftPadding : undefined
                         }

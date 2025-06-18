@@ -1,6 +1,6 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -61,12 +61,12 @@ export function SuggestedFollows(props: ISuggestedFollowsProps) {
                             <CategoryFollowDropdownWithNotificationPreferencesContext
                                 key={category.categoryID}
                                 userID={user?.userID}
-                                categoryID={category.categoryID}
-                                categoryName={category.name}
+                                recordID={category.categoryID}
+                                name={category.name}
                                 emailDigestEnabled={emailEnabled}
                                 size={"compact"}
-                                categoryAsLabel
-                                categoryUrl={category.url}
+                                nameAsLabel
+                                viewRecordUrl={category.url}
                             />
                         ))}
                 </div>

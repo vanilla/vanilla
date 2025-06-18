@@ -35,7 +35,7 @@ class SendGridMailer implements MailerInterface
     private ?int $activityID = null;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function send(): bool
     {
@@ -62,7 +62,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function addHeader(string $name, ?string $value = null): void
     {
@@ -70,7 +70,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function addTo(string $recipientMail, ?string $recipientName = null): void
     {
@@ -79,7 +79,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function addCC(string $recipientMail, ?string $recipientName = null): void
     {
@@ -88,7 +88,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function addBCC(string $recipientMail, ?string $recipientName = null): void
     {
@@ -97,7 +97,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setFrom(string $senderEmail, ?string $senderName = null): void
     {
@@ -106,7 +106,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFromAddress(): string
     {
@@ -114,7 +114,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFromName(): string
     {
@@ -122,7 +122,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getToAddresses(): array
     {
@@ -130,7 +130,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCcAddresses(): array
     {
@@ -138,7 +138,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getBccAddresses(): array
     {
@@ -146,7 +146,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSubject(): string
     {
@@ -154,7 +154,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSender(): ?string
     {
@@ -162,7 +162,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getContentType(): string
     {
@@ -170,7 +170,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setContentType(string $type): void
     {
@@ -181,7 +181,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCharSet(): ?string
     {
@@ -189,7 +189,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setSubject(string $subject, bool $encode = true): void
     {
@@ -197,7 +197,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function isSingleTo(): bool
     {
@@ -205,7 +205,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function clearRecipients(): void
     {
@@ -216,7 +216,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function clearContent(): void
     {
@@ -225,7 +225,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setTextContent(string $content = ""): void
     {
@@ -233,7 +233,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setHtmlContent(string $content = ""): void
     {
@@ -241,7 +241,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setTextOnlyContent(string $content = ""): void
     {
@@ -249,7 +249,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTextOnlyContent(): ?string
     {
@@ -257,7 +257,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setSender(string $senderEmail): void
     {
@@ -265,7 +265,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAllRecipients(): array
     {
@@ -273,7 +273,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setBodyContent(string $content = ""): void
     {
@@ -281,7 +281,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getBodyContent(): ?string
     {
@@ -289,7 +289,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTextContent(): ?string
     {
@@ -297,7 +297,7 @@ class SendGridMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setActivityID(int $activityID): void
     {

@@ -37,6 +37,7 @@ use Vanilla\Dashboard\Activity\EscalationActivity;
 use Vanilla\Dashboard\Activity\MyEscalationActivity;
 use Vanilla\Dashboard\Activity\ParticipateCommentActivity;
 use Vanilla\Dashboard\Activity\ReportActivity;
+use Vanilla\Dashboard\Activity\ScheduledPostFailedActivity;
 use Vanilla\Dashboard\Activity\WallCommentActivity;
 use Vanilla\Dashboard\AuthenticatorTypeService;
 use Vanilla\Dashboard\Controllers\Api\SiteTotalsFilterOpenApi;
@@ -51,6 +52,7 @@ use Vanilla\Dashboard\Events\AiSuggestionAccessEvent;
 use Vanilla\Dashboard\Events\ConfigurationChangeEvent;
 use Vanilla\Dashboard\Events\DashboardAccessEvent;
 use Vanilla\Dashboard\Events\DashboardApiAccessEvent;
+use Vanilla\Dashboard\Events\DiscussionPostTypeChangeEvent;
 use Vanilla\Dashboard\Events\ExportAccessEvent;
 use Vanilla\Dashboard\Events\LayoutApplyEvent;
 use Vanilla\Dashboard\Events\PasswordResetCompletedEvent;
@@ -92,6 +94,7 @@ use Vanilla\SamlSSO\Events\JsConnectAuditEvent;
 use Vanilla\SamlSSO\Events\OAuth2AuditEvent;
 use Vanilla\Dashboard\Events\SsoStringAuditEvent;
 use Vanilla\Web\APIExpandMiddleware;
+use VanillaStaffPageController;
 
 /**
  * Container rules for the dashboard.
@@ -109,7 +112,8 @@ class DashboardContainerRules extends AddonContainerRules
                 "/settings/layout" => LayoutSettingsPageController::class,
                 "/appearance" => AppearancePageController::class,
                 "/home/leaving" => LeavingController::class,
-                "/settings/developer/profiles" => DeveloperProfilesPageController::class,
+                "/settings/vanilla-staff/profiles" => DeveloperProfilesPageController::class,
+                "/settings/vanilla-staff" => VanillaStaffPageController::class,
             ],
             null,
             -1
@@ -129,6 +133,7 @@ class DashboardContainerRules extends AddonContainerRules
 
         $container
             ->rule(ActivityService::class)
+            ->addCall("registerActivity", [ScheduledPostFailedActivity::class])
             ->addCall("registerActivity", [DiscussionCommentActivity::class])
             ->addCall("registerActivity", [ActivityCommentActivity::class])
             ->addCall("registerActivity", [WallCommentActivity::class])
@@ -179,7 +184,8 @@ class DashboardContainerRules extends AddonContainerRules
         $container
             ->rule(OpenAPIBuilder::class)
             ->addCall("addFilter", [new Reference(ModerationMessagesFilterOpenApi::class)])
-            ->addCall("addFilter", [new Reference(NotificationPreferencesFilterOpenApi::class)]);
+            ->addCall("addFilter", [new Reference(NotificationPreferencesFilterOpenApi::class)])
+            ->addCall("addFilter", [new Reference(DraftSchedulingOpenApi::class)]);
 
         $container->rule(OpenAPIBuilder::class)->addCall("addFilter", [new Reference(AuthenticatorTypeService::class)]);
 
@@ -226,6 +232,7 @@ class DashboardContainerRules extends AddonContainerRules
                     AiSuggestionAccessEvent::class,
                     SuperSpamAuditLog::class,
                     SsoStringAuditEvent::class,
+                    DiscussionPostTypeChangeEvent::class,
                 ],
             ]);
 

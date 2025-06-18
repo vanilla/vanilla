@@ -25,6 +25,7 @@ import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { ReduxThemeContextProvider } from "@library/theming/Theme.context";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { LoadStatus } from "@library/@types/api/core";
+import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 
 loadTranslations({});
 
@@ -32,7 +33,7 @@ export default {
     title: "Headers/Title Bar",
 };
 
-const makeMockRegisterUser: IMe = {
+const makeMockRegisterUser: IMe = UserFixture.createMockUser({
     name: "Neena",
     userID: 1,
     isAdmin: true,
@@ -41,7 +42,7 @@ const makeMockRegisterUser: IMe = {
     countUnreadNotifications: 1,
     countUnreadConversations: 1,
     emailConfirmed: true,
-};
+});
 
 const optionsItems: ISelectBoxItem[] = [
     {
@@ -78,16 +79,18 @@ function TestTitleBar(props: { hasConversations: boolean }) {
         },
     });
     useEffect(() => {
-        TitleBarStatic.registerBeforeMeBox(() => {
-            return (
-                <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
-                    <>
-                        English
-                        <DownTriangleIcon />
-                    </>
-                </Button>
-            );
-        });
+        TitleBarStatic.extraMeBoxComponents = [
+            () => {
+                return (
+                    <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
+                        <>
+                            English
+                            <DownTriangleIcon />
+                        </>
+                    </Button>
+                );
+            },
+        ];
 
         setMeta("context.conversationsEnabled", props.hasConversations);
     }, []);
@@ -99,46 +102,31 @@ function TestTitleBar(props: { hasConversations: boolean }) {
                         <TitleBarDeviceProvider>
                             <StoryFullPage>
                                 <StoryHeading>Hamburger menu</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} />
+                                <TitleBar isFixed={false} />
 
                                 <StoryHeading>Hamburger menu - open</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                                <TitleBar isFixed={false} forceVisibility={true} />
 
                                 <StoryHeading>Hamburger menu - open with scope</StoryHeading>
-                                <TitleBar
-                                    useMobileBackButton={false}
-                                    isFixed={false}
-                                    forceVisibility={true}
-                                    scope={scope}
-                                />
+                                <TitleBar isFixed={false} forceVisibility={true} scope={scope} />
 
                                 <StoryHeading>Big Logo</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} />
+                                <TitleBar isFixed={false} />
 
                                 <StoryHeading>Big Logo - open</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                                <TitleBar isFixed={false} forceVisibility={true} />
 
                                 <StoryHeading>Big Logo - open with scope</StoryHeading>
-                                <TitleBar
-                                    useMobileBackButton={false}
-                                    isFixed={false}
-                                    forceVisibility={true}
-                                    scope={scope}
-                                />
+                                <TitleBar isFixed={false} forceVisibility={true} scope={scope} />
 
                                 <StoryHeading>Extra Navigation links</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} />
+                                <TitleBar isFixed={false} />
 
                                 <StoryHeading>Extra Navigation links - open</StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} forceVisibility={true} />
+                                <TitleBar isFixed={false} forceVisibility={true} />
 
                                 <StoryHeading>Extra Navigation links - open with scope</StoryHeading>
-                                <TitleBar
-                                    useMobileBackButton={false}
-                                    isFixed={false}
-                                    forceVisibility={true}
-                                    scope={scope}
-                                />
+                                <TitleBar isFixed={false} forceVisibility={true} scope={scope} />
                             </StoryFullPage>
                         </TitleBarDeviceProvider>
                     </CurrentUserContextProvider>
@@ -239,16 +227,18 @@ export const TitleBarRegisteredUserWithManyNavigationItemsAndCenterAligned = () 
         },
     });
     useEffect(() => {
-        TitleBarStatic.registerBeforeMeBox(() => {
-            return (
-                <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
-                    <>
-                        English
-                        <DownTriangleIcon />
-                    </>
-                </Button>
-            );
-        });
+        TitleBarStatic.extraMeBoxComponents = [
+            () => {
+                return (
+                    <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
+                        <>
+                            English
+                            <DownTriangleIcon />
+                        </>
+                    </Button>
+                );
+            },
+        ];
 
         setMeta("context.conversationsEnabled", true);
     }, []);
@@ -264,7 +254,7 @@ export const TitleBarRegisteredUserWithManyNavigationItemsAndCenterAligned = () 
                                     If mebox section colides with nav items, titlebar will automatically switch to
                                     compact view
                                 </StoryHeading>
-                                <TitleBar useMobileBackButton={false} isFixed={false} />
+                                <TitleBar isFixed={false} />
                             </StoryFullPage>
                         </TitleBarDeviceProvider>
                     </CurrentUserContextProvider>

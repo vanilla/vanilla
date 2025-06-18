@@ -68,6 +68,10 @@ class PostTypesApiController extends \AbstractApiController
 
         $query = $in->validate($query);
 
+        if (str_contains($id, "edit")) {
+            $id = str_replace("edit", "", $id);
+        }
+
         $row = $this->getPostTypeByID($id, $query["includeDeleted"] ?? false);
         $row = $out->validate($row);
 

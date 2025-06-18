@@ -762,6 +762,60 @@ class CommentsTest extends AbstractResourceTest
     }
 
     /**
+     * Test that you can still post a comment when including a non-existent draftID.
+     *
+     * @return void
+     */
+    public function testPostingCommentFromDeletedDraft(): void
+    {
+        $discussion = $this->createDiscussion();
+        $commentBody = "This is a comment";
+
+        // Post the comment
+        $this->api()
+            ->post("/comments", [
+                "body" => $commentBody,
+                "discussionID" => $discussion["discussionID"],
+                "format" => "markdown",
+                "draftID" => 9999,
+            ])
+            ->assertSuccess();
+    }
+
+    /**
+     * Test that you cannot delete a draft that belongs to another user if you don't have the correct permission.
+     *
+     * @return void
+     */
+    public function testPostingWithAnotherUsersDraft(): void
+    {
+        $discussion = $this->createDiscussion();
+        $commentDraftData = [
+            "recordType" => "comment",
+            "parentRecordID" => $discussion["discussionID"],
+            "attributes" => [
+                "body" => "Hello world. I am a comment.",
+                "format" => "Markdown",
+            ],
+        ];
+        $draft = $this->api()
+            ->post("/drafts", $commentDraftData)
+            ->assertSuccess()
+            ->getBody();
+
+        $user = $this->createUser();
+        $this->runWithUser(function () use ($draft, $discussion) {
+            $this->expectExceptionCode(403);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->createComment([
+                "body" => "Should not post",
+                "discussionID" => $discussion["discussionID"],
+                "draftID" => $draft["draftID"],
+            ]);
+        }, $user);
+    }
+
+    /**
      * Provide reaction data to test permissions.
      *
      * @return array[]

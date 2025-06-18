@@ -8,33 +8,22 @@
 namespace Vanilla\Widgets\React;
 
 use Garden\Schema\Schema;
-use Vanilla\Knowledge\Models\ArticleJsonLD;
-use Vanilla\Knowledge\Models\SearchJsonLD;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
-use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Widget for rendering raw HTML in react.
  */
-class HtmlReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface
+class HtmlReactWidget extends ReactWidget
 {
     use AllSectionTrait;
-    use TwigRenderTrait;
-    use CombinedPropsWidgetTrait;
-
-    /** @var ContentSecurityPolicyModel */
-    private $cspModel;
 
     /**
      * DI.
-     *
-     * @param ContentSecurityPolicyModel $cspModel
      */
-    public function __construct(ContentSecurityPolicyModel $cspModel)
+    public function __construct(private ContentSecurityPolicyModel $cspModel)
     {
-        $this->cspModel = $cspModel;
     }
 
     /**
@@ -51,6 +40,14 @@ class HtmlReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterf
     public static function getWidgetIconPath(): string
     {
         return "/applications/dashboard/design/images/widgetIcons/customhtml.svg";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Custom";
     }
 
     /**
@@ -81,7 +78,7 @@ class HtmlReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

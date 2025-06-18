@@ -13,6 +13,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
+import { css } from "@emotion/css";
+import { bodyStyleMixin } from "@library/layout/bodyStyles";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -188,6 +190,10 @@ export const storyBookClasses = useThemeCache(() => {
         width: percent(100),
     });
 
+    const contentBg = css({
+        ...bodyStyleMixin(),
+    });
+
     const content = style("content", {
         position: "relative",
         display: "block",
@@ -334,6 +340,7 @@ export const storyBookClasses = useThemeCache(() => {
         containerInner,
         tiles,
         tile,
+        contentBg,
         content,
         smallContent,
         scaleContents,

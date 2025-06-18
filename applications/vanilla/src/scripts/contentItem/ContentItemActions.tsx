@@ -27,7 +27,7 @@ export function ContentItemActions(props: IProps) {
     const { categoryID, closed } = commentParent;
     const isMobile = useMobile();
 
-    const classes = ContentItemClasses();
+    const classes = ContentItemClasses.useAsHook();
 
     const permissionOptions: IPermissionOptions = {
         mode: PermissionMode.RESOURCE_IF_JUNCTION,

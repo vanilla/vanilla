@@ -32,7 +32,7 @@ class InterestsTest extends AbstractResourceTest
     protected $testPagingOnIndex = false;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -51,7 +51,7 @@ class InterestsTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function record(): array
     {
@@ -71,7 +71,7 @@ class InterestsTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testGetEdit($record = null)
     {

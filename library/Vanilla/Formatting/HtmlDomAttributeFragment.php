@@ -28,7 +28,7 @@ class HtmlDomAttributeFragment implements TextFragmentInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getInnerContent(): string
     {
@@ -36,7 +36,7 @@ class HtmlDomAttributeFragment implements TextFragmentInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setInnerContent(string $text)
     {
@@ -44,7 +44,7 @@ class HtmlDomAttributeFragment implements TextFragmentInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getFragmentType(): string
     {

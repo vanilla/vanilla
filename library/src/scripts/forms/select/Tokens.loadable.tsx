@@ -14,13 +14,9 @@ import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import * as selectOverrides from "@library/forms/select/overwrites";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import type { IGroupOption } from "@library/forms/select/Tokens.types";
 
-export interface IGroupOption {
-    label: string;
-    options: IComboBoxOption[];
-}
-
-export interface ITokenProps extends IOptionalComponentID {
+export interface ITokensProps extends IOptionalComponentID {
     options: IComboBoxOption[] | IGroupOption[] | undefined;
     label?: string | null;
     labelNote?: string;
@@ -50,7 +46,7 @@ interface IState {
 /**
  * Implements the search bar component
  */
-export default class TokensLoadable extends React.Component<ITokenProps, IState> {
+export default class TokensLoadable extends React.Component<ITokensProps, IState> {
     private prefix = "tokens";
     private id: string = getRequiredID(this.props, this.prefix);
     private inputID: string = this.id + "-tokenInput";

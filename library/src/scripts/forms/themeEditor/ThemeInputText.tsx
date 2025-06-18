@@ -72,9 +72,8 @@ export function ThemeInputText(props: IProps) {
                 inputProps={{
                     placeholder: props.placeholder,
                     autoComplete: false,
-                    defaultValue: defaultValue ?? undefined,
                     className: classes.input,
-                    value: generatedValue ?? undefined,
+                    value: generatedValue ?? defaultValue ?? undefined,
                     onFocus: () => {
                         setFocus(true);
                     },

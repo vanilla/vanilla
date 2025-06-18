@@ -7,13 +7,11 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
-use Garden\Schema\Validation;
-use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
-use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\Schema\LegacyDateRangeExpression;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
 use Webmozart\Assert\Assert;
 
@@ -43,15 +41,7 @@ abstract class SearchQuery
 
     // Match terms from the query in any order using a fulltext-language specific analyzer.
     const MATCH_VECTORIZED = "vectorized";
-
-    // Match terms from the query by combining the result of a fulltext match and a vectorized match.
-    const MATCH_VECTORIZED_EXTENDED = "vectorized_extended";
-    const TEXT_MATCH_MODES = [
-        self::MATCH_FULLTEXT,
-        self::MATCH_FULLTEXT_EXTENDED,
-        self::MATCH_VECTORIZED,
-        self::MATCH_VECTORIZED_EXTENDED,
-    ];
+    const TEXT_MATCH_MODES = [self::MATCH_FULLTEXT, self::MATCH_FULLTEXT_EXTENDED, self::MATCH_VECTORIZED];
     const SORT_RELEVANCE = "relevance";
     const SORT_ASC = "asc";
     const SORT_DESC = "desc";
@@ -314,8 +304,10 @@ abstract class SearchQuery
                     self::MATCH_FULLTEXT_EXTENDED,
                     self::MATCH_WILDCARD,
                     self::MATCH_VECTORIZED,
-                    self::MATCH_VECTORIZED_EXTENDED,
                 ],
+            ],
+            "vectorizationModel:s?" => [
+                "enum" => ["OpenAI", "Elastic"],
             ],
         ]);
 
@@ -451,6 +443,36 @@ abstract class SearchQuery
         [$start, $end] = $schemaFilter["inclusiveRange"];
         $this->setFilterRange($attribute, $start->getTimestamp(), $end->getTimestamp());
         return $this;
+    }
+
+    /**
+     * Set filter by RangeExpression object.
+     *
+     * @param string $field
+     * @param RangeExpression $filter
+     * @return void
+     */
+    public function setRangeExpressionFilter(string $field, RangeExpression $filter): void
+    {
+        foreach ($filter->getValues() as $op => $val) {
+            switch ($op) {
+                case "=":
+                    $this->setFilter($field, is_array($val) ? $val : [$val]);
+                    break;
+                case "<":
+                    $this->setFilterRange($field, null, $val, true, false);
+                    break;
+                case ">":
+                    $this->setFilterRange($field, $val, null, true, false);
+                    break;
+                case "<=":
+                    $this->setFilterRange($field, null, $val, false, false);
+                    break;
+                case ">=":
+                    $this->setFilterRange($field, $val, null, false, false);
+                    break;
+            }
+        }
     }
 
     /**

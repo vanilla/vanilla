@@ -27,7 +27,7 @@ class LayoutTranslatableModel implements TranslatableModelInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getContentType(): string
     {
@@ -35,7 +35,7 @@ class LayoutTranslatableModel implements TranslatableModelInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getContentToTranslate(int $primaryID = null, array $data = null): array
     {
@@ -107,7 +107,7 @@ class LayoutTranslatableModel implements TranslatableModelInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getContentKeysToTranslate(): array
     {
@@ -115,7 +115,7 @@ class LayoutTranslatableModel implements TranslatableModelInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getPrimaryKey(): string
     {

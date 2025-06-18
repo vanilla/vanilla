@@ -6,7 +6,7 @@
 
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { AddInterest, EditInterest } from "@dashboard/interestsSettings/AddInterest";
@@ -211,7 +211,6 @@ function InterestsSettingsImpl() {
                     }}
                 >
                     <Frame
-                        scrollable
                         header={<FrameHeader closeFrame={() => setOpenFilterModal(false)} title={t("Filter")} />}
                         body={
                             <FrameBody>

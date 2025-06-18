@@ -21,7 +21,7 @@ export function PostRevisionPicker(props: IProps) {
             {postRevisionOptions.options.length > 1 ? (
                 <Sort
                     sortID={"postRevision"}
-                    sortLabel={t("Revision: ")}
+                    sortLabel={t("Revision") + ": "}
                     sortOptions={postRevisionOptions.options.map((option) => {
                         return {
                             name: option.label,
@@ -42,7 +42,8 @@ export function PostRevisionPicker(props: IProps) {
                 />
             ) : (
                 <span>
-                    {t("Revision: ")}
+                    {t("Revision")}
+                    {": "}
                     <strong>{postRevisionOptions.options[0]?.label ?? t("Live")}</strong>
                 </span>
             )}

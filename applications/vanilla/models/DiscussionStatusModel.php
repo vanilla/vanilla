@@ -111,8 +111,10 @@ class DiscussionStatusModel
 
             if ($status["isInternal"]) {
                 $this->discussionModel->setField($discussionID, "internalStatusID", $statusID);
+                $discussion["internalStatusID"] = $statusID;
             } else {
                 $this->discussionModel->setField($discussionID, "statusID", $statusID);
+                $discussion["statusID"] = $statusID;
             }
 
             $statusLogId = $this->recordStatusLogModel->insert($recordLogData);
@@ -151,7 +153,7 @@ class DiscussionStatusModel
      */
     public function determineAndUpdateDiscussionStatus(int $discussionID): array
     {
-        //first set status to default discussion status
+        // first set status to default discussion status
         $statusID = RecordStatusModel::DISCUSSION_STATUS_NONE;
         $statusRecord = $this->getDiscussionStatus($discussionID);
         // If status does not have recordSubType specified, we do not change statusID.

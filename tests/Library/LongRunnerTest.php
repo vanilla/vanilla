@@ -24,7 +24,7 @@ class LongRunnerTest extends SiteTestCase
     use SchedulerTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

@@ -29,7 +29,7 @@ class StorybookCommand extends Console\Command\Command
     private string $mode = "dev";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function configure()
     {

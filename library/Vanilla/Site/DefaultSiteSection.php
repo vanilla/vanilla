@@ -72,7 +72,7 @@ class DefaultSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      * @return string|null
      */
     public function getSectionDescription(): ?string
@@ -151,7 +151,7 @@ class DefaultSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSectionThemeID()
     {
@@ -169,7 +169,7 @@ class DefaultSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getBannerImageLink(): string
     {
@@ -187,7 +187,7 @@ class DefaultSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackablePayload(): array
     {

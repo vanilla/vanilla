@@ -32,7 +32,7 @@ class LogEntryTest extends TestCase
     private $log;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

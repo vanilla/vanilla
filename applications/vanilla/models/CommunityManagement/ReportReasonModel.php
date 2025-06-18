@@ -7,6 +7,7 @@
 
 namespace Vanilla\Forum\Models\CommunityManagement;
 
+use Exception;
 use Garden\Schema\Schema;
 use Vanilla\Database\CallbackWhereExpression;
 use Vanilla\Database\Operation;
@@ -121,6 +122,7 @@ class ReportReasonModel extends FullRecordCacheModel
      */
     public function createInitialReason(array $row)
     {
+        $row["isDeletable"] = 0;
         $hasExisting =
             $this->createSql()->getCount($this->getTable(), ["reportReasonID" => $row["reportReasonID"]]) > 0;
         if ($hasExisting) {
@@ -208,6 +210,7 @@ class ReportReasonModel extends FullRecordCacheModel
             ->column("roleIDs", "json", null)
             ->column("deleted", "tinyint(1)", "0", "index")
             ->column("isSystem", "tinyint(1)", "0")
+            ->column("isDeletable", "tinyint(1)", "1")
             ->set();
 
         // Add default reasons

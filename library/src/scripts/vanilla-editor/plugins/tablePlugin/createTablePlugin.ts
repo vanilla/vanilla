@@ -5,15 +5,18 @@
  */
 
 import { withTable } from "@library/vanilla-editor/plugins/tablePlugin/withTable";
-import { ELEMENT_TABLE, ELEMENT_TR, ELEMENT_TH, ELEMENT_TD } from "@udecode/plate-table";
+import { ELEMENT_TABLE, ELEMENT_TR, ELEMENT_TH, ELEMENT_TD, TablePlugin } from "@udecode/plate-table";
 import { createPluginFactory } from "@udecode/plate-common";
+import { getMeta } from "@library/utility/appUtils";
 
 export const ELEMENT_CAPTION = "caption";
 export const ELEMENT_TBODY = "tbody";
 export const ELEMENT_THEAD = "thead";
 export const ELEMENT_TFOOT = "tfoot";
 
-export const createTablePlugin = createPluginFactory<{}>({
+const isRichTableEnabled = getMeta("featureFlags.RichTable.Enabled", false);
+
+export const createTablePlugin = createPluginFactory<TablePlugin>({
     key: ELEMENT_TABLE,
     isElement: true,
     deserializeHtml: {
@@ -84,4 +87,10 @@ export const createTablePlugin = createPluginFactory<{}>({
             }),
         },
     ],
+    ...(isRichTableEnabled && {
+        options: {
+            initialTableWidth: 600,
+            minColumnWidth: 80,
+        },
+    }),
 });

@@ -36,6 +36,7 @@ Anotherline could go in here
 And Another Line
 Erin, ON, Canada, N0B 1T0
 
+Digest Subscribe Reason
 Unsubscribe (https://demo.vanillawip.com/unsubscribe/token) from the email digest or
 
 Manage (https://demo.vanillawip.com/profile/preferences) your notification preferences

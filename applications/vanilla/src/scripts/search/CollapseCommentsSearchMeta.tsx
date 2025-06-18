@@ -13,7 +13,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { notEmpty } from "@vanilla/utils";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
-import qs from "qs";
+import * as qs from "qs-esm";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
 import { ListItem } from "@library/lists/ListItem";
 import { IDiscussion } from "@dashboard/@types/api/discussion";

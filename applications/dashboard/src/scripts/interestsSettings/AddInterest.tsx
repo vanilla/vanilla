@@ -193,7 +193,6 @@ function InterestForm(props: IProps) {
             }}
         >
             <Frame
-                scrollable
                 header={<FrameHeader closeFrame={onClose} title={title} />}
                 body={
                     <FrameBody>

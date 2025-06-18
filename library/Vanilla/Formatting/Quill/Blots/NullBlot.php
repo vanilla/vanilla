@@ -17,7 +17,7 @@ class NullBlot extends AbstractBlot
 {
     /**
      * The NullBlot is the ultimate fallback blot. It matches anything so always return true.
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $operation): bool
     {
@@ -26,7 +26,7 @@ class NullBlot extends AbstractBlot
 
     /**
      * The null blot always has empty content.
-     * @inheritDoc
+     * @inheritdoc
      */
     public function __construct(array $currentOperation, array $previousOperation, array $nextOperation)
     {
@@ -35,7 +35,7 @@ class NullBlot extends AbstractBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function render(): string
     {
@@ -44,7 +44,7 @@ class NullBlot extends AbstractBlot
 
     /**
      * A null blot should not have any affect on anything around it.
-     * @inheritDoc
+     * @inheritdoc
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool
     {
@@ -53,7 +53,7 @@ class NullBlot extends AbstractBlot
 
     /**
      * The null blot only ever consumes it's own non-matching operation.
-     * @inheritDoc
+     * @inheritdoc
      */
     public function hasConsumedNextOp(): bool
     {

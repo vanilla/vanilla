@@ -34,7 +34,7 @@ class DiscussionsControllerTest extends SiteTestCase
     private $discussion;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {
@@ -45,7 +45,7 @@ class DiscussionsControllerTest extends SiteTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {
@@ -277,11 +277,15 @@ class DiscussionsControllerTest extends SiteTestCase
 
         // Now let's read the discussion with bessy and see if there is a latest marker.
         $controller = $this->bessy()->get("/discussion/{$discussion["discussionID"]}/xxx");
-
+        $this->api()->post("tick", [
+            "discussionID" => $discussion["discussionID"],
+            "type" => "discussion_view",
+        ]);
         // The discussion should be marked read at this point. Let's look for an entry in user discussion.
         $discussionDb = $this->discussionModel->getID($discussion["discussionID"]);
         $this->assertSame(1, (int) $discussionDb->CountCommentWatch);
     }
+
     /**
      **
      * Test if we are rendering all the discussions and discussions from followed categories, and the order is correct.

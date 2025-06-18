@@ -17,7 +17,7 @@ class EmailDigestActivity extends Activity
     const ALLOW_DEFAULT_PREFERENCE = false;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityTypeID(): string
     {
@@ -25,7 +25,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreference(): string
     {
@@ -33,7 +33,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceDescription(): string
     {
@@ -41,7 +41,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getGroupClass(): string
     {
@@ -49,7 +49,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function allowsComments(): bool
     {
@@ -57,7 +57,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getProfileHeadline(): ?string
     {
@@ -65,7 +65,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getFullHeadline(): ?string
     {
@@ -73,7 +73,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityReason(): ?string
     {
@@ -81,7 +81,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPluralHeadline(): ?string
     {
@@ -89,7 +89,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isNotificationType(): bool
     {
@@ -97,7 +97,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceSchemaProperties(): array
     {
@@ -144,7 +144,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceSchemaRequiredProperties(): array
     {
@@ -172,7 +172,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isPublicActivity(): bool
     {
@@ -180,7 +180,7 @@ class EmailDigestActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getNotificationRequiredSettings(): array
     {

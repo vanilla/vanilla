@@ -22,7 +22,7 @@ class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test
     private $configuration;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

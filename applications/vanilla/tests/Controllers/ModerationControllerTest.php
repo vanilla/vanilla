@@ -28,7 +28,7 @@ class ModerationControllerTest extends SiteTestCase
     private $category;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function getAddons(): array
     {
@@ -36,7 +36,7 @@ class ModerationControllerTest extends SiteTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

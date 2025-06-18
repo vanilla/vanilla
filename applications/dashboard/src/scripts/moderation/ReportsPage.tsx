@@ -141,7 +141,6 @@ export function ReportsPage() {
                         </span>
                         <NumberedPager
                             className={cmdClasses.pager}
-                            isMobile={false}
                             showNextButton={false}
                             onChange={setPage}
                             {...paginationProps}

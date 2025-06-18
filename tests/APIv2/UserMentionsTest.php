@@ -30,7 +30,7 @@ class UserMentionsTest extends SiteTestCase
     public $baseUrl = "/user-mentions";
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

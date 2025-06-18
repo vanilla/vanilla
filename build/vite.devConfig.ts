@@ -13,7 +13,7 @@ export default defineConfig(() => {
     const entryModel = new EntryModel();
     const devEntry = path.join(VANILLA_ROOT, "build", ".vite/dev-build.html");
     entryModel.synthesizeHtmlEntry(devEntry, buildSections);
-    const commonConfig = makeViteBuildConfig(devEntry);
+    const commonConfig = makeViteBuildConfig("all", devEntry);
 
     // Dev build
     writeHotReloadConfig();

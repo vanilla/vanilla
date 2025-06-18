@@ -8,7 +8,7 @@ import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { PageBox } from "@library/layout/PageBox";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { quickLinksClasses } from "@library/navigation/QuickLinks.classes";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import SmartLink from "@library/routing/links/SmartLink";
@@ -28,8 +28,8 @@ interface IProps {
  * Component for displaying data lists
  */
 export function QuickLinksView(props: IProps) {
-    const classes = quickLinksClasses(props.containerOptions);
-    const variables = quickLinksVariables(props.containerOptions);
+    const classes = quickLinksClasses.useAsHook(props.containerOptions);
+    const variables = quickLinksVariables.useAsHook(props.containerOptions);
     const { title, links, activePath } = props;
     const visibleLinks = links.filter((link) => {
         const isSetHidden = "isHidden" in link && link.isHidden;
@@ -37,7 +37,7 @@ export function QuickLinksView(props: IProps) {
     });
 
     return (
-        <Widget className={classes.root}>
+        <LayoutWidget className={classes.root}>
             <PageHeadingBox
                 title={title ?? ""}
                 options={{
@@ -66,7 +66,7 @@ export function QuickLinksView(props: IProps) {
                     </ul>
                 </nav>
             </PageBox>
-        </Widget>
+        </LayoutWidget>
     );
 }
 interface IQuickLinkProps {
@@ -79,7 +79,7 @@ interface IQuickLinkProps {
 }
 
 function QuickLink(props: IQuickLinkProps) {
-    const classes = quickLinksClasses();
+    const classes = quickLinksClasses.useAsHook();
     const { path, title, count, countLimit, active } = props;
     const displayCount = React.useMemo(() => {
         if (count && countLimit && count >= countLimit) {

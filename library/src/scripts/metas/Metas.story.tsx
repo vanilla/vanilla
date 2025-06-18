@@ -58,12 +58,12 @@ export function StoryMetasAll() {
                 <Translate
                     source="Posted by <0/> in <1/>"
                     c0={
-                        <SmartLink to={"#"} className={metasClasses().metaLink}>
+                        <SmartLink to={"#"} asMeta>
                             Mike Jonan
                         </SmartLink>
                     }
                     c1={
-                        <SmartLink to={"#"} className={metasClasses().metaLink}>
+                        <SmartLink to={"#"} asMeta>
                             That Category
                         </SmartLink>
                     }

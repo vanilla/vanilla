@@ -13,10 +13,12 @@ use EntryController;
 use Garden\Schema\ValidationException;
 use PermissionModel;
 use UserMetaModel;
+use Vanilla\Dashboard\Events\UserEvent;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\AuditLogTestTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\Dashboard\EntryControllerConnectTestTrait;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -60,6 +62,7 @@ class EntryControllerConnectTest extends SiteTestCase
     use ExpectExceptionTrait;
     use CommunityApiTestTrait;
     use AuditLogTestTrait;
+    use EventSpyTestTrait;
 
     protected const PROVIDER_KEY = "ec-test";
 
@@ -950,7 +953,7 @@ class EntryControllerConnectTest extends SiteTestCase
         }
         $dbUser["Profile"] = $ssoUser;
         $dbUser["UniqueID"] = $uniqueID;
-        return $dbUser;
+        return [$dbUser, $profileFieldData];
     }
 
     /**
@@ -1201,13 +1204,19 @@ class EntryControllerConnectTest extends SiteTestCase
      *
      * They should be recognized by their `UniqueID` and their new user information should be updated.
      *
-     * @param array $existingUser Pass a user that has already registered via SSO
-     * @depends testconnectPageWithMultipleCustomProfileFields
+     * @param array $dependencies Tuple with [A user that has already registered via SSO, profile field data to recreate]
+     * @depends testConnectPageWithMultipleCustomProfileFields
      */
-    public function testSSOSyncWithProfileFields(array $existingUser): void
+    public function testSSOSyncWithProfileFields(array $dependencies): void
     {
+        [$existingUser, $profileFieldData] = $dependencies;
         $newSSOInfo = $this->dummyUser();
         $newSSOInfo["UniqueID"] = $existingUser["UniqueID"];
+
+        // Recreate profile field data because a test trait clears profile fields on setup.
+        foreach ($profileFieldData as $profileFieldRecord) {
+            $this->createProfileFieldsWithPermission($profileFieldRecord);
+        }
 
         // We need to now modify the api data and verify if they are being updated
         $i = 1;
@@ -1232,6 +1241,57 @@ class EntryControllerConnectTest extends SiteTestCase
         foreach (array_slice($newSSOInfo, -2, 2) as $key => $val) {
             $this->assertEquals($val, $metaData["Profile." . $key]);
         }
+    }
+
+    /**
+     * Tests the workflow where a user already exists, the `$connectSynchronizeErrors` flag is set,
+     * and a validation error occurs, forcing the user to submit the form instead of automatically logging them in.
+     *
+     * @return void
+     * @depends testMinimalSSORegistration
+     */
+    public function testConnectWithShowConnectSynchronizeErrors($existingUser)
+    {
+        $newSSOInfo = $this->dummyUser();
+        $newSSOInfo["UniqueID"] = $existingUser["UniqueID"];
+
+        $profileField = $this->createProfileFieldsWithPermission([
+            "dataType" => ProfileFieldModel::DATA_TYPE_STRING_MUL,
+            "formType" => ProfileFieldModel::FORM_TYPE_TOKENS,
+            "dropdownOptions" => ["apple", "banana"],
+            "registrationOptions" => "required",
+            "enabled" => true,
+        ]);
+        $addUserValidationError = function (\UserModel $userModel) {
+            $userModel->Validation->addValidationResult("MockField", "MockErrorCode");
+        };
+
+        $connectSynchronizeErrors = true;
+        $setShowConnectSynchronizeErrors = function ($sender, $args) use (&$connectSynchronizeErrors) {
+            $sender->setShowConnectSynchronizeErrors($connectSynchronizeErrors);
+        };
+
+        $this->getEventManager()->bind("userModel_beforeSaveValidation", $addUserValidationError);
+        $this->getEventManager()->bind("entryController_afterConnectData", $setShowConnectSynchronizeErrors);
+
+        // With the $connectSynchronizeErrors flag set we should only get the error we added above.
+        $this->runWithExpectedExceptionMessage("MockErrorCode", function () use ($newSSOInfo) {
+            $this->entryConnect($newSSOInfo);
+        });
+
+        // With the flag unset we should not have any validation errors.
+        $connectSynchronizeErrors = false;
+        $this->entryConnect(
+            $newSSOInfo,
+            [
+                "Profile" => [$profileField["apiName"] => json_encode([["label" => "banana", "value" => "banana"]])],
+                "Connect" => "connect",
+            ],
+            skipInputCheck: true
+        );
+
+        $this->getEventManager()->unbind("userModel_beforeSaveValidation", $addUserValidationError);
+        $this->getEventManager()->unbind("entryController_afterConnectData", $setShowConnectSynchronizeErrors);
     }
 
     //endregion

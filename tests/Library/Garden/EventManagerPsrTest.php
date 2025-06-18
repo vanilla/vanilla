@@ -53,7 +53,7 @@ class EventManagerPsrTest extends TestCase
     private $eventManager;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

@@ -19,7 +19,7 @@ use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\React\FilterableWidgetTrait;
 use Vanilla\Widgets\WidgetSchemaTrait;
@@ -30,7 +30,7 @@ use Gdn;
 /**
  * Class CategoriesWidget
  */
-class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidgetInterface, HydrateAwareInterface
+class CategoriesWidget extends LegacyReactModule implements CombinedPropsWidgetInterface, HydrateAwareInterface
 {
     use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
@@ -88,6 +88,14 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
     public static function getWidgetName(): string
     {
         return "Categories";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
     }
 
     /**
@@ -181,7 +189,21 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
         // Get the categories
         $categories = $this->api->get("/categories", $params)->getBody();
 
-        $this->props["itemData"] = $this->mapCategoryToItem($categories);
+        $itemData = $this->mapCategoryToItem($categories);
+
+        // Let's preserve the order of featured categories if we have the filter
+        if (
+            $featuredFilter &&
+            !empty($apiParams["featuredCategoryID"]) &&
+            is_array($apiParams["featuredCategoryID"]) &&
+            count($apiParams["featuredCategoryID"]) > 0 &&
+            count($itemData) > 0
+        ) {
+            $orderMap = array_flip($apiParams["featuredCategoryID"]);
+            usort($itemData, fn($a, $b) => $orderMap[$a["categoryID"]] <=> $orderMap[$b["categoryID"]]);
+        }
+
+        $this->props["itemData"] = $itemData;
 
         return $this->props;
     }
@@ -197,9 +219,10 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
         // Compatibility layer. With release 2023.022 we changed category filter values, so we need to convert the previous filter values into right ones
         // Previously the property `categoryID` indicated one or more categories that should appear in the widget.
         if (
-            (!is_array($apiParams["featuredCategoryID"] ?? null) || count($apiParams["featuredCategoryID"]) == 0) &&
+            (!is_array($apiParams["featuredCategoryID"] ?? null) ||
+                count($apiParams["featuredCategoryID"] ?? []) == 0) &&
             is_array($apiParams["categoryID"] ?? null) &&
-            count($apiParams["categoryID"]) > 0
+            count($apiParams["categoryID"] ?? []) > 0
         ) {
             $apiParams["filter"] = "featured";
             $apiParams["featuredCategoryID"] = $apiParams["categoryID"];
@@ -233,7 +256,7 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

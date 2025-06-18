@@ -60,7 +60,7 @@ abstract class AbstractNode implements \JsonSerializable
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function jsonSerialize(): array
     {

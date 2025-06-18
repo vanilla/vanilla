@@ -28,7 +28,7 @@ class DumbArray implements \ArrayAccess
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetExists($offset): bool
     {
@@ -36,7 +36,7 @@ class DumbArray implements \ArrayAccess
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetGet($offset): mixed
     {
@@ -44,7 +44,7 @@ class DumbArray implements \ArrayAccess
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetSet($offset, $value): void
     {
@@ -56,7 +56,7 @@ class DumbArray implements \ArrayAccess
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function offsetUnset($offset): void
     {

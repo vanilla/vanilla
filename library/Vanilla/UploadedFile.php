@@ -6,7 +6,10 @@
 
 namespace Vanilla;
 
+use Garden\SafeCurl\Exception;
+use Garden\SafeCurl\Exception\CurlException;
 use Garden\SafeCurl\SafeCurl;
+use Garden\Web\Exception\ServerException;
 use InvalidArgumentException;
 use RuntimeException;
 use Gdn_Upload;
@@ -107,7 +110,7 @@ class UploadedFile
      * @param string[] $requestHeaders Headers to apply when fetching the remote resource. Useful for authentication.
      *
      * @return UploadedFile
-     * @throws \Garden\SafeCurl\Exception\CurlException If that resource does not exist, does too many redirects, or points to a blacklisted IP.
+     * @throws CurlException|Exception If that resource does not exist, does too many redirects, or points to a blacklisted IP.
      */
     public static function fromRemoteResourceUrl(string $remoteUrl, array $requestHeaders = []): UploadedFile
     {
@@ -119,7 +122,7 @@ class UploadedFile
         $requestHeaders = array_merge(["User-Agent: garden-http/2 (HttpRequest)"], $requestHeaders);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $requestHeaders);
 
-        // Make sure we validating redirect URLs to be safe.
+        // Make sure we are validating redirect URLs.
         $safeCurl = new SafeCurl($curl);
         $safeCurl->setFollowLocationLimit(5);
         $safeCurl->setFollowLocation(true);
@@ -135,7 +138,10 @@ class UploadedFile
         }
 
         if (!$contentType === null || $downloadSize === null) {
-            throw new \Exception("File missing content type or download size");
+            throw new ServerException(
+                "File missing content type or download size",
+                context: ["url" => $remoteUrl, "header" => $requestHeaders]
+            );
         }
 
         $name = self::extractNameFromUrl($remoteUrl);
@@ -159,7 +165,7 @@ class UploadedFile
         $successful = file_put_contents($tmpFilePath, fopen($resolvedUrl, "r", false, $streamContext));
 
         if (!$successful) {
-            throw new \Exception("Failed to copy file locally");
+            throw new ServerException("Failed to copy file locally", context: ["url" => $resolvedUrl]);
         }
 
         $file = new UploadedFile(new \Gdn_Upload(), $tmpFilePath, $downloadSize, UPLOAD_ERR_OK, $name, $contentType);
@@ -242,10 +248,21 @@ class UploadedFile
      * @param bool $copy Whether or not to copy the file instead of moving it.
      * @param string $path The subpath to save to.
      * @return $this
+     * @throws \Exception
      */
     public function persistUploadToPath(bool $copy, string $path): UploadedFile
     {
-        $this->tryApplyImageProcessing();
+        // Ensure the file is an image before processing as an image
+        $mediaType = $this->getClientMediaType();
+        if ($mediaType && strpos($mediaType, "image/") === 0) {
+            try {
+                // Only apply image processing for image file types
+                $this->tryApplyImageProcessing();
+            } catch (RuntimeException $e) {
+                trigger_error("Image processing skipped: " . $e->getMessage(), E_USER_WARNING);
+            }
+        }
+
         $result = $this->uploadModel->saveAs(
             $this->getFile(),
             $path,
@@ -259,10 +276,21 @@ class UploadedFile
     /**
      * If the upload is an image, attempt to apply some processing to it.
      * This includes optional resizing and re-orienting, based on EXIF data.
+     *
+     * @throws RuntimeException If the image is too large to process
      */
     private function tryApplyImageProcessing(): void
     {
         $file = $this->getFile();
+
+        // Check if the file is too large to process as an image (100MB limit)
+        $maxImageSizeBytes = 100 * 1024 * 1024; // 100MB in bytes
+        if ($this->getSize() > $maxImageSizeBytes) {
+            throw new RuntimeException(
+                "Image file is too large for processing. Maximum size for image processing is 100MB."
+            );
+        }
+
         $size = getimagesize($file);
 
         if (empty($size)) {

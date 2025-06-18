@@ -32,7 +32,7 @@ class ElasticSearchHttpClient extends HttpClient
     }
 
     /**
-     * Perform a healthcheck on the kibana instance.
+     * Perform a healthcheck on the elastic instance.
      *
      * @throws HttpResponseException If the instance is not up.
      */

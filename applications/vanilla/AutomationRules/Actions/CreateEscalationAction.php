@@ -33,7 +33,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
 
     private const AUTOMATION_REPORT_BODY = '[{"children":[{"text":"Automation generated report"}],"type":"p"}]';
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -41,7 +41,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -49,7 +49,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -57,7 +57,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function canAddAction(): bool
     {
@@ -66,7 +66,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setPostRecord(array $postRecord): void
     {
@@ -74,7 +74,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getPostRecord(): array
     {
@@ -82,7 +82,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -111,7 +111,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -138,7 +138,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function execute(): bool
     {
@@ -401,7 +401,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -427,7 +427,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {

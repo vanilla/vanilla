@@ -30,7 +30,7 @@ class SpamModelTest extends SiteTestCase
     private $eventManager;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {
@@ -44,7 +44,7 @@ class SpamModelTest extends SiteTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {

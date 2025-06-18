@@ -6,8 +6,6 @@
 
 import { copyMonacoEditorModule } from "build/scripts/utility/moduleUtils";
 import path from "path";
-import { visualizer } from "rollup-plugin-visualizer";
-import * as tmp from "tmp";
 import { build } from "vite";
 import { DYNAMIC_ENTRY_DIR_PATH, LIBRARY_SRC_DIRECTORY, DIST_DIRECTORY } from "./scripts/env";
 import EntryModel from "./scripts/utility/EntryModel";
@@ -15,17 +13,22 @@ import { printSection } from "./scripts/utility/utils";
 import { makeViteBuildConfig } from "./vite.makeBuildConfig";
 import "./vite.buildLegacyDashboard";
 import { minifyScripts } from "./scripts/minifyLegacyScripts";
+import { VanillaChunkDebuggerPlugin } from "build/VanillaChunkDebuggerPlugin";
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 
-// @ts-check
-
-minifyScripts();
 void run();
 
 async function run() {
     let buildSections = process.env.BUILD_SECTIONS?.split(",") ?? [];
+    const allBuildSections = ["admin", "admin-new", "forum", "layouts", "knowledge"];
     if (buildSections.length === 0) {
         buildSections = ["admin", "admin-new", "forum", "layouts", "knowledge"];
     }
+
+    if (buildSections.length === allBuildSections.length) {
+        minifyScripts();
+    }
+
     const entryModel = new EntryModel();
 
     for (const section of buildSections) {
@@ -33,7 +36,7 @@ async function run() {
         const outFile = path.resolve(DYNAMIC_ENTRY_DIR_PATH, `${section}.html`);
         entryModel.synthesizeHtmlEntry(outFile, [section]);
 
-        let config = makeViteBuildConfig(outFile);
+        let config = makeViteBuildConfig(section, outFile);
         config = {
             ...config,
             define: {
@@ -53,7 +56,22 @@ async function run() {
         if (process.env.BUILD_ANALYZE) {
             config = {
                 ...config,
-                plugins: [...(config.plugins ?? []), makeVisualizerPlugin(section)],
+                plugins: [...(config.plugins ?? []), VanillaChunkDebuggerPlugin()],
+            };
+        }
+
+        if (process.env.CODECOV_TOKEN) {
+            config = {
+                ...config,
+                plugins: [
+                    ...(config.plugins ?? []),
+                    codecovVitePlugin({
+                        enableBundleAnalysis: true,
+                        bundleName: section,
+                        uploadToken: process.env.CODECOV_TOKEN,
+                        telemetry: false,
+                    }),
+                ],
             };
         }
 
@@ -73,19 +91,4 @@ async function run() {
         },
     });
     copyMonacoEditorModule();
-}
-
-function makeVisualizerPlugin(section: string): any {
-    const tmpobj = tmp.dirSync();
-    const filename = path.join(tmpobj.name, `${section} - stats.html`);
-    return {
-        ...visualizer({
-            open: true,
-            filename,
-            title: `Analyze - ${section}`,
-            brotliSize: false, // Bun doesn't currently support brotli. https://github.com/oven-sh/bun/issues/267
-            gzipSize: true,
-        }),
-        enforce: "post",
-    };
 }

@@ -9,6 +9,8 @@ namespace VanillaTests;
 
 use DiscussionStatusModel;
 use Garden\Container\Container;
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Container\Reference;
 use Garden\EventManager;
 use Garden\Web\RequestInterface;
@@ -48,13 +50,15 @@ use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Storage\S3\S3StorageProvider;
+use Vanilla\Storage\StorageService;
 use Vanilla\Utility\Timers;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\SystemTokenUtils;
 use Vanilla\Web\TwigEnhancer;
 use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetService;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
@@ -128,6 +132,8 @@ class Bootstrap
      * Initialize the container with Vanilla's environment.
      *
      * @param Container $container The container to initialize.
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function initialize(Container $container)
     {
@@ -414,6 +420,11 @@ class Bootstrap
             ->setClass(\VanillaHtmlFormatter::class)
             ->setShared(true)
 
+            // File Storage
+            ->rule(StorageService::class)
+            ->addCall("addProvider", [new Reference(S3StorageProvider::class)])
+            ->setShared(true)
+
             ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
             ->setClass(\VanillaTests\Fixtures\Scheduler\InstantScheduler::class)
             ->addCall("addDriver", [\Vanilla\Scheduler\Driver\LocalDriver::class])
@@ -422,7 +433,7 @@ class Bootstrap
             ->rule(\Gdn_Form::class)
             ->addAlias("Form")
 
-            ->rule(WidgetService::class)
+            ->rule(LegacyWidgetService::class)
             ->addCall("registerWidget", [MockWidget1::class])
             ->addCall("registerWidget", [MockWidget2::class])
             ->addCall("registerWidget", [MockWidget3::class])

@@ -4,6 +4,7 @@ if (!defined("APPLICATION")) {
 }
 
 use Vanilla\Cache\StaticCache;
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists("AdminCheck")) {
@@ -183,7 +184,7 @@ if (!function_exists("WriteDiscussion")):
             $firstDiscussion = false;
         }
 
-        $discussion->CountPages = ceil($discussion->CountComments / $sender->CountCommentsPerPage);
+        $discussion->CountPages = ceil($discussion->CountComments / Gdn::config("Vanilla.Comments.PerPage", 30));
         ?>
         <li id="Discussion_<?php echo $discussion->DiscussionID; ?>" class="<?php echo $cssClass; ?> pageBox">
             <?php
@@ -537,9 +538,10 @@ if (!function_exists("writeFilterTabs")):
         $countDrafts = 0;
 
         if ($session->isValid()) {
+            $contentDraftModel = Gdn::getContainer()->get(ContentDraftModel::class);
             $countBookmarks = $session->User->CountBookmarks;
             $countDiscussions = $session->User->CountDiscussions;
-            $countDrafts = $session->User->CountDrafts;
+            $countDrafts = $contentDraftModel->draftsWhereCountByUser();
         }
 
         if (c("Vanilla.Discussions.ShowCounts", true)) {

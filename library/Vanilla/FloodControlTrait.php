@@ -48,13 +48,6 @@ trait FloodControlTrait
     private $keyLastDateChecked;
 
     /**
-     * Whether admins should be skipped in the flood control checks.
-     *
-     * @var bool
-     */
-    private $skipAdmins = true;
-
-    /**
      * Force the flood control to be true for testing.
      *
      * @var bool
@@ -64,28 +57,6 @@ trait FloodControlTrait
     public function setForceEnabled(bool $forceEnabled): void
     {
         $this->forceEnabled = $forceEnabled;
-    }
-
-    /**
-     * Get the skipAdmins value.
-     *
-     * @return bool
-     */
-    public function getSkipAdmins(): bool
-    {
-        return $this->skipAdmins;
-    }
-
-    /**
-     * Set the skipAdmins value.
-     *
-     * @param bool $skipAdmins
-     * @return $this
-     */
-    public function setSkipAdmins(bool $skipAdmins): self
-    {
-        $this->skipAdmins = $skipAdmins;
-        return $this;
     }
 
     /**
@@ -212,10 +183,7 @@ trait FloodControlTrait
         $session = Gdn::session();
         if (!$session->isValid()) {
             $this->setFloodControlEnabled(false);
-        } elseif (
-            $this->skipAdmins &&
-            ($session->User->Admin || $session->checkPermission("Garden.Moderation.Manage"))
-        ) {
+        } elseif ($session->User->Admin || $session->checkPermission("Garden.Moderation.Manage")) {
             $this->setFloodControlEnabled(false);
         } elseif (DebugUtils::isTestMode() && !$this->forceEnabled) {
             // Here too

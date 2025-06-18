@@ -15,7 +15,7 @@ interface IProps {
 
 export default function DropDownItemThumbnail(props: IProps) {
     const { label, thumbnail, onClick, isCompact } = props;
-    const classes = dropDownClasses();
+    const classes = dropDownClasses.useAsHook();
 
     return (
         <div

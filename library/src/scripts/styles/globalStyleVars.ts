@@ -76,6 +76,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         almostWhite: color("#f5f6f7"),
         transparent: rgba(0, 0, 0, 0),
         primary: colorPrimary,
+        red: color("#d0021b"),
     };
 
     /**
@@ -243,7 +244,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
              * @type string
              * @format hex-color
              */
-            fg: color("#d0021b"),
+            fg: elementaryColors.red,
             /**
              * @var global.messageColors.error.bg
              * @type string
@@ -274,13 +275,13 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
              * @type string
              * @format hex-color
              */
-            fg: color("#D0021B"),
+            fg: elementaryColors.red,
             /**
              * @var global.messageColors.deleted.bg
              * @type string
              * @format hex-color
              */
-            bg: color("#D0021B"),
+            bg: elementaryColors.red,
         },
     });
 
@@ -643,14 +644,11 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         fonts.googleFontFamily = "custom";
     }
 
-    const fontSizeAndWeightVars = (
-        size: keyof typeof fonts.size,
-        weight?: keyof typeof fonts.weights,
-    ): Pick<IFont, "size" | "weight"> => {
+    const fontSizeAndWeightVars = (size: keyof typeof fonts.size, weight?: keyof typeof fonts.weights): IFont => {
         return {
             size: fonts.size[size],
             weight: weight ? fonts.weights[weight] : fonts.sizeWeight[size],
-        };
+        } as IFont;
     };
 
     /**
@@ -888,7 +886,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
          * @var global.overlay.dropShadow
          * @type string
          */
-        dropShadow: `2px -2px 5px ${ColorsUtils.colorOut(overlayBg.fade(0.3))}`,
+        dropShadow: `2px -2px 5px rgba(0, 0, 0, 0.2)`,
         /**
          * @var global.overlay.bg
          * @type string

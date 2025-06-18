@@ -81,40 +81,39 @@ final class ViteAssetProvider
     public function getEnabledEntryAssets(string $buildSection): array
     {
         $assetsByID = $this->getAssetsByID($buildSection);
-        $entryAssets = [$this->getLocaleAsset()];
+        $entryAssets = ["locales" => $this->getLocaleAsset()];
         $enabledAddonKeys = $this->getEnabledAddonKeys();
         foreach ($assetsByID as $asset) {
-            if ($asset->isEntry($buildSection) && $asset->belongsToAddon($enabledAddonKeys)) {
-                $entryAssets[] = $asset;
+            if (
+                ($asset->isAddonEntry() && $asset->belongsToAddon($enabledAddonKeys)) ||
+                $asset->isAsset() ||
+                $asset->isPrimaryEntry()
+            ) {
+                $entryAssets[$asset->assetID] = $asset;
                 // Push in the dependencies
                 $entryAssets = array_merge($entryAssets, $asset->resolveDependencies($assetsByID));
             }
         }
+        $entryAssets = array_values($entryAssets);
 
         return $entryAssets;
     }
 
     /**
-     * Get content for an inline polyfill script.
+     * Get content for an inline bootstrapping script.
      *
-     * It checks for support for the following:
-     * - Promise,
-     * - fetch,
-     * - Symbol,
-     * - Various new Element/NodeList methods.
+     * Register vanilla globals.
      *
-     * If a single one is missing we will block the page load to add all polyfills.
-     * This allows to us to
-     * - keep the polyfill simple.
-     * - Ship 0 polyfills to users modern browsers (basically after 2016 release).
+     * @param string $buildSection
      *
      * @return string The contents of the script.
      */
-    public function getBootstrapInlineScript(): string
+    public function getBootstrapInlineScript(string $buildSection): string
     {
         return $this->renderTwig("library/Vanilla/Web/Asset/InlineBootstrapContent.js.twig", [
             "debugModeLiteral" => debug() ? "true" : "false",
             "enabledAddonKeys" => json_encode($this->getEnabledAddonKeys()),
+            "buildSection" => $buildSection,
         ]);
     }
 
@@ -259,7 +258,7 @@ JS;
      */
     private function getEnabledAddonKeys(): array
     {
-        $enabledKeys = [];
+        $enabledKeys = ["library"];
         foreach ($this->addonManager->getEnabled() as $addon) {
             $addon = $this->checkReplacePreview($addon);
             $enabledKeys[] = strtolower($addon->getKey());

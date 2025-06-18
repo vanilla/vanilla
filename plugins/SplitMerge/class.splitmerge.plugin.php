@@ -133,7 +133,7 @@ class SplitMergePlugin extends Gdn_Plugin
                 saveToConfig("Garden.InputFormatter", "Html", false);
             }
 
-            $newDiscussionID = $discussionModel->save($data);
+            $newDiscussionID = $discussionModel->save($data, ["skipEvents" => true]);
 
             // Reset the input formatter
             if (c("Garden.ForceInputFormatter")) {

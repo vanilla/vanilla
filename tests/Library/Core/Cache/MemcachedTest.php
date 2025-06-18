@@ -18,7 +18,7 @@ class MemcachedTest extends SimpleCacheTest {
     use MemcachedTestTrait;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @psalm-suppress UndefinedClass
      */
     public static function setUpBeforeClass(): void {
@@ -28,7 +28,7 @@ class MemcachedTest extends SimpleCacheTest {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void {
         $this->setUpBootstrap();
@@ -37,14 +37,14 @@ class MemcachedTest extends SimpleCacheTest {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function createSimpleCache() {
         return new ValidatingCacheCacheAdapter(self::$memcached);
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function createLegacyCache(): \Gdn_Cache {
         return self::$memcached;

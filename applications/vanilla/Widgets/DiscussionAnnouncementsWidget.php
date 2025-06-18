@@ -12,18 +12,17 @@ use Garden\Schema\ValidationException;
 use Vanilla\Forum\Modules\AnnouncementWidgetModule;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\React\FilterableWidgetTrait;
-use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
  * Class DiscussionAnnouncementsWidget
  */
-class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements ReactWidgetInterface
+class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule
 {
     use DiscussionsWidgetSchemaTrait;
     use FilterableWidgetTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -31,7 +30,7 @@ class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements 
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -39,7 +38,7 @@ class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements 
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -55,7 +54,7 @@ class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements 
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -69,7 +68,7 @@ class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements 
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getApiSchema(): Schema
     {

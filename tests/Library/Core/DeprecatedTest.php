@@ -34,7 +34,7 @@ class DeprecatedTest extends TestCase
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {

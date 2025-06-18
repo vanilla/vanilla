@@ -19,8 +19,10 @@ use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ResponseException;
 use Garden\Web\Redirect;
+use Smarty\Cacheresource\Custom;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Dashboard\Events\LayoutApplyEvent;
+use Vanilla\Dashboard\Models\FragmentModel;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\Asset\LayoutQuery;
@@ -33,9 +35,12 @@ use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\Resolvers\ReactResolver;
 use Vanilla\Layout\Section\AbstractLayoutSection;
 use Vanilla\Logging\AuditLogger;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Models\CustomPageModel;
 use Vanilla\QnA\Layout\Assets\AnswerThreadAsset;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Widgets\React\CustomFragmentWidget;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
@@ -43,38 +48,17 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
  */
 class LayoutsApiController extends \AbstractApiController
 {
-    /** @var LayoutHydrator */
-    private $layoutHydrator;
-
-    /** @var LayoutModel $layoutModel */
-    private $layoutModel;
-
-    /** @var LayoutViewModel $layoutViewModel */
-    private $layoutViewModel;
-
-    /** @var LayoutService $layoutService */
-    private $layoutService;
-
     //endregion
 
     /**
      * DI.
-     *
-     * @param LayoutHydrator $layoutHydrator
-     * @param LayoutModel $layoutModel
-     * @param LayoutViewModel $layoutViewModel
-     * @param LayoutService $layoutProviderService
      */
     public function __construct(
-        LayoutHydrator $layoutHydrator,
-        LayoutModel $layoutModel,
-        LayoutViewModel $layoutViewModel,
-        LayoutService $layoutProviderService
+        private LayoutHydrator $layoutHydrator,
+        private LayoutModel $layoutModel,
+        private LayoutViewModel $layoutViewModel,
+        private LayoutService $layoutService
     ) {
-        $this->layoutHydrator = $layoutHydrator;
-        $this->layoutModel = $layoutModel;
-        $this->layoutViewModel = $layoutViewModel;
-        $this->layoutService = $layoutProviderService;
     }
 
     //region Layout API endpoints
@@ -123,7 +107,7 @@ class LayoutsApiController extends \AbstractApiController
         $this->permission();
         $in = Schema::parse([
             "layoutViewType:s?" => [
-                "enum" => $this->layoutHydrator->getLayoutViewTypes(),
+                "enum" => array_merge($this->layoutHydrator->getLayoutViewTypes(), ["all"]),
             ],
         ]);
         $out = Schema::parse([
@@ -135,86 +119,51 @@ class LayoutsApiController extends \AbstractApiController
             "widgets:o",
             "assets:o",
             "sections:o",
+            "fragments:o",
         ]);
 
         $query = $in->validate($query);
 
-        $layoutView = $this->layoutHydrator->getLayoutViewType($query["layoutViewType"]);
-        $hydrator = $this->layoutHydrator->getHydrator($query["layoutViewType"] ?? null);
-        $paramSchema = $this->layoutHydrator->getViewParamSchema($layoutView, true);
+        $layoutViewType = $query["layoutViewType"] ?? null;
+        $layoutViews =
+            $layoutViewType === "all"
+                ? $this->layoutHydrator->getAllLayoutViews()
+                : [$this->layoutHydrator->getLayoutViewType($layoutViewType)];
+
+        $hydrator = $this->layoutHydrator->getHydrator($layoutViewType === "all" ? null : $layoutViewType);
+        $paramSchema = $this->layoutHydrator->getViewParamSchema(null, true);
+        foreach ($layoutViews as $layoutView) {
+            $paramSchema = $paramSchema->merge($this->layoutHydrator->getViewParamSchema($layoutView, true));
+        }
         $flattenedParamSchema = SchemaUtils::flattenSchema($paramSchema, "/");
 
         $widgetSchemas = [];
         $assetSchemas = [];
         $sectionSchemas = [];
-        foreach ($hydrator->getResolvers() as $resolver) {
-            if (!$resolver instanceof ReactResolver) {
-                continue;
-            }
-
-            if (is_a($resolver->getReactWidgetClass(), AbstractLayoutAsset::class, true)) {
-                // Assets are handled separately below.
-                continue;
-            }
-
+        foreach ($this->layoutHydrator->getReactWidgetResolvers($layoutViewType) as $resolver) {
             /** @var ReactWidgetInterface $widgetClass */
             $widgetClass = $resolver->getReactWidgetClass();
-            $componentName = $widgetClass::getComponentName();
-            $widgetIconUrl = asset($widgetClass::getWidgetIconPath(), true);
-            $widgetName = $widgetClass::getWidgetName();
-            $schema = $resolver->getSchema();
 
-            SchemaUtils::fixObjectDefaultSerialization($schema);
-
+            $result = $resolver->asCatalogItem($hydrator);
             if (is_a($widgetClass, AbstractLayoutSection::class, true)) {
-                $sectionSchemas[$resolver->getType()] = [
-                    '$reactComponent' => $componentName,
-                    "schema" => $schema,
-                    "allowedWidgetIDs" => $this->getAllowedWidgetIDs($hydrator, $widgetClass::getWidgetID()),
-                    "iconUrl" => $widgetIconUrl,
-                    "name" => $widgetName,
-                ];
+                $sectionSchemas[$resolver->getType()] = $result;
             } else {
-                $widgetSchemas[$resolver->getType()] = [
-                    '$reactComponent' => $componentName,
-                    "schema" => $schema,
-                    "iconUrl" => $widgetIconUrl,
-                    "name" => $widgetName,
-                ];
+                $widgetSchemas[$resolver->getType()] = $result;
             }
         }
 
         // Go through the assets.
-
-        if ($layoutView !== null) {
-            /**
-             * @var class-string<AbstractLayoutAsset> $assetClass
-             */
-            foreach ($layoutView->getAssetClasses() as $assetClass) {
-                $resolver = new ReactResolver($assetClass, \Gdn::getContainer());
-                $iconUrl = empty($assetClass::getWidgetIconPath())
-                    ? $assetClass::getWidgetIconPath()
-                    : asset($assetClass::getWidgetIconPath(), true);
-
-                $schema = $resolver->getSchema();
-                SchemaUtils::fixObjectDefaultSerialization($schema);
-
-                $assetSchemas[$resolver->getType()] = [
-                    '$reactComponent' => $assetClass::getComponentName(),
-                    "schema" => $schema,
-                    "iconUrl" => $iconUrl,
-                    "name" => $assetClass::getWidgetName(),
-                    "isRequired" => $assetClass::isRequired(),
-                ];
-            }
+        foreach ($this->layoutHydrator->getReactAssetResolvers($layoutViewType) as $resolver) {
+            $assetSchemas[$resolver->getType()] = $resolver->asCatalogItem($hydrator);
         }
 
         $result = [
-            "layoutViewType" => $query["layoutViewType"],
+            "layoutViewType" => $query["layoutViewType"] ?? null,
             "layoutParams" => [],
             "widgets" => $widgetSchemas,
             "assets" => $assetSchemas,
             "sections" => $sectionSchemas,
+            "fragments" => $this->layoutHydrator->getFragmentMetas($layoutViewType),
         ];
 
         foreach ($flattenedParamSchema->getSchemaArray()["properties"] as $propName => $propSchema) {
@@ -227,25 +176,12 @@ class LayoutsApiController extends \AbstractApiController
 
         $result = $out->validate($result);
 
-        return new Data($result);
-    }
-
-    /**
-     * Get a list allowed widgets for a section.
-     *
-     * @param string $sectionID Section ID.
-     *
-     * @return array
-     */
-    private function getAllowedWidgetIDs(DataHydrator $hydrator, string $sectionID): array
-    {
-        $allowed = [];
-        foreach ($hydrator->getResolvers() as $resolver) {
-            if ($resolver instanceof ReactResolver && in_array($sectionID, $resolver->getAllowedSectionIDs())) {
-                $allowed[] = $resolver->getType();
-            }
-        }
-        return $allowed;
+        return new Data(
+            $result,
+            meta: [
+                "api-allow" => ["email"],
+            ]
+        );
     }
 
     /**
@@ -304,7 +240,7 @@ class LayoutsApiController extends \AbstractApiController
 
         $query = $this->schema($this->layoutModel->getQueryInputSchema(true), "in")->validate($query);
 
-        $out = $this->schema($this->layoutModel->getMetadataSchema(), "out");
+        $out = $this->schema($this->layoutModel->getFullSchema(), "out");
 
         $provider = $this->layoutService->getCompatibleProvider($layoutID);
         if (!isset($provider)) {
@@ -348,6 +284,10 @@ class LayoutsApiController extends \AbstractApiController
         } catch (NoResultsException $e) {
             throw new NotFoundException("Layout");
         }
+
+        $layout["titleBar"] = $layout["titleBar"] ?? [
+            "\$hydrate" => "react.titleBar",
+        ];
 
         $out = $this->schema($this->layoutModel->getEditSchema(), "out");
         $result = $out->validate($layout);
@@ -588,8 +528,8 @@ class LayoutsApiController extends \AbstractApiController
         } catch (NoResultsException $e) {
             throw new NotFoundException("Layout");
         }
-        $layoutViewType = $row["layoutViewType"];
 
+        $layoutViewType = $row["layoutViewType"];
         $assets = $this->layoutHydrator->getAssetLayout($layoutViewType, $params, $row);
 
         $result = $out->validate($assets);
@@ -621,10 +561,12 @@ class LayoutsApiController extends \AbstractApiController
         $layoutProvider = $this->tryGetMutableLayoutProvider($layoutID);
 
         try {
-            $layoutProvider->getByID($layoutID);
+            $layout = $layoutProvider->getByID($layoutID);
         } catch (NoResultsException $e) {
             throw new NotFoundException("Layout");
         }
+
+        CustomPageModel::ensureNonCustomPageLayout($layout);
 
         // If the layout has associated views, we prevent deletion & throw an exception.
         $associatedViews = $this->get_views($layoutID, [])->getData();
@@ -656,6 +598,8 @@ class LayoutsApiController extends \AbstractApiController
         $out = $this->schema($this->layoutModel->getFullSchema(), "out");
 
         $body = $in->validate($body);
+
+        CustomPageModel::ensureNonCustomPageLayout($body);
 
         $layoutID = intval($this->layoutModel->insert($body));
         $row = $this->layoutModel->selectSingle(["layoutID" => $layoutID]);
@@ -695,6 +639,8 @@ class LayoutsApiController extends \AbstractApiController
         } catch (NoResultsException $e) {
             throw new NotFoundException("Layout");
         }
+
+        CustomPageModel::ensureNonCustomPageLayout($layout);
 
         $body = $this->schema($this->layoutModel->getPatchSchema(), "in")->validate($body);
         if (!empty($body)) {
@@ -792,6 +738,8 @@ class LayoutsApiController extends \AbstractApiController
             throw new NotFoundException("Layout");
         }
 
+        CustomPageModel::ensureNonCustomPageLayout($row);
+
         $layoutViewType = $row["layoutViewType"];
 
         $layoutViewIDs = $this->layoutViewModel->saveLayoutViews($body, $layoutViewType, $layoutID);
@@ -821,6 +769,16 @@ class LayoutsApiController extends \AbstractApiController
         $this->permission("site.manage");
         $this->schema($this->layoutModel->getIDSchema(), "in")->validate(["layoutID" => $layoutID]);
         $query = $this->schema(["layoutViewIDs:a?" => [":i"]], "in")->validate($query);
+
+        try {
+            $layoutProvider = $this->layoutService->getCompatibleProvider($layoutID);
+            $layout = $layoutProvider->getByID($layoutID);
+            CustomPageModel::ensureNonCustomPageLayout($layout);
+        } catch (\Throwable $e) {
+            // The above code was added just to make sure the layout doesn't belong to `customPage`. The `getByID()` method
+            // may throw a NotFoundException, but we don't care if a layout doesn't exist if we are deleting view associations.
+            ErrorLogger::warning($e, ["layouts"]);
+        }
 
         $where = [
             "layoutID" => $layoutID,

@@ -4,9 +4,8 @@
  * @license gpl-2.0-only
  */
 
-import AdminLayout from "@dashboard/components/AdminLayout";
-import { DeveloperNav } from "@dashboard/developer/DeveloperNav";
-import { DeveloperProfileDetailRoute } from "@dashboard/developer/getDeveloperRoutes";
+import { StaffAdminLayout } from "@dashboard/components/navigation/StaffAdminLayout";
+import { DeveloperProfileDetailRoute } from "@dashboard/developer/getVanillaStaffRoutes";
 import { developerProfileClasses } from "@dashboard/developer/pages/DeveloperProfilePage.classes";
 import { DeveloperProfileOptionsMenu } from "@dashboard/developer/profileViewer/DeveloperProfile.OptionsMenu";
 import {
@@ -65,9 +64,8 @@ export function DeveloperProfilesListPage() {
     };
 
     return (
-        <AdminLayout
+        <StaffAdminLayout
             title="Developer Profiles"
-            leftPanel={<DeveloperNav />}
             rightPanel={
                 <>
                     <div>

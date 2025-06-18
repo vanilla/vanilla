@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Formatting\FormatService;
 use VanillaTests\MinimalContainerTestCase;
 use VanillaTests\Fixtures\Formatting\FormatFixture;

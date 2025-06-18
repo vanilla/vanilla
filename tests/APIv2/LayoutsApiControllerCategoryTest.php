@@ -22,11 +22,12 @@ use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Fixtures\IterableArray;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Layout\LayoutTestTrait;
+use VanillaTests\SiteTestCase;
 
 /**
  * Tests for api/v2/layouts endpoints
  */
-class LayoutsApiControllerCategoryTest extends AbstractResourceTest
+class LayoutsApiControllerCategoryTest extends SiteTestCase
 {
     use CommunityApiTestTrait;
     use ExpectExceptionTrait;
@@ -34,34 +35,6 @@ class LayoutsApiControllerCategoryTest extends AbstractResourceTest
 
     /* @var LayoutViewModel */
     private $layoutViewModel;
-
-    //region Properties
-    protected $testPagingOnIndex = false;
-
-    /** {@inheritdoc} */
-    protected $baseUrl = "/layouts";
-
-    /** {@inheritdoc} */
-    protected $pk = "layoutID";
-
-    /** {@inheritdoc} */
-    protected $editFields = ["name", "layout"];
-
-    /** {@inheritdoc} */
-    protected $patchFields = ["name", "layout"];
-
-    /** {@inheritdoc} */
-    protected $record = [
-        "name" => "Layout",
-        "layout" => [["foo" => "bar"], ["fizz" => "buzz", "flip" => ["flap", "flop"], "drip" => ["drop" => "derp"]]],
-        "layoutViewType" => "categoryList",
-    ];
-
-    /** local version of the record */
-    protected $localRecord = [
-        "name" => "Layout",
-        "layout" => [["foo" => "bar"], ["fizz" => "buzz", "flip" => ["flap", "flop"], "drip" => ["drop" => "derp"]]],
-    ];
 
     /** @var CategoryModel */
     protected $categoryModel;
@@ -74,7 +47,7 @@ class LayoutsApiControllerCategoryTest extends AbstractResourceTest
     //region Setup / Teardown
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function configureContainerBeforeStartup(Container $container)
     {
@@ -143,7 +116,7 @@ class LayoutsApiControllerCategoryTest extends AbstractResourceTest
      */
     public function testGetStaticLayout(string $id): void
     {
-        $response = $this->api()->get("{$this->baseUrl}/{$id}");
+        $response = $this->api()->get("/layouts/{$id}");
         $this->assertTrue($response->isSuccessful());
         $layout = $response->getBody();
         $this->assertEquals($id, $layout["layoutID"]);
@@ -158,7 +131,7 @@ class LayoutsApiControllerCategoryTest extends AbstractResourceTest
      */
     public function testIndexIncludesStaticLayout(string $id): void
     {
-        $response = $this->api()->get("{$this->baseUrl}");
+        $response = $this->api()->get("/layouts");
         $this->assertTrue($response->isSuccessful());
         $layouts = $response->getBody();
         $this->assertIsArray($layouts);

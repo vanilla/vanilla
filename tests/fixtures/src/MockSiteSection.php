@@ -101,7 +101,7 @@ class MockSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSectionDescription(): ?string
     {
@@ -191,7 +191,7 @@ class MockSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getBannerImageLink(): string
     {
@@ -199,7 +199,7 @@ class MockSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLayoutRecordType(): string
     {
@@ -207,7 +207,7 @@ class MockSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLayoutRecordID(): int|string
     {
@@ -215,7 +215,7 @@ class MockSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackablePayload(): array
     {

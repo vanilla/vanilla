@@ -10,6 +10,7 @@ import { cx } from "@emotion/css";
 import InputBlock from "@library/forms/InputBlock";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { inputClasses } from "@library/forms/inputStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import React from "react";
 
 interface IProps {
@@ -31,7 +32,12 @@ export function DashboardColorPicker(props: IProps) {
                     inputClassName={cx(inputClassNames.inputText, dashboardClassNames.colorInput)}
                     swatchClassName={cx(dashboardClassNames.swatch, { [dashboardClassNames.disabled]: props.disabled })}
                     {...props}
-                    defaultBackground={props.defaultBackground ?? props.placeholder}
+                    defaultBackground={
+                        props.defaultBackground ??
+                        (props.placeholder?.includes("#")
+                            ? props.placeholder
+                            : globalVariables().mainColors.bg.toHexString())
+                    }
                 />
             </InputBlock>
         </DashboardInputWrap>

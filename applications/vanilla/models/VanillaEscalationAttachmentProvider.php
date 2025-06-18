@@ -88,7 +88,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function normalizeAttachment(array $attachment): array
     {
@@ -134,7 +134,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function refreshAttachments(array $attachmentRows): array
     {
@@ -158,7 +158,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTypeName(): string
     {
@@ -166,7 +166,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getIsEscalation(): bool
     {
@@ -191,7 +191,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRecordTypes(): array
     {
@@ -199,7 +199,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTitleLabelCode(): string
     {
@@ -207,7 +207,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getExternalIDLabelCode(): string
     {
@@ -215,7 +215,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogoIconName(): string
     {
@@ -223,7 +223,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRefreshTimeSeconds(): int
     {
@@ -231,7 +231,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEscalationDelayUnit(): ?string
     {
@@ -239,7 +239,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEscalationDelayLength(): int
     {
@@ -247,7 +247,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canViewBasicAttachment(array $attachment): bool
     {
@@ -256,7 +256,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canViewFullAttachment(array $attachment): bool
     {
@@ -278,7 +278,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canCreateAttachmentForRecord(string $recordType, int $recordID): bool
     {
@@ -286,7 +286,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getProviderName(): string
     {
@@ -338,7 +338,7 @@ class VanillaEscalationAttachmentProvider implements AttachmentProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAdditionalCatalogInfo(): array
     {

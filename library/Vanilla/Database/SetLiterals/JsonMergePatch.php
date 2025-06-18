@@ -20,7 +20,7 @@ class JsonMergePatch extends SetLiteral
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function toSql(\Gdn_SQLDriver $sql, string $escapedFieldName): string
     {

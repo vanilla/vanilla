@@ -10,7 +10,7 @@ import { oneColumnVariables } from "@library/layout/Section.variables";
 import { percent } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { Mixins } from "@library/styles/Mixins";
 import { ISpacing } from "@library/styles/cssUtilsTypes";
 

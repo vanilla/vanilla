@@ -102,10 +102,13 @@ class ReportPostTriggerHandler
                 if ($categoryIDs !== null) {
                     $categories = [];
                     foreach ($categoryIDs as $categoryID) {
-                        $categories[] = $this->categoryModel->getSearchCategoryIDs(
-                            $categoryID,
-                            false,
-                            $automationRule["triggerValue"]["includeSubcategories"]
+                        $categories = array_merge(
+                            $categories,
+                            $this->categoryModel->getSearchCategoryIDs(
+                                $categoryID,
+                                false,
+                                $automationRule["triggerValue"]["includeSubcategories"] ?? false
+                            )
                         );
                     }
                     $recordReports = array_filter($recordReports, function ($recordReport) use ($categories) {

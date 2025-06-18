@@ -13,20 +13,21 @@ interface IProps extends IBaseEmbedProps {
     size: number;
     dateInserted: string;
     name: string;
+    downloadUrl?: string;
 }
 
 /**
  * An embed class for quoted user content on the same site.
  */
 export function FileEmbed(props: IProps) {
-    const { type, size, dateInserted, name, url } = props;
+    const { type, size, dateInserted, name, downloadUrl, url } = props;
     const attachmentType = mimeTypeToAttachmentType(type);
     return (
         <Attachment
             type={attachmentType}
             size={size}
             name={name}
-            url={url}
+            url={downloadUrl ?? url}
             dateUploaded={dateInserted}
             mimeType={type}
         />

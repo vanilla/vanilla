@@ -15,10 +15,15 @@ use Symfony\Component\Console;
 use Vanilla\Cli\Docker\KibanaHttpClient;
 use Vanilla\Cli\Docker\ElasticSearchHttpClient;
 use Vanilla\Cli\Docker\Service\AbstractLaravelService;
+use Vanilla\Cli\Docker\Service\AbstractService;
+use Vanilla\Cli\Docker\Service\VanillaJobberService;
+use Vanilla\Cli\Docker\Service\VanillaManagementService;
 use Vanilla\Cli\Docker\Service\VanillaElasticService;
+use Vanilla\Cli\Docker\Service\VanillaFilesService;
 use Vanilla\Cli\Docker\Service\VanillaImgProxyService;
 use Vanilla\Cli\Docker\Service\VanillaLogsService;
 use Vanilla\Cli\Docker\Service\VanillaMailhogService;
+use Vanilla\Cli\Docker\Service\VanillaMySqlService;
 use Vanilla\Cli\Docker\Service\VanillaNginxService;
 use Vanilla\Cli\Docker\Service\VanillaQueueService;
 use Vanilla\Cli\Docker\Service\VanillaSearchService;
@@ -33,14 +38,19 @@ use Vanilla\Utility\ArrayUtils;
  */
 class DockerCommand extends Console\Command\Command
 {
-    const SERVICE_MAP = [
-        VanillaVanillaService::SERVICE_NAME => [VanillaVanillaService::class],
-        VanillaImgProxyService::SERVICE_NAME => [VanillaImgProxyService::class],
-        VanillaMailhogService::SERVICE_NAME => [VanillaMailhogService::class],
-        VanillaElasticService::SERVICE_NAME => [VanillaElasticService::class],
-        VanillaLogsService::SERVICE_NAME => [VanillaElasticService::class, VanillaLogsService::class],
-        VanillaSearchService::SERVICE_NAME => [VanillaElasticService::class, VanillaSearchService::class],
-        VanillaQueueService::SERVICE_NAME => [VanillaQueueService::class],
+    const SERVICE_CLASSES = [
+        VanillaNginxService::class,
+        VanillaMySqlService::class,
+        VanillaManagementService::class,
+        VanillaVanillaService::class,
+        VanillaImgProxyService::class,
+        VanillaMailhogService::class,
+        VanillaElasticService::class,
+        VanillaLogsService::class,
+        VanillaSearchService::class,
+        VanillaQueueService::class,
+        VanillaFilesService::class,
+        VanillaJobberService::class,
     ];
 
     use ScriptLoggerTrait;
@@ -48,38 +58,57 @@ class DockerCommand extends Console\Command\Command
 
     const VNLA_DOCKER_CWD = PATH_ROOT . "/docker";
 
-    private ElasticSearchHttpClient $elasticClient;
-    private KibanaHttpClient $kibanaClient;
+    const COMMAND_START = "start";
+    const COMMAND_STOP = "stop";
 
-    private const COMMAND_START = "start";
-    private const COMMAND_STOP = "stop";
+    const COMMAND_UP = "up";
+    const COMMAND_DOWN = "down";
 
-    private const COMMAND_UP = "up";
-    private const COMMAND_DOWN = "down";
-
-    private const COMMAND_RESET = "reset";
+    private const SUBCOMMANDS = [self::COMMAND_START, self::COMMAND_STOP, self::COMMAND_UP, self::COMMAND_DOWN];
 
     /** @var AbstractLaravelService[] */
     private array $services = [];
 
     /**
-     * DI.
+     * Get instances of all the service classes.
+     *
+     * @return array<string, AbstractService> Mapping of serviceID to service instance.
      */
-    public function __construct(ElasticSearchHttpClient $logClient, KibanaHttpClient $kibanaClient)
+    public static function allServiceInstances(): array
     {
-        parent::__construct();
-        $this->elasticClient = $logClient;
-        $this->kibanaClient = $kibanaClient;
+        static $services = null;
+        if ($services === null) {
+            // Startup is really slow if we have to keep re-initializing these, but there are a few static contexts we
+            // want to use them in. The static keeps this performant.
+            $services = [];
+            $container = new Container();
+            foreach (self::SERVICE_CLASSES as $SERVICE_CLASS) {
+                /** @var AbstractService $instance */
+                $instance = $container->get($SERVICE_CLASS);
+                $services[$instance->descriptor->serviceID] = $instance;
+            }
+        }
+        return $services;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRunningServices(): array
+    {
+        return array_filter(self::allServiceInstances(), fn(AbstractService $service) => $service->isRunning());
     }
 
     /**
      * Declare input arguments.
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
-        $servicesValues = array_keys(self::SERVICE_MAP);
-        $serviceCsv = implode(", ", $servicesValues);
+        $serviceCsv = implode(", ", self::validServiceIDs());
+
+        $commands = implode(", ", self::SUBCOMMANDS);
+
         $this->setName("docker")
             ->setDescription("Run vanilla locally in a docker container")
             ->setDefinition(
@@ -87,7 +116,7 @@ class DockerCommand extends Console\Command\Command
                     new Console\Input\InputArgument(
                         "sub-command",
                         Console\Input\InputArgument::OPTIONAL,
-                        "Subcommand",
+                        "One of: $commands",
                         "start"
                     ),
                     new Console\Input\InputOption(
@@ -106,13 +135,19 @@ class DockerCommand extends Console\Command\Command
      *
      * @return array
      */
-    private static function validServiceKeys(): array
+    private static function validServiceIDs(): array
     {
-        $validServices = array_keys(self::SERVICE_MAP);
+        $serviceIDs = array_map(
+            fn(AbstractService $service) => $service->descriptor->serviceID,
+            self::allServiceInstances()
+        );
+        $validServices = $serviceIDs;
         if (!file_exists(PATH_ROOT . "/cloud")) {
             $validServices = array_diff($validServices, [
-                VanillaSearchService::SERVICE_NAME,
-                VanillaQueueService::SERVICE_NAME,
+                VanillaSearchService::SERVICE_ID,
+                VanillaQueueService::SERVICE_ID,
+                VanillaManagementService::SERVICE_ID,
+                VanillaJobberService::SERVICE_ID,
             ]);
         }
         return $validServices;
@@ -121,50 +156,69 @@ class DockerCommand extends Console\Command\Command
     /**
      * @inheritdoc
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         parent::initialize($input, $output);
 
         $rawServiceInput = $input->getOption("service") ?? "";
         if ($rawServiceInput === "all") {
-            $inputServices = self::validServiceKeys();
+            $inputServiceIDs = self::validServiceIDs();
         } else {
-            $inputServices = array_filter(array_map("trim", explode(",", $rawServiceInput)));
+            $inputServiceIDs = array_filter(array_map("trim", explode(",", $rawServiceInput)));
         }
 
-        if (empty($inputServices)) {
-            // Try to load input services from config.
-            $inputServices = self::validServiceKeys();
-        }
-
-        // Persist
-        $badServices = array_diff($inputServices, self::validServiceKeys());
-        if (!empty($badServices)) {
-            throw new \Exception("Invalid service(s) specified: " . implode(", ", $badServices));
-        }
-
-        // Used services in order
-        $usedServices = array_intersect(self::validServiceKeys(), $inputServices);
-
-        $serviceClasses = [VanillaNginxService::class];
-        foreach ($usedServices as $serviceKey) {
-            $serviceClasses = array_merge($serviceClasses, self::SERVICE_MAP[$serviceKey]);
-        }
-
-        $container = new Container();
-        foreach (array_unique($serviceClasses) as $serviceClass) {
-            $this->services[] = $container->get($serviceClass);
-        }
-        $this->logger()->info("Using services: <yellow>" . implode(", ", $usedServices) . "</yellow>");
+        $this->initServiceIDs($inputServiceIDs);
     }
 
     /**
-     * Main command entrypoint.
+     * Initialize the command for a set of serviceIDs.
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param array $serviceIDs
+     *
+     * @return void
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function initServiceIDs(array $serviceIDs): void
+    {
+        $validServiceIDs = self::validServiceIDs();
+
+        if (empty($serviceIDs)) {
+            // Try to load input services from config.
+            $serviceIDs = $validServiceIDs;
+        }
+
+        // Used services in order
+
+        $allServiceInstances = self::allServiceInstances();
+
+        $finalServiceIDs = [VanillaNginxService::SERVICE_ID];
+        foreach ($serviceIDs as $serviceID) {
+            $serviceInstance = $allServiceInstances[$serviceID] ?? null;
+            if ($serviceInstance === null) {
+                throw new \Exception("Service '$serviceID' not found");
+            }
+
+            // First add dependants
+            foreach ($serviceInstance::$requiredServiceIDs as $requiredServiceID) {
+                if (!in_array(needle: $requiredServiceID, haystack: $finalServiceIDs)) {
+                    $finalServiceIDs[] = $requiredServiceID;
+                }
+            }
+            // Then add the service itself
+            if (!in_array(needle: $serviceID, haystack: $finalServiceIDs)) {
+                $finalServiceIDs[] = $serviceID;
+            }
+        }
+
+        $serviceInstances = array_map(fn(string $serviceID) => $allServiceInstances[$serviceID], $finalServiceIDs);
+
+        $this->services = $serviceInstances;
+        $this->logger()->info("Using services: <yellow>" . implode(", ", $finalServiceIDs) . "</yellow>");
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $command = $input->getArgument("sub-command");
 
@@ -197,7 +251,7 @@ class DockerCommand extends Console\Command\Command
      * - Migrates old database if necessary.
      * - Ensures logs are configured.
      */
-    private function start()
+    public function start(): void
     {
         // Validate that we have docker.
         $hostValidator = new HostValidator();
@@ -210,16 +264,27 @@ class DockerCommand extends Console\Command\Command
         }
 
         $this->writeVanillaConfigs();
-
-        // One final nginx restart
-        DockerUtils::restartContainer(DockerCommand::VNLA_DOCKER_CWD, "nginx");
     }
 
-    private function writeVanillaConfigs()
+    /**
+     * Stop running containers if they are running.
+     */
+    public function stop(): void
+    {
+        foreach ($this->services as $service) {
+            $service->stop();
+        }
+        $this->writeVanillaConfigs();
+    }
+
+    /**
+     * Write config defaults for vanilla.
+     */
+    private function writeVanillaConfigs(): void
     {
         $configPath = PATH_CONF . "/docker-defaults.php";
         $finalConfigs = [];
-        foreach ($this->services as $service) {
+        foreach (self::getRunningServices() as $service) {
             foreach ($service->getVanillaConfigDefaults() as $key => $val) {
                 ArrayUtils::setByPath($key, $finalConfigs, $val);
             }
@@ -227,15 +292,5 @@ class DockerCommand extends Console\Command\Command
 
         $fileContents = \Gdn_Configuration::format($finalConfigs, []);
         file_put_contents($configPath, $fileContents);
-    }
-
-    /**
-     * Stop running containers if they are running.
-     */
-    private function stop()
-    {
-        foreach ($this->services as $service) {
-            $service->stop();
-        }
     }
 }

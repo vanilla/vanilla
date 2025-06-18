@@ -75,7 +75,7 @@ export function useConfigQuery(configKeys: string[]) {
 
 export type ConfigQuery = ReturnType<typeof useConfigQuery>;
 
-export function useConfigMutation() {
+export function useConfigMutation(invalidationDelay = 50) {
     const toast = useToast();
     const queryClient = useQueryClient();
     return useMutation({
@@ -86,7 +86,7 @@ export function useConfigMutation() {
         onSuccess: () => {
             setTimeout(() => {
                 void queryClient.invalidateQueries(["getConfigs"]);
-            }, 50);
+            }, invalidationDelay);
             toast.addToast({ body: t("Configuration changes saved."), autoDismiss: true, dismissible: true });
         },
         onError: () => {

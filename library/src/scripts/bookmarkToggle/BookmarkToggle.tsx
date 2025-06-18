@@ -11,20 +11,21 @@ import { cx } from "@emotion/css";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 
-interface IProps {
+interface IBookmarkToggleProps {
     bookmarked: boolean;
     onToggleBookmarked: () => any;
+    classNames?: string;
 }
 
-const BookmarkToggle: FunctionComponent<IProps> = ({ bookmarked, onToggleBookmarked }) => {
-    const { icon, iconChecked, iconDisabled } = bookmarkToggleClasses();
+const BookmarkToggle: FunctionComponent<IBookmarkToggleProps> = ({ bookmarked, onToggleBookmarked, classNames }) => {
+    const { icon, iconChecked, iconDisabled } = bookmarkToggleClasses.useAsHook();
 
     return (
         <ActsAsCheckbox checked={bookmarked} onChange={onToggleBookmarked} title={t("Bookmark")}>
             {(props) => (
                 <Icon
                     icon={bookmarked ? "bookmark-filled" : "bookmark-empty"}
-                    className={cx(icon, {
+                    className={cx(icon, classNames, {
                         [iconChecked]: bookmarked,
                     })}
                 />

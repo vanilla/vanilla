@@ -6,10 +6,9 @@
 import { AppliedLayoutViewLocationDetails } from "@dashboard/appearance/components/AppliedLayoutViewLocationDetails";
 import { ApplyLayout } from "@dashboard/appearance/components/ApplyLayout";
 import { DeleteLayout } from "@dashboard/appearance/components/DeleteLayout";
-import { AppearanceNav } from "@dashboard/components/navigation/AppearanceNav";
 import { ErrorWrapper } from "@dashboard/appearance/pages/ErrorWrapper";
 import { LayoutEditorRoute } from "@dashboard/appearance/routes/appearanceRoutes";
-import AdminLayout from "@dashboard/components/AdminLayout";
+import { AppearanceAdminLayout } from "@dashboard/components/navigation/AppearanceAdminLayout";
 import { useLayoutQuery } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { LayoutOverview } from "@dashboard/layout/overview/LayoutOverview";
@@ -19,19 +18,21 @@ import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ErrorMessages from "@library/forms/ErrorMessages";
-import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { MetaItem, Metas } from "@library/metas/Metas";
 import { metasClasses } from "@library/metas/Metas.styles";
 import ProfileLink from "@library/navigation/ProfileLink";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { t } from "@vanilla/i18n";
-import { useCollisionDetector } from "@vanilla/react-utils";
 import { notEmpty, stableObjectHash } from "@vanilla/utils";
-import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { layoutOverviewPageClasses } from "./LayoutOverviewPage.classes";
-import { AppearanceAdminLayout } from "@dashboard/components/navigation/AppearanceAdminLayout";
+import {
+    EditorThemePreviewDropDownItem,
+    EditorThemePreviewOverrides,
+    EditorThemePreviewProvider,
+} from "@library/theming/EditorThemePreviewContext";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 
 function LayoutOverviewPageMetasImpl(props: { layout: ILayoutDetails }) {
     const { layout } = props;
@@ -94,6 +95,8 @@ function TitleBarActionsContent(props: { layout: ILayoutDetails }) {
                 >
                     {t("Copy")}
                 </DropDownItemLink>
+                <DropDownItemSeparator />
+                <EditorThemePreviewDropDownItem />
             </DropDown>
 
             <LinkAsButton
@@ -133,17 +136,23 @@ export default function LayoutOverviewPage(
     );
 
     return (
-        <AppearanceAdminLayout
-            contentClassNames={classes.overviewContent}
-            title={layoutQuery.data?.name || ""}
-            description={descriptionContent}
-            titleBarActions={layoutQuery.data ? <TitleBarActionsContent layout={layoutQuery.data} /> : <></>}
-            content={<LayoutOverview layoutID={layoutID} />}
-            titleLabel={
-                (layoutQuery.data?.layoutViews ?? []).length > 0 ? (
-                    <span className={classes.titleLabel}>{t("Applied")}</span>
-                ) : undefined
-            }
-        />
+        <EditorThemePreviewProvider>
+            <AppearanceAdminLayout
+                contentClassNames={classes.overviewContent}
+                title={layoutQuery.data?.name || ""}
+                description={descriptionContent}
+                titleBarActions={layoutQuery.data ? <TitleBarActionsContent layout={layoutQuery.data} /> : <></>}
+                content={
+                    <EditorThemePreviewOverrides>
+                        <LayoutOverview layoutID={layoutID} />
+                    </EditorThemePreviewOverrides>
+                }
+                titleLabel={
+                    (layoutQuery.data?.layoutViews ?? []).length > 0 ? (
+                        <span className={classes.titleLabel}>{t("Applied")}</span>
+                    ) : undefined
+                }
+            />
+        </EditorThemePreviewProvider>
     );
 }

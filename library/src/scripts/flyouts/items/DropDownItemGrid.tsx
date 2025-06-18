@@ -13,7 +13,7 @@ interface IProps {
 
 export default function DropDownItemGrid(props: IProps) {
     const { children, isCompact } = props;
-    const classes = dropDownClasses();
+    const classes = dropDownClasses.useAsHook();
 
     return <div className={cx(classes.gridItem, isCompact ? classes.gridItemSmall : undefined)}>{children}</div>;
 }

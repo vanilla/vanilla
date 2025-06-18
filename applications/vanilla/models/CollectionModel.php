@@ -333,15 +333,17 @@ class CollectionModel extends PipelineModel
     public function updateCollection(int $collectionID, array $collectionRecord): void
     {
         $currentRecords = $this->selectSingle(["collectionID" => $collectionID]);
-        $records = $collectionRecord["records"];
+        $records = $collectionRecord["records"] ?? null;
         unset($collectionRecord["records"]);
         $collectionRecord = array_merge($currentRecords, $collectionRecord);
         try {
             $this->database->beginTransaction();
             $sql = $this->createSql();
-            $sql->delete("collectionRecord", ["collectionID" => $collectionID]);
             $this->update($collectionRecord, ["collectionID" => $collectionID]);
-            $this->addCollectionRecords($collectionID, $records);
+            if ($records) {
+                $sql->delete("collectionRecord", ["collectionID" => $collectionID]);
+                $this->addCollectionRecords($collectionID, $records);
+            }
             $this->database->commitTransaction();
         } catch (Exception $e) {
             $this->database->rollbackTransaction();

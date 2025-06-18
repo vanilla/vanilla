@@ -17,7 +17,7 @@ export default function PageLoaderWithTitleBar(props: React.PropsWithChildren<IP
     if (status === LoadStatus.LOADING) {
         return (
             <>
-                <TitleBar useMobileBackButton={false} />
+                <TitleBar />
                 <Loader />
             </>
         );

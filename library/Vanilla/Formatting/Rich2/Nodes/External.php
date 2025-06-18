@@ -20,7 +20,7 @@ class External extends AbstractLeafNode
     private EmbedService $embedService;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function __construct(array $data, string $parseMode = Parser::PARSE_MODE_NORMAL)
     {
@@ -29,7 +29,7 @@ class External extends AbstractLeafNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $node): bool
     {
@@ -39,7 +39,7 @@ class External extends AbstractLeafNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderHtmlContent(): string
     {
@@ -117,7 +117,7 @@ class External extends AbstractLeafNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

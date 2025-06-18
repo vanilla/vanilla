@@ -40,7 +40,9 @@ interface IProps {
     canDelete?: boolean;
     canEdit?: boolean;
     canCopyCustom?: boolean;
+    onSelect?: () => void;
     revisions?: boolean;
+    focusable?: boolean;
 }
 
 export default function ThemePreviewCard(props: IProps) {
@@ -259,6 +261,7 @@ export default function ThemePreviewCard(props: IProps) {
 
     return (
         <PreviewCard
+            focusable={props.focusable}
             previewImage={previewImage}
             background={vars.globalBg}
             name={props.name}

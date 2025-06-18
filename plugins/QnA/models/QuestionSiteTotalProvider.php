@@ -37,7 +37,7 @@ class QuestionSiteTotalProvider implements SiteSectionTotalProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function calculateSiteTotalCount(?SiteSectionInterface $siteSection = null): int
     {
@@ -58,7 +58,7 @@ class QuestionSiteTotalProvider implements SiteSectionTotalProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTableName(): string
     {
@@ -66,7 +66,7 @@ class QuestionSiteTotalProvider implements SiteSectionTotalProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getSiteTotalRecordType(): string
     {

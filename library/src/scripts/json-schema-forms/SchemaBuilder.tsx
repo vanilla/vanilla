@@ -226,7 +226,7 @@ export class SchemaFormBuilder {
 
     public dropdown(
         property: string,
-        label: string,
+        label: ICommonControl["label"],
         description: string | null,
         options: IPickerOption[],
         disabled?: boolean,
@@ -287,7 +287,7 @@ export class SchemaFormBuilder {
 
     public selectStatic(
         property: string,
-        label: string,
+        label: ICommonControl["label"],
         description: string | null,
         options: Select.Option[],
         isMulti?: boolean,

@@ -48,7 +48,7 @@ class MediaModel extends Gdn_Model implements FileUploadHandler, SystemCallableI
     {
         parent::__construct("Media");
         $this->upload = \Gdn::getContainer()->get(Gdn_Upload::class);
-        $this->floodGate = FloodControlHelper::configure($this, "Vanilla", "Media", false);
+        $this->floodGate = FloodControlHelper::configure($this, "Vanilla", "Media");
         $this->setFloodControlEnabled(true);
         $this->setPostCountThreshold(250);
         $this->setTimeSpan(3600);
@@ -188,6 +188,28 @@ class MediaModel extends Gdn_Model implements FileUploadHandler, SystemCallableI
     private function normalizeAndValidate(array $row): array
     {
         return VanillaMediaSchema::normalizeFromDbRecord($row);
+    }
+
+    /**
+     * Assosciate some media rows with a record.
+     *
+     * @param array $where
+     * @param string $foreignType
+     * @param string $foreignID
+     * @return void
+     */
+    public function assosciateWithRecord(array $where, string $foreignType, string $foreignID): void
+    {
+        $this->createSql()
+            ->update(
+                $this->getTableName(),
+                set: [
+                    "ForeignTable" => $foreignType,
+                    "ForeignID" => $foreignID,
+                ],
+                where: $where
+            )
+            ->put();
     }
 
     /**

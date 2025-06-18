@@ -20,7 +20,7 @@ class FileUploadPostPermissionTest extends SiteTestCase
     use UsersAndRolesApiTestTrait, CommunityApiTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

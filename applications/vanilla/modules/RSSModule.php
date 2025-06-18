@@ -118,7 +118,7 @@ class RSSModule extends AbstractHomeWidgetModule implements InjectableInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -126,7 +126,7 @@ class RSSModule extends AbstractHomeWidgetModule implements InjectableInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getContainerOptions(): array
     {

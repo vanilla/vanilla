@@ -10,6 +10,7 @@ namespace VanillaTests\Models;
 use DiscussionModel;
 use Garden\Web\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
+use UserDiscussionModel;
 use Vanilla\Forum\Models\DiscussionMergeModel;
 use VanillaTests\VanillaTestCase;
 
@@ -23,6 +24,11 @@ trait TestDiscussionModelTrait
      */
     protected $discussionModel;
 
+    /**
+     * @var UserDiscussionModel
+     */
+    protected $userDiscussionModel;
+
     /** @var DiscussionMergeModel */
     protected $mergeModel;
 
@@ -33,6 +39,7 @@ trait TestDiscussionModelTrait
     {
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->mergeModel = $this->container()->get(DiscussionMergeModel::class);
+        $this->userDiscussionModel = $this->container()->get(UserDiscussionModel::class);
         DiscussionModel::cleanForTests();
     }
 

@@ -66,7 +66,10 @@ export function useDiscussionQuery(discussionID: RecordID, expand?: string[]) {
     });
 }
 
-export function useToggleDiscussionBookmarked(discussionID: IPutDiscussionBookmarked["discussionID"]) {
+export function useToggleDiscussionBookmarked(
+    discussionID: IPutDiscussionBookmarked["discussionID"],
+    initialState?: boolean,
+) {
     const { putDiscussionBookmarked } = useDiscussionActions();
     const { addToast } = useToast();
 
@@ -77,7 +80,8 @@ export function useToggleDiscussionBookmarked(discussionID: IPutDiscussionBookma
         null;
 
     const isBookmarked = useSelector(
-        (state: IDiscussionsStoreState) => state.discussions.discussionsByID[discussionID]?.bookmarked ?? false,
+        (state: IDiscussionsStoreState) =>
+            state.discussions.discussionsByID[discussionID]?.bookmarked ?? initialState ?? false,
     );
 
     useEffect(() => {

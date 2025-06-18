@@ -36,7 +36,7 @@ class DiscussionApiStatusTest extends SiteTestCase
     private $internalStatusID;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

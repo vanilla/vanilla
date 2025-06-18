@@ -31,6 +31,10 @@ class AuditLogger
      */
     public static function log(AuditLogEventInterface $event): string
     {
+        if (!self::c("Garden.Installed")) {
+            // Don't log if the system isn't installed.
+            return "";
+        }
         if (self::c("auditLog.enabled", false) === false) {
             return "";
         }

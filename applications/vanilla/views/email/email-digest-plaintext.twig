@@ -32,6 +32,7 @@
 {{ email.footer }}
 {% endif %}
 
+{{ t(email.digestSubscribeReason) }}
 {{t("Unsubscribe")}} ({% if email.utmParams|default(false) %}{{ email.digestUnsubscribeLink ~ '?' ~ email.utmParams }}"{% else %}{{ email.digestUnsubscribeLink }}{% endif %}) {{t("from the email digest or")}}
 
 {{t("Manage")}} ({{ email.siteUrl }}/profile/preferences{% if email.utmParams|default(false) %}?{{ email.utmParams }} {% endif %}) {{t("your notification preferences")}}{% endautoescape %}

@@ -6,7 +6,7 @@
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { DashboardColorPicker } from "@dashboard/forms/DashboardFormColorPicker";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
@@ -24,17 +24,10 @@ import { RangePicker } from "@library/forms/rangePicker/RangePicker";
 import { IDateModifierRange } from "@library/forms/rangePicker/types";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import {
-    AutoComplete,
-    FormGroup,
-    FormGroupInput,
-    FormGroupLabel,
-    INumberBoxProps,
-    NumberBox as VanillaUINumberBox,
-    TextBox,
-} from "@vanilla/ui";
+import { AutoComplete, FormGroup, FormGroupInput, FormGroupLabel, TextBox } from "@vanilla/ui";
 import React, { useState } from "react";
 import puppyImage from "../../../../applications/dashboard/styleguide/public/resources/images/puppy.jpg";
+import { NumberBox as NumberBoxComponent, INumberBoxProps } from "@library/forms/NumberBox";
 
 export default {
     title: "Forms/Admin Form Fields",
@@ -66,7 +59,7 @@ const options = [
 
 function StoryNumberBox(extraProps: Partial<INumberBoxProps>) {
     const [value, setValue] = useState(0);
-    return <VanillaUINumberBox value={value} onValueChange={setValue} {...extraProps} />;
+    return <NumberBoxComponent value={value} onChange={setValue} {...extraProps} />;
 }
 
 interface StoryAutoCompleteProps extends React.ComponentProps<typeof AutoComplete> {
@@ -416,8 +409,10 @@ export function ImageUpload() {
 
 export function DateRangePicker() {
     const [range, setRange] = useState<IDateModifierRange>({
-        from: { operations: [{ type: "subtract", amount: 3, unit: "weeks" }] },
-        to: {},
+        from: { date: new Date("2024-01-29T00:00:00Z"), operations: [{ type: "subtract", amount: 3, unit: "weeks" }] },
+        to: {
+            date: new Date("2024-02-04T00:00:00Z"),
+        },
     });
 
     const rangePickerContainerStyles = css({
@@ -568,7 +563,7 @@ export function CodeBox() {
 
             <h4>
                 {`Looks like for now we canot render our dashboard code editor in storybook until already created bug is
-                addressed (see the comment in <TextEditor/> component)`}
+                addressed (see the comment in <MonacoEditor/> component)`}
             </h4>
             {/* <DashboardFormGroup label="Label" description="Description">
                 <DashboardCodeEditor

@@ -39,9 +39,9 @@ export interface IHomeWidgetContainerProps {
 }
 
 export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
-    const { options } = homeWidgetContainerVariables(props.options);
+    const { options } = homeWidgetContainerVariables.useAsHook(props.options);
     let { children: content } = props;
-    const classes = homeWidgetContainerClasses(options);
+    const classes = homeWidgetContainerClasses.useAsHook(options);
     const widgetClasses = useWidgetSectionClasses();
 
     if (options.displayType === WidgetContainerDisplayType.CAROUSEL) {

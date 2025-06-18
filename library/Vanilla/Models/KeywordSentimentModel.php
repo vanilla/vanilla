@@ -49,7 +49,7 @@ class KeywordSentimentModel extends PipelineModel
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function insert(array $set, $options = []): int
     {

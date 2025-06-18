@@ -49,28 +49,44 @@ export const groupsCSS = () => {
         ".groupToolbar": {
             marginTop: styleUnit(16),
         },
-        ".Group-Header": {
-            display: "flex",
-            flexDirection: "row",
+        ".Group-Header.Group-Header.Group-Header": {
+            display: "grid",
+            gridTemplateColumns: "fit-content(140px) auto auto",
+            gridTemplateAreas: `"icon details actions"`,
             alignItems: "center",
-            flexWrap: "wrap",
+
+            ...mediaQueries.mobileDown({
+                gridTemplateAreas: `"icon details details"
+                                    "actions actions actions"`,
+            }),
+
+            "&.HasBanner": {
+                gridTemplateAreas: `
+                                    "banner banner banner"
+                                    "icon details actions"
+                                    `,
+                ...mediaQueries.mobileDown({
+                    gridTemplateAreas: `
+                                    "banner banner banner"
+                                    "icon details details"
+                                    "actions actions actions"
+                                    `,
+                }),
+            },
         },
         ".Group-Header.NoBanner": {
             alignItems: "center",
         },
         ".Group-Banner": {
             height: styleUnit(vars.banner.height),
-        },
-        ".Group-Header.HasBanner .Group-Banner": {
-            ...mediaQueries.mobileDown({
-                marginBottom: styleUnit(vars.logo.height / 2 + 10),
-            }),
+            gridArea: "banner",
         },
         ".Group-GuestModule": {
             borderTop: "1px solid #dddee0",
             paddingTop: styleUnit(32),
         },
-        ".Group-Icon-Big-Wrap": {
+        ".Group-Icon-Big-Wrap.Group-Icon-Big-Wrap": {
+            gridArea: "icon",
             width: styleUnit(vars.logo.height),
             height: styleUnit(vars.logo.height),
             flexBasis: styleUnit(vars.logo.height),
@@ -84,30 +100,20 @@ export const groupsCSS = () => {
                 bottom: 10,
             }),
         },
-        ".Group-Header.HasBanner .Group-Icon-Big-Wrap": {
-            ...mediaQueries.mobileDown({
-                position: "absolute",
-                top: styleUnit(vars.banner.height - vars.logo.height / 2),
-                marginBottom: 0,
-                marginLeft: 15,
-            }),
-        },
         "Group-Header.NoBanner .Group-Icon-Big-Wrap": {
             position: "relative",
             top: "auto",
             marginBottom: 0,
         },
         ".Group-Header-Info": {
-            flex: 1,
+            gridArea: "details",
+            height: "fit-content",
         },
-        ".Group-Header.NoBanner .Group-Header-Info": {
+        ".Group-Header.NoBanner.Group-Header.NoBanner .Group-Header-Info": {
             paddingLeft: styleUnit(0),
         },
         ".Group-Header.HasBanner .Group-Header-Info": {
             paddingLeft: styleUnit(0),
-            ...mediaQueries.mobileDown({
-                flex: "unset",
-            }),
         },
         ...{
             [`
@@ -136,7 +142,6 @@ export const groupsCSS = () => {
         },
         ".GroupOptions": {
             top: calc(`100% + ${styleUnit(globalVars.gutter.size)}`),
-            marginLeft: "auto",
         },
         ".GroupWrap .DataTable .Title-Icon": {
             color: ColorsUtils.colorOut(metasVars.font.color),
@@ -229,13 +234,20 @@ export const groupsCSS = () => {
             marginBottom: styleUnit(36),
         },
 
-        ".Group-Header-Actions": {
+        ".Group-Header-Actions.Group-Header-Actions": {
+            gridArea: "actions",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "end",
+            gap: styleUnit(8),
             width: percent(100),
             ...Mixins.margin({
                 vertical: styleUnit(globalVars.gutter.size),
+            }),
+            ...mediaQueries.mobileDown({
+                ".Group-Buttons": {
+                    width: "max-content",
+                },
             }),
         },
         [`.Group-Header-Actions .Group-Buttons, .Group-Header-Actions .ButtonGroup,`]: {

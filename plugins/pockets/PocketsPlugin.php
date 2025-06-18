@@ -5,8 +5,8 @@
  */
 
 use Vanilla\Addons\Pockets\PocketsModel;
-use Vanilla\Widgets\WidgetFactory;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetFactory;
+use Vanilla\Widgets\LegacyWidgetService;
 
 /**
  * Class PocketsPlugin
@@ -46,14 +46,14 @@ class PocketsPlugin extends Gdn_Plugin
     private $pocketsModel;
 
     /**
-     * @var WidgetService
+     * @var LegacyWidgetService
      */
     private $widgetService;
 
     /**
      * PocketsPlugin constructor.
      */
-    public function __construct(PocketsModel $pocketsModel, WidgetService $widgetService)
+    public function __construct(PocketsModel $pocketsModel, LegacyWidgetService $widgetService)
     {
         parent::__construct();
         $this->pocketsModel = $pocketsModel;
@@ -231,8 +231,8 @@ class PocketsPlugin extends Gdn_Plugin
         $model = new PocketsModel();
         $pocketData = $model->getAll();
 
-        /** @var WidgetService $widgetService */
-        $widgetService = \Gdn::getContainer()->get(WidgetService::class);
+        /** @var LegacyWidgetService $widgetService */
+        $widgetService = \Gdn::getContainer()->get(LegacyWidgetService::class);
         // Add notes to the pockets data.
         foreach ($pocketData as $index => &$pocketRow) {
             $mobileOnly = $pocketRow["MobileOnly"];
@@ -620,7 +620,7 @@ class PocketsPlugin extends Gdn_Plugin
             return;
         }
 
-        $widgetService = \Gdn::getContainer()->get(WidgetService::class);
+        $widgetService = \Gdn::getContainer()->get(LegacyWidgetService::class);
         $model = \Gdn::getContainer()->get(PocketsModel::class);
         $pockets = $model->getEnabled();
         foreach ($pockets as $row) {
@@ -673,7 +673,7 @@ class PocketsPlugin extends Gdn_Plugin
                     if (!$pocket->canRender($data)) {
                         continue;
                     }
-                    /** @var WidgetFactory | null $widget */
+                    /** @var LegacyWidgetFactory | null $widget */
                     $widgetFactory = $this->widgetService->getFactoryByID($widgetID);
                     $definition = $widgetFactory ? $widgetFactory->getDefinition() : null;
                     $widgetClass = $definition["widgetClass"] ?? null;

@@ -15,6 +15,7 @@ use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
+use TagModel;
 
 class PostTagsAsset extends AbstractLayoutAsset implements HydrateAwareInterface
 {
@@ -22,15 +23,20 @@ class PostTagsAsset extends AbstractLayoutAsset implements HydrateAwareInterface
     use TwigRenderTrait;
     use HomeWidgetContainerSchemaTrait;
 
-    /** @var InternalClient */
-    private InternalClient $internalClient;
-
     /**
      * @param InternalClient $internalClient
+     * @param TagModel $tagModel
      */
-    public function __construct(InternalClient $internalClient)
+    public function __construct(protected InternalClient $internalClient, protected TagModel $tagModel)
     {
-        $this->internalClient = $internalClient;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
     }
 
     public function renderSeoHtml(array $props): ?string
@@ -65,7 +71,7 @@ TWIG
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): ?string
     {
@@ -82,6 +88,24 @@ TWIG
         );
 
         return $schema;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getProps(): ?array
+    {
+        $taggingEnabled = $this->tagModel->discussionTaggingEnabled();
+
+        if (!$taggingEnabled) {
+            return null;
+        }
+
+        $props = $this->props;
+
+        $props["title"] = t($props["title"]);
+
+        return $props;
     }
 
     public static function getWidgetName(): string

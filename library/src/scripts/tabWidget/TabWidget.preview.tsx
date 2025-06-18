@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import TabWidget from "@library/tabWidget/TabWidget";
 import { DiscussionsWidget } from "@library/features/discussions/DiscussionsWidget";
-import { Widget, WidgetContextProvider } from "@library/layout/Widget";
+import { LayoutWidget, WidgetContextProvider } from "@library/layout/LayoutWidget";
 import { LayoutLookupContext } from "@library/features/Layout/LayoutRenderer";
 import { FauxWidget, fetchOverviewComponent } from "@dashboard/layout/overview/LayoutOverview";
 import { css } from "@emotion/css";
@@ -35,7 +35,7 @@ export function TabWidgetPreview(props: IProps) {
     const classes = widgetLayoutClasses();
 
     return (
-        <Widget>
+        <LayoutWidget>
             <LayoutLookupContext.Provider
                 value={{
                     componentFetcher: fetchOverviewComponent,
@@ -51,11 +51,12 @@ export function TabWidgetPreview(props: IProps) {
                         }),
                     }}
                 >
-                    <WidgetContextProvider>
+                    {/* Extra widget context provider because we might be rendering other widgets within and don't want them to get the editor toolbars. */}
+                    <WidgetContextProvider widgetRef={{ current: null }}>
                         <TabWidget {...previewProps} />
                     </WidgetContextProvider>
                 </WidgetSectionContext.Provider>
             </LayoutLookupContext.Provider>
-        </Widget>
+        </LayoutWidget>
     );
 }

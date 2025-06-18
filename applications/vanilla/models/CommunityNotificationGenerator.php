@@ -20,6 +20,7 @@ use PermissionNotificationGenerator;
 use Ramsey\Uuid\Uuid;
 use UserModel;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
@@ -61,7 +62,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {
@@ -355,7 +356,8 @@ class CommunityNotificationGenerator implements SystemCallableInterface
      */
     private function getMentions($body, $format): array
     {
-        if (!is_string($body) || !is_string($format)) {
+        $canParseMentions = UserMentionsModel::canParseMentions();
+        if (!is_string($body) || !is_string($format) || !$canParseMentions) {
             return [];
         } else {
             return Gdn::formatService()->parseMentions($body, $format);

@@ -132,7 +132,6 @@ function EscalationsPage(props: IProps) {
                         </span>
                         <NumberedPager
                             className={cmdClasses.pager}
-                            isMobile={false}
                             {...paginationProps}
                             showNextButton={false}
                             onChange={setPage}

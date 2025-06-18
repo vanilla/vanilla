@@ -1,35 +1,23 @@
 name: "vanilla"
 services:
-    database:
-        build:
-            context: "./images/mysql"
-        container_name: "database"
-        ports:
-            - "3306:3306"
-        environment:
-            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-            MYSQL_DATABASE: vanilla_dev
-        networks:
-            - "vanilla-network"
-        volumes:
-            - "mysql8:/var/lib/mysql"
-            - "logs-mysql8:/var/log/mysql"
     memcached:
         build:
             context: "./images/memcached"
         networks:
-            - "vanilla-network"
+            "vanilla-network":
         container_name: memcached
-    php-fpm:
+        ports:
+            - "11211:11211"
+    vanilla-cloud-php:
         build:
             context: "./images/php"
             dockerfile: "./8.1/Dockerfile"
             args:
                 WWWGROUP: "${WWWGROUP}"
                 WWWUSER: "${WWWUSER}"
-        container_name: "php-fpm"
+        container_name: "vanilla-cloud-php"
         networks:
-            - "vanilla-network"
+            "vanilla-network":
         volumes:
             - "./images/nginx/certs:/usr/local/share/ca-certificates" # Mount self-signed certificates
 
@@ -42,6 +30,7 @@ services:
 
             # Not cached for consistency.
             - "../conf:/srv/vanilla-repositories/conf"
+            - "../cache:/srv/vanilla-repositories/cache"
 
             # A few exclusions so that we don't have to sync some large directories.
             - "/srv/vanilla-repositories/vanilla/.git" # Don't sync this one.
@@ -51,10 +40,6 @@ services:
             # Specifically excluded because it runs in its own container.
             - /srv/vanilla-repositories/vanilla-queue-service
             - /srv/vanilla-repositories/vanilla-search-service
-
-volumes:
-    mysql8:
-    logs-mysql8:
 
 networks:
     vanilla-network:

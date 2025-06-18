@@ -7,7 +7,7 @@
 import Container from "@library/layout/components/Container";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import FormTree from "@library/tree/FormTree";
+import FormTree from "@library/tree/FormTree.loadable";
 import { itemsToTree } from "@library/tree/utils";
 import { IFormControl, JsonSchema } from "@vanilla/json-schema-forms";
 import React, { useState } from "react";

@@ -6,10 +6,12 @@
 
 const { noUnconventionalImports } = require("./rules/noUnconventionalImports");
 const { noCloudImportsInCore } = require("./rules/noCloudImportsInCore");
+const { noStaticLoaddableImports } = require("./rules/noStaticLoadableImports");
 
 module.exports = {
     rules: {
         [noUnconventionalImports.name]: noUnconventionalImports,
         [noCloudImportsInCore.name]: noCloudImportsInCore,
+        [noStaticLoaddableImports.name]: noStaticLoaddableImports,
     },
 };

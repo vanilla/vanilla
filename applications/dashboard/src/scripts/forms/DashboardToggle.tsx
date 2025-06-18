@@ -5,7 +5,7 @@
 
 import React, { useContext } from "react";
 import { FormGroupContext, useFormGroup, useOptionalFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import classNames from "classnames";
 import { visibility } from "@library/styles/styleHelpers";
 import { IFieldError } from "@library/@types/api/core";

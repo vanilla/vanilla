@@ -22,7 +22,7 @@ class CivilTongueTests extends SiteTestCase
     public static $addons = ["civiltongueex"];
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

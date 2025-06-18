@@ -28,6 +28,7 @@ import { listItemMediaClasses } from "@library/lists/ListItemMedia.styles";
 import { createSourceSetValue, t } from "@library/utility/appUtils";
 import { HomeWidgetItemDefaultImage } from "@library/homeWidget/HomeWidgetItemDefaultImage";
 import type { IBoxOptions } from "@library/styles/cssUtilsTypes";
+import { useWithThemeContext } from "@library/theming/ThemeOverrideContext";
 
 export interface IListItemProps {
     className?: string;
@@ -61,8 +62,10 @@ export function ListItem(props: IListItemProps) {
     const { headingDepth = 3, descriptionClassName, truncateDescription = true, descriptionMaxCharCount = 200 } = props;
     const selfRef = useRef<HTMLDivElement>(null);
     const { layout } = useContext(ListItemContext);
-    const listItemVars = listItemVariables(props.options);
-    const mediaClasses = listItemMediaClasses();
+
+    const listItemVars = listItemVariables.useAsHook(props.options);
+
+    const mediaClasses = listItemMediaClasses.useAsHook();
     const {
         options: { iconPosition },
     } = listItemVars;
@@ -73,7 +76,7 @@ export function ListItem(props: IListItemProps) {
     const asTile = props.asTile == null ? props.asTile || isMobileMedia : props.asTile;
     const iconInMeta = iconPosition === ListItemIconPosition.META && !hasImage;
     const hasCheckbox = Boolean(props.checkbox);
-    const classes = listItemClasses(asTile, hasImage, hasCheckbox, isMobileMedia && !props.asTile);
+    const classes = listItemClasses.useAsHook(asTile, hasImage, hasCheckbox, isMobileMedia && !props.asTile);
 
     const checkboxWrapped = props.checkbox && <div className={cx(classes.checkboxContainer)}>{props.checkbox}</div>;
 

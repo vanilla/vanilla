@@ -9,7 +9,7 @@ import {
     IEmailSettings,
     IEmailStyleSettings,
 } from "@dashboard/emailSettings/EmailSettings.types";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
 import { t } from "@vanilla/i18n";
 import { JSONSchemaType } from "@vanilla/json-schema-forms";

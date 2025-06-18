@@ -12,7 +12,7 @@ import { MenuBar } from "@library/MenuBar/MenuBar";
 import { MenuBarItem } from "@library/MenuBar/MenuBarItem";
 import { cx } from "@library/styles/styleShim";
 import { t } from "@vanilla/i18n";
-import React from "react";
+import React, { RefObject } from "react";
 
 interface IProps {
     className?: string;
@@ -21,11 +21,12 @@ interface IProps {
     children?: React.ReactNode;
     noBaseClass?: boolean;
     isSmall?: boolean;
+    positionBelow?: boolean;
     embedActions?: React.ReactNode;
 }
 
 export const EmbedContent = React.forwardRef<HTMLDivElement, IProps>(function EmbedContent(props: IProps, ref) {
-    const { inEditor, isSelected, isNewEditor, deleteSelf, descriptionID } = useEmbedContext();
+    const { inEditor, isSelected, isNewEditor, deleteSelf, descriptionID, isInRichTable } = useEmbedContext();
     const classes = embedContentClasses();
 
     return (
@@ -42,7 +43,13 @@ export const EmbedContent = React.forwardRef<HTMLDivElement, IProps>(function Em
             {props.children}
             {(!isNewEditor || props.embedActions) && inEditor && isSelected && (
                 <EditorEventWall>
-                    <MenuBar className={classes.menuBar}>
+                    <MenuBar
+                        className={cx(classes.menuBar, {
+                            [classes.positionBelow]: props.positionBelow,
+                        })}
+                        asPopover={isInRichTable}
+                        rootRef={ref as RefObject<HTMLDivElement>}
+                    >
                         {props.embedActions as any}
                         <MenuBarItem icon={<DeleteIcon />} accessibleLabel={t("Delete item")} onActivate={deleteSelf} />
                     </MenuBar>

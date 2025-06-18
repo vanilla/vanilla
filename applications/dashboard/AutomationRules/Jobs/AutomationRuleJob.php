@@ -32,7 +32,7 @@ class AutomationRuleJob extends LocalApiJob implements LoggerAwareInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setMessage(array $message)
     {

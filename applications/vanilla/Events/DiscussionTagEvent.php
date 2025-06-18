@@ -46,7 +46,7 @@ class DiscussionTagEvent extends DiscussionEvent implements LoggableEventInterfa
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTrackableCollection(): ?string
     {
@@ -75,7 +75,7 @@ class DiscussionTagEvent extends DiscussionEvent implements LoggableEventInterfa
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTrackableAction(): string
     {
@@ -83,7 +83,7 @@ class DiscussionTagEvent extends DiscussionEvent implements LoggableEventInterfa
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getBaseAction(): string
     {

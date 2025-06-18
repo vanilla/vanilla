@@ -172,7 +172,7 @@ class CategoryListAsset extends AbstractLayoutAsset implements HydrateAwareInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -180,7 +180,7 @@ class CategoryListAsset extends AbstractLayoutAsset implements HydrateAwareInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getApiSchema(): Schema
     {

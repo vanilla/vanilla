@@ -20,7 +20,6 @@ import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import { BannerContextProvider } from "@library/banner/BannerContext";
 import { EntryLinkContextProvider } from "@library/contexts/EntryLinkContext";
 import { css } from "@emotion/css";
 import { ApiV2Context } from "@library/apiv2";
@@ -31,6 +30,7 @@ import { SiteSectionContextProvider } from "./utility/SiteSectionContext";
 import { ReduxCurrentUserContextProvider } from "./features/users/userHooks";
 import { ReduxThemeContextProvider } from "./theming/Theme.context";
 import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
+import { TranslationDebugProvider } from "@library/TranslationDebugProvider";
 
 interface IProps {
     children: React.ReactNode;
@@ -92,12 +92,12 @@ export function AppContext(props: IProps) {
             FontSizeCalculatorProvider,
             ...ExtraContextProviders,
             TitleBarDeviceProvider,
-            BannerContextProvider,
             EntryLinkContextProvider,
             DeviceProvider,
             ToastProvider,
             DiscussionCheckboxProvider,
             AttachmentIntegrationsContextProvider,
+            TranslationDebugProvider,
         ],
         props.children,
     );

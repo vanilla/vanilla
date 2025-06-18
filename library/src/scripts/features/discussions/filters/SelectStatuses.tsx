@@ -9,7 +9,7 @@ import { Tokens } from "@library/forms/select/Tokens";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { useStatusOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
 import flatten from "lodash-es/flatten";
-import { IGroupOption } from "@library/forms/select/Tokens.loadable";
+import { IGroupOption } from "@library/forms/select/Tokens.types";
 import { useIsInModal } from "@library/modal/Modal.context";
 import { t } from "@vanilla/i18n";
 

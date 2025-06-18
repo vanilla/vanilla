@@ -5,7 +5,7 @@
  */
 
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { ISchemaRenderProps, IFieldError, JSONSchemaType, JsonSchema } from "./types";
+import { ISchemaRenderProps, IFieldError, JSONSchemaType, JsonSchema, type CustomConditionEvaluator } from "./types";
 import { IPartialSchemaFormProps, PartialSchemaForm, RenderChildren } from "./PartialSchemaForm";
 import { VanillaUIFormControl } from "./vanillaUIControl/VanillaUIFormControl";
 import { VanillaUIFormControlGroup } from "./vanillaUIControl/VanillaUIFormControlGroup";
@@ -13,7 +13,7 @@ import { useFormValidation, ValidationProvider } from "./ValidationContext";
 import { fieldErrorsToValidationErrors, recursivelyCleanInstance } from "./utils";
 import { ValidationResult } from "@cfworker/json-schema";
 
-interface IProps extends ISchemaRenderProps, IPartialSchemaFormProps {
+export interface IJSONSchemaFormProps extends ISchemaRenderProps, IPartialSchemaFormProps {
     /** When possible, define `schema` as `JSONSchemaType<YourSchemaInterface>` and cast `as JsonSchema` when passing props to this component  */
     schema: JSONSchemaType | string;
     instance: any;
@@ -21,6 +21,7 @@ interface IProps extends ISchemaRenderProps, IPartialSchemaFormProps {
     autoValidate?: boolean;
     vanillaUI?: boolean;
     fieldErrors?: Record<string, IFieldError[]>;
+    customConditionValidator?: CustomConditionEvaluator;
 }
 
 export interface IJsonSchemaFormHandle {
@@ -34,7 +35,7 @@ export interface IJsonSchemaFormHandle {
  * Please make sure you don't use any external dependencies that aren't passed as props to the component.
  */
 export const JsonSchemaForm = forwardRef(function JsonSchemaFormWithContextImpl(
-    props: IProps,
+    props: IJSONSchemaFormProps,
     ref: React.Ref<IJsonSchemaFormHandle>,
 ) {
     const ownRef = useRef<IJsonSchemaFormHandle>(null);
@@ -55,7 +56,7 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormWithContextImpl(
 });
 
 const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
-    props: IProps,
+    props: IJSONSchemaFormProps,
     ref: React.Ref<IJsonSchemaFormHandle>,
 ) {
     const {

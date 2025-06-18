@@ -50,16 +50,19 @@ class LayoutsApiControllerTest extends AbstractResourceTest
     protected $pk = "layoutID";
 
     /** {@inheritdoc} */
-    protected $editFields = ["name", "layout"];
+    protected $editFields = ["name", "layout", "titleBar"];
 
     /** {@inheritdoc} */
-    protected $patchFields = ["name", "layout"];
+    protected $patchFields = ["name", "layout", "titleBar"];
 
     /** {@inheritdoc} */
     protected $record = [
         "name" => "Layout",
         "layout" => [["foo" => "bar"], ["fizz" => "buzz", "flip" => ["flap", "flop"], "drip" => ["drop" => "derp"]]],
         "layoutViewType" => "home",
+        "titleBar" => [
+            '$hydrate' => "react.titleBar",
+        ],
     ];
 
     /** @var CategoryModel */
@@ -70,7 +73,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
     //region Setup / Teardown
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function configureContainerBeforeStartup(Container $container)
     {

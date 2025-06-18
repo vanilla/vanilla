@@ -5,7 +5,7 @@
 
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { RecordID } from "@vanilla/utils";
-import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
+import { IFollowedCategoryNotificationPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { PostType } from "@dashboard/postTypes/postType.types";
 
@@ -35,10 +35,11 @@ export interface ICategory extends ICategoryFragment {
     dateInserted: string;
     iconUrl?: string;
     dateFollowed?: string;
-    preferences?: ICategoryPreferences;
+    preferences?: IFollowedCategoryNotificationPreferences;
     lastPost?: IDiscussion;
     allowedPostTypeIDs?: Array<PostType["postTypeID"]>;
     allowedPostTypeOptions?: PostType[];
+    hasRestrictedPostTypes?: boolean;
 }
 
 export enum CategoryDisplayAs {

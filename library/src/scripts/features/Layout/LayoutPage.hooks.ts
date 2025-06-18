@@ -8,17 +8,24 @@
 import apiv2 from "@library/apiv2";
 import { ILayoutQuery, type IHydratedLayoutSpec } from "@library/features/Layout/LayoutRenderer.types";
 import { useToast } from "@library/features/toaster/ToastContext";
+import { isDevSite, isQASite, t } from "@library/utility/appUtils";
 import { useQuery } from "@tanstack/react-query";
-import { flattenObject, logError, logWarning } from "@vanilla/utils";
-import isEqual from "lodash/isEqual";
+import isEqual from "lodash-es/isEqual";
+import { flattenObject, logDebug, promiseTimeout } from "@vanilla/utils";
 import { useEffect } from "react";
 
 let hasLoadedLayoutBefore = false;
 const initialPath = window.location.pathname;
 
+declare global {
+    interface Window {
+        vanillaInitialLayout: IInitialLayout | undefined;
+    }
+}
+
 // Currently hardcoded.
 export function useLayoutSpec(query: ILayoutQuery) {
-    const initialLayout = window.vanillaInitialLayout as IInitialLayout | undefined;
+    const initialLayout = window.vanillaInitialLayout;
     const initialQuery = initialLayout?.query;
     const initialData = initialLayout?.data;
 
@@ -37,17 +44,7 @@ export function useLayoutSpec(query: ILayoutQuery) {
             );
             console.table({ preloadedQuery: flattenObject(initialQuery), currentQuery: flattenObject(query) });
 
-            const qaHostnames = [
-                "qa1.vanilla.community",
-                "qa2.vanilla.community",
-                "qa3.vanilla.community",
-                "qa-1.vanillatesting.com",
-                "qa-2.vanillatesting.com",
-                "qa-3.vanillatesting.com",
-            ];
-            const devHostnames = ["dev.vanilla.local", "test.vanilla.local", "vanilla.local"];
-
-            if (qaHostnames.includes(window.location.hostname)) {
+            if (isQASite()) {
                 toast.addToast({
                     toastID: "useLayoutSpecMismatch",
                     body: "This page has a double fetching bug causing slower page loads and additional server load. Please report this to the developers with reproduction steps. Check the console to see the mismatching preload parameters.",
@@ -55,7 +52,7 @@ export function useLayoutSpec(query: ILayoutQuery) {
                 });
             }
 
-            if (devHostnames.includes(window.location.hostname)) {
+            if (isDevSite()) {
                 toast.addToast({
                     toastID: "useLayoutSpecMismatch",
                     body: "This page has a double fetching bug causing slower page loads and additional server load. Fix this immediately. Check the console to see the mismatching preload parameters.",
@@ -77,7 +74,10 @@ export function useLayoutSpec(query: ILayoutQuery) {
             if (data.redirectTo) {
                 // We just navigated to this url.
                 // In order to avoid a double navigation, we need to replace the current history entry so that the "bad" redirecting url is no longer there.
+                logDebug("Layout query returned redirect to", data.redirectTo);
                 window.location.replace(data.redirectTo);
+                // Give the browser some time to redirect.
+                await promiseTimeout(5000);
             }
 
             return data;

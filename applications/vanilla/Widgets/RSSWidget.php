@@ -9,27 +9,21 @@ namespace Vanilla\Forum\Widgets;
 use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\Forms\StaticFormChoices;
 use Vanilla\InjectableInterface;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
-use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
-use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
-use Vanilla\Widgets\React\DefaultSectionTrait;
-use Vanilla\Widgets\React\ReactWidgetInterface;
+use Vanilla\Widgets\React\ReactWidget;
 
 /**
  * Class RSSWidget
  */
-class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, InjectableInterface
+class RSSWidget extends ReactWidget implements InjectableInterface
 {
-    use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
     use RssWidgetTrait;
-    use DefaultSectionTrait;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -37,7 +31,7 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -45,7 +39,7 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -83,7 +77,7 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -92,7 +86,7 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {

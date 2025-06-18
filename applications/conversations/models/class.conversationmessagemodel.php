@@ -433,7 +433,7 @@ class ConversationMessageModel extends ConversationsModel
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($formPostValues, $insert = false)
     {

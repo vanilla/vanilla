@@ -6,6 +6,7 @@
 import React, { useContext } from "react";
 import { INITIAL_THEME_STATE, IThemeState } from "./themeReducer";
 import { useSelector } from "react-redux";
+import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 type IThemeContextValue = IThemeState;
 

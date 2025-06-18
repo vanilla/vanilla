@@ -4,11 +4,12 @@
  * @license gpl-2.0-only
  */
 
-import { css } from "@emotion/css";
+import { css, cx } from "@emotion/css";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { listItemVariables } from "@library/lists/ListItem.variables";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { ColorVar } from "@library/styles/CssVar";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { extendItemContainer } from "@library/styles/styleHelpers";
@@ -172,6 +173,7 @@ export const listItemClasses = useThemeCache(
         const title = css({
             flex: 1,
             ...Mixins.font(vars.title.font),
+            color: ColorsUtils.varOverride(ColorVar.Foreground, vars.title.font.color),
             margin: 0,
             marginBottom: 0,
         });
@@ -209,19 +211,22 @@ export const listItemClasses = useThemeCache(
 
         const mediaIconContainer = css({});
 
-        const metasContainer = css({
-            ...(isTile && {
-                marginTop: "auto",
+        const metasContainer = cx(
+            css({
+                ...(isTile && {
+                    marginTop: "auto",
+                }),
             }),
-        });
+            "metasContainer",
+        );
 
         const description = css({
             ...Mixins.font(vars.description.font),
             marginBottom: 0,
-            [`.${metasContainer} + &`]: {
+            [`.metasContainer + &`]: {
                 marginTop: 4,
             },
-            [`& + .${metasContainer}`]: {
+            [`& + .metasContainer`]: {
                 marginTop: 8,
                 ...(isTile && {
                     marginTop: "auto",

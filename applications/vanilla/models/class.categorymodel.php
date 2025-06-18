@@ -444,7 +444,7 @@ class CategoryModel extends Gdn_Model implements
         // Convert post types to expected format for new post widget.
         $result = [];
         foreach ($postTypes as $postType) {
-            $result[$postType["name"]] = $postType + [
+            $result[$postType["postTypeID"]] = $postType + [
                 "apiType" => $postType["postTypeID"],
                 "Singular" => $postType["name"],
                 "Plural" => $postType["name"],
@@ -624,8 +624,14 @@ class CategoryModel extends Gdn_Model implements
         $category["PermsCommentsAdd"] = self::checkPermission($category, "Vanilla.Comments.Add");
 
         $code = $category["UrlCode"];
-        $category["Name"] = Gdn::translate("Categories." . $code . ".Name", $category["Name"]);
-        $category["Description"] = Gdn::translate("Categories." . $code . ".Description", $category["Description"]);
+        $category["Name"] = Gdn::translate("Categories." . $code . ".Name", [
+            "default" => $category["Name"],
+            "optional" => true,
+        ]);
+        $category["Description"] = Gdn::translate("Categories." . $code . ".Description", [
+            "default" => $category["Description"],
+            "optional" => true,
+        ]);
 
         if ($addUserCategory || ($addUserCategory === null && $this->joinUserCategory())) {
             $userCategories = $this->getUserCategories();
@@ -1590,7 +1596,7 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function calculateAggregates(string $aggregateName, int $from, int $to)
     {
@@ -1672,9 +1678,11 @@ class CategoryModel extends Gdn_Model implements
      *
      *
      * @return mixed
+     * @deprecated
      */
     public static function defaultCategory()
     {
+        deprecated("CategoryModel->defaultCategory", "");
         foreach (self::categories() as $category) {
             if ($category["CategoryID"] > 0) {
                 return $category;
@@ -2587,8 +2595,9 @@ class CategoryModel extends Gdn_Model implements
                     array_flip($category["allowedPostTypeIDs"])
                 )
             );
+
             $category["AllowedDiscussionTypes"] = array_unique(
-                array_column($category["allowedPostTypeOptions"], "baseType")
+                array_intersect($category["allowedPostTypeIDs"], array_values(PostTypeModel::LEGACY_TYPE_MAP))
             );
         }
     }
@@ -3895,15 +3904,16 @@ class CategoryModel extends Gdn_Model implements
             isset($formPostValues["AllowedDiscussionTypes"]) && is_array($formPostValues["AllowedDiscussionTypes"])
                 ? $formPostValues["AllowedDiscussionTypes"]
                 : null;
-
+        $SetPostWithLegacyTypes = false;
         $allowedPostTypeIDs = $formPostValues["allowedPostTypeIDs"] ?? null;
 
         if (isset($allowedDiscussionTypes)) {
             $formPostValues["AllowedDiscussionTypes"] = dbencode($formPostValues["AllowedDiscussionTypes"]);
-        } elseif (isset($allowedPostTypeIDs)) {
+        } elseif (!empty($allowedPostTypeIDs)) {
             $legacyTypesFromPostTypes = array_intersect($allowedPostTypeIDs, PostTypeModel::LEGACY_TYPE_MAP);
             $legacyTypesFromPostTypes = array_values(array_map("ucfirst", $legacyTypesFromPostTypes));
             $formPostValues["AllowedDiscussionTypes"] = dbencode($legacyTypesFromPostTypes);
+            $SetPostWithLegacyTypes = count($legacyTypesFromPostTypes) > 0;
         } else {
             $formPostValues["AllowedDiscussionTypes"] = null;
         }
@@ -4013,7 +4023,7 @@ class CategoryModel extends Gdn_Model implements
                 $CategoryID = $this->insert($Fields);
 
                 if ($CategoryID) {
-                    if ($CustomPermissions) {
+                    if ($CustomPermissions || $SetPostWithLegacyTypes) {
                         $this->SQL->put(
                             "Category",
                             ["PermissionCategoryID" => $CategoryID],
@@ -4115,9 +4125,8 @@ class CategoryModel extends Gdn_Model implements
                 }
                 $postTypeModel = self::getPostTypeModel();
 
-                if (isset($allowedPostTypeIDs)) {
-                    $allowedPostTypeIDs = $formPostValues["allowedPostTypeIDs"];
-                    $postTypeModel->putPostTypesForCategory($CategoryID, $allowedPostTypeIDs);
+                if (isset($formPostValues["allowedPostTypeIDs"])) {
+                    $postTypeModel->putPostTypesForCategory($CategoryID, $formPostValues["allowedPostTypeIDs"]);
                 }
 
                 if (isset($allowedDiscussionTypes)) {
@@ -4665,7 +4674,7 @@ class CategoryModel extends Gdn_Model implements
                     }
                 }
 
-                $this->setPreferences($userID, $categoryID, $preferences);
+                $this->setPreferences($userID, $categoryID, $preferences, true);
             }
         } catch (JsonException $exception) {
             $this->logger->notice("Invalid format received for the category default configuration.", [
@@ -4782,8 +4791,10 @@ class CategoryModel extends Gdn_Model implements
      * @param int $userID
      * @param int $categoryID
      * @param array $preferences
+     * @param bool $isDefault
+     * @return void
      */
-    public function setPreferences(int $userID, int $categoryID, array $preferences): void
+    public function setPreferences(int $userID, int $categoryID, array $preferences, bool $isDefault = false): void
     {
         $preferencesToRecord = [];
         $currentPrefs = $this->getPreferencesByCategoryID($userID, $categoryID);
@@ -4841,7 +4852,9 @@ class CategoryModel extends Gdn_Model implements
             $this->updateFollowerCount($categoryID);
         }
 
-        $this->dispatchSubscriptionEvent($userID, $categoryID, $preferencesToRecord);
+        if (!$isDefault) {
+            $this->dispatchSubscriptionEvent($userID, $categoryID, $preferencesToRecord);
+        }
     }
 
     /**
@@ -5426,7 +5439,7 @@ SQL;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCrawlInfo(): array
     {
@@ -5848,15 +5861,14 @@ SQL;
     public function isPostTypeAllowed(array $category, string $type, bool $exclusive = false): bool
     {
         if (PostTypeModel::isPostTypesFeatureEnabled()) {
-            if (isset(PostTypeModel::LEGACY_TYPE_MAP[$type])) {
-                // If this is a legacy type name, convert to post type ID first.
-                $type = PostTypeModel::LEGACY_TYPE_MAP[$type];
-            }
             $allowedPostTypes = self::getPostTypeModel()->getAllowedPostTypesByCategory($category);
             return in_array($type, array_column($allowedPostTypes, "postTypeID"));
         }
 
         $allowedTypes = $category["AllowedDiscussionTypes"] ?? [];
+
+        $allowedTypes = array_map("strtolower", $allowedTypes);
+        $type = strtolower($type);
 
         if (empty($allowedTypes) && !$exclusive) {
             return true;

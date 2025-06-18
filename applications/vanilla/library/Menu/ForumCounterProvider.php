@@ -8,6 +8,7 @@ namespace Vanilla\Forum\Menu;
 
 use Vanilla\Menu\CounterProviderInterface;
 use Vanilla\Menu\Counter;
+use Vanilla\Models\ContentDraftModel;
 
 /**
  * Menu counter provider for user.
@@ -17,7 +18,7 @@ class ForumCounterProvider implements CounterProviderInterface
     /**
      * DI.
      */
-    public function __construct(private \Gdn_Session $session)
+    public function __construct(private \Gdn_Session $session, private ContentDraftModel $contentDraftModel)
     {
     }
 
@@ -32,7 +33,7 @@ class ForumCounterProvider implements CounterProviderInterface
             $counters[] = new Counter("Bookmarks", $user->CountBookmarks ?? 0);
             $counters[] = new Counter("Discussions", $user->CountDiscussions ?? 0);
             $counters[] = new Counter("UnreadDiscussions", $user->CountUnreadDiscussions ?? 0);
-            $counters[] = new Counter("Drafts", $user->CountDrafts ?? 0);
+            $counters[] = new Counter("Drafts", $this->contentDraftModel->draftsWhereCountByUser());
         }
         return $counters;
     }

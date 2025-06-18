@@ -57,7 +57,7 @@ class UserEvent extends ResourceEvent implements LoggableEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {
@@ -138,7 +138,7 @@ class UserEvent extends ResourceEvent implements LoggableEventInterface
     /**
      * Return modified user profile fields in addition to regular fields in an update event.
      *
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getModifications(): ?array
     {

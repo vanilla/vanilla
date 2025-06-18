@@ -20,6 +20,7 @@ import {
 import { t } from "@vanilla/i18n";
 import moment from "moment";
 import UserContent from "@library/content/UserContent";
+import { blessStringAsSanitizedHtml } from "@vanilla/dom-utils";
 
 export function mapProfileFieldDropdownOptionsToComboBoxOptions(
     dropdownOptions: NonNullable<ProfileField["dropdownOptions"]>,
@@ -109,7 +110,9 @@ export function mapProfileFieldsToSchema(
                                 ["checkBox", "richeditor"].includes(inputType) ? undefined : config[
                                       "descriptionHtml"
                                   ] ? (
-                                    <UserContent content={String(config["description"])} />
+                                    <UserContent
+                                        vanillaSanitizedHtml={blessStringAsSanitizedHtml(String(config["description"]))}
+                                    />
                                 ) : (
                                     config["description"]
                                 )

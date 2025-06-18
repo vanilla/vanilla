@@ -37,6 +37,8 @@ import { MetaIcon } from "@library/metas/Metas";
 import AiEscalationMetaIcon from "@library/features/discussions/integrations/components/AiEscalationMetaIcon";
 import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
 import { ContentItemAttachmentService } from "@vanilla/addon-vanilla/contentItem/ContentItemAttachments.service";
+import SearchWidget from "@library/search/SearchWidget";
+import { CustomFragmentWidget } from "@library/widgets/CustomFragmentWidget";
 
 if (getMeta("inputFormat.desktop")?.match(/rich2/i)) {
     supportsFrames(true);
@@ -59,9 +61,7 @@ function LayoutApp() {
             <HamburgerMenuContextProvider>
                 <Backgrounds />
 
-                <Router useLayoutRouting>
-                    <TitleBar />
-                </Router>
+                <Router useLayoutRouting />
             </HamburgerMenuContextProvider>
         </>
     );
@@ -73,11 +73,13 @@ addPageComponent(LayoutApp);
 // Widgets
 logDebug("Register core widgets");
 registerWidgets({
+    TitleBar,
     LayoutError,
     SectionFullWidth,
     SectionOneColumn,
     SectionThreeColumns: ThreeColumnSection,
     SectionTwoColumns: TwoColumnSection,
+    CustomFragmentWidget,
 });
 
 registerLoadableWidgets({
@@ -97,16 +99,17 @@ registerLoadableWidgets({
     TagWidget: () => import("@vanilla/addon-vanilla/tag/TagWidget"),
     RSSWidget: () => import("@library/rssWidget/RSSWidget"),
     UserSpotlightWidget: () => import("@library/userSpotlight/UserSpotlightWidget"),
-    SiteTotalsWidget: () => import("@library/siteTotals/SiteTotalsWidget"),
+    SiteTotalsWidget: () => import("@library/widgets/SiteTotalsWidget"),
     NewPostMenu: () => import("@library/newPostMenu/NewPostMenu"),
     LeaderboardWidget: () => import("@library/leaderboardWidget/LeaderboardWidget"),
     DiscussionsWidget: () => import("@library/features/discussions/DiscussionsWidget"),
     TabWidget: () => import("@library/tabWidget/TabWidget"),
-    CallToActionWidget: () => import("@library/callToAction/CallToActionWidget"),
-    GuestCallToActionWidget: () => import("@library/callToAction/GuestCallToActionWidget"),
+    CallToActionWidget: () => import("@library/widgets/CallToActionWidget"),
+    GuestCallToActionWidget: () => import("@library/widgets/GuestCallToActionWidget"),
     FeaturedCollectionsWidget: () => import("@library/featuredCollections/FeaturedCollectionsWidget"),
     CategoryFollowWidget: () => import("@vanilla/addon-vanilla/categories/CategoryFollowDropdown"),
     SuggestedContentWidget: () => import("@library/suggestedContent/SuggestedContentWidget"),
+    SearchWidget: () => import("@library/search/SearchWidget"),
 });
 
 // Reducers

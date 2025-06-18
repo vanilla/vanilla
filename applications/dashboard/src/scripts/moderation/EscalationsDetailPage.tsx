@@ -151,7 +151,7 @@ function EscalationsDetailPageImpl(props: IImplProps) {
                         <PostRevisionPicker postRevisionOptions={postRevisions} />
 
                         <label className={classes.assigneeDropdown}>
-                            <span>{t("Assignee: ")}</span>
+                            <span>{t("Assignee")}: </span>
                             {escalation && (
                                 <EscalationAssignee
                                     escalation={escalation}

@@ -24,8 +24,8 @@ import {
     ITreeSourcePosition,
     Path,
 } from "@library/tree/types";
-import { castDraft, notEmpty, uuidv4 } from "@vanilla/utils";
-import produce from "immer";
+import { notEmpty, uuidv4 } from "@vanilla/utils";
+import produce, { type Draft } from "immer";
 
 const between = (min: number, max: number, number: number) => Math.min(max, Math.max(min, number));
 
@@ -474,4 +474,11 @@ export function treeToItems<D extends {}>(treeData: ITreeData<D>): Array<WithRec
 
 export function getFirstItemID(treeData: ITreeData): ItemID | null {
     return treeData.items[TREE_ROOT_ID]?.children?.[0] ?? null;
+}
+
+/**
+ * Can be removed once we update our typescript version.
+ */
+export function castDraft<T>(item: T): Draft<T> {
+    return item as Draft<T>;
 }

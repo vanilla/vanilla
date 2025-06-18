@@ -19,7 +19,7 @@ use Vanilla\StopForumSpam\StopForumSpamPremoderator;
 class StopFormSpamContainerRules extends AddonContainerRules
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function configureContainer(ContainerConfigurationInterface $container): void
     {

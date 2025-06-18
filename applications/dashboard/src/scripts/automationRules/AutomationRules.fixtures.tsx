@@ -470,6 +470,17 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                 required: ["triggerTimeDelay"],
             },
         },
+        timeSinceLastActiveTrigger: {
+            triggerType: "timeSinceLastActiveTrigger",
+            name: "A certain amount of time has passed since a user was last active",
+            triggerActions: ["addRemoveRoleAction"],
+            contentType: "users",
+            schema: {
+                type: "object",
+                properties: triggerDelaySchemaProperties,
+                required: ["triggerTimeDelay"],
+            },
+        },
         ideationVoteTrigger: {
             triggerType: "ideationVoteTrigger",
             name: "An idea receives a certain number of votes",
@@ -766,7 +777,7 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
         addRemoveRoleAction: {
             actionType: "addRemoveRoleAction",
             name: "Role Action Name",
-            actionTriggers: ["profileFieldTrigger"],
+            actionTriggers: ["profileFieldTrigger", "timeSinceLastActiveTrigger"],
             contentType: "users",
             schema: {
                 type: "object",

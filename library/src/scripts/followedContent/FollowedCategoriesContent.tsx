@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -77,7 +77,7 @@ function FollowedCategoryRow(props: IFollowedContentRow) {
                                                 userID: lastPost.insertUser.userID,
                                                 name: lastPost.insertUser.name,
                                             }}
-                                            className={metasClasses().metaLink}
+                                            asMeta
                                         />
                                     ) : null
                                 }
@@ -90,12 +90,12 @@ function FollowedCategoryRow(props: IFollowedContentRow) {
                 <div style={{ marginTop: 28 }}>
                     <CategoryFollowDropDown
                         userID={userID}
-                        categoryID={categoryID}
-                        categoryName={name}
+                        recordID={categoryID}
+                        name={name}
                         notificationPreferences={preferences}
                         emailDigestEnabled={emailDigestEnabled}
                         iconOnly
-                        categoryUrl={url}
+                        viewRecordUrl={url}
                     />
                 </div>
             }
@@ -136,7 +136,6 @@ export function FollowedCategoriesContent(props: { withTitle?: boolean }) {
                             hasMorePages={pagination?.total ? pagination?.total >= MAX_PAGE_COUNT : false}
                             showNextButton={false}
                             onChange={(page: number) => setPage(page)}
-                            isMobile={false}
                             className={classes.pager}
                         />
                     )

@@ -22,7 +22,7 @@ class ContainerUtilsTest extends TestCase
     private $container;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

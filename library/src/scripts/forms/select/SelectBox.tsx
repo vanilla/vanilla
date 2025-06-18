@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
+import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
@@ -137,7 +137,7 @@ export default function SelectBox(props: ISelectBoxProps) {
                 buttonType={props.buttonType}
                 openAsModal={props.openAsModal}
                 flyoutType={FlyoutType.LIST}
-                renderLeft={renderLeft}
+                openDirection={renderLeft ? DropDownOpenDirection.BELOW_LEFT : DropDownOpenDirection.BELOW_RIGHT}
                 horizontalOffset={horizontalOffset}
             >
                 {props.options.map((option, i) => {

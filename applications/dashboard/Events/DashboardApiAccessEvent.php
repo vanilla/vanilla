@@ -29,7 +29,7 @@ class DashboardApiAccessEvent extends BasicAuditLogEvent implements AuditEventWi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function eventType(): string
     {
@@ -37,7 +37,7 @@ class DashboardApiAccessEvent extends BasicAuditLogEvent implements AuditEventWi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function formatAuditMessage(string $eventType, array $context, array $meta): string
     {
@@ -45,7 +45,7 @@ class DashboardApiAccessEvent extends BasicAuditLogEvent implements AuditEventWi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParentAuditEvent(): AuditLogEventInterface
     {

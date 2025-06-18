@@ -8,6 +8,7 @@ import { IReport } from "@dashboard/moderation/CommunityManagementTypes";
 import { CommunityManagementFixture } from "@dashboard/moderation/__fixtures__/CommunityManagement.Fixture";
 import { ReportListItem as ReportListItemComponent } from "@dashboard/moderation/components/ReportListItem";
 import { IUserFragment } from "@library/@types/api/users";
+import { blessStringAsSanitizedHtml } from "@vanilla/dom-utils";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -17,8 +18,9 @@ export default {
 
 const reportPartial: Partial<IReport> = {
     recordName: "Make $10,000 in a week! Click here!",
-    recordHtml:
+    recordHtml: blessStringAsSanitizedHtml(
         "Hey everyone! I just stumbled upon this amazing opportunity to make $10,000 in a week! Its really changed my life and I know it can change yours too! Simply go to 👉makemoneyfast[dot]com👈 and input your social insurance number.",
+    ),
     placeRecordName: "General",
     insertUser: {
         name: "Samantha",
@@ -28,7 +30,7 @@ const reportPartial: Partial<IReport> = {
         name: "Milo",
         photoUrl: "https://us.v-cdn.net/6030677/uploads/userpics/1PEUJTENJ7YM/nKQQZ8A0LHB3X.jpg",
     } as IUserFragment,
-    noteHtml: "This post is spam. It's a scam.",
+    noteHtml: blessStringAsSanitizedHtml("This post is spam. It's a scam."),
 };
 const queryClient = new QueryClient();
 

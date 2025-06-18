@@ -1,8 +1,8 @@
 import { buttonClasses, buttonUtilityClasses } from "./Button.styles";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { titleBarClasses } from "@library/headers/TitleBar.classes";
+import { ButtonTypes, type ButtonType } from "@library/forms/buttonTypes";
 
-export function getClassForButtonType(type: ButtonTypes | undefined) {
+export function getClassForButtonType(type: ButtonType | undefined) {
     if (type) {
         const buttonUtils = buttonUtilityClasses();
         const classes = buttonClasses();
@@ -43,6 +43,8 @@ export function getClassForButtonType(type: ButtonTypes | undefined) {
                 return "btn btn-link";
             case ButtonTypes.NOT_STANDARD:
                 return classes.notStandard;
+            case ButtonTypes.INPUT:
+                return classes.input;
             default:
                 return "";
         }

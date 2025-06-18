@@ -8,7 +8,6 @@
 namespace VanillaTests\Library\EmbeddedContent\Embeds;
 
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
-use Vanilla\EmbeddedContent\Embeds\FileEmbedFilter;
 use VanillaTests\MinimalContainerTestCase;
 
 /**
@@ -86,37 +85,36 @@ JSON;
     }
 
     /**
-     * Tests that the FileEmbedFilter replaces the URL with the media API endpoint if a mediaID exists.
+     * Test the fix for https://higherlogic.atlassian.net/browse/VNLA-8498
      *
      * @return void
-     *
      */
-    public function testFileEmbedFilter()
+    public function testNormalizeNestedUrl(): void
     {
-        $mediaID = 22;
-        $fileData = [
-            "url" => "https://dev.vanilla.local/uploads/R5ANYXKSFK1I/dummy.pdf",
-            "name" => "dummy.pdf",
+        $initialUrl = "https://dev.vanilla.local/uploads/150/LKE0S2FWLFUP.zip";
+        $data = [
+            "url" => FileEmbed::makeDownloadUrl(FileEmbed::makeDownloadUrl($initialUrl)),
+            "name" => "nested.zip",
             "type" => "file",
-            "size" => 13264,
-            "displaySize" => "large",
-            "float" => "none",
-            "mediaID" => $mediaID,
-            "dateInserted" => "2024-12-02T22:02:10+00:00",
-            "insertUserID" => 2,
+            "size" => 0,
+            "dateInserted" => "2015-05-09 00:00:01",
+            "mediaID" => 62,
+            "foreignID" => 4,
+            "foreignTable" => "embed",
+            "active" => 1,
+            "insertUserID" => 4,
+            "imageWidth" => null,
+            "imageHeight" => null,
+            "thumbWidth" => null,
+            "thumbHeight" => null,
+            "thumbPath" => null,
             "foreignType" => "embed",
-            "foreignID" => 2,
         ];
-        $embed = new FileEmbed($fileData);
-        $filter = new FileEmbedFilter();
 
-        $embed = $filter->filterEmbed($embed);
+        $embed = new FileEmbed($data);
+
         $data = $embed->getData();
-        $this->assertArrayHasKey("url", $data);
-        $this->assertEquals(
-            "http://vanilla.test/minimal-container-test/api/v2/media/download-by-url?url=" .
-                urlencode($fileData["url"]),
-            $data["url"]
-        );
+        $this->assertEquals($initialUrl, $data["url"]);
+        $this->assertEquals(FileEmbed::makeDownloadUrl($initialUrl), $data["downloadUrl"]);
     }
 }

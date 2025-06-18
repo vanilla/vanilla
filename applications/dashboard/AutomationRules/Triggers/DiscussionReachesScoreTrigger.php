@@ -33,7 +33,7 @@ use Vanilla\Forum\Models\PostTypeModel;
 class DiscussionReachesScoreTrigger extends AutomationTrigger
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -41,7 +41,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -49,7 +49,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -57,7 +57,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -65,7 +65,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -159,7 +159,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -254,7 +254,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getPrimaryKey(): string
     {
@@ -262,7 +262,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getObjectModel(): \Gdn_Model
     {
@@ -270,7 +270,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getWhereArray(array $triggerValue): array
     {
@@ -318,7 +318,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess($lastRecordId, array $where): iterable
     {
@@ -347,7 +347,7 @@ class DiscussionReachesScoreTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {

@@ -10,10 +10,16 @@ import { TabHandler } from "@vanilla/dom-utils/src";
 import { translate } from "@vanilla/i18n/src";
 
 interface IGdn {
-    meta: AnyObject;
-    permissions: AnyObject;
-    translations: AnyObject;
+    meta: Record<string, any>;
+    permissions: Record<string, any>;
+    translations: Record<string, any>;
     [key: string]: any;
+}
+
+declare global {
+    interface Window {
+        gdn: any;
+    }
 }
 
 /** The gdn object may be set in an inline script in the head of the document. */

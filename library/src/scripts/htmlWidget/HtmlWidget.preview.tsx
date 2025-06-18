@@ -9,18 +9,18 @@ import { htmlWidgetEditorClasses } from "@library/htmlWidget/HtmlWidgetEditor.cl
 import { CodeBlockIcon } from "@library/icons/editorIcons";
 import { PageBox } from "@library/layout/PageBox";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import React from "react";
 
 export function HtmlWidgetPreview(props: React.ComponentProps<typeof HtmlWidget>) {
     const classes = htmlWidgetEditorClasses();
     return (
-        <Widget>
+        <LayoutWidget>
             <PageBox options={{ borderType: BorderType.SHADOW }}>
                 <h3>{`Custom HTML - ${props.name ?? "Untitled"}`}</h3>
                 <CodeBlockIcon className={classes.previewIcon} />
             </PageBox>
-        </Widget>
+        </LayoutWidget>
     );
 }

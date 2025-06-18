@@ -39,7 +39,7 @@ class UserMentionsRemovalTest extends SiteTestCase
     private int $mockedTimeStamp = 1675123472;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

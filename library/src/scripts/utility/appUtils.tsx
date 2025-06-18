@@ -17,6 +17,23 @@ export { t, translate } from "@vanilla/i18n";
 // Absolute path pattern
 const ABSOLUTE_PATH_REGEX = /^\s*(mailto:|((https?:)?\/\/))/i;
 
+export function isDevSite(): boolean {
+    const devHostnames = ["dev.vanilla.local", "test.vanilla.local", "vanilla.local"];
+
+    return devHostnames.includes(window.location.hostname);
+}
+
+export function isQASite(): boolean {
+    const qaHostnames = [
+        "qa1.vanilla.community",
+        "qa2.vanilla.community",
+        "qa3.vanilla.community",
+        "qa-1.vanillatesting.com",
+        "qa-2.vanillatesting.com",
+        "qa-3.vanillatesting.com",
+    ];
+    return qaHostnames.includes(window.location.hostname);
+}
 /**
  * Get a piece of metadata passed from the server.
  *
@@ -24,6 +41,9 @@ const ABSOLUTE_PATH_REGEX = /^\s*(mailto:|((https?:)?\/\/))/i;
  * @param defaultValue - A fallback value in case the key cannot be found.
  *
  * @returns Returns a meta value or the default value.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
  */
 export function getMeta(key: string, defaultValue?: any) {
     if (!gdn.meta) {
@@ -114,6 +134,9 @@ export interface ISiteSection {
 
 /**
  * Get the current site section.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
  */
 export function getSiteSection(): ISiteSection {
     return getMeta("siteSection");
@@ -404,6 +427,12 @@ export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
     return { execute: (siteKey) => window.grecaptcha.execute(siteKey) };
 }
 
+declare global {
+    interface Window {
+        grecaptcha: IRecaptcha;
+    }
+}
+
 /**
  * Translation helper for accessible labels, because <Translate/> doesn't return as string
  * @param template - the template for the string (must be translated ahead of time)
@@ -418,6 +447,9 @@ export type ImageSourceSet = Record<RecordID, string>;
 /**
  * This function creates a source set value from an object where the key indicates the
  * the width and the corresponding values are the image URL.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
  */
 export function createSourceSetValue(sourceSet: ImageSourceSet): string {
     return (

@@ -5,7 +5,6 @@
  */
 
 import { useEffect, useState } from "react";
-import { getMeta } from "@library/utility/appUtils";
 
 /**
  * Get saved data from sessionStorage or DefaultValue
@@ -19,13 +18,12 @@ function getSessionStorageOrDefault<T>(key: string, defaultValue: T): T {
     return JSON.parse(stored);
 }
 
-const host = getMeta("context.host", "");
-const PREFIX = `vanilla/${host}`;
-
 /**
  * Allow fetching and setting of a value in the user's sessionStorage.
  */
 export function useSessionStorage<T>(key: string, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+    const host = (window as any).gdn?.meta?.context?.host ?? "";
+    const PREFIX = `vanilla/${host}`;
     key = `${PREFIX}/${key}`;
     const [value, setValue] = useState(getSessionStorageOrDefault(key, defaultValue));
 

@@ -20,7 +20,11 @@
 !/build/package-include.txt
 !/build/package-exclude.txt
 !/build/README.md
-!/build/webpack.aliases.js
+!/build/*.js
+!/build/*.ts
+!/build/*.mts
+!/build/*.cjs
+!/build/*.tsx
 /cache/*
 .cache
 !/cache/.htaccess
@@ -87,6 +91,7 @@
 !/themes/mobile/
 /uploads/*
 !/uploads/.gitkeep
+packages/*/dist
 *vanillaforums*
 *.kpf
 .DS_Store

@@ -108,7 +108,7 @@ class BasicSchemaSchema extends Schema
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($data, $sparse = false)
     {

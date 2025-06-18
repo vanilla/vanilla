@@ -5,7 +5,7 @@
  */
 
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import TagWidget from "@vanilla/addon-vanilla/tag/TagWidget";
 import React from "react";
 
@@ -13,8 +13,8 @@ interface IProps extends Omit<React.ComponentProps<typeof TagWidget>, "onlineUse
 
 export function TagWidgetPreview(props: IProps) {
     return (
-        <Widget>
+        <LayoutWidget>
             <TagWidget {...props} tags={LayoutEditorPreviewData.tags()} />
-        </Widget>
+        </LayoutWidget>
     );
 }

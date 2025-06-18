@@ -33,51 +33,18 @@ class PostFieldsApiController extends \AbstractApiController
     public function index(array $query)
     {
         $this->permission();
-        $in = $this->schema([
-            "postTypeID:s?" => ["x-filter" => true],
-            "dataType:s?" => ["enum" => PostFieldModel::DATA_TYPES, "x-filter" => true],
-            "formType:s?" => ["enum" => PostFieldModel::FORM_TYPES, "x-filter" => true],
-            "visibility:s?" => ["x-filter" => true],
-            "isRequired:b?" => ["x-filter" => true],
-            "isActive:b?" => ["x-filter" => true],
-            "page:i?" => [
-                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
-                "default" => 1,
-                "minimum" => 1,
-            ],
-            "limit:i?" => [
-                "description" => "Desired number of items per page.",
-                "default" => 30,
-                "minimum" => 1,
-                "maximum" => ApiUtils::getMaxLimit(),
-            ],
-        ]);
+        $in = $this->schema($this->postFieldModel->indexSchema());
         $out = $this->schema([":a" => $this->postFieldModel->outputSchema()], "out");
 
         $query = $in->validate($query);
 
         $filters = ApiUtils::queryToFilters($in, $query);
 
-        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
-
-        $rows = $this->postFieldModel->getWhere($filters, [
-            Model::OPT_LIMIT => $limit,
-            Model::OPT_OFFSET => $offset,
-        ]);
-
-        $rows = array_map(function ($row) {
-            $row["isRequired"] = (bool) $row["isRequired"];
-            $row["isActive"] = (bool) $row["isActive"];
-            return $row;
-        }, $rows);
+        $rows = $this->postFieldModel->getWhere($filters);
 
         $rows = $out->validate($rows);
 
-        $totalCount = $this->postFieldModel->getWhereCount($filters);
-
-        $paging = ApiUtils::numberedPagerInfo($totalCount, "/api/v2/post-fields", $query, $in);
-
-        return new Data($rows, ["paging" => $paging]);
+        return $rows;
     }
 
     /**

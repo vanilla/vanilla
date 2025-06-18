@@ -1,6 +1,6 @@
 <div class="js-embed embedResponsive" data-embedjson="{{ data|json_encode }}">
     <a
-        href="{{ url }}"
+        href="{{ downloadUrl|default(url) }}"
         download
         aria-label="{{ name }}"
     >

@@ -381,7 +381,7 @@ if (!function_exists("getDiscussionOptions")):
                 $timeLeft = " (" . Gdn_Format::seconds($timeLeft) . ")";
             }
             $options["EditDiscussion"] = [
-                "Label" => t("Edit") . $timeLeft,
+                "Label" => $timeLeft ? t("Edit") . $timeLeft : t("Edit"),
                 "Url" => "/post/editdiscussion/" . $discussion->DiscussionID,
             ];
         }
@@ -579,10 +579,29 @@ if (!function_exists("getDiscussionOptionsDropdown")):
             )
             ->addLinkIf(
                 $canMove,
-                t("Move"),
-                "/moderation/confirmdiscussionmoves?discussionid=" . $discussionID,
-                "move",
-                "MoveDiscussion Popup"
+                t("Move Post"),
+                "#",
+                "postSettingMove",
+                "js-postSettingsMove",
+                [],
+                [
+                    "attributes" => [
+                        "data-discussionID" => $discussion->DiscussionID,
+                    ],
+                ]
+            )
+            ->addLinkIf(
+                $canMove,
+                t("Change Post Type"),
+                "#",
+                "postSettingChange",
+                "js-postSettingsChange",
+                [],
+                [
+                    "attributes" => [
+                        "data-discussionID" => $discussion->DiscussionID,
+                    ],
+                ]
             );
 
         $hasDiv = false;
@@ -730,7 +749,7 @@ if (!function_exists("getCommentOptions")):
                 $timeLeft = " (" . Gdn_Format::seconds($timeLeft) . ")";
             }
             $options["EditComment"] = [
-                "Label" => t("Edit") . $timeLeft,
+                "Label" => $timeLeft ? t("Edit") . $timeLeft : t("Edit"),
                 "Url" => "/post/editcomment/" . $comment->CommentID,
                 "EditComment",
             ];

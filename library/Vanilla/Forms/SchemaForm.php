@@ -33,15 +33,20 @@ class SchemaForm
      * Create a "section" of the form on an object type.
      *
      * @param FormOptions $options
+     * @param FieldMatchConditional|null $conditions,
      *
      * @return array
      */
-    public static function section(FormOptions $options): array
+    public static function section(FormOptions $options, ?FieldMatchConditional $conditions = null): array
     {
-        return [
+        $result = [
             "label" => $options->getLabel(),
             "description" => $options->getDescription(),
         ];
+        if ($conditions) {
+            $result["conditions"] = [$conditions->getCondition()];
+        }
+        return $result;
     }
 
     /**
@@ -50,24 +55,26 @@ class SchemaForm
      * @param FormOptions $options
      * @param FormChoicesInterface $choices
      * @param FieldMatchConditional|null $conditions
-     * @param boolean $multiple
+     * @param bool $multiple
      * @return array
      */
     public static function dropDown(
         FormOptions $options,
         FormChoicesInterface $choices,
         FieldMatchConditional $conditions = null,
-        $multiple = false
+        bool $multiple = false
     ): array {
-        $result = [
-            "description" => $options->getDescription(),
-            "label" => $options->getLabel(),
-            "inputType" => self::DROPDOWN_TYPE,
-            "placeholder" => $options->getPlaceHolder(),
-            "choices" => $choices->getChoices(),
-            "multiple" => $multiple,
-            "tooltip" => $options->getTooltip(),
-        ];
+        $result = array_merge(
+            [
+                "description" => $options->getDescription(),
+                "label" => $options->getLabel(),
+                "inputType" => "select",
+                "placeholder" => $options->getPlaceHolder(),
+                "multiple" => $multiple,
+                "tooltip" => $options->getTooltip(),
+            ],
+            $choices->getOptionsData()
+        );
 
         if ($conditions) {
             $result["conditions"] = [$conditions->getCondition()];
@@ -259,6 +266,33 @@ class SchemaForm
     }
 
     /**
+     * Render a custom react component.
+     *
+     * @param FormOptions $options
+     * @param string $reactComponent
+     * @param array|null $componentProps
+     * @param FieldMatchConditional|null $conditional
+     *
+     * @return array
+     */
+    public static function custom(
+        FormOptions $options,
+        string $reactComponent,
+        ?array $componentProps = null,
+        FieldMatchConditional $conditional = null
+    ): array {
+        $result = $options->values() + [
+            "inputType" => "custom",
+            "component" => $reactComponent,
+            "componentProps" => $componentProps,
+        ];
+        if ($conditional) {
+            $result["conditions"] = [$conditional->getCondition()];
+        }
+        return $result;
+    }
+
+    /**
      * Used for rendering custom react form controls.
      *
      * @param FormOptions $options
@@ -266,13 +300,24 @@ class SchemaForm
      *
      * @return array
      */
-    public static function dragAndDrop(FormOptions $options, Schema $itemSchema): array
-    {
-        return $options->values() + [
+    public static function dragAndDrop(
+        FormOptions $options,
+        Schema $itemSchema,
+        FormModalOptions|null $modal = null
+    ): array {
+        $result = $options->values() + [
             "inputType" => self::DRAG_AND_DROP_TYPE,
             "itemSchema" => $itemSchema,
-            "fullSize" => true,
         ];
+
+        if ($modal !== null) {
+            $result["asModal"] = true;
+            $result["modalTitle"] = $modal->title;
+            $result["modalSubmitLabel"] = $modal->submitLabel;
+        } else {
+            $result["fullSize"] = true;
+        }
+        return $result;
     }
 
     /**
@@ -311,10 +356,10 @@ class SchemaForm
      * Used for upload inputs.
      *
      * @param FormOptions $options
-     * @param ?FieldMatchConditional $conditions
+     * @param FieldMatchConditional|Array<FieldMatchConditional>|null $conditions
      * @return array
      */
-    public static function upload(FormOptions $options, FieldMatchConditional $conditions = null): array
+    public static function upload(FormOptions $options, FieldMatchConditional|array $conditions = null): array
     {
         $result = [
             "description" => $options->getDescription(),
@@ -325,7 +370,10 @@ class SchemaForm
         ];
 
         if ($conditions) {
-            $result["conditions"] = [$conditions->getCondition()];
+            $conditions = is_array($conditions)
+                ? array_map(fn(FieldMatchConditional $condition) => $condition->getCondition(), $conditions)
+                : [$conditions->getCondition()];
+            $result["conditions"] = $conditions;
         }
 
         return $result;

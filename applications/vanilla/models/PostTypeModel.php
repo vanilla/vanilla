@@ -144,14 +144,23 @@ class PostTypeModel extends FullRecordCacheModel
         $associations = $this->getCategoryAssociations();
         $associationsByPostTypeID = ArrayUtils::arrayColumnArrays($associations, "categoryID", "postTypeID");
         $explicitCategoryIDs = array_column($associations, "categoryID");
-        $allCategories = array_filter(
+        $allCategories = $this->categoryModel->getVisibleCategories(["forceArrayReturn" => true]);
+        $implicitCategoryIDs = array_diff(array_column($allCategories, "CategoryID"), $explicitCategoryIDs);
+
+        $postableCategories = array_filter(
             $this->categoryModel->getVisibleCategories([
                 "filterDiscussionsAdd" => true,
                 "forceArrayReturn" => true,
             ]),
             fn($category) => $category["CategoryID"] === -1 || strtolower($category["DisplayAs"]) === "discussions"
         );
-        $implicitCategoryIDs = array_diff(array_column($allCategories, "CategoryID"), $explicitCategoryIDs);
+        $postableCategoryIDs = array_column($postableCategories, "CategoryID");
+
+        // Allow addons to modify the allowed categories.
+        [$implicitCategoryIDs, $postableCategoryIDs] = $this->eventManager->fireFilter(
+            "postTypeModel_getAdditionalCategoryIDs",
+            [$implicitCategoryIDs, $postableCategoryIDs]
+        );
 
         foreach ($rows as &$row) {
             if (!empty($row["categoryIDs"])) {
@@ -165,8 +174,10 @@ class PostTypeModel extends FullRecordCacheModel
                     $implicitCategoryIDs
                 );
             }
-
-            $row["countCategories"] = count(array_filter($row["availableCategoryIDs"], fn($cat) => $cat > -1));
+            $row["postableCategoryIDs"] = array_values(
+                array_intersect($row["availableCategoryIDs"], $postableCategoryIDs)
+            );
+            $row["countCategories"] = count(array_filter($row["postableCategoryIDs"], fn($cat) => $cat > -1));
         }
     }
 
@@ -208,10 +219,25 @@ class PostTypeModel extends FullRecordCacheModel
         foreach ($rows as &$row) {
             $row["roleIDs"] = $row["roleIDs"] ?? [];
             $row["categoryIDs"] = $row["categoryIDs"] ?? [];
-            $row["baseType"] = $row["isOriginal"] ? $row["postTypeID"] : $row["parentPostTypeID"];
+            $row["baseType"] = $this->resolveBasePostType($row);
             $row["postButtonIcon"] = $row["attributes"]["postButtonIcon"] ?? null;
             unset($row["attributes"]);
         }
+    }
+
+    /**
+     * Given a postTypeID or a row, resolve the base post type. Throws if we need to fetch a post type and it's not found.
+     *
+     * @param array|string $rowOrPostTypeID
+     * @return string
+     *
+     * @throws \Vanilla\Exception\Database\NoResultsException
+     */
+    public function resolveBasePostType(array|string $rowOrPostTypeID): string
+    {
+        $row = is_array($rowOrPostTypeID) ? $rowOrPostTypeID : $this->selectSingle(["postTypeID" => $rowOrPostTypeID]);
+
+        return $row["isOriginal"] ? $row["postTypeID"] : $row["parentPostTypeID"];
     }
 
     /**
@@ -252,7 +278,6 @@ class PostTypeModel extends FullRecordCacheModel
     {
         $schema = Schema::parse([
             "name:s",
-            "postButtonLabel:s?",
             "postHelperText:s?",
             "roleIDs:a?" => [
                 "items" => [
@@ -295,8 +320,7 @@ class PostTypeModel extends FullRecordCacheModel
     public function postSchema(): Schema
     {
         $schema = $this->commonSchema()
-            ->merge(Schema::parse(["postTypeID:s", "parentPostTypeID:s"]))
-            ->merge($this->patchSchema())
+            ->merge(Schema::parse(["postTypeID:s", "parentPostTypeID:s", "postButtonLabel:s"]))
             ->addValidator("postTypeID", function ($postTypeID, ValidationField $field) {
                 if (preg_match("#[.\s/|A-Z]#", $postTypeID)) {
                     $field->addError("Whitespace, slashes, periods and uppercase letters are not allowed");
@@ -325,7 +349,7 @@ class PostTypeModel extends FullRecordCacheModel
      */
     public function patchSchema(): Schema
     {
-        return $this->commonSchema();
+        return $this->commonSchema()->merge(Schema::parse(["postButtonLabel:s?" => ["minLength" => 1]]));
     }
 
     /**
@@ -575,7 +599,7 @@ class PostTypeModel extends FullRecordCacheModel
             },
         ]);
         $postType = array_find($allowedPostTypes, fn($item) => $item["postTypeID"] === $postTypeID);
-        return $postType["availableCategoryIDs"] ?? [];
+        return $postType["postableCategoryIDs"] ?? [];
     }
 
     /**
@@ -595,7 +619,7 @@ class PostTypeModel extends FullRecordCacheModel
     /**
      * Override insert method to save associated record data.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function insert(array $set, array $options = [])
     {
@@ -704,16 +728,14 @@ class PostTypeModel extends FullRecordCacheModel
             $sort = 0;
         }
 
-        $rows = [];
         foreach ($postFieldIDs as $postFieldID) {
-            $rows[] = [
+            $sql->insert("postTypePostFieldJunction", [
                 "postFieldID" => $postFieldID,
                 "postTypeID" => $postTypeID,
                 "sort" => $sort++,
-            ];
+            ]);
         }
-
-        $sql->insert("postTypePostFieldJunction", $rows);
+        $this->postFieldModel->clearCache();
     }
 
     /**
@@ -721,7 +743,7 @@ class PostTypeModel extends FullRecordCacheModel
      *
      * @return string[]
      */
-    private function getAvailableBasePostTypes(): array
+    public function getAvailableBasePostTypes(): array
     {
         $baseTypes = ["discussion"];
 

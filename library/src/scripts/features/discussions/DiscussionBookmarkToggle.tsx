@@ -4,24 +4,34 @@
  * @license gpl-2.0-only
  */
 
-import React, { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 
 import { useToggleDiscussionBookmarked } from "@library/features/discussions/discussionHooks";
 import BookmarkToggle from "@library/bookmarkToggle/BookmarkToggle";
 
-const DiscussionBookmarkToggle: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
-    discussion,
-    onSuccess,
-}) => {
-    const { toggleDiscussionBookmarked, isBookmarked } = useToggleDiscussionBookmarked(discussion.discussionID);
+const DiscussionBookmarkToggle: FunctionComponent<{
+    discussion: IDiscussion;
+    onSuccess?: () => Promise<void>;
+    classNames?: string;
+}> = ({ discussion, onSuccess, classNames }) => {
+    const { toggleDiscussionBookmarked, isBookmarked } = useToggleDiscussionBookmarked(
+        discussion.discussionID,
+        discussion.bookmarked,
+    );
 
     async function handleToggleBookmarked() {
         await toggleDiscussionBookmarked(!isBookmarked);
         !!onSuccess && (await onSuccess());
     }
 
-    return <BookmarkToggle bookmarked={!!isBookmarked} onToggleBookmarked={handleToggleBookmarked} />;
+    return (
+        <BookmarkToggle
+            bookmarked={!!isBookmarked}
+            onToggleBookmarked={handleToggleBookmarked}
+            classNames={classNames}
+        />
+    );
 };
 
 export default DiscussionBookmarkToggle;

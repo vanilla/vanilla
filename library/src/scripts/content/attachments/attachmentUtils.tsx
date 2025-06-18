@@ -51,7 +51,7 @@ export function mimeTypeToAttachmentType(mimeType?: string | null): AttachmentTy
     }
 }
 
-export function GetAttachmentIcon(props: { type: AttachmentType; className?: string }) {
+export function GetAttachmentIcon(props: { type: string; className?: string }) {
     switch (props.type) {
         case AttachmentType.PDF:
             return <FileTypePDFIcon className={props.className} />;

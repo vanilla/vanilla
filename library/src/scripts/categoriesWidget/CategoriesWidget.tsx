@@ -3,8 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { homeWidgetItemVariables, IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
+import { IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
 import {
     WidgetContainerDisplayType,
     IHomeWidgetContainerOptions,
@@ -12,7 +11,7 @@ import {
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { DeepPartial } from "redux";
 import { QuickLinks } from "@library/navigation/QuickLinks";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import CategoryList from "@library/categoriesWidget/CategoryList";
 import CategoryGrid from "@library/categoriesWidget/CategoryGrid";
 import { ICategoryItem, ICategoryItemOptions } from "@library/categoriesWidget/CategoryItem";
@@ -46,7 +45,7 @@ export function CategoriesWidget(props: ICategoriesWidgetProps) {
     }
 
     return (
-        <Widget>
+        <LayoutWidget>
             {isList || (!props.containerOptions?.displayType && props.isAsset) ? (
                 <CategoryList {...props} isPreview={props.isPreview} />
             ) : (
@@ -61,7 +60,7 @@ export function CategoriesWidget(props: ICategoriesWidgetProps) {
                     }}
                 />
             )}
-        </Widget>
+        </LayoutWidget>
     );
 }
 

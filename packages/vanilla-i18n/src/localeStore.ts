@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -44,6 +44,9 @@ export function setCurrentLocale(localeKey: string) {
 
 /**
  * Get the current locale.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
  */
 export function getCurrentLocale() {
     return currentLocaleRef.current();
@@ -63,7 +66,18 @@ export function getJSLocaleKey() {
  * Load a group of locales.
  */
 export function loadLocales(locales: ILocale[]) {
-    localeStoreRef.set([...localeStoreRef.current(), ...locales]);
+    // Add the new locales to the store. If a localeID already exists, prefer the new one. This avoids duplicates.
+    localeStoreRef.set(
+        locales.reduce((acc: ILocale[], locale: ILocale) => {
+            const existingLocale = acc.find((l) => l.localeID === locale.localeID);
+            if (existingLocale) {
+                return acc.map((l) => (l.localeID === locale.localeID ? locale : l));
+            } else {
+                return [...acc, locale];
+            }
+        }, localeStoreRef.current()),
+    );
+
     callbacksRef.current().forEach((callback) => callback());
 }
 

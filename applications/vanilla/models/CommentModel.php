@@ -23,7 +23,6 @@ use Psr\SimpleCache\CacheInterface;
 use Vanilla\Community\Events\MachineTranslationEvent;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Contracts\Models\VectorizeInterface;
-use Vanilla\Dashboard\DocumentModel;
 use Vanilla\Forum\Models\AbstractCommentParentHandler;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Utility\ArrayUtils;
@@ -57,7 +56,6 @@ use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\Model;
 use Vanilla\Models\UserFragmentSchema;
-use Vanilla\Permissions;
 use Vanilla\Premoderation\PremoderationException;
 use Vanilla\Premoderation\PremoderationItem;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
@@ -164,8 +162,6 @@ class CommentModel extends Gdn_Model implements
     /** @var LayoutModel */
     private LayoutModel $layoutModel;
 
-    /** @var DocumentModel */
-    private DocumentModel $documentModel;
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -194,7 +190,6 @@ class CommentModel extends Gdn_Model implements
         $this->threadModel = Gdn::getContainer()->get(CommentThreadModel::class);
         $this->layoutViewModel = Gdn::getContainer()->get(LayoutViewModel::class);
         $this->layoutModel = Gdn::getContainer()->get(LayoutModel::class);
-        $this->documentModel = Gdn::getContainer()->get(DocumentModel::class);
 
         // Registering default parent types
         $this->registerCommentParentType(DiscussionCommentModel::class);
@@ -375,7 +370,9 @@ class CommentModel extends Gdn_Model implements
             $options[Model::OPT_ORDER] = "sortDateUpdated";
             $subQuery->select("c.dateUpdated, c.dateInserted", "COALESCE", "sortDateUpdated");
         } elseif (!empty($options[Model::OPT_ORDER]) && $options[Model::OPT_ORDER] !== ModelUtils::SORT_TRENDING) {
-            $options[Model::OPT_ORDER] = "c.{$options[Model::OPT_ORDER]}";
+            $options[Model::OPT_ORDER] = str_starts_with($options[Model::OPT_ORDER], "c.")
+                ? $options[Model::OPT_ORDER]
+                : "c.{$options[Model::OPT_ORDER]}";
         }
         $subQuery->applyModelOptions($options);
 
@@ -769,27 +766,6 @@ class CommentModel extends Gdn_Model implements
     }
 
     /**
-     * Record the user's watch data.
-     *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param object $discussion Discussion being watched.
-     * @param int $limit Max number to get.
-     * @param int $offset Number to skip.
-     * @param int $totalComments Total in entire discussion (hard limit).
-     * @param string|null $maxDateInserted The most recent insert date of the viewed comments.
-     * @deprecated Use `DiscussionModel::setWatch()` instead.
-     */
-    public function setWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted = null)
-    {
-        deprecated("CommentModel::setWatch()", "DiscussionModel::setWatch()");
-
-        /* @var DiscussionModel $discussionModel */
-        $this->discussionModel->setWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getCount($wheres = "")
@@ -1012,14 +988,18 @@ class CommentModel extends Gdn_Model implements
      */
     public function resolveCommentMaxDepth(int $parentCommentID): int
     {
-        if (!FeatureFlagHelper::featureEnabled("customLayout.post")) {
-            // No nesting allowed.
-            return 1;
-        }
         // get Base layout without extra details all we need is LayoutID.
         [$layoutID, $resolvedQuery] = $this->layoutViewModel->queryLayout(
             new LayoutQuery("comment", "comment", $parentCommentID, ["skipPageCalculation" => true])
         );
+
+        if (
+            ($layoutID !== "event" && !FeatureFlagHelper::featureEnabled("customLayout.post")) ||
+            ($layoutID === "event" && !FeatureFlagHelper::featureEnabled("customLayout.event"))
+        ) {
+            // No nesting allowed.
+            return 1;
+        }
 
         try {
             $layout = $this->layoutModel->selectSingle(["layoutID" => $layoutID]);
@@ -1167,19 +1147,24 @@ class CommentModel extends Gdn_Model implements
      * Events: BeforeSaveComment, AfterValidateComment, AfterSaveComment.
      *
      * @param array $formPostValues Data from the form model.
-     * @param array|false $settings Currently unused.
+     * @param array $settings Currently unused. Options ["skipSpamCheck", "skipNotification"] if set will skip default notification.
      * @return int $commentID
      * @throws ClientException
      * @throws NotFoundException
      * @throws PremoderationException
      * @since 2.0.0
      */
-    public function save($formPostValues, $settings = false)
+    public function save($formPostValues, $settings = [])
     {
         // Define the primary key in this model's table.
         $this->defineSchema();
         $textUpdated = false;
         $settings = is_array($settings) ? $settings : [];
+        $settingSchema = Schema::parse([
+            "skipSpamCheck:b" => ["default" => false],
+            "skipNotification:b" => ["default" => false],
+        ]);
+        $settings = $settingSchema->validate($settings);
         // Validate $CommentID and whether this is an insert
         $commentID = val("CommentID", $formPostValues);
         $commentID = is_numeric($commentID) && $commentID > 0 ? $commentID : false;
@@ -1260,10 +1245,9 @@ class CommentModel extends Gdn_Model implements
         $prevDiscussionID = false;
 
         // If the post is new and it validates, check for spam
-        $skipSpamCheck = $settings["skipSpamCheck"] ?? false;
         if ($isInsert) {
             if (
-                !$skipSpamCheck &&
+                !$settings["skipSpamCheck"] &&
                 $isDiscussionComment &&
                 $this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)
             ) {
@@ -1291,7 +1275,7 @@ class CommentModel extends Gdn_Model implements
             ])
             : $fields;
 
-        if ($isDiscussionComment && !$skipSpamCheck) {
+        if ($isDiscussionComment && !$settings["skipSpamCheck"]) {
             if (FeatureFlagHelper::featureEnabled("escalations")) {
                 ///
                 /// Modern premoderation.
@@ -1354,7 +1338,11 @@ class CommentModel extends Gdn_Model implements
             $textUpdated = $previousComment["Body"] !== ($fields["Body"] ?? $previousComment["Body"]);
             $this->SQL->put($this->Name, $fields, ["CommentID" => $commentID]);
         } else {
-            if (!FeatureFlagHelper::featureEnabled("escalations") && $isDiscussionComment && !$skipSpamCheck) {
+            if (
+                !FeatureFlagHelper::featureEnabled("escalations") &&
+                $isDiscussionComment &&
+                !$settings["skipSpamCheck"]
+            ) {
                 ///
                 /// Legacy Premoderation
                 ///
@@ -1421,6 +1409,7 @@ class CommentModel extends Gdn_Model implements
                 commentRow: $comment,
                 discussionID: $parentRecordID,
                 isInsert: $isInsert,
+                skipNotification: $settings["skipNotification"],
                 prevDiscussionID: is_int($prevDiscussionID) ? $prevDiscussionID : null
             );
         }
@@ -1441,14 +1430,17 @@ class CommentModel extends Gdn_Model implements
         $this->updateUser($comment["InsertUserID"], $isInsert);
 
         $action = $isInsert ? CommentEvent::ACTION_INSERT : CommentEvent::ACTION_UPDATE;
-        \Gdn::scheduler()->addJobDescriptor(
-            new NormalJobDescriptor(DeferredResourceEventJob::class, [
-                "id" => $commentID,
-                "model" => CommentModel::class,
-                "action" => $action,
-                "textUpdated" => $textUpdated,
-            ])
-        );
+
+        if (!($settings["skipNotification"] ?? false)) {
+            \Gdn::scheduler()->addJobDescriptor(
+                new NormalJobDescriptor(DeferredResourceEventJob::class, [
+                    "id" => $commentID,
+                    "model" => CommentModel::class,
+                    "action" => $action,
+                    "textUpdated" => $textUpdated,
+                ])
+            );
+        }
         return $commentID;
     }
 
@@ -1490,6 +1482,7 @@ class CommentModel extends Gdn_Model implements
         array $commentRow,
         int $discussionID,
         bool $isInsert,
+        bool $skipNotification,
         int|null $prevDiscussionID
     ): void {
         // Aggregate counts
@@ -1520,7 +1513,7 @@ class CommentModel extends Gdn_Model implements
         ///
         /// Notifications / webhooks / deferred jobs
         ///
-        if ($isInsert && $discussion) {
+        if (!$skipNotification && $isInsert && $discussion) {
             // Send notifications
             $notificationGenerator = Gdn::getContainer()->get(\Vanilla\Models\CommunityNotificationGenerator::class);
             $notificationGenerator->notifyNewComment($commentRow, $discussion);
@@ -1663,7 +1656,7 @@ TWIG;
         $row["Body"] = $this->formatterService->renderHTML($bodyParsed);
         $row["image"] = $this->formatterService->parseMainImage($bodyParsed, $format);
         $row["Name"] = self::generateCommentName(
-            $row["parentName"] ?? ($row["DiscussionName"] ?? $row["discussion"]["Name"])
+            $row["parentName"] ?? ($row["DiscussionName"] ?? ($row["discussion"]["Name"] ?? ""))
         );
         $row["Url"] = commentUrl($row);
         $row["Attributes"] = new Attributes($row["Attributes"] ?? null);
@@ -2108,7 +2101,7 @@ TWIG;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCrawlInfo(): array
     {
@@ -2231,7 +2224,7 @@ TWIG;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function calculateAggregates(string $aggregateName, int $from, int $to): void
     {
@@ -2241,7 +2234,7 @@ TWIG;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function counts(string $column, $from = false, $to = false, $max = false, array $where = []): array
     {

@@ -33,7 +33,7 @@ use Vanilla\Forum\Models\PostTypeModel;
 class StaleDiscussionTrigger extends TimedAutomationTrigger
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -41,7 +41,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -49,7 +49,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -57,7 +57,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -65,7 +65,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -74,6 +74,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
         foreach ($enum as $key => $value) {
             $formChoices[$value["apiType"]] = $key;
         }
+
         $staleDiscussionSchema = [
             "postType" => [
                 "type" => "array",
@@ -229,7 +230,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -240,7 +241,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getPrimaryKey(): string
     {
@@ -248,7 +249,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getObjectModel(): \Gdn_Model
     {
@@ -275,7 +276,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getWhereArray(array $triggerValue, ?DateTimeImmutable $lastRunDate = null): array
     {
@@ -302,7 +303,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess($lastRecordId, array $where): iterable
     {
@@ -332,7 +333,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {

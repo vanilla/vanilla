@@ -46,6 +46,7 @@ const mockToastProps = {
     addToast: vitest.fn(),
     updateToast: vitest.fn(),
     removeToast: vitest.fn(),
+    setIsInModal: vitest.fn(),
 };
 
 const renderInProvider = async () => {

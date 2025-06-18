@@ -8,8 +8,12 @@ import { expectStoriesToRender, iterateStoriesModules } from "@library/__tests__
 
 describe("Storybook Chunk 1", async () => {
     await iterateStoriesModules(3, 0, async (name, module) => {
-        it(`Stories - <${name}/>`, async () => {
-            await expectStoriesToRender(module);
-        });
+        it(
+            `Stories - <${name}/>`,
+            async () => {
+                await expectStoriesToRender(module);
+            },
+            { timeout: 100000 },
+        );
     });
 });

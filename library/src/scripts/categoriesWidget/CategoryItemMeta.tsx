@@ -78,7 +78,7 @@ export function CategoryItemMeta(props: ICategoryItemMetaProps) {
                             userID: category.lastPost.insertUser.userID,
                             name: category.lastPost.insertUser.name,
                         }}
-                        className={metasClasses().metaLink}
+                        asMeta
                     />
                 </>
             )}

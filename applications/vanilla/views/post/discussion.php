@@ -69,11 +69,7 @@ if (!$CancelUrl) {
 
     echo '<div class="P">';
     echo $this->Form->label("Discussion Title", "Name");
-    echo wrap(
-        $this->Form->textBox("Name", ["maxlength" => 100, "class" => "InputBox BigInput", "spellcheck" => "true"]),
-        "div",
-        ["class" => "TextBoxWrapper"]
-    );
+    echo wrap($this->Form->postTitle(), "div", ["class" => "TextBoxWrapper"]);
     echo "</div>";
 
     $this->fireEvent("BeforeBodyInput");
@@ -106,7 +102,10 @@ if (!$CancelUrl) {
 
     echo '<div class="Buttons">';
     $this->fireEvent("BeforeFormButtons");
-    echo $this->Form->button(property_exists($this, "Discussion") ? "Save" : "Post Discussion", [
+
+    $isExistingDiscussion =
+        property_exists($this, "Discussion") && is_object($this->Discussion) && $this->Discussion->DiscussionID;
+    echo $this->Form->button($isExistingDiscussion ? "Save" : "Post Discussion", [
         "class" => "Button Primary DiscussionButton",
     ]);
     if (

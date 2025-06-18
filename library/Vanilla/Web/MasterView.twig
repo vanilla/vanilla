@@ -134,7 +134,7 @@
                     {{ bodyContent }}
                 {%- else -%}
                 {# Modern Vanilla\Web\Page layout (layouts, admin-new, knowledge, forum w/ isReactView) #}
-                    <header id="titleBar"></header>
+                    <div id="titleBar"></div>
                     <div id="app">
                         {% if breadcrumbs|default(false) %}
                             <noscript>
@@ -163,6 +163,28 @@
                     </div>
                 {%- endif -%}
             </div>
+            {%- if isDistMissing|default(false) -%}
+                <style>
+                    .distMissing {
+                        display: flex;
+                        position: fixed;
+                        top: 24px;
+                        left: 24px;
+                        right: 24px;
+                        bottom: 24px;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 80vh;
+                    }
+                </style>
+                <div class="distMissing">
+                    <div>
+                        <h1>Frontend Build Assets are missing</h1>
+                        <p>Did you forget to build vanilla?</p>
+                        <pre><code>vnla build</code></pre>
+                    </div>
+                </div>
+            {% endif %}
             {%- if themeFooter -%}
                 <div id="themeFooter">
                     <template shadowrootmode="open">{{ themeFooter }}</template>

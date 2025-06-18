@@ -53,6 +53,12 @@ interface IProps {
     preventFocusOnVisible?: boolean; //in some cases focus will be handled through parent components, so we'll prevent the responsibility here
 }
 
+declare global {
+    interface Window {
+        closeAllFlyouts?: () => void;
+    }
+}
+
 export default function FlyoutToggle(props: IProps) {
     const { initialFocusElement, preventFocusOnVisible, onVisibilityChange, onClose, id, contentID, buttonType } =
         props;
@@ -171,7 +177,7 @@ export default function FlyoutToggle(props: IProps) {
         callback: closeMenuHandler,
     });
 
-    const classes = dropDownClasses();
+    const classes = dropDownClasses.useAsHook();
     const buttonClasses = cx(props.buttonClassName, {
         isOpen: isVisible,
     });
@@ -186,19 +192,22 @@ export default function FlyoutToggle(props: IProps) {
         buttonRef,
     };
 
-    const classesDropDown = !props.openAsModal ? cx("flyouts", classes.root) : null;
+    const classesDropDown = !props.openAsModal ? cx("flyouts", classes.root, props.className) : props.className;
     const Tag = (props.tag ?? `div`) as "div";
 
     const isContentVisible = !props.disabled && isVisible;
     return (
         <Tag
-            className={classNames(classesDropDown, props.className, {
+            className={classNames(classesDropDown, {
                 asModal: props.openAsModal,
             })}
             ref={controllerRef}
             onClick={handleBlockEventPropagation}
         >
             <Button
+                onFocus={(e) => {
+                    e.target.scrollIntoView({ block: "nearest", inline: "nearest" });
+                }}
                 {...props.buttonProps}
                 id={id}
                 className={buttonClasses}

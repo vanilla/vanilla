@@ -14,6 +14,8 @@ use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\CurrentTimeStamp;
@@ -39,6 +41,7 @@ use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\Model;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Navigation\BreadcrumbProviderNotFoundException;
+use Vanilla\PostTypeConversionPayload;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\SchemaFactory;
@@ -50,14 +53,17 @@ use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\ModelUtils;
 use Garden\Web\Pagination;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Logging\AuditLogger;
+use Vanilla\Dashboard\Events\DiscussionPostTypeChangeEvent;
 
 /**
  * API Controller for the `/discussions` resource.
  */
-class DiscussionsApiController extends AbstractApiController
+class DiscussionsApiController extends AbstractApiController implements LoggerAwareInterface
 {
     use CommunitySearchSchemaTrait;
     use \Vanilla\Formatting\FormatCompatTrait;
+    use LoggerAwareTrait;
 
     /** @var Schema */
     private $discussionSchema;
@@ -326,9 +332,15 @@ class DiscussionsApiController extends AbstractApiController
             ],
         ]);
 
+        $in->merge(Schema::parse(["postTypeID:s?", "postMeta?"]));
+
         if (PostTypeModel::isPostTypesFeatureEnabled()) {
-            $in->merge(Schema::parse(["postTypeID:s?"]));
+            $in->addFilter("", SchemaUtils::fieldRequirement("postMeta", "postTypeID"))->addFilter(
+                "",
+                $this->postFieldModel->createPostMetaFilter()
+            );
         }
+
         $body = $in->validate($body);
 
         $discussionIDs = $body["discussionIDs"];
@@ -345,16 +357,31 @@ class DiscussionsApiController extends AbstractApiController
             throw new PermissionException("Vanilla.Discussions.Edit", ["recordIDs" => $missingPermissionIDs]);
         }
 
-        // Defer to the LongRunner for execution.
-        $result = $this->longRunner->runApi(
-            new LongRunnerAction(DiscussionModel::class, "moveDiscussionsIterator", [
-                $discussionIDs,
+        if (count($discussionIDs) === 1) {
+            // We can just do the move.
+            $this->discussionModel->moveDiscussion(
+                $discussionIDs[0],
                 $categoryID,
                 $body["addRedirects"],
                 $postTypeID,
-            ])
-        );
-        return $result;
+                $body["postMeta"] ?? null
+            );
+            return new Data([
+                "status" => "success",
+            ]);
+        } else {
+            // Defer to the LongRunner for execution.
+            $result = $this->longRunner->runApi(
+                new LongRunnerAction(DiscussionModel::class, "moveDiscussionsIterator", [
+                    $discussionIDs,
+                    $categoryID,
+                    $body["addRedirects"],
+                    $postTypeID,
+                    $body["postMeta"] ?? null,
+                ])
+            );
+            return $result;
+        }
     }
 
     /**
@@ -476,7 +503,7 @@ class DiscussionsApiController extends AbstractApiController
                 "body:s?",
                 "format:s?",
                 "categoryID:i",
-                PostTypeModel::isPostTypesFeatureEnabled() ? "postTypeID:i" : "postType:s",
+                "postType:s",
                 "authorType" => [
                     "type" => "string",
                     "enum" => ["me", "system"],
@@ -535,10 +562,8 @@ class DiscussionsApiController extends AbstractApiController
 
         if (PostTypeModel::isPostTypesFeatureEnabled()) {
             $allowedDiscussionTypes = $this->categoryModel->getAllowedPostTypeData($newCategory);
-            $postableDiscussionTypes = null;
         } else {
             $allowedDiscussionTypes = $this->categoryModel::getAllowedDiscussionData($permissionCategory, $newCategory);
-            $postableDiscussionTypes = CategoryModel::instance()->getPostableDiscussionTypes();
         }
 
         $allowedDiscussionTypes = array_map("strtolower", array_column($allowedDiscussionTypes, "apiType"));
@@ -566,7 +591,13 @@ class DiscussionsApiController extends AbstractApiController
             "Body" => $newPost["body"],
             "Format" => $newPost["format"],
         ];
-        $destinationDiscussionID = $this->discussionModel->save($newDiscussionData);
+
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $newDiscussionData["postTypeID"] = $newPost["postType"];
+            unset($newDiscussionData["Type"]);
+        }
+
+        $destinationDiscussionID = $this->discussionModel->save($newDiscussionData, ["skipEvents" => true]);
         if (!$destinationDiscussionID) {
             throw new NotFoundException("Discussion", ["discussionID" => $destinationDiscussionID]);
         }
@@ -627,7 +658,6 @@ class DiscussionsApiController extends AbstractApiController
         $row = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row) {
             $this->discussionModel->tryThrowGoneException($id);
-
             throw new NotFoundException("Discussion", ["discussionID" => $id]);
         }
         return $row;
@@ -654,6 +684,8 @@ class DiscussionsApiController extends AbstractApiController
                     "pinLocation?",
                     "announce?",
                     "draftID?",
+                    "newTagNames:a?" => ["items" => ["type" => "string"]],
+                    "tagIDs:a?" => ["items" => ["type" => "integer"]],
                 ])
                     ->add(DiscussionExpandSchema::commonExpandSchema())
                     ->add($this->fullSchema()),
@@ -662,13 +694,16 @@ class DiscussionsApiController extends AbstractApiController
             if ($this->getPermissions()->has("staff.allow")) {
                 $this->discussionPostSchema->merge(Schema::parse(["resolved:b?"]));
             }
+            if ($this->getPermissions()->has("schedule.allow")) {
+                $this->discussionPostSchema->merge(Schema::parse(["discussionID:i?"]));
+            }
             $this->discussionPostSchema
                 ->merge(Schema::parse(["postTypeID?", "postMeta?"]))
                 ->addFilter("", function ($data, \Garden\Schema\ValidationField $field) {
                     if (!ArrayUtils::isArray($data)) {
                         return $data;
                     }
-                    if (isset($data["postTypeID"])) {
+                    if (isset($data["postTypeID"]) && isset($data["categoryID"])) {
                         $category = \CategoryModel::categories($data["categoryID"]);
                         $allowedPostTypes = $this->postTypeModel->getAllowedPostTypesByCategory($category);
                         if (!in_array($data["postTypeID"], array_column($allowedPostTypes, "postTypeID"))) {
@@ -706,6 +741,8 @@ class DiscussionsApiController extends AbstractApiController
                 "pinned?",
                 "pinLocation?",
                 "draftID?",
+                "newTagNames:a?" => ["items" => ["type" => "string"]],
+                "tagIDs:a?" => ["items" => ["type" => "integer"]],
             ])
                 ->add(DiscussionExpandSchema::commonExpandSchema())
                 ->add($this->fullSchema()),
@@ -725,8 +762,7 @@ class DiscussionsApiController extends AbstractApiController
                         $row["postTypeID"] ?? strtolower($row["Type"] ?? "discussion") ?: "discussion";
                     return $data;
                 })
-                ->addFilter("", SchemaUtils::fieldRequirement("postMeta", "postTypeID"))
-                ->addFilter("", $this->postFieldModel->createPostMetaFilter());
+                ->addFilter("", SchemaUtils::fieldRequirement("postMeta", "postTypeID"));
         }
 
         return $this->schema($schema, $type);
@@ -840,9 +876,6 @@ class DiscussionsApiController extends AbstractApiController
         $rows = [&$row];
         $this->expandLastCommentBody($rows, $query["expand"]);
         $result = $out->validate($row);
-        if ($this->isExpandField("tags", $query["expand"]) ?? false) {
-            $this->tagModel->expandTags($result);
-        }
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter(
@@ -854,6 +887,18 @@ class DiscussionsApiController extends AbstractApiController
             $row,
             true
         );
+
+        // Allow addons to modify the result. This one only applies to this endpoint.
+        $result = $this->getEventManager()->fireFilter(
+            "discussionsApiController_getSingleOutput",
+            $result,
+            $this,
+            $in,
+            $query,
+            $row,
+            true
+        );
+
         return $result;
     }
 
@@ -923,8 +968,8 @@ class DiscussionsApiController extends AbstractApiController
         }
 
         $isRich = strcasecmp($discussion["Format"], RichFormat::FORMAT_KEY) === 0;
-        $discussion["bodyRaw"] = $isRich ? json_decode($discussion["Body"], true) : $discussion["Body"];
-        $discussion["bodyRaw"] = Gdn::formatService()->renderPlainText($discussion["bodyRaw"], "text");
+        $discussion["bodyRaw"] = Gdn::formatService()->renderPlainText($discussion["Body"], "text");
+        $discussion["bodyRaw"] = $isRich ? json_decode($discussion["bodyRaw"], true) : $discussion["bodyRaw"];
         $discussion = $this->discussionModel->fixRow($discussion);
 
         $this->userModel->expandUsers($discussion, ["InsertUserID"]);
@@ -979,11 +1024,15 @@ class DiscussionsApiController extends AbstractApiController
                 "closed",
                 "pinned",
                 "pinLocation",
+                "type?",
                 "postTypeID?",
                 "postMeta?",
             ])->add($this->fullSchema()),
             ["DiscussionGetEdit", "out"]
         )->addFilter("", [\Vanilla\Formatting\Formats\RichFormat::class, "editBodyFilter"]);
+        if ($this->tagModel->discussionTaggingEnabled()) {
+            $out->merge(Schema::parse(["tagIDs:a?" => ["items" => ["type" => "integer"]]]));
+        }
 
         $row = $this->discussionByID($id);
         $row["Url"] = discussionUrl($row);
@@ -995,6 +1044,13 @@ class DiscussionsApiController extends AbstractApiController
 
         $scheme = new CamelCaseScheme();
         $row = $scheme->convertArrayKeys($row);
+
+        $this->joinDiscussionTags($row);
+
+        $row["type"] = DiscussionModel::normalizeDiscussionType($row["type"] ?? null);
+        if ($row["postTypeID"] === null) {
+            $row["postTypeID"] = $row["type"];
+        }
 
         $this->postMetaModel->joinPostMeta($row);
 
@@ -1039,6 +1095,10 @@ class DiscussionsApiController extends AbstractApiController
         ])->setDescription("List discussions.");
         $query["followed"] = $query["followed"] ?? false;
         $query["excludeHiddenCategories"] = $query["excludeHiddenCategories"] ?? false;
+        // If postTypes feature is not enabled and someone tries to filter by postTypeID, throw an error.
+        if (isset($query["postMeta"]) && is_array($query["postMeta"])) {
+            PostTypeModel::ensurePostTypesFeatureEnabled();
+        }
         $query = $in->validate($query);
         $query = $this->filterValues($query);
         $discussionSchema = CrawlableRecordSchema::applyExpandedSchema(
@@ -1088,6 +1148,12 @@ class DiscussionsApiController extends AbstractApiController
                 // Only get discussions that do have comments.
                 $where["countComments >"] = 0;
             }
+        }
+        if (isset($query["type"])) {
+            $query["type"] = array_map(
+                fn($v) => strtolower($v) === strtolower(DiscussionModel::SCHEDULE_TYPE) ? "na" : $v,
+                $query["type"]
+            );
         }
 
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
@@ -1192,6 +1258,19 @@ class DiscussionsApiController extends AbstractApiController
                 $query["reactionType"],
             ]);
             $where["d.DiscussionID"] = $reactedDiscussions;
+        }
+
+        if (isset($query["postMeta"]) && !empty($query["postMeta"])) {
+            $discussionIDs = $this->postMetaModel->discussionMetaPostFieldsFilter($query["postMeta"]);
+            if (!empty($discussionIDs)) {
+                if (isset($where["d.DiscussionID"])) {
+                    $where["d.DiscussionID"] = array_intersect($where["d.DiscussionID"], $discussionIDs);
+                } else {
+                    $where["d.DiscussionID"] = $discussionIDs;
+                }
+            } else {
+                return new Data([]);
+            }
         }
 
         // Allow addons to update the where clause.
@@ -1331,6 +1410,8 @@ class DiscussionsApiController extends AbstractApiController
         $this->discussionExpandSchema->commonExpand($rows, $query["expand"] ?? []);
         $this->expandLastCommentBody($rows, $query["expand"]);
 
+        //        $this->tagModel->expandTags($rows);
+
         $result = $out->validate($rows);
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter(
@@ -1341,9 +1422,7 @@ class DiscussionsApiController extends AbstractApiController
             $query,
             $rows
         );
-        if ($this->isExpandField("tags", $query["expand"]) ?? false) {
-            $this->tagModel->expandTags($result);
-        }
+
         // When crawling the endpoint use a more pager.
         $paging =
             $count === null
@@ -1546,6 +1625,9 @@ class DiscussionsApiController extends AbstractApiController
         $this->idParamSchema("in");
         $row = $this->discussionByID($id);
         $in = $this->discussionPatchSchema("in", $row)->setDescription("Update a discussion.");
+        if (isset($body["postMeta"])) {
+            $in->addFilter("", $this->postFieldModel->createPostMetaFilter());
+        }
         $out = $this->schema($this->discussionSchema(), "out");
 
         $body = $in->validate($body, true);
@@ -1574,9 +1656,19 @@ class DiscussionsApiController extends AbstractApiController
         $this->fieldPermission($body, "pinned", "Vanilla.Discussions.Announce", $permissionCategoryID);
         $this->fieldPermission($body, "pinLocation", "Vanilla.Discussions.Announce", $permissionCategoryID);
         $this->fieldPermission($body, "sink", "Vanilla.Discussions.Sink", $permissionCategoryID);
+        if (isset($body["newTagNames"]) && !empty($body["newTagNames"])) {
+            $this->fieldPermission($body, "newTagNames", "tags.add");
+        }
+        if (isset($body["newTagNames"]) || isset($body["tagIDs"])) {
+            if (!$this->tagModel->discussionTaggingEnabled()) {
+                throw new ForbiddenException("Tagging is not enabled.");
+            }
+
+            $tags = $this->processDiscussionTags($body);
+            $this->saveDiscussionTags($id, $tags, true);
+        }
 
         $saveResult = $this->discussionModel->save($discussionData);
-
         $this->validateModel($this->discussionModel);
         ModelUtils::validateSaveResultPremoderation($saveResult, "discussion");
 
@@ -1635,26 +1727,76 @@ class DiscussionsApiController extends AbstractApiController
     {
         $this->permission("Garden.SignIn.Allow");
 
+        $settings = [];
+        $type = $body["type"] ?? "";
+
+        if (ContentDraftModel::draftSchedulingEnabled()) {
+            $draftID = $body["draftID"] ?? null;
+            if ($draftID && $body["discussionID"] ?? null) {
+                //We are trying to create a new post from a scheduled draft
+                $draft = $this->contentDraftModel->selectSingle(["DraftID" => $draftID]);
+                if ($draft["draftStatus"] != ContentDraftModel::DRAFT_TYPE_SCHEDULED) {
+                    throw new ClientException("Draft is not a scheduled draft");
+                }
+                $settings["insert"] = true;
+                $settings["forcedDiscussion"] = true;
+            } else {
+                if ($type == DiscussionModel::SCHEDULE_TYPE) {
+                    $settings["scheduled"] = true;
+                }
+            }
+        }
+
         $in = $this->discussionPostSchema("in")->setDescription("Add a discussion.");
+
         $out = $this->discussionSchema("out");
 
         $body = $in->validate($body);
+
+        if ($draftID = $body["draftID"] ?? null) {
+            // It's possible the draft has already been deleted by the time we get here,
+            // so we just want to catch and log.
+            try {
+                $this->contentDraftModel->deleteDraftWithPermissionCheck($draftID);
+            } catch (NotFoundException $e) {
+                $this->logger->error("Unable to delete discussion draft with ID {$draftID}.", [
+                    "exception" => $e,
+                    "draftID" => $draftID,
+                ]);
+            }
+        }
+
         $categoryID = $body["categoryID"];
         $category = CategoryModel::categories($categoryID);
         if (!$category) {
             throw new NotFoundException("Category");
         }
-        $this->checkCategoryAllowsPosting($category);
 
+        $this->checkCategoryAllowsPosting($category);
         $categoryPermissionID = self::getPermissionID($categoryID);
         $this->discussionModel->categoryPermission("Vanilla.Discussions.Add", $categoryID);
         $this->fieldPermission($body, "closed", "Vanilla.Discussions.Close", $categoryPermissionID);
         $this->fieldPermission($body, "pinned", "Vanilla.Discussions.Announce", $categoryPermissionID);
         $this->fieldPermission($body, "pinLocation", "Vanilla.Discussions.Announce", $categoryPermissionID);
         $this->fieldPermission($body, "sink", "Vanilla.Discussions.Sink", $categoryPermissionID);
+        if (isset($body["newTagNames"]) && !empty($body["newTagNames"])) {
+            $this->fieldPermission($body, "newTagNames", "tags.add");
+        }
+        if (isset($body["newTagNames"]) || isset($body["tagIDs"])) {
+            if (!$this->tagModel->discussionTaggingEnabled()) {
+                throw new ForbiddenException("Tagging is not enabled.");
+            }
+
+            $tags = $this->processDiscussionTags($body);
+        }
 
         $discussionData = ApiUtils::convertInputKeys($body, ["postTypeID", "postMeta"]);
-        $id = $this->discussionModel->save($discussionData);
+        $id = $this->discussionModel->save($discussionData, $settings);
+
+        if ($id && isset($tags)) {
+            $this->saveDiscussionTags($id, $tags);
+        }
+
         $this->validateModel($this->discussionModel);
         ModelUtils::validateSaveResultPremoderation($id, "discussion");
 
@@ -1667,11 +1809,6 @@ class DiscussionsApiController extends AbstractApiController
         $row = $this->normalizeOutput($row);
         $this->discussionExpandSchema->commonExpand($row, $query["expand"] ?? []);
         $result = $out->validate($row);
-
-        // Discussion drafts should be deleted after its posted
-        if ($draftID = $body["draftID"] ?? null) {
-            $this->contentDraftModel->deleteDraftWithPermissionCheck($draftID);
-        }
 
         return new Data($result, ["status" => 201]);
     }
@@ -1937,12 +2074,17 @@ class DiscussionsApiController extends AbstractApiController
             "in"
         )->setDescription("Change a discussions type. ie. idea, question");
 
+        $in["required"] = [];
+        $in->merge(Schema::parse(["postTypeID?", "postMeta?"]))->addFilter(
+            "",
+            SchemaUtils::onlyOneOf(["type", "postTypeID"])
+        );
+
         if (PostTypeModel::isPostTypesFeatureEnabled()) {
-            $in["required"] = [];
-            $in->merge(Schema::parse(["postTypeID?", "postMeta?"]))
-                ->addFilter("", SchemaUtils::fieldRequirement("postMeta", "postTypeID"))
-                ->addFilter("", $this->postFieldModel->createPostMetaFilter())
-                ->addFilter("", SchemaUtils::onlyOneOf(["type", "postTypeID"]));
+            $in->addFilter("", SchemaUtils::fieldRequirement("postMeta", "postTypeID"))->addFilter(
+                "",
+                $this->postFieldModel->createPostMetaFilter()
+            );
         }
 
         $out = $this->schema($this->discussionSchema(), "out");
@@ -1953,24 +2095,18 @@ class DiscussionsApiController extends AbstractApiController
             throw new ClientException("Record not found.");
         }
 
-        $fromType = $from["postTypeID"] ?? (strtolower($from["Type"] ?? "") ?? "");
-        $toType = $body["postTypeID"] ?? (strtolower($body["type"] ?? "") ?? null);
+        $payload = isset($body["type"])
+            ? PostTypeConversionPayload::fromDiscussionLegacy($from, $body["type"])
+            : PostTypeConversionPayload::fromDiscussion($from, $body["postTypeID"] ?? null, $body["postMeta"] ?? []);
 
-        $isDiscussionType = empty($fromType);
-        $noChange = $fromType === $toType || ($isDiscussionType && $toType === "discussion");
-
-        if ($noChange) {
+        if (!$payload->hasTypeChange()) {
             $result = $this->normalizeOutput($from);
             return $out->validate($result);
         }
         // We need to fetch it now rather than at the initialization to prevent load order problems.
         $discussionTypeConverter = Gdn::getContainer()->get(DiscussionTypeConverter::class);
-        $discussionTypeConverter->convert(
-            $from,
-            $toType,
-            postMeta: $body["postMeta"] ?? null,
-            isCustomPostType: isset($body["postTypeID"])
-        );
+
+        $discussionTypeConverter->convert($payload);
         $record = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
         $result = $this->normalizeOutput($record);
         $result = $out->validate($result);
@@ -2116,7 +2252,7 @@ class DiscussionsApiController extends AbstractApiController
      */
     public function put_tags(int $id, array $body): Data
     {
-        $this->permission("Vanilla.Tagging.Add");
+        $this->permission("session.valid");
         $this->canEditDiscussion($id);
 
         // Validate the body.
@@ -2140,6 +2276,71 @@ class DiscussionsApiController extends AbstractApiController
 
         $result = new Data($validatedTags);
         return $result;
+    }
+
+    /**
+     * Process tags included in a discussion post or patch request. This method saves and returns an array of
+     * tags that in a format that added to the discussion.
+     *
+     * @param $body
+     * @return array
+     * @throws ClientException
+     */
+    public function processDiscussionTags(&$body, ?bool $allowNonUserTypes = false): array
+    {
+        $tagIDs = $body["tagIDs"] ?? [];
+        $newTagNames = $body["newTagNames"] ?? [];
+        $this->tagModel->checkMaxTagsLimit(array_merge($tagIDs, $newTagNames));
+
+        foreach ($newTagNames as $newTagName) {
+            $tag = ["Name" => $this->tagModel->tagSlug($newTagName), "FullName" => $newTagName];
+            $newTagID = $this->tagModel->save($tag);
+            ModelUtils::validationResultToValidationException($this->tagModel);
+            $tagIDs[] = $newTagID;
+        }
+
+        if (!empty($tagIDs)) {
+            $tags = $this->tagModel->getTagsFromReferences(["tagIDs" => $tagIDs]);
+            // Make sure each tag is of an allowed type and throw an error if not.
+            if (!$allowNonUserTypes) {
+                $this->tagModel->checkAllowedDiscussionTagTypes($tags);
+            }
+        }
+
+        unset($body["tagIDs"]);
+        unset($body["newTagNames"]);
+
+        return $tags ?? [];
+    }
+
+    /**
+     * Add array of associated tagIDs to a discussions row.
+     *
+     * @param array $body The body of the request.
+     * @return void
+     */
+    public function joinDiscussionTags(&$body): void
+    {
+        if ($this->tagModel->discussionTaggingEnabled()) {
+            $tags = $this->tagModel->selectDiscussionTags([$body["discussionID"]]);
+            $body["tagIDs"] = array_column($tags, "TagID");
+        }
+    }
+
+    public function saveDiscussionTags(int $id, array $tags, ?bool $throw = false): void
+    {
+        try {
+            $this->tagModel->saveDiscussion($id, array_column($tags, "TagID"));
+        } catch (Exception $e) {
+            if ($throw) {
+                throw new ClientException("Unable to save discussion tags.", 500);
+            } else {
+                $this->logger->error("Unable to save discussion tags.", [
+                    "exception" => $e,
+                    "discussionID" => $id,
+                ]);
+            }
+        }
     }
 
     /**

@@ -13,6 +13,7 @@ import { singleBorder } from "@library/styles/styleHelpersBorders";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { metasVariables } from "@library/metas/Metas.variables";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const dashboardClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -50,9 +51,10 @@ export const dashboardClasses = useThemeCache(() => {
             marginBottom: "0",
             paddingTop: 9,
             paddingBottom: 9,
-            borderTop: "1px solid #D8D8D8",
-            borderBottom: "1px solid #D8D8D8",
-            backgroundColor: "#f6f9fb",
+            borderTop: singleBorder(),
+            borderBottom: singleBorder(),
+            backgroundColor: ColorsUtils.varOverride(ColorVar.InputBackground, "#f6f9fb"),
+            color: ColorsUtils.varOverride(ColorVar.InputForeground),
             textTransform: "uppercase",
             maxHeight: 41,
         },

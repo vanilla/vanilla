@@ -14,6 +14,7 @@ use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\AddonStructure;
+use Vanilla\Dashboard\Models\ActivityService;
 use Vanilla\Utility\DebugUtils;
 
 /**
@@ -867,6 +868,10 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface
             );
             Gdn::permissionModel()->define($permissions);
         }
+
+        // Register any activities that might belong to the addon.
+        $activityService = Gdn::getContainer()->get(ActivityService::class);
+        $activityService->structure();
 
         return !$hasError;
     }

@@ -11,7 +11,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { DiscardDraftModal } from "@vanilla/addon-vanilla/comments/DiscardDraftModal";
 import { useDraftContext } from "@vanilla/addon-vanilla/drafts/DraftContext";
-import { DraftsApi } from "@vanilla/addon-vanilla/drafts/DraftsApi";
+import { IDraft } from "@vanilla/addon-vanilla/drafts/types";
 import { isCommentDraftMeta } from "@vanilla/addon-vanilla/drafts/utils";
 import { t } from "@vanilla/i18n";
 import { logDebug, RecordID } from "@vanilla/utils";
@@ -24,8 +24,8 @@ interface ICreateCommentContext {
     visibleReplyFormRef?: MutableRefObject<HTMLFormElement | null>;
     setVisibleReplyFormRef?: (ref: MutableRefObject<HTMLFormElement | null>) => void;
     // This is to handle the discard draft modal
-    draftToRemove: DraftsApi.PostParams | null;
-    setDraftToRemove: (draft: DraftsApi.PostParams | null) => void;
+    draftToRemove: IDraft | null;
+    setDraftToRemove: (draft: IDraft | null) => void;
 }
 
 export const CreateCommentContext = createContext<ICreateCommentContext>({
@@ -59,7 +59,7 @@ export function CreateCommentProvider(props: {
         ICreateCommentContext["createCommentLocation"] | null
     >(null);
     // This state holds a cache of the last draft before it is removed. Its needed so that either reply from the comment thread or the new comment form determine if it needs to reveal itself because the thread context is within this provider
-    const [draftToRemove, setDraftToRemove] = useState<DraftsApi.PostParams | null>(null);
+    const [draftToRemove, setDraftToRemove] = useState<IDraft | null>(null);
 
     const isTopLevelCommentDraft = draft ? !(draft?.attributes?.draftMeta ?? {}).hasOwnProperty("commentPath") : false;
     const isDraftCommentForOriginalPost = !!(draft && isTopLevelCommentDraft);

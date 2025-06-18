@@ -30,6 +30,12 @@ import isEqual from "lodash-es/isEqual";
 import { isCommentDraftMeta, makeCommentDraft, makeCommentDraftProps } from "@vanilla/addon-vanilla/drafts/utils";
 import { useDebouncedInput } from "@dashboard/hooks";
 import ModalConfirm from "@library/modal/ModalConfirm";
+import Message from "@library/messages/Message";
+import { ErrorIcon } from "@library/icons/common";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import { commentEditorClasses } from "@vanilla/addon-vanilla/comments/CommentEditor.classes";
+import { IFieldError } from "@library/json-schema-forms";
+import { IApiError } from "@library/@types/api/core";
 
 interface IProps {
     threadItem: (IThreadItem & { type: "comment" }) | (IThreadItem & { type: "reply" });
@@ -50,10 +56,13 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
 ) {
     const [editorKey, setEditorKey] = useState(new Date().getTime());
     const [value, setValue] = useState<MyValue | undefined>();
+    const [error, setError] = useState<IError | null>(null);
+    const [fieldError, setFieldError] = useState<IFieldError[] | null>(null);
     const threadParent = useCommentThreadParentContext();
-    const { draftID, draft, updateDraft, removeDraft, enable, disable } = useDraftContext();
+    const { draftID, draft, updateDraft, removeDraft, enableAutosave, disableAutosave } = useDraftContext();
     const { addReplyToThread, removeReplyFromThread, constructReplyFromComment } = useNestedCommentContext();
     const threadItem = isNestedReply(props.threadItem) ? props.threadItem : constructReplyFromComment(props.threadItem);
+    const classes = commentEditorClasses();
 
     const commentMeta =
         draft?.attributes?.draftMeta &&
@@ -102,7 +111,9 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
     const postMutation = useMutation({
         mutationKey: ["postComment", threadParent.recordType, threadParent.recordID, threadItem?.parentCommentID],
         mutationFn: async (richContent: MyValue) => {
-            disable();
+            disableAutosave();
+            setError(null);
+            setFieldError(null);
             const body = safelySerializeJSON(richContent);
             if (body) {
                 const response = await CommentsApi.post({
@@ -112,8 +123,10 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
                     ...(draftID && { draftID }),
                     body,
                     parentCommentID: `${threadItem?.parentCommentID}`,
-                }).catch((error: IError) => {
+                }).catch((error: IApiError) => {
                     logDebug("Error posting comment", error);
+                    setError(error);
+                    setFieldError(error?.errors?.body ?? null);
                     addToast({
                         body: <>{error.message ? error.message : t("Something went wrong posting your comment.")}</>,
                         dismissible: true,
@@ -121,7 +134,7 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
                     });
                     return null;
                 });
-                enable();
+                enableAutosave();
                 if (response) {
                     if (!isComment(response)) {
                         addToast({
@@ -140,7 +153,7 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
                     props.onSuccess?.();
                     return commentWithExpands;
                 }
-                enable();
+                enableAutosave();
                 return null;
             }
         },
@@ -163,9 +176,22 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
             <CommentEditor
                 ref={ref}
                 title={
-                    props.title ?? (
-                        <PageHeadingBox title={<Translate source={"Replying to <0/>"} c0={threadItem.replyingTo} />} />
-                    )
+                    <>
+                        {props.title ?? (
+                            <PageHeadingBox
+                                title={<Translate source={"Replying to <0/>"} c0={threadItem.replyingTo} />}
+                            />
+                        )}
+                        {error && fieldError && (
+                            <Message
+                                className={classes.errorMessages}
+                                type="error"
+                                stringContents={error.message}
+                                icon={<ErrorIcon />}
+                                contents={<ErrorMessages errors={fieldError} />}
+                            />
+                        )}
+                    </>
                 }
                 className={props.className}
                 editorKey={editorKey}

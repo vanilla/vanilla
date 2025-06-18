@@ -7,7 +7,7 @@
 
 namespace Vanilla\Widgets;
 
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 
 /**
  * Abstract class implementing a factory of tab widgets.
@@ -21,7 +21,7 @@ abstract class AbstractTabWidgetTabFactory
      */
     public function getDefaultTabLabelCode(): string
     {
-        /** @var AbstractReactModule $class */
+        /** @var LegacyReactModule $class */
         $class = static::getWidgetClass();
         return $class::getWidgetName();
     }
@@ -29,11 +29,11 @@ abstract class AbstractTabWidgetTabFactory
     /**
      * Create a configured instance of the module.
      *
-     * @return AbstractReactModule
+     * @return LegacyReactModule
      */
-    public function getTabModule(): AbstractReactModule
+    public function getTabModule(): LegacyReactModule
     {
-        /** @var AbstractReactModule $module */
+        /** @var LegacyReactModule $module */
         $module = \Gdn::getContainer()->get(static::getWidgetClass());
         return $module;
     }
@@ -53,7 +53,7 @@ abstract class AbstractTabWidgetTabFactory
     /**
      * Get the name of the widget that is to be created by the factory.
      *
-     * @psalm-return class-string<AbstractReactModule>
+     * @psalm-return class-string<LegacyReactModule>
      * @return string
      */
     abstract public function getWidgetClass(): string;

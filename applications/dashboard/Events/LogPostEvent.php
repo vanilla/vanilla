@@ -84,7 +84,7 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPayload(): ?array
     {
@@ -92,7 +92,7 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getAction(): string
     {
@@ -100,7 +100,7 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -146,7 +146,7 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {

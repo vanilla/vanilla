@@ -49,7 +49,7 @@ class RequestsControllerTest extends SiteTestCase
     private $config;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @throws \Garden\Container\ContainerException
      * @throws \Exception
      */

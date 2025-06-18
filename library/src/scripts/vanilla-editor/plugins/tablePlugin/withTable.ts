@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+import { getMeta } from "@library/utility/appUtils";
+import { withNormalizeRichTable } from "@library/vanilla-editor/plugins/tablePlugin/withNormalizeRichTable";
 import { withNormalizeTable } from "@library/vanilla-editor/plugins/tablePlugin/withNormalizeTable";
 import { PlateEditor, Value, WithPlatePlugin } from "@udecode/plate-common";
 import {
@@ -19,7 +21,9 @@ export const withTable = <V extends Value = Value, E extends PlateEditor<V> = Pl
     editor: E,
     plugin: WithPlatePlugin<TablePlugin<V>, V, E>,
 ) => {
-    editor = withNormalizeTable<V, E>(editor);
+    const isRichTableEnabled = getMeta("featureFlags.RichTable.Enabled", false);
+
+    editor = isRichTableEnabled ? withNormalizeRichTable<V, E>(editor) : withNormalizeTable<V, E>(editor);
     editor = withDeleteTable<V, E>(editor);
     editor = withGetFragmentTable<V, E>(editor);
     editor = withInsertFragmentTable<V, E>(editor, plugin);

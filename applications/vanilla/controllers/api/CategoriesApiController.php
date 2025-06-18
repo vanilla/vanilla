@@ -99,65 +99,63 @@ class CategoriesApiController extends AbstractApiController
      */
     public function categoryPostSchema($type = "", array $extra = [])
     {
-        if ($this->categoryPostSchema === null) {
-            $fields = [
-                "name",
-                "parentCategoryID?",
-                "urlcode",
-                "displayAs?",
-                "customPermissions?",
-                "description?",
-                "featured?",
-                "iconUrl?",
-                "bannerUrl?",
-                "pointsCategoryID?",
-                "allowedDiscussionTypes:a?",
-            ];
-            $this->categoryPostSchema = $this->schema(
-                Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
-                "CategoryPost"
-            );
-            $this->categoryPostSchema->addValidator("allowedDiscussionTypes", function ($data, ValidationField $field) {
-                $allowedDiscussionTypes = array_keys(DiscussionModel::discussionTypes());
-                $result = array_diff($data, $allowedDiscussionTypes);
+        $fields = [
+            "name",
+            "parentCategoryID?",
+            "urlcode",
+            "displayAs?",
+            "customPermissions?",
+            "description?",
+            "featured?",
+            "iconUrl?",
+            "bannerUrl?",
+            "pointsCategoryID?",
+            "allowedDiscussionTypes:a?",
+        ];
+        $this->categoryPostSchema = $this->schema(
+            Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
+            "CategoryPost"
+        );
+        $this->categoryPostSchema->addValidator("allowedDiscussionTypes", function ($data, ValidationField $field) {
+            $allowedDiscussionTypes = array_keys(DiscussionModel::discussionTypes());
+            $result = array_diff($data, $allowedDiscussionTypes);
 
-                if (!empty($result) || empty($data)) {
-                    $validTypes = implode(", ", $allowedDiscussionTypes);
-                    $field->addError("Validation Failed", [
-                        "messageCode" => "allowedDiscussionTypes can only contain the following values: $validTypes",
-                        "code" => 403,
-                    ]);
-                }
-            });
-            if (PostTypeModel::isPostTypesFeatureEnabled()) {
-                $validPostTypes = $this->postTypeModel->getAvailablePostTypes();
-                $this->categoryPostSchema
-                    ->merge(
-                        Schema::parse([
-                            "hasRestrictedPostTypes:b?",
-                            "allowedPostTypeIDs:a?" => [
-                                "items" => [
-                                    "type" => "string",
-                                    "enum" => array_column($validPostTypes, "postTypeID"),
-                                ],
-                            ],
-                        ])
-                    )
-                    ->addFilter("", function ($data, ValidationField $field) {
-                        if (!ArrayUtils::isArray($data)) {
-                            return $data;
-                        }
-
-                        if (isset($data["hasRestrictedPostTypes"]) && !$data["hasRestrictedPostTypes"]) {
-                            // Make sure we clear associated post types.
-                            $data["allowedPostTypeIDs"] = [];
-                        }
-                        unset($data["hasRestrictedPostTypes"]);
-                        return $data;
-                    })
-                    ->addFilter("allowedPostTypeIDs", fn($allowedPostTypeIDs) => array_unique($allowedPostTypeIDs))
-                    ->addFilter("", SchemaUtils::onlyOneOf(["allowedDiscussionTypes", "allowedPostTypeIDs"]));
+            if (!empty($result) || empty($data)) {
+                $validTypes = implode(", ", $allowedDiscussionTypes);
+                $field->addError("Validation Failed", [
+                    "messageCode" => "allowedDiscussionTypes can only contain the following values: $validTypes",
+                    "code" => 403,
+                ]);
             }
+        });
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $validPostTypes = $this->postTypeModel->getAvailablePostTypes();
+            $this->categoryPostSchema
+                ->merge(
+                    Schema::parse([
+                        "hasRestrictedPostTypes:b?",
+                        "allowedPostTypeIDs:a?" => [
+                            "items" => [
+                                "type" => "string",
+                                "enum" => array_column($validPostTypes, "postTypeID"),
+                            ],
+                        ],
+                    ])
+                )
+                ->addFilter("", function ($data, ValidationField $field) {
+                    if (!ArrayUtils::isArray($data)) {
+                        return $data;
+                    }
+
+                    if (isset($data["hasRestrictedPostTypes"]) && !$data["hasRestrictedPostTypes"]) {
+                        // Make sure we clear associated post types.
+                        $data["allowedPostTypeIDs"] = [];
+                    }
+                    unset($data["hasRestrictedPostTypes"]);
+                    return $data;
+                })
+                ->addFilter("allowedPostTypeIDs", fn($allowedPostTypeIDs) => array_unique($allowedPostTypeIDs))
+                ->addFilter("", SchemaUtils::onlyOneOf(["allowedDiscussionTypes", "allowedPostTypeIDs"]));
         }
         return $this->schema($this->categoryPostSchema, $type);
     }
@@ -397,6 +395,7 @@ class CategoriesApiController extends AbstractApiController
                 "minimum" => 1,
             ],
             "parentCategoryID:i?",
+            "siteSectionID:s?" => "Filter categories by site-section-id (subcommunity)",
             "limit:i?" => [
                 "description" => "Desired number of items per page.",
                 "default" => $this->categoryModel->getDefaultLimit(),
@@ -430,9 +429,11 @@ class CategoriesApiController extends AbstractApiController
             $where["DisplayAs"] = $query["displayAs"];
         }
 
+        $parentCategory = $this->getIndexParentCategoryID($query);
+
         $results = $this->categoryModel->searchByName(
             $query["query"],
-            $query["parentCategoryID"] ?? null,
+            $parentCategory["CategoryID"] ?? null,
             $where,
             $this->isExpandField("parent", $expand),
             $limit,
@@ -513,6 +514,11 @@ class CategoriesApiController extends AbstractApiController
                      The query looks like:
                      siteSectionID=$SubcommunityID:{id} ie. 1
                      siteSectionID=$SubcommunityID:{folder} ie. ',
+                ],
+                "includeParentCategory:b?" => [
+                    "description" =>
+                        "Whether to include the parent category when used with parentCategoryID, parentCategoryCode, or siteSectionID.",
+                    "default" => false,
                 ],
                 "layoutViewType:s?",
                 "postTypeID:s?",
@@ -693,9 +699,12 @@ class CategoriesApiController extends AbstractApiController
         // Parent category filtering.
         if (!empty($parentCategory)) {
             $descendantIDs = $this->categoryModel->getCategoriesDescendantIDs([$parentCategory["CategoryID"]]);
-            $descendantIDs = array_filter($descendantIDs, function (int $id) use ($parentCategory) {
-                return $id !== $parentCategory["CategoryID"];
-            });
+            if (!$query["includeParentCategory"]) {
+                $descendantIDs = array_filter($descendantIDs, function (int $id) use ($parentCategory) {
+                    return $id !== $parentCategory["CategoryID"];
+                });
+            }
+
             $categoryIDs = $categoryIDs->withFilteredValue("=", $descendantIDs);
         }
 

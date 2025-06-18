@@ -10,13 +10,15 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { Mixins } from "@library/styles/Mixins";
 import { ToolTip } from "@library/toolTip/ToolTip";
+import type { VanillaSanitizedHtml } from "@vanilla/dom-utils";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { useState } from "react";
 
 interface IProps {
-    comment: string;
-    hideText: string;
+    commentBody: VanillaSanitizedHtml;
+    hideText: VanillaSanitizedHtml;
+    comment: VanillaSanitizedHtml;
 }
 
 const trollCommentClasses = () => {
@@ -50,10 +52,12 @@ const trollCommentClasses = () => {
 export function TrollComment(props: IProps) {
     const classes = trollCommentClasses();
     const [isVisible, setIsVisible] = useState(false);
+    // Use commentBody if provided, otherwise fallback to comment for backward compatibility
+    const contentToShow = props.commentBody || props.comment;
 
     return (
         <div className={classes.root}>
-            <UserContent content={props.hideText} />
+            <UserContent vanillaSanitizedHtml={props.hideText} />
             <div className={classes.layout}>
                 <span>
                     <ToolTip label={isVisible ? t("Hide this content") : t("Show this content")}>
@@ -63,7 +67,7 @@ export function TrollComment(props: IProps) {
                     </ToolTip>
                 </span>
                 <div className={classes.blurContainer} data-visible={isVisible}>
-                    <UserContent content={props.comment} />
+                    <UserContent vanillaSanitizedHtml={contentToShow} />
                 </div>
             </div>
         </div>

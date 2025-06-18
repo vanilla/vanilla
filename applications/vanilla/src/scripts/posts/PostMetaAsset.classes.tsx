@@ -36,16 +36,13 @@ export const PostMetaAssetClasses = useThemeCache((args?: PostMetaClassesArgs) =
         "@container postMeta (width > 290px)": {
             width: columnWidth,
         },
-        "&:hover": {
-            backgroundColor: ColorsUtils.colorOut(globalVars.elementaryColors.primary.fade(0.075)),
-            borderRadius: globalVars.border.radius,
-        },
     });
     const fieldName = css({
-        display: "inline",
+        display: "inline-flex",
         ...Mixins.font({ ...globalVars.fontSizeAndWeightVars("small") }),
         lineHeight: 1.5,
         cursor: "default",
+        alignItems: "center",
     });
     const fieldValue = css({});
     const metaFieldName = css({});

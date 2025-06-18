@@ -21,7 +21,7 @@ class StubbedContentTest extends AbstractAPIv2Test
     public static $addons = ["stubcontent"];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

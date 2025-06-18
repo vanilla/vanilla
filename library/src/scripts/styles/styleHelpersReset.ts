@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { Property } from "csstype";
 import { important } from "csx";
 

@@ -13,7 +13,7 @@ namespace Vanilla\Dashboard\Activity;
 class EmailDigestActivityGroup extends ActivityGroup
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityGroupID(): string
     {
@@ -21,7 +21,7 @@ class EmailDigestActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceLabel(): string
     {
@@ -29,7 +29,7 @@ class EmailDigestActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceDescription(): ?string
     {
@@ -47,7 +47,7 @@ class EmailDigestActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getParentGroupClass(): ?string
     {

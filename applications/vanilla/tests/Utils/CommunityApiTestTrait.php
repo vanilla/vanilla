@@ -50,6 +50,8 @@ trait CommunityApiTestTrait
     /** @var int|null */
     protected $lastInsertedCollectionID = null;
 
+    protected $lastResponse = null;
+
     /** @var int|null */
     protected $lastReportID = null;
 
@@ -1005,5 +1007,23 @@ trait CommunityApiTestTrait
         } catch (NoResultsException $ex) {
             return false;
         }
+    }
+
+    /**
+     * Add a tag to a discussion.
+     *
+     * @param int|null $discussionID
+     * @param int|null $tagID
+     * @return void
+     */
+    public function tagDiscussion(?int $discussionID = null, ?int $tagID = null): void
+    {
+        $discussionID = $discussionID ?? $this->lastInsertedDiscussionID;
+        $tagID = $tagID ?? $this->lastInsertedTagID;
+        $this->api()
+            ->post("/discussions/{$discussionID}/tags", [
+                "tagIDs" => [$tagID],
+            ])
+            ->assertSuccess();
     }
 }

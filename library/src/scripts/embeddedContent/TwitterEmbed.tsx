@@ -72,6 +72,16 @@ export function TwitterEmbed(props: IProps): JSX.Element {
 
 TwitterEmbed.async = true;
 
+declare global {
+    interface Window {
+        twttr: {
+            widgets: {
+                createTweet: (statusID: string, element: HTMLElement, options: any) => Promise<void>;
+            };
+        };
+    }
+}
+
 /**
  * Render a single twitter embed.
  */

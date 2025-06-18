@@ -50,6 +50,11 @@ class TagModel extends Gdn_Model
         $this->modelCache = new ModelCache("tags", Gdn::cache());
     }
 
+    public function discussionTaggingEnabled(): bool
+    {
+        return Gdn::config("Tagging.Discussions.Enabled", false);
+    }
+
     /**
      * @return void
      */
@@ -430,14 +435,34 @@ class TagModel extends Gdn_Model
                     }
                     setValue("Tags", $row, $tags);
                 }
+                setValue("TagIDs", $row, array_column($tags, "TagID"));
             } else {
                 if ($this->StringTags) {
                     setValue("Tags", $row, "");
                 } else {
                     setValue("Tags", $row, []);
                 }
+                setValue("TagIDs", $row, []);
             }
         }
+    }
+
+    /**
+     * Select all tags for a set of discussions.
+     *
+     * @param array $ids
+     * @return array
+     */
+    public function selectDiscussionTags(array $ids): array
+    {
+        return $this->SQL
+            ->select("td.DiscussionID, t.TagID, t.Name, t.FullName, t.Type")
+            ->from("TagDiscussion td")
+            ->join("Tag t", "t.TagID = td.TagID")
+            ->where("td.DiscussionID", $ids)
+            ->where("t.Type", ["User", ""])
+            ->get()
+            ->resultArray();
     }
 
     /**
@@ -1120,10 +1145,13 @@ class TagModel extends Gdn_Model
         $populate = function (array &$rows) use ($tagSchema) {
             $this->joinTags($rows);
             foreach ($rows as &$row) {
-                $row["Tags"] = $this->normalizeOutput($row["Tags"]);
-                $row = ApiUtils::convertOutputKeys($row, ["postMeta"]);
-                unset($row["Tags"]);
+                $row["tags"] = $this->normalizeOutput($row["Tags"]) ?? [];
                 $this->validateTagFragmentsOutput($row["tags"], $tagSchema);
+                unset($row["Tags"]);
+                if ($this->discussionTaggingEnabled()) {
+                    $row["tagIDs"] = $row["TagIDs"] ?? [];
+                }
+                unset($row["TagIDs"]);
             }
         };
 
@@ -1434,7 +1462,7 @@ class TagModel extends Gdn_Model
      * @param array $tags
      * @throws ClientException Throws an error if there are more tags than are allowed.
      */
-    private function checkMaxTagsLimit($tags): void
+    public function checkMaxTagsLimit($tags): void
     {
         $maxTags = Gdn::config("Vanilla.Tagging.Max", 5);
         if (count($tags) > $maxTags) {

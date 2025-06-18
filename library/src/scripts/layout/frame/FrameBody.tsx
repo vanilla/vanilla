@@ -13,7 +13,6 @@ export interface IFrameBodyProps {
     selfPadded?: boolean;
     hasVerticalPadding?: boolean;
     children: React.ReactNode;
-    scrollable?: boolean; // DON'T use at the same time as the Modal scrollable.
     style?: React.CSSProperties;
 }
 
@@ -21,21 +20,20 @@ export interface IFrameBodyProps {
  * This section goes between the header/footer.
  * Note the each child will be split into a separate "FramePanel". This will allow animations/transitions in the future.
  */
-export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
-    public render() {
-        const classes = frameBodyClasses();
-        return (
-            <div
-                className={classNames("frameBody", this.props.className, classes.root, {
-                    isSelfPadded: this.props.selfPadded,
-                    hasVerticalPadding: this.props.hasVerticalPadding,
-                })}
-                style={this.props.style}
-            >
-                {this.props.children}
-            </div>
-        );
-    }
+export default function FrameBody(props: IFrameBodyProps) {
+    const classes = frameBodyClasses.useAsHook();
+
+    return (
+        <div
+            className={classNames("frameBody", props.className, classes.root, {
+                isSelfPadded: props.selfPadded,
+                hasVerticalPadding: props.hasVerticalPadding,
+            })}
+            style={props.style}
+        >
+            {props.children}
+        </div>
+    );
 }
 
 interface ILayoutContainer extends React.HTMLAttributes<HTMLDivElement> {
@@ -45,6 +43,6 @@ interface ILayoutContainer extends React.HTMLAttributes<HTMLDivElement> {
  * Container to apply paddings inside of a frame body.
  */
 export function FrameBodyContainer(props: ILayoutContainer) {
-    const classes = frameBodyClasses();
+    const classes = frameBodyClasses.useAsHook();
     return <div {...props} className={classNames(props.className, classes.framePaddings)} />;
 }

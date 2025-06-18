@@ -4,7 +4,10 @@
  * @license Proprietary
  */
 
-import { ILegacyCategoryPreferences, IFollowedCategory } from "@dashboard/userPreferences/DefaultCategoriesModal";
+import {
+    ILegacyCategoryPreferences,
+    IFollowedCategory,
+} from "@dashboard/userPreferences/DefaultFollowedCategories/DefaultCategoriesModal";
 import {
     CategoryDisplayAs,
     CategoryPostNotificationType,

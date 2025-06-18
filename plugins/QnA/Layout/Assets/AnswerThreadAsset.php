@@ -98,7 +98,7 @@ TWIG
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): ?string
     {
@@ -116,7 +116,7 @@ TWIG
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getHeaderSchema(): Schema
     {

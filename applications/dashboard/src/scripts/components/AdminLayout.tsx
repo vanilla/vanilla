@@ -9,6 +9,8 @@ import AdminTitleBar from "@dashboard/components/AdminTitleBar";
 import { userContentClasses } from "@library/content/UserContent.styles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
+import { AdminAssistant } from "@library/features/adminAssistant/AdminAssistant";
+import Permission from "@library/features/users/Permission";
 
 type IProps = {
     /** The content which should be rendered in the hamburger menu on mobile */
@@ -150,6 +152,9 @@ export default function AdminLayout(props: IProps) {
                     {props.children}
                 </Container>
             </div>
+            <Permission permission={"site.manage"}>
+                <AdminAssistant />
+            </Permission>
         </ErrorBoundary>
     );
 }

@@ -14,7 +14,7 @@ class Anchor extends AbstractNode
     const TYPE_KEY = "a";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -27,7 +27,7 @@ class Anchor extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -49,7 +49,7 @@ class Anchor extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

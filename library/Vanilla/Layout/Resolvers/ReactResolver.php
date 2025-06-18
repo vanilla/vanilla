@@ -12,16 +12,23 @@ use Garden\Hydrate\DataHydrator;
 use Garden\Hydrate\Middleware\AbstractMiddleware;
 use Garden\Hydrate\Resolvers\AbstractDataResolver;
 use Garden\Schema\Schema;
+use Vanilla\Dashboard\Models\FragmentModel;
+use Vanilla\Forms\ApiFormChoices;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
+use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Layout\LayoutAssetAwareInterface;
 use Vanilla\Layout\LayoutAssetAwareTrait;
 use Vanilla\Layout\Section\AbstractLayoutSection;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\SchemaUtils;
 use Vanilla\Utility\Timers;
 use Vanilla\Web\PageHeadAwareInterface;
 use Vanilla\Web\PageHeadAwareTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
+use Vanilla\Widgets\React\FragmentMeta;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
@@ -46,7 +53,7 @@ class ReactResolver extends AbstractDataResolver implements
     private $reactWidgetClass;
 
     /** @var Container */
-    private $container;
+    protected $container;
 
     /**
      * Constructor.
@@ -69,6 +76,14 @@ class ReactResolver extends AbstractDataResolver implements
     }
 
     /**
+     * @return ReactWidgetInterface
+     */
+    protected function createWidgetInstance(): ReactWidgetInterface
+    {
+        return $this->container->get($this->reactWidgetClass);
+    }
+
+    /**
      * @inheritdoc
      */
     protected function resolveInternal(array $data, array $params)
@@ -81,8 +96,7 @@ class ReactResolver extends AbstractDataResolver implements
             if (isset($data['$reactTestID'])) {
                 unset($data['$reactTestID']);
             }
-            /** @var ReactWidgetInterface $module */
-            $module = $this->container->get($this->reactWidgetClass);
+            $module = $this->createWidgetInstance();
 
             $this->addWidgetName($module->getComponentName());
 
@@ -104,14 +118,14 @@ class ReactResolver extends AbstractDataResolver implements
             // Apply properties
             if ($module instanceof CombinedPropsWidgetInterface) {
                 $module->setProps($data);
-            } else {
-                foreach ($data as $name => $value) {
-                    // Check for a setter method
-                    if (method_exists($module, $method = "set" . ucfirst($name))) {
-                        $module->$method($value);
-                    } else {
-                        $module->$name = $value;
-                    }
+            }
+
+            foreach ($data as $name => $value) {
+                // Check for a setter method
+                if (method_exists($module, $method = "set" . ucfirst($name))) {
+                    $module->$method($value);
+                } else {
+                    $module->$name = $value;
                 }
             }
 
@@ -170,6 +184,28 @@ class ReactResolver extends AbstractDataResolver implements
         /** @var ReactWidgetInterface $class */
         $class = $this->reactWidgetClass;
         $schema = $class::getWidgetSchema();
+
+        $availableFragmentTypes = $this->container->get(FragmentModel::class)->getUsedFragmentTypes();
+
+        $implProperties = [];
+        foreach ($class::getFragmentClasses() as $fragmentClass) {
+            $fragmentType = $fragmentClass::getFragmentType();
+            if (!in_array($fragmentType, $availableFragmentTypes)) {
+                continue;
+            }
+            $implProperties[$fragmentType] = $this->fragmentTypeSchema($fragmentClass);
+        }
+
+        if (!empty($implProperties)) {
+            $schema = Schema::parse([
+                "\$fragmentImpls?" => new Schema([
+                    "type" => "object",
+                    "properties" => $implProperties,
+                    "x-control" => SchemaForm::section(new FormOptions("Customization")),
+                ]),
+            ])->merge($schema);
+        }
+
         if ($schema->getField("description", null) === null) {
             $schema->setField("description", $class::getWidgetName());
         }
@@ -177,7 +213,43 @@ class ReactResolver extends AbstractDataResolver implements
         $schema->setField("properties.\$reactTestID", [
             "type" => "string",
         ]);
+
         return $schema;
+    }
+
+    /**
+     * @param class-string<FragmentMeta> $fragmentTypeClass
+     * @return Schema
+     */
+    private function fragmentTypeSchema(string $fragmentTypeClass): Schema
+    {
+        $fragmentType = $fragmentTypeClass::getFragmentType();
+        $label = $fragmentTypeClass::getName();
+        $inStyleguide = $fragmentTypeClass::isAvailableInStyleguide();
+
+        $staticOptions = [];
+        if ($inStyleguide) {
+            $staticOptions[] = [
+                "label" => t("System"),
+                "value" => "system",
+            ];
+        }
+
+        return Schema::parse([
+            "fragmentUUID?" => new Schema([
+                "type" => "string",
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions(label: $label, placeholder: $inStyleguide ? t("Style Guide Default") : t("System")),
+                    choices: new ApiFormChoices(
+                        indexUrl: "/api/v2/fragments?fragmentType={$fragmentType}&status=active",
+                        singleUrl: "/api/v2/fragments/%s",
+                        valueKey: "fragmentUUID",
+                        labelKey: "name",
+                        staticOptions: $staticOptions
+                    )
+                ),
+            ]),
+        ]);
     }
 
     /**
@@ -208,5 +280,73 @@ class ReactResolver extends AbstractDataResolver implements
     public function getHydrateGroups(): array
     {
         return [$this->getHydrateGroup()];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getWidgetName(): string
+    {
+        /** @var ReactWidgetInterface $widgetClass */
+        $widgetClass = $this->getReactWidgetClass();
+        return $widgetClass::getWidgetName();
+    }
+
+    /**
+     * Get a catalog item for the resolver.
+     *
+     * @param DataHydrator $dataHydrator
+     *
+     * @return array
+     */
+    public function asCatalogItem(DataHydrator $dataHydrator): array
+    {
+        /** @var ReactWidgetInterface $widgetClass */
+        $widgetClass = $this->getReactWidgetClass();
+
+        $componentName = $widgetClass::getComponentName();
+        $widgetIconUrl = asset($widgetClass::getWidgetIconPath(), true);
+        $widgetName = $this->getWidgetName();
+        $schema = $this->getSchema();
+
+        SchemaUtils::fixObjectDefaultSerialization($schema);
+
+        $fragmentClasses = $widgetClass::getFragmentClasses();
+        $fragmentTypes = [];
+        /** @var class-string<FragmentMeta> $fragmentClass */
+        foreach ($fragmentClasses as $fragmentClass) {
+            $fragmentTypes[] = $fragmentClass::getFragmentType();
+        }
+
+        $result = [
+            '$reactComponent' => $componentName,
+            "schema" => $schema,
+            "iconUrl" => $widgetIconUrl,
+            "name" => $widgetName,
+            "fragmentTypes" => $fragmentTypes,
+            "widgetGroup" => $widgetClass::getWidgetGroup(),
+        ];
+
+        if (is_a($widgetClass, AbstractLayoutAsset::class, true)) {
+            $result += [
+                "isRequired" => $widgetClass::isRequired(),
+            ];
+        } elseif (is_a($widgetClass, AbstractLayoutSection::class, true)) {
+            $allowedWidgetIDs = [];
+            foreach ($dataHydrator->getResolvers() as $resolver) {
+                if (
+                    $resolver instanceof ReactResolver &&
+                    in_array($widgetClass::getWidgetID(), $resolver->getAllowedSectionIDs())
+                ) {
+                    $allowedWidgetIDs[] = $resolver->getType();
+                }
+            }
+
+            $result += [
+                "allowedWidgetIDs" => $allowedWidgetIDs,
+            ];
+        }
+
+        return $result;
     }
 }

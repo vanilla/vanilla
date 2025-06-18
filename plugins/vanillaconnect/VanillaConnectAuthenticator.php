@@ -298,7 +298,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function sso(RequestInterface $request): SSOData
     {

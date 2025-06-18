@@ -25,7 +25,7 @@ describe("Stacking Context", () => {
                 <DisplayCurrentZindex testid={"zindex"} />
             </StackingContextProvider>,
         );
-        expect(screen.getByTestId("zindex")).toHaveTextContent("1051");
+        expect(screen.getByTestId("zindex")).toHaveTextContent("1052");
     });
 
     it("Nested providers increment the zIndex", () => {
@@ -38,6 +38,6 @@ describe("Stacking Context", () => {
                 </DisplayCurrentZindex>
             </StackingContextProvider>,
         );
-        expect(screen.getByTestId("zindex-2")).toHaveTextContent("1052");
+        expect(screen.getByTestId("zindex-2")).toHaveTextContent("1053");
     });
 });

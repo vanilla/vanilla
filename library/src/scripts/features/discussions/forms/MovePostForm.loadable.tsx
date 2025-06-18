@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { usePostTypeQuery } from "@dashboard/postTypes/postType.hooks";
 import { PostType } from "@dashboard/postTypes/postType.types";
 import { css } from "@emotion/css";
@@ -33,14 +32,11 @@ import { useMutation } from "@tanstack/react-query";
 import { DiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
 import Checkbox from "@library/forms/Checkbox";
 import { useToast } from "@library/features/toaster/ToastContext";
-
-interface IProps {
-    onCancel: () => void;
-    onSuccess?: () => Promise<void>;
-    discussion: IDiscussion;
-}
+import { IMovePostFormLoadableProps } from "@library/features/discussions/forms/MovePostForm.types";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 
 const movePostFormClasses = () => {
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const layout = css({
         // Fighting with a _very_ general margin rule in the message component
         marginTop: `${globalVariables().fonts.size.medium.toString()}px!important`,
@@ -58,10 +54,11 @@ const movePostFormClasses = () => {
     const visibilityIcon = css({
         marginInlineStart: globalVariables().fonts.size.large * -1,
     });
+
     return { layout, infoBlock, visibilityIcon };
 };
 
-export default function MovePostFormLoadable(props: IProps) {
+export default function MovePostFormLoadable(props: IMovePostFormLoadableProps) {
     const { onSuccess, onCancel, discussion } = props;
     const toast = useToast();
 
@@ -275,13 +272,7 @@ export default function MovePostFormLoadable(props: IProps) {
                         >
                             {t("Cancel")}
                         </Button>
-                        <Button
-                            submit
-                            // disabled={values.category?.value === undefined || !dirty || isSubmitting}
-                            buttonType={ButtonTypes.TEXT_PRIMARY}
-                            className={classFrameFooter.actionButton}
-                        >
-                            {/* {isSubmitting ? <ButtonLoader /> : t("Submit")} */}
+                        <Button submit buttonType={ButtonTypes.TEXT_PRIMARY} className={classFrameFooter.actionButton}>
                             {t("Move")}
                         </Button>
                     </FrameFooter>

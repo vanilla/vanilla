@@ -16,25 +16,14 @@ use Garden\Schema\Schema;
 class FieldMatchConditional implements FormFieldMatchInterface
 {
     /**
-     * @var string $field
-     */
-    private $field;
-
-    /**
-     * @var Schema $schema
-     */
-    private $schema;
-
-    /**
      * FieldMatchConditional constructor.
      *
      * @param string $field
      * @param Schema $schema
+     * @param bool $invert
      */
-    public function __construct(string $field, Schema $schema)
+    public function __construct(protected string $field, protected Schema $schema, protected bool $invert = false)
     {
-        $this->field = $field;
-        $this->schema = $schema;
     }
 
     /**
@@ -44,8 +33,13 @@ class FieldMatchConditional implements FormFieldMatchInterface
      */
     public function getCondition(): array
     {
-        return [
-            "field" => $this->field,
-        ] + $this->schema->getSchemaArray();
+        $res =
+            [
+                "field" => $this->field,
+            ] + $this->schema->getSchemaArray();
+        if ($this->invert) {
+            $res["invert"] = true;
+        }
+        return $res;
     }
 }

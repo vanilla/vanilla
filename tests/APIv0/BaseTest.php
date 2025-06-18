@@ -46,7 +46,7 @@ abstract class BaseTest extends SharedBootstrapTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function tearDownAfterClass(): void
     {

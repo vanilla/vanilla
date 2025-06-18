@@ -15,7 +15,7 @@ import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@library/utility/appUtils";
-import { tagDiscussionFormClasses } from "@library/features/discussions/forms/TagDiscussionForm.loadable.styles";
+import { tagDiscussionFormClasses } from "@library/features/discussions/forms/TagDiscussionForm.styles";
 import { useState } from "react";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { useMutation } from "@tanstack/react-query";
@@ -98,7 +98,7 @@ export default function TagDiscussionFormLoadable(props: IProps) {
                     <FrameBody>
                         <div className={classesFrameBody.contents}>
                             <TagPostUI
-                                initialTagIDs={initialValues}
+                                initialTags={initialValues ?? []}
                                 onSelectedExistingTag={setTagsToAssign}
                                 onSelectedNewTag={setTagsToCreate}
                                 fieldErrors={tagDiscussionMutation?.error}

@@ -6,12 +6,12 @@
  */
 
 use Garden\Schema\Schema;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 
 /**
  * Class ReactionsModule
  */
-class ReactionsModule extends AbstractReactModule
+class ReactionsModule extends LegacyReactModule
 {
     /** @var object|null User */
     public $user = null;
@@ -33,7 +33,7 @@ class ReactionsModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function assetTarget()
     {
@@ -82,7 +82,7 @@ class ReactionsModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -90,7 +90,7 @@ class ReactionsModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -98,7 +98,7 @@ class ReactionsModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {

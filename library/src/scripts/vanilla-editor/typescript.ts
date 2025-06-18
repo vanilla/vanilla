@@ -10,37 +10,39 @@ import type { IRichEmbedElement } from "@library/vanilla-editor/plugins/richEmbe
 import type { AutoformatRule } from "@udecode/plate-autoformat";
 import type { ELEMENT_BLOCKQUOTE } from "@udecode/plate-block-quote";
 import type { ELEMENT_CODE_BLOCK, ELEMENT_CODE_LINE } from "@udecode/plate-code-block";
-import type {
-    DOMHandler,
-    Decorate,
-    DecorateEntry,
-    EDescendant,
-    EElement,
-    EElementEntry,
-    EElementOrText,
-    EMarks,
-    ENode,
-    ENodeEntry,
-    EText,
-    ETextEntry,
-    InjectComponent,
-    InjectProps,
-    KeyboardHandler,
-    NoInfer,
-    OnChange,
-    OverrideByKey,
-    PlateEditor,
-    PlatePlugin,
-    PlatePluginInsertData,
-    PlatePluginProps,
-    PlateProps,
-    PluginOptions,
-    SerializeHtml,
-    TElement,
-    TNodeEntry,
-    TReactEditor,
-    TText,
-    WithOverride,
+import {
+    usePlateEditorState,
+    type DOMHandler,
+    type Decorate,
+    type DecorateEntry,
+    type EDescendant,
+    type EElement,
+    type EElementEntry,
+    type EElementOrText,
+    type EMarks,
+    type ENode,
+    type ENodeEntry,
+    type EText,
+    type ETextEntry,
+    type InjectComponent,
+    type InjectProps,
+    type KeyboardHandler,
+    type NoInfer,
+    type OnChange,
+    type OverrideByKey,
+    type PlateEditor,
+    type PlateId,
+    type PlatePlugin,
+    type PlatePluginInsertData,
+    type PlatePluginProps,
+    type PlateProps,
+    type PluginOptions,
+    type SerializeHtml,
+    type TElement,
+    type TNodeEntry,
+    type TReactEditor,
+    type TText,
+    type WithOverride,
 } from "@udecode/plate-common";
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from "@udecode/plate-heading";
 import { ELEMENT_HR } from "@udecode/plate-horizontal-rule";
@@ -256,6 +258,8 @@ export type MySerializeHtml = SerializeHtml<MyValue>;
 export type MyWithOverride<P = PluginOptions> = WithOverride<P, MyValue, MyEditor>;
 
 export type MyAutoformatRule = AutoformatRule<MyValue, MyEditor>;
+
+export const useMyPlateEditorState = (id?: PlateId) => usePlateEditorState<MyValue, MyEditor>(id);
 
 export interface IVanillaEditorRef {
     focusEditor(): void;

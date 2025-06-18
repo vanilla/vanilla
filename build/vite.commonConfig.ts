@@ -174,6 +174,14 @@ export function makeViteCommonConfig(): UserConfig {
             preserveSymlinks: true,
             extensions: [".mjs", ".js", ".jsx", ".ts", ".tsx", ".json", ".scss"],
             alias: [
+                {
+                    find: "@library/headers/titleBarStyles",
+                    replacement: path.resolve(VANILLA_ROOT, "library/src/scripts/headers/TitleBar.classes.ts"),
+                },
+                {
+                    find: "@library/headers/TitleBar.variables",
+                    replacement: path.resolve(VANILLA_ROOT, "library/src/scripts/headers/TitleBar.variables.ts"),
+                },
                 ...entryModel.aliases,
                 {
                     find: "@dashboard/compatibilityStyles/Leaderboard.variables",

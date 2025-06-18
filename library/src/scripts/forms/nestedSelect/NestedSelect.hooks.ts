@@ -104,13 +104,13 @@ export function useNestedOptions(params: {
         if (value) {
             if (Array.isArray(value)) {
                 for (const val of value) {
-                    const option = mergedOptions.find((opt) => opt.value === val);
+                    const option = mergedOptions.find((opt) => `${opt.value}` === `${val}`);
                     if (option) {
                         selectedOptions.push(option);
                     }
                 }
             } else {
-                const option = mergedOptions.find((opt) => opt.value === value);
+                const option = mergedOptions.find((opt) => `${opt.value}` === `${value}`);
                 if (option) {
                     selectedOptions.push(option);
                 }

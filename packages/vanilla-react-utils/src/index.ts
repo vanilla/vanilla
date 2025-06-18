@@ -33,3 +33,4 @@ export * from "./useMobile";
 export * from "./useDeferredFocuser";
 export * from "./useIsOverflowing";
 export * from "./useSizeAnimator";
+export * from "./useCollisionDetector";

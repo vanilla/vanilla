@@ -12,7 +12,7 @@ interface IStackingContext {
 
 const StackingContext = React.createContext<IStackingContext>({
     // Modals default z-index, just above titlebar
-    zIndex: 1051,
+    zIndex: 1060,
 });
 
 /**

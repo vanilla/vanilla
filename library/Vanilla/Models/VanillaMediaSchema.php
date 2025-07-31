@@ -117,6 +117,7 @@ class VanillaMediaSchema extends Schema
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($row);
+        $schemaRecord["type"] = $schemaRecord["type"] ?: "unknown";
         $schema = new VanillaMediaSchema(true);
         return $schema->validate($schemaRecord);
     }

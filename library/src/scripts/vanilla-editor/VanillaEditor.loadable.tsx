@@ -249,6 +249,12 @@ export const VanillaEditorLoadable = forwardRef(function VanillaEditorLoadable(
         return value;
     }, [props.initialContent, initialValue]);
 
+    useEffect(() => {
+        if (initValue) {
+            props.onChange?.(initValue);
+        }
+    }, [initValue]);
+
     const classesUserContent = userContentClasses.useAsHook();
     const classesEditor = vanillaEditorClasses.useAsHook();
 

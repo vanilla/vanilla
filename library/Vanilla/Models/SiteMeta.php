@@ -207,6 +207,11 @@ class SiteMeta implements \JsonSerializable
                         "query" => $this->config->get("Garden.ExternalSearch.Query", false),
                         "resultsInNewTab" => $this->config->get("Garden.ExternalSearch.ResultsInNewTab", false),
                     ],
+                    "shouldAbortDuringAutocomplete" => (bool) $this->config->get(
+                        "Search.ShouldAbortDuringAutocomplete",
+                        false
+                    ),
+                    "autocompleteDebounce" => (int) $this->config->get("Search.AutocompleteDebounce", 500),
                 ],
                 "upload" => [
                     "maxSize" => $this->getMaxUploadSize(),

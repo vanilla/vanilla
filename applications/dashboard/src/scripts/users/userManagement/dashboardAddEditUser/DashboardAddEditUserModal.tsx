@@ -45,6 +45,7 @@ export default function DashboardAddEditUserModal(props: React.PropsWithChildren
                 aria-label={t(title ?? "Add/Edit User")}
             >
                 <Frame
+                    canGrow={true}
                     header={
                         <FrameHeader
                             closeFrame={() => {

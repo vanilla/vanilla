@@ -253,4 +253,41 @@ class CategoriesPostTypesTest extends AbstractAPIv2Test
             $this->assertNotContains($catSpecialPerms["categoryID"], $categoryIDs);
         }, $user);
     }
+
+    /**
+     * Make sure we are excluding post types when crawling.
+     *
+     * @return void
+     */
+    public function testPostTypeExcludedWhenCrawl(): void
+    {
+        $postType = $this->createPostType(["postTypeID" => strtolower(__FUNCTION__)]);
+        $this->createCategory([
+            "hasRestrictedPostTypes" => true,
+            "parentCategoryID" => null,
+            "allowedPostTypeIDs" => [$postType["postTypeID"]],
+        ]);
+
+        $results = $this->api()
+            ->get("categories")
+            ->getBody();
+        foreach ($results as $result) {
+            $this->assertArrayHasKey(
+                "allowedPostTypeOptions",
+                $result,
+                "allowedPostTypeOptions be present in the response for categories."
+            );
+        }
+
+        $results = $this->api()
+            ->get("categories", ["expand" => ["crawl"]])
+            ->getBody();
+        foreach ($results as $result) {
+            $this->assertArrayNotHasKey(
+                "allowedPostTypeOptions",
+                $result,
+                "allowedPostTypeOptions should not be present in the response for categories when crawling."
+            );
+        }
+    }
 }

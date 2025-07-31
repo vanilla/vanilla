@@ -4,19 +4,20 @@
  * @license gpl-2.0-only
  */
 
-import { useCurrentUser } from "@library/features/users/userHooks";
-import type { LogoAlignment } from "@library/headers/LogoAlignment";
-import { navigationVariables } from "@library/headers/navigationVariables";
-import { TitleBarTransparentContext } from "@library/headers/TitleBar.TransparentContext";
-import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import type { BorderType } from "@library/styles/styleHelpersBorders";
-import { getPixelNumber } from "@library/styles/styleUtils";
-import type { IThemeVariables } from "@library/theming/themeReducer";
-import type TitleBarFragmentInjectable from "@vanilla/injectables/TitleBarFragment";
-import { stableObjectHash } from "@vanilla/utils";
-import type { ColorHelper } from "csx";
 import { createContext, useContext, useMemo } from "react";
+
+import type { BorderType } from "@library/styles/styleHelpersBorders";
+import type { ColorHelper } from "csx";
 import type { DeepPartial } from "redux";
+import type { IThemeVariables } from "@library/theming/themeReducer";
+import type { LogoAlignment } from "@library/headers/LogoAlignment";
+import type TitleBarFragmentInjectable from "@vanilla/injectables/TitleBarFragment";
+import { TitleBarTransparentContext } from "@library/headers/TitleBar.TransparentContext";
+import { getPixelNumber } from "@library/styles/styleUtils";
+import { navigationVariables } from "@library/headers/navigationVariables";
+import { stableObjectHash } from "@vanilla/utils";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { useCurrentUser } from "@library/features/users/userHooks";
 
 export const TitleBarPositioning = {
     StickySolid: "StickySolid",
@@ -46,14 +47,34 @@ export type ITitleBarParams = {
 
 export type ITitleBarParamsResolved = Omit<ITitleBarParams, "logoType" | "navigationType"> & {};
 
-export const TitleBarParamContext = createContext<ITitleBarParamsResolved>({} as any);
+const defaultParams: ITitleBarParamsResolved = {
+    positioning: TitleBarPositioning.StickySolid,
+    backgroundColor: undefined as any, // Will be resolved at runtime
+    foregroundColor: undefined as any, // Will be resolved at runtime
+    height: 48, // Default from titleBarVariables().sizing.height
+    heightMobile: 44, // Default from titleBarVariables().sizing.mobile.height
+    borderType: "none" as BorderType, // Default from titleBarVariables().border.type
+    logo: {
+        alignment: "left" as LogoAlignment, // Default from titleBarVariables().logo.justifyContent
+        alignmentMobile: "center" as LogoAlignment, // Default from titleBarVariables().mobileLogo.justifyContent
+        imageUrl: undefined, // Default from titleBarVariables().logo.desktop.url
+        imageUrlMobile: undefined, // Default from titleBarVariables().logo.mobile.url
+        url: "/", // Default from navigationVariables().logo.url
+    },
+    navigation: {
+        alignment: "left" as "left" | "center", // Default from titleBarVariables().navAlignment.alignment
+        items: [], // Default from navigationVariables().navigationItems
+    },
+};
+
+export const TitleBarParamContext = createContext<ITitleBarParamsResolved>(defaultParams);
 
 export function useTitleBarParams() {
     return useContext(TitleBarParamContext);
 }
 
 export function useTitleBarParamVarOverrides(): IThemeVariables {
-    const params = useTitleBarParams();
+    const params: Partial<ITitleBarParamsResolved> = useTitleBarParams();
     return useMemo(() => {
         const varOverrides: {
             titleBar: DeepPartial<ReturnType<typeof titleBarVariables>>;
@@ -61,35 +82,35 @@ export function useTitleBarParamVarOverrides(): IThemeVariables {
         } = {
             titleBar: {
                 logo: {
-                    justifyContent: params.logo.alignment, // alignment for desktop logo.
+                    justifyContent: params?.logo?.alignment, // alignment for desktop logo.
                 },
                 mobileLogo: {
-                    justifyContent: params.logo.alignmentMobile,
+                    justifyContent: params?.logo?.alignmentMobile,
                 },
                 colors: {
-                    bg: params.backgroundColor as ColorHelper,
-                    fg: params.foregroundColor as ColorHelper,
+                    bg: params?.backgroundColor as ColorHelper,
+                    fg: params?.foregroundColor as ColorHelper,
                 },
                 sizing: {
-                    height: params.height,
+                    height: params?.height,
                     mobile: {
-                        height: params.heightMobile,
+                        height: params?.heightMobile,
                     },
                 },
                 navAlignment: {
-                    alignment: params.navigation.alignment,
+                    alignment: params?.navigation?.alignment,
                 },
                 border: {
-                    type: params.borderType,
+                    type: params?.borderType,
                 },
                 positioning: {
-                    mode: params.positioning,
+                    mode: params?.positioning,
                 },
             },
             navigation: {
-                navigationItems: params.navigation.items,
+                navigationItems: params?.navigation?.items,
                 logo: {
-                    url: params.logo.url,
+                    url: params?.logo?.url,
                 },
             },
         };

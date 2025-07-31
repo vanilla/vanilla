@@ -17,6 +17,8 @@ use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Database\SetLiterals\RawExpression;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
+use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\Model;
 use Vanilla\Schema\RangeExpression;
 use Webmozart\Assert\Assert;
@@ -451,7 +453,7 @@ class CommentThreadModel
      */
     public function renderParentCommentAsQuote(array $row): string
     {
-        if (!isset($row["parentCommentBody"])) {
+        if (empty($row["parentCommentBody"])) {
             // The comment was likely deleted.
             return "";
         }
@@ -471,11 +473,18 @@ class CommentThreadModel
             "embedType" => QuoteEmbed::TYPE,
         ];
         $this->userModel->expandUsers($quoteData, ["insertUserID"]);
-        $quote = new QuoteEmbed($quoteData);
 
-        $filter = $this->getQuoteEmbedFilter();
-        $quote = $filter->filterEmbed($quote);
-        return $quote->renderHtml();
+        try {
+            $quote = new QuoteEmbed($quoteData);
+
+            $filter = $this->getQuoteEmbedFilter();
+            $quote = $filter->filterEmbed($quote);
+
+            return $quote->renderHtml();
+        } catch (\Exception $ex) {
+            ErrorLogger::warning($ex, ["parentComment"]);
+            return "";
+        }
     }
 
     /**

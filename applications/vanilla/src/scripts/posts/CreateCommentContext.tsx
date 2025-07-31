@@ -50,7 +50,7 @@ export function CreateCommentProvider(props: {
     parentRecordID: RecordID;
     parentRecordType: string;
 }) {
-    const { draftID, draft, removeDraft } = useDraftContext();
+    const { draft, removeDraft } = useDraftContext();
 
     const [createCommentLocation, setCreateCommentLocation] =
         useState<ICreateCommentContext["createCommentLocation"]>("widget");
@@ -95,7 +95,7 @@ export function CreateCommentProvider(props: {
                 onCancel={() => setDiscardDraftModalVisible(null)}
                 onConfirm={() => {
                     draft && setDraftToRemove(draft);
-                    draft && draftID && removeDraft(draftID);
+                    removeDraft();
                     discardDraftModalVisible && setCreateCommentLocation(discardDraftModalVisible);
                     setDiscardDraftModalVisible(null);
                 }}

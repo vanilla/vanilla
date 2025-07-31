@@ -195,7 +195,6 @@ export function AddComment(props: IProps & { replyTo?: string }) {
 
     const postMutation = useMutation({
         mutationFn: async (body: string) => {
-            disableAutosave();
             setError(null);
             const response = await CommentsApi.post({
                 format: "rich2",
@@ -204,7 +203,6 @@ export function AddComment(props: IProps & { replyTo?: string }) {
                 ...(draftID && { draftID }),
                 body,
             });
-            removeDraft(draftID ?? window.location.pathname, true);
 
             if ("status" in response && response.status === 202) {
                 addToast({
@@ -216,8 +214,9 @@ export function AddComment(props: IProps & { replyTo?: string }) {
             await queryClient.invalidateQueries({ queryKey: ["discussion"] });
             await queryClient.invalidateQueries({ queryKey: ["commentList"] });
             await queryClient.invalidateQueries({ queryKey: ["commentThread"] });
+            // It is important to remove the draft here before resetting the state, otherwise the props will be not change and restore the previous draft value creating a new draft in the process.
+            removeDraft(true);
             resetState();
-            enableAutosave();
             return response;
         },
         onError: (error: IApiError) => {
@@ -264,14 +263,11 @@ export function AddComment(props: IProps & { replyTo?: string }) {
 
     const removeActiveDraft = () => {
         disableAutosave();
-
-        const removed = removeDraft(draftID ?? window.location.pathname, true);
-
+        const removed = removeDraft();
         if (removed) {
             resetState();
             props.onDiscard?.();
         }
-
         setDeleteDraftModal(false);
         enableAutosave();
     };
@@ -313,7 +309,9 @@ export function AddComment(props: IProps & { replyTo?: string }) {
                 onValueChange={setValue}
                 format={"rich2"}
                 onPublish={async (value) => {
+                    disableAutosave();
                     await postMutation.mutateAsync(JSON.stringify(value));
+                    enableAutosave();
                 }}
                 publishLoading={postMutation.isLoading}
                 isPreview={props.isPreview}

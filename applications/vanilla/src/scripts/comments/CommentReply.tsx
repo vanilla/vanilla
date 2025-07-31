@@ -17,7 +17,6 @@ import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
 import { useMutation } from "@tanstack/react-query";
 import { CommentsApi } from "@vanilla/addon-vanilla/comments/CommentsApi";
 import { useNestedCommentContext } from "@vanilla/addon-vanilla/comments/NestedCommentContext";
-
 import { logDebug } from "@vanilla/utils";
 import { t } from "@vanilla/i18n";
 import { forwardRef, ReactNode, useEffect, useState } from "react";
@@ -35,7 +34,6 @@ import { ErrorIcon } from "@library/icons/common";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { commentEditorClasses } from "@vanilla/addon-vanilla/comments/CommentEditor.classes";
 import { IFieldError } from "@library/json-schema-forms";
-import { IApiError } from "@library/@types/api/core";
 
 interface IProps {
     threadItem: (IThreadItem & { type: "comment" }) | (IThreadItem & { type: "reply" });
@@ -111,7 +109,6 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
     const postMutation = useMutation({
         mutationKey: ["postComment", threadParent.recordType, threadParent.recordID, threadItem?.parentCommentID],
         mutationFn: async (richContent: MyValue) => {
-            disableAutosave();
             setError(null);
             setFieldError(null);
             const body = safelySerializeJSON(richContent);
@@ -123,38 +120,22 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
                     ...(draftID && { draftID }),
                     body,
                     parentCommentID: `${threadItem?.parentCommentID}`,
-                }).catch((error: IApiError) => {
-                    logDebug("Error posting comment", error);
-                    setError(error);
-                    setFieldError(error?.errors?.body ?? null);
+                });
+                if (!isComment(response)) {
                     addToast({
-                        body: <>{error.message ? error.message : t("Something went wrong posting your comment.")}</>,
+                        body: t("Your comment will appear after it is approved."),
                         dismissible: true,
                         autoDismiss: false,
                     });
-                    return null;
-                });
-                enableAutosave();
-                if (response) {
-                    if (!isComment(response)) {
-                        addToast({
-                            body: t("Your comment will appear after it is approved."),
-                            dismissible: true,
-                            autoDismiss: false,
-                        });
-                        return response;
-                    }
-                    const commentWithExpands = await CommentsApi.get(response.commentID, {
-                        expand: ["reactions"],
-                        quoteParent: false,
-                    });
-                    addReplyToThread(threadItem, commentWithExpands, !!props.skipReplyThreadItem);
-                    removeDraft(draftID ?? window.location.pathname, true);
-                    props.onSuccess?.();
-                    return commentWithExpands;
+                    return response;
                 }
-                enableAutosave();
-                return null;
+                const commentWithExpands = await CommentsApi.get(response.commentID, {
+                    expand: ["reactions"],
+                    quoteParent: false,
+                });
+                addReplyToThread(threadItem, commentWithExpands, !!props.skipReplyThreadItem);
+                props.onSuccess?.();
+                return commentWithExpands;
             }
         },
     });
@@ -163,11 +144,9 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
     const draftProps = draftID && draft ? makeCommentDraftProps(draftID, draft) ?? {} : {};
 
     const discardReply = () => {
-        const removed = (draftID && removeDraft(draftID)) ?? true;
-        if (removed) {
-            props.onCancel?.();
-            removeReplyFromThread(threadItem);
-        }
+        removeDraft();
+        props.onCancel?.();
+        removeReplyFromThread(threadItem);
         setDeleteDraftModal(false);
     };
 
@@ -201,7 +180,23 @@ export const CommentReply = forwardRef(function ThreadCommentEditor(
                     setValue(value);
                 }}
                 onPublish={async (value) => {
-                    await postMutation.mutateAsync(value);
+                    disableAutosave();
+                    try {
+                        await postMutation.mutateAsync(value);
+                        removeDraft(true);
+                    } catch (error) {
+                        logDebug("Error posting comment", error);
+                        setError(error);
+                        setFieldError(error?.errors?.body ?? null);
+                        addToast({
+                            body: (
+                                <>{error.message ? error.message : t("Something went wrong posting your comment.")}</>
+                            ),
+                            dismissible: true,
+                            autoDismiss: false,
+                        });
+                    }
+                    enableAutosave();
                 }}
                 publishLoading={postMutation.isLoading}
                 tertiaryActions={

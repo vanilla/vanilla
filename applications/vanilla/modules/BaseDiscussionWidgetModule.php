@@ -489,7 +489,7 @@ class BaseDiscussionWidgetModule extends LegacyReactModule implements LimitableW
      */
     public function renderSeoHtml(array $props): ?string
     {
-        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["discussions"]));
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["discussions"] ?? []));
         return $result;
     }
 

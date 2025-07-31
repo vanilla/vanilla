@@ -86,6 +86,7 @@ class AiConversationTest extends SiteTestCase
         }
         $config->saveToConfig(ErrorLogger::CONF_LOG_NOTICES, true);
         $this->aiConversationModel = $this->container()->get(AiConversationModel::class);
+        CurrentTimeStamp::mockTime("2024-01-01");
         parent::setUp();
     }
 

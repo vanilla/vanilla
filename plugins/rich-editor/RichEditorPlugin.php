@@ -9,6 +9,7 @@ use Vanilla\Formatting\FormatConfig;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Formatting\Formats;
+use Vanilla\Http\InternalClient;
 use Vanilla\Web\TwigStaticRenderer;
 use Vanilla\Formatting\Quill\Parser;
 
@@ -32,8 +33,11 @@ class RichEditorPlugin extends Gdn_Plugin
      *
      * @param \Vanilla\Formatting\FormatService $formatService
      */
-    public function __construct(\Vanilla\Formatting\FormatService $formatService)
-    {
+    public function __construct(
+        \Vanilla\Formatting\FormatService $formatService,
+        private InternalClient $internalClient,
+        private MediaModel $mediaModel
+    ) {
         $this->formatService = $formatService;
         parent::__construct();
         self::$editorID++;
@@ -249,7 +253,16 @@ class RichEditorPlugin extends Gdn_Plugin
                 if ($shouldConvert) {
                     $viewData["needsHtmlConversion"] = true;
                     $viewData["showConversionNotice"] = $args["Attributes"]["showConversionNotice"] ?? true;
+
                     $newBodyValue = $this->formatService->renderHTML($body, $originalFormat);
+
+                    // Append media items if necessary
+                    [$foreignTable, $foreignID] = $this->getMediaForeignRecordID($originalRecord);
+                    $mediaItems = $this->mediaModel
+                        ->getWhere(["ForeignTable" => $foreignTable, "ForeignID" => $foreignID])
+                        ->resultArray();
+                    $newBodyValue = $this->mediaModel->appendMediaToPost($newBodyValue, $mediaItems);
+
                     $sender->setValue($bodyFieldName, $newBodyValue);
                     $sender->setValue(
                         "Format",
@@ -285,6 +298,23 @@ class RichEditorPlugin extends Gdn_Plugin
                         $sender->setValue($bodyFieldName, $newBodyValue);
                 }
             }
+        }
+    }
+
+    /**
+     * Given a raw record rendered in a bodybox, figure out it's recordType/recordID for the GDN_Media table.
+     *
+     * @param array $record
+     * @return array{string, int}
+     */
+    public function getMediaForeignRecordID(array $record): array
+    {
+        if (array_key_exists("CommentID", $record)) {
+            return ["Comment", $record["CommentID"]];
+        } elseif (array_key_exists("DiscussionID", $record)) {
+            return ["Discussion", $record["DiscussionID"]];
+        } else {
+            return ["Unknown", -1];
         }
     }
 

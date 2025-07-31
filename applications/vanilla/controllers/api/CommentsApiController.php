@@ -766,11 +766,13 @@ class CommentsApiController extends AbstractApiController implements LoggerAware
         foreach ($rows as &$currentRow) {
             $currentRow = $this->normalizeOutput($currentRow, $query["expand"]);
 
-            // Render the parent as a quote.
-            $parentCommentID = $currentRow["parentCommentID"] ?? false;
-            if ($quoteParent && $parentCommentID) {
-                $quote = $this->threadModel->renderParentCommentAsQuote($currentRow);
-                $currentRow["body"] = $quote . $currentRow["body"];
+            if (!ModelUtils::isExpandOption("crawl", $query["expand"] ?? [])) {
+                // Render the parent as a quote.
+                $parentCommentID = $currentRow["parentCommentID"] ?? false;
+                if ($quoteParent && $parentCommentID) {
+                    $quote = $this->threadModel->renderParentCommentAsQuote($currentRow);
+                    $currentRow["body"] = $quote . $currentRow["body"];
+                }
             }
         }
 

@@ -141,6 +141,8 @@ export function CreatePostFormAsset(props: IProps) {
             }),
     };
 
+    const needsConversion = parentRecordContext.record && parentRecordContext.record.format.toLowerCase() !== "rich2";
+
     const { draftID, draft, draftLoaded, updateDraft, updateImmediate, enableAutosave, disableAutosave, removeDraft } =
         useDraftContext();
 
@@ -325,8 +327,7 @@ export function CreatePostFormAsset(props: IProps) {
 
     useEffect(() => {
         // We now have a server draftID and we need to update the URL
-        // We compare vs the pathname, because local drafts use the pathname as the ID.
-        if (draftID && draftID !== window.location.pathname) {
+        if (draftID) {
             window.history.replaceState(
                 null,
                 "",
@@ -357,7 +358,7 @@ export function CreatePostFormAsset(props: IProps) {
                 endpoint,
                 body,
             });
-            removeDraft(draftID ?? window.location.pathname, true);
+            removeDraft(true);
             pushSmartLocation(response.canonicalUrl);
         }
         // Re-enable autosave
@@ -620,6 +621,7 @@ export function CreatePostFormAsset(props: IProps) {
                                         required={isBodyRequired}
                                     >
                                         <VanillaEditor
+                                            showConversionNotice={needsConversion}
                                             initialContent={formBody.body}
                                             onChange={(body) => updateFormBody({ body })}
                                         />

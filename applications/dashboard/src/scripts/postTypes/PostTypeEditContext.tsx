@@ -104,9 +104,9 @@ export function PostTypeEditProvider(props: IProps) {
     const [allPostFields, setAllPostFields] = useState<PostField[]>(allPostFieldsQuery.data ?? []);
     const [initialOptionValues, setInitialOptionValues] = useState<IPostTypeEditContext["initialOptionValues"]>({});
 
-    const [postFieldIDsByPostTypeID, setPostFieldIDsByPostTypeID] = useState<
-        Record<PostType["postTypeID"], Array<PostField["postFieldID"]>>
-    >({});
+    const [postFieldsByPostTypeID, setPostFieldsByPostTypeID] = useState<Record<PostType["postTypeID"], PostField[]>>(
+        {},
+    );
 
     const getCategories = async (categoryIDs: RecordID[]) => {
         const response = await apiv2.get("/categories", {
@@ -157,12 +157,10 @@ export function PostTypeEditProvider(props: IProps) {
                     }));
                 });
 
-                setPostFieldIDsByPostTypeID((prev) => {
+                setPostFieldsByPostTypeID((prev) => {
                     return {
                         ...prev,
-                        [singularPostType.postTypeID]: (singularPostType?.postFields ?? []).map(
-                            (field) => field.postFieldID,
-                        ),
+                        [singularPostType.postTypeID]: singularPostType?.postFields ?? [],
                     };
                 });
             }
@@ -177,22 +175,29 @@ export function PostTypeEditProvider(props: IProps) {
         }
     }, [allPostFieldsQuery.data]);
 
-    const [postFieldsByPostTypeID, setPostFieldsByPostTypeID] = useState<Record<PostType["postTypeID"], PostField[]>>(
-        {},
-    );
-
     useEffect(() => {
+        const postTypeData = postTypesQuery.data?.[0];
         const grouped = [...allPostFields, ...dirtyPostFields]?.reduce((acc, postField) => {
             const IDs = postField.postTypeIDs ?? [];
-
             IDs.forEach((postTypeID) => {
-                acc[postTypeID] = [...(acc[postTypeID] ?? []), postField].sort((a, b) => (a.sort > b.sort ? 1 : -1));
+                acc[postTypeID] = [...(acc[postTypeID] ?? []), postField].sort((a, b) => {
+                    let sortA = 0;
+                    let sortB = 0;
+                    if (postTypeData?.postTypeID === postTypeID) {
+                        sortA =
+                            postTypeData.postFields?.find(({ postFieldID }) => postFieldID === a.postFieldID)?.sort ??
+                            0;
+                        sortB =
+                            postTypeData.postFields?.find(({ postFieldID }) => postFieldID === b.postFieldID)?.sort ??
+                            0;
+                    }
+                    return sortA > sortB ? 1 : -1;
+                });
             });
-
             return acc;
         }, {});
         setPostFieldsByPostTypeID(grouped);
-    }, [allPostFields, dirtyPostFields]);
+    }, [allPostFields, dirtyPostFields, postTypesQuery.status]);
 
     const updatePostType = (newValue) => {
         setIsDirty(true);
@@ -282,7 +287,10 @@ export function PostTypeEditProvider(props: IProps) {
         // Make list of post fields to apply to the post type and maintain their order
         const dirtyPostFieldIDs = dirtyPostFields.map((field) => field.postFieldID);
         const postFieldIDs = [
-            ...new Set([...(postFieldIDsByPostTypeID?.[postTypeIDCache] ?? []), ...dirtyPostFieldIDs]),
+            ...new Set([
+                ...(postFieldsByPostTypeID?.[postTypeIDCache] ?? []).map(({ postFieldID }) => postFieldID),
+                ...dirtyPostFieldIDs,
+            ]),
         ].filter((id) => {
             return ![...fieldsToUnlink, ...fieldsToDelete].includes(id);
         });
@@ -312,10 +320,11 @@ export function PostTypeEditProvider(props: IProps) {
     };
 
     const reorderPostFields = async (postFields: Record<PostField["postFieldID"], number>) => {
+        const postTypeID = props.postTypeID ?? "-1";
         setIsDirty(true);
         setDirtyFieldsOrder(postFields);
         setPostFieldsByPostTypeID((prev) => {
-            const updatedOrder = postFieldsByPostTypeID[props.postTypeID]
+            const updatedOrder = postFieldsByPostTypeID[postTypeID]
                 .map((field) => {
                     return {
                         ...field,
@@ -323,7 +332,7 @@ export function PostTypeEditProvider(props: IProps) {
                     };
                 })
                 .sort((a, b) => (a.sort > b.sort ? 1 : -1));
-            return { ...prev, [props.postTypeID]: updatedOrder };
+            return { ...prev, [postTypeID]: updatedOrder };
         });
     };
 

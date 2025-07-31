@@ -26,7 +26,7 @@ interface IDraftContext {
     draftID: RecordID | null;
     updateDraft: (draftPayload: DraftsApi.PostParams) => void;
     updateImmediate: (draftPayload: DraftsApi.PostParams, forceUpdateLocal?: boolean) => Promise<void>;
-    removeDraft: (draftID: RecordID, localOnly?: boolean) => boolean;
+    removeDraft: (localOnly?: boolean) => boolean;
     draft?: IDraft | null;
     draftLoaded: boolean;
     draftLastSavedToServer?: string;
@@ -119,10 +119,14 @@ export function DraftContextProvider(props: DraftProviderProps) {
     const draftMutation = useDraftPostPatchMutation();
     const draftServerDelete = useDraftDeleteMutation();
 
+    const unsavedLocalDraftID = !draftID.current && !!localDraft ? pathname : undefined;
+
     const saveServerDraft = async (payload: DraftsApi.PostParams, forcePost?: boolean) => {
         if (!draftMutation.isLoading && !draftServerDelete.isLoading && payload) {
             const response = await draftMutation.mutateAsync({
-                ...(draftID.current && draftID.current !== pathname && !forcePost && { draftID: draftID.current }),
+                ...(draftID.current &&
+                    draftID.current !== unsavedLocalDraftID &&
+                    !forcePost && { draftID: draftID.current }),
                 body: {
                     ...payload,
                     ...(forcePost && { draftID: undefined }),
@@ -243,20 +247,36 @@ export function DraftContextProvider(props: DraftProviderProps) {
 
     const isMounted = useIsMounted();
     const updateDraft = useMemo(() => {
-        return debounce((payload: IDraft) => {
-            requestAnimationFrame(() => {
-                if (isMounted()) {
-                    updateDraftImplRef.current(payload);
-                }
-            });
-        }, 1000);
+        return debounce(
+            (payload: IDraft) => {
+                requestAnimationFrame(() => {
+                    if (isMounted()) {
+                        updateDraftImplRef.current(payload);
+                    }
+                });
+            },
+            1000,
+            {
+                leading: true,
+            },
+        );
     }, []);
 
-    const removeDraft = (id: RecordID, localOnly?: boolean) => {
+    function enableAutosave() {
+        setAutosaveEnabled(true);
+    }
+
+    function disableAutosave() {
+        updateDraft.cancel(); // Remove any pending updates to the local draft
+        setAutosaveEnabled(false);
+    }
+
+    const removeDraft = (localOnly?: boolean) => {
+        const id = draftID.current ?? unsavedLocalDraftID;
         // Short circuit if the draft is already being mutated or deleted
         if (!id || draftMutation.isLoading || draftServerDelete.isLoading) return false;
         removeDraftAtID(id);
-        !localOnly && id !== pathname && draftServerDelete.mutate(id);
+        if (!(localOnly || id === unsavedLocalDraftID)) draftServerDelete.mutate(id);
         draftID.current = null;
         return true;
     };
@@ -271,8 +291,8 @@ export function DraftContextProvider(props: DraftProviderProps) {
                 draft: localDraft,
                 draftLoaded: !!localDraft,
                 draftLastSavedToServer: draftLastSavedToServer.current,
-                enableAutosave: () => setAutosaveEnabled(true),
-                disableAutosave: () => setAutosaveEnabled(false),
+                enableAutosave,
+                disableAutosave,
                 getDraftByMatchers,
                 recordID: localDraft?.recordID ?? recordID,
             }}

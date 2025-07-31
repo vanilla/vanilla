@@ -1119,18 +1119,17 @@ class UsersApiController extends AbstractApiController
             "ValidateName" => false,
         ];
         $id = $this->userModel->save($userData, $settings);
-        if ($id && $body["sendWelcomeEmail"] ?? true) {
+        $this->validateModel($this->userModel);
+        if (!$id) {
+            throw new ServerException("Unable to add user.", 500);
+        }
+
+        if ($body["sendWelcomeEmail"] ?? true) {
             $this->userModel->sendWelcomeEmail($id, $userData["Password"] ?? "");
         }
         // Add default preferences for the new user
         $userNotificationPrefsModel = Gdn::getContainer()->get(UserNotificationPreferencesModel::class);
         $userNotificationPrefsModel->setInitialDefaults($id, true);
-
-        $this->validateModel($this->userModel);
-
-        if (!$id) {
-            throw new ServerException("Unable to add user.", 500);
-        }
 
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);

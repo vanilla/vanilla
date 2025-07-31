@@ -23,7 +23,6 @@ import type { IThreadItem } from "@vanilla/addon-vanilla/comments/NestedCommentT
 import { CommentItem } from "@vanilla/addon-vanilla/comments/CommentItem";
 import { CommentThreadMobileReply } from "@vanilla/addon-vanilla/comments/CommentThreadMobileReply";
 import { useDraftContext } from "@vanilla/addon-vanilla/drafts/DraftContext";
-import { CommentDraftMeta } from "@vanilla/addon-vanilla/drafts/types";
 import { isCommentDraftMeta } from "@vanilla/addon-vanilla/drafts/utils";
 import { useLocation } from "react-router";
 import { DiscardDraftModal } from "@vanilla/addon-vanilla/comments/DiscardDraftModal";
@@ -45,6 +44,7 @@ interface IProps {
  * Renders a comment thread item with children
  */
 export const NestedCommentItem = memo(function NestedCommentItem(props: IProps) {
+    const { hash } = useLocation();
     const { threadItem } = props;
     const [isLoading, setIsLoading] = useState(false);
     const {
@@ -121,7 +121,7 @@ export const NestedCommentItem = memo(function NestedCommentItem(props: IProps) 
     const isMobile = useMobile();
     const [isMobileReplyModalVisible, setIsMobileReplyModalVisible] = useState(false);
 
-    const { draftID, draft, removeDraft } = useDraftContext();
+    const { draft, removeDraft } = useDraftContext();
 
     const hasDraftForThis = () => {
         if (!draft) {
@@ -216,7 +216,7 @@ export const NestedCommentItem = memo(function NestedCommentItem(props: IProps) 
         props.threadItem.children[0].type === "reply";
     const hasChildren = props.threadItem.children && props.threadItem.children.length > 0;
 
-    const isPermalinked = useLocation().hash?.toLowerCase() === `#comment_${comment?.commentID}`;
+    const isPermalinked = hash?.toLowerCase() === `#comment_${comment?.commentID}`;
 
     return (
         <>
@@ -279,7 +279,7 @@ export const NestedCommentItem = memo(function NestedCommentItem(props: IProps) 
                 onCancel={() => setDiscardDraftModalVisible(false)}
                 onConfirm={() => {
                     draft && setDraftToRemove(draft);
-                    draft && draftID && removeDraft(draftID);
+                    removeDraft();
                     if (isMobile) {
                         setIsMobileReplyModalVisible(true);
                     } else {

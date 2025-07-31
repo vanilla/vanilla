@@ -63,7 +63,7 @@ export default class TokensLoadable extends React.Component<ITokensProps, IState
 
         const portalProps = inModal
             ? {
-                  styles: this.getStyles(1051), // This magic number from the stacking context
+                  styles: this.getStyles(1061), // This magic number from the stacking context
                   menuPortalTarget: document.body,
               }
             : {};

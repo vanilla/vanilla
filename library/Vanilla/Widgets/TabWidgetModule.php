@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\JsInterpop\LegacyReactModule;
 
@@ -94,7 +95,7 @@ class TabWidgetModule extends LegacyReactModule
                 ];
             } catch (\Exception $e) {
                 // Still try to render the other tabs.
-                trigger_error(formatException($e), E_USER_WARNING);
+                ErrorLogger::error($e, ["tabWidget"]);
             }
         }
 

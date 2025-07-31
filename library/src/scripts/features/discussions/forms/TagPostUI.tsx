@@ -50,31 +50,6 @@ export function TagPostUI(props: TagPostUIProps) {
 
     const userCanCreateNewTags = hasPermission("tags.add");
 
-    const TAG_POST_SCHEMA: JSONSchemaType<{ tags: string | number }> = {
-        type: "object",
-        properties: {
-            tags: {
-                type: ["string", "number"],
-                minLength: 1,
-                maxLength: 100,
-                "x-control": {
-                    labelType: "none",
-                    inputType: "select",
-                    multiple: true,
-                    optionsLookup: tagLookup,
-                    createable: userCanCreateNewTags,
-                    isClearable: true,
-                    label: t("Tags"),
-                    noBorder: true,
-                    createableLabel: t("Create and add tag"),
-                    checkIsOptionUserCreated: (value) => {
-                        return typeof value === "string";
-                    },
-                },
-            },
-        },
-    };
-
     const { initialTags = [] } = props;
 
     const [tags, setTags] = useState<RecordID[]>(initialTags);
@@ -126,6 +101,51 @@ export function TagPostUI(props: TagPostUIProps) {
         });
         const existingTagUpdateValues = [...tags.filter((tag) => typeof tag === "number"), tagID];
         props.onSelectedExistingTag?.(existingTagUpdateValues);
+    };
+
+    const popularTagOptions = useMemo(() => {
+        if (popularTagsQuery.data && popularTagsQuery.data.length > 0) {
+            return popularTagsQuery.data.map((tag: ITag) => ({
+                label: tag.name,
+                value: tag.tagID,
+                data: { ...tag, type: "User" }, // Match the processOptions check
+            }));
+        }
+        return [];
+    }, [popularTagsQuery.data]);
+
+    // Include popular tags with the initial options for NestedSelect
+    const dynamicTagLookup = useMemo(
+        () => ({
+            ...tagLookup,
+            initialOptions: popularTagOptions,
+        }),
+        [popularTagOptions],
+    );
+
+    const TAG_POST_SCHEMA: JSONSchemaType<{ tags: string | number }> = {
+        type: "object",
+        properties: {
+            tags: {
+                type: ["string", "number"],
+                minLength: 1,
+                maxLength: 100,
+                "x-control": {
+                    labelType: "none",
+                    inputType: "select",
+                    multiple: true,
+                    optionsLookup: dynamicTagLookup,
+                    createable: userCanCreateNewTags,
+                    isClearable: true,
+                    label: t("Tags"),
+                    noBorder: true,
+                    createableLabel: t("Create and add tag"),
+                    checkIsOptionUserCreated: (value) => {
+                        return typeof value === "string";
+                    },
+                },
+            },
+        },
     };
 
     return (

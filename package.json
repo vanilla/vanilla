@@ -255,6 +255,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "@types/react": "^16.9.46",
+    "form-data": "^4.0.4",
     "@types/react-dom": "^16.9.8",
     "@testing-library/jest-dom": "^6.4.2",
     "eslint": "^7.10.0",

@@ -8,9 +8,11 @@
  * @package editor
  */
 
+use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\Models\VanillaMediaSchema;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Class EditorPlugin
@@ -1944,7 +1946,7 @@ class EditorPlugin extends Gdn_Plugin
             ->getWhere(["ForeignID" => $results["discussionID"], "ForeignTable" => "discussion"])
             ->resultArray();
 
-        $results["body"] = $this->addFileToPost($results["body"], $attachments);
+        $results["body"] = $mediaModel->appendMediaToPost($results["body"], $attachments);
         return $results;
     }
 
@@ -1968,7 +1970,7 @@ class EditorPlugin extends Gdn_Plugin
             ->getWhere(["ForeignID" => $results["commentID"], "ForeignTable" => "comment"])
             ->resultArray();
 
-        $results["body"] = $this->addFileToPost($results["body"], $attachments);
+        $results["body"] = $mediaModel->appendMediaToPost($results["body"], $attachments);
         return $results;
     }
 
@@ -1979,8 +1981,17 @@ class EditorPlugin extends Gdn_Plugin
      * @return array
      * @throws ValidationException
      */
-    public function commentsApiController_indexOutput(array $results): array
-    {
+    public function commentsApiController_indexOutput(
+        array $results,
+        CommentsApiController $commentsApiController,
+        Schema $inputSchema,
+        array $query
+    ): array {
+        if (ModelUtils::isExpandOption("crawl", $query["expand"] ?? [])) {
+            // No expansion of these when crawling for search.
+            return $results;
+        }
+
         // Check whether attachments should be rendered (for example, private discussions).
         $shouldAttach = Gdn::eventManager()->fireFilter("shouldAttachUploads", true);
         if (!$shouldAttach) {
@@ -2010,90 +2021,9 @@ class EditorPlugin extends Gdn_Plugin
                 }
             }
 
-            $results[$key]["body"] = $this->addFileToPost($comment["body"], $commentAttachments);
+            $results[$key]["body"] = $mediaModel->appendMediaToPost($comment["body"], $commentAttachments);
         }
 
         return $results;
-    }
-
-    /**
-     * Add the attachment files at the end of a post if it's not already in the body.
-     *
-     * @param string $body Fully rendered HTML.
-     * @param array $attachments
-     * @return string
-     * @throws ValidationException
-     */
-    private function addFileToPost(string $body, array $attachments): string
-    {
-        $result = $body;
-        $format = $this->Format ? strtolower($this->Format) : "";
-        $attachedFileNames = [];
-
-        foreach ($attachments as $attachment) {
-            // Only process active attachments
-            if (empty($attachment["Active"]) || $attachment["Active"] != 1) {
-                continue;
-            }
-
-            $fileUrl = Gdn_Upload::url($attachment["Path"]);
-            $inbody = str_contains($body, $fileUrl);
-
-            // Check for protocol-relative versions of the URL
-            if (!$inbody) {
-                $urlParts = parse_url($fileUrl);
-                $protocolRelativeUrl =
-                    ($urlParts["host"] ?? "") .
-                    ($urlParts["path"] ?? "") .
-                    (isset($urlParts["query"]) ? "?" . $urlParts["query"] : "") .
-                    (isset($urlParts["fragment"]) ? "#" . $urlParts["fragment"] : "");
-                $inbody |= str_contains($body, $protocolRelativeUrl);
-            }
-
-            // Check for URL-encoded versions
-            if (!$inbody) {
-                $encodedUrl = urlencode($fileUrl);
-                $inbody |= str_contains($body, $encodedUrl);
-                $partiallyEncodedUrl = str_replace(["&", " "], ["%26", "%20"], $fileUrl);
-                $inbody |= str_contains($body, $partiallyEncodedUrl);
-            }
-
-            // Check for JSON-escaped versions of the URL
-            if (!$inbody) {
-                $jsonEscapedUrl = str_replace("/", "\/", $fileUrl);
-                $inbody |= str_contains($body, $jsonEscapedUrl);
-
-                $protocolRelativeJsonEscaped = str_replace("/", "\/", $protocolRelativeUrl);
-                $inbody |= str_contains($body, $protocolRelativeJsonEscaped);
-            }
-
-            // Check for HTML-encoded versions
-            if (!$inbody) {
-                $htmlEncodedUrl = htmlspecialchars($fileUrl, ENT_QUOTES);
-                $inbody |= str_contains($body, $htmlEncodedUrl);
-            }
-
-            if ($inbody) {
-                continue;
-            }
-
-            // Check if we already have a file with the same name attached
-            $fileName = $attachment["Name"];
-            if (in_array($fileName, $attachedFileNames)) {
-                continue;
-            }
-
-            // Add this filename to our tracking array
-            $attachedFileNames[] = $fileName;
-
-            $attachment = VanillaMediaSchema::normalizeFromDbRecord($attachment);
-            $attachment["embedType"] = "file";
-
-            // Use existing HTML rendering for non-rich formats
-            $file = new FileEmbed($attachment);
-            $result .= $file->renderHtml();
-        }
-
-        return $result;
     }
 }

@@ -730,7 +730,8 @@ class CategoriesApiController extends AbstractApiController
             $offset,
             $sort,
             $orderDirection,
-            $filter
+            $filter,
+            !ModelUtils::isExpandOption("crawl", $expand)
         );
 
         // Filter tree by the category "archived" fields.
@@ -1296,7 +1297,8 @@ class CategoriesApiController extends AbstractApiController
         $offset,
         $order = "",
         $orderDirection = "",
-        bool $filter = true
+        bool $filter = true,
+        bool $joinPostType = true
     ): array {
         $dirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
         $userID = null;
@@ -1343,7 +1345,7 @@ class CategoriesApiController extends AbstractApiController
             CategoryModel::calculate($category);
         }
 
-        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+        if ($joinPostType && PostTypeModel::isPostTypesFeatureEnabled()) {
             CategoryModel::joinPostTypes($categories);
         }
 

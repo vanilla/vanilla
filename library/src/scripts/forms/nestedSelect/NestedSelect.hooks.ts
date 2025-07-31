@@ -74,6 +74,20 @@ export function useNestedOptions(params: {
         });
     }, [data]);
 
+    function findOptionRecursively(options: Select.Option[], value: RecordID) {
+        for (const option of options) {
+            if (option.value === value) {
+                return option;
+            }
+            if (option.children) {
+                const matchingOption = findOptionRecursively(option.children, value);
+                if (matchingOption) {
+                    return matchingOption;
+                }
+            }
+        }
+    }
+
     const optionsState = useMemo<INestedOptionsState>(() => {
         const processedInitialOptions =
             initialOptionsData && optionsLookup?.processOptions
@@ -104,7 +118,8 @@ export function useNestedOptions(params: {
         if (value) {
             if (Array.isArray(value)) {
                 for (const val of value) {
-                    const option = mergedOptions.find((opt) => `${opt.value}` === `${val}`);
+                    const option = findOptionRecursively(mergedOptions, val);
+
                     if (option) {
                         selectedOptions.push(option);
                     }

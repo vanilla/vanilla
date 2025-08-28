@@ -2589,17 +2589,39 @@ class CategoryModel extends Gdn_Model implements
                 $postTypesByCategory[$category["CategoryID"]] ?? [],
                 "postTypeID"
             );
-            $category["allowedPostTypeOptions"] = array_values(
+            $allowedPostTypesOptions = array_values(
                 array_intersect_key(
                     array_column($allowedPostTypes, null, "postTypeID"),
                     array_flip($category["allowedPostTypeIDs"])
                 )
             );
-
+            $category["allowedPostTypeOptions"] = self::normalizeCategoryPostType($allowedPostTypesOptions);
             $category["AllowedDiscussionTypes"] = array_unique(
                 array_intersect($category["allowedPostTypeIDs"], array_values(PostTypeModel::LEGACY_TYPE_MAP))
             );
         }
+    }
+
+    /**
+     * Normalize the postTypes data to be return by the index.
+     *
+     * @param array $postTypes
+     * @return array
+     */
+    private static function normalizeCategoryPostType(array $postTypes): array
+    {
+        $result = [];
+        foreach ($postTypes as $postType) {
+            $result[] = [
+                "postTypeID" => $postType["postTypeID"],
+                "name" => $postType["name"],
+                "parentPostTypeID" => $postType["parentPostTypeID"],
+                "postHelperText" => $postType["postHelperText"],
+                "layoutViewType" => $postType["layoutViewType"],
+            ];
+        }
+
+        return $result;
     }
 
     /**

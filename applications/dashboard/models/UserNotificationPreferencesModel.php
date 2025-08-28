@@ -249,9 +249,6 @@ class UserNotificationPreferencesModel
                 $sender = Gdn::userModel()->currentFragment();
                 $senderSchema = new UserFragmentSchema();
                 $sender = $senderSchema->validate($sender);
-                $totalDigestSubscribers = Gdn::getContainer()
-                    ->get(EmailDigestGenerator::class)
-                    ->getDigestEnabledUsersCount();
                 $digestSubscriptionChangeEvent = new SubscriptionChangeEvent(
                     $action,
                     [
@@ -260,7 +257,6 @@ class UserNotificationPreferencesModel
                             "subscription" =>
                                 ($newDigestPref > 0 ? t("Enabled") : t("Disabled")) . " " . t("Email Digest"),
                             "type" => $action,
-                            "digestSubscribers" => $totalDigestSubscribers,
                         ],
                     ],
                     $sender

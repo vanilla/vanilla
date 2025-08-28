@@ -386,13 +386,13 @@ trait CommunityApiTestTrait
      *
      * @param array $overrides Fields to override on the insert.
      * @param array $extras Extra fields to set directly in the model.
-     *
+     * @param array $options
      * @return array
      * @throws ContainerException
      * @throws NotFoundException
      * @throws ValidationException
      */
-    public function createDiscussion(array $overrides = [], array $extras = []): array
+    public function createDiscussion(array $overrides = [], array $extras = [], array $options = []): array
     {
         $categoryID = $overrides["categoryID"] ?? ($this->lastInsertedCategoryID ?? -1);
 
@@ -416,7 +416,7 @@ trait CommunityApiTestTrait
             $apiUrl .= "/" . strtolower($type);
         }
 
-        $this->lastCommunityResponse = $this->api()->post($apiUrl, $params);
+        $this->lastCommunityResponse = $this->api()->post($apiUrl, $params, options: $options);
         $result = $this->lastCommunityResponse->getBody();
         $this->lastInsertedDiscussionID = $result["discussionID"] ?? null;
         if ($this->lastInsertedDiscussionID === null) {
@@ -512,10 +512,23 @@ trait CommunityApiTestTrait
     }
 
     /**
-     * Give score to a discussion.
+     * Bookmark a discussion as a specific user.
      *
-     * @param int $discussionID
-     * @param int $score
+     * @param int|array $discussionOrDiscussionID The discussion to bookmark
+     * @param array $user The user to bookmark as
+     */
+    public function bookmarkDiscussionWithUser(int|array $discussionOrDiscussionID, array $user): void
+    {
+        $this->runWithUser(function () use ($discussionOrDiscussionID) {
+            $this->bookmarkDiscussion($discussionOrDiscussionID);
+        }, $user);
+    }
+
+    /**
+     * Set a discussion's score.
+     *
+     * @param int $discussionID The discussion to set the score for.
+     * @param int $score The score to set.
      */
     public function setDiscussionScore(int $discussionID, int $score)
     {
@@ -720,6 +733,19 @@ trait CommunityApiTestTrait
         $id = $attachmentModel->save($attachment);
         $savedAttachment = $attachmentModel->getID($id);
         return $savedAttachment;
+    }
+
+    /**
+     * Return the attachments based on a foreignID.
+     *
+     * @param string $foreignID
+     * @return array
+     */
+    public function getAttachment(string $foreignID): array
+    {
+        $attachmentModel = $this->container()->get(AttachmentModel::class);
+        $attachments = $attachmentModel->getWhere(["ForeignID" => $foreignID])->resultArray();
+        return $attachments;
     }
 
     /**

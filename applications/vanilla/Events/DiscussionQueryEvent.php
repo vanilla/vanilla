@@ -14,25 +14,13 @@ use Gdn_SQLDriver;
  */
 class DiscussionQueryEvent
 {
-    protected Gdn_SQLDriver $discussionSQL;
-
     /**
      * Constructor.
      *
-     * @param Gdn_SQLDriver $discussionSQL
+     * @param Gdn_SQLDriver $innerQuery Add extra where's here.
+     * @param Gdn_SQLDriver $outerQuery Add extra join's and selects here.
      */
-    public function __construct(Gdn_SQLDriver &$discussionSQL)
+    public function __construct(public Gdn_SQLDriver &$innerQuery, public Gdn_SQLDriver &$outerQuery)
     {
-        $this->discussionSQL = &$discussionSQL;
-    }
-
-    /**
-     * Get the discussionModel.
-     *
-     * @return Gdn_SQLDriver
-     */
-    public function &getDiscussionSQL(): Gdn_SQLDriver
-    {
-        return $this->discussionSQL;
     }
 }

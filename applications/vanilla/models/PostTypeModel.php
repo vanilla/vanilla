@@ -377,8 +377,6 @@ class PostTypeModel extends FullRecordCacheModel
     /**
      * Create an initial post type if it doesn't exist.
      *
-     * @todo At the moment this method replaces (inserts or updates). Later we will only want to insert if the
-     *   post type does not exist to keep customizations of the base types.
      * @param array $row
      *
      * @return void
@@ -390,9 +388,7 @@ class PostTypeModel extends FullRecordCacheModel
         }
 
         $hasExisting = $this->createSql()->getCount($this->getTable(), ["postTypeID" => $row["postTypeID"]]) > 0;
-        if ($hasExisting) {
-            $this->update($row, ["postTypeID" => $row["postTypeID"]]);
-        } else {
+        if (!$hasExisting) {
             $this->insert($row);
         }
     }

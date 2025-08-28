@@ -43,8 +43,7 @@ final class DiscussionJsonLD extends AbstractJsonLDItem
      */
     public function calculateValue(): Data
     {
-        $structuredData = $this->discussionModel->structuredData((array) $this->discussion);
-        //        $structuredData['@context'] = 'https://schema.org';
+        $structuredData = $this->discussionModel->structuredData($this->discussion);
         $structuredData["@type"] = self::TYPE;
         return new Data($structuredData);
     }

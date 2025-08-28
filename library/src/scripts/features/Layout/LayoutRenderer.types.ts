@@ -4,6 +4,8 @@
  * @license gpl-2.0-only
  */
 
+import { RecordID } from "@vanilla/utils";
+
 export enum LayoutDevice {
     MOBILE = "mobile",
     DESKTOP = "desktop",
@@ -58,4 +60,5 @@ export interface IHydratedLayoutSpec {
     titleBar: IHydratedLayoutWidget;
     contexts?: IHydratedLayoutWidget[];
     redirectTo?: string;
+    layoutID?: RecordID;
 }

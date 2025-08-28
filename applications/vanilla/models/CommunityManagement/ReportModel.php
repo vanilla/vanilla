@@ -320,7 +320,12 @@ class ReportModel extends PipelineModel
             $reportID = $report["reportID"];
             $report["reasons"] = $reasonFragmentsByReportID[$reportID] ?? [];
 
-            $report["noteHtml"] = trim($this->formatService->renderHTML($report["noteBody"], $report["noteFormat"]));
+            if (isset($report["noteBody"])) {
+                $report["noteHtml"] = trim(
+                    $this->formatService->renderHTML($report["noteBody"], $report["noteFormat"])
+                );
+            }
+
             $report["recordHtml"] = trim(
                 $this->formatService->renderHTML($report["recordBody"], $report["recordFormat"])
             );

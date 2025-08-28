@@ -11,6 +11,7 @@ use CategoryModel;
 use PHPUnit\Framework\TestCase;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Formatting\Formats\MarkdownFormat;
+use Vanilla\Web\AbstractJsonLDItem;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
 use VanillaTests\SetupTraitsTrait;
@@ -371,6 +372,27 @@ class DiscussionsControllerTest extends SiteTestCase
                 $assertControllerData($controller);
             }
         );
+    }
+
+    /**
+     * Test that the headline and description are properly set.
+     *
+     * @return void
+     */
+    public function testRichJsonLdDescription(): void
+    {
+        $this->createDiscussion([
+            "name" => __FUNCTION__,
+            "body" => "[{\"type\":\"p\",\"children\":[{\"text\":\"This is SUPER important for SEO!\"}]}]",
+            "format" => "rich2",
+        ]);
+        $response = $this->bessy()->get("/discussion/{$this->lastInsertedDiscussionID}");
+        $jsonLDItems = array_map(function (AbstractJsonLDItem $item) {
+            return $item->calculateValue()->getData();
+        }, $response->Head->getJsonLDItems());
+
+        $this->assertEquals($jsonLDItems[0]["headline"], __FUNCTION__);
+        $this->assertEquals($jsonLDItems[0]["description"], "This is SUPER important for SEO!");
     }
 
     /**

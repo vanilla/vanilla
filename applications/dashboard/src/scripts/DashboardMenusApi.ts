@@ -4,9 +4,10 @@
  * @license gpl-2.0-only
  */
 
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import type { INavigationItemBadge } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export namespace DashboardMenusApi {
     export interface GroupLink {
@@ -21,7 +22,7 @@ export namespace DashboardMenusApi {
     export interface Group {
         name: string;
         id: string;
-        children: GroupLink[];
+        children: GroupLink[] | Group[];
     }
 
     export interface Section {
@@ -31,6 +32,29 @@ export namespace DashboardMenusApi {
         url: string;
         children: Group[];
     }
+}
+
+// Type guards to help distinguish between GroupLink[] and Group[]
+export function isGroupLink(
+    item: DashboardMenusApi.GroupLink | DashboardMenusApi.Group,
+): item is DashboardMenusApi.GroupLink {
+    return "url" in item && "react" in item;
+}
+
+export function isGroup(item: DashboardMenusApi.GroupLink | DashboardMenusApi.Group): item is DashboardMenusApi.Group {
+    return "children" in item && !("url" in item);
+}
+
+export function hasGroupLinkChildren(
+    group: DashboardMenusApi.Group,
+): group is DashboardMenusApi.Group & { children: DashboardMenusApi.GroupLink[] } {
+    return group.children.length === 0 || isGroupLink(group.children[0]);
+}
+
+export function hasGroupChildren(
+    group: DashboardMenusApi.Group,
+): group is DashboardMenusApi.Group & { children: DashboardMenusApi.Group[] } {
+    return group.children.length > 0 && isGroup(group.children[0]);
 }
 
 export class DashboardMenusApi {

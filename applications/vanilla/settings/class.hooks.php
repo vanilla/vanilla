@@ -1459,13 +1459,30 @@ class VanillaHooks extends Gdn_Plugin
         } elseif (strtolower($RecordType) === "comment") {
             $comment = CommentModel::instance()->getID((int) $ID);
             $discussion = DiscussionModel::instance()->getID($comment->DiscussionID);
+        } elseif (strtolower($RecordType) === "activity") {
+            $activity = Gdn::getContainer()
+                ->get(ActivityModel::class)
+                ->getID((int) $ID, DATASET_TYPE_ARRAY);
         }
 
-        if ($discussion) {
+        if ($discussion ?? false) {
             $eventManager = Gdn::eventManager();
             $eventManager->fire("reactionModel_beforeReact", $discussion);
             $category = CategoryModel::categories($discussion->CategoryID);
             $Sender->permission("Vanilla.Discussions.View", true, "Category", $category["PermissionCategoryID"]);
+        }
+
+        if ($activity ?? false) {
+            $activityUserID = $activity["ActivityUserID"];
+            $user = Gdn::getContainer()
+                ->get(UserModel::class)
+                ->getID($activityUserID, DATASET_TYPE_ARRAY);
+            $isPrivate = $user["Attributes"]["Private"] ?? ($user["Private"] ?? 0);
+            if ($isPrivate) {
+                $Sender->permission("personalInfo.view");
+            } else {
+                $Sender->permission("profiles.view");
+            }
         }
 
         $ReactionModel = new ReactionModel();

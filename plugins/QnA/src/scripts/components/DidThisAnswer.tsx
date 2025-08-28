@@ -13,6 +13,7 @@ import { useCurrentUserID } from "@library/features/users/userHooks";
 import DidThisAnswerClasses from "@QnA/components/DidThisAnswer.classes";
 import { usePatchAnswerStatus } from "@QnA/hooks/usePatchAnswerStatus";
 import { useCommentThreadParentContext } from "@vanilla/addon-vanilla/comments/CommentThreadParentContext";
+import { PermissionMode } from "@library/features/users/Permission";
 
 interface IProps {
     comment: IComment;
@@ -28,7 +29,14 @@ export default function DidThisAnswer(props: IProps) {
     const currentUserID = useCurrentUserID();
     const currentUserIsDiscussionAuthor = commentParent.insertUserID === currentUserID;
     const { hasPermission } = usePermissionsContext();
-    const canChangeStatus = currentUserIsDiscussionAuthor || hasPermission("curation.manage");
+    const canChangeStatus =
+        currentUserIsDiscussionAuthor ||
+        hasPermission("curation.manage") ||
+        hasPermission("discussions.edit", {
+            resourceType: "category",
+            resourceID: comment.categoryID,
+            mode: PermissionMode.RESOURCE_IF_JUNCTION,
+        });
 
     const status: QnAStatus | undefined = comment.attributes?.answer?.status;
 

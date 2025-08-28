@@ -293,7 +293,7 @@ class StaleDiscussionTrigger extends TimedAutomationTrigger
         }
         if (!empty($triggerValue["categoryID"])) {
             $categoryIDs = $triggerValue["categoryID"];
-            if ($triggerValue["includeSubcategories"]) {
+            if ($triggerValue["includeSubcategories"] ?? false) {
                 $categoryIDs = $categoryModel->getSearchCategoryIDs(null, null, true, null, $categoryIDs, true);
             }
             $where["CategoryID"] = $categoryIDs;

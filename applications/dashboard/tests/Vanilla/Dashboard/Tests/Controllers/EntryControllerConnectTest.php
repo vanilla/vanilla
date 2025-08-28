@@ -229,6 +229,7 @@ class EntryControllerConnectTest extends SiteTestCase
     public function testAutoConnect(): void
     {
         $this->config->set("Garden.Registration.AutoConnect", true);
+        $this->config->set("Garden.Registration.ConfirmEmail", false); // Make sure the user is confirmed for testing auto connect
 
         $importedUser = $this->insertDummyUser();
         $ssoUser = $this->dummyUser(["Email" => $importedUser["Email"], "UniqueID" => __FUNCTION__]);
@@ -261,6 +262,7 @@ class EntryControllerConnectTest extends SiteTestCase
     public function testAutoConnectWithVerifiedTrue(string $suffix, $verified): void
     {
         $this->config->set("Garden.Registration.AutoConnect", true);
+        $this->config->set("Garden.Registration.ConfirmEmail", false); // Make sure the user is confirmed for testing auto connect
 
         $importedUser = $this->insertDummyUser();
         $ssoUser = $this->dummyUser([
@@ -1455,6 +1457,7 @@ class EntryControllerConnectTest extends SiteTestCase
         });
 
         $this->config->removeFromConfig("Garden.User.ValidationRegexPattern");
+        $this->config->removeFromConfig("Garden.User.ValidationRegex");
 
         //Post back without providing Name Field
         $this->runWithExpectedExceptionMessage(
@@ -1471,6 +1474,107 @@ class EntryControllerConnectTest extends SiteTestCase
             "Usernames must be 3-20 characters and consist of letters, numbers, and underscores."
         );
         $r = $this->entryConnect($newSSOInfo, $body);
+    }
+
+    /**
+     * Test that SSO will not connect to users with unconfirmed emails (regardless of AutoConnect setting).
+     */
+    public function testSSOSkipsUnconfirmedEmails(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", true);
+        $this->config->set("Garden.Registration.ConfirmEmail", true);
+
+        $user = $this->insertDummyUser();
+
+        $ssoUser = $this->dummyUser([
+            "Email" => $user["Email"],
+            "UniqueID" => __FUNCTION__,
+        ]);
+
+        // Our security fix should show an error message
+        try {
+            $this->entryConnect($ssoUser);
+            $this->fail("Expected security exception was not thrown");
+        } catch (\Garden\Web\Exception\ResponseException $ex) {
+            // Security check worked - exception was thrown
+            $this->assertTrue(true, "Security check properly blocked unconfirmed email connection");
+        }
+    }
+
+    /**
+     * Test that AutoConnect still works normally with confirmed emails.
+     * This ensures our security fix doesn't break legitimate AutoConnect functionality.
+     */
+    public function testAutoConnectWorksWithConfirmedEmails(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", true);
+        $this->config->set("Garden.Registration.ConfirmEmail", false);
+
+        $confirmedUser = $this->insertDummyUser();
+
+        $ssoUser = $this->dummyUser([
+            "Email" => $confirmedUser["Email"],
+            "UniqueID" => __FUNCTION__,
+        ]);
+
+        $r = $this->entryConnect($ssoUser);
+        $this->bessy()->assertNoFormErrors();
+
+        $this->assertTrue($this->session->isValid(), "User should be auto-signed in");
+        $this->assertEquals($confirmedUser["UserID"], $this->session->UserID);
+
+        // Verify SSO authentication was created
+        $dbUser = $this->assertSSOUser($ssoUser);
+        $this->assertEquals($confirmedUser["UserID"], $dbUser["UserID"]);
+    }
+
+    /**
+     * Test that SSO blocks unconfirmed emails even when AutoConnect is disabled.
+     * This verifies our security fix works regardless of AutoConnect settings.
+     */
+    public function testSSOSkipsUnconfirmedEmailsWithAutoConnectDisabled(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", false);
+        $this->config->set("Garden.Registration.ConfirmEmail", true);
+
+        $user = $this->insertDummyUser();
+
+        $ssoUser = $this->dummyUser([
+            "Email" => $user["Email"],
+            "UniqueID" => __FUNCTION__,
+        ]);
+
+        // Our security fix should show an error message
+        try {
+            $this->entryConnect($ssoUser);
+            $this->fail("Expected security exception was not thrown");
+        } catch (\Garden\Web\Exception\ResponseException $ex) {
+            $this->assertTrue(true, "Security check properly blocked unconfirmed email connection");
+        }
+    }
+
+    /**
+     * Test that when email confirmation is disabled, SSO works normally even with unconfirmed users.
+     */
+    public function testSSOWorksWhenEmailConfirmationDisabled(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", true);
+        $this->config->set("Garden.Registration.ConfirmEmail", false);
+
+        $user = $this->insertDummyUser();
+
+        $ssoUser = $this->dummyUser([
+            "Email" => $user["Email"],
+            "UniqueID" => __FUNCTION__,
+        ]);
+
+        // Attempt SSO connection
+        $r = $this->entryConnect($ssoUser);
+
+        $this->assertTrue($this->session->isValid(), "User should be signed in when email confirmation is disabled");
+
+        // Should have no errors
+        $this->bessy()->assertNoFormErrors();
     }
 
     /**
@@ -1515,5 +1619,6 @@ class EntryControllerConnectTest extends SiteTestCase
 
         return $profileMetaData;
     }
+
     //endregion
 }

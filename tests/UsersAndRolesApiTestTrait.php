@@ -139,7 +139,7 @@ trait UsersAndRolesApiTestTrait
     }
 
     /**
-     * Create an user through the API.
+     * Create a user through the API.
      *
      * @param array $overrides
      * @param array $extras Extra fields to set directly through the model.
@@ -164,7 +164,7 @@ trait UsersAndRolesApiTestTrait
             "email" => "test-$salt@test.com",
             "emailConfirmed" => true,
             "sendWelcomeEmail" => false,
-            "name" => "user-$salt",
+            "name" => "user_$salt",
             "password" => "testpassword",
             "photo" => null,
             "roleID" => [\RoleModel::MEMBER_ID],
@@ -201,6 +201,22 @@ trait UsersAndRolesApiTestTrait
     {
         $overrides = array_merge_recursive($overrides, [
             "roleID" => [\RoleModel::MOD_ID],
+        ]);
+        return $this->createUser($overrides, $extras);
+    }
+
+    /**
+     * Create a user with a role giving the curation.manage permission.
+     *
+     * @param array $overrides
+     * @param array $extras
+     * @return array
+     */
+    protected function createCurator(array $overrides = [], array $extras = []): array
+    {
+        $curatorRole = $this->createRole([], ["curation.manage" => true]);
+        $overrides = array_merge_recursive($overrides, [
+            "roleID" => [\RoleModel::MEMBER_ID, $curatorRole["roleID"]],
         ]);
         return $this->createUser($overrides, $extras);
     }
@@ -408,7 +424,7 @@ trait UsersAndRolesApiTestTrait
      */
     private function generateSalt(): string
     {
-        return VanillaTestCase::makeRandomKey("-");
+        return VanillaTestCase::makeRandomKey();
     }
 
     /**

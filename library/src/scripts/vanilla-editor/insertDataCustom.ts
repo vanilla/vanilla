@@ -107,7 +107,20 @@ export default function insertDataCustom(editor: MyEditor, data: DataTransfer) {
 
         // if the nodes are not in a block element, then place them in the default one
         if (!isBlock(editor, nodes[0])) {
-            nodes = [{ type: ELEMENT_DEFAULT, children: nodes }] as MyNode[];
+            nodes = [
+                {
+                    type: ELEMENT_DEFAULT,
+                    children:
+                        // If the user has pasted an empty string, we need to include an empty text node here to prevent slate bugs
+                        nodes.length > 0
+                            ? nodes
+                            : [
+                                  {
+                                      text: "",
+                                  },
+                              ],
+                },
+            ] as MyNode[];
         }
 
         // check the text of nodes that are not mention elements to see if there might be a mention

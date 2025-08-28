@@ -13,6 +13,7 @@ use Garden\Container\NotFoundException;
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\StaticCacheConfigTrait;
 use Garden\Utils\ContextException;
 use Garden\Web\Exception\ForbiddenException;
@@ -7287,6 +7288,8 @@ SQL;
             "/api/v2/users?sort=-userID&expand=crawl,profileFields",
             "userID"
         );
+        // A higher limit is allowed for users.
+        $r["maxLimit"] = 1000;
         return $r;
     }
 

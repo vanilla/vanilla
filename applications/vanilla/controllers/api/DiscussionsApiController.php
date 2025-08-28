@@ -17,6 +17,7 @@ use Garden\Web\Exception\ServerException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\ApiUtils;
+use Vanilla\Community\Events\BeforeDiscussionViewEvent;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\InterestModel;
@@ -1298,15 +1299,14 @@ class DiscussionsApiController extends AbstractApiController implements LoggerAw
             $query["sort"] ?? "-DateLastComment"
         );
 
+        $extraInnerSelects = [];
         if ($orderField === DiscussionModel::SORT_EXPIRIMENTAL_TRENDING) {
             // Validation requires that we must have a slotType.
-            $selects = array_merge(
-                $selects,
-                ModelUtils::getTrendingSelects(
-                    dateField: "d.DateInserted",
-                    scoreCalculation: "COALESCE(d.Score, 0) + COALESCE(d.CountComments, 0) * 2 + COALESCE(d.CountViews, 0) / 10",
-                    slotType: $slotType
-                )
+            $selects[] = ModelUtils::SORT_TRENDING;
+            $extraInnerSelects = ModelUtils::getTrendingSelects(
+                dateField: "d.DateInserted",
+                scoreCalculation: "COALESCE(d.Score, 0) + COALESCE(d.CountComments, 0) * 2 + COALESCE(d.CountViews, 0) / 10",
+                slotType: $slotType
             );
         }
         $this->discussionModel->SQL->reset();
@@ -1370,11 +1370,23 @@ class DiscussionsApiController extends AbstractApiController implements LoggerAw
                         false,
                         null,
                         null,
-                        $selects
+                        $selects,
+                        $extraInnerSelects
                     )
                     ->resultArray();
                 $discussions = $this->discussionModel
-                    ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false, null, null, $selects)
+                    ->getWhere(
+                        $where,
+                        $orderField,
+                        $orderDirection,
+                        $limit,
+                        $offset,
+                        false,
+                        null,
+                        null,
+                        $selects,
+                        $extraInnerSelects
+                    )
                     ->resultArray();
                 $rows = array_merge($announcements, $discussions);
                 if ($shouldCount) {
@@ -1383,7 +1395,18 @@ class DiscussionsApiController extends AbstractApiController implements LoggerAw
                 }
             } else {
                 $rows = $this->discussionModel
-                    ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false, null, null, $selects)
+                    ->getWhere(
+                        $where,
+                        $orderField,
+                        $orderDirection,
+                        $limit,
+                        $offset,
+                        false,
+                        null,
+                        null,
+                        $selects,
+                        $extraInnerSelects
+                    )
                     ->resultArray();
                 if ($shouldCount) {
                     $count = $this->discussionModel->getPagingCount($where);
@@ -1793,7 +1816,9 @@ class DiscussionsApiController extends AbstractApiController implements LoggerAw
         $discussionData = ApiUtils::convertInputKeys($body, ["postTypeID", "postMeta"]);
         $id = $this->discussionModel->save($discussionData, $settings);
 
-        if ($id && isset($tags)) {
+        // When a post contains a pre-moderated keyword the DiscussionModel→save() method returns the constant UNAPPROVED (a string) instead of an integer ID.
+        // Only save tags when an actual discussionID was returned. Prevents type errors on pre-mod.
+        if ($id && is_int($id) && isset($tags)) {
             $this->saveDiscussionTags($id, $tags);
         }
 
@@ -2327,6 +2352,14 @@ class DiscussionsApiController extends AbstractApiController implements LoggerAw
         }
     }
 
+    /**
+     * Add the discussion tags.
+     *
+     * @param int $id
+     * @param array $tags
+     * @param bool|null $throw
+     * @return void
+     */
     public function saveDiscussionTags(int $id, array $tags, ?bool $throw = false): void
     {
         try {
@@ -2431,6 +2464,8 @@ class DiscussionsApiController extends AbstractApiController implements LoggerAw
         );
 
         $discussion = $this->discussionByID($id);
+
+        $this->getEventManager()->dispatch(new BeforeDiscussionViewEvent($discussion));
         $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $discussion["CategoryID"]);
 
         $query = $in->validate($query);

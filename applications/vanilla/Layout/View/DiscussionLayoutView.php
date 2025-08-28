@@ -70,7 +70,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
         return Schema::parse([
             "discussionID:i",
             "commentID:i?",
-            "page:i" => ["default" => 1],
+            "page:i|s" => ["default" => 1],
             "sort:s?" => [
                 "enum" => ["-dateInserted", "dateInserted", "-score", "-" . ModelUtils::SORT_TRENDING, ""],
             ],
@@ -93,6 +93,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
         // Filter to only user tags.
 
         $discussionData = $discussion->getData();
+        $discussionData["format"] = "html";
 
         // Ensure we're in a valid site section, otherwise this will perform a redirect.
         $canonicalUrl = isset($paramInput["page"])

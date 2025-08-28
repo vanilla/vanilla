@@ -58,7 +58,7 @@ class AiSuggestionModel extends PipelineModel
             ->column("commentID", "int", true, "commentID")
             ->column("title", "varchar(255)")
             ->column("summary", "mediumtext")
-            ->column("url", "varchar(255)")
+            ->column("url", "text")
             ->column("type", "varchar(55)")
             ->column("format", "varchar(55)")
             ->column("documentID", "varchar(55)", true)

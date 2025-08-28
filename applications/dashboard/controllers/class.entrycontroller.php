@@ -718,6 +718,28 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             $submittedEmail = $this->Form->getFormValue("Email");
             $canMatchEmail = strlen($submittedEmail) > 0 && !UserModel::noEmail();
 
+            // This prevents account takeover regardless of AutoConnect settings
+            // Only enforce when email confirmation is required by configuration
+            if ($submittedEmail && count($existingUsers) > 0 && c("Garden.Registration.ConfirmEmail", false)) {
+                foreach ($existingUsers as $row) {
+                    if (strcasecmp($submittedEmail, $row["Email"]) === 0 && !$row["Confirmed"]) {
+                        $this->logger->error("SSO blocked - attempted connection to unconfirmed email account", [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_TAGS => ["entry", "connect", "security"],
+                            "SSO_Email" => $submittedEmail,
+                            "TargetUserID" => $row["UserID"],
+                            "Provider" => $this->Form->getFormValue("Provider"),
+                        ]);
+
+                        // Redirect to sign-in page with error message as URL parameter
+                        $errorMessage =
+                            "Account connection via SSO requires email verification. Please verify your email first.";
+                        redirectTo("/entry/signin?error=" . urlencode($errorMessage));
+                        return;
+                    }
+                }
+            }
+
             // Check to automatically link the user.
             if (
                 !$userProvidedEmail &&
@@ -1497,6 +1519,12 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         $this->setData("Title", t("Sign In"));
         // Add open graph description in case a restricted page is shared.
         $this->description(Gdn::config("Garden.Description"));
+
+        // Check for error message from SSO security check
+        $errorMessage = $this->Request->get("error");
+        if ($errorMessage) {
+            $this->Form->addError(urldecode($errorMessage));
+        }
 
         $this->Form->addHidden("Target", $this->target());
         $this->Form->addHidden("ClientHour", date("Y-m-d H:00")); // Use the server's current hour as a default.
